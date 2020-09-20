@@ -51,6 +51,7 @@
         "vars": "local",
         "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|scroll_timeout|transmission"
       }],
+      "object-shorthand": ["error", "always"],
       "prefer-const": "error",
       "prefer-template": "error",
       "semi": ["error", "always"]

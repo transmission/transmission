@@ -13,7 +13,7 @@ Dialog.prototype = {
   /*
    * Constructor
    */
-  initialize: function () {
+  initialize () {
     /*
      * Private Interface Variables
      */
@@ -47,27 +47,27 @@ Dialog.prototype = {
    *
    *--------------------------------------------*/
 
-  executeCallback: function () {
+  executeCallback () {
     this._callback();
     dialog.hideDialog();
   },
 
-  hideDialog: function () {
+  hideDialog () {
     $('body.dialog_showing').removeClass('dialog_showing');
     this._container.hide();
     transmission.hideMobileAddressbar();
     transmission.updateButtonStates();
   },
 
-  isVisible: function () {
+  isVisible () {
     return this._container.is(':visible');
   },
 
-  onCancelClicked: function (event) {
+  onCancelClicked (event) {
     event.data.dialog.hideDialog();
   },
 
-  onConfirmClicked: function (event) {
+  onConfirmClicked (event) {
     event.data.dialog.executeCallback();
   },
 
@@ -80,7 +80,7 @@ Dialog.prototype = {
   /*
    * Display a confirm dialog
    */
-  confirm: function (
+  confirm (
     dialog_heading,
     dialog_message,
     confirm_button_label,
@@ -107,7 +107,7 @@ Dialog.prototype = {
   /*
    * Display an alert dialog
    */
-  alert: function (dialog_heading, dialog_message, cancel_button_label) {
+  alert (dialog_heading, dialog_message, cancel_button_label) {
     if (!isMobileDevice) {
       $('.dialog_container').hide();
     }

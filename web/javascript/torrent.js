@@ -109,18 +109,18 @@ Torrent.Fields.StatsExtra = [
  ***/
 
 Torrent.prototype = {
-  initialize: function (data) {
+  initialize (data) {
     this.fields = {};
     this.fieldObservers = {};
     this.refresh(data);
   },
 
-  notifyOnFieldChange: function (field, callback) {
+  notifyOnFieldChange (field, callback) {
     this.fieldObservers[field] = this.fieldObservers[field] || [];
     this.fieldObservers[field].push(callback);
   },
 
-  setField: function (o, name, value) {
+  setField (o, name, value) {
     let i, observer;
 
     if (o[name] === value) {
@@ -136,7 +136,7 @@ Torrent.prototype = {
   },
 
   // fields.files is an array of unions of RPC's "files" and "fileStats" objects.
-  updateFiles: function (files) {
+  updateFiles (files) {
     let changed = false;
     const myfiles = this.fields.files || [];
     const keys = ['length', 'name', 'bytesCompleted', 'wanted', 'priority'];
@@ -155,11 +155,11 @@ Torrent.prototype = {
     return changed;
   },
 
-  collateTrackers: function (trackers) {
+  collateTrackers (trackers) {
     return trackers.map((t) => t.announce.toLowerCase()).join('\t');
   },
 
-  refreshFields: function (data) {
+  refreshFields (data) {
     let key;
     let changed = false;
 
@@ -185,7 +185,7 @@ Torrent.prototype = {
     return changed;
   },
 
-  refresh: function (data) {
+  refresh (data) {
     if (this.refreshFields(data)) {
       $(this).trigger('dataChanged', this);
     }
@@ -196,177 +196,177 @@ Torrent.prototype = {
    ****/
 
   // simple accessors
-  getComment: function () {
+  getComment () {
     return this.fields.comment;
   },
-  getCreator: function () {
+  getCreator () {
     return this.fields.creator;
   },
-  getDateAdded: function () {
+  getDateAdded () {
     return this.fields.addedDate;
   },
-  getDateCreated: function () {
+  getDateCreated () {
     return this.fields.dateCreated;
   },
-  getDesiredAvailable: function () {
+  getDesiredAvailable () {
     return this.fields.desiredAvailable;
   },
-  getDownloadDir: function () {
+  getDownloadDir () {
     return this.fields.downloadDir;
   },
-  getDownloadSpeed: function () {
+  getDownloadSpeed () {
     return this.fields.rateDownload;
   },
-  getDownloadedEver: function () {
+  getDownloadedEver () {
     return this.fields.downloadedEver;
   },
-  getError: function () {
+  getError () {
     return this.fields.error;
   },
-  getErrorString: function () {
+  getErrorString () {
     return this.fields.errorString;
   },
-  getETA: function () {
+  getETA () {
     return this.fields.eta;
   },
-  getFailedEver: function () {
+  getFailedEver () {
     return this.fields.corruptEver;
   },
-  getFile: function (i) {
+  getFile (i) {
     return this.fields.files[i];
   },
-  getFileCount: function () {
+  getFileCount () {
     return this.fields.files ? this.fields.files.length : 0;
   },
-  getHashString: function () {
+  getHashString () {
     return this.fields.hashString;
   },
-  getHave: function () {
+  getHave () {
     return this.getHaveValid() + this.getHaveUnchecked();
   },
-  getHaveUnchecked: function () {
+  getHaveUnchecked () {
     return this.fields.haveUnchecked;
   },
-  getHaveValid: function () {
+  getHaveValid () {
     return this.fields.haveValid;
   },
-  getId: function () {
+  getId () {
     return this.fields.id;
   },
-  getLastActivity: function () {
+  getLastActivity () {
     return this.fields.activityDate;
   },
-  getLeftUntilDone: function () {
+  getLeftUntilDone () {
     return this.fields.leftUntilDone;
   },
-  getMetadataPercentComplete: function () {
+  getMetadataPercentComplete () {
     return this.fields.metadataPercentComplete;
   },
-  getName: function () {
+  getName () {
     return this.fields.name || 'Unknown';
   },
-  getPeers: function () {
+  getPeers () {
     return this.fields.peers;
   },
-  getPeersConnected: function () {
+  getPeersConnected () {
     return this.fields.peersConnected;
   },
-  getPeersGettingFromUs: function () {
+  getPeersGettingFromUs () {
     return this.fields.peersGettingFromUs;
   },
-  getPeersSendingToUs: function () {
+  getPeersSendingToUs () {
     return this.fields.peersSendingToUs;
   },
-  getPieceCount: function () {
+  getPieceCount () {
     return this.fields.pieceCount;
   },
-  getPieceSize: function () {
+  getPieceSize () {
     return this.fields.pieceSize;
   },
-  getPrivateFlag: function () {
+  getPrivateFlag () {
     return this.fields.isPrivate;
   },
-  getQueuePosition: function () {
+  getQueuePosition () {
     return this.fields.queuePosition;
   },
-  getRecheckProgress: function () {
+  getRecheckProgress () {
     return this.fields.recheckProgress;
   },
-  getSeedRatioLimit: function () {
+  getSeedRatioLimit () {
     return this.fields.seedRatioLimit;
   },
-  getSeedRatioMode: function () {
+  getSeedRatioMode () {
     return this.fields.seedRatioMode;
   },
-  getSizeWhenDone: function () {
+  getSizeWhenDone () {
     return this.fields.sizeWhenDone;
   },
-  getStartDate: function () {
+  getStartDate () {
     return this.fields.startDate;
   },
-  getStatus: function () {
+  getStatus () {
     return this.fields.status;
   },
-  getTotalSize: function () {
+  getTotalSize () {
     return this.fields.totalSize;
   },
-  getTrackers: function () {
+  getTrackers () {
     return this.fields.trackers;
   },
-  getUploadSpeed: function () {
+  getUploadSpeed () {
     return this.fields.rateUpload;
   },
-  getUploadRatio: function () {
+  getUploadRatio () {
     return this.fields.uploadRatio;
   },
-  getUploadedEver: function () {
+  getUploadedEver () {
     return this.fields.uploadedEver;
   },
-  getWebseedsSendingToUs: function () {
+  getWebseedsSendingToUs () {
     return this.fields.webseedsSendingToUs;
   },
-  isFinished: function () {
+  isFinished () {
     return this.fields.isFinished;
   },
 
   // derived accessors
-  hasExtraInfo: function () {
+  hasExtraInfo () {
     return 'hashString' in this.fields;
   },
-  isSeeding: function () {
+  isSeeding () {
     return this.getStatus() === Torrent._StatusSeed;
   },
-  isStopped: function () {
+  isStopped () {
     return this.getStatus() === Torrent._StatusStopped;
   },
-  isChecking: function () {
+  isChecking () {
     return this.getStatus() === Torrent._StatusCheck;
   },
-  isDownloading: function () {
+  isDownloading () {
     return this.getStatus() === Torrent._StatusDownload;
   },
-  isQueued: function () {
+  isQueued () {
     return (
       this.getStatus() === Torrent._StatusDownloadWait ||
       this.getStatus() === Torrent._StatusSeedWait
     );
   },
-  isDone: function () {
+  isDone () {
     return this.getLeftUntilDone() < 1;
   },
-  needsMetaData: function () {
+  needsMetaData () {
     return this.getMetadataPercentComplete() < 1;
   },
-  getActivity: function () {
+  getActivity () {
     return this.getDownloadSpeed() + this.getUploadSpeed();
   },
-  getPercentDoneStr: function () {
+  getPercentDoneStr () {
     return Transmission.fmt.percentString(100 * this.getPercentDone());
   },
-  getPercentDone: function () {
+  getPercentDone () {
     return this.fields.percentDone;
   },
-  getStateString: function () {
+  getStateString () {
     switch (this.getStatus()) {
       case Torrent._StatusStopped:
         return this.isFinished() ? 'Seeding complete' : 'Paused';
@@ -389,7 +389,7 @@ Torrent.prototype = {
         return 'Error';
     }
   },
-  seedRatioLimit: function (controller) {
+  seedRatioLimit (controller) {
     switch (this.getSeedRatioMode()) {
       case Torrent._RatioUseGlobal:
         return controller.seedRatioLimit();
@@ -399,27 +399,27 @@ Torrent.prototype = {
         return -1;
     }
   },
-  getErrorMessage: function () {
+  getErrorMessage () {
     const str = this.getErrorString();
     switch (this.getError()) {
       case Torrent._ErrTrackerWarning:
-        return `Tracker returned a warning: ${  str}`;
+        return `Tracker returned a warning: ${str}`;
       case Torrent._ErrTrackerError:
-        return `Tracker returned an error: ${  str}`;
+        return `Tracker returned an error: ${str}`;
       case Torrent._ErrLocalError:
-        return `Error: ${  str}`;
+        return `Error: ${str}`;
       default:
         return null;
     }
   },
-  getCollatedName: function () {
+  getCollatedName () {
     const f = this.fields;
     if (!f.collatedName && f.name) {
       f.collatedName = f.name.toLowerCase();
     }
     return f.collatedName || '';
   },
-  getCollatedTrackers: function () {
+  getCollatedTrackers () {
     const f = this.fields;
     if (!f.collatedTrackers && f.trackers) {
       f.collatedTrackers = this.collateTrackers(f.trackers);
@@ -431,7 +431,7 @@ Torrent.prototype = {
    *****
    ****/
 
-  testState: function (state) {
+  testState (state) {
     const s = this.getStatus();
 
     switch (state) {
@@ -460,7 +460,7 @@ Torrent.prototype = {
    * @param search substring to look for, or null
    * @return true if it passes the test, false if it fails
    */
-  test: function (state, search, tracker) {
+  test (state, search, tracker) {
     // flter by state...
     let pass = this.testState(state);
 

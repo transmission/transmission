@@ -54,14 +54,14 @@ TorrentRendererHelper.createProgressbar = function (classes) {
   incomplete.className = 'torrent_progress_bar incomplete';
 
   const progressbar = document.createElement('div');
-  progressbar.className = `torrent_progress_bar_container ${  classes}`;
+  progressbar.className = `torrent_progress_bar_container ${classes}`;
   progressbar.appendChild(complete);
   progressbar.appendChild(incomplete);
 
   return {
     element: progressbar,
-    complete: complete,
-    incomplete: incomplete,
+    complete,
+    incomplete,
   };
 };
 
@@ -72,12 +72,12 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
   // update the complete progressbar
   e = progressbar.complete;
   const style = e.style;
-  const width = `${  info.percent  }%`;
+  const width = `${info.percent}%`;
   display = info.percent > 0 ? 'block' : 'none';
   if (style.width !== width || style.display !== display) {
     $(e).css({
-      width: `${  info.percent  }%`,
-      display: display,
+      width: `${info.percent}%`,
+      display,
     });
   }
 
@@ -99,11 +99,11 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
 };
 
 TorrentRendererHelper.formatUL = function (t) {
-  return `▲${  Transmission.fmt.speedBps(t.getUploadSpeed())}`;
+  return `▲${Transmission.fmt.speedBps(t.getUploadSpeed())}`;
 };
 
 TorrentRendererHelper.formatDL = function (t) {
-  return `▼${  Transmission.fmt.speedBps(t.getDownloadSpeed())}`;
+  return `▼${Transmission.fmt.speedBps(t.getDownloadSpeed())}`;
 };
 
 TorrentRendererHelper.formatETA = function (t) {
@@ -111,7 +111,7 @@ TorrentRendererHelper.formatETA = function (t) {
   if (eta < 0 || eta >= 999 * 60 * 60) {
     return '';
   }
-  return `ETA: ${  Transmission.fmt.timeInterval(eta)}`;
+  return `ETA: ${Transmission.fmt.timeInterval(eta)}`;
 };
 
 /****
@@ -121,7 +121,7 @@ TorrentRendererHelper.formatETA = function (t) {
 
 function TorrentRendererFull() {}
 TorrentRendererFull.prototype = {
-  createRow: function () {
+  createRow () {
     const root = document.createElement('li');
     root.className = 'torrent';
 
@@ -156,7 +156,7 @@ TorrentRendererFull.prototype = {
     return root;
   },
 
-  getPeerDetails: function (t) {
+  getPeerDetails (t) {
     let err, peer_count, webseed_count;
     const fmt = Transmission.fmt;
 
@@ -226,7 +226,7 @@ TorrentRendererFull.prototype = {
     return t.getStateString();
   },
 
-  getProgressDetails: function (controller, t) {
+  getProgressDetails (controller, t) {
     if (t.needsMetaData()) {
       let MetaDataStatus = 'retrieving';
       if (t.isStopped()) {
@@ -234,7 +234,7 @@ TorrentRendererFull.prototype = {
       }
       const percent = 100 * t.getMetadataPercentComplete();
       return [
-        `Magnetized transfer - ${  MetaDataStatus  } metadata (`,
+        `Magnetized transfer - ${MetaDataStatus} metadata (`,
         Transmission.fmt.percentString(percent),
         '%)',
       ].join('');
@@ -294,7 +294,7 @@ TorrentRendererFull.prototype = {
     return c.join('');
   },
 
-  render: function (controller, t, root) {
+  render (controller, t, root) {
     // name
     setTextContent(root._name_container, t.getName());
 
@@ -326,7 +326,7 @@ TorrentRendererFull.prototype = {
 
 function TorrentRendererCompact() {}
 TorrentRendererCompact.prototype = {
-  createRow: function () {
+  createRow () {
     const progressbar = TorrentRendererHelper.createProgressbar('compact');
 
     const details = document.createElement('div');
@@ -346,7 +346,7 @@ TorrentRendererCompact.prototype = {
     return root;
   },
 
-  getPeerDetails: function (t) {
+  getPeerDetails (t) {
     let c;
     if ((c = t.getErrorMessage())) {
       return c;
@@ -360,7 +360,7 @@ TorrentRendererCompact.prototype = {
       }
       let s = '';
       if (!isMobileDevice) {
-        s = `${TorrentRendererHelper.formatETA(t)  } `;
+        s = `${TorrentRendererHelper.formatETA(t)} `;
       }
       if (have_dn) {
         s += TorrentRendererHelper.formatDL(t);
@@ -384,7 +384,7 @@ TorrentRendererCompact.prototype = {
     return t.getStateString();
   },
 
-  render: function (controller, t, root) {
+  render (controller, t, root) {
     // name
     const is_stopped = t.isStopped();
     let e = root._name_container;
@@ -411,7 +411,7 @@ function TorrentRow(view, controller, torrent) {
   this.initialize(view, controller, torrent);
 }
 TorrentRow.prototype = {
-  initialize: function (view, controller, torrent) {
+  initialize (view, controller, torrent) {
     const row = this;
     this._view = view;
     this._torrent = torrent;
@@ -421,23 +421,23 @@ TorrentRow.prototype = {
       row.render(controller);
     });
   },
-  getElement: function () {
+  getElement () {
     return this._element;
   },
-  render: function (controller) {
+  render (controller) {
     const tor = this.getTorrent();
     if (tor) {
       this._view.render(controller, tor, this.getElement());
     }
   },
-  isSelected: function () {
+  isSelected () {
     return this.getElement().className.indexOf('selected') !== -1;
   },
 
-  getTorrent: function () {
+  getTorrent () {
     return this._torrent;
   },
-  getTorrentId: function () {
+  getTorrentId () {
     return this.getTorrent().getId();
   },
 };

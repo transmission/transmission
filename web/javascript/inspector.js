@@ -41,7 +41,7 @@ function Inspector(controller) {
       $(tab).addClass('selected').siblings().removeClass('selected');
 
       // show this tab and hide the others
-      $(`#${  tab.id.replace('tab', 'page')}`)
+      $(`#${tab.id.replace('tab', 'page')}`)
         .show()
         .siblings('.inspector-page')
         .hide();
@@ -59,7 +59,7 @@ function Inspector(controller) {
       } else if (torrents.length === 1) {
         name = torrents[0].getName();
       } else {
-        name = `${  torrents.length  } Transfers Selected`;
+        name = `${torrents.length} Transfers Selected`;
       }
       setTextContent(e.name_lb, name || 'Not Applicable');
 
@@ -172,19 +172,13 @@ function Inspector(controller) {
         str = fmt.percentString(d);
 
         if (!haveUnverified && !leftUntilDone) {
-          str = `${fmt.size(haveVerified)  } (100%)`;
+          str = `${fmt.size(haveVerified)} (100%)`;
         } else if (!haveUnverified) {
-          str = `${fmt.size(haveVerified)  } of ${  fmt.size(sizeWhenDone)  } (${  str  }%)`;
+          str = `${fmt.size(haveVerified)} of ${fmt.size(sizeWhenDone)} (${str}%)`;
         } else {
-          str =
-            `${fmt.size(haveVerified) 
-            } of ${ 
-            fmt.size(sizeWhenDone) 
-            } (${ 
-            str 
-            }%), ${ 
-            fmt.size(haveUnverified) 
-            } Unverified`;
+          str = `${fmt.size(haveVerified)} of ${fmt.size(sizeWhenDone)} (${str}%), ${fmt.size(
+            haveUnverified
+          )} Unverified`;
         }
       }
       setTextContent(e.have_lb, str);
@@ -198,7 +192,7 @@ function Inspector(controller) {
       } else if (sizeWhenDone == 0) {
         str = none;
       } else {
-        str = `${  fmt.percentString((100.0 * available) / sizeWhenDone)  }%`;
+        str = `${fmt.percentString((100.0 * available) / sizeWhenDone)}%`;
       }
       setTextContent(e.availability_lb, str);
 
@@ -215,7 +209,7 @@ function Inspector(controller) {
           f += t.getFailedEver();
         }
         if (f) {
-          str = `${fmt.size(d)  } (${  fmt.size(f)  } corrupt)`;
+          str = `${fmt.size(d)} (${fmt.size(f)} corrupt)`;
         } else {
           str = fmt.size(d);
         }
@@ -243,7 +237,7 @@ function Inspector(controller) {
             u += t.getUploadedEver();
           }
         }
-        str = `${fmt.size(u)  } (Ratio: ${  fmt.ratioString(Math.ratio(u, d))  })`;
+        str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Math.ratio(u, d))})`;
       }
       setTextContent(e.uploaded_lb, str);
 
@@ -320,7 +314,7 @@ function Inspector(controller) {
         } else if (d < 5) {
           str = 'Active now';
         } else {
-          str = `${fmt.timeInterval(d)  } ago`;
+          str = `${fmt.timeInterval(d)} ago`;
         }
       }
       setTextContent(e.last_activity_lb, str);
@@ -364,15 +358,9 @@ function Inspector(controller) {
         if (!size) {
           str = none;
         } else if (pieceSize > 0) {
-          str =
-            `${fmt.size(size) 
-            } (${ 
-            pieces.toStringWithCommas() 
-            } pieces @ ${ 
-            fmt.mem(pieceSize) 
-            })`;
+          str = `${fmt.size(size)} (${pieces.toStringWithCommas()} pieces @ ${fmt.mem(pieceSize)})`;
         } else {
-          str = `${fmt.size(size)  } (${  pieces.toStringWithCommas()  } pieces)`;
+          str = `${fmt.size(size)} (${pieces.toStringWithCommas()} pieces)`;
         }
       }
       setTextContent(e.size_lb, str);
@@ -432,7 +420,7 @@ function Inspector(controller) {
       }
       if (str.startsWith('https://') || str.startsWith('http://')) {
         str = encodeURI(str);
-        setInnerHTML(e.comment_lb, `<a href="${  str  }" target="_blank" >${  str  }</a>`);
+        setInnerHTML(e.comment_lb, `<a href="${str}" target="_blank" >${str}</a>`);
       } else {
         setTextContent(e.comment_lb, str);
       }
@@ -463,11 +451,11 @@ function Inspector(controller) {
         } else if (empty_creator && empty_date) {
           str = unknown;
         } else if (empty_date && !empty_creator) {
-          str = `Created by ${  creator}`;
+          str = `Created by ${creator}`;
         } else if (empty_creator && !empty_date) {
-          str = `Created on ${  new Date(date * 1000).toDateString()}`;
+          str = `Created on ${new Date(date * 1000).toDateString()}`;
         } else {
-          str = `Created by ${  creator  } on ${  new Date(date * 1000).toDateString()}`;
+          str = `Created by ${creator} on ${new Date(date * 1000).toDateString()}`;
         }
       }
       setTextContent(e.origin_lb, str);
@@ -706,7 +694,7 @@ function Inspector(controller) {
           if (timeUntilAnnounce < 0) {
             timeUntilAnnounce = 0;
           }
-          s = `Next announce in ${  Transmission.fmt.timeInterval(timeUntilAnnounce)}`;
+          s = `Next announce in ${Transmission.fmt.timeInterval(timeUntilAnnounce)}`;
           break;
         case Torrent._TrackerQueued:
           s = 'Announce is queued';
@@ -715,7 +703,7 @@ function Inspector(controller) {
           s = tracker.isBackup ? 'Tracker will be used as a backup' : 'Announce not scheduled';
           break;
         default:
-          s = `unknown announce state: ${  tracker.announceState}`;
+          s = `unknown announce state: ${tracker.announceState}`;
       }
       return s;
     },
@@ -736,7 +724,7 @@ function Inspector(controller) {
         } else {
           lastAnnounceLabel = 'Announce error';
           lastAnnounce = [
-            tracker.lastAnnounceResult ? `${tracker.lastAnnounceResult  } - ` : '',
+            tracker.lastAnnounceResult ? `${tracker.lastAnnounceResult} - ` : '',
             lastAnnounceTime,
           ];
         }
@@ -758,7 +746,7 @@ function Inspector(controller) {
         } else {
           lastScrapeLabel = 'Scrape error';
           lastScrape =
-            (tracker.lastScrapeResult ? `${tracker.lastScrapeResult  } - ` : '') + lastScrapeTime;
+            (tracker.lastScrapeResult ? `${tracker.lastScrapeResult} - ` : '') + lastScrapeTime;
         }
       }
       return {

@@ -29,7 +29,7 @@ Transmission.fmt = (function () {
     /*
      *   Format a percentage to a string
      */
-    percentString: function (x) {
+    percentString (x) {
       if (x < 10.0) {
         return x.toTruncFixed(2);
       } else if (x < 100.0) {
@@ -42,7 +42,7 @@ Transmission.fmt = (function () {
     /*
      *   Format a ratio to a string
      */
-    ratioString: function (x) {
+    ratioString (x) {
       if (x === -1) {
         return 'None';
       }
@@ -57,7 +57,7 @@ Transmission.fmt = (function () {
      * @param {Number} bytes the filesize in bytes
      * @return {String} human-readable string
      */
-    mem: function (bytes) {
+    mem (bytes) {
       if (bytes < mem_K) {
         return [bytes, mem_B_str].join(' ');
       }
@@ -90,7 +90,7 @@ Transmission.fmt = (function () {
      * @param {Number} bytes the filesize in bytes
      * @return {String} human-readable string
      */
-    size: function (bytes) {
+    size (bytes) {
       if (bytes < size_K) {
         return [bytes, size_B_str].join(' ');
       }
@@ -118,15 +118,15 @@ Transmission.fmt = (function () {
         : [convertedSize.toTruncFixed(1), unit].join(' ');
     },
 
-    speedBps: function (Bps) {
+    speedBps (Bps) {
       return this.speed(this.toKBps(Bps));
     },
 
-    toKBps: function (Bps) {
+    toKBps (Bps) {
       return Math.floor(Bps / speed_K);
     },
 
-    speed: function (KBps) {
+    speed (KBps) {
       let speed = KBps;
 
       if (speed <= 999.95) {
@@ -150,38 +150,38 @@ Transmission.fmt = (function () {
       return [speed.toTruncFixed(2), speed_G_str].join(' ');
     },
 
-    timeInterval: function (seconds) {
+    timeInterval (seconds) {
       const days = Math.floor(seconds / 86400);
       const hours = Math.floor((seconds % 86400) / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       seconds = Math.floor(seconds % 60);
-      const d = `${days  } ${  days > 1 ? 'days' : 'day'}`;
-      const h = `${hours  } ${  hours > 1 ? 'hours' : 'hour'}`;
-      const m = `${minutes  } ${  minutes > 1 ? 'minutes' : 'minute'}`;
-      const s = `${seconds  } ${  seconds > 1 ? 'seconds' : 'second'}`;
+      const d = `${days} ${days > 1 ? 'days' : 'day'}`;
+      const h = `${hours} ${hours > 1 ? 'hours' : 'hour'}`;
+      const m = `${minutes} ${minutes > 1 ? 'minutes' : 'minute'}`;
+      const s = `${seconds} ${seconds > 1 ? 'seconds' : 'second'}`;
 
       if (days) {
         if (days >= 4 || !hours) {
           return d;
         }
-        return `${d  }, ${  h}`;
+        return `${d}, ${h}`;
       }
       if (hours) {
         if (hours >= 4 || !minutes) {
           return h;
         }
-        return `${h  }, ${  m}`;
+        return `${h}, ${m}`;
       }
       if (minutes) {
         if (minutes >= 4 || !seconds) {
           return m;
         }
-        return `${m  }, ${  s}`;
+        return `${m}, ${s}`;
       }
       return s;
     },
 
-    timestamp: function (seconds) {
+    timestamp (seconds) {
       if (!seconds) {
         return 'N/A';
       }
@@ -218,15 +218,15 @@ Transmission.fmt = (function () {
         hours = 12;
       }
       if (hours < 10) {
-        hours = `0${  hours}`;
+        hours = `0${hours}`;
       }
       let minutes = myDate.getMinutes();
       if (minutes < 10) {
-        minutes = `0${  minutes}`;
+        minutes = `0${minutes}`;
       }
       seconds = myDate.getSeconds();
       if (seconds < 10) {
-        seconds = `0${  seconds}`;
+        seconds = `0${seconds}`;
       }
 
       time = [hours, minutes, seconds].join(':');
@@ -234,16 +234,16 @@ Transmission.fmt = (function () {
       return [date, time, period].join(' ');
     },
 
-    ngettext: function (msgid, msgid_plural, n) {
+    ngettext (msgid, msgid_plural, n) {
       // TODO(i18n): http://doc.qt.digia.com/4.6/i18n-plural-rules.html
       return n === 1 ? msgid : msgid_plural;
     },
 
-    countString: function (msgid, msgid_plural, n) {
+    countString (msgid, msgid_plural, n) {
       return [n.toStringWithCommas(), this.ngettext(msgid, msgid_plural, n)].join(' ');
     },
 
-    peerStatus: function (flagStr) {
+    peerStatus (flagStr) {
       const formattedFlags = [];
       for (const flag of flagStr) {
         let explanation = null;
@@ -289,9 +289,7 @@ Transmission.fmt = (function () {
         if (!explanation) {
           formattedFlags.push(flag);
         } else {
-          formattedFlags.push(
-            `<span title="${  flag  }: ${  explanation  }">${  flag  }</span>`
-          );
+          formattedFlags.push(`<span title="${flag}: ${explanation}">${flag}</span>`);
         }
       }
 

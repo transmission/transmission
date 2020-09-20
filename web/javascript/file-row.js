@@ -121,7 +121,7 @@ function FileRow(torrent, depth, name, indices, even) {
     let e;
 
     const root = document.createElement('li');
-    root.className = `inspector_torrent_file_list_entry${  even ? 'even' : 'odd'}`;
+    root.className = `inspector_torrent_file_list_entry${even ? 'even' : 'odd'}`;
     elements.root = root;
 
     e = document.createElement('input');
@@ -179,7 +179,7 @@ function FileRow(torrent, depth, name, indices, even) {
     $(e).click(fireNameClicked);
     elements.progress = e;
 
-    $(root).css('margin-left', `${  depth * 16  }px`);
+    $(root).css('margin-left', `${depth * 16}px`);
 
     refreshImpl();
     return root;
