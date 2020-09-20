@@ -52,6 +52,7 @@
         "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|scroll_timeout|transmission"
       }],
       "prefer-const": "error",
+      "prefer-template": "error",
       "semi": ["error", "always"]
     }
   },

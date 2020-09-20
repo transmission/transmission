@@ -137,7 +137,7 @@ Transmission.prototype = {
     Prefs.getClutchPrefs(this);
 
     if (this.isMenuEnabled) {
-      $('#sort_by_' + this[Prefs._SortMethod]).selectMenuItem();
+      $(`#sort_by_${  this[Prefs._SortMethod]}`).selectMenuItem();
 
       if (this[Prefs._SortDirection] === Prefs._SortDescending) {
         $('#reverse_sort_order').selectMenuItem();
@@ -293,11 +293,11 @@ Transmission.prototype = {
     if (formdir == dir) {
       e = $('label#add-dialog-folder-label');
       if (bytes > 0) {
-        str = '  <i>(' + Transmission.fmt.size(bytes) + ' Free)</i>';
+        str = `  <i>(${  Transmission.fmt.size(bytes)  } Free)</i>`;
       } else {
         str = '';
       }
-      e.html('Destination folder' + str + ':');
+      e.html(`Destination folder${  str  }:`);
     }
   },
 
@@ -863,7 +863,7 @@ Transmission.prototype = {
           break;
 
         case 'about-button':
-          o = 'Transmission ' + this.serverVersion;
+          o = `Transmission ${  this.serverVersion}`;
           $('#about-dialog #about-title').html(o);
           $('#about-dialog').dialog({
             title: 'About',
@@ -920,7 +920,7 @@ Transmission.prototype = {
           break;
 
         default:
-          console.log('unhandled: ' + id);
+          console.log(`unhandled: ${  id}`);
           break;
       }
     }
@@ -1134,7 +1134,7 @@ Transmission.prototype = {
             };
             remote.sendRequest(o, function (response) {
               if (response.result != 'success') {
-                alert('Error adding "' + file.name + '": ' + response.result);
+                alert(`Error adding "${  file.name  }": ${  response.result}`);
               }
             });
           }
@@ -1145,7 +1145,7 @@ Transmission.prototype = {
       let url = $('#torrent_upload_url').val();
       if (url != '') {
         if (url.match(/^[0-9a-f]{40}$/i)) {
-          url = 'magnet:?xt=urn:btih:' + url;
+          url = `magnet:?xt=urn:btih:${  url}`;
         }
         const o = {
           method: 'torrent-add',
@@ -1157,7 +1157,7 @@ Transmission.prototype = {
         };
         remote.sendRequest(o, function (response) {
           if (response.result != 'success') {
-            alert('Error adding "' + url + '": ' + response.result);
+            alert(`Error adding "${  url  }": ${  response.result}`);
           }
         });
       }
@@ -1206,14 +1206,14 @@ Transmission.prototype = {
   promptToRemoveTorrents: function (torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
-      const header = 'Remove ' + torrent.getName() + '?';
+      const header = `Remove ${  torrent.getName()  }?`;
       const message =
         'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
       dialog.confirm(header, message, 'Remove', function () {
         transmission.removeTorrents(torrents);
       });
     } else {
-      const header = 'Remove ' + torrents.length + ' transfers?';
+      const header = `Remove ${  torrents.length  } transfers?`;
       const message =
         'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
       dialog.confirm(header, message, 'Remove', function () {
@@ -1225,7 +1225,7 @@ Transmission.prototype = {
   promptToRemoveTorrentsAndData: function (torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
-      const header = 'Remove ' + torrent.getName() + ' and delete data?';
+      const header = `Remove ${  torrent.getName()  } and delete data?`;
       const message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
 
@@ -1233,7 +1233,7 @@ Transmission.prototype = {
         transmission.removeTorrentsAndData(torrents);
       });
     } else {
-      const header = 'Remove ' + torrents.length + ' transfers and delete data?';
+      const header = `Remove ${  torrents.length  } transfers and delete data?`;
       const message =
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
 
@@ -1395,7 +1395,7 @@ Transmission.prototype = {
       limited = o[RPC._DownSpeedLimited];
 
       e = menu.find('#limited_download_rate');
-      e.html('Limit (' + fmt.speed(limit) + ')');
+      e.html(`Limit (${  fmt.speed(limit)  })`);
 
       if (!limited) {
         e = menu.find('#unlimited_download_rate');
@@ -1408,7 +1408,7 @@ Transmission.prototype = {
       limited = o[RPC._UpSpeedLimited];
 
       e = menu.find('#limited_upload_rate');
-      e.html('Limit (' + fmt.speed(limit) + ')');
+      e.html(`Limit (${  fmt.speed(limit)  })`);
 
       if (!limited) {
         e = menu.find('#unlimited_upload_rate');
@@ -1457,11 +1457,11 @@ Transmission.prototype = {
     }
     for (const name of names) {
       const o = trackers[name];
-      str += '<option value="' + o.domain + '"';
+      str += `<option value="${  o.domain  }"`;
       if (trackers[name].domain === this.filterTracker) {
         str += ' selected="selected"';
       }
-      str += '>' + name + '</option>';
+      str += `>${  name  }</option>`;
     }
 
     if (!this.filterTrackersStr || this.filterTrackersStr !== str) {
@@ -1556,7 +1556,7 @@ Transmission.prototype = {
     if (isMobileDevice) {
       $('body').toggleClass('inspector_showing', visible);
     } else {
-      const w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';
+      const w = visible ? `${$('#torrent_inspector').outerWidth() + 1  }px` : '0px';
       $('#torrent_container')[0].style.right = w;
     }
   },
@@ -1739,7 +1739,7 @@ Transmission.prototype = {
   setFilterTracker: function (domain) {
     // update which tracker is selected in the popup
     const key = domain ? this.getReadableDomain(domain) : 'all';
-    const id = '#show-tracker-' + key;
+    const id = `#show-tracker-${  key}`;
 
     $(id).addClass('selected').siblings().removeClass('selected');
 
@@ -1897,7 +1897,7 @@ Transmission.prototype = {
 
     s = stats['cumulative-stats'];
     ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
-    $('#stats-total-count').html(s.sessionCount + ' times');
+    $('#stats-total-count').html(`${s.sessionCount  } times`);
     $('#stats-total-uploaded').html(fmt.size(s.uploadedBytes));
     $('#stats-total-downloaded').html(fmt.size(s.downloadedBytes));
     $('#stats-total-ratio').html(fmt.ratioString(ratio));

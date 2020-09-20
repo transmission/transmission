@@ -67,14 +67,14 @@ function PrefsDialog(remote) {
       hour = parseInt(i / 4, 10);
       mins = (i % 4) * 15;
       value = i * 15;
-      content = hour + ':' + (mins || '00');
+      content = `${hour  }:${  mins || '00'}`;
       e.options[i] = new Option(content, value);
     }
   };
 
   const onPortChecked = function (response) {
     const is_open = response['arguments']['port-is-open'];
-    const text = 'Port is <b>' + (is_open ? 'Open' : 'Closed') + '</b>';
+    const text = `Port is <b>${  is_open ? 'Open' : 'Closed'  }</b>`;
     const e = data.elements.root.find('#port-label');
     setInnerHTML(e[0], text);
   };
@@ -87,7 +87,7 @@ function PrefsDialog(remote) {
       keys = data.groups[parent_key];
 
       for (i = 0; (key = keys[i]); ++i) {
-        root.find('#' + key).attr('disabled', !enabled);
+        root.find(`#${  key}`).attr('disabled', !enabled);
       }
     }
   };
@@ -192,7 +192,7 @@ function PrefsDialog(remote) {
 
     // listen for user input
     for (i = 0; (key = data.keys[i]); ++i) {
-      e = data.elements.root.find('#' + key);
+      e = data.elements.root.find(`#${  key}`);
       switch (e[0].type) {
         case 'checkbox':
         case 'radio':
@@ -220,7 +220,7 @@ function PrefsDialog(remote) {
     const root = data.elements.root;
 
     for (const key of data.keys) {
-      const val = getValue(root.find('#' + key));
+      const val = getValue(root.find(`#${  key}`));
       if (val !== null) {
         o[key] = val;
       }
@@ -249,11 +249,11 @@ function PrefsDialog(remote) {
 
     for (i = 0; (key = keys[i]); ++i) {
       val = o[key];
-      e = root.find('#' + key);
+      e = root.find(`#${  key}`);
 
       if (key === 'blocklist-size') {
         // special case -- regular text area
-        e.text('' + val.toStringWithCommas());
+        e.text(`${  val.toStringWithCommas()}`);
       } else {
         switch (e[0].type) {
           case 'checkbox':

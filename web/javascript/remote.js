@@ -253,7 +253,7 @@ TransmissionRemote.prototype = {
   addTorrentByUrl: function (url, options) {
     const remote = this;
     if (url.match(/^[0-9a-f]{40}$/i)) {
-      url = 'magnet:?xt=urn:btih:' + url;
+      url = `magnet:?xt=urn:btih:${  url}`;
     }
     const o = {
       method: 'torrent-add',

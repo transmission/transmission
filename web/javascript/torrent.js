@@ -403,11 +403,11 @@ Torrent.prototype = {
     const str = this.getErrorString();
     switch (this.getError()) {
       case Torrent._ErrTrackerWarning:
-        return 'Tracker returned a warning: ' + str;
+        return `Tracker returned a warning: ${  str}`;
       case Torrent._ErrTrackerError:
-        return 'Tracker returned an error: ' + str;
+        return `Tracker returned an error: ${  str}`;
       case Torrent._ErrLocalError:
-        return 'Error: ' + str;
+        return `Error: ${  str}`;
       default:
         return null;
     }

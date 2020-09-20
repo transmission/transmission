@@ -155,28 +155,28 @@ Transmission.fmt = (function () {
       const hours = Math.floor((seconds % 86400) / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       seconds = Math.floor(seconds % 60);
-      const d = days + ' ' + (days > 1 ? 'days' : 'day');
-      const h = hours + ' ' + (hours > 1 ? 'hours' : 'hour');
-      const m = minutes + ' ' + (minutes > 1 ? 'minutes' : 'minute');
-      const s = seconds + ' ' + (seconds > 1 ? 'seconds' : 'second');
+      const d = `${days  } ${  days > 1 ? 'days' : 'day'}`;
+      const h = `${hours  } ${  hours > 1 ? 'hours' : 'hour'}`;
+      const m = `${minutes  } ${  minutes > 1 ? 'minutes' : 'minute'}`;
+      const s = `${seconds  } ${  seconds > 1 ? 'seconds' : 'second'}`;
 
       if (days) {
         if (days >= 4 || !hours) {
           return d;
         }
-        return d + ', ' + h;
+        return `${d  }, ${  h}`;
       }
       if (hours) {
         if (hours >= 4 || !minutes) {
           return h;
         }
-        return h + ', ' + m;
+        return `${h  }, ${  m}`;
       }
       if (minutes) {
         if (minutes >= 4 || !seconds) {
           return m;
         }
-        return m + ', ' + s;
+        return `${m  }, ${  s}`;
       }
       return s;
     },
@@ -218,15 +218,15 @@ Transmission.fmt = (function () {
         hours = 12;
       }
       if (hours < 10) {
-        hours = '0' + hours;
+        hours = `0${  hours}`;
       }
       let minutes = myDate.getMinutes();
       if (minutes < 10) {
-        minutes = '0' + minutes;
+        minutes = `0${  minutes}`;
       }
       seconds = myDate.getSeconds();
       if (seconds < 10) {
-        seconds = '0' + seconds;
+        seconds = `0${  seconds}`;
       }
 
       time = [hours, minutes, seconds].join(':');
@@ -290,7 +290,7 @@ Transmission.fmt = (function () {
           formattedFlags.push(flag);
         } else {
           formattedFlags.push(
-            '<span title="' + flag + ': ' + explanation + '">' + flag + '</span>'
+            `<span title="${  flag  }: ${  explanation  }">${  flag  }</span>`
           );
         }
       }

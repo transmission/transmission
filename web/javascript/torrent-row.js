@@ -54,7 +54,7 @@ TorrentRendererHelper.createProgressbar = function (classes) {
   incomplete.className = 'torrent_progress_bar incomplete';
 
   const progressbar = document.createElement('div');
-  progressbar.className = 'torrent_progress_bar_container ' + classes;
+  progressbar.className = `torrent_progress_bar_container ${  classes}`;
   progressbar.appendChild(complete);
   progressbar.appendChild(incomplete);
 
@@ -72,11 +72,11 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
   // update the complete progressbar
   e = progressbar.complete;
   const style = e.style;
-  const width = '' + info.percent + '%';
+  const width = `${  info.percent  }%`;
   display = info.percent > 0 ? 'block' : 'none';
   if (style.width !== width || style.display !== display) {
     $(e).css({
-      width: '' + info.percent + '%',
+      width: `${  info.percent  }%`,
       display: display,
     });
   }
@@ -99,11 +99,11 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
 };
 
 TorrentRendererHelper.formatUL = function (t) {
-  return '▲' + Transmission.fmt.speedBps(t.getUploadSpeed());
+  return `▲${  Transmission.fmt.speedBps(t.getUploadSpeed())}`;
 };
 
 TorrentRendererHelper.formatDL = function (t) {
-  return '▼' + Transmission.fmt.speedBps(t.getDownloadSpeed());
+  return `▼${  Transmission.fmt.speedBps(t.getDownloadSpeed())}`;
 };
 
 TorrentRendererHelper.formatETA = function (t) {
@@ -111,7 +111,7 @@ TorrentRendererHelper.formatETA = function (t) {
   if (eta < 0 || eta >= 999 * 60 * 60) {
     return '';
   }
-  return 'ETA: ' + Transmission.fmt.timeInterval(eta);
+  return `ETA: ${  Transmission.fmt.timeInterval(eta)}`;
 };
 
 /****
@@ -234,7 +234,7 @@ TorrentRendererFull.prototype = {
       }
       const percent = 100 * t.getMetadataPercentComplete();
       return [
-        'Magnetized transfer - ' + MetaDataStatus + ' metadata (',
+        `Magnetized transfer - ${  MetaDataStatus  } metadata (`,
         Transmission.fmt.percentString(percent),
         '%)',
       ].join('');
@@ -360,7 +360,7 @@ TorrentRendererCompact.prototype = {
       }
       let s = '';
       if (!isMobileDevice) {
-        s = TorrentRendererHelper.formatETA(t) + ' ';
+        s = `${TorrentRendererHelper.formatETA(t)  } `;
       }
       if (have_dn) {
         s += TorrentRendererHelper.formatDL(t);
