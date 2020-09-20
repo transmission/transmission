@@ -1,3 +1,5 @@
+
+
 const Notifications = {};
 
 $(document).ready(function () {

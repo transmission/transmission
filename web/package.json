@@ -58,7 +58,8 @@
       "prefer-rest-params": "error",
       "prefer-spread": "error",
       "prefer-template": "error",
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "strict": ["error", "global"]
     }
   },
   "prettier": {
