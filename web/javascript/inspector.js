@@ -435,8 +435,7 @@ function Inspector(controller) {
       if (!str) {
         str = none;
       }
-      const uri = new URL(str);
-      if (uri.protocol == 'http:' || uri.protocol == 'https:') {
+      if (str.startsWith('https://') || str.startsWith('http://')) {
         str = encodeURI(str);
         setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
       } else {

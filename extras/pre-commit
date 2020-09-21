@@ -3,4 +3,4 @@
 [ -z "$TR_SKIP_HOOKS" ] || exit 0
 
 root="$(git rev-parse --show-toplevel)"
-exec "${root}/format/format.sh" --staged --test
+exec "${root}/code_style.sh" --check
