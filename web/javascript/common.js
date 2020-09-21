@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
  *
@@ -130,12 +132,12 @@ Prefs._SortByState = 'state';
 Prefs._CompactDisplayState = 'compact_display_state';
 
 Prefs._Defaults = {
+  compact_display_state: false,
   filter: 'all',
   refresh_rate: 5,
   sort_direction: 'ascending',
   sort_method: 'name',
   'turtle-state': false,
-  compact_display_state: false,
 };
 
 /*

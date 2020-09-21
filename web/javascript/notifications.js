@@ -1,3 +1,5 @@
+'use strict';
+
 const Notifications = {};
 
 $(document).ready(function () {

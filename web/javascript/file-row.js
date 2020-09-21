@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -110,9 +112,11 @@ class FileRow {
     e.type = 'checkbox';
     e.className = 'file_wanted_control';
     e.title = 'Download file';
-    $(e).change(function (ev) {
-      this.fireWantedChanged($(ev.currentTarget).prop('checked'));
-    });
+    $(e).change(
+      function (ev) {
+        this.fireWantedChanged($(ev.currentTarget).prop('checked'));
+      }.bind(this)
+    );
     root.checkbox = e;
     root.appendChild(e);
 
@@ -123,27 +127,33 @@ class FileRow {
     e = document.createElement('div');
     e.className = 'low';
     e.title = 'Low Priority';
-    $(e).click(function () {
-      this.firePriorityChanged(-1);
-    });
+    $(e).click(
+      function () {
+        this.firePriorityChanged(-1);
+      }.bind(this)
+    );
     this.elements.priority_low_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.className = 'normal';
     e.title = 'Normal Priority';
-    $(e).click(function () {
-      this.firePriorityChanged(0);
-    });
+    $(e).click(
+      function () {
+        this.firePriorityChanged(0);
+      }.bind(this)
+    );
     this.elements.priority_normal_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.title = 'High Priority';
     e.className = 'high';
-    $(e).click(function () {
-      this.firePriorityChanged(1);
-    });
+    $(e).click(
+      function () {
+        this.firePriorityChanged(1);
+      }.bind(this)
+    );
     this.elements.priority_high_button = e;
     box.appendChild(e);
 
@@ -152,13 +162,13 @@ class FileRow {
     e = document.createElement('div');
     e.className = 'inspector_torrent_file_list_entry_name';
     setTextContent(e, name);
-    $(e).click(this.fireNameClicked);
+    $(e).click(this.fireNameClicked.bind(this));
     root.appendChild(e);
 
     e = document.createElement('div');
     e.className = 'inspector_torrent_file_list_entry_progress';
     root.appendChild(e);
-    $(e).click(this.fireNameClicked);
+    $(e).click(this.fireNameClicked.bind(this));
     this.elements.progress = e;
 
     $(root).css('margin-left', `${depth * 16}px`);
@@ -185,9 +195,9 @@ class FileRow {
       torrent,
     };
     this.elements = {
+      priority_high_button: null,
       priority_low_button: null,
       priority_normal_button: null,
-      priority_high_button: null,
       progress: null,
       root: null,
     };

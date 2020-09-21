@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -572,11 +574,11 @@ function Inspector(controller) {
           let sub = walk.children[token];
           if (!sub) {
             walk.children[token] = sub = {
+              children: {},
+              depth: j,
+              file_indices: [],
               name: token,
               parent: walk,
-              children: {},
-              file_indices: [],
-              depth: j,
             };
           }
           walk = sub;

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -37,9 +39,9 @@ TorrentRendererHelper.getProgressInfo = function (controller, t) {
   }
 
   return {
-    percent: pct,
     complete: ['torrent_progress_bar', 'complete', extra].join(' '),
     incomplete: ['torrent_progress_bar', 'incomplete', extra].join(' '),
+    percent: pct,
   };
 };
 
@@ -56,8 +58,8 @@ TorrentRendererHelper.createProgressbar = function (classes) {
   progressbar.appendChild(incomplete);
 
   return {
-    element: progressbar,
     complete,
+    element: progressbar,
     incomplete,
   };
 };
@@ -71,8 +73,8 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
   let display = info.percent > 0 ? 'block' : 'none';
   if (e.style.width !== width || e.style.display !== display) {
     $(e).css({
-      width: `${info.percent}%`,
       display,
+      width: `${info.percent}%`,
     });
   }
 
@@ -402,11 +404,8 @@ TorrentRendererCompact.prototype = {
  *****
  ****/
 
-function TorrentRow(view, controller, torrent) {
-  this.initialize(view, controller, torrent);
-}
-TorrentRow.prototype = {
-  initialize(view, controller, torrent) {
+class TorrentRow {
+  constructor(view, controller, torrent) {
     const row = this;
     this._view = view;
     this._torrent = torrent;
@@ -415,24 +414,28 @@ TorrentRow.prototype = {
     $(this._torrent).bind('dataChanged.torrentRowListener', function () {
       row.render(controller);
     });
-  },
+  }
+
   getElement() {
     return this._element;
-  },
+  }
+
   render(controller) {
     const tor = this.getTorrent();
     if (tor) {
       this._view.render(controller, tor, this.getElement());
     }
-  },
+  }
+
   isSelected() {
     return this.getElement().className.indexOf('selected') !== -1;
-  },
+  }
 
   getTorrent() {
     return this._torrent;
-  },
+  }
+
   getTorrentId() {
     return this.getTorrent().getId();
-  },
-};
+  }
+}

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -97,9 +99,9 @@ class PrefsDialog {
 
   static getDefaultMobileOptions() {
     return {
-      width: $(window).width(),
       height: $(window).height(),
       position: ['left', 'top'],
+      width: $(window).width(),
     };
   }
 
@@ -189,8 +191,19 @@ class PrefsDialog {
       elements: {
         root: $('#prefs-dialog'),
       },
-      remote,
-
+      // map of keys that are enabled only if a 'parent' key is enabled
+      groups: {
+        'alt-speed-time-enabled': [
+          'alt-speed-time-begin',
+          'alt-speed-time-day',
+          'alt-speed-time-end',
+        ],
+        'blocklist-enabled': ['blocklist-url', 'blocklist-update-button'],
+        'idle-seeding-limit-enabled': ['idle-seeding-limit'],
+        seedRatioLimited: ['seedRatioLimit'],
+        'speed-limit-down-enabled': ['speed-limit-down'],
+        'speed-limit-up-enabled': ['speed-limit-up'],
+      },
       // all the RPC session keys that we have gui controls for
       keys: [
         'alt-speed-down',
@@ -224,20 +237,7 @@ class PrefsDialog {
         'start-added-torrents',
         'utp-enabled',
       ],
-
-      // map of keys that are enabled only if a 'parent' key is enabled
-      groups: {
-        'alt-speed-time-enabled': [
-          'alt-speed-time-begin',
-          'alt-speed-time-day',
-          'alt-speed-time-end',
-        ],
-        'blocklist-enabled': ['blocklist-url', 'blocklist-update-button'],
-        'idle-seeding-limit-enabled': ['idle-seeding-limit'],
-        seedRatioLimited: ['seedRatioLimit'],
-        'speed-limit-down-enabled': ['speed-limit-down'],
-        'speed-limit-up-enabled': ['speed-limit-up'],
-      },
+      remote,
     };
 
     let e = this.data.elements.root;
@@ -247,8 +247,8 @@ class PrefsDialog {
     const o = isMobileDevice
       ? this.getDefaultMobileOptions()
       : {
-          width: 350,
           height: 400,
+          width: 350,
         };
     o.autoOpen = false;
     o.show = o.hide = 'fade';

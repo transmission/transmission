@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -26,6 +28,91 @@ Transmission.fmt = (function () {
   const mem_T_str = 'TiB';
 
   return {
+    countString(msgid, msgid_plural, n) {
+      return [n.toStringWithCommas(), this.ngettext(msgid, msgid_plural, n)].join(' ');
+    },
+
+    /**
+     * Formats the a memory size into a human-readable string
+     * @param {Number} bytes the filesize in bytes
+     * @return {String} human-readable string
+     */
+    mem(bytes) {
+      const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
+
+      if (bytes < mem_K) {
+        return toStr(bytes, mem_B_str);
+      }
+      if (bytes < Math.pow(mem_K, 2)) {
+        return toStr(bytes / mem_K, mem_K_str);
+      }
+      if (bytes < Math.pow(mem_K, 3)) {
+        return toStr(bytes / Math.pow(mem_K, 2), mem_M_str);
+      }
+      if (bytes < Math.pow(mem_K, 4)) {
+        return toStr(bytes / Math.pow(mem_K, 3), mem_G_str);
+      }
+      return bytes / Math.pow(mem_K, 4), mem_T_str;
+    },
+
+    ngettext(msgid, msgid_plural, n) {
+      // TODO(i18n): http://doc.qt.digia.com/4.6/i18n-plural-rules.html
+      return n === 1 ? msgid : msgid_plural;
+    },
+
+    peerStatus(flagStr) {
+      const formattedFlags = [];
+      for (const flag of flagStr) {
+        let explanation = null;
+        switch (flag) {
+          case 'O':
+            explanation = 'Optimistic unchoke';
+            break;
+          case 'D':
+            explanation = 'Downloading from this peer';
+            break;
+          case 'd':
+            explanation = "We would download from this peer if they'd let us";
+            break;
+          case 'U':
+            explanation = 'Uploading to peer';
+            break;
+          case 'u':
+            explanation = "We would upload to this peer if they'd ask";
+            break;
+          case 'K':
+            explanation = "Peer has unchoked us, but we're not interested";
+            break;
+          case '?':
+            explanation = "We unchoked this peer, but they're not interested";
+            break;
+          case 'E':
+            explanation = 'Encrypted Connection';
+            break;
+          case 'H':
+            explanation = 'Peer was discovered through Distributed Hash Table (DHT)';
+            break;
+          case 'X':
+            explanation = 'Peer was discovered through Peer Exchange (PEX)';
+            break;
+          case 'I':
+            explanation = 'Peer is an incoming connection';
+            break;
+          case 'T':
+            explanation = 'Peer is connected via uTP';
+            break;
+        }
+
+        if (!explanation) {
+          formattedFlags.push(flag);
+        } else {
+          formattedFlags.push(`<span title="${flag}: ${explanation}">${flag}</span>`);
+        }
+      }
+
+      return formattedFlags.join('');
+    },
+
     /*
      *   Format a percentage to a string
      */
@@ -53,29 +140,6 @@ Transmission.fmt = (function () {
     },
 
     /**
-     * Formats the a memory size into a human-readable string
-     * @param {Number} bytes the filesize in bytes
-     * @return {String} human-readable string
-     */
-    mem(bytes) {
-      const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
-
-      if (bytes < mem_K) {
-        return toStr(bytes, mem_B_str);
-      }
-      if (bytes < Math.pow(mem_K, 2)) {
-        return toStr(bytes / mem_K, mem_K_str);
-      }
-      if (bytes < Math.pow(mem_K, 3)) {
-        return toStr(bytes / Math.pow(mem_K, 2), mem_M_str);
-      }
-      if (bytes < Math.pow(mem_K, 4)) {
-        return toStr(bytes / Math.pow(mem_K, 3), mem_G_str);
-      }
-      return bytes / Math.pow(mem_K, 4), mem_T_str;
-    },
-
-    /**
      * Formats the a disk capacity or file size into a human-readable string
      * @param {Number} bytes the filesize in bytes
      * @return {String} human-readable string
@@ -96,14 +160,6 @@ Transmission.fmt = (function () {
         return toStr(bytes / Math.pow(size_K, 3), size_G_str);
       }
       return bytes / Math.pow(size_K, 4), size_T_str;
-    },
-
-    speedBps(Bps) {
-      return this.speed(this.toKBps(Bps));
-    },
-
-    toKBps(Bps) {
-      return Math.floor(Bps / speed_K);
     },
 
     speed(KBps) {
@@ -128,6 +184,10 @@ Transmission.fmt = (function () {
       // insane speeds
       speed /= speed_K;
       return [speed.toTruncFixed(2), speed_G_str].join(' ');
+    },
+
+    speedBps(Bps) {
+      return this.speed(this.toKBps(Bps));
     },
 
     timeInterval(seconds) {
@@ -214,66 +274,8 @@ Transmission.fmt = (function () {
       return [date, time, period].join(' ');
     },
 
-    ngettext(msgid, msgid_plural, n) {
-      // TODO(i18n): http://doc.qt.digia.com/4.6/i18n-plural-rules.html
-      return n === 1 ? msgid : msgid_plural;
-    },
-
-    countString(msgid, msgid_plural, n) {
-      return [n.toStringWithCommas(), this.ngettext(msgid, msgid_plural, n)].join(' ');
-    },
-
-    peerStatus(flagStr) {
-      const formattedFlags = [];
-      for (const flag of flagStr) {
-        let explanation = null;
-        switch (flag) {
-          case 'O':
-            explanation = 'Optimistic unchoke';
-            break;
-          case 'D':
-            explanation = 'Downloading from this peer';
-            break;
-          case 'd':
-            explanation = "We would download from this peer if they'd let us";
-            break;
-          case 'U':
-            explanation = 'Uploading to peer';
-            break;
-          case 'u':
-            explanation = "We would upload to this peer if they'd ask";
-            break;
-          case 'K':
-            explanation = "Peer has unchoked us, but we're not interested";
-            break;
-          case '?':
-            explanation = "We unchoked this peer, but they're not interested";
-            break;
-          case 'E':
-            explanation = 'Encrypted Connection';
-            break;
-          case 'H':
-            explanation = 'Peer was discovered through Distributed Hash Table (DHT)';
-            break;
-          case 'X':
-            explanation = 'Peer was discovered through Peer Exchange (PEX)';
-            break;
-          case 'I':
-            explanation = 'Peer is an incoming connection';
-            break;
-          case 'T':
-            explanation = 'Peer is connected via uTP';
-            break;
-        }
-
-        if (!explanation) {
-          formattedFlags.push(flag);
-        } else {
-          formattedFlags.push(`<span title="${flag}: ${explanation}">${flag}</span>`);
-        }
-      }
-
-      return formattedFlags.join('');
+    toKBps(Bps) {
+      return Math.floor(Bps / speed_K);
     },
   };
 })();

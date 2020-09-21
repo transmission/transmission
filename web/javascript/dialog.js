@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Dave Perrett and Malcolm Jarvis
  *
@@ -5,18 +7,9 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-function Dialog() {
-  this.initialize();
-}
-
-Dialog.prototype = {
-  /*
-   * Constructor
-   */
-  initialize() {
-    /*
-     * Private Interface Variables
-     */
+class Dialog {
+  constructor() {
+    // private interface variables
     this._container = $('#dialog_container');
     this._heading = $('#dialog_heading');
     this._message = $('#dialog_message');
@@ -39,47 +32,37 @@ Dialog.prototype = {
       },
       this.onConfirmClicked
     );
-  },
+  }
 
-  /*--------------------------------------------
-   *
-   *  E V E N T   F U N C T I O N S
-   *
-   *--------------------------------------------*/
+  /// EVENT FUNCTIONS
 
   executeCallback() {
     this._callback();
     dialog.hideDialog();
-  },
+  }
 
   hideDialog() {
     $('body.dialog_showing').removeClass('dialog_showing');
     this._container.hide();
     transmission.hideMobileAddressbar();
     transmission.updateButtonStates();
-  },
+  }
 
   isVisible() {
     return this._container.is(':visible');
-  },
+  }
 
-  onCancelClicked(event) {
+  static onCancelClicked(event) {
     event.data.dialog.hideDialog();
-  },
+  }
 
-  onConfirmClicked(event) {
+  static onConfirmClicked(event) {
     event.data.dialog.executeCallback();
-  },
+  }
 
-  /*--------------------------------------------
-   *
-   *  I N T E R F A C E   F U N C T I O N S
-   *
-   *--------------------------------------------*/
+  /// INTERFACE FUNCTIONS
 
-  /*
-   * Display a confirm dialog
-   */
+  // display a confirm dialog
   confirm(dialog_heading, dialog_message, confirm_button_label, callback, cancel_button_label) {
     if (!isMobileDevice) {
       $('.dialog_container').hide();
@@ -96,11 +79,9 @@ Dialog.prototype = {
     if (isMobileDevice) {
       transmission.hideMobileAddressbar();
     }
-  },
+  }
 
-  /*
-   * Display an alert dialog
-   */
+  // display an alert dialog
   alert(dialog_heading, dialog_message, cancel_button_label) {
     if (!isMobileDevice) {
       $('.dialog_container').hide();
@@ -119,5 +100,5 @@ Dialog.prototype = {
       transmission.hideMobileAddressbar();
     }
     this._container.show();
-  },
-};
+  }
+}

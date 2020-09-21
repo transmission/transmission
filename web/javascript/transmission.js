@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -5,23 +7,13 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-function Transmission() {
-  this.initialize();
-}
-
-Transmission.prototype = {
-  /****
-   *****
-   *****  STARTUP
-   *****
-   ****/
-
-  initialize() {
+class Transmission {
+  constructor() {
     // Initialize the helper classes
     this.remote = new TransmissionRemote(this);
     this.inspector = new Inspector(this);
     this.prefsDialog = new PrefsDialog(this.remote);
-    $(this.prefsDialog).bind('closed', $.proxy(this.onPrefsDialogClosed, this));
+    $(this.prefsDialog).bind('closed', $.proxy(Transmission.onPrefsDialogClosed, this));
 
     this.isMenuEnabled = !isMobileDevice;
 
@@ -49,7 +41,7 @@ Transmission.prototype = {
     $('#upload_cancel_button').click($.proxy(this.hideUploadDialog, this));
 
     $('#rename_confirm_button').click($.proxy(this.confirmRenameClicked, this));
-    $('#rename_cancel_button').click($.proxy(this.hideRenameDialog, this));
+    $('#rename_cancel_button').click($.proxy(Transmission.hideRenameDialog, this));
 
     $('#move_confirm_button').click($.proxy(this.confirmMoveClicked, this));
     $('#move_cancel_button').click($.proxy(this.hideMoveDialog, this));
@@ -76,8 +68,8 @@ Transmission.prototype = {
       $(document).bind('keydown', $.proxy(this.keyDown, this));
       $(document).bind('keyup', $.proxy(this.keyUp, this));
       $('#torrent_container').click($.proxy(this.deselectAll, this));
-      $('#torrent_container').bind('dragover', $.proxy(this.dragenter, this));
-      $('#torrent_container').bind('dragenter', $.proxy(this.dragenter, this));
+      $('#torrent_container').bind('dragover', $.proxy(Transmission.dragenter, this));
+      $('#torrent_container').bind('dragenter', $.proxy(Transmission.dragenter, this));
       $('#torrent_container').bind('drop', $.proxy(this.drop, this));
       $('#inspector_link').click($.proxy(this.toggleInspector, this));
 
@@ -109,7 +101,7 @@ Transmission.prototype = {
     this.togglePeriodicSessionRefresh(true);
 
     this.updateButtonsSoon();
-  },
+  }
 
   loadDaemonPrefs(async) {
     this.remote.loadDaemonPrefs(
@@ -122,7 +114,7 @@ Transmission.prototype = {
       this,
       async
     );
-  },
+  }
 
   /*
    * Load the clutch prefs and init the GUI according to those prefs
@@ -139,7 +131,7 @@ Transmission.prototype = {
     }
 
     this.initCompactMode();
-  },
+  }
 
   /*
    * Set up the search box
@@ -168,7 +160,7 @@ Transmission.prototype = {
           }
         });
     }
-  },
+  }
 
   /**
    * Create the torrent right-click menu
@@ -176,32 +168,17 @@ Transmission.prototype = {
   createContextMenu() {
     const tr = this;
     const bindings = {
-      pause_selected() {
-        tr.stopSelectedTorrents();
-      },
-      resume_selected() {
-        tr.startSelectedTorrents(false);
-      },
-      resume_now_selected() {
-        tr.startSelectedTorrents(true);
+      deselect_all() {
+        tr.deselectAll();
       },
       move() {
         tr.moveSelectedTorrents(false);
       },
-      remove() {
-        tr.removeSelectedTorrents();
+      move_bottom() {
+        tr.moveBottom();
       },
-      remove_data() {
-        tr.removeSelectedTorrentsAndData();
-      },
-      verify() {
-        tr.verifySelectedTorrents();
-      },
-      rename() {
-        tr.renameSelectedTorrents();
-      },
-      reannounce() {
-        tr.reannounceSelectedTorrents();
+      move_down() {
+        tr.moveDown();
       },
       move_top() {
         tr.moveTop();
@@ -209,35 +186,37 @@ Transmission.prototype = {
       move_up() {
         tr.moveUp();
       },
-      move_down() {
-        tr.moveDown();
+      pause_selected() {
+        tr.stopSelectedTorrents();
       },
-      move_bottom() {
-        tr.moveBottom();
+      reannounce() {
+        tr.reannounceSelectedTorrents();
+      },
+      remove() {
+        tr.removeSelectedTorrents();
+      },
+      remove_data() {
+        tr.removeSelectedTorrentsAndData();
+      },
+      rename() {
+        tr.renameSelectedTorrents();
+      },
+      resume_now_selected() {
+        tr.startSelectedTorrents(true);
+      },
+      resume_selected() {
+        tr.startSelectedTorrents(false);
       },
       select_all() {
         tr.selectAll();
       },
-      deselect_all() {
-        tr.deselectAll();
+      verify() {
+        tr.verifySelectedTorrents();
       },
     };
 
     // Set up the context menu
     $('ul#torrent_list').contextmenu({
-      delegate: '.torrent',
-      menu: '#torrent_context_menu',
-      preventSelect: true,
-      taphold: true,
-      show: {
-        effect: 'none',
-      },
-      hide: {
-        effect: 'none',
-      },
-      select(event, ui) {
-        bindings[ui.cmd]();
-      },
       beforeOpen: $.proxy(function (event) {
         const element = $(event.currentTarget);
         const i = $('#torrent_list > li').index(element);
@@ -253,23 +232,36 @@ Transmission.prototype = {
           tl.contextmenu('enableEntry', 'rename', s.sel === 1);
         });
       }, this),
+      delegate: '.torrent',
+      hide: {
+        effect: 'none',
+      },
+      menu: '#torrent_context_menu',
+      preventSelect: true,
+      select(event, ui) {
+        bindings[ui.cmd]();
+      },
+      show: {
+        effect: 'none',
+      },
+      taphold: true,
     });
-  },
+  }
 
   createSettingsMenu() {
     $('#footer_super_menu').transMenu({
-      open() {
-        $('#settings_menu').addClass('selected');
-      },
       close() {
         $('#settings_menu').removeClass('selected');
+      },
+      open() {
+        $('#settings_menu').addClass('selected');
       },
       select: $.proxy(this.onMenuClicked, this),
     });
     $('#settings_menu').click(function () {
       $('#footer_super_menu').transMenu('open');
     });
-  },
+  }
 
   /****
    *****
@@ -277,17 +269,17 @@ Transmission.prototype = {
 
   updateFreeSpaceInAddDialog() {
     const formdir = $('input#add-dialog-folder-input').val();
-    this.remote.getFreeSpace(formdir, this.onFreeSpaceResponse, this);
-  },
+    this.remote.getFreeSpace(formdir, Transmission.onFreeSpaceResponse, this);
+  }
 
-  onFreeSpaceResponse(dir, bytes) {
+  static onFreeSpaceResponse(dir, bytes) {
     const formdir = $('input#add-dialog-folder-input').val();
     if (formdir === dir) {
       const e = $('label#add-dialog-folder-label');
       const str = bytes > 0 ? `  <i>(${Transmission.fmt.size(bytes)} Free)</i>` : '';
       e.html(`Destination folder${str}:`);
     }
-  },
+  }
 
   /****
    *****
@@ -301,15 +293,15 @@ Transmission.prototype = {
       torrents.push(this._torrents[key]);
     }
     return torrents;
-  },
+  }
 
-  getTorrentIds(torrents) {
+  static getTorrentIds(torrents) {
     return $.map(torrents.slice(0), function (t) {
       return t.getId();
     });
-  },
+  }
 
-  scrollToRow(row) {
+  static scrollToRow(row) {
     if (isMobileDevice) {
       // FIXME: why? return
       const list = $('#torrent_container');
@@ -324,7 +316,7 @@ Transmission.prototype = {
         list.scrollTop(offsetTop + offsetHeight - innerHeight);
       }
     }
-  },
+  }
 
   seedRatioLimit() {
     const p = this.sessionProperties;
@@ -332,12 +324,12 @@ Transmission.prototype = {
       return p.seedRatioLimit;
     }
     return -1;
-  },
+  }
 
   setPref(key, val) {
     this[key] = val;
     Prefs.setValue(key, val);
-  },
+  }
 
   /****
    *****
@@ -349,46 +341,46 @@ Transmission.prototype = {
     return $.grep(this._rows, function (r) {
       return r.isSelected();
     });
-  },
+  }
 
   getSelectedTorrents() {
     return $.map(this.getSelectedRows(), function (r) {
       return r.getTorrent();
     });
-  },
+  }
 
   getSelectedTorrentIds() {
-    return this.getTorrentIds(this.getSelectedTorrents());
-  },
+    return Transmission.getTorrentIds(this.getSelectedTorrents());
+  }
 
   setSelectedRow(row) {
     $(this.elements.torrent_list).children('.selected').removeClass('selected');
     this.selectRow(row);
-  },
+  }
 
   selectRow(row) {
     $(row.getElement()).addClass('selected');
     this.callSelectionChangedSoon();
-  },
+  }
 
   deselectRow(row) {
     $(row.getElement()).removeClass('selected');
     this.callSelectionChangedSoon();
-  },
+  }
 
   selectAll() {
     $(this.elements.torrent_list).children().addClass('selected');
     this.callSelectionChangedSoon();
-  },
+  }
   deselectAll() {
     $(this.elements.torrent_list).children('.selected').removeClass('selected');
     this.callSelectionChangedSoon();
     delete this._last_torrent_clicked;
-  },
+  }
 
   indexOfLastTorrent() {
     return this._rows.findIndex((row) => row.getTorrentId() === this._last_torrent_clicked);
-  },
+  }
 
   // Select a range from this row to the last clicked torrent
   selectRange(row) {
@@ -407,16 +399,16 @@ Transmission.prototype = {
     }
 
     this.callSelectionChangedSoon();
-  },
+  }
 
   selectionChanged() {
     this.updateButtonStates();
 
-    this.inspector.setTorrents(this.inspectorIsVisible() ? this.getSelectedTorrents() : []);
+    this.inspector.setTorrents(Transmission.inspectorIsVisible() ? this.getSelectedTorrents() : []);
 
     clearTimeout(this.selectionChangedTimer);
     delete this.selectionChangedTimer;
-  },
+  }
 
   callSelectionChangedSoon() {
     if (!this.selectionChangedTimer) {
@@ -424,7 +416,7 @@ Transmission.prototype = {
         msec = 200;
       this.selectionChangedTimer = setTimeout(callback, msec);
     }
-  },
+  }
 
   /*--------------------------------------------
    *
@@ -511,7 +503,7 @@ Transmission.prototype = {
 
       // handle rename dialog
       if ($('#rename_container').is(':visible')) {
-        this.hideRenameDialog();
+        Transmission.hideRenameDialog();
         handled = true;
       }
     }
@@ -527,7 +519,7 @@ Transmission.prototype = {
       }
 
       if (slash_key) {
-        this.showHotkeysDialog();
+        Transmission.showHotkeysDialog();
         handled = true;
       }
 
@@ -611,7 +603,7 @@ Transmission.prototype = {
           }
         }
         this._last_torrent_clicked = r.getTorrentId();
-        this.scrollToRow(r);
+        Transmission.scrollToRow(r);
         handled = true;
       } else if (shift_key) {
         this._shift_index = this.indexOfLastTorrent();
@@ -619,57 +611,57 @@ Transmission.prototype = {
     }
 
     return !handled;
-  },
+  }
 
   keyUp(ev) {
     if (ev.keyCode === 16) {
       // shift key pressed
       delete this._shift_index;
     }
-  },
+  }
 
-  isButtonEnabled(ev) {
+  static isButtonEnabled(ev) {
     const p = (ev.target || ev.srcElement).parentNode;
     return p.className !== 'disabled' && p.parentNode.className !== 'disabled';
-  },
+  }
 
   stopSelectedClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       this.stopSelectedTorrents();
       this.hideMobileAddressbar();
     }
-  },
+  }
 
   startSelectedClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       this.startSelectedTorrents(false);
       this.hideMobileAddressbar();
     }
-  },
+  }
 
   stopAllClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       this.stopAllTorrents();
       this.hideMobileAddressbar();
     }
-  },
+  }
 
   startAllClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       this.startAllTorrents(false);
       this.hideMobileAddressbar();
     }
-  },
+  }
 
   openTorrentClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       $('body').addClass('open_showing');
       this.uploadTorrentFile();
       this.updateButtonStates();
     }
-  },
+  }
 
-  dragenter(ev) {
+  static dragenter(ev) {
     if (ev.dataTransfer && ev.dataTransfer.types) {
       const types = ['text/uri-list', 'text/plain'];
       for (let i = 0; i < types.length; ++i) {
@@ -686,7 +678,7 @@ Transmission.prototype = {
       ev.dataTransfer.dropEffect = 'none';
     }
     return true;
-  },
+  }
 
   drop(ev) {
     const types = ['text/uri-list', 'text/plain'];
@@ -716,46 +708,46 @@ Transmission.prototype = {
 
     ev.preventDefault();
     return false;
-  },
+  }
 
   hideUploadDialog() {
     $('body.open_showing').removeClass('open_showing');
     $('#upload_container').hide();
     this.updateButtonStates();
-  },
+  }
 
   confirmUploadClicked() {
     this.uploadTorrentFile(true);
     this.hideUploadDialog();
-  },
+  }
 
   hideMoveDialog() {
     $('#move_container').hide();
     this.updateButtonStates();
-  },
+  }
 
   confirmMoveClicked() {
     this.moveSelectedTorrents(true);
     this.hideUploadDialog();
-  },
+  }
 
-  hideRenameDialog() {
+  static hideRenameDialog() {
     $('body.open_showing').removeClass('open_showing');
     $('#rename_container').hide();
-  },
+  }
 
   confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
     this.renameTorrent(torrents[0], $('input#torrent_rename_name').attr('value'));
-    this.hideRenameDialog();
-  },
+    Transmission.hideRenameDialog();
+  }
 
   removeClicked(ev) {
-    if (this.isButtonEnabled(ev)) {
+    if (Transmission.isButtonEnabled(ev)) {
       this.removeSelectedTorrents();
       this.hideMobileAddressbar();
     }
-  },
+  }
 
   // turn the periodic ajax session refresh on & off
   togglePeriodicSessionRefresh(enabled) {
@@ -770,13 +762,13 @@ Transmission.prototype = {
         this.sessionInterval = setInterval(this.loadDaemonPrefs.bind(this), msec);
       }
     }
-  },
+  }
 
   toggleTurtleClicked() {
     const o = {};
     o[RPC._TurtleState] = !$('#turtle-button').hasClass('selected');
     this.remote.savePrefs(o);
-  },
+  }
 
   /*--------------------------------------------
    *
@@ -784,9 +776,9 @@ Transmission.prototype = {
    *
    *--------------------------------------------*/
 
-  onPrefsDialogClosed() {
+  static onPrefsDialogClosed() {
     $('#prefs-button').removeClass('selected');
-  },
+  }
 
   togglePrefsDialogClicked() {
     const e = $('#prefs-button');
@@ -797,22 +789,22 @@ Transmission.prototype = {
       e.addClass('selected');
       this.prefsDialog.show();
     }
-  },
+  }
 
   setFilterText(search) {
     this.filterText = search ? search.trim() : null;
     this.refilter(true);
-  },
+  }
 
   setSortMethod(sort_method) {
     this.setPref(Prefs._SortMethod, sort_method);
     this.refilter(true);
-  },
+  }
 
   setSortDirection(direction) {
     this.setPref(Prefs._SortDirection, direction);
     this.refilter(true);
-  },
+  }
 
   onMenuClicked(event, ui) {
     const id = ui.id;
@@ -839,16 +831,16 @@ Transmission.prototype = {
           break;
 
         case 'hotkeys':
-          this.showHotkeysDialog();
+          Transmission.showHotkeysDialog();
           break;
 
         case 'about-button': {
           const o = `Transmission ${this.serverVersion}`;
           $('#about-dialog #about-title').html(o);
           $('#about-dialog').dialog({
-            title: 'About',
-            show: 'fade',
             hide: 'fade',
+            show: 'fade',
+            title: 'About',
           });
           break;
         }
@@ -897,7 +889,7 @@ Transmission.prototype = {
           break;
       }
     }
-  },
+  }
 
   onTorrentChanged(ev, tor) {
     // update our dirty fields
@@ -906,7 +898,7 @@ Transmission.prototype = {
     // enqueue ui refreshes
     this.refilterSoon();
     this.updateButtonsSoon();
-  },
+  }
 
   updateFromTorrentGet(updates, removed_ids) {
     const needinfo = [];
@@ -963,7 +955,7 @@ Transmission.prototype = {
       this.deleteTorrents(removed_ids);
       this.refilterSoon();
     }
-  },
+  }
 
   updateTorrents(ids, fields, callback) {
     const that = this;
@@ -977,7 +969,7 @@ Transmission.prototype = {
     }
 
     this.remote.updateTorrents(ids, fields, f);
-  },
+  }
 
   refreshTorrents() {
     const callback = $.proxy(this.refreshTorrents, this);
@@ -990,12 +982,12 @@ Transmission.prototype = {
     // schedule the next request
     clearTimeout(this.refreshTorrentsTimeout);
     this.refreshTorrentsTimeout = setTimeout(callback, msec);
-  },
+  }
 
   initializeTorrents() {
     const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
     this.updateTorrents(null, fields);
-  },
+  }
 
   onRowClicked(ev) {
     const meta_key = ev.metaKey || ev.ctrlKey,
@@ -1045,7 +1037,7 @@ Transmission.prototype = {
     }
 
     this._last_torrent_clicked = row.getTorrentId();
-  },
+  }
 
   deleteTorrents(ids) {
     if (ids && ids.length) {
@@ -1055,11 +1047,11 @@ Transmission.prototype = {
       }
       this.refilter();
     }
-  },
+  }
 
   shouldAddedTorrentsStart() {
     return this.prefsDialog.shouldAddedTorrentsStart();
-  },
+  }
 
   /*
    * Select a torrent file to upload
@@ -1096,12 +1088,12 @@ Transmission.prototype = {
           if (index > -1) {
             const metainfo = contents.substring(index + key.length);
             const o = {
-              method: 'torrent-add',
               arguments: {
-                paused,
                 'download-dir': destination,
                 metainfo,
+                paused,
               },
+              method: 'torrent-add',
             };
             remote.sendRequest(o, function (response) {
               if (response.result !== 'success') {
@@ -1119,12 +1111,12 @@ Transmission.prototype = {
           url = `magnet:?xt=urn:btih:${url}`;
         }
         const o = {
-          method: 'torrent-add',
           arguments: {
-            paused,
             'download-dir': destination,
             filename: url,
+            paused,
           },
+          method: 'torrent-add',
         };
         remote.sendRequest(o, function (response) {
           if (response.result !== 'success') {
@@ -1133,7 +1125,7 @@ Transmission.prototype = {
         });
       }
     }
-  },
+  }
 
   promptSetLocation(confirmed, torrents) {
     if (!confirmed) {
@@ -1142,34 +1134,34 @@ Transmission.prototype = {
       $('#move_container').show();
       $('#torrent_path').focus();
     } else {
-      const ids = this.getTorrentIds(torrents);
+      const ids = Transmission.getTorrentIds(torrents);
       this.remote.moveTorrents(ids, $('input#torrent_path').val(), this.refreshTorrents, this);
       $('#move_container').hide();
     }
-  },
+  }
 
   moveSelectedTorrents(confirmed) {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptSetLocation(confirmed, torrents);
     }
-  },
+  }
 
   removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
-      this.promptToRemoveTorrents(torrents);
+      Transmission.promptToRemoveTorrents(torrents);
     }
-  },
+  }
 
   removeSelectedTorrentsAndData() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
-      this.promptToRemoveTorrentsAndData(torrents);
+      Transmission.promptToRemoveTorrentsAndData(torrents);
     }
-  },
+  }
 
-  promptToRemoveTorrents(torrents) {
+  static promptToRemoveTorrents(torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
       const header = `Remove ${torrent.getName()}?`;
@@ -1186,9 +1178,9 @@ Transmission.prototype = {
         transmission.removeTorrents(torrents);
       });
     }
-  },
+  }
 
-  promptToRemoveTorrentsAndData(torrents) {
+  static promptToRemoveTorrentsAndData(torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
       const header = `Remove ${torrent.getName()} and delete data?`;
@@ -1207,32 +1199,32 @@ Transmission.prototype = {
         transmission.removeTorrentsAndData(torrents);
       });
     }
-  },
+  }
 
   removeTorrents(torrents) {
-    const ids = this.getTorrentIds(torrents);
+    const ids = Transmission.getTorrentIds(torrents);
     this.remote.removeTorrents(ids, this.refreshTorrents, this);
-  },
+  }
 
   removeTorrentsAndData(torrents) {
     this.remote.removeTorrentsAndData(torrents);
-  },
+  }
 
-  promptToRenameTorrent(torrent) {
+  static promptToRenameTorrent(torrent) {
     $('body').addClass('open_showing');
     $('input#torrent_rename_name').attr('value', torrent.getName());
     $('#rename_container').show();
     $('#torrent_rename_name').focus();
-  },
+  }
 
   renameSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length !== 1) {
       dialog.alert('Renaming', 'You can rename only one torrent at a time.', 'Ok');
     } else {
-      this.promptToRenameTorrent(torrents[0]);
+      Transmission.promptToRenameTorrent(torrents[0]);
     }
-  },
+  }
 
   onTorrentRenamed(response) {
     if (response.result === 'success' && response.arguments) {
@@ -1241,63 +1233,72 @@ Transmission.prototype = {
         torrent.refresh(response.arguments);
       }
     }
-  },
+  }
 
   renameTorrent(torrent, newname) {
     const oldpath = torrent.getName();
     this.remote.renameTorrent([torrent.getId()], oldpath, newname, this.onTorrentRenamed, this);
-  },
+  }
 
   verifySelectedTorrents() {
     this.verifyTorrents(this.getSelectedTorrents());
-  },
+  }
 
   reannounceSelectedTorrents() {
     this.reannounceTorrents(this.getSelectedTorrents());
-  },
+  }
 
   startAllTorrents(force) {
     this.startTorrents(this.getAllTorrents(), force);
-  },
+  }
   startSelectedTorrents(force) {
     this.startTorrents(this.getSelectedTorrents(), force);
-  },
+  }
   startTorrent(torrent) {
     this.startTorrents([torrent], false);
-  },
+  }
 
   startTorrents(torrents, force) {
-    this.remote.startTorrents(this.getTorrentIds(torrents), force, this.refreshTorrents, this);
-  },
+    this.remote.startTorrents(
+      Transmission.getTorrentIds(torrents),
+      force,
+      this.refreshTorrents,
+      this
+    );
+  }
   verifyTorrent(torrent) {
     this.verifyTorrents([torrent]);
-  },
+  }
   verifyTorrents(torrents) {
-    this.remote.verifyTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
-  },
+    this.remote.verifyTorrents(Transmission.getTorrentIds(torrents), this.refreshTorrents, this);
+  }
 
   reannounceTorrent(torrent) {
     this.reannounceTorrents([torrent]);
-  },
+  }
   reannounceTorrents(torrents) {
-    this.remote.reannounceTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
-  },
+    this.remote.reannounceTorrents(
+      Transmission.getTorrentIds(torrents),
+      this.refreshTorrents,
+      this
+    );
+  }
 
   stopAllTorrents() {
     this.stopTorrents(this.getAllTorrents());
-  },
+  }
   stopSelectedTorrents() {
     this.stopTorrents(this.getSelectedTorrents());
-  },
+  }
   stopTorrent(torrent) {
     this.stopTorrents([torrent]);
-  },
+  }
   stopTorrents(torrents) {
-    this.remote.stopTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
-  },
+    this.remote.stopTorrents(Transmission.getTorrentIds(torrents), this.refreshTorrents, this);
+  }
   changeFileCommand(torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
-  },
+  }
 
   hideMobileAddressbar(delaySecs) {
     if (isMobileDevice && !this.scroll_timeout) {
@@ -1305,28 +1306,28 @@ Transmission.prototype = {
       const msec = delaySecs * 1000 || 150;
       this.scroll_timeout = setTimeout(callback, msec);
     }
-  },
+  }
   doToolbarHide() {
     window.scrollTo(0, 1);
     if (this.scroll_timeout) {
       clearTimeout(this.scroll_timeout);
       delete this.scroll_timeout;
     }
-  },
+  }
 
   // Queue
   moveTop() {
     this.remote.moveTorrentsToTop(this.getSelectedTorrentIds(), this.refreshTorrents, this);
-  },
+  }
   moveUp() {
     this.remote.moveTorrentsUp(this.getSelectedTorrentIds(), this.refreshTorrents, this);
-  },
+  }
   moveDown() {
     this.remote.moveTorrentsDown(this.getSelectedTorrentIds(), this.refreshTorrents, this);
-  },
+  }
   moveBottom() {
     this.remote.moveTorrentsToBottom(this.getSelectedTorrentIds(), this.refreshTorrents, this);
-  },
+  }
 
   /***
    ****
@@ -1381,7 +1382,7 @@ Transmission.prototype = {
       }
       e.selectMenuItem();
     }
-  },
+  }
 
   updateStatusbar() {
     const fmt = Transmission.fmt;
@@ -1398,11 +1399,7 @@ Transmission.prototype = {
     // visible torrents
     const str = fmt.countString('Transfer', 'Transfers', this._rows.length);
     document.getElementById('filter-count').textContent = str;
-  },
-
-  setEnabled(key, flag) {
-    $(key).toggleClass('disabled', !flag);
-  },
+  }
 
   updateFilterSelect() {
     const trackers = this.getTrackers();
@@ -1428,7 +1425,7 @@ Transmission.prototype = {
       this.filterTrackersStr = str;
       $('#filter-tracker').html(str);
     }
-  },
+  }
 
   updateButtonsSoon() {
     if (!this.buttonRefreshTimer) {
@@ -1437,17 +1434,17 @@ Transmission.prototype = {
 
       this.buttonRefreshTimer = setTimeout(callback, msec);
     }
-  },
+  }
 
   calculateTorrentStates(callback) {
     const stats = {
-      total: 0,
       active: 0,
-      paused: 0,
-      sel: 0,
       activeSel: 0,
+      paused: 0,
       pausedSel: 0,
       queuedSel: 0,
+      sel: 0,
+      total: 0,
     };
 
     clearTimeout(this.buttonRefreshTimer);
@@ -1479,18 +1476,17 @@ Transmission.prototype = {
     }
 
     callback(stats);
-  },
+  }
 
   updateButtonStates() {
-    const tr = this;
     const e = this.elements;
-
     this.calculateTorrentStates(function (s) {
-      tr.setEnabled(e.toolbar_pause_button, s.activeSel > 0);
-      tr.setEnabled(e.toolbar_start_button, s.pausedSel > 0);
-      tr.setEnabled(e.toolbar_remove_button, s.sel > 0);
+      const setEnabled = (key, flag) => $(key).toggleClass('disabled', !flag);
+      setEnabled(e.toolbar_pause_button, s.activeSel > 0);
+      setEnabled(e.toolbar_start_button, s.pausedSel > 0);
+      setEnabled(e.toolbar_remove_button, s.sel > 0);
     });
-  },
+  }
 
   /****
    *****
@@ -1498,12 +1494,12 @@ Transmission.prototype = {
    *****
    ****/
 
-  inspectorIsVisible() {
+  static inspectorIsVisible() {
     return $('#torrent_inspector').is(':visible');
-  },
+  }
   toggleInspector() {
-    this.setInspectorVisible(!this.inspectorIsVisible());
-  },
+    this.setInspectorVisible(!Transmission.inspectorIsVisible());
+  }
   setInspectorVisible(visible) {
     this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
 
@@ -1517,7 +1513,7 @@ Transmission.prototype = {
       const w = visible ? `${$('#torrent_inspector').outerWidth() + 1}px` : '0px';
       document.getElementById('torrent_container').style.right = w;
     }
-  },
+  }
 
   /****
    *****
@@ -1534,7 +1530,7 @@ Transmission.prototype = {
         msec = 100;
       this.refilterTimer = setTimeout(callback, msec);
     }
-  },
+  }
 
   sortRows(rows) {
     const torrents = rows.map((row) => row.getTorrent());
@@ -1544,7 +1540,7 @@ Transmission.prototype = {
     }, {});
     Torrent.sortTorrents(torrents, this[Prefs._SortMethod], this[Prefs._SortDirection]);
     torrents.forEach((tor, idx) => (rows[idx] = id2row[tor.getId()]));
-  },
+  }
 
   refilter(rebuildEverything) {
     // let i, e, id, t, row;
@@ -1670,7 +1666,7 @@ Transmission.prototype = {
     if (old_sel_count !== $(list).children('.selected').length) {
       this.selectionChanged();
     }
-  },
+  }
 
   setFilterMode(mode) {
     // set the state
@@ -1678,40 +1674,40 @@ Transmission.prototype = {
 
     // refilter
     this.refilter(true);
-  },
+  }
 
   onFilterModeClicked() {
     this.setFilterMode($('#filter-mode').val());
-  },
+  }
 
   onFilterTrackerClicked() {
     const tracker = $('#filter-tracker').val();
     this.setFilterTracker(tracker === 'all' ? null : tracker);
-  },
+  }
 
   setFilterTracker(domain) {
     // update which tracker is selected in the popup
-    const key = domain ? this.getReadableDomain(domain) : 'all';
+    const key = domain ? Transmission.getReadableDomain(domain) : 'all';
     const id = `#show-tracker-${key}`;
 
     $(id).addClass('selected').siblings().removeClass('selected');
 
     this.filterTracker = domain;
     this.refilter(true);
-  },
+  }
 
   // example: "tracker.ubuntu.com" returns "ubuntu.com"
-  getDomainName(host) {
+  static getDomainName(host) {
     const dot = host.indexOf('.');
     if (dot !== host.lastIndexOf('.')) {
       host = host.slice(dot + 1);
     }
 
     return host;
-  },
+  }
 
   // example: "ubuntu.com" returns "Ubuntu"
-  getReadableDomain(name) {
+  static getReadableDomain(name) {
     if (name.length) {
       name = name.charAt(0).toUpperCase() + name.slice(1);
     }
@@ -1720,7 +1716,7 @@ Transmission.prototype = {
       name = name.slice(0, dot);
     }
     return name;
-  },
+  }
 
   getTrackers() {
     const ret = {};
@@ -1738,15 +1734,15 @@ Transmission.prototype = {
           uri = this.uriCache[announce];
         } else {
           uri = this.uriCache[announce] = new URL(announce);
-          uri.domain = this.getDomainName(uri.host);
-          uri.name = this.getReadableDomain(uri.domain);
+          uri.domain = Transmission.getDomainName(uri.host);
+          uri.name = Transmission.getReadableDomain(uri.domain);
         }
 
         if (!(uri.name in ret)) {
           ret[uri.name] = {
-            uri,
-            domain: uri.domain,
             count: 0,
+            domain: uri.domain,
+            uri,
           };
         }
 
@@ -1761,7 +1757,7 @@ Transmission.prototype = {
     }
 
     return ret;
-  },
+  }
 
   /***
    ****
@@ -1771,7 +1767,7 @@ Transmission.prototype = {
 
   toggleCompactClicked() {
     this.setCompactMode(!this[Prefs._CompactDisplayState]);
-  },
+  }
   setCompactMode(is_compact) {
     const key = Prefs._CompactDisplayState;
     const was_compact = this[key];
@@ -1780,10 +1776,10 @@ Transmission.prototype = {
       this.setPref(key, is_compact);
       this.onCompactModeChanged();
     }
-  },
+  }
   initCompactMode() {
     this.onCompactModeChanged();
-  },
+  }
   onCompactModeChanged() {
     const compact = this[Prefs._CompactDisplayState];
 
@@ -1793,7 +1789,7 @@ Transmission.prototype = {
     // update the ui: torrent list
     this.torrentRenderer = compact ? new TorrentRendererCompact() : new TorrentRendererFull();
     this.refilter(true);
-  },
+  }
 
   /***
    ****
@@ -1814,20 +1810,20 @@ Transmission.prototype = {
         this.statsInterval = setInterval(this.loadDaemonStats.bind(this), msec);
       }
     }
-  },
+  }
 
   loadDaemonStats(async) {
     this.remote.loadDaemonStats(
       function (data) {
-        this.updateStats(data['arguments']);
-      },
+        Transmission.updateStats(data['arguments']);
+      }.bind(this),
       this,
       async
     );
-  },
+  }
 
   // Process new session stats from the server
-  updateStats(stats) {
+  static updateStats(stats) {
     const fmt = Transmission.fmt;
 
     let s = stats['current-stats'];
@@ -1844,7 +1840,7 @@ Transmission.prototype = {
     $('#stats-total-downloaded').html(fmt.size(s.downloadedBytes));
     $('#stats-total-ratio').html(fmt.ratioString(ratio));
     $('#stats-total-duration').html(fmt.timeInterval(s.secondsActive));
-  },
+  }
 
   showStatsDialog() {
     this.loadDaemonStats();
@@ -1852,27 +1848,27 @@ Transmission.prototype = {
     this.togglePeriodicStatsRefresh(true);
     $('#stats-dialog').dialog({
       close: $.proxy(this.onStatsDialogClosed, this),
-      show: 'fade',
       hide: 'fade',
+      show: 'fade',
       title: 'Statistics',
     });
-  },
+  }
 
   onStatsDialogClosed() {
     this.hideMobileAddressbar();
     this.togglePeriodicStatsRefresh(false);
-  },
+  }
 
   /***
    ****
    ****  Hotkeys
    ****
    ***/
-  showHotkeysDialog() {
+  static showHotkeysDialog() {
     $('#hotkeys-dialog').dialog({
-      title: 'Hotkeys',
-      show: 'fade',
       hide: 'fade',
+      show: 'fade',
+      title: 'Hotkeys',
     });
-  },
-};
+  }
+}

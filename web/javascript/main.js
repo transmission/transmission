@@ -1,9 +1,14 @@
+'use strict';
+
 /**
  * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
  *
  * This file is licensed under the GPLv2.
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
+
+let dialog = null;
+let transmission = null;
 
 function main() {
   // IE specific fixes here
