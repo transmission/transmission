@@ -89,7 +89,7 @@ function Inspector(controller) {
 
       if (torrents.length < 1) {
         str = none;
-      } else if (sizeWhenDone == 0) {
+      } else if (sizeWhenDone === 0) {
         str = none;
       } else {
         const available = torrents.reduce((acc, t) => t.getHave() + t.getDesiredAvailable(), 0);
@@ -456,7 +456,7 @@ function Inspector(controller) {
 
         let tier = -1;
         tor.getTrackers().forEach((tracker, idx) => {
-          if (tier != tracker.tier) {
+          if (tier !== tracker.tier) {
             if (tier !== -1) {
               // close previous tier
               html.push('</ul></div>');
@@ -631,7 +631,7 @@ function Inspector(controller) {
 
       const tor = torrents[0];
       const n = tor ? tor.getFileCount() : 0;
-      if (tor != data.file_torrent || n != data.file_torrent_n) {
+      if (tor !== data.file_torrent || n !== data.file_torrent_n) {
         // rebuild the file list...
         clearFileList();
         data.file_torrent = tor;

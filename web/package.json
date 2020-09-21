@@ -47,6 +47,7 @@
       "block-scoped-var": "error",
       "class-methods-use-this": "error",
       "curly": ["error", "all"],
+      "eqeqeq": "error",
       "init-declarations": ["error", "always"],
       "no-use-before-define": "error",
       "no-shadow": "error",

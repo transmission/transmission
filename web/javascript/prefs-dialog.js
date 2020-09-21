@@ -74,7 +74,7 @@ class PrefsDialog {
        immediately, like checkboxs, radioboxes, and selects */
   onControlChanged(ev) {
     const o = {};
-    o[ev.target.id] = this.getValue($(ev.target));
+    o[ev.target.id] = PrefsDialog.getValue($(ev.target));
     this.data.remote.savePrefs(o);
   }
 
@@ -82,11 +82,11 @@ class PrefsDialog {
        immediately -- like a text entry field -- because it takes many
        change events for the user to get to the desired result */
   onControlFocused(ev) {
-    this.data.oldValue = this.getValue($(ev.target));
+    this.data.oldValue = PrefsDialog.getValue($(ev.target));
   }
 
   onControlBlurred(ev) {
-    const newValue = this.getValue($(ev.target));
+    const newValue = PrefsDialog.getValue($(ev.target));
     if (newValue !== this.data.oldValue) {
       const o = {};
       o[ev.target.id] = newValue;
@@ -108,7 +108,7 @@ class PrefsDialog {
     const root = this.data.elements.root;
 
     for (const key of this.data.keys) {
-      const val = this.getValue(root.find(`#${key}`));
+      const val = PrefsDialog.getValue(root.find(`#${key}`));
       if (val !== null) {
         o[key] = val;
       }
@@ -241,8 +241,8 @@ class PrefsDialog {
     };
 
     let e = this.data.elements.root;
-    this.initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
-    this.initTimeDropDown(e.find('#alt-speed-time-end')[0]);
+    PrefsDialog.initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
+    PrefsDialog.initTimeDropDown(e.find('#alt-speed-time-end')[0]);
 
     const o = isMobileDevice
       ? this.getDefaultMobileOptions()

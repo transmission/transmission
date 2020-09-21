@@ -40,7 +40,7 @@ function setInnerHTML(e, html) {
   /* innerHTML is listed as a string, but the browser seems to change it.
    * For example, "&infin;" gets changed to "∞" somewhere down the line.
    * So, let's use an arbitrary  different field to test our state... */
-  if (e.currentHTML != html) {
+  if (e.currentHTML !== html) {
     e.currentHTML = html;
     e.innerHTML = html;
   }
@@ -56,7 +56,7 @@ function sanitizeText(text) {
  * so see if the text actually changed before poking the DOM.
  */
 function setTextContent(e, text) {
-  if (e && e.textContent != text) {
+  if (e && e.textContent !== text) {
     e.textContent = text;
   }
 }
@@ -68,7 +68,7 @@ Math.ratio = function (numerator, denominator) {
   let result = Math.floor((100 * numerator) / denominator) / 100;
 
   // check for special cases
-  if (result == Number.POSITIVE_INFINITY || result == Number.NEGATIVE_INFINITY) {
+  if (result === Number.POSITIVE_INFINITY || result === Number.NEGATIVE_INFINITY) {
     result = -2;
   } else if (isNaN(result)) {
     result = -1;

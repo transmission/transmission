@@ -62,7 +62,7 @@ class FileRow {
       }
     }
 
-    if (this.fields.have != have || this.fields.size != size) {
+    if (this.fields.have !== have || this.fields.size !== size) {
       this.fields.have = have;
       this.fields.size = size;
       this.refreshProgressHTML();

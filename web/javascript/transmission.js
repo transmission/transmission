@@ -250,7 +250,7 @@ Transmission.prototype = {
           tl.contextmenu('enableEntry', 'pause_selected', s.activeSel > 0);
           tl.contextmenu('enableEntry', 'resume_selected', s.pausedSel > 0);
           tl.contextmenu('enableEntry', 'resume_now_selected', s.pausedSel > 0 || s.queuedSel > 0);
-          tl.contextmenu('enableEntry', 'rename', s.sel == 1);
+          tl.contextmenu('enableEntry', 'rename', s.sel === 1);
         });
       }, this),
     });
@@ -282,7 +282,7 @@ Transmission.prototype = {
 
   onFreeSpaceResponse(dir, bytes) {
     const formdir = $('input#add-dialog-folder-input').val();
-    if (formdir == dir) {
+    if (formdir === dir) {
       const e = $('label#add-dialog-folder-label');
       const str = bytes > 0 ? `  <i>(${Transmission.fmt.size(bytes)} Free)</i>` : '';
       e.html(`Destination folder${str}:`);
@@ -819,7 +819,7 @@ Transmission.prototype = {
     const remote = this.remote;
     const element = ui.target;
 
-    if (ui.group == 'sort-mode') {
+    if (ui.group === 'sort-mode') {
       element.selectMenuItem();
       this.setSortMethod(id.replace(/sort_by_/, ''));
     } else if (element.hasClass('upload-speed')) {
@@ -935,7 +935,7 @@ Transmission.prototype = {
           $.proxy(function (newValue, oldValue) {
             if (
               oldValue === Torrent._StatusDownload &&
-              (newValue == Torrent._StatusSeed || newValue == Torrent._StatusSeedWait)
+              (newValue === Torrent._StatusSeed || newValue === Torrent._StatusSeedWait)
             ) {
               $(this).trigger('downloadComplete', [t]);
             } else if (
@@ -1104,7 +1104,7 @@ Transmission.prototype = {
               },
             };
             remote.sendRequest(o, function (response) {
-              if (response.result != 'success') {
+              if (response.result !== 'success') {
                 alert(`Error adding "${file.name}": ${response.result}`);
               }
             });
@@ -1114,7 +1114,7 @@ Transmission.prototype = {
       });
 
       let url = $('#torrent_upload_url').val();
-      if (url != '') {
+      if (url !== '') {
         if (url.match(/^[0-9a-f]{40}$/i)) {
           url = `magnet:?xt=urn:btih:${url}`;
         }
@@ -1127,7 +1127,7 @@ Transmission.prototype = {
           },
         };
         remote.sendRequest(o, function (response) {
-          if (response.result != 'success') {
+          if (response.result !== 'success') {
             alert(`Error adding "${url}": ${response.result}`);
           }
         });
@@ -1227,7 +1227,7 @@ Transmission.prototype = {
 
   renameSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
-    if (torrents.length != 1) {
+    if (torrents.length !== 1) {
       dialog.alert('Renaming', 'You can rename only one torrent at a time.', 'Ok');
     } else {
       this.promptToRenameTorrent(torrents[0]);
@@ -1623,11 +1623,11 @@ Transmission.prototype = {
     const frag = document.createDocumentFragment();
     let ci = 0;
     let di = 0;
-    while (ci != cmax || di != dmax) {
+    while (ci !== cmax || di !== dmax) {
       let push_clean = null;
-      if (ci == cmax) {
+      if (ci === cmax) {
         push_clean = false;
-      } else if (di == dmax) {
+      } else if (di === dmax) {
         push_clean = true;
       } else {
         const c = Torrent.compareTorrents(

@@ -128,7 +128,7 @@ Torrent.prototype = {
     }
 
     const observers = this.fieldObservers[name];
-    if (o == this.fields && observers && observers.length) {
+    if (o === this.fields && observers && observers.length) {
       for (const observer of observers) {
         observer.call(this, value, old_value, name);
       }

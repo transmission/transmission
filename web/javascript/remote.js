@@ -80,7 +80,7 @@ TransmissionRemote.prototype = {
 
   sendRequest(data, callback, context, async) {
     const remote = this;
-    if (typeof async != 'boolean') {
+    if (typeof async !== 'boolean') {
       async = true;
     }
 
