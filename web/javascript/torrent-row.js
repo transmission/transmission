@@ -411,7 +411,7 @@ class TorrentRow {
     this._torrent = torrent;
     this._element = view.createRow();
     this.render(controller);
-    $(this._torrent).bind('dataChanged.torrentRowListener', function () {
+    $(this._torrent).bind('dataChanged.torrentRowListener', () => {
       row.render(controller);
     });
   }

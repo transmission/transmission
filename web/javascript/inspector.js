@@ -17,9 +17,7 @@ function Inspector(controller) {
       return torrents.some((tor) => !tor.hasExtraInfo());
     },
     refreshTorrents = function (callback) {
-      const ids = $.map(data.torrents.slice(0), function (t) {
-        return t.getId();
-      });
+      const ids = data.torrents.map((t) => t.getId());
 
       if (ids && ids.length) {
         const fields = ['id'].concat(Torrent.Fields.StatsExtra);

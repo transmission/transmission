@@ -52,7 +52,7 @@ class Transmission {
     // tell jQuery to copy the dataTransfer property from events over if it exists
     jQuery.event.props.push('dataTransfer');
 
-    $('#torrent_upload_form').submit(function () {
+    $('#torrent_upload_form').submit(() => {
       $('#upload_confirm_button').click();
       return false;
     });
@@ -105,7 +105,7 @@ class Transmission {
 
   loadDaemonPrefs(async) {
     this.remote.loadDaemonPrefs(
-      function (data) {
+      (data) => {
         const o = data['arguments'];
         Prefs.getClutchPrefs(o);
         this.updateGuiFromSession(o);
@@ -224,7 +224,7 @@ class Transmission {
           this.setSelectedRow(this._rows[i]);
         }
 
-        this.calculateTorrentStates(function (s) {
+        this.calculateTorrentStates((s) => {
           const tl = $(event.target);
           tl.contextmenu('enableEntry', 'pause_selected', s.activeSel > 0);
           tl.contextmenu('enableEntry', 'resume_selected', s.pausedSel > 0);
@@ -258,7 +258,7 @@ class Transmission {
       },
       select: $.proxy(this.onMenuClicked, this),
     });
-    $('#settings_menu').click(function () {
+    $('#settings_menu').click(() => {
       $('#footer_super_menu').transMenu('open');
     });
   }
@@ -296,7 +296,7 @@ class Transmission {
   }
 
   static getTorrentIds(torrents) {
-    return $.map(torrents.slice(0), function (t) {
+    return $.map(torrents.slice(0), (t) => {
       return t.getId();
     });
   }
@@ -338,13 +338,13 @@ class Transmission {
    ****/
 
   getSelectedRows() {
-    return $.grep(this._rows, function (r) {
+    return $.grep(this._rows, (r) => {
       return r.isSelected();
     });
   }
 
   getSelectedTorrents() {
-    return $.map(this.getSelectedRows(), function (r) {
+    return $.map(this.getSelectedRows(), (r) => {
       return r.getTorrent();
     });
   }
@@ -1079,7 +1079,7 @@ class Transmission {
       const destination = folderInput.val();
       const { remote } = this;
 
-      jQuery.each(fileInput[0].files, function (i, file) {
+      jQuery.each(fileInput[0].files, (i, file) => {
         const reader = new FileReader();
         reader.onload = function (e) {
           const contents = e.target.result;
@@ -1095,7 +1095,7 @@ class Transmission {
               },
               method: 'torrent-add',
             };
-            remote.sendRequest(o, function (response) {
+            remote.sendRequest(o, (response) => {
               if (response.result !== 'success') {
                 alert(`Error adding "${file.name}": ${response.result}`);
               }
@@ -1118,7 +1118,7 @@ class Transmission {
           },
           method: 'torrent-add',
         };
-        remote.sendRequest(o, function (response) {
+        remote.sendRequest(o, (response) => {
           if (response.result !== 'success') {
             alert(`Error adding "${url}": ${response.result}`);
           }
@@ -1167,14 +1167,14 @@ class Transmission {
       const header = `Remove ${torrent.getName()}?`;
       const message =
         'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-      dialog.confirm(header, message, 'Remove', function () {
+      dialog.confirm(header, message, 'Remove', () => {
         transmission.removeTorrents(torrents);
       });
     } else {
       const header = `Remove ${torrents.length} transfers?`;
       const message =
         'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-      dialog.confirm(header, message, 'Remove', function () {
+      dialog.confirm(header, message, 'Remove', () => {
         transmission.removeTorrents(torrents);
       });
     }
@@ -1187,7 +1187,7 @@ class Transmission {
       const message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
 
-      dialog.confirm(header, message, 'Remove', function () {
+      dialog.confirm(header, message, 'Remove', () => {
         transmission.removeTorrentsAndData(torrents);
       });
     } else {
@@ -1195,7 +1195,7 @@ class Transmission {
       const message =
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
 
-      dialog.confirm(header, message, 'Remove', function () {
+      dialog.confirm(header, message, 'Remove', () => {
         transmission.removeTorrentsAndData(torrents);
       });
     }
@@ -1480,7 +1480,7 @@ class Transmission {
 
   updateButtonStates() {
     const e = this.elements;
-    this.calculateTorrentStates(function (s) {
+    this.calculateTorrentStates((s) => {
       const setEnabled = (key, flag) => $(key).toggleClass('disabled', !flag);
       setEnabled(e.toolbar_pause_button, s.activeSel > 0);
       setEnabled(e.toolbar_start_button, s.pausedSel > 0);
@@ -1814,9 +1814,9 @@ class Transmission {
 
   loadDaemonStats(async) {
     this.remote.loadDaemonStats(
-      function (data) {
+      (data) => {
         Transmission.updateStats(data['arguments']);
-      }.bind(this),
+      },
       this,
       async
     );

@@ -129,13 +129,11 @@ class PrefsDialog {
 
   // update the dialog's controls
   set(o) {
-    const { root } = this.data.elements;
-
     this.setBlocklistButtonEnabled(true);
 
     for (const key of this.data.keys) {
       const val = o[key];
-      const [e] = root.find(`#${key}`);
+      const e = document.getElementById(key);
 
       if (key === 'blocklist-size') {
         // special case -- regular text area

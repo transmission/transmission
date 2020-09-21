@@ -2,7 +2,7 @@
 
 const Notifications = {};
 
-$(document).ready(function () {
+$(document).ready(() => {
   if (!window.webkitNotifications) {
     return;
   }
@@ -16,7 +16,7 @@ $(document).ready(function () {
 
   toggle.show();
   updateMenuTitle();
-  $(transmission).bind('downloadComplete seedingComplete', function (event, torrent) {
+  $(transmission).bind('downloadComplete seedingComplete', (event, torrent) => {
     if (notificationsEnabled) {
       const title = `${event.type === 'downloadComplete' ? 'Download' : 'Seeding'} complete`;
       const content = torrent.getName();
@@ -26,7 +26,7 @@ $(document).ready(function () {
         content
       );
       notification.show();
-      setTimeout(function () {
+      setTimeout(() => {
         notification.cancel();
       }, 5000);
     }
@@ -34,7 +34,7 @@ $(document).ready(function () {
 
   Notifications.toggle = function () {
     if (window.webkitNotifications.checkPermission() !== 0) {
-      window.webkitNotifications.requestPermission(function () {
+      window.webkitNotifications.requestPermission(() => {
         notificationsEnabled = window.webkitNotifications.checkPermission() === 0;
         updateMenuTitle();
       });

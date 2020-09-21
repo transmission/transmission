@@ -203,7 +203,7 @@ Prefs.getClutchPrefs = function (o) {
 // forceNumeric() plug-in implementation
 jQuery.fn.forceNumeric = function () {
   return this.each(function () {
-    $(this).keydown(function (e) {
+    $(this).keydown((e) => {
       const key = e.which || e.keyCode;
       return (
         (!e.shiftKey &&

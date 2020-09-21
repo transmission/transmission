@@ -27,12 +27,12 @@ function main() {
 
   if (isMobileDevice) {
     window.onload = function () {
-      setTimeout(function () {
+      setTimeout(() => {
         window.scrollTo(0, 1);
       }, 500);
     };
     window.onorientationchange = function () {
-      setTimeout(function () {
+      setTimeout(() => {
         window.scrollTo(0, 1);
       }, 100);
     };
@@ -43,7 +43,7 @@ function main() {
     }
   } else {
     // Fix for non-Safari-3 browsers: dark borders to replace shadows.
-    Array.from(document.getElementsByClassName('dialog_window')).forEach(function (e) {
+    Array.from(document.getElementsByClassName('dialog_window')).forEach((e) => {
       e.style['border'] = '1px solid #777';
     });
   }

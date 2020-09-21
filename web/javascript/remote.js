@@ -135,7 +135,7 @@ class TransmissionRemote {
     if (torrentIds) {
       o['arguments'].ids = torrentIds;
     }
-    this.sendRequest(o, function (response) {
+    this.sendRequest(o, (response) => {
       const args = response['arguments'];
       callback.call(context, args.torrents, args.removed);
     });
@@ -148,7 +148,7 @@ class TransmissionRemote {
       },
       method: 'free-space',
     };
-    this.sendRequest(o, function (response) {
+    this.sendRequest(o, (response) => {
       const args = response['arguments'];
       callback.call(context, args.path, args['size-bytes']);
     });
@@ -164,9 +164,9 @@ class TransmissionRemote {
         arguments: args,
         method: 'torrent-set',
       },
-      function () {
+      () => {
         this._controller.refreshTorrents([torrentId]);
-      }.bind(this)
+      }
     );
   }
 
@@ -224,12 +224,9 @@ class TransmissionRemote {
         o.arguments.ids.push(torrents[i].getId());
       }
     }
-    this.sendRequest(
-      o,
-      function () {
-        this._controller.refreshTorrents();
-      }.bind(this)
-    );
+    this.sendRequest(o, () => {
+      this._controller.refreshTorrents();
+    });
   }
   verifyTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback, context);
@@ -248,35 +245,26 @@ class TransmissionRemote {
       },
       method: 'torrent-add',
     };
-    this.sendRequest(
-      o,
-      function () {
-        this._controller.refreshTorrents();
-      }.bind(this)
-    );
+    this.sendRequest(o, () => {
+      this._controller.refreshTorrents();
+    });
   }
   savePrefs(args) {
     const o = {
       arguments: args,
       method: 'session-set',
     };
-    this.sendRequest(
-      o,
-      function () {
-        this._controller.loadDaemonPrefs();
-      }.bind(this)
-    );
+    this.sendRequest(o, () => {
+      this._controller.loadDaemonPrefs();
+    });
   }
   updateBlocklist() {
     const o = {
       method: 'blocklist-update',
     };
-    this.sendRequest(
-      o,
-      function () {
-        this._controller.loadDaemonPrefs();
-      }.bind(this)
-    );
+    this.sendRequest(o, () => {
+      this._controller.loadDaemonPrefs();
+    });
   }
 
   // Added queue calls

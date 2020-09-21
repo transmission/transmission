@@ -112,11 +112,7 @@ class FileRow {
     e.type = 'checkbox';
     e.className = 'file_wanted_control';
     e.title = 'Download file';
-    $(e).change(
-      function (ev) {
-        this.fireWantedChanged($(ev.currentTarget).prop('checked'));
-      }.bind(this)
-    );
+    $(e).change((ev) => this.fireWantedChanged($(ev.currentTarget).prop('checked')));
     root.checkbox = e;
     root.appendChild(e);
 
@@ -127,33 +123,21 @@ class FileRow {
     e = document.createElement('div');
     e.className = 'low';
     e.title = 'Low Priority';
-    $(e).click(
-      function () {
-        this.firePriorityChanged(-1);
-      }.bind(this)
-    );
+    $(e).click(() => this.firePriorityChanged(-1));
     this.elements.priority_low_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.className = 'normal';
     e.title = 'Normal Priority';
-    $(e).click(
-      function () {
-        this.firePriorityChanged(0);
-      }.bind(this)
-    );
+    $(e).click(() => this.firePriorityChanged(0));
     this.elements.priority_normal_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.title = 'High Priority';
     e.className = 'high';
-    $(e).click(
-      function () {
-        this.firePriorityChanged(1);
-      }.bind(this)
-    );
+    $(e).click(() => this.firePriorityChanged(1));
     this.elements.priority_high_button = e;
     box.appendChild(e);
 
