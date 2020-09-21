@@ -75,6 +75,7 @@
       "no-void": "error",
       "no-with": "error",
       "object-shorthand": ["error", "always"],
+      "prefer-destructuring": "error",
       "prefer-const": "error",
       "prefer-numeric-literals": "error",
       "prefer-rest-params": "error",

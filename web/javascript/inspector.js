@@ -36,9 +36,9 @@ function Inspector(controller) {
       const none = 'None';
       const mixed = 'Mixed';
       const unknown = 'Unknown';
-      const fmt = Transmission.fmt;
+      const { fmt } = Transmission;
       const now = Date.now();
-      const torrents = data.torrents;
+      const { torrents } = data;
       const e = data.elements;
       const sizeWhenDone = torrents.reduce((acc, t) => acc + t.getSizeWhenDone(), 0);
 
@@ -305,9 +305,9 @@ function Inspector(controller) {
 
     updatePeersPage = function () {
       const html = [];
-      const fmt = Transmission.fmt;
-      const peers_list = data.elements.peers_list;
-      const torrents = data.torrents;
+      const { fmt } = Transmission;
+      const { peers_list } = data.elements;
+      const { torrents } = data;
 
       for (const tor of torrents) {
         const peers = tor.getPeers();
@@ -443,8 +443,8 @@ function Inspector(controller) {
     },
     updateTrackersPage = function () {
       const na = 'N/A';
-      const trackers_list = data.elements.trackers_list;
-      const torrents = data.torrents;
+      const { trackers_list } = data.elements;
+      const { torrents } = data;
 
       // By building up the HTML as as string, then have the browser
       // turn this into a DOM tree, this is a fast operation.
@@ -464,7 +464,7 @@ function Inspector(controller) {
               html.push('</ul></div>');
             }
 
-            tier = tracker.tier;
+            ({ tier } = tracker);
 
             html.push(
               '<div class="inspector_group_label">',
@@ -566,7 +566,7 @@ function Inspector(controller) {
 
       const n = tor.getFileCount();
       for (let i = 0; i < n; ++i) {
-        const name = tor.getFile(i).name;
+        const { name } = tor.getFile(i);
         const tokens = name.split('/');
         let walk = tree;
         for (let j = 0; j < tokens.length; ++j) {
@@ -622,8 +622,8 @@ function Inspector(controller) {
       return i;
     },
     updateFilesPage = function () {
-      const file_list = data.elements.file_list;
-      const torrents = data.torrents;
+      const { file_list } = data.elements;
+      const { torrents } = data;
 
       // only show one torrent at a time
       if (torrents.length !== 1) {
@@ -631,7 +631,7 @@ function Inspector(controller) {
         return;
       }
 
-      const tor = torrents[0];
+      const [tor] = torrents;
       const n = tor ? tor.getFileCount() : 0;
       if (tor !== data.file_torrent || n !== data.file_torrent_n) {
         // rebuild the file list...
@@ -650,7 +650,7 @@ function Inspector(controller) {
     },
     updateInspector = function () {
       const e = data.elements;
-      const torrents = data.torrents;
+      const { torrents } = data;
 
       // update the name, which is shown on all the pages
       let name = null;

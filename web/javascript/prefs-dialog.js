@@ -27,7 +27,7 @@ class PrefsDialog {
 
   setGroupEnabled(parent_key, enabled) {
     if (parent_key in this.data.groups) {
-      const root = this.data.elements.root;
+      const { root } = this.data.elements;
       for (const key of this.data.groups[parent_key]) {
         root.find(`#${key}`).attr('disabled', !enabled);
       }
@@ -107,7 +107,7 @@ class PrefsDialog {
 
   getValues() {
     const o = {};
-    const root = this.data.elements.root;
+    const { root } = this.data.elements;
 
     for (const key of this.data.keys) {
       const val = PrefsDialog.getValue(root.find(`#${key}`));
@@ -129,13 +129,13 @@ class PrefsDialog {
 
   // update the dialog's controls
   set(o) {
-    const root = this.data.elements.root;
+    const { root } = this.data.elements;
 
     this.setBlocklistButtonEnabled(true);
 
     for (const key of this.data.keys) {
       const val = o[key];
-      const e = root.find(`#${key}`)[0];
+      const [e] = root.find(`#${key}`);
 
       if (key === 'blocklist-size') {
         // special case -- regular text area

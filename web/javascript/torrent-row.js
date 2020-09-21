@@ -154,7 +154,7 @@ TorrentRendererFull.prototype = {
   },
 
   getPeerDetails(t) {
-    const fmt = Transmission.fmt;
+    const { fmt } = Transmission;
 
     const err = t.getErrorMessage();
     if (err) {

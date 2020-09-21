@@ -307,7 +307,7 @@ class Transmission {
       const list = $('#torrent_container');
       const scrollTop = list.scrollTop();
       const innerHeight = list.innerHeight();
-      const offsetTop = row.getElement().offsetTop;
+      const { offsetTop } = row.getElement();
       const offsetHeight = $(row.getElement()).outerHeight();
 
       if (offsetTop < scrollTop) {
@@ -807,8 +807,8 @@ class Transmission {
   }
 
   onMenuClicked(event, ui) {
-    const id = ui.id;
-    const remote = this.remote;
+    const { id } = ui;
+    const { remote } = this;
     const element = ui.target;
 
     if (ui.group === 'sort-mode') {
@@ -904,7 +904,7 @@ class Transmission {
     const needinfo = [];
 
     for (const o of updates) {
-      const id = o.id;
+      const { id } = o;
       let t = this._torrents[id];
       if (t) {
         const needed = t.needsMetaData();
@@ -991,7 +991,7 @@ class Transmission {
 
   onRowClicked(ev) {
     const meta_key = ev.metaKey || ev.ctrlKey,
-      row = ev.currentTarget.row;
+      { row } = ev.currentTarget;
 
     // handle the per-row "torrent_resume" button
     if (ev.target.className === 'torrent_resume') {
@@ -1077,7 +1077,7 @@ class Transmission {
     } else {
       const paused = !startInput.is(':checked');
       const destination = folderInput.val();
-      const remote = this.remote;
+      const { remote } = this;
 
       jQuery.each(fileInput[0].files, function (i, file) {
         const reader = new FileReader();
@@ -1163,7 +1163,7 @@ class Transmission {
 
   static promptToRemoveTorrents(torrents) {
     if (torrents.length === 1) {
-      const torrent = torrents[0];
+      const [torrent] = torrents;
       const header = `Remove ${torrent.getName()}?`;
       const message =
         'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
@@ -1182,7 +1182,7 @@ class Transmission {
 
   static promptToRemoveTorrentsAndData(torrents) {
     if (torrents.length === 1) {
-      const torrent = torrents[0];
+      const [torrent] = torrents;
       const header = `Remove ${torrent.getName()} and delete data?`;
       const message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
@@ -1334,7 +1334,7 @@ class Transmission {
    ***/
 
   updateGuiFromSession(o) {
-    const fmt = Transmission.fmt;
+    const { fmt } = Transmission;
     const menu = $('#footer_super_menu');
 
     this.serverVersion = o.version;
@@ -1385,7 +1385,7 @@ class Transmission {
   }
 
   updateStatusbar() {
-    const fmt = Transmission.fmt;
+    const { fmt } = Transmission;
     const torrents = this.getAllTorrents();
 
     const u = torrents.reduce((acc, tor) => acc + tor.getUploadSpeed(), 0);
@@ -1727,7 +1727,7 @@ class Transmission {
       const trackers = torrent.getTrackers();
 
       for (let j = 0, tracker; (tracker = trackers[j]); ++j) {
-        const announce = tracker.announce;
+        const { announce } = tracker;
 
         let uri = null;
         if (announce in this.uriCache) {
@@ -1824,7 +1824,7 @@ class Transmission {
 
   // Process new session stats from the server
   static updateStats(stats) {
-    const fmt = Transmission.fmt;
+    const { fmt } = Transmission;
 
     let s = stats['current-stats'];
     let ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
