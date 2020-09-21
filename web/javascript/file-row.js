@@ -17,23 +17,18 @@ class FileRow {
   }
 
   refreshWantedHTML() {
-    const e = $(this.elements.root);
-    e.toggleClass('skip', !this.fields.isWanted);
-    e.toggleClass('complete', this.isDone());
-    $(e[0].checkbox).prop('disabled', !this.isEditable());
-    $(e[0].checkbox).prop('checked', this.fields.isWanted);
+    const e = this.elements.root;
+    e.classList.toggle('skip', !this.fields.isWanted);
+    e.classList.toggle('complete', this.isDone());
+    e.checkbox.disabled = !this.isEditable();
+    e.checkbox.checked = this.fields.isWanted;
   }
 
   refreshProgressHTML() {
-    const pct = 100 * (this.fields.size ? this.fields.have / this.fields.size : 1.0);
-    const c = [
-      Transmission.fmt.size(this.fields.have),
-      ' of ',
-      Transmission.fmt.size(this.fields.size),
-      ' (',
-      Transmission.fmt.percentString(pct),
-      '%)',
-    ].join('');
+    const { size, have } = this.fields;
+    const pct = 100 * (size ? have / size : 1.0);
+    const { fmt } = Transmission;
+    const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(pct)}%)`;
     setTextContent(this.elements.progress, c);
   }
 
@@ -77,17 +72,17 @@ class FileRow {
 
     if (this.fields.priorityLow !== low) {
       this.fields.priorityLow = low;
-      $(this.elements.priority_low_button).toggleClass('selected', low);
+      this.elements.priority_low_button.classList.toggle('selected', low);
     }
 
     if (this.fields.priorityNormal !== normal) {
       this.fields.priorityNormal = normal;
-      $(this.elements.priority_normal_button).toggleClass('selected', normal);
+      this.elements.priority_normal_button.classList.toggle('selected', normal);
     }
 
     if (this.fields.priorityHigh !== high) {
       this.fields.priorityHigh = high;
-      $(this.elements.priority_high_button).toggleClass('selected', high);
+      this.elements.priority_high_button.classList.toggle('selected', high);
     }
   }
 
@@ -112,7 +107,7 @@ class FileRow {
     e.type = 'checkbox';
     e.className = 'file_wanted_control';
     e.title = 'Download file';
-    $(e).change((ev) => this.fireWantedChanged($(ev.currentTarget).prop('checked')));
+    $(e).change((ev) => this.fireWantedChanged(ev.currentTarget.checked));
     root.checkbox = e;
     root.appendChild(e);
 
@@ -123,21 +118,21 @@ class FileRow {
     e = document.createElement('div');
     e.className = 'low';
     e.title = 'Low Priority';
-    $(e).click(() => this.firePriorityChanged(-1));
+    e.addEventListener('click', () => this.firePriorityChanged(-1));
     this.elements.priority_low_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.className = 'normal';
     e.title = 'Normal Priority';
-    $(e).click(() => this.firePriorityChanged(0));
+    e.addEventListener('click', () => this.firePriorityChanged(0));
     this.elements.priority_normal_button = e;
     box.appendChild(e);
 
     e = document.createElement('div');
     e.title = 'High Priority';
     e.className = 'high';
-    $(e).click(() => this.firePriorityChanged(1));
+    e.addEventListener('click', () => this.firePriorityChanged(1));
     this.elements.priority_high_button = e;
     box.appendChild(e);
 
@@ -145,17 +140,17 @@ class FileRow {
 
     e = document.createElement('div');
     e.className = 'inspector_torrent_file_list_entry_name';
+    e.addEventListener('click', () => this.fireNameClicked());
     setTextContent(e, name);
-    $(e).click(this.fireNameClicked.bind(this));
     root.appendChild(e);
 
     e = document.createElement('div');
     e.className = 'inspector_torrent_file_list_entry_progress';
+    e.addEventListener('click', () => this.fireNameClicked());
     root.appendChild(e);
-    $(e).click(this.fireNameClicked.bind(this));
     this.elements.progress = e;
 
-    $(root).css('margin-left', `${depth * 16}px`);
+    root.style.marginLeft = `${depth * 16}px`;
 
     this.refresh();
   }

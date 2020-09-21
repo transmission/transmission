@@ -46,10 +46,10 @@ class PrefsDialog {
   }
 
   static getValue(e) {
-    switch (e[0].type) {
+    switch (e.type) {
       case 'checkbox':
       case 'radio':
-        return e.prop('checked');
+        return e.checked;
 
       case 'text':
       case 'url':
@@ -57,7 +57,7 @@ class PrefsDialog {
       case 'number':
       case 'search':
       case 'select-one': {
-        const str = e.val();
+        const str = e.value;
         if (parseInt(str, 10).toString() === str) {
           return parseInt(str, 10);
         }
@@ -76,7 +76,7 @@ class PrefsDialog {
        immediately, like checkboxs, radioboxes, and selects */
   onControlChanged(ev) {
     const o = {};
-    o[ev.target.id] = PrefsDialog.getValue($(ev.target));
+    o[ev.target.id] = PrefsDialog.getValue(ev.target);
     this.data.remote.savePrefs(o);
   }
 
@@ -84,11 +84,11 @@ class PrefsDialog {
        immediately -- like a text entry field -- because it takes many
        change events for the user to get to the desired result */
   onControlFocused(ev) {
-    this.data.oldValue = PrefsDialog.getValue($(ev.target));
+    this.data.oldValue = PrefsDialog.getValue(ev.target);
   }
 
   onControlBlurred(ev) {
-    const newValue = PrefsDialog.getValue($(ev.target));
+    const newValue = PrefsDialog.getValue(ev.target);
     if (newValue !== this.data.oldValue) {
       const o = {};
       o[ev.target.id] = newValue;
@@ -106,17 +106,11 @@ class PrefsDialog {
   }
 
   getValues() {
-    const o = {};
-    const { root } = this.data.elements;
-
-    for (const key of this.data.keys) {
-      const val = PrefsDialog.getValue(root.find(`#${key}`));
-      if (val !== null) {
-        o[key] = val;
-      }
-    }
-
-    return o;
+    return Object.fromEntries(
+      this.data.keys
+        .map((key) => [key, PrefsDialog.getValue(document.getElementById(key))])
+        .filter(([, val]) => val)
+    );
   }
 
   onDialogClosed() {

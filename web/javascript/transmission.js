@@ -28,9 +28,8 @@ class Transmission {
     Prefs.getClutchPrefs(this);
 
     // Set up user events
-    const listen = (key, event_name, callback) =>
-      document.getElementById(key).addEventListener(event_name, callback);
-    const click = (key, callback) => listen(key, 'click', callback);
+    const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
+    const click = (key, cb) => listen(key, 'click', cb);
     click('compact-button', () => this.toggleCompactClicked());
     click('move_cancel_button', () => this.hideMoveDialog());
     click('move_confirm_button', () => this.confirmMoveClicked());
