@@ -1,13 +1,9 @@
-
-
 /**
  * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
  *
  * This file is licensed under the GPLv2.
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
-
-let transmission, dialog, scroll_timeout;
 
 const isMobileDevice = RegExp('(iPhone|iPod|Android)').test(navigator.userAgent);
 
@@ -162,12 +158,11 @@ Prefs.setValue = function (key, val) {
  * @param fallback if the option isn't set, return this instead
  */
 Prefs.getValue = function (key, fallback) {
-  let val;
-
   if (!(key in Prefs._Defaults)) {
     console.warn("unrecognized preference key '%s'", key);
   }
 
+  let val = null;
   const lines = document.cookie.split(';');
   for (let i = 0, len = lines.length; !val && i < len; ++i) {
     const line = lines[i].trim();

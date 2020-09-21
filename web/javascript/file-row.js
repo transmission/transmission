@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -58,18 +56,16 @@ function FileRow(torrent, depth, name, indices, even) {
   };
 
   const refreshImpl = function () {
-    let i,
-      file,
-      have = 0,
-      size = 0,
-      wanted = false,
-      low = false,
-      normal = false,
-      high = false;
+    let have = 0;
+    let high = false;
+    let low = false;
+    let normal = false;
+    let size = 0;
+    let wanted = false;
 
     // loop through the file_indices that affect this row
-    for (i = 0; i < fields.indices.length; ++i) {
-      file = fields.torrent.getFile(fields.indices[i]);
+    for (const idx of fields.indices) {
+      const file = fields.torrent.getFile(idx);
       have += file.bytesCompleted;
       size += file.length;
       wanted |= file.wanted;
@@ -126,13 +122,11 @@ function FileRow(torrent, depth, name, indices, even) {
   };
 
   const createRow = function (torrent, depth, name, even) {
-    let e;
-
     const root = document.createElement('li');
     root.className = `inspector_torrent_file_list_entry${even ? 'even' : 'odd'}`;
     elements.root = root;
 
-    e = document.createElement('input');
+    let e = document.createElement('input');
     e.type = 'checkbox';
     e.className = 'file_wanted_control';
     e.title = 'Download file';

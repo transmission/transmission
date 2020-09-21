@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -43,17 +41,16 @@ TransmissionRemote.prototype = {
    * or on a 409, globally set the X-Transmission-Session-Id and resend
    */
   ajaxError(request, error_string, exception, ajaxObject) {
-    let token;
     const remote = this;
 
     // set the Transmission-Session-Id on a 409
-    if (
-      request.status === 409 &&
-      (token = request.getResponseHeader('X-Transmission-Session-Id'))
-    ) {
-      remote._token = token;
-      $.ajax(ajaxObject);
-      return;
+    if (request.status === 409) {
+      const token = request.getResponseHeader('X-Transmission-Session-Id');
+      if (token) {
+        remote._token = token;
+        $.ajax(ajaxObject);
+        return;
+      }
     }
 
     remote._error = request.responseText

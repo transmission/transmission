@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -19,8 +17,6 @@ Transmission.prototype = {
    ****/
 
   initialize() {
-    let e;
-
     // Initialize the helper classes
     this.remote = new TransmissionRemote(this);
     this.inspector = new Inspector(this);
@@ -33,7 +29,7 @@ Transmission.prototype = {
     this.filterText = '';
     this._torrents = {};
     this._rows = [];
-    this.dirtyTorrents = {};
+    this.dirtyTorrents = new Set();
     this.uriCache = {};
 
     // Initialize the clutch preferences
@@ -71,7 +67,7 @@ Transmission.prototype = {
 
     $('#toolbar-inspector').click($.proxy(this.toggleInspector, this));
 
-    e = $('#filter-mode');
+    let e = $('#filter-mode');
     e.val(this[Prefs._FilterMode]);
     e.change($.proxy(this.onFilterModeClicked, this));
     $('#filter-tracker').change($.proxy(this.onFilterTrackerClicked, this));
@@ -94,11 +90,11 @@ Transmission.prototype = {
     }
 
     e = {};
-    e.torrent_list = $('#torrent_list')[0];
+    e.torrent_list = document.getElementById('torrent_list');
     e.toolbar_buttons = $('#toolbar ul li');
-    e.toolbar_pause_button = $('#toolbar-pause')[0];
-    e.toolbar_start_button = $('#toolbar-start')[0];
-    e.toolbar_remove_button = $('#toolbar-remove')[0];
+    e.toolbar_pause_button = document.getElementById('toolbar-pause');
+    e.toolbar_start_button = document.getElementById('toolbar-start');
+    e.toolbar_remove_button = document.getElementById('toolbar-remove');
     this.elements = e;
 
     // Apply the prefs settings to the gui
@@ -285,16 +281,10 @@ Transmission.prototype = {
   },
 
   onFreeSpaceResponse(dir, bytes) {
-    let e, str;
-
     const formdir = $('input#add-dialog-folder-input').val();
     if (formdir == dir) {
-      e = $('label#add-dialog-folder-label');
-      if (bytes > 0) {
-        str = `  <i>(${Transmission.fmt.size(bytes)} Free)</i>`;
-      } else {
-        str = '';
-      }
+      const e = $('label#add-dialog-folder-label');
+      const str = bytes > 0 ? `  <i>(${Transmission.fmt.size(bytes)} Free)</i>` : '';
       e.html(`Destination folder${str}:`);
     }
   },
@@ -699,8 +689,6 @@ Transmission.prototype = {
   },
 
   drop(ev) {
-    let i, uri;
-    let uris = null;
     const types = ['text/uri-list', 'text/plain'];
     const paused = this.shouldAddedTorrentsStart();
 
@@ -708,13 +696,14 @@ Transmission.prototype = {
       return true;
     }
 
-    for (i = 0; !uris && i < types.length; ++i) {
+    let uris = null;
+    for (let i = 0; !uris && i < types.length; ++i) {
       if (ev.dataTransfer.types.contains(types[i])) {
         uris = ev.dataTransfer.getData(types[i]).split('\n');
       }
     }
 
-    for (i = 0; (uri = uris[i]); ++i) {
+    for (const uri of uris) {
       if (/^#/.test(uri)) {
         // lines which start with "#" are comments
         continue;
@@ -826,7 +815,6 @@ Transmission.prototype = {
   },
 
   onMenuClicked(event, ui) {
-    let o, dir;
     const id = ui.id;
     const remote = this.remote;
     const element = ui.target;
@@ -835,12 +823,12 @@ Transmission.prototype = {
       element.selectMenuItem();
       this.setSortMethod(id.replace(/sort_by_/, ''));
     } else if (element.hasClass('upload-speed')) {
-      o = {};
+      const o = {};
       o[RPC._UpSpeedLimit] = parseInt(element.text());
       o[RPC._UpSpeedLimited] = true;
       remote.savePrefs(o);
     } else if (element.hasClass('download-speed')) {
-      o = {};
+      const o = {};
       o[RPC._DownSpeedLimit] = parseInt(element.text());
       o[RPC._DownSpeedLimited] = true;
       remote.savePrefs(o);
@@ -854,8 +842,8 @@ Transmission.prototype = {
           this.showHotkeysDialog();
           break;
 
-        case 'about-button':
-          o = `Transmission ${this.serverVersion}`;
+        case 'about-button': {
+          const o = `Transmission ${this.serverVersion}`;
           $('#about-dialog #about-title').html(o);
           $('#about-dialog').dialog({
             title: 'About',
@@ -863,6 +851,7 @@ Transmission.prototype = {
             hide: 'fade',
           });
           break;
+        }
 
         case 'homepage':
           window.open('https://transmissionbt.com/');
@@ -873,39 +862,31 @@ Transmission.prototype = {
           break;
 
         case 'unlimited_download_rate':
-          o = {};
-          o[RPC._DownSpeedLimited] = false;
-          remote.savePrefs(o);
+          remote.savePrefs({ [RPC._DownSpeedLimited]: false });
           break;
 
         case 'limited_download_rate':
-          o = {};
-          o[RPC._DownSpeedLimited] = true;
-          remote.savePrefs(o);
+          remote.savePrefs({ [RPC._DownSpeedLimited]: true });
           break;
 
         case 'unlimited_upload_rate':
-          o = {};
-          o[RPC._UpSpeedLimited] = false;
-          remote.savePrefs(o);
+          remote.savePrefs({ [RPC._UpSpeedLimited]: false });
           break;
 
         case 'limited_upload_rate':
-          o = {};
-          o[RPC._UpSpeedLimited] = true;
-          remote.savePrefs(o);
+          remote.savePrefs({ [RPC._UpSpeedLimited]: true });
           break;
 
-        case 'reverse_sort_order':
-          if (element.menuItemIsSelected()) {
-            dir = Prefs._SortAscending;
+        case 'reverse_sort_order': {
+          const dir = element.menuItemIsSelected() ? Prefs._SortAscending : Prefs._SortDescending;
+          if (dir === Prefs._SortAscending) {
             element.deselectMenuItem();
           } else {
-            dir = Prefs._SortDescending;
             element.selectMenuItem();
           }
           this.setSortDirection(dir);
           break;
+        }
 
         case 'toggle_notifications':
           Notifications && Notifications.toggle();
@@ -920,7 +901,7 @@ Transmission.prototype = {
 
   onTorrentChanged(ev, tor) {
     // update our dirty fields
-    this.dirtyTorrents[tor.getId()] = true;
+    this.dirtyTorrents.add(tor.getId());
 
     // enqueue ui refreshes
     this.refilterSoon();
@@ -928,21 +909,21 @@ Transmission.prototype = {
   },
 
   updateFromTorrentGet(updates, removed_ids) {
-    let i, o, t, id, needed, callback, fields;
     const needinfo = [];
 
-    for (i = 0; (o = updates[i]); ++i) {
-      id = o.id;
-      if ((t = this._torrents[id])) {
-        needed = t.needsMetaData();
+    for (const o of updates) {
+      const id = o.id;
+      let t = this._torrents[id];
+      if (t) {
+        const needed = t.needsMetaData();
         t.refresh(o);
         if (needed && !t.needsMetaData()) {
           needinfo.push(id);
         }
       } else {
         t = this._torrents[id] = new Torrent(o);
-        this.dirtyTorrents[id] = true;
-        callback = $.proxy(this.onTorrentChanged, this);
+        this.dirtyTorrents.add(id);
+        const callback = $.proxy(this.onTorrentChanged, this);
         $(t).bind('dataChanged', callback);
         // do we need more info for this torrent?
         if (!('name' in t.fields) || !('status' in t.fields)) {
@@ -973,7 +954,7 @@ Transmission.prototype = {
 
     if (needinfo.length) {
       // whee, new torrents! get their initial information.
-      fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+      const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
       this.updateTorrents(needinfo, fields);
       this.refilterSoon();
     }
@@ -1067,11 +1048,9 @@ Transmission.prototype = {
   },
 
   deleteTorrents(ids) {
-    let i, id;
-
     if (ids && ids.length) {
-      for (i = 0; (id = ids[i]); ++i) {
-        this.dirtyTorrents[id] = true;
+      for (const id of ids) {
+        this.dirtyTorrents.add(id);
         delete this._torrents[id];
       }
       this.refilter();
@@ -1158,12 +1137,7 @@ Transmission.prototype = {
 
   promptSetLocation(confirmed, torrents) {
     if (!confirmed) {
-      let path;
-      if (torrents.length === 1) {
-        path = torrents[0].getDownloadDir();
-      } else {
-        path = $('#download-dir').val();
-      }
+      const path = torrents.length === 1 ? torrents[0].getDownloadDir() : $('#download-dir').val();
       $('input#torrent_path').attr('value', path);
       $('#move_container').show();
       $('#torrent_path').focus();
@@ -1261,13 +1235,11 @@ Transmission.prototype = {
   },
 
   onTorrentRenamed(response) {
-    let torrent;
-    if (
-      response.result === 'success' &&
-      response.arguments &&
-      (torrent = this._torrents[response.arguments.id])
-    ) {
-      torrent.refresh(response.arguments);
+    if (response.result === 'success' && response.arguments) {
+      const torrent = this._torrents[response.arguments.id];
+      if (torrent) {
+        torrent.refresh(response.arguments);
+      }
     }
   },
 
@@ -1328,15 +1300,18 @@ Transmission.prototype = {
   },
 
   hideMobileAddressbar(delaySecs) {
-    if (isMobileDevice && !scroll_timeout) {
+    if (isMobileDevice && !this.scroll_timeout) {
       const callback = $.proxy(this.doToolbarHide, this);
       const msec = delaySecs * 1000 || 150;
-      scroll_timeout = setTimeout(callback, msec);
+      this.scroll_timeout = setTimeout(callback, msec);
     }
   },
   doToolbarHide() {
     window.scrollTo(0, 1);
-    scroll_timeout = null;
+    if (this.scroll_timeout) {
+      clearTimeout(this.scroll_timeout);
+      delete this.scroll_timeout;
+    }
   },
 
   // Queue
@@ -1358,7 +1333,6 @@ Transmission.prototype = {
    ***/
 
   updateGuiFromSession(o) {
-    let limit, limited, e, b, text;
     const fmt = Transmission.fmt;
     const menu = $('#footer_super_menu');
 
@@ -1367,9 +1341,9 @@ Transmission.prototype = {
     this.prefsDialog.set(o);
 
     if (RPC._TurtleState in o) {
-      b = o[RPC._TurtleState];
-      e = $('#turtle-button');
-      text = [
+      const b = o[RPC._TurtleState];
+      const e = $('#turtle-button');
+      const text = [
         'Click to ',
         b ? 'disable' : 'enable',
         ' Temporary Speed Limits (',
@@ -1383,10 +1357,10 @@ Transmission.prototype = {
     }
 
     if (this.isMenuEnabled && RPC._DownSpeedLimited in o && RPC._DownSpeedLimit in o) {
-      limit = o[RPC._DownSpeedLimit];
-      limited = o[RPC._DownSpeedLimited];
+      const limit = o[RPC._DownSpeedLimit];
+      const limited = o[RPC._DownSpeedLimited];
 
-      e = menu.find('#limited_download_rate');
+      let e = menu.find('#limited_download_rate');
       e.html(`Limit (${fmt.speed(limit)})`);
 
       if (!limited) {
@@ -1396,10 +1370,10 @@ Transmission.prototype = {
     }
 
     if (this.isMenuEnabled && RPC._UpSpeedLimited in o && RPC._UpSpeedLimit in o) {
-      limit = o[RPC._UpSpeedLimit];
-      limited = o[RPC._UpSpeedLimited];
+      const limit = o[RPC._UpSpeedLimit];
+      const limited = o[RPC._UpSpeedLimited];
 
-      e = menu.find('#limited_upload_rate');
+      let e = menu.find('#limited_upload_rate');
       e.html(`Limit (${fmt.speed(limit)})`);
 
       if (!limited) {
@@ -1410,26 +1384,20 @@ Transmission.prototype = {
   },
 
   updateStatusbar() {
-    let i, row;
-    let u = 0;
-    let d = 0;
     const fmt = Transmission.fmt;
     const torrents = this.getAllTorrents();
 
-    // up/down speed
-    for (i = 0; (row = torrents[i]); ++i) {
-      u += row.getUploadSpeed();
-      d += row.getDownloadSpeed();
-    }
+    const u = torrents.reduce((acc, tor) => acc + tor.getUploadSpeed(), 0);
+    document.getElementById('speed-up-container').classList.toggle('active', u > 0);
+    document.getElementById('speed-up-label').textContent = fmt.speedBps(u);
 
-    $('#speed-up-container').toggleClass('active', u > 0);
-    $('#speed-up-label').text(fmt.speedBps(u));
-
-    $('#speed-dn-container').toggleClass('active', d > 0);
-    $('#speed-dn-label').text(fmt.speedBps(d));
+    const d = torrents.reduce((acc, tor) => acc + tor.getDownloadSpeed(), 0);
+    document.getElementById('speed-dn-container').classList.toggle('active', d > 0);
+    document.getElementById('speed-dn-label').textContent = fmt.speedBps(d);
 
     // visible torrents
-    $('#filter-count').text(fmt.countString('Transfer', 'Transfers', this._rows.length));
+    const str = fmt.countString('Transfer', 'Transfers', this._rows.length);
+    document.getElementById('filter-count').textContent = str;
   },
 
   setEnabled(key, flag) {
@@ -1441,11 +1409,11 @@ Transmission.prototype = {
     const names = Object.keys(trackers).sort();
 
     // build the new html
-    let str;
+    let str = '';
     if (!this.filterTracker) {
-      str = '<option value="all" selected="selected">All</option>';
+      str += '<option value="all" selected="selected">All</option>';
     } else {
-      str = '<option value="all">All</option>';
+      str += '<option value="all">All</option>';
     }
     for (const name of names) {
       const o = trackers[name];
@@ -1547,7 +1515,7 @@ Transmission.prototype = {
       $('body').toggleClass('inspector_showing', visible);
     } else {
       const w = visible ? `${$('#torrent_inspector').outerWidth() + 1}px` : '0px';
-      $('#torrent_container')[0].style.right = w;
+      document.getElementById('torrent_container').style.right = w;
     }
   },
 
@@ -1579,7 +1547,7 @@ Transmission.prototype = {
   },
 
   refilter(rebuildEverything) {
-    let i, e, id, t, row, dirty_rows;
+    // let i, e, id, t, row;
     const sort_mode = this[Prefs._SortMethod];
     const sort_direction = this[Prefs._SortDirection];
     const filter_mode = this[Prefs._FilterMode];
@@ -1598,17 +1566,17 @@ Transmission.prototype = {
     if (rebuildEverything) {
       $(list).empty();
       this._rows = [];
-      for (id in this._torrents) {
-        this.dirtyTorrents[id] = true;
+      for (const id in this._torrents) {
+        this.dirtyTorrents.add(id);
       }
     }
 
     // rows that overlap with dirtyTorrents need to be refiltered.
     // those that don't are 'clean' and don't need refiltering.
     const clean_rows = [];
-    dirty_rows = [];
-    for (i = 0; (row = this._rows[i]); ++i) {
-      if (row.getTorrentId() in this.dirtyTorrents) {
+    let dirty_rows = [];
+    for (const row of this._rows) {
+      if (this.dirtyTorrents.has(row.getTorrentId())) {
         dirty_rows.push(row);
       } else {
         clean_rows.push(row);
@@ -1616,31 +1584,27 @@ Transmission.prototype = {
     }
 
     // remove the dirty rows from the dom
-    e = [];
-    for (i = 0; (row = dirty_rows[i]); ++i) {
-      e.push(row.getElement());
-    }
-    $(e).detach();
+    $(dirty_rows.map((row) => row.getElement())).detach();
 
     // drop any dirty rows that don't pass the filter test
     const tmp = [];
-    for (i = 0; (row = dirty_rows[i]); ++i) {
-      id = row.getTorrentId();
-      t = this._torrents[id];
+    for (const row of dirty_rows) {
+      const id = row.getTorrentId();
+      const t = this._torrents[id];
       if (t && t.test(filter_mode, filter_text, filter_tracker)) {
         tmp.push(row);
       }
-      delete this.dirtyTorrents[id];
+      this.dirtyTorrents.delete(id);
     }
     dirty_rows = tmp;
 
     // make new rows for dirty torrents that pass the filter test
     // but don't already have a row
-    for (id in this.dirtyTorrents) {
-      t = this._torrents[id];
+    for (const id of this.dirtyTorrents.values()) {
+      const t = this._torrents[id];
       if (t && t.test(filter_mode, filter_text, filter_tracker)) {
-        row = new TorrentRow(renderer, this, t);
-        e = row.getElement();
+        const row = new TorrentRow(renderer, this, t);
+        const e = row.getElement();
         e.row = row;
         dirty_rows.push(row);
         $(e).click($.proxy(this.onRowClicked, this));
@@ -1660,8 +1624,7 @@ Transmission.prototype = {
     let ci = 0;
     let di = 0;
     while (ci != cmax || di != dmax) {
-      let push_clean;
-
+      let push_clean = null;
       if (ci == cmax) {
         push_clean = false;
       } else if (di == dmax) {
@@ -1679,8 +1642,8 @@ Transmission.prototype = {
       if (push_clean) {
         rows.push(clean_rows[ci++]);
       } else {
-        row = dirty_rows[di++];
-        e = row.getElement();
+        const row = dirty_rows[di++];
+        const e = row.getElement();
 
         if (ci !== cmax) {
           list.insertBefore(e, clean_rows[ci].getElement());
@@ -1695,12 +1658,12 @@ Transmission.prototype = {
 
     // update our implementation fields
     this._rows = rows;
-    this.dirtyTorrents = {};
+    this.dirtyTorrents.clear();
 
-    // jquery's even/odd starts with 1 not 0, so invert its logic
-    e = rows.map((row) => row.getElement());
-    $(e).filter(':odd').addClass('even');
-    $(e).filter(':even').removeClass('even');
+    // set the odd/even property
+    rows
+      .map((row) => row.getElement())
+      .forEach((e, idx) => e.classList.toggle('even', idx % 2 === 0));
 
     // sync gui
     this.updateStatusbar();
@@ -1770,7 +1733,7 @@ Transmission.prototype = {
       for (let j = 0, tracker; (tracker = trackers[j]); ++j) {
         const announce = tracker.announce;
 
-        let uri;
+        let uri = null;
         if (announce in this.uriCache) {
           uri = this.uriCache[announce];
         } else {
@@ -1854,7 +1817,6 @@ Transmission.prototype = {
   },
 
   loadDaemonStats(async) {
-    console.log('loadDaemonStats');
     this.remote.loadDaemonStats(
       function (data) {
         this.updateStats(data['arguments']);
@@ -1866,11 +1828,10 @@ Transmission.prototype = {
 
   // Process new session stats from the server
   updateStats(stats) {
-    let s, ratio;
     const fmt = Transmission.fmt;
 
-    s = stats['current-stats'];
-    ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
+    let s = stats['current-stats'];
+    let ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
     $('#stats-session-uploaded').html(fmt.size(s.uploadedBytes));
     $('#stats-session-downloaded').html(fmt.size(s.downloadedBytes));
     $('#stats-session-ratio').html(fmt.ratioString(ratio));

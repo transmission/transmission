@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -123,14 +121,16 @@ Torrent.prototype = {
   },
 
   setField(o, name, value) {
-    let i, observer;
+    const old_value = o[name];
 
-    if (o[name] === value) {
+    if (old_value === value) {
       return false;
     }
-    if (o == this.fields && this.fieldObservers[name] && this.fieldObservers[name].length) {
-      for (i = 0; (observer = this.fieldObservers[name][i]); ++i) {
-        observer.call(this, value, o[name], name);
+
+    const observers = this.fieldObservers[name];
+    if (o == this.fields && observers && observers.length) {
+      for (const observer of observers) {
+        observer.call(this, value, old_value, name);
       }
     }
     o[name] = value;
@@ -142,11 +142,11 @@ Torrent.prototype = {
     let changed = false;
     const myfiles = this.fields.files || [];
     const keys = ['length', 'name', 'bytesCompleted', 'wanted', 'priority'];
-    let i, f, j, key, myfile;
 
-    for (i = 0; (f = files[i]); ++i) {
-      myfile = myfiles[i] || {};
-      for (j = 0; (key = keys[j]); ++j) {
+    for (let i = 0; i < files.length; ++i) {
+      const f = files[i];
+      const myfile = myfiles[i] || {};
+      for (const key of keys) {
         if (key in f) {
           changed |= this.setField(myfile, key, f[key]);
         }
@@ -162,10 +162,9 @@ Torrent.prototype = {
   },
 
   refreshFields(data) {
-    let key;
     let changed = false;
 
-    for (key in data) {
+    for (const key in data) {
       switch (key) {
         case 'files':
         case 'fileStats': // merge files and fileStats together
@@ -539,7 +538,7 @@ Torrent.compareBySize = function (ta, tb) {
 };
 
 Torrent.compareTorrents = function (a, b, sortMethod, sortDirection) {
-  let i;
+  let i = 0;
 
   switch (sortMethod) {
     case Prefs._SortByActivity:

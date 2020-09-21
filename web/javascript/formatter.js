@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -60,31 +58,21 @@ Transmission.fmt = (function () {
      * @return {String} human-readable string
      */
     mem(bytes) {
+      const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
+
       if (bytes < mem_K) {
-        return [bytes, mem_B_str].join(' ');
+        return toStr(bytes, mem_B_str);
       }
-
-      let convertedSize;
-      let unit;
-
       if (bytes < Math.pow(mem_K, 2)) {
-        convertedSize = bytes / mem_K;
-        unit = mem_K_str;
-      } else if (bytes < Math.pow(mem_K, 3)) {
-        convertedSize = bytes / Math.pow(mem_K, 2);
-        unit = mem_M_str;
-      } else if (bytes < Math.pow(mem_K, 4)) {
-        convertedSize = bytes / Math.pow(mem_K, 3);
-        unit = mem_G_str;
-      } else {
-        convertedSize = bytes / Math.pow(mem_K, 4);
-        unit = mem_T_str;
+        return toStr(bytes / mem_K, mem_K_str);
       }
-
-      // try to have at least 3 digits and at least 1 decimal
-      return convertedSize <= 9.995
-        ? [convertedSize.toTruncFixed(2), unit].join(' ')
-        : [convertedSize.toTruncFixed(1), unit].join(' ');
+      if (bytes < Math.pow(mem_K, 3)) {
+        return toStr(bytes / Math.pow(mem_K, 2), mem_M_str);
+      }
+      if (bytes < Math.pow(mem_K, 4)) {
+        return toStr(bytes / Math.pow(mem_K, 3), mem_G_str);
+      }
+      return bytes / Math.pow(mem_K, 4), mem_T_str;
     },
 
     /**
@@ -93,31 +81,21 @@ Transmission.fmt = (function () {
      * @return {String} human-readable string
      */
     size(bytes) {
+      const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
+
       if (bytes < size_K) {
-        return [bytes, size_B_str].join(' ');
+        return toStr(bytes, size_B_str);
       }
-
-      let convertedSize;
-      let unit;
-
       if (bytes < Math.pow(size_K, 2)) {
-        convertedSize = bytes / size_K;
-        unit = size_K_str;
-      } else if (bytes < Math.pow(size_K, 3)) {
-        convertedSize = bytes / Math.pow(size_K, 2);
-        unit = size_M_str;
-      } else if (bytes < Math.pow(size_K, 4)) {
-        convertedSize = bytes / Math.pow(size_K, 3);
-        unit = size_G_str;
-      } else {
-        convertedSize = bytes / Math.pow(size_K, 4);
-        unit = size_T_str;
+        return toStr(bytes / size_K, size_K_str);
       }
-
-      // try to have at least 3 digits and at least 1 decimal
-      return convertedSize <= 9.995
-        ? [convertedSize.toTruncFixed(2), unit].join(' ')
-        : [convertedSize.toTruncFixed(1), unit].join(' ');
+      if (bytes < Math.pow(size_K, 3)) {
+        return toStr(bytes / Math.pow(size_K, 2), size_M_str);
+      }
+      if (bytes < Math.pow(size_K, 4)) {
+        return toStr(bytes / Math.pow(size_K, 3), size_G_str);
+      }
+      return bytes / Math.pow(size_K, 4), size_T_str;
     },
 
     speedBps(Bps) {

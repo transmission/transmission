@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
@@ -63,13 +61,11 @@ function PrefsDialog(remote) {
   };
 
   const initTimeDropDown = function (e) {
-    let i, hour, mins, value, content;
-
-    for (i = 0; i < 24 * 4; ++i) {
-      hour = parseInt(i / 4, 10);
-      mins = (i % 4) * 15;
-      value = i * 15;
-      content = `${hour}:${mins || '00'}`;
+    for (let i = 0; i < 24 * 4; ++i) {
+      const hour = parseInt(i / 4, 10);
+      const mins = (i % 4) * 15;
+      const value = i * 15;
+      const content = `${hour}:${mins || '00'}`;
       e.options[i] = new Option(content, value);
     }
   };
@@ -82,13 +78,9 @@ function PrefsDialog(remote) {
   };
 
   const setGroupEnabled = function (parent_key, enabled) {
-    let i, key, keys, root;
-
     if (parent_key in data.groups) {
-      root = data.elements.root;
-      keys = data.groups[parent_key];
-
-      for (i = 0; (key = keys[i]); ++i) {
+      const root = data.elements.root;
+      for (const key of data.groups[parent_key]) {
         root.find(`#${key}`).attr('disabled', !enabled);
       }
     }
@@ -106,8 +98,6 @@ function PrefsDialog(remote) {
   };
 
   const getValue = function (e) {
-    let str;
-
     switch (e[0].type) {
       case 'checkbox':
       case 'radio':
@@ -118,8 +108,8 @@ function PrefsDialog(remote) {
       case 'email':
       case 'number':
       case 'search':
-      case 'select-one':
-        str = e.val();
+      case 'select-one': {
+        const str = e.val();
         if (parseInt(str, 10).toString() === str) {
           return parseInt(str, 10);
         }
@@ -127,6 +117,7 @@ function PrefsDialog(remote) {
           return parseFloat(str);
         }
         return str;
+      }
 
       default:
         return null;
@@ -187,11 +178,9 @@ function PrefsDialog(remote) {
   };
 
   const initialize = function (remote) {
-    let i, key, e;
-
     data.remote = remote;
 
-    e = $('#prefs-dialog');
+    let e = $('#prefs-dialog');
     data.elements.root = e;
 
     initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
@@ -213,7 +202,7 @@ function PrefsDialog(remote) {
     e.click(onBlocklistUpdateClicked);
 
     // listen for user input
-    for (i = 0; (key = data.keys[i]); ++i) {
+    for (const key of data.keys) {
       e = data.elements.root.find(`#${key}`);
       switch (e[0].type) {
         case 'checkbox':
@@ -243,15 +232,13 @@ function PrefsDialog(remote) {
 
   // update the dialog's controls
   this.set = function (o) {
-    let e, i, key, val;
-    const keys = data.keys;
     const root = data.elements.root;
 
     setBlocklistButtonEnabled(true);
 
-    for (i = 0; (key = keys[i]); ++i) {
-      val = o[key];
-      e = root.find(`#${key}`);
+    for (const key of data.keys) {
+      const val = o[key];
+      const e = root.find(`#${key}`);
 
       if (key === 'blocklist-size') {
         // special case -- regular text area

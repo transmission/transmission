@@ -36,7 +36,6 @@
       "setTextContent": "readonly",
 
       "dialog": "writable",
-      "scroll_timeout": "writable",
       "transmission": "writable"
     },
     "parser": "@babel/eslint-parser",
@@ -45,13 +44,14 @@
     },
     "rules": {
       "curly": ["error", "all"],
-      "no-var": "error",
+      "init-declarations": ["error", "always"],
       "no-use-before-define": "error",
       "no-unused-vars": ["error", {
         "args": "after-used",
         "vars": "local",
-        "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|scroll_timeout|transmission"
+        "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|transmission"
       }],
+      "no-var": "error",
       "object-shorthand": ["error", "always"],
       "prefer-const": "error",
       "prefer-numeric-literals": "error",

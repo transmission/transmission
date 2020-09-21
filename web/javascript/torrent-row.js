@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright © Mnemosyne LLC
  *
@@ -10,10 +8,10 @@
 function TorrentRendererHelper() {}
 
 TorrentRendererHelper.getProgressInfo = function (controller, t) {
-  let pct, extra;
   const s = t.getStatus();
   const seed_ratio_limit = t.seedRatioLimit(controller);
 
+  let pct = 100;
   if (t.needsMetaData()) {
     pct = t.getMetadataPercentComplete() * 100;
   } else if (!t.isDone()) {
@@ -21,10 +19,9 @@ TorrentRendererHelper.getProgressInfo = function (controller, t) {
   } else if (seed_ratio_limit > 0 && t.isSeeding()) {
     // don't split up the bar if paused or queued
     pct = Math.round((t.getUploadRatio() * 100) / seed_ratio_limit);
-  } else {
-    pct = 100;
   }
 
+  let extra = '';
   if (s === Torrent._StatusStopped) {
     extra = 'paused';
   } else if (s === Torrent._StatusDownloadWait) {
@@ -37,8 +34,6 @@ TorrentRendererHelper.getProgressInfo = function (controller, t) {
     extra = 'seeding queued';
   } else if (s === Torrent._StatusSeed) {
     extra = 'seeding';
-  } else {
-    extra = '';
   }
 
   return {
@@ -68,15 +63,13 @@ TorrentRendererHelper.createProgressbar = function (classes) {
 };
 
 TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) {
-  let e, display;
   const info = TorrentRendererHelper.getProgressInfo(controller, t);
+  const width = `${info.percent}%`;
 
   // update the complete progressbar
-  e = progressbar.complete;
-  const style = e.style;
-  const width = `${info.percent}%`;
-  display = info.percent > 0 ? 'block' : 'none';
-  if (style.width !== width || style.display !== display) {
+  let e = progressbar.complete;
+  let display = info.percent > 0 ? 'block' : 'none';
+  if (e.style.width !== width || e.style.display !== display) {
     $(e).css({
       width: `${info.percent}%`,
       display,
@@ -159,16 +152,16 @@ TorrentRendererFull.prototype = {
   },
 
   getPeerDetails(t) {
-    let err, peer_count, webseed_count;
     const fmt = Transmission.fmt;
 
-    if ((err = t.getErrorMessage())) {
+    const err = t.getErrorMessage();
+    if (err) {
       return err;
     }
 
     if (t.isDownloading()) {
-      peer_count = t.getPeersConnected();
-      webseed_count = t.getWebseedsSendingToUs();
+      const peer_count = t.getPeersConnected();
+      const webseed_count = t.getWebseedsSendingToUs();
 
       if (webseed_count && peer_count) {
         // Downloading from 2 of 3 peer(s) and 2 webseed(s)
@@ -242,25 +235,25 @@ TorrentRendererFull.prototype = {
       ].join('');
     }
 
-    let c;
     const sizeWhenDone = t.getSizeWhenDone();
     const totalSize = t.getTotalSize();
     const is_done = t.isDone() || t.isSeeding();
+    const c = [];
 
     if (is_done) {
       if (totalSize === sizeWhenDone) {
         // seed: '698.05 MiB'
-        c = [Transmission.fmt.size(totalSize)];
+        c.push(Transmission.fmt.size(totalSize));
       } else {
         // partial seed: '127.21 MiB of 698.05 MiB (18.2%)'
-        c = [
+        c.push(
           Transmission.fmt.size(sizeWhenDone),
           ' of ',
           Transmission.fmt.size(t.getTotalSize()),
           ' (',
           t.getPercentDoneStr(),
-          '%)',
-        ];
+          '%)'
+        );
       }
       // append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
       c.push(
@@ -272,14 +265,14 @@ TorrentRendererFull.prototype = {
       );
     } else {
       // not done yet
-      c = [
+      c.push(
         Transmission.fmt.size(sizeWhenDone - t.getLeftUntilDone()),
         ' of ',
         Transmission.fmt.size(sizeWhenDone),
         ' (',
         t.getPercentDoneStr(),
-        '%)',
-      ];
+        '%)'
+      );
     }
 
     // maybe append eta
@@ -349,9 +342,9 @@ TorrentRendererCompact.prototype = {
   },
 
   getPeerDetails(t) {
-    let c;
-    if ((c = t.getErrorMessage())) {
-      return c;
+    const errMsg = t.getErrorMessage();
+    if (errMsg) {
+      return errMsg;
     }
     if (t.isDownloading()) {
       const have_dn = t.getDownloadSpeed() > 0;

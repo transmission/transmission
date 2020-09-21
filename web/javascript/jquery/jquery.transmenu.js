@@ -11,43 +11,43 @@ $.widget('tr.transMenu', $.ui.menu, {
 		close: null
 	},
 
-	_create: function() {
+	_create() {
 		this.selectImpl = this.options.select;
 		this.options.select = $.proxy(this._select, this);
 		this.element.hide();
 		this._superApply(arguments);
 	},
 
-	_select: function(event, ui) {
+	_select(event, ui) {
 		if (ui.item.is("[aria-haspopup='true']"))
-			return;
+			{return;}
 		ui.id = ui.item.attr("id");
 		ui.group = ui.item.attr("radio-group");
 		ui.target = $(event.currentTarget);
 		if (this.selectImpl(event, ui) !== false)
-			this.close();
+			{this.close();}
 	},
 
-	open: function(event) {
+	open(event) {
 		this.element.show();
 		this.element.css({ position: "absolute", left: 4, top: -this.element.height() - 4 });
 
-		$(document).bind("keydown" + this.eventNamespace, $.proxy(function(event) {
+		$(document).bind(`keydown${  this.eventNamespace}`, $.proxy(function(event) {
 			if (event.which === $.ui.keyCode.ESCAPE)
-				this.close();
+				{this.close();}
 		}, this));
-		$(document).bind("mousedown" + this.eventNamespace + " touchstart" + this.eventNamespace, $.proxy(function(event) {
+		$(document).bind(`mousedown${  this.eventNamespace  } touchstart${  this.eventNamespace}`, $.proxy(function(event) {
 			if (!$(event.target).closest(".ui-menu-item").length)
-				this.close();
+				{this.close();}
 		}, this));
 
 		this._trigger("open", event);
 	},
 
-	close: function(event) {
-		$(document).unbind("keydown" + this.eventNamespace);
-		$(document).unbind("mousedown" + this.eventNamespace);
-		$(document).unbind("touchstart" + this.eventNamespace);
+	close(event) {
+		$(document).unbind(`keydown${  this.eventNamespace}`);
+		$(document).unbind(`mousedown${  this.eventNamespace}`);
+		$(document).unbind(`touchstart${  this.eventNamespace}`);
 
 		this._close(this.element);
 		this.element.hide();
@@ -60,36 +60,38 @@ $.widget('tr.transMenu', $.ui.menu, {
 {
 	function indicatorClass(type)
 	{
-		return ['ui-icon', 'ui-icon-' + type];
+		return ['ui-icon', `ui-icon-${  type}`];
 	}
 
 	function findIndicator(item, type)
 	{
-		return $(item).find('span.' + indicatorClass(type).join('.'));
+		return $(item).find(`span.${  indicatorClass(type).join('.')}`);
 	}
 
 	function createIndicator(item, type)
 	{
-		$(item).prepend($("<span class='" + indicatorClass(type).join(' ') + "'></span>"));
+		$(item).prepend($(`<span class='${  indicatorClass(type).join(' ')  }'></span>`));
 	}
 
 	function indicatorType(item)
 	{
-		var group = item.attr('radio-group');
-		return { type: group !== undefined ? 'bullet' : 'check', group: group };
+		const group = item.attr('radio-group');
+		return { type: group !== undefined ? 'bullet' : 'check', group };
 	}
 
 	$.fn.selectMenuItem = function() {
-		var t = indicatorType(this);
-		if (t.type == 'bullet')
-			this.parent().find('li[radio-group=' + t.group + '] span.' + indicatorClass(t.type).join('.')).remove();
-		if (findIndicator(this, t.type).length == 0)
+		const t = indicatorType(this);
+		if (t.type == 'bullet') {
+			this.parent().find(`li[radio-group=${  t.group  }] span.${  indicatorClass(t.type).join('.')}`).remove();
+		}
+		if (findIndicator(this, t.type).length == 0) {
 			createIndicator(this, t.type);
+		}
 		return this;
 	};
 
 	$.fn.deselectMenuItem = function() {
-		var t = indicatorType(this);
+		const t = indicatorType(this);
 		return findIndicator(this, t.type).remove();
 	};
 
