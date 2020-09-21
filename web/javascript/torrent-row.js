@@ -7,153 +7,109 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-function TorrentRendererHelper() {}
+class TorrentRendererHelper {
+  static getProgressInfo(controller, t) {
+    const s = t.getStatus();
+    const seed_ratio_limit = t.seedRatioLimit(controller);
 
-TorrentRendererHelper.getProgressInfo = function (controller, t) {
-  const s = t.getStatus();
-  const seed_ratio_limit = t.seedRatioLimit(controller);
+    let pct = 100;
+    if (t.needsMetaData()) {
+      pct = t.getMetadataPercentComplete() * 100;
+    } else if (!t.isDone()) {
+      pct = Math.round(t.getPercentDone() * 100);
+    } else if (seed_ratio_limit > 0 && t.isSeeding()) {
+      // don't split up the bar if paused or queued
+      pct = Math.round((t.getUploadRatio() * 100) / seed_ratio_limit);
+    }
 
-  let pct = 100;
-  if (t.needsMetaData()) {
-    pct = t.getMetadataPercentComplete() * 100;
-  } else if (!t.isDone()) {
-    pct = Math.round(t.getPercentDone() * 100);
-  } else if (seed_ratio_limit > 0 && t.isSeeding()) {
-    // don't split up the bar if paused or queued
-    pct = Math.round((t.getUploadRatio() * 100) / seed_ratio_limit);
+    let extra = '';
+    if (s === Torrent._StatusStopped) {
+      extra = 'paused';
+    } else if (s === Torrent._StatusDownloadWait) {
+      extra = 'leeching queued';
+    } else if (t.needsMetaData()) {
+      extra = 'magnet';
+    } else if (s === Torrent._StatusDownload) {
+      extra = 'leeching';
+    } else if (s === Torrent._StatusSeedWait) {
+      extra = 'seeding queued';
+    } else if (s === Torrent._StatusSeed) {
+      extra = 'seeding';
+    }
+
+    return {
+      complete: ['torrent_progress_bar', 'complete', extra].join(' '),
+      incomplete: ['torrent_progress_bar', 'incomplete', extra].join(' '),
+      percent: pct,
+    };
   }
 
-  let extra = '';
-  if (s === Torrent._StatusStopped) {
-    extra = 'paused';
-  } else if (s === Torrent._StatusDownloadWait) {
-    extra = 'leeching queued';
-  } else if (t.needsMetaData()) {
-    extra = 'magnet';
-  } else if (s === Torrent._StatusDownload) {
-    extra = 'leeching';
-  } else if (s === Torrent._StatusSeedWait) {
-    extra = 'seeding queued';
-  } else if (s === Torrent._StatusSeed) {
-    extra = 'seeding';
+  static createProgressbar(classes) {
+    const complete = document.createElement('div');
+    complete.className = 'torrent_progress_bar complete';
+
+    const incomplete = document.createElement('div');
+    incomplete.className = 'torrent_progress_bar incomplete';
+
+    const progressbar = document.createElement('div');
+    progressbar.className = `torrent_progress_bar_container ${classes}`;
+    progressbar.appendChild(complete);
+    progressbar.appendChild(incomplete);
+
+    return {
+      complete,
+      element: progressbar,
+      incomplete,
+    };
   }
 
-  return {
-    complete: ['torrent_progress_bar', 'complete', extra].join(' '),
-    incomplete: ['torrent_progress_bar', 'incomplete', extra].join(' '),
-    percent: pct,
-  };
-};
+  static renderProgressbar(controller, t, progressbar) {
+    const info = TorrentRendererHelper.getProgressInfo(controller, t);
+    const width = `${info.percent}%`;
 
-TorrentRendererHelper.createProgressbar = function (classes) {
-  const complete = document.createElement('div');
-  complete.className = 'torrent_progress_bar complete';
+    // update the complete progressbar
+    let e = progressbar.complete;
+    let display = info.percent > 0 ? 'block' : 'none';
+    if (e.style.width !== width || e.style.display !== display) {
+      $(e).css({
+        display,
+        width: `${info.percent}%`,
+      });
+    }
 
-  const incomplete = document.createElement('div');
-  incomplete.className = 'torrent_progress_bar incomplete';
+    if (e.className !== info.complete) {
+      e.className = info.complete;
+    }
 
-  const progressbar = document.createElement('div');
-  progressbar.className = `torrent_progress_bar_container ${classes}`;
-  progressbar.appendChild(complete);
-  progressbar.appendChild(incomplete);
+    // update the incomplete progressbar
+    e = progressbar.incomplete;
+    display = info.percent < 100 ? 'block' : 'none';
 
-  return {
-    complete,
-    element: progressbar,
-    incomplete,
-  };
-};
+    if (e.style.display !== display) {
+      e.style.display = display;
+    }
 
-TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) {
-  const info = TorrentRendererHelper.getProgressInfo(controller, t);
-  const width = `${info.percent}%`;
-
-  // update the complete progressbar
-  let e = progressbar.complete;
-  let display = info.percent > 0 ? 'block' : 'none';
-  if (e.style.width !== width || e.style.display !== display) {
-    $(e).css({
-      display,
-      width: `${info.percent}%`,
-    });
+    if (e.className !== info.incomplete) {
+      e.className = info.incomplete;
+    }
   }
 
-  if (e.className !== info.complete) {
-    e.className = info.complete;
+  static formatUL = (t) => `▲${Transmission.fmt.speedBps(t.getUploadSpeed())}`;
+  static formatDL = (t) => `▼${Transmission.fmt.speedBps(t.getDownloadSpeed())}`;
+
+  static formatETA(t) {
+    const eta = t.getETA();
+    if (eta < 0 || eta >= 999 * 60 * 60) {
+      return '';
+    }
+    return `ETA: ${Transmission.fmt.timeInterval(eta)}`;
   }
+}
 
-  // update the incomplete progressbar
-  e = progressbar.incomplete;
-  display = info.percent < 100 ? 'block' : 'none';
+///
 
-  if (e.style.display !== display) {
-    e.style.display = display;
-  }
-
-  if (e.className !== info.incomplete) {
-    e.className = info.incomplete;
-  }
-};
-
-TorrentRendererHelper.formatUL = function (t) {
-  return `▲${Transmission.fmt.speedBps(t.getUploadSpeed())}`;
-};
-
-TorrentRendererHelper.formatDL = function (t) {
-  return `▼${Transmission.fmt.speedBps(t.getDownloadSpeed())}`;
-};
-
-TorrentRendererHelper.formatETA = function (t) {
-  const eta = t.getETA();
-  if (eta < 0 || eta >= 999 * 60 * 60) {
-    return '';
-  }
-  return `ETA: ${Transmission.fmt.timeInterval(eta)}`;
-};
-
-/****
- *****
- *****
- ****/
-
-function TorrentRendererFull() {}
-TorrentRendererFull.prototype = {
-  createRow() {
-    const root = document.createElement('li');
-    root.className = 'torrent';
-
-    const name = document.createElement('div');
-    name.className = 'torrent_name';
-
-    const peers = document.createElement('div');
-    peers.className = 'torrent_peer_details';
-
-    const progressbar = TorrentRendererHelper.createProgressbar('full');
-
-    const details = document.createElement('div');
-    details.className = 'torrent_progress_details';
-
-    const image = document.createElement('div');
-    const button = document.createElement('a');
-    button.appendChild(image);
-
-    root.appendChild(name);
-    root.appendChild(peers);
-    root.appendChild(button);
-    root.appendChild(progressbar.element);
-    root.appendChild(details);
-
-    root._name_container = name;
-    root._peer_details_container = peers;
-    root._progress_details_container = details;
-    root._progressbar = progressbar;
-    root._pause_resume_button_image = image;
-    root._toggle_running_button = button;
-
-    return root;
-  },
-
-  getPeerDetails(t) {
+class TorrentRendererFull {
+  static getPeerDetails(t) {
     const { fmt } = Transmission;
 
     const err = t.getErrorMessage();
@@ -178,7 +134,8 @@ TorrentRendererFull.prototype = {
           TorrentRendererHelper.formatDL(t),
           TorrentRendererHelper.formatUL(t),
         ].join(' ');
-      } else if (webseed_count) {
+      }
+      if (webseed_count) {
         // Downloading from 2 webseed(s)
         return [
           'Downloading from',
@@ -187,18 +144,18 @@ TorrentRendererFull.prototype = {
           TorrentRendererHelper.formatDL(t),
           TorrentRendererHelper.formatUL(t),
         ].join(' ');
-      } else {
-        // Downloading from 2 of 3 peer(s)
-        return [
-          'Downloading from',
-          t.getPeersSendingToUs(),
-          'of',
-          fmt.countString('peer', 'peers', peer_count),
-          '–',
-          TorrentRendererHelper.formatDL(t),
-          TorrentRendererHelper.formatUL(t),
-        ].join(' ');
       }
+
+      // Downloading from 2 of 3 peer(s)
+      return [
+        'Downloading from',
+        t.getPeersSendingToUs(),
+        'of',
+        fmt.countString('peer', 'peers', peer_count),
+        '–',
+        TorrentRendererHelper.formatDL(t),
+        TorrentRendererHelper.formatUL(t),
+      ].join(' ');
     }
 
     if (t.isSeeding()) {
@@ -221,9 +178,9 @@ TorrentRendererFull.prototype = {
     }
 
     return t.getStateString();
-  },
+  }
 
-  getProgressDetails(controller, t) {
+  static getProgressDetails(controller, t) {
     if (t.needsMetaData()) {
       let MetaDataStatus = 'retrieving';
       if (t.isStopped()) {
@@ -289,8 +246,9 @@ TorrentRendererFull.prototype = {
     }
 
     return c.join('');
-  },
+  }
 
+  // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     // name
     setTextContent(root._name_container, t.getName());
@@ -302,48 +260,60 @@ TorrentRendererFull.prototype = {
     const has_error = t.getError() !== Torrent._ErrNone;
     let e = root._peer_details_container;
     $(e).toggleClass('error', has_error);
-    setTextContent(e, this.getPeerDetails(t));
+    setTextContent(e, TorrentRendererFull.getPeerDetails(t));
 
     // progress details
     e = root._progress_details_container;
-    setTextContent(e, this.getProgressDetails(controller, t));
+    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
 
     // pause/resume button
     const is_stopped = t.isStopped();
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
     e.className = is_stopped ? 'torrent_resume' : 'torrent_pause';
-  },
-};
+  }
 
-/****
- *****
- *****
- ****/
-
-function TorrentRendererCompact() {}
-TorrentRendererCompact.prototype = {
+  // eslint-disable-next-line class-methods-use-this
   createRow() {
-    const progressbar = TorrentRendererHelper.createProgressbar('compact');
-
-    const details = document.createElement('div');
-    details.className = 'torrent_peer_details compact';
+    const root = document.createElement('li');
+    root.className = 'torrent';
 
     const name = document.createElement('div');
-    name.className = 'torrent_name compact';
+    name.className = 'torrent_name';
 
-    const root = document.createElement('li');
+    const peers = document.createElement('div');
+    peers.className = 'torrent_peer_details';
+
+    const progressbar = TorrentRendererHelper.createProgressbar('full');
+
+    const details = document.createElement('div');
+    details.className = 'torrent_progress_details';
+
+    const image = document.createElement('div');
+    const button = document.createElement('a');
+    button.appendChild(image);
+
+    root.appendChild(name);
+    root.appendChild(peers);
+    root.appendChild(button);
     root.appendChild(progressbar.element);
     root.appendChild(details);
-    root.appendChild(name);
-    root.className = 'torrent compact';
-    root._progressbar = progressbar;
-    root._details_container = details;
-    root._name_container = name;
-    return root;
-  },
 
-  getPeerDetails(t) {
+    root._name_container = name;
+    root._peer_details_container = peers;
+    root._progress_details_container = details;
+    root._progressbar = progressbar;
+    root._pause_resume_button_image = image;
+    root._toggle_running_button = button;
+
+    return root;
+  }
+}
+
+///
+
+class TorrentRendererCompact {
+  static getPeerDetails(t) {
     const errMsg = t.getErrorMessage();
     if (errMsg) {
       return errMsg;
@@ -379,8 +349,9 @@ TorrentRendererCompact.prototype = {
       ].join('');
     }
     return t.getStateString();
-  },
+  }
 
+  // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     // name
     const is_stopped = t.isStopped();
@@ -392,17 +363,35 @@ TorrentRendererCompact.prototype = {
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
     $(e).toggleClass('error', has_error);
-    setTextContent(e, this.getPeerDetails(t));
+    setTextContent(e, TorrentRendererCompact.getPeerDetails(t));
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
-  },
-};
+  }
 
-/****
- *****
- *****
- ****/
+  // eslint-disable-next-line class-methods-use-this
+  createRow() {
+    const progressbar = TorrentRendererHelper.createProgressbar('compact');
+
+    const details = document.createElement('div');
+    details.className = 'torrent_peer_details compact';
+
+    const name = document.createElement('div');
+    name.className = 'torrent_name compact';
+
+    const root = document.createElement('li');
+    root.appendChild(progressbar.element);
+    root.appendChild(details);
+    root.appendChild(name);
+    root.className = 'torrent compact';
+    root._progressbar = progressbar;
+    root._details_container = details;
+    root._name_container = name;
+    return root;
+  }
+}
+
+///
 
 class TorrentRow {
   constructor(view, controller, torrent) {

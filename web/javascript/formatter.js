@@ -52,7 +52,7 @@ Transmission.fmt = (function () {
       if (bytes < Math.pow(mem_K, 4)) {
         return toStr(bytes / Math.pow(mem_K, 3), mem_G_str);
       }
-      return bytes / Math.pow(mem_K, 4), mem_T_str;
+      return toStr(bytes / Math.pow(mem_K, 4), mem_T_str);
     },
 
     ngettext(msgid, msgid_plural, n) {
@@ -101,6 +101,9 @@ Transmission.fmt = (function () {
           case 'T':
             explanation = 'Peer is connected via uTP';
             break;
+          default:
+            explanation = null;
+            break;
         }
 
         if (!explanation) {
@@ -119,11 +122,11 @@ Transmission.fmt = (function () {
     percentString(x) {
       if (x < 10.0) {
         return x.toTruncFixed(2);
-      } else if (x < 100.0) {
-        return x.toTruncFixed(1);
-      } else {
-        return x.toTruncFixed(0);
       }
+      if (x < 100.0) {
+        return x.toTruncFixed(1);
+      }
+      return x.toTruncFixed(0);
     },
 
     /*
@@ -159,7 +162,7 @@ Transmission.fmt = (function () {
       if (bytes < Math.pow(size_K, 4)) {
         return toStr(bytes / Math.pow(size_K, 3), size_G_str);
       }
-      return bytes / Math.pow(size_K, 4), size_T_str;
+      return toStr(bytes / Math.pow(size_K, 4), size_T_str);
     },
 
     speed(KBps) {

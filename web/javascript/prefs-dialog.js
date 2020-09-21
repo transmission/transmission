@@ -243,7 +243,7 @@ class PrefsDialog {
     PrefsDialog.initTimeDropDown(e.find('#alt-speed-time-end')[0]);
 
     const o = isMobileDevice
-      ? this.getDefaultMobileOptions()
+      ? PrefsDialog.getDefaultMobileOptions()
       : {
           height: 400,
           width: 350,

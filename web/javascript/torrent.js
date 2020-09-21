@@ -63,22 +63,22 @@ class Torrent {
   refreshFields(data) {
     let changed = false;
 
-    for (const key in data) {
+    for (const [key, val] of Object.entries(data)) {
       switch (key) {
         case 'files':
         case 'fileStats': // merge files and fileStats together
-          changed |= this.updateFiles(data[key]);
+          changed |= this.updateFiles(val);
           break;
         case 'trackerStats': // 'trackerStats' is a superset of 'trackers'...
-          changed |= this.setField(this.fields, 'trackers', data[key]);
+          changed |= this.setField(this.fields, 'trackers', val);
           break;
         case 'trackers': // ...so only save 'trackers' if we don't have it already
           if (!(key in this.fields)) {
-            changed |= this.setField(this.fields, key, data[key]);
+            changed |= this.setField(this.fields, key, val);
           }
           break;
         default:
-          changed |= this.setField(this.fields, key, data[key]);
+          changed |= this.setField(this.fields, key, val);
       }
     }
 
@@ -319,7 +319,7 @@ class Torrent {
   getCollatedTrackers() {
     const f = this.fields;
     if (!f.collatedTrackers && f.trackers) {
-      f.collatedTrackers = this.collateTrackers(f.trackers);
+      f.collatedTrackers = Torrent.collateTrackers(f.trackers);
     }
     return f.collatedTrackers || '';
   }

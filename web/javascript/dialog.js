@@ -10,54 +10,34 @@
 class Dialog {
   constructor() {
     // private interface variables
-    this._container = $('#dialog_container');
-    this._heading = $('#dialog_heading');
-    this._message = $('#dialog_message');
-    this._cancel_button = $('#dialog_cancel_button');
-    this._confirm_button = $('#dialog_confirm_button');
+    this._container = document.getElementById('dialog_container');
+    this._heading = document.getElementById('dialog_heading');
+    this._message = document.getElementById('dialog_message');
+    this._cancel_button = document.getElementById('dialog_cancel_button');
+    this._confirm_button = document.getElementById('dialog_confirm_button');
     this._callback = null;
 
     // Observe the buttons
-    this._cancel_button.bind(
-      'click',
-      {
-        dialog: this,
-      },
-      this.onCancelClicked
-    );
-    this._confirm_button.bind(
-      'click',
-      {
-        dialog: this,
-      },
-      this.onConfirmClicked
-    );
+    this._cancel_button.addEventListener('click', this.hideDialog.bind(this));
+    this._confirm_button.addEventListener('click', this.executeCallback.bind(this));
   }
 
   /// EVENT FUNCTIONS
 
   executeCallback() {
     this._callback();
-    dialog.hideDialog();
+    this.hideDialog();
   }
 
   hideDialog() {
-    $('body.dialog_showing').removeClass('dialog_showing');
-    this._container.hide();
+    document.body.classList.remove('dialog_showing');
+    this._container.style.display = 'none';
     transmission.hideMobileAddressbar();
     transmission.updateButtonStates();
   }
 
-  isVisible() {
-    return this._container.is(':visible');
-  }
-
-  static onCancelClicked(event) {
-    event.data.dialog.hideDialog();
-  }
-
-  static onConfirmClicked(event) {
-    event.data.dialog.executeCallback();
+  static isVisible() {
+    document.body.classList.contains('dialog_showing');
   }
 
   /// INTERFACE FUNCTIONS
@@ -67,14 +47,14 @@ class Dialog {
     if (!isMobileDevice) {
       $('.dialog_container').hide();
     }
-    setTextContent(this._heading[0], dialog_heading);
-    setTextContent(this._message[0], dialog_message);
-    setTextContent(this._cancel_button[0], cancel_button_label || 'Cancel');
-    setTextContent(this._confirm_button[0], confirm_button_label);
-    this._confirm_button.show();
+    setTextContent(this._heading, dialog_heading);
+    setTextContent(this._message, dialog_message);
+    setTextContent(this._cancel_button, cancel_button_label || 'Cancel');
+    setTextContent(this._confirm_button, confirm_button_label);
+    this._confirm_button.style.display = 'block';
     this._callback = callback;
-    $('body').addClass('dialog_showing');
-    this._container.show();
+    document.body.classList.add('dialog_showing');
+    this._container.style.display = 'block';
     transmission.updateButtonStates();
     if (isMobileDevice) {
       transmission.hideMobileAddressbar();
@@ -86,19 +66,19 @@ class Dialog {
     if (!isMobileDevice) {
       $('.dialog_container').hide();
     }
-    setTextContent(this._heading[0], dialog_heading);
-    setTextContent(this._message[0], dialog_message);
+    setTextContent(this._heading, dialog_heading);
+    setTextContent(this._message, dialog_message);
     // jquery::hide() doesn't work here in Safari for some odd reason
-    this._confirm_button.css('display', 'none');
-    setTextContent(this._cancel_button[0], cancel_button_label);
+    this._confirm_button.style.display = 'none';
+    setTextContent(this._cancel_button, cancel_button_label);
     // Just in case
     $('#upload_container').hide();
     $('#move_container').hide();
-    $('body').addClass('dialog_showing');
+    document.body.classList.add('dialog_showing');
     transmission.updateButtonStates();
     if (isMobileDevice) {
       transmission.hideMobileAddressbar();
     }
-    this._container.show();
+    this._container.style.display = 'block';
   }
 }

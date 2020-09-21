@@ -612,8 +612,8 @@ function Inspector(controller) {
         addNodeToView(tor, div, sub, i++);
       }
       if (sub.children) {
-        for (const key in sub.children) {
-          i = addSubtreeToView(tor, div, sub.children[key]);
+        for (const val of Object.values(sub.children)) {
+          i = addSubtreeToView(tor, div, val);
         }
       }
       parent.appendChild(div);

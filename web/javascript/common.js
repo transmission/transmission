@@ -7,7 +7,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-const isMobileDevice = RegExp('(iPhone|iPod|Android)').test(navigator.userAgent);
+const isMobileDevice = /(iPhone|iPod|Android)/.test(navigator.userAgent);
 
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
 $.fn.tabbedDialog = function (dialog_opts) {
@@ -91,19 +91,64 @@ Number.prototype.toStringWithCommas = function () {
   return this.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
 };
 
-/*
- * Trim whitespace from a string
- */
-String.prototype.trim = function () {
-  return this.replace(/^\s*/, '').replace(/\s*$/, '');
-};
+/// PREFERENCES
 
-/***
- ****  Preferences
- ***/
+class Prefs {
+  // set a preference option
+  static setValue(key, val) {
+    Prefs._warnIfUnknownKey(key);
 
-function Prefs() {}
-Prefs.prototype = {};
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    document.cookie = `${key}=${val}; expires=${date.toGMTString()}; path=/`;
+  }
+
+  static _warnIfUnknownKey(key) {
+    if (!Object.prototype.hasOwnProperty.call(Prefs._Defaults, key)) {
+      console.warn("unrecognized preference key '%s'", key);
+    }
+  }
+
+  static _getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    return parts.length === 2 ? parts.pop().split(';').shift() : null;
+  }
+
+  /**
+   * Get a preference option
+   *
+   * @param key the preference's key
+   * @param fallback if the option isn't set, return this instead
+   */
+  static getValue(key, fallback) {
+    Prefs._warnIfUnknownKey(key);
+
+    const val = Prefs._getCookie(key);
+    if (!val) {
+      return fallback;
+    }
+    if (val === 'true') {
+      return true;
+    }
+    if (val === 'false') {
+      return false;
+    }
+    return val;
+  }
+
+  /**
+   * Get an object with all the Clutch preferences set
+   *
+   * @pararm o object to be populated (optional)
+   */
+  static getClutchPrefs(o = {}) {
+    for (const [key, val] of Object.entries(Prefs._Defaults)) {
+      o[key] = Prefs.getValue(key, val);
+    }
+    return o;
+  }
+}
 
 Prefs._RefreshRate = 'refresh_rate';
 
@@ -138,101 +183,4 @@ Prefs._Defaults = {
   sort_direction: 'ascending',
   sort_method: 'name',
   'turtle-state': false,
-};
-
-/*
- * Set a preference option
- */
-Prefs.setValue = function (key, val) {
-  if (!(key in Prefs._Defaults)) {
-    console.warn("unrecognized preference key '%s'", key);
-  }
-
-  const date = new Date();
-  date.setFullYear(date.getFullYear() + 1);
-  document.cookie = `${key}=${val}; expires=${date.toGMTString()}; path=/`;
-};
-
-/**
- * Get a preference option
- *
- * @param key the preference's key
- * @param fallback if the option isn't set, return this instead
- */
-Prefs.getValue = function (key, fallback) {
-  if (!(key in Prefs._Defaults)) {
-    console.warn("unrecognized preference key '%s'", key);
-  }
-
-  let val = null;
-  const lines = document.cookie.split(';');
-  for (let i = 0, len = lines.length; !val && i < len; ++i) {
-    const line = lines[i].trim();
-    const delim = line.indexOf('=');
-    if (delim === key.length && line.indexOf(key) === 0) {
-      val = line.substring(delim + 1);
-    }
-  }
-
-  // FIXME: we support strings and booleans... add number support too?
-  if (!val) {
-    val = fallback;
-  } else if (val === 'true') {
-    val = true;
-  } else if (val === 'false') {
-    val = false;
-  }
-  return val;
-};
-
-/**
- * Get an object with all the Clutch preferences set
- *
- * @pararm o object to be populated (optional)
- */
-Prefs.getClutchPrefs = function (o) {
-  if (!o) {
-    o = {};
-  }
-  for (const key in Prefs._Defaults) {
-    o[key] = Prefs.getValue(key, Prefs._Defaults[key]);
-  }
-  return o;
-};
-
-// forceNumeric() plug-in implementation
-jQuery.fn.forceNumeric = function () {
-  return this.each(function () {
-    $(this).keydown((e) => {
-      const key = e.which || e.keyCode;
-      return (
-        (!e.shiftKey &&
-          !e.altKey &&
-          !e.ctrlKey &&
-          // numbers
-          key >= 48 &&
-          key <= 57) ||
-        // Numeric keypad
-        (key >= 96 && key <= 105) ||
-        // comma, period and minus, . on keypad
-        key === 190 ||
-        key === 188 ||
-        key === 109 ||
-        key === 110 ||
-        // Backspace and Tab and Enter
-        key === 8 ||
-        key === 9 ||
-        key === 13 ||
-        // Home and End
-        key === 35 ||
-        key === 36 ||
-        // left and right arrows
-        key === 37 ||
-        key === 39 ||
-        // Del and Ins
-        key === 46 ||
-        key === 45
-      );
-    });
-  });
 };

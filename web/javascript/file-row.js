@@ -55,11 +55,11 @@ class FileRow {
         case -1:
           low = true;
           break;
-        case 0:
-          normal = true;
-          break;
         case 1:
           high = true;
+          break;
+        default:
+          normal = true;
           break;
       }
     }
