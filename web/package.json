@@ -43,6 +43,9 @@
       "sourceType": "module"
     },
     "rules": {
+      "array-callback-return": "error",
+      "block-scoped-var": "error",
+      "class-methods-use-this": "error",
       "curly": ["error", "all"],
       "init-declarations": ["error", "always"],
       "no-use-before-define": "error",
@@ -52,6 +55,7 @@
         "vars": "local",
         "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|transmission"
       }],
+      "no-useless-backreference": "error",
       "no-var": "error",
       "object-shorthand": ["error", "always"],
       "prefer-const": "error",

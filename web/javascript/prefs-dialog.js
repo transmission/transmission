@@ -6,7 +6,7 @@
  */
 
 class PrefsDialog {
-  initTimeDropDown(e) {
+  static initTimeDropDown(e) {
     for (let i = 0; i < 24 * 4; ++i) {
       const hour = parseInt(i / 4, 10);
       const mins = (i % 4) * 15;
@@ -43,7 +43,7 @@ class PrefsDialog {
     this.setBlocklistButtonEnabled(false);
   }
 
-  getValue(e) {
+  static getValue(e) {
     switch (e[0].type) {
       case 'checkbox':
       case 'radio':
@@ -95,7 +95,7 @@ class PrefsDialog {
     }
   }
 
-  getDefaultMobileOptions() {
+  static getDefaultMobileOptions() {
     return {
       width: $(window).width(),
       height: $(window).height(),
