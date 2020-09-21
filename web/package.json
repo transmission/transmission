@@ -46,6 +46,7 @@
       "curly": ["error", "all"],
       "init-declarations": ["error", "always"],
       "no-use-before-define": "error",
+      "no-shadow": "error",
       "no-unused-vars": ["error", {
         "args": "after-used",
         "vars": "local",

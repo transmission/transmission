@@ -5,62 +5,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-function PrefsDialog(remote) {
-  const data = {
-    dialog: null,
-    remote: null,
-    elements: {},
-
-    // all the RPC session keys that we have gui controls for
-    keys: [
-      'alt-speed-down',
-      'alt-speed-time-begin',
-      'alt-speed-time-day',
-      'alt-speed-time-enabled',
-      'alt-speed-time-end',
-      'alt-speed-up',
-      'blocklist-enabled',
-      'blocklist-size',
-      'blocklist-url',
-      'dht-enabled',
-      'download-dir',
-      'encryption',
-      'idle-seeding-limit',
-      'idle-seeding-limit-enabled',
-      'lpd-enabled',
-      'peer-limit-global',
-      'peer-limit-per-torrent',
-      'peer-port',
-      'peer-port-random-on-start',
-      'pex-enabled',
-      'port-forwarding-enabled',
-      'rename-partial-files',
-      'seedRatioLimit',
-      'seedRatioLimited',
-      'speed-limit-down',
-      'speed-limit-down-enabled',
-      'speed-limit-up',
-      'speed-limit-up-enabled',
-      'start-added-torrents',
-      'utp-enabled',
-    ],
-
-    // map of keys that are enabled only if a 'parent' key is enabled
-    groups: {
-      'alt-speed-time-enabled': [
-        'alt-speed-time-begin',
-        'alt-speed-time-day',
-        'alt-speed-time-end',
-      ],
-      'blocklist-enabled': ['blocklist-url', 'blocklist-update-button'],
-      'idle-seeding-limit-enabled': ['idle-seeding-limit'],
-      seedRatioLimited: ['seedRatioLimit'],
-      'speed-limit-down-enabled': ['speed-limit-down'],
-      'speed-limit-up-enabled': ['speed-limit-up'],
-    },
-  };
-
-  const initTimeDropDown = function (e) {
+class PrefsDialog {
+  initTimeDropDown(e) {
     for (let i = 0; i < 24 * 4; ++i) {
       const hour = parseInt(i / 4, 10);
       const mins = (i % 4) * 15;
@@ -68,36 +14,36 @@ function PrefsDialog(remote) {
       const content = `${hour}:${mins || '00'}`;
       e.options[i] = new Option(content, value);
     }
-  };
+  }
 
-  const onPortChecked = function (response) {
+  onPortChecked(response) {
     const is_open = response['arguments']['port-is-open'];
     const text = `Port is <b>${is_open ? 'Open' : 'Closed'}</b>`;
-    const e = data.elements.root.find('#port-label');
+    const e = this.data.elements.root.find('#port-label');
     setInnerHTML(e[0], text);
-  };
+  }
 
-  const setGroupEnabled = function (parent_key, enabled) {
-    if (parent_key in data.groups) {
-      const root = data.elements.root;
-      for (const key of data.groups[parent_key]) {
+  setGroupEnabled(parent_key, enabled) {
+    if (parent_key in this.data.groups) {
+      const root = this.data.elements.root;
+      for (const key of this.data.groups[parent_key]) {
         root.find(`#${key}`).attr('disabled', !enabled);
       }
     }
-  };
+  }
 
-  const setBlocklistButtonEnabled = function (b) {
-    const e = data.elements.blocklist_button;
+  setBlocklistButtonEnabled(b) {
+    const e = this.data.elements.blocklist_button;
     e.attr('disabled', !b);
     e.val(b ? 'Update' : 'Updating...');
-  };
+  }
 
-  const onBlocklistUpdateClicked = function () {
-    data.remote.updateBlocklist();
-    setBlocklistButtonEnabled(false);
-  };
+  onBlocklistUpdateClicked() {
+    this.data.remote.updateBlocklist();
+    this.setBlocklistButtonEnabled(false);
+  }
 
-  const getValue = function (e) {
+  getValue(e) {
     switch (e[0].type) {
       case 'checkbox':
       case 'radio':
@@ -122,133 +68,82 @@ function PrefsDialog(remote) {
       default:
         return null;
     }
-  };
+  }
 
   /* this callback is for controls whose changes can be applied
        immediately, like checkboxs, radioboxes, and selects */
-  const onControlChanged = function (ev) {
+  onControlChanged(ev) {
     const o = {};
-    o[ev.target.id] = getValue($(ev.target));
-    data.remote.savePrefs(o);
-  };
+    o[ev.target.id] = this.getValue($(ev.target));
+    this.data.remote.savePrefs(o);
+  }
 
   /* these two callbacks are for controls whose changes can't be applied
        immediately -- like a text entry field -- because it takes many
        change events for the user to get to the desired result */
-  const onControlFocused = function (ev) {
-    data.oldValue = getValue($(ev.target));
-  };
+  onControlFocused(ev) {
+    this.data.oldValue = this.getValue($(ev.target));
+  }
 
-  const onControlBlurred = function (ev) {
-    const newValue = getValue($(ev.target));
-    if (newValue !== data.oldValue) {
+  onControlBlurred(ev) {
+    const newValue = this.getValue($(ev.target));
+    if (newValue !== this.data.oldValue) {
       const o = {};
       o[ev.target.id] = newValue;
-      data.remote.savePrefs(o);
-      delete data.oldValue;
+      this.data.remote.savePrefs(o);
+      delete this.data.oldValue;
     }
-  };
+  }
 
-  const getDefaultMobileOptions = function () {
+  getDefaultMobileOptions() {
     return {
       width: $(window).width(),
       height: $(window).height(),
       position: ['left', 'top'],
     };
-  };
+  }
 
-  const getValues = function () {
+  getValues() {
     const o = {};
-    const root = data.elements.root;
+    const root = this.data.elements.root;
 
-    for (const key of data.keys) {
-      const val = getValue(root.find(`#${key}`));
+    for (const key of this.data.keys) {
+      const val = this.getValue(root.find(`#${key}`));
       if (val !== null) {
         o[key] = val;
       }
     }
 
     return o;
-  };
+  }
 
-  const onDialogClosed = function () {
+  onDialogClosed() {
     transmission.hideMobileAddressbar();
 
-    $(data.dialog).trigger('closed', getValues());
-  };
+    $(this.data.dialog).trigger('closed', this.getValues());
+  }
 
-  const initialize = function (remote) {
-    data.remote = remote;
-
-    let e = $('#prefs-dialog');
-    data.elements.root = e;
-
-    initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
-    initTimeDropDown(e.find('#alt-speed-time-end')[0]);
-
-    const o = isMobileDevice
-      ? getDefaultMobileOptions()
-      : {
-          width: 350,
-          height: 400,
-        };
-    o.autoOpen = false;
-    o.show = o.hide = 'fade';
-    o.close = onDialogClosed;
-    e.tabbedDialog(o);
-
-    e = e.find('#blocklist-update-button');
-    data.elements.blocklist_button = e;
-    e.click(onBlocklistUpdateClicked);
-
-    // listen for user input
-    for (const key of data.keys) {
-      e = data.elements.root.find(`#${key}`);
-      switch (e[0].type) {
-        case 'checkbox':
-        case 'radio':
-        case 'select-one':
-          e.change(onControlChanged);
-          break;
-
-        case 'text':
-        case 'url':
-        case 'email':
-        case 'number':
-        case 'search':
-          e.focus(onControlFocused);
-          e.blur(onControlBlurred);
-          break;
-
-        default:
-          break;
-      }
-    }
-  };
-
-  /****
-   *****  PUBLIC FUNCTIONS
-   ****/
+  /// PUBLIC FUNCTIONS
 
   // update the dialog's controls
-  this.set = function (o) {
-    const root = data.elements.root;
+  set(o) {
+    const root = this.data.elements.root;
 
-    setBlocklistButtonEnabled(true);
+    this.setBlocklistButtonEnabled(true);
 
-    for (const key of data.keys) {
+    for (const key of this.data.keys) {
       const val = o[key];
-      const e = root.find(`#${key}`);
+      const e = root.find(`#${key}`)[0];
 
       if (key === 'blocklist-size') {
         // special case -- regular text area
-        e.text(`${val.toStringWithCommas()}`);
+        e.textContent = val.toStringWithCommas();
       } else {
-        switch (e[0].type) {
+        switch (e.type) {
           case 'checkbox':
           case 'radio':
-            e.prop('checked', val);
-            setGroupEnabled(key, val);
+            e.checked = val;
+            this.setGroupEnabled(key, val);
             break;
           case 'text':
           case 'url':
@@ -257,37 +152,135 @@ function PrefsDialog(remote) {
           case 'search':
             // don't change the text if the user's editing it.
             // it's very annoying when that happens!
-            if (e[0] !== document.activeElement) {
-              e.val(val);
+            if (e !== document.activeElement) {
+              e.value = val;
             }
             break;
           case 'select-one':
-            e.val(val);
+            e.value = val;
             break;
           default:
             break;
         }
       }
     }
-  };
+  }
 
-  this.show = function () {
+  show() {
     transmission.hideMobileAddressbar();
 
-    setBlocklistButtonEnabled(true);
-    data.remote.checkPort(onPortChecked, this);
-    data.elements.root.dialog('open');
-  };
+    this.setBlocklistButtonEnabled(true);
+    this.data.remote.checkPort(this.onPortChecked, this);
+    this.data.elements.root.dialog('open');
+  }
 
-  this.close = function () {
+  close() {
     transmission.hideMobileAddressbar();
-    data.elements.root.dialog('close');
-  };
+    this.data.elements.root.dialog('close');
+  }
 
-  this.shouldAddedTorrentsStart = function () {
-    return data.elements.root.find('#start-added-torrents')[0].checked;
-  };
+  shouldAddedTorrentsStart() {
+    return this.data.elements.root.find('#start-added-torrents')[0].checked;
+  }
 
-  data.dialog = this;
-  initialize(remote);
+  constructor(remote) {
+    this.data = {
+      dialog: this,
+      elements: {
+        root: $('#prefs-dialog'),
+      },
+      remote,
+
+      // all the RPC session keys that we have gui controls for
+      keys: [
+        'alt-speed-down',
+        'alt-speed-time-begin',
+        'alt-speed-time-day',
+        'alt-speed-time-enabled',
+        'alt-speed-time-end',
+        'alt-speed-up',
+        'blocklist-enabled',
+        'blocklist-size',
+        'blocklist-url',
+        'dht-enabled',
+        'download-dir',
+        'encryption',
+        'idle-seeding-limit',
+        'idle-seeding-limit-enabled',
+        'lpd-enabled',
+        'peer-limit-global',
+        'peer-limit-per-torrent',
+        'peer-port',
+        'peer-port-random-on-start',
+        'pex-enabled',
+        'port-forwarding-enabled',
+        'rename-partial-files',
+        'seedRatioLimit',
+        'seedRatioLimited',
+        'speed-limit-down',
+        'speed-limit-down-enabled',
+        'speed-limit-up',
+        'speed-limit-up-enabled',
+        'start-added-torrents',
+        'utp-enabled',
+      ],
+
+      // map of keys that are enabled only if a 'parent' key is enabled
+      groups: {
+        'alt-speed-time-enabled': [
+          'alt-speed-time-begin',
+          'alt-speed-time-day',
+          'alt-speed-time-end',
+        ],
+        'blocklist-enabled': ['blocklist-url', 'blocklist-update-button'],
+        'idle-seeding-limit-enabled': ['idle-seeding-limit'],
+        seedRatioLimited: ['seedRatioLimit'],
+        'speed-limit-down-enabled': ['speed-limit-down'],
+        'speed-limit-up-enabled': ['speed-limit-up'],
+      },
+    };
+
+    let e = this.data.elements.root;
+    this.initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
+    this.initTimeDropDown(e.find('#alt-speed-time-end')[0]);
+
+    const o = isMobileDevice
+      ? this.getDefaultMobileOptions()
+      : {
+          width: 350,
+          height: 400,
+        };
+    o.autoOpen = false;
+    o.show = o.hide = 'fade';
+    o.close = this.onDialogClosed.bind(this);
+    e.tabbedDialog(o);
+
+    e = e.find('#blocklist-update-button');
+    this.data.elements.blocklist_button = e;
+    e.click(this.onBlocklistUpdateClicked.bind(this));
+
+    // listen for user input
+    for (const key of this.data.keys) {
+      e = this.data.elements.root.find(`#${key}`);
+      switch (e[0].type) {
+        case 'checkbox':
+        case 'radio':
+        case 'select-one':
+          e.change(this.onControlChanged.bind(this));
+          break;
+
+        case 'text':
+        case 'url':
+        case 'email':
+        case 'number':
+        case 'search':
+          e.focus(this.onControlFocused.bind(this));
+          e.blur(this.onControlBlurred.bind(this));
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
 }

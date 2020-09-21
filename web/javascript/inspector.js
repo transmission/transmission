@@ -455,7 +455,7 @@ function Inspector(controller) {
         }
 
         let tier = -1;
-        tor.getTrackers.forEach((tracker, idx) => {
+        tor.getTrackers().forEach((tracker, idx) => {
           if (tier != tracker.tier) {
             if (tier !== -1) {
               // close previous tier
@@ -601,9 +601,10 @@ function Inspector(controller) {
       const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
       data.file_rows.push(row);
       parent.appendChild(row.getElement());
-      $(row).bind('wantedToggled', onFileWantedToggled);
-      $(row).bind('priorityToggled', onFilePriorityToggled);
-      $(row).bind('nameClicked', onNameClicked);
+      const e = $(row);
+      e.bind('wantedToggled', onFileWantedToggled);
+      e.bind('priorityToggled', onFilePriorityToggled);
+      e.bind('nameClicked', onNameClicked);
     },
     addSubtreeToView = function (tor, parent, sub, i) {
       const div = document.createElement('div');
@@ -689,8 +690,8 @@ function Inspector(controller) {
 
       updateInspector();
     },
-    initialize = function (controller) {
-      data.controller = controller;
+    initialize = function (controller_arg) {
+      data.controller = controller_arg;
 
       $('.inspector-tab').click(onTabClicked);
 
