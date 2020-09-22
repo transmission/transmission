@@ -50,9 +50,9 @@ class Transmission {
     // tell jQuery to copy the dataTransfer property from events over if it exists
     jQuery.event.props.push('dataTransfer');
 
-    $('#torrent_upload_form').submit(() => {
-      $('#upload_confirm_button').click();
-      return false;
+    document.getElementById('torrent_upload_form').addEventListener((ev) => {
+      this.confirmUploadClicked();
+      ev.preventDefault();
     });
 
     let e = document.getElementById('filter-mode');

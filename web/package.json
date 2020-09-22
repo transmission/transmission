@@ -70,7 +70,6 @@
       "jquery/no-ajax": "off",
       "jquery/no-bind": "off",
       "jquery/no-slide": "off",
-      "jquery/no-submit": "off",
       "jquery/no-trigger": "off",
       "no-caller": "error",
       "no-confusing-arrow": "error",
@@ -181,8 +180,8 @@
     "vueIndentScriptAndStyle": false
   },
   "scripts": {
-    "lint": "prettier --loglevel warn --check javascript/*js && eslint javascript/*js",
-    "lint:fix": "prettier --loglevel warn -w javascript/*js && eslint --fix javascript/*js"
+    "lint": "prettier --loglevel warn --check index.html style/transmission/*.css style/transmission/*.scss javascript/*.js && eslint javascript/*.js",
+    "lint:fix": "prettier --loglevel warn -w --check index.html style/transmission/*.css style/transmission/*.scss javascript/*.js && eslint javascript/*.js"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
