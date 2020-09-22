@@ -71,10 +71,8 @@ class TorrentRendererHelper {
     let e = progressbar.complete;
     let display = info.percent > 0 ? 'block' : 'none';
     if (e.style.width !== width || e.style.display !== display) {
-      $(e).css({
-        display,
-        width: `${info.percent}%`,
-      });
+      e.style.display = display;
+      e.style.width = `${info.percent}%`;
     }
 
     if (e.className !== info.complete) {
@@ -259,7 +257,7 @@ class TorrentRendererFull {
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
     let e = root._peer_details_container;
-    $(e).toggleClass('error', has_error);
+    e.classList.toggle('error', has_error);
     setTextContent(e, TorrentRendererFull.getPeerDetails(t));
 
     // progress details
@@ -356,13 +354,13 @@ class TorrentRendererCompact {
     // name
     const is_stopped = t.isStopped();
     let e = root._name_container;
-    $(e).toggleClass('paused', is_stopped);
+    e.classList.toggle('paused', is_stopped);
     setTextContent(e, t.getName());
 
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
-    $(e).toggleClass('error', has_error);
+    e.classList.toggle('error', has_error);
     setTextContent(e, TorrentRendererCompact.getPeerDetails(t));
 
     // progressbar
@@ -395,14 +393,11 @@ class TorrentRendererCompact {
 
 class TorrentRow {
   constructor(view, controller, torrent) {
-    const row = this;
     this._view = view;
     this._torrent = torrent;
     this._element = view.createRow();
+    this._torrent.addEventListener('dataChanged', () => this.render(controller));
     this.render(controller);
-    $(this._torrent).bind('dataChanged.torrentRowListener', () => {
-      row.render(controller);
-    });
   }
 
   getElement() {

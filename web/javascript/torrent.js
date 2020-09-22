@@ -7,10 +7,22 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-class Torrent {
+class Torrent extends EventTarget {
   constructor(data) {
-    this.fields = {};
+    super();
+
+    const debounce = (callback, wait = 100) => {
+      let timeout = null;
+      return (...args) => {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => callback.apply(context, args), wait);
+      };
+    };
+
+    this.dispatchDataChanged = debounce(() => this.dispatchEvent(new Event('dataChanged')));
     this.fieldObservers = {};
+    this.fields = {};
     this.refresh(data);
   }
 
@@ -87,7 +99,7 @@ class Torrent {
 
   refresh(data) {
     if (this.refreshFields(data)) {
-      $(this).trigger('dataChanged', this);
+      this.dispatchDataChanged();
     }
   }
 

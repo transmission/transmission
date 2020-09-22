@@ -7,7 +7,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-class PrefsDialog {
+class PrefsDialog extends EventTarget {
   static initTimeDropDown(e) {
     for (let i = 0; i < 24 * 4; ++i) {
       const hour = parseInt(i / 4, 10);
@@ -36,8 +36,8 @@ class PrefsDialog {
 
   setBlocklistButtonEnabled(b) {
     const e = this.data.elements.blocklist_button;
-    e.attr('disabled', !b);
-    e.val(b ? 'Update' : 'Updating...');
+    e.setAttribute('disabled', !b);
+    e.value = b ? 'Update' : 'Updating...';
   }
 
   onBlocklistUpdateClicked() {
@@ -116,7 +116,7 @@ class PrefsDialog {
   onDialogClosed() {
     transmission.hideMobileAddressbar();
 
-    $(this.data.dialog).trigger('closed', this.getValues());
+    this.dispatchEvent(new Event('closed'));
   }
 
   /// PUBLIC FUNCTIONS
@@ -178,6 +178,8 @@ class PrefsDialog {
   }
 
   constructor(remote) {
+    super();
+
     this.data = {
       dialog: this,
       elements: {
@@ -247,9 +249,9 @@ class PrefsDialog {
     o.close = this.onDialogClosed.bind(this);
     e.tabbedDialog(o);
 
-    e = e.find('#blocklist-update-button');
+    e = document.getElementById('blocklist-update-button');
     this.data.elements.blocklist_button = e;
-    e.click(this.onBlocklistUpdateClicked.bind(this));
+    e.addEventListener('click', () => this.onBlocklistUpdateClicked());
 
     // listen for user input
     for (const key of this.data.keys) {

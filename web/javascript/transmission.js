@@ -13,7 +13,7 @@ class Transmission {
     this.remote = new TransmissionRemote(this);
     this.inspector = new Inspector(this);
     this.prefsDialog = new PrefsDialog(this.remote);
-    $(this.prefsDialog).bind('closed', Transmission.onPrefsDialogClosed.bind(this));
+    this.prefsDialog.addEventListener('closed', Transmission.onPrefsDialogClosed);
 
     this.isMenuEnabled = !isMobileDevice;
 
@@ -30,22 +30,22 @@ class Transmission {
     // Set up user events
     const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
     const click = (key, cb) => listen(key, 'click', cb);
-    click('compact-button', () => this.toggleCompactClicked());
-    click('move_cancel_button', () => this.hideMoveDialog());
-    click('move_confirm_button', () => this.confirmMoveClicked());
-    click('prefs-button', () => this.togglePrefsDialogClicked());
+    click('compact-button', this.toggleCompactClicked.bind(this));
+    click('move_cancel_button', this.hideMoveDialog.bind(this));
+    click('move_confirm_button', this.confirmMoveClicked.bind(this));
+    click('prefs-button', this.togglePrefsDialogClicked.bind(this));
     click('rename_cancel_button', Transmission.hideRenameDialog);
-    click('rename_confirm_button', () => this.confirmRenameClicked());
-    click('toolbar-inspector', () => this.toggleInspector());
-    click('toolbar-open', () => this.openTorrentClicked());
-    click('toolbar-pause', () => this.stopSelectedClicked());
-    click('toolbar-pause-all', () => this.stopAllClicked());
-    click('toolbar-remove', () => this.removeClicked());
-    click('toolbar-start', () => this.startSelectedClicked());
-    click('toolbar-start-all', () => this.startAllClicked());
-    click('turtle-button', () => this.toggleTurtleClicked());
-    click('upload_cancel_button', () => this.hideUploadDialog());
-    click('upload_confirm_button', () => this.confirmUploadClicked());
+    click('rename_confirm_button', this.confirmRenameClicked.bind(this));
+    click('toolbar-inspector', this.toggleInspector.bind(this));
+    click('toolbar-open', this.openTorrentClicked.bind(this));
+    click('toolbar-pause', this.stopSelectedClicked.bind(this));
+    click('toolbar-pause-all', this.stopAllClicked.bind(this));
+    click('toolbar-remove', this.removeClicked.bind(this));
+    click('toolbar-start', this.startSelectedClicked.bind(this));
+    click('toolbar-start-all', this.startAllClicked.bind(this));
+    click('turtle-button', this.toggleTurtleClicked.bind(this));
+    click('upload_cancel_button', this.hideUploadDialog.bind(this));
+    click('upload_confirm_button', this.confirmUploadClicked.bind(this));
 
     // tell jQuery to copy the dataTransfer property from events over if it exists
     jQuery.event.props.push('dataTransfer');
@@ -55,9 +55,9 @@ class Transmission {
       return false;
     });
 
-    let e = $('#filter-mode');
-    e.val(this[Prefs._FilterMode]);
-    e.change(this.onFilterModeClicked.bind(this));
+    let e = document.getElementById('filter-mode');
+    e.value = this[Prefs._FilterMode];
+    e.addEventListener('change', this.onFilterModeClicked.bind(this));
     listen('filter-tracker', 'change', this.onFilterTrackerClicked.bind(this));
 
     if (!isMobileDevice) {
@@ -79,7 +79,6 @@ class Transmission {
 
     e = {};
     e.torrent_list = document.getElementById('torrent_list');
-    e.toolbar_buttons = $('#toolbar ul li');
     e.toolbar_pause_button = document.getElementById('toolbar-pause');
     e.toolbar_start_button = document.getElementById('toolbar-start');
     e.toolbar_remove_button = document.getElementById('toolbar-remove');
@@ -227,10 +226,10 @@ class Transmission {
   createSettingsMenu() {
     $('#footer_super_menu').transMenu({
       close() {
-        $('#settings_menu').removeClass('selected');
+        document.getElementById('settings_menu').classList.remove('selected');
       },
       open() {
-        $('#settings_menu').addClass('selected');
+        document.getElementById('settings_menu').classList.add('selected');
       },
       select: this.onMenuClicked.bind(this),
     });
@@ -244,12 +243,12 @@ class Transmission {
    ****/
 
   updateFreeSpaceInAddDialog() {
-    const formdir = $('input#add-dialog-folder-input').val();
+    const formdir = document.getElementById('add-dialog-folder-input').value;
     this.remote.getFreeSpace(formdir, Transmission.onFreeSpaceResponse, this);
   }
 
   static onFreeSpaceResponse(dir, bytes) {
-    const formdir = $('input#add-dialog-folder-input').val();
+    const formdir = document.getElementById('add-dialog-folder-input').value;
     if (formdir === dir) {
       const e = $('label#add-dialog-folder-label');
       const str = bytes > 0 ? `  <i>(${Transmission.fmt.size(bytes)} Free)</i>` : '';
@@ -320,26 +319,34 @@ class Transmission {
   }
 
   setSelectedRow(row) {
-    $(this.elements.torrent_list).children('.selected').removeClass('selected');
-    this.selectRow(row);
+    const e_sel = row.getElement();
+    for (const e of this.elements.torrent_list.children) {
+      e.classList.toggle('selected', e === e_sel);
+    }
+    this.callSelectionChangedSoon();
   }
 
   selectRow(row) {
-    $(row.getElement()).addClass('selected');
+    row.getElement().classList.add('selected');
     this.callSelectionChangedSoon();
   }
 
   deselectRow(row) {
-    $(row.getElement()).removeClass('selected');
+    row.getElement().classList.remove('selected');
     this.callSelectionChangedSoon();
   }
 
   selectAll() {
-    $(this.elements.torrent_list).children().addClass('selected');
+    for (const e of this.elements.torrent_list.children) {
+      e.classList.add('selected');
+    }
     this.callSelectionChangedSoon();
   }
+
   deselectAll() {
-    $(this.elements.torrent_list).children('.selected').removeClass('selected');
+    for (const e of this.elements.torrent_list.children) {
+      e.classList.remove('selected');
+    }
     this.callSelectionChangedSoon();
     delete this._last_torrent_clicked;
   }
@@ -369,7 +376,6 @@ class Transmission {
 
   selectionChanged() {
     this.updateButtonStates();
-
     this.inspector.setTorrents(Transmission.inspectorIsVisible() ? this.getSelectedTorrents() : []);
 
     clearTimeout(this.selectionChangedTimer);
@@ -396,9 +402,10 @@ class Transmission {
   keyDown(ev) {
     let handled = false;
     const rows = this._rows;
-    const isInputFocused = $(ev.target).is('input');
-    const isDialogVisible =
-      $('.dialog_heading:visible').length > 0 || $('.ui-dialog:visible').length > 0;
+    const isInputFocused = ev.target.matches('input');
+    const anyDialogShowing = [...document.getElementsByClassName('dialog_container')].some(
+      (e) => !Utils.isHidden(e)
+    );
 
     // hotkeys
     const up_key = ev.keyCode === 38; // up key pressed
@@ -430,19 +437,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if ($('#upload_container').is(':visible')) {
+      if (!Utils.isHidden('upload_container')) {
         this.confirmUploadClicked();
         handled = true;
       }
 
       // handle move dialog
-      if ($('#move_container').is(':visible')) {
+      if (!Utils.isHidden('move_container')) {
         this.confirmMoveClicked();
         handled = true;
       }
 
       // handle rename dialog
-      if ($('#rename_container').is(':visible')) {
+      if (!Utils.isHidden('rename_container')) {
         this.confirmRenameClicked();
         handled = true;
       }
@@ -456,19 +463,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if ($('#upload_container').is(':visible')) {
+      if (!Utils.isHidden('upload_container')) {
         this.hideUploadDialog();
         handled = true;
       }
 
       // handle move dialog
-      if ($('#move_container').is(':visible')) {
+      if (!Utils.isHidden('move_container')) {
         this.hideMoveDialog();
         handled = true;
       }
 
       // handle rename dialog
-      if ($('#rename_container').is(':visible')) {
+      if (!Utils.isHidden('rename_container')) {
         Transmission.hideRenameDialog();
         handled = true;
       }
@@ -478,7 +485,7 @@ class Transmission {
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (!isInputFocused && !isDialogVisible && !ev.metaKey && !ev.ctrlKey) {
+    if (!isInputFocused && !anyDialogShowing && !ev.metaKey && !ev.ctrlKey) {
       if (comma_key) {
         this.togglePrefsDialogClicked();
         handled = true;
@@ -621,7 +628,7 @@ class Transmission {
 
   openTorrentClicked(ev) {
     if (Transmission.isButtonEnabled(ev)) {
-      $('body').addClass('open_showing');
+      document.body.classList.add('open_showing');
       this.uploadTorrentFile();
       this.updateButtonStates();
     }
@@ -673,8 +680,8 @@ class Transmission {
   }
 
   hideUploadDialog() {
-    $('body.open_showing').removeClass('open_showing');
-    $('#upload_container').hide();
+    document.body.classList.remove('open_showing');
+    Utils.hide('upload_container');
     this.updateButtonStates();
   }
 
@@ -684,7 +691,7 @@ class Transmission {
   }
 
   hideMoveDialog() {
-    $('#move_container').hide();
+    Utils.hide('move_container');
     this.updateButtonStates();
   }
 
@@ -694,13 +701,13 @@ class Transmission {
   }
 
   static hideRenameDialog() {
-    $('body.open_showing').removeClass('open_showing');
-    $('#rename_container').hide();
+    document.body.classList.remove('open_showing');
+    Utils.hide('rename_container');
   }
 
   confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
-    this.renameTorrent(torrents[0], $('input#torrent_rename_name').attr('value'));
+    this.renameTorrent(torrents[0], document.getElementById('torrent_rename_name').value);
     Transmission.hideRenameDialog();
   }
 
@@ -727,9 +734,9 @@ class Transmission {
   }
 
   toggleTurtleClicked() {
-    const o = {};
-    o[RPC._TurtleState] = !$('#turtle-button').hasClass('selected');
-    this.remote.savePrefs(o);
+    this.remote.savePrefs({
+      [RPC._TurtleState]: !document.getElementById('turtle-button').classList.contains('selected'),
+    });
   }
 
   /*--------------------------------------------
@@ -739,17 +746,15 @@ class Transmission {
    *--------------------------------------------*/
 
   static onPrefsDialogClosed() {
-    $('#prefs-button').removeClass('selected');
+    document.getElementById('prefs-button').classList.remove('selected');
   }
 
   togglePrefsDialogClicked() {
-    const e = $('#prefs-button');
-
-    if (e.hasClass('selected')) {
-      this.prefsDialog.close();
-    } else {
-      e.addClass('selected');
+    const e = document.getElementById('prefs-button');
+    if (e.classList.toggle('selected')) {
       this.prefsDialog.show();
+    } else {
+      this.prefsDialog.close();
     }
   }
 
@@ -798,7 +803,7 @@ class Transmission {
 
         case 'about-button': {
           const o = `Transmission ${this.serverVersion}`;
-          $('#about-dialog #about-title').html(o);
+          document.querySelector('#about-dialog #about-title').textContent = o;
           $('#about-dialog').dialog({
             hide: 'fade',
             show: 'fade',
@@ -853,8 +858,9 @@ class Transmission {
     }
   }
 
-  onTorrentChanged(ev, tor) {
+  onTorrentChanged(ev) {
     // update our dirty fields
+    const tor = ev.currentTarget;
     this.dirtyTorrents.add(tor.getId());
 
     // enqueue ui refreshes
@@ -876,9 +882,8 @@ class Transmission {
         }
       } else {
         t = this._torrents[id] = new Torrent(o);
+        t.addEventListener('dataChanged', this.onTorrentChanged.bind(this));
         this.dirtyTorrents.add(id);
-        const callback = this.onTorrentChanged.bind(this);
-        $(t).bind('dataChanged', callback);
         // do we need more info for this torrent?
         if (!('name' in t.fields) || !('status' in t.fields)) {
           needinfo.push(id);
@@ -1017,7 +1022,7 @@ class Transmission {
    */
   uploadTorrentFile(confirmed) {
     const fileInput = $('input#torrent_upload_file');
-    const folderInput = $('input#add-dialog-folder-input');
+    const folderInput = document.getElementById('add-dialog-folder-input');
     const startInput = $('input#torrent_auto_start');
     const urlInput = $('input#torrent_upload_url');
 
@@ -1026,16 +1031,16 @@ class Transmission {
       fileInput.attr('value', '');
       urlInput.attr('value', '');
       startInput.attr('checked', this.shouldAddedTorrentsStart());
-      folderInput.attr('value', $('#download-dir').val());
-      folderInput.change(this.updateFreeSpaceInAddDialog.bind(this));
+      folderInput.value = document.getElementById('download-dir').value;
+      folderInput.addEventListener('change', this.updateFreeSpaceInAddDialog.bind(this));
       this.updateFreeSpaceInAddDialog();
 
       // show the dialog
-      $('#upload_container').show();
+      Utils.show('upload_container');
       urlInput.focus();
     } else {
       const paused = !startInput.is(':checked');
-      const destination = folderInput.val();
+      const destination = folderInput.value;
       const { remote } = this;
 
       jQuery.each(fileInput[0].files, (i, file) => {
@@ -1064,7 +1069,7 @@ class Transmission {
         reader.readAsDataURL(file);
       });
 
-      let url = $('#torrent_upload_url').val();
+      let url = document.getElementById('torrent_upload_url').value;
       if (url !== '') {
         if (url.match(/^[0-9a-f]{40}$/i)) {
           url = `magnet:?xt=urn:btih:${url}`;
@@ -1088,14 +1093,22 @@ class Transmission {
 
   promptSetLocation(confirmed, torrents) {
     if (!confirmed) {
-      const path = torrents.length === 1 ? torrents[0].getDownloadDir() : $('#download-dir').val();
-      $('input#torrent_path').attr('value', path);
-      $('#move_container').show();
-      $('#torrent_path').focus();
+      const path =
+        torrents.length === 1
+          ? torrents[0].getDownloadDir()
+          : document.getElementById('download-dir').value;
+      document.querySelector('input#torrent_path').value = path;
+      Utils.show('move_container');
+      document.getElementById('torrent_path').focus();
     } else {
       const ids = Transmission.getTorrentIds(torrents);
-      this.remote.moveTorrents(ids, $('input#torrent_path').val(), this.refreshTorrents, this);
-      $('#move_container').hide();
+      this.remote.moveTorrents(
+        ids,
+        document.querySelector('input#torrent_path').value,
+        this.refreshTorrents,
+        this
+      );
+      Utils.hide('move_container');
     }
   }
 
@@ -1170,10 +1183,10 @@ class Transmission {
   }
 
   static promptToRenameTorrent(torrent) {
-    $('body').addClass('open_showing');
-    $('input#torrent_rename_name').attr('value', torrent.getName());
-    $('#rename_container').show();
-    $('#torrent_rename_name').focus();
+    document.body.classList.add('open_showing');
+    document.querySelector('input#torrent_rename_name').value = torrent.getName();
+    Utils.show('rename_container');
+    document.getElementById('torrent_rename_name').focus();
   }
 
   renameSelectedTorrents() {
@@ -1302,18 +1315,13 @@ class Transmission {
 
     if (RPC._TurtleState in o) {
       const b = o[RPC._TurtleState];
-      const e = $('#turtle-button');
-      const text = [
-        'Click to ',
-        b ? 'disable' : 'enable',
-        ' Temporary Speed Limits (',
-        fmt.speed(o[RPC._TurtleUpSpeedLimit]),
-        ' up,',
-        fmt.speed(o[RPC._TurtleDownSpeedLimit]),
-        ' down)',
-      ].join('');
-      e.toggleClass('selected', b);
-      e.attr('title', text);
+      const e = document.getElementById('turtle-button');
+      e.classList.toggle('selected', b);
+      const up = o[RPC._TurtleUpSpeedLimit];
+      const dn = o[RPC._TurtleDownSpeedLimit];
+      e.title = `Click to ${
+        b ? 'disable' : 'enable'
+      } temporary speed limits (${up} up, ${dn} down)`;
     }
 
     if (this.isMenuEnabled && RPC._DownSpeedLimited in o && RPC._DownSpeedLimit in o) {
@@ -1382,7 +1390,7 @@ class Transmission {
 
     if (!this.filterTrackersStr || this.filterTrackersStr !== str) {
       this.filterTrackersStr = str;
-      $('#filter-tracker').html(str);
+      document.getElementById('filter-tracker').innerHTML = str;
     }
   }
 
@@ -1440,7 +1448,7 @@ class Transmission {
   updateButtonStates() {
     const e = this.elements;
     this.calculateTorrentStates((s) => {
-      const setEnabled = (key, flag) => $(key).toggleClass('disabled', !flag);
+      const setEnabled = (key, flag) => key.classList.toggle('disabled', !flag);
       setEnabled(e.toolbar_pause_button, s.activeSel > 0);
       setEnabled(e.toolbar_start_button, s.pausedSel > 0);
       setEnabled(e.toolbar_remove_button, s.sel > 0);
@@ -1454,21 +1462,22 @@ class Transmission {
    ****/
 
   static inspectorIsVisible() {
-    return $('#torrent_inspector').is(':visible');
+    return document.body.classList.contains('inspector_showing');
   }
+
   toggleInspector() {
     this.setInspectorVisible(!Transmission.inspectorIsVisible());
   }
+
   setInspectorVisible(visible) {
     this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
 
     // update the ui widgetry
-    $('#torrent_inspector').toggle(visible);
-    $('#toolbar-inspector').toggleClass('selected', visible);
+    Utils.setVisible('torrent_inspector', visible);
+    document.getElementById('toolbar-inspector').classList.toggle('selected', visible);
+    document.body.classList.toggle('inspector_showing', visible);
     this.hideMobileAddressbar();
-    if (isMobileDevice) {
-      $('body').toggleClass('inspector_showing', visible);
-    } else {
+    if (!isMobileDevice) {
       const w = visible ? `${$('#torrent_inspector').outerWidth() + 1}px` : '0px';
       document.getElementById('torrent_container').style.right = w;
     }
@@ -1502,7 +1511,6 @@ class Transmission {
   }
 
   refilter(rebuildEverything) {
-    // let i, e, id, t, row;
     const sort_mode = this[Prefs._SortMethod];
     const sort_direction = this[Prefs._SortDirection];
     const filter_mode = this[Prefs._FilterMode];
@@ -1626,10 +1634,7 @@ class Transmission {
   }
 
   setFilterMode(mode) {
-    // set the state
     this.setPref(Prefs._FilterMode, mode);
-
-    // refilter
     this.refilter(true);
   }
 
@@ -1643,11 +1648,8 @@ class Transmission {
   }
 
   setFilterTracker(domain) {
-    // update which tracker is selected in the popup
-    const key = domain ? Transmission.getReadableDomain(domain) : 'all';
-    const id = `#show-tracker-${key}`;
-
-    $(id).addClass('selected').siblings().removeClass('selected');
+    const e = document.getElementById('filter-tracker');
+    e.value = domain ? Transmission.getReadableDomain(domain) : 'all';
 
     this.filterTracker = domain;
     this.refilter(true);
@@ -1741,7 +1743,7 @@ class Transmission {
     const compact = this[Prefs._CompactDisplayState];
 
     // update the ui: footer button
-    $('#compact-button').toggleClass('selected', compact);
+    document.getElementById('compact-button').classList.toggle('selected', compact);
 
     // update the ui: torrent list
     this.torrentRenderer = compact ? new TorrentRendererCompact() : new TorrentRendererFull();
@@ -1782,21 +1784,22 @@ class Transmission {
   // Process new session stats from the server
   static updateStats(stats) {
     const { fmt } = Transmission;
+    const setText = (id, str) => (document.getElementById(id).textContent = str);
 
     let s = stats['current-stats'];
     let ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
-    $('#stats-session-uploaded').html(fmt.size(s.uploadedBytes));
-    $('#stats-session-downloaded').html(fmt.size(s.downloadedBytes));
-    $('#stats-session-ratio').html(fmt.ratioString(ratio));
-    $('#stats-session-duration').html(fmt.timeInterval(s.secondsActive));
+    setText('stats-session-uploaded', fmt.size(s.uploadedBytes));
+    setText('stats-session-downloaded', fmt.size(s.downloadedBytes));
+    setText('stats-session-ratio', fmt.ratioString(ratio));
+    setText('stats-session-duration', fmt.timeInterval(s.secondsActive));
 
     s = stats['cumulative-stats'];
     ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
-    $('#stats-total-count').html(`${s.sessionCount} times`);
-    $('#stats-total-uploaded').html(fmt.size(s.uploadedBytes));
-    $('#stats-total-downloaded').html(fmt.size(s.downloadedBytes));
-    $('#stats-total-ratio').html(fmt.ratioString(ratio));
-    $('#stats-total-duration').html(fmt.timeInterval(s.secondsActive));
+    setText('stats-total-count', `${s.sessionCount} times`);
+    setText('stats-total-uploaded', fmt.size(s.uploadedBytes));
+    setText('stats-total-downloaded', fmt.size(s.downloadedBytes));
+    setText('stats-total-ratio', fmt.ratioString(ratio));
+    setText('stats-total-duration', fmt.timeInterval(s.secondsActive));
   }
 
   showStatsDialog() {

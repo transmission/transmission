@@ -31,6 +31,57 @@ $.fn.tabbedDialog = function (dialog_opts) {
   tabul.addClass('ui-dialog-titlebar');
 };
 
+class Utils {
+  static isIterable(o) {
+    return o && typeof o[Symbol.iterator] === 'function';
+  }
+
+  static recurseElements(item, func) {
+    if (item instanceof HTMLElement) {
+      func(item);
+      return;
+    }
+
+    if (typeof item === 'string') {
+      Utils.recurseElements(document.getElementById(item), func);
+      return;
+    }
+
+    if (Utils.isIterable(item)) {
+      for (const i of item) {
+        Utils.recurseElements(i, func);
+      }
+    }
+  }
+
+  static isHidden(i) {
+    if (typeof i === 'string') {
+      i = document.getElementById(i);
+    }
+    return i.offsetParent === null;
+  }
+
+  static hide(i) {
+    Utils.recurseElements(i, (item) => {
+      item.style.display = 'none';
+    });
+  }
+
+  static show(i) {
+    Utils.recurseElements(i, (item) => {
+      item.style.display = 'block';
+    });
+  }
+
+  static setVisible(i, visible) {
+    if (visible) {
+      Utils.show(i);
+    } else {
+      Utils.hide(i);
+    }
+  }
+}
+
 /**
  * Checks to see if the content actually changed before poking the DOM.
  */

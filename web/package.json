@@ -15,7 +15,10 @@
       "es6": true,
       "jquery": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+      "eslint:recommended",
+      "plugin:jquery/deprecated"
+    ],
     "globals": {
       "Dialog": "readonly",
       "FileRow": "readonly",
@@ -30,11 +33,11 @@
       "TorrentRow": "readonly",
       "Transmission": "readonly",
       "TransmissionRemote": "readonly",
+      "Utils": "readonly",
       "isMobileDevice": "readonly",
       "sanitizeText": "readonly",
       "setInnerHTML": "readonly",
       "setTextContent": "readonly",
-
       "dialog": "writable",
       "transmission": "writable"
     },
@@ -42,19 +45,33 @@
     "parserOptions": {
       "sourceType": "script"
     },
+    "plugins": [
+      "jquery"
+    ],
     "rules": {
       "array-callback-return": "error",
       "arrow-spacing": "error",
       "block-scoped-var": "error",
       "class-methods-use-this": "error",
       "consistent-return": "error",
-      "curly": ["error", "all"],
+      "curly": [
+        "error",
+        "all"
+      ],
       "default-case": "error",
       "default-case-last": "error",
       "default-param-last": "error",
       "eqeqeq": "error",
       "guard-for-in": "error",
-      "init-declarations": ["error", "always"],
+      "init-declarations": [
+        "error",
+        "always"
+      ],
+      "jquery/no-ajax": "off",
+      "jquery/no-bind": "off",
+      "jquery/no-slide": "off",
+      "jquery/no-submit": "off",
+      "jquery/no-trigger": "off",
       "no-caller": "error",
       "no-confusing-arrow": "error",
       "no-constructor-return": "error",
@@ -64,7 +81,14 @@
       "no-empty-function": "error",
       "no-eq-null": "error",
       "no-eval": "error",
-      "no-extend-native": ["error", {"exceptions": ["Number"]}],
+      "no-extend-native": [
+        "error",
+        {
+          "exceptions": [
+            "Number"
+          ]
+        }
+      ],
       "no-extra-bind": "error",
       "no-floating-decimal": "error",
       "no-implied-eval": "error",
@@ -81,9 +105,7 @@
       "no-redeclare": "off",
       "no-restricted-properties": "error",
       "no-return-assign": "error",
-      "no-return-assign": "error",
       "no-script-url": "error",
-      "no-self-compare": "error",
       "no-self-compare": "error",
       "no-sequences": "error",
       "no-shadow": "error",
@@ -93,11 +115,14 @@
       "no-unmodified-loop-condition": "error",
       "no-unused-expressions": "error",
       "no-unused-labels": "error",
-      "no-unused-vars": ["error", {
-        "args": "after-used",
-        "vars": "local",
-        "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|transmission"
-      }],
+      "no-unused-vars": [
+        "error",
+        {
+          "args": "after-used",
+          "vars": "local",
+          "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|Utils|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|transmission"
+        }
+      ],
       "no-use-before-define": "error",
       "no-useless-backreference": "error",
       "no-useless-call": "error",
@@ -111,7 +136,10 @@
       "no-var": "error",
       "no-void": "error",
       "no-with": "error",
-      "object-shorthand": ["error", "always"],
+      "object-shorthand": [
+        "error",
+        "always"
+      ],
       "prefer-arrow-callback": "error",
       "prefer-const": "error",
       "prefer-destructuring": "error",
@@ -122,9 +150,15 @@
       "prefer-spread": "error",
       "prefer-template": "error",
       "require-await": "error",
-      "semi": ["error", "always"],
+      "semi": [
+        "error",
+        "always"
+      ],
       "sort-keys": "error",
-      "strict": ["error", "global"]
+      "strict": [
+        "error",
+        "global"
+      ]
     }
   },
   "prettier": {
@@ -155,6 +189,7 @@
     "@babel/eslint-parser": "^7.11.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "eslint": "^7.9.0",
+    "eslint-plugin-jquery": "^1.5.1",
     "prettier": "^2.1.2"
   }
 }

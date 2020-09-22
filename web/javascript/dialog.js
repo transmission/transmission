@@ -31,54 +31,54 @@ class Dialog {
 
   hideDialog() {
     document.body.classList.remove('dialog_showing');
-    this._container.style.display = 'none';
+    Utils.hide(this._container);
     transmission.hideMobileAddressbar();
     transmission.updateButtonStates();
   }
 
   static isVisible() {
-    document.body.classList.contains('dialog_showing');
+    return document.body.classList.contains('dialog_showing');
+  }
+
+  static hideAllDialogs() {
+    Utils.hide(document.getElementsByClassName('dialog_container'));
   }
 
   /// INTERFACE FUNCTIONS
 
   // display a confirm dialog
   confirm(dialog_heading, dialog_message, confirm_button_label, callback, cancel_button_label) {
-    if (!isMobileDevice) {
-      $('.dialog_container').hide();
-    }
+    Dialog.hideAllDialogs();
     setTextContent(this._heading, dialog_heading);
     setTextContent(this._message, dialog_message);
     setTextContent(this._cancel_button, cancel_button_label || 'Cancel');
     setTextContent(this._confirm_button, confirm_button_label);
-    this._confirm_button.style.display = 'block';
     this._callback = callback;
-    document.body.classList.add('dialog_showing');
-    this._container.style.display = 'block';
-    transmission.updateButtonStates();
+
     if (isMobileDevice) {
       transmission.hideMobileAddressbar();
     }
+
+    document.body.classList.add('dialog_showing');
+    Utils.show([this._confirm_button, this._container]);
+    transmission.updateButtonStates();
   }
 
   // display an alert dialog
   alert(dialog_heading, dialog_message, cancel_button_label) {
-    if (!isMobileDevice) {
-      $('.dialog_container').hide();
-    }
+    Dialog.hideAllDialogs();
     setTextContent(this._heading, dialog_heading);
     setTextContent(this._message, dialog_message);
-    // jquery::hide() doesn't work here in Safari for some odd reason
-    this._confirm_button.style.display = 'none';
     setTextContent(this._cancel_button, cancel_button_label);
-    // Just in case
-    $('#upload_container').hide();
-    $('#move_container').hide();
-    document.body.classList.add('dialog_showing');
-    transmission.updateButtonStates();
+
     if (isMobileDevice) {
       transmission.hideMobileAddressbar();
     }
-    this._container.style.display = 'block';
+
+    document.body.classList.add('dialog_showing');
+    Utils.hide(this._confirm_button);
+    Utils.show(this._container);
+
+    transmission.updateButtonStates();
   }
 }

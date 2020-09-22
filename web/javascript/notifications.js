@@ -2,7 +2,7 @@
 
 const Notifications = {};
 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
   if (!window.webkitNotifications) {
     return;
   }
