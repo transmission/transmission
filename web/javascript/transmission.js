@@ -193,10 +193,11 @@ class Transmission {
     // Set up the context menu
     $('ul#torrent_list').contextmenu({
       beforeOpen: function (event) {
-        const element = $(event.currentTarget);
-        const i = $('#torrent_list > li').index(element);
-        if (i !== -1 && !this._rows[i].isSelected()) {
-          this.setSelectedRow(this._rows[i]);
+        // ensure the clicked row is selected
+        const e = event.currentTarget;
+        const row = this._rows.find((r) => r.getElement() === e);
+        if (row && !row.isSelected()) {
+          this.setSelectedRow(row);
         }
 
         this.calculateTorrentStates((s) => {
@@ -276,8 +277,7 @@ class Transmission {
       const list = $('#torrent_container');
       const scrollTop = list.scrollTop();
       const innerHeight = list.innerHeight();
-      const { offsetTop } = row.getElement();
-      const offsetHeight = $(row.getElement()).outerHeight();
+      const { offsetHeight, offsetTop } = row.getElement();
 
       if (offsetTop < scrollTop) {
         list.scrollTop(offsetTop);
@@ -437,19 +437,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if (!Utils.isHidden('upload_container')) {
+      if (!Utils.isHiddenId('upload_container')) {
         this.confirmUploadClicked();
         handled = true;
       }
 
       // handle move dialog
-      if (!Utils.isHidden('move_container')) {
+      if (!Utils.isHiddenId('move_container')) {
         this.confirmMoveClicked();
         handled = true;
       }
 
       // handle rename dialog
-      if (!Utils.isHidden('rename_container')) {
+      if (!Utils.isHiddenId('rename_container')) {
         this.confirmRenameClicked();
         handled = true;
       }
@@ -463,19 +463,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if (!Utils.isHidden('upload_container')) {
+      if (!Utils.isHiddenId('upload_container')) {
         this.hideUploadDialog();
         handled = true;
       }
 
       // handle move dialog
-      if (!Utils.isHidden('move_container')) {
+      if (!Utils.isHiddenId('move_container')) {
         this.hideMoveDialog();
         handled = true;
       }
 
       // handle rename dialog
-      if (!Utils.isHidden('rename_container')) {
+      if (!Utils.isHiddenId('rename_container')) {
         Transmission.hideRenameDialog();
         handled = true;
       }
@@ -681,7 +681,7 @@ class Transmission {
 
   hideUploadDialog() {
     document.body.classList.remove('open_showing');
-    Utils.hide('upload_container');
+    Utils.hideId('upload_container');
     this.updateButtonStates();
   }
 
@@ -691,7 +691,7 @@ class Transmission {
   }
 
   hideMoveDialog() {
-    Utils.hide('move_container');
+    Utils.hideId('move_container');
     this.updateButtonStates();
   }
 
@@ -702,7 +702,7 @@ class Transmission {
 
   static hideRenameDialog() {
     document.body.classList.remove('open_showing');
-    Utils.hide('rename_container');
+    Utils.hideId('rename_container');
   }
 
   confirmRenameClicked() {
@@ -1036,7 +1036,7 @@ class Transmission {
       this.updateFreeSpaceInAddDialog();
 
       // show the dialog
-      Utils.show('upload_container');
+      Utils.showId('upload_container');
       urlInput.focus();
     } else {
       const paused = !startInput.is(':checked');
@@ -1098,7 +1098,7 @@ class Transmission {
           ? torrents[0].getDownloadDir()
           : document.getElementById('download-dir').value;
       document.querySelector('input#torrent_path').value = path;
-      Utils.show('move_container');
+      Utils.showId('move_container');
       document.getElementById('torrent_path').focus();
     } else {
       const ids = Transmission.getTorrentIds(torrents);
@@ -1108,7 +1108,7 @@ class Transmission {
         this.refreshTorrents,
         this
       );
-      Utils.hide('move_container');
+      Utils.hideId('move_container');
     }
   }
 
@@ -1185,7 +1185,7 @@ class Transmission {
   static promptToRenameTorrent(torrent) {
     document.body.classList.add('open_showing');
     document.querySelector('input#torrent_rename_name').value = torrent.getName();
-    Utils.show('rename_container');
+    Utils.showId('rename_container');
     document.getElementById('torrent_rename_name').focus();
   }
 
@@ -1473,7 +1473,7 @@ class Transmission {
     this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
 
     // update the ui widgetry
-    Utils.setVisible('torrent_inspector', visible);
+    Utils.setVisibleId('torrent_inspector', visible);
     document.getElementById('toolbar-inspector').classList.toggle('selected', visible);
     document.body.classList.toggle('inspector_showing', visible);
     this.hideMobileAddressbar();

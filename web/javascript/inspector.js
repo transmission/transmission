@@ -567,7 +567,11 @@ class Inspector {
   }
 
   clearFileList() {
-    $(this.data.elements.file_list).empty();
+    const e = this.data.elements.file_list;
+    while (e.firstChild) {
+      e.removeChild(e.firstChild);
+    }
+
     delete this.data.file_torrent;
     delete this.data.file_torrent_n;
     delete this.data.file_rows;

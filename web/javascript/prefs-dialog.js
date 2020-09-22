@@ -8,7 +8,7 @@
  */
 
 class PrefsDialog extends EventTarget {
-  static initTimeDropDown(e) {
+  static _initTimeDropDown(e) {
     for (let i = 0; i < 24 * 4; ++i) {
       const hour = parseInt(i / 4, 10);
       const mins = (i % 4) * 15;
@@ -18,14 +18,14 @@ class PrefsDialog extends EventTarget {
     }
   }
 
-  onPortChecked(response) {
+  _onPortChecked(response) {
     const is_open = response['arguments']['port-is-open'];
     const text = `Port is <b>${is_open ? 'Open' : 'Closed'}</b>`;
     const e = this.data.elements.root.find('#port-label');
     setInnerHTML(e[0], text);
   }
 
-  setGroupEnabled(parent_key, enabled) {
+  _setGroupEnabled(parent_key, enabled) {
     if (parent_key in this.data.groups) {
       const { root } = this.data.elements;
       for (const key of this.data.groups[parent_key]) {
@@ -34,18 +34,18 @@ class PrefsDialog extends EventTarget {
     }
   }
 
-  setBlocklistButtonEnabled(b) {
+  _setBlocklistButtonEnabled(b) {
     const e = this.data.elements.blocklist_button;
     e.setAttribute('disabled', !b);
     e.value = b ? 'Update' : 'Updating...';
   }
 
-  onBlocklistUpdateClicked() {
+  _onBlocklistUpdateClicked() {
     this.data.remote.updateBlocklist();
-    this.setBlocklistButtonEnabled(false);
+    this._setBlocklistButtonEnabled(false);
   }
 
-  static getValue(e) {
+  static _getValue(e) {
     switch (e.type) {
       case 'checkbox':
       case 'radio':
@@ -74,21 +74,21 @@ class PrefsDialog extends EventTarget {
 
   /* this callback is for controls whose changes can be applied
        immediately, like checkboxs, radioboxes, and selects */
-  onControlChanged(ev) {
+  _onControlChanged(ev) {
     const o = {};
-    o[ev.target.id] = PrefsDialog.getValue(ev.target);
+    o[ev.target.id] = PrefsDialog._getValue(ev.target);
     this.data.remote.savePrefs(o);
   }
 
   /* these two callbacks are for controls whose changes can't be applied
        immediately -- like a text entry field -- because it takes many
        change events for the user to get to the desired result */
-  onControlFocused(ev) {
-    this.data.oldValue = PrefsDialog.getValue(ev.target);
+  _onControlFocused(ev) {
+    this.data.oldValue = PrefsDialog._getValue(ev.target);
   }
 
-  onControlBlurred(ev) {
-    const newValue = PrefsDialog.getValue(ev.target);
+  _onControlBlurred(ev) {
+    const newValue = PrefsDialog._getValue(ev.target);
     if (newValue !== this.data.oldValue) {
       const o = {};
       o[ev.target.id] = newValue;
@@ -97,14 +97,15 @@ class PrefsDialog extends EventTarget {
     }
   }
 
-  static getDefaultMobileOptions() {
+  static _getDefaultMobileOptions() {
     return {
-      height: $(window).height(),
+      height: window.innerHeight,
       position: ['left', 'top'],
-      width: $(window).width(),
+      width: window.innerWidth,
     };
   }
 
+  /*
   getValues() {
     return Object.fromEntries(
       this.data.keys
@@ -112,8 +113,9 @@ class PrefsDialog extends EventTarget {
         .filter(([, val]) => val)
     );
   }
+   */
 
-  onDialogClosed() {
+  _onDialogClosed() {
     transmission.hideMobileAddressbar();
 
     this.dispatchEvent(new Event('closed'));
@@ -123,7 +125,7 @@ class PrefsDialog extends EventTarget {
 
   // update the dialog's controls
   set(o) {
-    this.setBlocklistButtonEnabled(true);
+    this._setBlocklistButtonEnabled(true);
 
     for (const key of this.data.keys) {
       const val = o[key];
@@ -137,7 +139,7 @@ class PrefsDialog extends EventTarget {
           case 'checkbox':
           case 'radio':
             e.checked = val;
-            this.setGroupEnabled(key, val);
+            this._setGroupEnabled(key, val);
             break;
           case 'text':
           case 'url':
@@ -163,8 +165,8 @@ class PrefsDialog extends EventTarget {
   show() {
     transmission.hideMobileAddressbar();
 
-    this.setBlocklistButtonEnabled(true);
-    this.data.remote.checkPort(this.onPortChecked, this);
+    this._setBlocklistButtonEnabled(true);
+    this.data.remote.checkPort(this._onPortChecked, this);
     this.data.elements.root.dialog('open');
   }
 
@@ -235,23 +237,23 @@ class PrefsDialog extends EventTarget {
     };
 
     let e = this.data.elements.root;
-    PrefsDialog.initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
-    PrefsDialog.initTimeDropDown(e.find('#alt-speed-time-end')[0]);
+    PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
+    PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-end')[0]);
 
     const o = isMobileDevice
-      ? PrefsDialog.getDefaultMobileOptions()
+      ? PrefsDialog._getDefaultMobileOptions()
       : {
           height: 400,
           width: 350,
         };
     o.autoOpen = false;
     o.show = o.hide = 'fade';
-    o.close = this.onDialogClosed.bind(this);
+    o.close = this._onDialogClosed.bind(this);
     e.tabbedDialog(o);
 
     e = document.getElementById('blocklist-update-button');
     this.data.elements.blocklist_button = e;
-    e.addEventListener('click', () => this.onBlocklistUpdateClicked());
+    e.addEventListener('click', () => this._onBlocklistUpdateClicked());
 
     // listen for user input
     for (const key of this.data.keys) {
@@ -260,7 +262,7 @@ class PrefsDialog extends EventTarget {
         case 'checkbox':
         case 'radio':
         case 'select-one':
-          e.change(this.onControlChanged.bind(this));
+          e.change(this._onControlChanged.bind(this));
           break;
 
         case 'text':
@@ -268,8 +270,8 @@ class PrefsDialog extends EventTarget {
         case 'email':
         case 'number':
         case 'search':
-          e.focus(this.onControlFocused.bind(this));
-          e.blur(this.onControlBlurred.bind(this));
+          e.focus(this._onControlFocused.bind(this));
+          e.blur(this._onControlBlurred.bind(this));
           break;
 
         default:

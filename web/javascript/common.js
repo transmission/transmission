@@ -36,49 +36,36 @@ class Utils {
     return o && typeof o[Symbol.iterator] === 'function';
   }
 
-  static recurseElements(item, func) {
-    if (item instanceof HTMLElement) {
-      func(item);
-      return;
-    }
-
-    if (typeof item === 'string') {
-      Utils.recurseElements(document.getElementById(item), func);
-      return;
-    }
-
-    if (Utils.isIterable(item)) {
-      for (const i of item) {
-        Utils.recurseElements(i, func);
-      }
-    }
+  static isHidden(el) {
+    return el.offsetParent === null;
+  }
+  static isHiddenId(id) {
+    return Utils.isHidden(document.getElementById(id));
   }
 
-  static isHidden(i) {
-    if (typeof i === 'string') {
-      i = document.getElementById(i);
-    }
-    return i.offsetParent === null;
+  static hide(el) {
+    el.style.display = 'none';
+  }
+  static hideId(id) {
+    return Utils.hide(document.getElementById(id));
   }
 
-  static hide(i) {
-    Utils.recurseElements(i, (item) => {
-      item.style.display = 'none';
-    });
+  static show(el) {
+    el.style.display = 'none';
+  }
+  static showId(id) {
+    return Utils.show(document.getElementById(id));
   }
 
-  static show(i) {
-    Utils.recurseElements(i, (item) => {
-      item.style.display = 'block';
-    });
-  }
-
-  static setVisible(i, visible) {
+  static setVisible(el, visible) {
     if (visible) {
-      Utils.show(i);
+      Utils.show(el);
     } else {
-      Utils.hide(i);
+      Utils.hide(el);
     }
+  }
+  static setVisibleId(id) {
+    return Utils.setVisible(document.getElementById(id));
   }
 }
 

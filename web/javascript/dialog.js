@@ -41,7 +41,7 @@ class Dialog {
   }
 
   static hideAllDialogs() {
-    Utils.hide(document.getElementsByClassName('dialog_container'));
+    [...document.getElementsByClassName('dialog_container')].forEach((e) => Utils.hide(e));
   }
 
   /// INTERFACE FUNCTIONS
@@ -60,7 +60,8 @@ class Dialog {
     }
 
     document.body.classList.add('dialog_showing');
-    Utils.show([this._confirm_button, this._container]);
+    Utils.show(this._confirm_button);
+    Utils.show(this._container);
     transmission.updateButtonStates();
   }
 
@@ -78,7 +79,6 @@ class Dialog {
     document.body.classList.add('dialog_showing');
     Utils.hide(this._confirm_button);
     Utils.show(this._container);
-
     transmission.updateButtonStates();
   }
 }

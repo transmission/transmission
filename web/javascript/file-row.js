@@ -87,15 +87,15 @@ class FileRow {
   }
 
   fireWantedChanged(do_want) {
-    $(this.fields.me).trigger('wantedToggled', [this.fields.indices, do_want]);
+    $(this).trigger('wantedToggled', [this.fields.indices, do_want]);
   }
 
   firePriorityChanged(priority) {
-    $(this.fields.me).trigger('priorityToggled', [this.fields.indices, priority]);
+    $(this).trigger('priorityToggled', [this.fields.indices, priority]);
   }
 
   fireNameClicked() {
-    $(this.fields.me).trigger('nameClicked', [this.fields.me, this.fields.indices]);
+    $(this).trigger('nameClicked', [this, this.fields.indices]);
   }
 
   createRow(torrent, depth, name, even) {
@@ -166,7 +166,6 @@ class FileRow {
       have: 0,
       indices,
       isWanted: true,
-      me: this,
       priorityHigh: false,
       priorityLow: false,
       priorityNormal: false,
