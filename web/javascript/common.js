@@ -206,9 +206,9 @@ Prefs._SortMethod = 'sort_method';
 Prefs._SortByAge = 'age';
 Prefs._SortByActivity = 'activity';
 Prefs._SortByName = 'name';
-Prefs._SortByQueue = 'queue_order';
+Prefs._SortByQueue = 'queue-order';
 Prefs._SortBySize = 'size';
-Prefs._SortByProgress = 'percent_completed';
+Prefs._SortByProgress = 'percent-completed';
 Prefs._SortByRatio = 'ratio';
 Prefs._SortByState = 'state';
 

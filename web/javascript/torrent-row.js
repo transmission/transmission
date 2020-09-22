@@ -38,21 +38,21 @@ class TorrentRendererHelper {
     }
 
     return {
-      complete: ['torrent_progress_bar', 'complete', extra].join(' '),
-      incomplete: ['torrent_progress_bar', 'incomplete', extra].join(' '),
+      complete: ['torrent-progress-bar', 'complete', extra].join(' '),
+      incomplete: ['torrent-progress-bar', 'incomplete', extra].join(' '),
       percent: pct,
     };
   }
 
   static createProgressbar(classes) {
     const complete = document.createElement('div');
-    complete.className = 'torrent_progress_bar complete';
+    complete.className = 'torrent-progress-bar complete';
 
     const incomplete = document.createElement('div');
-    incomplete.className = 'torrent_progress_bar incomplete';
+    incomplete.className = 'torrent-progress-bar incomplete';
 
     const progressbar = document.createElement('div');
-    progressbar.className = `torrent_progress_bar_container ${classes}`;
+    progressbar.className = `torrent-progress-bar-container ${classes}`;
     progressbar.appendChild(complete);
     progressbar.appendChild(incomplete);
 
@@ -268,7 +268,7 @@ class TorrentRendererFull {
     const is_stopped = t.isStopped();
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
-    e.className = is_stopped ? 'torrent_resume' : 'torrent_pause';
+    e.className = is_stopped ? 'torrent-resume' : 'torrent-pause';
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -277,15 +277,15 @@ class TorrentRendererFull {
     root.className = 'torrent';
 
     const name = document.createElement('div');
-    name.className = 'torrent_name';
+    name.className = 'torrent-name';
 
     const peers = document.createElement('div');
-    peers.className = 'torrent_peer_details';
+    peers.className = 'torrent-peer-details';
 
     const progressbar = TorrentRendererHelper.createProgressbar('full');
 
     const details = document.createElement('div');
-    details.className = 'torrent_progress_details';
+    details.className = 'torrent-progress-details';
 
     const image = document.createElement('div');
     const button = document.createElement('a');
@@ -372,10 +372,10 @@ class TorrentRendererCompact {
     const progressbar = TorrentRendererHelper.createProgressbar('compact');
 
     const details = document.createElement('div');
-    details.className = 'torrent_peer_details compact';
+    details.className = 'torrent-peer-details compact';
 
     const name = document.createElement('div');
-    name.className = 'torrent_name compact';
+    name.className = 'torrent-name compact';
 
     const root = document.createElement('li');
     root.appendChild(progressbar.element);

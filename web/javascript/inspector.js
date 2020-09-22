@@ -16,23 +16,23 @@ class Inspector {
         comment_lb: document.getElementById('inspector-info-comment'),
         downloaded_lb: document.getElementById('inspector-info-downloaded'),
         error_lb: document.getElementById('inspector-info-error'),
-        file_list: document.getElementById('inspector_file_list'),
+        file_list: document.getElementById('inspector-file-list'),
         files_page: document.getElementById('inspector-page-files'),
         foldername_lb: document.getElementById('inspector-info-location'),
         hash_lb: document.getElementById('inspector-info-hash'),
         have_lb: document.getElementById('inspector-info-have'),
         info_page: document.getElementById('inspector-page-info'),
         last_activity_lb: document.getElementById('inspector-info-last-activity'),
-        name_lb: document.getElementById('torrent_inspector_name'),
+        name_lb: document.getElementById('torrent-inspector-name'),
         origin_lb: document.getElementById('inspector-info-origin'),
-        peers_list: document.getElementById('inspector_peers_list'),
+        peers_list: document.getElementById('inspector-peers-list'),
         peers_page: document.getElementById('inspector-page-peers'),
         privacy_lb: document.getElementById('inspector-info-privacy'),
         remaining_time_lb: document.getElementById('inspector-info-remaining-time'),
         running_time_lb: document.getElementById('inspector-info-running-time'),
         size_lb: document.getElementById('inspector-info-size'),
         state_lb: document.getElementById('inspector-info-state'),
-        trackers_list: document.getElementById('inspector_trackers_list'),
+        trackers_list: document.getElementById('inspector-trackers-list'),
         trackers_page: document.getElementById('inspector-page-trackers'),
         uploaded_lb: document.getElementById('inspector-info-uploaded'),
       },
@@ -322,7 +322,7 @@ class Inspector {
 
     for (const tor of torrents) {
       const peers = tor.getPeers();
-      html.push('<div class="inspector_group">');
+      html.push('<div class="inspector-group">');
       if (torrents.length > 1) {
         html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
       }
@@ -331,20 +331,20 @@ class Inspector {
         continue;
       }
       html.push(
-        '<table class="peer_list">',
-        '<tr class="inspector_peer_entry even">',
-        '<th class="encryptedCol"></th>',
-        '<th class="upCol">Up</th>',
-        '<th class="downCol">Down</th>',
-        '<th class="percentCol">%</th>',
-        '<th class="statusCol">Status</th>',
-        '<th class="addressCol">Address</th>',
-        '<th class="clientCol">Client</th>',
+        '<table class="peer-list">',
+        '<tr class="inspector-peer-entry even">',
+        '<th class="encrypted-col"></th>',
+        '<th class="up-col">Up</th>',
+        '<th class="down-col">Down</th>',
+        '<th class="percent-col">%</th>',
+        '<th class="status-col">Status</th>',
+        '<th class="address-col">Address</th>',
+        '<th class="client-col">Client</th>',
         '</tr>'
       );
       peers.forEach((peer, idx) => {
         html.push(
-          '<tr class="inspector_peer_entry ',
+          '<tr class="inspector-peer-entry ',
           idx % 2 ? 'odd' : 'even',
           '">',
           '<td>',
@@ -359,7 +359,7 @@ class Inspector {
           '<td>',
           peer.rateToClient ? fmt.speedBps(peer.rateToClient) : '',
           '</td>',
-          '<td class="percentCol">',
+          '<td class="percent-col">',
           Math.floor(peer.progress * 100),
           '%',
           '</td>',
@@ -369,7 +369,7 @@ class Inspector {
           '<td>',
           sanitizeText(peer.address),
           '</td>',
-          '<td class="clientCol">',
+          '<td class="client-col">',
           sanitizeText(peer.clientName),
           '</td>',
           '</tr>'
@@ -459,7 +459,7 @@ class Inspector {
     // turn this into a DOM tree, this is a fast operation.
     const html = [];
     for (const tor of torrents) {
-      html.push('<div class="inspector_group">');
+      html.push('<div class="inspector-group">');
 
       if (torrents.length > 1) {
         html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
@@ -476,11 +476,11 @@ class Inspector {
           ({ tier } = tracker);
 
           html.push(
-            '<div class="inspector_group_label">',
+            '<div class="inspector-group_label">',
             'Tier ',
             tier + 1,
             '</div>',
-            '<ul class="tier_list">'
+            '<ul class="tier-list">'
           );
         }
 
@@ -489,14 +489,14 @@ class Inspector {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
         html.push(
-          '<li class="inspector_tracker_entry ',
+          '<li class="inspector-tracker-entry ',
           idx % 2 ? 'odd' : 'even',
-          '"><div class="tracker_host" title="',
+          '"><div class="tracker-host" title="',
           sanitizeText(tracker.announce),
           '">',
           sanitizeText(tracker.host || tracker.announce),
           '</div>',
-          '<div class="tracker_activity">',
+          '<div class="tracker-activity">',
           '<div>',
           lastAnnounceStatusHash['label'],
           ': ',
@@ -528,7 +528,7 @@ class Inspector {
         html.push('</ul></div>');
       }
 
-      html.push('</div>'); // inspector_group
+      html.push('</div>'); // inspector-group
     }
 
     setInnerHTML(trackers_list, html.join(''));

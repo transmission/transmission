@@ -22,7 +22,7 @@ function main() {
 
   if (jQuery.browser.safari) {
     // Move search field's margin down for the styled input
-    document.getElementById('torrent_search').style['margin-top'] = 3;
+    document.getElementById('torrent-search').style['margin-top'] = 3;
   }
 
   if (isMobileDevice) {
@@ -39,11 +39,11 @@ function main() {
     if (window.navigator.standalone) {
       // Fix min height for isMobileDevice when run in full screen mode from home screen
       // so the footer appears in the right place
-      document.getElementById('torrent_container').style['min-height'] = '338px';
+      document.getElementById('torrent-container').style['min-height'] = '338px';
     }
   } else {
     // Fix for non-Safari-3 browsers: dark borders to replace shadows.
-    Array.from(document.getElementsByClassName('dialog_window')).forEach((e) => {
+    Array.from(document.getElementsByClassName('dialog-window')).forEach((e) => {
       e.style['border'] = '1px solid #777';
     });
   }

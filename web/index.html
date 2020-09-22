@@ -55,7 +55,7 @@
     <script type="text/javascript" src="./javascript/main.js"></script>
     <title>Transmission Web Interface</title>
   </head>
-  <body id="transmission_body">
+  <body id="transmission-body">
     <div id="toolbar">
       <div id="toolbar-open" title="Open Torrent"></div>
       <div id="toolbar-remove" title="Remove Selected Torrents"></div>
@@ -80,7 +80,7 @@
           <option value="finished">Finished</option>
         </select>
         <select id="filter-tracker"></select>
-        <input type="search" id="torrent_search" placeholder="Filter" />
+        <input type="search" id="torrent-search" placeholder="Filter" />
         <span id="filter-count">&nbsp;</span>
       </div>
 
@@ -338,7 +338,7 @@
       </div>
     </div>
 
-    <div class="ui-helper-hidden" id="torrent_inspector">
+    <div class="ui-helper-hidden" id="torrent-inspector">
       <div id="inspector-tabs-wrapper">
         <div id="inspector-tabs">
           <div class="inspector-tab selected" id="inspector-tab-info" title="Info">
@@ -358,8 +358,8 @@
       </div>
       <!-- inspector-tabs-wrapper -->
 
-      <div id="inspector_header">
-        <div id="torrent_inspector_name"></div>
+      <div id="inspector-header">
+        <div id="torrent-inspector-name"></div>
       </div>
 
       <div class="inspector-page" id="inspector-page-info">
@@ -430,36 +430,36 @@
           </div>
         </div>
       </div>
-      <!-- id="inspector_tab_info_container" -->
+      <!-- id="inspector-tab-info-container" -->
 
       <div class="inspector-page ui-helper-hidden" id="inspector-page-peers">
-        <div id="inspector_peers_list"></div>
+        <div id="inspector-peers-list"></div>
       </div>
-      <!-- id="inspector_tab_peers_container" -->
+      <!-- id="inspector-tab-peers-container" -->
 
       <div class="inspector-page ui-helper-hidden" id="inspector-page-trackers">
-        <div id="inspector_trackers_list"></div>
+        <div id="inspector-trackers-list"></div>
       </div>
-      <!-- id="inspector_tab_trackers_container" -->
+      <!-- id="inspector-tab-trackers-container" -->
 
       <div class="inspector-page ui-helper-hidden" id="inspector-page-files">
-        <ul id="inspector_file_list"></ul>
+        <ul id="inspector-file-list"></ul>
       </div>
-      <!-- id="inspector_tab_files_container" -->
+      <!-- id="inspector-tab-files-container" -->
     </div>
 
-    <div id="torrent_container">
-      <ul class="torrent_list" id="torrent_list"></ul>
+    <div id="torrent-container">
+      <ul class="torrent-list" id="torrent-list"></ul>
     </div>
 
-    <div class="dialog_container ui-helper-hidden" id="dialog_container">
-      <div class="dialog_top_bar"></div>
-      <div class="dialog_window">
-        <div class="dialog_logo" id="dialog_logo"></div>
-        <h2 class="dialog_heading" id="dialog_heading"></h2>
-        <div class="dialog_message" id="dialog_message"></div>
-        <a href="#confirm" id="dialog_confirm_button">Confirm</a>
-        <a href="#cancel" id="dialog_cancel_button">Cancel</a>
+    <div class="dialog-container ui-helper-hidden" id="dialog-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="dialog-logo"></div>
+        <h2 class="dialog-heading" id="dialog-heading"></h2>
+        <div class="dialog-message" id="dialog-message"></div>
+        <a href="#confirm" id="dialog-confirm-button">Confirm</a>
+        <a href="#cancel" id="dialog-cancel-button">Cancel</a>
       </div>
     </div>
 
@@ -600,85 +600,85 @@
       </table>
     </div>
 
-    <div class="dialog_container ui-helper-hidden" id="upload_container">
-      <div class="dialog_top_bar"></div>
-      <div class="dialog_window">
-        <div class="dialog_logo" id="upload_dialog_logo"></div>
-        <h2 class="dialog_heading">Upload Torrent Files</h2>
+    <div class="dialog-container ui-helper-hidden" id="upload-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="upload-dialog-logo"></div>
+        <h2 class="dialog-heading">Upload Torrent Files</h2>
         <form
           action="#"
           method="post"
-          id="torrent_upload_form"
+          id="torrent-upload-form"
           enctype="multipart/form-data"
-          target="torrent_upload_frame"
+          target="torrent-upload-frame"
           autocomplete="off"
         >
-          <div class="dialog_message">
-            <label for="torrent_upload_file">Please select a torrent file to upload:</label>
+          <div class="dialog-message">
+            <label for="torrent-upload-file">Please select a torrent file to upload:</label>
             <input
               type="file"
-              name="torrent_files[]"
-              id="torrent_upload_file"
+              name="torrent-files[]"
+              id="torrent-upload-file"
               multiple="multiple"
             />
-            <label for="torrent_upload_url">Or enter a URL:</label>
-            <input type="url" id="torrent_upload_url" />
+            <label for="torrent-upload-url">Or enter a URL:</label>
+            <input type="url" id="torrent-upload-url" />
             <label id="add-dialog-folder-label" for="add-dialog-folder-input"
               >Destination folder:</label
             >
             <input type="text" id="add-dialog-folder-input" />
-            <input type="checkbox" id="torrent_auto_start" />
-            <label for="torrent_auto_start" id="auto_start_label">Start when added</label>
+            <input type="checkbox" id="torrent-auto-start" />
+            <label for="torrent-auto-start" id="auto-start-label">Start when added</label>
           </div>
-          <a href="#upload" id="upload_confirm_button">Upload</a>
-          <a href="#cancel" id="upload_cancel_button">Cancel</a>
+          <a href="#upload" id="upload-confirm-button">Upload</a>
+          <a href="#cancel" id="upload-cancel-button">Cancel</a>
         </form>
       </div>
     </div>
 
-    <div class="dialog_container ui-helper-hidden" id="rename_container">
-      <div class="dialog_top_bar"></div>
-      <div class="dialog_window">
-        <div class="dialog_logo"></div>
-        <h2 class="dialog_heading">Rename torrent</h2>
-        <div class="dialog_message">
-          <label for="torrent_rename_name">Enter new name:</label>
-          <input type="text" id="torrent_rename_name" />
+    <div class="dialog-container ui-helper-hidden" id="rename-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo"></div>
+        <h2 class="dialog-heading">Rename torrent</h2>
+        <div class="dialog-message">
+          <label for="torrent-rename-name">Enter new name:</label>
+          <input type="text" id="torrent-rename-name" />
         </div>
-        <a href="#rename" id="rename_confirm_button">Rename</a>
-        <a href="#cancel" id="rename_cancel_button">Cancel</a>
+        <a href="#rename" id="rename-confirm-button">Rename</a>
+        <a href="#cancel" id="rename-cancel-button">Cancel</a>
       </div>
     </div>
 
-    <div class="dialog_container ui-helper-hidden" id="move_container">
-      <div class="dialog_top_bar"></div>
-      <div class="dialog_window">
-        <div class="dialog_logo" id="move_dialog_logo"></div>
-        <h2 class="dialog_heading">Set Location</h2>
+    <div class="dialog-container ui-helper-hidden" id="move-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="move-dialog-logo"></div>
+        <h2 class="dialog-heading">Set Location</h2>
         <form
           action="#"
           method="post"
-          id="torrent_move_form"
+          id="torrent-move-form"
           enctype="multipart/form-data"
-          target="torrent_move_frame"
+          target="torrent-move-frame"
         >
-          <div class="dialog_message">
-            <label for="torrent_path">Location:</label>
-            <input type="text" id="torrent_path" />
+          <div class="dialog-message">
+            <label for="torrent-path">Location:</label>
+            <input type="text" id="torrent-path" />
           </div>
-          <a href="#move" id="move_confirm_button">Apply</a>
-          <a href="#cancel" id="move_cancel_button">Cancel</a>
+          <a href="#move" id="move-confirm-button">Apply</a>
+          <a href="#cancel" id="move-cancel-button">Cancel</a>
         </form>
       </div>
     </div>
 
-    <div class="torrent_footer">
-      <div id="settings_menu" title="Settings Menu">&nbsp;</div>
+    <div class="torrent-footer">
+      <div id="settings-menu" title="Settings Menu">&nbsp;</div>
       <div id="prefs-button" title="Edit Preferences…">&nbsp;</div>
       <div id="turtle-button" title="Alternative Speed Limits">&nbsp;</div>
       <div id="compact-button" title="Compact View">&nbsp;</div>
 
-      <ul class="ui-helper-hidden" id="footer_super_menu">
+      <ul class="ui-helper-hidden" id="footer-super-menu">
         <li id="about-button">About</li>
         <li>---</li>
         <li id="homepage">Transmission Homepage</li>
@@ -687,16 +687,16 @@
         <li id="statistics">Statistics</li>
         <li id="hotkeys">Hotkeys</li>
         <!--
-				<li id="toggle_notifications">Notifcations</li>
+				<li id="toggle-notifications">Notifcations</li>
 				-->
         <li>---</li>
         <li>
           Total Download Rate
-          <ul id="footer_download_rate_menu">
-            <li radio-group="download-rate" id="unlimited_download_rate">
+          <ul id="footer-download-rate-menu">
+            <li radio-group="download-rate" id="unlimited-download-rate">
               <span class="ui-icon ui-icon-bullet"></span>Unlimited
             </li>
-            <li radio-group="download-rate" id="limited_download_rate">Limit (10 kB/s)</li>
+            <li radio-group="download-rate" id="limited-download-rate">Limit (10 kB/s)</li>
             <li>---</li>
             <li class="download-speed">5 kB/s</li>
             <li class="download-speed">10 kB/s</li>
@@ -715,11 +715,11 @@
         </li>
         <li>
           Total Upload Rate
-          <ul id="footer_upload_rate_menu">
-            <li radio-group="upload-rate" id="unlimited_upload_rate">
+          <ul id="footer-upload-rate-menu">
+            <li radio-group="upload-rate" id="unlimited-upload-rate">
               <span class="ui-icon ui-icon-bullet"></span>Unlimited
             </li>
-            <li radio-group="upload-rate" id="limited_upload_rate">Limit (10 kB/s)</li>
+            <li radio-group="upload-rate" id="limited-upload-rate">Limit (10 kB/s)</li>
             <li>---</li>
             <li class="upload-speed">5 kB/s</li>
             <li class="upload-speed">10 kB/s</li>
@@ -739,34 +739,34 @@
         <li>---</li>
         <li>
           Sort Transfers By
-          <ul id="footer_sort_menu">
-            <li radio-group="sort-mode" id="sort_by_queue_order">Queue Order</li>
-            <li radio-group="sort-mode" id="sort_by_activity">Activity</li>
-            <li radio-group="sort-mode" id="sort_by_age">Age</li>
-            <li radio-group="sort-mode" id="sort_by_name">Name</li>
-            <li radio-group="sort-mode" id="sort_by_percent_completed">Progress</li>
-            <li radio-group="sort-mode" id="sort_by_ratio">Ratio</li>
-            <li radio-group="sort-mode" id="sort_by_size">Size</li>
-            <li radio-group="sort-mode" id="sort_by_state">State</li>
+          <ul id="footer-sort-menu">
+            <li radio-group="sort-mode" id="sort-by-queue-order">Queue Order</li>
+            <li radio-group="sort-mode" id="sort-by-activity">Activity</li>
+            <li radio-group="sort-mode" id="sort-by-age">Age</li>
+            <li radio-group="sort-mode" id="sort-by-name">Name</li>
+            <li radio-group="sort-mode" id="sort-by-percent-completed">Progress</li>
+            <li radio-group="sort-mode" id="sort-by-ratio">Ratio</li>
+            <li radio-group="sort-mode" id="sort-by-size">Size</li>
+            <li radio-group="sort-mode" id="sort-by-state">State</li>
             <li>---</li>
-            <li id="reverse_sort_order">Reverse Sort Order</li>
+            <li id="reverse-sort-order">Reverse Sort Order</li>
           </ul>
         </li>
       </ul>
     </div>
 
-    <ul class="ui-helper-hidden" id="torrent_context_menu">
-      <li data-command="pause_selected">Pause</li>
-      <li data-command="resume_selected">Resume</li>
-      <li data-command="resume_now_selected">Resume Now</li>
+    <ul class="ui-helper-hidden" id="torrent-context-menu">
+      <li data-command="pause-selected">Pause</li>
+      <li data-command="resume-selected">Resume</li>
+      <li data-command="resume-now-selected">Resume Now</li>
       <li>---</li>
-      <li data-command="move_top">Move to Top</li>
-      <li data-command="move_up">Move Up</li>
-      <li data-command="move_down">Move Down</li>
-      <li data-command="move_bottom">Move to Bottom</li>
+      <li data-command="move-top">Move to Top</li>
+      <li data-command="move-up">Move Up</li>
+      <li data-command="move-down">Move Down</li>
+      <li data-command="move-bottom">Move to Bottom</li>
       <li>---</li>
       <li data-command="remove">Remove From List…</li>
-      <li data-command="remove_data">Trash Data and Remove From List…</li>
+      <li data-command="remove-data">Trash Data and Remove From List…</li>
       <li>---</li>
       <li data-command="verify">Verify Local Data</li>
       <li data-command="move">Set Location…</li>
@@ -774,10 +774,10 @@
       <li>---</li>
       <li data-command="reannounce">Ask tracker for more peers</li>
       <li>---</li>
-      <li data-command="select_all">Select All</li>
-      <li data-command="deselect_all">Deselect All</li>
+      <li data-command="select-all">Select All</li>
+      <li data-command="deselect-all">Deselect All</li>
     </ul>
 
-    <iframe name="torrent_upload_frame" id="torrent_upload_frame" src="about:blank"></iframe>
+    <iframe name="torrent-upload-frame" id="torrent-upload-frame" src="about:blank"></iframe>
   </body>
 </html>

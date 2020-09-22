@@ -10,11 +10,11 @@
 class Dialog {
   constructor() {
     // private interface variables
-    this._container = document.getElementById('dialog_container');
-    this._heading = document.getElementById('dialog_heading');
-    this._message = document.getElementById('dialog_message');
-    this._cancel_button = document.getElementById('dialog_cancel_button');
-    this._confirm_button = document.getElementById('dialog_confirm_button');
+    this._container = document.getElementById('dialog-container');
+    this._heading = document.getElementById('dialog-heading');
+    this._message = document.getElementById('dialog-message');
+    this._cancel_button = document.getElementById('dialog-cancel-button');
+    this._confirm_button = document.getElementById('dialog-confirm-button');
     this._callback = null;
 
     // Observe the buttons
@@ -30,18 +30,18 @@ class Dialog {
   }
 
   hideDialog() {
-    document.body.classList.remove('dialog_showing');
+    document.body.classList.remove('dialog-showing');
     Utils.hide(this._container);
     transmission.hideMobileAddressbar();
     transmission.updateButtonStates();
   }
 
   static isVisible() {
-    return document.body.classList.contains('dialog_showing');
+    return document.body.classList.contains('dialog-showing');
   }
 
   static hideAllDialogs() {
-    [...document.getElementsByClassName('dialog_container')].forEach((e) => Utils.hide(e));
+    [...document.getElementsByClassName('dialog-container')].forEach((e) => Utils.hide(e));
   }
 
   /// INTERFACE FUNCTIONS
@@ -59,7 +59,7 @@ class Dialog {
       transmission.hideMobileAddressbar();
     }
 
-    document.body.classList.add('dialog_showing');
+    document.body.classList.add('dialog-showing');
     Utils.show(this._confirm_button);
     Utils.show(this._container);
     transmission.updateButtonStates();
@@ -76,7 +76,7 @@ class Dialog {
       transmission.hideMobileAddressbar();
     }
 
-    document.body.classList.add('dialog_showing');
+    document.body.classList.add('dialog-showing');
     Utils.hide(this._confirm_button);
     Utils.show(this._container);
     transmission.updateButtonStates();

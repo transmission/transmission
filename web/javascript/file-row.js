@@ -100,12 +100,12 @@ class FileRow {
 
   createRow(torrent, depth, name, even) {
     const root = document.createElement('li');
-    root.className = `inspector_torrent_file_list_entry${even ? 'even' : 'odd'}`;
+    root.className = `inspector-torrent-file-list-entry${even ? 'even' : 'odd'}`;
     this.elements.root = root;
 
     let e = document.createElement('input');
     e.type = 'checkbox';
-    e.className = 'file_wanted_control';
+    e.className = 'file-wanted-control';
     e.title = 'Download file';
     $(e).change((ev) => this.fireWantedChanged(ev.currentTarget.checked));
     root.checkbox = e;
@@ -139,13 +139,13 @@ class FileRow {
     root.appendChild(box);
 
     e = document.createElement('div');
-    e.className = 'inspector_torrent_file_list_entry_name';
+    e.className = 'inspector-torrent-file-list-entry-name';
     e.addEventListener('click', () => this.fireNameClicked());
     setTextContent(e, name);
     root.appendChild(e);
 
     e = document.createElement('div');
-    e.className = 'inspector_torrent_file_list_entry_progress';
+    e.className = 'inspector-torrent-file-list-entry-progress';
     e.addEventListener('click', () => this.fireNameClicked());
     root.appendChild(e);
     this.elements.progress = e;

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let notificationsEnabled = window.webkitNotifications.checkPermission() === 0;
-  const toggle = $('#toggle_notifications');
+  const toggle = $('#toggle-notifications');
 
   function updateMenuTitle() {
     toggle.html(`${notificationsEnabled ? 'Disable' : 'Enable'} Notifications`);

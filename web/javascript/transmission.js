@@ -31,11 +31,11 @@ class Transmission {
     const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
     const click = (key, cb) => listen(key, 'click', cb);
     click('compact-button', this.toggleCompactClicked.bind(this));
-    click('move_cancel_button', this.hideMoveDialog.bind(this));
-    click('move_confirm_button', this.confirmMoveClicked.bind(this));
+    click('move-cancel-button', this.hideMoveDialog.bind(this));
+    click('move-confirm-button', this.confirmMoveClicked.bind(this));
     click('prefs-button', this.togglePrefsDialogClicked.bind(this));
-    click('rename_cancel_button', Transmission.hideRenameDialog);
-    click('rename_confirm_button', this.confirmRenameClicked.bind(this));
+    click('rename-cancel-button', Transmission.hideRenameDialog);
+    click('rename-confirm-button', this.confirmRenameClicked.bind(this));
     click('toolbar-inspector', this.toggleInspector.bind(this));
     click('toolbar-open', this.openTorrentClicked.bind(this));
     click('toolbar-pause', this.stopSelectedClicked.bind(this));
@@ -44,13 +44,13 @@ class Transmission {
     click('toolbar-start', this.startSelectedClicked.bind(this));
     click('toolbar-start-all', this.startAllClicked.bind(this));
     click('turtle-button', this.toggleTurtleClicked.bind(this));
-    click('upload_cancel_button', this.hideUploadDialog.bind(this));
-    click('upload_confirm_button', this.confirmUploadClicked.bind(this));
+    click('upload-cancel-button', this.hideUploadDialog.bind(this));
+    click('upload-confirm-button', this.confirmUploadClicked.bind(this));
 
     // tell jQuery to copy the dataTransfer property from events over if it exists
     jQuery.event.props.push('dataTransfer');
 
-    document.getElementById('torrent_upload_form').addEventListener((ev) => {
+    document.getElementById('torrent-upload-form').addEventListener((ev) => {
       this.confirmUploadClicked();
       ev.preventDefault();
     });
@@ -63,7 +63,7 @@ class Transmission {
     if (!isMobileDevice) {
       document.addEventListener('keydown', this.keyDown.bind(this));
       document.addEventListener('keyup', this.keyUp.bind(this));
-      e = document.getElementById('torrent_container');
+      e = document.getElementById('torrent-container');
       e.addEventListener('click', this.deselectAll.bind(this));
       e.addEventListener('dragenter', Transmission.dragenter);
       e.addEventListener('dragover', Transmission.dragenter);
@@ -78,7 +78,7 @@ class Transmission {
     }
 
     e = {};
-    e.torrent_list = document.getElementById('torrent_list');
+    e.torrent_list = document.getElementById('torrent-list');
     e.toolbar_pause_button = document.getElementById('toolbar-pause');
     e.toolbar_start_button = document.getElementById('toolbar-start');
     e.toolbar_remove_button = document.getElementById('toolbar-remove');
@@ -118,10 +118,10 @@ class Transmission {
     Prefs.getClutchPrefs(this);
 
     if (this.isMenuEnabled) {
-      $(`#sort_by_${this[Prefs._SortMethod]}`).selectMenuItem();
+      $(`#sort-by-${this[Prefs._SortMethod]}`).selectMenuItem();
 
       if (this[Prefs._SortDirection] === Prefs._SortDescending) {
-        $('#reverse_sort_order').selectMenuItem();
+        $('#reverse-sort-order').selectMenuItem();
       }
     }
 
@@ -129,7 +129,7 @@ class Transmission {
   }
 
   setupSearchBox() {
-    const e = document.getElementById('torrent_search');
+    const e = document.getElementById('torrent-search');
     const blur_token = 'blur';
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
@@ -191,7 +191,7 @@ class Transmission {
     };
 
     // Set up the context menu
-    $('ul#torrent_list').contextmenu({
+    $('ul#torrent-list').contextmenu({
       beforeOpen: function (event) {
         // ensure the clicked row is selected
         const e = event.currentTarget;
@@ -202,9 +202,9 @@ class Transmission {
 
         this.calculateTorrentStates((s) => {
           const tl = $(event.target);
-          tl.contextmenu('enableEntry', 'pause_selected', s.activeSel > 0);
-          tl.contextmenu('enableEntry', 'resume_selected', s.pausedSel > 0);
-          tl.contextmenu('enableEntry', 'resume_now_selected', s.pausedSel > 0 || s.queuedSel > 0);
+          tl.contextmenu('enableEntry', 'pause-selected', s.activeSel > 0);
+          tl.contextmenu('enableEntry', 'resume-selected', s.pausedSel > 0);
+          tl.contextmenu('enableEntry', 'resume-now-selected', s.pausedSel > 0 || s.queuedSel > 0);
           tl.contextmenu('enableEntry', 'rename', s.sel === 1);
         });
       }.bind(this),
@@ -212,10 +212,10 @@ class Transmission {
       hide: {
         effect: 'none',
       },
-      menu: '#torrent_context_menu',
+      menu: '#torrent-context-menu',
       preventSelect: true,
       select(event, ui) {
-        bindings[ui.cmd]();
+        bindings[ui.cmd.replaceAll('-', '_')]();
       },
       show: {
         effect: 'none',
@@ -225,17 +225,17 @@ class Transmission {
   }
 
   createSettingsMenu() {
-    $('#footer_super_menu').transMenu({
+    $('#footer-super-menu').transMenu({
       close() {
-        document.getElementById('settings_menu').classList.remove('selected');
+        document.getElementById('settings-menu').classList.remove('selected');
       },
       open() {
-        document.getElementById('settings_menu').classList.add('selected');
+        document.getElementById('settings-menu').classList.add('selected');
       },
       select: this.onMenuClicked.bind(this),
     });
-    $('#settings_menu').click(() => {
-      $('#footer_super_menu').transMenu('open');
+    $('#settings-menu').click(() => {
+      $('#footer-super-menu').transMenu('open');
     });
   }
 
@@ -274,7 +274,7 @@ class Transmission {
   static scrollToRow(row) {
     if (isMobileDevice) {
       // FIXME: why? return
-      const list = $('#torrent_container');
+      const list = $('#torrent-container');
       const scrollTop = list.scrollTop();
       const innerHeight = list.innerHeight();
       const { offsetHeight, offsetTop } = row.getElement();
@@ -403,7 +403,7 @@ class Transmission {
     let handled = false;
     const rows = this._rows;
     const isInputFocused = ev.target.matches('input');
-    const anyDialogShowing = [...document.getElementsByClassName('dialog_container')].some(
+    const anyDialogShowing = [...document.getElementsByClassName('dialog-container')].some(
       (e) => !Utils.isHidden(e)
     );
 
@@ -437,19 +437,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if (!Utils.isHiddenId('upload_container')) {
+      if (!Utils.isHiddenId('upload-container')) {
         this.confirmUploadClicked();
         handled = true;
       }
 
       // handle move dialog
-      if (!Utils.isHiddenId('move_container')) {
+      if (!Utils.isHiddenId('move-container')) {
         this.confirmMoveClicked();
         handled = true;
       }
 
       // handle rename dialog
-      if (!Utils.isHiddenId('rename_container')) {
+      if (!Utils.isHiddenId('rename-container')) {
         this.confirmRenameClicked();
         handled = true;
       }
@@ -463,19 +463,19 @@ class Transmission {
       }
 
       // handle upload dialog
-      if (!Utils.isHiddenId('upload_container')) {
+      if (!Utils.isHiddenId('upload-container')) {
         this.hideUploadDialog();
         handled = true;
       }
 
       // handle move dialog
-      if (!Utils.isHiddenId('move_container')) {
+      if (!Utils.isHiddenId('move-container')) {
         this.hideMoveDialog();
         handled = true;
       }
 
       // handle rename dialog
-      if (!Utils.isHiddenId('rename_container')) {
+      if (!Utils.isHiddenId('rename-container')) {
         Transmission.hideRenameDialog();
         handled = true;
       }
@@ -628,7 +628,7 @@ class Transmission {
 
   openTorrentClicked(ev) {
     if (Transmission.isButtonEnabled(ev)) {
-      document.body.classList.add('open_showing');
+      document.body.classList.add('open-showing');
       this.uploadTorrentFile();
       this.updateButtonStates();
     }
@@ -680,8 +680,8 @@ class Transmission {
   }
 
   hideUploadDialog() {
-    document.body.classList.remove('open_showing');
-    Utils.hideId('upload_container');
+    document.body.classList.remove('open-showing');
+    Utils.hideId('upload-container');
     this.updateButtonStates();
   }
 
@@ -691,7 +691,7 @@ class Transmission {
   }
 
   hideMoveDialog() {
-    Utils.hideId('move_container');
+    Utils.hideId('move-container');
     this.updateButtonStates();
   }
 
@@ -701,13 +701,13 @@ class Transmission {
   }
 
   static hideRenameDialog() {
-    document.body.classList.remove('open_showing');
-    Utils.hideId('rename_container');
+    document.body.classList.remove('open-showing');
+    Utils.hideId('rename-container');
   }
 
   confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
-    this.renameTorrent(torrents[0], document.getElementById('torrent_rename_name').value);
+    this.renameTorrent(torrents[0], document.getElementById('torrent-rename-name').value);
     Transmission.hideRenameDialog();
   }
 
@@ -780,7 +780,7 @@ class Transmission {
 
     if (ui.group === 'sort-mode') {
       element.selectMenuItem();
-      this.setSortMethod(id.replace(/sort_by_/, ''));
+      this.setSortMethod(id.replace(/sort-by-/, ''));
     } else if (element.hasClass('upload-speed')) {
       const o = {};
       o[RPC._UpSpeedLimit] = parseInt(element.text());
@@ -820,23 +820,23 @@ class Transmission {
           window.open('https://transmissionbt.com/donate/');
           break;
 
-        case 'unlimited_download_rate':
+        case 'unlimited-download-rate':
           remote.savePrefs({ [RPC._DownSpeedLimited]: false });
           break;
 
-        case 'limited_download_rate':
+        case 'limited-download-rate':
           remote.savePrefs({ [RPC._DownSpeedLimited]: true });
           break;
 
-        case 'unlimited_upload_rate':
+        case 'unlimited-upload-rate':
           remote.savePrefs({ [RPC._UpSpeedLimited]: false });
           break;
 
-        case 'limited_upload_rate':
+        case 'limited-upload-rate':
           remote.savePrefs({ [RPC._UpSpeedLimited]: true });
           break;
 
-        case 'reverse_sort_order': {
+        case 'reverse-sort-order': {
           const dir = element.menuItemIsSelected() ? Prefs._SortAscending : Prefs._SortDescending;
           if (dir === Prefs._SortAscending) {
             element.deselectMenuItem();
@@ -847,7 +847,7 @@ class Transmission {
           break;
         }
 
-        case 'toggle_notifications':
+        case 'toggle-notifications':
           Notifications.toggle();
           break;
 
@@ -957,14 +957,14 @@ class Transmission {
     const meta_key = ev.metaKey || ev.ctrlKey,
       { row } = ev.currentTarget;
 
-    // handle the per-row "torrent_resume" button
-    if (ev.target.className === 'torrent_resume') {
+    // handle the per-row "torrent-resume" button
+    if (ev.target.className === 'torrent-resume') {
       this.startTorrent(row.getTorrent());
       return;
     }
 
-    // handle the per-row "torrent_pause" button
-    if (ev.target.className === 'torrent_pause') {
+    // handle the per-row "torrent-pause" button
+    if (ev.target.className === 'torrent-pause') {
       this.stopTorrent(row.getTorrent());
       return;
     }
@@ -1021,10 +1021,10 @@ class Transmission {
    * Select a torrent file to upload
    */
   uploadTorrentFile(confirmed) {
-    const fileInput = $('input#torrent_upload_file');
+    const fileInput = $('input#torrent-upload-file');
     const folderInput = document.getElementById('add-dialog-folder-input');
-    const startInput = $('input#torrent_auto_start');
-    const urlInput = $('input#torrent_upload_url');
+    const startInput = $('input#torrent-auto-start');
+    const urlInput = $('input#torrent-upload-url');
 
     if (!confirmed) {
       // update the upload dialog's fields
@@ -1036,7 +1036,7 @@ class Transmission {
       this.updateFreeSpaceInAddDialog();
 
       // show the dialog
-      Utils.showId('upload_container');
+      Utils.showId('upload-container');
       urlInput.focus();
     } else {
       const paused = !startInput.is(':checked');
@@ -1069,7 +1069,7 @@ class Transmission {
         reader.readAsDataURL(file);
       });
 
-      let url = document.getElementById('torrent_upload_url').value;
+      let url = document.getElementById('torrent-upload-url').value;
       if (url !== '') {
         if (url.match(/^[0-9a-f]{40}$/i)) {
           url = `magnet:?xt=urn:btih:${url}`;
@@ -1097,18 +1097,18 @@ class Transmission {
         torrents.length === 1
           ? torrents[0].getDownloadDir()
           : document.getElementById('download-dir').value;
-      document.querySelector('input#torrent_path').value = path;
-      Utils.showId('move_container');
-      document.getElementById('torrent_path').focus();
+      document.querySelector('input#torrent-path').value = path;
+      Utils.showId('move-container');
+      document.getElementById('torrent-path').focus();
     } else {
       const ids = Transmission.getTorrentIds(torrents);
       this.remote.moveTorrents(
         ids,
-        document.querySelector('input#torrent_path').value,
+        document.querySelector('input#torrent-path').value,
         this.refreshTorrents,
         this
       );
-      Utils.hideId('move_container');
+      Utils.hideId('move-container');
     }
   }
 
@@ -1183,10 +1183,10 @@ class Transmission {
   }
 
   static promptToRenameTorrent(torrent) {
-    document.body.classList.add('open_showing');
-    document.querySelector('input#torrent_rename_name').value = torrent.getName();
-    Utils.showId('rename_container');
-    document.getElementById('torrent_rename_name').focus();
+    document.body.classList.add('open-showing');
+    document.querySelector('input#torrent-rename-name').value = torrent.getName();
+    Utils.showId('rename-container');
+    document.getElementById('torrent-rename-name').focus();
   }
 
   renameSelectedTorrents() {
@@ -1307,7 +1307,7 @@ class Transmission {
 
   updateGuiFromSession(o) {
     const { fmt } = Transmission;
-    const menu = $('#footer_super_menu');
+    const menu = $('#footer-super-menu');
 
     this.serverVersion = o.version;
 
@@ -1328,11 +1328,11 @@ class Transmission {
       const limit = o[RPC._DownSpeedLimit];
       const limited = o[RPC._DownSpeedLimited];
 
-      let e = menu.find('#limited_download_rate');
+      let e = menu.find('#limited-download-rate');
       e.html(`Limit (${fmt.speed(limit)})`);
 
       if (!limited) {
-        e = menu.find('#unlimited_download_rate');
+        e = menu.find('#unlimited-download-rate');
       }
       e.selectMenuItem();
     }
@@ -1341,11 +1341,11 @@ class Transmission {
       const limit = o[RPC._UpSpeedLimit];
       const limited = o[RPC._UpSpeedLimited];
 
-      let e = menu.find('#limited_upload_rate');
+      let e = menu.find('#limited-upload-rate');
       e.html(`Limit (${fmt.speed(limit)})`);
 
       if (!limited) {
-        e = menu.find('#unlimited_upload_rate');
+        e = menu.find('#unlimited-upload-rate');
       }
       e.selectMenuItem();
     }
@@ -1462,7 +1462,7 @@ class Transmission {
    ****/
 
   static inspectorIsVisible() {
-    return document.body.classList.contains('inspector_showing');
+    return document.body.classList.contains('inspector-showing');
   }
 
   toggleInspector() {
@@ -1473,13 +1473,13 @@ class Transmission {
     this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
 
     // update the ui widgetry
-    Utils.setVisibleId('torrent_inspector', visible);
+    Utils.setVisibleId('torrent-inspector', visible);
     document.getElementById('toolbar-inspector').classList.toggle('selected', visible);
-    document.body.classList.toggle('inspector_showing', visible);
+    document.body.classList.toggle('inspector-showing', visible);
     this.hideMobileAddressbar();
     if (!isMobileDevice) {
-      const w = visible ? `${$('#torrent_inspector').outerWidth() + 1}px` : '0px';
-      document.getElementById('torrent_container').style.right = w;
+      const w = visible ? `${$('#torrent-inspector').outerWidth() + 1}px` : '0px';
+      document.getElementById('torrent-container').style.right = w;
     }
   }
 
