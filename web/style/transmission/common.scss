@@ -528,12 +528,11 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 }
 
 .prefs-section {
-  margin: 10px;
+  //  margin: 10px;
   text-align: left;
 
   > * {
-    padding-left: 8px;
-    padding-top: 8px;
+    padding: 0 8px 8px;
   }
 
   .title {
@@ -617,6 +616,10 @@ $inspector-width: 570px;
   top: $torrent-container-top;
   width: $inspector-width;
   z-index: 5;
+
+  .inspector-page {
+    padding: 8px 0;
+  }
 
   #inspector-close {
     display: none;
@@ -715,23 +718,18 @@ $inspector-width: 570px;
 
   .tracker-host {
     color: #222;
-    font-size: 1.2em;
-    font-weight: bold;
+    font: bold 1.2em;
   }
 
   /* Files Inspector Tab */
 
   #inspector-file-list {
-    clear: both;
     cursor: default;
-    display: block;
     list-style: none;
-    margin: 6px 0 0;
+    margin: 0;
     overflow: hidden;
-    padding-bottom: 10px;
-    padding-top: 6px;
+    padding-inline-start: 0;
     text-align: left;
-    width: 100%;
   }
 
   .inspector-torrent-file-list-entry {
@@ -1046,8 +1044,7 @@ $inspector-width: 570px;
       cursor: default;
       display: block;
       float: right;
-      font: -webkit-control;
-      font-weight: bold;
+      font: bold -webkit-control;
       height: 15px;
       margin: 10px 20px 10px -8px;
       padding: 5px;
