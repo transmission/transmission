@@ -62,7 +62,10 @@ fi
 cd "${root}/web" || exit 1
 if [ -n "$fix" ]; then
   cd "${root}/web" && yarn --silent install && yarn --silent 'lint:fix'
-elif ! yarn -s install && yarn --silent lint; then
+elif ! yarn -s install; then
+  echo 'JS code could not be checked -- "yarn install" failed'
+  exitcode=1
+elif ! yarn --silent lint; then
   echo 'JS code needs formatting'
   exitcode=1
 fi

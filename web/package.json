@@ -180,18 +180,35 @@
     "vueIndentScriptAndStyle": false
   },
   "stylelint": {
-    "extends": "stylelint-config-sass-guidelines",
+    "extends": [
+      "stylelint-config-sass-guidelines",
+      "stylelint-config-prettier"
+    ],
     "rules": {
       "max-nesting-depth": null,
       "selector-max-compound-selectors": null,
       "selector-max-id": null,
-      "selector-no-qualifying-type": null
+      "selector-no-qualifying-type": [
+        true,
+        {
+          "ignore": [
+            "attribute"
+          ]
+        }
+      ]
     }
   },
   "scripts": {
     "css": "sass --no-source-map style/transmission",
-    "lint": "prettier --loglevel warn --check index.html style/transmission/*css javascript/*.js && stylelint style/transmission/*css && eslint javascript/*.js",
-    "lint:fix": "prettier --loglevel warn -w --check index.html style/transmission/*css style/transmission/*.scss javascript/*.js && stylelint --fix style/transmission/*css && eslint javascript/*.js"
+    "css:map": "sass style/transmission",
+    "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
+    "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
+    "lint:eslint": "eslint javascript/*.js",
+    "lint:eslint:fix": "eslint --fix javascript/*.js",
+    "lint:prettier": "prettier --loglevel warn --check index.html style/transmission/*css javascript/*.js",
+    "lint:prettier:fix": "prettier --loglevel warn -w index.html style/transmission/*css javascript/*.js",
+    "lint:stylelint": "stylelint style/transmission/*css",
+    "lint:stylelint:fix": "stylelint --fix style/transmission/*css"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -199,9 +216,11 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "eslint": "^7.9.0",
     "eslint-plugin-jquery": "^1.5.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "sass": "^1.26.11",
     "stylelint": "^13.7.1",
+    "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-sass-guidelines": "^7.1.0",
     "stylelint-config-standard": "^20.0.0"
   }

@@ -31,15 +31,23 @@ $selection-color: #cdcdff;
 $selected-gradient-top: $selection-color;
 $selected-gradient-bottom: #fff;
 
-@mixin button {
-  border-color: #aaa;
-  border-style: solid;
-  border-width: 1px;
+@mixin button-area {
   cursor: pointer;
   display: inline-block;
   padding: 3px;
   user-select: none;
-  user-select: none;
+}
+
+@mixin flat-button {
+  @include button-area;
+  border: 0;
+}
+
+@mixin button {
+  @include button-area;
+  border-color: #aaa;
+  border-style: solid;
+  border-width: 1px;
 }
 
 @mixin rounded-box($radius) {
@@ -141,11 +149,7 @@ $toolbar-gradient-top: #ddd;
 $toolbar-gradient-bottom: #bbb;
 $toolbar-height: 36px;
 
-div#toolbar {
-  $idle-color-top: $nonselected-gradient-top;
-  $idle-color-bottom: $nonselected-gradient-bottom;
-  $active-color-top: $selected-gradient-top;
-  $active-color-bottom: $selected-gradient-bottom;
+#toolbar {
   @include vertical-gradient($toolbar-gradient-top, $toolbar-gradient-bottom);
   border-bottom: 1px solid #aaa;
   height: $toolbar-height;
@@ -154,7 +158,7 @@ div#toolbar {
   width: 100%;
 
   > * {
-    @include button;
+    @include flat-button;
     background-position: center center;
     background-repeat: no-repeat;
     border: 0;
@@ -164,7 +168,7 @@ div#toolbar {
     width: 34px;
   }
 
-  > div.toolbar-separator {
+  > .toolbar-separator {
     border-left: 1px solid #aaa;
     height: 25px;
     margin-bottom: 5px;
@@ -172,31 +176,31 @@ div#toolbar {
     width: 3px;
   }
 
-  > div#toolbar-open {
+  > #toolbar-open {
     background-image: url('images/toolbar-folder.png');
   }
 
-  > div#toolbar-remove {
+  > #toolbar-remove {
     background-image: url('images/toolbar-close.png');
   }
 
-  > div#toolbar-start {
+  > #toolbar-start {
     background-image: url('images/toolbar-start.png');
   }
 
-  > div#toolbar-pause {
+  > #toolbar-pause {
     background-image: url('images/toolbar-pause.png');
   }
 
-  > div#toolbar-start-all {
+  > #toolbar-start-all {
     background-image: url('images/toolbar-start-all.png');
   }
 
-  > div#toolbar-pause-all {
+  > #toolbar-pause-all {
     background-image: url('images/toolbar-pause-all.png');
   }
 
-  > div#toolbar-inspector {
+  > #toolbar-inspector {
     background-image: url('images/toolbar-info.png');
     float: right;
     margin-right: 4px;
@@ -229,7 +233,7 @@ $statusbar-height: 26px;
     float: left;
     margin-left: 5px;
 
-    input#torrent-search {
+    #torrent-search {
       border-radius: 6px;
       height: 18px;
       width: 100px;
@@ -281,7 +285,7 @@ $statusbar-height: 26px;
 
 $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 
-div#torrent-container {
+#torrent-container {
   bottom: 22px;
   left: 0;
   margin: 0;
@@ -293,7 +297,7 @@ div#torrent-container {
   top: $torrent-container-top;
 }
 
-ul.torrent-list {
+.torrent-list {
   cursor: pointer;
   list-style-type: none;
   margin: 0;
@@ -301,7 +305,7 @@ ul.torrent-list {
   text-align: left;
   width: 100%;
 
-  li.torrent {
+  .torrent {
     background-color: #fff;
     border-bottom: 1px solid #ccc;
     color: #666;
@@ -320,7 +324,7 @@ ul.torrent-list {
     }
 
     &.compact {
-      div.torrent-name {
+      .torrent-name {
         color: #000;
       }
     }
@@ -343,36 +347,36 @@ ul.torrent-list {
         width: 14px;
       }
 
-      div.torrent-pause {
+      .torrent-pause {
         background-position: left top;
       }
 
-      div.torrent-resume {
+      .torrent-resume {
         background-position: center top;
       }
 
       &:active {
-        div.torrent-pause {
+        .torrent-pause {
           background-position: left bottom;
         }
 
-        div.torrent-resume {
+        .torrent-resume {
           background-position: center bottom;
         }
       }
 
       &:hover {
-        div.torrent-pause {
+        .torrent-pause {
           background-position: left center;
         }
 
-        div.torrent-resume {
+        .torrent-resume {
           background-position: center center;
         }
       }
     }
 
-    div.torrent-name {
+    .torrent-name {
       color: #222;
       font-size: 1.3em;
       font-weight: bold;
@@ -393,21 +397,21 @@ ul.torrent-list {
       }
     }
 
-    div.torrent-progress-details,
-    div.torrent-peer-details {
+    .torrent-progress-details,
+    .torrent-peer-details {
       clear: left;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    div.torrent-progress-details.error,
-    div.torrent-peer-details.error {
+    .torrent-progress-details.error,
+    .torrent-peer-details.error {
       color: #f00;
     }
 
-    &.selected div.torrent-progress-details.error,
-    &.selected div.torrent-peer-details.error {
+    &.selected .torrent-progress-details.error,
+    &.selected .torrent-peer-details.error {
       color: #fff;
     }
   }
@@ -426,7 +430,7 @@ ul.torrent-list {
 	 * The progressbar has different colors depending on its state, so there
 	 * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
 	 */
-  div.torrent-progress-bar-container {
+  .torrent-progress-bar-container {
     height: 10px;
     position: relative;
 
@@ -444,13 +448,13 @@ ul.torrent-list {
     }
   }
 
-  div.torrent-peer-details.compact {
+  .torrent-peer-details.compact {
     float: right; /* pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div */
     margin-right: 65px; /* leave room on the right for the progressbar */
     margin-top: 2px;
   }
 
-  div.torrent-progress-bar {
+  .torrent-progress-bar {
     background-image: url('images/progress.png');
     background-repeat: repeat-x;
     border: 1px solid #888;
@@ -605,11 +609,17 @@ ul.torrent-list {
 
 $inspector-width: 570px;
 
-div#torrent-inspector {
-  $idle-color-top: $nonselected-gradient-top;
-  $idle-color-bottom: $nonselected-gradient-bottom;
-  $active-color-top: $selected-gradient-top;
-  $active-color-bottom: $selected-gradient-bottom;
+@mixin inspector-tab-image($image-url) {
+  @include button-image(
+    $image-url,
+    $nonselected-gradient-top,
+    $nonselected-gradient-bottom,
+    $selected-gradient-top,
+    $selected-gradient-bottom
+  );
+}
+
+#torrent-inspector {
   border-left: 1px solid #888;
   bottom: 22px;
   overflow: auto;
@@ -627,62 +637,38 @@ div#torrent-inspector {
   }
 
   #inspector-tabs-wrapper {
-    overflow: hidden;
-    text-align: center;
-    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
 
     #inspector-tabs {
       $border-radius: 5px;
-
-      display: inline-block;
+      display: flex;
 
       > * {
         @include button;
         height: 20px;
+        margin-left: 0;
         width: 30px;
       }
 
       > #inspector-tab-info {
         @include left-rounded-box($border-radius);
-        @include button-image(
-          'images/inspector-info.png',
-          $idle-color-top,
-          $idle-color-bottom,
-          $active-color-top,
-          $active-color-bottom
-        );
+        @include inspector-tab-image('images/inspector-info.png');
         border-left-width: 1px;
       }
 
       > #inspector-tab-peers {
-        @include button-image(
-          'images/inspector-peers.png',
-          $idle-color-top,
-          $idle-color-bottom,
-          $active-color-top,
-          $active-color-bottom
-        );
+        @include inspector-tab-image('images/inspector-peers.png');
       }
 
       > #inspector-tab-trackers {
-        @include button-image(
-          'images/inspector-trackers.png',
-          $idle-color-top,
-          $idle-color-bottom,
-          $active-color-top,
-          $active-color-bottom
-        );
+        @include inspector-tab-image('images/inspector-trackers.png');
       }
 
       > #inspector-tab-files {
         @include right-rounded-box($border-radius);
-        @include button-image(
-          'images/inspector-files.png',
-          $idle-color-top,
-          $idle-color-bottom,
-          $active-color-top,
-          $active-color-bottom
-        );
+        @include inspector-tab-image('images/inspector-files.png');
       }
     }
   }
@@ -696,7 +682,7 @@ div#torrent-inspector {
     }
   }
 
-  ul.tier-list {
+  .tier-list {
     clear: both;
     cursor: default;
     display: block;
@@ -734,7 +720,7 @@ div#torrent-inspector {
     }
   }
 
-  li.inspector-tracker-entry {
+  .inspector-tracker-entry {
     display: block;
     padding: 3px 0 3px 2px;
 
@@ -743,7 +729,7 @@ div#torrent-inspector {
     }
   }
 
-  div.tracker-host {
+  .tracker-host {
     color: #222;
     font-size: 1.2em;
     font-weight: bold;
@@ -773,7 +759,7 @@ div#torrent-inspector {
     width: 100%;
   }
 
-  li.inspector-torrent-file-list-entry {
+  .inspector-torrent-file-list-entry {
     display: block;
     padding: 3px 0 3px 2px;
 
@@ -786,24 +772,24 @@ div#torrent-inspector {
     }
   }
 
-  div.inspector-torrent-file-list-entry-name {
+  .inspector-torrent-file-list-entry-name {
     color: #000;
     display: inline;
     font-size: 1.2em;
     margin-left: 0;
   }
 
-  li.inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
+  .inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
     color: #999;
   }
 
-  div.inspector-torrent-file-list-entry-progress {
+  .inspector-torrent-file-list-entry-progress {
     color: #999;
     margin-left: 20px;
   }
 
-  ul.single-file li.inspector-torrent-file-list-entry > .file-wanted-control,
-  li.inspector-torrent-file-list-entry.complete > .file-wanted-control {
+  .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
+  .inspector-torrent-file-list-entry.complete > .file-wanted-control {
     cursor: default;
   }
 }
@@ -816,13 +802,13 @@ div#torrent-inspector {
   padding: 0;
   text-align: left;
 
-  > div.inspector-group {
+  > .inspector-group {
     margin-bottom: 0;
     padding-bottom: 0;
   }
 }
 
-table.peer-list {
+.peer-list {
   border-collapse: collapse;
   clear: both;
   cursor: default;
@@ -864,8 +850,8 @@ table.peer-list {
   }
 }
 
-tr.inspector-peer-entry {
-  div.encrypted-peer-cell {
+.inspector-peer-entry {
+  .encrypted-peer-cell {
     background: transparent url('images/lock_icon.png') no-repeat;
     height: 16px;
     width: 16px;
@@ -880,15 +866,21 @@ tr.inspector-peer-entry {
 ****  File Priority Buttons
 ***/
 
-div.file-priority-radiobox {
+@mixin file-button-image($image-url) {
+  @include button-image(
+    $image-url,
+    mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%),
+    mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%),
+    mix($selected-gradient-top, $selected-gradient-bottom, 80%),
+    mix($selected-gradient-top, $selected-gradient-bottom, 20%)
+  );
+}
+
+.file-priority-radiobox {
   $border-radius: 5px;
 
   // We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
   // Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
-  $idle-color-top: mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%);
-  $idle-color-bottom: mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%);
-  $active-color-top: mix($selected-gradient-top, $selected-gradient-bottom, 80%);
-  $active-color-bottom: mix($selected-gradient-top, $selected-gradient-bottom, 20%);
 
   display: inline;
   float: right;
@@ -901,37 +893,19 @@ div.file-priority-radiobox {
     width: 20px;
   }
 
-  > div.low {
+  > .low {
     @include left-rounded-box($border-radius);
-    @include button-image(
-      'images/file-priority-low.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include file-button-image('images/file-priority-low.png');
     border-right-width: 0;
   }
 
-  > div.normal {
-    @include button-image(
-      'images/file-priority-normal.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+  > .normal {
+    @include file-button-image('images/file-priority-normal.png');
   }
 
-  > div.high {
+  > .high {
     @include right-rounded-box($border-radius);
-    @include button-image(
-      'images/file-priority-high.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include file-button-image('images/file-priority-high.png');
     border-left-width: 0;
   }
 }
@@ -942,12 +916,17 @@ div.file-priority-radiobox {
 *****
 ****/
 
-div.torrent-footer {
-  $idle-color-top: $nonselected-gradient-top;
-  $idle-color-bottom: $nonselected-gradient-bottom;
-  $active-color-top: $selected-gradient-top;
-  $active-color-bottom: $selected-gradient-bottom;
+@mixin footer-button-image($image-url) {
+  @include button-image(
+    $image-url,
+    $nonselected-gradient-top,
+    $nonselected-gradient-bottom,
+    $selected-gradient-top,
+    $selected-gradient-bottom
+  );
+}
 
+.torrent-footer {
   @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
   border-top: 1px solid #555;
   bottom: 0;
@@ -970,55 +949,31 @@ div.torrent-footer {
 
   #settings-menu {
     @include rounded-box(5px);
-    @include button-image(
-      'images/settings.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include footer-button-image('images/settings.png');
   }
 
   #prefs-button {
     @include rounded-box(5px);
-    @include button-image(
-      'images/wrench.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include footer-button-image('images/wrench.png');
   }
 
   #turtle-button {
     @include rounded-box(5px);
-    @include button-image(
-      'images/turtle.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include footer-button-image('images/turtle.png');
 
     &:active,
     &.selected {
       @include image-on-vertical-gradient(
         'images/blue-turtle.png',
-        $active-color-top,
-        $active-color-bottom
+        $selected-gradient-top,
+        $selected-gradient-bottom
       );
     }
   }
 
   #compact-button {
     @include rounded-box(5px);
-    @include button-image(
-      'images/compact.png',
-      $idle-color-top,
-      $idle-color-bottom,
-      $active-color-top,
-      $active-color-bottom
-    );
+    @include footer-button-image('images/compact.png');
   }
 
   #freespace-info {
@@ -1035,7 +990,7 @@ div.torrent-footer {
 *****
 ****/
 
-div.dialog-container {
+.dialog-container {
   color: #000;
   font-size: 1.1em;
   height: 100%;
@@ -1045,113 +1000,114 @@ div.dialog-container {
   text-align: center;
   top: 0;
   width: 100%;
+
+  .dialog-logo {
+    background: transparent url('images/logo.png') top left no-repeat;
+    float: left;
+    height: 64px;
+    margin: 20px 20px 0;
+    width: 64px;
+  }
+
+  .dialog-window {
+    background-color: #eee;
+    border-top: 0;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    margin: 0 auto;
+    opacity: 0.95;
+    overflow: hidden;
+    position: relative;
+    text-align: left;
+    top: 80px;
+    width: 420px;
+    z-index: 10;
+
+    .dialog-heading {
+      color: #000;
+      display: block;
+      float: left;
+      font-size: 1.2em;
+      margin-top: 20px;
+      width: 305px;
+    }
+
+    .dialog-message {
+      float: left;
+      margin-left: -3px;
+      overflow: hidden;
+      padding-left: 3px;
+      width: 305px;
+
+      label {
+        display: block;
+        margin-top: 15px;
+      }
+
+      input {
+        display: block;
+        margin: 3px 0 0;
+        width: 249px;
+      }
+
+      input[type='text'] {
+        padding: 2px;
+        width: 245px;
+      }
+
+      input[type='checkbox'] {
+        display: inline;
+        margin: 15px 3px 0 0;
+        width: auto;
+      }
+
+      #auto-start-label {
+        display: inline;
+      }
+    }
+
+    a {
+      appearance: button;
+      background-color: #eee;
+      border: 1px solid #787878;
+      color: #323232;
+      cursor: default;
+      display: block;
+      float: right;
+      font: -webkit-control;
+      font-weight: bold;
+      height: 15px;
+      margin: 10px 20px 10px -8px;
+      padding: 5px;
+      text-align: center;
+      text-decoration: none;
+      width: 50px;
+    }
+
+    a:hover,
+    a:active {
+      background: #c0c8d6 url('images/filter_bar.png') bottom repeat-x;
+    }
+
+    form {
+      margin: 0;
+      padding: 0;
+    }
+  }
 }
 
-div.dialog-container div.dialog-window {
-  background-color: #eee;
-  border-top: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
-  margin: 0 auto;
-  opacity: 0.95;
-  overflow: hidden;
-  position: relative;
-  text-align: left;
-  top: 80px;
-  width: 420px;
-  z-index: 10;
-}
 @media screen and (min-device-pixel-ratio: 0) {
-  div.dialog-container div.dialog-window {
+  .dialog-container .dialog-window {
     margin-top: 71px;
     top: 0;
   }
 }
 
-div.dialog-container .dialog-logo {
-  background: transparent url('images/logo.png') top left no-repeat;
-  float: left;
-  height: 64px;
-  margin: 20px 20px 0;
-  width: 64px;
-}
-
-div.dialog-container div.dialog-window h2.dialog-heading {
-  color: #000;
-  display: block;
-  float: left;
-  font-size: 1.2em;
-  margin-top: 20px;
-  width: 305px;
-}
-
-div.dialog-container div.dialog-window div.dialog-message {
-  float: left;
-  margin-left: -3px;
-  overflow: hidden;
-  padding-left: 3px;
-  width: 305px;
-}
-
-div.dialog-container div.dialog-window a {
-  appearance: button;
-  background-color: #eee;
-  border: 1px solid #787878;
-  color: #323232;
-  cursor: default;
-  display: block;
-  float: right;
-  font: -webkit-control;
-  font-weight: bold;
-  height: 15px;
-  margin: 10px 20px 10px -8px;
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  width: 50px;
-}
-
-div.dialog-container div.dialog-window a:hover,
-div.dialog-container div.dialog-window a:active {
-  background: #c0c8d6 url('images/filter_bar.png') bottom repeat-x;
-}
-
-div#upload-container div.dialog-window div.dialog-message label {
-  display: block;
-  margin-top: 15px;
-}
-
-div#upload-container div.dialog-window div.dialog-message input {
-  display: block;
-  margin: 3px 0 0;
-  width: 249px;
-}
-
-div#upload-container div.dialog-window div.dialog-message input[type='text'] {
-  padding: 2px;
-  width: 245px;
-}
-
-div#upload-container div.dialog-window div.dialog-message input[type='checkbox'] {
-  display: inline;
-  margin: 15px 3px 0 0;
-  width: auto;
-}
-
-div#upload-container div.dialog-window div.dialog-message #auto-start-label {
-  display: inline;
-}
-
-div.dialog-container div.dialog-window form {
-  margin: 0;
-  padding: 0;
-}
-
-div#move-container input#torrent-path {
+#move-container #torrent-path {
   padding: 2px;
   width: 286px;
 }
 
-iframe#torrent-upload-frame {
+#torrent-upload-frame {
   border: 0;
   display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
   height: 0;

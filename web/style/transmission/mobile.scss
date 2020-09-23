@@ -1,10 +1,12 @@
 @mixin vertical-gradient($topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
-  background-image: -webkit-gradient(linear,
-  left top,
-  left bottom,
-  from($topColor),
-  to($bottomColor));
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from($topColor),
+    to($bottomColor)
+  );
   background-image: linear-gradient(top, $topColor, $bottomColor);
   background-image: linear-gradient(top, $topColor, $bottomColor);
   background-image: linear-gradient(top, $topColor, $bottomColor);
@@ -105,38 +107,40 @@ body {
     outline: 0;
   }
 
-  div#torrent-container {
+  #torrent-container {
     min-height: 328px;
   }
 
-  div.dialog-container {
+  .dialog-container {
     min-height: 326px;
   }
 
-  div#torrent-inspector {
+  #torrent-inspector {
     min-height: 329px;
   }
+}
 
-  &.landscape div#torrent-container {
+.landscape {
+  #torrent-container {
     min-height: 147px;
   }
 
-  &.landscape div#dialog-container,
-  &.landscape div#torrent-inspector {
+  #dialog-container,
+  #torrent-inspector {
     min-height: 143px;
   }
 }
 
-body.inspector-showing #torrent-filter-bar,
-body.inspector-showing #torrent-container,
-body.dialog-showing #torrent-filter-bar,
-body.dialog-showing #torrent-container,
-body.dialog-showing #torrent-inspector,
-body.prefs-showing #torrent-inspector,
-body.prefs-showing #torrent-filter-bar,
-body.prefs-showing #torrent-container,
-body.open-showing #torrent-filter-bar,
-body.open-showing #torrent-container {
+.inspector-showing #torrent-filter-bar,
+.inspector-showing #torrent-container,
+.dialog-showing #torrent-filter-bar,
+.dialog-showing #torrent-container,
+.dialog-showing #torrent-inspector,
+.prefs-showing #torrent-inspector,
+.prefs-showing #torrent-filter-bar,
+.prefs-showing #torrent-container,
+.open-showing #torrent-filter-bar,
+.open-showing #torrent-container {
   display: none !important;
 }
 
@@ -150,7 +154,7 @@ $toolbar-gradient-top: #ddd;
 $toolbar-gradient-bottom: #bbb;
 $toolbar-height: 39px;
 
-div#toolbar {
+#toolbar {
   $idle-color-top: $nonselected-gradient-top;
   $idle-color-bottom: $nonselected-gradient-bottom;
   $active-color-top: $selected-gradient-top;
@@ -174,7 +178,7 @@ div#toolbar {
     width: 34px;
   }
 
-  > div.toolbar-separator {
+  > .toolbar-separator {
     border-left: 1px solid #aaa;
     height: 25px;
     margin-bottom: 8px;
@@ -182,31 +186,31 @@ div#toolbar {
     width: 3px;
   }
 
-  > div#toolbar-open {
+  > #toolbar-open {
     background-image: url('images/toolbar-folder.png');
   }
 
-  > div#toolbar-remove {
+  > #toolbar-remove {
     background-image: url('images/toolbar-close.png');
   }
 
-  > div#toolbar-start {
+  > #toolbar-start {
     background-image: url('images/toolbar-start.png');
   }
 
-  > div#toolbar-pause {
+  > #toolbar-pause {
     background-image: url('images/toolbar-pause.png');
   }
 
-  > div#toolbar-start-all {
+  > #toolbar-start-all {
     background-image: url('images/toolbar-start-all.png');
   }
 
-  > div#toolbar-pause-all {
+  > #toolbar-pause-all {
     background-image: url('images/toolbar-pause-all.png');
   }
 
-  > div#toolbar-inspector {
+  > #toolbar-inspector {
     background-image: url('images/toolbar-info.png');
     float: right;
   }
@@ -238,7 +242,7 @@ $statusbar-height: 24px;
     float: left;
     margin-left: 5px;
 
-    input#torrent-search {
+    #torrent-search {
       display: none;
     }
 
@@ -282,14 +286,14 @@ $statusbar-height: 24px;
 ****
 ***/
 
-ul.torrent-list {
+.torrent-list {
   cursor: pointer;
   margin: 0;
   padding: 0;
   text-align: left;
   width: 100%;
 
-  li.torrent {
+  .torrent {
     background-color: #fff;
     border-bottom: 1px solid #ccc;
     color: #666;
@@ -308,7 +312,7 @@ ul.torrent-list {
     }
 
     &.compact {
-      div.torrent-name {
+      .torrent-name {
         color: #000;
       }
     }
@@ -318,7 +322,7 @@ ul.torrent-list {
       display: none;
     }
 
-    div.torrent-name {
+    .torrent-name {
       color: #222;
       font-size: 1.3em;
       font-weight: bold;
@@ -339,21 +343,21 @@ ul.torrent-list {
       }
     }
 
-    div.torrent-progress-details,
-    div.torrent-peer-details {
+    .torrent-progress-details,
+    .torrent-peer-details {
       clear: left;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    div.torrent-progress-details.error,
-    div.torrent-peer-details.error {
+    .torrent-progress-details.error,
+    .torrent-peer-details.error {
       color: #f00;
     }
 
-    &.selected div.torrent-progress-details.error,
-    &.selected div.torrent-peer-details.error {
+    &.selected .torrent-progress-details.error,
+    &.selected .torrent-peer-details.error {
       color: #fff;
     }
   }
@@ -372,7 +376,7 @@ ul.torrent-list {
 	 * The progressbar has different colors depending on its state, so there
 	 * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
 	 */
-  div.torrent-progress-bar-container {
+  .torrent-progress-bar-container {
     height: 10px;
     position: relative;
 
@@ -390,13 +394,13 @@ ul.torrent-list {
     }
   }
 
-  div.torrent-peer-details.compact {
+  .torrent-peer-details.compact {
     float: right; /* pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div */
     margin-right: 65px; /* leave room on the right for the progressbar */
     margin-top: 2px;
   }
 
-  div.torrent-progress-bar {
+  .torrent-progress-bar {
     background-image: url('images/progress.png');
     background-repeat: repeat-x;
     border: 1px solid #888;
@@ -539,7 +543,7 @@ ul.torrent-list {
 ****
 ***/
 
-div#torrent-inspector {
+#torrent-inspector {
   $idle-color-top: $nonselected-gradient-top;
   $idle-color-bottom: $nonselected-gradient-bottom;
   $active-color-top: $selected-gradient-top;
@@ -622,7 +626,7 @@ div#torrent-inspector {
     }
   }
 
-  ul.tier-list {
+  .tier-list {
     clear: both;
     cursor: default;
     display: block;
@@ -660,7 +664,7 @@ div#torrent-inspector {
     }
   }
 
-  li.inspector-tracker-entry {
+  .inspector-tracker-entry {
     display: block;
     padding: 3px 0 3px 2px;
 
@@ -669,7 +673,7 @@ div#torrent-inspector {
     }
   }
 
-  div.tracker-host {
+  .tracker-host {
     color: #222;
     font-size: 1.2em;
     font-weight: bold;
@@ -699,7 +703,7 @@ div#torrent-inspector {
     width: 100%;
   }
 
-  li.inspector-torrent-file-list-entry {
+  .inspector-torrent-file-list-entry {
     display: block;
     padding: 3px 0 3px 2px;
 
@@ -712,24 +716,24 @@ div#torrent-inspector {
     }
   }
 
-  div.inspector-torrent-file-list-entry-name {
+  .inspector-torrent-file-list-entry-name {
     color: #000;
     display: inline;
     font-size: 1.2em;
     margin-left: 0;
   }
 
-  li.inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
+  .inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
     color: #999;
   }
 
-  div.inspector-torrent-file-list-entry-progress {
+  .inspector-torrent-file-list-entry-progress {
     color: #999;
     margin-left: 20px;
   }
 
-  ul.single-file li.inspector-torrent-file-list-entry > .file-wanted-control,
-  li.inspector-torrent-file-list-entry.complete > .file-wanted-control {
+  .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
+  .inspector-torrent-file-list-entry.complete > .file-wanted-control {
     cursor: default;
   }
 }
@@ -742,13 +746,13 @@ div#torrent-inspector {
   padding: 0;
   text-align: left;
 
-  > div.inspector-group {
+  > .inspector-group {
     margin-bottom: 0;
     padding-bottom: 0;
   }
 }
 
-table.peer-list {
+.peer-list {
   border-collapse: collapse;
   clear: both;
   cursor: default;
@@ -790,8 +794,8 @@ table.peer-list {
   }
 }
 
-tr.inspector-peer-entry {
-  div.encrypted-peer-cell {
+.inspector-peer-entry {
+  .encrypted-peer-cell {
     background: transparent url('images/lock_icon.png') no-repeat;
     height: 16px;
     width: 16px;
@@ -806,7 +810,7 @@ tr.inspector-peer-entry {
 ****  File Priority Buttons
 ***/
 
-div.file-priority-radiobox {
+.file-priority-radiobox {
   $border-radius: 5px;
 
   // We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
@@ -827,7 +831,7 @@ div.file-priority-radiobox {
     width: 20px;
   }
 
-  > div.low {
+  > .low {
     @include left-rounded-box($border-radius);
     @include button-image(
       'images/file-priority-low.png',
@@ -839,7 +843,7 @@ div.file-priority-radiobox {
     border-right-width: 0;
   }
 
-  > div.normal {
+  > .normal {
     @include button-image(
       'images/file-priority-normal.png',
       $idle-color-top,
@@ -849,7 +853,7 @@ div.file-priority-radiobox {
     );
   }
 
-  > div.high {
+  > .high {
     @include right-rounded-box($border-radius);
     @include button-image(
       'images/file-priority-high.png',
@@ -868,7 +872,7 @@ div.file-priority-radiobox {
 *****
 ****/
 
-div.torrent-footer {
+.torrent-footer {
   $idle-color-top: $nonselected-gradient-top;
   $idle-color-bottom: $nonselected-gradient-bottom;
   $active-color-top: $selected-gradient-top;
@@ -947,7 +951,7 @@ div.torrent-footer {
 *****
 ****/
 
-div#dialog-message.dialog-message {
+#dialog-message.dialog-message {
   font-size: 13px;
   line-height: 14px;
   margin: 10px auto 25px;
@@ -957,7 +961,7 @@ div#dialog-message.dialog-message {
   word-wrap: break-word;
 }
 
-div#upload-container div.dialog-window div.dialog-message {
+#upload-container .dialog-window .dialog-message {
   label {
     display: block;
     margin-top: 15px;
@@ -979,14 +983,14 @@ div#upload-container div.dialog-window div.dialog-message {
   }
 }
 
-h2.dialog-heading {
+.dialog-heading {
   font-size: 17px;
   margin: 0 auto;
   text-align: center;
   width: 300px;
 }
 
-div.dialog-container a {
+.dialog-container a {
   background: #222;
   border: 2px solid #fff;
   border-radius: 16px;
@@ -1001,17 +1005,17 @@ div.dialog-container a {
   width: 90px;
 }
 
-#dialog-container div.dialog-window img {
+#dialog-container .dialog-window img {
   margin: 5px auto 12px;
 }
 
 .landscape {
-  div.dialog-container {
-    a#dialog-cancel-button {
+  .dialog-container {
+    #dialog-cancel-button {
       left: 155px;
     }
 
-    a#dialog-confirm-button {
+    #dialog-confirm-button {
       right: 110px;
     }
 
@@ -1021,13 +1025,13 @@ div.dialog-container a {
     }
   }
 
-  h2#dialog-heading.dialog-heading {
+  #dialog-heading.dialog-heading {
     margin: 5px auto 0;
     margin-left: 150px;
     text-align: left;
   }
 
-  div#dialog-message.dialog-message {
+  #dialog-message.dialog-message {
     margin: 10px 0 20px 150px;
     text-align: left;
     width: 300px;
@@ -1044,7 +1048,7 @@ div.dialog-container a {
   z-index: 3;
 }
 
-iframe#torrent-upload-frame {
+#torrent-upload-frame {
   border: 0;
   display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
   height: 0;
