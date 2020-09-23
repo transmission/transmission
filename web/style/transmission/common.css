@@ -566,8 +566,6 @@ div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-i
   background-repeat: no-repeat;
   border-bottom-left-radius: 5px;
   border-left-width: 1px;
-  border-radius-bottomleft: 5px;
-  border-radius-topleft: 5px;
   border-top-left-radius: 5px;
 }
 
@@ -615,8 +613,6 @@ div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-f
   background-position: center;
   background-repeat: no-repeat;
   border-bottom-right-radius: 5px;
-  border-radius-bottomright: 5px;
-  border-radius-topright: 5px;
   border-top-right-radius: 5px;
 }
 
@@ -843,8 +839,6 @@ div.file-priority-radiobox > div.low {
   background-position: center;
   background-repeat: no-repeat;
   border-bottom-left-radius: 5px;
-  border-radius-bottomleft: 5px;
-  border-radius-topleft: 5px;
   border-right-width: 0;
   border-top-left-radius: 5px;
 }
@@ -879,8 +873,6 @@ div.file-priority-radiobox > div.high {
   background-repeat: no-repeat;
   border-bottom-right-radius: 5px;
   border-left-width: 0;
-  border-radius-bottomright: 5px;
-  border-radius-topright: 5px;
   border-top-right-radius: 5px;
 }
 

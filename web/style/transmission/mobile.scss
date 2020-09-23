@@ -64,14 +64,10 @@ $selected-gradient-bottom: #fff;
 
 @mixin leftRoundedBox($radius) {
   border-bottom-left-radius: $radius;
-  border-radius-bottomleft: $radius;
-  border-radius-topleft: $radius;
   border-top-left-radius: $radius;
 }
 @mixin rightRoundedBox($radius) {
   border-bottom-right-radius: $radius;
-  border-radius-bottomright: $radius;
-  border-radius-topright: $radius;
   border-top-right-radius: $radius;
 }
 
