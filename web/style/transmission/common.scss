@@ -1,13 +1,11 @@
+@use "sass:color";
+
 @mixin vertical-gradient($topColor, $bottomColor) {
-  background-color: mix($topColor, $bottomColor);
-  background-image: linear-gradient($topColor, $bottomColor);
+  background: color.mix($topColor, $bottomColor) linear-gradient($topColor, $bottomColor);
 }
 
 @mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
-  background-color: mix($topColor, $bottomColor);
-  background-image: url($src), linear-gradient($topColor, $bottomColor);
-  background-position: center;
-  background-repeat: no-repeat;
+  background: url($src) no-repeat center, linear-gradient($topColor, $bottomColor);
 }
 
 @mixin button-image(
@@ -31,27 +29,15 @@ $selection-color: #cdcdff;
 $selected-gradient-top: $selection-color;
 $selected-gradient-bottom: #fff;
 
-@mixin button-area {
+@mixin button {
+  border: 1px solid #aaa;
   cursor: pointer;
   display: inline-block;
   padding: 3px;
   user-select: none;
 }
 
-@mixin flat-button {
-  @include button-area;
-  border: 0;
-}
-
-@mixin button {
-  @include button-area;
-  border-color: #aaa;
-  border-style: solid;
-  border-width: 1px;
-}
-
 @mixin rounded-box($radius) {
-  border-radius: $radius;
   border-radius: $radius;
 }
 
@@ -145,11 +131,12 @@ body {
 ****  TOOLBAR
 ****
 ***/
-$toolbar-gradient-top: #ddd;
-$toolbar-gradient-bottom: #bbb;
+
 $toolbar-height: 36px;
 
 #toolbar {
+  $toolbar-gradient-top: #ddd;
+  $toolbar-gradient-bottom: #bbb;
   @include vertical-gradient($toolbar-gradient-top, $toolbar-gradient-bottom);
   border-bottom: 1px solid #aaa;
   height: $toolbar-height;
@@ -158,13 +145,15 @@ $toolbar-height: 36px;
   width: 100%;
 
   > * {
-    @include flat-button;
     background-position: center center;
     background-repeat: no-repeat;
     border: 0;
+    cursor: pointer;
+    display: inline-block;
     float: left;
     height: 34px;
-    padding: 0 3px;
+    padding: 0 6px;
+    user-select: none;
     width: 34px;
   }
 
@@ -416,20 +405,18 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
     }
   }
 
-  /**
-	 * Progressbar
-	 *
-	 * Each progressbar has three elemens: a parent container and two children,
-	 * complete and incomplete.
-	 *
-	 * The only thing needed to set the progressbar percentage is to set
-	 * the complete child's width as a percentage. This is because incomplete
-	 * is pinned to the full width and height of the parent, and complete
-	 * is pinned to the left side of the parent and has a higher z-index.
-	 *
-	 * The progressbar has different colors depending on its state, so there
-	 * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
-	 */
+  // Progressbar
+  //
+  // Each progressbar has three elemens: a parent container and two children,
+  // complete and incomplete.
+  //
+  // The only thing needed to set the progressbar percentage is to set
+  // the complete child's width as a percentage. This is because incomplete
+  // is pinned to the full width and height of the parent, and complete
+  // is pinned to the left side of the parent and has a higher z-index.
+  //
+  // The progressbar has different colors depending on its state, so there
+  // are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
   .torrent-progress-bar-container {
     height: 10px;
     position: relative;
@@ -449,8 +436,8 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
   }
 
   .torrent-peer-details.compact {
-    float: right; /* pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div */
-    margin-right: 65px; /* leave room on the right for the progressbar */
+    float: right; // pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div
+    margin-right: 65px; // leave room on the right for the progressbar
     margin-top: 2px;
   }
 
@@ -537,7 +524,6 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 
 #prefs-dialog.ui-tabs .ui-tabs-panel {
   padding: 0;
-  user-select: none;
   user-select: none;
 }
 
@@ -687,8 +673,6 @@ $inspector-width: 570px;
     cursor: default;
     display: block;
     list-style: none;
-    list-style-image: none;
-    list-style-type: none;
     margin: 2px 0 8px;
     padding-left: 0;
     text-align: left;
@@ -738,21 +722,12 @@ $inspector-width: 570px;
   /* Files Inspector Tab */
 
   #inspector-file-list {
-    cursor: default;
-    margin: 0;
-    overflow: hidden;
-    padding: 0;
-    text-align: left;
-  }
-
-  #inspector-file-list {
     clear: both;
     cursor: default;
     display: block;
     list-style: none;
-    list-style-image: none;
-    list-style-type: none;
     margin: 6px 0 0;
+    overflow: hidden;
     padding-bottom: 10px;
     padding-top: 6px;
     text-align: left;
@@ -869,10 +844,10 @@ $inspector-width: 570px;
 @mixin file-button-image($image-url) {
   @include button-image(
     $image-url,
-    mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%),
-    mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%),
-    mix($selected-gradient-top, $selected-gradient-bottom, 80%),
-    mix($selected-gradient-top, $selected-gradient-bottom, 20%)
+    color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%),
+    color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%),
+    color.mix($selected-gradient-top, $selected-gradient-bottom, 80%),
+    color.mix($selected-gradient-top, $selected-gradient-bottom, 20%)
   );
 }
 
@@ -938,11 +913,9 @@ $inspector-width: 570px;
   > div {
     border: 1px solid #888;
     float: left;
-    float: left;
     height: 12px;
     margin: 2px 4px;
     padding: 2px 8px;
-    user-select: none;
     user-select: none;
     width: 18px;
   }
@@ -1092,13 +1065,6 @@ $inspector-width: 570px;
       margin: 0;
       padding: 0;
     }
-  }
-}
-
-@media screen and (min-device-pixel-ratio: 0) {
-  .dialog-container .dialog-window {
-    margin-top: 71px;
-    top: 0;
   }
 }
 

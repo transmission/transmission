@@ -1,28 +1,11 @@
 @mixin vertical-gradient($topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    from($topColor),
-    to($bottomColor)
-  );
-  background-image: linear-gradient(top, $topColor, $bottomColor);
-  background-image: linear-gradient(top, $topColor, $bottomColor);
-  background-image: linear-gradient(top, $topColor, $bottomColor);
-  background-image: linear-gradient(top, $topColor, $bottomColor);
-  background-image: linear-gradient(top, $topColor, $bottomColor);
+  background-image: linear-gradient($topColor, $bottomColor);
 }
 
 @mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
-  background-image: url($src); /* fallback */
-  background-image: url($src),
-    -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); /* Saf4+, Chrome */
-  background-image: url($src), -webkit-linear-gradient(top, $topColor, $bottomColor); /* Chrome 10+, Saf5.1+ */
-  background-image: url($src), -moz-linear-gradient(top, $topColor, $bottomColor); /* FF3.6+ */
-  background-image: url($src), -ms-linear-gradient(top, $topColor, $bottomColor); /* IE10 */
-  background-image: url($src), -o-linear-gradient(top, $topColor, $bottomColor); /* Opera 11.10+ */
+  background-image: url($src), linear-gradient($topColor, $bottomColor); /* Opera 11.10+ */
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -56,11 +39,9 @@ $selected-gradient-bottom: #fff;
   display: inline-block;
   padding: 3px;
   user-select: none;
-  user-select: none;
 }
 
 @mixin rounded-box($radius) {
-  border-radius: $radius;
   border-radius: $radius;
 }
 
@@ -167,14 +148,16 @@ $toolbar-height: 39px;
   width: 100%;
 
   > * {
-    @include button;
-    background-position: center center;
+    background-position: center;
     background-repeat: no-repeat;
     border: 0;
+    cursor: pointer;
+    display: inline-block;
     float: left;
     height: 34px;
     margin-top: 5px;
     padding: 0 3px;
+    user-select: none;
     width: 34px;
   }
 
@@ -483,7 +466,6 @@ $statusbar-height: 24px;
 
 #prefs-dialog.ui-tabs .ui-tabs-panel {
   padding: 0;
-  user-select: none;
   user-select: none;
 }
 
@@ -888,12 +870,10 @@ $statusbar-height: 24px;
   > div {
     border: 1px solid #888;
     float: left;
-    float: left;
     height: 12px;
     margin: 2px 4px;
     padding: 2px 8px;
     position: relative;
-    user-select: none;
     user-select: none;
     width: 18px;
   }
