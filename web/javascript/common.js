@@ -51,7 +51,7 @@ class Utils {
   }
 
   static show(el) {
-    el.style.display = 'none';
+    el.style.display = 'block';
   }
   static showId(id) {
     return Utils.show(document.getElementById(id));
@@ -64,8 +64,8 @@ class Utils {
       Utils.hide(el);
     }
   }
-  static setVisibleId(id) {
-    return Utils.setVisible(document.getElementById(id));
+  static setVisibleId(id, visible) {
+    return Utils.setVisible(document.getElementById(id), visible);
   }
 }
 
