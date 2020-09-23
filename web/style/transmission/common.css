@@ -19,9 +19,11 @@ body {
   overflow: hidden;
   text-align: center;
 }
+
 body img {
   border: none;
 }
+
 body a {
   outline: 0;
 }
@@ -34,12 +36,14 @@ body a {
 #about-dialog > * {
   text-align: center;
 }
+
 #about-dialog > #about-logo {
   background: transparent url('images/logo.png') top left no-repeat;
   height: 64px;
   margin-left: 100px;
   width: 64px;
 }
+
 #about-dialog > #about-title {
   font-size: 1.3em;
   font-weight: bold;
@@ -54,6 +58,7 @@ body a {
   border-collapse: collapse;
   width: 100%;
 }
+
 #hotkeys-dialog table th,
 #hotkeys-dialog table td {
   border: 1px solid #aaa;
@@ -65,36 +70,33 @@ body a {
 ****
 ***/
 div#toolbar {
-  background-color: #cccccc;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
+  background-color: #ccc;
+  background-image: linear-gradient(#ddd, #bbb);
   border-bottom: 1px solid #aaa;
   height: 36px;
   margin: 0;
   padding: 2px;
   width: 100%;
 }
+
 div#toolbar > * {
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: none;
   border-color: #aaa;
   border-style: solid;
   border-width: 1px;
   cursor: pointer;
   display: inline-block;
-  padding: 3px;
-  user-select: none;
-  user-select: none;
-  background-position: center center;
-  background-repeat: no-repeat;
-  border: none;
   float: left;
   height: 34px;
+  padding: 3px;
   padding: 0 3px;
+  user-select: none;
+  user-select: none;
   width: 34px;
 }
+
 div#toolbar > div.toolbar-separator {
   border-left: 1px solid #aaa;
   height: 25px;
@@ -102,29 +104,37 @@ div#toolbar > div.toolbar-separator {
   margin-top: 8px;
   width: 3px;
 }
+
 div#toolbar > div#toolbar-open {
   background-image: url('images/toolbar-folder.png');
 }
+
 div#toolbar > div#toolbar-remove {
   background-image: url('images/toolbar-close.png');
 }
+
 div#toolbar > div#toolbar-start {
   background-image: url('images/toolbar-start.png');
 }
+
 div#toolbar > div#toolbar-pause {
   background-image: url('images/toolbar-pause.png');
 }
+
 div#toolbar > div#toolbar-start-all {
   background-image: url('images/toolbar-start-all.png');
 }
+
 div#toolbar > div#toolbar-pause-all {
   background-image: url('images/toolbar-pause-all.png');
 }
+
 div#toolbar > div#toolbar-inspector {
   background-image: url('images/toolbar-info.png');
   float: right;
   margin-right: 4px;
 }
+
 div#toolbar > *.disabled {
   opacity: 0.25;
 }
@@ -135,53 +145,57 @@ div#toolbar > *.disabled {
 ****
 ***/
 #statusbar {
-  background-color: #cccccc;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
+  background-color: #ccc;
+  background-image: linear-gradient(#ddd, #bbb);
   border-bottom: 1px solid #aaa;
   height: 26px;
   overflow: hidden;
   position: relative;
   width: 100%;
 }
+
 #statusbar #filter {
   float: left;
   margin-left: 5px;
 }
+
 #statusbar #filter input#torrent-search {
   border-radius: 6px;
   height: 18px;
   width: 100px;
 }
+
 #statusbar #filter input#torrent-search.blur {
   color: #999;
 }
+
 #statusbar #filter #filter-count {
   margin-left: 8px;
 }
+
 #statusbar #speed-info {
   float: right;
   margin-right: 10px;
   margin-top: 5px;
 }
+
 #statusbar #speed-info * {
   display: inline-block;
 }
+
 #statusbar #speed-info #speed-up-icon {
   background: url('images/arrow-up.png') bottom no-repeat;
   height: 8px;
   margin-left: 8px;
   width: 8px;
 }
+
 #statusbar #speed-info #speed-dn-icon {
   background: url('images/arrow-down.png') bottom no-repeat;
   height: 8px;
   width: 8px;
 }
+
 #statusbar #speed-info #speed-up-container,
 #statusbar #speed-info #speed-dn-container {
   display: inline;
@@ -226,57 +240,72 @@ ul.torrent-list {
   * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
   */
 }
+
 ul.torrent-list li.torrent {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   color: #666;
   padding: 4px 30px 5px 14px;
 }
+
 ul.torrent-list li.torrent.compact {
   padding: 4px;
 }
+
 ul.torrent-list li.torrent.even {
   background-color: #f7f7f7;
 }
+
 ul.torrent-list li.torrent.selected {
   background-color: #cdcdff;
 }
+
 ul.torrent-list li.torrent.compact div.torrent-name {
   color: #000;
 }
+
 ul.torrent-list li.torrent a {
   float: right;
   position: relative;
   right: -22px;
   top: 1px;
 }
+
 ul.torrent-list li.torrent a img {
   position: relative;
   right: -10px;
 }
+
 ul.torrent-list li.torrent a div {
   background: url('images/buttons/torrent_buttons.png');
   height: 14px;
   width: 14px;
 }
+
 ul.torrent-list li.torrent a div.torrent-pause {
   background-position: left top;
 }
+
 ul.torrent-list li.torrent a div.torrent-resume {
   background-position: center top;
 }
+
 ul.torrent-list li.torrent a:active div.torrent-pause {
   background-position: left bottom;
 }
+
 ul.torrent-list li.torrent a:active div.torrent-resume {
   background-position: center bottom;
 }
+
 ul.torrent-list li.torrent a:hover div.torrent-pause {
   background-position: left center;
 }
+
 ul.torrent-list li.torrent a:hover div.torrent-resume {
   background-position: center center;
 }
+
 ul.torrent-list li.torrent div.torrent-name {
   color: #222;
   font-size: 1.3em;
@@ -287,14 +316,17 @@ ul.torrent-list li.torrent div.torrent-name {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 ul.torrent-list li.torrent div.torrent-name.compact {
   font-size: 1em;
   font-weight: normal;
 }
+
 ul.torrent-list li.torrent div.torrent-name.paused {
   color: #777;
   font-weight: normal;
 }
+
 ul.torrent-list li.torrent div.torrent-progress-details,
 ul.torrent-list li.torrent div.torrent-peer-details {
   clear: left;
@@ -302,18 +334,22 @@ ul.torrent-list li.torrent div.torrent-peer-details {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 ul.torrent-list li.torrent div.torrent-progress-details.error,
 ul.torrent-list li.torrent div.torrent-peer-details.error {
   color: #f00;
 }
+
 ul.torrent-list li.torrent.selected div.torrent-progress-details.error,
 ul.torrent-list li.torrent.selected div.torrent-peer-details.error {
   color: #fff;
 }
+
 ul.torrent-list div.torrent-progress-bar-container {
   height: 10px;
   position: relative;
 }
+
 ul.torrent-list div.torrent-progress-bar-container.compact {
   margin-top: 2px;
   position: absolute;
@@ -321,10 +357,12 @@ ul.torrent-list div.torrent-progress-bar-container.compact {
   width: 50px;
   /*float: right;*/
 }
+
 ul.torrent-list div.torrent-progress-bar-container.full {
   margin-bottom: 5px;
   margin-top: 2px;
 }
+
 ul.torrent-list div.torrent-peer-details.compact {
   float: right;
   /* pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div */
@@ -332,6 +370,7 @@ ul.torrent-list div.torrent-peer-details.compact {
   /* leave room on the right for the progressbar */
   margin-top: 2px;
 }
+
 ul.torrent-list div.torrent-progress-bar {
   background-image: url('images/progress.png');
   background-repeat: repeat-x;
@@ -341,53 +380,66 @@ ul.torrent-list div.torrent-progress-bar {
   position: absolute;
   top: 0;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete {
   z-index: 2;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.paused {
   background-position: left -30px;
   border-color: #989898;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.magnet {
   background-position: left -20px;
   border-color: #cfcfcf;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.leeching {
   background-position: left 0;
   border-color: #3d9dea;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.leeching.queued {
   background-position: left -70px;
   border-color: #889ca5;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.seeding {
   background-position: left -40px;
   border-color: #269e30;
 }
+
 ul.torrent-list div.torrent-progress-bar.complete.seeding.queued {
   background-position: left -60px;
   border-color: #8a998d;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete {
   width: 100%;
   z-index: 1;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete.paused {
   background-position: left -20px;
   border-color: #cfcfcf;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete.magnet {
   background-position: left -50px;
   border-color: #d47778;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete.leeching {
   background-position: left -20px;
   border-color: #cfcfcf;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete.leeching.queued {
   background-position: left -80px;
   border-color: #c4c4c4;
 }
+
 ul.torrent-list div.torrent-progress-bar.incomplete.seeding {
   background-position: left -10px;
   border-color: #29ad35;
@@ -408,42 +460,53 @@ ul.torrent-list div.torrent-progress-bar.incomplete.seeding {
   margin: 10px;
   text-align: left;
 }
+
 .prefs-section > * {
   padding-left: 8px;
   padding-top: 8px;
 }
+
 .prefs-section .title {
   font-size: larger;
   font-weight: bold;
   padding-left: 0;
 }
+
 .prefs-section .row .key {
   float: left;
   padding-top: 3px;
 }
+
 .prefs-section .row .key > * {
   margin-left: 0;
 }
+
 .prefs-section .row .value {
   margin-left: 150px;
 }
+
 .prefs-section .row .value > * {
   width: 100%;
 }
+
 .prefs-section .checkbox-row > input {
   margin: 0;
 }
+
 .prefs-section .checkbox-row > label {
   margin-left: 5px;
 }
+
 .prefs-section #alternative-speed-limits-title {
   background: transparent url('images/blue-turtle.png') no-repeat;
   padding-left: 18px;
 }
+
 .prefs-section #alternative-speed-limits-desc {
   font-size: smaller;
   padding-bottom: 4px;
 }
+
 .prefs-section #blocklist-info {
   font-size: smaller;
   margin-top: 3px;
@@ -468,194 +531,112 @@ div#torrent-inspector {
   z-index: 5;
   /* Files Inspector Tab */
 }
+
 div#torrent-inspector #inspector-close {
   display: none;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper {
   overflow: hidden;
   text-align: center;
   width: 100%;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs {
   display: inline-block;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > * {
   border-color: #aaa;
   border-style: solid;
   border-width: 1px;
   cursor: pointer;
   display: inline-block;
+  height: 20px;
   padding: 3px;
   user-select: none;
   user-select: none;
-  height: 20px;
   width: 30px;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info {
+  background-color: #ddd;
+  background-image: url('images/inspector-info.png'), linear-gradient(#fff, #bbb);
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom-left-radius: 5px;
+  border-left-width: 1px;
   border-radius-bottomleft: 5px;
   border-radius-topleft: 5px;
   border-top-left-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/inspector-info.png');
-  /* fallback */
-  background-image: url('images/inspector-info.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-info.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-info.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/inspector-info.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/inspector-info.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
-  background-position: center;
-  background-repeat: no-repeat;
-  border-left-width: 1px;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info:active,
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info.selected {
   background-color: #e6e6ff;
-  background-image: url('images/inspector-info.png');
-  /* fallback */
-  background-image: url('images/inspector-info.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-info.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-info.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/inspector-info.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/inspector-info.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/inspector-info.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers {
-  background-color: #dddddd;
-  background-image: url('images/inspector-peers.png');
-  /* fallback */
-  background-image: url('images/inspector-peers.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-peers.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-peers.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/inspector-peers.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/inspector-peers.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/inspector-peers.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers:active,
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers.selected {
   background-color: #e6e6ff;
-  background-image: url('images/inspector-peers.png');
-  /* fallback */
-  background-image: url('images/inspector-peers.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-peers.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-peers.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/inspector-peers.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/inspector-peers.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/inspector-peers.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers {
-  background-color: #dddddd;
-  background-image: url('images/inspector-trackers.png');
-  /* fallback */
-  background-image: url('images/inspector-trackers.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-trackers.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-trackers.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/inspector-trackers.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/inspector-trackers.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/inspector-trackers.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers:active,
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers.selected {
   background-color: #e6e6ff;
-  background-image: url('images/inspector-trackers.png');
-  /* fallback */
-  background-image: url('images/inspector-trackers.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-trackers.png'),
-    -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-trackers.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/inspector-trackers.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/inspector-trackers.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/inspector-trackers.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files {
+  background-color: #ddd;
+  background-image: url('images/inspector-files.png'), linear-gradient(#fff, #bbb);
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom-right-radius: 5px;
   border-radius-bottomright: 5px;
   border-radius-topright: 5px;
   border-top-right-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/inspector-files.png');
-  /* fallback */
-  background-image: url('images/inspector-files.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-files.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-files.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/inspector-files.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/inspector-files.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
-  background-position: center;
-  background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files:active,
 div#torrent-inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files.selected {
   background-color: #e6e6ff;
-  background-image: url('images/inspector-files.png');
-  /* fallback */
-  background-image: url('images/inspector-files.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/inspector-files.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/inspector-files.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/inspector-files.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/inspector-files.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/inspector-files.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div#torrent-inspector #inspector-header {
   margin-top: 8px;
 }
+
 div#torrent-inspector #inspector-header #torrent-inspector-name {
   font-size: large;
   font-weight: bold;
 }
+
 div#torrent-inspector ul.tier-list {
   clear: both;
   cursor: default;
@@ -668,9 +649,11 @@ div#torrent-inspector ul.tier-list {
   text-align: left;
   width: 100%;
 }
+
 div#torrent-inspector ul.tier-list li {
   overflow: hidden;
 }
+
 div#torrent-inspector ul.tier-list .tracker-activity {
   color: #666;
   display: table;
@@ -678,28 +661,35 @@ div#torrent-inspector ul.tier-list .tracker-activity {
   margin-top: 1px;
   width: 330px;
 }
+
 div#torrent-inspector ul.tier-list .tracker-activity div {
   padding: 2px;
 }
+
 div#torrent-inspector ul.tier-list table {
   color: #666;
   float: right;
 }
+
 div#torrent-inspector ul.tier-list th {
   text-align: right;
 }
+
 div#torrent-inspector li.inspector-tracker-entry {
   display: block;
   padding: 3px 0 3px 2px;
 }
+
 div#torrent-inspector li.inspector-tracker-entry.odd {
   background-color: #eee;
 }
+
 div#torrent-inspector div.tracker-host {
   color: #222;
   font-size: 1.2em;
   font-weight: bold;
 }
+
 div#torrent-inspector #inspector-file-list {
   cursor: default;
   margin: 0;
@@ -707,6 +697,7 @@ div#torrent-inspector #inspector-file-list {
   padding: 0;
   text-align: left;
 }
+
 div#torrent-inspector #inspector-file-list {
   clear: both;
   cursor: default;
@@ -720,31 +711,38 @@ div#torrent-inspector #inspector-file-list {
   text-align: left;
   width: 100%;
 }
+
 div#torrent-inspector li.inspector-torrent-file-list-entry {
   display: block;
   padding: 3px 0 3px 2px;
 }
+
 div#torrent-inspector li.inspector-torrent-file-list-entry.skip {
   color: #666;
 }
+
 div#torrent-inspector li.inspector-torrent-file-list-entry.even {
   background-color: #f7f7f7;
 }
+
 div#torrent-inspector div.inspector-torrent-file-list-entry-name {
   color: #000;
   display: inline;
   font-size: 1.2em;
   margin-left: 0;
 }
+
 div#torrent-inspector
-  li.inspector-torrent-file-list-entry.skip
-  > .inspector-torrent-file-list-entry-name {
+li.inspector-torrent-file-list-entry.skip
+> .inspector-torrent-file-list-entry-name {
   color: #999;
 }
+
 div#torrent-inspector div.inspector-torrent-file-list-entry-progress {
   color: #999;
   margin-left: 20px;
 }
+
 div#torrent-inspector ul.single-file li.inspector-torrent-file-list-entry > .file-wanted-control,
 div#torrent-inspector li.inspector-torrent-file-list-entry.complete > .file-wanted-control {
   cursor: default;
@@ -758,6 +756,7 @@ div#torrent-inspector li.inspector-torrent-file-list-entry.complete > .file-want
   padding: 0;
   text-align: left;
 }
+
 #inspector-peers-list > div.inspector-group {
   margin-bottom: 0;
   padding-bottom: 0;
@@ -771,27 +770,34 @@ table.peer-list {
   text-align: left;
   width: 100%;
 }
+
 table.peer-list .encrypted-col {
   width: 16px;
 }
+
 table.peer-list .up-col {
   width: 70px;
 }
+
 table.peer-list .down-col {
   width: 70px;
 }
+
 table.peer-list .percent-col {
   padding-right: 5px;
   text-align: right;
   width: 30px;
 }
+
 table.peer-list .status-col {
   padding-right: 5px;
   width: 40px;
 }
+
 table.peer-list .address-col {
   width: 180px;
 }
+
 table.peer-list .client-col {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -803,6 +809,7 @@ tr.inspector-peer-entry div.encrypted-peer-cell {
   height: 16px;
   width: 16px;
 }
+
 tr.inspector-peer-entry.odd {
   background-color: #eee;
 }
@@ -816,150 +823,71 @@ div.file-priority-radiobox {
   margin: 4px;
   margin-top: 2px;
 }
+
 div.file-priority-radiobox > * {
   border-color: #aaa;
   border-style: solid;
   border-width: 1px;
   cursor: pointer;
   display: inline-block;
+  height: 12px;
   padding: 3px;
   user-select: none;
   user-select: none;
-  height: 12px;
   width: 20px;
 }
+
 div.file-priority-radiobox > div.low {
+  background-color: #ddd;
+  background-image: url('images/file-priority-low.png'), linear-gradient(#f1f1f1, #c9c9c9);
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom-left-radius: 5px;
   border-radius-bottomleft: 5px;
   border-radius-topleft: 5px;
-  border-top-left-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/file-priority-low.png');
-  /* fallback */
-  background-image: url('images/file-priority-low.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#f1f1f1), to(#c9c9c9));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-low.png'),
-    -webkit-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-low.png'), -moz-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-low.png'), -ms-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* IE10 */
-  background-image: url('images/file-priority-low.png'), -o-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Opera 11.10+ */
-  background-position: center;
-  background-repeat: no-repeat;
   border-right-width: 0;
+  border-top-left-radius: 5px;
 }
+
 div.file-priority-radiobox > div.low:active,
 div.file-priority-radiobox > div.low.selected {
   background-color: #e6e6ff;
-  background-image: url('images/file-priority-low.png');
-  /* fallback */
-  background-image: url('images/file-priority-low.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#d7d7ff), to(#f5f5ff));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-low.png'),
-    -webkit-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-low.png'), -moz-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-low.png'), -ms-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* IE10 */
-  background-image: url('images/file-priority-low.png'), -o-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Opera 11.10+ */
+  background-image: url('images/file-priority-low.png'), linear-gradient(#d7d7ff, #f5f5ff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.file-priority-radiobox > div.normal {
-  background-color: #dddddd;
-  background-image: url('images/file-priority-normal.png');
-  /* fallback */
-  background-image: url('images/file-priority-normal.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#f1f1f1), to(#c9c9c9));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-normal.png'),
-    -webkit-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-normal.png'),
-    -moz-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-normal.png'),
-    -ms-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* IE10 */
-  background-image: url('images/file-priority-normal.png'),
-    -o-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/file-priority-normal.png'), linear-gradient(#f1f1f1, #c9c9c9);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.file-priority-radiobox > div.normal:active,
 div.file-priority-radiobox > div.normal.selected {
   background-color: #e6e6ff;
-  background-image: url('images/file-priority-normal.png');
-  /* fallback */
-  background-image: url('images/file-priority-normal.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#d7d7ff), to(#f5f5ff));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-normal.png'),
-    -webkit-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-normal.png'),
-    -moz-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-normal.png'),
-    -ms-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* IE10 */
-  background-image: url('images/file-priority-normal.png'),
-    -o-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Opera 11.10+ */
+  background-image: url('images/file-priority-normal.png'), linear-gradient(#d7d7ff, #f5f5ff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.file-priority-radiobox > div.high {
+  background-color: #ddd;
+  background-image: url('images/file-priority-high.png'), linear-gradient(#f1f1f1, #c9c9c9);
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom-right-radius: 5px;
+  border-left-width: 0;
   border-radius-bottomright: 5px;
   border-radius-topright: 5px;
   border-top-right-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/file-priority-high.png');
-  /* fallback */
-  background-image: url('images/file-priority-high.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#f1f1f1), to(#c9c9c9));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-high.png'),
-    -webkit-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-high.png'),
-    -moz-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-high.png'), -ms-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* IE10 */
-  background-image: url('images/file-priority-high.png'), -o-linear-gradient(top, #f1f1f1, #c9c9c9);
-  /* Opera 11.10+ */
-  background-position: center;
-  background-repeat: no-repeat;
-  border-left-width: 0;
 }
+
 div.file-priority-radiobox > div.high:active,
 div.file-priority-radiobox > div.high.selected {
   background-color: #e6e6ff;
-  background-image: url('images/file-priority-high.png');
-  /* fallback */
-  background-image: url('images/file-priority-high.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#d7d7ff), to(#f5f5ff));
-  /* Saf4+, Chrome */
-  background-image: url('images/file-priority-high.png'),
-    -webkit-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/file-priority-high.png'),
-    -moz-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* FF3.6+ */
-  background-image: url('images/file-priority-high.png'), -ms-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* IE10 */
-  background-image: url('images/file-priority-high.png'), -o-linear-gradient(top, #d7d7ff, #f5f5ff);
-  /* Opera 11.10+ */
+  background-image: url('images/file-priority-high.png'), linear-gradient(#d7d7ff, #f5f5ff);
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -970,13 +898,8 @@ div.file-priority-radiobox > div.high.selected {
 *****
 ****/
 div.torrent-footer {
-  background-color: #cccccc;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
-  background-image: linear-gradient(top, #ddd, #bbb);
+  background-color: #ccc;
+  background-image: linear-gradient(#ddd, #bbb);
   border-top: 1px solid #555;
   bottom: 0;
   height: 22px;
@@ -984,6 +907,7 @@ div.torrent-footer {
   width: 100%;
   z-index: 3;
 }
+
 div.torrent-footer > div {
   border: 1px solid #888;
   float: left;
@@ -995,181 +919,83 @@ div.torrent-footer > div {
   user-select: none;
   width: 18px;
 }
+
 div.torrent-footer #settings-menu {
-  border-radius: 5px;
-  border-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/settings.png');
-  /* fallback */
-  background-image: url('images/settings.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/settings.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/settings.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/settings.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/settings.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/settings.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
+  border-radius: 5px;
 }
+
 div.torrent-footer #settings-menu:active,
 div.torrent-footer #settings-menu.selected {
   background-color: #e6e6ff;
-  background-image: url('images/settings.png');
-  /* fallback */
-  background-image: url('images/settings.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/settings.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/settings.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/settings.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/settings.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/settings.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.torrent-footer #prefs-button {
-  border-radius: 5px;
-  border-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/wrench.png');
-  /* fallback */
-  background-image: url('images/wrench.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/wrench.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/wrench.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/wrench.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/wrench.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/wrench.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
+  border-radius: 5px;
 }
+
 div.torrent-footer #prefs-button:active,
 div.torrent-footer #prefs-button.selected {
   background-color: #e6e6ff;
-  background-image: url('images/wrench.png');
-  /* fallback */
-  background-image: url('images/wrench.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/wrench.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/wrench.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/wrench.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/wrench.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/wrench.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.torrent-footer #turtle-button {
-  border-radius: 5px;
-  border-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/turtle.png');
-  /* fallback */
-  background-image: url('images/turtle.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/turtle.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/turtle.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/turtle.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/turtle.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/turtle.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
+  border-radius: 5px;
 }
+
 div.torrent-footer #turtle-button:active,
 div.torrent-footer #turtle-button.selected {
   background-color: #e6e6ff;
-  background-image: url('images/turtle.png');
-  /* fallback */
-  background-image: url('images/turtle.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/turtle.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/turtle.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/turtle.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/turtle.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/turtle.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.torrent-footer #turtle-button:active,
 div.torrent-footer #turtle-button.selected {
   background-color: #e6e6ff;
-  background-image: url('images/blue-turtle.png');
-  /* fallback */
-  background-image: url('images/blue-turtle.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/blue-turtle.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/blue-turtle.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/blue-turtle.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/blue-turtle.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/blue-turtle.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.torrent-footer #compact-button {
-  border-radius: 5px;
-  border-radius: 5px;
-  background-color: #dddddd;
-  background-image: url('images/compact.png');
-  /* fallback */
-  background-image: url('images/compact.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#fff), to(#bbb));
-  /* Saf4+, Chrome */
-  background-image: url('images/compact.png'), -webkit-linear-gradient(top, #fff, #bbb);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/compact.png'), -moz-linear-gradient(top, #fff, #bbb);
-  /* FF3.6+ */
-  background-image: url('images/compact.png'), -ms-linear-gradient(top, #fff, #bbb);
-  /* IE10 */
-  background-image: url('images/compact.png'), -o-linear-gradient(top, #fff, #bbb);
-  /* Opera 11.10+ */
+  background-color: #ddd;
+  background-image: url('images/compact.png'), linear-gradient(#fff, #bbb);
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 5px;
+  border-radius: 5px;
 }
+
 div.torrent-footer #compact-button:active,
 div.torrent-footer #compact-button.selected {
   background-color: #e6e6ff;
-  background-image: url('images/compact.png');
-  /* fallback */
-  background-image: url('images/compact.png'),
-    -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(#fff));
-  /* Saf4+, Chrome */
-  background-image: url('images/compact.png'), -webkit-linear-gradient(top, #cdcdff, #fff);
-  /* Chrome 10+, Saf5.1+ */
-  background-image: url('images/compact.png'), -moz-linear-gradient(top, #cdcdff, #fff);
-  /* FF3.6+ */
-  background-image: url('images/compact.png'), -ms-linear-gradient(top, #cdcdff, #fff);
-  /* IE10 */
-  background-image: url('images/compact.png'), -o-linear-gradient(top, #cdcdff, #fff);
-  /* Opera 11.10+ */
+  background-image: url('images/compact.png'), linear-gradient(#cdcdff, #fff);
   background-position: center;
   background-repeat: no-repeat;
 }
+
 div.torrent-footer #freespace-info {
   border: 0;
   float: right;
@@ -1214,6 +1040,7 @@ div.dialog-container div.dialog-window {
     top: 0;
   }
 }
+
 div.dialog-container .dialog-logo {
   background: transparent url('images/logo.png') top left no-repeat;
   float: left;
@@ -1326,5 +1153,3 @@ iframe#torrent-upload-frame {
   font-size: 1em;
   z-index: 3;
 }
-
-/*# sourceMappingURL=common.css.map */

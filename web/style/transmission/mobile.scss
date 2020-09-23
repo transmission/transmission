@@ -1,12 +1,10 @@
 @mixin verticalGradient($topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    from($topColor),
-    to($bottomColor)
-  );
+  background-image: -webkit-gradient(linear,
+  left top,
+  left bottom,
+  from($topColor),
+  to($bottomColor));
   background-image: linear-gradient(top, $topColor, $bottomColor);
   background-image: linear-gradient(top, $topColor, $bottomColor);
   background-image: linear-gradient(top, $topColor, $bottomColor);
