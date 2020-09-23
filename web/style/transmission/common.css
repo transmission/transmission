@@ -21,7 +21,7 @@ body {
 }
 
 body img {
-  border: none;
+  border: 0;
 }
 
 body a {
@@ -82,7 +82,7 @@ div#toolbar {
 div#toolbar > * {
   background-position: center center;
   background-repeat: no-repeat;
-  border: none;
+  border: 0;
   border-color: #aaa;
   border-style: solid;
   border-width: 1px;
@@ -1014,7 +1014,7 @@ div.dialog-container {
 
 div.dialog-container div.dialog-window {
   background-color: #eee;
-  border-top: none;
+  border-top: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   margin: 0 auto;
   opacity: 0.95;
@@ -1118,7 +1118,7 @@ div#move-container input#torrent-path {
 }
 
 iframe#torrent-upload-frame {
-  border: none;
+  border: 0;
   display: block;
   /* Don't change this : safari forms won't target hidden frames (they open a new window) */
   height: 0;

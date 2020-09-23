@@ -98,7 +98,7 @@ body {
   width: 100%;
 
   img {
-    border: none;
+    border: 0;
   }
 
   a {
@@ -166,7 +166,7 @@ div#toolbar {
     @include button;
     background-position: center center;
     background-repeat: no-repeat;
-    border: none;
+    border: 0;
     float: left;
     height: 34px;
     margin-top: 5px;
@@ -1045,7 +1045,7 @@ div.dialog-container a {
 }
 
 iframe#torrent-upload-frame {
-  border: none;
+  border: 0;
   display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
   height: 0;
   left: -1000px;

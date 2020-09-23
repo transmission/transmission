@@ -182,7 +182,6 @@
   "stylelint": {
     "extends": "stylelint-config-sass-guidelines",
     "rules": {
-      "declaration-property-value-disallowed-list": null,
       "max-nesting-depth": null,
       "scss/at-mixin-pattern": null,
       "selector-max-compound-selectors": null,
