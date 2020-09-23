@@ -1,4 +1,4 @@
-@mixin verticalGradient($topColor, $bottomColor) {
+@mixin vertical-gradient($topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
   background-image: -webkit-gradient(linear,
   left top,
@@ -12,7 +12,7 @@
   background-image: linear-gradient(top, $topColor, $bottomColor);
 }
 
-@mixin imageOnVerticalGradient($src, $topColor, $bottomColor) {
+@mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
   background-color: mix($topColor, $bottomColor);
   background-image: url($src); /* fallback */
   background-image: url($src),
@@ -25,18 +25,18 @@
   background-repeat: no-repeat;
 }
 
-@mixin buttonImage(
+@mixin button-image(
   $image-url,
   $idle-color-top,
   $idle-color-bottom,
   $active-color-top,
   $active-color-bottom
 ) {
-  @include imageOnVerticalGradient($image-url, $idle-color-top, $idle-color-bottom);
+  @include image-on-vertical-gradient($image-url, $idle-color-top, $idle-color-bottom);
 
   &:active,
   &.selected {
-    @include imageOnVerticalGradient($image-url, $active-color-top, $active-color-bottom);
+    @include image-on-vertical-gradient($image-url, $active-color-top, $active-color-bottom);
   }
 }
 
@@ -57,23 +57,23 @@ $selected-gradient-bottom: #fff;
   user-select: none;
 }
 
-@mixin roundedBox($radius) {
+@mixin rounded-box($radius) {
   border-radius: $radius;
   border-radius: $radius;
 }
 
-@mixin leftRoundedBox($radius) {
+@mixin left-rounded-box($radius) {
   border-bottom-left-radius: $radius;
   border-top-left-radius: $radius;
 }
-@mixin rightRoundedBox($radius) {
+@mixin right-rounded-box($radius) {
   border-bottom-right-radius: $radius;
   border-top-right-radius: $radius;
 }
 
-@mixin roundedButton($radius) {
+@mixin rounded-button($radius) {
   @include button;
-  @include roundedBox($radius);
+  @include rounded-box($radius);
 }
 
 /*--------------------------------------
@@ -155,7 +155,7 @@ div#toolbar {
   $idle-color-bottom: $nonselected-gradient-bottom;
   $active-color-top: $selected-gradient-top;
   $active-color-bottom: $selected-gradient-bottom;
-  @include verticalGradient($toolbar-gradient-top, $toolbar-gradient-bottom);
+  @include vertical-gradient($toolbar-gradient-top, $toolbar-gradient-bottom);
   border-bottom: 1px solid #aaa;
   height: $toolbar-height;
   margin: 0;
@@ -227,7 +227,7 @@ $statusbar-gradient-bottom: #bbb;
 $statusbar-height: 24px;
 
 #statusbar {
-  @include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
+  @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
   border-bottom: 1px solid #aaa;
   height: $statusbar-height;
   overflow: hidden;
@@ -569,8 +569,8 @@ div#torrent-inspector {
       }
 
       > #inspector-tab-info {
-        @include leftRoundedBox($border-radius);
-        @include buttonImage(
+        @include left-rounded-box($border-radius);
+        @include button-image(
           'images/inspector-info.png',
           $idle-color-top,
           $idle-color-bottom,
@@ -581,7 +581,7 @@ div#torrent-inspector {
       }
 
       > #inspector-tab-peers {
-        @include buttonImage(
+        @include button-image(
           'images/inspector-peers.png',
           $idle-color-top,
           $idle-color-bottom,
@@ -591,7 +591,7 @@ div#torrent-inspector {
       }
 
       > #inspector-tab-trackers {
-        @include buttonImage(
+        @include button-image(
           'images/inspector-trackers.png',
           $idle-color-top,
           $idle-color-bottom,
@@ -601,8 +601,8 @@ div#torrent-inspector {
       }
 
       > #inspector-tab-files {
-        @include rightRoundedBox($border-radius);
-        @include buttonImage(
+        @include right-rounded-box($border-radius);
+        @include button-image(
           'images/inspector-files.png',
           $idle-color-top,
           $idle-color-bottom,
@@ -828,8 +828,8 @@ div.file-priority-radiobox {
   }
 
   > div.low {
-    @include leftRoundedBox($border-radius);
-    @include buttonImage(
+    @include left-rounded-box($border-radius);
+    @include button-image(
       'images/file-priority-low.png',
       $idle-color-top,
       $idle-color-bottom,
@@ -840,7 +840,7 @@ div.file-priority-radiobox {
   }
 
   > div.normal {
-    @include buttonImage(
+    @include button-image(
       'images/file-priority-normal.png',
       $idle-color-top,
       $idle-color-bottom,
@@ -850,8 +850,8 @@ div.file-priority-radiobox {
   }
 
   > div.high {
-    @include rightRoundedBox($border-radius);
-    @include buttonImage(
+    @include right-rounded-box($border-radius);
+    @include button-image(
       'images/file-priority-high.png',
       $idle-color-top,
       $idle-color-bottom,
@@ -874,7 +874,7 @@ div.torrent-footer {
   $active-color-top: $selected-gradient-top;
   $active-color-bottom: $selected-gradient-bottom;
 
-  @include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
+  @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
   border-top: 1px solid #555;
   height: 22px;
   position: relative;
@@ -899,8 +899,8 @@ div.torrent-footer {
   }
 
   #prefs-button {
-    @include roundedBox(5px);
-    @include buttonImage(
+    @include rounded-box(5px);
+    @include button-image(
       'images/wrench.png',
       $idle-color-top,
       $idle-color-bottom,
@@ -910,8 +910,8 @@ div.torrent-footer {
   }
 
   #turtle-button {
-    @include roundedBox(5px);
-    @include buttonImage(
+    @include rounded-box(5px);
+    @include button-image(
       'images/turtle.png',
       $idle-color-top,
       $idle-color-bottom,
@@ -921,7 +921,7 @@ div.torrent-footer {
 
     &:active,
     &.selected {
-      @include imageOnVerticalGradient(
+      @include image-on-vertical-gradient(
         'images/blue-turtle.png',
         $active-color-top,
         $active-color-bottom
@@ -930,8 +930,8 @@ div.torrent-footer {
   }
 
   #compact-button {
-    @include roundedBox(5px);
-    @include buttonImage(
+    @include rounded-box(5px);
+    @include button-image(
       'images/compact.png',
       $idle-color-top,
       $idle-color-bottom,
