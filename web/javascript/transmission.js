@@ -7,6 +7,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+// import {MDCMenu} from '@material/menu';
+
 class Transmission {
   constructor() {
     // Initialize the helper classes
@@ -27,6 +29,8 @@ class Transmission {
     // Initialize the clutch preferences
     Prefs.getClutchPrefs(this);
 
+    // this._more_menu = MDCMenu(document.querySelector('toolbar-more-menu'));
+
     // Set up user events
     const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
     const click = (key, cb) => listen(key, 'click', cb);
@@ -39,10 +43,11 @@ class Transmission {
     click('toolbar-inspector', this.toggleInspector.bind(this));
     click('toolbar-open', this.openTorrentClicked.bind(this));
     click('toolbar-pause', this.stopSelectedClicked.bind(this));
-    click('toolbar-pause-all', this.stopAllClicked.bind(this));
+    // click('toolbar-pause-all', this.stopAllClicked.bind(this));
     click('toolbar-remove', this.removeClicked.bind(this));
     click('toolbar-start', this.startSelectedClicked.bind(this));
-    click('toolbar-start-all', this.startAllClicked.bind(this));
+    // click('toolbar-more', () => { console.log('more'); this._more_menu.open = true; });
+    // click('toolbar-start-all', this.startAllClicked.bind(this));
     click('turtle-button', this.toggleTurtleClicked.bind(this));
     click('upload-cancel-button', this.hideUploadDialog.bind(this));
     click('upload-confirm-button', this.confirmUploadClicked.bind(this));

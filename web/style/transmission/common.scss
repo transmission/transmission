@@ -68,27 +68,26 @@ html {
 }
 
 body {
-  background: #fff;
-  color: #222; /* !important; */
-  font: 62.5% 'lucida grande', Tahoma, Verdana, Arial, Helvetica, sans-serif; /* Resets 1em to 10px */
-  margin: 0 0 30px;
+  display: flex;
+  flex-direction: column;
+  font: 70% Calibri, Arial, Helvetica, sans-serif;
+  margin: 0;
   overflow: hidden;
-  text-align: center;
-
-  img {
-    border: 0;
-  }
-
-  a {
-    outline: 0;
-  }
 }
 
-/***
-****
-****  ABOUT DIALOG
-****
-***/
+.torrent-container {
+  flex-grow: 1;
+}
+
+img {
+  border: 0;
+}
+
+a {
+  outline: 0;
+}
+
+/// ABOUT DIALOG
 
 #about-dialog {
   > * {
@@ -108,11 +107,7 @@ body {
   }
 }
 
-/***
-****
-****  HOTKEYS DIALOG
-****
-***/
+/// HOTKEYS DIALOG
 
 #hotkeys-dialog {
   table {
@@ -126,35 +121,37 @@ body {
   }
 }
 
-/***
-****
-****  TOOLBAR
-****
-***/
+/// TOOLBAR
 
 $toolbar-height: 36px;
 
+.toolbar-button {
+  cursor: pointer;
+  height: $toolbar-height;
+  padding: 0 6px;
+  user-select: none;
+  width: $toolbar-height;
+}
+
 #toolbar {
+  $toolbar-button-size: 36px;
   $toolbar-gradient-top: #ddd;
   $toolbar-gradient-bottom: #bbb;
   @include vertical-gradient($toolbar-gradient-top, $toolbar-gradient-bottom);
   border-bottom: 1px solid #aaa;
+  display: flex;
+  flex-direction: row;
   height: $toolbar-height;
   margin: 0;
   padding: 2px;
   width: 100%;
 
   > * {
-    background-position: center center;
-    background-repeat: no-repeat;
-    border: 0;
-    cursor: pointer;
-    display: inline-block;
-    float: left;
-    height: 34px;
-    padding: 0 6px;
-    user-select: none;
-    width: 34px;
+    // background-position: center;
+    // background-repeat: no-repeat;
+    // border: 0;
+    // display: inline-block;
+    // float: left;
   }
 
   > .toolbar-separator {
@@ -166,33 +163,54 @@ $toolbar-height: 36px;
   }
 
   > #toolbar-open {
-    background-image: url('images/toolbar-folder.png');
+    background: center no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>");
   }
 
   > #toolbar-remove {
-    background-image: url('images/toolbar-close.png');
+    background: center no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/></svg>");
+    // background: no-repeat center url('images/remove_circle-24px.svg');
+    // background-image: url('images/toolbar-close.png');
   }
 
   > #toolbar-start {
-    background-image: url('images/toolbar-start.png');
+    background: center no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>");
+    // background: no-repeat center url('images/play_circle_filled-24px.svg');
+    //background-image: url('images/toolbar-start.png');
   }
 
   > #toolbar-pause {
-    background-image: url('images/toolbar-pause.png');
+    background: center no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>");
+    // background: no-repeat center url('images/pause_circle_filled-24px.svg');
+    // background-image: url('images/toolbar-pause.png');
   }
 
   > #toolbar-start-all {
-    background-image: url('images/toolbar-start-all.png');
+    // background-image: url('images/toolbar-start-all.png');
+    background: no-repeat center url('images/toolbar-start-all.png');
   }
 
   > #toolbar-pause-all {
-    background-image: url('images/toolbar-pause-all.png');
+    // background-image: url('images/toolbar-pause-all.png');
+    background: no-repeat center url('images/toolbar-pause-all.png');
   }
 
   > #toolbar-inspector {
-    background-image: url('images/toolbar-info.png');
-    float: right;
-    margin-right: 4px;
+    // background: no-repeat center url('images/toolbar-info.png');
+    background: center no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>");
+    // background-image: url('images/toolbar-info.png');
+  }
+
+  > #toolbar-more {
+    background: right no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/></svg>");
+    flex-grow: 1;
+    margin-left: auto;
+    margin-right: 8px;
   }
 
   > *.disabled {

@@ -16,7 +16,14 @@
     <script type="text/javascript" src="./javascript/jquery/jquery-migrate.min.js"></script>
     <script type="text/javascript" src="./javascript/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript" src="./javascript/jquery/jquery.ui-contextmenu.min.js"></script>
+    <script type="text/javascript" src="./javascript/jquery/material.min.js"></script>
     <link rel="stylesheet" href="./style/jqueryui/jquery-ui.min.css" type="text/css" media="all" />
+    <link
+      rel="stylesheet"
+      href="./style/jqueryui/material-components-web.min.css"
+      type="text/css"
+      media="all"
+    />
     <!--
 		<link media="screen" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
 -->
@@ -57,15 +64,14 @@
   </head>
   <body id="transmission-body">
     <div id="toolbar">
-      <div id="toolbar-open" title="Open Torrent"></div>
-      <div id="toolbar-remove" title="Remove Selected Torrents"></div>
+      <div class="toolbar-button" id="toolbar-open" title="Open Torrent"></div>
+      <div class="toolbar-button" id="toolbar-remove" title="Remove Selected Torrents"></div>
       <div class="toolbar-separator"></div>
-      <div id="toolbar-start" title="Start Selected Torrents"></div>
-      <div id="toolbar-pause" title="Pause Selected Torrents"></div>
+      <div class="toolbar-button" id="toolbar-start" title="Start Selected Torrents"></div>
+      <div class="toolbar-button" id="toolbar-pause" title="Pause Selected Torrents"></div>
       <div class="toolbar-separator"></div>
-      <div id="toolbar-start-all" title="Start All Torrents"></div>
-      <div id="toolbar-pause-all" title="Pause All Torrents"></div>
-      <div id="toolbar-inspector" title="Toggle Inspector"></div>
+      <div class="toolbar-button" id="toolbar-inspector" title="Toggle Inspector"></div>
+      <div class="toolbar-button" id="toolbar-more" title="More..."></div>
     </div>
 
     <div id="statusbar">
@@ -751,6 +757,19 @@
             <li>---</li>
             <li id="reverse-sort-order">Reverse Sort Order</li>
           </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="mdc-menu mdc-menu-surface" id="toolbar-more-menu">
+      <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+        <li class="mdc-list-item" role="menuitem">
+          <span class="mdc-list-item__ripple"></span>
+          <span class="mdc-list-item__text">A Menu Item</span>
+        </li>
+        <li class="mdc-list-item" role="menuitem">
+          <span class="mdc-list-item__ripple"></span>
+          <span class="mdc-list-item__text">Another Menu Item</span>
         </li>
       </ul>
     </div>

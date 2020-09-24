@@ -10,27 +10,25 @@ html {
 }
 
 body {
-  background: #fff;
-  color: #222;
-  /* !important; */
-  font: 62.5% 'lucida grande', Tahoma, Verdana, Arial, Helvetica, sans-serif;
-  /* Resets 1em to 10px */
-  margin: 0 0 30px;
+  display: flex;
+  flex-direction: column;
+  font: 70% Calibri, Arial, Helvetica, sans-serif;
+  margin: 0;
   overflow: hidden;
-  text-align: center;
 }
-body img {
+
+.torrent-container {
+  flex-grow: 1;
+}
+
+img {
   border: 0;
 }
-body a {
+
+a {
   outline: 0;
 }
 
-/***
-****
-****  ABOUT DIALOG
-****
-***/
 #about-dialog > * {
   text-align: center;
 }
@@ -45,11 +43,6 @@ body a {
   font-weight: bold;
 }
 
-/***
-****
-****  HOTKEYS DIALOG
-****
-***/
 #hotkeys-dialog table {
   border-collapse: collapse;
   width: 100%;
@@ -59,30 +52,23 @@ body a {
   border: 1px solid #aaa;
 }
 
-/***
-****
-****  TOOLBAR
-****
-***/
+.toolbar-button {
+  cursor: pointer;
+  height: 36px;
+  padding: 0 6px;
+  user-select: none;
+  width: 36px;
+}
+
 #toolbar {
   background: #ccc linear-gradient(#ddd, #bbb);
   border-bottom: 1px solid #aaa;
+  display: flex;
+  flex-direction: row;
   height: 36px;
   margin: 0;
   padding: 2px;
   width: 100%;
-}
-#toolbar > * {
-  background-position: center center;
-  background-repeat: no-repeat;
-  border: 0;
-  cursor: pointer;
-  display: inline-block;
-  float: left;
-  height: 34px;
-  padding: 0 6px;
-  user-select: none;
-  width: 34px;
 }
 #toolbar > .toolbar-separator {
   border-left: 1px solid #aaa;
@@ -92,27 +78,37 @@ body a {
   width: 3px;
 }
 #toolbar > #toolbar-open {
-  background-image: url('images/toolbar-folder.png');
+  background: center no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>");
 }
 #toolbar > #toolbar-remove {
-  background-image: url('images/toolbar-close.png');
+  background: center no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/></svg>");
 }
 #toolbar > #toolbar-start {
-  background-image: url('images/toolbar-start.png');
+  background: center no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>");
 }
 #toolbar > #toolbar-pause {
-  background-image: url('images/toolbar-pause.png');
+  background: center no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>");
 }
 #toolbar > #toolbar-start-all {
-  background-image: url('images/toolbar-start-all.png');
+  background: no-repeat center url('images/toolbar-start-all.png');
 }
 #toolbar > #toolbar-pause-all {
-  background-image: url('images/toolbar-pause-all.png');
+  background: no-repeat center url('images/toolbar-pause-all.png');
 }
 #toolbar > #toolbar-inspector {
-  background-image: url('images/toolbar-info.png');
-  float: right;
-  margin-right: 4px;
+  background: center no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>");
+}
+#toolbar > #toolbar-more {
+  background: right no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/></svg>");
+  flex-grow: 1;
+  margin-left: auto;
+  margin-right: 8px;
 }
 #toolbar > *.disabled {
   opacity: 0.25;
