@@ -12,6 +12,7 @@
   "eslintConfig": {
     "env": {
       "browser": true,
+      "commonjs": true,
       "es6": true,
       "jquery": true
     },
@@ -19,31 +20,9 @@
       "eslint:recommended",
       "plugin:jquery/deprecated"
     ],
-    "globals": {
-      "Dialog": "readonly",
-      "FileRow": "readonly",
-      "Inspector": "readonly",
-      "Notifications": "readonly",
-      "Prefs": "readonly",
-      "PrefsDialog": "readonly",
-      "RPC": "readonly",
-      "Torrent": "readonly",
-      "TorrentRendererCompact": "readonly",
-      "TorrentRendererFull": "readonly",
-      "TorrentRow": "readonly",
-      "Transmission": "readonly",
-      "TransmissionRemote": "readonly",
-      "Utils": "readonly",
-      "isMobileDevice": "readonly",
-      "sanitizeText": "readonly",
-      "setInnerHTML": "readonly",
-      "setTextContent": "readonly",
-      "dialog": "writable",
-      "transmission": "writable"
-    },
     "parser": "@babel/eslint-parser",
     "parserOptions": {
-      "sourceType": "script"
+      "sourceType": "module"
     },
     "plugins": [
       "jquery"
@@ -114,14 +93,7 @@
       "no-unmodified-loop-condition": "error",
       "no-unused-expressions": "error",
       "no-unused-labels": "error",
-      "no-unused-vars": [
-        "error",
-        {
-          "args": "after-used",
-          "vars": "local",
-          "varsIgnorePattern": "FileRow|Inspector|PrefsDialog|Utils|isMobileDevice|sanitizeText|setInnerHTML|setTextContent|dialog|transmission"
-        }
-      ],
+      "no-unused-vars": "error",
       "no-use-before-define": "error",
       "no-useless-backreference": "error",
       "no-useless-call": "error",
@@ -222,29 +194,43 @@
     }
   },
   "scripts": {
-    "css": "sass --no-source-map style/transmission",
-    "css:map": "sass style/transmission",
+    "build": "webpack --config webpack.config.js --display-modules",
+    "css": "sass --no-source-map style/",
+    "css:map": "sass style/",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
     "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
-    "lint:eslint": "eslint javascript/*.js",
-    "lint:eslint:fix": "eslint --fix javascript/*.js",
-    "lint:prettier": "prettier --loglevel warn --check index.html style/transmission/*css javascript/*.js",
-    "lint:prettier:fix": "prettier --loglevel warn -w index.html style/transmission/*css javascript/*.js",
-    "lint:stylelint": "stylelint style/transmission/*css",
-    "lint:stylelint:fix": "stylelint --fix style/transmission/*css"
+    "lint:eslint": "eslint src/*.js src/deprecated/jquery.transmenu.js",
+    "lint:eslint:fix": "eslint --fix src/*.js src/deprecated/jquery.transmenu.js",
+    "lint:prettier": "prettier --loglevel warn --check public_html/index.html style/*scss src/*.js src/deprecated/jquery.transmenu.js",
+    "lint:prettier:fix": "prettier --loglevel warn -w public_html/index.html style/*scss src/*.js src/deprecated/jquery.transmenu.js",
+    "lint:stylelint": "stylelint style/*scss",
+    "lint:stylelint:fix": "stylelint --fix style/*scss"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/eslint-parser": "^7.11.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@material/menu": "^7.0.0",
+    "css-loader": "^4.3.0",
     "eslint": "^7.9.0",
     "eslint-plugin-jquery": "^1.5.1",
+    "file-loader": "^6.1.0",
+    "jquery-ui": "^1.12.1",
+    "mini-css-extract-plugin": "^0.11.2",
+    "node-sass": "^4.14.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "sass": "^1.26.11",
+    "sass-loader": "^10.0.2",
+    "style-loader": "^1.2.1",
     "stylelint": "^13.7.1",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-sass-guidelines": "^7.1.0",
-    "stylelint-config-standard": "^20.0.0"
+    "stylelint-config-standard": "^20.0.0",
+    "terser-webpack-plugin": "^4.2.2",
+    "url-loader": "^4.1.0",
+    "webpack": "^4.44.2",
+    "webpack-bundle-analyzer": "^3.9.0",
+    "webpack-cli": "^3.3.12"
   }
 }

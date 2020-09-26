@@ -279,7 +279,8 @@ static char const* mimetype_guess(char const* path)
         { "html", "text/html" },
         { "ico", "image/vnd.microsoft.icon" },
         { "js", "application/javascript" },
-        { "png", "image/png" }
+        { "png", "image/png" },
+        { "svg", "image/svg+xml" }
     };
     char const* dot = strrchr(path, '.');
 

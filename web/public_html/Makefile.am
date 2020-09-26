@@ -4,5 +4,6 @@ SUBDIRS = \
   images
 
 EXTRA_DIST = \
-  common.scss \
-  mobile.scss
+  index.html \
+  transmission-app.js \
+  transmission-app.js.LICENSE.txt

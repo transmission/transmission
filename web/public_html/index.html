@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+    <!-- ticket #4555 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="./images/favicon.ico" rel="icon" />
+    <link href="./images/favicon.png" rel="shortcut icon" />
+    <link rel="apple-touch-icon" href="./images/webclip-icon.png" />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="./transmission-app.js"></script>
+    <title>Transmission Web Interface</title>
+  </head>
+  <body id="transmission-body">
+    <div id="toolbar">
+      <div class="toolbar-button" id="toolbar-open" title="Open Torrent"></div>
+      <div class="toolbar-button" id="toolbar-remove" title="Remove Selected Torrents"></div>
+      <div class="toolbar-separator"></div>
+      <div class="toolbar-button" id="toolbar-start" title="Start Selected Torrents"></div>
+      <div class="toolbar-button" id="toolbar-pause" title="Pause Selected Torrents"></div>
+      <div class="toolbar-separator"></div>
+      <div class="toolbar-button" id="toolbar-start-all" title="Start All Torrents"></div>
+      <div class="toolbar-button" id="toolbar-pause-all" title="Pause All Torrents"></div>
+      <div class="toolbar-separator"></div>
+      <span class="flex"></span>
+      <div class="toolbar-button" id="toolbar-inspector" title="Toggle Inspector"></div>
+    </div>
+
+    <div id="statusbar">
+      <div id="filter">
+        Show
+        <select id="filter-mode">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="downloading">Downloading</option>
+          <option value="seeding">Seeding</option>
+          <option value="paused">Paused</option>
+          <option value="finished">Finished</option>
+        </select>
+        <select id="filter-tracker"></select>
+        <input type="search" id="torrent-search" placeholder="Filter" />
+        <span id="filter-count">&nbsp;</span>
+      </div>
+
+      <div id="speed-info">
+        <div id="speed-dn-container">
+          <div id="speed-dn-icon"></div>
+          <div id="speed-dn-label"></div>
+        </div>
+        <div id="speed-up-container">
+          <div id="speed-up-icon"></div>
+          <div id="speed-up-label"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="prefs-dialog">
+      <ul>
+        <li id="prefs-tab-general"><a href="#prefs-page-torrents">Torrents</a></li>
+        <li id="prefs-tab-speed"><a href="#prefs-page-speed">Speed</a></li>
+        <li id="prefs-tab-peers"><a href="#prefs-page-peers">Peers</a></li>
+        <li id="prefs-tab-network"><a href="#prefs-page-network">Network</a></li>
+        <li class="ui-tab-dialog-close"></li>
+      </ul>
+      <div>
+        <div id="prefs-page-torrents">
+          <div class="prefs-section">
+            <div class="title">Downloading</div>
+            <div class="row">
+              <div class="key">Download to:</div>
+              <div class="value"><input type="text" id="download-dir" /></div>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="start-added-torrents" /><label for="start-added-torrents"
+                >Start when added</label
+              >
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="rename-partial-files" /><label for="rename-partial-files"
+                >Append &quot;.part&quot; to incomplete files' names</label
+              >
+            </div>
+          </div>
+          <div class="prefs-section">
+            <div class="title">Seeding</div>
+            <div class="row">
+              <div class="key">
+                <input type="checkbox" id="seedRatioLimited" /><label for="seedRatioLimited"
+                  >Stop seeding at ratio:</label
+                >
+              </div>
+              <div class="value"><input type="number" min="0" id="seedRatioLimit" /></div>
+            </div>
+            <div class="row">
+              <div class="key">
+                <input type="checkbox" id="idle-seeding-limit-enabled" /><label
+                  for="idle-seeding-limit-enabled"
+                  >Stop seeding if idle for (min):</label
+                >
+              </div>
+              <div class="value">
+                <input type="number" min="1" max="40320" id="idle-seeding-limit" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="prefs-page-speed">
+          <div class="prefs-section">
+            <div class="title">Speed Limits</div>
+            <div class="row">
+              <div class="key">
+                <input type="checkbox" id="speed-limit-up-enabled" /><label
+                  for="speed-limit-up-enabled"
+                  >Upload (kB/s):</label
+                >
+              </div>
+              <div class="value"><input type="number" min="0" id="speed-limit-up" /></div>
+            </div>
+            <div class="row">
+              <div class="key">
+                <input type="checkbox" id="speed-limit-down-enabled" /><label
+                  for="speed-limit-down-enabled"
+                  >Download (kB/s):</label
+                >
+              </div>
+              <div class="value"><input type="number" min="0" id="speed-limit-down" /></div>
+            </div>
+          </div>
+          <div class="prefs-section">
+            <div class="title">
+              <div id="alternative-speed-limits-title">Alternative Speed Limits</div>
+            </div>
+            <div class="row" id="alternative-speed-limits-desc">
+              Override normal speed limits manually or at scheduled times
+            </div>
+            <div class="row">
+              <div class="key">Upload (kB/s):</div>
+              <div class="value"><input type="number" min="0" id="alt-speed-up" /></div>
+            </div>
+            <div class="row">
+              <div class="key">Download (kB/s):</div>
+              <div class="value"><input type="number" min="0" id="alt-speed-down" /></div>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="alt-speed-time-enabled" /><label
+                for="alt-speed-time-enabled"
+                >Scheduled Times</label
+              >
+            </div>
+            <div class="row">
+              <div class="key">From:</div>
+              <div class="value"><select id="alt-speed-time-begin"></select></div>
+            </div>
+            <div class="row">
+              <div class="key">To:</div>
+              <div class="value"><select id="alt-speed-time-end"></select></div>
+            </div>
+            <div class="row">
+              <div class="key"><label for="alt-speed-time-day">On days:</label></div>
+              <div class="value">
+                <select id="alt-speed-time-day">
+                  <option value="127">Everyday</option>
+                  <option value="62">Weekdays</option>
+                  <option value="65">Weekends</option>
+                  <option value="1">Sunday</option>
+                  <option value="2">Monday</option>
+                  <option value="4">Tuesday</option>
+                  <option value="8">Wednesday</option>
+                  <option value="16">Thursday</option>
+                  <option value="32">Friday</option>
+                  <option value="64">Saturday</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="prefs-page-peers">
+          <div class="prefs-section">
+            <div class="title">Connections</div>
+            <div class="row">
+              <div class="key">
+                <label for="peer-limit-per-torrent">Max peers per torrent:</label>
+              </div>
+              <div class="value"><input type="number" min="0" id="peer-limit-per-torrent" /></div>
+            </div>
+            <div class="row">
+              <div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
+              <div class="value"><input type="number" min="0" id="peer-limit-global" /></div>
+            </div>
+          </div>
+          <div class="prefs-section">
+            <div class="title">Options</div>
+            <div class="row">
+              <div class="key">Encryption mode:</div>
+              <div class="value">
+                <select id="encryption">
+                  <option value="tolerated">Allow encryption</option>
+                  <option value="preferred">Prefer encryption</option>
+                  <option value="required">Require encryption</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-row">
+              <input
+                type="checkbox"
+                id="pex-enabled"
+                title="PEX is a tool for exchanging peer lists with the peers you're connected to."
+              />
+              <label
+                for="pex-enabled"
+                title="PEX is a tool for exchanging peer lists with the peers you're connected to."
+                >Use PEX to find more peers</label
+              >
+            </div>
+            <div class="checkbox-row">
+              <input
+                type="checkbox"
+                id="dht-enabled"
+                title="DHT is a tool for finding peers without a tracker."
+              />
+              <label for="dht-enabled" title="DHT is a tool for finding peers without a tracker."
+                >Use DHT to find more peers</label
+              >
+            </div>
+            <div class="checkbox-row">
+              <input
+                type="checkbox"
+                id="lpd-enabled"
+                title="LPD is a tool for finding peers on your local network."
+              />
+              <label
+                for="lpd-enabled"
+                title="LPD is a tool for finding peers on your local network."
+                >Use LPD to find more peers</label
+              >
+            </div>
+          </div>
+          <div class="prefs-section">
+            <div class="title">Blocklist</div>
+            <div class="row">
+              <div class="key">
+                <input type="checkbox" id="blocklist-enabled" /><label for="blocklist-enabled"
+                  >Enable blocklist:</label
+                >
+              </div>
+              <div class="value"><input type="url" id="blocklist-url" /></div>
+            </div>
+            <div class="row">
+              <div class="key" id="blocklist-info">
+                Blocklist has <span id="blocklist-size">?</span> rules
+              </div>
+              <div class="value">
+                <input type="button" id="blocklist-update-button" value="Update" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="prefs-page-network">
+          <div class="prefs-section">
+            <div class="title">Listening Port</div>
+            <div class="row">
+              <div class="key"><label for="peer-port">Peer listening port:</label></div>
+              <div class="value"><input type="number" min="0" max="65535" id="peer-port" /></div>
+            </div>
+            <div class="row">
+              <div class="key">&nbsp;</div>
+              <div class="value"><span id="port-label">Status: Unknown</span></div>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="peer-port-random-on-start" /><label
+                for="peer-port-random-on-start"
+                >Randomize port on launch</label
+              >
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="port-forwarding-enabled" /><label
+                for="port-forwarding-enabled"
+                >Use port forwarding from my router</label
+              >
+            </div>
+          </div>
+          <div class="prefs-section">
+            <div class="title">Options</div>
+            <div class="checkbox-row">
+              <input
+                type="checkbox"
+                id="utp-enabled"
+                title="uTP is a tool for reducing network congestion."
+              />
+              <label for="utp-enabled" title="uTP is a tool for reducing network congestion."
+                >Enable uTP for peer communication</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="torrent-inspector">
+      <div id="inspector-tabs-wrapper">
+        <div id="inspector-tabs">
+          <div class="inspector-tab selected" id="inspector-tab-info" title="Info">
+            <a href="#info"></a>
+          </div>
+          <div class="inspector-tab" id="inspector-tab-peers" title="Peers">
+            <a href="#peers"></a>
+          </div>
+          <div class="inspector-tab" id="inspector-tab-trackers" title="Trackers">
+            <a href="#trackers"></a>
+          </div>
+          <div class="inspector-tab" id="inspector-tab-files" title="Files">
+            <a href="#files"></a>
+          </div>
+        </div>
+        <!-- inspector-tabs -->
+      </div>
+      <!-- inspector-tabs-wrapper -->
+
+      <div id="inspector-header">
+        <div id="torrent-inspector-name"></div>
+      </div>
+
+      <div class="inspector-page" id="inspector-page-info">
+        <div class="prefs-section">
+          <div class="title">Activity</div>
+          <div class="row">
+            <div class="key">Have:</div>
+            <div class="value" id="inspector-info-have">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Availability:</div>
+            <div class="value" id="inspector-info-availability">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Uploaded:</div>
+            <div class="value" id="inspector-info-uploaded">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Downloaded:</div>
+            <div class="value" id="inspector-info-downloaded">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">State:</div>
+            <div class="value" id="inspector-info-state">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Running Time:</div>
+            <div class="value" id="inspector-info-running-time">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Remaining Time:</div>
+            <div class="value" id="inspector-info-remaining-time">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Last Activity:</div>
+            <div class="value" id="inspector-info-last-activity">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Error:</div>
+            <div class="value" id="inspector-info-error">&nbsp;</div>
+          </div>
+        </div>
+        <div class="prefs-section">
+          <div class="title">Details</div>
+          <div class="row">
+            <div class="key">Size:</div>
+            <div class="value" id="inspector-info-size">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Location:</div>
+            <div class="value" id="inspector-info-location">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Hash:</div>
+            <div class="value" id="inspector-info-hash">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Privacy:</div>
+            <div class="value" id="inspector-info-privacy">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Origin:</div>
+            <div class="value" id="inspector-info-origin">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="key">Comment:</div>
+            <div class="value" id="inspector-info-comment">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+      <!-- id="inspector-tab-info-container" -->
+
+      <div class="inspector-page ui-helper-hidden" id="inspector-page-peers">
+        <div id="inspector-peers-list"></div>
+      </div>
+      <!-- id="inspector-tab-peers-container" -->
+
+      <div class="inspector-page ui-helper-hidden" id="inspector-page-trackers">
+        <div id="inspector-trackers-list"></div>
+      </div>
+      <!-- id="inspector-tab-trackers-container" -->
+
+      <div class="inspector-page ui-helper-hidden" id="inspector-page-files">
+        <ul id="inspector-file-list"></ul>
+      </div>
+      <!-- id="inspector-tab-files-container" -->
+    </div>
+
+    <div id="torrent-container">
+      <ul class="torrent-list" id="torrent-list"></ul>
+    </div>
+
+    <div class="dialog-container ui-helper-hidden" id="dialog-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="dialog-logo"></div>
+        <h2 class="dialog-heading" id="dialog-heading"></h2>
+        <div class="dialog-message" id="dialog-message"></div>
+        <a href="#confirm" id="dialog-confirm-button">Confirm</a>
+        <a href="#cancel" id="dialog-cancel-button">Cancel</a>
+      </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="about-dialog">
+      <p id="about-logo"></p>
+      <p id="about-title">Transmission X</p>
+      <p id="about-blurb">A fast and easy BitTorrent client</p>
+      <p id="about-copyright">Copyright (c) The Transmission Project</p>
+    </div>
+
+    <div class="ui-helper-hidden" id="stats-dialog">
+      <div class="prefs-section">
+        <div class="title">Current Session</div>
+        <div class="row">
+          <div class="key">Uploaded:</div>
+          <div class="value" id="stats-session-uploaded">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Downloaded:</div>
+          <div class="value" id="stats-session-downloaded">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Ratio:</div>
+          <div class="value" id="stats-session-ratio">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Running Time:</div>
+          <div class="value" id="stats-session-duration">&nbsp;</div>
+        </div>
+      </div>
+      <div class="prefs-section">
+        <div class="title">Total</div>
+        <div class="row">
+          <div class="key">Started:</div>
+          <div class="value" id="stats-total-count">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Uploaded:</div>
+          <div class="value" id="stats-total-uploaded">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Downloaded:</div>
+          <div class="value" id="stats-total-downloaded">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Ratio:</div>
+          <div class="value" id="stats-total-ratio">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="key">Running Time:</div>
+          <div class="value" id="stats-total-duration">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="hotkeys-dialog">
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>/</td>
+            <td>Show hotkeys dialog</td>
+          </tr>
+          <tr>
+            <td>,</td>
+            <td>Open preferences</td>
+          </tr>
+          <tr>
+            <td>Enter</td>
+            <td>Confirm dialog</td>
+          </tr>
+          <tr>
+            <td>ESC</td>
+            <td>Close/cancel dialog</td>
+          </tr>
+          <tr>
+            <td>a</td>
+            <td>Select all torrents</td>
+          </tr>
+          <tr>
+            <td>SHIFT + a</td>
+            <td>Deselect all torrents</td>
+          </tr>
+          <tr>
+            <td>c</td>
+            <td>Toggle compact view</td>
+          </tr>
+          <tr>
+            <td>d</td>
+            <td>Delete selected torrents</td>
+          </tr>
+          <tr>
+            <td>Backspace</td>
+            <td>Delete selected torrents</td>
+          </tr>
+          <tr>
+            <td>DEL</td>
+            <td>Delete selected torrents</td>
+          </tr>
+          <tr>
+            <td>i</td>
+            <td>Toggle inspector</td>
+          </tr>
+          <tr>
+            <td>l</td>
+            <td>Move torrent/Set location</td>
+          </tr>
+          <tr>
+            <td>m</td>
+            <td>Move torrent/Set location</td>
+          </tr>
+          <tr>
+            <td>o</td>
+            <td>Add/open a torrent</td>
+          </tr>
+          <tr>
+            <td>u</td>
+            <td>Add/open a torrent</td>
+          </tr>
+          <tr>
+            <td>p</td>
+            <td>Pause selected torrents</td>
+          </tr>
+          <tr>
+            <td>r</td>
+            <td>Resume selected torrents</td>
+          </tr>
+          <tr>
+            <td>t</td>
+            <td>Toggle turtle mode</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dialog-container ui-helper-hidden" id="upload-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="upload-dialog-logo"></div>
+        <h2 class="dialog-heading">Upload Torrent Files</h2>
+        <form
+          action="#"
+          method="post"
+          id="torrent-upload-form"
+          enctype="multipart/form-data"
+          target="torrent-upload-frame"
+          autocomplete="off"
+        >
+          <div class="dialog-message">
+            <label for="torrent-upload-file">Please select a torrent file to upload:</label>
+            <input
+              type="file"
+              name="torrent-files[]"
+              id="torrent-upload-file"
+              multiple="multiple"
+            />
+            <label for="torrent-upload-url">Or enter a URL:</label>
+            <input type="url" id="torrent-upload-url" />
+            <label id="add-dialog-folder-label" for="add-dialog-folder-input"
+              >Destination folder:</label
+            >
+            <input type="text" id="add-dialog-folder-input" />
+            <input type="checkbox" id="torrent-auto-start" />
+            <label for="torrent-auto-start" id="auto-start-label">Start when added</label>
+          </div>
+          <a href="#upload" id="upload-confirm-button">Upload</a>
+          <a href="#cancel" id="upload-cancel-button">Cancel</a>
+        </form>
+      </div>
+    </div>
+
+    <div class="dialog-container ui-helper-hidden" id="rename-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo"></div>
+        <h2 class="dialog-heading">Rename torrent</h2>
+        <div class="dialog-message">
+          <label for="torrent-rename-name">Enter new name:</label>
+          <input type="text" id="torrent-rename-name" />
+        </div>
+        <a href="#rename" id="rename-confirm-button">Rename</a>
+        <a href="#cancel" id="rename-cancel-button">Cancel</a>
+      </div>
+    </div>
+
+    <div class="dialog-container ui-helper-hidden" id="move-container">
+      <div class="dialog-top-bar"></div>
+      <div class="dialog-window">
+        <div class="dialog-logo" id="move-dialog-logo"></div>
+        <h2 class="dialog-heading">Set Location</h2>
+        <form
+          action="#"
+          method="post"
+          id="torrent-move-form"
+          enctype="multipart/form-data"
+          target="torrent-move-frame"
+        >
+          <div class="dialog-message">
+            <label for="torrent-path">Location:</label>
+            <input type="text" id="torrent-path" />
+          </div>
+          <a href="#move" id="move-confirm-button">Apply</a>
+          <a href="#cancel" id="move-cancel-button">Cancel</a>
+        </form>
+      </div>
+    </div>
+
+    <div class="torrent-footer">
+      <div id="settings-menu" title="Settings Menu">&nbsp;</div>
+      <div id="prefs-button" title="Edit Preferences…">&nbsp;</div>
+      <div id="turtle-button" title="Alternative Speed Limits">&nbsp;</div>
+      <div id="compact-button" title="Compact View">&nbsp;</div>
+
+      <ul class="ui-helper-hidden" id="footer-super-menu">
+        <li id="about-button"><div>About</div></li>
+        <li>---</li>
+        <li id="homepage"><div>Transmission Homepage</div></li>
+        <li id="tipjar"><div>Transmission Tip Jar</div></li>
+        <li>---</li>
+        <li id="statistics"><div>Statistics</div></li>
+        <li id="hotkeys"><div>Hotkeys</div></li>
+        <!--
+				<li id="toggle-notifications">Notifcations</li>
+				-->
+        <li>---</li>
+        <li>
+          <div>Total Download Rate</div>
+          <ul id="footer-download-rate-menu">
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">5 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">10 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">20 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">30 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">40 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">50 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">75 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">100 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">150 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">200 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">250 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">500 kB/s</span>
+              </div>
+            </li>
+            <li class="download-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">750 kB/s</span>
+              </div>
+            </li>
+            <li>---</li>
+            <li radio-group="download-rate" id="limited-download-rate">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span
+                ><span class="label">Limit (10 kB/s)</span>
+              </div>
+            </li>
+            <li radio-group="download-rate" id="unlimited-download-rate">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Unlimited</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <div>Total Upload Rate</div>
+          <ul id="footer-upload-rate-menu">
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">5 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">10 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">20 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">30 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">40 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">50 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">75 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">100 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">150 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">200 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">250 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">500 kB/s</span>
+              </div>
+            </li>
+            <li class="upload-speed">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">750 kB/s</span>
+              </div>
+            </li>
+            <li>---</li>
+            <li radio-group="upload-rate" id="limited-upload-rate">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span
+                ><span class="label">Limit (10 kB/s)</span>
+              </div>
+            </li>
+            <li radio-group="upload-rate" id="unlimited-upload-rate">
+              <div>
+                <span class="ui-icon ui-icon-bullet"></span><span class="label">Unlimited</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li>---</li>
+        <li>
+          <div>Sort Transfers By</div>
+          <ul id="footer-sort-menu">
+            <!-- these ids must match the strings in src/Prefs.js -->
+            <li radio-group="sort-mode" radio-id="activity">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Activity</span>
+              </div>
+            </li>
+            <li radio-group="sort-mode" radio-id="age">
+              <div><span class="ui-icon ui-icon-blank"></span><span class="label">Age</span></div>
+            </li>
+            <li radio-group="sort-mode" radio-id="name">
+              <div><span class="ui-icon ui-icon-blank"></span><span class="label">Name</span></div>
+            </li>
+            <li radio-group="sort-mode" radio-id="progress">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Progress</span>
+              </div>
+            </li>
+            <li radio-group="sort-mode" radio-id="ratio">
+              <div><span class="ui-icon ui-icon-blank"></span><span class="label">Ratio</span></div>
+            </li>
+            <li radio-group="sort-mode" radio-id="size">
+              <div><span class="ui-icon ui-icon-blank"></span><span class="label">Size</span></div>
+            </li>
+            <li radio-group="sort-mode" radio-id="state">
+              <div><span class="ui-icon ui-icon-blank"></span><span class="label">State</span></div>
+            </li>
+            <li radio-group="sort-mode" radio-id="queue">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Queue order</span>
+              </div>
+            </li>
+            <li>--</li>
+            <!-- these ids must match the strings in src/Prefs.js -->
+            <li radio-group="sort-direction" radio-id="ascending">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Ascending</span>
+              </div>
+            </li>
+            <li radio-group="sort-direction" radio-id="descending">
+              <div>
+                <span class="ui-icon ui-icon-blank"></span><span class="label">Descending</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <ul class="ui-helper-hidden" id="torrent-context-menu">
+      <li data-command="pause-selected"><div>Pause</div></li>
+      <li data-command="resume-selected"><div>Resume</div></li>
+      <li data-command="resume-now-selected"><div>Resume Now</div></li>
+      <li>---</li>
+      <li data-command="move-top"><div>Move to Top</div></li>
+      <li data-command="move-up"><div>Move Up</div></li>
+      <li data-command="move-down"><div>Move Down</div></li>
+      <li data-command="move-bottom"><div>Move to Bottom</div></li>
+      <li>---</li>
+      <li data-command="remove"><div>Remove From List…</div></li>
+      <li data-command="remove-data"><div>Trash Data and Remove From List…</div></li>
+      <li>---</li>
+      <li data-command="verify"><div>Verify Local Data</div></li>
+      <li data-command="move"><div>Set Location…</div></li>
+      <li data-command="rename"><div>Rename…</div></li>
+      <li>---</li>
+      <li data-command="reannounce"><div>Ask tracker for more peers</div></li>
+      <li>---</li>
+      <li data-command="select-all"><div>Select All</div></li>
+      <li data-command="deselect-all"><div>Deselect All</div></li>
+    </ul>
+
+    <iframe name="torrent-upload-frame" id="torrent-upload-frame" src="about:blank"></iframe>
+  </body>
+</html>

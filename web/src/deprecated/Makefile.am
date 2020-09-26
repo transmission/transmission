@@ -1,8 +1,5 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-SUBDIRS = \
-  images
-
 EXTRA_DIST = \
-  common.scss \
-  mobile.scss
+  jquery.transmenu.js \
+  jquery.ui-contextmenu.js

@@ -1,11 +1,11 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-dist_data_DATA = \
-  index.html \
-  LICENSE
-
 SUBDIRS = \
-  images \
-  style \
-  javascript
+  src \
+  style
 
+EXTRA_DIST = \
+  package.json \
+  public_html \
+  webpack.config.js \
+  yarn.lock
