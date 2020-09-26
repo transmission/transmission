@@ -8,7 +8,7 @@
 import { Formatter } from './formatter.js';
 import { Utils } from './utils.js';
 
-export class FileRow {
+export class FileRow extends EventTarget {
   isDone() {
     return this.fields.have >= this.fields.size;
   }
@@ -87,16 +87,22 @@ export class FileRow {
     }
   }
 
-  fireWantedChanged(do_want) {
-    $(this).trigger('wantedToggled', [this.fields.indices, do_want]);
+  fireWantedChanged(wanted) {
+    const e = new Event('wantedToggled');
+    e.indices = [...this.fields.indices];
+    e.wanted = wanted;
+    this.dispatchEvent(e);
   }
 
   firePriorityChanged(priority) {
-    $(this).trigger('priorityToggled', [this.fields.indices, priority]);
+    const e = new Event('priorityToggled');
+    e.indices = [...this.fields.indices];
+    e.priority = priority;
+    this.dispatchEvent(e);
   }
 
   fireNameClicked() {
-    $(this).trigger('nameClicked', [this, this.fields.indices]);
+    this.dispatchEvent(new Event('nameClicked'));
   }
 
   createRow(torrent, depth, name, even) {
@@ -163,6 +169,8 @@ export class FileRow {
   }
 
   constructor(torrent, depth, name, indices, even) {
+    super();
+
     this.fields = {
       have: 0,
       indices,

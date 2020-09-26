@@ -552,11 +552,14 @@ export class Inspector {
     controller.changeFileCommand(torrentId, fileIndices, command);
   }
 
-  onFileWantedToggled(ev, fileIndices, want) {
-    this.changeFileCommand(fileIndices, want ? 'files-wanted' : 'files-unwanted');
+  onFileWantedToggled(ev) {
+    const { indices, wanted } = ev;
+    this.changeFileCommand(indices, wanted ? 'files-wanted' : 'files-unwanted');
   }
 
-  onFilePriorityToggled(ev, fileIndices, priority) {
+  onFilePriorityToggled(ev) {
+    const { indices, priority } = ev;
+
     let command = null;
     switch (priority) {
       case -1:
@@ -569,11 +572,12 @@ export class Inspector {
         command = 'priority-normal';
         break;
     }
-    this.changeFileCommand(fileIndices, command);
+
+    this.changeFileCommand(indices, command);
   }
 
-  static onNameClicked(ev, fileRow) {
-    $(fileRow.getElement()).siblings().slideToggle();
+  static onNameClicked(ev) {
+    $(ev.target.getElement()).siblings().slideToggle();
   }
 
   clearFileList() {
@@ -632,12 +636,11 @@ export class Inspector {
 
   addNodeToView(tor, parent, sub, i) {
     const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
+    row.addEventListener('wantedToggled', this.onFileWantedToggled.bind(this));
+    row.addEventListener('priorityToggled', this.onFilePriorityToggled.bind(this));
+    row.addEventListener('nameClicked', Inspector.onNameClicked);
     this.data.file_rows.push(row);
     parent.appendChild(row.getElement());
-    const e = $(row);
-    e.bind('wantedToggled', this.onFileWantedToggled.bind(this));
-    e.bind('priorityToggled', this.onFilePriorityToggled.bind(this));
-    e.bind('nameClicked', Inspector.onNameClicked);
   }
 
   addSubtreeToView(tor, parent, sub, i) {

@@ -886,6 +886,8 @@ export class Transmission {
           needinfo.push(id);
         }
 
+        /*
+FIXME: fix this when notifications get fixed
         t.notifyOnFieldChange('status', (newValue, oldValue) => {
           if (
             oldValue === Torrent._StatusDownload &&
@@ -902,6 +904,7 @@ export class Transmission {
             $(this).trigger('statusChange', [t]);
           }
         });
+*/
       }
     }
 

@@ -44,7 +44,6 @@
       "init-declarations": "error",
       "jquery/no-ajax": "off",
       "jquery/no-slide": "off",
-      "jquery/no-trigger": "off",
       "no-array-constructor" :"error",
       "no-caller": "error",
       "no-confusing-arrow": "error",
