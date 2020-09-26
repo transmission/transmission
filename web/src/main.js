@@ -28,8 +28,7 @@ import { Dialog } from './dialog.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
-import { Utils } from './utils.js';
-import { isMobileDevice } from './common.js';
+import { isMobileDevice, Utils } from './utils.js';
 
 import '../style/common.scss';
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs

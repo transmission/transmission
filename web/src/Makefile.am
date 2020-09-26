@@ -4,7 +4,6 @@ SUBDIRS = \
   deprecated
 
 EXTRA_DIST = \
-  common.js \
   dialog.js \
   file-row.js \
   formatter.js \

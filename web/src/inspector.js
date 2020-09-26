@@ -5,11 +5,10 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { isMobileDevice } from './common.js';
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { Utils } from './utils.js';
+import { isMobileDevice, Utils } from './utils.js';
 
 export class Inspector {
   constructor(controller) {
@@ -152,7 +151,7 @@ export class Inspector {
       const d =
         torrents.reduce((acc, t) => acc + t.getDownloadedEver(), 0) ||
         torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
-      str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Math.ratio(u, d))})`;
+      str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
     }
     Utils.setTextContent(e.uploaded_lb, str);
 

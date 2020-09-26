@@ -39,16 +39,16 @@ export class Formatter {
     if (bytes < mem_K) {
       return toStr(bytes, mem_B_str);
     }
-    if (bytes < Math.pow(mem_K, 2)) {
+    if (bytes < mem_K ** 2) {
       return toStr(bytes / mem_K, mem_K_str);
     }
-    if (bytes < Math.pow(mem_K, 3)) {
-      return toStr(bytes / Math.pow(mem_K, 2), mem_M_str);
+    if (bytes < mem_K ** 3) {
+      return toStr(bytes / mem_K ** 2, mem_M_str);
     }
-    if (bytes < Math.pow(mem_K, 4)) {
-      return toStr(bytes / Math.pow(mem_K, 3), mem_G_str);
+    if (bytes < mem_K ** 4) {
+      return toStr(bytes / mem_K ** 3, mem_G_str);
     }
-    return toStr(bytes / Math.pow(mem_K, 4), mem_T_str);
+    return toStr(bytes / mem_K ** 4, mem_T_str);
   }
 
   static ngettext(msgid, msgid_plural, n) {
@@ -92,16 +92,16 @@ export class Formatter {
     if (bytes < size_K) {
       return toStr(bytes, size_B_str);
     }
-    if (bytes < Math.pow(size_K, 2)) {
+    if (bytes < size_K ** 2) {
       return toStr(bytes / size_K, size_K_str);
     }
-    if (bytes < Math.pow(size_K, 3)) {
-      return toStr(bytes / Math.pow(size_K, 2), size_M_str);
+    if (bytes < size_K ** 3) {
+      return toStr(bytes / size_K ** 2, size_M_str);
     }
-    if (bytes < Math.pow(size_K, 4)) {
-      return toStr(bytes / Math.pow(size_K, 3), size_G_str);
+    if (bytes < size_K ** 4) {
+      return toStr(bytes / size_K ** 3, size_G_str);
     }
-    return toStr(bytes / Math.pow(size_K, 4), size_T_str);
+    return toStr(bytes / size_K ** 4, size_T_str);
   }
 
   static speed(KBps) {
@@ -220,11 +220,13 @@ export class Formatter {
     return Math.floor(Bps / speed_K);
   }
 
-  static toStringWithCommas = (number) => number.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+  static toStringWithCommas(number) {
+    return number.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+  }
 
   /** Round a string of a number to a specified number of decimal places */
   static _toTruncFixed(number, places) {
-    const ret = Math.floor(this * Math.pow(10, places)) / Math.pow(10, places);
+    const ret = Math.floor(number * 10 ** places) / 10 ** places;
     return ret.toFixed(places);
   }
 }

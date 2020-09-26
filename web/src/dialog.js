@@ -5,8 +5,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { isMobileDevice } from './common.js';
-import { Utils } from './utils.js';
+import { isMobileDevice, Utils } from './utils.js';
 
 export class Dialog {
   constructor() {

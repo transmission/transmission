@@ -5,10 +5,9 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { isMobileDevice } from './common.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { Utils } from './utils.js';
+import { isMobileDevice, Utils } from './utils.js';
 
 class TorrentRendererHelper {
   static getProgressInfo(controller, t) {

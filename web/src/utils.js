@@ -5,6 +5,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+export const isMobileDevice = /(iPhone|iPod|Android)/.test(navigator.userAgent);
+
 export class Utils {
   static isIterable(o) {
     return o && typeof o[Symbol.iterator] === 'function';
@@ -82,20 +84,18 @@ export class Utils {
       timeout = setTimeout(() => callback.apply(context, args), wait);
     };
   }
-}
 
-/*
- *   Given a numerator and denominator, return a ratio string
- */
-Math.ratio = function (numerator, denominator) {
-  let result = Math.floor((100 * numerator) / denominator) / 100;
+  /** Given a numerator and denominator, return a ratio string */
+  static ratio(numerator, denominator) {
+    let result = Math.floor((100 * numerator) / denominator) / 100;
 
-  // check for special cases
-  if (result === Number.POSITIVE_INFINITY || result === Number.NEGATIVE_INFINITY) {
-    result = -2;
-  } else if (isNaN(result)) {
-    result = -1;
+    // check for special cases
+    if (result === Number.POSITIVE_INFINITY || result === Number.NEGATIVE_INFINITY) {
+      result = -2;
+    } else if (isNaN(result)) {
+      result = -1;
+    }
+
+    return result;
   }
-
-  return result;
-};
+}

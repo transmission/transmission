@@ -5,16 +5,15 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { isMobileDevice } from './common.js';
 import { Dialog } from './dialog.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { Prefs } from './prefs.js';
 import { PrefsDialog } from './prefs-dialog.js';
 import { Remote, RPC } from './remote.js';
-import { Utils } from './utils.js';
 import { Torrent } from './torrent.js';
 import { TorrentRow, TorrentRendererCompact, TorrentRendererFull } from './torrent-row.js';
+import { isMobileDevice, Utils } from './utils.js';
 
 export class Transmission {
   constructor(dialog, notifications, prefs) {
@@ -1720,14 +1719,14 @@ export class Transmission {
     const setText = (id, str) => (document.getElementById(id).textContent = str);
 
     let s = stats['current-stats'];
-    let ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
+    let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setText('stats-session-uploaded', fmt.size(s.uploadedBytes));
     setText('stats-session-downloaded', fmt.size(s.downloadedBytes));
     setText('stats-session-ratio', fmt.ratioString(ratio));
     setText('stats-session-duration', fmt.timeInterval(s.secondsActive));
 
     s = stats['cumulative-stats'];
-    ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
+    ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setText('stats-total-count', `${s.sessionCount} times`);
     setText('stats-total-uploaded', fmt.size(s.uploadedBytes));
     setText('stats-total-downloaded', fmt.size(s.downloadedBytes));
