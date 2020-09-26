@@ -5,13 +5,11 @@
  *
  * @see https://github.com/mar10/jquery-ui-contextmenu
  *
- * Copyright (c) 2013-2015, Martin Wendt (http://wwWendt.de). Licensed MIT.
+ * Copyright (c) 2013-2018, Martin Wendt (http://wwWendt.de). Licensed MIT.
  */
 
-import 'jquery-ui/ui/widgets/menu';
-
 (function( factory ) {
-	"use strict";
+	
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
 		define([ "jquery", "jquery-ui/ui/widgets/menu" ], factory );
@@ -19,23 +17,26 @@ import 'jquery-ui/ui/widgets/menu';
 		// Browser globals
 		factory( jQuery );
 	}
-}(function( $ ) {
+}(( $ ) => {
 
-"use strict";
 
-var supportSelectstart = "onselectstart" in document.createElement("div"),
+
+const supportSelectstart = "onselectstart" in document.createElement("div"),
 	match = $.ui.menu.version.match(/^(\d)\.(\d+)/),
 	uiVersion = {
 		major: parseInt(match[1], 10),
 		minor: parseInt(match[2], 10)
 	},
-	isLTE110 = ( uiVersion.major < 2 && uiVersion.minor < 11 );
+	isLTE110 = ( uiVersion.major < 2 && uiVersion.minor <= 10 ),
+	isLTE111 = ( uiVersion.major < 2 && uiVersion.minor <= 11 );
 
 $.widget("moogle.contextmenu", {
 	version: "@VERSION",
 	options: {
 		addClass: "ui-contextmenu",  // Add this class to the outer <ul>
-		autoFocus: false,      // Set keyboard focus to first entry on open
+		closeOnWindowBlur: true,     // Close menu when window loses focus
+		appendTo: "body",     // Set keyboard focus to first entry on open
+		autoFocus: false,     // Set keyboard focus to first entry on open
 		autoTrigger: true,    // open menu on browser's `contextmenu` event
 		delegate: null,       // selector
 		hide: { effect: "fadeOut", duration: "fast" },
@@ -59,29 +60,33 @@ $.widget("moogle.contextmenu", {
 		select: $.noop        // menu option was selected; return `false` to prevent closing
 	},
 	/** Constructor */
-	_create: function() {
-		var cssText, eventNames, targetId,
+	_create() {
+		let cssText, eventNames, targetId,
 			opts = this.options;
 
 		this.$headStyle = null;
 		this.$menu = null;
 		this.menuIsTemp = false;
 		this.currentTarget = null;
+		this.extraData = {};
 		this.previousFocus = null;
 
+		if (opts.delegate == null) {
+			$.error("ui-contextmenu: Missing required option `delegate`.");
+		}
 		if (opts.preventSelect) {
 			// Create a global style for all potential menu targets
 			// If the contextmenu was bound to `document`, we apply the
 			// selector relative to the <body> tag instead
 			targetId = ($(this.element).is(document) ? $("body")
 				: this.element).uniqueId().attr("id");
-			cssText = "#" + targetId + " " + opts.delegate + " { " +
-					"-webkit-user-select: none; " +
-					"-khtml-user-select: none; " +
-					"-moz-user-select: none; " +
-					"-ms-user-select: none; " +
-					"user-select: none; " +
-					"}";
+			cssText = `#${  targetId  } ${  opts.delegate  } { ` +
+					`-webkit-user-select: none; ` +
+					`-khtml-user-select: none; ` +
+					`-moz-user-select: none; ` +
+					`-ms-user-select: none; ` +
+					`user-select: none; ` +
+					`}`;
 			this.$headStyle = $("<style class='moogle-contextmenu-style' />")
 				.prop("type", "text/css")
 				.appendTo("head");
@@ -94,23 +99,23 @@ $.widget("moogle.contextmenu", {
 			}
 			// TODO: the selectstart is not supported by FF?
 			if (supportSelectstart) {
-				this.element.delegate(opts.delegate, "selectstart" + this.eventNamespace,
-									  function(event) {
+				this.element.on(`selectstart${  this.eventNamespace}`, opts.delegate,
+									  (event) => {
 					event.preventDefault();
 				});
 			}
 		}
 		this._createUiMenu(opts.menu);
 
-		eventNames = "contextmenu" + this.eventNamespace;
+		eventNames = `contextmenu${  this.eventNamespace}`;
 		if (opts.taphold) {
-			eventNames += " taphold" + this.eventNamespace;
+			eventNames += ` taphold${  this.eventNamespace}`;
 		}
-		this.element.delegate(opts.delegate, eventNames, $.proxy(this._openMenu, this));
+		this.element.on(eventNames, opts.delegate, $.proxy(this._openMenu, this));
 	},
 	/** Destructor, called on $().contextmenu("destroy"). */
-	_destroy: function() {
-		this.element.undelegate(this.eventNamespace);
+	_destroy() {
+		this.element.off(this.eventNamespace);
 
 		this._createUiMenu(null);
 
@@ -120,24 +125,26 @@ $.widget("moogle.contextmenu", {
 		}
 	},
 	/** (Re)Create jQuery UI Menu. */
-	_createUiMenu: function(menuDef) {
-		var ct,
+	_createUiMenu(menuDef) {
+		let ct, ed,
 			opts = this.options;
 
 		// Remove temporary <ul> if any
 		if (this.isOpen()) {
 			// #58: 'replaceMenu' in beforeOpen causing select: to lose ui.target
 			ct = this.currentTarget;
+			ed = this.extraData;
 			// close without animation, to force async mode
 			this._closeMenu(true);
 			this.currentTarget = ct;
+			this.extraData = ed;
 		}
 		if (this.menuIsTemp) {
 			this.$menu.remove(); // this will also destroy ui.menu
 		} else if (this.$menu) {
 			this.$menu
 				.menu("destroy")
-				.removeClass(this.options.addClass)
+				.removeClass(opts.addClass)
 				.hide();
 		}
 		this.$menu = null;
@@ -147,7 +154,7 @@ $.widget("moogle.contextmenu", {
 		if ( !menuDef ) {
 			return;
 		} else if ($.isArray(menuDef)) {
-			this.$menu = $.moogle.contextmenu.createMenuMarkup(menuDef);
+			this.$menu = $.moogle.contextmenu.createMenuMarkup(menuDef, null, opts);
 			this.menuIsTemp = true;
 		}else if ( typeof menuDef === "string" ) {
 			this.$menu = $(menuDef);
@@ -160,17 +167,19 @@ $.widget("moogle.contextmenu", {
 			.addClass(opts.addClass)
 			// Create a menu instance that delegates events to our widget
 			.menu($.extend(true, {}, opts.uiMenuOptions, {
+				items: "> :not(.ui-widget-header)",
 				blur: $.proxy(opts.blur, this),
 				create: $.proxy(opts.createMenu, this),
 				focus: $.proxy(opts.focus, this),
 				select: $.proxy(function(event, ui) {
 					// User selected a menu entry
-					var retval,
+					let retval,
 						isParent = $.moogle.contextmenu.isMenu(ui.item),
 						actionHandler = ui.item.data("actionHandler");
 
 					ui.cmd = ui.item.attr("data-command");
 					ui.target = $(this.currentTarget);
+					ui.extraData = this.extraData;
 					// ignore clicks, if they only open a sub-menu
 					if ( !isParent || !opts.ignoreParentSelect) {
 						retval = this._trigger.call(this, "select", event, ui);
@@ -186,25 +195,25 @@ $.widget("moogle.contextmenu", {
 			}));
 	},
 	/** Open popup (called on 'contextmenu' event). */
-	_openMenu: function(event, recursive) {
-		var res, promise,
+	_openMenu(event, recursive) {
+		let res, promise, ui,
 			opts = this.options,
 			posOption = opts.position,
 			self = this,
-			manualTrigger = !!event.isTrigger,
-			ui = { menu: this.$menu, target: $(event.target),
-				   extraData: event.extraData, originalEvent: event,
-				   result: null };
+			manualTrigger = !!event.isTrigger;
 
 		if ( !opts.autoTrigger && !manualTrigger ) {
 			// ignore browser's `contextmenu` events
 			return;
 		}
-
 		// Prevent browser from opening the system context menu
 		event.preventDefault();
 
 		this.currentTarget = event.target;
+		this.extraData = event._extraData || {};
+
+		ui = { menu: this.$menu, target: $(this.currentTarget), extraData: this.extraData,
+			   originalEvent: event, result: null };
 
 		if ( !recursive ) {
 			res = this._trigger("beforeOpen", event, ui);
@@ -216,7 +225,7 @@ $.widget("moogle.contextmenu", {
 			} else if ( promise ) {
 				// Handler returned a Deferred or Promise. Delay menu open until
 				// the promise is resolved
-				promise.done(function() {
+				promise.done(() => {
 					self._openMenu(event, true);
 				});
 				this.currentTarget = null;
@@ -226,14 +235,19 @@ $.widget("moogle.contextmenu", {
 		}
 
 		// Register global event handlers that close the dropdown-menu
-		$(document).bind("keydown" + this.eventNamespace, function(event) {
+		$(document).on(`keydown${  this.eventNamespace}`, (event) => {
 			if ( event.which === $.ui.keyCode.ESCAPE ) {
 				self._closeMenu();
 			}
-		}).bind("mousedown" + this.eventNamespace + " touchstart" + this.eventNamespace,
-				function(event) {
+		}).on(`mousedown${  this.eventNamespace  } touchstart${  this.eventNamespace}`,
+				(event) => {
 			// Close menu when clicked outside menu
 			if ( !$(event.target).closest(".ui-menu-item").length ) {
+				self._closeMenu();
+			}
+		});
+		$(window).on(`blur${  this.eventNamespace}`, (event) => {
+			if ( opts.closeOnWindowBlur ) {
 				self._closeMenu();
 			}
 		});
@@ -250,6 +264,9 @@ $.widget("moogle.contextmenu", {
 			collision: "fit"
 		}, posOption);
 
+		// Update entry statuses from callbacks
+		this._updateEntries(this.$menu);
+
 		// Finally display the popup
 		this.$menu
 			.show() // required to fix positioning error
@@ -261,49 +278,58 @@ $.widget("moogle.contextmenu", {
 			.hide(); // hide again, so we can apply nice effects
 
 		if ( opts.preventContextMenuForPopup ) {
-			this.$menu.bind("contextmenu" + this.eventNamespace, function(event) {
+			this.$menu.on(`contextmenu${  this.eventNamespace}`, (event) => {
 				event.preventDefault();
 			});
 		}
-		this._show(this.$menu, opts.show, function() {
+		this._show(this.$menu, opts.show, () => {
+			let $first;
+
 			// Set focus to first active menu entry
 			if ( opts.autoFocus ) {
-				// var $first = self.$menu.children(".ui-menu-item:enabled:first");
-				// self.$menu.menu("focus", event, $first).focus();
-				self.$menu.focus();
 				self.previousFocus = $(event.target);
+				// self.$menu.focus();
+				$first = self.$menu
+					.children("li.ui-menu-item")
+					.not(".ui-state-disabled")
+					.first();
+				self.$menu.menu("focus", null, $first).focus();
 			}
 			self._trigger.call(self, "open", event, ui);
 		});
 	},
 	/** Close popup. */
-	_closeMenu: function(immediately) {
-		var self = this,
-			hideOpts = immediately ? false : this.options.hide;
+	_closeMenu(immediately) {
+		const self = this,
+			hideOpts = immediately ? false : this.options.hide,
+			ui = { menu: this.$menu, target: $(this.currentTarget), extraData: this.extraData };
 
 		// Note: we don't want to unbind the 'contextmenu' event
 		$(document)
-			.unbind("mousedown" + this.eventNamespace)
-			.unbind("touchstart" + this.eventNamespace)
-			.unbind("keydown" + this.eventNamespace);
+			.off(`mousedown${  this.eventNamespace}`)
+			.off(`touchstart${  this.eventNamespace}`)
+			.off(`keydown${  this.eventNamespace}`);
+		$(window)
+			.off(`blur${  this.eventNamespace}`);
 
 		self.currentTarget = null; // issue #44 after hide animation is too late
+		self.extraData = {};
 		if ( this.$menu ) { // #88: widget might have been destroyed already
 			this.$menu
-				.unbind("contextmenu" + this.eventNamespace);
-			this._hide(this.$menu, hideOpts, function() {
+				.off(`contextmenu${  this.eventNamespace}`);
+			this._hide(this.$menu, hideOpts, () => {
 				if ( self.previousFocus ) {
 					self.previousFocus.focus();
 					self.previousFocus = null;
 				}
-				self._trigger("close");
+				self._trigger("close", null, ui);
 			});
 		} else {
-			self._trigger("close");
+			self._trigger("close", null, ui);
 		}
 	},
 	/** Handle $().contextmenu("option", key, value) calls. */
-	_setOption: function(key, value) {
+	_setOption(key, value) {
 		switch (key) {
 		case "menu":
 			this.replaceMenu(value);
@@ -312,62 +338,186 @@ $.widget("moogle.contextmenu", {
 		$.Widget.prototype._setOption.apply(this, arguments);
 	},
 	/** Return ui-menu entry (<LI> tag). */
-	_getMenuEntry: function(cmd) {
-		return this.$menu.find("li[data-command=" + cmd + "]");
+	_getMenuEntry(cmd) {
+		return this.$menu.find(`li[data-command=${  cmd  }]`);
 	},
 	/** Close context menu. */
-	close: function() {
+	close() {
 		if (this.isOpen()) {
 			this._closeMenu();
 		}
 	},
+	/* Apply status callbacks when menu is opened. */
+	_updateEntries() {
+		const self = this,
+			ui = {
+				menu: this.$menu, target: $(this.currentTarget), extraData: this.extraData };
+
+		$.each(this.$menu.find(".ui-menu-item"), (i, o) => {
+			let $entry = $(o),
+				fn = $entry.data("disabledHandler"),
+				res = fn ? fn({ type: "disabled" }, ui) : null;
+
+			ui.item = $entry;
+			ui.cmd = $entry.attr("data-command");
+			// Evaluate `disabled()` callback
+			if ( res != null ) {
+				self.enableEntry(ui.cmd, !res);
+				self.showEntry(ui.cmd, res !== "hide");
+			}
+			// Evaluate `title()` callback
+			fn = $entry.data("titleHandler"),
+			res = fn ? fn({ type: "title" }, ui) : null;
+			if ( res != null ) {
+				self.setTitle(ui.cmd, `${  res}`);
+			}
+			// Evaluate `tooltip()` callback
+			fn = $entry.data("tooltipHandler"),
+			res = fn ? fn({ type: "tooltip" }, ui) : null;
+			if ( res != null ) {
+				$entry.attr("title", `${  res}`);
+			}
+		});
+	},
 	/** Enable or disable the menu command. */
-	enableEntry: function(cmd, flag) {
+	enableEntry(cmd, flag) {
 		this._getMenuEntry(cmd).toggleClass("ui-state-disabled", (flag === false));
 	},
+	/** Return ui-menu entry (LI tag) as jQuery object. */
+	getEntry(cmd) {
+		return this._getMenuEntry(cmd);
+	},
+	/** Return ui-menu entry wrapper as jQuery object.
+		UI 1.10: this is the <a> tag inside the LI
+		UI 1.11: this is the LI istself
+		UI 1.12: this is the <div> tag inside the LI
+	 */
+	getEntryWrapper(cmd) {
+		return this._getMenuEntry(cmd).find(">[role=menuitem]").addBack("[role=menuitem]");
+	},
 	/** Return Menu element (UL). */
-	getMenu: function() {
+	getMenu() {
 		return this.$menu;
 	},
 	/** Return true if menu is open. */
-	isOpen: function() {
+	isOpen() {
 //            return this.$menu && this.$menu.is(":visible");
 		return !!this.$menu && !!this.currentTarget;
 	},
 	/** Open context menu on a specific target (must match options.delegate)
 	 *  Optional `extraData` is passed to event handlers as `ui.extraData`.
 	 */
-	open: function(target, extraData) {
+	open(targetOrEvent, extraData) {
 		// Fake a 'contextmenu' event
 		extraData = extraData || {};
-		var e = jQuery.Event("contextmenu", { target: target.get(0), extraData: extraData });
+
+		const isEvent = (targetOrEvent && targetOrEvent.type && targetOrEvent.target),
+			event =  isEvent ? targetOrEvent : {},
+			target = isEvent ? targetOrEvent.target : targetOrEvent,
+			e = jQuery.Event("contextmenu", {
+				target: $(target).get(0),
+				pageX: event.pageX,
+				pageY: event.pageY,
+				originalEvent: isEvent ? targetOrEvent : undefined,
+				_extraData: extraData
+			});
 		return this.element.trigger(e);
 	},
 	/** Replace the menu altogether. */
-	replaceMenu: function(data) {
+	replaceMenu(data) {
 		this._createUiMenu(data);
 	},
-	/** Redefine menu entry (title or all of it). */
-	setEntry: function(cmd, entry) {
-		var $ul,
+	/** Redefine a whole menu entry. */
+	setEntry(cmd, entry) {
+		let $ul,
 			$entryLi = this._getMenuEntry(cmd);
 
 		if (typeof entry === "string") {
-			$.moogle.contextmenu.updateTitle($entryLi, entry);
-		} else {
-			$entryLi.empty();
-			entry.cmd = entry.cmd || cmd;
-			$.moogle.contextmenu.createEntryMarkup(entry, $entryLi);
-			if ($.isArray(entry.children)) {
-				$ul = $("<ul/>").appendTo($entryLi);
-				$.moogle.contextmenu.createMenuMarkup(entry.children, $ul);
-			}
-			this.getMenu().menu("refresh");
+			window.console && window.console.warn(
+				`${"setEntry(cmd, t) with a plain string title is deprecated since v1.18." +
+				"Use setTitle(cmd, '"}${  entry  }') instead.`);
+			return this.setTitle(cmd, entry);
 		}
+		$entryLi.empty();
+		entry.cmd = entry.cmd || cmd;
+		$.moogle.contextmenu.createEntryMarkup(entry, $entryLi);
+		if ($.isArray(entry.children)) {
+			$ul = $("<ul/>").appendTo($entryLi);
+			$.moogle.contextmenu.createMenuMarkup(entry.children, $ul);
+		}
+		// #110: jQuery UI 1.12: refresh only works when this class is not set:
+		$entryLi.removeClass("ui-menu-item");
+		this.getMenu().menu("refresh");
 	},
+	/** Set icon (pass null to remove). */
+	setIcon(cmd, icon) {
+		return this.updateEntry(cmd, { uiIcon: icon });
+	},
+	/** Set title. */
+	setTitle(cmd, title) {
+		return this.updateEntry(cmd, { title });
+	},
+	// /** Set tooltip (pass null to remove). */
+	// setTooltip: function(cmd, tooltip) {
+	// 	this._getMenuEntry(cmd).attr("title", tooltip);
+	// },
 	/** Show or hide the menu command. */
-	showEntry: function(cmd, flag) {
+	showEntry(cmd, flag) {
 		this._getMenuEntry(cmd).toggle(flag !== false);
+	},
+	/** Redefine selective attributes of a menu entry. */
+	updateEntry(cmd, entry) {
+		let $icon, $wrapper,
+			$entryLi = this._getMenuEntry(cmd);
+
+		if ( entry.title !== undefined ) {
+			$.moogle.contextmenu.updateTitle($entryLi, `${  entry.title}`);
+		}
+		if ( entry.tooltip !== undefined ) {
+			if ( entry.tooltip === null ) {
+				$entryLi.removeAttr("title");
+			} else {
+				$entryLi.attr("title", entry.tooltip);
+			}
+		}
+		if ( entry.uiIcon !== undefined ) {
+			$wrapper = this.getEntryWrapper(cmd),
+			$icon = $wrapper.find("span.ui-icon").not(".ui-menu-icon");
+			$icon.remove();
+			if ( entry.uiIcon ) {
+				$wrapper.append($("<span class='ui-icon' />").addClass(entry.uiIcon));
+			}
+		}
+		if ( entry.hide !== undefined ) {
+			$entryLi.toggle(!entry.hide);
+		} else if ( entry.show !== undefined ) {
+			// Note: `show` is an undocumented variant. `hide: false` is preferred
+			$entryLi.toggle(!!entry.show);
+		}
+		// if ( entry.isHeader !== undefined ) {
+		// 	$entryLi.toggleClass("ui-widget-header", !!entry.isHeader);
+		// }
+		if ( entry.data !== undefined ) {
+			$entryLi.data(entry.data);
+		}
+
+		// Set/clear class names, but handle ui-state-disabled separately
+		if ( entry.disabled === undefined ) {
+			entry.disabled = $entryLi.hasClass("ui-state-disabled");
+		}
+		if ( entry.setClass ) {
+			if ( $entryLi.hasClass("ui-menu-item") ) {
+				entry.setClass += " ui-menu-item";
+			}
+			$entryLi.removeClass();
+			$entryLi.addClass(entry.setClass);
+		} else if ( entry.addClass ) {
+			$entryLi.addClass(entry.addClass);
+		}
+		$entryLi.toggleClass("ui-state-disabled", !!entry.disabled);
+		// // #110: jQuery UI 1.12: refresh only works when this class is not set:
+		// $entryLi.removeClass("ui-menu-item");
+		// this.getMenu().menu("refresh");
 	}
 });
 
@@ -376,8 +526,10 @@ $.widget("moogle.contextmenu", {
  */
 $.extend($.moogle.contextmenu, {
 	/** Convert a menu description into a into a <li> content. */
-	createEntryMarkup: function(entry, $parentLi) {
-		var $a = null;
+	createEntryMarkup(entry, $parentLi) {
+		let $wrapper = null;
+
+		$parentLi.attr("data-command", entry.cmd);
 
 		if ( !/[^\-\u2014\u2013\s]/.test( entry.title ) ) {
 			// hyphen, em dash, en dash: separator as defined by UI Menu 1.10
@@ -385,35 +537,36 @@ $.extend($.moogle.contextmenu, {
 		} else {
 			if ( isLTE110 ) {
 				// jQuery UI Menu 1.10 or before required an `<a>` tag
-				$parentLi.attr("data-command", entry.cmd);
-				$a = $("<a/>", {
-						html: "" + entry.title,
+				$wrapper = $("<a/>", {
+						html: `${  entry.title}`,
 						href: "#"
 					}).appendTo($parentLi);
 
-				if ( entry.uiIcon ) {
-					$a.append($("<span class='ui-icon' />").addClass(entry.uiIcon));
-				}
+			} else if ( isLTE111 ) {
+				// jQuery UI Menu 1.11 preferes to avoid `<a>` tags or <div> wrapper
+				$parentLi.html(`${  entry.title}`);
+				$wrapper = $parentLi;
 
 			} else {
-				// jQuery UI Menu 1.11+ preferes to avoid `<a>` tags
-				$parentLi
-					.attr("data-command", entry.cmd)
-					.html("" + entry.title);
-				if ( $.isFunction(entry.action) ) {
-					$parentLi.data("actionHandler", entry.action);
-				}
-				if ( entry.uiIcon ) {
-					$parentLi
-						.append($("<span class='ui-icon' />")
-						.addClass(entry.uiIcon));
-				}
+				// jQuery UI Menu 1.12 introduced `<div>` wrappers
+				$wrapper = $("<div/>", {
+						html: `${  entry.title}`
+					}).appendTo($parentLi);
 			}
-			if ( $.isFunction(entry.action) ) {
-				$parentLi.data("actionHandler", entry.action);
+			if ( entry.uiIcon ) {
+				$wrapper.append($("<span class='ui-icon' />").addClass(entry.uiIcon));
 			}
-			if ( entry.disabled ) {
+			// Store option callbacks in entry's data
+			$.each( [ "action", "disabled", "title", "tooltip" ], (i, attr) => {
+				if ( $.isFunction(entry[attr]) ) {
+					$parentLi.data(`${attr  }Handler`, entry[attr]);
+				}
+			});
+			if ( entry.disabled === true ) {
 				$parentLi.addClass("ui-state-disabled");
+			}
+			if ( entry.isHeader ) {
+				$parentLi.addClass("ui-widget-header");
 			}
 			if ( entry.addClass ) {
 				$parentLi.addClass(entry.addClass);
@@ -421,13 +574,18 @@ $.extend($.moogle.contextmenu, {
 			if ( $.isPlainObject(entry.data) ) {
 				$parentLi.data(entry.data);
 			}
+			if ( typeof entry.tooltip === "string" ) {
+				$parentLi.attr("title", entry.tooltip);
+			}
 		}
 	},
 	/** Convert a nested array of command objects into a <ul> structure. */
-	createMenuMarkup: function(options, $parentUl) {
-		var i, menu, $ul, $li;
+	createMenuMarkup(options, $parentUl, opts) {
+		let i, menu, $ul, $li,
+			appendTo = (opts && opts.appendTo) ? opts.appendTo : "body";
+
 		if ( $parentUl == null ) {
-			$parentUl = $("<ul class='ui-helper-hidden' />").appendTo("body");
+			$parentUl = $("<ul class='ui-helper-hidden' />").appendTo(appendTo);
 		}
 		for (i = 0; i < options.length; i++) {
 			menu = options[i];
@@ -443,27 +601,32 @@ $.extend($.moogle.contextmenu, {
 		return $parentUl;
 	},
 	/** Returns true if the menu item has child menu items */
-	isMenu: function(item) {
+	isMenu(item) {
 		if ( isLTE110 ) {
 			return item.has(">a[aria-haspopup='true']").length > 0;
-		} else {
+		} else if ( isLTE111 ) {  // jQuery UI 1.11 used no tag wrappers
 			return item.is("[aria-haspopup='true']");
-		}
+		} 
+			return item.has(">div[aria-haspopup='true']").length > 0;
+		
 	},
-	/** Replaces the value of elem's first text node child */
-	replaceFirstTextNodeChild: function(elem, text) {
+	/** Replace the title of elem', but retain icons andchild entries. */
+	replaceFirstTextNodeChild(elem, html) {
+		const $icons = elem.find(">span.ui-icon,>ul.ui-menu").detach();
+
 		elem
-			.contents()
-			.filter(function() { return this.nodeType === 3; })
-			.first()
-			.replaceWith(text);
+			.empty()
+			.html(html)
+			.append($icons);
 	},
 	/** Updates the menu item's title */
-	updateTitle: function(item, title) {
-		if ( isLTE110 ) {
+	updateTitle(item, title) {
+		if ( isLTE110 ) {  // jQuery UI 1.10 and before used <a> tags
 			$.moogle.contextmenu.replaceFirstTextNodeChild($("a", item), title);
-		} else {
+		} else if ( isLTE111 ) {  // jQuery UI 1.11 used no tag wrappers
 			$.moogle.contextmenu.replaceFirstTextNodeChild(item, title);
+		} else {  // jQuery UI 1.12+ introduced <div> tag wrappers
+			$.moogle.contextmenu.replaceFirstTextNodeChild($("div", item), title);
 		}
 	}
 });

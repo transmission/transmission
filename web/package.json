@@ -194,15 +194,15 @@
     }
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js --display-modules",
+    "build": "webpack --config webpack.config.js",
     "css": "sass --no-source-map style/",
     "css:map": "sass style/",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
     "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
-    "lint:eslint": "eslint src/*.js src/deprecated/jquery.transmenu.js",
-    "lint:eslint:fix": "eslint --fix src/*.js src/deprecated/jquery.transmenu.js",
-    "lint:prettier": "prettier --loglevel warn --check public_html/index.html style/*scss src/*.js src/deprecated/jquery.transmenu.js",
-    "lint:prettier:fix": "prettier --loglevel warn -w public_html/index.html style/*scss src/*.js src/deprecated/jquery.transmenu.js",
+    "lint:eslint": "eslint src/*.js",
+    "lint:eslint:fix": "eslint --fix src/*.js",
+    "lint:prettier": "prettier --loglevel warn --check public_html/index.html style/*scss src/*.js",
+    "lint:prettier:fix": "prettier --loglevel warn -w public_html/index.html style/*scss src/*.js",
     "lint:stylelint": "stylelint style/*scss",
     "lint:stylelint:fix": "stylelint --fix style/*scss"
   },
