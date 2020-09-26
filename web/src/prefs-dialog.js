@@ -6,6 +6,7 @@
  */
 
 import { isMobileDevice } from './common.js';
+import { Formatter } from './formatter.js';
 import { Utils } from './utils.js';
 
 export class PrefsDialog extends EventTarget {
@@ -134,7 +135,7 @@ export class PrefsDialog extends EventTarget {
 
       if (key === 'blocklist-size') {
         // special case -- regular text area
-        e.textContent = val.toStringWithCommas();
+        e.textContent = Formatter.toStringWithCommas(val);
       } else {
         switch (e.type) {
           case 'checkbox':

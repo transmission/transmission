@@ -223,13 +223,12 @@ export class Inspector {
       } else {
         const get = (t) => t.getPieceSize();
         const pieceCount = torrents.reduce((acc, t) => acc + t.getPieceCount(), 0);
+        const pieceStr = fmt.toStringWithCommas(pieceCount);
         const pieceSize = get(torrents[0]);
         if (torrents.every((t) => get(t) === pieceSize)) {
-          str = `${fmt.size(size)} (${pieceCount.toStringWithCommas()} pieces @ ${fmt.mem(
-            pieceSize
-          )})`;
+          str = `${fmt.size(size)} (${pieceStr} pieces @ ${fmt.mem(pieceSize)})`;
         } else {
-          str = `${fmt.size(size)} (${pieceCount.toStringWithCommas()} pieces)`;
+          str = `${fmt.size(size)} (${pieceStr} pieces)`;
         }
       }
     }

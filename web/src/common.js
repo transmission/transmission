@@ -22,15 +22,3 @@ Math.ratio = function (numerator, denominator) {
 
   return result;
 };
-
-/**
- * Round a string of a number to a specified number of decimal places
- */
-Number.prototype.toTruncFixed = function (place) {
-  const ret = Math.floor(this * Math.pow(10, place)) / Math.pow(10, place);
-  return ret.toFixed(place);
-};
-
-Number.prototype.toStringWithCommas = function () {
-  return this.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
-};

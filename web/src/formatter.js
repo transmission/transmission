@@ -26,14 +26,15 @@ const mem_T_str = 'TiB';
 
 export class Formatter {
   static countString(msgid, msgid_plural, n) {
-    return `${n.toStringWithCommas()} ${Formatter.ngettext(msgid, msgid_plural, n)}`;
+    return `${Formatter.toStringWithCommas(n)} ${Formatter.ngettext(msgid, msgid_plural, n)}`;
   }
 
   // Formats the a memory size into a human-readable string
   // @param {Number} bytes the filesize in bytes
   // @return {String} human-readable string
   static mem(bytes) {
-    const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
+    const toStr = (size, units) =>
+      `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 
     if (bytes < mem_K) {
       return toStr(bytes, mem_B_str);
@@ -58,12 +59,12 @@ export class Formatter {
   // format a percentage to a string
   static percentString(x) {
     if (x < 10.0) {
-      return x.toTruncFixed(2);
+      return Formatter._toTruncFixed(x, 2);
     }
     if (x < 100.0) {
-      return x.toTruncFixed(1);
+      return Formatter._toTruncFixed(x, 1);
     }
-    return x.toTruncFixed(0);
+    return Formatter._toTruncFixed(x, 0);
   }
 
   /*
@@ -85,7 +86,8 @@ export class Formatter {
    * @return {String} human-readable string
    */
   static size(bytes) {
-    const toStr = (size, units) => `${size.toTruncFixed(size <= 9.995 ? 2 : 1)} ${units}`;
+    const toStr = (size, units) =>
+      `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 
     if (bytes < size_K) {
       return toStr(bytes, size_B_str);
@@ -107,23 +109,23 @@ export class Formatter {
 
     if (speed <= 999.95) {
       // 0 KBps to 999 K
-      return [speed.toTruncFixed(0), speed_K_str].join(' ');
+      return [Formatter._toTruncFixed(speed, 0), speed_K_str].join(' ');
     }
 
     speed /= speed_K;
 
     if (speed <= 99.995) {
       // 1 M to 99.99 M
-      return [speed.toTruncFixed(2), speed_M_str].join(' ');
+      return [Formatter._toTruncFixed(speed, 2), speed_M_str].join(' ');
     }
     if (speed <= 999.95) {
       // 100 M to 999.9 M
-      return [speed.toTruncFixed(1), speed_M_str].join(' ');
+      return [Formatter._toTruncFixed(speed, 1), speed_M_str].join(' ');
     }
 
     // insane speeds
     speed /= speed_K;
-    return [speed.toTruncFixed(2), speed_G_str].join(' ');
+    return [Formatter._toTruncFixed(speed, 2), speed_G_str].join(' ');
   }
 
   static speedBps(Bps) {
@@ -216,5 +218,13 @@ export class Formatter {
 
   static toKBps(Bps) {
     return Math.floor(Bps / speed_K);
+  }
+
+  static toStringWithCommas = (number) => number.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+
+  /** Round a string of a number to a specified number of decimal places */
+  static _toTruncFixed(number, places) {
+    const ret = Math.floor(this * Math.pow(10, places)) / Math.pow(10, places);
+    return ret.toFixed(places);
   }
 }

@@ -28,6 +28,7 @@
       "jquery"
     ],
     "rules": {
+      "accessor-pairs": "error",
       "array-callback-return": "error",
       "arrow-spacing": "error",
       "block-scoped-var": "error",
@@ -41,13 +42,14 @@
       "default-case-last": "error",
       "default-param-last": "error",
       "eqeqeq": "error",
+      "grouped-accessor-pairs": "error",
       "guard-for-in": "error",
       "init-declarations": [
         "error",
         "always"
       ],
       "jquery/no-ajax": "off",
-      "jquery/no-bind": "off",
+      "jquery/no-bind": "error",
       "jquery/no-slide": "off",
       "jquery/no-trigger": "off",
       "no-caller": "error",
@@ -59,14 +61,7 @@
       "no-empty-function": "error",
       "no-eq-null": "error",
       "no-eval": "error",
-      "no-extend-native": [
-        "error",
-        {
-          "exceptions": [
-            "Number"
-          ]
-        }
-      ],
+      "no-extend-native": "error",
       "no-extra-bind": "error",
       "no-floating-decimal": "error",
       "no-implied-eval": "error",
@@ -76,21 +71,25 @@
       "no-labels": "error",
       "no-lone-blocks": "error",
       "no-loop-func": "error",
+      "no-loss-of-precision": "error",
       "no-new": "error",
       "no-new-func": "error",
       "no-new-wrappers": "error",
+      "no-promise-executor-return": "error",
       "no-proto": "error",
-      "no-redeclare": "off",
+      "no-redeclare": "error",
       "no-restricted-properties": "error",
       "no-return-assign": "error",
       "no-script-url": "error",
       "no-self-compare": "error",
       "no-sequences": "error",
       "no-shadow": "error",
+      "no-template-curly-in-string": "error",
       "no-this-before-super": "error",
       "no-undef-init": "error",
       "no-undefined": "error",
       "no-unmodified-loop-condition": "error",
+      "no-unreachable-loop": "error",
       "no-unused-expressions": "error",
       "no-unused-labels": "error",
       "no-unused-vars": "error",
@@ -107,6 +106,7 @@
       "no-var": "error",
       "no-void": "error",
       "no-with": "error",
+      "require-atomic-updates": "error",
       "object-shorthand": [
         "error",
         "always"
