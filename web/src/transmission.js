@@ -793,12 +793,12 @@ export class Transmission {
       this.prefs.sort_direction = ui.radio_id;
     } else if (element.hasClass('upload-speed')) {
       const o = {};
-      o[RPC._UpSpeedLimit] = parseInt(element.text());
+      o[RPC._UpSpeedLimit] = parseInt(element.text(), 10);
       o[RPC._UpSpeedLimited] = true;
       remote.savePrefs(o);
     } else if (element.hasClass('download-speed')) {
       const o = {};
-      o[RPC._DownSpeedLimit] = parseInt(element.text());
+      o[RPC._DownSpeedLimit] = parseInt(element.text(), 10);
       o[RPC._DownSpeedLimited] = true;
       remote.savePrefs(o);
     } else {
