@@ -285,9 +285,9 @@ export class Transmission {
   static onFreeSpaceResponse(dir, bytes) {
     const formdir = document.getElementById('add-dialog-folder-input').value;
     if (formdir === dir) {
-      const e = $('label#add-dialog-folder-label');
+      const e = document.getElementById('add-dialog-folder-label');
       const str = bytes > 0 ? `  <i>(${Formatter.size(bytes)} Free)</i>` : '';
-      e.html(`Destination folder${str}:`);
+      e.innerHTML = `Destination folder${str}:`;
     }
   }
 
@@ -1485,7 +1485,9 @@ FIXME: fix this when notifications get fixed
     const renderer = this.torrentRenderer;
     const list = this.elements.torrent_list;
 
-    const old_sel_count = $(list).children('.selected').length;
+    const countSelectedRows = () =>
+      [...list.children].reduce((n, e) => (n + e.classList.contains('selected') ? 1 : 0), 0);
+    const old_sel_count = countSelectedRows();
 
     this.updateFilterSelect();
 
@@ -1511,7 +1513,9 @@ FIXME: fix this when notifications get fixed
     }
 
     // remove the dirty rows from the dom
-    $(dirty_rows.map((row) => row.getElement())).detach();
+    for (const row of dirty_rows) {
+      row.getElement().detach();
+    }
 
     // drop any dirty rows that don't pass the filter test
     const tmp = [];
@@ -1594,7 +1598,7 @@ FIXME: fix this when notifications get fixed
 
     // sync gui
     this.updateStatusbar();
-    if (old_sel_count !== $(list).children('.selected').length) {
+    if (old_sel_count !== countSelectedRows()) {
       this.selectionChanged();
     }
   }

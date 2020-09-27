@@ -21,7 +21,7 @@ export class Prefs extends EventTarget {
 
     for (const [key, default_value] of Object.entries(Prefs._Defaults)) {
       // populate the cache...
-      this._cache[key] = Prefs._getCookie(key, default_value);
+      this._set(key, Prefs._getCookie(key, default_value));
 
       // add property getter/setters...
       Object.defineProperty(this, key.replaceAll('-', '_'), {
