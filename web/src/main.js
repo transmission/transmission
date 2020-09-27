@@ -28,9 +28,12 @@ import { Dialog } from './dialog.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
-import { isMobileDevice, Utils } from './utils.js';
+import { Utils } from './utils.js';
 
+// TODO: merge mobile.scss and common.scss
+// import '../style/mobile.scss';
 import '../style/common.scss';
+
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
 $.fn.tabbedDialog = function (dialog_opts) {
   this.tabs({
@@ -54,16 +57,9 @@ $.fn.tabbedDialog = function (dialog_opts) {
 };
 
 function main() {
-  if (isMobileDevice) {
-    const scroll_soon = Utils.debounce(() => window.scrollTo(0, 1));
-    window.onload = scroll_soon;
-    window.onorientationchange = scroll_soon;
-    if (window.navigator.standalone) {
-      // Fix min height for isMobileDevice when run in full screen mode from home screen
-      // so the footer appears in the right place
-      document.getElementById('torrent-container').style['min-height'] = '338px';
-    }
-  }
+  const scroll_soon = Utils.debounce(() => window.scrollTo(0, 1));
+  window.onload = scroll_soon;
+  window.onorientationchange = scroll_soon;
 
   const prefs = new Prefs();
   const dialog = new Dialog();

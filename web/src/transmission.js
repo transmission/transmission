@@ -598,41 +598,41 @@ export class Transmission {
     }
   }
 
-  static isButtonEnabled(ev) {
-    const p = (ev.target || ev.srcElement).parentNode;
-    return p.className !== 'disabled' && p.parentNode.className !== 'disabled';
+  static isElementEnabled(e) {
+    return !e.classList.contains('disabled');
+  }
+  static setElementEnabled(e, enabled = true) {
+    e.classList.toggle('disabled', !enabled);
   }
 
   stopSelectedClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    if (Transmission.isElementEnabled(ev.target)) {
       this.stopSelectedTorrents();
-      this.hideMobileAddressbar();
     }
   }
 
   startSelectedClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    if (Transmission.isElementEnabled(ev.target)) {
       this.startSelectedTorrents(false);
-      this.hideMobileAddressbar();
     }
   }
 
   stopAllClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    if (Transmission.isElementEnabled(ev.target)) {
       this.stopAllTorrents();
-      this.hideMobileAddressbar();
     }
   }
 
   startAllClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    if (Transmission.isElementEnabled(ev.target)) {
       this.startAllTorrents(false);
-      this.hideMobileAddressbar();
     }
   }
 
   openTorrentClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    const e = ev.target;
+    if (Transmission.isElementEnabled(e)) {
+      Transmission.setElementEnabled(e, false);
       document.body.classList.add('open-showing');
       this.uploadTorrentFile();
       this.updateButtonStates();
@@ -687,6 +687,7 @@ export class Transmission {
   hideUploadDialog() {
     document.body.classList.remove('open-showing');
     Utils.hideId('upload-container');
+    Transmission.setElementEnabled(document.getElementById('toolbar-open'));
     this.updateButtonStates();
   }
 
@@ -717,9 +718,8 @@ export class Transmission {
   }
 
   removeClicked(ev) {
-    if (Transmission.isButtonEnabled(ev)) {
+    if (Transmission.isElementEnabled(ev.target)) {
       this.removeSelectedTorrents();
-      this.hideMobileAddressbar();
     }
   }
 
@@ -1244,21 +1244,6 @@ FIXME: fix this when notifications get fixed
     this.remote.changeFileCommand(torrentId, rowIndices, command);
   }
 
-  hideMobileAddressbar(delaySecs) {
-    if (isMobileDevice && !this.scroll_timeout) {
-      const callback = this.doToolbarHide.bind(this);
-      const msec = delaySecs * 1000 || 150;
-      this.scroll_timeout = setTimeout(callback, msec);
-    }
-  }
-  doToolbarHide() {
-    window.scrollTo(0, 1);
-    if (this.scroll_timeout) {
-      clearTimeout(this.scroll_timeout);
-      delete this.scroll_timeout;
-    }
-  }
-
   // Queue
   moveTop() {
     this.remote.moveTorrentsToTop(this.getSelectedTorrentIds(), this.refreshTorrents, this);
@@ -1415,10 +1400,9 @@ FIXME: fix this when notifications get fixed
   updateButtonStates() {
     const e = this.elements;
     this.calculateTorrentStates((s) => {
-      const setEnabled = (key, flag) => key.classList.toggle('disabled', !flag);
-      setEnabled(e.toolbar_pause_button, s.activeSel > 0);
-      setEnabled(e.toolbar_start_button, s.pausedSel > 0);
-      setEnabled(e.toolbar_remove_button, s.sel > 0);
+      Transmission.setElementEnabled(e.toolbar_pause_button, s.activeSel > 0);
+      Transmission.setElementEnabled(e.toolbar_start_button, s.pausedSel > 0);
+      Transmission.setElementEnabled(e.toolbar_remove_button, s.sel > 0);
     });
   }
 
@@ -1443,7 +1427,6 @@ FIXME: fix this when notifications get fixed
     Utils.setVisibleId('torrent-inspector', visible);
     document.getElementById('toolbar-inspector').classList.toggle('selected', visible);
     document.body.classList.toggle('inspector-showing', visible);
-    this.hideMobileAddressbar();
     if (!isMobileDevice) {
       const w = visible ? `${$('#torrent-inspector').outerWidth() + 1}px` : '0px';
       document.getElementById('torrent-container').style.right = w;
@@ -1479,7 +1462,9 @@ FIXME: fix this when notifications get fixed
     delete this.refilterTimer;
 
     if (rebuildEverything) {
-      $(list).empty();
+      while (list.firstChild) {
+        list.removeChild(list.firstChild);
+      }
       this._rows = [];
       this.dirtyTorrents = new Set(Object.keys(this._torrents));
     }
@@ -1728,7 +1713,6 @@ FIXME: fix this when notifications get fixed
 
   showStatsDialog() {
     this.loadDaemonStats();
-    this.hideMobileAddressbar();
     this.togglePeriodicStatsRefresh(true);
     $('#stats-dialog').dialog({
       close: this.onStatsDialogClosed.bind(this),
@@ -1739,7 +1723,6 @@ FIXME: fix this when notifications get fixed
   }
 
   onStatsDialogClosed() {
-    this.hideMobileAddressbar();
     this.togglePeriodicStatsRefresh(false);
   }
 

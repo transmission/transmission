@@ -5,6 +5,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+// TODO: remove this and set layout based on window size
 export const isMobileDevice = /(iPhone|iPod|Android)/.test(navigator.userAgent);
 
 export class Utils {

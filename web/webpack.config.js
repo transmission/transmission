@@ -6,7 +6,7 @@ const webpack = require('webpack');
 
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-if (isDevelopment) {
+if (!isDevelopment) {
   process.env.GENERATE_SOURCEMAP='false';
 }
 

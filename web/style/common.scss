@@ -57,10 +57,6 @@ $selected-gradient-bottom: #fff;
 
 /// GLOBAL
 
-.hidden {
-  display: none;
-}
-
 html {
   height: 100%;
   margin: 0;
@@ -70,13 +66,9 @@ html {
 body {
   display: flex;
   flex-direction: column;
-  font: Calibri, Arial, Helvetica, sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0;
   overflow: hidden;
-}
-
-.torrent-container {
-  flex-grow: 1;
 }
 
 img {
@@ -139,8 +131,7 @@ $toolbar-height: 36px;
 #toolbar {
   $toolbar-button-size: 36px;
   $toolbar-gradient-top: #ddd;
-  $toolbar-gradient-bottom: #bbb;
-  @include vertical-gradient($toolbar-gradient-top, $toolbar-gradient-bottom);
+  @include vertical-gradient(#ddd, #bbb);
   border-bottom: 1px solid #aaa;
   display: flex;
   flex-direction: row;
@@ -271,15 +262,13 @@ $statusbar-height: 26px;
 $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 
 #torrent-container {
-  bottom: 22px;
+  flex-grow: 1;
   left: 0;
   margin: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0;
-  position: fixed;
   right: 0;
-  top: $torrent-container-top;
 }
 
 .torrent-list {
@@ -524,7 +513,6 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 }
 
 .prefs-section {
-  //  margin: 10px;
   text-align: left;
 
   > * {

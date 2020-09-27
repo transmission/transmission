@@ -7,7 +7,7 @@
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { isMobileDevice, Utils } from './utils.js';
+import { Utils } from './utils.js';
 
 class TorrentRendererHelper {
   static getProgressInfo(controller, t) {
@@ -329,28 +329,20 @@ export class TorrentRendererCompact {
       if (!have_up && !have_dn) {
         return 'Idle';
       }
-      let s = '';
-      if (!isMobileDevice) {
-        s = `${TorrentRendererHelper.formatETA(t)} `;
-      }
+
+      const s = [`${TorrentRendererHelper.formatETA(t)} `];
       if (have_dn) {
-        s += TorrentRendererHelper.formatDL(t);
-      }
-      if (have_dn && have_up) {
-        s += ' ';
+        s.push(TorrentRendererHelper.formatDL(t));
       }
       if (have_up) {
-        s += TorrentRendererHelper.formatUL(t);
+        s.push(TorrentRendererHelper.formatUL(t));
       }
-      return s;
+      return s.join(' ');
     }
     if (t.isSeeding()) {
-      return [
-        'Ratio: ',
-        Formatter.ratioString(t.getUploadRatio()),
-        ', ',
-        TorrentRendererHelper.formatUL(t),
-      ].join('');
+      return `Ratio: ${Formatter.ratioString(t.getUploadRatio())}, ${TorrentRendererHelper.formatUL(
+        t
+      )}`;
     }
     return t.getStateString();
   }
