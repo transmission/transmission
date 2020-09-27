@@ -26,69 +26,52 @@ export class Remote {
     this._controller = controller;
     this._dialog = dialog;
     this._error = '';
-    this._token = '';
+    this._session_id = '';
   }
 
-  // Display an error if an ajax request fails, and stop sending requests
-  // or on a 409, globally set the X-Transmission-Session-Id and resend
-  ajaxError(request, error_string, exception, ajaxObject) {
-    // set the Transmission-Session-Id on a 409
-    if (request.status === 409) {
-      const token = request.getResponseHeader('X-Transmission-Session-Id');
-      if (token) {
-        this._token = token;
-        $.ajax(ajaxObject);
-        return;
-      }
+  sendRequest(data, callback, context) {
+    const headers = new Headers();
+    headers.append('cache-control', 'no-cache');
+    headers.append('content-type', 'application/json');
+    headers.append('pragma', 'no-cache');
+    if (this._session_id) {
+      headers.append(Remote._SessionHeader, this._session_id);
     }
 
-    this._error = request.responseText
-      ? request.responseText.trim().replace(/(<([^>]+)>)/gi, '')
-      : '';
-    if (!this._error.length) {
-      this._error = 'Server not responding';
-    }
-
-    this._dialog.confirm(
-      'Connection Failed',
-      'Could not connect to the server. You may need to reload the page to reconnect.',
-      'Details',
-      () => alert(this._error),
-      'Dismiss'
-    );
-    this._controller.togglePeriodicSessionRefresh(false);
-  }
-
-  appendSessionId(XHR) {
-    if (this._token) {
-      XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
-    }
-  }
-
-  sendRequest(data, callback, context, async) {
-    if (typeof async !== 'boolean') {
-      async = true;
-    }
-
-    const ajaxSettings = {
-      async,
-      beforeSend: function (XHR) {
-        this.appendSessionId(XHR);
-      }.bind(this),
-      cache: false,
-      contentType: 'json',
-      context,
-      data: JSON.stringify(data),
-      dataType: 'json',
-      error: function (request, error_string, exception) {
-        this.ajaxError(request, error_string, exception, ajaxSettings);
-      }.bind(this),
-      success: callback,
-      type: 'POST',
-      url: RPC._Root,
-    };
-
-    $.ajax(ajaxSettings);
+    let response_arg = null;
+    fetch(RPC._Root, {
+      body: JSON.stringify(data),
+      headers,
+      method: 'POST',
+    })
+      .then((response) => {
+        response_arg = response;
+        if (response.status === 409) {
+          const error = new Error(Remote._SessionHeader);
+          error.header = response.headers.get(Remote._SessionHeader);
+          throw error;
+        }
+        return response.json();
+      })
+      .then((payload) => {
+        callback.call(context, payload, response_arg);
+      })
+      .catch((error) => {
+        if (error.message === Remote._SessionHeader) {
+          // copy the session header and try again
+          this._session_id = error.header;
+          this.sendRequest(data, callback, context);
+          return;
+        }
+        this._dialog.confirm(
+          'Connection Failed',
+          'Could not connect to the server. You may need to reload the page to reconnect.',
+          'Details',
+          () => alert(`${error}`),
+          'Dismiss'
+        );
+        this._controller.togglePeriodicSessionRefresh(false);
+      });
   }
 
   loadDaemonPrefs(callback, context, async) {
@@ -280,3 +263,5 @@ export class Remote {
     this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback, context);
   }
 }
+
+Remote._SessionHeader = 'X-Transmission-Session-Id';

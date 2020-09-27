@@ -1030,31 +1030,32 @@ FIXME: fix this when notifications get fixed
       const destination = folderInput.value;
       const { remote } = this;
 
-      fileInput[0].files.forEach((i, file) => {
+      for (const file of fileInput.get(0).files) {
         const reader = new FileReader();
         reader.onload = function (e) {
           const contents = e.target.result;
           const key = 'base64,';
           const index = contents.indexOf(key);
-          if (index > -1) {
-            const metainfo = contents.substring(index + key.length);
-            const o = {
-              arguments: {
-                'download-dir': destination,
-                metainfo,
-                paused,
-              },
-              method: 'torrent-add',
-            };
-            remote.sendRequest(o, (response) => {
-              if (response.result !== 'success') {
-                alert(`Error adding "${file.name}": ${response.result}`);
-              }
-            });
+          if (index === -1) {
+            return;
           }
+          const metainfo = contents.substring(index + key.length);
+          const o = {
+            arguments: {
+              'download-dir': destination,
+              metainfo,
+              paused,
+            },
+            method: 'torrent-add',
+          };
+          remote.sendRequest(o, (response) => {
+            if (response.result !== 'success') {
+              alert(`Error adding "${file.name}": ${response.result}`);
+            }
+          });
         };
         reader.readAsDataURL(file);
-      });
+      }
 
       let url = document.getElementById('torrent-upload-url').value;
       if (url !== '') {
@@ -1069,7 +1070,7 @@ FIXME: fix this when notifications get fixed
           },
           method: 'torrent-add',
         };
-        remote.sendRequest(o, (response) => {
+        remote.sendRequest(o, (payload, response) => {
           if (response.result !== 'success') {
             alert(`Error adding "${url}": ${response.result}`);
           }

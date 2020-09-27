@@ -54,9 +54,7 @@ export class Prefs extends EventTarget {
   _set(key, value) {
     const { _cache } = this;
     const old_value = _cache[key];
-    if (old_value === value) {
-      console.log(`setting ${key} to ${value} -- no change`);
-    } else {
+    if (old_value !== value) {
       _cache[key] = value;
       Prefs._setCookie(key, value);
       this.dispatchPrefsChange(key, old_value, value);

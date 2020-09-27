@@ -42,7 +42,6 @@
       "grouped-accessor-pairs": "error",
       "guard-for-in": "error",
       "init-declarations": "error",
-      "jquery/no-ajax": "off",
       "jquery/no-slide": "off",
       "no-array-constructor" :"error",
       "no-caller": "error",

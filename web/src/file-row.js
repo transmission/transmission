@@ -114,7 +114,7 @@ export class FileRow extends EventTarget {
     e.type = 'checkbox';
     e.className = 'file-wanted-control';
     e.title = 'Download file';
-    $(e).change((ev) => this.fireWantedChanged(ev.currentTarget.checked));
+    e.addEventListener('change', (ev) => this.fireWantedChanged(ev.target.checked));
     root.checkbox = e;
     root.appendChild(e);
 
