@@ -305,22 +305,6 @@ export class Transmission {
     return torrents.map((t) => t.getId());
   }
 
-  static scrollToRow(row) {
-    if (isMobileDevice) {
-      // FIXME: why? return
-      const list = $('#torrent-container');
-      const scrollTop = list.scrollTop();
-      const innerHeight = list.innerHeight();
-      const { offsetHeight, offsetTop } = row.getElement();
-
-      if (offsetTop < scrollTop) {
-        list.scrollTop(offsetTop);
-      } else if (innerHeight + scrollTop < offsetTop + offsetHeight) {
-        list.scrollTop(offsetTop + offsetHeight - innerHeight);
-      }
-    }
-  }
-
   seedRatioLimit() {
     const p = this.sessionProperties;
     if (p && p.seedRatioLimited) {
@@ -597,7 +581,7 @@ export class Transmission {
           }
         }
         this._last_torrent_clicked = r.getTorrentId();
-        Transmission.scrollToRow(r);
+        r.getElement().scrollIntoView();
         handled = true;
       } else if (shift_key) {
         this._shift_index = this.indexOfLastTorrent();
@@ -1514,7 +1498,7 @@ FIXME: fix this when notifications get fixed
 
     // remove the dirty rows from the dom
     for (const row of dirty_rows) {
-      row.getElement().detach();
+      row.getElement().remove();
     }
 
     // drop any dirty rows that don't pass the filter test
