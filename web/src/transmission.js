@@ -992,29 +992,29 @@ FIXME: fix this when notifications get fixed
    * Select a torrent file to upload
    */
   uploadTorrentFile(confirmed) {
-    const fileInput = $('input#torrent-upload-file');
+    const file_input = document.getElementById('torrent-upload-file');
     const folderInput = document.getElementById('add-dialog-folder-input');
-    const startInput = $('input#torrent-auto-start');
-    const urlInput = $('input#torrent-upload-url');
+    const start_input = document.getElementById('torrent-auto-start');
+    const url_input = document.getElementById('torrent-upload-url');
 
     if (!confirmed) {
       // update the upload dialog's fields
-      fileInput.attr('value', '');
-      urlInput.attr('value', '');
-      startInput.attr('checked', this.shouldAddedTorrentsStart());
+      file_input.setAttribute('value', '');
+      url_input.setAttribute('value', '');
+      start_input.setAttribute('checked', this.shouldAddedTorrentsStart());
       folderInput.value = document.getElementById('download-dir').value;
       folderInput.addEventListener('change', this.updateFreeSpaceInAddDialog.bind(this));
       this.updateFreeSpaceInAddDialog();
 
       // show the dialog
       Utils.showId('upload-container');
-      urlInput.focus();
+      url_input.focus();
     } else {
-      const paused = !startInput.is(':checked');
+      const paused = !start_input.getAttribute('checked');
       const destination = folderInput.value;
       const { remote } = this;
 
-      for (const file of fileInput.get(0).files) {
+      for (const file of file_input.files) {
         const reader = new FileReader();
         reader.onload = function (e) {
           const contents = e.target.result;
