@@ -5,7 +5,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { isMobileDevice, Utils } from './utils.js';
+import { Utils } from './utils.js';
 
 export class Dialog {
   constructor() {
@@ -55,9 +55,9 @@ export class Dialog {
     Utils.setTextContent(this._confirm_button, confirm_button_label);
     this._callback = callback;
 
-    if (isMobileDevice) {
-      // transmission.hideMobileAddressbar();
-    }
+    // if (isMobileDevice) {
+    //   transmission.hideMobileAddressbar();
+    // }
 
     document.body.classList.add('dialog-showing');
     Utils.show(this._confirm_button);
@@ -72,9 +72,9 @@ export class Dialog {
     Utils.setTextContent(this._message, dialog_message);
     Utils.setTextContent(this._cancel_button, cancel_button_label);
 
-    if (isMobileDevice) {
-      // transmission.hideMobileAddressbar();
-    }
+    // if (isMobileDevice) {
+    //   transmission.hideMobileAddressbar();
+    // }
 
     document.body.classList.add('dialog-showing');
     Utils.hide(this._confirm_button);

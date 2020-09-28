@@ -31,36 +31,50 @@
       <div class="toolbar-button" id="toolbar-start-all" title="Start All Torrents"></div>
       <div class="toolbar-button" id="toolbar-pause-all" title="Pause All Torrents"></div>
       <div class="toolbar-separator"></div>
-      <span class="flex"></span>
       <div class="toolbar-button" id="toolbar-inspector" title="Toggle Inspector"></div>
+      <div class="toolbar-separator"></div>
+      <div class="toolbar-button dropdown" id="toolbar-more" title="More...">
+        <ul id="main-menu" class="menu">
+          <li class="menu-item">
+            <a href="..." class="menu-link">Link 1</a>
+          </li>
+          <li class="menu-item dropdown">
+            <a class="menu-link toggle">Section 1 ▼</a>
+            <ul class="menu dropdown">
+              <li class="menu-item">
+                <a href="..." class="menu-link">Sub-link 1</a>
+              </li>
+              <li class="menu-item">
+                <a href="..." class="menu-link">Sub-link 2</a>
+              </li>
+            </ul>
+          </li>
+          <li class="menu-item">
+            <a href="..." class="menu-link">Link 3</a>
+          </li>
+        </ul>
+      </div>
+      <span class="flex"></span>
     </div>
 
     <div id="statusbar">
-      <div id="filter">
-        Show
-        <select id="filter-mode">
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="downloading">Downloading</option>
-          <option value="seeding">Seeding</option>
-          <option value="paused">Paused</option>
-          <option value="finished">Finished</option>
-        </select>
-        <select id="filter-tracker"></select>
-        <input type="search" id="torrent-search" placeholder="Filter" />
-        <span id="filter-count">&nbsp;</span>
-      </div>
-
-      <div id="speed-info">
-        <div id="speed-dn-container">
-          <div id="speed-dn-icon"></div>
-          <div id="speed-dn-label"></div>
-        </div>
-        <div id="speed-up-container">
-          <div id="speed-up-icon"></div>
-          <div id="speed-up-label"></div>
-        </div>
-      </div>
+      <span>Show</span>
+      <select id="filter-mode">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="downloading">Downloading</option>
+        <option value="seeding">Seeding</option>
+        <option value="paused">Paused</option>
+        <option value="finished">Finished</option>
+      </select>
+      <select id="filter-tracker"></select>
+      <input type="search" id="torrent-search" placeholder="Filter" />
+      <span id="filter-count">&nbsp;</span>
+      <span class="flex"></span>
+      <div class="speed-dn-icon"></div>
+      <div id="speed-dn-label"></div>
+      <div class="speed-up-icon"></div>
+      <div id="speed-up-label"></div>
     </div>
 
     <div class="ui-helper-hidden" id="prefs-dialog">
@@ -416,17 +430,21 @@
     </div>
 
     <div id="torrent-container">
-      <ul class="torrent-list" id="torrent-list"></ul>
+      <ul class="torrent-list flex" id="torrent-list"></ul>
     </div>
 
     <div class="dialog-container ui-helper-hidden" id="dialog-container">
-      <div class="dialog-top-bar"></div>
       <div class="dialog-window">
         <div class="dialog-logo" id="dialog-logo"></div>
-        <h2 class="dialog-heading" id="dialog-heading"></h2>
+        <div class="dialog-heading" id="dialog-heading"></div>
         <div class="dialog-message" id="dialog-message"></div>
-        <a href="#confirm" id="dialog-confirm-button">Confirm</a>
-        <a href="#cancel" id="dialog-cancel-button">Cancel</a>
+        <div class="dialog-workarea" id="dialog-workarea"></div>
+        <div class="dialog-buttons">
+          <span class="dialog-buttons-begin"></span>
+          <a href="#confirm" id="dialog-confirm-button">Confirm</a>
+          <a href="#cancel" id="dialog-cancel-button">Cancel</a>
+          <span class="dialog-buttons-end"></span>
+        </div>
       </div>
     </div>
 
@@ -567,11 +585,27 @@
       </table>
     </div>
 
-    <div class="dialog-container ui-helper-hidden" id="upload-container">
-      <div class="dialog-top-bar"></div>
+    <!--
+    <div class="dialog-container ui-helper-hidden" id="dialog-container">
       <div class="dialog-window">
-        <div class="dialog-logo" id="upload-dialog-logo"></div>
-        <h2 class="dialog-heading">Upload Torrent Files</h2>
+        <div class="dialog-logo" id="dialog-logo"></div>
+        <div class="dialog-heading" id="dialog-heading"></div>
+        <div class="dialog-message" id="dialog-message"></div>
+        <div class="dialog-workarea" id="dialog-workarea"></div>
+        <div class="dialog-buttons">
+          <span class="dialog-buttons-begin"></span>
+          <a href="#confirm" id="dialog-confirm-button">Confirm</a>
+          <a href="#cancel" id="dialog-cancel-button">Cancel</a>
+          <span class="dialog-buttons-end"></span>
+        </div>
+      </div>
+    </div>
+-->
+
+    <div class="dialog-container ui-helper-hidden" id="upload-container">
+      <div class="dialog-window">
+        <div class="dialog-logo"></div>
+        <div class="dialog-heading">Upload Torrent Files</div>
         <form
           action="#"
           method="post"
@@ -580,8 +614,9 @@
           target="torrent-upload-frame"
           autocomplete="off"
         >
-          <div class="dialog-message">
-            <label for="torrent-upload-file">Please select a torrent file to upload:</label>
+          <div class="dialog-message"></div>
+          <div class="dialog-workarea">
+            <label for="torrent-upload-file">Please select a torrent to upload:</label>
             <input
               type="file"
               name="torrent-files[]"
@@ -591,20 +626,25 @@
             <label for="torrent-upload-url">Or enter a URL:</label>
             <input type="url" id="torrent-upload-url" />
             <label id="add-dialog-folder-label" for="add-dialog-folder-input"
-              >Destination folder:</label
-            >
+              >Destination folder: <span id="free-space-text"></span
+            ></label>
             <input type="text" id="add-dialog-folder-input" />
-            <input type="checkbox" id="torrent-auto-start" />
-            <label for="torrent-auto-start" id="auto-start-label">Start when added</label>
+            <div class="checkbox-and-label">
+              <input type="checkbox" id="torrent-auto-start" />
+              <label for="torrent-auto-start" id="auto-start-label">Start when added</label>
+            </div>
           </div>
-          <a href="#upload" id="upload-confirm-button">Upload</a>
-          <a href="#cancel" id="upload-cancel-button">Cancel</a>
+          <div class="dialog-buttons">
+            <span class="dialog-buttons-begin"></span>
+            <a href="#upload" id="upload-confirm-button">Confirm</a>
+            <a href="#cancel" id="upload-cancel-button">Cancel</a>
+            <span class="dialog-buttons-end"></span>
+          </div>
         </form>
       </div>
     </div>
 
     <div class="dialog-container ui-helper-hidden" id="rename-container">
-      <div class="dialog-top-bar"></div>
       <div class="dialog-window">
         <div class="dialog-logo"></div>
         <h2 class="dialog-heading">Rename torrent</h2>
@@ -612,13 +652,16 @@
           <label for="torrent-rename-name">Enter new name:</label>
           <input type="text" id="torrent-rename-name" />
         </div>
-        <a href="#rename" id="rename-confirm-button">Rename</a>
-        <a href="#cancel" id="rename-cancel-button">Cancel</a>
+        <div class="dialog-buttons">
+          <span class="dialog-buttons-begin"></span>
+          <a href="#rename" id="rename-confirm-button">Rename</a>
+          <a href="#cancel" id="rename-cancel-button">Cancel</a>
+          <span class="dialog-buttons-end"></span>
+        </div>
       </div>
     </div>
 
     <div class="dialog-container ui-helper-hidden" id="move-container">
-      <div class="dialog-top-bar"></div>
       <div class="dialog-window">
         <div class="dialog-logo" id="move-dialog-logo"></div>
         <h2 class="dialog-heading">Set Location</h2>

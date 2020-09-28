@@ -288,19 +288,21 @@ export class TorrentRendererFull {
     const peers = document.createElement('div');
     peers.className = 'torrent-peer-details';
 
+    const progress = document.createElement('div');
+    progress.classList.add('torrent-progress');
     const progressbar = TorrentRendererHelper.createProgressbar('full');
+    progress.appendChild(progressbar.element);
+    const button = document.createElement('a');
+    const image = document.createElement('div');
+    button.appendChild(image);
+    progress.appendChild(button);
 
     const details = document.createElement('div');
     details.className = 'torrent-progress-details';
 
-    const image = document.createElement('div');
-    const button = document.createElement('a');
-    button.appendChild(image);
-
     root.appendChild(name);
     root.appendChild(peers);
-    root.appendChild(button);
-    root.appendChild(progressbar.element);
+    root.appendChild(progress);
     root.appendChild(details);
 
     root._name_container = name;

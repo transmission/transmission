@@ -5,6 +5,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+import AccessibleMenu from 'accessible-menu';
+
 import { Dialog } from './dialog.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
@@ -28,6 +30,32 @@ export class Transmission {
 
     this.isMenuEnabled = !isMobileDevice;
 
+    // zzz
+    //const closeClass = "closed";
+    const containerElement = document.getElementById('toolbar-more');
+    const controllerElement = containerElement;
+    const menuElement = document.querySelector('#main-menu');
+    const menuItemSelector = '.menu-item';
+    const menuLinkSelector = '.menu-link';
+    // const openClass = "open";
+    const submenuItemSelector = '.menu-item.dropdown';
+    const submenuSelector = '.menu.dropdown';
+    const submenuToggleSelector = '.menu-link.toggle';
+
+    this.menu = new AccessibleMenu.DisclosureMenu({
+      //closeClass,
+      containerElement,
+      controllerElement,
+      menuElement,
+      menuItemSelector,
+      menuLinkSelector,
+      //openClass,
+      submenuItemSelector,
+      submenuSelector,
+      submenuToggleSelector,
+    });
+    // zzz
+
     // Initialize the implementation fields
     this.filterText = '';
     this._torrents = {};
@@ -50,6 +78,7 @@ export class Transmission {
     click('rename-cancel-button', Transmission.hideRenameDialog);
     click('rename-confirm-button', this.confirmRenameClicked.bind(this));
     click('toolbar-inspector', this.toggleInspector.bind(this));
+    click('toolbar-more', this.toggleMore.bind(this));
     click('toolbar-open', this.openTorrentClicked.bind(this));
     click('toolbar-pause', this.stopSelectedClicked.bind(this));
     click('toolbar-pause-all', this.stopAllClicked.bind(this));
@@ -1317,15 +1346,11 @@ FIXME: fix this when notifications get fixed
     const torrents = this.getAllTorrents();
 
     const u = torrents.reduce((acc, tor) => acc + tor.getUploadSpeed(), 0);
-    document.getElementById('speed-up-container').classList.toggle('active', u > 0);
-    document.getElementById('speed-up-label').textContent = fmt.speedBps(u);
-
     const d = torrents.reduce((acc, tor) => acc + tor.getDownloadSpeed(), 0);
-    document.getElementById('speed-dn-container').classList.toggle('active', d > 0);
-    document.getElementById('speed-dn-label').textContent = fmt.speedBps(d);
-
-    // visible torrents
     const str = fmt.countString('Transfer', 'Transfers', this._rows.length);
+
+    document.getElementById('speed-up-label').textContent = fmt.speedBps(u);
+    document.getElementById('speed-dn-label').textContent = fmt.speedBps(d);
     document.getElementById('filter-count').textContent = str;
   }
 
@@ -1414,6 +1439,10 @@ FIXME: fix this when notifications get fixed
 
   static inspectorIsVisible() {
     return document.body.classList.contains('inspector-showing');
+  }
+
+  toggleMore() {
+    console.log('FIXME: add more menu', this);
   }
 
   toggleInspector() {

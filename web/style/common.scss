@@ -1,5 +1,20 @@
 @use "sass:color";
 
+$black: #000;
+$white: #fff;
+$grey13: #212121;
+$grey20: #333;
+$grey33: #555;
+$grey40: #666;
+$grey47: #787878;
+$grey53: #878787;
+$grey60: #999;
+$grey67: #ababab;
+$grey73: #bababa;
+$grey81: #cfcfcf;
+$grey87: #dedede;
+$grey97: #f7f7f7;
+
 @mixin vertical-gradient($topColor, $bottomColor) {
   background: color.mix($topColor, $bottomColor) linear-gradient($topColor, $bottomColor);
 }
@@ -23,14 +38,14 @@
   }
 }
 
-$nonselected-gradient-top: #fff;
-$nonselected-gradient-bottom: #bbb;
+$nonselected-gradient-top: $white;
+$nonselected-gradient-bottom: $grey73;
 $selection-color: #cdcdff;
 $selected-gradient-top: $selection-color;
-$selected-gradient-bottom: #fff;
+$selected-gradient-bottom: $white;
 
 @mixin button {
-  border: 1px solid #aaa;
+  border: 1px solid $grey67;
   cursor: pointer;
   display: inline-block;
   padding: 3px;
@@ -61,14 +76,17 @@ html {
   height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 body {
   display: flex;
   flex-direction: column;
   font-family: Verdana, Arial, Helvetica, sans-serif;
+  height: 100%;
   margin: 0;
   overflow: hidden;
+  width: 100%;
 }
 
 img {
@@ -108,31 +126,35 @@ a {
 
     th,
     td {
-      border: 1px solid #aaa;
+      border: 1px solid $grey67;
     }
   }
 }
 
 /// TOOLBAR
 
-$toolbar-height: 36px;
+$toolbar-height-num: 36;
+$toolbar-height: $toolbar-height-num * 1px;
 
 .toolbar-button {
+  background-position: center;
+  background-repeat: no-repeat;
   cursor: pointer;
   height: $toolbar-height;
   padding: 0 6px;
   user-select: none;
   width: $toolbar-height;
-}
-.toolbar-button.disabled {
-  opacity: 0.25;
+
+  &.disabled {
+    opacity: 0.25;
+  }
 }
 
 #toolbar {
   $toolbar-button-size: 36px;
-  $toolbar-gradient-top: #ddd;
-  @include vertical-gradient(#ddd, #bbb);
-  border-bottom: 1px solid #aaa;
+  $toolbar-gradient-top: $grey87;
+  @include vertical-gradient($grey87, $grey73);
+  border-bottom: 1px solid $grey67;
   display: flex;
   flex-direction: row;
   height: $toolbar-height;
@@ -141,125 +163,95 @@ $toolbar-height: 36px;
   width: 100%;
 
   > .toolbar-separator {
-    border-left: 1px solid #aaa;
+    border-left: 1px solid $grey67;
     height: 25px;
     margin-bottom: 5px;
     margin-top: 8px;
     width: 3px;
   }
+}
 
-  :nth-last-child(2) {
-    flex-grow: 1;
+@mixin toolbar-button-background-image($url) {
+  background-image: url($url);
+
+  // use a lighter background color during hover
+  &:hover:not(.disabled) {
+    background-image: url($url), linear-gradient($white, $grey87);
   }
 }
-
 #toolbar-open {
-  background: center no-repeat url('images/toolbar-folder.png');
-  // url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>");
+  @include toolbar-button-background-image('images/toolbar-folder.png');
 }
 #toolbar-remove {
-  background: center no-repeat url('images/toolbar-close.png');
-  // url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/></svg>");
+  @include toolbar-button-background-image('images/toolbar-close.png');
 }
 #toolbar-start {
-  background: center no-repeat url('images/toolbar-start.png');
-  // url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>");
+  @include toolbar-button-background-image('images/toolbar-start.png');
 }
 #toolbar-pause {
-  background: center no-repeat url('images/toolbar-pause.png');
-  // url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>");
+  @include toolbar-button-background-image('images/toolbar-pause.png');
 }
 #toolbar-start-all {
-  background: center no-repeat url('images/toolbar-start-all.png');
+  @include toolbar-button-background-image('images/toolbar-start-all.png');
 }
 #toolbar-pause-all {
-  background: center no-repeat url('images/toolbar-pause-all.png');
+  @include toolbar-button-background-image('images/toolbar-pause-all.png');
 }
 #toolbar-inspector {
-  background: no-repeat center url('images/toolbar-info.png');
-  // url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>");
+  @include toolbar-button-background-image('images/toolbar-info.png');
 }
-
 #toolbar-more {
-  background: right no-repeat
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/></svg>");
-  margin-left: auto;
+  @include toolbar-button-background-image(
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/></svg>"
+  );
   margin-right: 8px;
 }
 
-/***
-****
-****  STATUSBAR
-****
-***/
+/// STATUSBAR
 
-$statusbar-gradient-top: #ddd;
-$statusbar-gradient-bottom: #bbb;
-$statusbar-height: 26px;
+$statusbar-gradient-top: $grey87;
+$statusbar-gradient-bottom: $grey73;
+
+$statusbar-height-num: 26;
+$statusbar-height: $statusbar-height-num * 1px;
 
 #statusbar {
   @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
-  border-bottom: 1px solid #aaa;
+  align-items: center;
+  border-bottom: 1px solid $grey67;
+  display: flex;
+  flex-direction: row;
   height: $statusbar-height;
-  overflow: hidden;
-  position: relative;
   width: 100%;
 
-  #filter {
-    float: left;
-    margin-left: 5px;
-
-    #torrent-search {
-      border-radius: 6px;
-      height: 18px;
-      width: 100px;
-
-      &.blur {
-        color: #999;
-      }
-    }
-
-    #filter-count {
-      margin-left: 8px;
-    }
-  }
-
-  #speed-info {
-    float: right;
-    margin-right: 10px;
-    margin-top: 5px;
-
-    * {
-      display: inline-block;
-    }
-
-    #speed-up-icon {
-      background: url('images/arrow-up.png') bottom no-repeat;
-      height: 8px;
-      margin-left: 8px;
-      width: 8px;
-    }
-
-    #speed-dn-icon {
-      background: url('images/arrow-down.png') bottom no-repeat;
-      height: 8px;
-      width: 8px;
-    }
-
-    #speed-up-container,
-    #speed-dn-container {
-      display: inline;
-    }
+  > * {
+    font-size: smaller;
+    margin: 5px;
   }
 }
+#torrent-search {
+  &.blur {
+    color: $grey60;
+  }
+}
+.speed-up-icon {
+  background: url('images/arrow-up.png') center no-repeat;
+  height: 8px;
+  width: 8px;
+}
+.speed-dn-icon {
+  background: url('images/arrow-down.png') center no-repeat;
+  height: 8px;
+  width: 8px;
+}
 
-/***
-****
-****  TORRENT CONTAINER
-****
-***/
+/// TORRENT CONTAINER
 
-$torrent-container-top: $toolbar-height + $statusbar-height + 6px;
+$torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
+
+.flex {
+  flex-grow: 1;
+}
 
 #torrent-container {
   flex-grow: 1;
@@ -280,17 +272,19 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
   width: 100%;
 
   .torrent {
-    background-color: #fff;
+    background-color: $white;
     border-bottom: 1px solid #ccc;
-    color: #666;
-    padding: 4px 30px 5px 14px;
+    color: $grey40;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 12px;
 
     &.compact {
       padding: 4px;
     }
 
     &.even {
-      background-color: #f7f7f7;
+      background-color: $grey97;
     }
 
     &.selected {
@@ -299,16 +293,13 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 
     &.compact {
       .torrent-name {
-        color: #000;
+        color: $black;
       }
     }
 
     // start-stop button
     a {
-      float: right;
-      position: relative;
-      right: -22px;
-      top: 1px;
+      padding-left: 6px;
 
       img {
         position: relative;
@@ -351,7 +342,7 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
     }
 
     .torrent-name {
-      color: #222;
+      color: $grey13;
       font-weight: bold;
       margin-bottom: 2px;
       margin-top: 2px;
@@ -365,7 +356,7 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
       }
 
       &.paused {
-        color: #777;
+        color: $grey47;
         font-weight: normal;
       }
     }
@@ -386,7 +377,15 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
 
     &.selected .torrent-progress-details.error,
     &.selected .torrent-peer-details.error {
-      color: #fff;
+      color: $white;
+    }
+
+    .torrent-progress {
+      display: flex;
+
+      .torrent-progress-bar-container {
+        flex-grow: 1;
+      }
     }
   }
 
@@ -427,76 +426,54 @@ $torrent-container-top: $toolbar-height + $statusbar-height + 6px;
   }
 
   .torrent-progress-bar {
-    background-image: url('images/progress.png');
-    background-repeat: repeat-x;
-    border: 1px solid #888;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-
-    &.complete {
-      z-index: 2;
-    }
-
-    &.complete.paused {
-      background-position: left -30px;
-      border-color: #989898;
-    }
-
-    &.complete.magnet {
-      background-position: left -20px;
-      border-color: #cfcfcf;
-    }
-
-    &.complete.leeching {
-      background-position: left 0;
-      border-color: #3d9dea;
-    }
-
-    &.complete.leeching.queued {
-      background-position: left -70px;
-      border-color: #889ca5;
-    }
-
-    &.complete.seeding {
-      background-position: left -40px;
-      border-color: #269e30;
-    }
-
-    &.complete.seeding.queued {
-      background-position: left -60px;
-      border-color: #8a998d;
-    }
+    border: 1px solid;
+    border-radius: 3px;
+    height: 100%; // border: 1px solid $grey53;
 
     &.incomplete {
       width: 100%;
-      z-index: 1;
+    }
+
+    @mixin progressbar-gradient($value) {
+      background: linear-gradient(to bottom, $value, darken($value, 25%) 80%);
+      border-color: darken($value, 30%);
+    }
+
+    // FIXME: 50% torrents' progressbars don't work. We don't have a way to overlay the two progressbars
+
+    &.complete.paused {
+      @include progressbar-gradient(#aaa);
+    }
+    &.complete.magnet {
+      @include progressbar-gradient(#eee);
+    }
+    &.complete.leeching.queued {
+      @include progressbar-gradient(#abc3cf);
+    }
+    &.complete.leeching {
+      @include progressbar-gradient(#42a9ff);
+    }
+    &.complete.seeding.queued {
+      @include progressbar-gradient(#aec0b1);
+    }
+    &.complete.seeding {
+      @include progressbar-gradient(#4e4);
     }
 
     &.incomplete.paused {
-      background-position: left -20px;
-      border-color: #cfcfcf;
+      @include progressbar-gradient(#eee);
     }
-
     &.incomplete.magnet {
-      background-position: left -50px;
-      border-color: #d47778;
+      @include progressbar-gradient(#e98484);
     }
-
-    &.incomplete.leeching {
-      background-position: left -20px;
-      border-color: #cfcfcf;
-    }
-
     &.incomplete.leeching.queued {
-      background-position: left -80px;
-      border-color: #c4c4c4;
+      @include progressbar-gradient(#f3f3f3);
     }
-
+    &.incomplete.leeching {
+      @include progressbar-gradient(#eee);
+    }
     &.incomplete.seeding {
-      background-position: left -10px;
-      border-color: #29ad35;
+      @include progressbar-gradient(#5e5);
     }
   }
 }
@@ -589,7 +566,7 @@ $inspector-width: 570px;
 }
 
 #torrent-inspector {
-  border-left: 1px solid #888;
+  border-left: 1px solid $grey53;
   bottom: 22px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -670,7 +647,7 @@ $inspector-width: 570px;
     }
 
     .tracker-activity {
-      color: #666;
+      color: $grey40;
       display: table;
       float: left;
       margin-top: 1px;
@@ -682,7 +659,7 @@ $inspector-width: 570px;
     }
 
     table {
-      color: #666;
+      color: $grey40;
       float: right;
     }
 
@@ -701,7 +678,7 @@ $inspector-width: 570px;
   }
 
   .tracker-host {
-    color: #222;
+    color: $grey13;
     font: bold 1.2em;
   }
 
@@ -721,7 +698,7 @@ $inspector-width: 570px;
     padding: 3px 0 3px 2px;
 
     &.skip {
-      color: #666;
+      color: $grey40;
     }
 
     &.even {
@@ -730,18 +707,18 @@ $inspector-width: 570px;
   }
 
   .inspector-torrent-file-list-entry-name {
-    color: #000;
+    color: $black;
     display: inline;
     font-size: 1.2em;
     margin-left: 0;
   }
 
   .inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
-    color: #999;
+    color: $grey60;
   }
 
   .inspector-torrent-file-list-entry-progress {
-    color: #999;
+    color: $grey60;
     margin-left: 20px;
   }
 
@@ -885,15 +862,15 @@ $inspector-width: 570px;
 
 .torrent-footer {
   @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
-  border-top: 1px solid #555;
+  border-top: 1px solid $grey33;
   bottom: 0;
   height: 22px;
   position: fixed;
   width: 100%;
-  z-index: 3;
+  // z-index: 3;
 
   > div {
-    border: 1px solid #888;
+    border: 1px solid $grey53;
     float: left;
     height: 12px;
     margin: 2px 4px;
@@ -945,96 +922,147 @@ $inspector-width: 570px;
 *****
 ****/
 
-.dialog-container {
-  color: #000;
-  font-size: 1.1em;
-  height: 100%;
-  left: 0;
-  margin: 0;
-  position: absolute;
-  text-align: center;
-  top: 0;
-  width: 100%;
-
+/*
+// zzz
+@media screen and (max-width: 650px) {
+  .dialog-container {
+    flex-grow: 1;
+    height: 100%;
+    top: $torrent-container-top;
+    width: 100%;
+  }
+  .dialog-window {
+    display: grid;
+    height: 100%;
+    padding: 20px;
+    width: 100%;
+  }
+  .dialog-logo {
+    grid-column-end: 2;
+    grid-column-start: 1;
+    grid-row-end: 4;
+    grid-row-start: 1;
+  }
+  .dialog-heading {
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 2;
+    grid-row-start: 1;
+  }
+  .dialog-message {
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 3;
+    grid-row-start: 2;
+  }
+  .dialog-workarea {
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 4;
+    grid-row-start: 3;
+  }
+  .dialog-buttons {
+    grid-column-end: 3;
+    grid-column-start: 1;
+    grid-row-end: 5;
+    grid-row-start: 4;
+  }
+}
+*/
+@media screen and (min-width: 651px) {
+  $padding-number: 20;
+  .dialog-container {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    left: 50%;
+    position: absolute;
+    top: $torrent-container-top * 2;
+    transform: translateX(-50%);
+  }
+  .dialog-window {
+    @include vertical-gradient($grey97, $grey87);
+    display: grid;
+    height: 100%;
+    padding: $padding-number * 1px;
+  }
   .dialog-logo {
     background: transparent url('images/logo.png') top left no-repeat;
-    float: left;
+    grid-column-end: 2;
+    grid-column-start: 1;
+    grid-row-end: 4;
+    grid-row-start: 1;
     height: 64px;
-    margin: 20px 20px 0;
+    padding-right: ($padding-number * 2 / 3) * 1px;
     width: 64px;
   }
+  .dialog-heading {
+    font-size: 1.2em;
+    font-weight: bold;
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 2;
+    grid-row-start: 1;
+  }
+  .dialog-message {
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 3;
+    grid-row-start: 2;
+  }
+  .dialog-workarea {
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 4;
+    grid-row-start: 3;
+    margin: 10px 0;
+  }
+  .dialog-buttons {
+    float: right;
+    grid-column-end: 3;
+    grid-column-start: 2;
+    grid-row-end: 5;
+    grid-row-start: 4;
+    text-align: center;
+    > * {
+      margin-left: 8px;
+      padding: 8px;
+    }
+  }
+  #free-space-text {
+    font-size: smaller;
+    font-style: italic;
+  }
+  .dialog-buttons-end {
+    display: none;
+  }
+  .dialog-workarea {
+    display: flex;
+    flex-direction: column;
+    > * {
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.dialog-container {
+  $button-spacing: 15px;
+  $outer-border: 20px;
 
   .dialog-window {
-    background-color: #eee;
-    border-top: 0;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
-    margin: 0 auto;
-    opacity: 0.95;
-    overflow: hidden;
-    position: relative;
-    text-align: left;
-    top: 80px;
-    width: 420px;
-    z-index: 10;
-
-    .dialog-heading {
-      color: #000;
-      display: block;
-      float: left;
-      font-size: 1.2em;
-      margin-top: 20px;
-      width: 305px;
-    }
-
     .dialog-message {
-      float: left;
-      margin-left: -3px;
-      overflow: hidden;
-      padding-left: 3px;
-      width: 305px;
-
-      label {
-        display: block;
-        margin-top: 15px;
-      }
-
-      input {
-        display: block;
-        margin: 3px 0 0;
-        width: 249px;
-      }
-
-      input[type='text'] {
-        padding: 2px;
-        width: 245px;
-      }
-
       input[type='checkbox'] {
-        display: inline;
         margin: 15px 3px 0 0;
         width: auto;
-      }
-
-      #auto-start-label {
-        display: inline;
       }
     }
 
     a {
       appearance: button;
-      background-color: #eee;
-      border: 1px solid #787878;
-      color: #323232;
+      background-color: #ddd;
+      border: 1px solid $grey47;
+      color: $grey20;
       cursor: default;
-      display: block;
-      float: right;
-      font: bold -webkit-control;
+      font: bold;
       height: 15px;
-      margin: 10px 20px 10px -8px;
-      padding: 5px;
-      text-align: center;
-      text-decoration: none;
-      width: 50px;
     }
 
     a:hover,
@@ -1068,4 +1096,143 @@ $inspector-width: 570px;
 
 .ui-menu {
   width: 200px;
+}
+
+/// more menu
+// package @ https://www.npmjs.com/package/accessible-menu
+// cribbed from https://jsfiddle.net/NickDJM/yokxg0vr/
+// FIXME: this is a work in progress
+
+$green: #0d464e;
+$green-90: #25585f;
+$red: #f58a97;
+
+#toolbar-more {
+  > .menu {
+    display: none;
+    flex-direction: column;
+
+    &.show {
+      display: flex;
+    }
+  }
+
+  > .menu-toggle {
+    background: transparent;
+    border: 0;
+    color: $white;
+    display: block;
+    font-size: 2rem;
+    margin-left: auto;
+    padding: 0.5rem 2rem;
+  }
+
+  > .branding {
+    display: block;
+    font-size: 1.5rem;
+    padding: 0.5rem 2rem;
+  }
+
+  @media screen and (max-width: 1069px) {
+    > .menu {
+      width: 100%;
+    }
+  }
+
+  /*
+  @media screen and (min-width: 1070px) {
+    > .menu {
+      display: flex;
+      flex-direction: row;
+    }
+
+    > .menu-toggle {
+      display: none;
+    }
+  }
+*/
+}
+
+.visually-hidden {
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  white-space: nowrap !important;
+  width: 1px !important;
+}
+
+.menu {
+  background-color: $green-90;
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &.dropdown {
+    display: none;
+    flex-direction: column;
+
+    @media screen and (min-width: 1070px) {
+      .menu-item .menu.dropdown {
+        left: 100%;
+        top: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1069px) {
+    .menu .menu-link {
+      padding-left: 3rem;
+    }
+
+    .menu .menu .menu-link {
+      padding-left: 4rem;
+    }
+  }
+
+  .menu-link,
+  .menu-toggle {
+    background-color: $green-90;
+    border: 0;
+    color: $white;
+    display: block;
+    padding: 1rem 2rem;
+    text-decoration: none;
+
+    &:hover {
+      background-color: $green;
+      text-decoration-color: $red;
+      text-decoration-line: underline;
+      text-decoration-thickness: 0.2rem;
+    }
+  }
+
+  .menu-link:active {
+    background-color: $red;
+    color: $black;
+  }
+
+  .menu-item {
+    position: relative;
+
+    &.dropdown > .dropdown-toggle::after {
+      content: '▼';
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
+    .menu.dropdown.show {
+      display: flex;
+
+      @media screen and (min-width: 1070px) {
+        left: 0;
+        position: absolute;
+      }
+    }
+  }
 }
