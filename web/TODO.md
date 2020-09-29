@@ -23,4 +23,7 @@
 - [ ] overlaid progressbars are broken
 - [ ] filterbar isn't responsive
 - [ ] dialogs are broken in smol mode
-- [ ] buttons in 'remove' dialog are wrong
+- [x] buttons in 'remove' dialog are wrong
+- [ ] entry field in 'rename' dialog isn't wide enough
+- [ ] entry field in 'set location' dialog isn't wide enough
+- [ ] buttons in 'set location' dialog are wrong

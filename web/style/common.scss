@@ -966,6 +966,10 @@ $inspector-width: 570px;
     grid-column-start: 1;
     grid-row-end: 5;
     grid-row-start: 4;
+    display:grid;
+  }
+  .dialog-buttons-begin {
+    flex-grow: 1;
   }
 }
 */
@@ -1001,17 +1005,21 @@ $inspector-width: 570px;
   .dialog-message {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
+    margin: 10px 0 0;
   }
   .dialog-workarea {
     grid-column: 2 / 3;
     grid-row: 3 / 4;
-    margin: 10px 0;
+    margin: 10px 0 0;
   }
   .dialog-buttons {
+    display: flex;
     float: right;
     grid-column: 2 / 3;
     grid-row: 4 / 5;
+    margin: 10px 0 0;
     text-align: center;
+
     > * {
       margin-left: 8px;
       padding: 8px;
@@ -1020,6 +1028,9 @@ $inspector-width: 570px;
   #free-space-text {
     font-size: smaller;
     font-style: italic;
+  }
+  .dialog-buttons-begin {
+    flex-grow: 1;
   }
   .dialog-buttons-end {
     display: none;
