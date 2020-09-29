@@ -22,8 +22,15 @@
 - [ ] compact mode is broken
 - [ ] overlaid progressbars are broken
 - [ ] filterbar isn't responsive
-- [ ] dialogs are broken in smol mode
+- [x] dialogs are broken in smol mode
 - [x] buttons in 'remove' dialog are wrong
-- [ ] entry field in 'rename' dialog isn't wide enough
-- [ ] entry field in 'set location' dialog isn't wide enough
-- [ ] buttons in 'set location' dialog are wrong
+- [x] entry field in 'rename' dialog isn't wide enough
+- [x] entry field in 'set location' dialog isn't wide enough
+- [x] buttons in 'set location' dialog are wrong
+- [x] dialogs that appear to be using jquery-ui but could use the dialog refactor:
+  - [x] 'about'
+  - [x] 'shortcuts'
+  - [x] 'stats'
+- [ ] 'open' shortcut 'o' only works once
+- [x] 'paused' class is not set on the torrent-name items when the torrent is paused
+- [ ] extract the configs out of package.json -- preferably into .js files where comments can be used

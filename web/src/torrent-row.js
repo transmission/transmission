@@ -254,15 +254,19 @@ export class TorrentRendererFull {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
+    const is_stopped = t.isStopped();
+
     // name
-    Utils.setTextContent(root._name_container, t.getName());
+    let e = root._name_container;
+    Utils.setTextContent(e, t.getName());
+    e.classList.toggle('paused', is_stopped);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
 
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
-    let e = root._peer_details_container;
+    e = root._peer_details_container;
     e.classList.toggle('error', has_error);
     Utils.setTextContent(e, TorrentRendererFull.getPeerDetails(t));
 
@@ -271,7 +275,6 @@ export class TorrentRendererFull {
     Utils.setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
 
     // pause/resume button
-    const is_stopped = t.isStopped();
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
     e.className = is_stopped ? 'torrent-resume' : 'torrent-pause';
@@ -352,9 +355,8 @@ export class TorrentRendererCompact {
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     // name
-    const is_stopped = t.isStopped();
     let e = root._name_container;
-    e.classList.toggle('paused', is_stopped);
+    e.classList.toggle('paused', t.isStopped());
     Utils.setTextContent(e, t.getName());
 
     // peer details

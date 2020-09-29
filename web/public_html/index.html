@@ -448,159 +448,177 @@
       </div>
     </div>
 
-    <div class="ui-helper-hidden" id="about-dialog">
-      <p id="about-logo"></p>
-      <p id="about-title">Transmission X</p>
-      <p id="about-blurb">A fast and easy BitTorrent client</p>
-      <p id="about-copyright">Copyright (c) The Transmission Project</p>
-    </div>
-
-    <div class="ui-helper-hidden" id="stats-dialog">
-      <div class="prefs-section">
-        <div class="title">Current Session</div>
-        <div class="row">
-          <div class="key">Uploaded:</div>
-          <div class="value" id="stats-session-uploaded">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Downloaded:</div>
-          <div class="value" id="stats-session-downloaded">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Ratio:</div>
-          <div class="value" id="stats-session-ratio">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Running Time:</div>
-          <div class="value" id="stats-session-duration">&nbsp;</div>
-        </div>
-      </div>
-      <div class="prefs-section">
-        <div class="title">Total</div>
-        <div class="row">
-          <div class="key">Started:</div>
-          <div class="value" id="stats-total-count">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Uploaded:</div>
-          <div class="value" id="stats-total-uploaded">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Downloaded:</div>
-          <div class="value" id="stats-total-downloaded">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Ratio:</div>
-          <div class="value" id="stats-total-ratio">&nbsp;</div>
-        </div>
-        <div class="row">
-          <div class="key">Running Time:</div>
-          <div class="value" id="stats-total-duration">&nbsp;</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="ui-helper-hidden" id="hotkeys-dialog">
-      <table>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>/</td>
-            <td>Show hotkeys dialog</td>
-          </tr>
-          <tr>
-            <td>,</td>
-            <td>Open preferences</td>
-          </tr>
-          <tr>
-            <td>Enter</td>
-            <td>Confirm dialog</td>
-          </tr>
-          <tr>
-            <td>ESC</td>
-            <td>Close/cancel dialog</td>
-          </tr>
-          <tr>
-            <td>a</td>
-            <td>Select all torrents</td>
-          </tr>
-          <tr>
-            <td>SHIFT + a</td>
-            <td>Deselect all torrents</td>
-          </tr>
-          <tr>
-            <td>c</td>
-            <td>Toggle compact view</td>
-          </tr>
-          <tr>
-            <td>d</td>
-            <td>Delete selected torrents</td>
-          </tr>
-          <tr>
-            <td>Backspace</td>
-            <td>Delete selected torrents</td>
-          </tr>
-          <tr>
-            <td>DEL</td>
-            <td>Delete selected torrents</td>
-          </tr>
-          <tr>
-            <td>i</td>
-            <td>Toggle inspector</td>
-          </tr>
-          <tr>
-            <td>l</td>
-            <td>Move torrent/Set location</td>
-          </tr>
-          <tr>
-            <td>m</td>
-            <td>Move torrent/Set location</td>
-          </tr>
-          <tr>
-            <td>o</td>
-            <td>Add/open a torrent</td>
-          </tr>
-          <tr>
-            <td>u</td>
-            <td>Add/open a torrent</td>
-          </tr>
-          <tr>
-            <td>p</td>
-            <td>Pause selected torrents</td>
-          </tr>
-          <tr>
-            <td>r</td>
-            <td>Resume selected torrents</td>
-          </tr>
-          <tr>
-            <td>t</td>
-            <td>Toggle turtle mode</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!--
-    <div class="dialog-container ui-helper-hidden" id="dialog-container">
+    <div class="dialog-container ui-helper-hidden" id="about-dialog">
       <div class="dialog-window">
-        <div class="dialog-logo" id="dialog-logo"></div>
-        <div class="dialog-heading" id="dialog-heading"></div>
-        <div class="dialog-message" id="dialog-message"></div>
-        <div class="dialog-workarea" id="dialog-workarea"></div>
+        <div class="dialog-logo"></div>
+        <div class="dialog-heading">
+          Transmission
+          <div id="about-dialog-version-number">X</div>
+          <div id="about-dialog-version-checksum"></div>
+        </div>
+        <div class="dialog-message">A fast and easy bitTorrent client</div>
+        <div class="dialog-workarea">Copyright (c) The Transmission Project</div>
         <div class="dialog-buttons">
           <span class="dialog-buttons-begin"></span>
-          <a href="#confirm" id="dialog-confirm-button">Confirm</a>
-          <a href="#cancel" id="dialog-cancel-button">Cancel</a>
+          <a href="#close" id="about-dialog-close-button">Close</a>
           <span class="dialog-buttons-end"></span>
         </div>
       </div>
     </div>
--->
+
+    <div class="dialog-container ui-helper-hidden" id="stats-dialog">
+      <div class="dialog-window">
+        <div class="dialog-logo" id="dialog-logo"></div>
+        <div class="dialog-message" id="dialog-message">
+          <div class="prefs-section">
+            <div class="title">Current Session</div>
+            <div class="row">
+              <div class="key">Uploaded:</div>
+              <div class="value" id="stats-session-uploaded">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Downloaded:</div>
+              <div class="value" id="stats-session-downloaded">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Ratio:</div>
+              <div class="value" id="stats-session-ratio">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Running Time:</div>
+              <div class="value" id="stats-session-duration">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-workarea">
+          <div class="prefs-section">
+            <div class="title">Total</div>
+            <div class="row">
+              <div class="key">Started:</div>
+              <div class="value" id="stats-total-count">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Uploaded:</div>
+              <div class="value" id="stats-total-uploaded">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Downloaded:</div>
+              <div class="value" id="stats-total-downloaded">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Ratio:</div>
+              <div class="value" id="stats-total-ratio">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="key">Running Time:</div>
+              <div class="value" id="stats-total-duration">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-buttons">
+          <span class="dialog-buttons-begin"></span>
+          <a href="#close" id="stats-dialog-close-button">Close</a>
+          <span class="dialog-buttons-end"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-container ui-helper-hidden" id="hotkeys-dialog">
+      <div class="dialog-window">
+        <div class="dialog-logo" id="dialog-logo"></div>
+        <div class="dialog-heading" id="dialog-heading">Hotkeys</div>
+        <div class="dialog-message" id="dialog-message">
+          <table>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>,</td>
+                <td>Open preferences</td>
+              </tr>
+              <tr>
+                <td>/</td>
+                <td>Show hotkeys dialog</td>
+              </tr>
+              <tr>
+                <td>Backspace</td>
+                <td>Delete selected torrents</td>
+              </tr>
+              <tr>
+                <td>DEL</td>
+                <td>Delete selected torrents</td>
+              </tr>
+              <tr>
+                <td>ESC</td>
+                <td>Close/cancel dialog</td>
+              </tr>
+              <tr>
+                <td>Enter</td>
+                <td>Confirm dialog</td>
+              </tr>
+              <tr>
+                <td>SHIFT + a</td>
+                <td>Deselect all torrents</td>
+              </tr>
+              <tr>
+                <td>a</td>
+                <td>Select all torrents</td>
+              </tr>
+              <tr>
+                <td>c</td>
+                <td>Toggle compact view</td>
+              </tr>
+              <tr>
+                <td>d</td>
+                <td>Delete selected torrents</td>
+              </tr>
+              <tr>
+                <td>i</td>
+                <td>Toggle inspector</td>
+              </tr>
+              <tr>
+                <td>l</td>
+                <td>Move torrent/Set location</td>
+              </tr>
+              <tr>
+                <td>m</td>
+                <td>Move torrent/Set location</td>
+              </tr>
+              <tr>
+                <td>o</td>
+                <td>Add/open a torrent</td>
+              </tr>
+              <tr>
+                <td>p</td>
+                <td>Pause selected torrents</td>
+              </tr>
+              <tr>
+                <td>r</td>
+                <td>Resume selected torrents</td>
+              </tr>
+              <tr>
+                <td>t</td>
+                <td>Toggle turtle mode</td>
+              </tr>
+              <tr>
+                <td>u</td>
+                <td>Add/open a torrent</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dialog-workarea" id="dialog-workarea"></div>
+        <div class="dialog-buttons">
+          <span class="dialog-buttons-begin"></span>
+          <a href="#close" id="hotkeys-dialog-close-button">Close</a>
+          <span class="dialog-buttons-end"></span>
+        </div>
+      </div>
+    </div>
 
     <div class="dialog-container ui-helper-hidden" id="upload-container">
       <div class="dialog-window">
@@ -647,8 +665,8 @@
     <div class="dialog-container ui-helper-hidden" id="rename-container">
       <div class="dialog-window">
         <div class="dialog-logo"></div>
-        <h2 class="dialog-heading">Rename torrent</h2>
-        <div class="dialog-message">
+        <div class="dialog-heading">Rename torrent</div>
+        <div class="dialog-workarea">
           <label for="torrent-rename-name">Enter new name:</label>
           <input type="text" id="torrent-rename-name" />
         </div>
@@ -664,7 +682,7 @@
     <div class="dialog-container ui-helper-hidden" id="move-container">
       <div class="dialog-window">
         <div class="dialog-logo" id="move-dialog-logo"></div>
-        <h2 class="dialog-heading">Set Location</h2>
+        <div class="dialog-heading">Set Location</div>
         <form
           action="#"
           method="post"
@@ -672,12 +690,17 @@
           enctype="multipart/form-data"
           target="torrent-move-frame"
         >
-          <div class="dialog-message">
+          <div class="dialog-message"></div>
+          <div class="dialog-workarea">
             <label for="torrent-path">Location:</label>
             <input type="text" id="torrent-path" />
           </div>
-          <a href="#cancel" id="move-cancel-button">Cancel</a>
-          <a href="#move" id="move-confirm-button">Apply</a>
+          <div class="dialog-buttons">
+            <span class="dialog-buttons-begin"></span>
+            <a href="#cancel" id="move-cancel-button">Cancel</a>
+            <a href="#move" id="move-confirm-button">Apply</a>
+            <span class="dialog-buttons-end"></span>
+          </div>
         </form>
       </div>
     </div>

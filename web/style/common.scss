@@ -4,10 +4,7 @@ $black: #000;
 $white: #fff;
 $grey13: #212121;
 $grey20: #333;
-$grey33: #555;
 $grey40: #666;
-$grey47: #787878;
-$grey53: #878787;
 $grey60: #999;
 $grey67: #ababab;
 $grey73: #bababa;
@@ -67,7 +64,7 @@ $selected-gradient-bottom: $white;
 
 @mixin rounded-button($radius) {
   @include button;
-  @include rounded-box($radius);
+  border-radius: $radius;
 }
 
 /// GLOBAL
@@ -97,26 +94,6 @@ a {
   outline: 0;
 }
 
-/// ABOUT DIALOG
-
-#about-dialog {
-  > * {
-    text-align: center;
-  }
-
-  > #about-logo {
-    background: transparent url('images/logo.png') top left no-repeat;
-    height: 64px;
-    margin-left: 100px;
-    width: 64px;
-  }
-
-  > #about-title {
-    font-size: 1.3em;
-    font-weight: bold;
-  }
-}
-
 /// HOTKEYS DIALOG
 
 #hotkeys-dialog {
@@ -129,6 +106,17 @@ a {
       border: 1px solid $grey67;
     }
   }
+}
+
+#about-dialog-version-number {
+  margin-left: 4px;
+}
+#about-dialog-version-checksum {
+  font-size: small;
+  font-style: italic;
+  font-weight: normal;
+  margin-left: auto;
+  padding-left: 10px;
 }
 
 /// TOOLBAR
@@ -342,7 +330,6 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
     }
 
     .torrent-name {
-      color: $grey13;
       font-weight: bold;
       margin-bottom: 2px;
       margin-top: 2px;
@@ -355,9 +342,8 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
         font-weight: normal;
       }
 
-      &.paused {
-        color: $grey47;
-        font-weight: normal;
+      &:not(.paused) {
+        color: $grey13;
       }
     }
 
@@ -428,7 +414,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
   .torrent-progress-bar {
     border: 1px solid;
     border-radius: 3px;
-    height: 100%; // border: 1px solid $grey53;
+    height: 100%;
 
     &.incomplete {
       width: 100%;
@@ -566,7 +552,7 @@ $inspector-width: 570px;
 }
 
 #torrent-inspector {
-  border-left: 1px solid $grey53;
+  border-left: 1px solid $grey40;
   bottom: 22px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -860,17 +846,19 @@ $inspector-width: 570px;
   );
 }
 
+$footer-height-number: 22;
+
 .torrent-footer {
   @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
-  border-top: 1px solid $grey33;
+  border-top: 1px solid $grey40;
   bottom: 0;
-  height: 22px;
+  height: $footer-height-number * 1px;
   position: fixed;
   width: 100%;
-  // z-index: 3;
 
   > div {
-    border: 1px solid $grey53;
+    border: 1px solid $grey40;
+    border-radius: 5px;
     float: left;
     height: 12px;
     margin: 2px 4px;
@@ -880,17 +868,14 @@ $inspector-width: 570px;
   }
 
   #settings-menu {
-    @include rounded-box(5px);
     @include footer-button-image('images/settings.png');
   }
 
   #prefs-button {
-    @include rounded-box(5px);
     @include footer-button-image('images/wrench.png');
   }
 
   #turtle-button {
-    @include rounded-box(5px);
     @include footer-button-image('images/turtle.png');
 
     &:active,
@@ -904,7 +889,6 @@ $inspector-width: 570px;
   }
 
   #compact-button {
-    @include rounded-box(5px);
     @include footer-button-image('images/compact.png');
   }
 
@@ -916,171 +900,147 @@ $inspector-width: 570px;
   }
 }
 
-/****
-*****
-*****  DIALOGS
-*****
-****/
+/// DIALOGS
 
-/*
-// zzz
-@media screen and (max-width: 650px) {
+$width-threshold-number: 550;
+$dialog-padding-number: 20;
+$dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
+
+@media screen and (max-width: $width-threshold-number * 1px) {
   .dialog-container {
-    flex-grow: 1;
-    height: 100%;
+    opacity: 96%;
+    position: absolute;
     top: $torrent-container-top;
     width: 100%;
   }
-  .dialog-window {
-    display: grid;
-    height: 100%;
-    padding: 20px;
-    width: 100%;
-  }
   .dialog-logo {
-    grid-column-end: 2;
-    grid-column-start: 1;
-    grid-row-end: 4;
-    grid-row-start: 1;
+    padding-bottom: $dialog-logo-padding-number * 1px;
+  }
+  .dialog-window {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
   }
   .dialog-heading {
-    grid-column-end: 3;
-    grid-column-start: 2;
-    grid-row-end: 2;
-    grid-row-start: 1;
-  }
-  .dialog-message {
-    grid-column-end: 3;
-    grid-column-start: 2;
-    grid-row-end: 3;
-    grid-row-start: 2;
-  }
-  .dialog-workarea {
-    grid-column-end: 3;
-    grid-column-start: 2;
-    grid-row-end: 4;
-    grid-row-start: 3;
+    grid-row: 2 / 3;
   }
   .dialog-buttons {
-    grid-column-end: 3;
-    grid-column-start: 1;
-    grid-row-end: 5;
-    grid-row-start: 4;
-    display:grid;
-  }
-  .dialog-buttons-begin {
-    flex-grow: 1;
+    padding-top: $dialog-logo-padding-number * 1px;
   }
 }
-*/
-@media screen and (min-width: 651px) {
-  $padding-number: 20;
+@media screen and (min-width: ($width-threshold-number + 1) * 1px) {
   .dialog-container {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
     left: 50%;
+    min-width: 400px;
     position: absolute;
     top: $torrent-container-top * 2;
     transform: translateX(-50%);
   }
   .dialog-window {
-    @include vertical-gradient($grey97, $grey87);
     display: grid;
-    height: 100%;
-    padding: $padding-number * 1px;
   }
   .dialog-logo {
-    background: transparent url('images/logo.png') top left no-repeat;
     grid-column: 1 / 2;
     grid-row: 1 / 4;
-    height: 64px;
-    padding-right: ($padding-number * 2 / 3) * 1px;
-    width: 64px;
+    padding-right: $dialog-logo-padding-number * 1px;
   }
   .dialog-heading {
-    font-size: 1.2em;
-    font-weight: bold;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
-  }
-  .dialog-message {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    margin: 10px 0 0;
-  }
-  .dialog-workarea {
-    grid-column: 2 / 3;
-    grid-row: 3 / 4;
-    margin: 10px 0 0;
-  }
-  .dialog-buttons {
-    display: flex;
-    float: right;
-    grid-column: 2 / 3;
-    grid-row: 4 / 5;
-    margin: 10px 0 0;
-    text-align: center;
-
-    > * {
-      margin-left: 8px;
-      padding: 8px;
-    }
-  }
-  #free-space-text {
-    font-size: smaller;
-    font-style: italic;
-  }
-  .dialog-buttons-begin {
-    flex-grow: 1;
-  }
-  .dialog-buttons-end {
-    display: none;
-  }
-  .dialog-workarea {
-    display: flex;
-    flex-direction: column;
-    > * {
-      margin-bottom: 5px;
-    }
   }
 }
 
 .dialog-container {
-  $button-spacing: 15px;
-  $outer-border: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+}
+.dialog-container form {
+  margin: 0;
+  padding: 0;
+}
+.dialog-window {
+  @include vertical-gradient($white, $grey87);
+  height: 100%;
+  padding: $dialog-padding-number * 1px;
+}
+.dialog-logo {
+  background: transparent url('images/logo.png') top left no-repeat;
+  height: 64px;
+  width: 64px;
+}
+.dialog-heading {
+  align-items: center;
+  display: flex;
+  font-size: 1.2em;
+  font-weight: bold;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+.dialog-message {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  margin: 10px 0 0;
+}
+.dialog-workarea {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+  margin: 10px 0 0;
+}
+.dialog-buttons {
+  display: flex;
+  float: right;
+  grid-column: 2 / 3;
+  grid-row: 4 / 5;
+  margin: 10px 0 0;
+  text-align: center;
 
-  .dialog-window {
-    .dialog-message {
-      input[type='checkbox'] {
-        margin: 15px 3px 0 0;
-        width: auto;
-      }
-    }
+  > * {
+    margin-left: 8px;
+    padding: 8px;
+  }
 
-    a {
-      appearance: button;
-      background-color: #ddd;
-      border: 1px solid $grey47;
-      color: $grey20;
-      cursor: default;
-      font: bold;
-      height: 15px;
-    }
+  a {
+    border: 1px solid $grey20;
+    border-radius: 4px;
+    color: $grey20;
+    // cursor: default;
+    // font: bold;
+    height: 15px;
+  }
 
-    a:hover,
-    a:active {
-      background: #c0c8d6 url('images/filter_bar.png') bottom repeat-x;
-    }
-
-    form {
-      margin: 0;
-      padding: 0;
-    }
+  a:hover,
+  a:active {
+    @include vertical-gradient($white, $grey87);
+  }
+}
+.dialog-buttons-begin {
+  flex-grow: 1;
+}
+.dialog-buttons-end {
+  display: none;
+}
+.dialog-workarea {
+  display: flex;
+  flex-direction: column;
+  > * {
+    margin-bottom: 5px;
   }
 }
 
+#free-space-text {
+  font-size: smaller;
+  font-style: italic;
+}
+
+#torrent-rename-name {
+  min-width: 400px;
+}
+
+#stats-dialog {
+  min-width: 500px;
+}
+
 #move-container #torrent-path {
-  padding: 2px;
-  width: 286px;
+  min-width: 400px;
 }
 
 #torrent-upload-frame {

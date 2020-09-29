@@ -72,6 +72,9 @@ export class Transmission {
     const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
     const click = (key, cb) => listen(key, 'click', cb);
     click('compact-button', this.toggleCompactClicked.bind(this));
+    click('hotkeys-dialog-close-button', Transmission.closeHotkeysDialog);
+    click('about-dialog-close-button', Transmission.closeAboutDialog);
+    click('stats-dialog-close-button', this.closeStatsDialog.bind(this));
     click('move-cancel-button', this.hideMoveDialog.bind(this));
     click('move-confirm-button', this.confirmMoveClicked.bind(this));
     click('prefs-button', this.togglePrefsDialogClicked.bind(this));
@@ -490,6 +493,10 @@ export class Transmission {
     }
 
     if (esc_key) {
+      Transmission.closeAboutDialog();
+      Transmission.closeHotkeysDialog();
+      this.closeStatsDialog();
+
       // handle other dialogs
       if (Dialog.isVisible()) {
         this.dialog.hideDialog();
@@ -823,16 +830,9 @@ export class Transmission {
           Transmission.showHotkeysDialog();
           break;
 
-        case 'about-button': {
-          const o = `Transmission ${this.serverVersion}`;
-          document.querySelector('#about-dialog #about-title').textContent = o;
-          $('#about-dialog').dialog({
-            hide: 'fade',
-            show: 'fade',
-            title: 'About',
-          });
+        case 'about-button':
+          Transmission.showAboutDialog();
           break;
-        }
 
         case 'homepage':
           window.open('https://transmissionbt.com/');
@@ -1295,7 +1295,9 @@ FIXME: fix this when notifications get fixed
     const fmt = Formatter;
     const menu = $('#footer-super-menu');
 
-    this.serverVersion = o.version;
+    const [, version, checksum] = o.version.match(/(.*)\s\(([0-9a-f]+)\)/);
+    Utils.setTextContent(document.getElementById('about-dialog-version-number'), version);
+    Utils.setTextContent(document.getElementById('about-dialog-version-checksum'), checksum);
 
     this.prefsDialog.set(o);
 
@@ -1688,36 +1690,7 @@ FIXME: fix this when notifications get fixed
     this.prefs.display_mode = compact ? Prefs.DisplayCompact : Prefs.DisplayFull;
   }
 
-  /***
-   ****
-   ****  Statistics
-   ****
-   ***/
-
-  // turn the periodic ajax stats refresh on & off
-  togglePeriodicStatsRefresh(enabled) {
-    if (!enabled && this.statsInterval) {
-      clearInterval(this.statsInterval);
-      delete this.statsInterval;
-    }
-    if (enabled) {
-      this.loadDaemonStats();
-      if (!this.statsInterval) {
-        const msec = 5000;
-        this.statsInterval = setInterval(this.loadDaemonStats.bind(this), msec);
-      }
-    }
-  }
-
-  loadDaemonStats(async) {
-    this.remote.loadDaemonStats(
-      (data) => {
-        Transmission.updateStats(data['arguments']);
-      },
-      this,
-      async
-    );
-  }
+  /// STATS DIALOG
 
   // Process new session stats from the server
   static updateStats(stats) {
@@ -1740,31 +1713,54 @@ FIXME: fix this when notifications get fixed
     setText('stats-total-duration', fmt.timeInterval(s.secondsActive));
   }
 
+  loadDaemonStats() {
+    this.remote.loadDaemonStats((data) => Transmission.updateStats(data['arguments']));
+  }
+
+  // turn the periodic ajax stats refresh on & off
+  togglePeriodicStatsRefresh(enabled) {
+    if (this.statsInterval) {
+      clearInterval(this.statsInterval);
+      delete this.statsInterval;
+    }
+
+    if (enabled) {
+      this.loadDaemonStats();
+      if (!this.statsInterval) {
+        const msec = 5000;
+        this.statsInterval = setInterval(this.loadDaemonStats.bind(this), msec);
+      }
+    }
+  }
+
   showStatsDialog() {
     this.loadDaemonStats();
     this.togglePeriodicStatsRefresh(true);
-    $('#stats-dialog').dialog({
-      close: this.onStatsDialogClosed.bind(this),
-      hide: 'fade',
-      show: 'fade',
-      title: 'Statistics',
-    });
+    document.getElementById('stats-dialog').classList.remove('ui-helper-hidden');
   }
 
-  onStatsDialogClosed() {
+  closeStatsDialog() {
+    document.getElementById('stats-dialog').classList.add('ui-helper-hidden');
     this.togglePeriodicStatsRefresh(false);
   }
 
-  /***
-   ****
-   ****  Hotkeys
-   ****
-   ***/
+  /// HOTKEYS DIALOG
+
   static showHotkeysDialog() {
-    $('#hotkeys-dialog').dialog({
-      hide: 'fade',
-      show: 'fade',
-      title: 'Hotkeys',
-    });
+    document.getElementById('hotkeys-dialog').classList.remove('ui-helper-hidden');
+  }
+
+  static closeHotkeysDialog() {
+    document.getElementById('hotkeys-dialog').classList.add('ui-helper-hidden');
+  }
+
+  /// ABOUT DIALOG
+
+  static showAboutDialog() {
+    document.getElementById('about-dialog').classList.remove('ui-helper-hidden');
+  }
+
+  static closeAboutDialog() {
+    document.getElementById('about-dialog').classList.add('ui-helper-hidden');
   }
 }
