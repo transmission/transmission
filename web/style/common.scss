@@ -958,7 +958,7 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
   padding: 0;
 }
 .dialog-window {
-  @include vertical-gradient($white, $grey87);
+  background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
   height: 100%;
   padding: $dialog-padding-number * 1px;
 }
