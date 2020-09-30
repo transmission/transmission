@@ -33,7 +33,7 @@
 - [x] torrent-row pause/resume buttons don't highlight
 - [x] replace png files with svgs where possible
 - [x] extract the configs out of package.json -- preferably into .js files where comments can be used
-- [ ] ratio should have one decimal place, not two
+- [x] ratio should have one decimal place, not two
 - [ ] can't open the 'about' dialog after opening and closing the 'remove' dialog
 - [ ] 'open' shortcut 'o' only works once
 - [ ] inspector is broken on desktop

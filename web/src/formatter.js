@@ -37,7 +37,7 @@ export class Formatter {
       `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 
     if (bytes < mem_K) {
-      return toStr(bytes, mem_B_str);
+      return `${Math.floor(bytes)} ${mem_B_str}`;
     }
     if (bytes < mem_K ** 2) {
       return toStr(bytes / mem_K, mem_K_str);
@@ -58,6 +58,9 @@ export class Formatter {
 
   // format a percentage to a string
   static percentString(x) {
+    if (x < 0.1) {
+      return '0';
+    }
     if (x < 10.0) {
       return Formatter._toTruncFixed(x, 2);
     }
@@ -90,7 +93,7 @@ export class Formatter {
       `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 
     if (bytes < size_K) {
-      return toStr(bytes, size_B_str);
+      return `${Math.floor(bytes)} ${size_B_str}`;
     }
     if (bytes < size_K ** 2) {
       return toStr(bytes / size_K, size_K_str);
