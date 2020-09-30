@@ -30,9 +30,7 @@ import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
 import { Utils } from './utils.js';
 
-// TODO: merge mobile.scss and common.scss
-// import '../style/mobile.scss';
-import '../style/common.scss';
+import '../style/transmission-app.scss';
 
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
 $.fn.tabbedDialog = function (dialog_opts) {

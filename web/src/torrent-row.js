@@ -279,6 +279,7 @@ export class TorrentRendererFull {
     const progressbar = TorrentRendererHelper.createProgressbar('full');
     progress.appendChild(progressbar.element);
     const button = document.createElement('a');
+    button.className = 'torrent-pauseresume-button';
     const image = document.createElement('div');
     button.appendChild(image);
     progress.appendChild(button);

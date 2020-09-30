@@ -30,8 +30,12 @@
   - [x] 'shortcuts'
   - [x] 'stats'
 - [x] 'paused' class is not set on the torrent-name items when the torrent is paused
+- [x] torrent-row pause/resume buttons don't highlight
+- [x] replace png files with svgs where possible
+- [ ] ratio should have one decimal place, not two
 - [ ] extract the configs out of package.json -- preferably into .js files where comments can be used
 - [ ] can't open the 'about' dialog after opening and closing the 'remove' dialog
 - [ ] 'open' shortcut 'o' only works once
 - [ ] inspector is broken on desktop
 - [ ] filterbar isn't responsive
+- [ ] compact mode overflows on iPhone

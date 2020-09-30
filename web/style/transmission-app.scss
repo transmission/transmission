@@ -1,4 +1,8 @@
 @use "sass:color";
+@use "sass:math";
+
+// COLORS
+// TODO: do we need this many greys?
 
 $black: #000;
 $white: #fff;
@@ -12,12 +16,64 @@ $grey81: #cfcfcf;
 $grey87: #dedede;
 $grey97: #f7f7f7;
 
+// SVG ICONS
+
+// https://icons.getbootstrap.com/icons/chevron-up/ MIT license
+$svg-chevron-up: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-chevron-up' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/chevron-down/ MIT license
+$svg-chevron-dn: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-chevron-down' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/three-dots-vertical/ MIT license
+$svg-three-dots-vertical: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-three-dots-vertical' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z'/></svg>";
+
+// https://material.io/resources/icons/?icon=horizontal_rule Apache license version 2.0.
+$svg-baseline: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' enable-background='new 0 0 24 24' height='24' viewBox='0 0 24 24' width='24'><g><rect fill='none' fill-rule='evenodd' height='24' width='24'/><rect fill-rule='evenodd' height='2' width='16' x='4' y='11'/></g></svg>";
+
+// https://icons.getbootstrap.com/icons/search/ MIT license
+$svg-search: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-search' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z'/><path fill-rule='evenodd' d='M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/gear-fill/ MIT license
+$svg-gear-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-gear-fill' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 0 0-5.86 2.929 2.929 0 0 0 0 5.858z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/files/ MIT license
+$svg-bi-files: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-files' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z'/><path d='M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/person-fill/ MIT license
+$svg-person-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-person-fill' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'/></svg>";
+
+// https://material.io/resources/icons/?icon=list  license version 2.0.
+$svg-list: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/lock-fill/ MIT license
+$svg-lock-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-lock-fill' fill='%23FFD700' xmlns='http://www.w3.org/2000/svg'><path d='M2.5 9a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9z'/><path fill-rule='evenodd' d='M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z'/></svg>";
+
+// https://material.io/resources/icons/?icon=pause_circle_filled Apache license version 2.0.
+// grey60 <- %23999
+$svg-pause-circle-idle: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23999' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>";
+$svg-pause-circle-active: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23800' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>";
+
+// https://material.io/resources/icons/?icon=play_circle_filled Apache license version 2.0.
+// grey60 <- %23999
+$svg-play-circle-idle: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23999' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>";
+$svg-play-circle-active: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23080' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>";
+
+// https://material.io/resources/icons/?icon=analytics Apache license version 2.0.
+$svg-analytics: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-5h2v5zm4 0h-2v-3h2v3zm0-5h-2v-2h2v2zm4 5h-2V7h2v10z'/></svg>";
+
+// https://icons.getbootstrap.com/icons/broadcast/ MIT license
+$svg-broadcast: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-broadcast' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707zm2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 0 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708zm5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708zm2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707z'/><path d='M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z'/></svg>";
+
+/// MIXINS
+
 @mixin vertical-gradient($topColor, $bottomColor) {
   background: color.mix($topColor, $bottomColor) linear-gradient($topColor, $bottomColor);
 }
 
 @mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
-  background: url($src) no-repeat center, linear-gradient($topColor, $bottomColor);
+  background-image: url($src), linear-gradient($topColor, $bottomColor);
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 @mixin button-image(
@@ -94,31 +150,6 @@ a {
   outline: 0;
 }
 
-/// HOTKEYS DIALOG
-
-#hotkeys-dialog {
-  table {
-    border-collapse: collapse;
-    width: 100%;
-
-    th,
-    td {
-      border: 1px solid $grey67;
-    }
-  }
-}
-
-#about-dialog-version-number {
-  margin-left: 4px;
-}
-#about-dialog-version-checksum {
-  font-size: small;
-  font-style: italic;
-  font-weight: normal;
-  margin-left: auto;
-  padding-left: 10px;
-}
-
 /// TOOLBAR
 
 $toolbar-height-num: 36;
@@ -189,10 +220,8 @@ $toolbar-height: $toolbar-height-num * 1px;
   @include toolbar-button-background-image('images/toolbar-info.png');
 }
 #toolbar-more {
-  @include toolbar-button-background-image(
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/></svg>"
-  );
-  margin-right: 8px;
+  background-image: url($svg-three-dots-vertical);
+  background-size: math.ceil($toolbar-height-num * 0.666) * 1px;
 }
 
 /// STATUSBAR
@@ -222,19 +251,27 @@ $statusbar-height: $statusbar-height-num * 1px;
     color: $grey60;
   }
 }
+
+$speed-icon-size: 12px;
 .speed-up-icon {
-  background: url('images/arrow-up.png') center no-repeat;
-  height: 8px;
-  width: 8px;
+  background-image: url($svg-chevron-up);
+  background-size: $speed-icon-size $speed-icon-size;
+  height: $speed-icon-size;
+  width: $speed-icon-size;
 }
 .speed-dn-icon {
-  background: url('images/arrow-down.png') center no-repeat;
-  height: 8px;
-  width: 8px;
+  background-image: url($svg-chevron-dn);
+  background-size: $speed-icon-size $speed-icon-size;
+  height: $speed-icon-size;
+  width: $speed-icon-size;
 }
 
 /// TORRENT CONTAINER
 
+$pauseresume-size: 14px;
+$progressbar-border-number: 1;
+$progressbar-height-number: 14;
+$progressbar-height: 14px;
 $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
 
 .flex {
@@ -261,15 +298,23 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
 
   .torrent {
     background-color: $white;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid $grey81;
     color: $grey40;
     display: flex;
-    flex-direction: column;
-    padding: 4px 12px;
 
     &.compact {
+      align-items: center;
       flex-direction: row-reverse;
-      padding: 4px;
+      > * {
+        margin: 4px 5px;
+      }
+    }
+    &:not(.compact) {
+      flex-direction: column;
+      padding: 2px 12px;
+      > * {
+        margin: 1px 0;
+      }
     }
 
     &.even {
@@ -280,127 +325,86 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
       background-color: $selection-color;
     }
 
-    // start-stop button
-    a {
-      padding-left: 6px;
-
-      img {
-        position: relative;
-        right: -10px;
-      }
-
-      div {
-        background: url('images/torrent-buttons.png');
-        height: 14px;
-        width: 14px;
-      }
-
-      .torrent-pause {
-        background-position: left top;
-      }
-
-      .torrent-resume {
-        background-position: center top;
-      }
-
-      &:active {
-        .torrent-pause {
-          background-position: left bottom;
-        }
-
-        .torrent-resume {
-          background-position: center bottom;
-        }
-      }
-
-      &:hover {
-        .torrent-pause {
-          background-position: left center;
-        }
-
-        .torrent-resume {
-          background-position: center center;
-        }
-      }
-    }
-
-    .torrent-name {
-      font-weight: bold;
-      margin-bottom: 2px;
-      margin-top: 2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-      &.compact {
-        flex-grow: 1;
-        font-size: 1em;
-        font-weight: normal;
-      }
-
-      &:not(.paused) {
-        color: $grey13;
-      }
-    }
-
-    .torrent-progress-details,
-    .torrent-peer-details {
-      font-size: smaller;
-    }
-
-    .torrent-progress-details.error,
-    .torrent-peer-details.error {
-      color: #f00;
-    }
-
     &.selected .torrent-progress-details.error,
     &.selected .torrent-peer-details.error {
       color: $white;
     }
+  }
 
-    .torrent-progress {
-      display: flex;
+  .torrent-pauseresume-button {
+    padding-left: 6px;
+  }
 
-      .torrent-progress-bar-container {
-        flex-grow: 1;
-      }
+  .torrent-pause {
+    background-image: url($svg-pause-circle-idle);
+    background-size: $pauseresume-size;
+    height: $pauseresume-size;
+    width: $pauseresume-size;
+    &:active,
+    &:hover {
+      background-image: url($svg-pause-circle-active);
     }
   }
 
-  // Progressbar
-  //
-  // Each progressbar has three elemens: a parent container and two children,
-  // complete and incomplete.
-  //
-  // The only thing needed to set the progressbar percentage is to set
-  // the complete child's width as a percentage. This is because incomplete
-  // is pinned to the full width and height of the parent, and complete
-  // is pinned to the left side of the parent and has a higher z-index.
-  //
-  // The progressbar has different colors depending on its state, so there
-  // are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
+  .torrent-resume {
+    background-image: url($svg-play-circle-idle);
+    background-size: $pauseresume-size;
+    height: $pauseresume-size;
+    width: $pauseresume-size;
+    &:active,
+    &:hover {
+      background-image: url($svg-play-circle-active);
+    }
+  }
+
+  .torrent-progress-details.error,
+  .torrent-peer-details.error {
+    color: #f00;
+  }
+
+  .torrent-name {
+    font-weight: bold;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.compact {
+      flex-grow: 1;
+      font-size: 1em;
+      font-weight: normal;
+    }
+
+    &:not(.paused) {
+      color: $grey13;
+    }
+  }
+
+  .torrent-progress-details,
+  .torrent-peer-details {
+    font-size: smaller;
+  }
+
+  .torrent-progress {
+    display: flex;
+
+    &.full {
+      margin: 2px 0;
+    }
+    .torrent-progress-bar-container {
+      flex-grow: 1;
+    }
+  }
+
   .torrent-progress-bar-container {
-    height: 10px;
+    height: ($progressbar-height-number - ($progressbar-border-number * 2)) * 1px;
     position: relative;
 
     &.compact {
-      margin-top: 2px;
-      position: absolute;
-      right: 10px;
+      min-width: 50px;
       width: 50px;
-      /*float: right;*/
     }
-
-    &.full {
-      margin-bottom: 5px;
-      margin-top: 2px;
-    }
-  }
-
-  .torrent-peer-details.compact {
-    float: right; // pins it next to progressbar & forces torrent-name to ellipsize when it bumps up against this div
-    margin-right: 65px; // leave room on the right for the progressbar
-    margin-top: 2px;
   }
 
   .torrent-progress-bar {
@@ -586,21 +590,21 @@ $inspector-width: 570px;
 
       > #inspector-tab-info {
         @include left-rounded-box($border-radius);
-        @include inspector-tab-image('images/inspector-info.png');
+        @include inspector-tab-image($svg-analytics);
         border-left-width: 1px;
       }
 
       > #inspector-tab-peers {
-        @include inspector-tab-image('images/inspector-peers.png');
+        @include inspector-tab-image($svg-person-fill);
       }
 
       > #inspector-tab-trackers {
-        @include inspector-tab-image('images/inspector-trackers.png');
+        @include inspector-tab-image($svg-broadcast);
       }
 
       > #inspector-tab-files {
         @include right-rounded-box($border-radius);
-        @include inspector-tab-image('images/inspector-files.png');
+        @include inspector-tab-image($svg-bi-files);
       }
     }
   }
@@ -768,7 +772,7 @@ $inspector-width: 570px;
 
 .inspector-peer-entry {
   .encrypted-peer-cell {
-    background: transparent url('images/lock_icon.png') no-repeat;
+    background: transparent url($svg-lock-fill) no-repeat;
     height: 16px;
     width: 16px;
   }
@@ -803,23 +807,25 @@ $inspector-width: 570px;
 
   > * {
     @include button;
+    background-size: 20px 12px;
     height: 12px;
+    padding: 0;
     width: 20px;
   }
 
   > .low {
     @include left-rounded-box($border-radius);
-    @include file-button-image('images/file-priority-low.png');
+    @include file-button-image($svg-chevron-dn);
     border-right-width: 0;
   }
 
   > .normal {
-    @include file-button-image('images/file-priority-normal.png');
+    @include file-button-image($svg-baseline);
   }
 
   > .high {
     @include right-rounded-box($border-radius);
-    @include file-button-image('images/file-priority-high.png');
+    @include file-button-image($svg-chevron-up);
     border-left-width: 0;
   }
 }
@@ -858,11 +864,11 @@ $footer-height-number: 22;
   }
 
   #settings-menu {
-    @include footer-button-image('images/settings.png');
+    @include footer-button-image($svg-three-dots-vertical);
   }
 
   #prefs-button {
-    @include footer-button-image('images/wrench.png');
+    @include footer-button-image($svg-gear-fill);
   }
 
   #turtle-button {
@@ -879,7 +885,7 @@ $footer-height-number: 22;
   }
 
   #compact-button {
-    @include footer-button-image('images/compact.png');
+    @include footer-button-image($svg-list);
   }
 
   #freespace-info {
@@ -993,8 +999,6 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
     border: 1px solid $grey20;
     border-radius: 4px;
     color: $grey20;
-    // cursor: default;
-    // font: bold;
     height: 15px;
   }
 
@@ -1017,21 +1021,56 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
   }
 }
 
-#free-space-text {
-  font-size: smaller;
-  font-style: italic;
+/// ABOUT DIALOG
+
+#about-dialog-version-number {
+  margin-left: 4px;
 }
+#about-dialog-version-checksum {
+  font-size: small;
+  font-style: italic;
+  font-weight: normal;
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+/// HOTKEYS DIALOG
+
+#hotkeys-dialog {
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    th,
+    td {
+      border: 1px solid $grey67;
+    }
+  }
+}
+
+/// RENAME DIALOG
 
 #torrent-rename-name {
   min-width: 400px;
 }
 
+/// SET-LOCATION DIALOG
+
+#move-container #torrent-path {
+  min-width: 400px;
+}
+
+/// STATS DIALOG
+
 #stats-dialog {
   min-width: 500px;
 }
 
-#move-container #torrent-path {
-  min-width: 400px;
+/// UPLOAD DIALOG
+
+#free-space-text {
+  font-size: smaller;
+  font-style: italic;
 }
 
 #torrent-upload-frame {
