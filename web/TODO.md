@@ -18,10 +18,8 @@
       - [ ] after completing the proof-of-concept above, add more TODO items here
 
 ## Short-term TODO
-- [ ] inspector is broken on desktop
-- [ ] compact mode is broken
-- [ ] overlaid progressbars are broken
-- [ ] filterbar isn't responsive
+- [x] compact mode is broken
+- [x] overlaid progressbars are broken
 - [x] dialogs are broken in smol mode
 - [x] buttons in 'remove' dialog are wrong
 - [x] entry field in 'rename' dialog isn't wide enough
@@ -31,6 +29,9 @@
   - [x] 'about'
   - [x] 'shortcuts'
   - [x] 'stats'
-- [ ] 'open' shortcut 'o' only works once
 - [x] 'paused' class is not set on the torrent-name items when the torrent is paused
 - [ ] extract the configs out of package.json -- preferably into .js files where comments can be used
+- [ ] can't open the 'about' dialog after opening and closing the 'remove' dialog
+- [ ] 'open' shortcut 'o' only works once
+- [ ] inspector is broken on desktop
+- [ ] filterbar isn't responsive

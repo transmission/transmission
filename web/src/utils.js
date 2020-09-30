@@ -67,14 +67,16 @@ export class Utils {
   }
 
   /**
-   * Many of our text changes are triggered by periodic refreshes
-   * on torrents whose state hasn't changed since the last update,
-   * so see if the text actually changed before poking the DOM.
+   * Avoid poking properties that haven't changed.
+   * This is a (possibly unnecessary?) precaution to avoid unnecessary DOM changes
    */
-  static setTextContent(e, text) {
-    if (e && e.textContent !== text) {
-      e.textContent = text;
+  static setProperty(o, key, val) {
+    if (o && o[key] !== val) {
+      o[key] = val;
     }
+  }
+  static setTextContent(e, text) {
+    Utils.setProperty(e, 'textContent', text);
   }
 
   static debounce(callback, wait = 100) {

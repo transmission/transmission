@@ -958,13 +958,13 @@ FIXME: fix this when notifications get fixed
       { row } = ev.currentTarget;
 
     // handle the per-row "torrent-resume" button
-    if (ev.target.className === 'torrent-resume') {
+    if (ev.target.classList.contains('torrent-resume')) {
       this.startTorrent(row.getTorrent());
       return;
     }
 
     // handle the per-row "torrent-pause" button
-    if (ev.target.className === 'torrent-pause') {
+    if (ev.target.classList.contains('torrent-pause')) {
       this.stopTorrent(row.getTorrent());
       return;
     }

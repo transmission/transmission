@@ -40,58 +40,41 @@ class TorrentRendererHelper {
     }
 
     return {
-      complete: ['torrent-progress-bar', 'complete', extra].join(' '),
-      incomplete: ['torrent-progress-bar', 'incomplete', extra].join(' '),
+      background: ['torrent-progress-bar', 'background', extra].join(' '),
+      foreground: ['torrent-progress-bar', 'foreground', extra, pct > 99 ? 'full' : ''].join(' '),
       percent: pct,
     };
   }
 
   static createProgressbar(classes) {
-    const complete = document.createElement('div');
-    complete.className = 'torrent-progress-bar complete';
+    const foreground = document.createElement('div');
+    foreground.className = 'torrent-progress-bar foreground';
 
-    const incomplete = document.createElement('div');
-    incomplete.className = 'torrent-progress-bar incomplete';
+    const background = document.createElement('div');
+    background.className = 'torrent-progress-bar background';
 
     const progressbar = document.createElement('div');
     progressbar.className = `torrent-progress-bar-container ${classes}`;
-    progressbar.appendChild(complete);
-    progressbar.appendChild(incomplete);
+    progressbar.appendChild(foreground);
+    progressbar.appendChild(background);
 
     return {
-      complete,
+      background,
       element: progressbar,
-      incomplete,
+      foreground,
     };
   }
 
   static renderProgressbar(controller, t, progressbar) {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
-    const width = `${info.percent}%`;
 
-    // update the complete progressbar
-    let e = progressbar.complete;
-    let display = info.percent > 0 ? 'block' : 'none';
-    if (e.style.width !== width || e.style.display !== display) {
-      e.style.display = display;
-      e.style.width = `${info.percent}%`;
-    }
+    let e = progressbar.foreground;
+    Utils.setProperty(e.style, 'width', `${info.percent}%`);
+    Utils.setProperty(e, 'className', info.foreground);
+    Utils.setVisible(e, info.percent > 0);
 
-    if (e.className !== info.complete) {
-      e.className = info.complete;
-    }
-
-    // update the incomplete progressbar
-    e = progressbar.incomplete;
-    display = info.percent < 100 ? 'block' : 'none';
-
-    if (e.style.display !== display) {
-      e.style.display = display;
-    }
-
-    if (e.className !== info.incomplete) {
-      e.className = info.incomplete;
-    }
+    e = progressbar.background;
+    Utils.setProperty(e, 'className', info.background);
   }
 
   static formatUL(t) {
@@ -277,7 +260,7 @@ export class TorrentRendererFull {
     // pause/resume button
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
-    e.className = is_stopped ? 'torrent-resume' : 'torrent-pause';
+    Utils.setProperty(e, 'className', is_stopped ? 'torrent-resume' : 'torrent-pause');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -414,7 +397,7 @@ export class TorrentRow {
   }
 
   isSelected() {
-    return this.getElement().className.indexOf('selected') !== -1;
+    return this.getElement().classList.contains('selected');
   }
 
   getTorrent() {

@@ -268,6 +268,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
     padding: 4px 12px;
 
     &.compact {
+      flex-direction: row-reverse;
       padding: 4px;
     }
 
@@ -277,12 +278,6 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
 
     &.selected {
       background-color: $selection-color;
-    }
-
-    &.compact {
-      .torrent-name {
-        color: $black;
-      }
     }
 
     // start-stop button
@@ -338,6 +333,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
       white-space: nowrap;
 
       &.compact {
+        flex-grow: 1;
         font-size: 1em;
         font-weight: normal;
       }
@@ -349,11 +345,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
 
     .torrent-progress-details,
     .torrent-peer-details {
-      clear: left;
       font-size: smaller;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .torrent-progress-details.error,
@@ -414,10 +406,22 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
   .torrent-progress-bar {
     border: 1px solid;
     border-radius: 3px;
+    bottom: 0;
     height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
 
-    &.incomplete {
-      width: 100%;
+    &.background {
+      right: 0;
+    }
+    &.foreground {
+      width: attr(percent-done);
+      z-index: 1;
+      &:not(.full) {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+      }
     }
 
     @mixin progressbar-gradient($value) {
@@ -427,48 +431,44 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
 
     // FIXME: 50% torrents' progressbars don't work. We don't have a way to overlay the two progressbars
 
-    &.complete.paused {
+    &.foreground.paused {
       @include progressbar-gradient(#aaa);
     }
-    &.complete.magnet {
+    &.foreground.magnet {
       @include progressbar-gradient(#eee);
     }
-    &.complete.leeching.queued {
+    &.foreground.leeching.queued {
       @include progressbar-gradient(#abc3cf);
     }
-    &.complete.leeching {
+    &.foreground.leeching {
       @include progressbar-gradient(#42a9ff);
     }
-    &.complete.seeding.queued {
+    &.foreground.seeding.queued {
       @include progressbar-gradient(#aec0b1);
     }
-    &.complete.seeding {
+    &.foreground.seeding {
       @include progressbar-gradient(#4e4);
     }
 
-    &.incomplete.paused {
+    &.background.paused {
       @include progressbar-gradient(#eee);
     }
-    &.incomplete.magnet {
+    &.background.magnet {
       @include progressbar-gradient(#e98484);
     }
-    &.incomplete.leeching.queued {
+    &.background.leeching.queued {
       @include progressbar-gradient(#f3f3f3);
     }
-    &.incomplete.leeching {
+    &.background.leeching {
       @include progressbar-gradient(#eee);
     }
-    &.incomplete.seeding {
+    &.background.seeding {
       @include progressbar-gradient(#5e5);
     }
   }
 }
 
-/***
-****
-****  PREFERENCES
-****
-***/
+/// PREFERENCES DIALOG
 
 #prefs-dialog.ui-tabs .ui-tabs-panel {
   padding: 0;
@@ -533,11 +533,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
   }
 }
 
-/***
-****
-****  TORRENT INSPECTOR
-****
-***/
+/// INSPECTOR
 
 $inspector-width: 570px;
 
@@ -782,9 +778,7 @@ $inspector-width: 570px;
   }
 }
 
-/***
-****  File Priority Buttons
-***/
+/// FILE PRIORITY BUTTONS
 
 @mixin file-button-image($image-url) {
   @include button-image(
@@ -830,11 +824,7 @@ $inspector-width: 570px;
   }
 }
 
-/****
-*****
-*****  MAIN WINDOW FOOTER
-*****
-****/
+/// MAIN WINDOW FOOTER
 
 @mixin footer-button-image($image-url) {
   @include button-image(
@@ -972,8 +962,9 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
   display: flex;
   font-size: 1.2em;
   font-weight: bold;
-  overflow-wrap: break-word;
-  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dialog-message {
   grid-column: 2 / 3;
