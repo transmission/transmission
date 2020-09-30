@@ -79,10 +79,14 @@
 
     <div class="ui-helper-hidden" id="prefs-dialog">
       <ul>
-        <li id="prefs-tab-general"><a href="#prefs-page-torrents">Torrents</a></li>
+        <li id="prefs-tab-general">
+          <a href="#prefs-page-torrents">Torrents</a>
+        </li>
         <li id="prefs-tab-speed"><a href="#prefs-page-speed">Speed</a></li>
         <li id="prefs-tab-peers"><a href="#prefs-page-peers">Peers</a></li>
-        <li id="prefs-tab-network"><a href="#prefs-page-network">Network</a></li>
+        <li id="prefs-tab-network">
+          <a href="#prefs-page-network">Network</a>
+        </li>
         <li class="ui-tab-dialog-close"></li>
       </ul>
       <div>
@@ -112,7 +116,9 @@
                   >Stop seeding at ratio:</label
                 >
               </div>
-              <div class="value"><input type="number" min="0" id="seedRatioLimit" /></div>
+              <div class="value">
+                <input type="number" min="0" id="seedRatioLimit" />
+              </div>
             </div>
             <div class="row">
               <div class="key">
@@ -137,7 +143,9 @@
                   >Upload (kB/s):</label
                 >
               </div>
-              <div class="value"><input type="number" min="0" id="speed-limit-up" /></div>
+              <div class="value">
+                <input type="number" min="0" id="speed-limit-up" />
+              </div>
             </div>
             <div class="row">
               <div class="key">
@@ -146,7 +154,9 @@
                   >Download (kB/s):</label
                 >
               </div>
-              <div class="value"><input type="number" min="0" id="speed-limit-down" /></div>
+              <div class="value">
+                <input type="number" min="0" id="speed-limit-down" />
+              </div>
             </div>
           </div>
           <div class="prefs-section">
@@ -158,11 +168,15 @@
             </div>
             <div class="row">
               <div class="key">Upload (kB/s):</div>
-              <div class="value"><input type="number" min="0" id="alt-speed-up" /></div>
+              <div class="value">
+                <input type="number" min="0" id="alt-speed-up" />
+              </div>
             </div>
             <div class="row">
               <div class="key">Download (kB/s):</div>
-              <div class="value"><input type="number" min="0" id="alt-speed-down" /></div>
+              <div class="value">
+                <input type="number" min="0" id="alt-speed-down" />
+              </div>
             </div>
             <div class="checkbox-row">
               <input type="checkbox" id="alt-speed-time-enabled" /><label
@@ -172,14 +186,18 @@
             </div>
             <div class="row">
               <div class="key">From:</div>
-              <div class="value"><select id="alt-speed-time-begin"></select></div>
+              <div class="value">
+                <select id="alt-speed-time-begin"></select>
+              </div>
             </div>
             <div class="row">
               <div class="key">To:</div>
               <div class="value"><select id="alt-speed-time-end"></select></div>
             </div>
             <div class="row">
-              <div class="key"><label for="alt-speed-time-day">On days:</label></div>
+              <div class="key">
+                <label for="alt-speed-time-day">On days:</label>
+              </div>
               <div class="value">
                 <select id="alt-speed-time-day">
                   <option value="127">Everyday</option>
@@ -204,11 +222,17 @@
               <div class="key">
                 <label for="peer-limit-per-torrent">Max peers per torrent:</label>
               </div>
-              <div class="value"><input type="number" min="0" id="peer-limit-per-torrent" /></div>
+              <div class="value">
+                <input type="number" min="0" id="peer-limit-per-torrent" />
+              </div>
             </div>
             <div class="row">
-              <div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
-              <div class="value"><input type="number" min="0" id="peer-limit-global" /></div>
+              <div class="key">
+                <label for="peer-limit-global">Max peers overall:</label>
+              </div>
+              <div class="value">
+                <input type="number" min="0" id="peer-limit-global" />
+              </div>
             </div>
           </div>
           <div class="prefs-section">
@@ -282,12 +306,18 @@
           <div class="prefs-section">
             <div class="title">Listening Port</div>
             <div class="row">
-              <div class="key"><label for="peer-port">Peer listening port:</label></div>
-              <div class="value"><input type="number" min="0" max="65535" id="peer-port" /></div>
+              <div class="key">
+                <label for="peer-port">Peer listening port:</label>
+              </div>
+              <div class="value">
+                <input type="number" min="0" max="65535" id="peer-port" />
+              </div>
             </div>
             <div class="row">
               <div class="key">&nbsp;</div>
-              <div class="value"><span id="port-label">Status: Unknown</span></div>
+              <div class="value">
+                <span id="port-label">Status: Unknown</span>
+              </div>
             </div>
             <div class="checkbox-row">
               <input type="checkbox" id="peer-port-random-on-start" /><label
@@ -950,7 +980,9 @@
       <li data-command="move-bottom"><div>Move to Bottom</div></li>
       <li>---</li>
       <li data-command="remove"><div>Remove From List…</div></li>
-      <li data-command="remove-data"><div>Trash Data and Remove From List…</div></li>
+      <li data-command="remove-data">
+        <div>Trash Data and Remove From List…</div>
+      </li>
       <li>---</li>
       <li data-command="verify"><div>Verify Local Data</div></li>
       <li data-command="move"><div>Set Location…</div></li>
