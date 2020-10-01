@@ -30,7 +30,6 @@ export class Transmission {
 
     this.isMenuEnabled = !isMobileDevice;
 
-    // zzz
     //const closeClass = "closed";
     const containerElement = document.getElementById('toolbar-more');
     const controllerElement = containerElement;
@@ -54,7 +53,6 @@ export class Transmission {
       submenuSelector,
       submenuToggleSelector,
     });
-    // zzz
 
     // Initialize the implementation fields
     this.filterText = '';
@@ -72,13 +70,8 @@ export class Transmission {
     const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
     const click = (key, cb) => listen(key, 'click', cb);
     click('compact-button', this.toggleCompactClicked.bind(this));
-    click('hotkeys-dialog-close-button', Transmission.closeHotkeysDialog);
-    click('about-dialog-close-button', Transmission.closeAboutDialog);
-    click('stats-dialog-close-button', this.closeStatsDialog.bind(this));
-    click('move-cancel-button', this.hideMoveDialog.bind(this));
     click('move-confirm-button', this.confirmMoveClicked.bind(this));
     click('prefs-button', this.togglePrefsDialogClicked.bind(this));
-    click('rename-cancel-button', Transmission.hideRenameDialog);
     click('rename-confirm-button', this.confirmRenameClicked.bind(this));
     click('toolbar-inspector', this.toggleInspector.bind(this));
     click('toolbar-more', this.toggleMore.bind(this));
@@ -89,8 +82,12 @@ export class Transmission {
     click('toolbar-start', this.startSelectedClicked.bind(this));
     click('toolbar-start-all', this.startAllClicked.bind(this));
     click('turtle-button', this.toggleTurtleClicked.bind(this));
-    click('upload-cancel-button', this.hideUploadDialog.bind(this));
     click('upload-confirm-button', this.confirmUploadClicked.bind(this));
+
+    let e = null;
+    for (e of document.getElementsByClassName('dialog-close-button')) {
+      e.addEventListener('click', Transmission.closeAllDialogs);
+    }
 
     // tell jQuery to copy the dataTransfer property from events over if it exists
     //FIXME
@@ -101,7 +98,7 @@ export class Transmission {
       ev.preventDefault();
     });
 
-    let e = document.getElementById('filter-mode');
+    e = document.getElementById('filter-mode');
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', this.onFilterModeClicked.bind(this));
     listen('filter-tracker', 'change', this.onFilterTrackerClicked.bind(this));
@@ -492,34 +489,8 @@ export class Transmission {
       }
     }
 
-    if (esc_key) {
-      Transmission.closeAboutDialog();
-      Transmission.closeHotkeysDialog();
-      this.closeStatsDialog();
-
-      // handle other dialogs
-      if (Dialog.isVisible()) {
-        this.dialog.hideDialog();
-        handled = true;
-      }
-
-      // handle upload dialog
-      if (!Utils.isHiddenId('upload-container')) {
-        this.hideUploadDialog();
-        handled = true;
-      }
-
-      // handle move dialog
-      if (!Utils.isHiddenId('move-container')) {
-        this.hideMoveDialog();
-        handled = true;
-      }
-
-      // handle rename dialog
-      if (!Utils.isHiddenId('rename-container')) {
-        Transmission.hideRenameDialog();
-        handled = true;
-      }
+    if (esc_key && Transmission.closeAllDialogs()) {
+      handled = true;
     }
 
     // Some hotkeys can only be used if the following conditions are met:
@@ -533,7 +504,7 @@ export class Transmission {
       }
 
       if (slash_key) {
-        Transmission.showHotkeysDialog();
+        Transmission.showDialog('hotkeys-dialog');
         handled = true;
       }
 
@@ -669,7 +640,6 @@ export class Transmission {
     const e = ev.target;
     if (Transmission.isElementEnabled(e)) {
       Transmission.setElementEnabled(e, false);
-      document.body.classList.add('open-showing');
       this.uploadTorrentFile();
       this.updateButtonStates();
     }
@@ -720,16 +690,9 @@ export class Transmission {
     return false;
   }
 
-  hideUploadDialog() {
-    document.body.classList.remove('open-showing');
-    Utils.hideId('upload-container');
-    Transmission.setElementEnabled(document.getElementById('toolbar-open'));
-    this.updateButtonStates();
-  }
-
   confirmUploadClicked() {
     this.uploadTorrentFile(true);
-    this.hideUploadDialog();
+    Transmission.closeAllDialogs();
   }
 
   hideMoveDialog() {
@@ -739,18 +702,13 @@ export class Transmission {
 
   confirmMoveClicked() {
     this.moveSelectedTorrents(true);
-    this.hideUploadDialog();
-  }
-
-  static hideRenameDialog() {
-    document.body.classList.remove('open-showing');
-    Utils.hideId('rename-container');
+    Transmission.closeAllDialogs();
   }
 
   confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
     this.renameTorrent(torrents[0], document.getElementById('torrent-rename-name').value);
-    Transmission.hideRenameDialog();
+    Transmission.closeAllDialogs();
   }
 
   removeClicked(ev) {
@@ -827,11 +785,11 @@ export class Transmission {
           break;
 
         case 'hotkeys':
-          Transmission.showHotkeysDialog();
+          Transmission.showDialog('hotkeys-dialog');
           break;
 
         case 'about-button':
-          Transmission.showAboutDialog();
+          Transmission.showDialog('about-dialog');
           break;
 
         case 'homepage':
@@ -1022,7 +980,7 @@ FIXME: fix this when notifications get fixed
    */
   uploadTorrentFile(confirmed) {
     const file_input = document.getElementById('torrent-upload-file');
-    const folderInput = document.getElementById('add-dialog-folder-input');
+    const folder_input = document.getElementById('add-dialog-folder-input');
     const start_input = document.getElementById('torrent-auto-start');
     const url_input = document.getElementById('torrent-upload-url');
 
@@ -1031,16 +989,16 @@ FIXME: fix this when notifications get fixed
       file_input.setAttribute('value', '');
       url_input.setAttribute('value', '');
       start_input.setAttribute('checked', this.shouldAddedTorrentsStart());
-      folderInput.value = document.getElementById('download-dir').value;
-      folderInput.addEventListener('change', this.updateFreeSpaceInAddDialog.bind(this));
+      folder_input.value = document.getElementById('download-dir').value;
+      folder_input.addEventListener('change', this.updateFreeSpaceInAddDialog.bind(this));
       this.updateFreeSpaceInAddDialog();
 
       // show the dialog
-      Utils.showId('upload-container');
+      Transmission.showDialog('upload-container');
       url_input.focus();
     } else {
       const paused = !start_input.getAttribute('checked');
-      const destination = folderInput.value;
+      const destination = folder_input.value;
       const { remote } = this;
 
       for (const file of file_input.files) {
@@ -1184,7 +1142,6 @@ FIXME: fix this when notifications get fixed
   }
 
   static promptToRenameTorrent(torrent) {
-    document.body.classList.add('open-showing');
     document.querySelector('input#torrent-rename-name').value = torrent.getName();
     Utils.showId('rename-container');
     document.getElementById('torrent-rename-name').focus();
@@ -1428,8 +1385,8 @@ FIXME: fix this when notifications get fixed
     const e = this.elements;
     this.calculateTorrentStates((s) => {
       Transmission.setElementEnabled(e.toolbar_pause_button, s.activeSel > 0);
-      Transmission.setElementEnabled(e.toolbar_start_button, s.pausedSel > 0);
       Transmission.setElementEnabled(e.toolbar_remove_button, s.sel > 0);
+      Transmission.setElementEnabled(e.toolbar_start_button, s.pausedSel > 0);
     });
   }
 
@@ -1734,33 +1691,45 @@ FIXME: fix this when notifications get fixed
   }
 
   showStatsDialog() {
+    Transmission.showDialog('stats-dialog');
     this.loadDaemonStats();
     this.togglePeriodicStatsRefresh(true);
-    document.getElementById('stats-dialog').classList.remove('ui-helper-hidden');
   }
 
   closeStatsDialog() {
-    document.getElementById('stats-dialog').classList.add('ui-helper-hidden');
     this.togglePeriodicStatsRefresh(false);
+    Transmission.closeAllDialogs();
   }
 
-  /// HOTKEYS DIALOG
+  ///
 
-  static showHotkeysDialog() {
-    document.getElementById('hotkeys-dialog').classList.remove('ui-helper-hidden');
+  static closeAllDialogs() {
+    let any_closed = false;
+    const class_name = 'ui-helper-hidden';
+
+    for (const e of document.getElementsByClassName('dialog-container')) {
+      if (!e.classList.contains(class_name)) {
+        e.classList.add(class_name);
+        any_closed = true;
+        console.log(e.id);
+        if (e.id === 'upload-container') {
+          Transmission.setElementEnabled(document.getElementById('toolbar-open'), true);
+        }
+      }
+    }
+
+    return any_closed;
   }
 
-  static closeHotkeysDialog() {
-    document.getElementById('hotkeys-dialog').classList.add('ui-helper-hidden');
-  }
-
-  /// ABOUT DIALOG
-
-  static showAboutDialog() {
-    document.getElementById('about-dialog').classList.remove('ui-helper-hidden');
-  }
-
-  static closeAboutDialog() {
-    document.getElementById('about-dialog').classList.add('ui-helper-hidden');
+  static showDialog(id) {
+    Transmission.closeAllDialogs();
+    document.getElementById(id).classList.remove('ui-helper-hidden');
+    switch (id) {
+      case 'upload-container':
+        Transmission.setElementEnabled(document.getElementById('toolbar-open'), false);
+        break;
+      default:
+        break;
+    }
   }
 }
