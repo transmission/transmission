@@ -83,8 +83,12 @@ export class Utils {
     let timeout = null;
     return (...args) => {
       const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => callback.apply(context, args), wait);
+      if (!timeout) {
+        timeout = setTimeout(() => {
+          timeout = null;
+          callback.apply(context, args);
+        }, wait);
+      }
     };
   }
 

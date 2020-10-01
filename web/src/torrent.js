@@ -7,13 +7,11 @@
 
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
-import { Utils } from './utils.js';
 
 export class Torrent extends EventTarget {
   constructor(data) {
     super();
 
-    this.dispatchDataChanged = Utils.debounce(() => this.dispatchEvent(new Event('dataChanged')));
     this.fieldObservers = {};
     this.fields = {};
     this.refresh(data);
@@ -92,7 +90,7 @@ export class Torrent extends EventTarget {
 
   refresh(data) {
     if (this.refreshFields(data)) {
-      this.dispatchDataChanged();
+      this.dispatchEvent(new Event('dataChanged'));
     }
   }
 
