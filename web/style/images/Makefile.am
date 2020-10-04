@@ -9,8 +9,6 @@ EXTRA_DIST = \
   toolbar-close.png \
   toolbar-folder.png \
   toolbar-info.png \
-  toolbar-pause-all.png \
   toolbar-pause.png \
-  toolbar-start-all.png \
   toolbar-start.png \
   turtle.png

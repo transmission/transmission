@@ -21,14 +21,14 @@ export class Utils {
   }
 
   static hide(el) {
-    el.style.display = 'none';
+    el.classList.add('hidden');
   }
   static hideId(id) {
     return Utils.hide(document.getElementById(id));
   }
 
   static show(el) {
-    el.style.display = 'block';
+    el.classList.remove('hidden');
   }
   static showId(id) {
     return Utils.show(document.getElementById(id));

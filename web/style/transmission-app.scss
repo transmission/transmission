@@ -16,6 +16,11 @@ $grey81: #cfcfcf;
 $grey87: #dedede;
 $grey97: #f7f7f7;
 
+// Z-INDEX ENUM
+$z-index-mainwin: 0;
+$z-index-progressbar: 1;
+$z-index-popup: 2;
+
 // SVG ICONS
 
 // https://icons.getbootstrap.com/icons/chevron-up/ MIT license
@@ -63,6 +68,9 @@ $svg-analytics: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
 
 // https://icons.getbootstrap.com/icons/broadcast/ MIT license
 $svg-broadcast: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-broadcast' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707zm2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 0 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708zm5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708zm2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707z'/><path d='M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z'/></svg>";
+
+// https://material.io/resources/icons/?icon=menu Apache license version 2.0.
+$svg-menu: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black' width='18px' height='18px'><path d='M0 0h24v24H0z' fill='none'/><path d='M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'/></svg>";
 
 /// MIXINS
 
@@ -125,21 +133,12 @@ $selected-gradient-bottom: $white;
 
 /// GLOBAL
 
-html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
+html,
 body {
-  display: flex;
-  flex-direction: column;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   height: 100%;
   margin: 0;
   overflow: hidden;
-  width: 100%;
 }
 
 img {
@@ -148,6 +147,28 @@ img {
 
 a {
   outline: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.mainwin {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+
+  > * {
+    margin: 0;
+    padding: 0;
+  }
+}
+.mainwin-workarea {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  overflow: auto;
 }
 
 /// TOOLBAR
@@ -169,7 +190,7 @@ $toolbar-height: $toolbar-height-num * 1px;
   }
 }
 
-#toolbar {
+#mainwin-toolbar {
   $toolbar-button-size: 36px;
   $toolbar-gradient-top: $grey87;
   @include vertical-gradient($grey87, $grey73);
@@ -210,35 +231,28 @@ $toolbar-height: $toolbar-height-num * 1px;
 #toolbar-pause {
   @include toolbar-button-background-image('images/toolbar-pause.png');
 }
-#toolbar-start-all {
-  @include toolbar-button-background-image('images/toolbar-start-all.png');
-}
-#toolbar-pause-all {
-  @include toolbar-button-background-image('images/toolbar-pause-all.png');
-}
 #toolbar-inspector {
   @include toolbar-button-background-image('images/toolbar-info.png');
 }
 #toolbar-more {
-  background-image: url($svg-three-dots-vertical);
-  background-size: math.ceil($toolbar-height-num * 0.666) * 1px;
+  @include toolbar-button-background-image($svg-menu);
 }
 
-/// STATUSBAR
+/// FILTERBAR
 
-$statusbar-gradient-top: $grey87;
-$statusbar-gradient-bottom: $grey73;
+$filterbar-gradient-top: $grey87;
+$filterbar-gradient-bottom: $grey73;
 
-$statusbar-height-num: 26;
-$statusbar-height: $statusbar-height-num * 1px;
+$filterbar-height-num: 26;
+$filterbar-height: $filterbar-height-num * 1px;
 
-#statusbar {
-  @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
+.mainwin-filterbar {
+  @include vertical-gradient($filterbar-gradient-top, $filterbar-gradient-bottom);
   align-items: center;
   border-bottom: 1px solid $grey67;
   display: flex;
   flex-direction: row;
-  height: $statusbar-height;
+  height: $filterbar-height;
   width: 100%;
 
   > * {
@@ -272,7 +286,7 @@ $pauseresume-size: 14px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
 $progressbar-height: 14px;
-$torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
+$torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
 
 .flex {
   flex-grow: 1;
@@ -421,7 +435,7 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
     }
     &.foreground {
       width: attr(percent-done);
-      z-index: 1;
+      z-index: $z-index-progressbar;
       &:not(.full) {
         border-bottom-right-radius: 0;
         border-top-right-radius: 0;
@@ -468,6 +482,70 @@ $torrent-container-top: $toolbar-height-num + $statusbar-height-num + 6px;
     }
     &.background.seeding {
       @include progressbar-gradient(#5e5);
+    }
+  }
+}
+
+/// MENU
+
+.mainwin-menu {
+  background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
+  height: 100%;
+  left: 0;
+  margin-right: 20px;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  transition: 0.5s;
+  width: 300px;
+  z-index: $z-index-popup;
+
+  &.hidden {
+    display: block;
+    width: 0;
+  }
+  &:not(.hidden) {
+    border-right: 1px solid $grey20;
+    padding: 20px;
+  }
+
+  .actions a,
+  .info a,
+  .links a {
+    display: block;
+    width: 150px;
+  }
+
+  .title {
+    color: $grey40;
+    font-weight: bold;
+  }
+  .options {
+    margin: 0 10px 20px;
+  }
+  a {
+    color: $grey40;
+    cursor: pointer;
+    display: inline-block;
+    font-size: smaller;
+    padding: 5px;
+    text-decoration: none;
+  }
+  a:hover {
+    background-color: $grey97;
+  }
+  .selected {
+    background-color: $grey97;
+  }
+  .mainwin-menu-close {
+    color: $grey67;
+    font-size: 36px;
+    margin-left: 50px;
+    position: absolute;
+    right: 25px;
+    top: 0;
+    &:hover {
+      color: $grey81;
     }
   }
 }
@@ -562,7 +640,7 @@ $inspector-width: 570px;
   text-align: left;
   top: $torrent-container-top;
   width: $inspector-width;
-  z-index: 5;
+  z-index: $z-index-popup;
 
   .inspector-page {
     padding: 8px 0;
@@ -844,13 +922,11 @@ $inspector-width: 570px;
 
 $footer-height-number: 22;
 
-.torrent-footer {
-  @include vertical-gradient($statusbar-gradient-top, $statusbar-gradient-bottom);
+.mainwin-footer {
+  @include vertical-gradient($filterbar-gradient-top, $filterbar-gradient-bottom);
   border-top: 1px solid $grey40;
-  bottom: 0;
   height: $footer-height-number * 1px;
-  position: fixed;
-  width: 100%;
+  // width: 100%;
 
   > div {
     border: 1px solid $grey40;
@@ -944,10 +1020,14 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
   }
+  #hotkeys-dialog {
+    min-width: 500px;
+  }
 }
 
 .dialog-container {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  z-index: $z-index-popup;
 }
 .dialog-container form {
   margin: 0;
@@ -996,10 +1076,10 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
   }
 
   a {
-    border: 1px solid $grey20;
-    border-radius: 4px;
+    border: 1px outset $grey97;
     color: $grey20;
     height: 15px;
+    text-decoration: none;
   }
 
   a:hover,
@@ -1044,6 +1124,7 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
     th,
     td {
       border: 1px solid $grey67;
+      padding: 5px 10px;
     }
   }
 }

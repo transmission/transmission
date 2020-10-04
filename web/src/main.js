@@ -22,7 +22,6 @@ import 'jquery-ui/themes/base/tabs.css';
 import 'jquery-ui/themes/base/theme.css';
 
 import './deprecated/jquery.ui-contextmenu.js';
-import './deprecated/jquery.transmenu.js';
 
 import { Dialog } from './dialog.js';
 import { Notifications } from './notifications.js';

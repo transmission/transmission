@@ -34,8 +34,22 @@
 - [x] replace png files with svgs where possible
 - [x] extract the configs out of package.json -- preferably into .js files where comments can be used
 - [x] ratio should have one decimal place, not two
-- [ ] can't open the 'about' dialog after opening and closing the 'remove' dialog
-- [ ] 'open' shortcut 'o' only works once
-- [ ] inspector is broken on desktop
+- [x] can't open the 'about' dialog after opening and closing the 'remove' dialog
+- [x] 'open' shortcut 'o' only works once
+- [x] compact mode overflows on iPhone
+- [x] more menu
+  - [x] more menu should 'slide' out from left
+  - [x] figure out what to do on submenus
+  - [x] styling
+  - [x] scrolling on mobile?
+  - [x] wire in start all
+  - [x] wire in stop all
+  - [x] wire in homepage
+  - [x] wire in tip jar
+  - [x] should OVERLAY torrent container, not go before it
+- [ ] stats dialog looks bad on mobile
+- [ ] inspector styling is broken
 - [ ] filterbar isn't responsive
-- [ ] compact mode overflows on iPhone
+- [ ] what to do about context menu? it still uses jQuery
+- [ ] what to do about prefs dialog? it still uses jQuery
+- [ ] what to do about footer? it's not useful right now

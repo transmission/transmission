@@ -20,8 +20,6 @@
     "@babel/core": "^7.11.6",
     "@babel/eslint-parser": "^7.11.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@material/menu": "^7.0.0",
-    "accessible-menu": "^2.1.0",
     "css-loader": "^4.3.0",
     "eslint": "^7.9.0",
     "eslint-plugin-jquery": "^1.5.1",

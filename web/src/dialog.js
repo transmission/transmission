@@ -30,55 +30,29 @@ export class Dialog {
   }
 
   hideDialog() {
-    document.body.classList.remove('dialog-showing');
     Utils.hide(this._container);
-    // transmission.hideMobileAddressbar();
-    // transmission.updateButtonStates();
-  }
-
-  static isVisible() {
-    return document.body.classList.contains('dialog-showing');
-  }
-
-  static hideAllDialogs() {
-    [...document.getElementsByClassName('dialog-container')].forEach((e) => Utils.hide(e));
+    this._callback = null;
   }
 
   /// INTERFACE FUNCTIONS
 
   // display a confirm dialog
   confirm(dialog_heading, dialog_message, confirm_button_label, callback, cancel_button_label) {
-    Dialog.hideAllDialogs();
+    this._callback = callback;
     Utils.setTextContent(this._heading, dialog_heading);
     Utils.setTextContent(this._message, dialog_message);
     Utils.setTextContent(this._cancel_button, cancel_button_label || 'Cancel');
     Utils.setTextContent(this._confirm_button, confirm_button_label);
-    this._callback = callback;
-
-    // if (isMobileDevice) {
-    //   transmission.hideMobileAddressbar();
-    // }
-
-    document.body.classList.add('dialog-showing');
     Utils.show(this._confirm_button);
     Utils.show(this._container);
-    // transmission.updateButtonStates();
   }
 
   // display an alert dialog
   alert(dialog_heading, dialog_message, cancel_button_label) {
-    Dialog.hideAllDialogs();
     Utils.setTextContent(this._heading, dialog_heading);
     Utils.setTextContent(this._message, dialog_message);
     Utils.setTextContent(this._cancel_button, cancel_button_label);
-
-    // if (isMobileDevice) {
-    //   transmission.hideMobileAddressbar();
-    // }
-
-    document.body.classList.add('dialog-showing');
     Utils.hide(this._confirm_button);
     Utils.show(this._container);
-    // transmission.updateButtonStates();
   }
 }

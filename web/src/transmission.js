@@ -5,9 +5,6 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import AccessibleMenu from 'accessible-menu';
-
-import { Dialog } from './dialog.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { Prefs } from './prefs.js';
@@ -26,33 +23,6 @@ export class Transmission {
     this.remote = new Remote(this, dialog);
     this.inspector = new Inspector(this);
     this.prefsDialog = new PrefsDialog(this.remote);
-    this.prefsDialog.addEventListener('closed', Transmission.onPrefsDialogClosed);
-
-    this.isMenuEnabled = !isMobileDevice;
-
-    //const closeClass = "closed";
-    const containerElement = document.getElementById('toolbar-more');
-    const controllerElement = containerElement;
-    const menuElement = document.querySelector('#main-menu');
-    const menuItemSelector = '.menu-item';
-    const menuLinkSelector = '.menu-link';
-    // const openClass = "open";
-    const submenuItemSelector = '.menu-item.dropdown';
-    const submenuSelector = '.menu.dropdown';
-    const submenuToggleSelector = '.menu-link.toggle';
-
-    this.menu = new AccessibleMenu.DisclosureMenu({
-      //closeClass,
-      containerElement,
-      controllerElement,
-      menuElement,
-      menuItemSelector,
-      menuLinkSelector,
-      //openClass,
-      submenuItemSelector,
-      submenuSelector,
-      submenuToggleSelector,
-    });
 
     // Initialize the implementation fields
     this.filterText = '';
@@ -67,27 +37,32 @@ export class Transmission {
     this.callSelectionChangedSoon = Utils.debounce(() => this.selectionChanged(), 200);
 
     // Set up user events
-    const listen = (key, name, cb) => document.getElementById(key).addEventListener(name, cb);
-    const click = (key, cb) => listen(key, 'click', cb);
-    click('compact-button', this.toggleCompactClicked.bind(this));
-    click('move-confirm-button', this.confirmMoveClicked.bind(this));
-    click('prefs-button', this.togglePrefsDialogClicked.bind(this));
-    click('rename-confirm-button', this.confirmRenameClicked.bind(this));
-    click('toolbar-inspector', this.toggleInspector.bind(this));
-    click('toolbar-more', this.toggleMore.bind(this));
-    click('toolbar-open', this.openTorrentClicked.bind(this));
-    click('toolbar-pause', this.stopSelectedClicked.bind(this));
-    click('toolbar-pause-all', this.stopAllClicked.bind(this));
-    click('toolbar-remove', this.removeClicked.bind(this));
-    click('toolbar-start', this.startSelectedClicked.bind(this));
-    click('toolbar-start-all', this.startAllClicked.bind(this));
-    click('turtle-button', this.toggleTurtleClicked.bind(this));
-    click('upload-confirm-button', this.confirmUploadClicked.bind(this));
-
-    let e = null;
-    for (e of document.getElementsByClassName('dialog-close-button')) {
-      e.addEventListener('click', Transmission.closeAllDialogs);
-    }
+    const listen_class = (event_name, class_name, cb) => {
+      for (const e of document.getElementsByClassName(class_name)) {
+        e.addEventListener(event_name, cb);
+      }
+    };
+    const listen_id = (event_name, id, cb) => {
+      document.getElementById(id).addEventListener(event_name, cb);
+    };
+    listen_class('click', 'dialog-close-button', Transmission.hidePopups);
+    listen_class('click', 'mainwin-menu-close', () => Transmission.toggleMore());
+    listen_id('click', 'button-about', () => Transmission.showDialog('about-dialog'));
+    listen_id('click', 'button-hotkeys', () => Transmission.showDialog('hotkeys-dialog'));
+    listen_id('click', 'button-pause-all', this.stopAllClicked.bind(this));
+    listen_id('click', 'button-start-all', this.startAllClicked.bind(this));
+    listen_id('click', 'button-stats', () => Transmission.showDialog('stats-dialog'));
+    listen_id('click', 'move-confirm-button', this.confirmMoveClicked.bind(this));
+    listen_id('click', 'button-edit-preferences', this.showPrefsDialog.bind(this));
+    listen_id('click', 'rename-confirm-button', this.confirmRenameClicked.bind(this));
+    listen_id('click', 'toolbar-inspector', this.toggleInspector.bind(this));
+    listen_id('click', 'toolbar-more', Transmission.toggleMore);
+    listen_id('click', 'toolbar-open', this.openTorrentClicked.bind(this));
+    listen_id('click', 'toolbar-pause', this.stopSelectedClicked.bind(this));
+    listen_id('click', 'toolbar-remove', this.removeClicked.bind(this));
+    listen_id('click', 'toolbar-start', this.startSelectedClicked.bind(this));
+    listen_id('click', 'turtle-button', this.toggleTurtleClicked.bind(this));
+    listen_id('click', 'upload-confirm-button', this.confirmUploadClicked.bind(this));
 
     // tell jQuery to copy the dataTransfer property from events over if it exists
     //FIXME
@@ -98,10 +73,10 @@ export class Transmission {
       ev.preventDefault();
     });
 
-    e = document.getElementById('filter-mode');
+    let e = document.getElementById('filter-mode');
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', this.onFilterModeClicked.bind(this));
-    listen('filter-tracker', 'change', this.onFilterTrackerClicked.bind(this));
+    listen_id('change', 'filter-tracker', this.onFilterTrackerClicked.bind(this));
 
     if (!isMobileDevice) {
       document.addEventListener('keydown', this.keyDown.bind(this));
@@ -123,10 +98,6 @@ export class Transmission {
     e.toolbar_remove_button = document.getElementById('toolbar-remove');
     this.elements = e;
 
-    if (this.isMenuEnabled) {
-      this.createSettingsMenu();
-    }
-
     // Get preferences & torrents from the daemon
     const async = false;
     this.loadDaemonPrefs(async);
@@ -138,6 +109,97 @@ export class Transmission {
 
     this.prefs.addEventListener('change', ({ key, value }) => this.onPrefChanged(key, value));
     this.prefs.entries().forEach(([key, value]) => this.onPrefChanged(key, value));
+
+    Transmission.hidePopups();
+    Transmission.populateHotkeyDialog();
+
+    for (e of document.querySelectorAll('a[data-radio-group]')) {
+      e.addEventListener('click', this.radioButtonClicked.bind(this));
+    }
+  }
+
+  static populateHotkeyDialog() {
+    // build an object that maps hotkey -> label
+    const propname = 'aria-keyshortcuts';
+    const o = {};
+    for (const el of document.querySelectorAll(`[${propname}]`)) {
+      const key = el.getAttribute(propname);
+      const label = el.getAttribute('aria-label');
+      const tokens = key.split('+');
+      const sortKey = [tokens.pop(), ...tokens].join('+');
+      o[sortKey] = { key, label };
+    }
+
+    // build an HTML table to show the hotkeys
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    table.appendChild(thead);
+    let tr = document.createElement('tr');
+    thead.appendChild(tr);
+    let th = document.createElement('th');
+    th.textContent = 'Key';
+    tr.appendChild(th);
+    th = document.createElement('th');
+    th.textContent = 'Action';
+    tr.appendChild(th);
+    const tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+    for (const [, value] of Object.entries(o).sort()) {
+      tr = document.createElement('tr');
+      tbody.appendChild(tr);
+      let td = document.createElement('td');
+      td.textContent = value.key.replaceAll('+', ' + ');
+      tr.appendChild(td);
+      td = document.createElement('td');
+      td.textContent = value.label;
+      tr.appendChild(td);
+    }
+
+    document.querySelector('#hotkeys-dialog .dialog-message').appendChild(table);
+  }
+
+  radioButtonClicked(ev) {
+    const { target } = ev;
+    const group = target.getAttribute('data-radio-group');
+    const value = target.getAttribute('data-radio-value');
+
+    switch (group) {
+      case Prefs.DisplayMode:
+        this.prefs.display_mode = value;
+        this.refilterSoon();
+        break;
+
+      case Prefs.SortDirection:
+        this.prefs.sort_direction = value;
+        this.refilterSoon();
+        break;
+
+      case Prefs.SortMode:
+        this.prefs.sort_mode = value;
+        this.refilterSoon();
+        break;
+
+      case 'speed-limit-down': {
+        const o =
+          value === 'unlimited'
+            ? { [RPC._DownSpeedLimited]: false }
+            : { [RPC._DownSpeedLimited]: true, [RPC._DownSpeedLimit]: parseInt(value, 10) };
+        this.remote.savePrefs(o);
+        break;
+      }
+
+      case 'speed-limit-up': {
+        const o =
+          value === 'unlimited'
+            ? { [RPC._UpSpeedLimited]: false }
+            : { [RPC._UpSpeedLimited]: true, [RPC._UpSpeedLimit]: parseInt(value, 10) };
+        this.remote.savePrefs(o);
+        break;
+      }
+
+      default:
+        console.warn(`unrecognized radio group: "${group}"`);
+    }
   }
 
   loadDaemonPrefs(async) {
@@ -249,40 +311,24 @@ export class Transmission {
     });
   }
 
-  createSettingsMenu() {
-    const e = document.getElementById('settings-menu');
-    $('#footer-super-menu').transMenu({
-      close() {
-        e.classList.remove('selected');
-      },
-      open() {
-        e.classList.add('selected');
-      },
-      select: this.onMenuClicked.bind(this),
-    });
-    $('#settings-menu').click(() => {
-      $('#footer-super-menu').transMenu('open');
-    });
+  static selectRadioGroupItem(group_name, item_name) {
+    for (const e of document.querySelectorAll(`[data-radio-group="${group_name}"]`)) {
+      e.classList.toggle('selected', e.getAttribute('data-radio-value') === item_name);
+    }
   }
-
-  ///
 
   onPrefChanged(key, value) {
     switch (key) {
-      case Prefs.DisplayMode: {
-        const compact = value === Prefs.DisplayCompact;
-        document.getElementById('compact-button').classList.toggle('selected', compact);
-        this.torrentRenderer = compact ? new TorrentRendererCompact() : new TorrentRendererFull();
-        this.refilterAllSoon();
-        break;
-      }
+      case Prefs.DisplayMode:
+        this.torrentRenderer =
+          value === 'compact' ? new TorrentRendererCompact() : new TorrentRendererFull();
+      // falls through
 
       case Prefs.SortMode:
-      case Prefs.SortDirection: {
-        $(`[radio-group="${key}"][radio-id="${value}"]`).selectMenuItem();
+      case Prefs.SortDirection:
+        Transmission.selectRadioGroupItem(key, value);
         this.refilterAllSoon();
         break;
-      }
 
       case Prefs.FilterMode:
         this.refilterAllSoon();
@@ -430,133 +476,63 @@ export class Transmission {
    *
    *--------------------------------------------*/
 
-  /*
-   * Process key event
-   */
+  static createKeyShortcutFromKeyboardEvent(ev) {
+    const a = [];
+    if (ev.ctrlKey) {
+      a.push('Control');
+    }
+    if (ev.altKey) {
+      a.push('Alt');
+    }
+    if (ev.metaKey) {
+      a.push('Meta');
+    }
+    if (ev.shitKey) {
+      a.push('Shift');
+    }
+    a.push(ev.key.length === 1 ? ev.key.toUpperCase() : ev.key);
+    return a.join('+');
+  }
+
+  // Process key events
   keyDown(ev) {
-    let handled = false;
+    const { keyCode } = ev;
+
+    // look for a shortcut
+    const propname = 'aria-keyshortcuts';
+    const aria_keys = Transmission.createKeyShortcutFromKeyboardEvent(ev);
+    for (const el of document.querySelectorAll(`[${propname}]`)) {
+      if (el.getAttribute(propname) === aria_keys) {
+        ev.preventDefault();
+        el.click();
+        return;
+      }
+    }
+
+    const esc_key = keyCode === 27; // esc key pressed
+    if (esc_key && Transmission.hidePopups()) {
+      ev.preventDefault();
+      return;
+    }
+
+    const enter_key = keyCode === 13; // enter key pressed
+    if (enter_key && Transmission.confirmPopup()) {
+      ev.preventDefault();
+      return;
+    }
+
+    const any_popup_active = document.querySelector('.popup:not(.hidden)');
+    const is_input_focused = ev.target.matches('input');
     const rows = this._rows;
-    const isInputFocused = ev.target.matches('input');
-    const anyDialogShowing = [...document.getElementsByClassName('dialog-container')].some(
-      (e) => !Utils.isHidden(e)
-    );
-
-    // hotkeys
-    const up_key = ev.keyCode === 38; // up key pressed
-    const dn_key = ev.keyCode === 40; // down key pressed
-    const a_key = ev.keyCode === 65; // a key pressed
-    const c_key = ev.keyCode === 67; // c key pressed
-    const d_key = ev.keyCode === 68; // d key pressed
-    const i_key = ev.keyCode === 73; // i key pressed
-    const l_key = ev.keyCode === 76; // l key pressed
-    const m_key = ev.keyCode === 77; // m key pressed
-    const o_key = ev.keyCode === 79; // o key pressed
-    const p_key = ev.keyCode === 80; // p key pressed
-    const r_key = ev.keyCode === 82; // r key pressed
-    const t_key = ev.keyCode === 84; // t key pressed
-    const u_key = ev.keyCode === 85; // u key pressed
-    const shift_key = ev.keyCode === 16; // shift key pressed
-    const slash_key = ev.keyCode === 191; // slash (/) key pressed
-    const backspace_key = ev.keyCode === 8; // backspace key pressed
-    const del_key = ev.keyCode === 46; // delete key pressed
-    const enter_key = ev.keyCode === 13; // enter key pressed
-    const esc_key = ev.keyCode === 27; // esc key pressed
-    const comma_key = ev.keyCode === 188; // comma key pressed
-
-    if (enter_key) {
-      // handle other dialogs
-      if (Dialog.isVisible()) {
-        this.dialog.executeCallback();
-        handled = true;
-      }
-
-      // handle upload dialog
-      if (!Utils.isHiddenId('upload-container')) {
-        this.confirmUploadClicked();
-        handled = true;
-      }
-
-      // handle move dialog
-      if (!Utils.isHiddenId('move-container')) {
-        this.confirmMoveClicked();
-        handled = true;
-      }
-
-      // handle rename dialog
-      if (!Utils.isHiddenId('rename-container')) {
-        this.confirmRenameClicked();
-        handled = true;
-      }
-    }
-
-    if (esc_key && Transmission.closeAllDialogs()) {
-      handled = true;
-    }
 
     // Some hotkeys can only be used if the following conditions are met:
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (!isInputFocused && !anyDialogShowing && !ev.metaKey && !ev.ctrlKey) {
-      if (comma_key) {
-        this.togglePrefsDialogClicked();
-        handled = true;
-      }
-
-      if (slash_key) {
-        Transmission.showDialog('hotkeys-dialog');
-        handled = true;
-      }
-
-      if (a_key) {
-        if (ev.shiftKey) {
-          this.deselectAll();
-        } else {
-          this.selectAll();
-        }
-        handled = true;
-      }
-
-      if (c_key) {
-        this.toggleCompactClicked();
-        handled = true;
-      }
-
-      if ((backspace_key || del_key || d_key) && rows.length) {
-        this.removeSelectedTorrents();
-        handled = true;
-      }
-
-      if (i_key) {
-        this.toggleInspector();
-        handled = true;
-      }
-
-      if (m_key || l_key) {
-        this.moveSelectedTorrents();
-        handled = true;
-      }
-
-      if (o_key || u_key) {
-        this.openTorrentClicked(ev);
-        handled = true;
-      }
-
-      if (p_key) {
-        this.stopSelectedTorrents();
-        handled = true;
-      }
-
-      if (r_key) {
-        this.startSelectedTorrents();
-        handled = true;
-      }
-
-      if (t_key) {
-        this.toggleTurtleClicked();
-        handled = true;
-      }
-
+    if (!is_input_focused && !any_popup_active && !ev.metaKey && !ev.ctrlKey) {
+      const shift_key = keyCode === 16; // shift key pressed
+      const up_key = keyCode === 38; // up key pressed
+      const dn_key = keyCode === 40; // down key pressed
       if ((up_key || dn_key) && rows.length) {
         const last = this.indexOfLastTorrent();
         const anchor = this._shift_index;
@@ -589,13 +565,11 @@ export class Transmission {
         }
         this._last_torrent_clicked = r.getTorrentId();
         r.getElement().scrollIntoView();
-        handled = true;
+        ev.preventDefault();
       } else if (shift_key) {
         this._shift_index = this.indexOfLastTorrent();
       }
     }
-
-    return !handled;
   }
 
   keyUp(ev) {
@@ -692,7 +666,7 @@ export class Transmission {
 
   confirmUploadClicked() {
     this.uploadTorrentFile(true);
-    Transmission.closeAllDialogs();
+    Transmission.hidePopups();
   }
 
   hideMoveDialog() {
@@ -702,13 +676,13 @@ export class Transmission {
 
   confirmMoveClicked() {
     this.moveSelectedTorrents(true);
-    Transmission.closeAllDialogs();
+    Transmission.hidePopups();
   }
 
   confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
     this.renameTorrent(torrents[0], document.getElementById('torrent-rename-name').value);
-    Transmission.closeAllDialogs();
+    Transmission.hidePopups();
   }
 
   removeClicked(ev) {
@@ -744,86 +718,14 @@ export class Transmission {
    *
    *--------------------------------------------*/
 
-  static onPrefsDialogClosed() {
-    document.getElementById('prefs-button').classList.remove('selected');
-  }
-
-  togglePrefsDialogClicked() {
-    const e = document.getElementById('prefs-button');
-    const is_selected = e.classList.toggle('selected');
-    this.prefsDialog.setVisible(is_selected);
+  showPrefsDialog() {
+    Transmission.hidePopups();
+    this.prefsDialog.setVisible(true);
   }
 
   setFilterText(search) {
     this.filterText = search ? search.trim() : null;
     this.refilter(true);
-  }
-
-  onMenuClicked(event, ui) {
-    const { id } = ui;
-    const { remote } = this;
-    const element = ui.target;
-
-    if (ui.group === Prefs.SortMode) {
-      this.prefs.sort_mode = ui.radio_id;
-    } else if (ui.group === Prefs.SortDirection) {
-      this.prefs.sort_direction = ui.radio_id;
-    } else if (element.hasClass('upload-speed')) {
-      const o = {};
-      o[RPC._UpSpeedLimit] = parseInt(element.text(), 10);
-      o[RPC._UpSpeedLimited] = true;
-      remote.savePrefs(o);
-    } else if (element.hasClass('download-speed')) {
-      const o = {};
-      o[RPC._DownSpeedLimit] = parseInt(element.text(), 10);
-      o[RPC._DownSpeedLimited] = true;
-      remote.savePrefs(o);
-    } else {
-      switch (id) {
-        case 'statistics':
-          this.showStatsDialog();
-          break;
-
-        case 'hotkeys':
-          Transmission.showDialog('hotkeys-dialog');
-          break;
-
-        case 'about-button':
-          Transmission.showDialog('about-dialog');
-          break;
-
-        case 'homepage':
-          window.open('https://transmissionbt.com/');
-          break;
-
-        case 'tipjar':
-          window.open('https://transmissionbt.com/donate/');
-          break;
-
-        case 'unlimited-download-rate':
-          remote.savePrefs({ [RPC._DownSpeedLimited]: false });
-          break;
-
-        case 'limited-download-rate':
-          remote.savePrefs({ [RPC._DownSpeedLimited]: true });
-          break;
-
-        case 'unlimited-upload-rate':
-          remote.savePrefs({ [RPC._UpSpeedLimited]: false });
-          break;
-
-        case 'limited-upload-rate':
-          remote.savePrefs({ [RPC._UpSpeedLimited]: true });
-          break;
-
-        case 'toggle-notifications':
-          this.notifications.toggle();
-          break;
-
-        default:
-          break;
-      }
-    }
   }
 
   onTorrentChanged(ev) {
@@ -1249,9 +1151,6 @@ FIXME: fix this when notifications get fixed
    ***/
 
   updateGuiFromSession(o) {
-    const fmt = Formatter;
-    const menu = $('#footer-super-menu');
-
     const [, version, checksum] = o.version.match(/(.*)\s\(([0-9a-f]+)\)/);
     Utils.setTextContent(document.getElementById('about-dialog-version-number'), version);
     Utils.setTextContent(document.getElementById('about-dialog-version-checksum'), checksum);
@@ -1269,35 +1168,14 @@ FIXME: fix this when notifications get fixed
       } temporary speed limits (${up} up, ${dn} down)`;
     }
 
-    if (this.isMenuEnabled && RPC._DownSpeedLimited in o && RPC._DownSpeedLimit in o) {
-      const limit = o[RPC._DownSpeedLimit];
-      const limited = o[RPC._DownSpeedLimited];
-
-      const e = document.querySelector('#limited-download-rate .label');
-      const str = `Limit (${fmt.speed(limit)})`;
-      Utils.setTextContent(e, str);
-
-      if (limited) {
-        menu.find('#limited-download-rate').selectMenuItem();
-      } else {
-        menu.find('#unlimited-download-rate').selectMenuItem();
-      }
-    }
-
-    if (this.isMenuEnabled && RPC._UpSpeedLimited in o && RPC._UpSpeedLimit in o) {
-      const limit = o[RPC._UpSpeedLimit];
-      const limited = o[RPC._UpSpeedLimited];
-
-      const e = document.querySelector('#limited-upload-rate .label');
-      const str = `Limit (${fmt.speed(limit)})`;
-      Utils.setTextContent(e, str);
-
-      if (limited) {
-        menu.find('#limited-upload-rate').selectMenuItem();
-      } else {
-        menu.find('#unlimited-upload-rate').selectMenuItem();
-      }
-    }
+    Transmission.selectRadioGroupItem(
+      'speed-limit-down',
+      o['speed-limit-down-enabled'] ? o['speed-limit-down'].toString() : 'unlimited'
+    );
+    Transmission.selectRadioGroupItem(
+      'speed-limit-up',
+      o['speed-limit-up-enabled'] ? o['speed-limit-up'].toString() : 'unlimited'
+    );
   }
 
   updateStatusbar() {
@@ -1400,8 +1278,12 @@ FIXME: fix this when notifications get fixed
     return document.body.classList.contains('inspector-showing');
   }
 
-  toggleMore() {
-    console.log('FIXME: add more menu', this);
+  static toggleMore() {
+    const [e] = document.getElementsByClassName('mainwin-menu');
+    if (e.classList.contains('hidden')) {
+      Transmission.hidePopups();
+    }
+    e.classList.toggle('hidden');
   }
 
   toggleInspector() {
@@ -1640,13 +1522,6 @@ FIXME: fix this when notifications get fixed
     return ret;
   }
 
-  ///
-
-  toggleCompactClicked() {
-    const compact = document.getElementById('compact-button').classList.toggle('selected');
-    this.prefs.display_mode = compact ? Prefs.DisplayCompact : Prefs.DisplayFull;
-  }
-
   /// STATS DIALOG
 
   // Process new session stats from the server
@@ -1698,20 +1573,17 @@ FIXME: fix this when notifications get fixed
 
   closeStatsDialog() {
     this.togglePeriodicStatsRefresh(false);
-    Transmission.closeAllDialogs();
+    Transmission.hidePopups();
   }
 
   ///
 
-  static closeAllDialogs() {
+  static hidePopups() {
     let any_closed = false;
-    const class_name = 'ui-helper-hidden';
-
-    for (const e of document.getElementsByClassName('dialog-container')) {
-      if (!e.classList.contains(class_name)) {
-        e.classList.add(class_name);
+    for (const e of document.getElementsByClassName('popup')) {
+      if (!e.classList.contains('hidden')) {
+        e.classList.add('hidden');
         any_closed = true;
-        console.log(e.id);
         if (e.id === 'upload-container') {
           Transmission.setElementEnabled(document.getElementById('toolbar-open'), true);
         }
@@ -1722,8 +1594,8 @@ FIXME: fix this when notifications get fixed
   }
 
   static showDialog(id) {
-    Transmission.closeAllDialogs();
-    document.getElementById(id).classList.remove('ui-helper-hidden');
+    Transmission.hidePopups();
+    document.getElementById(id).classList.remove('hidden');
     switch (id) {
       case 'upload-container':
         Transmission.setElementEnabled(document.getElementById('toolbar-open'), false);
@@ -1731,5 +1603,31 @@ FIXME: fix this when notifications get fixed
       default:
         break;
     }
+  }
+
+  static confirmPopup() {
+    const e = document.querySelector('.dialog-container:not(.hidden)');
+    if (!e) {
+      return false;
+    }
+    switch (e.id) {
+      case 'upload-container': {
+        this.confirmUploadClicked();
+        break;
+      }
+      case 'move-container': {
+        this.confirmMoveClicked();
+        break;
+      }
+      case 'rename-container': {
+        this.confirmRenameClicked();
+        break;
+      }
+      default: {
+        this.dialog.executeCallback();
+        break;
+      }
+    }
+    return true;
   }
 }

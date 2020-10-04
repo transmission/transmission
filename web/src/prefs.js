@@ -105,7 +105,6 @@ Prefs.FilterSeeding = 'seeding';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
 Prefs.SortAscending = 'ascending';
-Prefs.SortAscending = 'ascending';
 Prefs.SortByActivity = 'activity';
 Prefs.SortByAge = 'age';
 Prefs.SortByName = 'name';
