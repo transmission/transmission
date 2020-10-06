@@ -561,6 +561,7 @@ public:
         ERROR_STRING,
         ETA,
         FAILED_EVER,
+        FILE_COUNT,
         FILES,
         HASH,
         HAVE_UNCHECKED,
@@ -582,6 +583,7 @@ public:
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
+        PRIMARY_MIME_TYPE,
         QUEUE_POSITION,
         RECHECK_PROGRESS,
         SEED_IDLE_LIMIT,
@@ -642,6 +644,7 @@ private:
     uint64_t desired_available_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
+    uint64_t file_count_ = {};
     uint64_t have_unchecked_ = {};
     uint64_t have_verified_ = {};
     uint64_t left_until_done_ = {};
@@ -655,6 +658,7 @@ private:
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
 
+    QString primary_mime_type_;
     QString comment_;
     QString creator_;
     QString download_dir_;

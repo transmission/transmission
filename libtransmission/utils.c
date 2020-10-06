@@ -2254,3 +2254,45 @@ void tr_net_init(void)
         initialized = true;
     }
 }
+
+/// mime-type
+
+#include "mime-types.c"
+
+static int compareSuffix(void const* va, void const* vb)
+{
+    char const* suffix = va;
+    struct mime_type_suffix const* entry = vb;
+    return tr_strcmp0(suffix, entry->suffix);
+}
+
+char const* tr_get_mime_type_for_filename(char const* filename)
+{
+    char const* ret = NULL;
+
+    char const* in = strrchr(filename, '.');
+    if ((in != NULL) && (strlen(++in) <= MIME_TYPE_SUFFIX_MAXLEN))
+    {
+        char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
+        char* out = lowercase_suffix;
+        while (in && *in)
+        {
+            *out++ = tolower(*in++);
+        }
+
+        *out = '\0';
+
+        struct mime_type_suffix const* const info = bsearch(lowercase_suffix,
+            mime_type_suffixes,
+            TR_N_ELEMENTS(mime_type_suffixes),
+            sizeof(*mime_type_suffixes),
+            compareSuffix);
+
+        if (info != NULL)
+        {
+            ret = info->mime_type;
+        }
+    }
+
+    return ret;
+}

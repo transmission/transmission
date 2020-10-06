@@ -165,21 +165,7 @@ QIcon Torrent::getMimeTypeIcon() const
 {
     if (icon_.isNull())
     {
-        auto const& files = files_;
-        auto const& icon_cache = IconCache::get();
-
-        if (files.size() > 1)
-        {
-            icon_ = icon_cache.folderIcon();
-        }
-        else if (files.size() == 1)
-        {
-            icon_ = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
-        }
-        else
-        {
-            icon_ = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
-        }
+        icon_ = IconCache::get().getMimeTypeIcon(primary_mime_type_, file_count_);
     }
 
     return icon_;
@@ -220,6 +206,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
+            HANDLE_KEY(file_count, file_count, FILE_COUNT)
             HANDLE_KEY(hashString, hash, HASH)
             HANDLE_KEY(haveUnchecked, have_unchecked, HAVE_UNCHECKED)
             HANDLE_KEY(haveValid, have_verified, HAVE_VERIFIED)
@@ -239,6 +226,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(percentDone, percent_done, PERCENT_DONE)
             HANDLE_KEY(pieceCount, piece_count, PIECE_COUNT)
             HANDLE_KEY(pieceSize, piece_size, PIECE_SIZE)
+            HANDLE_KEY(primary_mime_type, primary_mime_type, PRIMARY_MIME_TYPE)
             HANDLE_KEY(queuePosition, queue_position, QUEUE_POSITION)
             HANDLE_KEY(rateDownload, download_speed, DOWNLOAD_SPEED)
             HANDLE_KEY(rateUpload, upload_speed, UPLOAD_SPEED)
@@ -282,7 +270,8 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
         {
             switch (key)
             {
-            case TR_KEY_name:
+            case TR_KEY_file_count:
+            case TR_KEY_primary_mime_type:
                 {
                     icon_ = {};
                     break;
@@ -290,7 +279,6 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_files:
                 {
-                    icon_ = {};
                     for (int i = 0; i < files_.size(); ++i)
                     {
                         files_[i].index = i;

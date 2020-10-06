@@ -18,6 +18,8 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QObject>
+#include <QPainter>
+#include <QStyle>
 
 #ifdef _WIN32
 #include <QPixmapCache>
@@ -70,6 +72,54 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
     if (icon.isNull())
     {
         icon = fallback;
+    }
+
+    return icon;
+}
+
+QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, size_t file_count) const
+{
+    auto const is_folder = file_count > 1;
+    auto& icon = (is_folder ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
+
+    if (!icon.isNull())
+    {
+        return icon;
+    }
+
+    if (!is_folder)
+    {
+        QMimeDatabase mime_db;
+        auto const type = mime_db.mimeTypeForName(mime_type_name);
+        icon = QIcon::fromTheme(type.iconName());
+
+        if (icon.isNull())
+        {
+            icon = QIcon::fromTheme(type.genericIconName());
+        }
+
+        if (icon.isNull())
+        {
+            icon = file_icon_;
+        }
+
+        return icon;
+    }
+
+    auto const base_icon = folder_icon_;
+    auto const type_icon = getMimeTypeIcon(mime_type_name, 1);
+    for (auto const& base_size : base_icon.availableSizes())
+    {
+        auto const type_size = QSize(base_size * 0.5);
+        auto const type_rect = QRect((base_size.width() - type_size.width()) * 0.8,
+            (base_size.height() - type_size.height()) * 0.8,
+            type_size.width(),
+            type_size.height());
+        auto base_pixmap = QPixmap(base_icon.pixmap(base_size));
+        QPainter painter(&base_pixmap);
+        auto type_pixmap = QPixmap(type_icon.pixmap(type_size));
+        painter.drawPixmap(type_rect, type_pixmap, type_pixmap.rect());
+        icon.addPixmap(base_pixmap);
     }
 
     return icon;
@@ -132,7 +182,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
         return {};
     }
 
-    QIcon& icon = icon_cache_[ext];
+    QIcon& icon = ext_to_icon_[ext];
     if (icon.isNull()) // cache miss
     {
         QMimeDatabase mime_db;
