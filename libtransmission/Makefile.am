@@ -197,3 +197,6 @@ apps_ldadd = \
   @ZLIB_LIBS@ \
   ${LIBM}
 
+EXTRA_DIST = \
+  mime-types.c \
+  mime-types.js

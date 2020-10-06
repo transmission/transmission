@@ -195,6 +195,7 @@
    errorString                 | string                      | tr_stat
    eta                         | number                      | tr_stat
    etaIdle                     | number                      | tr_stat
+   file-count                  | number                      | tr_info
    files                       | array (see below)           | n/a
    fileStats                   | array (see below)           | n/a
    hashString                  | string                      | tr_info
@@ -223,6 +224,7 @@
    pieceCount                  | number                      | tr_info
    pieceSize                   | number                      | tr_info
    priorities                  | array (see below)           | n/a
+   primary-mime-type           | string                      | tr_torrent
    queuePosition               | number                      | tr_stat
    rateDownload (B/s)          | number                      | tr_stat
    rateUpload (B/s)            | number                      | tr_stat
@@ -809,6 +811,9 @@
          |         | yes       | torrent-set          | new arg "labels"
          |         | yes       | torrent-get          | new arg "editDate"
          |         | yes       | torrent-get          | new request arg "format"
+   ------+---------+-----------+----------------------+-------------------------------
+   17    | 3.01    | yes       | torrent-get          | new arg "file-count"
+         |         | yes       | torrent-get          | new arg "primary-mime-type"
 
 
 5.1.  Upcoming Breakage
