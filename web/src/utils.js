@@ -14,7 +14,7 @@ export class Utils {
   }
 
   static isHidden(el) {
-    return el.offsetParent === null;
+    return el.classList.contains('hidden');
   }
   static isHiddenId(id) {
     return Utils.isHidden(document.getElementById(id));
@@ -32,6 +32,32 @@ export class Utils {
   }
   static showId(id) {
     return Utils.show(document.getElementById(id));
+  }
+
+  static toggle(el) {
+    el.classList.toggle('hidden');
+  }
+  static toggleId(id) {
+    return Utils.toggle(document.getElementById(id));
+  }
+
+  static isChecked(el) {
+    return el.getAttribute('aria-checked') === 'true';
+  }
+  static setChecked(el, b) {
+    el.setAttribute('aria-checked', b ? 'true' : 'false');
+  }
+  static toggleChecked(el) {
+    Utils.setChecked(el, !Utils.isChecked(el));
+  }
+  static isCheckedId(id) {
+    return Utils.isChecked(document.getElementById(id));
+  }
+  static setCheckedId(id, b) {
+    Utils.setChecked(document.getElementById(id), b);
+  }
+  static toggleCheckedId(id) {
+    Utils.toggleChecked(document.getElementById(id));
   }
 
   static setVisible(el, visible) {
@@ -97,7 +123,10 @@ export class Utils {
     let result = Math.floor((100 * numerator) / denominator) / 100;
 
     // check for special cases
-    if (result === Number.POSITIVE_INFINITY || result === Number.NEGATIVE_INFINITY) {
+    if (
+      result === Number.POSITIVE_INFINITY ||
+      result === Number.NEGATIVE_INFINITY
+    ) {
       result = -2;
     } else if (isNaN(result)) {
       result = -1;

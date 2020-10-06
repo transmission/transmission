@@ -26,7 +26,11 @@ const mem_T_str = 'TiB';
 
 export class Formatter {
   static countString(msgid, msgid_plural, n) {
-    return `${Formatter.toStringWithCommas(n)} ${Formatter.ngettext(msgid, msgid_plural, n)}`;
+    return `${Formatter.toStringWithCommas(n)} ${Formatter.ngettext(
+      msgid,
+      msgid_plural,
+      n
+    )}`;
   }
 
   // Formats the a memory size into a human-readable string

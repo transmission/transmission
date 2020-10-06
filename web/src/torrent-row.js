@@ -41,7 +41,12 @@ class TorrentRendererHelper {
 
     return {
       background: ['torrent-progress-bar', 'background', extra].join(' '),
-      foreground: ['torrent-progress-bar', 'foreground', extra, pct > 99 ? 'full' : ''].join(' '),
+      foreground: [
+        'torrent-progress-bar',
+        'foreground',
+        extra,
+        pct > 99 ? 'full' : '',
+      ].join(' '),
       percent: pct,
     };
   }
@@ -255,12 +260,19 @@ export class TorrentRendererFull {
 
     // progress details
     e = root._progress_details_container;
-    Utils.setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
+    Utils.setTextContent(
+      e,
+      TorrentRendererFull.getProgressDetails(controller, t)
+    );
 
     // pause/resume button
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
-    Utils.setProperty(e, 'className', is_stopped ? 'torrent-resume' : 'torrent-pause');
+    Utils.setProperty(
+      e,
+      'className',
+      is_stopped ? 'torrent-resume' : 'torrent-pause'
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -329,9 +341,9 @@ export class TorrentRendererCompact {
       return s.join(' ');
     }
     if (t.isSeeding()) {
-      return `Ratio: ${Formatter.ratioString(t.getUploadRatio())}, ${TorrentRendererHelper.formatUL(
-        t
-      )}`;
+      return `Ratio: ${Formatter.ratioString(
+        t.getUploadRatio()
+      )}, ${TorrentRendererHelper.formatUL(t)}`;
     }
     return t.getStateString();
   }
@@ -382,7 +394,9 @@ export class TorrentRow {
     this._view = view;
     this._torrent = torrent;
     this._element = view.createRow();
-    this._torrent.addEventListener('dataChanged', () => this.render(controller));
+    this._torrent.addEventListener('dataChanged', () =>
+      this.render(controller)
+    );
     this.render(controller);
   }
 

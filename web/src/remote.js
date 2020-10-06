@@ -74,18 +74,18 @@ export class Remote {
       });
   }
 
-  loadDaemonPrefs(callback, context, async) {
+  loadDaemonPrefs(callback, context) {
     const o = {
       method: 'session-get',
     };
-    this.sendRequest(o, callback, context, async);
+    this.sendRequest(o, callback, context);
   }
 
-  checkPort(callback, context, async) {
+  checkPort(callback, context) {
     const o = {
       method: 'port-test',
     };
-    this.sendRequest(o, callback, context, async);
+    this.sendRequest(o, callback, context);
   }
 
   renameTorrent(torrentIds, oldpath, newname, callback, context) {
@@ -100,22 +100,23 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  loadDaemonStats(callback, context, async) {
+  loadDaemonStats(callback, context) {
     const o = {
       method: 'session-stats',
     };
-    this.sendRequest(o, callback, context, async);
+    this.sendRequest(o, callback, context);
   }
 
   updateTorrents(torrentIds, fields, callback, context) {
     const o = {
       arguments: {
         fields,
+        format: 'table',
       },
       method: 'torrent-get',
     };
     if (torrentIds) {
-      o['arguments'].ids = torrentIds;
+      o.arguments.ids = torrentIds;
     }
     this.sendRequest(o, (response) => {
       const args = response['arguments'];
@@ -173,7 +174,12 @@ export class Remote {
     this.sendTorrentActionRequests(name, torrent_ids, callback, context);
   }
   stopTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      'torrent-stop',
+      torrent_ids,
+      callback,
+      context
+    );
   }
 
   moveTorrents(torrent_ids, new_location, callback, context) {
@@ -190,7 +196,12 @@ export class Remote {
   }
 
   removeTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      'torrent-remove',
+      torrent_ids,
+      callback,
+      context
+    );
   }
   removeTorrentsAndData(torrents) {
     const o = {
@@ -211,10 +222,20 @@ export class Remote {
     });
   }
   verifyTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      'torrent-verify',
+      torrent_ids,
+      callback,
+      context
+    );
   }
   reannounceTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      'torrent-reannounce',
+      torrent_ids,
+      callback,
+      context
+    );
   }
   addTorrentByUrl(url, options) {
     if (url.match(/^[0-9a-f]{40}$/i)) {
@@ -251,16 +272,36 @@ export class Remote {
 
   // Added queue calls
   moveTorrentsToTop(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(RPC._QueueMoveTop, torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      RPC._QueueMoveTop,
+      torrent_ids,
+      callback,
+      context
+    );
   }
   moveTorrentsToBottom(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(RPC._QueueMoveBottom, torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      RPC._QueueMoveBottom,
+      torrent_ids,
+      callback,
+      context
+    );
   }
   moveTorrentsUp(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(RPC._QueueMoveUp, torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      RPC._QueueMoveUp,
+      torrent_ids,
+      callback,
+      context
+    );
   }
   moveTorrentsDown(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback, context);
+    this.sendTorrentActionRequests(
+      RPC._QueueMoveDown,
+      torrent_ids,
+      callback,
+      context
+    );
   }
 }
 

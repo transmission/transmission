@@ -29,7 +29,9 @@ export class FileRow extends EventTarget {
     const { size, have } = this.fields;
     const pct = 100 * (size ? have / size : 1.0);
     const fmt = Formatter;
-    const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(pct)}%)`;
+    const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(
+      pct
+    )}%)`;
     Utils.setTextContent(this.elements.progress, c);
   }
 
@@ -107,14 +109,18 @@ export class FileRow extends EventTarget {
 
   createRow(torrent, depth, name, even) {
     const root = document.createElement('li');
-    root.className = `inspector-torrent-file-list-entry${even ? 'even' : 'odd'}`;
+    root.className = `inspector-torrent-file-list-entry${
+      even ? 'even' : 'odd'
+    }`;
     this.elements.root = root;
 
     let e = document.createElement('input');
     e.type = 'checkbox';
     e.className = 'file-wanted-control';
     e.title = 'Download file';
-    e.addEventListener('change', (ev) => this.fireWantedChanged(ev.target.checked));
+    e.addEventListener('change', (ev) =>
+      this.fireWantedChanged(ev.target.checked)
+    );
     root.checkbox = e;
     root.appendChild(e);
 

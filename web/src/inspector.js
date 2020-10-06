@@ -8,7 +8,7 @@
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { isMobileDevice, Utils } from './utils.js';
+import { Utils } from './utils.js';
 
 export class Inspector {
   constructor(controller) {
@@ -25,13 +25,17 @@ export class Inspector {
         hash_lb: document.getElementById('inspector-info-hash'),
         have_lb: document.getElementById('inspector-info-have'),
         info_page: document.getElementById('inspector-page-info'),
-        last_activity_lb: document.getElementById('inspector-info-last-activity'),
+        last_activity_lb: document.getElementById(
+          'inspector-info-last-activity'
+        ),
         name_lb: document.getElementById('torrent-inspector-name'),
         origin_lb: document.getElementById('inspector-info-origin'),
         peers_list: document.getElementById('inspector-peers-list'),
         peers_page: document.getElementById('inspector-page-peers'),
         privacy_lb: document.getElementById('inspector-info-privacy'),
-        remaining_time_lb: document.getElementById('inspector-info-remaining-time'),
+        remaining_time_lb: document.getElementById(
+          'inspector-info-remaining-time'
+        ),
         running_time_lb: document.getElementById('inspector-info-running-time'),
         size_lb: document.getElementById('inspector-info-size'),
         state_lb: document.getElementById('inspector-info-state'),
@@ -57,7 +61,7 @@ export class Inspector {
     return torrents.some((tor) => !tor.hasExtraInfo());
   }
 
-  refreshTorrents(callback) {
+  refreshTorrents() {
     const { controller, torrents } = this.data;
     const ids = torrents.map((t) => t.getId());
 
@@ -67,7 +71,7 @@ export class Inspector {
         fields.push(...Torrent.Fields.InfoExtra);
       }
 
-      controller.updateTorrents(ids, fields, callback);
+      controller.updateTorrents(ids, fields);
     }
   }
 
@@ -81,7 +85,10 @@ export class Inspector {
     const now = Date.now();
     const { torrents } = this.data;
     const e = this.data.elements;
-    const sizeWhenDone = torrents.reduce((acc, t) => acc + t.getSizeWhenDone(), 0);
+    const sizeWhenDone = torrents.reduce(
+      (acc, t) => acc + t.getSizeWhenDone(),
+      0
+    );
 
     // state_lb
     let str = null;
@@ -104,10 +111,18 @@ export class Inspector {
       str = none;
     } else {
       const verified = torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
-      const unverified = torrents.reduce((acc, t) => acc + t.getHaveUnchecked(), 0);
-      const leftUntilDone = torrents.reduce((acc, t) => acc + t.getLeftUntilDone(), 0);
+      const unverified = torrents.reduce(
+        (acc, t) => acc + t.getHaveUnchecked(),
+        0
+      );
+      const leftUntilDone = torrents.reduce(
+        (acc, t) => acc + t.getLeftUntilDone(),
+        0
+      );
 
-      const d = 100.0 * (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
+      const d =
+        100.0 *
+        (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
       str = fmt.percentString(d);
 
       if (!unverified && !leftUntilDone) {
@@ -115,9 +130,9 @@ export class Inspector {
       } else if (!unverified) {
         str = `${fmt.size(verified)} of ${fmt.size(sizeWhenDone)} (${str}%)`;
       } else {
-        str = `${fmt.size(verified)} of ${fmt.size(sizeWhenDone)} (${str}%), ${fmt.size(
-          unverified
-        )} Unverified`;
+        str = `${fmt.size(verified)} of ${fmt.size(
+          sizeWhenDone
+        )} (${str}%), ${fmt.size(unverified)} Unverified`;
       }
     }
     Utils.setTextContent(e.have_lb, str);
@@ -128,7 +143,10 @@ export class Inspector {
     } else if (sizeWhenDone === 0) {
       str = none;
     } else {
-      const available = torrents.reduce((acc, t) => t.getHave() + t.getDesiredAvailable(), 0);
+      const available = torrents.reduce(
+        (acc, t) => t.getHave() + t.getDesiredAvailable(),
+        0
+      );
       str = `${fmt.percentString((100.0 * available) / sizeWhenDone)}%`;
     }
     Utils.setTextContent(e.availability_lb, str);
@@ -191,11 +209,15 @@ export class Inspector {
     if (torrents.length < 1) {
       str = none;
     } else {
-      const latest = torrents.reduce((acc, t) => Math.max(acc, t.getLastActivity()), -1);
+      const latest = torrents.reduce(
+        (acc, t) => Math.max(acc, t.getLastActivity()),
+        -1
+      );
       const now_seconds = Math.floor(now / 1000);
       if (0 < latest && latest <= now_seconds) {
         const idle_secs = now_seconds - latest;
-        str = idle_secs < 5 ? 'Active now' : `${fmt.timeInterval(idle_secs)} ago`;
+        str =
+          idle_secs < 5 ? 'Active now' : `${fmt.timeInterval(idle_secs)} ago`;
       } else {
         str = none;
       }
@@ -221,11 +243,16 @@ export class Inspector {
         str = 'None';
       } else {
         const get = (t) => t.getPieceSize();
-        const pieceCount = torrents.reduce((acc, t) => acc + t.getPieceCount(), 0);
+        const pieceCount = torrents.reduce(
+          (acc, t) => acc + t.getPieceCount(),
+          0
+        );
         const pieceStr = fmt.toStringWithCommas(pieceCount);
         const pieceSize = get(torrents[0]);
         if (torrents.every((t) => get(t) === pieceSize)) {
-          str = `${fmt.size(size)} (${pieceStr} pieces @ ${fmt.mem(pieceSize)})`;
+          str = `${fmt.size(size)} (${pieceStr} pieces @ ${fmt.mem(
+            pieceSize
+          )})`;
         } else {
           str = `${fmt.size(size)} (${pieceStr} pieces)`;
         }
@@ -270,7 +297,10 @@ export class Inspector {
     str = str || none;
     if (str.startsWith('https://') || str.startsWith('http://')) {
       str = encodeURI(str);
-      Utils.setInnerHTML(e.comment_lb, `<a href="${str}" target="_blank" >${str}</a>`);
+      Utils.setInnerHTML(
+        e.comment_lb,
+        `<a href="${str}" target="_blank" >${str}</a>`
+      );
     } else {
       Utils.setTextContent(e.comment_lb, str);
     }
@@ -298,7 +328,9 @@ export class Inspector {
       } else if (empty_creator && !empty_date) {
         str = `Created on ${new Date(date * 1000).toDateString()}`;
       } else {
-        str = `Created by ${creator} on ${new Date(date * 1000).toDateString()}`;
+        str = `Created by ${creator} on ${new Date(
+          date * 1000
+        ).toDateString()}`;
       }
     }
     Utils.setTextContent(e.origin_lb, str);
@@ -403,7 +435,9 @@ export class Inspector {
       case Torrent._TrackerQueued:
         return 'Announce is queued';
       case Torrent._TrackerInactive:
-        return tracker.isBackup ? 'Tracker will be used as a backup' : 'Announce not scheduled';
+        return tracker.isBackup
+          ? 'Tracker will be used as a backup'
+          : 'Announce not scheduled';
       default:
         return `unknown announce state: ${tracker.announceState}`;
     }
@@ -447,7 +481,8 @@ export class Inspector {
       } else {
         lastScrapeLabel = 'Scrape error';
         lastScrape =
-          (tracker.lastScrapeResult ? `${tracker.lastScrapeResult} - ` : '') + lastScrapeTime;
+          (tracker.lastScrapeResult ? `${tracker.lastScrapeResult} - ` : '') +
+          lastScrapeTime;
       }
     }
     return {
@@ -637,7 +672,10 @@ export class Inspector {
   addNodeToView(tor, parent, sub, i) {
     const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
     row.addEventListener('wantedToggled', this.onFileWantedToggled.bind(this));
-    row.addEventListener('priorityToggled', this.onFilePriorityToggled.bind(this));
+    row.addEventListener(
+      'priorityToggled',
+      this.onFilePriorityToggled.bind(this)
+    );
     row.addEventListener('nameClicked', Inspector.onNameClicked);
     this.data.file_rows.push(row);
     parent.appendChild(row.getElement());
@@ -688,13 +726,8 @@ export class Inspector {
   ///
 
   onTabClicked(ev) {
-    const tab = ev.currentTarget;
-
-    if (isMobileDevice) {
-      ev.stopPropagation();
-    }
-
-    this.selectTab(tab);
+    this.selectTab(ev.currentTarget);
+    ev.stopPropagation();
   }
 
   selectTab(tab) {
@@ -774,7 +807,8 @@ export class Inspector {
           explanation = 'Encrypted Connection';
           break;
         case 'H':
-          explanation = 'Peer was discovered through Distributed Hash Table (DHT)';
+          explanation =
+            'Peer was discovered through Distributed Hash Table (DHT)';
           break;
         case 'X':
           explanation = 'Peer was discovered through Peer Exchange (PEX)';
@@ -793,7 +827,9 @@ export class Inspector {
       if (!explanation) {
         formattedFlags.push(flag);
       } else {
-        formattedFlags.push(`<span title="${flag}: ${explanation}">${flag}</span>`);
+        formattedFlags.push(
+          `<span title="${flag}: ${explanation}">${flag}</span>`
+        );
       }
     }
 

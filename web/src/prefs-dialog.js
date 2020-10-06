@@ -6,7 +6,7 @@
  */
 
 import { Formatter } from './formatter.js';
-import { isMobileDevice, Utils } from './utils.js';
+import { Utils } from './utils.js';
 
 export class PrefsDialog extends EventTarget {
   static _initTimeDropDown(e) {
@@ -96,14 +96,6 @@ export class PrefsDialog extends EventTarget {
       this.data.remote.savePrefs(o);
       delete this.data.oldValue;
     }
-  }
-
-  static _getDefaultMobileOptions() {
-    return {
-      height: window.innerHeight,
-      position: ['left', 'top'],
-      width: window.innerWidth,
-    };
   }
 
   /*
@@ -239,12 +231,7 @@ export class PrefsDialog extends EventTarget {
     PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
     PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-end')[0]);
 
-    const o = isMobileDevice
-      ? PrefsDialog._getDefaultMobileOptions()
-      : {
-          height: 400,
-          width: 350,
-        };
+    const o = {};
     o.autoOpen = false;
     o.show = o.hide = false;
     o.close = this._onDialogClosed.bind(this);

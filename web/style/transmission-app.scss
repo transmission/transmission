@@ -75,7 +75,8 @@ $svg-menu: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' view
 /// MIXINS
 
 @mixin vertical-gradient($topColor, $bottomColor) {
-  background: color.mix($topColor, $bottomColor) linear-gradient($topColor, $bottomColor);
+  background: color.mix($topColor, $bottomColor)
+    linear-gradient($topColor, $bottomColor);
 }
 
 @mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
@@ -91,11 +92,19 @@ $svg-menu: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' view
   $active-color-top,
   $active-color-bottom
 ) {
-  @include image-on-vertical-gradient($image-url, $idle-color-top, $idle-color-bottom);
+  @include image-on-vertical-gradient(
+    $image-url,
+    $idle-color-top,
+    $idle-color-bottom
+  );
 
   &:active,
   &.selected {
-    @include image-on-vertical-gradient($image-url, $active-color-top, $active-color-bottom);
+    @include image-on-vertical-gradient(
+      $image-url,
+      $active-color-top,
+      $active-color-bottom
+    );
   }
 }
 
@@ -186,6 +195,7 @@ $toolbar-height: $toolbar-height-num * 1px;
   width: $toolbar-height;
 
   &.disabled {
+    cursor: default;
     opacity: 0.25;
   }
 }
@@ -247,7 +257,10 @@ $filterbar-height-num: 26;
 $filterbar-height: $filterbar-height-num * 1px;
 
 .mainwin-filterbar {
-  @include vertical-gradient($filterbar-gradient-top, $filterbar-gradient-bottom);
+  @include vertical-gradient(
+    $filterbar-gradient-top,
+    $filterbar-gradient-bottom
+  );
   align-items: center;
   border-bottom: 1px solid $grey67;
   display: flex;
@@ -412,7 +425,8 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
   }
 
   .torrent-progress-bar-container {
-    height: ($progressbar-height-number - ($progressbar-border-number * 2)) * 1px;
+    height: ($progressbar-height-number - ($progressbar-border-number * 2)) *
+      1px;
     position: relative;
 
     &.compact {
@@ -523,19 +537,25 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
   .options {
     margin: 0 10px 20px;
   }
+  .disabled {
+    cursor: default;
+    opacity: 0.25;
+  }
   a {
+    border-radius: 5px;
     color: $grey40;
     cursor: pointer;
     display: inline-block;
     font-size: smaller;
     padding: 5px;
     text-decoration: none;
-  }
-  a:hover {
-    background-color: $grey97;
+    &:hover:not(.disabled) {
+      background-color: $grey97;
+    }
   }
   .selected {
     background-color: $grey97;
+    color: #000;
   }
   .mainwin-menu-close {
     color: $grey67;
@@ -548,6 +568,32 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
       color: $grey81;
     }
   }
+}
+
+/// CONTEXT MENU
+
+.context-menu {
+  background: linear-gradient($grey87, $grey73);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  position: absolute;
+  z-index: $z-index-popup;
+}
+.context-menuitem {
+  list-style: none;
+  padding: 5px 10px;
+
+  &:hover:not(.disabled) {
+    background-image: linear-gradient($white, $grey87);
+    cursor: pointer;
+  }
+  &.disabled {
+    opacity: 0.25;
+  }
+}
+.context-menu-separator {
+  border-bottom: 1px solid $grey40;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 /// PREFERENCES DIALOG
@@ -777,7 +823,8 @@ $inspector-width: 570px;
     margin-left: 0;
   }
 
-  .inspector-torrent-file-list-entry.skip > .inspector-torrent-file-list-entry-name {
+  .inspector-torrent-file-list-entry.skip
+    > .inspector-torrent-file-list-entry-name {
     color: $grey60;
   }
 
@@ -910,66 +957,48 @@ $inspector-width: 570px;
 
 /// MAIN WINDOW FOOTER
 
-@mixin footer-button-image($image-url) {
-  @include button-image(
-    $image-url,
-    $nonselected-gradient-top,
-    $nonselected-gradient-bottom,
-    $selected-gradient-top,
-    $selected-gradient-bottom
-  );
-}
-
 $footer-height-number: 22;
 
 .mainwin-footer {
-  @include vertical-gradient($filterbar-gradient-top, $filterbar-gradient-bottom);
+  @include vertical-gradient(
+    $filterbar-gradient-top,
+    $filterbar-gradient-bottom
+  );
+  align-items: center;
   border-top: 1px solid $grey40;
+  display: flex;
+  flex-direction: row;
   height: $footer-height-number * 1px;
-  // width: 100%;
 
   > div {
-    border: 1px solid $grey40;
-    border-radius: 5px;
-    float: left;
+    // border: 1px solid $grey40;
+    // border-radius: 5px;
     height: 12px;
     margin: 2px 4px;
     padding: 2px 8px;
     user-select: none;
     width: 18px;
   }
+}
 
-  #settings-menu {
-    @include footer-button-image($svg-three-dots-vertical);
+#turtle-button {
+  background-image: url('images/turtle.png');
+  background-position: center;
+  background-repeat: no-repeat;
+
+  &[aria-checked='true'] {
+    background-image: url('images/blue-turtle.png');
   }
-
-  #prefs-button {
-    @include footer-button-image($svg-gear-fill);
+  &:hover {
+    background-color: $grey97;
   }
+}
 
-  #turtle-button {
-    @include footer-button-image('images/turtle.png');
-
-    &:active,
-    &.selected {
-      @include image-on-vertical-gradient(
-        'images/blue-turtle.png',
-        $selected-gradient-top,
-        $selected-gradient-bottom
-      );
-    }
-  }
-
-  #compact-button {
-    @include footer-button-image($svg-list);
-  }
-
-  #freespace-info {
-    border: 0;
-    float: right;
-    text-align: right;
-    width: 100px;
-  }
+#freespace-info {
+  border: 0;
+  float: right;
+  text-align: right;
+  width: 100px;
 }
 
 /// DIALOGS
@@ -1168,143 +1197,4 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
 
 .ui-menu {
   width: 200px;
-}
-
-/// more menu
-// package @ https://www.npmjs.com/package/accessible-menu
-// cribbed from https://jsfiddle.net/NickDJM/yokxg0vr/
-// FIXME: this is a work in progress
-
-$green: #0d464e;
-$green-90: #25585f;
-$red: #f58a97;
-
-#toolbar-more {
-  > .menu {
-    display: none;
-    flex-direction: column;
-
-    &.show {
-      display: flex;
-    }
-  }
-
-  > .menu-toggle {
-    background: transparent;
-    border: 0;
-    color: $white;
-    display: block;
-    font-size: 2rem;
-    margin-left: auto;
-    padding: 0.5rem 2rem;
-  }
-
-  > .branding {
-    display: block;
-    font-size: 1.5rem;
-    padding: 0.5rem 2rem;
-  }
-
-  @media screen and (max-width: 1069px) {
-    > .menu {
-      width: 100%;
-    }
-  }
-
-  /*
-  @media screen and (min-width: 1070px) {
-    > .menu {
-      display: flex;
-      flex-direction: row;
-    }
-
-    > .menu-toggle {
-      display: none;
-    }
-  }
-*/
-}
-
-.visually-hidden {
-  border: 0 !important;
-  clip: rect(0, 0, 0, 0) !important;
-  height: 1px !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  position: absolute !important;
-  white-space: nowrap !important;
-  width: 1px !important;
-}
-
-.menu {
-  background-color: $green-90;
-  display: flex;
-  flex-direction: row;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  &.dropdown {
-    display: none;
-    flex-direction: column;
-
-    @media screen and (min-width: 1070px) {
-      .menu-item .menu.dropdown {
-        left: 100%;
-        top: 0;
-      }
-    }
-  }
-
-  @media screen and (max-width: 1069px) {
-    .menu .menu-link {
-      padding-left: 3rem;
-    }
-
-    .menu .menu .menu-link {
-      padding-left: 4rem;
-    }
-  }
-
-  .menu-link,
-  .menu-toggle {
-    background-color: $green-90;
-    border: 0;
-    color: $white;
-    display: block;
-    padding: 1rem 2rem;
-    text-decoration: none;
-
-    &:hover {
-      background-color: $green;
-      text-decoration-color: $red;
-      text-decoration-line: underline;
-      text-decoration-thickness: 0.2rem;
-    }
-  }
-
-  .menu-link:active {
-    background-color: $red;
-    color: $black;
-  }
-
-  .menu-item {
-    position: relative;
-
-    &.dropdown > .dropdown-toggle::after {
-      content: '▼';
-      display: inline-block;
-      margin-left: 0.5rem;
-    }
-
-    .menu.dropdown.show {
-      display: flex;
-
-      @media screen and (min-width: 1070px) {
-        left: 0;
-        position: absolute;
-      }
-    }
-  }
 }

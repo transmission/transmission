@@ -6,16 +6,6 @@
 
 - [ ] remove jQuery
   - [ ] remove use of jquery-ui-tabs from prefs dialog
-  - [ ] remove context menu
-  - [ ] replace popup menu with more menu
-    - [ ] add 'more menu' to toolbar
-      - [ ] add 'pause all' to more menu
-      - [ ] add 'start all' to more menu
-      - [ ] remove 'pause all' from toolbar
-      - [ ] remove 'start all' from toolbar
-      - [ ] add About to more menu
-      - [ ] remove About from popup menu
-      - [ ] after completing the proof-of-concept above, add more TODO items here
 
 ## Short-term TODO
 - [x] compact mode is broken
@@ -47,9 +37,10 @@
   - [x] wire in homepage
   - [x] wire in tip jar
   - [x] should OVERLAY torrent container, not go before it
+- [x] what to do about context menu? it still uses jQuery
 - [ ] stats dialog looks bad on mobile
 - [ ] inspector styling is broken
 - [ ] filterbar isn't responsive
-- [ ] what to do about context menu? it still uses jQuery
 - [ ] what to do about prefs dialog? it still uses jQuery
 - [ ] what to do about footer? it's not useful right now
+- [ ] aria for sidebar menu

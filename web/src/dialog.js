@@ -19,13 +19,18 @@ export class Dialog {
 
     // Observe the buttons
     this._cancel_button.addEventListener('click', this.hideDialog.bind(this));
-    this._confirm_button.addEventListener('click', this.executeCallback.bind(this));
+    this._confirm_button.addEventListener(
+      'click',
+      this.executeCallback.bind(this)
+    );
   }
 
   /// EVENT FUNCTIONS
 
   executeCallback() {
-    this._callback();
+    if (this._callback) {
+      this._callback();
+    }
     this.hideDialog();
   }
 
@@ -37,7 +42,13 @@ export class Dialog {
   /// INTERFACE FUNCTIONS
 
   // display a confirm dialog
-  confirm(dialog_heading, dialog_message, confirm_button_label, callback, cancel_button_label) {
+  confirm(
+    dialog_heading,
+    dialog_message,
+    confirm_button_label,
+    callback,
+    cancel_button_label
+  ) {
     this._callback = callback;
     Utils.setTextContent(this._heading, dialog_heading);
     Utils.setTextContent(this._message, dialog_message);

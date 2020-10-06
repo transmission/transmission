@@ -17,11 +17,16 @@ export class Notifications {
 
   _setEnabled(enabled) {
     this.prefs.notifications_enabled = enabled;
-    Utils.setTextContent(this._toggle, `${enabled ? 'Disable' : 'Enable'} Notifications`);
+    Utils.setTextContent(
+      this._toggle,
+      `${enabled ? 'Disable' : 'Enable'} Notifications`
+    );
   }
 
   _requestPermission() {
-    Notification.requestPermission().then((s) => this._setEnabled(s === 'granted'));
+    Notification.requestPermission().then((s) =>
+      this._setEnabled(s === 'granted')
+    );
   }
 
   toggle() {

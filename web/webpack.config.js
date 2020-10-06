@@ -1,14 +1,12 @@
 const path = require('path');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
-
-const isDevelopment = process.env.NODE_ENV === 'development';
-if (!isDevelopment) {
-  process.env.GENERATE_SOURCEMAP='false';
-}
+const mode = process.env.WEBPACK_MODE || 'production';
+console.log({ mode });
 
 module.exports = {
   devtool: 'source-map',
@@ -16,7 +14,7 @@ module.exports = {
   externals: {
     jquery: 'jQuery'
   },
-  mode: isDevelopment ? 'development' : 'production',
+  mode,
   module: {
     rules: [
       {
@@ -42,8 +40,14 @@ module.exports = {
     ],
   },
   optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin()],
+    minimizer: [
+      new TerserPlugin(),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessorPluginOptions: {
+          preset: ['default', { discardComments: { removeAll: true } }],
+        }
+      })
+    ],
   },
   output: {
     filename: 'transmission-app.js' ,
@@ -56,8 +60,8 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css',
-      filename: isDevelopment ? '[name].css' : '[name].[hash].css'
+      chunkFilename: '[id].css',
+      filename: '[name].css'
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,

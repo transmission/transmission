@@ -1,8 +1,5 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
-SUBDIRS = \
-  deprecated
-
 EXTRA_DIST = \
   dialog.js \
   file-row.js \

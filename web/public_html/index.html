@@ -23,24 +23,35 @@
   <body>
     <div class="mainwin">
       <div class="mainwin-menu popup hidden">
-        <a class="mainwin-menu-close">&times;</a>
+        <a data-command="hide-more-menu" class="mainwin-menu-close">&times;</a>
         <div class="section links">
           <div class="title">Links</div>
           <div class="options">
             <a href="http://transmissionbt.com/">Homepage</a>
             <a href="https://transmissionbt.com/donate/">Tip Jar</a>
-            <a href="https://github.com/transmission/transmission/">Source Code</a>
+            <a href="https://github.com/transmission/transmission/"
+              >Source Code</a
+            >
           </div>
           <!-- class="options"-->
         </div>
         <div class="section info">
           <div class="title">Info</div>
           <div class="options">
-            <a href="#" id="button-stats"><div>Statistics</div></a>
-            <a href="#" id="button-hotkeys" aria-label="Show hotkeys menu" aria-keyshortcuts="Alt+K"
+            <a href="#" data-command="show-stats-dialog" id="button-stats"
+              ><div>Statistics</div></a
+            >
+            <a
+              href="#"
+              data-command="show-hotkeys-dialog"
+              id="button-hotkeys"
+              aria-label="Show hotkeys menu"
+              aria-keyshortcuts="Alt+K"
               ><div>Hotkeys</div></a
             >
-            <a href="#" id="button-about"><div>About</div></a>
+            <a href="#" data-command="show-about-dialog" id="button-about"
+              ><div>About</div></a
+            >
           </div>
           <!-- class="options"-->
         </div>
@@ -48,20 +59,48 @@
           <div class="title">Sort Transfers By</div>
           <div class="options">
             <div>
-              <a data-radio-group="sort-mode" data-radio-value="activity" href="#">Activity</a>
-              <a data-radio-group="sort-mode" data-radio-value="age" href="#">Age</a>
-              <a data-radio-group="sort-mode" data-radio-value="name" href="#">Name</a>
-              <a data-radio-group="sort-mode" data-radio-value="progress" href="#">Progress</a>
-              <a data-radio-group="sort-mode" data-radio-value="ratio" href="#">Ratio</a>
-              <a data-radio-group="sort-mode" data-radio-value="size" href="#">Size</a>
-              <a data-radio-group="sort-mode" data-radio-value="state" href="#">State</a>
-              <a data-radio-group="sort-mode" data-radio-value="queue" href="#">Queue Order</a>
+              <a
+                data-radio-group="sort-mode"
+                data-radio-value="activity"
+                href="#"
+                >Activity</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="age" href="#"
+                >Age</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="name" href="#"
+                >Name</a
+              >
+              <a
+                data-radio-group="sort-mode"
+                data-radio-value="progress"
+                href="#"
+                >Progress</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="ratio" href="#"
+                >Ratio</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="size" href="#"
+                >Size</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="state" href="#"
+                >State</a
+              >
+              <a data-radio-group="sort-mode" data-radio-value="queue" href="#"
+                >Queue Order</a
+              >
             </div>
             <div>
-              <a data-radio-group="sort-direction" data-radio-value="ascending" href="#"
+              <a
+                data-radio-group="sort-direction"
+                data-radio-value="ascending"
+                href="#"
                 >Ascending</a
               >
-              <a data-radio-group="sort-direction" data-radio-value="descending" href="#"
+              <a
+                data-radio-group="sort-direction"
+                data-radio-value="descending"
+                href="#"
                 >Descending</a
               >
             </div>
@@ -95,13 +134,46 @@
         <div class="section download-speed">
           <div class="title">Limit Download Speed (kB/s)</div>
           <div class="options">
-            <a data-radio-group="speed-limit-down" data-radio-value="10" href="#">10</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="50" href="#">50</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="100" href="#">100</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="200" href="#">200</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="500" href="#">500</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="750" href="#">750</a>
-            <a data-radio-group="speed-limit-down" data-radio-value="unlimited" href="#"
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="10"
+              href="#"
+              >10</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="50"
+              href="#"
+              >50</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="100"
+              href="#"
+              >100</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="200"
+              href="#"
+              >200</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="500"
+              href="#"
+              >500</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="750"
+              href="#"
+              >750</a
+            >
+            <a
+              data-radio-group="speed-limit-down"
+              data-radio-value="unlimited"
+              href="#"
               >Unlimited</a
             >
           </div>
@@ -110,13 +182,30 @@
         <div class="section upload-speed">
           <div class="title">Limit Upload Speed (kB/s)</div>
           <div class="options">
-            <a data-radio-group="speed-limit-up" data-radio-value="10" href="#">10</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="50" href="#">50</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="100" href="#">100</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="200" href="#">200</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="500" href="#">500</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="750" href="#">750</a>
-            <a data-radio-group="speed-limit-up" data-radio-value="unlimited" href="#">Unlimited</a>
+            <a data-radio-group="speed-limit-up" data-radio-value="10" href="#"
+              >10</a
+            >
+            <a data-radio-group="speed-limit-up" data-radio-value="50" href="#"
+              >50</a
+            >
+            <a data-radio-group="speed-limit-up" data-radio-value="100" href="#"
+              >100</a
+            >
+            <a data-radio-group="speed-limit-up" data-radio-value="200" href="#"
+              >200</a
+            >
+            <a data-radio-group="speed-limit-up" data-radio-value="500" href="#"
+              >500</a
+            >
+            <a data-radio-group="speed-limit-up" data-radio-value="750" href="#"
+              >750</a
+            >
+            <a
+              data-radio-group="speed-limit-up"
+              data-radio-value="unlimited"
+              href="#"
+              >Unlimited</a
+            >
           </div>
           <!-- class="options"-->
         </div>
@@ -124,70 +213,81 @@
           <div class="title">Actions</div>
           <div class="options">
             <a
-              id="button-edit-preferences"
-              aria-label="Edit preferences"
               aria-keyshortcuts="Alt+,"
+              aria-label="Edit preferences"
+              data-command="show-preferences-dialog"
               href="#"
+              id="button-edit-preferences"
               ><div>Edit Preferences</div></a
             >
-            <a id="button-pause-all" href="#"><div>Pause All</div></a>
-            <a id="button-start-all" href="#"><div>Start All</div></a>
+            <a id="button-pause-all" data-command="pause-all-torrents" href="#"
+              ><div>Pause All</div></a
+            >
+            <a id="button-start-all" data-command="start-all-torrents" href="#"
+              ><div>Start All</div></a
+            >
           </div>
           <!-- class="options"-->
         </div>
       </div>
       <!-- class mainwin-menu -->
 
-      <div class="mainwin-toolbar" id="mainwin-toolbar">
+      <header class="mainwin-toolbar" id="mainwin-toolbar">
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+M"
           aria-label="Show sidebar menu"
+          class="toolbar-button"
+          data-command="show-more-menu"
+          href="#"
           id="toolbar-more"
         ></a>
         <a href="#" class="toolbar-separator"></a>
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+O"
           aria-label="Open torrent"
+          class="toolbar-button"
+          data-command="open-torrent"
+          href="#"
           id="toolbar-open"
         ></a>
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+Delete"
           aria-label="Remove selected torrents"
+          class="toolbar-button"
+          data-command="remove-selected-torrents"
+          href="#"
           id="toolbar-remove"
         ></a>
         <a href="#" class="toolbar-separator"></a>
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+R"
           aria-label="Resume selected torrents"
+          class="toolbar-button"
+          data-command="resume-selected-torrents"
+          href="#"
           id="toolbar-start"
         ></a>
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+P"
           aria-label="Pause selected torrents"
+          class="toolbar-button"
+          data-command="pause-selected-torrents"
+          href="#"
           id="toolbar-pause"
         ></a>
         <a href="#" class="toolbar-separator"></a>
         <a
-          href="#"
-          class="toolbar-button"
           aria-keyshortcuts="Alt+I"
           aria-label="Toggle inspector"
+          class="toolbar-button"
+          data-command="toggle-torrent-inspector"
+          href="#"
           id="toolbar-inspector"
         ></a>
-      </div>
+      </header>
       <!-- class mainwin-toolbar -->
 
-      <div class="mainwin-filterbar" id="statusbar">
+      <header class="mainwin-filterbar" id="statusbar">
         <span>Show</span>
         <select id="filter-mode">
           <option value="all">All</option>
@@ -197,7 +297,7 @@
           <option value="paused">Paused</option>
           <option value="finished">Finished</option>
         </select>
-        <select id="filter-tracker"></select>
+        <select data-command="set-tracker-filter" id="filter-tracker"></select>
         <input type="search" id="torrent-search" placeholder="Filter" />
         <span id="filter-count">&nbsp;</span>
         <span class="flex"></span>
@@ -205,10 +305,10 @@
         <div id="speed-dn-label"></div>
         <div class="speed-up-icon"></div>
         <div id="speed-up-label"></div>
-      </div>
+      </header>
       <!-- class mainwin-filterbar -->
 
-      <div class="mainwin-workarea">
+      <main class="mainwin-workarea">
         <div class="popup hidden" id="prefs-dialog">
           <ul>
             <li id="prefs-tab-general">
@@ -227,7 +327,9 @@
                 <div class="title">Downloading</div>
                 <div class="row">
                   <div class="key">Download to:</div>
-                  <div class="value"><input type="text" id="download-dir" /></div>
+                  <div class="value">
+                    <input type="text" id="download-dir" />
+                  </div>
                 </div>
                 <div class="checkbox-row">
                   <input type="checkbox" id="start-added-torrents" /><label
@@ -246,7 +348,8 @@
                 <div class="title">Seeding</div>
                 <div class="row">
                   <div class="key">
-                    <input type="checkbox" id="seedRatioLimited" /><label for="seedRatioLimited"
+                    <input type="checkbox" id="seedRatioLimited" /><label
+                      for="seedRatioLimited"
                       >Stop seeding at ratio:</label
                     >
                   </div>
@@ -256,13 +359,20 @@
                 </div>
                 <div class="row">
                   <div class="key">
-                    <input type="checkbox" id="idle-seeding-limit-enabled" /><label
-                      for="idle-seeding-limit-enabled"
+                    <input
+                      type="checkbox"
+                      id="idle-seeding-limit-enabled"
+                    /><label for="idle-seeding-limit-enabled"
                       >Stop seeding if idle for (min):</label
                     >
                   </div>
                   <div class="value">
-                    <input type="number" min="1" max="40320" id="idle-seeding-limit" />
+                    <input
+                      type="number"
+                      min="1"
+                      max="40320"
+                      id="idle-seeding-limit"
+                    />
                   </div>
                 </div>
               </div>
@@ -283,8 +393,10 @@
                 </div>
                 <div class="row">
                   <div class="key">
-                    <input type="checkbox" id="speed-limit-down-enabled" /><label
-                      for="speed-limit-down-enabled"
+                    <input
+                      type="checkbox"
+                      id="speed-limit-down-enabled"
+                    /><label for="speed-limit-down-enabled"
                       >Download (kB/s):</label
                     >
                   </div>
@@ -295,7 +407,9 @@
               </div>
               <div class="prefs-section">
                 <div class="title">
-                  <div id="alternative-speed-limits-title">Alternative Speed Limits</div>
+                  <div id="alternative-speed-limits-title">
+                    Alternative Speed Limits
+                  </div>
                 </div>
                 <div class="row" id="alternative-speed-limits-desc">
                   Override normal speed limits manually or at scheduled times
@@ -326,7 +440,9 @@
                 </div>
                 <div class="row">
                   <div class="key">To:</div>
-                  <div class="value"><select id="alt-speed-time-end"></select></div>
+                  <div class="value">
+                    <select id="alt-speed-time-end"></select>
+                  </div>
                 </div>
                 <div class="row">
                   <div class="key">
@@ -354,7 +470,9 @@
                 <div class="title">Connections</div>
                 <div class="row">
                   <div class="key">
-                    <label for="peer-limit-per-torrent">Max peers per torrent:</label>
+                    <label for="peer-limit-per-torrent"
+                      >Max peers per torrent:</label
+                    >
                   </div>
                   <div class="value">
                     <input type="number" min="0" id="peer-limit-per-torrent" />
@@ -422,18 +540,25 @@
                 <div class="title">Blocklist</div>
                 <div class="row">
                   <div class="key">
-                    <input type="checkbox" id="blocklist-enabled" /><label for="blocklist-enabled"
+                    <input type="checkbox" id="blocklist-enabled" /><label
+                      for="blocklist-enabled"
                       >Enable blocklist:</label
                     >
                   </div>
-                  <div class="value"><input type="url" id="blocklist-url" /></div>
+                  <div class="value">
+                    <input type="url" id="blocklist-url" />
+                  </div>
                 </div>
                 <div class="row">
                   <div class="key" id="blocklist-info">
                     Blocklist has <span id="blocklist-size">?</span> rules
                   </div>
                   <div class="value">
-                    <input type="button" id="blocklist-update-button" value="Update" />
+                    <input
+                      type="button"
+                      id="blocklist-update-button"
+                      value="Update"
+                    />
                   </div>
                 </div>
               </div>
@@ -476,7 +601,9 @@
                     id="utp-enabled"
                     title="uTP is a tool for reducing network congestion."
                   />
-                  <label for="utp-enabled" title="uTP is a tool for reducing network congestion."
+                  <label
+                    for="utp-enabled"
+                    title="uTP is a tool for reducing network congestion."
                     >Enable uTP for peer communication</label
                   >
                 </div>
@@ -488,13 +615,21 @@
         <div class="popup hidden" id="torrent-inspector">
           <div id="inspector-tabs-wrapper">
             <div id="inspector-tabs">
-              <div class="inspector-tab selected" id="inspector-tab-info" title="Info">
+              <div
+                class="inspector-tab selected"
+                id="inspector-tab-info"
+                title="Info"
+              >
                 <a href="#info"></a>
               </div>
               <div class="inspector-tab" id="inspector-tab-peers" title="Peers">
                 <a href="#peers"></a>
               </div>
-              <div class="inspector-tab" id="inspector-tab-trackers" title="Trackers">
+              <div
+                class="inspector-tab"
+                id="inspector-tab-trackers"
+                title="Trackers"
+              >
                 <a href="#trackers"></a>
               </div>
               <div class="inspector-tab" id="inspector-tab-files" title="Files">
@@ -538,11 +673,15 @@
               </div>
               <div class="row">
                 <div class="key">Remaining Time:</div>
-                <div class="value" id="inspector-info-remaining-time">&nbsp;</div>
+                <div class="value" id="inspector-info-remaining-time">
+                  &nbsp;
+                </div>
               </div>
               <div class="row">
                 <div class="key">Last Activity:</div>
-                <div class="value" id="inspector-info-last-activity">&nbsp;</div>
+                <div class="value" id="inspector-info-last-activity">
+                  &nbsp;
+                </div>
               </div>
               <div class="row">
                 <div class="key">Error:</div>
@@ -579,17 +718,26 @@
           </div>
           <!-- id="inspector-tab-info-container" -->
 
-          <div class="inspector-page ui-helper-hidden" id="inspector-page-peers">
+          <div
+            class="inspector-page ui-helper-hidden"
+            id="inspector-page-peers"
+          >
             <div id="inspector-peers-list"></div>
           </div>
           <!-- id="inspector-tab-peers-container" -->
 
-          <div class="inspector-page ui-helper-hidden" id="inspector-page-trackers">
+          <div
+            class="inspector-page ui-helper-hidden"
+            id="inspector-page-trackers"
+          >
             <div id="inspector-trackers-list"></div>
           </div>
           <!-- id="inspector-tab-trackers-container" -->
 
-          <div class="inspector-page ui-helper-hidden" id="inspector-page-files">
+          <div
+            class="inspector-page ui-helper-hidden"
+            id="inspector-page-files"
+          >
             <ul id="inspector-file-list"></ul>
           </div>
           <!-- id="inspector-tab-files-container" -->
@@ -599,7 +747,11 @@
           <ul class="torrent-list flex" id="torrent-list"></ul>
         </div>
 
-        <div class="dialog-container popup hidden" id="dialog-container">
+        <div
+          class="dialog-container popup hidden"
+          id="dialog-container"
+          role="dialog"
+        >
           <div class="dialog-window">
             <div class="dialog-logo" id="dialog-logo"></div>
             <div class="dialog-heading" id="dialog-heading"></div>
@@ -607,14 +759,25 @@
             <div class="dialog-workarea" id="dialog-workarea"></div>
             <div class="dialog-buttons">
               <span class="dialog-buttons-begin"></span>
-              <a href="#cancel" class="dialog-close-button" id="dialog-cancel-button">Cancel</a>
+              <a
+                href="#cancel"
+                data-command="hide-popups"
+                class="dialog-close-button"
+                id="dialog-cancel-button"
+                >Cancel</a
+              >
               <a href="#confirm" id="dialog-confirm-button">Confirm</a>
               <span class="dialog-buttons-end"></span>
             </div>
           </div>
         </div>
 
-        <div class="dialog-container popup hidden" id="about-dialog">
+        <div
+          class="dialog-container popup hidden"
+          id="about-dialog"
+          role="dialog"
+          aria-label="About Transmission"
+        >
           <div class="dialog-window">
             <div class="dialog-logo"></div>
             <div class="dialog-heading">
@@ -623,16 +786,29 @@
               <div id="about-dialog-version-checksum"></div>
             </div>
             <div class="dialog-message">A fast and easy bitTorrent client</div>
-            <div class="dialog-workarea">Copyright (c) The Transmission Project</div>
+            <div class="dialog-workarea">
+              Copyright (c) The Transmission Project
+            </div>
             <div class="dialog-buttons">
               <span class="dialog-buttons-begin"></span>
-              <a href="#close" class="dialog-close-button" id="about-dialog-close-button">Close</a>
+              <a
+                href="#close"
+                data-command="hide-popups"
+                class="dialog-close-button"
+                id="about-dialog-close-button"
+                >Close</a
+              >
               <span class="dialog-buttons-end"></span>
             </div>
           </div>
         </div>
 
-        <div class="dialog-container popup hidden" id="stats-dialog">
+        <div
+          class="dialog-container popup hidden"
+          id="stats-dialog"
+          role="dialog"
+          aria-label="Statistics"
+        >
           <div class="dialog-window">
             <div class="dialog-logo" id="dialog-logo"></div>
             <div class="dialog-message" id="dialog-message">
@@ -683,21 +859,11 @@
             </div>
             <div class="dialog-buttons">
               <span class="dialog-buttons-begin"></span>
-              <a href="#close" class="dialog-close-button" id="stats-dialog-close-button">Close</a>
-              <span class="dialog-buttons-end"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="dialog-container popup hidden" id="hotkeys-dialog">
-          <div class="dialog-window">
-            <div class="dialog-logo" id="dialog-logo"></div>
-            <div class="dialog-heading" id="dialog-heading">Hotkeys</div>
-            <div class="dialog-message" id="dialog-message"></div>
-            <div class="dialog-workarea" id="dialog-workarea"></div>
-            <div class="dialog-buttons">
-              <span class="dialog-buttons-begin"></span>
-              <a href="#close" class="dialog-close-button" id="hotkeys-dialog-close-button"
+              <a
+                href="#close"
+                data-command="hide-popups"
+                class="dialog-close-button"
+                id="stats-dialog-close-button"
                 >Close</a
               >
               <span class="dialog-buttons-end"></span>
@@ -705,10 +871,44 @@
           </div>
         </div>
 
-        <div class="dialog-container popup hidden" id="upload-container">
+        <div
+          class="dialog-container popup hidden"
+          id="hotkeys-dialog"
+          role="dialog"
+          aria-labelledby="hotkeys-dialog-heading"
+        >
           <div class="dialog-window">
             <div class="dialog-logo"></div>
-            <div class="dialog-heading">Add Torrents</div>
+            <div class="dialog-heading" id="hotkeys-dialog-heading">
+              Hotkeys
+            </div>
+            <div class="dialog-message"></div>
+            <div class="dialog-workarea"></div>
+            <div class="dialog-buttons">
+              <span class="dialog-buttons-begin"></span>
+              <a
+                href="#close"
+                data-command="hide-popups"
+                class="dialog-close-button"
+                id="hotkeys-dialog-close-button"
+                >Close</a
+              >
+              <span class="dialog-buttons-end"></span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="dialog-container popup hidden"
+          id="upload-container"
+          role="dialog"
+          aria-labelledby="add-dialog-heading"
+        >
+          <div class="dialog-window">
+            <div class="dialog-logo"></div>
+            <div class="dialog-heading" id="add-dialog-heading">
+              Add Torrents
+            </div>
             <form
               action="#"
               method="post"
@@ -719,7 +919,9 @@
             >
               <div class="dialog-message"></div>
               <div class="dialog-workarea">
-                <label for="torrent-upload-file">Please select torrent files to add:</label>
+                <label for="torrent-upload-file"
+                  >Please select torrent files to add:</label
+                >
                 <input
                   type="file"
                   name="torrent-files[]"
@@ -728,46 +930,86 @@
                 />
                 <label for="torrent-upload-url">Or enter a URL:</label>
                 <input type="url" id="torrent-upload-url" />
-                <label id="add-dialog-folder-label" for="add-dialog-folder-input"
+                <label
+                  id="add-dialog-folder-label"
+                  for="add-dialog-folder-input"
                   >Destination folder: <span id="free-space-text"></span
                 ></label>
                 <input type="text" id="add-dialog-folder-input" />
                 <div class="checkbox-and-label">
                   <input type="checkbox" id="torrent-auto-start" />
-                  <label for="torrent-auto-start" id="auto-start-label">Start when added</label>
+                  <label for="torrent-auto-start" id="auto-start-label"
+                    >Start when added</label
+                  >
                 </div>
               </div>
               <div class="dialog-buttons">
                 <span class="dialog-buttons-begin"></span>
-                <a href="#cancel" class="dialog-close-button" id="upload-cancel-button">Cancel</a>
-                <a href="#upload" id="upload-confirm-button">Confirm</a>
+                <a
+                  href="#cancel"
+                  data-command="hide-popups"
+                  class="dialog-close-button"
+                  id="upload-cancel-button"
+                  >Cancel</a
+                >
+                <a
+                  href="#upload"
+                  data-command="add-torrents"
+                  id="upload-confirm-button"
+                  >Confirm</a
+                >
                 <span class="dialog-buttons-end"></span>
               </div>
             </form>
           </div>
         </div>
 
-        <div class="dialog-container popup hidden" id="rename-container">
+        <div
+          class="dialog-container popup hidden"
+          id="rename-container"
+          role="dialog"
+          aria-labelledby="rename-dialog-heading"
+        >
           <div class="dialog-window">
             <div class="dialog-logo"></div>
-            <div class="dialog-heading">Rename torrent</div>
+            <div id="rename-dialog-heading" class="dialog-heading">
+              Rename torrent
+            </div>
             <div class="dialog-workarea">
               <label for="torrent-rename-name">Enter new name:</label>
               <input type="text" id="torrent-rename-name" />
             </div>
             <div class="dialog-buttons">
               <span class="dialog-buttons-begin"></span>
-              <a href="#cancel" class="dialog-close-button" id="rename-cancel-button">Cancel</a>
-              <a href="#rename" id="rename-confirm-button">Rename</a>
+              <a
+                href="#cancel"
+                data-command="hide-popups"
+                class="dialog-close-button"
+                id="rename-cancel-button"
+                >Cancel</a
+              >
+              <a
+                href="#rename"
+                data-command="rename-selected-torrent"
+                id="rename-confirm-button"
+                >Rename</a
+              >
               <span class="dialog-buttons-end"></span>
             </div>
           </div>
         </div>
 
-        <div class="dialog-container popup hidden" id="move-container">
+        <div
+          class="dialog-container popup hidden"
+          id="move-container"
+          role="dialog"
+          aria-labelledby="move-dialog-heading"
+        >
           <div class="dialog-window">
             <div class="dialog-logo" id="move-dialog-logo"></div>
-            <div class="dialog-heading">Set Location</div>
+            <div id="move-dialog-heading" class="dialog-heading">
+              Set Location
+            </div>
             <form
               action="#"
               method="post"
@@ -782,62 +1024,154 @@
               </div>
               <div class="dialog-buttons">
                 <span class="dialog-buttons-begin"></span>
-                <a href="#cancel" class="dialog-close-button" id="move-cancel-button">Cancel</a>
-                <a href="#move" id="move-confirm-button">Apply</a>
+                <a
+                  href="#cancel"
+                  data-command="hide-popups"
+                  class="dialog-close-button"
+                  id="move-cancel-button"
+                  >Cancel</a
+                >
+                <a
+                  href="#move"
+                  data-command="relocate-selected-torrents"
+                  id="move-confirm-button"
+                  >Apply</a
+                >
                 <span class="dialog-buttons-end"></span>
               </div>
             </form>
           </div>
         </div>
-      </div>
+      </main>
       <!-- class="mainwin-workarea" -->
 
-      <div class="mainwin-footer">
+      <footer class="mainwin-footer">
         <div
+          aria-checked="false"
           aria-keyshortcuts="Alt+T"
           aria-label="Toggle alternative speed limits"
+          data-command="toggle-alt-speed-limits"
           id="turtle-button"
+          role="button"
         >
           &nbsp;
         </div>
-      </div>
+      </footer>
 
-      <ul class="ui-helper-hidden" id="torrent-context-menu">
-        <li data-command="pause-selected"><div>Pause</div></li>
-        <li data-command="resume-selected"><div>Resume</div></li>
-        <li data-command="resume-now-selected"><div>Resume Now</div></li>
-        <li>---</li>
-        <li data-command="move-top"><div>Move to Top</div></li>
-        <li data-command="move-up"><div>Move Up</div></li>
-        <li data-command="move-down"><div>Move Down</div></li>
-        <li data-command="move-bottom"><div>Move to Bottom</div></li>
-        <li>---</li>
-        <li data-command="remove"><div>Remove From List…</div></li>
-        <li data-command="remove-data"><div>Trash Data and Remove From List…</div></li>
-        <li>---</li>
-        <li data-command="verify"><div>Verify Local Data</div></li>
-        <li aria-keyshortcuts="Alt+V" aria-label="Set location / move torrent" data-command="move">
-          <div>Set Location…</div>
-        </li>
-        <li aria-keyshortcuts="Alt+N" aria-label="Rename selected torrent" data-command="rename">
-          <div>Rename…</div>
-        </li>
-        <li>---</li>
-        <li data-command="reannounce"><div>Ask tracker for more peers</div></li>
-        <li>---</li>
-        <li aria-keyshortcuts="Alt+A" aria-label="Select all torrents" data-command="select-all">
-          <div>Select All</div>
-        </li>
-        <li
+      <div role="menu" class="context-menu hidden" id="torrent-context-menu">
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="pause-selected-torrents"
+        >
+          Pause
+        </div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="resume-selected-torrents"
+        >
+          Resume
+        </div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="resume-selected-torrents-now"
+        >
+          Resume Now
+        </div>
+        <div class="context-menu-separator"></div>
+        <div role="menuitem" class="context-menuitem" data-command="move-top">
+          Move to Top
+        </div>
+        <div role="menuitem" class="context-menuitem" data-command="move-up">
+          Move Up
+        </div>
+        <div role="menuitem" class="context-menuitem" data-command="move-down">
+          Move Down
+        </div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="move-bottom"
+        >
+          Move to Bottom
+        </div>
+        <div class="context-menu-separator"></div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="remove-selected-torrents"
+        >
+          Remove From List…
+        </div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="trash-selected-torrents"
+        >
+          Trash Data and Remove From List…
+        </div>
+        <div class="context-menu-separator"></div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="verify-selected-torrents"
+        >
+          Verify Local Data
+        </div>
+        <div
+          aria-keyshortcuts="Alt+V"
+          aria-label="Set location / move torrent"
+          class="context-menuitem"
+          data-command="show-relocate-dialog"
+          role="menuitem"
+        >
+          Set Location…
+        </div>
+        <div
+          aria-keyshortcuts="Alt+N"
+          aria-label="Rename selected torrent"
+          class="context-menuitem"
+          data-command="show-rename-dialog"
+          role="menuitem"
+        >
+          Rename…
+        </div>
+        <div class="context-menu-separator"></div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
+          data-command="reannounce-selected-torrents"
+        >
+          Ask tracker for more peers
+        </div>
+        <div class="context-menu-separator"></div>
+        <div
+          aria-keyshortcuts="Alt+A"
+          aria-label="Select all torrents"
+          class="context-menuitem"
+          data-command="select-all"
+          role="menuitem"
+        >
+          Select All
+        </div>
+        <div
+          role="menuitem"
+          class="context-menuitem"
           aria-keyshortcuts="Control+A"
           aria-label="Deselect all torrents"
           data-command="deselect-all"
         >
-          <div>Deselect All</div>
-        </li>
-      </ul>
+          Deselect All
+        </div>
+      </div>
 
-      <iframe name="torrent-upload-frame" id="torrent-upload-frame" src="about:blank"></iframe>
+      <iframe
+        name="torrent-upload-frame"
+        id="torrent-upload-frame"
+        src="about:blank"
+      ></iframe>
     </div>
     <!-- class mainwin -->
   </body>

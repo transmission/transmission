@@ -345,7 +345,9 @@ export class Torrent extends EventTarget {
       case Prefs.FilterSeeding:
         return s === Torrent._StatusSeed || s === Torrent._StatusSeedWait;
       case Prefs.FilterDownloading:
-        return s === Torrent._StatusDownload || s === Torrent._StatusDownloadWait;
+        return (
+          s === Torrent._StatusDownload || s === Torrent._StatusDownloadWait
+        );
       case Prefs.FilterPaused:
         return this.isStopped();
       case Prefs.FilterFinished:
@@ -381,7 +383,10 @@ export class Torrent extends EventTarget {
     return ta.getId() - tb.getId();
   }
   static compareByName(ta, tb) {
-    return ta.getCollatedName().localeCompare(tb.getCollatedName()) || Torrent.compareById(ta, tb);
+    return (
+      ta.getCollatedName().localeCompare(tb.getCollatedName()) ||
+      Torrent.compareById(ta, tb)
+    );
   }
   static compareByQueue(ta, tb) {
     return ta.getQueuePosition() - tb.getQueuePosition();
