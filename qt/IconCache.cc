@@ -106,20 +106,25 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, size_t file_coun
         return icon;
     }
 
-    auto const base_icon = folder_icon_;
-    auto const type_icon = getMimeTypeIcon(mime_type_name, 1);
-    for (auto const& base_size : base_icon.availableSizes())
+    auto const mime_icon = getMimeTypeIcon(mime_type_name, 1);
+    for (auto const& size : { QSize(24, 24), QSize(32, 32), QSize(48, 48) })
     {
-        auto const type_size = QSize(base_size * 0.5);
-        auto const type_rect = QRect((base_size.width() - type_size.width()) * 0.8,
-            (base_size.height() - type_size.height()) * 0.8,
-            type_size.width(),
-            type_size.height());
-        auto base_pixmap = QPixmap(base_icon.pixmap(base_size));
-        QPainter painter(&base_pixmap);
-        auto type_pixmap = QPixmap(type_icon.pixmap(type_size));
-        painter.drawPixmap(type_rect, type_pixmap, type_pixmap.rect());
-        icon.addPixmap(base_pixmap);
+        // upper left corner
+        auto const folder_size = size / 2;
+        auto const folder_rect = QRect(QPoint(), folder_size);
+
+        // fullsize
+        auto const mime_size = size;
+        auto const mime_rect = QRect(QPoint(), mime_size);
+
+        // build the icon
+        auto pixmap = QPixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        painter.drawPixmap(folder_rect, folder_icon_.pixmap(folder_size));
+        painter.drawPixmap(mime_rect, mime_icon.pixmap(mime_size));
+        icon.addPixmap(pixmap);
     }
 
     return icon;
