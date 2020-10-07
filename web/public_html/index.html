@@ -108,24 +108,21 @@
           <!-- class="options"-->
         </div>
         <div class="section sort">
-          <div class="title">Layout</div>
+          <div class="title">Display</div>
           <div class="options">
             <div>
               <a
-                data-radio-group="display-mode"
-                data-radio-value="full"
-                aria-label="Full layout mode"
-                aria-keyshortcuts="Alt+U"
+                aria-label="Toggle fullscreen"
+                data-command="toggle-fullscreen"
                 href="#"
-                >Full</a
+                >Fullscreen</a
               >
               <a
-                data-radio-group="display-mode"
-                data-radio-value="compact"
-                aria-label="Compact layout mode"
                 aria-keyshortcuts="Alt+C"
+                aria-label="Toggle compact rows"
+                data-command="toggle-compact-rows"
                 href="#"
-                >Compact</a
+                >Compact rows</a
               >
             </div>
           </div>
@@ -139,12 +136,6 @@
               data-radio-value="10"
               href="#"
               >10</a
-            >
-            <a
-              data-radio-group="speed-limit-down"
-              data-radio-value="50"
-              href="#"
-              >50</a
             >
             <a
               data-radio-group="speed-limit-down"
@@ -184,9 +175,6 @@
           <div class="options">
             <a data-radio-group="speed-limit-up" data-radio-value="10" href="#"
               >10</a
-            >
-            <a data-radio-group="speed-limit-up" data-radio-value="50" href="#"
-              >50</a
             >
             <a data-radio-group="speed-limit-up" data-radio-value="100" href="#"
               >100</a
@@ -787,7 +775,7 @@
             </div>
             <div class="dialog-message">A fast and easy bitTorrent client</div>
             <div class="dialog-workarea">
-              Copyright (c) The Transmission Project
+              Copyright © The Transmission Project
             </div>
             <div class="dialog-buttons">
               <span class="dialog-buttons-begin"></span>
@@ -1058,7 +1046,11 @@
         </div>
       </footer>
 
-      <div role="menu" class="context-menu hidden" id="torrent-context-menu">
+      <div
+        role="menu"
+        class="context-menu popup hidden"
+        id="torrent-context-menu"
+      >
         <div
           role="menuitem"
           class="context-menuitem"

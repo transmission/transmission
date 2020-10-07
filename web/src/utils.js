@@ -59,6 +59,11 @@ export class Utils {
   static toggleCheckedId(id) {
     Utils.toggleChecked(document.getElementById(id));
   }
+  static setCheckedCmd(cmd, b) {
+    for (const el of document.querySelectorAll(`[data-command="${cmd}"]`)) {
+      Utils.setChecked(el, b);
+    }
+  }
 
   static setVisible(el, visible) {
     if (visible) {

@@ -6,7 +6,6 @@ const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
 const mode = process.env.WEBPACK_MODE || 'production';
-console.log({ mode });
 
 module.exports = {
   devtool: 'source-map',
@@ -30,13 +29,18 @@ module.exports = {
         use: [ 'style-loader', 'css-loader' ],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|)$/i,
         use: [
-          {
-            loader: 'url-loader',
-          },
+          'url-loader',
         ],
-      }
+      },
+      {
+        test: /\.svg$/i,
+        use: [
+          'url-loader',
+          'svgo-loader'
+        ],
+      },
     ],
   },
   optimization: {

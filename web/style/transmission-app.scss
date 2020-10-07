@@ -21,56 +21,30 @@ $z-index-mainwin: 0;
 $z-index-progressbar: 1;
 $z-index-popup: 2;
 
-// SVG ICONS
-
-// https://icons.getbootstrap.com/icons/chevron-up/ MIT license
-$svg-chevron-up: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-chevron-up' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/chevron-down/ MIT license
-$svg-chevron-dn: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-chevron-down' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/three-dots-vertical/ MIT license
-$svg-three-dots-vertical: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-three-dots-vertical' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z'/></svg>";
-
-// https://material.io/resources/icons/?icon=horizontal_rule Apache license version 2.0.
-$svg-baseline: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' enable-background='new 0 0 24 24' height='24' viewBox='0 0 24 24' width='24'><g><rect fill='none' fill-rule='evenodd' height='24' width='24'/><rect fill-rule='evenodd' height='2' width='16' x='4' y='11'/></g></svg>";
-
-// https://icons.getbootstrap.com/icons/search/ MIT license
-$svg-search: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-search' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z'/><path fill-rule='evenodd' d='M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/gear-fill/ MIT license
-$svg-gear-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-gear-fill' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 0 0-5.86 2.929 2.929 0 0 0 0 5.858z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/files/ MIT license
-$svg-bi-files: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-files' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z'/><path d='M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/person-fill/ MIT license
-$svg-person-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-person-fill' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'/></svg>";
-
-// https://material.io/resources/icons/?icon=list  license version 2.0.
-$svg-list: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/lock-fill/ MIT license
-$svg-lock-fill: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-lock-fill' fill='%23FFD700' xmlns='http://www.w3.org/2000/svg'><path d='M2.5 9a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9z'/><path fill-rule='evenodd' d='M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z'/></svg>";
-
-// https://material.io/resources/icons/?icon=pause_circle_filled Apache license version 2.0.
-// grey60 <- %23999
-$svg-pause-circle-idle: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23999' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>";
-$svg-pause-circle-active: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23800' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z'/></svg>";
-
-// https://material.io/resources/icons/?icon=play_circle_filled Apache license version 2.0.
-// grey60 <- %23999
-$svg-play-circle-idle: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23999' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>";
-$svg-play-circle-active: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23080' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/></svg>";
-
-// https://material.io/resources/icons/?icon=analytics Apache license version 2.0.
-$svg-analytics: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'><path d='M0 0h24v24H0z' fill='none'/><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-5h2v5zm4 0h-2v-3h2v3zm0-5h-2v-2h2v2zm4 5h-2V7h2v10z'/></svg>";
-
-// https://icons.getbootstrap.com/icons/broadcast/ MIT license
-$svg-broadcast: "data:image/svg+xml;utf8,<svg width='1em' height='1em' viewBox='0 0 16 16' class='bi bi-broadcast' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707zm2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 0 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708zm5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708zm2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707z'/><path d='M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z'/></svg>";
-
-// https://material.io/resources/icons/?icon=menu Apache license version 2.0.
-$svg-menu: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black' width='18px' height='18px'><path d='M0 0h24v24H0z' fill='none'/><path d='M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'/></svg>";
+// SVG ICONS -- see images/README.md for sources and license details
+// Are you a designer? New icon PRs welcomed!
+$svg-analytics: 'images/analytics.svg';
+$svg-app: 'images/application-x-executable.svg';
+$svg-audio: 'images/audio-x-generic.svg';
+$svg-baseline: 'images/horizontal-rule.svg';
+$svg-bi-files: 'images/files.svg';
+$svg-broadcast: 'images/broadcast.svg';
+$svg-chevron-dn: 'images/chevron-down.svg';
+$svg-chevron-up: 'images/chevron-up.svg';
+$svg-folder: 'images/folder.svg';
+$svg-font: 'images/font-x-generic.svg';
+$svg-image: 'images/image-x-generic.svg';
+$svg-list: 'images/list.svg';
+$svg-lock-fill: 'images/lock-fill.svg';
+$svg-menu: 'images/menu.svg';
+$svg-model: 'images/text-x-generic.svg';
+$svg-pause-circle-active: 'images/pause-circle-active.svg';
+$svg-pause-circle-idle: 'images/pause-circle-idle.svg';
+$svg-person-fill: 'images/person-fill.svg';
+$svg-play-circle-active: 'images/play-circle-active.svg';
+$svg-play-circle-idle: 'images/play-circle-idle.svg';
+$svg-text: 'images/text-x-generic.svg';
+$svg-video: 'images/video-x-generic.svg';
 
 /// MIXINS
 
@@ -316,6 +290,14 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
 }
 
 .torrent-list {
+  $compact-primary-icon-size-number: 32;
+  $compact-primary-icon-size: $compact-primary-icon-size-number * 1px;
+  $compact-secondary-icon-size: 16px;
+  $full-primary-icon-size-number: 48;
+  $full-primary-icon-size: $full-primary-icon-size-number * 1px;
+  $full-secondary-icon-size: 24px;
+  $overlay-icon-background-position: 50% 64%, center;
+
   cursor: pointer;
   list-style-type: none;
   margin: 0;
@@ -327,18 +309,118 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     background-color: $white;
     border-bottom: 1px solid $grey81;
     color: $grey40;
-    display: flex;
 
     &.compact {
       align-items: center;
+      display: flex;
       flex-direction: row-reverse;
       > * {
         margin: 4px 5px;
       }
+
+      .icon {
+        @mixin mime-icon-compact($url) {
+          background-image: url($url);
+          background-size: $compact-primary-icon-size;
+          &[data-icon-multifile='true'] {
+            background-image: url($url), url($svg-folder);
+            background-position: $overlay-icon-background-position;
+            background-size: $compact-secondary-icon-size,
+              $compact-primary-icon-size;
+          }
+        }
+
+        flex-shrink: 0;
+        height: $compact-primary-icon-size;
+        width: $compact-primary-icon-size;
+
+        &[data-icon-mime-type='audio'] {
+          @include mime-icon-compact($svg-audio);
+        }
+        &[data-icon-mime-type='application'] {
+          @include mime-icon-compact($svg-app);
+        }
+        &[data-icon-mime-type='font'] {
+          @include mime-icon-compact($svg-font);
+        }
+        &[data-icon-mime-type='image'] {
+          @include mime-icon-compact($svg-image);
+        }
+        &[data-icon-mime-type='model'] {
+          @include mime-icon-compact($svg-model);
+        }
+        &[data-icon-mime-type='text'] {
+          @include mime-icon-compact($svg-text);
+        }
+        &[data-icon-mime-type='video'] {
+          @include mime-icon-compact($svg-video);
+        }
+      }
     }
     &:not(.compact) {
-      flex-direction: column;
-      padding: 2px 12px;
+      align-items: center;
+      display: grid;
+      grid-column-gap: 10px;
+      grid-template-areas:
+        'icon name'
+        'icon peers'
+        'icon progressbar'
+        'icon progress-text';
+      grid-template-columns: $full-primary-icon-size 1fr;
+      padding: 2px 5px;
+
+      .icon {
+        @mixin mime-icon-full($url) {
+          background-image: url($url);
+          background-size: $full-primary-icon-size;
+          &[data-icon-multifile='true'] {
+            background-image: url($url), url($svg-folder);
+            background-position: $overlay-icon-background-position;
+            background-size: $full-secondary-icon-size, $full-primary-icon-size;
+          }
+        }
+
+        background-size: $full-primary-icon-size;
+        grid-area: icon;
+        height: $full-primary-icon-size-number * 1.1px;
+        width: $full-primary-icon-size-number * 1.1px;
+
+        &[data-icon-mime-type='audio'] {
+          @include mime-icon-full($svg-audio);
+        }
+        &[data-icon-mime-type='application'] {
+          @include mime-icon-full($svg-app);
+        }
+        &[data-icon-mime-type='font'] {
+          @include mime-icon-full($svg-font);
+        }
+        &[data-icon-mime-type='image'] {
+          @include mime-icon-full($svg-image);
+        }
+        &[data-icon-mime-type='model'] {
+          @include mime-icon-full($svg-model);
+        }
+        &[data-icon-mime-type='text'] {
+          @include mime-icon-full($svg-text);
+        }
+        &[data-icon-mime-type='video'] {
+          @include mime-icon-full($svg-video);
+        }
+      }
+
+      .torrent-name {
+        grid-area: name;
+      }
+      .torrent-peer-details {
+        grid-area: peers;
+      }
+      .torrent-progress {
+        grid-area: progressbar;
+      }
+      .torrent-progress-details {
+        grid-area: progress-text;
+      }
+
       > * {
         margin: 1px 0;
       }
@@ -356,6 +438,11 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     &.selected .torrent-peer-details.error {
       color: $white;
     }
+  }
+
+  .icon {
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   .torrent-pauseresume-button {
@@ -552,11 +639,24 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     &:hover:not(.disabled) {
       background-color: $grey97;
     }
+    &[aria-checked='true'] {
+      background-color: $grey97;
+      color: #000;
+    }
+    .selected {
+      // FIXME: transition to aria-checked
+      background-color: $grey97;
+      color: #000;
+    }
   }
-  .selected {
-    background-color: $grey97;
-    color: #000;
+
+  // hide the fullscreen button unless we're on mobile
+  @media (min-width: 500px) {
+    [data-command='toggle-fullscreen'] {
+      display: none;
+    }
   }
+
   .mainwin-menu-close {
     color: $grey67;
     font-size: 36px;

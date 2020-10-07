@@ -276,9 +276,20 @@ export class TorrentRendererFull {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  createRow() {
+  createRow(torrent) {
     const root = document.createElement('li');
     root.className = 'torrent';
+
+    const icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.setAttribute(
+      'data-icon-mime-type',
+      torrent.getPrimaryMimeType().split('/', 1).pop()
+    );
+    icon.setAttribute(
+      'data-icon-multifile',
+      torrent.getFileCount() > 1 ? 'true' : 'false'
+    );
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -299,11 +310,13 @@ export class TorrentRendererFull {
     const details = document.createElement('div');
     details.className = 'torrent-progress-details';
 
+    root.appendChild(icon);
     root.appendChild(name);
     root.appendChild(peers);
     root.appendChild(progress);
     root.appendChild(details);
 
+    root._icon = icon;
     root._name_container = name;
     root._peer_details_container = peers;
     root._progress_details_container = details;
@@ -366,8 +379,19 @@ export class TorrentRendererCompact {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  createRow() {
+  createRow(torrent) {
     const progressbar = TorrentRendererHelper.createProgressbar('compact');
+
+    const icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.setAttribute(
+      'data-icon-mime-type',
+      torrent.getPrimaryMimeType().split('/', 1).pop()
+    );
+    icon.setAttribute(
+      'data-icon-multifile',
+      torrent.getFileCount() > 1 ? 'true' : 'false'
+    );
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
@@ -379,6 +403,7 @@ export class TorrentRendererCompact {
     root.appendChild(progressbar.element);
     root.appendChild(details);
     root.appendChild(name);
+    root.appendChild(icon);
     root.className = 'torrent compact';
     root._progressbar = progressbar;
     root._details_container = details;
@@ -393,7 +418,7 @@ export class TorrentRow {
   constructor(view, controller, torrent) {
     this._view = view;
     this._torrent = torrent;
-    this._element = view.createRow();
+    this._element = view.createRow(torrent);
     this._torrent.addEventListener('dataChanged', () =>
       this.render(controller)
     );

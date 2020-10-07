@@ -130,6 +130,29 @@ export class Transmission {
     listen_cmd('verify-selected-torrents', 'click', () =>
       this.verifySelectedTorrents()
     );
+    listen_cmd('toggle-fullscreen', 'click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.body.requestFullscreen();
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      for (const e of document.querySelectorAll(
+        '[data-command="toggle-fullscreen"]'
+      )) {
+        e.classList.toggle('selected', document.fullscreenElement);
+      }
+    });
+    listen_cmd('toggle-compact-rows', 'click', () => {
+      this.prefs.display_mode =
+        this.prefs.display_mode !== Prefs.DisplayCompact
+          ? Prefs.DisplayCompact
+          : Prefs.DisplayFull;
+    });
+    document.addEventListener('fullscreenchange', () =>
+      Utils.setCheckedCmd('toggle-fullscreen', document.fullscreenElement)
+    );
 
     for (const e of document.querySelectorAll('[data-command]')) {
       if (!listened.has(e)) {
@@ -138,13 +161,11 @@ export class Transmission {
     }
 
     // context menu
-    const hide_context_menu = () =>
-      Utils.hide(document.querySelector('.context-menu'));
     document
-      .getElementById('torrent-list')
-      .addEventListener('mousedown', hide_context_menu);
+      .getElementById('torrent-container')
+      .addEventListener('mousedown', Transmission.hidePopups);
     for (const e of document.getElementsByClassName('context-menuitem')) {
-      e.addEventListener('click', hide_context_menu);
+      e.addEventListener('click', Transmission.hidePopups);
     }
 
     // tell jQuery to copy the dataTransfer property from events over if it exists
@@ -252,11 +273,6 @@ export class Transmission {
     const value = target.getAttribute('data-radio-value');
 
     switch (group) {
-      case Prefs.DisplayMode:
-        this.prefs.display_mode = value;
-        this.refilterSoon();
-        break;
-
       case Prefs.SortDirection:
         this.prefs.sort_direction = value;
         this.refilterSoon();
@@ -318,14 +334,8 @@ export class Transmission {
     const getBestMenuPos = (r, bounds) => {
       let { x, y } = r;
       const { width, height } = r;
-
-      if (x > bounds.width - width) {
-        x -= width;
-      }
-      if (y > bounds.height - height) {
-        y -= height;
-      }
-
+      x = Math.min(x, bounds.x + bounds.width - width);
+      y = Math.min(y, bounds.y + bounds.height - height);
       return new DOMRect(x, y, width, height);
     };
 
@@ -347,8 +357,8 @@ export class Transmission {
       const e = context_menu;
       Utils.show(e);
       const initial_pos = new DOMRect(
-        ev.clientX,
-        ev.clientY,
+        ev.x,
+        ev.y,
         e.clientWidth,
         e.clientHeight
       );
@@ -374,11 +384,13 @@ export class Transmission {
 
   onPrefChanged(key, value) {
     switch (key) {
-      case Prefs.DisplayMode:
-        this.torrentRenderer =
-          value === 'compact'
-            ? new TorrentRendererCompact()
-            : new TorrentRendererFull();
+      case Prefs.DisplayMode: {
+        const compact = value === 'compact';
+        Utils.setCheckedCmd('toggle-compact-rows', compact);
+        this.torrentRenderer = compact
+          ? new TorrentRendererCompact()
+          : new TorrentRendererFull();
+      }
       // falls through
 
       case Prefs.SortMode:

@@ -137,7 +137,7 @@ export class Torrent extends EventTarget {
     return this.fields.files[i];
   }
   getFileCount() {
-    return this.fields.files ? this.fields.files.length : 0;
+    return this.fields['file-count'];
   }
   getHashString() {
     return this.fields.hashString;
@@ -183,6 +183,9 @@ export class Torrent extends EventTarget {
   }
   getPieceSize() {
     return this.fields.pieceSize;
+  }
+  getPrimaryMimeType() {
+    return this.fields['primary-mime-type'];
   }
   getPrivateFlag() {
     return this.fields.isPrivate;
@@ -551,7 +554,13 @@ Torrent.Fields = {};
 // commonly used fields which only need to be loaded once,
 // either on startup or when a magnet finishes downloading its metadata
 // finishes downloading its metadata
-Torrent.Fields.Metadata = ['addedDate', 'name', 'totalSize'];
+Torrent.Fields.Metadata = [
+  'addedDate',
+  'file-count',
+  'name',
+  'primary-mime-type',
+  'totalSize',
+];
 
 // commonly used fields which need to be periodically refreshed
 Torrent.Fields.Stats = [

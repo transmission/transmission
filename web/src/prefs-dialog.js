@@ -109,8 +109,6 @@ export class PrefsDialog extends EventTarget {
    */
 
   _onDialogClosed() {
-    // transmission.hideMobileAddressbar();
-
     this.dispatchEvent(new Event('closed'));
   }
 
@@ -156,7 +154,6 @@ export class PrefsDialog extends EventTarget {
   }
 
   setVisible(visible) {
-    // transmission.hideMobileAddressbar();
     if (visible) {
       this._setBlocklistButtonEnabled(true);
       this.data.remote.checkPort(this._onPortChecked, this);

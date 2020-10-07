@@ -38,9 +38,29 @@
   - [x] wire in tip jar
   - [x] should OVERLAY torrent container, not go before it
 - [x] what to do about context menu? it still uses jQuery
+- [x] clicking the torrent area should hide popups
+- [x] on mobile, context menu always goes up
+- [x] add fullscreen mode
+  - [x] remove the last of the 'hide addressbar' code
+  - [x] maybe remove the fullscreen hotkey -- it's only useful on mobile, and few keyboards there
+  - [x] should we hide the fullscreen button on desktop?
+- [ ] context menu doesn't like area where there are no rows
 - [ ] stats dialog looks bad on mobile
+- [ ] can't activate the filter text on mobile
 - [ ] inspector styling is broken
+- [ ] should there be a maximum width for the app? it looks kind of bad on a desktop when the window is wide
 - [ ] filterbar isn't responsive
+  - [ ] shorten width of input field
 - [ ] what to do about prefs dialog? it still uses jQuery
 - [ ] what to do about footer? it's not useful right now
+  - [ ] move speed up/down from filterbar to footer
 - [ ] aria for sidebar menu
+  - [ ] https://www.w3.org/TR/wai-aria-practices/examples/checkbox/checkbox-1/checkbox-1.html
+    - [ ] tabindex
+    - [ ] aria-checked='false'
+    - [ ] aria-checked='true'
+    - [ ] :focus
+    - [ ] data-command
+box
+- [ ] change the highlight color in dark mode
+- [ ] hide addressbar
