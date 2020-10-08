@@ -43,6 +43,7 @@ libtransmission_a_SOURCES = \
   magnet.c \
   makemeta.c \
   metainfo.c \
+  mime-types.c \
   natpmp.c \
   net.c \
   peer-io.c \
@@ -139,6 +140,7 @@ noinst_HEADERS = \
   magnet.h \
   makemeta.h \
   metainfo.h \
+  mime-types.h \
   natpmp_local.h \
   net.h \
   peer-common.h \
