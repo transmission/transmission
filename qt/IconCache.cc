@@ -17,6 +17,7 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QIcon>
+#include <QMimeDatabase>
 #include <QObject>
 #include <QPainter>
 #include <QStyle>
@@ -24,9 +25,6 @@
 #ifdef _WIN32
 #include <QPixmapCache>
 #include <QtWin>
-#else
-#include <QMimeDatabase>
-#include <QMimeType>
 #endif
 
 #include <libtransmission/transmission.h>
@@ -77,17 +75,16 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
     return icon;
 }
 
-QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, size_t file_count) const
+QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) const
 {
-    auto const is_folder = file_count > 1;
-    auto& icon = (is_folder ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
+    auto& icon = (multifile ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
 
     if (!icon.isNull())
     {
         return icon;
     }
 
-    if (!is_folder)
+    if (!multifile)
     {
         QMimeDatabase mime_db;
         auto const type = mime_db.mimeTypeForName(mime_type_name);
@@ -106,7 +103,7 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, size_t file_coun
         return icon;
     }
 
-    auto const mime_icon = getMimeTypeIcon(mime_type_name, 1);
+    auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
     for (auto const& size : { QSize(24, 24), QSize(32, 32), QSize(48, 48) })
     {
         // upper left corner
@@ -191,7 +188,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     if (icon.isNull()) // cache miss
     {
         QMimeDatabase mime_db;
-        QMimeType type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
+        auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
             icon = QIcon::fromTheme(type.iconName());

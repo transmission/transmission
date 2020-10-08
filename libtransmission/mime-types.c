@@ -1,13 +1,13 @@
-#define MIME_TYPE_SUFFIX_MAXLEN 24
-#define MIME_TYPE_SUFFIX_COUNT 1201
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
+ *
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
+ */
 
-struct mime_type_suffix
-{
-    char const* suffix;
-    char const* mime_type;
-};
+#include "mime-types.h"
 
-static struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
+struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
 {
     { "123", "application/vnd.lotus-1-2-3" },
     { "1km", "application/vnd.1000minds.decision-model+xml" },

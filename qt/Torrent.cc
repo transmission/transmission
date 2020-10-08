@@ -165,7 +165,7 @@ QIcon Torrent::getMimeTypeIcon() const
 {
     if (icon_.isNull())
     {
-        icon_ = IconCache::get().getMimeTypeIcon(primary_mime_type_, file_count_);
+        icon_ = IconCache::get().getMimeTypeIcon(primary_mime_type_, file_count_ > 1);
     }
 
     return icon_;
