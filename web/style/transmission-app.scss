@@ -290,13 +290,15 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
 }
 
 .torrent-list {
-  $compact-primary-icon-size-number: 32;
-  $compact-primary-icon-size: $compact-primary-icon-size-number * 1px;
-  $compact-secondary-icon-size: 16px;
-  $full-primary-icon-size-number: 48;
-  $full-primary-icon-size: $full-primary-icon-size-number * 1px;
-  $full-secondary-icon-size: 24px;
-  $overlay-icon-background-position: 50% 64%, center;
+  $app-image: 'images/application-x-executable.png';
+  $audio-image: 'images/audio-x-generic.png';
+  $folder-image: 'images/folder.png';
+  $font-image: 'images/font-x-generic.png';
+  $image-image: 'images/image-x-generic.png';
+  $package-image: 'images/package-x-generic.png';
+  $text-image: 'images/folder.png';
+  $text-image: 'images/text-x-generic.png';
+  $video-image: 'images/video-x-generic.png';
 
   cursor: pointer;
   list-style-type: none;
@@ -310,54 +312,61 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     border-bottom: 1px solid $grey81;
     color: $grey40;
 
+    .icon {
+      background-position: center, top left;
+
+      @mixin mime-icon-compact($mime-icon) {
+        background-image: url($mime-icon);
+        &[data-icon-multifile='true'] {
+          background-image: url($mime-icon), url($folder-image);
+        }
+      }
+
+      &[data-icon-mime-type='audio'] {
+        @include mime-icon-compact($audio-image);
+      }
+      &[data-icon-mime-type='application'] {
+        @include mime-icon-compact($app-image);
+      }
+      &[data-icon-mime-type='font'] {
+        @include mime-icon-compact($font-image);
+      }
+      &[data-icon-mime-type='image'] {
+        @include mime-icon-compact($image-image);
+      }
+      &[data-icon-mime-type='model'] {
+        @include mime-icon-compact($package-image);
+      }
+      &[data-icon-mime-type='text'] {
+        @include mime-icon-compact($text-image);
+      }
+      &[data-icon-mime-type='video'] {
+        @include mime-icon-compact($video-image);
+      }
+    }
+
     &.compact {
+      $icon-size-num: 16;
+      $icon-size: $icon-size-num * 1px;
+
       align-items: center;
       display: flex;
       flex-direction: row-reverse;
+
+      .icon {
+        background-size: $icon-size, $icon-size-num * 0.5px;
+        flex-shrink: 0;
+        height: $icon-size;
+        width: $icon-size;
+      }
+
       > * {
         margin: 4px 5px;
       }
-
-      .icon {
-        @mixin mime-icon-compact($url) {
-          background-image: url($url);
-          background-size: $compact-primary-icon-size;
-          &[data-icon-multifile='true'] {
-            background-image: url($url), url($svg-folder);
-            background-position: $overlay-icon-background-position;
-            background-size: $compact-secondary-icon-size,
-              $compact-primary-icon-size;
-          }
-        }
-
-        flex-shrink: 0;
-        height: $compact-primary-icon-size;
-        width: $compact-primary-icon-size;
-
-        &[data-icon-mime-type='audio'] {
-          @include mime-icon-compact($svg-audio);
-        }
-        &[data-icon-mime-type='application'] {
-          @include mime-icon-compact($svg-app);
-        }
-        &[data-icon-mime-type='font'] {
-          @include mime-icon-compact($svg-font);
-        }
-        &[data-icon-mime-type='image'] {
-          @include mime-icon-compact($svg-image);
-        }
-        &[data-icon-mime-type='model'] {
-          @include mime-icon-compact($svg-model);
-        }
-        &[data-icon-mime-type='text'] {
-          @include mime-icon-compact($svg-text);
-        }
-        &[data-icon-mime-type='video'] {
-          @include mime-icon-compact($svg-video);
-        }
-      }
     }
     &:not(.compact) {
+      $icon-size-num: 32;
+      $icon-size: $icon-size-num * 1px;
       align-items: center;
       display: grid;
       grid-column-gap: 10px;
@@ -366,48 +375,15 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
         'icon peers'
         'icon progressbar'
         'icon progress-text';
-      grid-template-columns: $full-primary-icon-size 1fr;
+      grid-template-columns: $icon-size 1fr;
       padding: 2px 5px;
 
       .icon {
-        @mixin mime-icon-full($url) {
-          background-image: url($url);
-          background-size: $full-primary-icon-size;
-          &[data-icon-multifile='true'] {
-            background-image: url($url), url($svg-folder);
-            background-position: $overlay-icon-background-position;
-            background-size: $full-secondary-icon-size, $full-primary-icon-size;
-          }
-        }
-
-        background-size: $full-primary-icon-size;
+        background-size: $icon-size, $icon-size-num * 0.5px;
         grid-area: icon;
-        height: $full-primary-icon-size-number * 1.1px;
-        width: $full-primary-icon-size-number * 1.1px;
-
-        &[data-icon-mime-type='audio'] {
-          @include mime-icon-full($svg-audio);
-        }
-        &[data-icon-mime-type='application'] {
-          @include mime-icon-full($svg-app);
-        }
-        &[data-icon-mime-type='font'] {
-          @include mime-icon-full($svg-font);
-        }
-        &[data-icon-mime-type='image'] {
-          @include mime-icon-full($svg-image);
-        }
-        &[data-icon-mime-type='model'] {
-          @include mime-icon-full($svg-model);
-        }
-        &[data-icon-mime-type='text'] {
-          @include mime-icon-full($svg-text);
-        }
-        &[data-icon-mime-type='video'] {
-          @include mime-icon-full($svg-video);
-        }
+        height: $icon-size;
+        width: $icon-size;
       }
-
       .torrent-name {
         grid-area: name;
       }

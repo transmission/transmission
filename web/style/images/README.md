@@ -7,12 +7,8 @@ https://github.com/google/material-design-icons/
 https://material.io/resources/icons/
 
 * analytics.svg
-* analytics.svg
-* horizontal-rule.svg
 * horizontal-rule.svg
 * list.svg
-* list.svg
-* menu.svg
 * menu.svg
 * pause-circle-active.svg (pause-circle-filled.svg)
 * pause-circle-idle.svg (pause-circle-filled.svg)
@@ -33,22 +29,19 @@ license: MIT
 * lock-fill.svg
 * person-fill.svg
 * search.svg
-* three-dots-vertical.svg
 
-## Tango Icons
+## Adwaita Icons
 
-https://commons.wikimedia.org/wiki/Tango_icons
-https://en.wikipedia.org/wiki/Tango_Desktop_Project
-license: public domain
+https://gitlab.gnome.org/GNOME/adwaita-icon-theme
+license: CC-BY-SA 3.0
 
-* application-x-executable.svg
-* audio-x-generic.svg
-* folder.svg
-* font-x-generic.svg
-* image-x-generic.svg
-* package-x-generic.svg
-* text-x-generic.svg
-* video-x-generic.svg
+* audio-x-generic.png
+* folder.png
+* font-x-generic.png
+* image-x-generic.png
+* package-x-generic.png
+* text-x-generic.png
+* video-x-generic.png
 
 ## Custom Icons
 
