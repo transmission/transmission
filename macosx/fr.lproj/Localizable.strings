@@ -987,7 +987,7 @@
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Ce transfert ne peut être ajouté, car il est un doublon d’un transfert déjà existant.";
 
 /* Torrent disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert va être arrêté. Faites de la place sur %@ ou désélectionner des fichers dans l’inspecteur pour continuer.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera interrompu. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
 
 /* Create torrent -> blank address -> message */
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Le transfert ne contactera pas de traqueurs pour obtenir des pairs et ne devra dépendre que de méthodes de découverte décentralisées qui ne s’appuient pas sur les traqueurs, telles que PEX et DHT, pour télécharger et propager.";
