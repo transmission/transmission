@@ -32,7 +32,6 @@ enum
     GUI_PAD = 6,
     BAR_WIDTH = 50,
     BAR_HEIGHT = 16,
-    ICON_SIZE = 24,
     LINE_SPACING = 4
 };
 
@@ -96,7 +95,7 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& embl
     status_font(base_font)
 {
     QStyle const* style(qApp->style());
-    int const icon_size = ICON_SIZE;
+    int const icon_size(style->pixelMetric(QStyle::PM_SmallIconSize));
 
     QFontMetrics const name_fm(name_font);
     QSize const name_size(name_fm.size(0, name_text_));
