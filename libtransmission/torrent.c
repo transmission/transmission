@@ -3378,6 +3378,58 @@ void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from
     tr_runInEventThread(tor->session, setLocation, data);
 }
 
+char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
+{
+    struct count
+    {
+        size_t length;
+        char const* mime_type;
+    };
+
+    tr_info const* inf = &tor->info;
+    struct count* counts = tr_new0(struct count, inf->fileCount);
+    size_t num_counts = 0;
+
+    for (tr_file const* it = inf->files, * end = it + inf->fileCount; it != end; ++it)
+    {
+        char const* mime_type = tr_get_mime_type_for_filename(it->name);
+        size_t i;
+        for (i = 0; i < num_counts; ++i)
+        {
+            if (counts[i].mime_type == mime_type)
+            {
+                counts[i].length += it->length;
+                break;
+            }
+        }
+
+        if (i == num_counts)
+        {
+            counts[i].mime_type = mime_type;
+            counts[i].length = it->length;
+            ++num_counts;
+        }
+    }
+
+    size_t max_len = 0;
+    char const* mime_type = NULL;
+    for (struct count const* it = counts, *end = it + num_counts; it != end; ++it)
+    {
+        if ((max_len < it->length) && (it->mime_type != NULL))
+        {
+            max_len = it->length;
+            mime_type = it->mime_type;
+        }
+    }
+
+    tr_free(counts);
+
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+    // application/octet-stream is the default value for all other cases.
+    // An unknown file type should use this type.
+    return mime_type ? mime_type : "application/octet-stream";
+}
+
 /***
 ****
 ***/

@@ -30,6 +30,7 @@ public:
     QIcon folderIcon() const { return folder_icon_; }
     QIcon fileIcon() const { return file_icon_; }
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
+    QIcon getMimeTypeIcon(QString const& mime_type, size_t file_count) const;
 
 protected:
     IconCache();
@@ -41,8 +42,10 @@ private:
 #if defined(_WIN32)
     void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const;
 #else
-    mutable std::unordered_map<QString, QIcon> icon_cache_;
     mutable std::unordered_set<QString> suffixes_;
+    mutable std::unordered_map<QString, QIcon> ext_to_icon_;
+    mutable std::unordered_map<QString, QIcon> name_to_icon_;
+    mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;
     QIcon getMimeIcon(QString const& filename) const;
 #endif
 };
