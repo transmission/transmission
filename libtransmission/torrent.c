@@ -3382,7 +3382,7 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
 {
     struct count
     {
-        size_t length;
+        uint64_t length;
         char const* mime_type;
     };
 
