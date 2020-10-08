@@ -3427,7 +3427,7 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     // application/octet-stream is the default value for all other cases.
     // An unknown file type should use this type.
-    return mime_type ? mime_type : "application/octet-stream";
+    return mime_type != NULL ? mime_type : "application/octet-stream";
 }
 
 /***
