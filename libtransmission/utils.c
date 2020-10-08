@@ -2275,7 +2275,7 @@ char const* tr_get_mime_type_for_filename(char const* filename)
     {
         char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
         char* out = lowercase_suffix;
-        while (in && *in)
+        while (*in != '\0')
         {
             *out++ = tolower(*in++);
         }
