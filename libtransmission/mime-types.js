@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+const copyright =
+`/*
+ * This file Copyright (C) ${new Date().getFullYear()} Mnemosyne LLC
+ *
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
+ */`;
+
 const fs = require('fs');
 const https = require('https');
 
@@ -14,25 +22,39 @@ const url = 'https://cdn.jsdelivr.net/gh/jshttp/mime-db@master/db.json';
 
 https.get(url, (res) => {
   res.setEncoding('utf8');
-  const rawData = [];
-  res.on('data', (chunk) => rawData.push(chunk));
+  const chunks = [];
+  res.on('data', (chunk) => chunks.push(chunk));
   res.on('end', () => {
     try {
       const suffixes = [];
-      const mime_types = JSON.parse(rawData.join(''));
+      const mime_types = JSON.parse(chunks.join(''));
       for (const [mime_type, info] of Object.entries(mime_types)) {
         for (const suffix of info?.extensions || []) {
           suffixes.push([ suffix, mime_type ]);
         }
       }
 
-      const max_suffix_len = suffixes.reduce((acc, [suffix]) => Math.max(acc, suffix.length), 0);
+      const max_suffix_len = suffixes
+        .reduce((acc, [suffix]) => Math.max(acc, suffix.length), 0);
+
       const mime_type_lines = suffixes
         .map(([suffix, mime_type]) => `    { "${suffix}", "${mime_type}" }`)
         .sort()
         .join(',\n');
-      fs.writeFileSync('mime-types.c',
-`#define MIME_TYPE_SUFFIX_MAXLEN ${max_suffix_len}
+      fs.writeFileSync('mime-types.c', `${copyright}
+
+#include "mime-types.h"
+
+struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
+{
+${mime_type_lines}
+};
+`);
+      fs.writeFileSync('mime-types.h', `${copyright}
+
+#pragma once
+
+#define MIME_TYPE_SUFFIX_MAXLEN ${max_suffix_len}
 #define MIME_TYPE_SUFFIX_COUNT ${suffixes.length}
 
 struct mime_type_suffix
@@ -41,12 +63,8 @@ struct mime_type_suffix
     char const* mime_type;
 };
 
-static struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
-{
-${mime_type_lines}
-};
-`
-      );
+extern struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT];
+`);
     } catch (e) {
       console.error(e.message);
     }
