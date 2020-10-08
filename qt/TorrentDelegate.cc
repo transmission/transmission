@@ -25,8 +25,7 @@
 enum
 {
     GUI_PAD = 6,
-    BAR_HEIGHT = 12,
-    ICON_SIZE = 48
+    BAR_HEIGHT = 12
 };
 
 namespace
@@ -91,7 +90,7 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_
     progress_font(base_font)
 {
     QStyle const* style(qApp->style());
-    int const icon_size = ICON_SIZE;
+    int const icon_size(style->pixelMetric(QStyle::PM_LargeIconSize));
 
     name_font.setWeight(QFont::Bold);
     QFontMetrics const name_fm(name_font);

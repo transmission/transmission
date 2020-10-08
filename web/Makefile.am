@@ -1,6 +1,7 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
 SUBDIRS = \
+  public_html \
   src \
   style
 
