@@ -3411,7 +3411,7 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
         }
     }
 
-    size_t max_len = 0;
+    uint64_t max_len = 0;
     char const* mime_type = NULL;
     for (struct count const* it = counts, *end = it + num_counts; it != end; ++it)
     {
