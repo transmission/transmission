@@ -133,6 +133,9 @@ export class Torrent extends EventTarget {
   getFailedEver() {
     return this.fields.corruptEver;
   }
+  getFiles() {
+    return this.fields.files || [];
+  }
   getFile(i) {
     return this.fields.files[i];
   }

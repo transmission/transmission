@@ -109,9 +109,9 @@ export class FileRow extends EventTarget {
 
   createRow(torrent, depth, name, even) {
     const root = document.createElement('li');
-    root.className = `inspector-torrent-file-list-entry${
-      even ? 'even' : 'odd'
-    }`;
+    root.classList.add('inspector-torrent-file-list-entry');
+    root.classList.add(even ? 'even' : 'odd');
+
     this.elements.root = root;
 
     let e = document.createElement('input');
@@ -123,6 +123,18 @@ export class FileRow extends EventTarget {
     );
     root.checkbox = e;
     root.appendChild(e);
+
+    e = document.createElement('div');
+    e.className = 'inspector-torrent-file-list-entry-name';
+    e.addEventListener('click', () => this.fireNameClicked());
+    Utils.setTextContent(e, name);
+    root.appendChild(e);
+
+    e = document.createElement('div');
+    e.className = 'inspector-torrent-file-list-entry-progress';
+    e.addEventListener('click', () => this.fireNameClicked());
+    root.appendChild(e);
+    this.elements.progress = e;
 
     e = document.createElement('div');
     e.className = 'file-priority-radiobox';
@@ -151,19 +163,7 @@ export class FileRow extends EventTarget {
 
     root.appendChild(box);
 
-    e = document.createElement('div');
-    e.className = 'inspector-torrent-file-list-entry-name';
-    e.addEventListener('click', () => this.fireNameClicked());
-    Utils.setTextContent(e, name);
-    root.appendChild(e);
-
-    e = document.createElement('div');
-    e.className = 'inspector-torrent-file-list-entry-progress';
-    e.addEventListener('click', () => this.fireNameClicked());
-    root.appendChild(e);
-    this.elements.progress = e;
-
-    root.style.marginLeft = `${depth * 16}px`;
+    root.style.paddingLeft = `${depth * 20}px`;
 
     this.refresh();
   }

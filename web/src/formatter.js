@@ -37,6 +37,13 @@ export class Formatter {
   // @param {Number} bytes the filesize in bytes
   // @return {String} human-readable string
   static mem(bytes) {
+    if (bytes < 0) {
+      return 'Unknown';
+    }
+    if (bytes === 0) {
+      return 'None';
+    }
+
     const toStr = (size, units) =>
       `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 
@@ -62,16 +69,8 @@ export class Formatter {
 
   // format a percentage to a string
   static percentString(x) {
-    if (x < 0.1) {
-      return '0';
-    }
-    if (x < 10.0) {
-      return Formatter._toTruncFixed(x, 2);
-    }
-    if (x < 100.0) {
-      return Formatter._toTruncFixed(x, 1);
-    }
-    return Formatter._toTruncFixed(x, 0);
+    const decimal_places = x < 100.0 ? 1 : 0;
+    return Formatter._toTruncFixed(x, decimal_places);
   }
 
   /*
@@ -93,6 +92,13 @@ export class Formatter {
    * @return {String} human-readable string
    */
   static size(bytes) {
+    if (bytes < 0) {
+      return 'Unknown';
+    }
+    if (bytes === 0) {
+      return 'None';
+    }
+
     const toStr = (size, units) =>
       `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
 

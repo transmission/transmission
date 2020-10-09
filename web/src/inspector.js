@@ -36,6 +36,7 @@ export class Inspector {
         remaining_time_lb: document.getElementById(
           'inspector-info-remaining-time'
         ),
+        root: document.getElementById('torrent-inspector'),
         running_time_lb: document.getElementById('inspector-info-running-time'),
         size_lb: document.getElementById('inspector-info-size'),
         state_lb: document.getElementById('inspector-info-state'),
@@ -43,10 +44,15 @@ export class Inspector {
         trackers_page: document.getElementById('inspector-page-trackers'),
         uploaded_lb: document.getElementById('inspector-info-uploaded'),
       },
-      onTorrentChanged: () => this.updateInspector(),
+      onTorrentChanged: () => this._updateInspector(),
       selectedPage: null,
       torrents: [],
     };
+
+    // listen to selection changes
+    controller.addEventListener('selection-changed', (ev) => {
+      this._setTorrents(ev.torrents);
+    });
 
     // listen to tab clicks
     const cb = this.onTabClicked.bind(this);
@@ -57,17 +63,17 @@ export class Inspector {
     this.selectTab(document.getElementById('inspector-tab-info'));
   }
 
-  static needsExtraInfo(torrents) {
+  static _needsExtraInfo(torrents) {
     return torrents.some((tor) => !tor.hasExtraInfo());
   }
 
-  refreshTorrents() {
+  _refreshTorrents() {
     const { controller, torrents } = this.data;
     const ids = torrents.map((t) => t.getId());
 
     if (ids && ids.length) {
       const fields = ['id', ...Torrent.Fields.StatsExtra];
-      if (Inspector.needsExtraInfo(torrents)) {
+      if (Inspector._needsExtraInfo(torrents)) {
         fields.push(...Torrent.Fields.InfoExtra);
       }
 
@@ -77,7 +83,7 @@ export class Inspector {
 
   /// GENERAL INFO PAGE
 
-  updateInfoPage() {
+  _updateInfoPage() {
     const none = 'None';
     const mixed = 'Mixed';
     const unknown = 'Unknown';
@@ -348,7 +354,7 @@ export class Inspector {
 
   ///  PEERS PAGE
 
-  updatePeersPage() {
+  _updatePeersPage() {
     const html = [];
     const fmt = Formatter;
     const { peers_list } = this.data.elements;
@@ -491,7 +497,7 @@ export class Inspector {
     };
   }
 
-  updateTrackersPage() {
+  _updateTrackersPage() {
     const na = 'N/A';
     const { trackers_list } = this.data.elements;
     const { torrents } = this.data;
@@ -611,10 +617,6 @@ export class Inspector {
     this.changeFileCommand(indices, command);
   }
 
-  static onNameClicked(ev) {
-    $(ev.target.getElement()).siblings().slideToggle();
-  }
-
   clearFileList() {
     const e = this.data.elements.file_list;
     while (e.firstChild) {
@@ -633,9 +635,8 @@ export class Inspector {
       file_indices: [],
     };
 
-    const n = tor.getFileCount();
-    for (let i = 0; i < n; ++i) {
-      const { name } = tor.getFile(i);
+    tor.getFiles().forEach((file, i) => {
+      const { name } = file;
       const tokens = name.split('/');
       let walk = tree;
       for (let j = 0; j < tokens.length; ++j) {
@@ -655,7 +656,7 @@ export class Inspector {
       walk.file_index = i;
       delete walk.children;
       leaves.push(walk);
-    }
+    });
 
     for (const leaf of leaves) {
       const { file_index } = leaf;
@@ -676,26 +677,23 @@ export class Inspector {
       'priorityToggled',
       this.onFilePriorityToggled.bind(this)
     );
-    row.addEventListener('nameClicked', Inspector.onNameClicked);
     this.data.file_rows.push(row);
     parent.appendChild(row.getElement());
   }
 
   addSubtreeToView(tor, parent, sub, i) {
-    const div = document.createElement('div');
     if (sub.parent) {
-      this.addNodeToView(tor, div, sub, i++);
+      this.addNodeToView(tor, parent, sub, i++);
     }
     if (sub.children) {
       for (const val of Object.values(sub.children)) {
-        i = this.addSubtreeToView(tor, div, val);
+        i = this.addSubtreeToView(tor, parent, val, i);
       }
     }
-    parent.appendChild(div);
     return i;
   }
 
-  updateFilesPage() {
+  _updateFilesPage() {
     const { file_list } = this.data.elements;
     const { torrents } = this.data;
 
@@ -706,7 +704,7 @@ export class Inspector {
     }
 
     const [tor] = torrents;
-    const n = tor ? tor.getFileCount() : 0;
+    const n = tor.getFiles().length;
     if (tor !== this.data.file_torrent || n !== this.data.file_torrent_n) {
       // rebuild the file list...
       this.clearFileList();
@@ -743,10 +741,10 @@ export class Inspector {
       Utils.setVisible(e, e === this.selectedPage);
     }
 
-    this.updateInspector();
+    this._updateInspector();
   }
 
-  updateInspector() {
+  _updateInspector() {
     const { elements, torrents } = this.data;
 
     // update the name, which is shown on all the pages
@@ -763,16 +761,16 @@ export class Inspector {
     // update the visible page
     switch (this.selectedPage) {
       case elements.files_page:
-        this.updateFilesPage();
+        this._updateFilesPage();
         break;
       case elements.peers_page:
-        this.updatePeersPage();
+        this._updatePeersPage();
         break;
       case elements.trackers_page:
-        this.updateTrackersPage();
+        this._updateTrackersPage();
         break;
       default:
-        this.updateInfoPage();
+        this._updateInfoPage();
         break;
     }
   }
@@ -836,14 +834,12 @@ export class Inspector {
     return formattedFlags.join('');
   }
 
-  /// PUBLIC
-
-  setTorrents(torrents) {
+  _setTorrents(torrents) {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
     const cb = this.data.onTorrentChanged;
     this.data.torrents.forEach((t) => t.removeEventListener(key, cb));
-    this.data.torrents = torrents || [];
+    this.data.torrents = [...torrents];
     this.data.torrents.forEach((t) => t.addEventListener(key, cb));
 
     // periodically ping the server for updates to these torrents
@@ -852,10 +848,10 @@ export class Inspector {
       delete this.data.interval;
     }
     if (this.data.torrents.length) {
-      this.data.interval = setInterval(this.refreshTorrents.bind(this), 2000);
-      this.refreshTorrents();
+      this.data.interval = setInterval(this._refreshTorrents.bind(this), 2000);
+      this._refreshTorrents();
     }
 
-    this.updateInspector();
+    this._updateInspector();
   }
 }

@@ -18,8 +18,10 @@ import {
 } from './torrent-row.js';
 import { isMobileDevice, Utils } from './utils.js';
 
-export class Transmission {
+export class Transmission extends EventTarget {
   constructor(dialog, notifications, prefs) {
+    super();
+
     // Initialize the helper classes
     this.dialog = dialog;
     this.notifications = notifications;
@@ -41,8 +43,8 @@ export class Transmission {
       () => this.updateButtonStates(),
       100
     );
-    this.callSelectionChangedSoon = Utils.debounce(
-      () => this.selectionChanged(),
+    this.dispatchSelectionChangedSoon = Utils.debounce(
+      () => this.dispatchSelectionChanged(),
       200
     );
 
@@ -223,6 +225,11 @@ export class Transmission {
     for (e of document.querySelectorAll('a[data-radio-group]')) {
       e.addEventListener('click', this.radioButtonClicked.bind(this));
     }
+
+    this.addEventListener(
+      'selection-changed',
+      this.updateButtonsSoon.bind(this)
+    );
   }
 
   static populateHotkeyDialog() {
@@ -480,31 +487,31 @@ export class Transmission {
     for (const e of this.elements.torrent_list.children) {
       e.classList.toggle('selected', e === e_sel);
     }
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
   }
 
   selectRow(row) {
     row.getElement().classList.add('selected');
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
   }
 
   deselectRow(row) {
     row.getElement().classList.remove('selected');
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
   }
 
   selectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.add('selected');
     }
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
   }
 
   deselectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.remove('selected');
     }
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
     delete this._last_torrent_clicked;
   }
 
@@ -530,17 +537,17 @@ export class Transmission {
       }
     }
 
-    this.callSelectionChangedSoon();
+    this.dispatchSelectionChangedSoon();
   }
 
-  selectionChanged() {
-    this.updateButtonsSoon();
-    this.inspector.setTorrents(
-      Transmission.inspectorIsVisible() ? this.getSelectedTorrents() : []
-    );
+  dispatchSelectionChanged() {
+    const rows = this.getSelectedRows();
+    const elements = rows.map((r) => r.getElement());
+    const torrents = rows.map((r) => r.getTorrent());
 
-    clearTimeout(this.selectionChangedTimer);
-    delete this.selectionChangedTimer;
+    const event = new Event('selection-changed');
+    Object.assign(event, { elements, torrents });
+    this.dispatchEvent(event);
   }
 
   /*--------------------------------------------
@@ -1562,13 +1569,17 @@ FIXME: fix this when notifications get fixed
     // set the odd/even property
     rows
       .map((row) => row.getElement())
-      .forEach((e, idx) => e.classList.toggle('even', idx % 2 === 0));
+      .forEach((e, idx) => {
+        const even = idx % 2 === 0;
+        e.classList.toggle('even', even);
+        e.classList.toggle('odd', !even);
+      });
 
     // sync gui
     this.updateButtonsSoon();
     this.updateStatusbar();
     if (old_sel_count !== countSelectedRows()) {
-      this.selectionChanged();
+      this.dispatchSelectionChangedSoon();
     }
   }
 

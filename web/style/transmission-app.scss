@@ -16,6 +16,8 @@ $grey81: #cfcfcf;
 $grey87: #dedede;
 $grey97: #f7f7f7;
 
+$odd-background: #f7f7f7;
+
 // Z-INDEX ENUM
 $z-index-mainwin: 0;
 $z-index-progressbar: 1;
@@ -134,6 +136,10 @@ a {
 
 .hidden {
   display: none;
+}
+
+.odd {
+  background-color: $odd-background;
 }
 
 .mainwin {
@@ -312,6 +318,10 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     border-bottom: 1px solid $grey81;
     color: $grey40;
 
+    &.odd {
+      background-color: $odd-background;
+    }
+
     .icon {
       background-position: center, top left;
 
@@ -369,14 +379,14 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
       $icon-size: $icon-size-num * 1px;
       align-items: center;
       display: grid;
-      grid-column-gap: 10px;
+      grid-column-gap: 12px;
       grid-template-areas:
         'icon name'
         'icon peers'
         'icon progressbar'
         'icon progress-text';
       grid-template-columns: $icon-size 1fr;
-      padding: 2px 5px;
+      padding: 2px 12px;
 
       .icon {
         background-size: $icon-size, $icon-size-num * 0.5px;
@@ -400,10 +410,6 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
       > * {
         margin: 1px 0;
       }
-    }
-
-    &.even {
-      background-color: $grey97;
     }
 
     &.selected {
@@ -585,6 +591,9 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
     border-right: 1px solid $grey20;
     padding: 20px;
   }
+  :focus:not(.disabled) {
+    outline: $grey13 solid 1px;
+  }
 
   .actions a,
   .info a,
@@ -619,11 +628,11 @@ $torrent-container-top: $toolbar-height-num + $filterbar-height-num + 6px;
       background-color: $grey97;
       color: #000;
     }
-    .selected {
-      // FIXME: transition to aria-checked
-      background-color: $grey97;
-      color: #000;
-    }
+  }
+  .selected {
+    // FIXME: transition to aria-checked
+    background-color: $grey97;
+    color: #000;
   }
 
   // hide the fullscreen button unless we're on mobile
@@ -752,6 +761,7 @@ $inspector-width: 570px;
 }
 
 #torrent-inspector {
+  background: #fff;
   border-left: 1px solid $grey40;
   bottom: 22px;
   overflow: auto;
@@ -857,10 +867,6 @@ $inspector-width: 570px;
   .inspector-tracker-entry {
     display: block;
     padding: 3px 0 3px 2px;
-
-    &.odd {
-      background-color: #eee;
-    }
   }
 
   .tracker-host {
@@ -871,32 +877,34 @@ $inspector-width: 570px;
   /* Files Inspector Tab */
 
   #inspector-file-list {
-    cursor: default;
-    list-style: none;
     margin: 0;
     overflow: hidden;
-    padding-inline-start: 0;
+    padding: 2px;
     text-align: left;
   }
 
   .inspector-torrent-file-list-entry {
-    display: block;
-    padding: 3px 0 3px 2px;
+    display: grid;
+    grid-column-gap: 5px;
+    grid-template-areas:
+      'check   name  priority'
+      'blank1  info  blank2';
+    grid-template-columns: 20px 1fr 65px;
+    margin-bottom: 4px;
+    padding: 5px;
 
     &.skip {
       color: $grey40;
     }
+  }
 
-    &.even {
-      background-color: #f7f7f7;
-    }
+  .file-wanted-control {
+    grid-area: check;
   }
 
   .inspector-torrent-file-list-entry-name {
     color: $black;
-    display: inline;
-    font-size: 1.2em;
-    margin-left: 0;
+    grid-area: name;
   }
 
   .inspector-torrent-file-list-entry.skip
@@ -906,7 +914,7 @@ $inspector-width: 570px;
 
   .inspector-torrent-file-list-entry-progress {
     color: $grey60;
-    margin-left: 20px;
+    grid-area: info;
   }
 
   .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
@@ -977,10 +985,6 @@ $inspector-width: 570px;
     height: 16px;
     width: 16px;
   }
-
-  &.odd {
-    background-color: #eee;
-  }
 }
 
 /// FILE PRIORITY BUTTONS
@@ -1001,10 +1005,7 @@ $inspector-width: 570px;
   // We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
   // Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
 
-  display: inline;
-  float: right;
-  margin: 4px;
-  margin-top: 2px;
+  grid-area: priority;
 
   > * {
     @include button;

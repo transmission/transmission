@@ -44,10 +44,18 @@
   - [x] remove the last of the 'hide addressbar' code
   - [x] maybe remove the fullscreen hotkey -- it's only useful on mobile, and few keyboards there
   - [x] should we hide the fullscreen button on desktop?
+- [ ] on mobile, torrent list, prefs, and inspector should take turns filling the workarea -- prefs/inspector are not popups on mobile
+- [ ] on desktop, torrent list is alway the primary in the workarea. prefs/inspector should go on the rhs
+- [ ] inspector is goofy
+  - [x] background is transparent
+  - [x] file list still uses jQuery
+  - [x] file list alignment doesn't line up right
+  - [ ] activity page needs margin fixing between sections
+  - [ ] consider _not_ treating inspector like a popup on desktop -- specifically, don't dismiss it when clicking on torrent list
+  - [ ] should fill screen in mobile mode
 - [ ] context menu doesn't like area where there are no rows
 - [ ] stats dialog looks bad on mobile
 - [ ] can't activate the filter text on mobile
-- [ ] inspector styling is broken
 - [ ] should there be a maximum width for the app? it looks kind of bad on a desktop when the window is wide
 - [ ] filterbar isn't responsive
   - [ ] shorten width of input field
