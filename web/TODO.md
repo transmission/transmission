@@ -39,11 +39,17 @@
   - [x] should OVERLAY torrent container, not go before it
 - [x] what to do about context menu? it still uses jQuery
 - [x] clicking the torrent area should hide popups
+- [x] context menu doesn't like area where there are no rows
 - [x] on mobile, context menu always goes up
 - [x] add fullscreen mode
   - [x] remove the last of the 'hide addressbar' code
   - [x] maybe remove the fullscreen hotkey -- it's only useful on mobile, and few keyboards there
   - [x] should we hide the fullscreen button on desktop?
+- [ ] port stats dialog over to new dialog popup code
+- [ ] selecting torrents accidentally highlights the torrent rows' texts
+- [ ] port nav menu over to new dialog popup code
+- [ ] port add-torrent menu over to new dialog popup code
+- [ ] remove old torrent class
 - [ ] on mobile, torrent list, prefs, and inspector should take turns filling the workarea -- prefs/inspector are not popups on mobile
 - [ ] on desktop, torrent list is alway the primary in the workarea. prefs/inspector should go on the rhs
 - [ ] inspector is goofy
@@ -53,7 +59,6 @@
   - [ ] activity page needs margin fixing between sections
   - [ ] consider _not_ treating inspector like a popup on desktop -- specifically, don't dismiss it when clicking on torrent list
   - [ ] should fill screen in mobile mode
-- [ ] context menu doesn't like area where there are no rows
 - [ ] stats dialog looks bad on mobile
 - [ ] can't activate the filter text on mobile
 - [ ] should there be a maximum width for the app? it looks kind of bad on a desktop when the window is wide

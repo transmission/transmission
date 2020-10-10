@@ -5,65 +5,62 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-import { Utils } from './utils.js';
-
 export class Dialog {
-  constructor() {
-    // private interface variables
-    this._container = document.getElementById('dialog-container');
-    this._heading = document.getElementById('dialog-heading');
-    this._message = document.getElementById('dialog-message');
-    this._cancel_button = document.getElementById('dialog-cancel-button');
-    this._confirm_button = document.getElementById('dialog-confirm-button');
-    this._callback = null;
+  static CreateContainer(id) {
+    const root = document.createElement('div');
+    root.classList.add('dialog-container');
+    root.classList.add('popup');
+    root.classList.add(id);
+    root.setAttribute('role', 'dialog');
 
-    // Observe the buttons
-    this._cancel_button.addEventListener('click', this.hideDialog.bind(this));
-    this._confirm_button.addEventListener(
-      'click',
-      this.executeCallback.bind(this)
-    );
-  }
+    const win = document.createElement('div');
+    win.classList.add('dialog-window');
+    root.appendChild(win);
 
-  /// EVENT FUNCTIONS
+    const logo = document.createElement('div');
+    logo.classList.add('dialog-logo');
+    win.appendChild(logo);
 
-  executeCallback() {
-    if (this._callback) {
-      this._callback();
-    }
-    this.hideDialog();
-  }
+    const heading = document.createElement('div');
+    heading.classList.add('dialog-heading');
+    win.appendChild(heading);
 
-  hideDialog() {
-    Utils.hide(this._container);
-    this._callback = null;
-  }
+    const message = document.createElement('div');
+    message.classList.add('dialog-message');
+    win.appendChild(message);
 
-  /// INTERFACE FUNCTIONS
+    const workarea = document.createElement('div');
+    workarea.classList.add('dialog-workarea');
+    win.appendChild(workarea);
 
-  // display a confirm dialog
-  confirm(
-    dialog_heading,
-    dialog_message,
-    confirm_button_label,
-    callback,
-    cancel_button_label
-  ) {
-    this._callback = callback;
-    Utils.setTextContent(this._heading, dialog_heading);
-    Utils.setTextContent(this._message, dialog_message);
-    Utils.setTextContent(this._cancel_button, cancel_button_label || 'Cancel');
-    Utils.setTextContent(this._confirm_button, confirm_button_label);
-    Utils.show(this._confirm_button);
-    Utils.show(this._container);
-  }
+    const buttons = document.createElement('div');
+    buttons.classList.add('dialog-buttons');
+    win.appendChild(buttons);
 
-  // display an alert dialog
-  alert(dialog_heading, dialog_message, cancel_button_label) {
-    Utils.setTextContent(this._heading, dialog_heading);
-    Utils.setTextContent(this._message, dialog_message);
-    Utils.setTextContent(this._cancel_button, cancel_button_label);
-    Utils.hide(this._confirm_button);
-    Utils.show(this._container);
+    const bbegin = document.createElement('span');
+    bbegin.classList.add('dialog-buttons-begin');
+    buttons.appendChild(bbegin);
+
+    const dismiss = document.createElement('button');
+    dismiss.classList.add('dialog-dismiss-button');
+    dismiss.textContent = 'Cancel';
+    buttons.appendChild(dismiss);
+
+    const confirm = document.createElement('button');
+    confirm.textContent = 'OK';
+    buttons.appendChild(confirm);
+
+    const bend = document.createElement('span');
+    bend.classList.add('dialog-buttons-end');
+    buttons.appendChild(bend);
+
+    return {
+      confirm,
+      dismiss,
+      heading,
+      message,
+      root,
+      workarea,
+    };
   }
 }

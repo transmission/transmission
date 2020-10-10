@@ -14,6 +14,7 @@ import 'jquery-ui/themes/base/dialog.css';
 import 'jquery-ui/themes/base/tabs.css';
 import 'jquery-ui/themes/base/theme.css';
 
+import { ActionManager } from './action-manager.js';
 import { Dialog } from './dialog.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
@@ -54,11 +55,17 @@ function main() {
   window.onload = scroll_soon;
   window.onorientationchange = scroll_soon;
 
+  const action_manager = new ActionManager();
   const prefs = new Prefs();
   const dialog = new Dialog();
   const notifications = new Notifications(prefs);
   // eslint-disable-next-line no-unused-vars
-  const transmission = new Transmission(dialog, notifications, prefs);
+  const transmission = new Transmission(
+    action_manager,
+    dialog,
+    notifications,
+    prefs
+  );
 }
 
 document.addEventListener('DOMContentLoaded', main);

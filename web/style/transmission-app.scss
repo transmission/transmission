@@ -1154,9 +1154,9 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
   display: flex;
   font-size: 1.2em;
   font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  // overflow: hidden;
+  // text-overflow: ellipsis;
+  // white-space: nowrap;
 }
 .dialog-message {
   grid-column: 2 / 3;
@@ -1209,10 +1209,14 @@ $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
 
 /// ABOUT DIALOG
 
-#about-dialog-version-number {
+.about-dialog .dialog-workarea > * {
+  margin-bottom: 10px;
+}
+
+.about-dialog-version-number {
   margin-left: 4px;
 }
-#about-dialog-version-checksum {
+.about-dialog-version-checksum {
   font-size: small;
   font-style: italic;
   font-weight: normal;

@@ -54,7 +54,9 @@ export class Remote {
         return response.json();
       })
       .then((payload) => {
-        callback.call(context, payload, response_arg);
+        if (callback) {
+          callback.call(context, payload, response_arg);
+        }
       })
       .catch((error) => {
         if (error.message === Remote._SessionHeader) {

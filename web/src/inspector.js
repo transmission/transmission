@@ -50,8 +50,8 @@ export class Inspector {
     };
 
     // listen to selection changes
-    controller.addEventListener('selection-changed', (ev) => {
-      this._setTorrents(ev.torrents);
+    controller.addEventListener('torrent-selection-changed', (ev) => {
+      this._setTorrents(ev.selected);
     });
 
     // listen to tab clicks
