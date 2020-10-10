@@ -61,7 +61,7 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
-if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -675,7 +675,7 @@ if(GIT_FOUND)
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    if(TR_GIT_ROOT)
+    if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
         configure_file(
             "${CMAKE_SOURCE_DIR}/extras/pre-commit"
             "${TR_GIT_ROOT}/.git/hooks/pre-commit"
@@ -689,8 +689,8 @@ if(GIT_FOUND)
             COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
-    endif(TR_GIT_ROOT)
+    endif()
     unset(TR_GIT_ROOT)
-endif(GIT_FOUND)
+endif()
 
 include(CPack)
