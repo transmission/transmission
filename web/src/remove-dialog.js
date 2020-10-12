@@ -22,10 +22,12 @@ export class RemoveDialog extends EventTarget {
 
   close() {
     if (!this.closed) {
-      this.closed = true;
       this.elements.root.remove();
       this.dispatchEvent(new Event('close'));
-      delete this.elements;
+      for (const key of Object.keys(this)) {
+        delete this[key];
+      }
+      this.closed = true;
     }
   }
 

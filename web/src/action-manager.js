@@ -8,27 +8,79 @@
 export class ActionManager extends EventTarget {
   constructor() {
     super();
-    this.actions = {
-      'deselect-all': { enabled: false, hotkey: 'Control+A' },
-      'move-bottom': { enabled: false },
-      'move-down': { enabled: false },
-      'move-top': { enabled: false },
-      'move-up': { enabled: false },
-      'pause-all-torrents': { enabled: false },
-      'pause-selected-torrents': { enabled: false },
-      'reannounce-selected-torrents': { enabled: false },
-      'remove-selected-torrents': { enabled: false },
-      'resume-selected-torrents': { enabled: false },
-      'resume-selected-torrents-now': { enabled: false },
-      'select-all': { enabled: false, hotkey: 'Alt+A' },
-      'show-about-dialog': { enabled: true },
-      'show-hotkeys-dialog': { enabled: true },
-      'show-move-dialog': { enabled: false, hotkey: 'Alt+L' },
-      'show-rename-dialog': { enabled: false, hotkey: 'Alt+N' },
-      'start-all-torrents': { enabled: false },
-      'trash-selected-torrents': { enabled: false },
-      'verify-selected-torrents': { enabled: false, hotkey: 'Alt+V' },
-    };
+    this.actions = Object.seal({
+      'deselect-all': {
+        enabled: false,
+        shortcut: 'Control+A',
+        text: 'Deselect all',
+      },
+      'move-bottom': { enabled: false, text: 'Move to the back of the queue' },
+      'move-down': { enabled: false, text: 'Move down in the queue' },
+      'move-top': { enabled: false, text: 'Move to the front of the queue' },
+      'move-up': { enabled: false, text: 'Move up in the queue' },
+      'open-torrent': {
+        enabled: true,
+        shortcut: 'Alt+O',
+        text: 'Open torrent…',
+      },
+      'pause-all-torrents': { enabled: false, text: 'Pause all' },
+      'pause-selected-torrents': {
+        enabled: false,
+        shortcut: 'Alt+U',
+        text: 'Pause',
+      },
+      'reannounce-selected-torrents': {
+        enabled: false,
+        text: 'Ask tracker for more peers',
+      },
+      'remove-selected-torrents': { enabled: false, text: 'Remove from list…' },
+      'resume-selected-torrents': {
+        enabled: false,
+        shortcut: 'Alt+R',
+        text: 'Resume',
+      },
+      'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
+      'select-all': { enabled: false, shortcut: 'Alt+A', text: 'Select all' },
+      'show-about-dialog': { enabled: true, text: 'About' },
+      'show-move-dialog': {
+        enabled: false,
+        shortcut: 'Alt+L',
+        text: 'Set location…',
+      },
+      'show-preferences-dialog': {
+        enabled: true,
+        shortcut: 'Alt+P',
+        text: 'Edit preferences',
+      },
+      'show-rename-dialog': {
+        enabled: false,
+        shortcut: 'Alt+N',
+        text: 'Rename…',
+      },
+      'show-shortcuts-dialog': { enabled: true, text: 'Keyboard shortcuts' },
+      'show-statistics-dialog': {
+        enabled: true,
+        shortcut: 'Alt+S',
+        text: 'Statistics',
+      },
+      'start-all-torrents': { enabled: false, text: 'Start all' },
+      'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
+      'toggle-inspector': {
+        enabled: true,
+        shortcut: 'Alt+I',
+        text: 'Torrent Inspector',
+      },
+      'toggle-overflow-menu': { enabled: true, text: 'More options…' },
+      'trash-selected-torrents': {
+        enabled: false,
+        text: 'Trash data and remove from list…',
+      },
+      'verify-selected-torrents': {
+        enabled: false,
+        shortcut: 'Alt+V',
+        text: 'Verify local data',
+      },
+    });
   }
 
   click(name) {
@@ -39,12 +91,34 @@ export class ActionManager extends EventTarget {
     }
   }
 
+  getActionForShortcut(shortcut) {
+    for (const [name, properties] of Object.entries(this.actions)) {
+      if (shortcut === properties.shortcut) {
+        return name;
+      }
+    }
+    return null;
+  }
+
+  // return a map of shortcuts to action names
+  allShortcuts() {
+    return new Map(
+      Object.entries(this.actions)
+        .filter(([, props]) => props.shortcut)
+        .map(([name, props]) => [props.shortcut, name])
+    );
+  }
+
   isEnabled(name) {
     return this._getAction(name).enabled;
   }
 
+  text(name) {
+    return this._getAction(name).text;
+  }
+
   keyshortcuts(name) {
-    return this._getAction(name).hotkey;
+    return this._getAction(name).shortcut;
   }
 
   update(ev) {
@@ -131,9 +205,8 @@ export class ActionManager extends EventTarget {
 
     if (action.enabled !== enabled) {
       action.enabled = enabled;
-      console.log(`updating action enabled: ${name}, ${enabled}`);
 
-      const event = new Event('action-state-changed');
+      const event = new Event('change');
       event.action = name;
       event.enabled = enabled;
       this.dispatchEvent(event);

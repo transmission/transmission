@@ -22,9 +22,9 @@ export const RPC = {
 };
 
 export class Remote {
-  constructor(controller, dialog) {
+  // TODO: decouple from controller
+  constructor(controller) {
     this._controller = controller;
-    this._dialog = dialog;
     this._error = '';
     this._session_id = '';
   }
@@ -65,6 +65,9 @@ export class Remote {
           this.sendRequest(data, callback, context);
           return;
         }
+        console.trace();
+        // FIXME: put an error dialog here
+        /*
         this._dialog.confirm(
           'Connection Failed',
           'Could not connect to the server. You may need to reload the page to reconnect.',
@@ -72,10 +75,12 @@ export class Remote {
           () => alert(`${error}`),
           'Dismiss'
         );
+*/
         this._controller.togglePeriodicSessionRefresh(false);
       });
   }
 
+  // TODO: return a Promise
   loadDaemonPrefs(callback, context) {
     const o = {
       method: 'session-get',

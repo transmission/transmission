@@ -8,10 +8,12 @@
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { Utils } from './utils.js';
+import { sanitizeText, Utils } from './utils.js';
 
-export class Inspector {
+export class Inspector extends EventTarget {
   constructor(controller) {
+    super();
+
     this.data = {
       controller,
       elements: {
@@ -46,21 +48,46 @@ export class Inspector {
       },
       onTorrentChanged: () => this._updateInspector(),
       selectedPage: null,
+      selection_listener: (ev) => this._setTorrents(ev.selected),
+      tab_listener: this.onTabClicked.bind(this),
       torrents: [],
     };
+    this.name = 'inspector';
 
+    // FIXME: transmission class should do this
     // listen to selection changes
-    controller.addEventListener('torrent-selection-changed', (ev) => {
-      this._setTorrents(ev.selected);
-    });
+    controller.addEventListener(
+      'torrent-selection-changed',
+      this.data.selection_listener
+    );
 
     // listen to tab clicks
-    const cb = this.onTabClicked.bind(this);
     for (const e of document.getElementsByClassName('inspector-tab')) {
-      e.addEventListener('click', cb);
+      e.addEventListener('click', this.data.tab_listener);
     }
 
     this.selectTab(document.getElementById('inspector-tab-info'));
+    this._setTorrents(this.data.controller.getSelectedTorrents());
+    this.data.elements.root.classList.remove('hidden');
+  }
+
+  close() {
+    if (!this.closed) {
+      this._setTorrents([]);
+      this.data.controller.removeEventListener(
+        'torrent-selection-changed',
+        this.data.selection_listener
+      );
+      for (const e of document.getElementsByClassName('inspector-tab')) {
+        e.removeEventListener('click', this.data.tab_listener);
+      }
+      this.data.elements.root.classList.add('hidden');
+      this.dispatchEvent(new Event('close'));
+      for (const key of Object.keys(this)) {
+        delete this[key];
+      }
+      this.closed = true;
+    }
   }
 
   static _needsExtraInfo(torrents) {
@@ -366,7 +393,7 @@ export class Inspector {
       if (torrents.length > 1) {
         html.push(
           '<div class="inspector_torrent_label">',
-          Utils.sanitizeText(tor.getName()),
+          sanitizeText(tor.getName()),
           '</div>'
         );
       }
@@ -411,10 +438,10 @@ export class Inspector {
           Inspector._peerStatus(peer.flagStr),
           '</td>',
           '<td>',
-          Utils.sanitizeText(peer.address),
+          sanitizeText(peer.address),
           '</td>',
           '<td class="client-col">',
-          Utils.sanitizeText(peer.clientName),
+          sanitizeText(peer.clientName),
           '</td>',
           '</tr>'
         );
@@ -511,7 +538,7 @@ export class Inspector {
       if (torrents.length > 1) {
         html.push(
           '<div class="inspector_torrent_label">',
-          Utils.sanitizeText(tor.getName()),
+          sanitizeText(tor.getName()),
           '</div>'
         );
       }
@@ -543,15 +570,15 @@ export class Inspector {
           '<li class="inspector-tracker-entry ',
           idx % 2 ? 'odd' : 'even',
           '"><div class="tracker-host" title="',
-          Utils.sanitizeText(tracker.announce),
+          sanitizeText(tracker.announce),
           '">',
-          Utils.sanitizeText(tracker.host || tracker.announce),
+          sanitizeText(tracker.host || tracker.announce),
           '</div>',
           '<div class="tracker-activity">',
           '<div>',
           lastAnnounceStatusHash['label'],
           ': ',
-          Utils.sanitizeText(lastAnnounceStatusHash['value']),
+          sanitizeText(lastAnnounceStatusHash['value']),
           '</div>',
           '<div>',
           announceState,
@@ -559,7 +586,7 @@ export class Inspector {
           '<div>',
           lastScrapeStatusHash['label'],
           ': ',
-          Utils.sanitizeText(lastScrapeStatusHash['value']),
+          sanitizeText(lastScrapeStatusHash['value']),
           '</div>',
           '</div><table class="tracker_stats">',
           '<tr><th>Seeders:</th><td>',

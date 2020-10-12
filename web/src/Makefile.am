@@ -1,7 +1,6 @@
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 
 EXTRA_DIST = \
-  dialog.js \
   file-row.js \
   formatter.js \
   inspector.js \

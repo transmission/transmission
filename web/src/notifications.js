@@ -40,7 +40,7 @@ export class Notifications {
   }
 
   /*
-  // FIXME:
+  // TODO:
   // $(transmission).bind('downloadComplete seedingComplete', (event, torrent) => {
   //  if (notificationsEnabled) {
       const title = `${event.type === 'downloadComplete' ? 'Download' : 'Seeding'} complete`;

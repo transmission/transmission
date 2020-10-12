@@ -1,12 +1,12 @@
-/**
- * Copyright © Mnemosyne LLC
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
 import { Formatter } from './formatter.js';
-import { Utils } from './utils.js';
+import { Utils, setEnabled } from './utils.js';
 
 export class FileRow extends EventTarget {
   isDone() {
@@ -21,7 +21,7 @@ export class FileRow extends EventTarget {
     const e = this.elements.root;
     e.classList.toggle('skip', !this.fields.isWanted);
     e.classList.toggle('complete', this.isDone());
-    e.checkbox.disabled = !this.isEditable();
+    setEnabled(e.checkbox, this.isEditable());
     e.checkbox.checked = this.fields.isWanted;
   }
 
@@ -109,8 +109,10 @@ export class FileRow extends EventTarget {
 
   createRow(torrent, depth, name, even) {
     const root = document.createElement('li');
-    root.classList.add('inspector-torrent-file-list-entry');
-    root.classList.add(even ? 'even' : 'odd');
+    root.classList.add(
+      'inspector-torrent-file-list-entry',
+      even ? 'even' : 'odd'
+    );
 
     this.elements.root = root;
 

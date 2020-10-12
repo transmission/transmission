@@ -5,91 +5,55 @@
  * or any future license endorsed by Mnemosyne LLC.
  */
 
+import { setEnabled } from './utils.js';
+
 export class ContextMenu extends EventTarget {
-  constructor(action_manager, mouse_event) {
+  constructor(action_manager) {
     super();
 
     this.action_listener = this._update.bind(this);
     this.action_manager = action_manager;
-    this.action_manager.addEventListener(
-      'action-state-changed',
-      this.action_listener
-    );
+    this.action_manager.addEventListener('change', this.action_listener);
+
     Object.assign(this, this._create());
     this.show();
-    this._setBounds(mouse_event);
-    mouse_event.preventDefault();
   }
 
   show() {
     for (const [action, item] of Object.entries(this.actions)) {
-      const is_enabled = this.action_manager.isEnabled(action);
-      item.classList.toggle('disabled', !is_enabled);
+      setEnabled(item, this.action_manager.isEnabled(action));
     }
     document.body.appendChild(this.root);
   }
 
   close() {
-    if (this.closed) {
-      return;
+    if (!this.closed) {
+      this.action_manager.removeEventListener('change', this.action_listener);
+      this.root.remove();
+      this.dispatchEvent(new Event('close'));
+      for (const key of Object.keys(this)) {
+        delete this[key];
+      }
+      this.closed = true;
     }
-
-    this.closed = true;
-    this.action_manager.removeEventListener(
-      'action-state-changed',
-      this.action_listener
-    );
-    this.root.remove();
-    this.dispatchEvent(new Event('close'));
-
-    delete this.actions;
-    delete this.remote;
-    delete this.root;
-    delete this.torrents;
-  }
-
-  _setBounds(ev) {
-    const getBestMenuPos = (r, bounds) => {
-      let { x, y } = r;
-      const { width, height } = r;
-      if (x > bounds.x + bounds.width - width) {
-        x -= width;
-      }
-      if (y > bounds.y + bounds.height - height) {
-        y -= height;
-      }
-      // x = Math.min(x, bounds.x + bounds.width - width);
-      // y = Math.min(y, bounds.y + bounds.height - height);
-      return new DOMRect(x, y, width, height);
-    };
-    const bounding_ancestor = document.getElementById('torrent-container');
-    const e = this.root;
-    const initial_pos = new DOMRect(ev.x, ev.y, e.clientWidth, e.clientHeight);
-    const clamped_pos = getBestMenuPos(
-      initial_pos,
-      bounding_ancestor.getBoundingClientRect()
-    );
-    e.style.left = `${clamped_pos.left}px`;
-    e.style.top = `${clamped_pos.top}px`;
   }
 
   _update(ev) {
-    const e = this.root.querySelector(`[data-action="${ev.action}"]`);
+    const e = this.actions[ev.action];
     if (e) {
-      e.classList.toggle('disabled', !ev.enabled);
+      setEnabled(e, ev.enabled);
     }
   }
 
   _create() {
     const root = document.createElement('div');
     root.role = 'menu';
-    root.classList.add('context-menu');
-    root.classList.add('popup');
-    root.id = 'torrent-context-menu'; // FIXME: is this needed?
+    root.classList.add('context-menu', 'popup');
 
     const actions = {};
-    const create_menuitem = (action, text) => {
+    const add_item = (action) => {
       const item = document.createElement('div');
+      const text = this.action_manager.text(action);
       item.role = 'menuitem';
       item.classList.add('context-menuitem');
       item.setAttribute('data-action', action);
@@ -103,55 +67,35 @@ export class ContextMenu extends EventTarget {
         this.close();
       });
       actions[action] = item;
-      return item;
+      root.appendChild(item);
     };
 
-    const create_separator = () => {
+    const add_sep = () => {
       const item = document.createElement('div');
       item.classList.add('context-menu-separator');
-      return item;
+      root.appendChild(item);
     };
 
-    root.appendChild(create_menuitem('pause-selected-torrents', 'Pause'));
-    root.appendChild(create_menuitem('resume-selected-torrents', 'Resume'));
-    root.appendChild(
-      create_menuitem('resume-selected-torrents-now', 'Resume now')
-    );
-    root.appendChild(create_separator());
-    root.appendChild(
-      create_menuitem('move-top', 'Move to the front of the queue')
-    );
-    root.appendChild(create_menuitem('move-up', 'Move up in the queue'));
-    root.appendChild(create_menuitem('move-down', 'Move down in the queue'));
-    root.appendChild(
-      create_menuitem('move-bottom', 'Move to the back of the queue')
-    );
-    root.appendChild(create_separator());
-    root.appendChild(
-      create_menuitem('remove-selected-torrents', 'Remove from list…')
-    );
-    root.appendChild(
-      create_menuitem(
-        'trash-selected-torrents',
-        'Trash data and remove from list…'
-      )
-    );
-    root.appendChild(create_separator());
-    root.appendChild(
-      create_menuitem('verify-selected-torrents', 'Verify local data')
-    );
-    root.appendChild(create_menuitem('show-move-dialog', 'Set location…'));
-    root.appendChild(create_menuitem('show-rename-dialog', 'Rename…'));
-    root.appendChild(create_separator());
-    root.appendChild(
-      create_menuitem(
-        'reannounce-selected-torrents',
-        'Ask tracker for more peers'
-      )
-    );
-    root.appendChild(create_separator());
-    root.appendChild(create_menuitem('select-all', 'Select all'));
-    root.appendChild(create_menuitem('deselect-all', 'Deselect all'));
+    add_item('resume-selected-torrents');
+    add_item('resume-selected-torrents-now');
+    add_item('pause-selected-torrents');
+    add_sep();
+    add_item('move-top');
+    add_item('move-up');
+    add_item('move-down');
+    add_item('move-bottom');
+    add_sep();
+    add_item('remove-selected-torrents');
+    add_item('trash-selected-torrents');
+    add_sep();
+    add_item('verify-selected-torrents');
+    add_item('show-move-dialog');
+    add_item('show-rename-dialog');
+    add_sep();
+    add_item('reannounce-selected-torrents');
+    add_sep();
+    add_item('select-all');
+    add_item('deselect-all');
 
     return { actions, root };
   }

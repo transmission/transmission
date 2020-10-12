@@ -1,79 +1,13 @@
 /**
- * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
+ * Copyright © Mnemosyne LLC
  *
  * This file is licensed under the GPLv2.
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-// TODO: remove this and set layout based on window size
-export const isMobileDevice = /(iPhone|iPod|Android)/.test(navigator.userAgent);
-
 export class Utils {
-  static isIterable(o) {
-    return o && typeof o[Symbol.iterator] === 'function';
-  }
-
-  static isHidden(el) {
-    return el.classList.contains('hidden');
-  }
-  static isHiddenId(id) {
-    return Utils.isHidden(document.getElementById(id));
-  }
-
-  static hide(el) {
-    el.classList.add('hidden');
-  }
-  static hideId(id) {
-    return Utils.hide(document.getElementById(id));
-  }
-
-  static show(el) {
-    el.classList.remove('hidden');
-  }
-  static showId(id) {
-    return Utils.show(document.getElementById(id));
-  }
-
-  static toggle(el) {
-    el.classList.toggle('hidden');
-  }
-  static toggleId(id) {
-    return Utils.toggle(document.getElementById(id));
-  }
-
-  static isChecked(el) {
-    return el.getAttribute('aria-checked') === 'true';
-  }
-  static setChecked(el, b) {
-    el.setAttribute('aria-checked', b ? 'true' : 'false');
-  }
-  static toggleChecked(el) {
-    Utils.setChecked(el, !Utils.isChecked(el));
-  }
-  static isCheckedId(id) {
-    return Utils.isChecked(document.getElementById(id));
-  }
-  static setCheckedId(id, b) {
-    Utils.setChecked(document.getElementById(id), b);
-  }
-  static toggleCheckedId(id) {
-    Utils.toggleChecked(document.getElementById(id));
-  }
-  static setCheckedCmd(cmd, b) {
-    for (const el of document.querySelectorAll(`[data-command="${cmd}"]`)) {
-      Utils.setChecked(el, b);
-    }
-  }
-
   static setVisible(el, visible) {
-    if (visible) {
-      Utils.show(el);
-    } else {
-      Utils.hide(el);
-    }
-  }
-  static setVisibleId(id, visible) {
-    return Utils.setVisible(document.getElementById(id), visible);
+    el.classList.toggle('hidden', !visible);
   }
 
   /**
@@ -91,10 +25,6 @@ export class Utils {
       e.currentHTML = html;
       e.innerHTML = html;
     }
-  }
-
-  static sanitizeText(text) {
-    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   /**
@@ -142,10 +72,9 @@ export class Utils {
 }
 
 export function createDialogContainer(id) {
-  const root = document.createElement('div');
-  root.classList.add('dialog-container');
-  root.classList.add('popup');
-  root.classList.add(id);
+  const root = document.createElement('dialog');
+  root.classList.add('dialog-container', 'popup', id);
+  root.open = true;
   root.setAttribute('role', 'dialog');
 
   const win = document.createElement('div');
@@ -197,4 +126,55 @@ export function createDialogContainer(id) {
     root,
     workarea,
   };
+}
+
+export function setEnabled(el, enabled) {
+  if (enabled) {
+    delete el.disabled;
+  } else {
+    el.setAttribute('disabled', true);
+  }
+}
+
+export function makeUUID() {
+  // source: https://stackoverflow.com/a/2117523/6568470
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
+}
+
+function getBestMenuPos(r, bounds) {
+  let { x, y } = r;
+  const { width, height } = r;
+
+  if (x > bounds.x + bounds.width - width && x - width >= bounds.x) {
+    x -= width;
+  } else {
+    x = Math.min(x, bounds.x + bounds.width - width);
+  }
+
+  if (y > bounds.y + bounds.height - height && y - height >= bounds.y) {
+    y -= height;
+  } else {
+    y = Math.min(y, bounds.y + bounds.height - height);
+  }
+
+  return new DOMRect(x, y, width, height);
+}
+
+export function movePopup(popup, x, y, boundingElement) {
+  const initial_pos = new DOMRect(x, y, popup.clientWidth, popup.clientHeight);
+  const clamped_pos = getBestMenuPos(
+    initial_pos,
+    boundingElement.getBoundingClientRect()
+  );
+  popup.style.left = `${clamped_pos.left}px`;
+  popup.style.top = `${clamped_pos.top}px`;
+}
+
+export function sanitizeText(text) {
+  return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

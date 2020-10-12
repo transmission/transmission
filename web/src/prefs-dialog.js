@@ -6,7 +6,7 @@
  */
 
 import { Formatter } from './formatter.js';
-import { Utils } from './utils.js';
+import { Utils, setEnabled } from './utils.js';
 
 export class PrefsDialog extends EventTarget {
   static _initTimeDropDown(e) {
@@ -19,25 +19,24 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
-  _onPortChecked(response) {
+  static _onPortChecked(response) {
     const is_open = response['arguments']['port-is-open'];
     const text = `Port is <b>${is_open ? 'Open' : 'Closed'}</b>`;
-    const e = this.data.elements.root.find('#port-label');
-    Utils.setInnerHTML(e[0], text);
+    const e = document.getElementById('port-label');
+    Utils.setInnerHTML(e, text);
   }
 
   _setGroupEnabled(parent_key, enabled) {
     if (parent_key in this.data.groups) {
-      const { root } = this.data.elements;
       for (const key of this.data.groups[parent_key]) {
-        root.find(`#${key}`).attr('disabled', !enabled);
+        setEnabled(document.getElementById(key), enabled);
       }
     }
   }
 
   _setBlocklistButtonEnabled(b) {
     const e = this.data.elements.blocklist_button;
-    e.setAttribute('disabled', !b);
+    setEnabled(e, b);
     e.value = b ? 'Update' : 'Updating...';
   }
 
@@ -156,7 +155,7 @@ export class PrefsDialog extends EventTarget {
   setVisible(visible) {
     if (visible) {
       this._setBlocklistButtonEnabled(true);
-      this.data.remote.checkPort(this._onPortChecked, this);
+      this.data.remote.checkPort(PrefsDialog._onPortChecked);
       this.data.elements.root.dialog('open');
     } else {
       this.data.elements.root.dialog('close');
@@ -173,7 +172,7 @@ export class PrefsDialog extends EventTarget {
     this.data = {
       dialog: this,
       elements: {
-        root: $('#prefs-dialog'),
+        root: document.getElementById('prefs-dialog'),
       },
       // map of keys that are enabled only if a 'parent' key is enabled
       groups: {
@@ -224,42 +223,52 @@ export class PrefsDialog extends EventTarget {
       remote,
     };
 
-    let e = this.data.elements.root;
-    PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
-    PrefsDialog._initTimeDropDown(e.find('#alt-speed-time-end')[0]);
+    for (const id of ['alt-speed-time-begin', 'alt-speed-time-end']) {
+      PrefsDialog._initTimeDropDown(document.getElementById(id));
+    }
 
     const o = {};
     o.autoOpen = false;
     o.show = o.hide = false;
     o.close = this._onDialogClosed.bind(this);
-    e.tabbedDialog(o);
+    //e.tabbedDialog(o);  // FIXME?
 
-    e = document.getElementById('blocklist-update-button');
-    this.data.elements.blocklist_button = e;
+    const e = document.getElementById('blocklist-update-button');
     e.addEventListener('click', () => this._onBlocklistUpdateClicked());
+    this.data.elements.blocklist_button = e;
 
     // listen for user input
-    for (const key of this.data.keys) {
-      e = this.data.elements.root.find(`#${key}`);
-      switch (e[0].type) {
+    const on_change = this._onControlChanged.bind(this);
+    const on_focus = this._onControlFocused.bind(this);
+    const on_blur = this._onControlBlurred.bind(this);
+    for (const el of this.data.keys.map((id) => document.getElementById(id))) {
+      switch (el.type) {
         case 'checkbox':
         case 'radio':
         case 'select-one':
-          e.change(this._onControlChanged.bind(this));
+          el.addEventListener('change', on_change);
           break;
 
-        case 'text':
-        case 'url':
         case 'email':
         case 'number':
         case 'search':
-          e.focus(this._onControlFocused.bind(this));
-          e.blur(this._onControlBlurred.bind(this));
+        case 'text':
+        case 'url':
+          el.addEventListener('focus', on_focus);
+          el.addEventListener('blur', on_blur);
           break;
 
         default:
           break;
       }
     }
+
+    // show it
+    this.data.elements.root.classList.remove('hidden');
+  }
+
+  close() {
+    this.data.elements.root.classList.add('hidden');
+    this.dispatchEvent(new Event('close'));
   }
 }

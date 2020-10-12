@@ -1,28 +1,30 @@
-/**
- * Copyright © Mnemosyne LLC
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
-const speed_K = 1000;
-const speed_K_str = 'kB/s';
-const speed_M_str = 'MB/s';
-const speed_G_str = 'GB/s';
+const plural_rules = new Intl.PluralRules();
+const current_locale = plural_rules.resolvedOptions().locale;
 
-const size_K = 1000;
-const size_B_str = 'B';
-const size_K_str = 'kB';
-const size_M_str = 'MB';
-const size_G_str = 'GB';
-const size_T_str = 'TB';
+const kilo = 1000;
+const mem_formatters = [
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'byte' }),
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'kilobyte' }),
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'megabyte' }),
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'terabyte' }),
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'petabyte' }),
+];
 
-const mem_K = 1024;
-const mem_B_str = 'B';
-const mem_K_str = 'KiB';
-const mem_M_str = 'MiB';
-const mem_G_str = 'GiB';
-const mem_T_str = 'TiB';
+const fmt_kBps = new Intl.NumberFormat(current_locale, {
+  style: 'unit',
+  unit: 'kilobyte-per-second',
+});
+const fmt_MBps = new Intl.NumberFormat(current_locale, {
+  style: 'unit',
+  unit: 'megabyte-per-second',
+});
 
 export class Formatter {
   static countString(msgid, msgid_plural, n) {
@@ -44,27 +46,19 @@ export class Formatter {
       return 'None';
     }
 
-    const toStr = (size, units) =>
-      `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
+    let size = bytes;
+    for (const nf of mem_formatters) {
+      if (size < kilo) {
+        return nf.format(Math.floor(size));
+      }
+      size /= kilo;
+    }
 
-    if (bytes < mem_K) {
-      return `${Math.floor(bytes)} ${mem_B_str}`;
-    }
-    if (bytes < mem_K ** 2) {
-      return toStr(bytes / mem_K, mem_K_str);
-    }
-    if (bytes < mem_K ** 3) {
-      return toStr(bytes / mem_K ** 2, mem_M_str);
-    }
-    if (bytes < mem_K ** 4) {
-      return toStr(bytes / mem_K ** 3, mem_G_str);
-    }
-    return toStr(bytes / mem_K ** 4, mem_T_str);
+    return 'E2BIG';
   }
 
   static ngettext(msgid, msgid_plural, n) {
-    // TODO(i18n): http://doc.qt.digia.com/4.6/i18n-plural-rules.html
-    return n === 1 ? msgid : msgid_plural;
+    return plural_rules.select(n) === 'one' ? msgid : msgid_plural;
   }
 
   // format a percentage to a string
@@ -92,53 +86,11 @@ export class Formatter {
    * @return {String} human-readable string
    */
   static size(bytes) {
-    if (bytes < 0) {
-      return 'Unknown';
-    }
-    if (bytes === 0) {
-      return 'None';
-    }
-
-    const toStr = (size, units) =>
-      `${Formatter._toTruncFixed(size, size <= 9.995 ? 2 : 1)} ${units}`;
-
-    if (bytes < size_K) {
-      return `${Math.floor(bytes)} ${size_B_str}`;
-    }
-    if (bytes < size_K ** 2) {
-      return toStr(bytes / size_K, size_K_str);
-    }
-    if (bytes < size_K ** 3) {
-      return toStr(bytes / size_K ** 2, size_M_str);
-    }
-    if (bytes < size_K ** 4) {
-      return toStr(bytes / size_K ** 3, size_G_str);
-    }
-    return toStr(bytes / size_K ** 4, size_T_str);
+    return Formatter.mem(bytes);
   }
 
   static speed(KBps) {
-    let speed = KBps;
-
-    if (speed <= 999.95) {
-      // 0 KBps to 999 K
-      return [Formatter._toTruncFixed(speed, 0), speed_K_str].join(' ');
-    }
-
-    speed /= speed_K;
-
-    if (speed <= 99.995) {
-      // 1 M to 99.99 M
-      return [Formatter._toTruncFixed(speed, 2), speed_M_str].join(' ');
-    }
-    if (speed <= 999.95) {
-      // 100 M to 999.9 M
-      return [Formatter._toTruncFixed(speed, 1), speed_M_str].join(' ');
-    }
-
-    // insane speeds
-    speed /= speed_K;
-    return [Formatter._toTruncFixed(speed, 2), speed_G_str].join(' ');
+    return KBps < 999.95 ? fmt_kBps.format(KBps) : fmt_MBps.format(KBps / 1000);
   }
 
   static speedBps(Bps) {
@@ -147,33 +99,22 @@ export class Formatter {
 
   static timeInterval(seconds) {
     const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    seconds = Math.floor(seconds % 60);
-    const d = `${days} ${days > 1 ? 'days' : 'day'}`;
-    const h = `${hours} ${hours > 1 ? 'hours' : 'hour'}`;
-    const m = `${minutes} ${minutes > 1 ? 'minutes' : 'minute'}`;
-    const s = `${seconds} ${seconds > 1 ? 'seconds' : 'second'}`;
-
     if (days) {
-      if (days >= 4 || !hours) {
-        return d;
-      }
-      return `${d}, ${h}`;
+      return Formatter.countString('day', 'days', days);
     }
+
+    const hours = Math.floor((seconds % 86400) / 3600);
     if (hours) {
-      if (hours >= 4 || !minutes) {
-        return h;
-      }
-      return `${h}, ${m}`;
+      return Formatter.countString('hour', 'hours', hours);
     }
+
+    const minutes = Math.floor((seconds % 3600) / 60);
     if (minutes) {
-      if (minutes >= 4 || !seconds) {
-        return m;
-      }
-      return `${m}, ${s}`;
+      return Formatter.countString('minute', 'minutes', minutes);
     }
-    return s;
+
+    seconds = Math.floor(seconds % 60);
+    return Formatter.countString('second', 'seconds', seconds);
   }
 
   static timestamp(seconds) {
@@ -230,7 +171,7 @@ export class Formatter {
   }
 
   static toKBps(Bps) {
-    return Math.floor(Bps / speed_K);
+    return Math.floor(Bps / kilo);
   }
 
   static toStringWithCommas(number) {

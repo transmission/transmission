@@ -58,10 +58,6 @@ module.exports = {
     path: path.resolve(__dirname, 'public_html'), 
     sourceMapFilename: 'transmission-app.js.map'
   },
-  performance: {
-    // disabled until jquery is removed
-    hints: false
-  },
   plugins: [
     new MiniCssExtractPlugin({
       chunkFilename: '[id].css',

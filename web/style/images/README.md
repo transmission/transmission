@@ -29,6 +29,7 @@ license: MIT
 * lock-fill.svg
 * person-fill.svg
 * search.svg
+* three-dots-vertical.svg
 
 ## Adwaita Icons
 

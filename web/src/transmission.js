@@ -6,36 +6,36 @@
  */
 
 import { AboutDialog } from './about-dialog.js';
-import { AlertDialog } from './alert-dialog.js';
 import { ContextMenu } from './context-menu.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { MoveDialog } from './move-dialog.js';
+import { OpenDialog } from './open-dialog.js';
+import { OverflowMenu } from './overflow-menu.js';
 import { Prefs } from './prefs.js';
 import { PrefsDialog } from './prefs-dialog.js';
 import { Remote, RPC } from './remote.js';
 import { RemoveDialog } from './remove-dialog.js';
 import { RenameDialog } from './rename-dialog.js';
+import { ShortcutsDialog } from './shortcuts-dialog.js';
+import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
 import {
   TorrentRow,
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { isMobileDevice, Utils } from './utils.js';
+import { setEnabled, movePopup, Utils } from './utils.js';
 
 export class Transmission extends EventTarget {
-  constructor(action_manager, dialog, notifications, prefs) {
+  constructor(action_manager, notifications, prefs) {
     super();
 
     // Initialize the helper classes
     this.action_manager = action_manager;
-    this.dialog = dialog;
     this.notifications = notifications;
     this.prefs = prefs;
-    this.remote = new Remote(this, dialog);
-    this.inspector = new Inspector(this);
-    this.prefsDialog = new PrefsDialog(this.remote);
+    this.remote = new Remote(this);
 
     this.addEventListener('torrent-selection-changed', (ev) =>
       this.action_manager.update(ev)
@@ -57,74 +57,38 @@ export class Transmission extends EventTarget {
       200
     );
 
-    // Set up user events
-    const listened = new Set();
-    const listen_cmd = (data_command, event_name, cb) => {
-      for (const e of document.querySelectorAll(
-        `[data-command="${data_command}"]`
-      )) {
-        e.addEventListener(event_name, (event) => {
-          if (Transmission.isElementEnabled(e)) {
-            cb(event);
-          }
-        });
-        listened.add(e);
-      }
-    };
-    listen_cmd('add-torrents', 'click', () =>
-      this.confirmUploadClicked.bind(this)
-    );
-    listen_cmd('hide-popups', 'click', () => Transmission.hidePopups());
-    listen_cmd('open-torrent', 'click', this.openTorrentClicked.bind(this));
-    listen_cmd('set-tracker-filter', 'change', (ev) =>
-      this.setFilterTracker(ev.target.value === 'all' ? null : ev.target.value)
-    );
-    listen_cmd('show-about-dialog', 'click', () =>
-      this.action_manager.click('show-about-dialog')
-    );
-    listen_cmd('show-stats-dialog', 'click', () =>
-      Transmission.showDialog('stats-dialog')
-    );
-    listen_cmd('toggle-alt-speed-limits', 'click', () =>
-      this.toggleTurtleClicked()
-    );
-    listen_cmd('hide-more-menu', 'click', Transmission.hidePopups);
-    listen_cmd('show-more-menu', 'click', () => {
-      Transmission.hidePopups();
-      Utils.show(document.querySelector('.mainwin-menu'));
-    });
-    listen_cmd('toggle-torrent-inspector', 'click', () =>
-      Transmission.toggleInspector()
-    );
-    listen_cmd('toggle-fullscreen', 'click', () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        document.body.requestFullscreen();
-      }
-    });
-    document.addEventListener('fullscreenchange', () => {
-      for (const e of document.querySelectorAll(
-        '[data-command="toggle-fullscreen"]'
-      )) {
-        e.classList.toggle('selected', document.fullscreenElement);
-      }
-    });
-    listen_cmd('toggle-compact-rows', 'click', () => {
-      this.prefs.display_mode =
-        this.prefs.display_mode !== Prefs.DisplayCompact
-          ? Prefs.DisplayCompact
-          : Prefs.DisplayFull;
-    });
-    document.addEventListener('fullscreenchange', () =>
-      Utils.setCheckedCmd('toggle-fullscreen', document.fullscreenElement)
-    );
-
-    for (const e of document.querySelectorAll('[data-command]')) {
-      if (!listened.has(e)) {
-        console.log('unlistened command:', e);
-      }
+    // listen to actions
+    // TODO: consider adding a mutator listener here to pick up dynamic additions
+    for (const el of document.querySelectorAll(`button[data-action]`)) {
+      const { action } = el.dataset;
+      setEnabled(el, this.action_manager.isEnabled(action));
+      el.addEventListener('click', () => {
+        this.action_manager.click(action);
+      });
     }
+    for (const el of document.querySelectorAll(`input[data-action]`)) {
+      const { action } = el.dataset;
+      setEnabled(el, this.action_manager.isEnabled(action));
+      el.addEventListener('change', () => {
+        this.action_manager.click(action);
+      });
+    }
+
+    document
+      .getElementById('filter-tracker')
+      .addEventListener('change', (ev) => {
+        this.setFilterTracker(
+          ev.target.value === 'all' ? null : ev.target.value
+        );
+      });
+
+    this.action_manager.addEventListener('change', (ev) => {
+      for (const el of document.querySelectorAll(
+        `[data-action="${ev.action}"]`
+      )) {
+        setEnabled(el, ev.enabled);
+      }
+    });
 
     this.action_manager.addEventListener('click', (ev) => {
       switch (ev.action) {
@@ -142,6 +106,9 @@ export class Transmission extends EventTarget {
           break;
         case 'move-up':
           this.moveUp();
+          break;
+        case 'open-torrent':
+          this.setCurrentPopup(new OpenDialog(this, this.remote));
           break;
         case 'pause-all-torrents':
           this.stopTorrents(this.getAllTorrents());
@@ -170,11 +137,56 @@ export class Transmission extends EventTarget {
         case 'show-move-dialog':
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
+        case 'toggle-overflow-menu':
+          if (this.popup && this.popup.name === 'overflow-menu') {
+            this.setCurrentPopup(null);
+          } else {
+            this.setCurrentPopup(
+              new OverflowMenu(
+                this,
+                this.prefs,
+                this.remote,
+                this.action_manager
+              )
+            );
+            const btnbox = document
+              .getElementById('toolbar-overflow')
+              .getBoundingClientRect();
+            movePopup(
+              this.popup.root,
+              btnbox.left + btnbox.width,
+              btnbox.top + btnbox.height,
+              document.body
+            );
+          }
+          break;
+        case 'show-preferences-dialog':
+          this.setCurrentPopup(new PrefsDialog(this));
+          break;
+        case 'show-shortcuts-dialog':
+          this.setCurrentPopup(new ShortcutsDialog(this.action_manager));
+          break;
+        case 'show-statistics-dialog':
+          this.setCurrentPopup(new StatisticsDialog(this.remote));
+          break;
         case 'show-rename-dialog':
           this.setCurrentPopup(new RenameDialog(this, this.remote));
           break;
         case 'start-all-torrents':
           this.startTorrents(this.getAllTorrents());
+          break;
+        case 'toggle-compact-rows':
+          this.prefs.display_mode =
+            this.prefs.display_mode !== Prefs.DisplayCompact
+              ? Prefs.DisplayCompact
+              : Prefs.DisplayFull;
+          break;
+        case 'toggle-inspector':
+          if (!this.popup || this.popup.name !== 'inspector') {
+            this.setCurrentPopup(new Inspector(this));
+          } else {
+            this.setCurrentPopup(null);
+          }
           break;
         case 'trash-selected-torrents':
           this.removeSelectedTorrents(true);
@@ -187,17 +199,6 @@ export class Transmission extends EventTarget {
       }
     });
 
-    // tell jQuery to copy the dataTransfer property from events over if it exists
-    //FIXME
-    // $.event.props.push('dataTransfer');
-
-    document
-      .getElementById('torrent-upload-form')
-      .addEventListener('submit', (ev) => {
-        this.confirmUploadClicked();
-        ev.preventDefault();
-      });
-
     // listen to filter changes
     let e = document.getElementById('filter-mode');
     e.value = this.prefs.filter_mode;
@@ -205,16 +206,22 @@ export class Transmission extends EventTarget {
       this.prefs.filter_mode = ev.target.value;
     });
 
-    if (!isMobileDevice) {
-      document.addEventListener('keydown', this.keyDown.bind(this));
-      document.addEventListener('keyup', this.keyUp.bind(this));
-      e = document.getElementById('torrent-container');
-      e.addEventListener('click', this.deselectAll.bind(this));
-      e.addEventListener('dragenter', Transmission.dragenter);
-      e.addEventListener('dragover', Transmission.dragenter);
-      e.addEventListener('drop', this.drop.bind(this));
-      this.setupSearchBox();
-    }
+    //if (!isMobileDevice) {
+    document.addEventListener('keydown', this.keyDown.bind(this));
+    document.addEventListener('keyup', this.keyUp.bind(this));
+    e = document.getElementById('torrent-container');
+    e.addEventListener('click', () => {
+      if (this.popup && this.popup.name !== 'inspector') {
+        this.setCurrentPopup(null);
+      } else {
+        this.deselectAll();
+      }
+    });
+    e.addEventListener('dragenter', Transmission.dragenter);
+    e.addEventListener('dragover', Transmission.dragenter);
+    e.addEventListener('drop', this.drop.bind(this));
+    this.setupSearchBox();
+    //}
 
     this.elements = {
       torrent_list: document.getElementById('torrent-list'),
@@ -230,7 +237,16 @@ export class Transmission extends EventTarget {
       if (row && !row.isSelected()) {
         this.setSelectedRow(row);
       }
-      this.setCurrentPopup(new ContextMenu(this.action_manager, ev));
+
+      const popup = new ContextMenu(this.action_manager);
+      this.setCurrentPopup(popup);
+      movePopup(
+        popup.root,
+        ev.x,
+        ev.y,
+        document.getElementById('torrent-container')
+      );
+      ev.preventDefault();
     });
 
     // Get preferences & torrents from the daemon
@@ -247,109 +263,27 @@ export class Transmission extends EventTarget {
     this.prefs
       .entries()
       .forEach(([key, value]) => this.onPrefChanged(key, value));
-
-    Transmission.hidePopups();
-    Transmission.populateHotkeyDialog();
-
-    for (e of document.querySelectorAll('a[data-radio-group]')) {
-      e.addEventListener('click', this.radioButtonClicked.bind(this));
-    }
-  }
-
-  static populateHotkeyDialog() {
-    // build an object that maps hotkey -> label
-    const propname = 'aria-keyshortcuts';
-    const o = {};
-    for (const el of document.querySelectorAll(`[${propname}]`)) {
-      const key = el.getAttribute(propname);
-      const label = el.getAttribute('aria-label');
-      const tokens = key.split('+');
-      const sortKey = [tokens.pop(), ...tokens].join('+');
-      o[sortKey] = { key, label };
-    }
-
-    // build an HTML table to show the hotkeys
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    table.appendChild(thead);
-    let tr = document.createElement('tr');
-    thead.appendChild(tr);
-    let th = document.createElement('th');
-    th.textContent = 'Key';
-    tr.appendChild(th);
-    th = document.createElement('th');
-    th.textContent = 'Action';
-    tr.appendChild(th);
-    const tbody = document.createElement('tbody');
-    table.appendChild(tbody);
-    for (const [, value] of Object.entries(o).sort()) {
-      tr = document.createElement('tr');
-      tbody.appendChild(tr);
-      let td = document.createElement('td');
-      td.textContent = value.key.replaceAll('+', ' + ');
-      tr.appendChild(td);
-      td = document.createElement('td');
-      td.textContent = value.label;
-      tr.appendChild(td);
-    }
-
-    document
-      .querySelector('#hotkeys-dialog .dialog-message')
-      .appendChild(table);
-  }
-
-  radioButtonClicked(ev) {
-    const { target } = ev;
-    const group = target.getAttribute('data-radio-group');
-    const value = target.getAttribute('data-radio-value');
-
-    switch (group) {
-      case Prefs.SortDirection:
-        this.prefs.sort_direction = value;
-        this.refilterSoon();
-        break;
-
-      case Prefs.SortMode:
-        this.prefs.sort_mode = value;
-        this.refilterSoon();
-        break;
-
-      case 'speed-limit-down': {
-        const o =
-          value === 'unlimited'
-            ? { [RPC._DownSpeedLimited]: false }
-            : {
-                [RPC._DownSpeedLimited]: true,
-                [RPC._DownSpeedLimit]: parseInt(value, 10),
-              };
-        this.remote.savePrefs(o);
-        break;
-      }
-
-      case 'speed-limit-up': {
-        const o =
-          value === 'unlimited'
-            ? { [RPC._UpSpeedLimited]: false }
-            : {
-                [RPC._UpSpeedLimited]: true,
-                [RPC._UpSpeedLimit]: parseInt(value, 10),
-              };
-        this.remote.savePrefs(o);
-        break;
-      }
-
-      default:
-        console.warn(`unrecognized radio group: "${group}"`);
-    }
   }
 
   loadDaemonPrefs() {
     this.remote.loadDaemonPrefs((data) => {
-      const o = data['arguments'];
-      // Prefs.getClutchPrefs(o); // FIXME -- is this needed
+      this.session_properties = data.arguments;
+    });
+  }
+
+  get session_properties() {
+    return this._session_properties;
+  }
+  set session_properties(o) {
+    if (JSON.stringify(this._session_properties) !== JSON.stringify(o)) {
+      this._session_properties = Object.seal(o);
+      const event = new Event('session-change');
+      event.session_properties = o;
+      this.dispatchEvent(event);
+
+      // TODO: maybe have this in a listener handler?
       this.updateGuiFromSession(o);
-      this.sessionProperties = o;
-    }, this);
+    }
   }
 
   setupSearchBox() {
@@ -375,11 +309,10 @@ export class Transmission extends EventTarget {
   onPrefChanged(key, value) {
     switch (key) {
       case Prefs.DisplayMode: {
-        const compact = value === 'compact';
-        Utils.setCheckedCmd('toggle-compact-rows', compact);
-        this.torrentRenderer = compact
-          ? new TorrentRendererCompact()
-          : new TorrentRendererFull();
+        this.torrentRenderer =
+          value === 'compact'
+            ? new TorrentRendererCompact()
+            : new TorrentRendererFull();
       }
       // falls through
 
@@ -425,11 +358,7 @@ export class Transmission extends EventTarget {
     }
   }
 
-  /****
-   *****
-   *****  UTILITIES
-   *****
-   ****/
+  /// UTILITIES
 
   getAllTorrents() {
     return Object.values(this._torrents);
@@ -439,19 +368,16 @@ export class Transmission extends EventTarget {
     return torrents.map((t) => t.getId());
   }
 
+  // TODO: is this still needed?
   seedRatioLimit() {
-    const p = this.sessionProperties;
+    const p = this.session_properties;
     if (p && p.seedRatioLimited) {
       return p.seedRatioLimit;
     }
     return -1;
   }
 
-  /****
-   *****
-   *****  SELECTION
-   *****
-   ****/
+  /// SELECTION
 
   getSelectedRows() {
     return this._rows.filter((r) => r.isSelected());
@@ -565,24 +491,17 @@ export class Transmission extends EventTarget {
     const { keyCode } = ev;
 
     // look for a shortcut
-    const propname = 'aria-keyshortcuts';
     const aria_keys = Transmission.createKeyShortcutFromKeyboardEvent(ev);
-    for (const el of document.querySelectorAll(`[${propname}]`)) {
-      if (el.getAttribute(propname) === aria_keys) {
-        ev.preventDefault();
-        el.click();
-        return;
-      }
-    }
-
-    const esc_key = keyCode === 27; // esc key pressed
-    if (esc_key && Transmission.hidePopups()) {
+    const action = this.action_manager.getActionForShortcut(aria_keys);
+    if (action) {
       ev.preventDefault();
+      this.action_manager.click(action);
       return;
     }
 
-    const enter_key = keyCode === 13; // enter key pressed
-    if (enter_key && this.confirmPopup()) {
+    const esc_key = keyCode === 27; // esc key pressed
+    if (esc_key && this.popup) {
+      this.setCurrentPopup(null);
       ev.preventDefault();
       return;
     }
@@ -591,7 +510,7 @@ export class Transmission extends EventTarget {
     const is_input_focused = ev.target.matches('input');
     const rows = this._rows;
 
-    // Some hotkeys can only be used if the following conditions are met:
+    // Some shortcuts can only be used if the following conditions are met:
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
@@ -650,22 +569,6 @@ export class Transmission extends EventTarget {
     }
   }
 
-  static isElementEnabled(e) {
-    return !e.classList.contains('disabled');
-  }
-  static setElementEnabled(e, enabled = true) {
-    e.classList.toggle('disabled', !enabled);
-  }
-
-  openTorrentClicked(ev) {
-    const e = ev.target;
-    if (Transmission.isElementEnabled(e)) {
-      Transmission.setElementEnabled(e, false);
-      this.uploadTorrentFile();
-      // this.updateButtonsSoon();
-    }
-  }
-
   static dragenter(ev) {
     if (ev.dataTransfer && ev.dataTransfer.types) {
       const copy_types = ['text/uri-list', 'text/plain'];
@@ -681,31 +584,31 @@ export class Transmission extends EventTarget {
     return true;
   }
 
+  static _isValidURL(str) {
+    try {
+      const url = new URL(str);
+      return url !== null;
+    } catch (e) {
+      return false;
+    }
+  }
+
   drop(ev) {
-    const types = ['text/uri-list', 'text/plain'];
-    const paused = this.shouldAddedTorrentsStart();
+    const paused = true; // FIXME this.shouldAddedTorrentsStart();
 
     if (!ev.dataTransfer || !ev.dataTransfer.types) {
       return true;
     }
 
-    let uris = null;
-    for (let i = 0; !uris && i < types.length; ++i) {
-      if (ev.dataTransfer.types.contains(types[i])) {
-        uris = ev.dataTransfer.getData(types[i]).split('\n');
-      }
-    }
-
-    for (const uri of uris) {
-      if (/^#/.test(uri)) {
-        // lines which start with "#" are comments
-        continue;
-      }
-      if (/^[a-z-]+:/i.test(uri)) {
-        // close enough to a url
-        this.remote.addTorrentByUrl(uri, paused);
-      }
-    }
+    const type = ev.data.Transfer.types
+      .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
+      .pop();
+    ev.dataTransfer
+      .getData(type)
+      .split('\n')
+      .map((str) => str.trim())
+      .filter((str) => Transmission._isValidURL(str))
+      .forEach((uri) => this.remote.addTorrentByUrl(uri, paused));
 
     ev.preventDefault();
     return false;
@@ -713,7 +616,7 @@ export class Transmission extends EventTarget {
 
   confirmUploadClicked() {
     this.uploadTorrentFile(true);
-    Transmission.hidePopups();
+    this.setCurrentPopup(null);
   }
 
   // turn the periodic ajax session refresh on & off
@@ -734,22 +637,11 @@ export class Transmission extends EventTarget {
     }
   }
 
-  toggleTurtleClicked() {
-    this.remote.savePrefs({
-      [RPC._TurtleState]: !Utils.isCheckedId('turtle-button'),
-    });
-  }
-
   /*--------------------------------------------
    *
    *  I N T E R F A C E   F U N C T I O N S
    *
    *--------------------------------------------*/
-
-  showPrefsDialog() {
-    Transmission.hidePopups();
-    this.prefsDialog.setVisible(true);
-  }
 
   setFilterText(search) {
     this.filterText = search ? search.trim() : null;
@@ -845,6 +737,11 @@ FIXME: fix this when notifications get fixed
     const meta_key = ev.metaKey || ev.ctrlKey,
       { row } = ev.currentTarget;
 
+    if (this.popup && this.popup.name !== 'inspector') {
+      this.setCurrentPopup(null);
+      return;
+    }
+
     // handle the per-row "torrent-resume" button
     if (ev.target.classList.contains('torrent-resume')) {
       this.startTorrent(row.getTorrent());
@@ -861,12 +758,8 @@ FIXME: fix this when notifications get fixed
     // which deselects all on click
     ev.stopPropagation();
 
-    if (isMobileDevice) {
-      if (row.isSelected()) {
-        this.setInspectorVisible(true);
-      }
-      this.setSelectedRow(row);
-    } else if (ev.shiftKey) {
+    // TODO: long-click should raise inspector
+    if (ev.shiftKey) {
       this.selectRange(row);
       // Need to deselect any selected text
       window.focus();
@@ -898,99 +791,6 @@ FIXME: fix this when notifications get fixed
         delete this._torrents[id];
       }
       this.refilter();
-    }
-  }
-
-  shouldAddedTorrentsStart() {
-    return this.prefsDialog.shouldAddedTorrentsStart();
-  }
-
-  /*
-   * Select a torrent file to upload
-   */
-  uploadTorrentFile(confirmed) {
-    const file_input = document.getElementById('torrent-upload-file');
-    const folder_input = document.getElementById('add-dialog-folder-input');
-    const start_input = document.getElementById('torrent-auto-start');
-    const url_input = document.getElementById('torrent-upload-url');
-
-    if (!confirmed) {
-      // update the upload dialog's fields
-      file_input.setAttribute('value', '');
-      url_input.setAttribute('value', '');
-      start_input.setAttribute('checked', this.shouldAddedTorrentsStart());
-      folder_input.value = document.getElementById('download-dir').value;
-      folder_input.addEventListener(
-        'change',
-        this.updateFreeSpaceInAddDialog.bind(this)
-      );
-      this.updateFreeSpaceInAddDialog();
-
-      // show the dialog
-      Transmission.showDialog('upload-container');
-      url_input.focus();
-    } else {
-      const paused = !start_input.getAttribute('checked');
-      const destination = folder_input.value;
-      const { remote } = this;
-
-      for (const file of file_input.files) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const contents = e.target.result;
-          const key = 'base64,';
-          const index = contents.indexOf(key);
-          if (index === -1) {
-            return;
-          }
-          const metainfo = contents.substring(index + key.length);
-          const o = {
-            arguments: {
-              'download-dir': destination,
-              metainfo,
-              paused,
-            },
-            method: 'torrent-add',
-          };
-          remote.sendRequest(o, (response) => {
-            if (response.result !== 'success') {
-              // alert(`Error adding "${file.name}": ${response.result}`);
-              this.setCurrentPopup(
-                new AlertDialog({
-                  heading: `Error adding "${file.name}"`,
-                  message: response.result,
-                })
-              );
-            }
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-
-      let url = document.getElementById('torrent-upload-url').value;
-      if (url !== '') {
-        if (url.match(/^[0-9a-f]{40}$/i)) {
-          url = `magnet:?xt=urn:btih:${url}`;
-        }
-        const o = {
-          arguments: {
-            'download-dir': destination,
-            filename: url,
-            paused,
-          },
-          method: 'torrent-add',
-        };
-        remote.sendRequest(o, (payload, response) => {
-          if (response.result !== 'success') {
-            this.setCurrentPopup(
-              new AlertDialog({
-                heading: `Error adding "${url}"`,
-                message: response.result,
-              })
-            );
-          }
-        });
-      }
     }
   }
 
@@ -1078,9 +878,7 @@ FIXME: fix this when notifications get fixed
     );
   }
 
-  /***
-   ****
-   ***/
+  ///
 
   updateGuiFromSession(o) {
     const [, version, checksum] = o.version.match(/(.*)\s\(([0-9a-f]+)\)/);
@@ -1089,32 +887,8 @@ FIXME: fix this when notifications get fixed
       version,
     };
 
-    this.prefsDialog.set(o);
-
-    if (RPC._TurtleState in o) {
-      const enabled = o[RPC._TurtleState];
-      for (const e of document.querySelectorAll(
-        '[data-command="toggle-alt-speed-limits"]'
-      )) {
-        Utils.setChecked(e, enabled);
-        const up = o[RPC._TurtleUpSpeedLimit];
-        const dn = o[RPC._TurtleDownSpeedLimit];
-        e.title = `Click to ${
-          enabled ? 'disable' : 'enable'
-        } temporary speed limits (${up} up, ${dn} down)`;
-      }
-    }
-
-    Transmission.selectRadioGroupItem(
-      'speed-limit-down',
-      o['speed-limit-down-enabled']
-        ? o['speed-limit-down'].toString()
-        : 'unlimited'
-    );
-    Transmission.selectRadioGroupItem(
-      'speed-limit-up',
-      o['speed-limit-up-enabled'] ? o['speed-limit-up'].toString() : 'unlimited'
-    );
+    const el = document.getElementById('toolbar-overflow');
+    el.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
   }
 
   updateStatusbar() {
@@ -1154,66 +928,6 @@ FIXME: fix this when notifications get fixed
       this.filterTrackersStr = str;
       document.getElementById('filter-tracker').innerHTML = str;
     }
-  }
-
-  calculateTorrentStates() {
-    const stats = {
-      active: 0,
-      activeSel: 0,
-      paused: 0,
-      pausedSel: 0,
-      queuedSel: 0,
-      sel: 0,
-      total: 0,
-    };
-
-    for (const row of this._rows) {
-      const tor = row.getTorrent();
-
-      ++stats.total;
-
-      const isStopped = tor.isStopped();
-      if (isStopped) {
-        ++stats.paused;
-      } else {
-        ++stats.active;
-      }
-
-      const isSelected = row.isSelected();
-      if (!isSelected) {
-        continue;
-      }
-
-      ++stats.sel;
-
-      const isQueued = tor.isQueued();
-      if (isQueued) {
-        ++stats.queuedSel;
-      }
-
-      if (isStopped) {
-        ++stats.pausedSel;
-      } else {
-        ++stats.activeSel;
-      }
-    }
-
-    return stats;
-  }
-
-  /// INSPECTOR
-
-  static inspectorIsVisible() {
-    Utils.isHiddenId('torrent-inspector');
-  }
-
-  static toggleInspector() {
-    Utils.toggleId('torrent-inspector');
-  }
-
-  setInspectorVisible(visible) {
-    this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
-    Utils.setVisibleId('torrent-inspector', visible);
   }
 
   /// FILTER
@@ -1299,8 +1013,10 @@ FIXME: fix this when notifications get fixed
         const e = row.getElement();
         e.row = row;
         dirty_rows.push(row);
-        e.addEventListener('click', (ev) => this.onRowClicked(ev));
-        e.addEventListener('dblclick', () => Transmission.toggleInspector());
+        e.addEventListener('click', this.onRowClicked.bind(this));
+        e.addEventListener('dblclick', () =>
+          this.action_manager.click('toggle-inspector')
+        );
       }
     }
 
@@ -1441,63 +1157,6 @@ FIXME: fix this when notifications get fixed
     return ret;
   }
 
-  /// STATS DIALOG
-
-  // Process new session stats from the server
-  static updateStats(stats) {
-    const fmt = Formatter;
-    const setText = (id, str) =>
-      (document.getElementById(id).textContent = str);
-
-    let s = stats['current-stats'];
-    let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    setText('stats-session-uploaded', fmt.size(s.uploadedBytes));
-    setText('stats-session-downloaded', fmt.size(s.downloadedBytes));
-    setText('stats-session-ratio', fmt.ratioString(ratio));
-    setText('stats-session-duration', fmt.timeInterval(s.secondsActive));
-
-    s = stats['cumulative-stats'];
-    ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    setText('stats-total-count', `${s.sessionCount} times`);
-    setText('stats-total-uploaded', fmt.size(s.uploadedBytes));
-    setText('stats-total-downloaded', fmt.size(s.downloadedBytes));
-    setText('stats-total-ratio', fmt.ratioString(ratio));
-    setText('stats-total-duration', fmt.timeInterval(s.secondsActive));
-  }
-
-  loadDaemonStats() {
-    this.remote.loadDaemonStats((data) =>
-      Transmission.updateStats(data['arguments'])
-    );
-  }
-
-  // turn the periodic ajax stats refresh on & off
-  togglePeriodicStatsRefresh(enabled) {
-    if (this.statsInterval) {
-      clearInterval(this.statsInterval);
-      delete this.statsInterval;
-    }
-
-    if (enabled) {
-      this.loadDaemonStats();
-      if (!this.statsInterval) {
-        const msec = 5000;
-        this.statsInterval = setInterval(this.loadDaemonStats.bind(this), msec);
-      }
-    }
-  }
-
-  showStatsDialog() {
-    Transmission.showDialog('stats-dialog');
-    this.loadDaemonStats();
-    this.togglePeriodicStatsRefresh(true);
-  }
-
-  closeStatsDialog() {
-    this.togglePeriodicStatsRefresh(false);
-    Transmission.hidePopups();
-  }
-
   ///
 
   popupCloseListener(ev) {
@@ -1509,10 +1168,6 @@ FIXME: fix this when notifications get fixed
   }
 
   setCurrentPopup(popup) {
-    // this line is temporary. Once everything is a live object,
-    // `popup.close()` should be enough
-    Transmission.hidePopups();
-
     if (this.popup) {
       this.popup.close();
     }
@@ -1522,73 +1177,5 @@ FIXME: fix this when notifications get fixed
     if (this.popup) {
       this.popup.addEventListener('close', this.boundPopupCloseListener);
     }
-  }
-
-  static hidePopups() {
-    const any_closed = false;
-    /*
-    for (const e of document.getElementsByClassName('popup')) {
-      if (!Utils.isHidden(e)) {
-        Utils.hide(e);
-        any_closed = true;
-        if (e.id === 'upload-container') {
-          Transmission.setElementEnabled(
-            document.getElementById('toolbar-open'),
-            true
-          );
-        }
-      }
-    }
-*/
-    return any_closed;
-  }
-
-  static showDialog(id) {
-    Transmission.hidePopups();
-    Utils.showId(id);
-    switch (id) {
-      case 'upload-container':
-        Transmission.setElementEnabled(
-          document.getElementById('toolbar-open'),
-          false
-        );
-        break;
-      default:
-        break;
-    }
-  }
-
-  confirmPopup() {
-    const e = document.querySelector('.dialog-container:not(.hidden)');
-    if (!e) {
-      return false;
-    }
-    switch (e.id) {
-      case 'upload-container':
-        this.confirmUploadClicked();
-        break;
-
-      /*
-      case 'move-container':
-        this.confirmMoveClicked();
-        break;
-*/
-
-      case 'rename-container':
-        this.confirmRenameClicked();
-        break;
-
-      case 'about-dialog':
-      case 'stats-dialog':
-      case 'hotkeys-dialog':
-        Utils.hide(e);
-        break;
-
-      default: {
-        this.dialog.executeCallback();
-        break;
-      }
-    }
-    return true;
   }
 }
