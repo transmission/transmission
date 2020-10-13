@@ -19,7 +19,7 @@ Param(
     [string] $ScriptBaseUrl
 )
 
-Set-StrictMode -Version '3.0'
+Set-StrictMode -Version '6.0'
 
 $ErrorActionPreference = 'Stop'
 $PSDefaultParameterValues['*:ErrorAction'] = $ErrorActionPreference
