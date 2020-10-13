@@ -34,6 +34,7 @@ set(PROJECT_FILES
   magnet.c
   makemeta.c
   metainfo.c
+  mime-types.c
   natpmp.c
   net.c
   peer-io.c
@@ -157,6 +158,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     list.h
     magnet.h
     metainfo.h
+    mime-types.h
     natpmp_local.h
     net.h
     peer-common.h

@@ -49,6 +49,7 @@
 #include "ConvertUTF.h"
 #include "list.h"
 #include "log.h"
+#include "mime-types.h"
 #include "net.h"
 #include "platform.h" /* tr_lockLock() */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
@@ -2253,4 +2254,39 @@ void tr_net_init(void)
 
         initialized = true;
     }
+}
+
+/// mime-type
+
+static int compareSuffix(void const* va, void const* vb)
+{
+    char const* suffix = va;
+    struct mime_type_suffix const* entry = vb;
+    return tr_strcmp0(suffix, entry->suffix);
+}
+
+char const* tr_get_mime_type_for_filename(char const* filename)
+{
+    struct mime_type_suffix const* info = NULL;
+
+    char const* in = strrchr(filename, '.');
+    if ((in != NULL) && (strlen(++in) <= MIME_TYPE_SUFFIX_MAXLEN))
+    {
+        char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
+        char* out = lowercase_suffix;
+        while (*in != '\0')
+        {
+            *out++ = tolower((unsigned char)*in++);
+        }
+
+        *out = '\0';
+
+        info = bsearch(lowercase_suffix,
+            mime_type_suffixes,
+            TR_N_ELEMENTS(mime_type_suffixes),
+            sizeof(*mime_type_suffixes),
+            compareSuffix);
+    }
+
+    return info != NULL ? info->mime_type : NULL;
 }

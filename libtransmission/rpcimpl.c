@@ -640,6 +640,10 @@ static void initField(tr_torrent* const tor, tr_info const* const inf, tr_stat c
         tr_variantInitInt(initme, st->eta);
         break;
 
+    case TR_KEY_file_count:
+        tr_variantInitInt(initme, inf->fileCount);
+        break;
+
     case TR_KEY_files:
         tr_variantInitList(initme, inf->fileCount);
         addFiles(tor, initme);
@@ -777,6 +781,10 @@ static void initField(tr_torrent* const tor, tr_info const* const inf, tr_stat c
 
     case TR_KEY_pieceSize:
         tr_variantInitInt(initme, inf->pieceSize);
+        break;
+
+    case TR_KEY_primary_mime_type:
+        tr_variantInitStr(initme, tr_torrentPrimaryMimeType(tor), TR_BAD_SIZE);
         break;
 
     case TR_KEY_priorities:

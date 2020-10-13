@@ -17,14 +17,14 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QIcon>
+#include <QMimeDatabase>
 #include <QObject>
+#include <QPainter>
+#include <QStyle>
 
 #ifdef _WIN32
 #include <QPixmapCache>
 #include <QtWin>
-#else
-#include <QMimeDatabase>
-#include <QMimeType>
 #endif
 
 #include <libtransmission/transmission.h>
@@ -70,6 +70,58 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
     if (icon.isNull())
     {
         icon = fallback;
+    }
+
+    return icon;
+}
+
+QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) const
+{
+    auto& icon = (multifile ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
+
+    if (!icon.isNull())
+    {
+        return icon;
+    }
+
+    if (!multifile)
+    {
+        QMimeDatabase mime_db;
+        auto const type = mime_db.mimeTypeForName(mime_type_name);
+        icon = QIcon::fromTheme(type.iconName());
+
+        if (icon.isNull())
+        {
+            icon = QIcon::fromTheme(type.genericIconName());
+        }
+
+        if (icon.isNull())
+        {
+            icon = file_icon_;
+        }
+
+        return icon;
+    }
+
+    auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
+    for (auto const& size : { QSize(24, 24), QSize(32, 32), QSize(48, 48) })
+    {
+        // upper left corner
+        auto const folder_size = size / 2;
+        auto const folder_rect = QRect(QPoint(), folder_size);
+
+        // fullsize
+        auto const mime_size = size;
+        auto const mime_rect = QRect(QPoint(), mime_size);
+
+        // build the icon
+        auto pixmap = QPixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        painter.drawPixmap(folder_rect, folder_icon_.pixmap(folder_size));
+        painter.drawPixmap(mime_rect, mime_icon.pixmap(mime_size));
+        icon.addPixmap(pixmap);
     }
 
     return icon;
@@ -132,11 +184,11 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
         return {};
     }
 
-    QIcon& icon = icon_cache_[ext];
+    QIcon& icon = ext_to_icon_[ext];
     if (icon.isNull()) // cache miss
     {
         QMimeDatabase mime_db;
-        QMimeType type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
+        auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
             icon = QIcon::fromTheme(type.iconName());

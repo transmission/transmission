@@ -96,6 +96,10 @@ void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
+/** Return the mime-type (e.g. "audio/x-flac") that matches more of the
+    torrent's content than any other mime-type. */
+char const* tr_torrentPrimaryMimeType(tr_torrent const* tor);
+
 typedef enum
 {
     TR_VERIFY_NONE,
