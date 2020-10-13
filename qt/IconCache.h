@@ -8,17 +8,20 @@
 
 #pragma once
 
-#if defined(_WIN32)
-#include <windows.h> // UINT
-class QFileInfo;
-#else
-#include <unordered_map>
+#if !defined(_WIN32)
 #include <unordered_set>
-#include "Utils.h" // std::hash<QString>()
 #endif
+
+#include <unordered_map>
 
 #include <QIcon>
 #include <QString>
+
+#include "Utils.h" // std::hash<QString>()
+
+#if defined(_WIN32)
+class QFileInfo;
+#endif
 
 class QModelIndex;
 
@@ -43,7 +46,7 @@ private:
     mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;
 
 #if defined(_WIN32)
-    void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const;
+    void addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const;
 #else
     mutable std::unordered_set<QString> suffixes_;
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
