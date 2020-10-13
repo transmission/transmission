@@ -61,7 +61,7 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
-if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -659,11 +659,13 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
     add_subdirectory(dist/msi)
 endif()
 
-set(CPACK_SOURCE_GENERATOR TBZ2)
+set(CPACK_SOURCE_GENERATOR TXZ)
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
-set(CPACK_SOURCE_IGNORE_FILES
-    \\\\.git
-)
+if(NOT TR_STABLE_RELEASE)
+    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
+endif()
+list(APPEND CPACK_SOURCE_IGNORE_FILES [.]git)
+set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting
 
@@ -675,7 +677,7 @@ if(GIT_FOUND)
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    if(TR_GIT_ROOT)
+    if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
         configure_file(
             "${CMAKE_SOURCE_DIR}/extras/pre-commit"
             "${TR_GIT_ROOT}/.git/hooks/pre-commit"
@@ -689,8 +691,8 @@ if(GIT_FOUND)
             COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
-    endif(TR_GIT_ROOT)
+    endif()
     unset(TR_GIT_ROOT)
-endif(GIT_FOUND)
+endif()
 
 include(CPack)
