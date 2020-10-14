@@ -130,7 +130,7 @@ export function createDialogContainer(id) {
 
 export function setEnabled(el, enabled) {
   if (enabled) {
-    delete el.disabled;
+    el.removeAttribute('disabled');
   } else {
     el.setAttribute('disabled', true);
   }
