@@ -1,93 +1,175 @@
-/**
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { sanitizeText, Utils } from './utils.js';
+import {
+  createTabsContainer,
+  createInfoSection,
+  sanitizeText,
+  OutsideClickListener,
+  Utils,
+} from './utils.js';
 
 export class Inspector extends EventTarget {
   constructor(controller) {
     super();
 
-    this.data = {
-      controller,
-      elements: {
-        availability_lb: document.getElementById('inspector-info-availability'),
-        comment_lb: document.getElementById('inspector-info-comment'),
-        downloaded_lb: document.getElementById('inspector-info-downloaded'),
-        error_lb: document.getElementById('inspector-info-error'),
-        file_list: document.getElementById('inspector-file-list'),
-        files_page: document.getElementById('inspector-page-files'),
-        foldername_lb: document.getElementById('inspector-info-location'),
-        hash_lb: document.getElementById('inspector-info-hash'),
-        have_lb: document.getElementById('inspector-info-have'),
-        info_page: document.getElementById('inspector-page-info'),
-        last_activity_lb: document.getElementById(
-          'inspector-info-last-activity'
-        ),
-        name_lb: document.getElementById('torrent-inspector-name'),
-        origin_lb: document.getElementById('inspector-info-origin'),
-        peers_list: document.getElementById('inspector-peers-list'),
-        peers_page: document.getElementById('inspector-page-peers'),
-        privacy_lb: document.getElementById('inspector-info-privacy'),
-        remaining_time_lb: document.getElementById(
-          'inspector-info-remaining-time'
-        ),
-        root: document.getElementById('torrent-inspector'),
-        running_time_lb: document.getElementById('inspector-info-running-time'),
-        size_lb: document.getElementById('inspector-info-size'),
-        state_lb: document.getElementById('inspector-info-state'),
-        trackers_list: document.getElementById('inspector-trackers-list'),
-        trackers_page: document.getElementById('inspector-page-trackers'),
-        uploaded_lb: document.getElementById('inspector-info-uploaded'),
-      },
-      onTorrentChanged: () => this._updateInspector(),
-      selectedPage: null,
-      selection_listener: (ev) => this._setTorrents(ev.selected),
-      tab_listener: this.onTabClicked.bind(this),
-      torrents: [],
-    };
+    this.closed = false;
+    this.controller = controller;
+    this.elements = this._create();
+    this.current_page = this.elements.info.root;
+    this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
+    this.selection_listener = (ev) => this._setTorrents(ev.selected);
+    this.torrent_listener = () => this._updateCurrentPage();
+    this.torrents = [];
+    this.file_torrent = null;
+    this.file_torrent_n = null;
+    this.file_rows = null;
+    this.outside = new OutsideClickListener(this.elements.root);
+    this.outside.addEventListener('click', () => this.close());
+    Object.seal(this);
 
-    // FIXME: transmission class should do this
-    // listen to selection changes
     controller.addEventListener(
       'torrent-selection-changed',
-      this.data.selection_listener
+      this.selection_listener
     );
+    this._setTorrents(this.controller.getSelectedTorrents());
 
-    // listen to tab clicks
-    for (const e of document.getElementsByClassName('inspector-tab')) {
-      e.addEventListener('click', this.data.tab_listener);
-    }
-
-    this.selectTab(document.getElementById('inspector-tab-info'));
-    this._setTorrents(this.data.controller.getSelectedTorrents());
-    this.data.elements.root.classList.remove('hidden');
+    document.body.appendChild(this.elements.root);
   }
 
   close() {
     if (!this.closed) {
+      this.outside.stop();
+      clearInterval(this.interval);
       this._setTorrents([]);
-      this.data.controller.removeEventListener(
+      this.elements.root.remove();
+      this.controller.removeEventListener(
         'torrent-selection-changed',
-        this.data.selection_listener
+        this.selection_listener
       );
-      for (const e of document.getElementsByClassName('inspector-tab')) {
-        e.removeEventListener('click', this.data.tab_listener);
-      }
-      this.data.elements.root.classList.add('hidden');
       this.dispatchEvent(new Event('close'));
-      for (const key of Object.keys(this)) {
-        delete this[key];
+      for (const prop of Object.keys(this)) {
+        this[prop] = null;
       }
       this.closed = true;
     }
+  }
+
+  static _createInfoPage() {
+    const root = document.createElement('div');
+    root.classList.add('inspector-info-page');
+    let labels = [
+      'Have:',
+      'Availability:',
+      'Uploaded:',
+      'Downloaded:',
+      'State:',
+      'Running time:',
+      'Remaining time:',
+      'Last activity:',
+      'Error:',
+    ];
+    let section = createInfoSection('Activity', labels);
+    root.appendChild(section.root);
+    const [
+      have,
+      availability,
+      uploaded,
+      downloaded,
+      state,
+      running_time,
+      remaining_time,
+      last_activity,
+      error,
+    ] = section.children;
+
+    labels = ['Size:', 'Location:', 'Hash:', 'Privacy:', 'Origin:', 'Comment:'];
+    section = createInfoSection('Details', labels);
+    root.appendChild(section.root);
+    const [size, location, hash, privacy, origin, comment] = section.children;
+
+    return {
+      availability,
+      comment,
+      downloaded,
+      error,
+      hash,
+      have,
+      last_activity,
+      location,
+      origin,
+      privacy,
+      remaining_time,
+      root,
+      running_time,
+      size,
+      state,
+      uploaded,
+    };
+  }
+
+  static _createListPage(list_type, list_id) {
+    const root = document.createElement('div');
+    const list = document.createElement(list_type);
+    list.id = list_id;
+    root.appendChild(list);
+    return { list, root };
+  }
+  static _createPeersPage() {
+    return Inspector._createListPage('div', 'inspector-peers-list');
+  }
+  static _createTrackersPage() {
+    return Inspector._createListPage('div', 'inspector-trackers-list');
+  }
+  static _createFilesPage() {
+    return Inspector._createListPage('ul', 'inspector-file-list');
+  }
+
+  _create() {
+    const pages = {
+      files: Inspector._createFilesPage(),
+      info: Inspector._createInfoPage(),
+      peers: Inspector._createPeersPage(),
+      trackers: Inspector._createTrackersPage(),
+    };
+
+    const on_activated = (page) => {
+      this.current_page = page;
+      this._updateCurrentPage();
+    };
+
+    const elements = createTabsContainer(
+      'inspector',
+      [
+        ['inspector-tab-info', pages.info.root],
+        ['inspector-tab-peers', pages.peers.root],
+        ['inspector-tab-trackers', pages.trackers.root],
+        ['inspector-tab-files', pages.files.root],
+      ],
+      on_activated.bind(this)
+    );
+
+    return { ...elements, ...pages };
+  }
+
+  _setTorrents(torrents) {
+    // update the inspector when a selected torrent's data changes.
+    const key = 'dataChanged';
+    const cb = this.torrent_listener;
+    this.torrents.forEach((t) => t.removeEventListener(key, cb));
+    this.torrents = [...torrents];
+    this.torrents.forEach((t) => t.addEventListener(key, cb));
+
+    this._refreshTorrents();
+    this._updateCurrentPage();
   }
 
   static _needsExtraInfo(torrents) {
@@ -95,7 +177,7 @@ export class Inspector extends EventTarget {
   }
 
   _refreshTorrents() {
-    const { controller, torrents } = this.data;
+    const { controller, torrents } = this;
     const ids = torrents.map((t) => t.getId());
 
     if (ids && ids.length) {
@@ -108,22 +190,41 @@ export class Inspector extends EventTarget {
     }
   }
 
-  /// GENERAL INFO PAGE
+  _updateCurrentPage() {
+    const { elements } = this;
+    switch (this.current_page) {
+      case elements.files.root:
+        this._updateFiles();
+        break;
+      case elements.info.root:
+        this._updateInfo();
+        break;
+      case elements.peers.root:
+        this._updatePeers();
+        break;
+      case elements.trackers.root:
+        this._updateTrackers();
+        break;
+      default:
+        console.warn('unexpected page');
+        console.log(this.current_page);
+    }
+  }
 
-  _updateInfoPage() {
+  _updateInfo() {
     const none = 'None';
     const mixed = 'Mixed';
     const unknown = 'Unknown';
     const fmt = Formatter;
     const now = Date.now();
-    const { torrents } = this.data;
-    const e = this.data.elements;
+    const { torrents } = this;
+    const e = this.elements;
     const sizeWhenDone = torrents.reduce(
       (acc, t) => acc + t.getSizeWhenDone(),
       0
     );
 
-    // state_lb
+    // state
     let str = null;
     if (torrents.length < 1) {
       str = none;
@@ -136,10 +237,10 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.state_lb, str);
+    Utils.setTextContent(e.info.state, str);
     const stateString = str;
 
-    // have_lb
+    // have
     if (torrents.length < 1) {
       str = none;
     } else {
@@ -168,9 +269,9 @@ export class Inspector extends EventTarget {
         )} (${str}%), ${fmt.size(unverified)} Unverified`;
       }
     }
-    Utils.setTextContent(e.have_lb, str);
+    Utils.setTextContent(e.info.have, str);
 
-    // availability_lb
+    // availability
     if (torrents.length < 1) {
       str = none;
     } else if (sizeWhenDone === 0) {
@@ -182,9 +283,9 @@ export class Inspector extends EventTarget {
       );
       str = `${fmt.percentString((100.0 * available) / sizeWhenDone)}%`;
     }
-    Utils.setTextContent(e.availability_lb, str);
+    Utils.setTextContent(e.info.availability, str);
 
-    //  downloaded_lb
+    //  downloaded
     if (torrents.length < 1) {
       str = none;
     } else {
@@ -192,9 +293,9 @@ export class Inspector extends EventTarget {
       const f = torrents.reduce((acc, t) => acc + t.getFailedEver(), 0);
       str = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
     }
-    Utils.setTextContent(e.downloaded_lb, str);
+    Utils.setTextContent(e.info.downloaded, str);
 
-    // uploaded_lb
+    // uploaded
     if (torrents.length < 1) {
       str = none;
     } else {
@@ -204,7 +305,7 @@ export class Inspector extends EventTarget {
         torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
       str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
     }
-    Utils.setTextContent(e.uploaded_lb, str);
+    Utils.setTextContent(e.info.uploaded, str);
 
     // running time
     if (torrents.length < 1) {
@@ -220,7 +321,7 @@ export class Inspector extends EventTarget {
         str = fmt.timeInterval(now / 1000 - first);
       }
     }
-    Utils.setTextContent(e.running_time_lb, str);
+    Utils.setTextContent(e.info.running_time, str);
 
     // remaining time
     if (torrents.length < 1) {
@@ -236,7 +337,7 @@ export class Inspector extends EventTarget {
         str = fmt.timeInterval(first);
       }
     }
-    Utils.setTextContent(e.remaining_time_lb, str);
+    Utils.setTextContent(e.info.remaining_time, str);
 
     // last active at
     if (torrents.length < 1) {
@@ -255,7 +356,7 @@ export class Inspector extends EventTarget {
         str = none;
       }
     }
-    Utils.setTextContent(e.last_activity_lb, str);
+    Utils.setTextContent(e.info.last_activity, str);
 
     // error
     if (torrents.length < 1) {
@@ -265,7 +366,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.error_lb, str || none);
+    Utils.setTextContent(e.info.error, str || none);
 
     // size
     if (torrents.length < 1) {
@@ -291,7 +392,7 @@ export class Inspector extends EventTarget {
         }
       }
     }
-    Utils.setTextContent(e.size_lb, str);
+    Utils.setTextContent(e.info.size, str);
 
     // hash
     if (torrents.length < 1) {
@@ -301,7 +402,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.hash_lb, str);
+    Utils.setTextContent(e.info.hash, str);
 
     // privacy
     if (torrents.length < 1) {
@@ -317,7 +418,7 @@ export class Inspector extends EventTarget {
         str = 'Public torrent';
       }
     }
-    Utils.setTextContent(e.privacy_lb, str);
+    Utils.setTextContent(e.info.privacy, str);
 
     // comment
     if (torrents.length < 1) {
@@ -331,11 +432,11 @@ export class Inspector extends EventTarget {
     if (str.startsWith('https://') || str.startsWith('http://')) {
       str = encodeURI(str);
       Utils.setInnerHTML(
-        e.comment_lb,
+        e.info.comment,
         `<a href="${str}" target="_blank" >${str}</a>`
       );
     } else {
-      Utils.setTextContent(e.comment_lb, str);
+      Utils.setTextContent(e.info.comment, str);
     }
 
     // origin
@@ -366,9 +467,9 @@ export class Inspector extends EventTarget {
         ).toDateString()}`;
       }
     }
-    Utils.setTextContent(e.origin_lb, str);
+    Utils.setTextContent(e.info.origin, str);
 
-    // donwload dir
+    // location
     if (torrents.length < 1) {
       str = none;
     } else {
@@ -376,16 +477,39 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.foldername_lb, str);
+    Utils.setTextContent(e.info.location, str);
   }
 
   ///  PEERS PAGE
 
-  _updatePeersPage() {
+  static _peerStatus(flag_str) {
+    const texts = Object.seal({
+      '?': "We unchoked this peer, but they're not interested",
+      D: 'Downloading from this peer',
+      E: 'Encrypted Connection',
+      H: 'Peer was discovered through Distributed Hash Table (DHT)',
+      I: 'Peer is an incoming connection',
+      K: "Peer has unchoked us, but we're not interested",
+      O: 'Optimistic unchoke',
+      T: 'Peer is connected via uTP',
+      U: 'Uploading to peer',
+      X: 'Peer was discovered through Peer Exchange (PEX)',
+      d: "We would download from this peer if they'd let us",
+      u: "We would upload to this peer if they'd ask",
+    });
+
+    const title = Array.from(flag_str)
+      .filter((ch) => texts[ch])
+      .map((ch) => `${ch}: ${texts[ch]}`)
+      .join('\n');
+    return `<span title="${title}">${flag_str}</span>`;
+  }
+
+  _updatePeers() {
     const html = [];
     const fmt = Formatter;
-    const { peers_list } = this.data.elements;
-    const { torrents } = this.data;
+    const { list } = this.elements.peers;
+    const { torrents } = this;
 
     for (const tor of torrents) {
       const peers = tor.getPeers();
@@ -449,7 +573,7 @@ export class Inspector extends EventTarget {
       html.push('</table></div>');
     }
 
-    Utils.setInnerHTML(peers_list, html.join(''));
+    Utils.setInnerHTML(list, html.join(''));
   }
 
   /// TRACKERS PAGE
@@ -524,10 +648,10 @@ export class Inspector extends EventTarget {
     };
   }
 
-  _updateTrackersPage() {
+  _updateTrackers() {
     const na = 'N/A';
-    const { trackers_list } = this.data.elements;
-    const { torrents } = this.data;
+    const { list } = this.elements.trackers;
+    const { torrents } = this;
 
     // By building up the HTML as as string, then have the browser
     // turn this into a DOM tree, this is a fast operation.
@@ -609,23 +733,26 @@ export class Inspector extends EventTarget {
       html.push('</div>'); // inspector-group
     }
 
-    Utils.setInnerHTML(trackers_list, html.join(''));
+    Utils.setInnerHTML(list, html.join(''));
   }
 
   ///  FILES PAGE
 
-  changeFileCommand(fileIndices, command) {
-    const { controller, file_torrent } = this.data;
+  _changeFileCommand(fileIndices, command) {
+    const { controller, file_torrent } = this;
     const torrentId = file_torrent.getId();
     controller.changeFileCommand(torrentId, fileIndices, command);
   }
 
-  onFileWantedToggled(ev) {
+  _onFileWantedToggled(ev) {
     const { indices, wanted } = ev;
-    this.changeFileCommand(indices, wanted ? 'files-wanted' : 'files-unwanted');
+    this._changeFileCommand(
+      indices,
+      wanted ? 'files-wanted' : 'files-unwanted'
+    );
   }
 
-  onFilePriorityToggled(ev) {
+  _onFilePriorityToggled(ev) {
     const { indices, priority } = ev;
 
     let command = null;
@@ -641,18 +768,18 @@ export class Inspector extends EventTarget {
         break;
     }
 
-    this.changeFileCommand(indices, command);
+    this._changeFileCommand(indices, command);
   }
 
-  clearFileList() {
-    const e = this.data.elements.file_list;
-    while (e.firstChild) {
-      e.removeChild(e.firstChild);
+  _clearFileList() {
+    const { list } = this.elements.files;
+    while (list.firstChild) {
+      list.removeChild(list.firstChild);
     }
 
-    delete this.data.file_torrent;
-    delete this.data.file_torrent_n;
-    delete this.data.file_rows;
+    this.file_torrent = null;
+    this.file_torrent_n = null;
+    this.file_rows = null;
   }
 
   static createFileTreeModel(tor) {
@@ -699,12 +826,12 @@ export class Inspector extends EventTarget {
 
   addNodeToView(tor, parent, sub, i) {
     const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
-    row.addEventListener('wantedToggled', this.onFileWantedToggled.bind(this));
+    row.addEventListener('wantedToggled', this._onFileWantedToggled.bind(this));
     row.addEventListener(
       'priorityToggled',
-      this.onFilePriorityToggled.bind(this)
+      this._onFilePriorityToggled.bind(this)
     );
-    this.data.file_rows.push(row);
+    this.file_rows.push(row);
     parent.appendChild(row.getElement());
   }
 
@@ -720,165 +847,31 @@ export class Inspector extends EventTarget {
     return i;
   }
 
-  _updateFilesPage() {
-    const { file_list } = this.data.elements;
-    const { torrents } = this.data;
+  _updateFiles() {
+    const { list } = this.elements.files;
+    const { torrents } = this;
 
     // only show one torrent at a time
     if (torrents.length !== 1) {
-      this.clearFileList();
+      this._clearFileList();
       return;
     }
 
     const [tor] = torrents;
     const n = tor.getFiles().length;
-    if (tor !== this.data.file_torrent || n !== this.data.file_torrent_n) {
+    if (tor !== this.file_torrent || n !== this.file_torrent_n) {
       // rebuild the file list...
-      this.clearFileList();
-      this.data.file_torrent = tor;
-      this.data.file_torrent_n = n;
-      this.data.file_rows = [];
+      this._clearFileList();
+      this.file_torrent = tor;
+      this.file_torrent_n = n;
+      this.file_rows = [];
       const fragment = document.createDocumentFragment();
       const tree = Inspector.createFileTreeModel(tor);
       this.addSubtreeToView(tor, fragment, tree, 0);
-      file_list.appendChild(fragment);
+      list.appendChild(fragment);
     } else {
       // ...refresh the already-existing file list
-      this.data.file_rows.forEach((row) => row.refresh());
+      this.file_rows.forEach((row) => row.refresh());
     }
-  }
-
-  ///
-
-  onTabClicked(ev) {
-    this.selectTab(ev.currentTarget);
-    ev.stopPropagation();
-  }
-
-  selectTab(tab) {
-    // select this tab and deselect the others
-    for (const e of tab.parentNode.children) {
-      e.classList.toggle('selected', e === tab);
-    }
-
-    // show this tab and hide the others
-    const id = tab.id.replace('tab', 'page');
-    this.selectedPage = document.getElementById(id);
-    for (const e of document.getElementsByClassName('inspector-page')) {
-      Utils.setVisible(e, e === this.selectedPage);
-    }
-
-    this._updateInspector();
-  }
-
-  _updateInspector() {
-    const { elements, torrents } = this.data;
-
-    // update the name, which is shown on all the pages
-    let name = null;
-    if (!torrents || !torrents.length) {
-      name = 'No Selection';
-    } else if (torrents.length === 1) {
-      name = torrents[0].getName();
-    } else {
-      name = `${torrents.length} Transfers Selected`;
-    }
-    Utils.setTextContent(elements.name_lb, name || 'Not Applicable');
-
-    // update the visible page
-    switch (this.selectedPage) {
-      case elements.files_page:
-        this._updateFilesPage();
-        break;
-      case elements.peers_page:
-        this._updatePeersPage();
-        break;
-      case elements.trackers_page:
-        this._updateTrackersPage();
-        break;
-      default:
-        this._updateInfoPage();
-        break;
-    }
-  }
-
-  static _peerStatus(flagStr) {
-    const formattedFlags = [];
-    for (const flag of flagStr) {
-      let explanation = null;
-      switch (flag) {
-        case 'O':
-          explanation = 'Optimistic unchoke';
-          break;
-        case 'D':
-          explanation = 'Downloading from this peer';
-          break;
-        case 'd':
-          explanation = "We would download from this peer if they'd let us";
-          break;
-        case 'U':
-          explanation = 'Uploading to peer';
-          break;
-        case 'u':
-          explanation = "We would upload to this peer if they'd ask";
-          break;
-        case 'K':
-          explanation = "Peer has unchoked us, but we're not interested";
-          break;
-        case '?':
-          explanation = "We unchoked this peer, but they're not interested";
-          break;
-        case 'E':
-          explanation = 'Encrypted Connection';
-          break;
-        case 'H':
-          explanation =
-            'Peer was discovered through Distributed Hash Table (DHT)';
-          break;
-        case 'X':
-          explanation = 'Peer was discovered through Peer Exchange (PEX)';
-          break;
-        case 'I':
-          explanation = 'Peer is an incoming connection';
-          break;
-        case 'T':
-          explanation = 'Peer is connected via uTP';
-          break;
-        default:
-          explanation = null;
-          break;
-      }
-
-      if (!explanation) {
-        formattedFlags.push(flag);
-      } else {
-        formattedFlags.push(
-          `<span title="${flag}: ${explanation}">${flag}</span>`
-        );
-      }
-    }
-
-    return formattedFlags.join('');
-  }
-
-  _setTorrents(torrents) {
-    // update the inspector when a selected torrent's data changes.
-    const key = 'dataChanged';
-    const cb = this.data.onTorrentChanged;
-    this.data.torrents.forEach((t) => t.removeEventListener(key, cb));
-    this.data.torrents = [...torrents];
-    this.data.torrents.forEach((t) => t.addEventListener(key, cb));
-
-    // periodically ping the server for updates to these torrents
-    if (this.data.interval) {
-      clearInterval(this.data.interval);
-      delete this.data.interval;
-    }
-    if (this.data.torrents.length) {
-      this.data.interval = setInterval(this._refreshTorrents.bind(this), 2000);
-      this._refreshTorrents();
-    }
-
-    this._updateInspector();
   }
 }

@@ -1,12 +1,18 @@
-/**
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
 import { Formatter } from './formatter.js';
-import { Utils, setEnabled } from './utils.js';
+import {
+  Utils,
+  createTabsContainer,
+  OutsideClickListener,
+  makeUUID,
+  setEnabled,
+} from './utils.js';
 
 export class PrefsDialog extends EventTarget {
   static _initTimeDropDown(e) {
@@ -19,29 +25,42 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
-  static _onPortChecked(response) {
-    const is_open = response['arguments']['port-is-open'];
-    const text = `Port is <b>${is_open ? 'Open' : 'Closed'}</b>`;
-    const e = document.getElementById('port-label');
-    Utils.setInnerHTML(e, text);
-  }
-
-  _setGroupEnabled(parent_key, enabled) {
-    if (parent_key in this.data.groups) {
-      for (const key of this.data.groups[parent_key]) {
-        setEnabled(document.getElementById(key), enabled);
-      }
+  static _initDayDropDown(e) {
+    const options = [
+      ['Everyday', '127'],
+      ['Weekdays', '62'],
+      ['Weekends', '65'],
+      ['Sunday', '1'],
+      ['Monday', '2'],
+      ['Tuesday', '4'],
+      ['Wednesday', '8'],
+      ['Thursday', '16'],
+      ['Friday', '32'],
+      ['Saturday', '64'],
+    ];
+    for (let i = 0; options[i]; ++i) {
+      const [text, value] = options[i];
+      e.options[i] = new Option(text, value);
     }
   }
 
+  _onPortChecked(response) {
+    console.log(response);
+    const e = this.elements.network.port_status_label;
+    const is_open = response.arguments['port-is-open'];
+    const text = is_open ? 'Open' : 'Closed';
+    e.dataset.open = is_open;
+    Utils.setInnerHTML(e, text);
+  }
+
   _setBlocklistButtonEnabled(b) {
-    const e = this.data.elements.blocklist_button;
+    const e = this.elements.peers.blocklist_update_button;
     setEnabled(e, b);
     e.value = b ? 'Update' : 'Updating...';
   }
 
   _onBlocklistUpdateClicked() {
-    this.data.remote.updateBlocklist();
+    this.remote.updateBlocklist();
     this._setBlocklistButtonEnabled(false);
   }
 
@@ -51,12 +70,9 @@ export class PrefsDialog extends EventTarget {
       case 'radio':
         return e.checked;
 
-      case 'text':
-      case 'url':
-      case 'email':
       case 'number':
-      case 'search':
-      case 'select-one': {
+      case 'text':
+      case 'url': {
         const str = e.value;
         if (parseInt(str, 10).toString() === str) {
           return parseInt(str, 10);
@@ -72,93 +88,61 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
-  /* this callback is for controls whose changes can be applied
-       immediately, like checkboxs, radioboxes, and selects */
+  // this callback is for controls whose changes can be applied
+  // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(ev) {
+    console.log(ev);
     const o = {};
-    o[ev.target.id] = PrefsDialog._getValue(ev.target);
-    this.data.remote.savePrefs(o);
+    o[ev.target.dataset.key] = PrefsDialog._getValue(ev.target);
+    console.log(o);
+    this.remote.savePrefs(o);
   }
-
-  /* these two callbacks are for controls whose changes can't be applied
-       immediately -- like a text entry field -- because it takes many
-       change events for the user to get to the desired result */
-  _onControlFocused(ev) {
-    this.data.oldValue = PrefsDialog._getValue(ev.target);
-  }
-
-  _onControlBlurred(ev) {
-    const newValue = PrefsDialog._getValue(ev.target);
-    if (newValue !== this.data.oldValue) {
-      const o = {};
-      o[ev.target.id] = newValue;
-      this.data.remote.savePrefs(o);
-      delete this.data.oldValue;
-    }
-  }
-
-  /*
-  getValues() {
-    return Object.fromEntries(
-      this.data.keys
-        .map((key) => [key, PrefsDialog.getValue(document.getElementById(key))])
-        .filter(([, val]) => val)
-    );
-  }
-   */
 
   _onDialogClosed() {
     this.dispatchEvent(new Event('closed'));
   }
 
-  /// PUBLIC FUNCTIONS
-
   // update the dialog's controls
-  set(o) {
+  _update(o) {
+    if (!o) {
+      return;
+    }
+
     this._setBlocklistButtonEnabled(true);
 
-    for (const key of this.data.keys) {
-      const val = o[key];
-      const e = document.getElementById(key);
-
-      if (key === 'blocklist-size') {
-        // special case -- regular text area
-        e.textContent = Formatter.toStringWithCommas(val);
-      } else {
-        switch (e.type) {
-          case 'checkbox':
-          case 'radio':
-            e.checked = val;
-            this._setGroupEnabled(key, val);
-            break;
-          case 'text':
-          case 'url':
-          case 'email':
-          case 'number':
-          case 'search':
-            // don't change the text if the user's editing it.
-            // it's very annoying when that happens!
-            if (e !== document.activeElement) {
-              e.value = val;
-            }
-            break;
-          case 'select-one':
-            e.value = val;
-            break;
-          default:
-            break;
+    for (const [key, value] of Object.entries(o)) {
+      for (const el of this.elements.root.querySelectorAll(
+        `[data-key="${key}"]`
+      )) {
+        if (key === 'blocklist-size') {
+          // special case -- regular text area
+          el.textContent = Formatter.toStringWithCommas(value);
+        } else {
+          // console.log({ key, type: el.type });
+          switch (el.type) {
+            case 'checkbox':
+            case 'radio':
+              el.checked = value;
+              break;
+            case 'text':
+            case 'url':
+            case 'email':
+            case 'number':
+            case 'search':
+              // don't change the text if the user's editing it.
+              // it's very annoying when that happens!
+              if (el !== document.activeElement) {
+                el.value = value;
+              }
+              break;
+            case 'select-one':
+              el.value = value;
+              break;
+            default:
+              break;
+          }
         }
       }
-    }
-  }
-
-  setVisible(visible) {
-    if (visible) {
-      this._setBlocklistButtonEnabled(true);
-      this.data.remote.checkPort(PrefsDialog._onPortChecked);
-      this.data.elements.root.dialog('open');
-    } else {
-      this.data.elements.root.dialog('close');
     }
   }
 
@@ -166,67 +150,536 @@ export class PrefsDialog extends EventTarget {
     return this.data.elements.root.find('#start-added-torrents')[0].checked;
   }
 
-  constructor(remote) {
-    super();
+  static _createCheckAndLabel(id, text) {
+    const root = document.createElement('div');
+    root.id = id;
 
-    this.data = {
-      dialog: this,
-      elements: {
-        root: document.getElementById('prefs-dialog'),
-      },
-      // map of keys that are enabled only if a 'parent' key is enabled
-      groups: {
-        'alt-speed-time-enabled': [
-          'alt-speed-time-begin',
-          'alt-speed-time-day',
-          'alt-speed-time-end',
-        ],
-        'blocklist-enabled': ['blocklist-url', 'blocklist-update-button'],
-        'idle-seeding-limit-enabled': ['idle-seeding-limit'],
-        seedRatioLimited: ['seedRatioLimit'],
-        'speed-limit-down-enabled': ['speed-limit-down'],
-        'speed-limit-up-enabled': ['speed-limit-up'],
-      },
-      // all the RPC session keys that we have gui controls for
-      keys: [
-        'alt-speed-down',
-        'alt-speed-time-begin',
-        'alt-speed-time-day',
-        'alt-speed-time-enabled',
-        'alt-speed-time-end',
-        'alt-speed-up',
-        'blocklist-enabled',
-        'blocklist-size',
-        'blocklist-url',
-        'dht-enabled',
-        'download-dir',
-        'encryption',
-        'idle-seeding-limit',
-        'idle-seeding-limit-enabled',
-        'lpd-enabled',
-        'peer-limit-global',
-        'peer-limit-per-torrent',
-        'peer-port',
-        'peer-port-random-on-start',
-        'pex-enabled',
-        'port-forwarding-enabled',
-        'rename-partial-files',
-        'seedRatioLimit',
-        'seedRatioLimited',
-        'speed-limit-down',
-        'speed-limit-down-enabled',
-        'speed-limit-up',
-        'speed-limit-up-enabled',
-        'start-added-torrents',
-        'utp-enabled',
-      ],
-      remote,
+    const check = document.createElement('input');
+    check.id = makeUUID();
+    check.type = 'checkbox';
+    root.appendChild(check);
+
+    const label = document.createElement('label');
+    label.textContent = text;
+    label.setAttribute('for', check.id);
+    root.appendChild(label);
+
+    return { check, label, root };
+  }
+
+  static _enableIfChecked(el, check) {
+    const cb = () => setEnabled(el, check.checked);
+    check.addEventListener('change', cb);
+    cb();
+  }
+
+  static _createTorrentsPage() {
+    const root = document.createElement('div');
+    root.classList.add('prefs-torrents-page');
+
+    let label = document.createElement('div');
+    label.textContent = 'Downloading';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    label = document.createElement('label');
+    label.textContent = 'Download to:';
+    root.appendChild(label);
+
+    let input = document.createElement('input');
+    input.type = 'text';
+    input.id = makeUUID();
+    input.setAttribute('data-key', 'download-dir');
+    label.setAttribute('for', input.id);
+    root.appendChild(input);
+    const download_dir = input;
+
+    let cal = PrefsDialog._createCheckAndLabel(
+      'autostart-div',
+      'Start when added'
+    );
+    cal.check.setAttribute('data-key', 'start-added-torrents');
+    root.appendChild(cal.root);
+    const autostart_check = cal.check;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'suffix-div',
+      `Append "part" to incomplete files' names`
+    );
+    cal.check.setAttribute('data-key', 'rename-partial-files');
+    root.appendChild(cal.root);
+    const suffix_check = cal.check;
+
+    label = document.createElement('div');
+    label.textContent = 'Seeding';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'stop-ratio-div',
+      'Stop seeding at ratio:'
+    );
+    cal.check.setAttribute('data-key', 'seedRatioLimited');
+    root.appendChild(cal.root);
+    const stop_ratio_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.setAttribute('data-key', 'seedRatioLimit');
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const stop_ratio_input = input;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'stop-idle-div',
+      'Stop seeding if idle for N mins:'
+    );
+    cal.check.setAttribute('data-key', 'idle-seeding-limit-enabled');
+    root.appendChild(cal.root);
+    const stop_idle_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.setAttribute('data-key', 'idle-seeding-limit');
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const stop_idle_input = input;
+
+    return {
+      autostart_check,
+      download_dir,
+      root,
+      stop_idle_check,
+      stop_idle_input,
+      stop_ratio_check,
+      stop_ratio_input,
+      suffix_check,
+    };
+  }
+
+  static _createSpeedPage() {
+    const root = document.createElement('div');
+    root.classList.add('prefs-speed-page');
+
+    let label = document.createElement('div');
+    label.textContent = 'Speed Limits';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    let cal = PrefsDialog._createCheckAndLabel(
+      'upload-speed-div',
+      'Upload (kB/s):'
+    );
+    cal.check.dataset.key = 'speed-limit-up-enabled';
+    root.appendChild(cal.root);
+    const upload_speed_check = cal.check;
+
+    let input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'speed-limit-up';
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const upload_speed_input = input;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'download-speed-div',
+      'Download (kB/s):'
+    );
+    cal.check.dataset.key = 'speed-limit-down-enabled';
+    root.appendChild(cal.root);
+    const download_speed_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'speed-limit-down';
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const download_speed_input = input;
+
+    label = document.createElement('div');
+    label.textContent = 'Alternative Speed Limits';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    label = document.createElement('div');
+    label.textContent =
+      'Override normal speed limits manually or at scheduled times';
+    label.classList.add('alt-speed-label');
+    root.appendChild(label);
+
+    label = document.createElement('label');
+    label.textContent = 'Upload (kB/s):';
+    root.appendChild(label);
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'alt-speed-up';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
+    root.appendChild(input);
+    const alt_upload_speed_input = input;
+
+    label = document.createElement('label');
+    label.textContent = 'Download (kB/s):';
+    root.appendChild(label);
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'alt-speed-down';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
+    root.appendChild(input);
+    const alt_download_speed_input = input;
+
+    cal = PrefsDialog._createCheckAndLabel('alt-times-div', 'Scheduled times');
+    cal.check.dataset.key = 'alt-speed-time-enabled';
+    root.appendChild(cal.root);
+    const alt_times_check = cal.check;
+
+    label = document.createElement('label');
+    label.textContent = 'From:';
+    PrefsDialog._enableIfChecked(label, cal.check);
+    root.appendChild(label);
+
+    let select = document.createElement('select');
+    select.id = makeUUID();
+    select.dataset.key = 'alt-speed-time-begin';
+    PrefsDialog._initTimeDropDown(select);
+    label.setAttribute('for', select.id);
+    root.appendChild(select);
+    PrefsDialog._enableIfChecked(select, cal.check);
+    const alt_from_select = select;
+
+    label = document.createElement('label');
+    label.textContent = 'To:';
+    PrefsDialog._enableIfChecked(label, cal.check);
+    root.appendChild(label);
+
+    select = document.createElement('select');
+    select.id = makeUUID();
+    select.dataset.key = 'alt-speed-time-end';
+    PrefsDialog._initTimeDropDown(select);
+    label.setAttribute('for', select.id);
+    root.appendChild(select);
+    PrefsDialog._enableIfChecked(select, cal.check);
+    const alt_to_select = select;
+
+    label = document.createElement('label');
+    label.textContent = 'On days:';
+    PrefsDialog._enableIfChecked(label, cal.check);
+    root.appendChild(label);
+
+    select = document.createElement('select');
+    select.id = makeUUID();
+    select.dataset.key = 'alt-speed-time-day';
+    PrefsDialog._initDayDropDown(select);
+    label.setAttribute('for', select.id);
+    root.appendChild(select);
+    PrefsDialog._enableIfChecked(select, cal.check);
+    const alt_days_select = select;
+
+    return {
+      alt_days_select,
+      alt_download_speed_input,
+      alt_from_select,
+      alt_times_check,
+      alt_to_select,
+      alt_upload_speed_input,
+      download_speed_check,
+      download_speed_input,
+      root,
+      upload_speed_check,
+      upload_speed_input,
+    };
+  }
+
+  static _createPeersPage() {
+    const root = document.createElement('div');
+    root.classList.add('prefs-peers-page');
+
+    let label = document.createElement('div');
+    label.textContent = 'Connections';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    let cal = PrefsDialog._createCheckAndLabel(
+      'max-peers-per-torrent-div',
+      'Max peers per torrent:'
+    );
+    root.appendChild(cal.root);
+    const max_peers_per_torrent_check = cal.check;
+
+    let input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'peer-limit-per-torrent';
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const max_peers_per_torrent_input = input;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'max-peers-overall-div',
+      'Max peers overall:'
+    );
+    root.appendChild(cal.root);
+    const max_peers_overall_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'peer-limit-global';
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const max_peers_overall_input = input;
+
+    label = document.createElement('div');
+    label.textContent = 'Options';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    label = document.createElement('label');
+    label.textContent = 'Encryption mode:';
+    root.appendChild(label);
+
+    const select = document.createElement('select');
+    select.id = makeUUID();
+    select.dataset.key = 'encryption';
+    select.options[0] = new Option('Prefer encryption', 'preferred');
+    select.options[1] = new Option('Allow encryption', 'tolerated');
+    select.options[2] = new Option('Require encryption', 'required');
+    root.appendChild(select);
+    const encryption_select = select;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'use-pex-div',
+      'Use PEX to find more peers'
+    );
+    cal.check.title =
+      "PEX is a tool for exchanging peer lists with the peers you're connected to.";
+    cal.check.dataset.key = 'pex-enabled';
+    cal.label.title = cal.check.title;
+    root.appendChild(cal.root);
+    const pex_check = cal.check;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'use-dht-div',
+      'Use DHT to find more peers'
+    );
+    cal.check.title = 'DHT is a tool for finding peers without a tracker.';
+    cal.check.dataset.key = 'dht-enabled';
+    cal.label.title = cal.check.title;
+    root.appendChild(cal.root);
+    const dht_check = cal.check;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'use-lpd-div',
+      'Use LPD to find more peers'
+    );
+    cal.check.title = 'LPD is a tool for finding peers on your local network.';
+    cal.check.dataset.key = 'lpd-enabled';
+    cal.label.title = cal.check.title;
+    root.appendChild(cal.root);
+    const lpd_check = cal.check;
+
+    label = document.createElement('div');
+    label.textContent = 'Blocklist';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'blocklist-enabled-div',
+      'Enable blocklist:'
+    );
+    cal.check.dataset.key = 'blocklist-enabled';
+    root.appendChild(cal.root);
+    const blocklist_enabled_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'url';
+    input.value = 'http://www.example.com/blocklist';
+    input.dataset.key = 'blocklist-url';
+    root.appendChild(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const blocklist_url_input = input;
+
+    label = document.createElement('label');
+    label.textContent = 'Blocklist has {n} rules';
+    label.dataset.key = 'blocklist-size';
+    label.classList.add('blocklist-size-label');
+    PrefsDialog._enableIfChecked(label, cal.check);
+    root.appendChild(label);
+
+    const button = document.createElement('button');
+    button.value = 'Update';
+    root.appendChild(button);
+    PrefsDialog._enableIfChecked(button, cal.check);
+    const blocklist_update_button = button;
+
+    return {
+      blocklist_enabled_check,
+      blocklist_update_button,
+      blocklist_url_input,
+      dht_check,
+      encryption_select,
+      lpd_check,
+      max_peers_overall_check,
+      max_peers_overall_input,
+      max_peers_per_torrent_check,
+      max_peers_per_torrent_input,
+      pex_check,
+      root,
+    };
+  }
+
+  static _createNetworkPage() {
+    const root = document.createElement('div');
+    root.classList.add('prefs-network-page');
+
+    let label = document.createElement('div');
+    label.textContent = 'Listening Port';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    label = document.createElement('label');
+    label.textContent = 'Peer listening port:';
+    root.appendChild(label);
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'peer-port';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
+    root.appendChild(input);
+    const port_input = input;
+
+    const port_status_div = document.createElement('div');
+    port_status_div.classList.add('port-status');
+    label = document.createElement('label');
+    label.textContent = 'Port is';
+    port_status_div.appendChild(label);
+    const port_status_label = document.createElement('label');
+    port_status_label.textContent = 'TBD'; // TODO
+    port_status_label.classList.add('port-status-label');
+    port_status_div.appendChild(port_status_label);
+    root.appendChild(port_status_div);
+
+    let cal = PrefsDialog._createCheckAndLabel(
+      'randomize-port',
+      'Randomize port on launch'
+    );
+    cal.check.dataset.key = 'peer-port-random-on-start';
+    root.appendChild(cal.root);
+    const random_port_check = cal.check;
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'port-forwarding',
+      'Use port forwarding from my router'
+    );
+    cal.check.dataset.key = 'port-forwarding-enabled';
+    root.appendChild(cal.root);
+    const port_forwarding_check = cal.check;
+
+    label = document.createElement('div');
+    label.textContent = 'Options';
+    label.classList.add('section-label');
+    root.appendChild(label);
+
+    cal = PrefsDialog._createCheckAndLabel(
+      'utp-enabled',
+      'Enable uTP for peer communication'
+    );
+    cal.check.dataset.key = 'utp-enabled';
+    root.appendChild(cal.root);
+    const utp_check = cal.check;
+
+    return {
+      port_forwarding_check,
+      port_input,
+      port_status_label,
+      random_port_check,
+      root,
+      utp_check,
+    };
+  }
+
+  _create() {
+    const pages = {
+      network: PrefsDialog._createNetworkPage(),
+      peers: PrefsDialog._createPeersPage(),
+      speed: PrefsDialog._createSpeedPage(),
+      torrents: PrefsDialog._createTorrentsPage(),
     };
 
-    for (const id of ['alt-speed-time-begin', 'alt-speed-time-end']) {
-      PrefsDialog._initTimeDropDown(document.getElementById(id));
-    }
+    const on_activated = (/*page*/) => {
+      // this.current_page = page;
+      // this._updateCurrentPage();
+    };
 
+    const elements = createTabsContainer(
+      'prefs-dialog',
+      [
+        ['prefs-tab-torrent', pages.torrents.root],
+        ['prefs-tab-speed', pages.speed.root],
+        ['prefs-tab-peers', pages.peers.root],
+        ['prefs-tab-network', pages.network.root],
+      ],
+      on_activated.bind(this)
+    );
+
+    return { ...elements, ...pages };
+  }
+
+  constructor(session_manager, remote) {
+    super();
+
+    this.closed = false;
+    this.session_manager = session_manager;
+    this.remote = remote;
+    this.update_soon = Utils.debounce(() => {
+      if (this.session_manager) {
+        this._update(this.session_manager.session_properties);
+      }
+    });
+
+    this.elements = this._create();
+    this.outside = new OutsideClickListener(this.elements.root);
+    this.outside.addEventListener('click', () => this.close());
+    this.remote.checkPort(this._onPortChecked, this);
+
+    Object.seal(this);
+
+    // listen for user input
+    const on_change = this._onControlChanged.bind(this);
+    const walk = (o) => {
+      for (const el of Object.values(o)) {
+        if (el.tagName === 'INPUT') {
+          switch (el.type) {
+            case 'checkbox':
+            case 'radio':
+            case 'number':
+            case 'text':
+            case 'url':
+              el.addEventListener('change', on_change);
+              break;
+            default:
+              console.trace(`unhandled input: ${el.type}`);
+              break;
+          }
+        }
+      }
+    };
+    walk(this.elements.network);
+    walk(this.elements.peers);
+    walk(this.elements.speed);
+    walk(this.elements.torrents);
+
+    this.session_manager.addEventListener('session-change', this.update_soon);
+    this.update_soon();
+
+    // controller.addEventListener('torrent-selection-changed', this.selection_listener);
+    // this._setTorrents(this.controller.getSelectedTorrents());
+
+    // document.body.appendChild(this.elements.root);
+
+    /*
     const o = {};
     o.autoOpen = false;
     o.show = o.hide = false;
@@ -236,39 +689,25 @@ export class PrefsDialog extends EventTarget {
     const e = document.getElementById('blocklist-update-button');
     e.addEventListener('click', () => this._onBlocklistUpdateClicked());
     this.data.elements.blocklist_button = e;
-
-    // listen for user input
-    const on_change = this._onControlChanged.bind(this);
-    const on_focus = this._onControlFocused.bind(this);
-    const on_blur = this._onControlBlurred.bind(this);
-    for (const el of this.data.keys.map((id) => document.getElementById(id))) {
-      switch (el.type) {
-        case 'checkbox':
-        case 'radio':
-        case 'select-one':
-          el.addEventListener('change', on_change);
-          break;
-
-        case 'email':
-        case 'number':
-        case 'search':
-        case 'text':
-        case 'url':
-          el.addEventListener('focus', on_focus);
-          el.addEventListener('blur', on_blur);
-          break;
-
-        default:
-          break;
-      }
-    }
+*/
 
     // show it
-    this.data.elements.root.classList.remove('hidden');
+    document.body.appendChild(this.elements.root);
   }
 
   close() {
-    this.data.elements.root.classList.add('hidden');
-    this.dispatchEvent(new Event('close'));
+    if (!this.closed) {
+      this.outside.stop();
+      this.session_manager.removeEventListener(
+        'session-change',
+        this.update_soon
+      );
+      this.elements.root.remove();
+      dispatchEvent(new Event('close'));
+      for (const key of Object.keys(this)) {
+        this[key] = null;
+      }
+      this.closed = true;
+    }
   }
 }

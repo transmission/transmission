@@ -48,12 +48,12 @@ export class Transmission extends EventTarget {
     this.dirtyTorrents = new Set();
     this.uriCache = {};
 
-    this.refilterSoon = Utils.debounce(() => this.refilter(false), 100);
-    this.refilterAllSoon = Utils.debounce(() => this.refilter(true), 100);
+    this.refilterSoon = Utils.debounce(() => this._refilter(false));
+    this.refilterAllSoon = Utils.debounce(() => this._refilter(true));
 
     this.boundPopupCloseListener = this.popupCloseListener.bind(this);
     this.dispatchSelectionChangedSoon = Utils.debounce(
-      () => this.dispatchSelectionChanged(),
+      () => this._dispatchSelectionChanged(),
       200
     );
 
@@ -93,54 +93,55 @@ export class Transmission extends EventTarget {
     this.action_manager.addEventListener('click', (ev) => {
       switch (ev.action) {
         case 'deselect-all':
-          this.deselectAll();
+          this._deselectAll();
           break;
         case 'move-bottom':
-          this.moveBottom();
+          this._moveBottom();
           break;
         case 'move-down':
-          this.moveDown();
+          this._moveDown();
           break;
         case 'move-top':
-          this.moveTop();
+          this._moveTop();
           break;
         case 'move-up':
-          this.moveUp();
+          this._moveUp();
           break;
         case 'open-torrent':
           this.setCurrentPopup(new OpenDialog(this, this.remote));
           break;
         case 'pause-all-torrents':
-          this.stopTorrents(this.getAllTorrents());
+          this._stopTorrents(this._getAllTorrents());
           break;
         case 'pause-selected-torrents':
-          this.stopTorrents(this.getSelectedTorrents());
+          this._stopTorrents(this.getSelectedTorrents());
           break;
         case 'reannounce-selected-torrents':
-          this.reannounceTorrents(this.getSelectedTorrents());
+          this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this.removeSelectedTorrents(false);
+          this._removeSelectedTorrents(false);
           break;
         case 'resume-selected-torrents':
-          this.startSelectedTorrents(false);
+          this._startSelectedTorrents(false);
           break;
         case 'resume-selected-torrents-now':
-          this.startSelectedTorrents(true);
+          this._startSelectedTorrents(true);
           break;
         case 'select-all':
-          this.selectAll();
+          this._selectAll();
           break;
         case 'show-about-dialog':
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
+        case 'show-inspector':
+          this.setCurrentPopup(new Inspector(this));
+          break;
         case 'show-move-dialog':
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
-        case 'toggle-overflow-menu':
-          if (this.popup && this.popup.name === 'overflow-menu') {
-            this.setCurrentPopup(null);
-          } else {
+        case 'show-overflow-menu':
+          {
             this.setCurrentPopup(
               new OverflowMenu(
                 this,
@@ -161,7 +162,7 @@ export class Transmission extends EventTarget {
           }
           break;
         case 'show-preferences-dialog':
-          this.setCurrentPopup(new PrefsDialog(this));
+          this.setCurrentPopup(new PrefsDialog(this, this.remote));
           break;
         case 'show-shortcuts-dialog':
           this.setCurrentPopup(new ShortcutsDialog(this.action_manager));
@@ -173,7 +174,7 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new RenameDialog(this, this.remote));
           break;
         case 'start-all-torrents':
-          this.startTorrents(this.getAllTorrents());
+          this._startTorrents(this._getAllTorrents());
           break;
         case 'toggle-compact-rows':
           this.prefs.display_mode =
@@ -181,18 +182,11 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayCompact
               : Prefs.DisplayFull;
           break;
-        case 'toggle-inspector':
-          if (!this.popup || this.popup.name !== 'inspector') {
-            this.setCurrentPopup(new Inspector(this));
-          } else {
-            this.setCurrentPopup(null);
-          }
-          break;
         case 'trash-selected-torrents':
-          this.removeSelectedTorrents(true);
+          this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
-          this.verifyTorrents(this.getSelectedTorrents());
+          this._verifyTorrents(this.getSelectedTorrents());
           break;
         default:
           console.warn(`unhandled action: ${ev.action}`);
@@ -207,20 +201,21 @@ export class Transmission extends EventTarget {
     });
 
     //if (!isMobileDevice) {
-    document.addEventListener('keydown', this.keyDown.bind(this));
-    document.addEventListener('keyup', this.keyUp.bind(this));
+    document.addEventListener('keydown', this._keyDown.bind(this));
+    document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.getElementById('torrent-container');
     e.addEventListener('click', () => {
+      // FIXME: :thinking:
       if (this.popup && this.popup.name !== 'inspector') {
         this.setCurrentPopup(null);
       } else {
-        this.deselectAll();
+        this._deselectAll();
       }
     });
-    e.addEventListener('dragenter', Transmission.dragenter);
-    e.addEventListener('dragover', Transmission.dragenter);
-    e.addEventListener('drop', this.drop.bind(this));
-    this.setupSearchBox();
+    e.addEventListener('dragenter', Transmission._dragenter);
+    e.addEventListener('dragover', Transmission._dragenter);
+    e.addEventListener('drop', this._drop.bind(this));
+    this._setupSearchBox();
     //}
 
     this.elements = {
@@ -235,7 +230,7 @@ export class Transmission extends EventTarget {
       }
       const row = this._rows.find((r) => r.getElement() === row_element);
       if (row && !row.isSelected()) {
-        this.setSelectedRow(row);
+        this._setSelectedRow(row);
       }
 
       const popup = new ContextMenu(this.action_manager);
@@ -251,18 +246,18 @@ export class Transmission extends EventTarget {
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
-    this.initializeTorrents();
+    this._initializeTorrents();
     this.refreshTorrents();
     this.togglePeriodicSessionRefresh(true);
 
     // this.updateButtonsSoon();
 
     this.prefs.addEventListener('change', ({ key, value }) =>
-      this.onPrefChanged(key, value)
+      this._onPrefChanged(key, value)
     );
     this.prefs
       .entries()
-      .forEach(([key, value]) => this.onPrefChanged(key, value));
+      .forEach(([key, value]) => this._onPrefChanged(key, value));
   }
 
   loadDaemonPrefs() {
@@ -282,47 +277,33 @@ export class Transmission extends EventTarget {
       this.dispatchEvent(event);
 
       // TODO: maybe have this in a listener handler?
-      this.updateGuiFromSession(o);
+      this._updateGuiFromSession(o);
     }
   }
 
-  setupSearchBox() {
+  _setupSearchBox() {
     const e = document.getElementById('torrent-search');
     const blur_token = 'blur';
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this.setFilterText(e.value));
+    e.addEventListener('keyup', () => this._setFilterText(e.value));
   }
 
-  static selectRadioGroupItem(group_name, item_name) {
-    for (const e of document.querySelectorAll(
-      `[data-radio-group="${group_name}"]`
-    )) {
-      e.classList.toggle(
-        'selected',
-        e.getAttribute('data-radio-value') === item_name
-      );
-    }
-  }
-
-  onPrefChanged(key, value) {
+  _onPrefChanged(key, value) {
     switch (key) {
       case Prefs.DisplayMode: {
         this.torrentRenderer =
           value === 'compact'
             ? new TorrentRendererCompact()
             : new TorrentRendererFull();
-      }
-      // falls through
-
-      case Prefs.SortMode:
-      case Prefs.SortDirection:
-        Transmission.selectRadioGroupItem(key, value);
         this.refilterAllSoon();
         break;
+      }
 
       case Prefs.FilterMode:
+      case Prefs.SortDirection:
+      case Prefs.SortMode:
         this.refilterAllSoon();
         break;
 
@@ -342,33 +323,16 @@ export class Transmission extends EventTarget {
     }
   }
 
-  ///
-
-  updateFreeSpaceInAddDialog() {
-    const formdir = document.getElementById('add-dialog-folder-input').value;
-    this.remote.getFreeSpace(formdir, Transmission.onFreeSpaceResponse, this);
-  }
-
-  static onFreeSpaceResponse(dir, bytes) {
-    const formdir = document.getElementById('add-dialog-folder-input').value;
-    if (formdir === dir) {
-      const e = document.getElementById('add-dialog-folder-label');
-      const str = bytes > 0 ? `  <i>(${Formatter.size(bytes)} Free)</i>` : '';
-      e.innerHTML = `Destination folder${str}:`;
-    }
-  }
-
   /// UTILITIES
 
-  getAllTorrents() {
+  _getAllTorrents() {
     return Object.values(this._torrents);
   }
 
-  static getTorrentIds(torrents) {
+  static _getTorrentIds(torrents) {
     return torrents.map((t) => t.getId());
   }
 
-  // TODO: is this still needed?
   seedRatioLimit() {
     const p = this.session_properties;
     if (p && p.seedRatioLimited) {
@@ -379,19 +343,19 @@ export class Transmission extends EventTarget {
 
   /// SELECTION
 
-  getSelectedRows() {
+  _getSelectedRows() {
     return this._rows.filter((r) => r.isSelected());
   }
 
   getSelectedTorrents() {
-    return this.getSelectedRows().map((r) => r.getTorrent());
+    return this._getSelectedRows().map((r) => r.getTorrent());
   }
 
-  getSelectedTorrentIds() {
-    return Transmission.getTorrentIds(this.getSelectedTorrents());
+  _getSelectedTorrentIds() {
+    return Transmission._getTorrentIds(this.getSelectedTorrents());
   }
 
-  setSelectedRow(row) {
+  _setSelectedRow(row) {
     const e_sel = row ? row.getElement() : null;
     for (const e of this.elements.torrent_list.children) {
       e.classList.toggle('selected', e === e_sel);
@@ -399,24 +363,24 @@ export class Transmission extends EventTarget {
     this.dispatchSelectionChangedSoon();
   }
 
-  selectRow(row) {
+  _selectRow(row) {
     row.getElement().classList.add('selected');
     this.dispatchSelectionChangedSoon();
   }
 
-  deselectRow(row) {
+  _deselectRow(row) {
     row.getElement().classList.remove('selected');
     this.dispatchSelectionChangedSoon();
   }
 
-  selectAll() {
+  _selectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.add('selected');
     }
     this.dispatchSelectionChangedSoon();
   }
 
-  deselectAll() {
+  _deselectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.remove('selected');
     }
@@ -424,32 +388,32 @@ export class Transmission extends EventTarget {
     delete this._last_torrent_clicked;
   }
 
-  indexOfLastTorrent() {
+  _indexOfLastTorrent() {
     return this._rows.findIndex(
       (row) => row.getTorrentId() === this._last_torrent_clicked
     );
   }
 
   // Select a range from this row to the last clicked torrent
-  selectRange(row) {
-    const last = this.indexOfLastTorrent();
+  _selectRange(row) {
+    const last = this._indexOfLastTorrent();
 
     if (last === -1) {
-      this.selectRow(row);
+      this._selectRow(row);
     } else {
       // select the range between the prevous & current
       const next = this._rows.indexOf(row);
       const min = Math.min(last, next);
       const max = Math.max(last, next);
       for (let i = min; i <= max; ++i) {
-        this.selectRow(this._rows[i]);
+        this._selectRow(this._rows[i]);
       }
     }
 
     this.dispatchSelectionChangedSoon();
   }
 
-  dispatchSelectionChanged() {
+  _dispatchSelectionChanged() {
     const nonselected = [];
     const selected = [];
     this._rows.forEach((r) =>
@@ -468,7 +432,7 @@ export class Transmission extends EventTarget {
    *
    *--------------------------------------------*/
 
-  static createKeyShortcutFromKeyboardEvent(ev) {
+  static _createKeyShortcutFromKeyboardEvent(ev) {
     const a = [];
     if (ev.ctrlKey) {
       a.push('Control');
@@ -487,11 +451,11 @@ export class Transmission extends EventTarget {
   }
 
   // Process key events
-  keyDown(ev) {
+  _keyDown(ev) {
     const { keyCode } = ev;
 
     // look for a shortcut
-    const aria_keys = Transmission.createKeyShortcutFromKeyboardEvent(ev);
+    const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(ev);
     const action = this.action_manager.getActionForShortcut(aria_keys);
     if (action) {
       ev.preventDefault();
@@ -519,7 +483,7 @@ export class Transmission extends EventTarget {
       const up_key = keyCode === 38; // up key pressed
       const dn_key = keyCode === 40; // down key pressed
       if ((up_key || dn_key) && rows.length) {
-        const last = this.indexOfLastTorrent();
+        const last = this._indexOfLastTorrent();
         const anchor = this._shift_index;
         const min = 0;
         const max = rows.length - 1;
@@ -537,18 +501,18 @@ export class Transmission extends EventTarget {
           // user is extending the selection
           // with the shift + arrow keys...
           if ((anchor <= last && last < i) || (anchor >= last && last > i)) {
-            this.selectRow(r);
+            this._selectRow(r);
           } else if (
             (anchor >= last && i > last) ||
             (anchor <= last && last > i)
           ) {
-            this.deselectRow(rows[last]);
+            this._deselectRow(rows[last]);
           }
         } else {
           if (ev.shiftKey) {
-            this.selectRange(r);
+            this._selectRange(r);
           } else {
-            this.setSelectedRow(r);
+            this._setSelectedRow(r);
           }
         }
         if (r) {
@@ -557,19 +521,19 @@ export class Transmission extends EventTarget {
           ev.preventDefault();
         }
       } else if (shift_key) {
-        this._shift_index = this.indexOfLastTorrent();
+        this._shift_index = this._indexOfLastTorrent();
       }
     }
   }
 
-  keyUp(ev) {
+  _keyUp(ev) {
     if (ev.keyCode === 16) {
       // shift key pressed
       delete this._shift_index;
     }
   }
 
-  static dragenter(ev) {
+  static _dragenter(ev) {
     if (ev.dataTransfer && ev.dataTransfer.types) {
       const copy_types = ['text/uri-list', 'text/plain'];
       if (ev.dataTransfer.types.some((type) => copy_types.includes(type))) {
@@ -593,7 +557,7 @@ export class Transmission extends EventTarget {
     }
   }
 
-  drop(ev) {
+  _drop(ev) {
     const paused = true; // FIXME this.shouldAddedTorrentsStart();
 
     if (!ev.dataTransfer || !ev.dataTransfer.types) {
@@ -614,11 +578,6 @@ export class Transmission extends EventTarget {
     return false;
   }
 
-  confirmUploadClicked() {
-    this.uploadTorrentFile(true);
-    this.setCurrentPopup(null);
-  }
-
   // turn the periodic ajax session refresh on & off
   togglePeriodicSessionRefresh(enabled) {
     if (!enabled && this.sessionInterval) {
@@ -637,25 +596,18 @@ export class Transmission extends EventTarget {
     }
   }
 
-  /*--------------------------------------------
-   *
-   *  I N T E R F A C E   F U N C T I O N S
-   *
-   *--------------------------------------------*/
-
-  setFilterText(search) {
+  _setFilterText(search) {
     this.filterText = search ? search.trim() : null;
-    this.refilter(true);
+    this.refilterAllSoon();
   }
 
-  onTorrentChanged(ev) {
+  _onTorrentChanged(ev) {
     // update our dirty fields
     const tor = ev.currentTarget;
     this.dirtyTorrents.add(tor.getId());
 
     // enqueue ui refreshes
     this.refilterSoon();
-    // this.updateButtonsSoon();
   }
 
   updateTorrents(ids, fields) {
@@ -678,7 +630,7 @@ export class Transmission extends EventTarget {
           }
         } else {
           t = this._torrents[id] = new Torrent(o);
-          t.addEventListener('dataChanged', this.onTorrentChanged.bind(this));
+          t.addEventListener('dataChanged', this._onTorrentChanged.bind(this));
           this.dirtyTorrents.add(id);
           // do we need more info for this torrent?
           if (!('name' in t.fields) || !('status' in t.fields)) {
@@ -698,7 +650,7 @@ export class Transmission extends EventTarget {
       }
 
       if (removed_ids) {
-        this.deleteTorrents(removed_ids);
+        this._deleteTorrents(removed_ids);
         this.refilterSoon();
       }
     });
@@ -728,12 +680,12 @@ FIXME: fix this when notifications get fixed
     this.updateTorrents('recently-active', fields);
   }
 
-  initializeTorrents() {
+  _initializeTorrents() {
     const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
     this.updateTorrents(null, fields);
   }
 
-  onRowClicked(ev) {
+  _onRowClicked(ev) {
     const meta_key = ev.metaKey || ev.ctrlKey,
       { row } = ev.currentTarget;
 
@@ -744,13 +696,13 @@ FIXME: fix this when notifications get fixed
 
     // handle the per-row "torrent-resume" button
     if (ev.target.classList.contains('torrent-resume')) {
-      this.startTorrent(row.getTorrent());
+      this._startTorrents([row.getTorrent()]);
       return;
     }
 
     // handle the per-row "torrent-pause" button
     if (ev.target.classList.contains('torrent-pause')) {
-      this.stopTorrents([row.getTorrent()]);
+      this._stopTorrents([row.getTorrent()]);
       return;
     }
 
@@ -760,41 +712,41 @@ FIXME: fix this when notifications get fixed
 
     // TODO: long-click should raise inspector
     if (ev.shiftKey) {
-      this.selectRange(row);
+      this._selectRange(row);
       // Need to deselect any selected text
       window.focus();
 
       // Apple-Click, not selected
     } else if (!row.isSelected() && meta_key) {
-      this.selectRow(row);
+      this._selectRow(row);
 
       // Regular Click, not selected
     } else if (!row.isSelected()) {
-      this.setSelectedRow(row);
+      this._setSelectedRow(row);
 
       // Apple-Click, selected
     } else if (row.isSelected() && meta_key) {
-      this.deselectRow(row);
+      this._deselectRow(row);
 
       // Regular Click, selected
     } else if (row.isSelected()) {
-      this.setSelectedRow(row);
+      this._setSelectedRow(row);
     }
 
     this._last_torrent_clicked = row.getTorrentId();
   }
 
-  deleteTorrents(ids) {
+  _deleteTorrents(ids) {
     if (ids && ids.length) {
       for (const id of ids) {
         this.dirtyTorrents.add(id);
         delete this._torrents[id];
       }
-      this.refilter();
+      this.refilterSoon();
     }
   }
 
-  removeSelectedTorrents(trash) {
+  _removeSelectedTorrents(trash) {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.setCurrentPopup(
@@ -803,43 +755,37 @@ FIXME: fix this when notifications get fixed
     }
   }
 
-  startSelectedTorrents(force) {
-    this.startTorrents(this.getSelectedTorrents(), force);
-  }
-  startTorrent(torrent) {
-    this.startTorrents([torrent], false);
+  _startSelectedTorrents(force) {
+    this._startTorrents(this.getSelectedTorrents(), force);
   }
 
-  startTorrents(torrents, force) {
+  _startTorrents(torrents, force) {
     this.remote.startTorrents(
-      Transmission.getTorrentIds(torrents),
+      Transmission._getTorrentIds(torrents),
       force,
       this.refreshTorrents,
       this
     );
   }
-  verifyTorrent(torrent) {
-    this.verifyTorrents([torrent]);
-  }
-  verifyTorrents(torrents) {
+  _verifyTorrents(torrents) {
     this.remote.verifyTorrents(
-      Transmission.getTorrentIds(torrents),
+      Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
       this
     );
   }
 
-  reannounceTorrents(torrents) {
+  _reannounceTorrents(torrents) {
     this.remote.reannounceTorrents(
-      Transmission.getTorrentIds(torrents),
+      Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
       this
     );
   }
 
-  stopTorrents(torrents) {
+  _stopTorrents(torrents) {
     this.remote.stopTorrents(
-      Transmission.getTorrentIds(torrents),
+      Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
       this
     );
@@ -849,30 +795,30 @@ FIXME: fix this when notifications get fixed
   }
 
   // Queue
-  moveTop() {
+  _moveTop() {
     this.remote.moveTorrentsToTop(
-      this.getSelectedTorrentIds(),
+      this._getSelectedTorrentIds(),
       this.refreshTorrents,
       this
     );
   }
-  moveUp() {
+  _moveUp() {
     this.remote.moveTorrentsUp(
-      this.getSelectedTorrentIds(),
+      this._getSelectedTorrentIds(),
       this.refreshTorrents,
       this
     );
   }
-  moveDown() {
+  _moveDown() {
     this.remote.moveTorrentsDown(
-      this.getSelectedTorrentIds(),
+      this._getSelectedTorrentIds(),
       this.refreshTorrents,
       this
     );
   }
-  moveBottom() {
+  _moveBottom() {
     this.remote.moveTorrentsToBottom(
-      this.getSelectedTorrentIds(),
+      this._getSelectedTorrentIds(),
       this.refreshTorrents,
       this
     );
@@ -880,7 +826,7 @@ FIXME: fix this when notifications get fixed
 
   ///
 
-  updateGuiFromSession(o) {
+  _updateGuiFromSession(o) {
     const [, version, checksum] = o.version.match(/(.*)\s\(([0-9a-f]+)\)/);
     this.version_info = {
       checksum,
@@ -891,9 +837,9 @@ FIXME: fix this when notifications get fixed
     el.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
   }
 
-  updateStatusbar() {
+  _updateStatusbar() {
     const fmt = Formatter;
-    const torrents = this.getAllTorrents();
+    const torrents = this._getAllTorrents();
 
     const u = torrents.reduce((acc, tor) => acc + tor.getUploadSpeed(), 0);
     const d = torrents.reduce((acc, tor) => acc + tor.getDownloadSpeed(), 0);
@@ -904,8 +850,8 @@ FIXME: fix this when notifications get fixed
     document.getElementById('filter-count').textContent = str;
   }
 
-  updateFilterSelect() {
-    const trackers = this.getTrackers();
+  _updateFilterSelect() {
+    const trackers = this._getTrackers();
     const names = Object.keys(trackers).sort();
 
     // build the new html
@@ -946,7 +892,7 @@ FIXME: fix this when notifications get fixed
     torrents.forEach((tor, idx) => (rows[idx] = id2row[tor.getId()]));
   }
 
-  refilter(rebuildEverything) {
+  _refilter(rebuildEverything) {
     const { sort_mode, sort_direction, filter_mode } = this.prefs;
     const filter_text = this.filterText;
     const filter_tracker = this.filterTracker;
@@ -962,7 +908,7 @@ FIXME: fix this when notifications get fixed
     const old_row_count = countRows();
     const old_sel_count = countSelectedRows();
 
-    this.updateFilterSelect();
+    this._updateFilterSelect();
 
     clearTimeout(this.refilterTimer);
     delete this.refilterTimer;
@@ -1013,9 +959,9 @@ FIXME: fix this when notifications get fixed
         const e = row.getElement();
         e.row = row;
         dirty_rows.push(row);
-        e.addEventListener('click', this.onRowClicked.bind(this));
+        e.addEventListener('click', this._onRowClicked.bind(this));
         e.addEventListener('dblclick', () =>
-          this.action_manager.click('toggle-inspector')
+          this.action_manager.click('show-inspector')
         );
       }
     }
@@ -1077,7 +1023,7 @@ FIXME: fix this when notifications get fixed
         e.classList.toggle('odd', !even);
       });
 
-    this.updateStatusbar();
+    this._updateStatusbar();
     if (
       old_sel_count !== countSelectedRows() ||
       old_row_count !== countRows()
@@ -1088,14 +1034,14 @@ FIXME: fix this when notifications get fixed
 
   setFilterTracker(domain) {
     const e = document.getElementById('filter-tracker');
-    e.value = domain ? Transmission.getReadableDomain(domain) : 'all';
+    e.value = domain ? Transmission._getReadableDomain(domain) : 'all';
 
     this.filterTracker = domain;
-    this.refilter(true);
+    this.refilterAllSoon();
   }
 
   // example: "tracker.ubuntu.com" returns "ubuntu.com"
-  static getDomainName(host) {
+  static _getDomainName(host) {
     const dot = host.indexOf('.');
     if (dot !== host.lastIndexOf('.')) {
       host = host.slice(dot + 1);
@@ -1105,7 +1051,7 @@ FIXME: fix this when notifications get fixed
   }
 
   // example: "ubuntu.com" returns "Ubuntu"
-  static getReadableDomain(name) {
+  static _getReadableDomain(name) {
     if (name.length) {
       name = name.charAt(0).toUpperCase() + name.slice(1);
     }
@@ -1116,27 +1062,23 @@ FIXME: fix this when notifications get fixed
     return name;
   }
 
-  getTrackers() {
+  _getTrackers() {
     const ret = {};
 
-    const torrents = this.getAllTorrents();
-    for (let i = 0, torrent; (torrent = torrents[i]); ++i) {
-      const names = [];
-      const trackers = torrent.getTrackers();
+    for (const torrent of this._getAllTorrents()) {
+      const names = new Set();
 
-      for (let j = 0, tracker; (tracker = trackers[j]); ++j) {
+      for (const tracker of torrent.getTrackers()) {
         const { announce } = tracker;
 
-        let uri = null;
-        if (announce in this.uriCache) {
-          uri = this.uriCache[announce];
-        } else {
+        let uri = this.uriCache[announce];
+        if (!uri) {
           uri = this.uriCache[announce] = new URL(announce);
-          uri.domain = Transmission.getDomainName(uri.host);
-          uri.name = Transmission.getReadableDomain(uri.domain);
+          uri.domain = Transmission._getDomainName(uri.host);
+          uri.name = Transmission._getReadableDomain(uri.domain);
         }
 
-        if (!(uri.name in ret)) {
+        if (!ret[uri.name]) {
           ret[uri.name] = {
             count: 0,
             domain: uri.domain,
@@ -1144,13 +1086,11 @@ FIXME: fix this when notifications get fixed
           };
         }
 
-        if (names.indexOf(uri.name) === -1) {
-          names.push(uri.name);
-        }
+        names.add(uri.name);
       }
 
-      for (const name of names) {
-        ret[name].count++;
+      for (const name of names.values()) {
+        ++ret[name].count;
       }
     }
 

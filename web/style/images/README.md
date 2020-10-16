@@ -8,12 +8,11 @@ https://material.io/resources/icons/
 
 * analytics.svg
 * horizontal-rule.svg
-* list.svg
-* menu.svg
 * pause-circle-active.svg (pause-circle-filled.svg)
 * pause-circle-idle.svg (pause-circle-filled.svg)
 * play-circle-active.svg (play-circle-filled.svg)
 * play-circle-idle.svg (play-circle-filled.svg)
+* router.svg
 
 ## Bootstrap Icons
 
@@ -21,13 +20,11 @@ https://github.com/twbs/icons
 https://icons.getbootstrap.com/icons/
 license: MIT
 
-* broadcast.svg
 * chevron-down.svg
 * chevron-up.svg
 * files.svg
 * gear-fill.svg
 * lock-fill.svg
-* person-fill.svg
 * search.svg
 * three-dots-vertical.svg
 
@@ -44,6 +41,20 @@ license: CC-BY-SA 3.0
 * text-x-generic.png
 * video-x-generic.png
 
+
+## SVG Repo
+
+https://www.svgrepo.com/
+license: CC0
+
+* checkered-flag.svg
+* cloud-networking.svg
+* globa-server.svg
+* team.svg
+* top-speed.svg (license: MIT)
+* up-and-down-arrows.svg
+
+
 ## Custom Icons
 
 license: MIT
@@ -56,4 +67,3 @@ license: MIT
 * toolbar-pause.png
 * toolbar-start.png
 * turtle.png
-

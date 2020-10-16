@@ -1,53 +1,66 @@
-@use "sass:color";
-@use "sass:math";
+@use 'sass:color';
+@use 'sass:math';
 
 // COLORS
-// TODO: do we need this many greys?
 
-$black: #000;
+$blue-100: #dbedff;
+$blue-300: #79b8ff;
+$blue-500: #0366d6;
+$green-100: #dcffe4;
+$green-200: #bef5cb;
+$green-300: #85e89d;
+$green-500: #28a745;
+$grey-100: #f6f8fa;
+$grey-200: #e1e4e8;
+$grey-300: #d1d5da;
+$grey-400: #959da5;
+$grey-500: #6a737d;
+$grey-800: #2f363d;
+$purple-100: #e6dcfd;
+$purple-000: #f5f0ff;
+$red-200: #fdaeb7;
 $white: #fff;
-$grey13: #212121;
-$grey20: #333;
-$grey40: #666;
-$grey60: #999;
-$grey67: #ababab;
-$grey73: #bababa;
-$grey81: #cfcfcf;
-$grey87: #dedede;
-$grey97: #f7f7f7;
 
-$odd-background: #f7f7f7;
+$bg-hover: $grey-100;
+$bg-menu: $grey-200;
+$bg-even: $white;
+$bg-odd: $grey-100;
+$bg-selection: $purple-100;
+$bg-selection-2: $purple-000;
+$bg-toolbar-gradient-1: $grey-300;
+$bg-toolbar-gradient-2: $grey-400;
+$fg-name: $grey-800;
+$fg-port-closed: $red-200;
+$fg-port-open: $green-200;
+$fg-text-disabled: $grey-400;
+$fg-text-error: $red-200;
+$fg-text-secondary: $grey-500;
+$fg-text-tertiary: $grey-400;
+$fg-text: $grey-800;
+$color-border: $fg-text-tertiary;
 
 // Z-INDEX ENUM
-$z-index-mainwin: 0;
 $z-index-progressbar: 1;
 $z-index-popup: 2;
 
 // SVG ICONS -- see images/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
-$svg-analytics: 'images/analytics.svg';
-$svg-app: 'images/application-x-executable.svg';
-$svg-audio: 'images/audio-x-generic.svg';
-$svg-baseline: 'images/horizontal-rule.svg';
-$svg-bi-files: 'images/files.svg';
-$svg-broadcast: 'images/broadcast.svg';
-$svg-chevron-dn: 'images/chevron-down.svg';
-$svg-chevron-up: 'images/chevron-up.svg';
-$svg-folder: 'images/folder.svg';
-$svg-font: 'images/font-x-generic.svg';
-$svg-image: 'images/image-x-generic.svg';
-$svg-list: 'images/list.svg';
-$svg-lock-fill: 'images/lock-fill.svg';
-$svg-menu: 'images/menu.svg';
-$svg-model: 'images/text-x-generic.svg';
-$svg-overflow: 'images/three-dots-vertical.svg';
-$svg-pause-circle-active: 'images/pause-circle-active.svg';
-$svg-pause-circle-idle: 'images/pause-circle-idle.svg';
-$svg-person-fill: 'images/person-fill.svg';
-$svg-play-circle-active: 'images/play-circle-active.svg';
-$svg-play-circle-idle: 'images/play-circle-idle.svg';
-$svg-text: 'images/text-x-generic.svg';
-$svg-video: 'images/video-x-generic.svg';
+$image-analytics: 'images/analytics.svg';
+$image-baseline: 'images/horizontal-rule.svg';
+$image-files: 'images/files.svg';
+$image-chevron-dn: 'images/chevron-down.svg';
+$image-chevron-up: 'images/chevron-up.svg';
+$image-lock-fill: 'images/lock-fill.svg';
+$image-network: 'images/router.svg';
+$image-overflow: 'images/three-dots-vertical.svg';
+$image-pause-circle-active: 'images/pause-circle-active.svg';
+$image-pause-circle-idle: 'images/pause-circle-idle.svg';
+$image-peers: 'images/team.svg';
+$image-play-circle-active: 'images/play-circle-active.svg';
+$image-play-circle-idle: 'images/play-circle-idle.svg';
+$image-speed: 'images/checkered-flag.svg';
+$image-trackers: 'images/diagram-3-fill.svg';
+$image-upload-download: 'images/up-and-down-arrows.svg';
 
 $width-threshold-number: 550;
 
@@ -55,8 +68,6 @@ $width-threshold-number: 550;
 
 @mixin image-on-vertical-gradient($src, $topColor, $bottomColor) {
   background-image: url($src), linear-gradient($topColor, $bottomColor);
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 @mixin button-image(
@@ -66,30 +77,22 @@ $width-threshold-number: 550;
   $active-color-top,
   $active-color-bottom
 ) {
-  @include image-on-vertical-gradient(
-    $image-url,
-    $idle-color-top,
-    $idle-color-bottom
-  );
+  background-image: url($image-url),
+    linear-gradient($idle-color-top, $idle-color-bottom);
 
   &:active,
+  &:checked,
   &.selected {
-    @include image-on-vertical-gradient(
-      $image-url,
-      $active-color-top,
-      $active-color-bottom
-    );
+    background-image: url($image-url),
+      linear-gradient($active-color-top, $active-color-bottom);
   }
 }
 
 $nonselected-gradient-top: $white;
-$nonselected-gradient-bottom: $grey73;
-$selection-color: #cdcdff;
-$selected-gradient-top: $selection-color;
-$selected-gradient-bottom: $white;
+$nonselected-gradient-bottom: $bg-menu;
 
 @mixin button {
-  border: 1px solid $grey67;
+  border: 1px solid $color-border;
   cursor: pointer;
   display: inline-block;
   padding: 3px;
@@ -98,15 +101,6 @@ $selected-gradient-bottom: $white;
 
 @mixin rounded-box($radius) {
   border-radius: $radius;
-}
-
-@mixin left-rounded-box($radius) {
-  border-bottom-left-radius: $radius;
-  border-top-left-radius: $radius;
-}
-@mixin right-rounded-box($radius) {
-  border-bottom-right-radius: $radius;
-  border-top-right-radius: $radius;
 }
 
 @mixin rounded-button($radius) {
@@ -118,10 +112,45 @@ $selected-gradient-bottom: $white;
 
 html,
 body {
+  //zzz
+  --progressbar-leeching-bg: #eee;
+  --progressbar-leeching-fg-1: #{$blue-300};
+  --progressbar-leeching-fg-2: #{$blue-500};
+  --progressbar-leeching-queued-bg: #f3f3f3;
+  --progressbar-leeching-queued-fg-1: #{$blue-100};
+  --progressbar-leeching-queued-fg-2: #{$blue-300};
+  --progressbar-magnet-bg: #e98484;
+  --progressbar-paused-bg-1: #{$grey-100};
+  --progressbar-paused-bg-2: #{$grey-300};
+  --progressbar-paused-fg-1: #{$grey-300};
+  --progressbar-paused-fg-2: #{$grey-500};
+  --progressbar-seeding-bg: #5e5;
+  --progressbar-seeding-fg-1: #{$green-300};
+  --progressbar-seeding-fg-2: #{$green-500};
+  --progressbar-seeding-queued-bg: #5e5;
+  --progressbar-seeding-queued-fg-1: #{$green-100};
+  --progressbar-seeding-queued-fg-2: #{$green-300};
+  color: $fg-text;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   height: 100%;
   margin: 0;
   overflow: hidden;
+  /*
+  @media (prefers-color-scheme: dark) {
+    --progressbar-leeching-bg: #eee;
+    --progressbar-leeching-fg: #42a9ff;
+    --progressbar-leeching-queued-bg: #f3f3f3;
+    --progressbar-leeching-queued-fg: #abc3cf;
+    --progressbar-magnet-bg: #e98484;
+    --progressbar-magnet-fg: #eee;
+    --progressbar-paused-bg: #eee;
+    --progressbar-paused-fg: #aaa;
+    --progressbar-seeding-bg: #5e5;
+    --progressbar-seeding-fg: #4e4;
+    --progressbar-seeding-queued-bg: #5e5;
+    --progressbar-seeding-queued-fg: #aec0b1;
+  }
+*/
 }
 
 img {
@@ -136,8 +165,11 @@ a {
   display: none;
 }
 
+.even {
+  background-color: $bg-even;
+}
 .odd {
-  background-color: $odd-background;
+  background-color: $bg-odd;
 }
 
 .mainwin {
@@ -151,6 +183,7 @@ a {
     padding: 0;
   }
 }
+
 .mainwin-workarea {
   display: flex;
   flex: 1;
@@ -164,11 +197,9 @@ $toolbar-height-number: 36;
 $toolbar-height: $toolbar-height-number * 1px;
 
 #mainwin-toolbar {
-  $toolbar-button-size: 36px;
-  $toolbar-gradient-top: $grey87;
   align-items: center;
-  background: linear-gradient($grey87, $grey73);
-  border-bottom: 1px solid $grey67;
+  background: linear-gradient($bg-toolbar-gradient-1, $bg-toolbar-gradient-2);
+  border-bottom: 1px solid $color-border;
   display: flex;
   flex-direction: row;
   height: $toolbar-height;
@@ -188,8 +219,9 @@ $toolbar-height: $toolbar-height-number * 1px;
     width: $toolbar-height;
 
     &:hover:not([disabled]) {
-      background-color: $grey97;
+      background-color: $bg-hover;
     }
+
     &[disabled] {
       cursor: default;
       opacity: 0.25;
@@ -197,7 +229,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 
   > .toolbar-separator {
-    border-left: 1px solid $grey67;
+    border-left: 1px solid $color-border;
     height: 25px;
     margin: 0 6px 0 0;
   }
@@ -211,28 +243,33 @@ $toolbar-height: $toolbar-height-number * 1px;
 #toolbar-open {
   background-image: url('images/toolbar-folder.png');
 }
+
 #toolbar-remove {
   background-image: url('images/toolbar-close.png');
 }
+
 #toolbar-start {
   background-image: url('images/toolbar-start.png');
 }
+
 #toolbar-pause {
   background-image: url('images/toolbar-pause.png');
 }
+
 #toolbar-inspector {
   background-image: url('images/toolbar-info.png');
 }
+
 #toolbar-overflow {
   background-color: transparent;
-  background-image: url($svg-overflow);
+  background-image: url($image-overflow);
   background-position: center;
   background-size: 26px;
   margin-right: 4px;
   width: 36px;
 
   &.alt-speed-enabled {
-    background-image: url('images/blue-turtle.png'), url($svg-overflow);
+    background-image: url('images/blue-turtle.png'), url($image-overflow);
     background-position: bottom left, center, center;
     background-size: 16px 9px, 26px, 26px;
   }
@@ -240,19 +277,13 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 /// FILTERBAR
 
-$filterbar-gradient-top: $grey87;
-$filterbar-gradient-bottom: $grey73;
-
 $filterbar-height-number: 26;
 $filterbar-height: $filterbar-height-number * 1px;
 
 .mainwin-filterbar {
   align-items: center;
-  background: linear-gradient(
-    $filterbar-gradient-top,
-    $filterbar-gradient-bottom
-  );
-  border-bottom: 1px solid $grey67;
+  background: linear-gradient($bg-toolbar-gradient-1, $bg-toolbar-gradient-2);
+  border-bottom: 1px solid $color-border;
   display: flex;
   flex-direction: row;
   height: $filterbar-height;
@@ -263,21 +294,24 @@ $filterbar-height: $filterbar-height-number * 1px;
     margin: 5px;
   }
 }
+
 #torrent-search {
   &.blur {
-    color: $grey60;
+    color: $fg-text-tertiary;
   }
 }
 
 $speed-icon-size: 12px;
+
 .speed-up-icon {
-  background-image: url($svg-chevron-up);
+  background-image: url($image-chevron-up);
   background-size: $speed-icon-size $speed-icon-size;
   height: $speed-icon-size;
   width: $speed-icon-size;
 }
+
 .speed-dn-icon {
-  background-image: url($svg-chevron-dn);
+  background-image: url($image-chevron-dn);
   background-size: $speed-icon-size $speed-icon-size;
   height: $speed-icon-size;
   width: $speed-icon-size;
@@ -288,7 +322,6 @@ $speed-icon-size: 12px;
 $pauseresume-size: 14px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
-$progressbar-height: 14px;
 $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 .flex {
@@ -328,12 +361,12 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   width: 100%;
 
   .torrent {
-    background-color: $white;
-    border-bottom: 1px solid $grey81;
-    color: $grey40;
+    border-bottom: 1px solid $color-border;
+    color: $fg-text-secondary;
+    user-select: none;
 
-    &.odd {
-      background-color: $odd-background;
+    &.paused {
+      color: $fg-text-disabled;
     }
 
     .icon {
@@ -341,6 +374,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
       @mixin mime-icon-compact($mime-icon) {
         background-image: url($mime-icon);
+
         &[data-icon-multifile='true'] {
           background-image: url($mime-icon), url($folder-image);
         }
@@ -349,21 +383,27 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       &[data-icon-mime-type='audio'] {
         @include mime-icon-compact($audio-image);
       }
+
       &[data-icon-mime-type='application'] {
         @include mime-icon-compact($app-image);
       }
+
       &[data-icon-mime-type='font'] {
         @include mime-icon-compact($font-image);
       }
+
       &[data-icon-mime-type='image'] {
         @include mime-icon-compact($image-image);
       }
+
       &[data-icon-mime-type='model'] {
         @include mime-icon-compact($package-image);
       }
+
       &[data-icon-mime-type='text'] {
         @include mime-icon-compact($text-image);
       }
+
       &[data-icon-mime-type='video'] {
         @include mime-icon-compact($video-image);
       }
@@ -388,6 +428,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
         margin: 4px 5px;
       }
     }
+
     &:not(.compact) {
       $icon-size-num: 32;
       $icon-size: $icon-size-num * 1px;
@@ -408,15 +449,19 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
         height: $icon-size;
         width: $icon-size;
       }
+
       .torrent-name {
         grid-area: name;
       }
+
       .torrent-peer-details {
         grid-area: peers;
       }
+
       .torrent-progress {
         grid-area: progressbar;
       }
+
       .torrent-progress-details {
         grid-area: progress-text;
       }
@@ -427,7 +472,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     &.selected {
-      background-color: $selection-color;
+      background-color: $bg-selection;
     }
 
     &.selected .torrent-progress-details.error,
@@ -446,30 +491,32 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .torrent-pause {
-    background-image: url($svg-pause-circle-idle);
+    background-image: url($image-pause-circle-idle);
     background-size: $pauseresume-size;
     height: $pauseresume-size;
     width: $pauseresume-size;
+
     &:active,
     &:hover {
-      background-image: url($svg-pause-circle-active);
+      background-image: url($image-pause-circle-active);
     }
   }
 
   .torrent-resume {
-    background-image: url($svg-play-circle-idle);
+    background-image: url($image-play-circle-idle);
     background-size: $pauseresume-size;
     height: $pauseresume-size;
     width: $pauseresume-size;
+
     &:active,
     &:hover {
-      background-image: url($svg-play-circle-active);
+      background-image: url($image-play-circle-active);
     }
   }
 
   .torrent-progress-details.error,
   .torrent-peer-details.error {
-    color: #f00;
+    color: $fg-text-error;
   }
 
   .torrent-name {
@@ -487,7 +534,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     &:not(.paused) {
-      color: $grey13;
+      color: $fg-name;
     }
   }
 
@@ -502,6 +549,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     &.full {
       margin: 2px 0;
     }
+
     .torrent-progress-bar-container {
       flex-grow: 1;
     }
@@ -519,8 +567,9 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .torrent-progress-bar {
-    border: 1px solid;
     border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
     bottom: 0;
     height: 100%;
     left: 0;
@@ -530,9 +579,10 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     &.background {
       right: 0;
     }
+
     &.foreground {
-      width: attr(percent-done);
       z-index: $z-index-progressbar;
+
       &:not(.full) {
         border-bottom-right-radius: 0;
         border-top-right-radius: 0;
@@ -540,73 +590,182 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     @mixin progressbar-gradient($value) {
-      background: linear-gradient(to bottom, $value, darken($value, 25%) 80%);
-      border-color: darken($value, 30%);
+      background: $value;
+    }
+
+    @mixin progressbar-gradient2($value1, $value2) {
+      background: linear-gradient(to bottom, $value1, $value2 80%);
+      border-color: $value2;
     }
 
     // FIXME: 50% torrents' progressbars don't work. We don't have a way to overlay the two progressbars
 
-    &.foreground.paused {
-      @include progressbar-gradient(#aaa);
+    &.leeching.background {
+      @include progressbar-gradient(var(--progressbar-leeching-bg));
     }
-    &.foreground.magnet {
-      @include progressbar-gradient(#eee);
+    &.leeching.foreground {
+      @include progressbar-gradient2(
+        var(--progressbar-leeching-fg-1),
+        var(--progressbar-leeching-fg-2)
+      );
     }
-    &.foreground.leeching.queued {
-      @include progressbar-gradient(#abc3cf);
+    &.leeching.queued.background {
+      @include progressbar-gradient(var(--progressbar-leeching-queued-bg));
     }
-    &.foreground.leeching {
-      @include progressbar-gradient(#42a9ff);
+    &.leeching.queued.foreground {
+      @include progressbar-gradient2(
+        var(--progressbar-leeching-queued-fg-1),
+        var(--progressbar-leeching-queued-fg-2)
+      );
     }
-    &.foreground.seeding.queued {
-      @include progressbar-gradient(#aec0b1);
+    &.magnet.background {
+      @include progressbar-gradient(var(--progressbar-magnet-bg));
     }
-    &.foreground.seeding {
-      @include progressbar-gradient(#4e4);
+    &.paused.background {
+      @include progressbar-gradient2(
+        var(--progressbar-paused-bg-1),
+        var(--progressbar-paused-bg-2)
+      );
     }
-
-    &.background.paused {
-      @include progressbar-gradient(#eee);
+    &.paused.foreground {
+      @include progressbar-gradient2(
+        var(--progressbar-paused-fg-1),
+        var(--progressbar-paused-fg-2)
+      );
     }
-    &.background.magnet {
-      @include progressbar-gradient(#e98484);
+    &.seeding.background {
+      @include progressbar-gradient(var(--progressbar-seeding-bg));
     }
-    &.background.leeching.queued {
-      @include progressbar-gradient(#f3f3f3);
+    &.seeding.foreground {
+      @include progressbar-gradient2(
+        var(--progressbar-seeding-fg-1),
+        var(--progressbar-seeding-fg-2)
+      );
     }
-    &.background.leeching {
-      @include progressbar-gradient(#eee);
+    &.seeding.queued.background {
+      @include progressbar-gradient(var(--progressbar-seeding-queued-bg));
     }
-    &.background.seeding {
-      @include progressbar-gradient(#5e5);
+    &.seeding.queued.foreground {
+      @include progressbar-gradient2(
+        var(--progressbar-seeding-queued-fg-1),
+        var(--progressbar-seeding-queued-fg-2)
+      );
     }
   }
 }
 
 /// PREFERENCES DIALOG
 
-@media screen and (max-width: $width-threshold-number * 1px) {
-  #prefs-dialog,
-  #torrent-inspector {
+@mixin tab-image($image-url) {
+  @include button-image(
+    $image-url,
+    $nonselected-gradient-top,
+    $nonselected-gradient-bottom,
+    $bg-selection,
+    $bg-selection-2
+  );
+}
+
+#inspector-tab-info {
+  @include tab-image($image-analytics);
+}
+
+#inspector-tab-peers {
+  @include tab-image($image-peers);
+}
+
+#inspector-tab-trackers {
+  @include tab-image($image-trackers);
+}
+
+#inspector-tab-files {
+  @include tab-image($image-files);
+}
+
+#inspector,
+#prefs-dialog {
+  @media screen and (max-width: $width-threshold-number * 1px) {
     left: 0;
   }
-}
-@media screen and (min-width: ($width-threshold-number + 1) * 1px) {
-  #prefs-dialog,
-  #torrent-inspector {
-    border-left: 1px solid $grey40;
+  @media screen and (min-width: ($width-threshold-number + 1) * 1px) {
+    border-left: 1px solid $fg-text-secondary;
     width: 570px;
   }
 }
 
 #prefs-dialog {
-  background: #fff;
+  $background-color: $white;
+  $disabled-color: $fg-text-disabled;
+
+  background: $background-color;
   bottom: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   position: absolute;
   right: 0;
   top: $torrent-container-top;
   z-index: $z-index-popup;
+
+  .tabs-page {
+    grid-column-gap: 8px;
+    grid-row-gap: 5px;
+    grid-template-columns: 1fr 1fr;
+    margin: 20px;
+
+    &:not(.hidden) {
+      display: grid;
+    }
+
+    .section-label {
+      font-weight: bold;
+      grid-column: span 2;
+      margin-left: -20px;
+      padding-bottom: 5px;
+
+      &:not(:first-of-type) {
+        padding-top: 20px;
+      }
+    }
+  }
+
+  :disabled {
+    color: $disabled-color;
+  }
+
+  #alt-times-div,
+  #autostart-div,
+  #port-forwarding,
+  #randomize-port,
+  #suffix-div,
+  #use-dht-div,
+  #use-lpd-div,
+  #use-pex-div,
+  #utp-enabled,
+  .alt-speed-label {
+    grid-column: span 2;
+  }
+
+  .port-status {
+    grid-column: 2 / 3;
+  }
+
+  .port-status-label {
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 5px;
+    &[data-open='true'] {
+      color: $fg-port-open;
+    }
+    &[data-open='false'] {
+      color: $fg-port-closed;
+    }
+  }
+
+  .alt-speed-label {
+    font-size: smaller;
+    font-style: lighter;
+    // nudge it up next to the section label
+    margin: -10px 0 10px -20px;
+  }
 }
 
 #prefs-dialog.ui-tabs .ui-tabs-panel {
@@ -672,20 +831,151 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 }
 
+/// TABS
+
+.tabs-container {
+  align-items: stretch;
+  background: $white;
+  border-left: solid 1px $color-border;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: $torrent-container-top;
+  z-index: $z-index-popup;
+  @media screen and (max-width: $width-threshold-number * 1px) {
+    left: 0;
+  }
+  @media screen and (min-width: ($width-threshold-number + 1) * 1px) {
+    width: 550px;
+  }
+}
+
+.tabs-buttons {
+  align-self: center;
+  display: flex;
+  padding: 10px;
+
+  button {
+    @include button;
+    appearance: none;
+    padding: 3px;
+  }
+}
+
+.file-priority-radiobox,
+.tabs-buttons {
+  $radius: 8px;
+  :first-child {
+    border-bottom-left-radius: $radius;
+    border-top-left-radius: $radius;
+  }
+  :last-child {
+    border-bottom-right-radius: $radius;
+    border-top-right-radius: $radius;
+  }
+}
+
+.tabs-pages {
+  box-sizing: border-box;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0 20px 20px;
+}
+
+.tabs-button {
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /// INSPECTOR
 
-@mixin inspector-tab-image($image-url) {
-  @include button-image(
-    $image-url,
-    $nonselected-gradient-top,
-    $nonselected-gradient-bottom,
-    $selected-gradient-top,
-    $selected-gradient-bottom
-  );
+#inspector {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+#inspector .tabs-button,
+#prefs-dialog .tabs-button {
+  background-size: 20px 20px, 40px 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  width: 40px;
+}
+
+#prefs-tab-torrent {
+  @include tab-image($image-upload-download);
+}
+
+#prefs-tab-speed {
+  @include tab-image($image-speed);
+}
+
+#prefs-tab-peers {
+  @include tab-image($image-peers);
+}
+
+#prefs-tab-network {
+  @include tab-image($image-network);
+}
+
+.inspector-info-page {
+  padding: 12px;
+}
+
+#inspector-file-list {
+  margin: 0;
+  padding: 0;
+
+  .inspector-torrent-file-list-entry {
+    display: grid;
+    grid-column-gap: 5px;
+    grid-template-areas:
+      'check   name  priority'
+      'blank1  info  blank2';
+    grid-template-columns: 20px 1fr 65px;
+    margin-bottom: 4px;
+    padding: 5px;
+
+    &.skip {
+      opacity: 0.5;
+    }
+  }
+
+  .file-wanted-control {
+    grid-area: check;
+  }
+
+  .inspector-torrent-file-list-entry-name {
+    color: $fg-name;
+    cursor: pointer;
+    grid-area: name;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .inspector-torrent-file-list-entry.skip
+    > .inspector-torrent-file-list-entry-name {
+    color: $fg-text-disabled;
+  }
+
+  .inspector-torrent-file-list-entry-progress {
+    color: $fg-text-secondary;
+    grid-area: info;
+  }
+
+  .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
+  .inspector-torrent-file-list-entry.complete > .file-wanted-control {
+    cursor: default;
+  }
 }
 
 #torrent-inspector {
-  background: #fff;
+  /*
+  background: $white;
   bottom: 0;
   overflow: auto;
   padding: 15px;
@@ -698,47 +988,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   .inspector-page {
     padding: 8px 0;
   }
-
-  #inspector-close {
-    display: none;
-  }
-
-  #inspector-tabs-wrapper {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-
-    #inspector-tabs {
-      $border-radius: 5px;
-      display: flex;
-
-      > * {
-        @include button;
-        height: 20px;
-        margin-left: 0;
-        width: 30px;
-      }
-
-      > #inspector-tab-info {
-        @include left-rounded-box($border-radius);
-        @include inspector-tab-image($svg-analytics);
-        border-left-width: 1px;
-      }
-
-      > #inspector-tab-peers {
-        @include inspector-tab-image($svg-person-fill);
-      }
-
-      > #inspector-tab-trackers {
-        @include inspector-tab-image($svg-broadcast);
-      }
-
-      > #inspector-tab-files {
-        @include right-rounded-box($border-radius);
-        @include inspector-tab-image($svg-bi-files);
-      }
-    }
-  }
+*/
 
   #inspector-header {
     margin: 8px 0;
@@ -748,7 +998,9 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       font-weight: bold;
     }
   }
+}
 
+#inspector-trackers-list {
   .tier-list {
     clear: both;
     cursor: default;
@@ -764,7 +1016,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     .tracker-activity {
-      color: $grey40;
+      color: $fg-text-secondary;
       display: table;
       float: left;
       margin-top: 1px;
@@ -776,7 +1028,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     table {
-      color: $grey40;
+      color: $fg-text-secondary;
       float: right;
     }
 
@@ -791,56 +1043,8 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .tracker-host {
-    color: $grey13;
-    font: bold 1.2em;
-  }
-
-  /* Files Inspector Tab */
-
-  #inspector-file-list {
-    margin: 0;
-    overflow: hidden;
-    padding: 2px;
-    text-align: left;
-  }
-
-  .inspector-torrent-file-list-entry {
-    display: grid;
-    grid-column-gap: 5px;
-    grid-template-areas:
-      'check   name  priority'
-      'blank1  info  blank2';
-    grid-template-columns: 20px 1fr 65px;
-    margin-bottom: 4px;
-    padding: 5px;
-
-    &.skip {
-      color: $grey40;
-    }
-  }
-
-  .file-wanted-control {
-    grid-area: check;
-  }
-
-  .inspector-torrent-file-list-entry-name {
-    color: $black;
-    grid-area: name;
-  }
-
-  .inspector-torrent-file-list-entry.skip
-    > .inspector-torrent-file-list-entry-name {
-    color: $grey60;
-  }
-
-  .inspector-torrent-file-list-entry-progress {
-    color: $grey60;
-    grid-area: info;
-  }
-
-  .single-file .inspector-torrent-file-list-entry > .file-wanted-control,
-  .inspector-torrent-file-list-entry.complete > .file-wanted-control {
-    cursor: default;
+    color: $fg-name;
+    font-size: 1.2em;
   }
 }
 
@@ -848,7 +1052,6 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 #inspector-peers-list {
   cursor: default;
   margin: 0;
-  overflow: hidden;
   padding: 0;
   text-align: left;
 
@@ -902,7 +1105,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 .inspector-peer-entry {
   .encrypted-peer-cell {
-    background: transparent url($svg-lock-fill) no-repeat;
+    background: transparent url($image-lock-fill) no-repeat;
     height: 16px;
     width: 16px;
   }
@@ -915,13 +1118,15 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     $image-url,
     color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%),
     color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%),
-    color.mix($selected-gradient-top, $selected-gradient-bottom, 80%),
-    color.mix($selected-gradient-top, $selected-gradient-bottom, 20%)
+    color.mix($bg-selection, $bg-selection-2, 80%),
+    color.mix($bg-selection, $bg-selection-2, 20%)
   );
 }
 
 .file-priority-radiobox {
-  $border-radius: 5px;
+  $size-number: 20;
+  $size: $size-number * 1px;
+  $halfsize: math.floor($size-number / 2) * 1px;
 
   // We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
   // Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
@@ -930,25 +1135,27 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
   > * {
     @include button;
-    background-size: 20px 12px;
-    height: 12px;
+    appearance: none;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: $halfsize, $size;
+    height: $size;
+    margin: 0;
     padding: 0;
-    width: 20px;
+    width: $size;
   }
 
   > .low {
-    @include left-rounded-box($border-radius);
-    @include file-button-image($svg-chevron-dn);
+    @include file-button-image($image-chevron-dn);
     border-right-width: 0;
   }
 
   > .normal {
-    @include file-button-image($svg-baseline);
+    @include file-button-image($image-baseline);
   }
 
   > .high {
-    @include right-rounded-box($border-radius);
-    @include file-button-image($svg-chevron-up);
+    @include file-button-image($image-chevron-up);
     border-left-width: 0;
   }
 }
@@ -956,27 +1163,33 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 /// CONTEXT MENU
 
 .context-menu {
-  background: linear-gradient($grey87, $grey73);
+  $background-color: $bg-menu;
+  $disabled-color: $fg-text-disabled;
+
+  background: $background-color;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   position: absolute;
   z-index: $z-index-popup;
-}
-.context-menuitem {
-  list-style: none;
-  padding: 5px 10px;
 
-  &:hover:not([disabled]),
-  &:focus:not([disabled]) {
-    background-image: linear-gradient($white, $grey87);
-    cursor: pointer;
-  }
-  &[disabled] {
-    cursor: none;
-    opacity: 0.25;
+  .context-menuitem {
+    list-style: none;
+    padding: 5px 10px;
+
+    &:hover:not([disabled]),
+    &:focus:not([disabled]) {
+      background-image: linear-gradient($white, $bg-menu);
+      cursor: pointer;
+    }
+
+    &[disabled] {
+      color: $disabled-color;
+      cursor: none;
+    }
   }
 }
+
 .context-menu-separator {
-  border-bottom: 1px solid $grey40;
+  border-bottom: 1px solid $fg-text-secondary;
   margin-bottom: 10px;
   padding-bottom: 10px;
 }
@@ -984,7 +1197,8 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 /// OVERFLOW MENU
 
 .overflow-menu {
-  background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
+  background: linear-gradient(160deg, #d21, 1%, $bg-hover, 40%, $bg-menu);
+  border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   padding: 20px;
   position: fixed;
@@ -1016,17 +1230,17 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   a,
   button,
   label {
-    color: $grey40;
+    color: $fg-text;
     font-size: 1em;
 
     &[disabled] {
+      color: $fg-text-disabled;
       cursor: default;
-      opacity: 0.25;
     }
 
     &:focus:not([disabled]),
     &:hover:not([disabled]) {
-      background-color: $grey97;
+      background-color: $bg-hover;
     }
   }
 
@@ -1057,9 +1271,11 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       > * {
         margin: 4px;
       }
+
       :first-child {
         margin-left: 0;
       }
+
       :last-child {
         margin-right: 0;
       }
@@ -1069,10 +1285,6 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   #speed-options {
     display: flex;
     flex-direction: column;
-
-    select: {
-      width: 120px;
-    }
 
     > .speed-up,
     > .speed-down {
@@ -1097,24 +1309,29 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       grid-template-columns: 20px 1fr;
       margin-bottom: 4px;
     }
+
     #alt-speed-check {
       grid-area: check;
 
       &:checked ~ #alt-speed-image {
         background-image: url('images/blue-turtle.png');
       }
+
       &:not(:checked) ~ #alt-speed-image {
         background-image: url('images/turtle.png');
       }
     }
+
     #alt-speed-image {
       background-position: center;
       background-repeat: no-repeat;
       grid-area: turtle;
     }
+
     #alt-speed-label {
       grid-area: lb;
     }
+
     #alt-speed-values-label {
       font-size: small;
       grid-area: values;
@@ -1140,15 +1357,18 @@ $logo-size: 64px;
   .dialog-buttons {
     padding-top: $dialog-logo-padding-number * 1px;
   }
+
   .dialog-container {
     opacity: 96%;
     position: absolute;
     top: $torrent-container-top;
     width: 100%;
   }
+
   .dialog-logo {
     padding-bottom: $dialog-logo-padding-number * 1px;
   }
+
   .dialog-window {
     align-items: center;
     display: flex;
@@ -1163,13 +1383,16 @@ $logo-size: 64px;
     top: $torrent-container-top * 2;
     transform: translateX(-50%);
   }
+
   .dialog-heading {
     grid-area: heading;
   }
+
   .dialog-logo {
     grid-area: icon;
     padding-right: $dialog-logo-padding-number * 1px;
   }
+
   .dialog-window {
     display: grid;
     grid-column-gap: 12px;
@@ -1193,9 +1416,9 @@ $logo-size: 64px;
   button {
     appearance: none;
     background: transparent;
-    border: 1px solid $grey60;
+    border: 1px solid $color-border;
     border-radius: 5px;
-    color: $grey20;
+    color: $fg-name;
     margin-left: 8px;
     padding: 8px;
     text-decoration: none;
@@ -1203,15 +1426,18 @@ $logo-size: 64px;
 
   a:hover,
   a:active {
-    background: linear-gradient($white, $grey87);
+    background: linear-gradient($white, $bg-menu);
   }
 }
+
 .dialog-buttons-begin {
   flex-grow: 1;
 }
+
 .dialog-buttons-end {
   display: none;
 }
+
 .dialog-container {
   border: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
@@ -1219,26 +1445,31 @@ $logo-size: 64px;
   padding: 0;
   z-index: $z-index-popup;
 }
+
 .dialog-heading {
   align-items: center;
   display: flex;
   font-size: 1.2em;
   font-weight: bold;
 }
+
 .dialog-logo {
   background: transparent url('images/logo.png') top left no-repeat;
   height: $logo-size;
   width: $logo-size;
 }
+
 .dialog-message {
   grid-area: message;
   margin: 10px 0 0;
 }
+
 .dialog-window {
   background: linear-gradient(160deg, #d21, 1%, #f7f7f7, 40%, #ccc);
   height: 100%;
   padding: $dialog-padding-number * 1px;
 }
+
 .dialog-workarea {
   display: flex;
   flex-direction: column;
@@ -1259,6 +1490,7 @@ $logo-size: 64px;
 .about-dialog-version-number {
   margin-left: 4px;
 }
+
 .about-dialog-version-checksum {
   font-size: small;
   font-style: italic;
@@ -1277,7 +1509,7 @@ $logo-size: 64px;
 
   th,
   td {
-    border: 1px solid $grey67;
+    border: 1px solid $color-border;
     padding: 5px 10px;
   }
 }
@@ -1296,6 +1528,8 @@ $logo-size: 64px;
 
 /// STATISTICS DIALOG
 
+.tabs-pages,
+.inspector-info-page,
 .statistics-dialog {
   .content {
     column-gap: 16px;
@@ -1303,6 +1537,10 @@ $logo-size: 64px;
     grid-row-gap: 6px;
     grid-template-columns: auto 1fr;
     margin: 4px 0 16px 16px;
+
+    div {
+      word-break: break-word;
+    }
   }
 
   fieldset {

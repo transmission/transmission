@@ -1,8 +1,8 @@
-/**
- * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
 import { Utils } from './utils.js';
@@ -64,7 +64,7 @@ export class Prefs extends EventTarget {
   static _setCookie(key, val) {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
-    document.cookie = `${key}=${val}; expires=${date.toGMTString()}; path=/`;
+    document.cookie = `${key}=${val}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
   }
 
   static _getCookie(key, fallback) {

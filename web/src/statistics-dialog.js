@@ -6,7 +6,7 @@
  */
 
 import { Formatter } from './formatter.js';
-import { Utils, createDialogContainer, makeUUID } from './utils.js';
+import { Utils, createDialogContainer, createInfoSection } from './utils.js';
 
 export class StatisticsDialog extends EventTarget {
   constructor(remote) {
@@ -63,63 +63,32 @@ export class StatisticsDialog extends EventTarget {
   static _create() {
     const elements = createDialogContainer('statistics-dialog');
     const { workarea } = elements;
+    elements.confirm.remove();
+    elements.dismiss.textContent = 'Close';
+    delete elements.confirm;
 
     const heading_text = 'Statistics';
     elements.root.setAttribute('aria-label', heading_text);
     elements.heading.textContent = heading_text;
 
-    const make_section = (classname, title) => {
-      const root = document.createElement('fieldset');
-      root.classList.add('section', classname);
-
-      const legend = document.createElement('legend');
-      legend.classList.add('title');
-      legend.textContent = title;
-      root.appendChild(legend);
-
-      const content = document.createElement('div');
-      content.classList.add('content');
-      root.appendChild(content);
-
-      return { content, root };
-    };
-
-    const make_row = (section, text) => {
-      const label = document.createElement('label');
-      label.textContent = text;
-      section.appendChild(label);
-
-      const item = document.createElement('div');
-      item.id = makeUUID();
-      section.appendChild(item);
-      label.setAttribute('for', item.id);
-
-      return item;
-    };
-
-    let o = make_section('current-session', 'Current session');
-    workarea.appendChild(o.root);
-
+    const labels = ['Uploaded:', 'Downloaded:', 'Ratio:', 'Running time:'];
+    let section = createInfoSection('Current session', labels);
+    const [sup, sdown, sratio, stime] = section.children;
     const session = (elements.session = {});
-    session.up = make_row(o.content, 'Uploaded:');
-    session.down = make_row(o.content, 'Downloaded:');
-    session.ratio = make_row(o.content, 'Ratio:');
-    session.time = make_row(o.content, 'Running time:');
+    session.up = sup;
+    session.down = sdown;
+    session.ratio = sratio;
+    session.time = stime;
+    workarea.appendChild(section.root);
 
-    o = make_section('total', 'Total');
-    workarea.appendChild(o.root);
-
+    section = createInfoSection('Total', labels);
+    const [tup, tdown, tratio, ttime] = section.children;
     const total = (elements.total = {});
-    total.up = make_row(o.content, 'Uploaded:');
-    total.down = make_row(o.content, 'Downloaded:');
-    total.ratio = make_row(o.content, 'Ratio:');
-    total.time = make_row(o.content, 'Running time:');
-
-    elements.heading.textContent = 'Statistics';
-    elements.dismiss.textContent = 'Close';
-    elements.heading.textContent = heading_text;
-    elements.confirm.remove();
-    delete elements.confirm;
+    total.up = tup;
+    total.down = tdown;
+    total.ratio = tratio;
+    total.time = ttime;
+    workarea.appendChild(section.root);
 
     return elements;
   }

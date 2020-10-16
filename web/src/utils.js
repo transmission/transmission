@@ -1,8 +1,8 @@
-/**
- * Copyright © Mnemosyne LLC
+/*
+ * This file Copyright (C) 2020 Mnemosyne LLC
  *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU GPL versions 2 or 3
+ * or any future license endorsed by Mnemosyne LLC.
  */
 
 export class Utils {
@@ -71,6 +71,53 @@ export class Utils {
   }
 }
 
+export function createTabsContainer(id, tabs, callback) {
+  const root = document.createElement('div');
+  root.id = id;
+  root.classList.add('tabs-container');
+
+  const buttons = document.createElement('div');
+  buttons.classList.add('tabs-buttons');
+  root.appendChild(buttons);
+
+  const pages = document.createElement('div');
+  pages.classList.add('tabs-pages');
+  root.appendChild(pages);
+
+  const button_array = [];
+  for (const [button_id, page] of tabs) {
+    const button = document.createElement('button');
+    button.id = button_id;
+    button.classList.add('tabs-button');
+    button.setAttribute('type', 'button');
+    buttons.appendChild(button);
+    button_array.push(button);
+
+    page.classList.add('hidden', 'tabs-page');
+    pages.appendChild(page);
+
+    button.addEventListener('click', () => {
+      for (const el of buttons.children) {
+        el.classList.toggle('selected', el === button);
+      }
+      for (const el of pages.children) {
+        el.classList.toggle('hidden', el !== page);
+      }
+      if (callback) {
+        callback(page);
+      }
+    });
+  }
+
+  button_array[0].classList.add('selected');
+  pages.children[0].classList.remove('hidden');
+
+  return {
+    buttons: button_array,
+    root,
+  };
+}
+
 export function createDialogContainer(id) {
   const root = document.createElement('dialog');
   root.classList.add('dialog-container', 'popup', id);
@@ -128,14 +175,6 @@ export function createDialogContainer(id) {
   };
 }
 
-export function setEnabled(el, enabled) {
-  if (enabled) {
-    el.removeAttribute('disabled');
-  } else {
-    el.setAttribute('disabled', true);
-  }
-}
-
 export function makeUUID() {
   // source: https://stackoverflow.com/a/2117523/6568470
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -144,6 +183,55 @@ export function makeUUID() {
       (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
     ).toString(16)
   );
+}
+
+export function createSection(title) {
+  const root = document.createElement('fieldset');
+  root.classList.add('section');
+
+  const legend = document.createElement('legend');
+  legend.classList.add('title');
+  legend.textContent = title;
+  root.appendChild(legend);
+
+  const content = document.createElement('div');
+  content.classList.add('content');
+  root.appendChild(content);
+
+  return { content, root };
+}
+
+export function createInfoSection(title, labels) {
+  const children = [];
+  const { root, content } = createSection(title);
+
+  for (const label_text of labels) {
+    const label_element = document.createElement('label');
+    label_element.textContent = label_text;
+    content.appendChild(label_element);
+
+    const item = document.createElement('div');
+    item.id = makeUUID();
+    content.appendChild(item);
+    label_element.setAttribute('for', item.id);
+    children.push(item);
+  }
+
+  return { children, root };
+}
+
+function setOrDeleteAttribute(el, attribute, b) {
+  if (b) {
+    el.setAttribute(attribute, true);
+  } else {
+    el.removeAttribute(attribute);
+  }
+}
+export function setEnabled(el, b) {
+  setOrDeleteAttribute(el, 'disabled', !b);
+}
+export function setChecked(el, b) {
+  setOrDeleteAttribute(el, 'checked', b);
 }
 
 function getBestMenuPos(r, bounds) {
@@ -177,4 +265,24 @@ export function movePopup(popup, x, y, boundingElement) {
 
 export function sanitizeText(text) {
   return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export class OutsideClickListener extends EventTarget {
+  constructor(el) {
+    super();
+    this.listener = (ev) => {
+      if (!el.contains(ev.target)) {
+        this.dispatchEvent(new MouseEvent(ev.type, ev));
+        ev.preventDefault();
+      }
+    };
+    Object.seal(this);
+    this.start();
+  }
+  start() {
+    setTimeout(() => document.addEventListener('click', this.listener), 0);
+  }
+  stop() {
+    document.removeEventListener('click', this.listener);
+  }
 }

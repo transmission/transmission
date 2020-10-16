@@ -4,6 +4,10 @@ module.exports = {
     "stylelint-config-sass-guidelines",
     "stylelint-config-prettier"
   ],
+  "plugins":  [
+    "stylelint-config-primer/plugins/no-undefined-vars",
+    "stylelint-config-primer/plugins/no-unused-vars"
+  ],
   "rules": {
     "block-no-empty": true,
     "color-no-invalid-hex": true,
@@ -21,6 +25,8 @@ module.exports = {
     "no-empty-source": true,
     "no-extra-semicolons": true,
     "no-invalid-double-slash-comments": true,
+    "primer/no-undefined-vars": true,
+    "primer/no-unused-vars": true,
     "property-no-unknown": true,
     "scss/at-rule-no-unknown": true,
     "selector-attribute-quotes": null,

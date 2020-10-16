@@ -24,42 +24,41 @@ class TorrentRendererHelper {
       pct = Math.round((t.getUploadRatio() * 100) / seed_ratio_limit);
     }
 
-    let extra = '';
+    const classList = ['torrent-progress-bar'];
     if (s === Torrent._StatusStopped) {
-      extra = 'paused';
+      classList.push('paused');
     } else if (s === Torrent._StatusDownloadWait) {
-      extra = 'leeching queued';
+      classList.push('leeching queued');
     } else if (t.needsMetaData()) {
-      extra = 'magnet';
+      classList.push('magnet');
     } else if (s === Torrent._StatusDownload) {
-      extra = 'leeching';
+      classList.push('leeching');
     } else if (s === Torrent._StatusSeedWait) {
-      extra = 'seeding queued';
+      classList.push('seeding queued');
     } else if (s === Torrent._StatusSeed) {
-      extra = 'seeding';
+      classList.push('seeding');
+    }
+
+    if (pct > 99) {
+      classList.push('full');
     }
 
     return {
-      background: ['torrent-progress-bar', 'background', extra].join(' '),
-      foreground: [
-        'torrent-progress-bar',
-        'foreground',
-        extra,
-        pct > 99 ? 'full' : '',
-      ].join(' '),
+      background: [...classList, 'background'],
+      foreground: [...classList, 'foreground'],
       percent: pct,
     };
   }
 
   static createProgressbar(classes) {
     const foreground = document.createElement('div');
-    foreground.className = 'torrent-progress-bar foreground';
+    foreground.classList.add('torrent-progress-bar', 'foreground');
 
     const background = document.createElement('div');
-    background.className = 'torrent-progress-bar background';
+    background.classList.add('torrent-progress-bar', 'background');
 
     const progressbar = document.createElement('div');
-    progressbar.className = `torrent-progress-bar-container ${classes}`;
+    progressbar.classList.add('torrent-progress-bar-container', classes);
     progressbar.appendChild(foreground);
     progressbar.appendChild(background);
 
@@ -74,12 +73,12 @@ class TorrentRendererHelper {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
 
     let e = progressbar.foreground;
-    Utils.setProperty(e.style, 'width', `${info.percent}%`);
-    Utils.setProperty(e, 'className', info.foreground);
+    e.classList.add(...info.foreground);
+    e.style.width = `${info.percent}%`;
     Utils.setVisible(e, info.percent > 0);
 
     e = progressbar.background;
-    Utils.setProperty(e, 'className', info.background);
+    e.classList.add(...info.background);
   }
 
   static formatUL(t) {

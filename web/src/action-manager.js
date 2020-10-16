@@ -42,11 +42,17 @@ export class ActionManager extends EventTarget {
       'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
       'select-all': { enabled: false, shortcut: 'Alt+A', text: 'Select all' },
       'show-about-dialog': { enabled: true, text: 'About' },
+      'show-inspector': {
+        enabled: true,
+        shortcut: 'Alt+I',
+        text: 'Torrent Inspector',
+      },
       'show-move-dialog': {
         enabled: false,
         shortcut: 'Alt+L',
         text: 'Set location…',
       },
+      'show-overflow-menu': { enabled: true, text: 'More options…' },
       'show-preferences-dialog': {
         enabled: true,
         shortcut: 'Alt+P',
@@ -65,12 +71,6 @@ export class ActionManager extends EventTarget {
       },
       'start-all-torrents': { enabled: false, text: 'Start all' },
       'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
-      'toggle-inspector': {
-        enabled: true,
-        shortcut: 'Alt+I',
-        text: 'Torrent Inspector',
-      },
-      'toggle-overflow-menu': { enabled: true, text: 'More options…' },
       'trash-selected-torrents': {
         enabled: false,
         text: 'Trash data and remove from list…',
@@ -186,6 +186,7 @@ export class ActionManager extends EventTarget {
       'move-down',
       'move-top',
       'move-up',
+      'show-inspector',
       'show-move-dialog',
       'remove-selected-torrents',
       'trash-selected-torrents',

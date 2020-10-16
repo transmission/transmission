@@ -5,6 +5,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+import { AlertDialog } from './alert-dialog.js';
+
 export const RPC = {
   _DaemonVersion: 'version',
   _DownSpeedLimit: 'speed-limit-down',
@@ -58,25 +60,22 @@ export class Remote {
           callback.call(context, payload, response_arg);
         }
       })
-      .catch((error) => {
-        if (error.message === Remote._SessionHeader) {
+      .catch((err) => {
+        if (err.message === Remote._SessionHeader) {
           // copy the session header and try again
-          this._session_id = error.header;
+          this._session_id = err.header;
           this.sendRequest(data, callback, context);
           return;
         }
-        console.trace();
-        // FIXME: put an error dialog here
-        /*
-        this._dialog.confirm(
-          'Connection Failed',
-          'Could not connect to the server. You may need to reload the page to reconnect.',
-          'Details',
-          () => alert(`${error}`),
-          'Dismiss'
-        );
-*/
+        console.trace(err);
         this._controller.togglePeriodicSessionRefresh(false);
+        this._controller.setCurrentPopup(
+          new AlertDialog({
+            heading: 'Connection failed',
+            message:
+              'Could not connect to the server. You may need to reload the page to reconnect.',
+          })
+        );
       });
   }
 

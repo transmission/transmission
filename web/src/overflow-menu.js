@@ -8,7 +8,7 @@
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
 import { RPC } from './remote.js';
-import { setEnabled } from './utils.js';
+import { OutsideClickListener, setEnabled } from './utils.js';
 
 export class OverflowMenu extends EventTarget {
   constructor(session_manager, prefs, remote, action_manager) {
@@ -22,6 +22,7 @@ export class OverflowMenu extends EventTarget {
     this.prefs = prefs;
     this.prefs.addEventListener('change', this.prefs_listener);
 
+    this.closed = false;
     this.remote = remote;
     this.name = 'overflow-menu';
 
@@ -34,6 +35,11 @@ export class OverflowMenu extends EventTarget {
 
     const { session_properties } = session_manager;
     Object.assign(this, this._create(session_properties));
+
+    this.outside = new OutsideClickListener(this.root);
+    this.outside.addEventListener('click', () => this.close());
+    Object.seal(this);
+
     this.show();
   }
 
@@ -43,6 +49,7 @@ export class OverflowMenu extends EventTarget {
 
   close() {
     if (!this.closed) {
+      this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
         this.session_listener
@@ -54,7 +61,7 @@ export class OverflowMenu extends EventTarget {
       this.dispatchEvent(new Event('close'));
 
       for (const key of Object.keys(this)) {
-        delete this[key];
+        this[key] = null;
       }
       this.closed = true;
     }
