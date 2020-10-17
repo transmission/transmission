@@ -43,7 +43,7 @@ extern char const* speed_T_str;
     { \
         static GQuark q; \
         \
-        if G_UNLIKELY(q == 0) \
+        if (G_UNLIKELY(q == 0)) \
         { \
             q = g_quark_from_static_string(#QN); \
         } \

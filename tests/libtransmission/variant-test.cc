@@ -249,14 +249,14 @@ TEST_F(VariantTest, parse)
 }
 
 TEST_F(VariantTest, bencParseAndReencode) {
-    struct Test
+    struct LocalTest
     {
         std::string benc;
         bool is_good;
     };
 
-    auto const tests = std::array<Test, 9>{
-        Test{ "llleee", true },
+    auto const tests = std::array<LocalTest, 9>{
+        LocalTest{ "llleee", true },
         { "d3:cow3:moo4:spam4:eggse", true },
         { "d4:spaml1:a1:bee", true },
         { "d5:greenli1ei2ei3ee4:spamd1:ai123e3:keyi214eee", true },
@@ -267,7 +267,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
         { " ", false }
     };
 
-    for (const auto& test : tests)
+    for (auto const& test : tests)
     {
         tr_variant val;
         char const* end = nullptr;
@@ -343,14 +343,14 @@ TEST_F(VariantTest, bencMalformedIncompleteString)
 
 TEST_F(VariantTest, bencToJson)
 {
-    struct Test
+    struct LocalTest
     {
         std::string benc;
         std::string expected;
     };
 
-    auto const tests = std::array<Test, 5>{
-        Test{ "i6e", "6" },
+    auto const tests = std::array<LocalTest, 5>{
+        LocalTest{ "i6e", "6" },
         { "d5:helloi1e5:worldi2ee", R"({"hello":1,"world":2})" },
         { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee", R"({"foo":[1,2,3],"hello":1,"world":2})" },
         { "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eeee", R"({"foo":[1,2,3,{"a":0}],"hello":1,"world":2})" },

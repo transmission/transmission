@@ -49,6 +49,7 @@
 #include "ConvertUTF.h"
 #include "list.h"
 #include "log.h"
+#include "mime-types.h"
 #include "net.h"
 #include "platform.h" /* tr_lockLock() */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
@@ -63,22 +64,50 @@ time_t __tr_current_time = 0;
 ****
 ***/
 
-struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result)
+struct tm* tr_gmtime_r(time_t const* timep, struct tm* result)
 {
-#ifdef HAVE_LOCALTIME_R
+#if defined(HAVE_GMTIME_R)
 
-    return localtime_r(_clock, _result);
+    return gmtime_r(timep, result);
+
+#elif defined(HAVE_GMTIME_S)
+
+    return gmtime_s(result, timep) == 0 ? result : NULL;
 
 #else
 
-    struct tm* p = localtime(_clock);
-
+    struct tm* p = gmtime(timep);
     if (p != NULL)
     {
-        *(_result) = *p;
+        *result = *p;
+        return result;
     }
 
-    return p;
+    return NULL;
+
+#endif
+}
+
+struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
+{
+#if defined(HAVE_LOCALTIME_R)
+
+    return localtime_r(timep, result);
+
+#elif defined(HAVE_LOCALTIME_S)
+
+    return localtime_s(result, timep) == 0 ? result : NULL;
+
+#else
+
+    struct tm* p = localtime(timep);
+    if (p != NULL)
+    {
+        *result = *p;
+        return result;
+    }
+
+    return NULL;
 
 #endif
 }
@@ -1931,7 +1960,7 @@ uint64_t tr_ntohll(uint64_t x)
 struct formatter_unit
 {
     char* name;
-    int64_t value;
+    size_t value;
 };
 
 struct formatter_units
@@ -1947,10 +1976,10 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(struct formatter_units* units, unsigned int kilo, char const* kb, char const* mb, char const* gb,
+static void formatter_init(struct formatter_units* units, size_t kilo, char const* kb, char const* mb, char const* gb,
     char const* tb)
 {
-    uint64_t value;
+    size_t value;
 
     value = kilo;
     units->units[TR_FMT_KB].name = tr_strdup(kb);
@@ -1969,7 +1998,7 @@ static void formatter_init(struct formatter_units* units, unsigned int kilo, cha
     units->units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(struct formatter_units const* u, char* buf, int64_t bytes, size_t buflen)
+static char* formatter_get_size_str(struct formatter_units const* u, char* buf, size_t bytes, size_t buflen)
 {
     int precision;
     double value;
@@ -2015,21 +2044,21 @@ static char* formatter_get_size_str(struct formatter_units const* u, char* buf, 
 
 static struct formatter_units size_units;
 
-void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     formatter_init(&size_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen)
+char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen)
 {
     return formatter_get_size_str(&size_units, buf, bytes, buflen);
 }
 
 static struct formatter_units speed_units;
 
-unsigned int tr_speed_K = 0U;
+size_t tr_speed_K = 0;
 
-void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_speed_K = kilo;
     formatter_init(&speed_units, kilo, kb, mb, gb, tb);
@@ -2067,15 +2096,15 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
 static struct formatter_units mem_units;
 
-unsigned int tr_mem_K = 0U;
+size_t tr_mem_K = 0;
 
-void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_mem_K = kilo;
     formatter_init(&mem_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_mem_B(char* buf, int64_t bytes_per_second, size_t buflen)
+char* tr_formatter_mem_B(char* buf, size_t bytes_per_second, size_t buflen)
 {
     return formatter_get_size_str(&mem_units, buf, bytes_per_second, buflen);
 }
@@ -2225,4 +2254,39 @@ void tr_net_init(void)
 
         initialized = true;
     }
+}
+
+/// mime-type
+
+static int compareSuffix(void const* va, void const* vb)
+{
+    char const* suffix = va;
+    struct mime_type_suffix const* entry = vb;
+    return tr_strcmp0(suffix, entry->suffix);
+}
+
+char const* tr_get_mime_type_for_filename(char const* filename)
+{
+    struct mime_type_suffix const* info = NULL;
+
+    char const* in = strrchr(filename, '.');
+    if ((in != NULL) && (strlen(++in) <= MIME_TYPE_SUFFIX_MAXLEN))
+    {
+        char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
+        char* out = lowercase_suffix;
+        while (*in != '\0')
+        {
+            *out++ = tolower((unsigned char)*in++);
+        }
+
+        *out = '\0';
+
+        info = bsearch(lowercase_suffix,
+            mime_type_suffixes,
+            TR_N_ELEMENTS(mime_type_suffixes),
+            sizeof(*mime_type_suffixes),
+            compareSuffix);
+    }
+
+    return info != NULL ? info->mime_type : NULL;
 }

@@ -167,7 +167,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 #ifdef IPV6_V6ONLY
     /* Since we always open an IPv4 socket on the same port, this
        shouldn't matter.  But I'm superstitious. */
-    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
+    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
 #endif
 
     memset(&sin6, 0, sizeof(sin6));

@@ -142,8 +142,10 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
     {
         int const sndbuf = isScrape ? 4096 : 1024;
         int const rcvbuf = isScrape ? 4096 : 3072;
-        setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
-        setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
+        /* ignore the sockopt() return values -- these are suggestions
+           rather than hard requirements & it's OK for them to fail */
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
     }
 
     /* return nonzero if this function encountered an error */
@@ -154,6 +156,9 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 
 static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 {
+    TR_UNUSED(curl);
+    TR_UNUSED(user_data);
+
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == NULL)
     {
@@ -204,11 +209,6 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 
         CertCloseStore(sys_cert_store, 0);
     }
-
-#else
-
-    TR_UNUSED(curl);
-    TR_UNUSED(user_data);
 
 #endif
 
@@ -599,9 +599,18 @@ void tr_webClose(tr_session* session, tr_web_close_mode close_mode)
     }
 }
 
-void tr_webGetTaskInfo(struct tr_web_task* task, tr_web_task_info info, void* dst)
+long tr_webGetTaskResponseCode(struct tr_web_task* task)
 {
-    curl_easy_getinfo(task->curl_easy, (CURLINFO)info, dst);
+    long code = 0;
+    curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
+    return code;
+}
+
+char const* tr_webGetTaskRealUrl(struct tr_web_task* task)
+{
+    char* url = NULL;
+    curl_easy_getinfo(task->curl_easy, CURLINFO_EFFECTIVE_URL, &url);
+    return url;
 }
 
 /*****

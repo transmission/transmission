@@ -2271,12 +2271,9 @@ static int tracker_list_get_current_torrent_id(struct DetailsImpl* di)
     int torrent_id = -1;
 
     /* if there's only one torrent in the dialog, always use it */
-    if (torrent_id < 0)
+    if (g_slist_length(di->ids) == 1)
     {
-        if (g_slist_length(di->ids) == 1)
-        {
-            torrent_id = GPOINTER_TO_INT(di->ids->data);
-        }
+        torrent_id = GPOINTER_TO_INT(di->ids->data);
     }
 
     /* otherwise, use the selected tracker's torrent */

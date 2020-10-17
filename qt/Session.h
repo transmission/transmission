@@ -15,6 +15,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
@@ -40,7 +41,7 @@ class Session : public QObject
 
 public:
     Session(QString config_dir, Prefs& prefs);
-    virtual ~Session();
+    ~Session() override;
 
     void stop();
     void restart();
@@ -176,4 +177,10 @@ private:
     bool is_definitely_local_session_ = true;
     RpcClient rpc_;
     torrent_ids_t const RecentlyActiveIDs = { -1 };
+
+    std::map<QString, QString> duplicates_;
+    QTimer duplicates_timer_;
+
+private slots:
+    void onDuplicatesTimer();
 };

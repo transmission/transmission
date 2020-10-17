@@ -8,17 +8,20 @@
 
 #pragma once
 
-#if defined(_WIN32)
-#include <windows.h> // UINT
-class QFileInfo;
-#else
-#include <unordered_map>
+#if !defined(_WIN32)
 #include <unordered_set>
-#include "Utils.h" // std::hash<QString>()
 #endif
+
+#include <unordered_map>
 
 #include <QIcon>
 #include <QString>
+
+#include "Utils.h" // std::hash<QString>()
+
+#if defined(_WIN32)
+class QFileInfo;
+#endif
 
 class QModelIndex;
 
@@ -29,7 +32,8 @@ public:
 
     QIcon folderIcon() const { return folder_icon_; }
     QIcon fileIcon() const { return file_icon_; }
-    QIcon guessMimeIcon(QString const& filename) const;
+    QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
+    QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 
 protected:
     IconCache();
@@ -38,11 +42,14 @@ private:
     QIcon const folder_icon_;
     QIcon const file_icon_;
 
+    mutable std::unordered_map<QString, QIcon> name_to_icon_;
+    mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;
+
 #if defined(_WIN32)
-    void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const;
+    void addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const;
 #else
-    mutable std::unordered_map<QString, QIcon> icon_cache_;
     mutable std::unordered_set<QString> suffixes_;
+    mutable std::unordered_map<QString, QIcon> ext_to_icon_;
     QIcon getMimeIcon(QString const& filename) const;
 #endif
 };

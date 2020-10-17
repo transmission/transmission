@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <unordered_set>
+
 #include <QApplication>
 #include <QTimer>
 #include <QTranslator>
@@ -15,6 +17,7 @@
 #include "FaviconCache.h"
 #include "Macros.h"
 #include "Typedefs.h"
+#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class Prefs;
@@ -31,11 +34,12 @@ class Application : public QApplication
 
 public:
     Application(int& argc, char** argv);
-    virtual ~Application();
+    ~Application() override;
 
     void raise();
     bool notifyApp(QString const& title, QString const& body) const;
 
+    QString const& intern(QString const& in) { return *interned_strings_.insert(in).first; }
     FaviconCache& faviconCache();
 
 public slots:
@@ -72,6 +76,8 @@ private:
 
     QString const config_name_;
     QString const display_name_;
+
+    std::unordered_set<QString> interned_strings_;
 };
 
 #undef qApp

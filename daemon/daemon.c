@@ -261,20 +261,20 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t logfile, int level, char const* name, char const* message, char const* file, int line)
+static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
 {
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
         if (name != NULL)
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, filename, line);
         }
         else
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, filename, line);
         }
     }
 
@@ -302,11 +302,11 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
         if (name != NULL)
         {
-            syslog(priority, "%s %s (%s:%d)", name, message, file, line);
+            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
         }
         else
         {
-            syslog(priority, "%s (%s:%d)", message, file, line);
+            syslog(priority, "%s (%s:%d)", message, filename, line);
         }
     }
 
@@ -317,18 +317,18 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t logfile)
+static void pumpLogMessages(tr_sys_file_t file)
 {
     tr_log_message* list = tr_logGetQueue();
 
     for (tr_log_message const* l = list; l != NULL; l = l->next)
     {
-        printMessage(logfile, l->level, l->name, l->message, l->file, l->line);
+        printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(logfile, NULL);
+        tr_sys_file_flush(file, NULL);
     }
 
     tr_logFreeQueue(list);
@@ -664,8 +664,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     tr_sessionSaveSettings(session, configDir, settings);
 
     pid_filename = NULL;
-    tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
-
+    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
     if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;

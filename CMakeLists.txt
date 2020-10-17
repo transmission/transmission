@@ -61,23 +61,24 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+    find_package(Git)
+endif()
+
 if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{GIT_COMMIT}")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
-elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
-    find_package(Git)
-    if(GIT_FOUND)
-        execute_process(
-            COMMAND
-                ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-            WORKING_DIRECTORY
-                ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE
-                TR_VCS_REVISION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    endif()
+elseif(GIT_FOUND)
+    execute_process(
+        COMMAND
+            ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
+        WORKING_DIRECTORY
+            ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE
+            TR_VCS_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -302,7 +303,7 @@ else()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" ${EVENT2_CONFIGURE_FLAGS})
+                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" ${EVENT2_CONFIGURE_FLAGS})
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
@@ -533,8 +534,11 @@ set(NEEDED_FUNCTIONS
     flock
     getmntent
     getpagesize
+    gmtime_r
+    gmtime_s
     htonll
     localtime_r
+    localtime_s
     memmem
     mkdtemp
     ntohll
@@ -655,10 +659,40 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
     add_subdirectory(dist/msi)
 endif()
 
-set(CPACK_SOURCE_GENERATOR TBZ2)
+set(CPACK_SOURCE_GENERATOR TXZ)
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
-set(CPACK_SOURCE_IGNORE_FILES
-    \\\\.git
-)
+if(NOT TR_STABLE_RELEASE)
+    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
+endif()
+list(APPEND CPACK_SOURCE_IGNORE_FILES [.]git)
+set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
+
+## Code Formatting
+
+if(GIT_FOUND)
+    message(STATUS "Looking for uncrustify")
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE TR_GIT_ROOT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/extras/pre-commit"
+            "${TR_GIT_ROOT}/.git/hooks/pre-commit"
+            COPYONLY
+        )
+        add_custom_target(check-format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+        add_custom_target(format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif()
+    unset(TR_GIT_ROOT)
+endif()
 
 include(CPack)

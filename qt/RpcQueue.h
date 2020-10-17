@@ -145,6 +145,7 @@ private:
 
 private:
     Tag const tag_;
+    static Tag next_tag;
     bool tolerate_errors_ = {};
     QFutureInterface<RpcResponse> promise_;
     QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;

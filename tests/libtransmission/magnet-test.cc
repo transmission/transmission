@@ -16,7 +16,7 @@
 
 TEST(Magnet, magnetParse)
 {
-    auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
+    auto const expected_hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
         210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
         39, 187, 9, 58, 98, 163, 137, 159, 243, 129
     };
@@ -47,8 +47,8 @@ TEST(Magnet, magnetParse)
         EXPECT_EQ(1, info->webseedCount);
         EXPECT_STREQ("http://server.webseed.org/path/to/file", info->webseeds[0]);
         EXPECT_STREQ("Display Name", info->displayName);
-        EXPECT_EQ(ExpectedHash.size(), sizeof(info->hash));
-        EXPECT_EQ(0, memcmp(info->hash, ExpectedHash.data(), ExpectedHash.size()));
+        EXPECT_EQ(expected_hash.size(), sizeof(info->hash));
+        EXPECT_EQ(0, memcmp(info->hash, expected_hash.data(), expected_hash.size()));
         tr_magnetFree(info);
     }
 }

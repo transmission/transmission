@@ -45,7 +45,7 @@ public:
 
 public:
     FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
-    ~FileTreeModel();
+    ~FileTreeModel() override;
 
     void setEditable(bool editable);
 

@@ -476,15 +476,15 @@ TEST_F(RenameTest, partialFile)
 {
     auto constexpr PieceCount = uint32_t { 33 };
     auto constexpr PieceSize = uint32_t { 32768 };
-    auto constexpr Length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
-    auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
+    auto const length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
+    auto const total_size = uint64_t(length[0]) + length[1] + length[2];
 
     /***
     ****  create our test torrent with an incomplete .part file
     ***/
 
     auto* tor = zeroTorrentInit();
-    EXPECT_EQ(TotalSize, tor->info.totalSize);
+    EXPECT_EQ(total_size, tor->info.totalSize);
     EXPECT_EQ(PieceSize, tor->info.pieceSize);
     EXPECT_EQ(PieceCount, tor->info.pieceCount);
     EXPECT_STREQ("files-filled-with-zeroes/1048576", tor->info.files[0].name);
@@ -493,12 +493,12 @@ TEST_F(RenameTest, partialFile)
 
     zeroTorrentPopulate(tor, false);
     auto* fst = tr_torrentFiles(tor, nullptr);
-    EXPECT_EQ(Length[0] - PieceSize, fst[0].bytesCompleted);
-    EXPECT_EQ(Length[1], fst[1].bytesCompleted);
-    EXPECT_EQ(Length[2], fst[2].bytesCompleted);
+    EXPECT_EQ(length[0] - PieceSize, fst[0].bytesCompleted);
+    EXPECT_EQ(length[1], fst[1].bytesCompleted);
+    EXPECT_EQ(length[2], fst[2].bytesCompleted);
     tr_torrentFilesFree(fst, tor->info.fileCount);
     auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(TotalSize, st->sizeWhenDone);
+    EXPECT_EQ(total_size, st->sizeWhenDone);
     EXPECT_EQ(PieceSize, st->leftUntilDone);
 
     /***

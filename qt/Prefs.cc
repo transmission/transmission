@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <string_view>
 
 #include <QDateTime>
 #include <QDir>
@@ -125,34 +126,43 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int }
 };
 
+namespace
+{
+
+auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>
+{{
+    { FilterMode::SHOW_ALL, "show-all" },
+    { FilterMode::SHOW_ACTIVE, "show-active" },
+    { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
+    { FilterMode::SHOW_SEEDING, "show-seeding" },
+    { FilterMode::SHOW_PAUSED, "show-paused" },
+    { FilterMode::SHOW_FINISHED, "show-finished" },
+    { FilterMode::SHOW_VERIFYING, "show-verifying" },
+    { FilterMode::SHOW_ERROR, "show-error" }
+}};
+
+auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>
+{{
+    { SortMode::SORT_BY_NAME, "sort-by-name" },
+    { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
+    { SortMode::SORT_BY_AGE, "sort-by-age" },
+    { SortMode::SORT_BY_ETA, "sort-by-eta" },
+    { SortMode::SORT_BY_PROGRESS, "sort-by-progress" },
+    { SortMode::SORT_BY_QUEUE, "sort-by-queue" },
+    { SortMode::SORT_BY_RATIO, "sort-by-ratio" },
+    { SortMode::SORT_BY_SIZE, "sort-by-size" },
+    { SortMode::SORT_BY_STATE, "sort-by-state" },
+    { SortMode::SORT_BY_ID, "sort-by-id" }
+}};
+
+} // namespace
+
 /***
 ****
 ***/
 
 Prefs::Prefs(QString config_dir) :
-    config_dir_(std::move(config_dir)),
-    FilterModes{
-        std::make_pair(FilterMode::SHOW_ALL, QStringLiteral("show-all")),
-        std::make_pair(FilterMode::SHOW_ACTIVE, QStringLiteral("show-active")),
-        std::make_pair(FilterMode::SHOW_DOWNLOADING, QStringLiteral("show-downloading")),
-        std::make_pair(FilterMode::SHOW_SEEDING, QStringLiteral("show-seeding")),
-        std::make_pair(FilterMode::SHOW_PAUSED, QStringLiteral("show-paused")),
-        std::make_pair(FilterMode::SHOW_FINISHED, QStringLiteral("show-finished")),
-        std::make_pair(FilterMode::SHOW_VERIFYING, QStringLiteral("show-verifying")),
-        std::make_pair(FilterMode::SHOW_ERROR, QStringLiteral("show-error"))
-        },
-    SortModes{
-        std::make_pair(SortMode::SORT_BY_NAME, QStringLiteral("sort-by-name")),
-        std::make_pair(SortMode::SORT_BY_ACTIVITY, QStringLiteral("sort-by-activity")),
-        std::make_pair(SortMode::SORT_BY_AGE, QStringLiteral("sort-by-age")),
-        std::make_pair(SortMode::SORT_BY_ETA, QStringLiteral("sort-by-eta")),
-        std::make_pair(SortMode::SORT_BY_PROGRESS, QStringLiteral("sort-by-progress")),
-        std::make_pair(SortMode::SORT_BY_QUEUE, QStringLiteral("sort-by-queue")),
-        std::make_pair(SortMode::SORT_BY_RATIO, QStringLiteral("sort-by-ratio")),
-        std::make_pair(SortMode::SORT_BY_SIZE, QStringLiteral("sort-by-size")),
-        std::make_pair(SortMode::SORT_BY_STATE, QStringLiteral("sort-by-state")),
-        std::make_pair(SortMode::SORT_BY_ID, QStringLiteral("sort-by-id"))
-        }
+    config_dir_(std::move(config_dir))
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -191,12 +201,13 @@ Prefs::Prefs(QString config_dir) :
 
         case CustomVariantType::SortModeType:
             {
-                auto const value = getValue<QString>(b);
+                auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto test = [&value](auto const& item) { return item.second == *value; };
-                    auto it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                    auto const& pair = it == std::end(SortModes) ? SortModes[0] : *it;
+                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    // NOLINTNEXTLINE(readability-qualified-auto)
+                    auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
+                    auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
                     values_[i] = QVariant::fromValue(SortMode(pair.first));
                 }
             }
@@ -204,12 +215,13 @@ Prefs::Prefs(QString config_dir) :
 
         case CustomVariantType::FilterModeType:
             {
-                auto const value = getValue<QString>(b);
+                auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto test = [&value](auto const& item) { return item.second == *value; };
-                    auto it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                    auto const& pair = it == std::end(FilterModes) ? FilterModes[0] : *it;
+                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    // NOLINTNEXTLINE(readability-qualified-auto)
+                    auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
+                    auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
                     values_[i] = QVariant::fromValue(FilterMode(pair.first));
                 }
             }
@@ -289,9 +301,10 @@ Prefs::~Prefs()
         case CustomVariantType::SortModeType:
             {
                 auto const mode = val.value<SortMode>().mode();
-                auto test = [&mode](auto const& item) { return item.first == mode; };
-                auto it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& pair = it == std::end(SortModes) ? SortModes[0] : *it;
+                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
+                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
                 dictAdd(&current_settings, key, pair.second);
                 break;
             }
@@ -299,9 +312,10 @@ Prefs::~Prefs()
         case CustomVariantType::FilterModeType:
             {
                 auto const mode = val.value<FilterMode>().mode();
-                auto test = [&mode](auto const& item) { return item.first == mode; };
-                auto it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes[0] : *it;
+                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
+                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
                 dictAdd(&current_settings, key, pair.second);
                 break;
             }

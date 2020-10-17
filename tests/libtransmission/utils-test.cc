@@ -184,14 +184,14 @@ int compareInts(void const* va, void const* vb) noexcept
 
 TEST_F(UtilsTest, lowerbound)
 {
-    auto constexpr A = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
+    auto const a = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
     auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
     auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
 
     for (int i = 1; i <= 10; i++)
     {
         bool exact;
-        auto const pos = tr_lowerBound(&i, A.data(), A.size(), sizeof(int), compareInts, &exact);
+        auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
         EXPECT_EQ(expected_pos[i - 1], pos);
         EXPECT_EQ(expected_exact[i - 1], exact);
     }
@@ -441,4 +441,13 @@ TEST_F(UtilsTest, env)
     EXPECT_EQ("135", s);
     s = makeString(tr_env_get_string(test_key, "c"));
     EXPECT_EQ("135", s);
+}
+
+TEST_F(UtilsTest, mimeTypes)
+{
+    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.flac"));
+    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.FLAC"));
+    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename(".avi"));
+    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"));
+    EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
 }

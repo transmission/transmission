@@ -1514,30 +1514,34 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     if (multiscrape_too_big(response->errmsg))
     {
         char const* url = response->url;
-        int* multiscrape_max = &tr_announcerGetScrapeInfo(announcer, url)->multiscrape_max;
-
-        /* Lower the max only if it hasn't already lowered for a similar error.
-           For example if N parallel multiscrapes all have the same `max` and
-           error out, lower the value once for that batch, not N times. */
-        if (*multiscrape_max >= response->row_count)
+        struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+        if (scrape_info != NULL)
         {
-            int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
-            if (*multiscrape_max != n)
-            {
-                char* scheme = NULL;
-                char* host = NULL;
-                int port;
-                if (tr_urlParse(url, strlen(url), &scheme, &host, &port, NULL))
-                {
-                    /* don't log the full URL, since that might have a personal announce id */
-                    char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
-                    tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
-                    tr_free(sanitized_url);
-                    tr_free(host);
-                    tr_free(scheme);
-                }
+            int* multiscrape_max = &scrape_info->multiscrape_max;
 
-                *multiscrape_max = n;
+            /* Lower the max only if it hasn't already lowered for a similar error.
+               For example if N parallel multiscrapes all have the same `max` and
+               error out, lower the value once for that batch, not N times. */
+            if (*multiscrape_max >= response->row_count)
+            {
+                int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
+                if (*multiscrape_max != n)
+                {
+                    char* scheme = NULL;
+                    char* host = NULL;
+                    int port;
+                    if (tr_urlParse(url, strlen(url), &scheme, &host, &port, NULL))
+                    {
+                        /* don't log the full URL, since that might have a personal announce id */
+                        char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
+                        tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
+                        tr_free(sanitized_url);
+                        tr_free(host);
+                        tr_free(scheme);
+                    }
+
+                    *multiscrape_max = n;
+                }
             }
         }
     }
@@ -1931,8 +1935,9 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if ((found = tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
+            if ((tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
             {
+                found = true;
                 copy_tier_attributes_impl(&tt->tiers[i], j, src);
             }
         }

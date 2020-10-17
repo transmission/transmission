@@ -893,7 +893,7 @@ void MainWindow::refreshActionSensitivity()
     auto const& torrents = model_.torrents();
     auto const is_paused = [](auto const* tor) { return tor->isPaused(); };
     auto const any_paused = std::any_of(std::begin(torrents), std::end(torrents), is_paused);
-    auto const any_not_paused = std::any_of(std::begin(torrents), std::end(torrents), std::not_fn(is_paused));
+    auto const any_not_paused = !std::all_of(std::begin(torrents), std::end(torrents), is_paused);
 
     auto const have_selection = selected > 0;
     auto const have_selection_with_metadata = selected_with_metadata > 0;

@@ -41,7 +41,7 @@
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
-#include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
+#include "peer-socket.h" /* for struct tr_peer_socket */
 #include "session.h" /* tr_sessionGetPublicAddress() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -86,6 +86,14 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
     return buf;
 }
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
+{
+    char addr_buf[INET6_ADDRSTRLEN];
+    tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
+    tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
+    return buf;
+}
+
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
 {
     TR_ASSERT(tr_address_is_valid(addr));
@@ -114,22 +122,20 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool ok;
+    bool success = false;
 
-    if ((ok = evutil_inet_pton(AF_INET, src, &dst->addr) == 1))
+    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
+        success = true;
     }
-
-    if (!ok) /* try IPv6 */
+    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
     {
-        if ((ok = evutil_inet_pton(AF_INET6, src, &dst->addr) == 1))
-        {
-            dst->type = TR_AF_INET6;
-        }
+        dst->type = TR_AF_INET6;
+        success = true;
     }
 
-    return ok;
+    return success;
 }
 
 /*
@@ -352,8 +358,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
-            tr_peerIoAddrStr(addr, port));
+        char addrstr[TR_ADDRSTRLEN];
+        tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
     }
 
     return ret;
@@ -406,8 +413,8 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     }
 
     optval = 1;
-    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
 
 #ifdef IPV6_V6ONLY
 
@@ -476,7 +483,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 #endif
 
     optval = 5;
-    setsockopt(fd, SOL_TCP, TCP_FASTOPEN, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_TCP, TCP_FASTOPEN, (void const*)&optval, sizeof(optval));
 
 #endif
 

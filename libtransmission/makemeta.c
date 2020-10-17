@@ -44,7 +44,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     }
 
     char* buf = tr_buildPath(dir, base, NULL);
-    tr_sys_path_native_separators(buf);
+    (void)tr_sys_path_native_separators(buf);
 
     tr_sys_path_info info;
     tr_error* error = NULL;
@@ -292,7 +292,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         {
             uint64_t const n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
-            tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
             bufptr += n_read;
             off += n_read;
             leftInPiece -= n_read;

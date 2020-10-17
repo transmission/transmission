@@ -121,7 +121,7 @@ QString AddData::readableShortName() const
     switch (type)
     {
     case FILENAME:
-        return QFileInfo(filename).fileName();
+        return QFileInfo(filename).baseName();
 
     case URL:
         return url.path().split(QLatin1Char('/')).last();

@@ -70,7 +70,12 @@ static size_t guessPacketOverhead(size_t d)
 ***
 **/
 
-#define dbgmsg(io, ...) tr_logAddDeepNamed(tr_peerIoGetAddrStr(io), __VA_ARGS__)
+#define dbgmsg(io, ...) \
+    do { \
+        char addrstr[TR_ADDRSTRLEN]; \
+        tr_peerIoGetAddrStr(io, addrstr, sizeof(addrstr)); \
+        tr_logAddDeepNamed(addrstr, __VA_ARGS__); \
+    } while(0)
 
 /**
 ***
@@ -966,16 +971,18 @@ tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
     return &io->addr;
 }
 
-char const* tr_peerIoAddrStr(tr_address const* addr, tr_port port)
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen)
 {
-    static char buf[512];
-    tr_snprintf(buf, sizeof(buf), "[%s]:%u", tr_address_to_string(addr), ntohs(port));
-    return buf;
-}
+    if (tr_isPeerIo(io))
+    {
+        tr_address_and_port_to_string(buf, buflen, &io->addr, io->port);
+    }
+    else
+    {
+        tr_strlcpy(buf, "error", buflen);
+    }
 
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io)
-{
-    return tr_isPeerIo(io) ? tr_peerIoAddrStr(&io->addr, io->port) : "error";
+    return buf;
 }
 
 void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)
@@ -1055,13 +1062,15 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    if ((io->peerIdIsSet = peer_id != NULL))
+    if (peer_id == NULL)
     {
-        memcpy(io->peerId, peer_id, 20);
+        memset(io->peerId, '\0', sizeof(io->peerId));
+        io->peerIdIsSet = false;
     }
     else
     {
-        memset(io->peerId, '\0', 20);
+        memcpy(io->peerId, peer_id, sizeof(io->peerId));
+        io->peerIdIsSet = true;
     }
 }
 

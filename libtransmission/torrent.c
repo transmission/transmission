@@ -975,7 +975,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     torrentInitFromInfo(tor);
 
     bool didRenameResumeFileToHashOnlyName = false;
-    loaded = tr_torrentLoadResume(tor, ~0, ctor, &didRenameResumeFileToHashOnlyName);
+    loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
 
     if (didRenameResumeFileToHashOnlyName)
     {
@@ -2226,21 +2226,6 @@ void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
     tr_torrentSetIdleLimitHitCallback(torrent, NULL, NULL);
 }
 
-static void get_local_time_str(char* const buffer, size_t const buffer_len)
-{
-    time_t const now = tr_time();
-
-    tr_strlcpy(buffer, ctime(&now), buffer_len);
-
-    char* newline_pos = strchr(buffer, '\n');
-
-    /* ctime() includes '\n', but it's better to be safe */
-    if (newline_pos != NULL)
-    {
-        *newline_pos = '\0';
-    }
-}
-
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
     if (tr_str_is_empty(script))
@@ -2248,8 +2233,11 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         return;
     }
 
-    char time_str[32];
-    get_local_time_str(time_str, TR_N_ELEMENTS(time_str));
+    time_t const now = tr_time();
+    struct tm tm;
+    char ctime_str[32];
+    tr_localtime_r(&now, &tm);
+    strftime(ctime_str, sizeof(ctime_str), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 
@@ -2264,7 +2252,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     char* const env[] =
     {
         tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
-        tr_strdup_printf("TR_TIME_LOCALTIME=%s", time_str),
+        tr_strdup_printf("TR_TIME_LOCALTIME=%s", ctime_str),
         tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
@@ -2614,7 +2602,9 @@ void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, t
     uint64_t pos = block;
     pos *= tor->blockSize;
     *piece = pos / tor->info.pieceSize;
-    *offset = pos - *piece * tor->info.pieceSize;
+    uint64_t piece_begin = tor->info.pieceSize;
+    piece_begin *= *piece;
+    *offset = pos - piece_begin;
     *length = tr_torBlockCountBytes(tor, block);
 }
 
@@ -2622,11 +2612,20 @@ tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_block_index_t ret;
+    tr_block_index_t ret = 0;
 
-    ret = index;
-    ret *= tor->info.pieceSize / tor->blockSize;
-    ret += offset / tor->blockSize;
+    if (tor->blockSize > 0)
+    {
+        ret = index;
+        ret *= tor->info.pieceSize / tor->blockSize;
+        ret += offset / tor->blockSize;
+    }
+    else
+    {
+        tr_logAddTorErr(tor, "Cannot calculate block number when blockSize is zero");
+        TR_ASSERT(tor->blockSize > 0);
+    }
+
     return ret;
 }
 
@@ -2756,9 +2755,11 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
 
 bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 {
-    uint64_t unused;
-    tr_file_index_t f;
-    tr_info const* inf = tr_torrentInfo(tor);
+    tr_info const* const inf = tr_torrentInfo(tor);
+    if (inf == NULL)
+    {
+        return false;
+    }
 
     /* if we've never checked this piece, then it needs to be checked */
     if (inf->pieces[p].timeChecked == 0)
@@ -2769,6 +2770,8 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
     /* If we think we've completed one of the files in this piece,
      * but it's been modified since we last checked it,
      * then it needs to be rechecked */
+    tr_file_index_t f;
+    uint64_t unused;
     tr_ioFindFileLocation(tor, p, 0, &f, &unused);
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
@@ -3375,6 +3378,58 @@ void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from
     tr_runInEventThread(tor->session, setLocation, data);
 }
 
+char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
+{
+    struct count
+    {
+        uint64_t length;
+        char const* mime_type;
+    };
+
+    tr_info const* inf = &tor->info;
+    struct count* counts = tr_new0(struct count, inf->fileCount);
+    size_t num_counts = 0;
+
+    for (tr_file const* it = inf->files, * end = it + inf->fileCount; it != end; ++it)
+    {
+        char const* mime_type = tr_get_mime_type_for_filename(it->name);
+        size_t i;
+        for (i = 0; i < num_counts; ++i)
+        {
+            if (counts[i].mime_type == mime_type)
+            {
+                counts[i].length += it->length;
+                break;
+            }
+        }
+
+        if (i == num_counts)
+        {
+            counts[i].mime_type = mime_type;
+            counts[i].length = it->length;
+            ++num_counts;
+        }
+    }
+
+    uint64_t max_len = 0;
+    char const* mime_type = NULL;
+    for (struct count const* it = counts, *end = it + num_counts; it != end; ++it)
+    {
+        if ((max_len < it->length) && (it->mime_type != NULL))
+        {
+            max_len = it->length;
+            mime_type = it->mime_type;
+        }
+    }
+
+    tr_free(counts);
+
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+    // application/octet-stream is the default value for all other cases.
+    // An unknown file type should use this type.
+    return mime_type != NULL ? mime_type : "application/octet-stream";
+}
+
 /***
 ****
 ***/
@@ -3511,7 +3566,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     tr_file const* file;
     char const* b = NULL;
     char const* s = NULL;
-    tr_sys_path_info file_info;
+    tr_sys_path_info file_info = { 0 };
 
     file = &tor->info.files[fileNum];
 

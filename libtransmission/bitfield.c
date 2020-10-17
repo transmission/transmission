@@ -410,8 +410,13 @@ void tr_bitfieldAdd(tr_bitfield* b, size_t nth)
 {
     if (!tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {
-        b->bits[nth >> 3U] |= 0x80 >> (nth & 7U);
-        tr_bitfieldIncTrueCount(b, 1);
+        size_t const offset = nth >> 3U;
+
+        if ((b->bits != NULL) && (offset < b->alloc_count))
+        {
+            b->bits[offset] |= 0x80 >> (nth & 7U);
+            tr_bitfieldIncTrueCount(b, 1);
+        }
     }
 }
 

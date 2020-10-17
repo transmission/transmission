@@ -142,7 +142,7 @@ void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
- * FIXME: this probably belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param session          the session to query
  * @param setme_dictionary the dictionary to populate
@@ -154,7 +154,7 @@ void tr_sessionGetSettings(tr_session* session, struct tr_variant* setme_diction
  * Load settings from the configuration directory's settings.json file,
  * using libtransmission's default settings as fallbacks for missing keys.
  *
- * FIXME: this belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param dictionary pointer to an uninitialized tr_variant
  * @param configDir the configuration directory to find settings.json
@@ -170,7 +170,7 @@ bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* configDir
  * Add the session's configuration settings to the benc dictionary
  * and save it to the configuration directory's settings.json file.
  *
- * FIXME: this belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param session    the session to save
  * @param configDir  the directory to write to
@@ -1636,7 +1636,8 @@ struct tr_info
 
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tr_torrentInfo(tor)->fileCount > 0;
+    tr_info const* const inf = tr_torrentInfo(tor);
+    return (inf != NULL) && (inf->fileCount > 0);
 }
 
 /**

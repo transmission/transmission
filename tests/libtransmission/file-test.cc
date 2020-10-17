@@ -976,15 +976,15 @@ TEST_F(FileTest, pathNativeSeparators)
 {
     EXPECT_EQ(nullptr, tr_sys_path_native_separators(nullptr));
 
-    struct Test
+    struct LocalTest
     {
         std::string input;
         std::string expected_output;
     };
 
-    auto const tests = std::array<Test, 5>
+    auto const tests = std::array<LocalTest, 5>
     {
-        Test{ "", "" },
+        LocalTest{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
         { "/", TR_IF_WIN32("\\", "/") },
         { "/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
