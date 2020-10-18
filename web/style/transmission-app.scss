@@ -1,9 +1,11 @@
 @use 'sass:color';
 @use 'sass:math';
 
-// COLORS
-
+// Color palette recycled from GitHub Primer.
+// Please use those values if you need to add colors.
+// https://primer.style/css/support/color-system
 $blue-100: #dbedff;
+$blue-200: #c8e1ff;
 $blue-300: #79b8ff;
 $blue-500: #0366d6;
 $green-100: #dcffe4;
@@ -16,31 +18,18 @@ $grey-300: #d1d5da;
 $grey-400: #959da5;
 $grey-500: #6a737d;
 $grey-800: #2f363d;
-$purple-100: #e6dcfd;
+$pink-300: #f692ce;
+$pink-500: #ea4aaa;
 $purple-000: #f5f0ff;
+$purple-100: #e6dcfd;
 $red-200: #fdaeb7;
 $white: #fff;
-
-$bg-hover: $grey-100;
-$bg-menu: $grey-200;
-$bg-even: $white;
-$bg-odd: $grey-100;
-$bg-selection: $purple-100;
-$bg-selection-2: $purple-000;
-$bg-toolbar-gradient-1: $grey-300;
-$bg-toolbar-gradient-2: $grey-400;
-$fg-name: $grey-800;
-$fg-port-closed: $red-200;
-$fg-port-open: $green-200;
-$fg-text-disabled: $grey-400;
-$fg-text-error: $red-200;
-$fg-text-secondary: $grey-500;
-$fg-text-tertiary: $grey-400;
-$fg-text: $grey-800;
-$color-border: $fg-text-tertiary;
+$yellow-200: #fff5b1;
+$yellow-300: #ffea7f;
+$yellow-500: #ffd33d;
 
 // Z-INDEX ENUM
-$z-index-progressbar: 1;
+// $z-index-progressbar: 1;
 $z-index-popup: 2;
 
 // SVG ICONS -- see images/README.md for sources and license details
@@ -70,29 +59,8 @@ $width-threshold-number: 550;
   background-image: url($src), linear-gradient($topColor, $bottomColor);
 }
 
-@mixin button-image(
-  $image-url,
-  $idle-color-top,
-  $idle-color-bottom,
-  $active-color-top,
-  $active-color-bottom
-) {
-  background-image: url($image-url),
-    linear-gradient($idle-color-top, $idle-color-bottom);
-
-  &:active,
-  &:checked,
-  &.selected {
-    background-image: url($image-url),
-      linear-gradient($active-color-top, $active-color-bottom);
-  }
-}
-
-$nonselected-gradient-top: $white;
-$nonselected-gradient-bottom: $bg-menu;
-
 @mixin button {
-  border: 1px solid $color-border;
+  border: 1px solid var(--color-border);
   cursor: pointer;
   display: inline-block;
   padding: 3px;
@@ -112,45 +80,52 @@ $nonselected-gradient-bottom: $bg-menu;
 
 html,
 body {
-  //zzz
-  --progressbar-leeching-bg: #eee;
-  --progressbar-leeching-fg-1: #{$blue-300};
-  --progressbar-leeching-fg-2: #{$blue-500};
-  --progressbar-leeching-queued-bg: #f3f3f3;
-  --progressbar-leeching-queued-fg-1: #{$blue-100};
-  --progressbar-leeching-queued-fg-2: #{$blue-300};
-  --progressbar-magnet-bg: #e98484;
-  --progressbar-paused-bg-1: #{$grey-100};
-  --progressbar-paused-bg-2: #{$grey-300};
-  --progressbar-paused-fg-1: #{$grey-300};
-  --progressbar-paused-fg-2: #{$grey-500};
-  --progressbar-seeding-bg: #5e5;
-  --progressbar-seeding-fg-1: #{$green-300};
-  --progressbar-seeding-fg-2: #{$green-500};
-  --progressbar-seeding-queued-bg: #5e5;
-  --progressbar-seeding-queued-fg-1: #{$green-100};
-  --progressbar-seeding-queued-fg-2: #{$green-300};
-  color: $fg-text;
+  --color-bg-even: #{$white};
+  --color-bg-hover: #{$grey-100};
+  --color-bg-menu: #{$grey-200};
+  --color-bg-odd: #{$grey-100};
+  --color-bg-selection-1: #{$purple-100};
+  --color-bg-selection-2: #{$purple-000};
+  --color-border: #{$grey-400};
+  --color-fg-disabled: #{$grey-400};
+  --color-fg-error: #{$red-200};
+  --color-fg-name: #{$grey-800};
+  --color-fg-port-closed: #{$red-200};
+  --color-fg-port-open: #{$green-200};
+  --color-fg-primary: #{$grey-800};
+  --color-fg-secondary: #{$grey-500};
+  --color-fg-tertiary: #{$grey-400};
+  --color-progressbar-background-1: #{$grey-100};
+  --color-progressbar-background-2: #{$grey-400};
+  --color-progressbar-leech-1: #{$blue-300};
+  --color-progressbar-leech-2: #{$blue-500};
+  --color-progressbar-leech-paused-1: #{$blue-200};
+  --color-progressbar-leech-paused-2: #{$grey-400};
+  --color-progressbar-leech-queued-1: #{$blue-100};
+  --color-progressbar-leech-queued-2: #{$blue-300};
+  --color-progressbar-magnet-1: #{$yellow-300};
+  --color-progressbar-magnet-2: #{$yellow-500};
+  --color-progressbar-magnet-paused-1: #{$yellow-200};
+  --color-progressbar-magnet-paused-2: #{$grey-400};
+  --color-progressbar-seed-1: #{$green-300};
+  --color-progressbar-seed-2: #{$green-500};
+  --color-progressbar-seed-paused-1: #{$green-200};
+  --color-progressbar-seed-paused-2: #{$grey-400};
+  --color-progressbar-seed-queued-1: #{$green-100};
+  --color-progressbar-seed-queued-2: #{$green-300};
+  --color-progressbar-verify-1: #{$pink-300};
+  --color-progressbar-verify-2: #{$pink-500};
+  --color-tab-deselected-1: #{$grey-100};
+  --color-tab-deselected-2: #{$grey-400};
+  --color-tab-selected-1: #{$purple-100};
+  --color-tab-selected-2: #{$purple-000};
+  --color-toolbar-background: linear-gradient(#{$grey-300}, #{$grey-400});
+
+  color: var(--color-fg-primary);
   font-family: Verdana, Arial, Helvetica, sans-serif;
   height: 100%;
   margin: 0;
   overflow: hidden;
-  /*
-  @media (prefers-color-scheme: dark) {
-    --progressbar-leeching-bg: #eee;
-    --progressbar-leeching-fg: #42a9ff;
-    --progressbar-leeching-queued-bg: #f3f3f3;
-    --progressbar-leeching-queued-fg: #abc3cf;
-    --progressbar-magnet-bg: #e98484;
-    --progressbar-magnet-fg: #eee;
-    --progressbar-paused-bg: #eee;
-    --progressbar-paused-fg: #aaa;
-    --progressbar-seeding-bg: #5e5;
-    --progressbar-seeding-fg: #4e4;
-    --progressbar-seeding-queued-bg: #5e5;
-    --progressbar-seeding-queued-fg: #aec0b1;
-  }
-*/
 }
 
 img {
@@ -166,10 +141,10 @@ a {
 }
 
 .even {
-  background-color: $bg-even;
+  background-color: var(--color-bg-even);
 }
 .odd {
-  background-color: $bg-odd;
+  background-color: var(--color-bg-odd);
 }
 
 .mainwin {
@@ -198,8 +173,8 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 #mainwin-toolbar {
   align-items: center;
-  background: linear-gradient($bg-toolbar-gradient-1, $bg-toolbar-gradient-2);
-  border-bottom: 1px solid $color-border;
+  background: var(--color-toolbar-background);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-direction: row;
   height: $toolbar-height;
@@ -219,7 +194,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     width: $toolbar-height;
 
     &:hover:not([disabled]) {
-      background-color: $bg-hover;
+      background-color: var(--color-bg-hover);
     }
 
     &[disabled] {
@@ -229,7 +204,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 
   > .toolbar-separator {
-    border-left: 1px solid $color-border;
+    border-left: 1px solid var(--color-border);
     height: 25px;
     margin: 0 6px 0 0;
   }
@@ -282,8 +257,8 @@ $filterbar-height: $filterbar-height-number * 1px;
 
 .mainwin-filterbar {
   align-items: center;
-  background: linear-gradient($bg-toolbar-gradient-1, $bg-toolbar-gradient-2);
-  border-bottom: 1px solid $color-border;
+  background: var(--color-toolbar-background);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-direction: row;
   height: $filterbar-height;
@@ -297,7 +272,7 @@ $filterbar-height: $filterbar-height-number * 1px;
 
 #torrent-search {
   &.blur {
-    color: $fg-text-tertiary;
+    color: var(--color-fg-tertiary);
   }
 }
 
@@ -322,6 +297,7 @@ $speed-icon-size: 12px;
 $pauseresume-size: 14px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
+$progressbar-height: $progressbar-height-number * 1px;
 $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 .flex {
@@ -361,12 +337,12 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   width: 100%;
 
   .torrent {
-    border-bottom: 1px solid $color-border;
-    color: $fg-text-secondary;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-fg-secondary);
     user-select: none;
 
     &.paused {
-      color: $fg-text-disabled;
+      color: var(--color-fg-disabled);
     }
 
     .icon {
@@ -472,7 +448,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     &.selected {
-      background-color: $bg-selection;
+      background-color: var(--color-bg-selection-1);
     }
 
     &.selected .torrent-progress-details.error,
@@ -516,7 +492,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
   .torrent-progress-details.error,
   .torrent-peer-details.error {
-    color: $fg-text-error;
+    color: var(--color-fg-error);
   }
 
   .torrent-name {
@@ -534,7 +510,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     &:not(.paused) {
-      color: $fg-name;
+      color: var(--color-fg-name);
     }
   }
 
@@ -550,15 +526,14 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       margin: 2px 0;
     }
 
-    .torrent-progress-bar-container {
+    .torrent-progress-bar {
       flex-grow: 1;
     }
   }
 
-  .torrent-progress-bar-container {
+  .torrent-progress-bar {
     height: ($progressbar-height-number - ($progressbar-border-number * 2)) *
       1px;
-    position: relative;
 
     &.compact {
       min-width: 50px;
@@ -567,88 +542,84 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .torrent-progress-bar {
+    background-repeat: no-repeat;
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
-    bottom: 0;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
+    height: $progressbar-height;
+    width: 100%;
 
-    &.background {
-      right: 0;
+    @function progressbar-gradient($color1, $color2) {
+      @return linear-gradient(to bottom, $color1, $color2 80%);
     }
 
-    &.foreground {
-      z-index: $z-index-progressbar;
-
-      &:not(.full) {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-      }
+    @mixin progressbar-background($color1, $color2) {
+      background: progressbar-gradient($color1, $color2),
+        progressbar-gradient(
+          var(--color-progressbar-background-1),
+          var(--color-progressbar-background-2)
+        );
+      background-repeat: no-repeat;
     }
 
-    @mixin progressbar-gradient($value) {
-      background: $value;
-    }
-
-    @mixin progressbar-gradient2($value1, $value2) {
-      background: linear-gradient(to bottom, $value1, $value2 80%);
-      border-color: $value2;
-    }
-
-    // FIXME: 50% torrents' progressbars don't work. We don't have a way to overlay the two progressbars
-
-    &.leeching.background {
-      @include progressbar-gradient(var(--progressbar-leeching-bg));
-    }
-    &.leeching.foreground {
-      @include progressbar-gradient2(
-        var(--progressbar-leeching-fg-1),
-        var(--progressbar-leeching-fg-2)
+    &.leech.paused {
+      @include progressbar-background(
+        var(--color-progressbar-leech-paused-1),
+        var(--color-progressbar-leech-paused-2)
       );
     }
-    &.leeching.queued.background {
-      @include progressbar-gradient(var(--progressbar-leeching-queued-bg));
-    }
-    &.leeching.queued.foreground {
-      @include progressbar-gradient2(
-        var(--progressbar-leeching-queued-fg-1),
-        var(--progressbar-leeching-queued-fg-2)
+    &.leech.queued {
+      @include progressbar-background(
+        var(--color-progressbar-leech-queued-1),
+        var(--color-progressbar-leech-queued-2)
       );
     }
-    &.magnet.background {
-      @include progressbar-gradient(var(--progressbar-magnet-bg));
-    }
-    &.paused.background {
-      @include progressbar-gradient2(
-        var(--progressbar-paused-bg-1),
-        var(--progressbar-paused-bg-2)
+    &.leech {
+      @include progressbar-background(
+        var(--color-progressbar-leech-1),
+        var(--color-progressbar-leech-2)
       );
     }
-    &.paused.foreground {
-      @include progressbar-gradient2(
-        var(--progressbar-paused-fg-1),
-        var(--progressbar-paused-fg-2)
+    &.magnet.paused {
+      @include progressbar-background(
+        var(--color-progressbar-magnet-paused-1),
+        var(--color-progressbar-magnet-paused-2)
       );
     }
-    &.seeding.background {
-      @include progressbar-gradient(var(--progressbar-seeding-bg));
-    }
-    &.seeding.foreground {
-      @include progressbar-gradient2(
-        var(--progressbar-seeding-fg-1),
-        var(--progressbar-seeding-fg-2)
+    &.magnet {
+      @include progressbar-background(
+        var(--color-progressbar-magnet-1),
+        var(--color-progressbar-magnet-2)
       );
     }
-    &.seeding.queued.background {
-      @include progressbar-gradient(var(--progressbar-seeding-queued-bg));
+    &.paused {
+      @include progressbar-background(
+        var(--color-progressbar-paused-1),
+        var(--color-progressbar-paused-2)
+      );
     }
-    &.seeding.queued.foreground {
-      @include progressbar-gradient2(
-        var(--progressbar-seeding-queued-fg-1),
-        var(--progressbar-seeding-queued-fg-2)
+    &.seed.paused {
+      @include progressbar-background(
+        var(--color-progressbar-seed-paused-1),
+        var(--color-progressbar-seed-paused-2)
+      );
+    }
+    &.seed.queued {
+      @include progressbar-background(
+        var(--color-progressbar-seed-queued-1),
+        var(--color-progressbar-seed-queued-2)
+      );
+    }
+    &.seed {
+      @include progressbar-background(
+        var(--color-progressbar-seed-1),
+        var(--color-progressbar-seed-2)
+      );
+    }
+    &.verify {
+      @include progressbar-background(
+        var(--color-progressbar-verify-1),
+        var(--color-progressbar-verify-2)
       );
     }
   }
@@ -657,13 +628,18 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 /// PREFERENCES DIALOG
 
 @mixin tab-image($image-url) {
-  @include button-image(
-    $image-url,
-    $nonselected-gradient-top,
-    $nonselected-gradient-bottom,
-    $bg-selection,
-    $bg-selection-2
-  );
+  background-image: url($image-url),
+    linear-gradient(
+      var(--color-tab-deselected-1),
+      var(--color-tab-deselected-2)
+    );
+
+  &:active,
+  &:checked,
+  &.selected {
+    background-image: url($image-url),
+      linear-gradient(var(--color-tab-selected-1), var(--color-tab-selected-2));
+  }
 }
 
 #inspector-tab-info {
@@ -688,14 +664,14 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     left: 0;
   }
   @media screen and (min-width: ($width-threshold-number + 1) * 1px) {
-    border-left: 1px solid $fg-text-secondary;
+    border-left: 1px solid var(--color-fg-secondary);
     width: 570px;
   }
 }
 
 #prefs-dialog {
   $background-color: $white;
-  $disabled-color: $fg-text-disabled;
+  $disabled-color: var(--color-fg-disabled);
 
   background: $background-color;
   bottom: 0;
@@ -753,10 +729,10 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     font-weight: bold;
     margin-left: 5px;
     &[data-open='true'] {
-      color: $fg-port-open;
+      color: var(--color-fg-port-open);
     }
     &[data-open='false'] {
-      color: $fg-port-closed;
+      color: var(--color-fg-port-closed);
     }
   }
 
@@ -836,7 +812,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 .tabs-container {
   align-items: stretch;
   background: $white;
-  border-left: solid 1px $color-border;
+  border-left: solid 1px var(--color-border);
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -949,7 +925,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .inspector-torrent-file-list-entry-name {
-    color: $fg-name;
+    color: var(--color-fg-name);
     cursor: pointer;
     grid-area: name;
     overflow: hidden;
@@ -959,11 +935,11 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
   .inspector-torrent-file-list-entry.skip
     > .inspector-torrent-file-list-entry-name {
-    color: $fg-text-disabled;
+    color: var(--color-fg-disabled);
   }
 
   .inspector-torrent-file-list-entry-progress {
-    color: $fg-text-secondary;
+    color: var(--color-fg-secondary);
     grid-area: info;
   }
 
@@ -1016,7 +992,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     .tracker-activity {
-      color: $fg-text-secondary;
+      color: var(--color-fg-secondary);
       display: table;
       float: left;
       margin-top: 1px;
@@ -1028,7 +1004,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
 
     table {
-      color: $fg-text-secondary;
+      color: var(--color-fg-secondary);
       float: right;
     }
 
@@ -1043,7 +1019,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   .tracker-host {
-    color: $fg-name;
+    color: var(--color-fg-name);
     font-size: 1.2em;
   }
 }
@@ -1113,16 +1089,6 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 /// FILE PRIORITY BUTTONS
 
-@mixin file-button-image($image-url) {
-  @include button-image(
-    $image-url,
-    color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 80%),
-    color.mix($nonselected-gradient-top, $nonselected-gradient-bottom, 20%),
-    color.mix($bg-selection, $bg-selection-2, 80%),
-    color.mix($bg-selection, $bg-selection-2, 20%)
-  );
-}
-
 .file-priority-radiobox {
   $size-number: 20;
   $size: $size-number * 1px;
@@ -1146,16 +1112,16 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 
   > .low {
-    @include file-button-image($image-chevron-dn);
+    @include tab-image($image-chevron-dn);
     border-right-width: 0;
   }
 
   > .normal {
-    @include file-button-image($image-baseline);
+    @include tab-image($image-baseline);
   }
 
   > .high {
-    @include file-button-image($image-chevron-up);
+    @include tab-image($image-chevron-up);
     border-left-width: 0;
   }
 }
@@ -1163,8 +1129,8 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 /// CONTEXT MENU
 
 .context-menu {
-  $background-color: $bg-menu;
-  $disabled-color: $fg-text-disabled;
+  $background-color: var(--color-bg-menu);
+  $disabled-color: var(--color-fg-disabled);
 
   background: $background-color;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
@@ -1177,7 +1143,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
     &:hover:not([disabled]),
     &:focus:not([disabled]) {
-      background-image: linear-gradient($white, $bg-menu);
+      background-image: linear-gradient($white, var(--color-bg-menu));
       cursor: pointer;
     }
 
@@ -1189,7 +1155,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 }
 
 .context-menu-separator {
-  border-bottom: 1px solid $fg-text-secondary;
+  border-bottom: 1px solid var(--color-fg-secondary);
   margin-bottom: 10px;
   padding-bottom: 10px;
 }
@@ -1197,7 +1163,14 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 /// OVERFLOW MENU
 
 .overflow-menu {
-  background: linear-gradient(160deg, #d21, 1%, $bg-hover, 40%, $bg-menu);
+  background: linear-gradient(
+    160deg,
+    #d21,
+    1%,
+    var(--color-bg-hover),
+    40%,
+    var(--color-bg-menu)
+  );
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   padding: 20px;
@@ -1230,17 +1203,17 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   a,
   button,
   label {
-    color: $fg-text;
+    color: var(--color-fg-primary);
     font-size: 1em;
 
     &[disabled] {
-      color: $fg-text-disabled;
+      color: var(--color-fg-disabled);
       cursor: default;
     }
 
     &:focus:not([disabled]),
     &:hover:not([disabled]) {
-      background-color: $bg-hover;
+      background-color: var(--color-bg-hover);
     }
   }
 
@@ -1416,9 +1389,9 @@ $logo-size: 64px;
   button {
     appearance: none;
     background: transparent;
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     border-radius: 5px;
-    color: $fg-name;
+    color: var(--color-fg-name);
     margin-left: 8px;
     padding: 8px;
     text-decoration: none;
@@ -1426,7 +1399,7 @@ $logo-size: 64px;
 
   a:hover,
   a:active {
-    background: linear-gradient($white, $bg-menu);
+    background: linear-gradient($white, var(--color-bg-menu));
   }
 }
 
@@ -1509,7 +1482,7 @@ $logo-size: 64px;
 
   th,
   td {
-    border: 1px solid $color-border;
+    border: 1px solid var(--color-border);
     padding: 5px 10px;
   }
 }

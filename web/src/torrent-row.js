@@ -11,74 +11,45 @@ import { Utils } from './utils.js';
 
 class TorrentRendererHelper {
   static getProgressInfo(controller, t) {
-    const s = t.getStatus();
-    const seed_ratio_limit = t.seedRatioLimit(controller);
-
-    let pct = 100;
-    if (t.needsMetaData()) {
-      pct = t.getMetadataPercentComplete() * 100;
-    } else if (!t.isDone()) {
-      pct = Math.round(t.getPercentDone() * 100);
-    } else if (seed_ratio_limit > 0 && t.isSeeding()) {
-      // don't split up the bar if paused or queued
-      pct = Math.round((t.getUploadRatio() * 100) / seed_ratio_limit);
-    }
-
+    const status = t.getStatus();
     const classList = ['torrent-progress-bar'];
-    if (s === Torrent._StatusStopped) {
+    let percent = null;
+
+    if (status === Torrent._StatusStopped) {
       classList.push('paused');
-    } else if (s === Torrent._StatusDownloadWait) {
-      classList.push('leeching queued');
-    } else if (t.needsMetaData()) {
+    }
+
+    if (t.needsMetaData()) {
       classList.push('magnet');
-    } else if (s === Torrent._StatusDownload) {
-      classList.push('leeching');
-    } else if (s === Torrent._StatusSeedWait) {
-      classList.push('seeding queued');
-    } else if (s === Torrent._StatusSeed) {
-      classList.push('seeding');
+      percent = Math.round(t.getMetadataPercentComplete() * 100);
+    } else if (status === Torrent._StatusCheck) {
+      classList.push('verify');
+      percent = Math.round(t.getRecheckProgress() * 100);
+    } else if (t.getLeftUntilDone() > 0) {
+      classList.push('leech');
+      percent = Math.round(t.getPercentDone() * 100);
+    } else {
+      classList.push('seed');
+      const seed_ratio_limit = t.seedRatioLimit(controller);
+      percent =
+        seed_ratio_limit > 0
+          ? (t.getUploadRatio() * 100) / seed_ratio_limit
+          : 100;
     }
-
-    if (pct > 99) {
-      classList.push('full');
+    if (t.isQueued()) {
+      classList.push('queued');
     }
 
     return {
-      background: [...classList, 'background'],
-      foreground: [...classList, 'foreground'],
-      percent: pct,
-    };
-  }
-
-  static createProgressbar(classes) {
-    const foreground = document.createElement('div');
-    foreground.classList.add('torrent-progress-bar', 'foreground');
-
-    const background = document.createElement('div');
-    background.classList.add('torrent-progress-bar', 'background');
-
-    const progressbar = document.createElement('div');
-    progressbar.classList.add('torrent-progress-bar-container', classes);
-    progressbar.appendChild(foreground);
-    progressbar.appendChild(background);
-
-    return {
-      background,
-      element: progressbar,
-      foreground,
+      classList,
+      percent,
     };
   }
 
   static renderProgressbar(controller, t, progressbar) {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
-
-    let e = progressbar.foreground;
-    e.classList.add(...info.foreground);
-    e.style.width = `${info.percent}%`;
-    Utils.setVisible(e, info.percent > 0);
-
-    e = progressbar.background;
-    e.classList.add(...info.background);
+    progressbar.className = info.classList.join(' ');
+    progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
   }
 
   static formatUL(t) {
@@ -298,8 +269,9 @@ export class TorrentRendererFull {
 
     const progress = document.createElement('div');
     progress.classList.add('torrent-progress');
-    const progressbar = TorrentRendererHelper.createProgressbar('full');
-    progress.appendChild(progressbar.element);
+    const progressbar = document.createElement('div');
+    progressbar.classList.add('torrent-progress-bar', 'full');
+    progress.appendChild(progressbar);
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
     const image = document.createElement('div');
@@ -379,7 +351,8 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   createRow(torrent) {
-    const progressbar = TorrentRendererHelper.createProgressbar('compact');
+    const progressbar = document.createElement('div');
+    progressbar.classList.add('torrent-progress-bar', 'compact');
 
     const icon = document.createElement('div');
     icon.classList.add('icon');
@@ -399,7 +372,7 @@ export class TorrentRendererCompact {
     name.className = 'torrent-name compact';
 
     const root = document.createElement('li');
-    root.appendChild(progressbar.element);
+    root.appendChild(progressbar);
     root.appendChild(details);
     root.appendChild(name);
     root.appendChild(icon);
@@ -418,10 +391,13 @@ export class TorrentRow {
     this._view = view;
     this._torrent = torrent;
     this._element = view.createRow(torrent);
-    this._torrent.addEventListener('dataChanged', () =>
-      this.render(controller)
-    );
-    this.render(controller);
+
+    const update = () => {
+      console.log('update');
+      this.render(controller);
+    };
+    this._torrent.addEventListener('dataChanged', update);
+    update();
   }
 
   getElement() {
