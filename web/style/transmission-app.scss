@@ -697,9 +697,15 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
       padding-bottom: 5px;
 
       &:not(:first-of-type) {
-        padding-top: 20px;
+        margin-top: 20px;
       }
     }
+  }
+
+  .alt-speed-section-label {
+    background: transparent url('images/blue-turtle.png') no-repeat;
+    background-position: left 4px;
+    padding-left: 22px;
   }
 
   :disabled,

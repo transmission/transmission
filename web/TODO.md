@@ -1,16 +1,6 @@
 # TODO
 
-- [ ] prefs
-  - [x] port label is not set
-  - [x] blocklist count label is malformatted
-  - [x] remove debouncer from prefs-dialog
-  - [ ] prefs dialog needs blue turtle
-  - [ ] editing settings in prefs dialog has no effect
-  - [ ] remove dead code
 - [ ] "about" dialog doesn't work on firefox mobile beta
-- [ ] colors
-  - [ ] fix progressbars to work like they did in old client
-  - [ ] honor prefers-color-scheme
 - [ ] inspector is goofy
   - [ ] tier list looks wrong on mobile
   - [ ] peers list looks awful
@@ -21,4 +11,3 @@
   - [ ] shorten width of input field
 - [ ] maybe hide focus border on tab buttons? it looks bad on dark mode mobile
 - [ ] should there be a maximum width for the app? it looks kind of bad on a desktop when the window is wide
-- [ ] pause/resume not change the progressbar class

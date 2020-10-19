@@ -313,7 +313,7 @@ export class PrefsDialog extends EventTarget {
 
     label = document.createElement('div');
     label.textContent = 'Alternative Speed Limits';
-    label.classList.add('section-label');
+    label.classList.add('section-label', 'alt-speed-section-label');
     root.appendChild(label);
 
     label = document.createElement('div');
