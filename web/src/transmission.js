@@ -25,7 +25,7 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { setEnabled, movePopup, Utils } from './utils.js';
+import { setEnabled, setTextContent, movePopup, Utils } from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -687,16 +687,18 @@ FIXME: fix this when notifications get fixed
       return;
     }
 
-    // handle the per-row "torrent-resume" button
-    if (ev.target.classList.contains('torrent-resume')) {
-      this._startTorrents([row.getTorrent()]);
-      return;
-    }
-
-    // handle the per-row "torrent-pause" button
-    if (ev.target.classList.contains('torrent-pause')) {
-      this._stopTorrents([row.getTorrent()]);
-      return;
+    // handle the per-row pause/resume button
+    if (ev.target.classList.contains('torrent-pauseresume-button')) {
+      switch (ev.target.dataset.action) {
+        case 'pause':
+          this._stopTorrents([row.getTorrent()]);
+          break;
+        case 'resume':
+          this._startTorrents([row.getTorrent()]);
+          break;
+        default:
+          break;
+      }
     }
 
     // Prevents click carrying to parent element
@@ -838,9 +840,9 @@ FIXME: fix this when notifications get fixed
     const d = torrents.reduce((acc, tor) => acc + tor.getDownloadSpeed(), 0);
     const str = fmt.countString('Transfer', 'Transfers', this._rows.length);
 
-    document.getElementById('speed-up-label').textContent = fmt.speedBps(u);
-    document.getElementById('speed-dn-label').textContent = fmt.speedBps(d);
-    document.getElementById('filter-count').textContent = str;
+    setTextContent(document.getElementById('speed-up-label'), fmt.speedBps(u));
+    setTextContent(document.getElementById('speed-dn-label'), fmt.speedBps(d));
+    setTextContent(document.getElementById('filter-count'), str);
   }
 
   _updateFilterSelect() {

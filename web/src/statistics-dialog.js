@@ -6,7 +6,12 @@
  */
 
 import { Formatter } from './formatter.js';
-import { Utils, createDialogContainer, createInfoSection } from './utils.js';
+import {
+  Utils,
+  setTextContent,
+  createDialogContainer,
+  createInfoSection,
+} from './utils.js';
 
 export class StatisticsDialog extends EventTarget {
   constructor(remote) {
@@ -47,17 +52,20 @@ export class StatisticsDialog extends EventTarget {
 
     let s = stats['current-stats'];
     let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    this.elements.session.up.textContent = fmt.size(s.uploadedBytes);
-    this.elements.session.down.textContent = fmt.size(s.downloadedBytes);
-    this.elements.session.ratio.textContent = fmt.ratioString(ratio);
-    this.elements.session.time.textContent = fmt.timeInterval(s.secondsActive);
+    setTextContent(this.elements.session.up, fmt.size(s.uploadedBytes));
+    setTextContent(this.elements.session.down, fmt.size(s.downloadedBytes));
+    setTextContent(this.elements.session.ratio, fmt.ratioString(ratio));
+    setTextContent(
+      this.elements.session.time,
+      fmt.timeInterval(s.secondsActive)
+    );
 
     s = stats['cumulative-stats'];
     ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
-    this.elements.total.up.textContent = fmt.size(s.uploadedBytes);
-    this.elements.total.down.textContent = fmt.size(s.downloadedBytes);
-    this.elements.total.ratio.textContent = fmt.ratioString(ratio);
-    this.elements.total.time.textContent = fmt.timeInterval(s.secondsActive);
+    setTextContent(this.elements.total.up, fmt.size(s.uploadedBytes));
+    setTextContent(this.elements.total.down, fmt.size(s.downloadedBytes));
+    setTextContent(this.elements.total.ratio, fmt.ratioString(ratio));
+    setTextContent(this.elements.total.time, fmt.timeInterval(s.secondsActive));
   }
 
   static _create() {

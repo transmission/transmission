@@ -286,3 +286,12 @@ export class OutsideClickListener extends EventTarget {
     document.removeEventListener('click', this.listener);
   }
 }
+
+export function setTextContent(e, text) {
+  console.log(e);
+  console.log(text);
+
+  if (e.textContent !== text) {
+    e.textContent = text;
+  }
+}

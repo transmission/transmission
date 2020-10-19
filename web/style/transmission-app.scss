@@ -52,7 +52,19 @@ $image-speed: 'images/checkered-flag.svg';
 $image-trackers: 'images/diagram-3-fill.svg';
 $image-upload-download: 'images/up-and-down-arrows.svg';
 
-$width-threshold-number: 550;
+@mixin for-phone-only {
+  @media (max-width: 599px) {
+    @content;
+  }
+}
+@mixin for-tablet-portrait-up {
+  @media (min-width: 600px) {
+    @content;
+  }
+}
+// @mixin for-tablet-landscape-up {media (min-width: 900px) { @content; }}
+// @mixin for-desktop-up {@media (min-width: 1200px) { @content; }}
+// @mixin for-big-desktop-up {@media (min-width: 1800px) { @content; }}
 
 /// MIXINS
 
@@ -98,24 +110,24 @@ body {
   --color-fg-tertiary: #{$grey-400};
   --color-progressbar-background-1: #{$grey-100};
   --color-progressbar-background-2: #{$grey-400};
-  --color-progressbar-leech-1: #{$blue-300};
-  --color-progressbar-leech-2: #{$blue-700};
-  --color-progressbar-leech-paused-1: #{$blue-200};
-  --color-progressbar-leech-paused-2: #{$grey-500};
-  --color-progressbar-leech-queued-1: #{$blue-100};
-  --color-progressbar-leech-queued-2: #{$blue-300};
+  --color-progressbar-verify-1: #{$pink-300};
+  --color-progressbar-verify-2: #{$pink-700};
   --color-progressbar-magnet-1: #{$yellow-300};
   --color-progressbar-magnet-2: #{$yellow-700};
   --color-progressbar-magnet-paused-1: #{$yellow-200};
   --color-progressbar-magnet-paused-2: #{$grey-500};
-  --color-progressbar-seed-1: #{$green-300};
-  --color-progressbar-seed-2: #{$green-700};
+  --color-progressbar-leech-paused-1: #{$blue-200};
+  --color-progressbar-leech-paused-2: #{$grey-500};
+  --color-progressbar-leech-queued-1: #{$blue-100};
+  --color-progressbar-leech-queued-2: #{$blue-300};
+  --color-progressbar-leech-1: #{$blue-300};
+  --color-progressbar-leech-2: #{$blue-700};
   --color-progressbar-seed-paused-1: #{$green-200};
   --color-progressbar-seed-paused-2: #{$grey-500};
   --color-progressbar-seed-queued-1: #{$green-100};
   --color-progressbar-seed-queued-2: #{$green-300};
-  --color-progressbar-verify-1: #{$pink-300};
-  --color-progressbar-verify-2: #{$pink-700};
+  --color-progressbar-seed-1: #{$green-300};
+  --color-progressbar-seed-2: #{$green-700};
   --color-tab-deselected-1: #{$grey-100};
   --color-tab-deselected-2: #{$grey-400};
   --color-tab-selected-1: #{$purple-100};
@@ -253,8 +265,8 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 /// FILTERBAR
 
-$filterbar-height-number: 26;
-$filterbar-height: $filterbar-height-number * 1px;
+// $filterbar-height-number: 30;
+// $filterbar-height: $filterbar-height-number * 1px;
 
 .mainwin-filterbar {
   align-items: center;
@@ -262,12 +274,25 @@ $filterbar-height: $filterbar-height-number * 1px;
   border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-direction: row;
-  height: $filterbar-height;
+  font-size: smaller;
+  // height: $filterbar-height;
   width: 100%;
 
+  @include for-phone-only {
+    > :not(select):not(input) {
+      display: none;
+    }
+    > input {
+      min-width: 50px;
+    }
+    > input,
+    > select {
+      height: 100%;
+    }
+  }
+
   > * {
-    font-size: smaller;
-    margin: 5px;
+    padding: 0 5px;
   }
 }
 
@@ -281,6 +306,7 @@ $speed-icon-size: 12px;
 
 .speed-up-icon {
   background-image: url($image-chevron-up);
+  background-repeat: no-repeat;
   background-size: $speed-icon-size $speed-icon-size;
   height: $speed-icon-size;
   width: $speed-icon-size;
@@ -288,6 +314,7 @@ $speed-icon-size: 12px;
 
 .speed-dn-icon {
   background-image: url($image-chevron-dn);
+  background-repeat: no-repeat;
   background-size: $speed-icon-size $speed-icon-size;
   height: $speed-icon-size;
   width: $speed-icon-size;
@@ -299,7 +326,7 @@ $pauseresume-size-number: 14;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
-$torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
+$popup-top: $toolbar-height-number + 36px;
 
 .flex {
   flex-grow: 1;
@@ -502,7 +529,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     white-space: nowrap;
 
     &.compact {
-      flex-grow: 1;
+      flex: 1;
       font-size: 1em;
       font-weight: normal;
     }
@@ -514,7 +541,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
   .torrent-progress-details,
   .torrent-peer-details {
-    font-size: smaller;
+    font-size: x-small;
   }
 
   .torrent-progress-bar {
@@ -639,10 +666,10 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 #inspector,
 #prefs-dialog {
-  @media screen and (max-width: $width-threshold-number * 1px) {
+  @include for-phone-only {
     left: 0;
   }
-  @media screen and (min-width: ($width-threshold-number + 1) * 1px) {
+  @include for-tablet-portrait-up {
     border-left: 1px solid var(--color-fg-secondary);
     width: 570px;
   }
@@ -656,7 +683,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   position: absolute;
   right: 0;
-  top: $torrent-container-top;
+  top: $popup-top;
   z-index: $z-index-popup;
 
   .tabs-page {
@@ -807,12 +834,12 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   flex-direction: column;
   position: absolute;
   right: 0;
-  top: $torrent-container-top;
+  top: $popup-top;
   z-index: $z-index-popup;
-  @media screen and (max-width: $width-threshold-number * 1px) {
+  @include for-phone-only {
     left: 0;
   }
-  @media screen and (min-width: ($width-threshold-number + 1) * 1px) {
+  @include for-tablet-portrait-up {
     width: 550px;
   }
 }
@@ -847,7 +874,12 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 0 20px 20px;
+  @include for-phone-only {
+    padding: 0 8px 20px;
+  }
+  @include for-tablet-portrait-up {
+    padding: 0 20px 20px;
+  }
 }
 
 .tabs-button {
@@ -1284,7 +1316,7 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 }
 
 // hide the fullscreen button unless we're on mobile
-@media (min-width: 500px) {
+@include for-tablet-portrait-up {
   #display-fullscreen-check,
   #display-fullscreen-label {
     display: none;
@@ -1297,7 +1329,7 @@ $dialog-padding-number: 20;
 $dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
 $logo-size: 64px;
 
-@media screen and (max-width: $width-threshold-number * 1px) {
+@include for-phone-only {
   .dialog-buttons {
     padding-top: $dialog-logo-padding-number * 1px;
   }
@@ -1305,7 +1337,7 @@ $logo-size: 64px;
   .dialog-container {
     opacity: 96%;
     position: absolute;
-    top: $torrent-container-top;
+    top: $popup-top;
     width: 100%;
   }
 
@@ -1319,12 +1351,12 @@ $logo-size: 64px;
     flex-direction: column;
   }
 }
-@media screen and (min-width: ($width-threshold-number + 1) * 1px) {
+@include for-tablet-portrait-up {
   .dialog-container {
     left: 50%;
     min-width: 400px;
     position: absolute;
-    top: $torrent-container-top * 2;
+    top: $popup-top * 2;
     transform: translateX(-50%);
   }
 
@@ -1480,7 +1512,14 @@ $logo-size: 64px;
     display: grid;
     grid-row-gap: 6px;
     grid-template-columns: auto 1fr;
-    margin: 4px 0 16px 16px;
+    margin-top: 4px;
+
+    @include for-phone-only {
+      margin: 4px 0 16px;
+    }
+    @include for-tablet-portrait-up {
+      margin: 4px 16px 16px;
+    }
 
     div {
       word-break: break-word;

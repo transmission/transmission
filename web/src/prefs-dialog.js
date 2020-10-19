@@ -7,10 +7,11 @@
 
 import { Formatter } from './formatter.js';
 import {
-  createTabsContainer,
   OutsideClickListener,
+  createTabsContainer,
   makeUUID,
   setEnabled,
+  setTextContent,
 } from './utils.js';
 
 export class PrefsDialog extends EventTarget {
@@ -46,7 +47,7 @@ export class PrefsDialog extends EventTarget {
   _checkPort() {
     const el = this.elements.network.port_status_label;
     el.removeAttribute('data-open');
-    el.textContent = 'Checking...';
+    setTextContent(el, 'Checking...');
     this.remote.checkPort(this._onPortChecked, this);
   }
 
@@ -54,7 +55,7 @@ export class PrefsDialog extends EventTarget {
     const el = this.elements.network.port_status_label;
     const is_open = response.arguments['port-is-open'];
     el.dataset.open = is_open;
-    el.textContent = is_open ? 'Open' : 'Closed';
+    setTextContent(el, is_open ? 'Open' : 'Closed');
   }
 
   _setBlocklistButtonEnabled(b) {
@@ -118,7 +119,7 @@ export class PrefsDialog extends EventTarget {
         if (key === 'blocklist-size') {
           const n = Formatter.number(value);
           el.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
-          this.elements.peers.blocklist_update_button.textContent = 'Update';
+          setTextContent(this.elements.peers.blocklist_update_button, 'Update');
         } else {
           switch (el.type) {
             case 'checkbox':
@@ -647,7 +648,7 @@ export class PrefsDialog extends EventTarget {
     this.elements.peers.blocklist_update_button.addEventListener(
       'click',
       (ev) => {
-        ev.target.textContent = 'Updating blocklist...';
+        setTextContent(ev.target, 'Updating blocklist...');
         this.remote.updateBlocklist();
         this._setBlocklistButtonEnabled(false);
       }
