@@ -381,7 +381,7 @@ export class Inspector extends EventTarget {
           (acc, t) => acc + t.getPieceCount(),
           0
         );
-        const pieceStr = fmt.toStringWithCommas(pieceCount);
+        const pieceStr = fmt.number(pieceCount);
         const pieceSize = get(torrents[0]);
         if (torrents.every((t) => get(t) === pieceSize)) {
           str = `${fmt.size(size)} (${pieceStr} pieces @ ${fmt.mem(

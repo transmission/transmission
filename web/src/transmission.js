@@ -66,13 +66,6 @@ export class Transmission extends EventTarget {
         this.action_manager.click(action);
       });
     }
-    for (const el of document.querySelectorAll(`input[data-action]`)) {
-      const { action } = el.dataset;
-      setEnabled(el, this.action_manager.isEnabled(action));
-      el.addEventListener('change', () => {
-        this.action_manager.click(action);
-      });
-    }
 
     document
       .getElementById('filter-tracker')

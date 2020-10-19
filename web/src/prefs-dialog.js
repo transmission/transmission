@@ -7,7 +7,6 @@
 
 import { Formatter } from './formatter.js';
 import {
-  Utils,
   createTabsContainer,
   OutsideClickListener,
   makeUUID,
@@ -44,24 +43,24 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
+  _checkPort() {
+    const el = this.elements.network.port_status_label;
+    el.removeAttribute('data-open');
+    el.textContent = 'Checking...';
+    this.remote.checkPort(this._onPortChecked, this);
+  }
+
   _onPortChecked(response) {
-    console.log(response);
-    const e = this.elements.network.port_status_label;
+    const el = this.elements.network.port_status_label;
     const is_open = response.arguments['port-is-open'];
-    const text = is_open ? 'Open' : 'Closed';
-    e.dataset.open = is_open;
-    Utils.setInnerHTML(e, text);
+    el.dataset.open = is_open;
+    el.textContent = is_open ? 'Open' : 'Closed';
   }
 
   _setBlocklistButtonEnabled(b) {
     const e = this.elements.peers.blocklist_update_button;
     setEnabled(e, b);
     e.value = b ? 'Update' : 'Updating...';
-  }
-
-  _onBlocklistUpdateClicked() {
-    this.remote.updateBlocklist();
-    this._setBlocklistButtonEnabled(false);
   }
 
   static _getValue(e) {
@@ -91,11 +90,13 @@ export class PrefsDialog extends EventTarget {
   // this callback is for controls whose changes can be applied
   // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(ev) {
-    console.log(ev);
-    const o = {};
-    o[ev.target.dataset.key] = PrefsDialog._getValue(ev.target);
-    console.log(o);
-    this.remote.savePrefs(o);
+    const { key } = ev.target.dataset;
+    this.remote.savePrefs({
+      [key]: PrefsDialog._getValue(ev.target),
+    });
+    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
+      this._checkPort();
+    }
   }
 
   _onDialogClosed() {
@@ -115,14 +116,17 @@ export class PrefsDialog extends EventTarget {
         `[data-key="${key}"]`
       )) {
         if (key === 'blocklist-size') {
-          // special case -- regular text area
-          el.textContent = Formatter.toStringWithCommas(value);
+          const n = Formatter.number(value);
+          el.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
+          this.elements.peers.blocklist_update_button.textContent = 'Update';
         } else {
-          // console.log({ key, type: el.type });
           switch (el.type) {
             case 'checkbox':
             case 'radio':
-              el.checked = value;
+              if (el.checked !== value) {
+                el.checked = value;
+                el.dispatchEvent(new Event('change'));
+              }
               break;
             case 'text':
             case 'url':
@@ -131,12 +135,17 @@ export class PrefsDialog extends EventTarget {
             case 'search':
               // don't change the text if the user's editing it.
               // it's very annoying when that happens!
-              if (el !== document.activeElement) {
+              // eslint-disable-next-line eqeqeq
+              if (el.value != value && el !== document.activeElement) {
                 el.value = value;
+                el.dispatchEvent(new Event('change'));
               }
               break;
             case 'select-one':
-              el.value = value;
+              if (el.value !== value) {
+                el.value = value;
+                el.dispatchEvent(new Event('change'));
+              }
               break;
             default:
               break;
@@ -168,7 +177,13 @@ export class PrefsDialog extends EventTarget {
   }
 
   static _enableIfChecked(el, check) {
-    const cb = () => setEnabled(el, check.checked);
+    const cb = () => {
+      if (el.tagName === 'INPUT') {
+        setEnabled(el, check.checked);
+      } else {
+        el.classList.toggle('disabled', !check.checked);
+      }
+    };
     check.addEventListener('change', cb);
     cb();
   }
@@ -508,7 +523,8 @@ export class PrefsDialog extends EventTarget {
     root.appendChild(label);
 
     const button = document.createElement('button');
-    button.value = 'Update';
+    button.classList.add('blocklist-update-button');
+    button.textContent = 'Update';
     root.appendChild(button);
     PrefsDialog._enableIfChecked(button, cal.check);
     const blocklist_update_button = button;
@@ -556,7 +572,7 @@ export class PrefsDialog extends EventTarget {
     label.textContent = 'Port is';
     port_status_div.appendChild(label);
     const port_status_label = document.createElement('label');
-    port_status_label.textContent = 'TBD'; // TODO
+    port_status_label.textContent = '?';
     port_status_label.classList.add('port-status-label');
     port_status_div.appendChild(port_status_label);
     root.appendChild(port_status_div);
@@ -600,7 +616,7 @@ export class PrefsDialog extends EventTarget {
     };
   }
 
-  _create() {
+  static _create() {
     const pages = {
       network: PrefsDialog._createNetworkPage(),
       peers: PrefsDialog._createPeersPage(),
@@ -608,21 +624,12 @@ export class PrefsDialog extends EventTarget {
       torrents: PrefsDialog._createTorrentsPage(),
     };
 
-    const on_activated = (/*page*/) => {
-      // this.current_page = page;
-      // this._updateCurrentPage();
-    };
-
-    const elements = createTabsContainer(
-      'prefs-dialog',
-      [
-        ['prefs-tab-torrent', pages.torrents.root],
-        ['prefs-tab-speed', pages.speed.root],
-        ['prefs-tab-peers', pages.peers.root],
-        ['prefs-tab-network', pages.network.root],
-      ],
-      on_activated.bind(this)
-    );
+    const elements = createTabsContainer('prefs-dialog', [
+      ['prefs-tab-torrent', pages.torrents.root],
+      ['prefs-tab-speed', pages.speed.root],
+      ['prefs-tab-peers', pages.peers.root],
+      ['prefs-tab-network', pages.network.root],
+    ]);
 
     return { ...elements, ...pages };
   }
@@ -633,16 +640,20 @@ export class PrefsDialog extends EventTarget {
     this.closed = false;
     this.session_manager = session_manager;
     this.remote = remote;
-    this.update_soon = Utils.debounce(() => {
-      if (this.session_manager) {
-        this._update(this.session_manager.session_properties);
-      }
-    });
+    this.update_soon = () =>
+      this._update(this.session_manager.session_properties);
 
-    this.elements = this._create();
+    this.elements = PrefsDialog._create();
+    this.elements.peers.blocklist_update_button.addEventListener(
+      'click',
+      (ev) => {
+        ev.target.textContent = 'Updating blocklist...';
+        this.remote.updateBlocklist();
+        this._setBlocklistButtonEnabled(false);
+      }
+    );
     this.outside = new OutsideClickListener(this.elements.root);
     this.outside.addEventListener('click', () => this.close());
-    this.remote.checkPort(this._onPortChecked, this);
 
     Object.seal(this);
 
@@ -674,24 +685,6 @@ export class PrefsDialog extends EventTarget {
     this.session_manager.addEventListener('session-change', this.update_soon);
     this.update_soon();
 
-    // controller.addEventListener('torrent-selection-changed', this.selection_listener);
-    // this._setTorrents(this.controller.getSelectedTorrents());
-
-    // document.body.appendChild(this.elements.root);
-
-    /*
-    const o = {};
-    o.autoOpen = false;
-    o.show = o.hide = false;
-    o.close = this._onDialogClosed.bind(this);
-    //e.tabbedDialog(o);  // FIXME?
-
-    const e = document.getElementById('blocklist-update-button');
-    e.addEventListener('click', () => this._onBlocklistUpdateClicked());
-    this.data.elements.blocklist_button = e;
-*/
-
-    // show it
     document.body.appendChild(this.elements.root);
   }
 

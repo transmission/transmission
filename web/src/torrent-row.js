@@ -392,10 +392,7 @@ export class TorrentRow {
     this._torrent = torrent;
     this._element = view.createRow(torrent);
 
-    const update = () => {
-      console.log('update');
-      this.render(controller);
-    };
+    const update = () => this.render(controller);
     this._torrent.addEventListener('dataChanged', update);
     update();
   }

@@ -7,6 +7,7 @@
 
 const plural_rules = new Intl.PluralRules();
 const current_locale = plural_rules.resolvedOptions().locale;
+const number_format = new Intl.NumberFormat(current_locale);
 
 const kilo = 1000;
 const mem_formatters = [
@@ -28,11 +29,7 @@ const fmt_MBps = new Intl.NumberFormat(current_locale, {
 
 export class Formatter {
   static countString(msgid, msgid_plural, n) {
-    return `${Formatter.toStringWithCommas(n)} ${Formatter.ngettext(
-      msgid,
-      msgid_plural,
-      n
-    )}`;
+    return `${this.number(n)} ${this.ngettext(msgid, msgid_plural, n)}`;
   }
 
   // Formats the a memory size into a human-readable string
@@ -64,7 +61,7 @@ export class Formatter {
   // format a percentage to a string
   static percentString(x) {
     const decimal_places = x < 100.0 ? 1 : 0;
-    return Formatter._toTruncFixed(x, decimal_places);
+    return this._toTruncFixed(x, decimal_places);
   }
 
   /*
@@ -77,7 +74,7 @@ export class Formatter {
     if (x === -2) {
       return '&infin;';
     }
-    return Formatter.percentString(x);
+    return this.percentString(x);
   }
 
   /**
@@ -86,7 +83,7 @@ export class Formatter {
    * @return {String} human-readable string
    */
   static size(bytes) {
-    return Formatter.mem(bytes);
+    return this.mem(bytes);
   }
 
   static speed(KBps) {
@@ -94,27 +91,27 @@ export class Formatter {
   }
 
   static speedBps(Bps) {
-    return Formatter.speed(Formatter.toKBps(Bps));
+    return this.speed(this.toKBps(Bps));
   }
 
   static timeInterval(seconds) {
     const days = Math.floor(seconds / 86400);
     if (days) {
-      return Formatter.countString('day', 'days', days);
+      return this.countString('day', 'days', days);
     }
 
     const hours = Math.floor((seconds % 86400) / 3600);
     if (hours) {
-      return Formatter.countString('hour', 'hours', hours);
+      return this.countString('hour', 'hours', hours);
     }
 
     const minutes = Math.floor((seconds % 3600) / 60);
     if (minutes) {
-      return Formatter.countString('minute', 'minutes', minutes);
+      return this.countString('minute', 'minutes', minutes);
     }
 
     seconds = Math.floor(seconds % 60);
-    return Formatter.countString('second', 'seconds', seconds);
+    return this.countString('second', 'seconds', seconds);
   }
 
   static timestamp(seconds) {
@@ -174,8 +171,8 @@ export class Formatter {
     return Math.floor(Bps / kilo);
   }
 
-  static toStringWithCommas(number) {
-    return number.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+  static number(number) {
+    return number_format.format(number);
   }
 
   /** Round a string of a number to a specified number of decimal places */

@@ -1,12 +1,12 @@
 # TODO
 
 - [ ] prefs
-  - [ ] port label is not set
+  - [x] port label is not set
+  - [x] blocklist count label is malformatted
+  - [x] remove debouncer from prefs-dialog
   - [ ] prefs dialog needs blue turtle
-  - [ ] blocklist count label is malformatted
   - [ ] editing settings in prefs dialog has no effect
   - [ ] remove dead code
-  - [ ] remove debouncer from prefs-dialog
 - [ ] "about" dialog doesn't work on firefox mobile beta
 - [ ] colors
   - [ ] fix progressbars to work like they did in old client

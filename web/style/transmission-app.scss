@@ -22,7 +22,7 @@ $pink-300: #f692ce;
 $pink-500: #ea4aaa;
 $purple-000: #f5f0ff;
 $purple-100: #e6dcfd;
-$red-200: #fdaeb7;
+$red-500: #d73a49;
 $white: #fff;
 $yellow-200: #fff5b1;
 $yellow-300: #ffea7f;
@@ -88,10 +88,10 @@ body {
   --color-bg-selection-2: #{$purple-000};
   --color-border: #{$grey-400};
   --color-fg-disabled: #{$grey-400};
-  --color-fg-error: #{$red-200};
+  --color-fg-error: #{$red-500};
   --color-fg-name: #{$grey-800};
-  --color-fg-port-closed: #{$red-200};
-  --color-fg-port-open: #{$green-200};
+  --color-fg-port-closed: #{$red-500};
+  --color-fg-port-open: #{$green-500};
   --color-fg-primary: #{$grey-800};
   --color-fg-secondary: #{$grey-500};
   --color-fg-tertiary: #{$grey-400};
@@ -193,11 +193,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     user-select: none;
     width: $toolbar-height;
 
-    &:hover:not([disabled]) {
+    &:hover:not(:disabled) {
       background-color: var(--color-bg-hover);
     }
 
-    &[disabled] {
+    &:disabled {
       cursor: default;
       opacity: 0.25;
     }
@@ -671,7 +671,6 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
 
 #prefs-dialog {
   $background-color: $white;
-  $disabled-color: var(--color-fg-disabled);
 
   background: $background-color;
   bottom: 0;
@@ -703,8 +702,9 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     }
   }
 
-  :disabled {
-    color: $disabled-color;
+  :disabled,
+  .disabled {
+    color: var(--color-fg-disabled);
   }
 
   #alt-times-div,
@@ -720,8 +720,17 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     grid-column: span 2;
   }
 
+  .blocklist-size-label,
+  .blocklist-update-button,
   .port-status {
     grid-column: 2 / 3;
+  }
+
+  .blocklist-size-label {
+    font-size: smaller;
+  }
+  .blocklist-size-number {
+    font-weight: bolder;
   }
 
   .port-status-label {
@@ -799,11 +808,6 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   #alternative-speed-limits-desc {
     font-size: smaller;
     padding-bottom: 4px;
-  }
-
-  #blocklist-info {
-    font-size: smaller;
-    margin-top: 3px;
   }
 }
 
@@ -949,31 +953,13 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
   }
 }
 
-#torrent-inspector {
-  /*
-  background: $white;
-  bottom: 0;
-  overflow: auto;
-  padding: 15px;
-  position: fixed;
-  right: 0;
-  text-align: left;
-  top: $torrent-container-top;
-  z-index: $z-index-popup;
+#inspector-header {
+  margin: 8px 0;
+}
 
-  .inspector-page {
-    padding: 8px 0;
-  }
-*/
-
-  #inspector-header {
-    margin: 8px 0;
-
-    #torrent-inspector-name {
-      font-size: large;
-      font-weight: bold;
-    }
-  }
+#torrent-inspector-name {
+  font-size: large;
+  font-weight: bold;
 }
 
 #inspector-trackers-list {
@@ -1141,13 +1127,13 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     list-style: none;
     padding: 5px 10px;
 
-    &:hover:not([disabled]),
-    &:focus:not([disabled]) {
+    &:hover:not(:disabled),
+    &:focus:not(:disabled) {
       background-image: linear-gradient($white, var(--color-bg-menu));
       cursor: pointer;
     }
 
-    &[disabled] {
+    &:disabled {
       color: $disabled-color;
       cursor: none;
     }
@@ -1206,13 +1192,13 @@ $torrent-container-top: $toolbar-height-number + $filterbar-height-number + 6px;
     color: var(--color-fg-primary);
     font-size: 1em;
 
-    &[disabled] {
+    &:disabled {
       color: var(--color-fg-disabled);
       cursor: default;
     }
 
-    &:focus:not([disabled]),
-    &:hover:not([disabled]) {
+    &:focus:not(:disabled),
+    &:hover:not(:disabled) {
       background-color: var(--color-bg-hover);
     }
   }
