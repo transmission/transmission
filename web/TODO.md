@@ -1,5 +1,8 @@
 # TODO
 
+- [ ] compact mode
+  - [x] progressbar width is wrong
+  - [ ] up/down speed text width is wrong 
 - [ ] "about" dialog doesn't work on firefox mobile beta
 - [ ] inspector is goofy
   - [ ] tier list looks wrong on mobile

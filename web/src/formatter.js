@@ -14,6 +14,7 @@ const mem_formatters = [
   new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'byte' }),
   new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'kilobyte' }),
   new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'megabyte' }),
+  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'gigabyte' }),
   new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'terabyte' }),
   new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'petabyte' }),
 ];

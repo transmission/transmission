@@ -221,6 +221,7 @@ export class TorrentRendererFull {
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
+    root._progressbar.classList.add('full');
 
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
@@ -236,13 +237,9 @@ export class TorrentRendererFull {
     );
 
     // pause/resume button
-    e = root._pause_resume_button_image;
+    e = root._toggle_running_button;
     e.alt = is_stopped ? 'Resume' : 'Pause';
-    Utils.setProperty(
-      e,
-      'className',
-      is_stopped ? 'torrent-resume' : 'torrent-pause'
-    );
+    e.dataset.action = is_stopped ? 'resume' : 'pause';
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -274,8 +271,6 @@ export class TorrentRendererFull {
     progress.appendChild(progressbar);
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
-    const image = document.createElement('div');
-    button.appendChild(image);
     progress.appendChild(button);
 
     const details = document.createElement('div');
@@ -292,7 +287,6 @@ export class TorrentRendererFull {
     root._peer_details_container = peers;
     root._progress_details_container = details;
     root._progressbar = progressbar;
-    root._pause_resume_button_image = image;
     root._toggle_running_button = button;
 
     return root;
@@ -347,6 +341,7 @@ export class TorrentRendererCompact {
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
+    root._progressbar.classList.add('compact');
   }
 
   // eslint-disable-next-line class-methods-use-this
