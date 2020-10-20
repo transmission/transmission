@@ -7,6 +7,7 @@
 
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
+import { deepEqual } from './utils.js';
 
 export class Torrent extends EventTarget {
   constructor(data) {
@@ -25,7 +26,7 @@ export class Torrent extends EventTarget {
   setField(o, name, value) {
     const old_value = o[name];
 
-    if (old_value === value) {
+    if (deepEqual(old_value, value)) {
       return false;
     }
 
@@ -170,7 +171,7 @@ export class Torrent extends EventTarget {
     return this.fields.name || 'Unknown';
   }
   getPeers() {
-    return this.fields.peers;
+    return this.fields.peers || [];
   }
   getPeersConnected() {
     return this.fields.peersConnected;

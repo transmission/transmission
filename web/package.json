@@ -46,5 +46,8 @@
     "webpack": "^4.44.2",
     "webpack-bundle-analyzer": "^3.9.0",
     "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "lodash.isequal": "^4.5.0"
   }
 }

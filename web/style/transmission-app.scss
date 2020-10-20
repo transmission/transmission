@@ -326,7 +326,7 @@ $pauseresume-size-number: 14;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border-number: 1;
 $progressbar-height-number: 14;
-$popup-top: $toolbar-height-number + 36px;
+$popup-top: 61px; // TODO: ugly that this is hardcoded
 
 .flex {
   flex-grow: 1;
@@ -893,6 +893,37 @@ $popup-top: $toolbar-height-number + 36px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
 }
 
+.inspector-info-page {
+  // TODO: this is (mostly) copied from prefs-dialog.
+  // can it be folded into a single set of rules?
+
+  grid-column-gap: 8px;
+  grid-row-gap: 5px;
+  grid-template-columns: auto 1fr;
+  margin: 20px;
+
+  &:not(.hidden) {
+    display: grid;
+  }
+
+  .section-label {
+    font-weight: bold;
+    grid-column: span 2;
+    margin-left: -20px;
+    padding-bottom: 5px;
+
+    &:not(:first-of-type) {
+      margin-top: 20px;
+    }
+  }
+
+  :not(.section-label) {
+    // this section is not copied
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 #inspector .tabs-button,
 #prefs-dialog .tabs-button {
   background-size: 20px 20px, 40px 30px;
@@ -1027,66 +1058,83 @@ $popup-top: $toolbar-height-number + 36px;
   }
 }
 
-/* Peers Inspector Tab */
-#inspector-peers-list {
-  cursor: default;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-
-  > .inspector-group {
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-}
+// Peers Tab
 
 .peer-list {
+  $table-border-color: $grey-100;
+  $table-border: 1px solid $table-border-color;
+
+  border: $table-border;
   border-collapse: collapse;
-  clear: both;
   cursor: default;
   table-layout: fixed;
   text-align: left;
   width: 100%;
 
-  .encrypted-col {
-    width: 16px;
+  td,
+  th {
+    font-size: smaller;
+    padding: 5px;
   }
 
-  .up-col {
-    width: 70px;
+  td {
+    border: $table-border;
+    color: var(--color-fg-secondary);
+    // padding: 5px 10px;
   }
 
-  .down-col {
-    width: 70px;
-  }
-
-  .percent-col {
-    padding-right: 5px;
-    text-align: right;
-    width: 30px;
-  }
-
-  .status-col {
-    padding-right: 5px;
-    width: 40px;
-  }
-
-  .address-col {
-    width: 180px;
-  }
-
-  .client-col {
-    overflow: hidden;
+  .torrent-row td {
+    background: $table-border-color;
+    color: var(--color-fg-primary);
+    font-size: normal;
+    font-weight: bolder;
+    overflow-x: hidden;
+    padding: 10px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-}
 
-.inspector-peer-entry {
-  .encrypted-peer-cell {
-    background: transparent url($image-lock-fill) no-repeat;
-    height: 16px;
+  .encryption {
     width: 16px;
+    &[data-encrypted='true'] {
+      background: transparent url($image-lock-fill) center center no-repeat;
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+  .peer-address,
+  .percent-done,
+  .speed-down,
+  .speed-up {
+    text-align: right;
+  }
+
+  .percent-done {
+    width: 10%;
+  }
+  .speed-down,
+  .speed-up {
+    width: 15%;
+  }
+  .peer-address {
+    width: 25%;
+  }
+
+  .peer-app-name {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    @include for-phone-only {
+      display: none;
+    }
+    @include for-tablet-portrait-up {
+      width: 25%;
+    }
+  }
+
+  .status {
+    cursor: pointer;
   }
 }
 
@@ -1096,9 +1144,6 @@ $popup-top: $toolbar-height-number + 36px;
   $size-number: 20;
   $size: $size-number * 1px;
   $halfsize: math.floor($size-number / 2) * 1px;
-
-  // We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
-  // Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
 
   grid-area: priority;
 

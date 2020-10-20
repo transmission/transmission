@@ -90,7 +90,6 @@ export class FileRow extends EventTarget {
     const e = new Event('priorityToggled');
     e.indices = [...this.fields.indices];
     e.priority = priority;
-    console.log(e);
     this.dispatchEvent(e);
   }
 

@@ -9,12 +9,22 @@ import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
 import {
-  createTabsContainer,
-  createInfoSection,
-  sanitizeText,
   OutsideClickListener,
   Utils,
+  createTabsContainer,
+  sanitizeText,
+  setTextContent,
 } from './utils.js';
+
+const peer_column_classes = [
+  'encryption',
+  'speed-up',
+  'speed-down',
+  'percent-done',
+  'status',
+  'peer-address',
+  'peer-app-name',
+];
 
 export class Inspector extends EventTarget {
   constructor(controller) {
@@ -66,54 +76,55 @@ export class Inspector extends EventTarget {
   static _createInfoPage() {
     const root = document.createElement('div');
     root.classList.add('inspector-info-page');
-    let labels = [
-      'Have:',
-      'Availability:',
-      'Uploaded:',
-      'Downloaded:',
-      'State:',
-      'Running time:',
-      'Remaining time:',
-      'Last activity:',
-      'Error:',
-    ];
-    let section = createInfoSection('Activity', labels);
-    root.appendChild(section.root);
-    const [
-      have,
-      availability,
-      uploaded,
-      downloaded,
-      state,
-      running_time,
-      remaining_time,
-      last_activity,
-      error,
-    ] = section.children;
+    const elements = { root };
 
-    labels = ['Size:', 'Location:', 'Hash:', 'Privacy:', 'Origin:', 'Comment:'];
-    section = createInfoSection('Details', labels);
-    root.appendChild(section.root);
-    const [size, location, hash, privacy, origin, comment] = section.children;
-
-    return {
-      availability,
-      comment,
-      downloaded,
-      error,
-      hash,
-      have,
-      last_activity,
-      location,
-      origin,
-      privacy,
-      remaining_time,
-      root,
-      running_time,
-      size,
-      state,
-      uploaded,
+    const append_section_title = (text) => {
+      const label = document.createElement('div');
+      label.textContent = text;
+      label.classList.add('section-label');
+      root.appendChild(label);
     };
+
+    const append_row = (text) => {
+      const lhs = document.createElement('label');
+      setTextContent(lhs, text);
+      root.appendChild(lhs);
+
+      const rhs = document.createElement('label');
+      root.appendChild(rhs);
+      return rhs;
+    };
+
+    append_section_title('Activity');
+    let rows = [
+      ['have', 'Have:'],
+      ['availability', 'Availability:'],
+      ['uploaded', 'Uploaded:'],
+      ['downloaded', 'Downloaded:'],
+      ['state', 'State:'],
+      ['running_time', 'Running time:'],
+      ['remaining_time', 'Remaining:'],
+      ['last_activity', 'Last activity:'],
+      ['error', 'Error:'],
+    ];
+    for (const [name, text] of rows) {
+      elements[name] = append_row(text);
+    }
+
+    append_section_title('Details');
+    rows = [
+      ['size', 'Size:'],
+      ['location', 'Location:'],
+      ['hash', 'Hash:'],
+      ['privacy', 'Privacy:'],
+      ['origin', 'Origin:'],
+      ['comment', 'Comment:'],
+    ];
+    for (const [name, text] of rows) {
+      elements[name] = append_row(text);
+    }
+
+    return elements;
   }
 
   static _createListPage(list_type, list_id) {
@@ -123,14 +134,39 @@ export class Inspector extends EventTarget {
     root.appendChild(list);
     return { list, root };
   }
-  static _createPeersPage() {
-    return Inspector._createListPage('div', 'inspector-peers-list');
-  }
+
   static _createTrackersPage() {
     return Inspector._createListPage('div', 'inspector-trackers-list');
   }
+
   static _createFilesPage() {
     return Inspector._createListPage('ul', 'inspector-file-list');
+  }
+
+  static _createPeersPage() {
+    const table = document.createElement('table');
+    table.classList.add('peer-list');
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    const names = ['', 'Up', 'Down', 'Done', 'Status', 'Address', 'Client'];
+    names.forEach((name, idx) => {
+      const th = document.createElement('th');
+      const classname = peer_column_classes[idx];
+      if (classname === 'encryption') {
+        th.dataset.encrypted = true;
+      }
+      th.classList.add(classname);
+      setTextContent(th, name);
+      tr.appendChild(th);
+    });
+    const tbody = document.createElement('tbody');
+    thead.appendChild(tr);
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    return {
+      root: table,
+      tbody,
+    };
   }
 
   _create() {
@@ -482,7 +518,7 @@ export class Inspector extends EventTarget {
 
   ///  PEERS PAGE
 
-  static _peerStatus(flag_str) {
+  static _peerStatusTitle(flag_str) {
     const texts = Object.seal({
       '?': "We unchoked this peer, but they're not interested",
       D: 'Downloading from this peer',
@@ -498,82 +534,70 @@ export class Inspector extends EventTarget {
       u: "We would upload to this peer if they'd ask",
     });
 
-    const title = Array.from(flag_str)
+    return Array.from(flag_str)
       .filter((ch) => texts[ch])
       .map((ch) => `${ch}: ${texts[ch]}`)
       .join('\n');
-    return `<span title="${title}">${flag_str}</span>`;
   }
 
   _updatePeers() {
-    const html = [];
     const fmt = Formatter;
-    const { list } = this.elements.peers;
     const { torrents } = this;
+    const { tbody } = this.elements.peers;
 
+    const cell_setters = [
+      (peer, td) => {
+        td.dataset.encrypted = peer.isEncrypted;
+      },
+      (peer, td) =>
+        setTextContent(
+          td,
+          peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''
+        ),
+      (peer, td) =>
+        setTextContent(
+          td,
+          peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''
+        ),
+      (peer, td) => setTextContent(td, `${Math.floor(peer.progress * 100)}%`),
+      (peer, td) => {
+        setTextContent(td, peer.flagStr);
+        td.setAttribute('title', Inspector._peerStatusTitle(peer.flagStr));
+      },
+      (peer, td) => setTextContent(td, peer.address),
+      (peer, td) => setTextContent(td, peer.clientName),
+    ];
+
+    const rows = [];
     for (const tor of torrents) {
-      const peers = tor.getPeers();
-      html.push('<div class="inspector-group">');
-      if (torrents.length > 1) {
-        html.push(
-          '<div class="inspector_torrent_label">',
-          sanitizeText(tor.getName()),
-          '</div>'
-        );
-      }
-      if (!peers || !peers.length) {
-        html.push('<br></div>'); // firefox won't paint the top border if the div is empty
-        continue;
-      }
-      html.push(
-        '<table class="peer-list">',
-        '<tr class="inspector-peer-entry even">',
-        '<th class="encrypted-col"></th>',
-        '<th class="up-col">Up</th>',
-        '<th class="down-col">Down</th>',
-        '<th class="percent-col">%</th>',
-        '<th class="status-col">Status</th>',
-        '<th class="address-col">Address</th>',
-        '<th class="client-col">Client</th>',
-        '</tr>'
-      );
-      peers.forEach((peer, idx) => {
-        html.push(
-          '<tr class="inspector-peer-entry ',
-          idx % 2 ? 'odd' : 'even',
-          '">',
-          '<td>',
-          peer.isEncrypted
-            ? '<div class="encrypted-peer-cell" title="Encrypted Connection">'
-            : '<div class="unencrypted-peer-cell">',
-          '</div>',
-          '</td>',
-          '<td>',
-          peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : '',
-          '</td>',
-          '<td>',
-          peer.rateToClient ? fmt.speedBps(peer.rateToClient) : '',
-          '</td>',
-          '<td class="percent-col">',
-          Math.floor(peer.progress * 100),
-          '%',
-          '</td>',
-          '<td>',
-          Inspector._peerStatus(peer.flagStr),
-          '</td>',
-          '<td>',
-          sanitizeText(peer.address),
-          '</td>',
-          '<td class="client-col">',
-          sanitizeText(peer.clientName),
-          '</td>',
-          '</tr>'
-        );
-      });
-      html.push('</table></div>');
-    }
+      // torrent name
+      const tortr = document.createElement('tr');
+      tortr.classList.add('torrent-row');
+      const tortd = document.createElement('td');
+      tortd.setAttribute('colspan', cell_setters.length);
+      setTextContent(tortd, tor.getName());
+      tortr.appendChild(tortd);
+      rows.push(tortr);
 
-    Utils.setInnerHTML(list, html.join(''));
+      // peers
+      for (const peer of tor.getPeers()) {
+        const tr = document.createElement('tr');
+        tr.classList.add('peer-row');
+        cell_setters.forEach((setter, idx) => {
+          const td = document.createElement('td');
+          td.classList.add(peer_column_classes[idx]);
+          setter(peer, td);
+          tr.appendChild(td);
+        });
+        rows.push(tr);
+      }
+
+      // TODO: modify instead of rebuilding wholesale?
+      while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+      }
+      rows.forEach((row) => tbody.append(row));
+    }
   }
 
   /// TRACKERS PAGE

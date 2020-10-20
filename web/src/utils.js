@@ -5,6 +5,8 @@
  * or any future license endorsed by Mnemosyne LLC.
  */
 
+import isEqual from 'lodash.isequal';
+
 export class Utils {
   static setVisible(el, visible) {
     el.classList.toggle('hidden', !visible);
@@ -287,10 +289,11 @@ export class OutsideClickListener extends EventTarget {
   }
 }
 
-export function setTextContent(e, text) {
-  console.log(e);
-  console.log(text);
+export function deepEqual(a, b) {
+  return isEqual(a, b);
+}
 
+export function setTextContent(e, text) {
   if (e.textContent !== text) {
     e.textContent = text;
   }

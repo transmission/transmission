@@ -25,7 +25,13 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { setEnabled, setTextContent, movePopup, Utils } from './utils.js';
+import {
+  deepEqual,
+  setEnabled,
+  setTextContent,
+  movePopup,
+  Utils,
+} from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -263,15 +269,17 @@ export class Transmission extends EventTarget {
     return this._session_properties;
   }
   set session_properties(o) {
-    if (JSON.stringify(this._session_properties) !== JSON.stringify(o)) {
-      this._session_properties = Object.seal(o);
-      const event = new Event('session-change');
-      event.session_properties = o;
-      this.dispatchEvent(event);
-
-      // TODO: maybe have this in a listener handler?
-      this._updateGuiFromSession(o);
+    if (deepEqual(this._session_properties, o)) {
+      return;
     }
+
+    this._session_properties = Object.seal(o);
+    const event = new Event('session-change');
+    event.session_properties = o;
+    this.dispatchEvent(event);
+
+    // TODO: maybe have this in a listener handler?
+    this._updateGuiFromSession(o);
   }
 
   _setupSearchBox() {
