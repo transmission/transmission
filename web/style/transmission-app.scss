@@ -49,7 +49,7 @@ $image-peers: 'images/team.svg';
 $image-play-circle-active: 'images/play-circle-active.svg';
 $image-play-circle-idle: 'images/play-circle-idle.svg';
 $image-speed: 'images/checkered-flag.svg';
-$image-trackers: 'images/diagram-3-fill.svg';
+$image-tiers: 'images/diagram-3-fill.svg';
 $image-upload-download: 'images/up-and-down-arrows.svg';
 
 @mixin for-phone-only {
@@ -665,8 +665,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   @include tab-image($image-peers);
 }
 
-#inspector-tab-trackers {
-  @include tab-image($image-trackers);
+#inspector-tab-tiers {
+  @include tab-image($image-tiers);
 }
 
 #inspector-tab-files {
@@ -1019,51 +1019,46 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   font-weight: bold;
 }
 
-#inspector-trackers-list {
-  .tier-list {
-    clear: both;
-    cursor: default;
-    display: block;
-    list-style: none;
-    margin: 2px 0 8px;
-    padding-left: 0;
+#inspector-tiers-list {
+  color: var(--color-fg-secondary);
+  margin: 0 10px;
+  padding: 0 12px;
+
+  .tier-list-row {
+    display: grid;
+    grid-column-gap: 8px;
+    grid-row-gap: 4px;
+    margin-top: 8px;
+  }
+
+  .tier-list-torrent {
+    color: var(--color-fg-primary);
+    font-size: larger;
+    font-weight: bolder;
+    margin-left: -12px;
+    overflow-x: hidden;
+    padding-top: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tier-list-tracker {
+    font-weight: bolder;
+    grid-column: span 2;
+    margin-top: 8px;
+    padding-bottom: 4px;
+  }
+
+  .tier-announce,
+  .tier-scrape,
+  .tier-state {
     text-align: left;
-    width: 100%;
-
-    li {
-      overflow: hidden;
-    }
-
-    .tracker-activity {
-      color: var(--color-fg-secondary);
-      display: table;
-      float: left;
-      margin-top: 1px;
-      width: 330px;
-    }
-
-    .tracker-activity div {
-      padding: 2px;
-    }
-
-    table {
-      color: var(--color-fg-secondary);
-      float: right;
-    }
-
-    th {
-      text-align: right;
-    }
   }
 
-  .inspector-tracker-entry {
-    display: block;
-    padding: 3px 0 3px 2px;
-  }
-
-  .tracker-host {
-    color: var(--color-fg-name);
-    font-size: 1.2em;
+  .tier-downloads,
+  .tier-leechers,
+  .tier-seeders {
+    text-align: right;
   }
 }
 

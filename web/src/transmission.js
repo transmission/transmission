@@ -52,7 +52,6 @@ export class Transmission extends EventTarget {
     this._torrents = {};
     this._rows = [];
     this.dirtyTorrents = new Set();
-    this.uriCache = {};
 
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
@@ -1043,28 +1042,6 @@ FIXME: fix this when notifications get fixed
     this.refilterAllSoon();
   }
 
-  // example: "tracker.ubuntu.com" returns "ubuntu.com"
-  static _getDomainName(host) {
-    const dot = host.indexOf('.');
-    if (dot !== host.lastIndexOf('.')) {
-      host = host.slice(dot + 1);
-    }
-
-    return host;
-  }
-
-  // example: "ubuntu.com" returns "Ubuntu"
-  static _getReadableDomain(name) {
-    if (name.length) {
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-    }
-    const dot = name.indexOf('.');
-    if (dot !== -1) {
-      name = name.slice(0, dot);
-    }
-    return name;
-  }
-
   _getTrackers() {
     const ret = {};
 
@@ -1072,24 +1049,13 @@ FIXME: fix this when notifications get fixed
       const names = new Set();
 
       for (const tracker of torrent.getTrackers()) {
-        const { announce } = tracker;
+        const { domain, name } = tracker;
 
-        let uri = this.uriCache[announce];
-        if (!uri) {
-          uri = this.uriCache[announce] = new URL(announce);
-          uri.domain = Transmission._getDomainName(uri.host);
-          uri.name = Transmission._getReadableDomain(uri.domain);
+        if (!ret[name]) {
+          ret[name] = { count: 0, domain };
         }
 
-        if (!ret[uri.name]) {
-          ret[uri.name] = {
-            count: 0,
-            domain: uri.domain,
-            uri,
-          };
-        }
-
-        names.add(uri.name);
+        names.add(name);
       }
 
       for (const name of names.values()) {

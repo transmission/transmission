@@ -251,10 +251,6 @@ export function movePopup(popup, x, y, boundingElement) {
   popup.style.top = `${clamped_pos.top}px`;
 }
 
-export function sanitizeText(text) {
-  return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 export class OutsideClickListener extends EventTarget {
   constructor(el) {
     super();

@@ -12,7 +12,6 @@ import {
   OutsideClickListener,
   Utils,
   createTabsContainer,
-  sanitizeText,
   setTextContent,
 } from './utils.js';
 
@@ -135,8 +134,8 @@ export class Inspector extends EventTarget {
     return { list, root };
   }
 
-  static _createTrackersPage() {
-    return Inspector._createListPage('div', 'inspector-trackers-list');
+  static _createTiersPage() {
+    return Inspector._createListPage('div', 'inspector-tiers-list');
   }
 
   static _createFilesPage() {
@@ -174,7 +173,7 @@ export class Inspector extends EventTarget {
       files: Inspector._createFilesPage(),
       info: Inspector._createInfoPage(),
       peers: Inspector._createPeersPage(),
-      trackers: Inspector._createTrackersPage(),
+      tiers: Inspector._createTiersPage(),
     };
 
     const on_activated = (page) => {
@@ -187,7 +186,7 @@ export class Inspector extends EventTarget {
       [
         ['inspector-tab-info', pages.info.root],
         ['inspector-tab-peers', pages.peers.root],
-        ['inspector-tab-trackers', pages.trackers.root],
+        ['inspector-tab-tiers', pages.tiers.root],
         ['inspector-tab-files', pages.files.root],
       ],
       on_activated.bind(this)
@@ -238,8 +237,8 @@ export class Inspector extends EventTarget {
       case elements.peers.root:
         this._updatePeers();
         break;
-      case elements.trackers.root:
-        this._updateTrackers();
+      case elements.tiers.root:
+        this._updateTiers();
         break;
       default:
         console.warn('unexpected page');
@@ -672,92 +671,100 @@ export class Inspector extends EventTarget {
     };
   }
 
-  _updateTrackers() {
+  _updateTiers() {
     const na = 'N/A';
-    const { list } = this.elements.trackers;
+    const { list } = this.elements.tiers;
     const { torrents } = this;
 
-    // By building up the HTML as as string, then have the browser
-    // turn this into a DOM tree, this is a fast operation.
-    const html = [];
+    const rows = [];
     for (const tor of torrents) {
-      html.push('<div class="inspector-group">');
+      const group = document.createElement('div');
+      group.classList.add('inspector-group');
+      rows.push(group);
 
+      // if >1 torrent to be shown, give a title
       if (torrents.length > 1) {
-        html.push(
-          '<div class="inspector_torrent_label">',
-          sanitizeText(tor.getName()),
-          '</div>'
-        );
+        const title = document.createElement('div');
+        title.classList.add('tier-list-torrent');
+        setTextContent(title, tor.getName());
+        rows.push(title);
       }
 
-      let tier = -1;
       tor.getTrackers().forEach((tracker, idx) => {
-        if (tier !== tracker.tier) {
-          if (tier !== -1) {
-            // close previous tier
-            html.push('</ul></div>');
-          }
-
-          ({ tier } = tracker);
-
-          html.push(
-            '<div class="inspector-group_label">',
-            'Tier ',
-            tier + 1,
-            '</div>',
-            '<ul class="tier-list">'
-          );
-        }
-
-        // Display construction
-        const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const announceState = Inspector.getAnnounceState(tracker);
+        const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
-        html.push(
-          '<li class="inspector-tracker-entry ',
-          idx % 2 ? 'odd' : 'even',
-          '"><div class="tracker-host" title="',
-          sanitizeText(tracker.announce),
-          '">',
-          sanitizeText(tracker.host || tracker.announce),
-          '</div>',
-          '<div class="tracker-activity">',
-          '<div>',
-          lastAnnounceStatusHash['label'],
-          ': ',
-          sanitizeText(lastAnnounceStatusHash['value']),
-          '</div>',
-          '<div>',
-          announceState,
-          '</div>',
-          '<div>',
-          lastScrapeStatusHash['label'],
-          ': ',
-          sanitizeText(lastScrapeStatusHash['value']),
-          '</div>',
-          '</div><table class="tracker_stats">',
-          '<tr><th>Seeders:</th><td>',
-          tracker.seederCount > -1 ? tracker.seederCount : na,
-          '</td></tr>',
-          '<tr><th>Leechers:</th><td>',
-          tracker.leecherCount > -1 ? tracker.leecherCount : na,
-          '</td></tr>',
-          '<tr><th>Downloads:</th><td>',
-          tracker.downloadCount > -1 ? tracker.downloadCount : na,
-          '</td></tr>',
-          '</table></li>'
-        );
-      });
-      if (tier !== -1) {
-        // close last tier
-        html.push('</ul></div>');
-      }
 
-      html.push('</div>'); // inspector-group
+        const tier_div = document.createElement('div');
+        tier_div.classList.add('tier-list-row', idx % 2 ? 'odd' : 'even');
+
+        let el = document.createElement('div');
+        el.classList.add('tier-list-tracker');
+        setTextContent(
+          el,
+          `${tracker.domain || tracker.host || tracker.announce} - tier ${
+            tracker.tier + 1
+          }`
+        );
+        el.setAttribute('title', tracker.announce);
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-announce');
+        setTextContent(
+          el,
+          `${lastAnnounceStatusHash.label}: ${lastAnnounceStatusHash.value}`
+        );
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-seeders');
+        setTextContent(
+          el,
+          `Seeders: ${tracker.seederCount > -1 ? tracker.seederCount : na}`
+        );
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-state');
+        setTextContent(el, announceState);
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-leechers');
+        setTextContent(
+          el,
+          `Leechers: ${tracker.leecherCount > -1 ? tracker.leecherCount : na}`
+        );
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-scrape');
+        setTextContent(
+          el,
+          `${lastScrapeStatusHash.label}: ${lastScrapeStatusHash.value}`
+        );
+        tier_div.appendChild(el);
+
+        el = document.createElement('div');
+        el.classList.add('tier-downloads');
+        setTextContent(
+          el,
+          `Downloads: ${
+            tracker.downloadCount > -1 ? tracker.downloadCount : na
+          }`
+        );
+        tier_div.appendChild(el);
+
+        rows.push(tier_div);
+      });
     }
 
-    Utils.setInnerHTML(list, html.join(''));
+    // TODO: modify instead of rebuilding wholesale?
+    while (list.firstChild) {
+      list.removeChild(list.firstChild);
+    }
+    rows.forEach((row) => list.append(row));
   }
 
   ///  FILES PAGE

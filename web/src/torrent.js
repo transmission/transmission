@@ -9,6 +9,48 @@ import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
 import { deepEqual } from './utils.js';
 
+/// DOMAINS
+
+// example: "tracker.ubuntu.com" returns "ubuntu.com"
+function getDomainName(host) {
+  const dot = host.indexOf('.');
+  if (dot !== host.lastIndexOf('.')) {
+    host = host.slice(dot + 1);
+  }
+  return host;
+}
+
+// example: "ubuntu.com" returns "Ubuntu"
+function getReadableDomain(name) {
+  if (name.length) {
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  const dot = name.indexOf('.');
+  if (dot !== -1) {
+    name = name.slice(0, dot);
+  }
+  return name;
+}
+
+// key: url string
+// val: { domain, readable_domain }
+const announce_to_domain_cache = {};
+
+function getAnnounceDomain(announce) {
+  if (announce_to_domain_cache[announce]) {
+    return announce_to_domain_cache[announce];
+  }
+
+  const url = new URL(announce);
+  const domain = getDomainName(url.host);
+  const name = getReadableDomain(domain);
+  const o = { domain, name, url };
+  announce_to_domain_cache[announce] = o;
+  return o;
+}
+
+///
+
 export class Torrent extends EventTarget {
   constructor(data) {
     super();
@@ -219,6 +261,12 @@ export class Torrent extends EventTarget {
     return this.fields.totalSize;
   }
   getTrackers() {
+    const trackers = this.fields.trackers || [];
+    for (const tracker of trackers) {
+      if (tracker.announce && !tracker.domain) {
+        Object.assign(tracker, getAnnounceDomain(tracker.announce));
+      }
+    }
     return this.fields.trackers;
   }
   getUploadSpeed() {
