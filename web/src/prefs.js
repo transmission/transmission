@@ -5,7 +5,7 @@
  * or any future license endorsed by Mnemosyne LLC.
  */
 
-import { Utils } from './utils.js';
+import { debounce } from './utils.js';
 
 export class Prefs extends EventTarget {
   constructor() {
@@ -13,7 +13,7 @@ export class Prefs extends EventTarget {
 
     this._cache = {};
 
-    this.dispatchPrefsChange = Utils.debounce((key, old_value, value) => {
+    this.dispatchPrefsChange = debounce((key, old_value, value) => {
       const event = new Event('change');
       Object.assign(event, { key, old_value, value });
       this.dispatchEvent(event);

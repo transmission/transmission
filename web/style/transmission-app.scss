@@ -91,8 +91,7 @@ $image-upload-download: 'images/up-and-down-arrows.svg';
 
 /// GLOBAL
 
-html,
-body {
+:root {
   --color-bg-even: #{$white};
   --color-bg-hover: #{$grey-100};
   --color-bg-menu: #{$grey-200};
@@ -105,9 +104,16 @@ body {
   --color-fg-name: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
-  --color-fg-primary: #{$grey-800};
-  --color-fg-secondary: #{$grey-500};
-  --color-fg-tertiary: #{$grey-400};
+  @media (prefers-color-scheme: dark) {
+    --color-fg-primary: #{$grey-100};
+    --color-fg-secondary: #{$grey-400};
+    --color-fg-tertiary: #{$grey-500};
+  }
+  @media (prefers-color-scheme: light) {
+    --color-fg-primary: #{$grey-800};
+    --color-fg-secondary: #{$grey-500};
+    --color-fg-tertiary: #{$grey-400};
+  }
   --color-progressbar-background-1: #{$grey-100};
   --color-progressbar-background-2: #{$grey-400};
   --color-progressbar-verify-1: #{$pink-300};
@@ -133,7 +139,10 @@ body {
   --color-tab-selected-1: #{$purple-100};
   --color-tab-selected-2: #{$purple-000};
   --color-toolbar-background: linear-gradient(#{$grey-300}, #{$grey-400});
+}
 
+html,
+body {
   color: var(--color-fg-primary);
   font-family: Verdana, Arial, Helvetica, sans-serif;
   height: 100%;
@@ -1462,6 +1471,8 @@ $logo-size: 64px;
 .dialog-container {
   border: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  color: var(--color-fg-primary);
+  display: block;
   margin: 0;
   padding: 0;
   z-index: $z-index-popup;

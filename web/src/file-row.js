@@ -6,7 +6,7 @@
  */
 
 import { Formatter } from './formatter.js';
-import { Utils, makeUUID, setChecked, setEnabled } from './utils.js';
+import { makeUUID, setChecked, setEnabled, setTextContent } from './utils.js';
 
 export class FileRow extends EventTarget {
   isDone() {
@@ -32,7 +32,7 @@ export class FileRow extends EventTarget {
     const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(
       pct
     )}%)`;
-    Utils.setTextContent(this.elements.progress, c);
+    setTextContent(this.elements.progress, c);
   }
 
   refresh() {
@@ -117,7 +117,7 @@ export class FileRow extends EventTarget {
     e = document.createElement('label');
     e.className = 'inspector-torrent-file-list-entry-name';
     e.setAttribute('for', check_id);
-    Utils.setTextContent(e, name);
+    setTextContent(e, name);
     root.appendChild(e);
 
     e = document.createElement('div');

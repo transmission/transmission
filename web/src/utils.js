@@ -8,10 +8,6 @@
 import isEqual from 'lodash.isequal';
 
 export class Utils {
-  static setVisible(el, visible) {
-    el.classList.toggle('hidden', !visible);
-  }
-
   /**
    * Checks to see if the content actually changed before poking the DOM.
    */
@@ -27,32 +23,6 @@ export class Utils {
       e.currentHTML = html;
       e.innerHTML = html;
     }
-  }
-
-  /**
-   * Avoid poking properties that haven't changed.
-   * This is a (possibly unnecessary?) precaution to avoid unnecessary DOM changes
-   */
-  static setProperty(o, key, val) {
-    if (o && o[key] !== val) {
-      o[key] = val;
-    }
-  }
-  static setTextContent(e, text) {
-    Utils.setProperty(e, 'textContent', text);
-  }
-
-  static debounce(callback, wait = 100) {
-    let timeout = null;
-    return (...args) => {
-      const context = this;
-      if (!timeout) {
-        timeout = setTimeout(() => {
-          timeout = null;
-          callback.apply(context, args);
-        }, wait);
-      }
-    };
   }
 
   /** Given a numerator and denominator, return a ratio string */
@@ -222,6 +192,22 @@ export function createInfoSection(title, labels) {
   return { children, root };
 }
 
+export function debounce(callback, wait = 100) {
+  let timeout = null;
+  return (...args) => {
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        timeout = null;
+        callback(args);
+      }, wait);
+    }
+  };
+}
+
+export function deepEqual(a, b) {
+  return isEqual(a, b);
+}
+
 function setOrDeleteAttribute(el, attribute, b) {
   if (b) {
     el.setAttribute(attribute, true);
@@ -287,10 +273,6 @@ export class OutsideClickListener extends EventTarget {
   stop() {
     document.removeEventListener('click', this.listener);
   }
-}
-
-export function deepEqual(a, b) {
-  return isEqual(a, b);
 }
 
 export function setTextContent(e, text) {

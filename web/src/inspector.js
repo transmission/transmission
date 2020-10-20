@@ -273,7 +273,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.info.state, str);
+    setTextContent(e.info.state, str);
     const stateString = str;
 
     // have
@@ -305,7 +305,7 @@ export class Inspector extends EventTarget {
         )} (${str}%), ${fmt.size(unverified)} Unverified`;
       }
     }
-    Utils.setTextContent(e.info.have, str);
+    setTextContent(e.info.have, str);
 
     // availability
     if (torrents.length < 1) {
@@ -319,7 +319,7 @@ export class Inspector extends EventTarget {
       );
       str = `${fmt.percentString((100.0 * available) / sizeWhenDone)}%`;
     }
-    Utils.setTextContent(e.info.availability, str);
+    setTextContent(e.info.availability, str);
 
     //  downloaded
     if (torrents.length < 1) {
@@ -329,7 +329,7 @@ export class Inspector extends EventTarget {
       const f = torrents.reduce((acc, t) => acc + t.getFailedEver(), 0);
       str = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
     }
-    Utils.setTextContent(e.info.downloaded, str);
+    setTextContent(e.info.downloaded, str);
 
     // uploaded
     if (torrents.length < 1) {
@@ -341,7 +341,7 @@ export class Inspector extends EventTarget {
         torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
       str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
     }
-    Utils.setTextContent(e.info.uploaded, str);
+    setTextContent(e.info.uploaded, str);
 
     // running time
     if (torrents.length < 1) {
@@ -357,7 +357,7 @@ export class Inspector extends EventTarget {
         str = fmt.timeInterval(now / 1000 - first);
       }
     }
-    Utils.setTextContent(e.info.running_time, str);
+    setTextContent(e.info.running_time, str);
 
     // remaining time
     if (torrents.length < 1) {
@@ -373,7 +373,7 @@ export class Inspector extends EventTarget {
         str = fmt.timeInterval(first);
       }
     }
-    Utils.setTextContent(e.info.remaining_time, str);
+    setTextContent(e.info.remaining_time, str);
 
     // last active at
     if (torrents.length < 1) {
@@ -392,7 +392,7 @@ export class Inspector extends EventTarget {
         str = none;
       }
     }
-    Utils.setTextContent(e.info.last_activity, str);
+    setTextContent(e.info.last_activity, str);
 
     // error
     if (torrents.length < 1) {
@@ -402,7 +402,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.info.error, str || none);
+    setTextContent(e.info.error, str || none);
 
     // size
     if (torrents.length < 1) {
@@ -428,7 +428,7 @@ export class Inspector extends EventTarget {
         }
       }
     }
-    Utils.setTextContent(e.info.size, str);
+    setTextContent(e.info.size, str);
 
     // hash
     if (torrents.length < 1) {
@@ -438,7 +438,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.info.hash, str);
+    setTextContent(e.info.hash, str);
 
     // privacy
     if (torrents.length < 1) {
@@ -454,7 +454,7 @@ export class Inspector extends EventTarget {
         str = 'Public torrent';
       }
     }
-    Utils.setTextContent(e.info.privacy, str);
+    setTextContent(e.info.privacy, str);
 
     // comment
     if (torrents.length < 1) {
@@ -472,7 +472,7 @@ export class Inspector extends EventTarget {
         `<a href="${str}" target="_blank" >${str}</a>`
       );
     } else {
-      Utils.setTextContent(e.info.comment, str);
+      setTextContent(e.info.comment, str);
     }
 
     // origin
@@ -503,7 +503,7 @@ export class Inspector extends EventTarget {
         ).toDateString()}`;
       }
     }
-    Utils.setTextContent(e.info.origin, str);
+    setTextContent(e.info.origin, str);
 
     // location
     if (torrents.length < 1) {
@@ -513,7 +513,7 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       str = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    Utils.setTextContent(e.info.location, str);
+    setTextContent(e.info.location, str);
   }
 
   ///  PEERS PAGE

@@ -5,7 +5,7 @@
  * or any future license endorsed by Mnemosyne LLC.
  */
 
-import { Utils } from './utils.js';
+import { setTextContent } from './utils.js';
 
 export class Notifications {
   constructor(prefs) {
@@ -17,7 +17,7 @@ export class Notifications {
 
   _setEnabled(enabled) {
     this.prefs.notifications_enabled = enabled;
-    Utils.setTextContent(
+    setTextContent(
       this._toggle,
       `${enabled ? 'Disable' : 'Enable'} Notifications`
     );

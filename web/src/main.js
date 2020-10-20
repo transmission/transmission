@@ -9,12 +9,12 @@ import { ActionManager } from './action-manager.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
-import { Utils } from './utils.js';
+import { debounce } from './utils.js';
 
 import '../style/transmission-app.scss';
 
 function main() {
-  const scroll_soon = Utils.debounce(() => window.scrollTo(0, 1));
+  const scroll_soon = debounce(() => window.scrollTo(0, 1));
   window.onload = scroll_soon;
   window.onorientationchange = scroll_soon;
 

@@ -7,7 +7,7 @@
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { Utils } from './utils.js';
+import { setTextContent } from './utils.js';
 
 class TorrentRendererHelper {
   static getProgressInfo(controller, t) {
@@ -216,7 +216,7 @@ export class TorrentRendererFull {
 
     // name
     let e = root._name_container;
-    Utils.setTextContent(e, t.getName());
+    setTextContent(e, t.getName());
     e.classList.toggle('paused', is_stopped);
 
     // progressbar
@@ -227,14 +227,11 @@ export class TorrentRendererFull {
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._peer_details_container;
     e.classList.toggle('error', has_error);
-    Utils.setTextContent(e, TorrentRendererFull.getPeerDetails(t));
+    setTextContent(e, TorrentRendererFull.getPeerDetails(t));
 
     // progress details
     e = root._progress_details_container;
-    Utils.setTextContent(
-      e,
-      TorrentRendererFull.getProgressDetails(controller, t)
-    );
+    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
 
     // pause/resume button
     e = root._toggle_running_button;
@@ -331,13 +328,13 @@ export class TorrentRendererCompact {
     // name
     let e = root._name_container;
     e.classList.toggle('paused', t.isStopped());
-    Utils.setTextContent(e, t.getName());
+    setTextContent(e, t.getName());
 
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
     e.classList.toggle('error', has_error);
-    Utils.setTextContent(e, TorrentRendererCompact.getPeerDetails(t));
+    setTextContent(e, TorrentRendererCompact.getPeerDetails(t));
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);

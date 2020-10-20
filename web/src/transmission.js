@@ -26,11 +26,11 @@ import {
   TorrentRendererFull,
 } from './torrent-row.js';
 import {
+  debounce,
   deepEqual,
   setEnabled,
   setTextContent,
   movePopup,
-  Utils,
 } from './utils.js';
 
 export class Transmission extends EventTarget {
@@ -54,11 +54,11 @@ export class Transmission extends EventTarget {
     this.dirtyTorrents = new Set();
     this.uriCache = {};
 
-    this.refilterSoon = Utils.debounce(() => this._refilter(false));
-    this.refilterAllSoon = Utils.debounce(() => this._refilter(true));
+    this.refilterSoon = debounce(() => this._refilter(false));
+    this.refilterAllSoon = debounce(() => this._refilter(true));
 
     this.boundPopupCloseListener = this.popupCloseListener.bind(this);
-    this.dispatchSelectionChangedSoon = Utils.debounce(
+    this.dispatchSelectionChangedSoon = debounce(
       () => this._dispatchSelectionChanged(),
       200
     );
