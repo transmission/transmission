@@ -203,7 +203,6 @@ export class Transmission extends EventTarget {
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.getElementById('torrent-container');
     e.addEventListener('click', () => {
-      // FIXME: :thinking:
       if (this.popup && this.popup.name !== 'inspector') {
         this.setCurrentPopup(null);
       } else {
@@ -557,8 +556,12 @@ export class Transmission extends EventTarget {
     }
   }
 
+  shouldAddedTorrentsStart() {
+    return this.session_properties['start-added-torrents'];
+  }
+
   _drop(ev) {
-    const paused = true; // FIXME this.shouldAddedTorrentsStart();
+    const paused = !this.shouldAddedTorrentsStart();
 
     if (!ev.dataTransfer || !ev.dataTransfer.types) {
       return true;
@@ -656,7 +659,7 @@ export class Transmission extends EventTarget {
     });
   }
   /*
-FIXME: fix this when notifications get fixed
+TODO: fix this when notifications get fixed
         t.notifyOnFieldChange('status', (newValue, oldValue) => {
           if (
             oldValue === Torrent._StatusDownload &&

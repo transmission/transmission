@@ -50,11 +50,6 @@ export class OpenDialog extends EventTarget {
     });
   }
 
-  // eslint-disable-next-line
-  _shouldAddedTorrentsStart() {
-    return false; // FIXME
-  }
-
   _onConfirm() {
     const { remote } = this;
     const { file_input, folder_input, start_input, url_input } = this.elements;
@@ -184,7 +179,7 @@ export class OpenDialog extends EventTarget {
     const check = document.createElement('input');
     check.type = 'checkbox';
     check.id = 'auto-start-check';
-    check.checked = this._shouldAddedTorrentsStart();
+    check.checked = this.controller.shouldAddedTorrentsStart();
     checkarea.appendChild(check);
     elements.start_input = check;
 
