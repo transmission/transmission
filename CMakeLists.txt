@@ -623,10 +623,7 @@ if(ENABLE_TESTS)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web DESTINATION ${DST_DIR}
-        PATTERN *.am EXCLUDE
-        PATTERN *.in EXCLUDE
-        PATTERN *.scss EXCLUDE)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html DESTINATION ${DST_DIR})
 endfunction()
 
 add_subdirectory(libtransmission)
