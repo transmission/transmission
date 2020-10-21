@@ -1265,5 +1265,11 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         }
     }
 
+    char const* webClientDir = tr_getWebClientDir(s->session);
+    if (!tr_str_is_empty(webClientDir))
+    {
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
+    }
+
     return s;
 }
