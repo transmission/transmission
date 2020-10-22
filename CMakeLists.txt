@@ -662,7 +662,11 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
 if(NOT TR_STABLE_RELEASE)
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
 endif()
-list(APPEND CPACK_SOURCE_IGNORE_FILES [.]git build node_modules)
+list(APPEND CPACK_SOURCE_IGNORE_FILES
+    "${CMAKE_BINARY_DIR}"
+    "[.]git"
+    "node_modules"
+)
 set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting
