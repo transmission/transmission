@@ -133,7 +133,7 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
 #ifdef _WIN32
 
-void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const
+void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const
 {
     QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
         file_info.suffix();
