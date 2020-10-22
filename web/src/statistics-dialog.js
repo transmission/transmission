@@ -27,7 +27,7 @@ export class StatisticsDialog extends EventTarget {
 
     this.elements = StatisticsDialog._create();
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
 
@@ -87,7 +87,7 @@ export class StatisticsDialog extends EventTarget {
     session.down = sdown;
     session.ratio = sratio;
     session.time = stime;
-    workarea.appendChild(section.root);
+    workarea.append(section.root);
 
     section = createInfoSection('Total', labels);
     const [tup, tdown, tratio, ttime] = section.children;
@@ -96,7 +96,7 @@ export class StatisticsDialog extends EventTarget {
     total.down = tdown;
     total.ratio = tratio;
     total.time = ttime;
-    workarea.appendChild(section.root);
+    workarea.append(section.root);
 
     return elements;
   }

@@ -15,7 +15,7 @@ export class AlertDialog extends EventTarget {
     this.elements = AlertDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.options = options;
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
 

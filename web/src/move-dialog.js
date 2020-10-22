@@ -34,7 +34,7 @@ export class MoveDialog extends EventTarget {
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.entry.value = default_path;
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
 
     this.elements.entry.focus();
   }
@@ -71,13 +71,13 @@ export class MoveDialog extends EventTarget {
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-path');
     label.textContent = 'Location:';
-    elements.workarea.appendChild(label);
+    elements.workarea.append(label);
 
     const entry = document.createElement('input');
     entry.setAttribute('type', 'text');
     entry.id = 'torrent-path';
     elements.entry = entry;
-    elements.workarea.appendChild(entry);
+    elements.workarea.append(entry);
 
     return elements;
   }

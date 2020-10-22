@@ -74,9 +74,9 @@ export class TorrentRendererFull {
   static getPeerDetails(t) {
     const fmt = Formatter;
 
-    const err = t.getErrorMessage();
-    if (err) {
-      return err;
+    const error = t.getErrorMessage();
+    if (error) {
+      return error;
     }
 
     if (t.isDownloading()) {
@@ -134,7 +134,7 @@ export class TorrentRendererFull {
     if (t.isChecking()) {
       return [
         'Verifying local data (',
-        Formatter.percentString(100.0 * t.getRecheckProgress()),
+        Formatter.percentString(100 * t.getRecheckProgress()),
         '% tested)',
       ].join('');
     }
@@ -246,14 +246,11 @@ export class TorrentRendererFull {
 
     const icon = document.createElement('div');
     icon.classList.add('icon');
-    icon.setAttribute(
-      'data-icon-mime-type',
-      torrent.getPrimaryMimeType().split('/', 1).pop()
-    );
-    icon.setAttribute(
-      'data-icon-multifile',
-      torrent.getFileCount() > 1 ? 'true' : 'false'
-    );
+    icon.dataset.iconMimeType = torrent
+      .getPrimaryMimeType()
+      .split('/', 1)
+      .pop();
+    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -265,19 +262,19 @@ export class TorrentRendererFull {
     progress.classList.add('torrent-progress');
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'full');
-    progress.appendChild(progressbar);
+    progress.append(progressbar);
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
-    progress.appendChild(button);
+    progress.append(button);
 
     const details = document.createElement('div');
     details.className = 'torrent-progress-details';
 
-    root.appendChild(icon);
-    root.appendChild(name);
-    root.appendChild(peers);
-    root.appendChild(progress);
-    root.appendChild(details);
+    root.append(icon);
+    root.append(name);
+    root.append(peers);
+    root.append(progress);
+    root.append(details);
 
     root._icon = icon;
     root._name_container = name;
@@ -294,9 +291,9 @@ export class TorrentRendererFull {
 
 export class TorrentRendererCompact {
   static getPeerDetails(t) {
-    const errMsg = t.getErrorMessage();
-    if (errMsg) {
-      return errMsg;
+    const errorMessage = t.getErrorMessage();
+    if (errorMessage) {
+      return errorMessage;
     }
     if (t.isDownloading()) {
       const have_dn = t.getDownloadSpeed() > 0;
@@ -348,14 +345,11 @@ export class TorrentRendererCompact {
 
     const icon = document.createElement('div');
     icon.classList.add('icon');
-    icon.setAttribute(
-      'data-icon-mime-type',
-      torrent.getPrimaryMimeType().split('/', 1).pop()
-    );
-    icon.setAttribute(
-      'data-icon-multifile',
-      torrent.getFileCount() > 1 ? 'true' : 'false'
-    );
+    icon.dataset.iconMimeType = torrent
+      .getPrimaryMimeType()
+      .split('/', 1)
+      .pop();
+    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
@@ -364,10 +358,10 @@ export class TorrentRendererCompact {
     name.className = 'torrent-name compact';
 
     const root = document.createElement('li');
-    root.appendChild(progressbar);
-    root.appendChild(details);
-    root.appendChild(name);
-    root.appendChild(icon);
+    root.append(progressbar);
+    root.append(details);
+    root.append(name);
+    root.append(icon);
     root.className = 'torrent compact';
     root._progressbar = progressbar;
     root._details_container = details;

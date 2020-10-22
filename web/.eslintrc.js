@@ -5,7 +5,8 @@ module.exports = {
     "es6": true
   },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "plugin:unicorn/recommended"
   ],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
@@ -114,8 +115,11 @@ module.exports = {
     "semi": "error",
     "sort-keys": "error",
     "strict": "error",
-    "unicorn/better-regex": "error",
-    "unicorn/catch-error-name": "error",
-    "unicorn/error-message": "error",
+    'unicorn/consistent-function-scoping': 'off',
+    "unicorn/no-fn-reference-in-iterator": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-reduce": "off",
+    "unicorn/no-unused-properties": "off",
+    "unicorn/prevent-abbreviations": "off",
   }
 };

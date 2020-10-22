@@ -15,7 +15,7 @@ import '../style/transmission-app.scss';
 
 function main() {
   const scroll_soon = debounce(() => window.scrollTo(0, 1));
-  window.onload = scroll_soon;
+  window.addEventListener('load', scroll_soon);
   window.onorientationchange = scroll_soon;
 
   const action_manager = new ActionManager();

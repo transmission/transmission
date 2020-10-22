@@ -11,7 +11,7 @@ export class Notifications {
   constructor(prefs) {
     this._prefs = prefs;
     this._elements = {
-      toggle: document.getElementById('toggle-notifications'),
+      toggle: document.querySelector('#toggle-notifications'),
     };
   }
 

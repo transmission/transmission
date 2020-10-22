@@ -85,9 +85,9 @@ export class ActionManager extends EventTarget {
 
   click(name) {
     if (this.isEnabled(name)) {
-      const ev = new Event('click');
-      ev.action = name;
-      this.dispatchEvent(ev);
+      const event_ = new Event('click');
+      event_.action = name;
+      this.dispatchEvent(event_);
     }
   }
 
@@ -104,8 +104,8 @@ export class ActionManager extends EventTarget {
   allShortcuts() {
     return new Map(
       Object.entries(this.actions)
-        .filter(([, props]) => props.shortcut)
-        .map(([name, props]) => [props.shortcut, name])
+        .filter(([, properties]) => properties.shortcut)
+        .map(([name, properties]) => [properties.shortcut, name])
     );
   }
 
@@ -121,8 +121,8 @@ export class ActionManager extends EventTarget {
     return this._getAction(name).shortcut;
   }
 
-  update(ev) {
-    const counts = ActionManager._recount(ev.selected, ev.nonselected);
+  update(event_) {
+    const counts = ActionManager._recount(event_.selected, event_.nonselected);
     this._updateStates(counts);
   }
 

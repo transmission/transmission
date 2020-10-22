@@ -13,7 +13,7 @@ export class ShortcutsDialog extends EventTarget {
 
     this.elements = ShortcutsDialog._create(action_manager);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
 
@@ -33,21 +33,21 @@ export class ShortcutsDialog extends EventTarget {
 
     const table = document.createElement('table');
     const thead = document.createElement('thead');
-    table.appendChild(thead);
+    table.append(thead);
 
     let tr = document.createElement('tr');
-    thead.appendChild(tr);
+    thead.append(tr);
 
     let th = document.createElement('th');
     th.textContent = 'Key';
-    tr.appendChild(th);
+    tr.append(th);
 
     th = document.createElement('th');
     th.textContent = 'Action';
-    tr.appendChild(th);
+    tr.append(th);
 
     const tbody = document.createElement('tbody');
-    table.appendChild(tbody);
+    table.append(tbody);
 
     const o = {};
     for (const [shortcut, name] of action_manager.allShortcuts().entries()) {
@@ -59,22 +59,22 @@ export class ShortcutsDialog extends EventTarget {
     for (const [, values] of Object.entries(o).sort()) {
       const { name, shortcut } = values;
       tr = document.createElement('tr');
-      tbody.appendChild(tr);
+      tbody.append(tr);
 
       let td = document.createElement('td');
       td.textContent = shortcut.replaceAll('+', ' + ');
-      tr.appendChild(td);
+      tr.append(td);
 
       td = document.createElement('td');
       td.textContent = action_manager.text(name);
-      tr.appendChild(td);
+      tr.append(td);
     }
 
     elements.heading.textContent = 'Transmission';
     elements.dismiss.textContent = 'Close';
 
     elements.heading.textContent = 'Keyboard shortcuts';
-    elements.message.appendChild(table);
+    elements.message.append(table);
     elements.confirm.remove();
     delete elements.confirm;
     return elements;

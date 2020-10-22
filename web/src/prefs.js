@@ -61,27 +61,27 @@ export class Prefs extends EventTarget {
     }
   }
 
-  static _setCookie(key, val) {
+  static _setCookie(key, value) {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
-    document.cookie = `${key}=${val}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
+    document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
   }
 
   static _getCookie(key, fallback) {
-    const val = Prefs._readCookie(key);
-    if (val === null) {
+    const value = Prefs._readCookie(key);
+    if (value === null) {
       return fallback;
     }
-    if (val === 'true') {
+    if (value === 'true') {
       return true;
     }
-    if (val === 'false') {
+    if (value === 'false') {
       return false;
     }
-    if (val.match(/^\d+$/)) {
-      return Number.parseInt(val, 10);
+    if (value.match(/^\d+$/)) {
+      return Number.parseInt(value, 10);
     }
-    return val;
+    return value;
   }
 
   static _readCookie(key) {

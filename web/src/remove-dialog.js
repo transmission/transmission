@@ -16,7 +16,7 @@ export class RemoveDialog extends EventTarget {
     this.elements = RemoveDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
 

@@ -43,8 +43,8 @@ export class Transmission extends EventTarget {
     this.prefs = prefs;
     this.remote = new Remote(this);
 
-    this.addEventListener('torrent-selection-changed', (ev) =>
-      this.action_manager.update(ev)
+    this.addEventListener('torrent-selection-changed', (event_) =>
+      this.action_manager.update(event_)
     );
 
     // Initialize the implementation fields
@@ -64,32 +64,32 @@ export class Transmission extends EventTarget {
 
     // listen to actions
     // TODO: consider adding a mutator listener here to pick up dynamic additions
-    for (const el of document.querySelectorAll(`button[data-action]`)) {
-      const { action } = el.dataset;
-      setEnabled(el, this.action_manager.isEnabled(action));
-      el.addEventListener('click', () => {
+    for (const element of document.querySelectorAll(`button[data-action]`)) {
+      const { action } = element.dataset;
+      setEnabled(element, this.action_manager.isEnabled(action));
+      element.addEventListener('click', () => {
         this.action_manager.click(action);
       });
     }
 
     document
-      .getElementById('filter-tracker')
-      .addEventListener('change', (ev) => {
+      .querySelector('#filter-tracker')
+      .addEventListener('change', (event_) => {
         this.setFilterTracker(
-          ev.target.value === 'all' ? null : ev.target.value
+          event_.target.value === 'all' ? null : event_.target.value
         );
       });
 
-    this.action_manager.addEventListener('change', (ev) => {
-      for (const el of document.querySelectorAll(
-        `[data-action="${ev.action}"]`
+    this.action_manager.addEventListener('change', (event_) => {
+      for (const element of document.querySelectorAll(
+        `[data-action="${event_.action}"]`
       )) {
-        setEnabled(el, ev.enabled);
+        setEnabled(element, event_.enabled);
       }
     });
 
-    this.action_manager.addEventListener('click', (ev) => {
-      switch (ev.action) {
+    this.action_manager.addEventListener('click', (event_) => {
+      switch (event_.action) {
         case 'deselect-all':
           this._deselectAll();
           break;
@@ -149,7 +149,7 @@ export class Transmission extends EventTarget {
               )
             );
             const btnbox = document
-              .getElementById('toolbar-overflow')
+              .querySelector('#toolbar-overflow')
               .getBoundingClientRect();
             movePopup(
               this.popup.root,
@@ -187,21 +187,21 @@ export class Transmission extends EventTarget {
           this._verifyTorrents(this.getSelectedTorrents());
           break;
         default:
-          console.warn(`unhandled action: ${ev.action}`);
+          console.warn(`unhandled action: ${event_.action}`);
       }
     });
 
     // listen to filter changes
-    let e = document.getElementById('filter-mode');
+    let e = document.querySelector('#filter-mode');
     e.value = this.prefs.filter_mode;
-    e.addEventListener('change', (ev) => {
-      this.prefs.filter_mode = ev.target.value;
+    e.addEventListener('change', (event_) => {
+      this.prefs.filter_mode = event_.target.value;
     });
 
     //if (!isMobileDevice) {
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
-    e = document.getElementById('torrent-container');
+    e = document.querySelector('#torrent-container');
     e.addEventListener('click', () => {
       if (this.popup && this.popup.name !== 'inspector') {
         this.setCurrentPopup(null);
@@ -216,10 +216,10 @@ export class Transmission extends EventTarget {
     //}
 
     this.elements = {
-      torrent_list: document.getElementById('torrent-list'),
+      torrent_list: document.querySelector('#torrent-list'),
     };
 
-    this.elements.torrent_list.addEventListener('contextmenu', (ev) => {
+    this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
       // ensure the clicked row is selected
       let row_element = event.target;
       while (row_element && !row_element.classList.contains('torrent')) {
@@ -234,11 +234,11 @@ export class Transmission extends EventTarget {
       this.setCurrentPopup(popup);
       movePopup(
         popup.root,
-        ev.x,
-        ev.y,
-        document.getElementById('torrent-container')
+        event_.x,
+        event_.y,
+        document.querySelector('#torrent-container')
       );
-      ev.preventDefault();
+      event_.preventDefault();
     });
 
     // Get preferences & torrents from the daemon
@@ -281,7 +281,7 @@ export class Transmission extends EventTarget {
   }
 
   _setupSearchBox() {
-    const e = document.getElementById('torrent-search');
+    const e = document.querySelector('#torrent-search');
     const blur_token = 'blur';
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
@@ -404,8 +404,8 @@ export class Transmission extends EventTarget {
       const next = this._rows.indexOf(row);
       const min = Math.min(last, next);
       const max = Math.max(last, next);
-      for (let i = min; i <= max; ++i) {
-        this._selectRow(this._rows[i]);
+      for (let index = min; index <= max; ++index) {
+        this._selectRow(this._rows[index]);
       }
     }
 
@@ -431,33 +431,33 @@ export class Transmission extends EventTarget {
    *
    *--------------------------------------------*/
 
-  static _createKeyShortcutFromKeyboardEvent(ev) {
+  static _createKeyShortcutFromKeyboardEvent(event_) {
     const a = [];
-    if (ev.ctrlKey) {
+    if (event_.ctrlKey) {
       a.push('Control');
     }
-    if (ev.altKey) {
+    if (event_.altKey) {
       a.push('Alt');
     }
-    if (ev.metaKey) {
+    if (event_.metaKey) {
       a.push('Meta');
     }
-    if (ev.shitKey) {
+    if (event_.shitKey) {
       a.push('Shift');
     }
-    a.push(ev.key.length === 1 ? ev.key.toUpperCase() : ev.key);
+    a.push(event_.key.length === 1 ? event_.key.toUpperCase() : event_.key);
     return a.join('+');
   }
 
   // Process key events
-  _keyDown(ev) {
-    const { keyCode } = ev;
+  _keyDown(event_) {
+    const { keyCode } = event_;
 
     // look for a shortcut
-    const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(ev);
+    const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(event_);
     const action = this.action_manager.getActionForShortcut(aria_keys);
     if (action) {
-      ev.preventDefault();
+      event_.preventDefault();
       this.action_manager.click(action);
       return;
     }
@@ -465,50 +465,58 @@ export class Transmission extends EventTarget {
     const esc_key = keyCode === 27; // esc key pressed
     if (esc_key && this.popup) {
       this.setCurrentPopup(null);
-      ev.preventDefault();
+      event_.preventDefault();
       return;
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const is_input_focused = ev.target.matches('input');
+    const is_input_focused = event_.target.matches('input');
     const rows = this._rows;
 
     // Some shortcuts can only be used if the following conditions are met:
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (!is_input_focused && !any_popup_active && !ev.metaKey && !ev.ctrlKey) {
+    if (
+      !is_input_focused &&
+      !any_popup_active &&
+      !event_.metaKey &&
+      !event_.ctrlKey
+    ) {
       const shift_key = keyCode === 16; // shift key pressed
       const up_key = keyCode === 38; // up key pressed
       const dn_key = keyCode === 40; // down key pressed
-      if ((up_key || dn_key) && rows.length) {
+      if ((up_key || dn_key) && rows.length > 0) {
         const last = this._indexOfLastTorrent();
         const anchor = this._shift_index;
         const min = 0;
         const max = rows.length - 1;
-        let i = last;
+        let index = last;
 
-        if (dn_key && i + 1 <= max) {
-          ++i;
-        } else if (up_key && i - 1 >= min) {
-          --i;
+        if (dn_key && index + 1 <= max) {
+          ++index;
+        } else if (up_key && index - 1 >= min) {
+          --index;
         }
 
-        const r = rows[i];
+        const r = rows[index];
 
         if (anchor >= 0) {
           // user is extending the selection
           // with the shift + arrow keys...
-          if ((anchor <= last && last < i) || (anchor >= last && last > i)) {
+          if (
+            (anchor <= last && last < index) ||
+            (anchor >= last && last > index)
+          ) {
             this._selectRow(r);
           } else if (
-            (anchor >= last && i > last) ||
-            (anchor <= last && last > i)
+            (anchor >= last && index > last) ||
+            (anchor <= last && last > index)
           ) {
             this._deselectRow(rows[last]);
           }
         } else {
-          if (ev.shiftKey) {
+          if (event_.shiftKey) {
             this._selectRange(r);
           } else {
             this._setSelectedRow(r);
@@ -517,7 +525,7 @@ export class Transmission extends EventTarget {
         if (r) {
           this._last_torrent_clicked = r.getTorrentId();
           r.getElement().scrollIntoView();
-          ev.preventDefault();
+          event_.preventDefault();
         }
       } else if (shift_key) {
         this._shift_index = this._indexOfLastTorrent();
@@ -525,33 +533,33 @@ export class Transmission extends EventTarget {
     }
   }
 
-  _keyUp(ev) {
-    if (ev.keyCode === 16) {
+  _keyUp(event_) {
+    if (event_.keyCode === 16) {
       // shift key pressed
       delete this._shift_index;
     }
   }
 
-  static _dragenter(ev) {
-    if (ev.dataTransfer && ev.dataTransfer.types) {
-      const copy_types = ['text/uri-list', 'text/plain'];
-      if (ev.dataTransfer.types.some((type) => copy_types.includes(type))) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = 'copy';
+  static _dragenter(event_) {
+    if (event_.dataTransfer && event_.dataTransfer.types) {
+      const copy_types = new Set(['text/uri-list', 'text/plain']);
+      if (event_.dataTransfer.types.some((type) => copy_types.has(type))) {
+        event_.stopPropagation();
+        event_.preventDefault();
+        event_.dataTransfer.dropEffect = 'copy';
         return false;
       }
-    } else if (ev.dataTransfer) {
-      ev.dataTransfer.dropEffect = 'none';
+    } else if (event_.dataTransfer) {
+      event_.dataTransfer.dropEffect = 'none';
     }
     return true;
   }
 
-  static _isValidURL(str) {
+  static _isValidURL(string) {
     try {
-      const url = new URL(str);
+      const url = new URL(string);
       return url !== null;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -560,24 +568,24 @@ export class Transmission extends EventTarget {
     return this.session_properties['start-added-torrents'];
   }
 
-  _drop(ev) {
+  _drop(event_) {
     const paused = !this.shouldAddedTorrentsStart();
 
-    if (!ev.dataTransfer || !ev.dataTransfer.types) {
+    if (!event_.dataTransfer || !event_.dataTransfer.types) {
       return true;
     }
 
-    const type = ev.data.Transfer.types
+    const type = event_.data.Transfer.types
       .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
       .pop();
-    ev.dataTransfer
+    event_.dataTransfer
       .getData(type)
       .split('\n')
-      .map((str) => str.trim())
-      .filter((str) => Transmission._isValidURL(str))
+      .map((string) => string.trim())
+      .filter((string) => Transmission._isValidURL(string))
       .forEach((uri) => this.remote.addTorrentByUrl(uri, paused));
 
-    ev.preventDefault();
+    event_.preventDefault();
     return false;
   }
 
@@ -604,9 +612,9 @@ export class Transmission extends EventTarget {
     this.refilterAllSoon();
   }
 
-  _onTorrentChanged(ev) {
+  _onTorrentChanged(event_) {
     // update our dirty fields
-    const tor = ev.currentTarget;
+    const tor = event_.currentTarget;
     this.dirtyTorrents.add(tor.getId());
 
     // enqueue ui refreshes
@@ -620,8 +628,8 @@ export class Transmission extends EventTarget {
       const keys = table.shift();
       const o = {};
       for (const row of table) {
-        keys.forEach((key, idx) => {
-          o[key] = row[idx];
+        keys.forEach((key, index) => {
+          o[key] = row[index];
         });
         const { id } = o;
         let t = this._torrents[id];
@@ -642,7 +650,7 @@ export class Transmission extends EventTarget {
         }
       }
 
-      if (needinfo.length) {
+      if (needinfo.length > 0) {
         // whee, new torrents! get their initial information.
         const more_fields = ['id'].concat(
           Torrent.Fields.Metadata,
@@ -688,9 +696,9 @@ TODO: fix this when notifications get fixed
     this.updateTorrents(null, fields);
   }
 
-  _onRowClicked(ev) {
-    const meta_key = ev.metaKey || ev.ctrlKey,
-      { row } = ev.currentTarget;
+  _onRowClicked(event_) {
+    const meta_key = event_.metaKey || event_.ctrlKey,
+      { row } = event_.currentTarget;
 
     if (this.popup && this.popup.name !== 'inspector') {
       this.setCurrentPopup(null);
@@ -698,8 +706,8 @@ TODO: fix this when notifications get fixed
     }
 
     // handle the per-row pause/resume button
-    if (ev.target.classList.contains('torrent-pauseresume-button')) {
-      switch (ev.target.dataset.action) {
+    if (event_.target.classList.contains('torrent-pauseresume-button')) {
+      switch (event_.target.dataset.action) {
         case 'pause':
           this._stopTorrents([row.getTorrent()]);
           break;
@@ -713,10 +721,10 @@ TODO: fix this when notifications get fixed
 
     // Prevents click carrying to parent element
     // which deselects all on click
-    ev.stopPropagation();
+    event_.stopPropagation();
 
     // TODO: long-click should raise inspector
-    if (ev.shiftKey) {
+    if (event_.shiftKey) {
       this._selectRange(row);
       // Need to deselect any selected text
       window.focus();
@@ -742,7 +750,7 @@ TODO: fix this when notifications get fixed
   }
 
   _deleteTorrents(ids) {
-    if (ids && ids.length) {
+    if (ids && ids.length > 0) {
       for (const id of ids) {
         this.dirtyTorrents.add(id);
         delete this._torrents[id];
@@ -753,7 +761,7 @@ TODO: fix this when notifications get fixed
 
   _removeSelectedTorrents(trash) {
     const torrents = this.getSelectedTorrents();
-    if (torrents.length) {
+    if (torrents.length > 0) {
       this.setCurrentPopup(
         new RemoveDialog({ remote: this.remote, torrents, trash })
       );
@@ -838,21 +846,27 @@ TODO: fix this when notifications get fixed
       version,
     };
 
-    const el = document.getElementById('toolbar-overflow');
-    el.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
+    const element = document.querySelector('#toolbar-overflow');
+    element.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
   }
 
   _updateStatusbar() {
     const fmt = Formatter;
     const torrents = this._getAllTorrents();
 
-    const u = torrents.reduce((acc, tor) => acc + tor.getUploadSpeed(), 0);
-    const d = torrents.reduce((acc, tor) => acc + tor.getDownloadSpeed(), 0);
-    const str = fmt.countString('Transfer', 'Transfers', this._rows.length);
+    const u = torrents.reduce(
+      (accumulator, tor) => accumulator + tor.getUploadSpeed(),
+      0
+    );
+    const d = torrents.reduce(
+      (accumulator, tor) => accumulator + tor.getDownloadSpeed(),
+      0
+    );
+    const string = fmt.countString('Transfer', 'Transfers', this._rows.length);
 
-    setTextContent(document.getElementById('speed-up-label'), fmt.speedBps(u));
-    setTextContent(document.getElementById('speed-dn-label'), fmt.speedBps(d));
-    setTextContent(document.getElementById('filter-count'), str);
+    setTextContent(document.querySelector('#speed-up-label'), fmt.speedBps(u));
+    setTextContent(document.querySelector('#speed-dn-label'), fmt.speedBps(d));
+    setTextContent(document.querySelector('#filter-count'), string);
   }
 
   _updateFilterSelect() {
@@ -860,24 +874,22 @@ TODO: fix this when notifications get fixed
     const names = Object.keys(trackers).sort();
 
     // build the new html
-    let str = '';
-    if (!this.filterTracker) {
-      str += '<option value="all" selected="selected">All</option>';
-    } else {
-      str += '<option value="all">All</option>';
-    }
+    let string = '';
+    string += !this.filterTracker
+      ? '<option value="all" selected="selected">All</option>'
+      : '<option value="all">All</option>';
     for (const name of names) {
       const o = trackers[name];
-      str += `<option value="${o.domain}"`;
+      string += `<option value="${o.domain}"`;
       if (trackers[name].domain === this.filterTracker) {
-        str += ' selected="selected"';
+        string += ' selected="selected"';
       }
-      str += `>${name}</option>`;
+      string += `>${name}</option>`;
     }
 
-    if (!this.filterTrackersStr || this.filterTrackersStr !== str) {
-      this.filterTrackersStr = str;
-      document.getElementById('filter-tracker').innerHTML = str;
+    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
+      this.filterTrackersStr = string;
+      document.querySelector('#filter-tracker').innerHTML = string;
     }
   }
 
@@ -885,16 +897,16 @@ TODO: fix this when notifications get fixed
 
   sortRows(rows) {
     const torrents = rows.map((row) => row.getTorrent());
-    const id2row = rows.reduce((acc, row) => {
-      acc[row.getTorrent().getId()] = row;
-      return acc;
+    const id2row = rows.reduce((accumulator, row) => {
+      accumulator[row.getTorrent().getId()] = row;
+      return accumulator;
     }, {});
     Torrent.sortTorrents(
       torrents,
       this.prefs.sort_mode,
       this.prefs.sort_direction
     );
-    torrents.forEach((tor, idx) => (rows[idx] = id2row[tor.getId()]));
+    torrents.forEach((tor, index) => (rows[index] = id2row[tor.getId()]));
   }
 
   _refilter(rebuildEverything) {
@@ -920,7 +932,7 @@ TODO: fix this when notifications get fixed
 
     if (rebuildEverything) {
       while (list.firstChild) {
-        list.removeChild(list.firstChild);
+        list.firstChild.remove();
       }
       this._rows = [];
       this.dirtyTorrents = new Set(Object.keys(this._torrents));
@@ -944,16 +956,16 @@ TODO: fix this when notifications get fixed
     }
 
     // drop any dirty rows that don't pass the filter test
-    const tmp = [];
+    const temporary = [];
     for (const row of dirty_rows) {
       const id = row.getTorrentId();
       const t = this._torrents[id];
       if (t && t.test(filter_mode, filter_text, filter_tracker)) {
-        tmp.push(row);
+        temporary.push(row);
       }
       this.dirtyTorrents.delete(id);
     }
-    dirty_rows = tmp;
+    dirty_rows = temporary;
 
     // make new rows for dirty torrents that pass the filter test
     // but don't already have a row
@@ -1007,13 +1019,13 @@ TODO: fix this when notifications get fixed
         if (ci !== cmax) {
           list.insertBefore(e, clean_rows[ci].getElement());
         } else {
-          frag.appendChild(e);
+          frag.append(e);
         }
 
         rows.push(row);
       }
     }
-    list.appendChild(frag);
+    list.append(frag);
 
     // update our implementation fields
     this._rows = rows;
@@ -1022,8 +1034,8 @@ TODO: fix this when notifications get fixed
     // set the odd/even property
     rows
       .map((row) => row.getElement())
-      .forEach((e, idx) => {
-        const even = idx % 2 === 0;
+      .forEach((e, index) => {
+        const even = index % 2 === 0;
         e.classList.toggle('even', even);
         e.classList.toggle('odd', !even);
       });
@@ -1038,7 +1050,7 @@ TODO: fix this when notifications get fixed
   }
 
   setFilterTracker(domain) {
-    const e = document.getElementById('filter-tracker');
+    const e = document.querySelector('#filter-tracker');
     e.value = domain ? Transmission._getReadableDomain(domain) : 'all';
 
     this.filterTracker = domain;
@@ -1046,7 +1058,7 @@ TODO: fix this when notifications get fixed
   }
 
   _getTrackers() {
-    const ret = {};
+    const returnValue = {};
 
     for (const torrent of this._getAllTorrents()) {
       const names = new Set();
@@ -1054,26 +1066,26 @@ TODO: fix this when notifications get fixed
       for (const tracker of torrent.getTrackers()) {
         const { domain, name } = tracker;
 
-        if (!ret[name]) {
-          ret[name] = { count: 0, domain };
+        if (!returnValue[name]) {
+          returnValue[name] = { count: 0, domain };
         }
 
         names.add(name);
       }
 
       for (const name of names.values()) {
-        ++ret[name].count;
+        ++returnValue[name].count;
       }
     }
 
-    return ret;
+    return returnValue;
   }
 
   ///
 
-  popupCloseListener(ev) {
-    if (ev.target !== this.popup) {
-      throw new Error(ev);
+  popupCloseListener(event_) {
+    if (event_.target !== this.popup) {
+      throw new Error(event_);
     }
     this.popup.removeEventListener('close', this.boundPopupCloseListener);
     delete this.popup;

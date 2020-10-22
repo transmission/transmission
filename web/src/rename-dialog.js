@@ -29,7 +29,7 @@ export class RenameDialog extends EventTarget {
     this.torrents = torrents;
     this.elements = RenameDialog._create();
     this.elements.entry.value = torrents[0].getName();
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
 
     this.elements.entry.focus();
   }
@@ -73,13 +73,13 @@ export class RenameDialog extends EventTarget {
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-rename-name');
     label.textContent = 'Enter new name:';
-    elements.workarea.appendChild(label);
+    elements.workarea.append(label);
 
     const entry = document.createElement('input');
     entry.setAttribute('type', 'text');
     entry.id = 'torrent-rename-name';
     elements.entry = entry;
-    elements.workarea.appendChild(entry);
+    elements.workarea.append(entry);
 
     return elements;
   }

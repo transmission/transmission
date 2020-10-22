@@ -23,7 +23,7 @@ export class ContextMenu extends EventTarget {
     for (const [action, item] of Object.entries(this.actions)) {
       setEnabled(item, this.action_manager.isEnabled(action));
     }
-    document.body.appendChild(this.root);
+    document.body.append(this.root);
   }
 
   close() {
@@ -38,10 +38,10 @@ export class ContextMenu extends EventTarget {
     }
   }
 
-  _update(ev) {
-    const e = this.actions[ev.action];
+  _update(event_) {
+    const e = this.actions[event_.action];
     if (e) {
-      setEnabled(e, ev.enabled);
+      setEnabled(e, event_.enabled);
     }
   }
 
@@ -56,7 +56,7 @@ export class ContextMenu extends EventTarget {
       const text = this.action_manager.text(action);
       item.role = 'menuitem';
       item.classList.add('context-menuitem');
-      item.setAttribute('data-action', action);
+      item.dataset.action = action;
       item.textContent = text;
       const keyshortcuts = this.action_manager.keyshortcuts(action);
       if (keyshortcuts) {
@@ -67,33 +67,33 @@ export class ContextMenu extends EventTarget {
         this.close();
       });
       actions[action] = item;
-      root.appendChild(item);
+      root.append(item);
     };
 
-    const add_sep = () => {
+    const add_separator = () => {
       const item = document.createElement('div');
       item.classList.add('context-menu-separator');
-      root.appendChild(item);
+      root.append(item);
     };
 
     add_item('resume-selected-torrents');
     add_item('resume-selected-torrents-now');
     add_item('pause-selected-torrents');
-    add_sep();
+    add_separator();
     add_item('move-top');
     add_item('move-up');
     add_item('move-down');
     add_item('move-bottom');
-    add_sep();
+    add_separator();
     add_item('remove-selected-torrents');
     add_item('trash-selected-torrents');
-    add_sep();
+    add_separator();
     add_item('verify-selected-torrents');
     add_item('show-move-dialog');
     add_item('show-rename-dialog');
-    add_sep();
+    add_separator();
     add_item('reannounce-selected-torrents');
-    add_sep();
+    add_separator();
     add_item('select-all');
     add_item('deselect-all');
 

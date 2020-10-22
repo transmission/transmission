@@ -27,7 +27,7 @@ export class FileRow extends EventTarget {
 
   refreshProgressHTML() {
     const { size, have } = this.fields;
-    const pct = 100 * (size ? have / size : 1.0);
+    const pct = 100 * (size ? have / size : 1);
     const fmt = Formatter;
     const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(
       pct
@@ -45,8 +45,8 @@ export class FileRow extends EventTarget {
 
     // loop through the file_indices that affect this row
     const files = this.fields.torrent.getFiles();
-    for (const idx of this.fields.indices) {
-      const file = files[idx];
+    for (const index of this.fields.indices) {
+      const file = files[index];
       have += file.bytesCompleted;
       size += file.length;
       wanted |= file.wanted;
@@ -108,29 +108,29 @@ export class FileRow extends EventTarget {
     e.className = 'file-wanted-control';
     e.title = 'Download file';
     e.id = check_id;
-    e.addEventListener('change', (ev) =>
-      this.fireWantedChanged(ev.target.checked)
+    e.addEventListener('change', (event_) =>
+      this.fireWantedChanged(event_.target.checked)
     );
     root.checkbox = e;
-    root.appendChild(e);
+    root.append(e);
 
     e = document.createElement('label');
     e.className = 'inspector-torrent-file-list-entry-name';
     e.setAttribute('for', check_id);
     setTextContent(e, name);
-    root.appendChild(e);
+    root.append(e);
 
     e = document.createElement('div');
     e.className = 'inspector-torrent-file-list-entry-progress';
-    root.appendChild(e);
+    root.append(e);
     this.elements.progress = e;
 
     e = document.createElement('div');
     e.className = 'file-priority-radiobox';
     const box = e;
 
-    const priority_click_listener = (ev) =>
-      this.firePriorityChanged(ev.target.value);
+    const priority_click_listener = (event_) =>
+      this.firePriorityChanged(event_.target.value);
 
     e = document.createElement('input');
     e.type = 'radio';
@@ -139,7 +139,7 @@ export class FileRow extends EventTarget {
     e.title = 'Low Priority';
     e.addEventListener('click', priority_click_listener);
     this.elements.priority_low_button = e;
-    box.appendChild(e);
+    box.append(e);
 
     e = document.createElement('input');
     e.type = 'radio';
@@ -148,7 +148,7 @@ export class FileRow extends EventTarget {
     e.title = 'Normal Priority';
     e.addEventListener('click', priority_click_listener);
     this.elements.priority_normal_button = e;
-    box.appendChild(e);
+    box.append(e);
 
     e = document.createElement('input');
     e.type = 'radio';
@@ -157,9 +157,9 @@ export class FileRow extends EventTarget {
     e.className = 'high';
     e.addEventListener('click', priority_click_listener);
     this.elements.priority_high_button = e;
-    box.appendChild(e);
+    box.append(e);
 
-    root.appendChild(box);
+    root.append(box);
 
     root.style.paddingLeft = `${depth * 20}px`;
 

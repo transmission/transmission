@@ -61,7 +61,7 @@ export class Formatter {
 
   // format a percentage to a string
   static percentString(x) {
-    const decimal_places = x < 100.0 ? 1 : 0;
+    const decimal_places = x < 100 ? 1 : 0;
     return this._toTruncFixed(x, decimal_places);
   }
 
@@ -178,7 +178,7 @@ export class Formatter {
 
   /** Round a string of a number to a specified number of decimal places */
   static _toTruncFixed(number, places) {
-    const ret = Math.floor(number * 10 ** places) / 10 ** places;
-    return ret.toFixed(places);
+    const returnValue = Math.floor(number * 10 ** places) / 10 ** places;
+    return returnValue.toFixed(places);
   }
 }

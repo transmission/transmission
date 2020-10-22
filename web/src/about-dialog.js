@@ -13,7 +13,7 @@ export class AboutDialog extends EventTarget {
 
     this.elements = AboutDialog._create(version_info);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
 
@@ -36,19 +36,19 @@ export class AboutDialog extends EventTarget {
     let e = document.createElement('div');
     e.classList.add('about-dialog-version-number');
     e.textContent = version_info.version;
-    elements.heading.appendChild(e);
+    elements.heading.append(e);
 
     e = document.createElement('div');
     e.classList.add('about-dialog-version-checksum');
     e.textContent = version_info.checksum;
-    elements.heading.appendChild(e);
+    elements.heading.append(e);
 
     e = document.createElement('div');
     e.textContent = 'A fast and easy bitTorrent client';
-    elements.workarea.appendChild(e);
+    elements.workarea.append(e);
     e = document.createElement('div');
     e.textContent = 'Copyright © The Transmission Project';
-    elements.workarea.appendChild(e);
+    elements.workarea.append(e);
 
     elements.confirm.remove();
     delete elements.confirm;

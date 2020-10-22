@@ -35,7 +35,7 @@ export class Inspector extends EventTarget {
     this.current_page = this.elements.info.root;
     this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
-    this.selection_listener = (ev) => this._setTorrents(ev.selected);
+    this.selection_listener = (event_) => this._setTorrents(event_.selected);
     this.torrent_listener = () => this._updateCurrentPage();
     this.torrents = [];
     this.file_torrent = null;
@@ -51,7 +51,7 @@ export class Inspector extends EventTarget {
     );
     this._setTorrents(this.controller.getSelectedTorrents());
 
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
   }
 
   close() {
@@ -65,8 +65,8 @@ export class Inspector extends EventTarget {
         this.selection_listener
       );
       this.dispatchEvent(new Event('close'));
-      for (const prop of Object.keys(this)) {
-        this[prop] = null;
+      for (const property of Object.keys(this)) {
+        this[property] = null;
       }
       this.closed = true;
     }
@@ -81,16 +81,16 @@ export class Inspector extends EventTarget {
       const label = document.createElement('div');
       label.textContent = text;
       label.classList.add('section-label');
-      root.appendChild(label);
+      root.append(label);
     };
 
     const append_row = (text) => {
       const lhs = document.createElement('label');
       setTextContent(lhs, text);
-      root.appendChild(lhs);
+      root.append(lhs);
 
       const rhs = document.createElement('label');
-      root.appendChild(rhs);
+      root.append(rhs);
       return rhs;
     };
 
@@ -130,7 +130,7 @@ export class Inspector extends EventTarget {
     const root = document.createElement('div');
     const list = document.createElement(list_type);
     list.id = list_id;
-    root.appendChild(list);
+    root.append(list);
     return { list, root };
   }
 
@@ -148,20 +148,20 @@ export class Inspector extends EventTarget {
     const thead = document.createElement('thead');
     const tr = document.createElement('tr');
     const names = ['', 'Up', 'Down', 'Done', 'Status', 'Address', 'Client'];
-    names.forEach((name, idx) => {
+    names.forEach((name, index) => {
       const th = document.createElement('th');
-      const classname = peer_column_classes[idx];
+      const classname = peer_column_classes[index];
       if (classname === 'encryption') {
         th.dataset.encrypted = true;
       }
       th.classList.add(classname);
       setTextContent(th, name);
-      tr.appendChild(th);
+      tr.append(th);
     });
     const tbody = document.createElement('tbody');
-    thead.appendChild(tr);
-    table.appendChild(thead);
-    table.appendChild(tbody);
+    thead.append(tr);
+    table.append(thead);
+    table.append(tbody);
     return {
       root: table,
       tbody,
@@ -198,10 +198,10 @@ export class Inspector extends EventTarget {
   _setTorrents(torrents) {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
-    const cb = this.torrent_listener;
-    this.torrents.forEach((t) => t.removeEventListener(key, cb));
+    const callback = this.torrent_listener;
+    this.torrents.forEach((t) => t.removeEventListener(key, callback));
     this.torrents = [...torrents];
-    this.torrents.forEach((t) => t.addEventListener(key, cb));
+    this.torrents.forEach((t) => t.addEventListener(key, callback));
 
     this._refreshTorrents();
     this._updateCurrentPage();
@@ -215,7 +215,7 @@ export class Inspector extends EventTarget {
     const { controller, torrents } = this;
     const ids = torrents.map((t) => t.getId());
 
-    if (ids && ids.length) {
+    if (ids && ids.length > 0) {
       const fields = ['id', ...Torrent.Fields.StatsExtra];
       if (Inspector._needsExtraInfo(torrents)) {
         fields.push(...Torrent.Fields.InfoExtra);
@@ -255,228 +255,242 @@ export class Inspector extends EventTarget {
     const { torrents } = this;
     const e = this.elements;
     const sizeWhenDone = torrents.reduce(
-      (acc, t) => acc + t.getSizeWhenDone(),
+      (accumulator, t) => accumulator + t.getSizeWhenDone(),
       0
     );
 
     // state
-    let str = null;
-    if (torrents.length < 1) {
-      str = none;
+    let string = null;
+    if (torrents.length === 0) {
+      string = none;
     } else if (torrents.every((t) => t.isFinished())) {
-      str = 'Finished';
+      string = 'Finished';
     } else if (torrents.every((t) => t.isStopped())) {
-      str = 'Paused';
+      string = 'Paused';
     } else {
       const get = (t) => t.getStateString();
       const first = get(torrents[0]);
-      str = torrents.every((t) => get(t) === first) ? first : mixed;
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    setTextContent(e.info.state, str);
-    const stateString = str;
+    setTextContent(e.info.state, string);
+    const stateString = string;
 
     // have
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
-      const verified = torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
+      const verified = torrents.reduce(
+        (accumulator, t) => accumulator + t.getHaveValid(),
+        0
+      );
       const unverified = torrents.reduce(
-        (acc, t) => acc + t.getHaveUnchecked(),
+        (accumulator, t) => accumulator + t.getHaveUnchecked(),
         0
       );
       const leftUntilDone = torrents.reduce(
-        (acc, t) => acc + t.getLeftUntilDone(),
+        (accumulator, t) => accumulator + t.getLeftUntilDone(),
         0
       );
 
       const d =
-        100.0 *
+        100 *
         (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
-      str = fmt.percentString(d);
+      string = fmt.percentString(d);
 
       if (!unverified && !leftUntilDone) {
-        str = `${fmt.size(verified)} (100%)`;
+        string = `${fmt.size(verified)} (100%)`;
       } else if (!unverified) {
-        str = `${fmt.size(verified)} of ${fmt.size(sizeWhenDone)} (${str}%)`;
-      } else {
-        str = `${fmt.size(verified)} of ${fmt.size(
+        string = `${fmt.size(verified)} of ${fmt.size(
           sizeWhenDone
-        )} (${str}%), ${fmt.size(unverified)} Unverified`;
+        )} (${string}%)`;
+      } else {
+        string = `${fmt.size(verified)} of ${fmt.size(
+          sizeWhenDone
+        )} (${string}%), ${fmt.size(unverified)} Unverified`;
       }
     }
-    setTextContent(e.info.have, str);
+    setTextContent(e.info.have, string);
 
     // availability
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else if (sizeWhenDone === 0) {
-      str = none;
+      string = none;
     } else {
       const available = torrents.reduce(
-        (acc, t) => t.getHave() + t.getDesiredAvailable(),
+        (accumulator, t) => t.getHave() + t.getDesiredAvailable(),
         0
       );
-      str = `${fmt.percentString((100.0 * available) / sizeWhenDone)}%`;
+      string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, str);
+    setTextContent(e.info.availability, string);
 
     //  downloaded
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
-      const d = torrents.reduce((acc, t) => acc + t.getDownloadedEver(), 0);
-      const f = torrents.reduce((acc, t) => acc + t.getFailedEver(), 0);
-      str = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
+      const d = torrents.reduce(
+        (accumulator, t) => accumulator + t.getDownloadedEver(),
+        0
+      );
+      const f = torrents.reduce(
+        (accumulator, t) => accumulator + t.getFailedEver(),
+        0
+      );
+      string = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
     }
-    setTextContent(e.info.downloaded, str);
+    setTextContent(e.info.downloaded, string);
 
     // uploaded
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
-      const u = torrents.reduce((acc, t) => acc + t.getUploadedEver(), 0);
+      const u = torrents.reduce(
+        (accumulator, t) => accumulator + t.getUploadedEver(),
+        0
+      );
       const d =
-        torrents.reduce((acc, t) => acc + t.getDownloadedEver(), 0) ||
-        torrents.reduce((acc, t) => acc + t.getHaveValid(), 0);
-      str = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
+        torrents.reduce(
+          (accumulator, t) => accumulator + t.getDownloadedEver(),
+          0
+        ) ||
+        torrents.reduce((accumulator, t) => accumulator + t.getHaveValid(), 0);
+      string = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
     }
-    setTextContent(e.info.uploaded, str);
+    setTextContent(e.info.uploaded, string);
 
     // running time
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else if (torrents.every((t) => t.isStopped())) {
-      str = stateString; // paused || finished}
+      string = stateString; // paused || finished}
     } else {
       const get = (t) => t.getStartDate();
       const first = get(torrents[0]);
-      if (!torrents.every((t) => get(t) === first)) {
-        str = mixed;
-      } else {
-        str = fmt.timeInterval(now / 1000 - first);
-      }
+      string = !torrents.every((t) => get(t) === first)
+        ? mixed
+        : fmt.timeInterval(now / 1000 - first);
     }
-    setTextContent(e.info.running_time, str);
+    setTextContent(e.info.running_time, string);
 
     // remaining time
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getETA();
       const first = get(torrents[0]);
       if (!torrents.every((t) => get(t) === first)) {
-        str = mixed;
+        string = mixed;
       } else if (first < 0) {
-        str = unknown;
+        string = unknown;
       } else {
-        str = fmt.timeInterval(first);
+        string = fmt.timeInterval(first);
       }
     }
-    setTextContent(e.info.remaining_time, str);
+    setTextContent(e.info.remaining_time, string);
 
     // last active at
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const latest = torrents.reduce(
-        (acc, t) => Math.max(acc, t.getLastActivity()),
+        (accumulator, t) => Math.max(accumulator, t.getLastActivity()),
         -1
       );
       const now_seconds = Math.floor(now / 1000);
       if (0 < latest && latest <= now_seconds) {
         const idle_secs = now_seconds - latest;
-        str =
+        string =
           idle_secs < 5 ? 'Active now' : `${fmt.timeInterval(idle_secs)} ago`;
       } else {
-        str = none;
+        string = none;
       }
     }
-    setTextContent(e.info.last_activity, str);
+    setTextContent(e.info.last_activity, string);
 
     // error
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getErrorString();
       const first = get(torrents[0]);
-      str = torrents.every((t) => get(t) === first) ? first : mixed;
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    setTextContent(e.info.error, str || none);
+    setTextContent(e.info.error, string || none);
 
     // size
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
-      const size = torrents.reduce((acc, t) => acc + t.getTotalSize(), 0);
+      const size = torrents.reduce(
+        (accumulator, t) => accumulator + t.getTotalSize(),
+        0
+      );
       if (!size) {
-        str = 'None';
+        string = 'None';
       } else {
         const get = (t) => t.getPieceSize();
         const pieceCount = torrents.reduce(
-          (acc, t) => acc + t.getPieceCount(),
+          (accumulator, t) => accumulator + t.getPieceCount(),
           0
         );
-        const pieceStr = fmt.number(pieceCount);
+        const pieceString = fmt.number(pieceCount);
         const pieceSize = get(torrents[0]);
-        if (torrents.every((t) => get(t) === pieceSize)) {
-          str = `${fmt.size(size)} (${pieceStr} pieces @ ${fmt.mem(
-            pieceSize
-          )})`;
-        } else {
-          str = `${fmt.size(size)} (${pieceStr} pieces)`;
-        }
+        string = torrents.every((t) => get(t) === pieceSize)
+          ? `${fmt.size(size)} (${pieceString} pieces @ ${fmt.mem(pieceSize)})`
+          : `${fmt.size(size)} (${pieceString} pieces)`;
       }
     }
-    setTextContent(e.info.size, str);
+    setTextContent(e.info.size, string);
 
     // hash
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getHashString();
       const first = get(torrents[0]);
-      str = torrents.every((t) => get(t) === first) ? first : mixed;
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    setTextContent(e.info.hash, str);
+    setTextContent(e.info.hash, string);
 
     // privacy
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getPrivateFlag();
       const first = get(torrents[0]);
       if (!torrents.every((t) => get(t) === first)) {
-        str = mixed;
+        string = mixed;
       } else if (first) {
-        str = 'Private to this tracker -- DHT and PEX disabled';
+        string = 'Private to this tracker -- DHT and PEX disabled';
       } else {
-        str = 'Public torrent';
+        string = 'Public torrent';
       }
     }
-    setTextContent(e.info.privacy, str);
+    setTextContent(e.info.privacy, string);
 
     // comment
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getComment();
       const first = get(torrents[0]);
-      str = torrents.every((t) => get(t) === first) ? first : mixed;
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    str = str || none;
-    if (str.startsWith('https://') || str.startsWith('http://')) {
-      str = encodeURI(str);
+    string = string || none;
+    if (string.startsWith('https://') || string.startsWith('http://')) {
+      string = encodeURI(string);
       Utils.setInnerHTML(
         e.info.comment,
-        `<a href="${str}" target="_blank" >${str}</a>`
+        `<a href="${string}" target="_blank" >${string}</a>`
       );
     } else {
-      setTextContent(e.info.comment, str);
+      setTextContent(e.info.comment, string);
     }
 
     // origin
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       let get = (t) => t.getCreator();
       const creator = get(torrents[0]);
@@ -489,35 +503,35 @@ export class Inspector extends EventTarget {
       const empty_creator = !creator || !creator.length;
       const empty_date = !date;
       if (mixed_creator || mixed_date) {
-        str = mixed;
+        string = mixed;
       } else if (empty_creator && empty_date) {
-        str = unknown;
+        string = unknown;
       } else if (empty_date && !empty_creator) {
-        str = `Created by ${creator}`;
+        string = `Created by ${creator}`;
       } else if (empty_creator && !empty_date) {
-        str = `Created on ${new Date(date * 1000).toDateString()}`;
+        string = `Created on ${new Date(date * 1000).toDateString()}`;
       } else {
-        str = `Created by ${creator} on ${new Date(
+        string = `Created by ${creator} on ${new Date(
           date * 1000
         ).toDateString()}`;
       }
     }
-    setTextContent(e.info.origin, str);
+    setTextContent(e.info.origin, string);
 
     // location
-    if (torrents.length < 1) {
-      str = none;
+    if (torrents.length === 0) {
+      string = none;
     } else {
       const get = (t) => t.getDownloadDir();
       const first = get(torrents[0]);
-      str = torrents.every((t) => get(t) === first) ? first : mixed;
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
-    setTextContent(e.info.location, str);
+    setTextContent(e.info.location, string);
   }
 
   ///  PEERS PAGE
 
-  static _peerStatusTitle(flag_str) {
+  static _peerStatusTitle(flag_string) {
     const texts = Object.seal({
       '?': "We unchoked this peer, but they're not interested",
       D: 'Downloading from this peer',
@@ -533,7 +547,7 @@ export class Inspector extends EventTarget {
       u: "We would upload to this peer if they'd ask",
     });
 
-    return Array.from(flag_str)
+    return [...flag_string]
       .filter((ch) => texts[ch])
       .map((ch) => `${ch}: ${texts[ch]}`)
       .join('\n');
@@ -575,27 +589,27 @@ export class Inspector extends EventTarget {
       const tortd = document.createElement('td');
       tortd.setAttribute('colspan', cell_setters.length);
       setTextContent(tortd, tor.getName());
-      tortr.appendChild(tortd);
+      tortr.append(tortd);
       rows.push(tortr);
 
       // peers
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
         tr.classList.add('peer-row');
-        cell_setters.forEach((setter, idx) => {
+        cell_setters.forEach((setter, index) => {
           const td = document.createElement('td');
-          td.classList.add(peer_column_classes[idx]);
+          td.classList.add(peer_column_classes[index]);
           setter(peer, td);
-          tr.appendChild(td);
+          tr.append(td);
         });
         rows.push(tr);
       }
 
       // TODO: modify instead of rebuilding wholesale?
       while (tbody.firstChild) {
-        tbody.removeChild(tbody.firstChild);
+        tbody.firstChild.remove();
       }
-      rows.forEach((row) => tbody.append(row));
+      tbody.append(...rows);
     }
   }
 
@@ -690,71 +704,71 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-      tor.getTrackers().forEach((tracker, idx) => {
+      tor.getTrackers().forEach((tracker, index) => {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
 
         const tier_div = document.createElement('div');
-        tier_div.classList.add('tier-list-row', idx % 2 ? 'odd' : 'even');
+        tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
-        let el = document.createElement('div');
-        el.classList.add('tier-list-tracker');
+        let element = document.createElement('div');
+        element.classList.add('tier-list-tracker');
         setTextContent(
-          el,
+          element,
           `${tracker.domain || tracker.host || tracker.announce} - tier ${
             tracker.tier + 1
           }`
         );
-        el.setAttribute('title', tracker.announce);
-        tier_div.appendChild(el);
+        element.setAttribute('title', tracker.announce);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-announce');
+        element = document.createElement('div');
+        element.classList.add('tier-announce');
         setTextContent(
-          el,
+          element,
           `${lastAnnounceStatusHash.label}: ${lastAnnounceStatusHash.value}`
         );
-        tier_div.appendChild(el);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-seeders');
+        element = document.createElement('div');
+        element.classList.add('tier-seeders');
         setTextContent(
-          el,
+          element,
           `Seeders: ${tracker.seederCount > -1 ? tracker.seederCount : na}`
         );
-        tier_div.appendChild(el);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-state');
-        setTextContent(el, announceState);
-        tier_div.appendChild(el);
+        element = document.createElement('div');
+        element.classList.add('tier-state');
+        setTextContent(element, announceState);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-leechers');
+        element = document.createElement('div');
+        element.classList.add('tier-leechers');
         setTextContent(
-          el,
+          element,
           `Leechers: ${tracker.leecherCount > -1 ? tracker.leecherCount : na}`
         );
-        tier_div.appendChild(el);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-scrape');
+        element = document.createElement('div');
+        element.classList.add('tier-scrape');
         setTextContent(
-          el,
+          element,
           `${lastScrapeStatusHash.label}: ${lastScrapeStatusHash.value}`
         );
-        tier_div.appendChild(el);
+        tier_div.append(element);
 
-        el = document.createElement('div');
-        el.classList.add('tier-downloads');
+        element = document.createElement('div');
+        element.classList.add('tier-downloads');
         setTextContent(
-          el,
+          element,
           `Downloads: ${
             tracker.downloadCount > -1 ? tracker.downloadCount : na
           }`
         );
-        tier_div.appendChild(el);
+        tier_div.append(element);
 
         rows.push(tier_div);
       });
@@ -762,9 +776,9 @@ export class Inspector extends EventTarget {
 
     // TODO: modify instead of rebuilding wholesale?
     while (list.firstChild) {
-      list.removeChild(list.firstChild);
+      list.firstChild.remove();
     }
-    rows.forEach((row) => list.append(row));
+    list.append(...rows);
   }
 
   ///  FILES PAGE
@@ -775,16 +789,16 @@ export class Inspector extends EventTarget {
     controller.changeFileCommand(torrentId, fileIndices, command);
   }
 
-  _onFileWantedToggled(ev) {
-    const { indices, wanted } = ev;
+  _onFileWantedToggled(event_) {
+    const { indices, wanted } = event_;
     this._changeFileCommand(
       indices,
       wanted ? 'files-wanted' : 'files-unwanted'
     );
   }
 
-  _onFilePriorityToggled(ev) {
-    const { indices, priority } = ev;
+  _onFilePriorityToggled(event_) {
+    const { indices, priority } = event_;
 
     let command = null;
     switch (priority) {
@@ -805,7 +819,7 @@ export class Inspector extends EventTarget {
   _clearFileList() {
     const { list } = this.elements.files;
     while (list.firstChild) {
-      list.removeChild(list.firstChild);
+      list.firstChild.remove();
     }
 
     this.file_torrent = null;
@@ -820,17 +834,16 @@ export class Inspector extends EventTarget {
       file_indices: [],
     };
 
-    tor.getFiles().forEach((file, i) => {
+    tor.getFiles().forEach((file, index) => {
       const { name } = file;
       const tokens = name.split('/');
       let walk = tree;
-      for (let j = 0; j < tokens.length; ++j) {
-        const token = tokens[j];
+      for (const [index_, token] of tokens.entries()) {
         let sub = walk.children[token];
         if (!sub) {
           walk.children[token] = sub = {
             children: {},
-            depth: j,
+            depth: index_,
             file_indices: [],
             name: token,
             parent: walk,
@@ -838,7 +851,7 @@ export class Inspector extends EventTarget {
         }
         walk = sub;
       }
-      walk.file_index = i;
+      walk.file_index = index;
       delete walk.children;
       leaves.push(walk);
     });
@@ -855,27 +868,33 @@ export class Inspector extends EventTarget {
     return tree;
   }
 
-  addNodeToView(tor, parent, sub, i) {
-    const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
+  addNodeToView(tor, parent, sub, index) {
+    const row = new FileRow(
+      tor,
+      sub.depth,
+      sub.name,
+      sub.file_indices,
+      index % 2
+    );
     row.addEventListener('wantedToggled', this._onFileWantedToggled.bind(this));
     row.addEventListener(
       'priorityToggled',
       this._onFilePriorityToggled.bind(this)
     );
     this.file_rows.push(row);
-    parent.appendChild(row.getElement());
+    parent.append(row.getElement());
   }
 
-  addSubtreeToView(tor, parent, sub, i) {
+  addSubtreeToView(tor, parent, sub, index) {
     if (sub.parent) {
-      this.addNodeToView(tor, parent, sub, i++);
+      this.addNodeToView(tor, parent, sub, index++);
     }
     if (sub.children) {
-      for (const val of Object.values(sub.children)) {
-        i = this.addSubtreeToView(tor, parent, val, i);
+      for (const value of Object.values(sub.children)) {
+        index = this.addSubtreeToView(tor, parent, value, index);
       }
     }
-    return i;
+    return index;
   }
 
   _updateFiles() {
@@ -899,7 +918,7 @@ export class Inspector extends EventTarget {
       const fragment = document.createDocumentFragment();
       const tree = Inspector.createFileTreeModel(tor);
       this.addSubtreeToView(tor, fragment, tree, 0);
-      list.appendChild(fragment);
+      list.append(fragment);
     } else {
       // ...refresh the already-existing file list
       this.file_rows.forEach((row) => row.refresh());

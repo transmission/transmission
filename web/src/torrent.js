@@ -22,7 +22,7 @@ function getDomainName(host) {
 
 // example: "ubuntu.com" returns "Ubuntu"
 function getReadableDomain(name) {
-  if (name.length) {
+  if (name.length > 0) {
     name = name.charAt(0).toUpperCase() + name.slice(1);
   }
   const dot = name.indexOf('.');
@@ -73,7 +73,7 @@ export class Torrent extends EventTarget {
     }
 
     const observers = this.fieldObservers[name];
-    if (o === this.fields && observers && observers.length) {
+    if (o === this.fields && observers && observers.length > 0) {
       for (const observer of observers) {
         observer.call(this, value, old_value, name);
       }
@@ -88,15 +88,14 @@ export class Torrent extends EventTarget {
     const myfiles = this.fields.files || [];
     const keys = ['length', 'name', 'bytesCompleted', 'wanted', 'priority'];
 
-    for (let i = 0; i < files.length; ++i) {
-      const f = files[i];
-      const myfile = myfiles[i] || {};
+    for (const [index, f] of files.entries()) {
+      const myfile = myfiles[index] || {};
       for (const key of keys) {
         if (key in f) {
           changed |= this.setField(myfile, key, f[key]);
         }
       }
-      myfiles[i] = myfile;
+      myfiles[index] = myfile;
     }
     this.fields.files = myfiles;
     return changed;
@@ -109,22 +108,22 @@ export class Torrent extends EventTarget {
   refreshFields(data) {
     let changed = false;
 
-    for (const [key, val] of Object.entries(data)) {
+    for (const [key, value] of Object.entries(data)) {
       switch (key) {
         case 'files':
         case 'fileStats': // merge files and fileStats together
-          changed |= this.updateFiles(val);
+          changed |= this.updateFiles(value);
           break;
         case 'trackerStats': // 'trackerStats' is a superset of 'trackers'...
-          changed |= this.setField(this.fields, 'trackers', val);
+          changed |= this.setField(this.fields, 'trackers', value);
           break;
         case 'trackers': // ...so only save 'trackers' if we don't have it already
           if (!(key in this.fields)) {
-            changed |= this.setField(this.fields, key, val);
+            changed |= this.setField(this.fields, key, value);
           }
           break;
         default:
-          changed |= this.setField(this.fields, key, val);
+          changed |= this.setField(this.fields, key, value);
       }
     }
 
@@ -179,8 +178,8 @@ export class Torrent extends EventTarget {
   getFiles() {
     return this.fields.files || [];
   }
-  getFile(i) {
-    return this.fields.files[i];
+  getFile(index) {
+    return this.fields.files[index];
   }
   getFileCount() {
     return this.fields['file-count'];
@@ -355,14 +354,14 @@ export class Torrent extends EventTarget {
     }
   }
   getErrorMessage() {
-    const str = this.getErrorString();
+    const string = this.getErrorString();
     switch (this.getError()) {
       case Torrent._ErrTrackerWarning:
-        return `Tracker returned a warning: ${str}`;
+        return `Tracker returned a warning: ${string}`;
       case Torrent._ErrTrackerError:
-        return `Tracker returned an error: ${str}`;
+        return `Tracker returned an error: ${string}`;
       case Torrent._ErrLocalError:
-        return `Error: ${str}`;
+        return `Error: ${string}`;
       default:
         return null;
     }
@@ -422,13 +421,13 @@ export class Torrent extends EventTarget {
     let pass = this.testState(state);
 
     // maybe filter by text...
-    if (pass && search && search.length) {
-      pass = this.getCollatedName().indexOf(search.toLowerCase()) !== -1;
+    if (pass && search && search.length > 0) {
+      pass = this.getCollatedName().includes(search.toLowerCase());
     }
 
     // maybe filter by tracker...
-    if (pass && tracker && tracker.length) {
-      pass = this.getCollatedTrackers().indexOf(tracker) !== -1;
+    if (pass && tracker && tracker.length > 0) {
+      pass = this.getCollatedTrackers().includes(tracker);
     }
 
     return pass;
@@ -490,44 +489,44 @@ export class Torrent extends EventTarget {
   }
 
   static compareTorrents(a, b, sortMode, sortDirection) {
-    let i = 0;
+    let index = 0;
 
     switch (sortMode) {
       case Prefs.SortByActivity:
-        i = Torrent.compareByActivity(a, b);
+        index = Torrent.compareByActivity(a, b);
         break;
       case Prefs.SortByAge:
-        i = Torrent.compareByAge(a, b);
+        index = Torrent.compareByAge(a, b);
         break;
       case Prefs.SortByQueue:
-        i = Torrent.compareByQueue(a, b);
+        index = Torrent.compareByQueue(a, b);
         break;
       case Prefs.SortByProgress:
-        i = Torrent.compareByProgress(a, b);
+        index = Torrent.compareByProgress(a, b);
         break;
       case Prefs.SortBySize:
-        i = Torrent.compareBySize(a, b);
+        index = Torrent.compareBySize(a, b);
         break;
       case Prefs.SortByState:
-        i = Torrent.compareByState(a, b);
+        index = Torrent.compareByState(a, b);
         break;
       case Prefs.SortByRatio:
-        i = Torrent.compareByRatio(a, b);
+        index = Torrent.compareByRatio(a, b);
         break;
       case Prefs.SortByName:
-        i = Torrent.compareByName(a, b);
+        index = Torrent.compareByName(a, b);
         break;
       default:
         console.log(`Unrecognized sort mode: ${sortMode}`);
-        i = Torrent.compareByName(a, b);
+        index = Torrent.compareByName(a, b);
         break;
     }
 
     if (sortDirection === Prefs.SortDescending) {
-      i = -i;
+      index = -index;
     }
 
-    return i;
+    return index;
   }
 
   /**

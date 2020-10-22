@@ -20,7 +20,7 @@ export class OpenDialog extends EventTarget {
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this._updateFreeSpaceInAddDialog();
-    document.body.appendChild(this.elements.root);
+    document.body.append(this.elements.root);
     this.elements.url_input.focus();
   }
 
@@ -45,8 +45,8 @@ export class OpenDialog extends EventTarget {
   _updateFreeSpaceInAddDialog() {
     const path = this.elements.folder_input.value;
     this.remote.getFreeSpace(path, (dir, bytes) => {
-      const str = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
-      this.elements.freespace.textContent = str;
+      const string = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
+      this.elements.freespace.textContent = string;
     });
   }
 
@@ -58,7 +58,7 @@ export class OpenDialog extends EventTarget {
 
     for (const file of file_input.files) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.addEventListener('load', (e) => {
         const contents = e.target.result;
         const key = 'base64,';
         const index = contents.indexOf(key);
@@ -68,7 +68,7 @@ export class OpenDialog extends EventTarget {
         const o = {
           arguments: {
             'download-dir': destination,
-            metainfo: contents.substring(index + key.length),
+            metainfo: contents.slice(Math.max(0, index + key.length)),
             paused,
           },
           method: 'torrent-add',
@@ -85,7 +85,7 @@ export class OpenDialog extends EventTarget {
             );
           }
         });
-      };
+      });
       reader.readAsDataURL(file);
     }
 
@@ -130,26 +130,26 @@ export class OpenDialog extends EventTarget {
     let label = document.createElement('label');
     label.setAttribute('for', input_id);
     label.textContent = 'Please select torrent files to add:';
-    workarea.appendChild(label);
+    workarea.append(label);
 
     let input = document.createElement('input');
     input.type = 'file';
     input.name = 'torrent-files[]';
     input.id = input_id;
     input.multiple = 'multiple';
-    workarea.appendChild(input);
+    workarea.append(input);
     elements.file_input = input;
 
     input_id = makeUUID();
     label = document.createElement('label');
     label.setAttribute('for', input_id);
     label.textContent = 'Or enter a URL:';
-    workarea.appendChild(label);
+    workarea.append(label);
 
     input = document.createElement('input');
     input.type = 'url';
     input.id = input_id;
-    workarea.appendChild(input);
+    workarea.append(input);
     elements.url_input = input;
 
     input_id = makeUUID();
@@ -157,12 +157,12 @@ export class OpenDialog extends EventTarget {
     label.id = 'add-dialog-folder-label';
     label.for = input_id;
     label.textContent = 'Destination folder:';
-    workarea.appendChild(label);
+    workarea.append(label);
 
     const freespace = document.createElement('span');
     freespace.id = 'free-space-text';
-    label.appendChild(freespace);
-    workarea.appendChild(label);
+    label.append(freespace);
+    workarea.append(label);
     elements.freespace = freespace;
 
     input = document.createElement('input');
@@ -170,24 +170,24 @@ export class OpenDialog extends EventTarget {
     input.id = 'add-dialog-folder-input';
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
     input.value = this.controller.session_properties['download-dir'];
-    workarea.appendChild(input);
+    workarea.append(input);
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
-    workarea.appendChild(checkarea);
+    workarea.append(checkarea);
 
     const check = document.createElement('input');
     check.type = 'checkbox';
     check.id = 'auto-start-check';
     check.checked = this.controller.shouldAddedTorrentsStart();
-    checkarea.appendChild(check);
+    checkarea.append(check);
     elements.start_input = check;
 
     label = document.createElement('label');
     label.id = 'auto-start-label';
     label.setAttribute('for', check.id);
     label.textContent = 'Start when added';
-    checkarea.appendChild(label);
+    checkarea.append(label);
 
     return elements;
   }

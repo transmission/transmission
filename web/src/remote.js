@@ -40,14 +40,14 @@ export class Remote {
       headers.append(Remote._SessionHeader, this._session_id);
     }
 
-    let response_arg = null;
+    let response_argument = null;
     fetch(RPC._Root, {
       body: JSON.stringify(data),
       headers,
       method: 'POST',
     })
       .then((response) => {
-        response_arg = response;
+        response_argument = response;
         if (response.status === 409) {
           const error = new Error(Remote._SessionHeader);
           error.header = response.headers.get(Remote._SessionHeader);
@@ -57,7 +57,7 @@ export class Remote {
       })
       .then((payload) => {
         if (callback) {
-          callback.call(context, payload, response_arg);
+          callback.call(context, payload, response_argument);
         }
       })
       .catch((error) => {
@@ -125,8 +125,8 @@ export class Remote {
       o.arguments.ids = torrentIds;
     }
     this.sendRequest(o, (response) => {
-      const args = response['arguments'];
-      callback.call(context, args.torrents, args.removed);
+      const arguments_ = response['arguments'];
+      callback.call(context, arguments_.torrents, arguments_.removed);
     });
   }
 
@@ -138,19 +138,19 @@ export class Remote {
       method: 'free-space',
     };
     this.sendRequest(o, (response) => {
-      const args = response['arguments'];
-      callback.call(context, args.path, args['size-bytes']);
+      const arguments_ = response['arguments'];
+      callback.call(context, arguments_.path, arguments_['size-bytes']);
     });
   }
 
   changeFileCommand(torrentId, fileIndices, command) {
-    const args = {
+    const arguments_ = {
       ids: [torrentId],
     };
-    args[command] = fileIndices;
+    arguments_[command] = fileIndices;
     this.sendRequest(
       {
-        arguments: args,
+        arguments: arguments_,
         method: 'torrent-set',
       },
       () => {
@@ -159,13 +159,13 @@ export class Remote {
     );
   }
 
-  sendTorrentSetRequests(method, torrent_ids, args, callback, context) {
-    if (!args) {
-      args = {};
+  sendTorrentSetRequests(method, torrent_ids, arguments_, callback, context) {
+    if (!arguments_) {
+      arguments_ = {};
     }
-    args['ids'] = torrent_ids;
+    arguments_['ids'] = torrent_ids;
     const o = {
-      arguments: args,
+      arguments: arguments_,
       method,
     };
     this.sendRequest(o, callback, context);
@@ -219,8 +219,8 @@ export class Remote {
     };
 
     if (torrents) {
-      for (let i = 0, len = torrents.length; i < len; ++i) {
-        o.arguments.ids.push(torrents[i].getId());
+      for (let index = 0, length_ = torrents.length; index < length_; ++index) {
+        o.arguments.ids.push(torrents[index].getId());
       }
     }
     this.sendRequest(o, () => {
@@ -258,9 +258,9 @@ export class Remote {
       this._controller.refreshTorrents();
     });
   }
-  savePrefs(args) {
+  savePrefs(arguments_) {
     const o = {
-      arguments: args,
+      arguments: arguments_,
       method: 'session-set',
     };
     this.sendRequest(o, () => {

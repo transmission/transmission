@@ -44,7 +44,7 @@ export class OverflowMenu extends EventTarget {
   }
 
   show() {
-    document.body.appendChild(this.root);
+    document.body.append(this.root);
   }
 
   close() {
@@ -67,43 +67,44 @@ export class OverflowMenu extends EventTarget {
     }
   }
 
-  _onSessionChange(ev) {
+  _onSessionChange(event_) {
     const { alt_speed_check } = this.elements;
-    const { session_properties } = ev;
+    const { session_properties } = event_;
     alt_speed_check.checked = session_properties[RPC._TurtleState];
   }
 
-  _onPrefsChange(ev) {
-    switch (ev.key) {
+  _onPrefsChange(event_) {
+    switch (event_.key) {
       case Prefs.SortDirection:
       case Prefs.SortMode:
-        this.root.querySelector(`[data-pref="${ev.key}"]`).value = ev.value;
+        this.root.querySelector(`[data-pref="${event_.key}"]`).value =
+          event_.value;
         break;
       default:
         break;
     }
   }
 
-  _onActionChange(ev) {
-    const el = this.actions[ev.action];
-    if (el) {
-      this._updateElement(el);
+  _onActionChange(event_) {
+    const element = this.actions[event_.action];
+    if (element) {
+      this._updateElement(element);
     }
   }
 
-  _updateElement(el) {
-    if (el.dataset.action) {
-      const { action } = el.dataset;
+  _updateElement(element) {
+    if (element.dataset.action) {
+      const { action } = element.dataset;
       const shortcuts = this.action_manager.keyshortcuts(action);
       if (shortcuts) {
-        el.setAttribute('aria-keyshortcuts', shortcuts);
+        element.setAttribute('aria-keyshortcuts', shortcuts);
       }
-      setEnabled(el, this.action_manager.isEnabled(action));
+      setEnabled(element, this.action_manager.isEnabled(action));
     }
   }
 
-  _onClick(ev) {
-    const { action, pref } = ev.target.dataset;
+  _onClick(event_) {
+    const { action, pref } = event_.target.dataset;
 
     if (action) {
       this.action_manager.click(action);
@@ -111,12 +112,12 @@ export class OverflowMenu extends EventTarget {
     }
 
     if (pref) {
-      this.prefs[pref] = ev.target.value;
+      this.prefs[pref] = event_.target.value;
       return;
     }
 
     console.log('unhandled');
-    console.log(ev);
+    console.log(event_);
     console.trace();
   }
 
@@ -131,7 +132,7 @@ export class OverflowMenu extends EventTarget {
       const legend = document.createElement('legend');
       legend.classList.add('title');
       legend.textContent = title;
-      section.appendChild(legend);
+      section.append(legend);
       return section;
     };
 
@@ -139,7 +140,7 @@ export class OverflowMenu extends EventTarget {
       const e = document.createElement('button');
       e.textContent = text;
       e.addEventListener('click', on_click);
-      parent.appendChild(e);
+      parent.append(e);
       if (action) {
         e.dataset.action = action;
       }
@@ -150,26 +151,26 @@ export class OverflowMenu extends EventTarget {
     root.classList.add('overflow-menu', 'popup');
 
     let section = make_section('display', 'Display');
-    root.appendChild(section);
+    root.append(section);
 
     let options = document.createElement('div');
     options.id = 'display-options';
-    section.appendChild(options);
+    section.append(options);
 
     // sort mode
 
     let div = document.createElement('div');
-    options.appendChild(div);
+    options.append(div);
 
     let label = document.createElement('label');
     label.id = 'display-sort-mode-label';
     label.textContent = 'Sort by';
-    div.appendChild(label);
+    div.append(label);
 
     let select = document.createElement('select');
     select.id = 'display-sort-mode-select';
     select.dataset.pref = Prefs.SortMode;
-    div.appendChild(select);
+    div.append(select);
 
     const sort_modes = [
       [Prefs.SortByActivity, 'Activity'],
@@ -185,35 +186,35 @@ export class OverflowMenu extends EventTarget {
       const option = document.createElement('option');
       option.value = value;
       option.textContent = text;
-      select.appendChild(option);
+      select.append(option);
     }
 
     label.setAttribute('for', select.id);
     select.value = this.prefs.sort_mode;
-    select.addEventListener('change', (ev) => {
-      this.prefs.sort_mode = ev.target.value;
+    select.addEventListener('change', (event_) => {
+      this.prefs.sort_mode = event_.target.value;
     });
 
     // sort direction
 
     div = document.createElement('div');
-    options.appendChild(div);
+    options.append(div);
 
     let check = document.createElement('input');
     check.id = 'display-sort-reverse-check';
     check.dataset.pref = Prefs.SortDirection;
     check.type = 'checkbox';
-    div.appendChild(check);
+    div.append(check);
 
     label = document.createElement('label');
     label.id = 'display-sort-reverse-label';
     label.setAttribute('for', check.id);
     label.textContent = 'Reverse sort';
-    div.appendChild(label);
+    div.append(label);
 
     check.checked = this.prefs.sort_direction !== Prefs.SortAscending;
-    check.addEventListener('input', (ev) => {
-      this.prefs.sort_direction = ev.target.checked
+    check.addEventListener('input', (event_) => {
+      this.prefs.sort_direction = event_.target.checked
         ? Prefs.SortDescending
         : Prefs.SortAscending;
     });
@@ -221,25 +222,25 @@ export class OverflowMenu extends EventTarget {
     // compact
 
     div = document.createElement('div');
-    options.appendChild(div);
+    options.append(div);
 
     const action = 'toggle-compact-rows';
     check = document.createElement('input');
     check.id = 'display-compact-check';
     check.dataset.action = action;
     check.type = 'checkbox';
-    div.appendChild(check);
+    div.append(check);
 
     label = document.createElement('label');
     label.id = 'display-compact-label';
     label.for = check.id;
     label.setAttribute('for', check.id);
     label.textContent = this.action_manager.text(action);
-    div.appendChild(label);
+    div.append(label);
 
     check.checked = this.prefs.display_mode === Prefs.DisplayCompact;
-    check.addEventListener('input', (ev) => {
-      const { checked } = ev.target;
+    check.addEventListener('input', (event_) => {
+      const { checked } = event_.target;
       this.prefs.display_mode = checked
         ? Prefs.DisplayCompact
         : Prefs.DisplayFull;
@@ -248,7 +249,7 @@ export class OverflowMenu extends EventTarget {
     // fullscreen
 
     div = document.createElement('div');
-    options.appendChild(div);
+    options.append(div);
 
     check = document.createElement('input');
     check.id = 'display-fullscreen-check';
@@ -265,37 +266,37 @@ export class OverflowMenu extends EventTarget {
     document.addEventListener('fullscreenchange', () => {
       check.checked = is_fullscreen();
     });
-    div.appendChild(check);
+    div.append(check);
 
     label = document.createElement('label');
     label.id = 'display-fullscreen-label';
     label.for = check.id;
     label.setAttribute('for', check.id);
     label.textContent = 'Fullscreen';
-    div.appendChild(label);
+    div.append(label);
 
     section = make_section('speed', 'Speed Limit');
-    root.appendChild(section);
+    root.append(section);
 
     options = document.createElement('div');
     options.id = 'speed-options';
-    section.appendChild(options);
+    section.append(options);
 
     // speed up
 
     div = document.createElement('div');
     div.classList.add('speed-up');
-    options.appendChild(div);
+    options.append(div);
 
     label = document.createElement('label');
     label.id = 'speed-up-label';
     label.textContent = 'Upload:';
-    div.appendChild(label);
+    div.append(label);
 
     const unlimited = 'Unlimited';
     select = document.createElement('select');
     select.id = 'speed-up-select';
-    div.appendChild(select);
+    div.append(select);
 
     const speeds = ['10', '100', '200', '500', '750', unlimited];
     for (const speed of [
@@ -307,22 +308,22 @@ export class OverflowMenu extends EventTarget {
       option.value = speed;
       option.textContent =
         speed === unlimited ? unlimited : Formatter.speed(speed);
-      select.appendChild(option);
+      select.append(option);
     }
 
     label.setAttribute('for', select.id);
     select.value = session_properties[RPC._UpSpeedLimited]
       ? `${session_properties[RPC._UpSpeedLimit]}`
       : unlimited;
-    select.addEventListener('change', (ev) => {
-      const { value } = ev.target;
-      console.log(ev);
-      if (ev.target.value === unlimited) {
+    select.addEventListener('change', (event_) => {
+      const { value } = event_.target;
+      console.log(event_);
+      if (event_.target.value === unlimited) {
         this.remote.savePrefs({ [RPC._UpSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
           [RPC._UpSpeedLimited]: true,
-          [RPC._UpSpeedLimit]: parseInt(value, 10),
+          [RPC._UpSpeedLimit]: Number.parseInt(value, 10),
         });
       }
     });
@@ -331,16 +332,16 @@ export class OverflowMenu extends EventTarget {
 
     div = document.createElement('div');
     div.classList.add('speed-down');
-    options.appendChild(div);
+    options.append(div);
 
     label = document.createElement('label');
     label.id = 'speed-down-label';
     label.textContent = 'Download:';
-    div.appendChild(label);
+    div.append(label);
 
     select = document.createElement('select');
     select.id = 'speed-down-select';
-    div.appendChild(select);
+    div.append(select);
 
     for (const speed of [
       ...new Set(speeds)
@@ -350,22 +351,22 @@ export class OverflowMenu extends EventTarget {
       const option = document.createElement('option');
       option.value = speed;
       option.textContent = speed;
-      select.appendChild(option);
+      select.append(option);
     }
 
     label.setAttribute('for', select.id);
     select.value = session_properties[RPC._DownSpeedLimited]
       ? `${session_properties[RPC._DownSpeedLimit]}`
       : unlimited;
-    select.addEventListener('change', (ev) => {
-      const { value } = ev.target;
-      console.log(ev);
-      if (ev.target.value === unlimited) {
+    select.addEventListener('change', (event_) => {
+      const { value } = event_.target;
+      console.log(event_);
+      if (event_.target.value === unlimited) {
         this.remote.savePrefs({ [RPC._DownSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
           [RPC._DownSpeedLimited]: true,
-          [RPC._DownSpeedLimit]: parseInt(value, 10),
+          [RPC._DownSpeedLimit]: Number.parseInt(value, 10),
         });
       }
     });
@@ -374,30 +375,30 @@ export class OverflowMenu extends EventTarget {
 
     div = document.createElement('div');
     div.classList.add('alt-speed');
-    options.appendChild(div);
+    options.append(div);
 
     check = document.createElement('input');
     check.id = 'alt-speed-check';
     check.type = 'checkbox';
     check.checked = session_properties[RPC._TurtleState];
-    check.addEventListener('change', (ev) => {
+    check.addEventListener('change', (event_) => {
       this.remote.savePrefs({
-        [RPC._TurtleState]: ev.target.checked,
+        [RPC._TurtleState]: event_.target.checked,
       });
     });
-    div.appendChild(check);
+    div.append(check);
     elements.alt_speed_check = check;
 
     label = document.createElement('label');
     label.id = 'alt-speed-image';
     label.setAttribute('for', check.id);
-    div.appendChild(label);
+    div.append(label);
 
     label = document.createElement('label');
     label.id = 'alt-speed-label';
     label.setAttribute('for', check.id);
     label.textContent = 'Use Temp limits';
-    div.appendChild(label);
+    div.append(label);
 
     label = document.createElement('label');
     label.id = 'alt-speed-values-label';
@@ -406,10 +407,10 @@ export class OverflowMenu extends EventTarget {
     const up = Formatter.speed(session_properties[RPC._TurtleUpSpeedLimit]);
     const dn = Formatter.speed(session_properties[RPC._TurtleDownSpeedLimit]);
     label.textContent = `(${up} up, ${dn} down)`;
-    div.appendChild(label);
+    div.append(label);
 
     section = make_section('actions', 'Actions');
-    root.appendChild(section);
+    root.append(section);
 
     for (const action_name of [
       'show-preferences-dialog',
@@ -421,10 +422,10 @@ export class OverflowMenu extends EventTarget {
     }
 
     section = make_section('info', 'Info');
-    root.appendChild(section);
+    root.append(section);
 
     options = document.createElement('div');
-    section.appendChild(options);
+    section.append(options);
 
     for (const action_name of [
       'show-about-dialog',
@@ -436,28 +437,28 @@ export class OverflowMenu extends EventTarget {
     }
 
     section = make_section('links', 'Links');
-    root.appendChild(section);
+    root.append(section);
 
     options = document.createElement('div');
-    section.appendChild(options);
+    section.append(options);
 
     let e = document.createElement('a');
     e.href = 'https://transmissionbt.com/';
     e.tabindex = '0';
     e.textContent = 'Homepage';
-    options.appendChild(e);
+    options.append(e);
 
     e = document.createElement('a');
     e.href = 'https://transmissionbt.com/donate/';
     e.tabindex = '0';
     e.textContent = 'Tip Jar';
-    options.appendChild(e);
+    options.append(e);
 
     e = document.createElement('a');
     e.href = 'https://github.com/transmission/transmission/';
     e.tabindex = '0';
     e.textContent = 'Source Code';
-    options.appendChild(e);
+    options.append(e);
 
     Object.values(actions).forEach(this._updateElement.bind(this));
     return { actions, elements, root };

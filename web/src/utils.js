@@ -35,7 +35,7 @@ export class Utils {
       result === Number.NEGATIVE_INFINITY
     ) {
       result = -2;
-    } else if (isNaN(result)) {
+    } else if (Number.isNaN(result)) {
       result = -1;
     }
 
@@ -50,11 +50,11 @@ export function createTabsContainer(id, tabs, callback) {
 
   const buttons = document.createElement('div');
   buttons.classList.add('tabs-buttons');
-  root.appendChild(buttons);
+  root.append(buttons);
 
   const pages = document.createElement('div');
   pages.classList.add('tabs-pages');
-  root.appendChild(pages);
+  root.append(pages);
 
   const button_array = [];
   for (const [button_id, page] of tabs) {
@@ -62,18 +62,18 @@ export function createTabsContainer(id, tabs, callback) {
     button.id = button_id;
     button.classList.add('tabs-button');
     button.setAttribute('type', 'button');
-    buttons.appendChild(button);
+    buttons.append(button);
     button_array.push(button);
 
     page.classList.add('hidden', 'tabs-page');
-    pages.appendChild(page);
+    pages.append(page);
 
     button.addEventListener('click', () => {
-      for (const el of buttons.children) {
-        el.classList.toggle('selected', el === button);
+      for (const element of buttons.children) {
+        element.classList.toggle('selected', element === button);
       }
-      for (const el of pages.children) {
-        el.classList.toggle('hidden', el !== page);
+      for (const element of pages.children) {
+        element.classList.toggle('hidden', element !== page);
       }
       if (callback) {
         callback(page);
@@ -98,44 +98,44 @@ export function createDialogContainer(id) {
 
   const win = document.createElement('div');
   win.classList.add('dialog-window');
-  root.appendChild(win);
+  root.append(win);
 
   const logo = document.createElement('div');
   logo.classList.add('dialog-logo');
-  win.appendChild(logo);
+  win.append(logo);
 
   const heading = document.createElement('div');
   heading.classList.add('dialog-heading');
-  win.appendChild(heading);
+  win.append(heading);
 
   const message = document.createElement('div');
   message.classList.add('dialog-message');
-  win.appendChild(message);
+  win.append(message);
 
   const workarea = document.createElement('div');
   workarea.classList.add('dialog-workarea');
-  win.appendChild(workarea);
+  win.append(workarea);
 
   const buttons = document.createElement('div');
   buttons.classList.add('dialog-buttons');
-  win.appendChild(buttons);
+  win.append(buttons);
 
   const bbegin = document.createElement('span');
   bbegin.classList.add('dialog-buttons-begin');
-  buttons.appendChild(bbegin);
+  buttons.append(bbegin);
 
   const dismiss = document.createElement('button');
   dismiss.classList.add('dialog-dismiss-button');
   dismiss.textContent = 'Cancel';
-  buttons.appendChild(dismiss);
+  buttons.append(dismiss);
 
   const confirm = document.createElement('button');
   confirm.textContent = 'OK';
-  buttons.appendChild(confirm);
+  buttons.append(confirm);
 
   const bend = document.createElement('span');
   bend.classList.add('dialog-buttons-end');
-  buttons.appendChild(bend);
+  buttons.append(bend);
 
   return {
     confirm,
@@ -164,11 +164,11 @@ export function createSection(title) {
   const legend = document.createElement('legend');
   legend.classList.add('title');
   legend.textContent = title;
-  root.appendChild(legend);
+  root.append(legend);
 
   const content = document.createElement('div');
   content.classList.add('content');
-  root.appendChild(content);
+  root.append(content);
 
   return { content, root };
 }
@@ -180,11 +180,11 @@ export function createInfoSection(title, labels) {
   for (const label_text of labels) {
     const label_element = document.createElement('label');
     label_element.textContent = label_text;
-    content.appendChild(label_element);
+    content.append(label_element);
 
     const item = document.createElement('div');
     item.id = makeUUID();
-    content.appendChild(item);
+    content.append(item);
     label_element.setAttribute('for', item.id);
     children.push(item);
   }
@@ -194,11 +194,11 @@ export function createInfoSection(title, labels) {
 
 export function debounce(callback, wait = 100) {
   let timeout = null;
-  return (...args) => {
+  return (...arguments_) => {
     if (!timeout) {
       timeout = setTimeout(() => {
         timeout = null;
-        callback(args);
+        callback(arguments_);
       }, wait);
     }
   };
@@ -208,18 +208,18 @@ export function deepEqual(a, b) {
   return isEqual(a, b);
 }
 
-function setOrDeleteAttribute(el, attribute, b) {
+function setOrDeleteAttribute(element, attribute, b) {
   if (b) {
-    el.setAttribute(attribute, true);
+    element.setAttribute(attribute, true);
   } else {
-    el.removeAttribute(attribute);
+    element.removeAttribute(attribute);
   }
 }
-export function setEnabled(el, b) {
-  setOrDeleteAttribute(el, 'disabled', !b);
+export function setEnabled(element, b) {
+  setOrDeleteAttribute(element, 'disabled', !b);
 }
-export function setChecked(el, b) {
-  setOrDeleteAttribute(el, 'checked', b);
+export function setChecked(element, b) {
+  setOrDeleteAttribute(element, 'checked', b);
 }
 
 function getBestMenuPos(r, bounds) {
@@ -252,12 +252,12 @@ export function movePopup(popup, x, y, boundingElement) {
 }
 
 export class OutsideClickListener extends EventTarget {
-  constructor(el) {
+  constructor(element) {
     super();
-    this.listener = (ev) => {
-      if (!el.contains(ev.target)) {
-        this.dispatchEvent(new MouseEvent(ev.type, ev));
-        ev.preventDefault();
+    this.listener = (event_) => {
+      if (!element.contains(event_.target)) {
+        this.dispatchEvent(new MouseEvent(event_.type, event_));
+        event_.preventDefault();
       }
     };
     Object.seal(this);
