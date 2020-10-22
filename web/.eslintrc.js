@@ -115,6 +115,7 @@ module.exports = {
     "sort-keys": "error",
     "strict": "error",
     "unicorn/better-regex": "error",
-    "unicorn/catch-error-name": "error"
+    "unicorn/catch-error-name": "error",
+    "unicorn/error-message": "error",
   }
 };
