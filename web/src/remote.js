@@ -244,7 +244,7 @@ export class Remote {
     );
   }
   addTorrentByUrl(url, options) {
-    if (url.match(/^[0-9a-f]{40}$/i)) {
+    if (url.match(/^[\da-f]{40}$/i)) {
       url = `magnet:?xt=urn:btih:${url}`;
     }
     const o = {

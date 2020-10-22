@@ -10,9 +10,6 @@ const mode = process.env.WEBPACK_MODE || 'production';
 module.exports = {
   devtool: 'source-map',
   entry: './src/main.js',
-  externals: {
-    jquery: 'jQuery'
-  },
   mode,
   module: {
     rules: [
@@ -65,10 +62,6 @@ module.exports = {
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
     }),
   ],
   resolve: {

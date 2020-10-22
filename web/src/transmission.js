@@ -832,7 +832,7 @@ TODO: fix this when notifications get fixed
   ///
 
   _updateGuiFromSession(o) {
-    const [, version, checksum] = o.version.match(/(.*)\s\(([0-9a-f]+)\)/);
+    const [, version, checksum] = o.version.match(/(.*)\s\(([\da-f]+)\)/);
     this.version_info = {
       checksum,
       version,

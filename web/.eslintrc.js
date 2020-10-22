@@ -2,19 +2,17 @@ module.exports = {
   "env": {
     "browser": true,
     "commonjs": true,
-    "es6": true,
-    "jquery": true
+    "es6": true
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:jquery/deprecated"
+    "eslint:recommended"
   ],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "sourceType": "module"
   },
   "plugins": [
-    "jquery"
+    "unicorn"
   ],
   "rules": {
     "accessor-pairs": "error",
@@ -31,7 +29,6 @@ module.exports = {
     "grouped-accessor-pairs": "error",
     "guard-for-in": "error",
     "init-declarations": "error",
-    "jquery/no-slide": "off",
     "no-array-constructor": "error",
     "no-caller": "error",
     "no-confusing-arrow": "error",
@@ -116,6 +113,7 @@ module.exports = {
     "require-await": "error",
     "semi": "error",
     "sort-keys": "error",
-    "strict": "error"
+    "strict": "error",
+    "unicorn/better-regex": "error"
   }
 };
