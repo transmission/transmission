@@ -14,15 +14,16 @@ import { debounce } from './utils.js';
 import '../style/transmission-app.scss';
 
 function main() {
-  const scroll_soon = debounce(() => window.scrollTo(0, 1));
-  window.addEventListener('load', scroll_soon);
-  window.onorientationchange = scroll_soon;
-
   const action_manager = new ActionManager();
   const prefs = new Prefs();
   const notifications = new Notifications(prefs);
-  // eslint-disable-next-line no-unused-vars
   const transmission = new Transmission(action_manager, notifications, prefs);
+
+  const scroll_soon = debounce(() =>
+    transmission.elements.torrent_list.scrollTo(0, 1)
+  );
+  window.addEventListener('load', scroll_soon);
+  window.onorientationchange = scroll_soon;
 }
 
 document.addEventListener('DOMContentLoaded', main);

@@ -558,7 +558,7 @@ export class Transmission extends EventTarget {
   static _isValidURL(string) {
     try {
       const url = new URL(string);
-      return url !== null;
+      return url ? true : false;
     } catch {
       return false;
     }
