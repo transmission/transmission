@@ -6,6 +6,7 @@ module.exports = {
   },
   "extends": [
     "eslint:recommended",
+    "plugin:sonarjs/recommended",
     "plugin:unicorn/recommended"
   ],
   "parser": "@babel/eslint-parser",
@@ -13,6 +14,7 @@ module.exports = {
     "sourceType": "module"
   },
   "plugins": [
+    "sonarjs",
     "unicorn"
   ],
   "rules": {
@@ -113,6 +115,8 @@ module.exports = {
     "require-atomic-updates": "error",
     "require-await": "error",
     "semi": "error",
+    "sonarjs/cognitive-complexity": "off",
+    "sonarjs/no-duplicate-string": "off",
     "sort-keys": "error",
     "strict": "error",
     'unicorn/consistent-function-scoping': 'off',
