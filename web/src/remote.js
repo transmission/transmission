@@ -60,14 +60,14 @@ export class Remote {
           callback.call(context, payload, response_arg);
         }
       })
-      .catch((err) => {
-        if (err.message === Remote._SessionHeader) {
+      .catch((error) => {
+        if (error.message === Remote._SessionHeader) {
           // copy the session header and try again
-          this._session_id = err.header;
+          this._session_id = error.header;
           this.sendRequest(data, callback, context);
           return;
         }
-        console.trace(err);
+        console.trace(error);
         this._controller.togglePeriodicSessionRefresh(false);
         this._controller.setCurrentPopup(
           new AlertDialog({

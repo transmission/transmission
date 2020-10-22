@@ -551,7 +551,7 @@ export class Transmission extends EventTarget {
     try {
       const url = new URL(str);
       return url !== null;
-    } catch (e) {
+    } catch (error) {
       return false;
     }
   }
