@@ -279,7 +279,8 @@ static char const* mimetype_guess(char const* path)
         { "html", "text/html" },
         { "ico", "image/vnd.microsoft.icon" },
         { "js", "application/javascript" },
-        { "png", "image/png" }
+        { "png", "image/png" },
+        { "svg", "image/svg+xml" }
     };
     char const* dot = strrchr(path, '.');
 
@@ -1262,6 +1263,12 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         {
             tr_logAddNamedInfo(MY_NAME, "%s", _("Password required"));
         }
+    }
+
+    char const* webClientDir = tr_getWebClientDir(s->session);
+    if (!tr_str_is_empty(webClientDir))
+    {
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
     }
 
     return s;

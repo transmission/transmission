@@ -493,7 +493,7 @@ char const* tr_getWebClientDir(tr_session const* session)
 #ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
 
             /* Look in the Application Support folder */
-            s = tr_buildPath(tr_sessionGetConfigDir(session), "web", NULL);
+            s = tr_buildPath(tr_sessionGetConfigDir(session), "public_html", NULL);
 
             if (!isWebClientDir(s))
             {
@@ -511,7 +511,7 @@ char const* tr_getWebClientDir(tr_session const* session)
                 CFRelease(appRef);
 
                 /* Fallback to the app bundle */
-                s = tr_buildPath(appString, "Contents", "Resources", "web", NULL);
+                s = tr_buildPath(appString, "Contents", "Resources", "public_html", NULL);
 
                 if (!isWebClientDir(s))
                 {
@@ -628,7 +628,7 @@ char const* tr_getWebClientDir(tr_session const* session)
             /* walk through the candidates & look for a match */
             for (tr_list* l = candidates; l != NULL; l = l->next)
             {
-                char* path = tr_buildPath(l->data, "transmission", "web", NULL);
+                char* path = tr_buildPath(l->data, "transmission", "public_html", NULL);
                 bool const found = isWebClientDir(path);
 
                 if (found)
