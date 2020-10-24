@@ -1,4 +1,6 @@
-/*
+/**
+ * @license
+ *
  * This file Copyright (C) 2020 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
