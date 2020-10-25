@@ -12,6 +12,25 @@ import { Prefs } from './prefs.js';
 import { RPC } from './remote.js';
 import { OutsideClickListener, setEnabled } from './utils.js';
 
+function make_section(classname, title) {
+  const section = document.createElement('fieldset');
+  section.classList.add('section', classname);
+  const legend = document.createElement('legend');
+  legend.classList.add('title');
+  legend.textContent = title;
+  section.append(legend);
+  return section;
+}
+
+function make_button(parent, text, action, on_click) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.addEventListener('click', on_click);
+  parent.append(button);
+  button.dataset.action = action;
+  return button;
+}
+
 export class OverflowMenu extends EventTarget {
   constructor(session_manager, prefs, remote, action_manager) {
     super();
@@ -125,29 +144,8 @@ export class OverflowMenu extends EventTarget {
 
   _create(session_properties) {
     const actions = {};
-    const on_click = this._onClick.bind(this);
     const elements = {};
-
-    const make_section = (classname, title) => {
-      const section = document.createElement('fieldset');
-      section.classList.add('section', classname);
-      const legend = document.createElement('legend');
-      legend.classList.add('title');
-      legend.textContent = title;
-      section.append(legend);
-      return section;
-    };
-
-    const make_button = (parent, text, action) => {
-      const e = document.createElement('button');
-      e.textContent = text;
-      e.addEventListener('click', on_click);
-      parent.append(e);
-      if (action) {
-        e.dataset.action = action;
-      }
-      return e;
-    };
+    const on_click = this._onClick.bind(this);
 
     const root = document.createElement('div');
     root.classList.add('overflow-menu', 'popup');
@@ -420,7 +418,7 @@ export class OverflowMenu extends EventTarget {
       'start-all-torrents',
     ]) {
       const text = this.action_manager.text(action_name);
-      actions[action_name] = make_button(section, text, action_name);
+      actions[action_name] = make_button(section, text, action_name, on_click);
     }
 
     section = make_section('info', 'Info');
@@ -435,7 +433,7 @@ export class OverflowMenu extends EventTarget {
       'show-statistics-dialog',
     ]) {
       const text = this.action_manager.text(action_name);
-      actions[action_name] = make_button(options, text, action_name);
+      actions[action_name] = make_button(options, text, action_name, on_click);
     }
 
     section = make_section('links', 'Links');

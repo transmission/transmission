@@ -2270,22 +2270,26 @@ char const* tr_get_mime_type_for_filename(char const* filename)
     struct mime_type_suffix const* info = NULL;
 
     char const* in = strrchr(filename, '.');
-    if ((in != NULL) && (strlen(++in) <= MIME_TYPE_SUFFIX_MAXLEN))
+    if (in != NULL)
     {
-        char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
-        char* out = lowercase_suffix;
-        while (*in != '\0')
+        char const* suffix = in + 1;
+        if (strlen(suffix) <= MIME_TYPE_SUFFIX_MAXLEN)
         {
-            *out++ = tolower((unsigned char)*in++);
+            char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
+            char* out = lowercase_suffix;
+            while (*in != '\0')
+            {
+                *out++ = (char)tolower((unsigned char)*in++);
+            }
+
+            *out = '\0';
+
+            info = bsearch(lowercase_suffix,
+                mime_type_suffixes,
+                TR_N_ELEMENTS(mime_type_suffixes),
+                sizeof(*mime_type_suffixes),
+                compareSuffix);
         }
-
-        *out = '\0';
-
-        info = bsearch(lowercase_suffix,
-            mime_type_suffixes,
-            TR_N_ELEMENTS(mime_type_suffixes),
-            sizeof(*mime_type_suffixes),
-            compareSuffix);
     }
 
     return info != NULL ? info->mime_type : NULL;
