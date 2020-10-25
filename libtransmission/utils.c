@@ -2272,8 +2272,8 @@ char const* tr_get_mime_type_for_filename(char const* filename)
     char const* in = strrchr(filename, '.');
     if (in != NULL)
     {
-        char const* suffix = in + 1;
-        if (strlen(suffix) <= MIME_TYPE_SUFFIX_MAXLEN)
+        ++in; // walk past '.'
+        if (strlen(in) <= MIME_TYPE_SUFFIX_MAXLEN)
         {
             char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
             char* out = lowercase_suffix;
