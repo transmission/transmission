@@ -910,6 +910,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   grid-row-gap: 5px;
   grid-template-columns: auto 1fr;
   margin: 20px;
+  padding: 12px;
 
   &:not(.hidden) {
     display: grid;
@@ -956,10 +957,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
 #prefs-tab-network {
   @include tab-image($image-network);
-}
-
-.inspector-info-page {
-  padding: 12px;
 }
 
 #inspector-file-list {

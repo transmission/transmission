@@ -1,4 +1,6 @@
 /**
+ * @license
+ *
  * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
  * This file is licensed under the GPLv2.
