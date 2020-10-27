@@ -41,7 +41,7 @@ for:
       choco install ActivePerl
       choco install nasm
       choco install jom
-      choco install imagemagick.tool
+      choco install imagemagick.tool --version 7.0.10.29
       choco install wixtoolset --version 3.11.2
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse

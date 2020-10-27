@@ -1,4 +1,3 @@
-/.depend
 /REVISION
 /beta
 /build
@@ -6,17 +5,13 @@ Transmission.xcodeproj/*.mode*
 Transmission.xcodeproj/*.pbxuser
 Transmission.xcodeproj/*.xcworkspace
 Transmission.xcodeproj/xcuserdata
-cli/.depend
 cli/transmissioncli
-daemon/.depend
 daemon/transmission-daemon
 daemon/transmission-proxy
 daemon/transmission-remote
-gtk/.depend
 gtk/defines.h
 gtk/transmission-gtk
 libtransmission/*.a
-libtransmission/.depend
 libtransmission/version.h
 macosx/Info.plist
 macosx/Transmission.app
@@ -24,3 +19,4 @@ macosx/en.lproj/*~.nib
 node_modules/
 po/*.mo
 third-party/miniupnp/miniupnpcstrings.h
+web/public_html/transmission-app.js.map

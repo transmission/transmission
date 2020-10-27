@@ -138,7 +138,7 @@ protected:
     void waitForFileToExist(std::string const& path)
     {
         auto const test = [path]() { return tr_sys_path_exists(path.data(), nullptr); };
-        EXPECT_TRUE(waitFor(test, 2000));
+        EXPECT_TRUE(waitFor(test, 30000));
     }
 
     void SetUp() override
