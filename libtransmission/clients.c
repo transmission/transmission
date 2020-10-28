@@ -683,6 +683,18 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         no_version(buf, buflen, "BitTyrant (Azureus Mod)");
     }
+    else if (strncmp(chid, "-UW110Q-", 8) == 0)
+    {
+        no_version(buf, buflen, "uTorrent Web");
+    }
+    else if (strncmp(chid, "-UW110Q-", 8) == 0)
+    {
+        no_version(buf, buflen, "FrostWire");
+    }
+    else if ((chid, "-BI2300-", 8) == 0)
+    {
+        no_version(buf, buflen, "BiglyBT (2.3.0.0)");
+    }
     else if (strncmp(chid, "LIME", 4) == 0)
     {
         no_version(buf, buflen, "Limewire");
