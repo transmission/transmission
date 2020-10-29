@@ -237,8 +237,8 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
 
     // listen for changes from the other players
     connect(&prefs_, &Prefs::changed, this, &FilterBar::refreshPref);
-    connect(activity_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
-    connect(tracker_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
+    connect(activity_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
+    connect(tracker_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
     connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
