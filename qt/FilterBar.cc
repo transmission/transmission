@@ -211,7 +211,6 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     prefs_(prefs),
     torrents_(torrents),
     filter_(filter),
-    recount_timer_(new QTimer(this)),
     is_bootstrapping_(true)
 {
     auto* h = new QHBoxLayout(this);
@@ -234,17 +233,17 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     line_edit_->setPlaceholderText(tr("Search..."));
     line_edit_->setMaximumWidth(250);
     h->addWidget(line_edit_, 1);
-    connect(line_edit_, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+    connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
     // listen for changes from the other players
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
-    connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onActivityIndexChanged(int)));
-    connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onTrackerIndexChanged(int)));
+    connect(&prefs_, &Prefs::changed, this, &FilterBar::refreshPref);
+    connect(activity_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
+    connect(tracker_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
     connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
-    connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
+    connect(&recount_timer_, &QTimer::timeout, this, &FilterBar::recount);
     connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
@@ -357,10 +356,10 @@ void FilterBar::recountSoon(Pending const& pending)
 {
     pending_ |= pending;
 
-    if (!recount_timer_->isActive())
+    if (!recount_timer_.isActive())
     {
-        recount_timer_->setSingleShot(true);
-        recount_timer_->start(800);
+        recount_timer_.setSingleShot(true);
+        recount_timer_.start(800);
     }
 }
 
