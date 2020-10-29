@@ -28,7 +28,7 @@ PathButton::PathButton(QWidget* parent) :
 
     updateAppearance();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(onClicked()));
+    connect(this, &QAbstractButton::clicked, this, &PathButton::onClicked);
 }
 
 void PathButton::setMode(Mode mode)
@@ -131,7 +131,7 @@ void PathButton::onClicked()
         }
     }
 
-    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(onFileSelected(QString)));
+    connect(dialog, &QFileDialog::fileSelected, this, &PathButton::onFileSelected);
 
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
