@@ -12,7 +12,7 @@
 #include "Macros.h"
 #include "ui_StatsDialog.h"
 
-class QTimer;
+#include <QTimer>
 
 class Session;
 
@@ -22,7 +22,7 @@ class StatsDialog : public BaseDialog
     TR_DISABLE_COPY_MOVE(StatsDialog)
 
 public:
-    StatsDialog(Session&, QWidget* parent = nullptr);
+    explicit StatsDialog(Session&, QWidget* parent = nullptr);
 
     // QWidget
     void setVisible(bool visible) override;
@@ -35,5 +35,5 @@ private:
 
     Ui::StatsDialog ui_ = {};
 
-    QTimer* timer_ = {};
+    QTimer timer_;
 };
