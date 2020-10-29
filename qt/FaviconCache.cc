@@ -24,7 +24,7 @@
 FaviconCache::FaviconCache() :
     nam_(new QNetworkAccessManager(this))
 {
-    connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
+    connect(nam_, &QNetworkAccessManager::finished, this, &FaviconCache::onRequestFinished);
 }
 
 /***
