@@ -40,15 +40,12 @@ FileTreeView::FileTreeView(QWidget* parent, bool is_editable) :
     setItemDelegate(delegate_);
     sortByColumn(FileTreeModel::COL_NAME, Qt::AscendingOrder);
 
-    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
+    connect(this, &QAbstractItemView::clicked, this, &FileTreeView::onClicked);
 
-    connect(model_, SIGNAL(priorityChanged(QSet<int>, int)), this, SIGNAL(priorityChanged(QSet<int>, int)));
-
-    connect(model_, SIGNAL(wantedChanged(QSet<int>, bool)), this, SIGNAL(wantedChanged(QSet<int>, bool)));
-
-    connect(model_, SIGNAL(pathEdited(QString, QString)), this, SIGNAL(pathEdited(QString, QString)));
-
-    connect(model_, SIGNAL(openRequested(QString)), this, SIGNAL(openRequested(QString)));
+    connect(model_, &FileTreeModel::openRequested, this, &FileTreeView::openRequested);
+    connect(model_, &FileTreeModel::pathEdited, this, &FileTreeView::pathEdited);
+    connect(model_, &FileTreeModel::priorityChanged, this, &FileTreeView::priorityChanged);
+    connect(model_, &FileTreeModel::wantedChanged, this, &FileTreeView::wantedChanged);
 }
 
 void FileTreeView::onClicked(QModelIndex const& proxy_index)
@@ -405,7 +402,7 @@ void FileTreeView::initContextMenu()
     open_action_ = context_menu_->addAction(tr("Open"), this, SLOT(openSelectedItem()));
     rename_action_ = context_menu_->addAction(tr("Rename..."), this, SLOT(renameSelectedItem()));
 
-    connect(context_menu_, SIGNAL(aboutToShow()), SLOT(refreshContextMenuActionsSensitivity()));
+    connect(context_menu_, &QMenu::aboutToShow, this, &FileTreeView::refreshContextMenuActionsSensitivity);
 }
 
 QModelIndexList FileTreeView::selectedSourceRows(int column) const
