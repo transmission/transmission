@@ -29,10 +29,10 @@ AboutDialog::AboutDialog(QWidget* parent) :
     QPushButton* b;
 
     b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showCredits()));
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
 
     b = ui_.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showLicense()));
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showLicense);
 
     ui_.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
 }
