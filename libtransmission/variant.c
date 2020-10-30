@@ -1067,7 +1067,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
         {
             if (tr_variantIsBool(val))
             {
-                bool boolVal;
+                bool boolVal = false;
                 tr_variantGetBool(val, &boolVal);
                 tr_variantDictAddBool(target, key, boolVal);
             }
