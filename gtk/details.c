@@ -1390,15 +1390,16 @@ static GtkListStore* peer_store_new(void)
 static void initPeerRow(GtkListStore* store, GtkTreeIter* iter, char const* key, char const* torrentName,
     tr_peer_stat const* peer)
 {
-    int q[4];
-    char collated_name[128];
-    char const* client = peer->client;
+    g_return_if_fail(peer != NULL);
 
+    char const* client = peer->client;
     if (client == NULL || g_strcmp0(client, "Unknown Client") == 0)
     {
         client = "";
     }
 
+    int q[4];
+    char collated_name[128];
     if (sscanf(peer->addr, "%d.%d.%d.%d", q, q + 1, q + 2, q + 3) != 4)
     {
         g_strlcpy(collated_name, peer->addr, sizeof(collated_name));
