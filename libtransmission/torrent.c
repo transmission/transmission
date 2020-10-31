@@ -1830,7 +1830,6 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     case TR_STATUS_SEED:
     case TR_STATUS_DOWNLOAD:
         return; /* already started */
-        break;
 
     case TR_STATUS_SEED_WAIT:
     case TR_STATUS_DOWNLOAD_WAIT:
@@ -1847,7 +1846,6 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
          * we'll know what completeness to use/announce */
         tor->startAfterVerify = true;
         return;
-        break;
 
     case TR_STATUS_STOPPED:
         if (!bypass_queue && torrentShouldQueue(tor))

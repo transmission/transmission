@@ -183,20 +183,15 @@ static GdkPixbuf* _get_icon_pixbuf(GIcon* icon, int size, GtkIconTheme* theme)
 
 static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mime_type)
 {
-    GIcon* icon;
-    char const* key = NULL;
-    GdkPixbuf* pixbuf;
-
-    icon = g_content_type_get_icon(mime_type);
-    key = _icon_cache_get_icon_key(icon);
-
+    GIcon* icon = g_content_type_get_icon(mime_type);
+    char const* key = _icon_cache_get_icon_key(icon);
     if (key == NULL)
     {
         key = VOID_PIXBUF_KEY;
     }
 
-    pixbuf = g_hash_table_lookup(icons->cache, key);
-
+    g_return_val_if_fail(icons != NULL, NULL);
+    GdkPixbuf* pixbuf = g_hash_table_lookup(icons->cache, key);
     if (pixbuf != NULL)
     {
         g_object_ref(pixbuf);

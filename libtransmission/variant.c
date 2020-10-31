@@ -198,7 +198,11 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
     if (len < sizeof(str->str.buf))
     {
         str->type = TR_STRING_TYPE_BUF;
-        memcpy(str->str.buf, bytes, len);
+        if (len > 0)
+        {
+            memcpy(str->str.buf, bytes, len);
+        }
+
         str->str.buf[len] = '\0';
         str->len = len;
     }
@@ -1067,7 +1071,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
         {
             if (tr_variantIsBool(val))
             {
-                bool boolVal;
+                bool boolVal = false;
                 tr_variantGetBool(val, &boolVal);
                 tr_variantDictAddBool(target, key, boolVal);
             }
