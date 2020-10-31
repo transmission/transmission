@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include <QApplication>
+#include <QAuthenticator>
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -152,8 +153,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(dataReadProgress()));
-    connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(dataSendProgress()));
+    connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
+    connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
     if (Verbose)
     {
@@ -203,10 +204,9 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     {
         nam_ = new QNetworkAccessManager();
 
-        connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+        connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
 
-        connect(nam_, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
-            SIGNAL(httpAuthenticationRequired()));
+        connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::httpAuthenticationRequired);
     }
 
     return nam_;

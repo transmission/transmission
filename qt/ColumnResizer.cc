@@ -8,7 +8,6 @@
 
 #include <QEvent>
 #include <QGridLayout>
-#include <QTimer>
 
 #include "ColumnResizer.h"
 
@@ -38,11 +37,10 @@ int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
 } // namespace
 
 ColumnResizer::ColumnResizer(QObject* parent) :
-    QObject(parent),
-    timer_(new QTimer(this))
+    QObject(parent)
 {
-    timer_->setSingleShot(true);
-    connect(timer_, SIGNAL(timeout()), SLOT(update()));
+    timer_.setSingleShot(true);
+    connect(&timer_, &QTimer::timeout, this, &ColumnResizer::update);
 }
 
 void ColumnResizer::addLayout(QGridLayout* layout)
@@ -88,5 +86,5 @@ void ColumnResizer::update()
 
 void ColumnResizer::scheduleUpdate()
 {
-    timer_->start(0);
+    timer_.start(0);
 }
