@@ -6,8 +6,10 @@ const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
 const mode = process.env.WEBPACK_MODE || 'production';
+const devPort = process.env.DEV_PORT || 9000;
+const rpcUrl = process.env.RPC_URL || 'http://localhost:9091/transmission/rpc';
 
-module.exports = {
+const config = {
   devtool: 'source-map',
   entry: './src/main.js',
   mode,
@@ -52,7 +54,7 @@ module.exports = {
   },
   output: {
     filename: 'transmission-app.js' ,
-    path: path.resolve(__dirname, 'public_html'), 
+    path: path.resolve(__dirname, 'public_html'),
     sourceMapFilename: 'transmission-app.js.map'
   },
   plugins: [
@@ -68,4 +70,23 @@ module.exports = {
     extensions: ['.js', '.scss']
   },
 };
+
+if (mode === 'development') {
+  config.devServer = {
+    compress: true,
+    contentBase: path.join(__dirname, 'public_html'),
+    historyApiFallback: {
+      rewrites: [
+        { from: '/transmission/web', to: '/' },
+      ]
+    },
+    hot: true,
+    port: devPort,
+    proxy: {
+      '/rpc': rpcUrl
+    }
+  };
+}
+
+module.exports = config;
 
