@@ -865,7 +865,6 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
 {
     tr_variant val;
     bool allow_pex;
-    bool allow_metadata_xfer;
     struct evbuffer* payload;
     struct evbuffer* out = msgs->outMessages;
     unsigned char const* ipv6 = tr_globalIPv6();
@@ -885,14 +884,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
-    if (tr_torrentIsPrivate(msgs->torrent))
-    {
-        allow_metadata_xfer = false;
-    }
-    else
-    {
-        allow_metadata_xfer = true;
-    }
+    bool const allow_metadata_xfer = !tr_torrentIsPrivate(msgs->torrent);
 
     /* decide if we want to advertise pex support */
     if (!tr_torrentAllowsPex(msgs->torrent))
@@ -1028,12 +1020,10 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i))
+    if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) &&
+        tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
-        if (tr_torrentSetMetadataSizeHint(msgs->torrent, i))
-        {
-            msgs->metadata_size_hint = (size_t)i;
-        }
+        msgs->metadata_size_hint = (size_t)i;
     }
 
     /* look for upload_only (BEP 21) */
@@ -1050,14 +1040,18 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
         dbgmsg(msgs, "peer's port is now %d", (int)i);
     }
 
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
+    if (tr_peerIoIsIncoming(msgs->io) &&
+        tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) &&
+        addr_len == 4)
     {
         pex.addr.type = TR_AF_INET;
         memcpy(&pex.addr.addr.addr4, addr, 4);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, seedProbability);
     }
 
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
+    if (tr_peerIoIsIncoming(msgs->io) &&
+        tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) &&
+        addr_len == 16)
     {
         pex.addr.type = TR_AF_INET6;
         memcpy(&pex.addr.addr.addr6, addr, 16);
@@ -1933,12 +1927,9 @@ static void updateDesiredRequestCount(tr_peerMsgs* msgs)
         msgs->desiredRequestCount = MAX(floor, estimatedBlocksInPeriod);
 
         /* honor the peer's maximum request count, if specified */
-        if (msgs->reqq > 0)
+        if ((msgs->reqq > 0) && (msgs->desiredRequestCount > msgs->reqq))
         {
-            if (msgs->desiredRequestCount > msgs->reqq)
-            {
-                msgs->desiredRequestCount = msgs->reqq;
-            }
+            msgs->desiredRequestCount = msgs->reqq;
         }
     }
 }

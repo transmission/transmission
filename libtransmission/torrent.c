@@ -109,12 +109,9 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHa
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (*tor->info.hash == *torrentHash)
+        if ((*tor->info.hash == *torrentHash) && (memcmp(tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0))
         {
-            if (memcmp(tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0)
-            {
-                return tor;
-            }
+            return tor;
         }
     }
 
@@ -157,12 +154,10 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction))
+    if (tr_torrentUsesSpeedLimit(tor, direction) &&
+        tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
     {
-        if (tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
-        {
-            allowed = false;
-        }
+        allowed = false;
     }
 
     if (tr_torrentUsesSessionLimits(tor))
@@ -209,23 +204,9 @@ static int peerIdTTL(tr_torrent const* tor)
 
 unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
 {
-    bool needs_new_peer_id = false;
-
-    if (*tor->peer_id == '\0')
-    {
-        needs_new_peer_id = true;
-    }
-
-    if (!needs_new_peer_id)
-    {
-        if (!tr_torrentIsPrivate(tor))
-        {
-            if (peerIdTTL(tor) <= 0)
-            {
-                needs_new_peer_id = true;
-            }
-        }
-    }
+    bool const needs_new_peer_id =
+        (*tor->peer_id == '\0') || // doesn't have one
+        (!tr_torrentIsPrivate(tor) && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
@@ -722,12 +703,9 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
         /* when dealing with multimedia files, getting the first and
            last pieces can sometimes allow you to preview it a bit
            before it's fully downloaded... */
-        if (file->priority >= TR_PRI_NORMAL)
+        if ((file->priority >= TR_PRI_NORMAL) && (file->firstPiece == piece || file->lastPiece == piece))
         {
-            if (file->firstPiece == piece || file->lastPiece == piece)
-            {
-                priority = TR_PRI_HIGH;
-            }
+            priority = TR_PRI_HIGH;
         }
     }
 
@@ -2774,12 +2752,10 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
     {
-        if (tr_cpFileIsComplete(&tor->completion, i))
+        if (tr_cpFileIsComplete(&tor->completion, i) &&
+            (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked))
         {
-            if (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked)
-            {
-                return true;
-            }
+            return true;
         }
     }
 
@@ -3485,12 +3461,11 @@ static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceInde
     {
         tr_file const* file = &tor->info.files[i];
 
-        if (file->firstPiece <= pieceIndex && pieceIndex <= file->lastPiece)
+        if ((file->firstPiece <= pieceIndex) &&
+            (pieceIndex <= file->lastPiece) &&
+            tr_cpFileIsComplete(&tor->completion, i))
         {
-            if (tr_cpFileIsComplete(&tor->completion, i))
-            {
-                tr_torrentFileCompleted(tor, i);
-            }
+            tr_torrentFileCompleted(tor, i);
         }
     }
 }
@@ -3736,22 +3711,20 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
     while ((walk = tr_torrentNext(tor->session, walk)) != NULL)
     {
-        if (old_pos < pos)
+        if ((old_pos < pos) &&
+            (old_pos <= walk->queuePosition) &&
+            (walk->queuePosition <= pos))
         {
-            if (old_pos <= walk->queuePosition && walk->queuePosition <= pos)
-            {
-                walk->queuePosition--;
-                walk->anyDate = now;
-            }
+            walk->queuePosition--;
+            walk->anyDate = now;
         }
 
-        if (old_pos > pos)
+        if ((old_pos > pos) &&
+            (pos <= walk->queuePosition) &&
+            (walk->queuePosition < old_pos))
         {
-            if (pos <= walk->queuePosition && walk->queuePosition < old_pos)
-            {
-                walk->queuePosition++;
-                walk->anyDate = now;
-            }
+            walk->queuePosition++;
+            walk->anyDate = now;
         }
 
         if (back < walk->queuePosition)

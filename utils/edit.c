@@ -146,18 +146,14 @@ static bool removeURL(tr_variant* metainfo, char const* url)
      * use it as the "announce" field */
     if (changed && !tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL))
     {
-        tr_variant* tier;
-        tr_variant* node;
-
-        if ((tier = tr_variantListChild(announce_list, 0)) != NULL)
+        tr_variant* const tier = tr_variantListChild(announce_list, 0);
+        if (tier != NULL)
         {
-            if ((node = tr_variantListChild(tier, 0)) != NULL)
+            tr_variant* const node = tr_variantListChild(tier, 0);
+            if ((node != NULL) && tr_variantGetStr(node, &str, NULL))
             {
-                if (tr_variantGetStr(node, &str, NULL))
-                {
-                    tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
-                    printf("\tAdded \"%s\" to announce\n", str);
-                }
+                tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
+                printf("\tAdded \"%s\" to announce\n", str);
             }
         }
     }

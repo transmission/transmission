@@ -520,16 +520,12 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
     ensureSessionFdInfoExists(session);
     gFd = session->fdInfo;
 
-    if (gFd->peerCount < session->peerLimit)
+    if ((gFd->peerCount < session->peerLimit) &&
+        ((s = socket(domain, type, 0)) == TR_BAD_SOCKET) &&
+        (sockerrno != EAFNOSUPPORT))
     {
-        if ((s = socket(domain, type, 0)) == TR_BAD_SOCKET)
-        {
-            if (sockerrno != EAFNOSUPPORT)
-            {
-                char err_buf[512];
-                tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
-            }
-        }
+        char err_buf[512];
+        tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
     if (s != TR_BAD_SOCKET)

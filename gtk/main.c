@@ -547,18 +547,16 @@ static void on_startup(GApplication* application, gpointer user_data)
     tr_sessionSetRPCCallback(session, on_rpc_changed, cbdata);
 
     /* check & see if it's time to update the blocklist */
-    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled))
+    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) &&
+        gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
     {
-        if (gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
-        {
-            int64_t const last_time = gtr_pref_int_get(TR_KEY_blocklist_date);
-            int const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
-            time_t const now = time(NULL);
+        int64_t const last_time = gtr_pref_int_get(TR_KEY_blocklist_date);
+        int const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
+        time_t const now = time(NULL);
 
-            if (last_time + SECONDS_IN_A_WEEK < now)
-            {
-                gtr_core_blocklist_update(cbdata->core);
-            }
+        if (last_time + SECONDS_IN_A_WEEK < now)
+        {
+            gtr_core_blocklist_update(cbdata->core);
         }
     }
 

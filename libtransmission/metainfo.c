@@ -265,13 +265,11 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
-            if (!tr_variantDictFindList(file, TR_KEY_path_utf_8, &path))
+            if (!tr_variantDictFindList(file, TR_KEY_path_utf_8, &path) &&
+                !tr_variantDictFindList(file, TR_KEY_path, &path))
             {
-                if (!tr_variantDictFindList(file, TR_KEY_path, &path))
-                {
-                    result = "path";
-                    break;
-                }
+                result = "path";
+                break;
             }
 
             bool is_file_adjusted;
@@ -613,12 +611,10 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     {
         len = 0;
 
-        if (!tr_variantDictFindStr(infoDict, TR_KEY_name_utf_8, &str, &len))
+        if (!tr_variantDictFindStr(infoDict, TR_KEY_name_utf_8, &str, &len) &&
+            !tr_variantDictFindStr(infoDict, TR_KEY_name, &str, &len))
         {
-            if (!tr_variantDictFindStr(infoDict, TR_KEY_name, &str, &len))
-            {
-                str = "";
-            }
+            str = "";
         }
 
         if (tr_str_is_empty(str))
@@ -635,12 +631,10 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* comment */
     len = 0;
 
-    if (!tr_variantDictFindStr(meta, TR_KEY_comment_utf_8, &str, &len))
+    if (!tr_variantDictFindStr(meta, TR_KEY_comment_utf_8, &str, &len) &&
+        !tr_variantDictFindStr(meta, TR_KEY_comment, &str, &len))
     {
-        if (!tr_variantDictFindStr(meta, TR_KEY_comment, &str, &len))
-        {
-            str = "";
-        }
+        str = "";
     }
 
     tr_free(inf->comment);
@@ -649,12 +643,10 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* created by */
     len = 0;
 
-    if (!tr_variantDictFindStr(meta, TR_KEY_created_by_utf_8, &str, &len))
+    if (!tr_variantDictFindStr(meta, TR_KEY_created_by_utf_8, &str, &len) &&
+        !tr_variantDictFindStr(meta, TR_KEY_created_by, &str, &len))
     {
-        if (!tr_variantDictFindStr(meta, TR_KEY_created_by, &str, &len))
-        {
-            str = "";
-        }
+        str = "";
     }
 
     tr_free(inf->creator);
@@ -669,12 +661,10 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     inf->dateCreated = i;
 
     /* private */
-    if (!tr_variantDictFindInt(infoDict, TR_KEY_private, &i))
+    if (!tr_variantDictFindInt(infoDict, TR_KEY_private, &i) &&
+        !tr_variantDictFindInt(meta, TR_KEY_private, &i))
     {
-        if (!tr_variantDictFindInt(meta, TR_KEY_private, &i))
-        {
-            i = 0;
-        }
+        i = 0;
     }
 
     inf->isPrivate = i != 0;

@@ -762,14 +762,11 @@ void PrefsDialog::refreshPref(int key)
     {
         QWidget* w(it.value());
 
-        if (!updateWidgetValue(w, key))
+        if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
-            if (key == Prefs::ENCRYPTION)
-            {
-                auto* combo_box = qobject_cast<QComboBox*>(w);
-                int const index = combo_box->findData(prefs_.getInt(key));
-                combo_box->setCurrentIndex(index);
-            }
+            auto* combo_box = qobject_cast<QComboBox*>(w);
+            int const index = combo_box->findData(prefs_.getInt(key));
+            combo_box->setCurrentIndex(index);
         }
     }
 }
