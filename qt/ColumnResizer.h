@@ -10,11 +10,11 @@
 
 #include <QObject>
 #include <QSet>
+#include <QTimer>
 
 #include "Macros.h"
 
 class QGridLayout;
-class QTimer;
 
 class ColumnResizer : public QObject
 {
@@ -35,6 +35,6 @@ public slots:
 private:
     void scheduleUpdate();
 
-    QTimer* timer_ = {};
+    QTimer timer_;
     QSet<QGridLayout*> layouts_;
 };

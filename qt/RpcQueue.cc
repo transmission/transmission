@@ -17,7 +17,7 @@ RpcQueue::RpcQueue(QObject* parent) :
     QObject(parent),
     tag_(next_tag++)
 {
-    connect(&future_watcher_, SIGNAL(finished()), SLOT(stepFinished()));
+    connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }
 
 void RpcQueue::stepFinished()

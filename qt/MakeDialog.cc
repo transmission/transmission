@@ -55,9 +55,9 @@ MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& bu
 {
     ui_.setupUi(this);
 
-    connect(ui_.dialogButtons, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &MakeProgressDialog::onButtonBoxClicked);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onProgress()));
+    connect(&timer_, &QTimer::timeout, this, &MakeProgressDialog::onProgress);
     timer_.start(100);
 
     onProgress();
@@ -248,13 +248,13 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent) :
 
     resize(minimumSizeHint());
 
-    connect(ui_.sourceFolderRadio, SIGNAL(toggled(bool)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFolderButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFileRadio, SIGNAL(toggled(bool)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFileButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
+    connect(ui_.sourceFolderRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFolderButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFileRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFileButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
 
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(makeTorrent()));
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &MakeDialog::makeTorrent);
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &MakeDialog::close);
 
     onSourceChanged();
 }

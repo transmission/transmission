@@ -337,7 +337,7 @@ Application::Application(int& argc, char** argv) :
         dialog->setDefaultButton(QMessageBox::Ok);
         dialog->setModal(true);
 
-        connect(dialog, SIGNAL(finished(int)), this, SLOT(consentGiven(int)));
+        connect(dialog, &QDialog::finished, this, &Application::consentGiven);
 
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->show();

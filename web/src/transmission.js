@@ -141,7 +141,9 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
         case 'show-overflow-menu':
-          {
+          if (this.popup instanceof OverflowMenu) {
+            this.setCurrentPopup(null);
+          } else {
             this.setCurrentPopup(
               new OverflowMenu(
                 this,

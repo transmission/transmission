@@ -301,12 +301,11 @@ Session::Session(QString config_dir, Prefs& prefs) :
     stats_.ratio = TR_RATIO_NA;
     cumulative_stats_ = stats_;
 
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
-    connect(&rpc_, SIGNAL(httpAuthenticationRequired()), this, SIGNAL(httpAuthenticationRequired()));
-    connect(&rpc_, SIGNAL(dataReadProgress()), this, SIGNAL(dataReadProgress()));
-    connect(&rpc_, SIGNAL(dataSendProgress()), this, SIGNAL(dataSendProgress()));
-    connect(&rpc_, SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)), this,
-        SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)));
+    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
+    connect(&rpc_, &RpcClient::httpAuthenticationRequired, this, &Session::httpAuthenticationRequired);
+    connect(&rpc_, &RpcClient::dataReadProgress, this, &Session::dataReadProgress);
+    connect(&rpc_, &RpcClient::dataSendProgress, this, &Session::dataSendProgress);
+    connect(&rpc_, &RpcClient::networkResponse, this, &Session::networkResponse);
 
     duplicates_timer_.setSingleShot(true);
     connect(&duplicates_timer_, &QTimer::timeout, this, &Session::onDuplicatesTimer);
@@ -905,7 +904,7 @@ void Session::updateStats(tr_variant* d)
 
 void Session::updateInfo(tr_variant* d)
 {
-    disconnect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
+    disconnect(&prefs_, &Prefs::changed, this, &Session::updatePref);
 
     for (int i = Prefs::FIRST_CORE_PREF; i <= Prefs::LAST_CORE_PREF; ++i)
     {
@@ -1044,7 +1043,7 @@ void Session::updateInfo(tr_variant* d)
     }
 
     // std::cerr << "Session::updateInfo end" << std::endl;
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
+    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
 
     emit sessionUpdated();
 }
