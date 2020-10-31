@@ -22,7 +22,7 @@ class ColumnResizer : public QObject
     TR_DISABLE_COPY_MOVE(ColumnResizer)
 
 public:
-    ColumnResizer(QObject* parent = nullptr);
+    explicit ColumnResizer(QObject* parent = nullptr);
 
     void addLayout(QGridLayout* layout);
 

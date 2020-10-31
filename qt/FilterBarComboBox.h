@@ -26,7 +26,7 @@ public:
     };
 
 public:
-    FilterBarComboBox(QWidget* parent = nullptr);
+    explicit FilterBarComboBox(QWidget* parent = nullptr);
 
     // QWidget
     QSize minimumSizeHint() const override;

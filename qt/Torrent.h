@@ -112,12 +112,12 @@ private:
 public:
     TorrentHash() {}
 
-    TorrentHash(char const* str)
+    explicit TorrentHash(char const* str)
     {
         tr_hex_to_sha1(data_.data(), str);
     }
 
-    TorrentHash(QString const& str)
+    explicit TorrentHash(QString const& str)
     {
         tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }

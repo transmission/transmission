@@ -29,7 +29,7 @@ public:
     };
 
 public:
-    FilterMode(int mode = SHOW_ALL) :
+    explicit FilterMode(int mode = SHOW_ALL) :
         mode_(mode)
     {
     }
@@ -77,7 +77,7 @@ public:
     };
 
 public:
-    SortMode(int mode = SORT_BY_ID) :
+    explicit SortMode(int mode = SORT_BY_ID) :
         mode_(mode)
     {
     }

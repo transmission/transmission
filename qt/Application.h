@@ -44,6 +44,7 @@ public:
 
 public slots:
     void addTorrent(AddData const&);
+    void addTorrent(QString const&);
 
 private slots:
     void consentGiven(int result);

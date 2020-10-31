@@ -18,7 +18,7 @@ class FileTreeDelegate : public QItemDelegate
     TR_DISABLE_COPY_MOVE(FileTreeDelegate)
 
 public:
-    FileTreeDelegate(QObject* parent = nullptr) :
+    explicit FileTreeDelegate(QObject* parent = nullptr) :
         QItemDelegate(parent)
     {
     }

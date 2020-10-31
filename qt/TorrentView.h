@@ -18,7 +18,7 @@ class TorrentView : public QListView
     TR_DISABLE_COPY_MOVE(TorrentView)
 
 public:
-    TorrentView(QWidget* parent = nullptr);
+    explicit TorrentView(QWidget* parent = nullptr);
 
 public slots:
     void setHeaderText(QString const& text);

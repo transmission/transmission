@@ -58,7 +58,7 @@ class RpcClient : public QObject
     TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
-    RpcClient(QObject* parent = nullptr);
+    explicit RpcClient(QObject* parent = nullptr);
 
     void stop();
     void start(tr_session* session);
