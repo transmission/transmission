@@ -4,6 +4,7 @@
   "repository": "https://github.com/transmission/transmission",
   "license": "MIT",
   "scripts": {
+    "dev": "WEBPACK_MODE=development webpack-dev-server --config webpack.config.js",
     "build": "webpack --config webpack.config.js",
     "css": "sass --no-source-map style/",
     "css:map": "sass style/",
@@ -45,7 +46,8 @@
     "url-loader": "^4.1.0",
     "webpack": "^4.44.2",
     "webpack-bundle-analyzer": "^3.9.0",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0"
