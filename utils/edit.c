@@ -149,7 +149,7 @@ static bool removeURL(tr_variant* metainfo, char const* url)
         tr_variant* const tier = tr_variantListChild(announce_list, 0);
         if (tier != NULL)
         {
-            tr_variant* const node = tr_variantListChild(tier, 0);
+            tr_variant const* const node = tr_variantListChild(tier, 0);
             if ((node != NULL) && tr_variantGetStr(node, &str, NULL))
             {
                 tr_variantDictAddStr(metainfo, TR_KEY_announce, str);

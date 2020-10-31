@@ -449,12 +449,12 @@ static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
-    char const* s = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
     struct blocklist_data* data = gdata;
     GtkMessageDialog* d = GTK_MESSAGE_DIALOG(data->updateBlocklistDialog);
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
     gtk_message_dialog_set_markup(d, success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"));
-    gtk_message_dialog_format_secondary_text(d, s, count);
+    char const* const fmt = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
+    gtk_message_dialog_format_secondary_text(d, fmt, count);
     updateBlocklistText(data->label, core);
 }
 

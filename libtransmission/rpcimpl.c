@@ -1405,10 +1405,14 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
 
         tor = torrents[i];
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp) &&
-            tr_isPriority(tmp))
+        if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
         {
-            tr_torrentSetPriority(tor, tmp);
+            tr_priority_t const priority = (tr_priority_t)tmp;
+
+            if (tr_isPriority(priority))
+            {
+                tr_torrentSetPriority(tor, priority);
+            }
         }
 
         if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))

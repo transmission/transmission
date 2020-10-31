@@ -255,19 +255,18 @@ static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivat
 
 static void syncAltSpeedButton(PrivateData* p)
 {
-    char u[32];
-    char d[32];
-    char* str;
-    char const* fmt;
     gboolean const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
-    char const* stock = b ? "alt-speed-on" : "alt-speed-off";
-    GtkWidget* w = p->alt_speed_button;
+    char const* const stock = b ? "alt-speed-on" : "alt-speed-off";
+    GtkWidget* const w = p->alt_speed_button;
 
+    char u[32];
     tr_formatter_speed_KBps(u, gtr_pref_int_get(TR_KEY_alt_speed_up), sizeof(u));
+    char d[32];
     tr_formatter_speed_KBps(d, gtr_pref_int_get(TR_KEY_alt_speed_down), sizeof(d));
-    fmt = b ? _("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)") :
-        _("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)");
-    str = g_strdup_printf(fmt, d, u);
+
+    char* const str = b ?
+        g_strdup_printf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
+        g_strdup_printf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
