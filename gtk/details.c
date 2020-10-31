@@ -1430,6 +1430,8 @@ static void refreshPeerRow(GtkListStore* store, GtkTreeIter* iter, tr_peer_stat 
     char cancelled_by_peer[64] = { '\0' };
     char cancelled_by_client[64] = { '\0' };
 
+    g_return_if_fail(peer != NULL);
+
     if (peer->rateToPeer_KBps > 0.01)
     {
         tr_formatter_speed_KBps(up_speed, peer->rateToPeer_KBps, sizeof(up_speed));
