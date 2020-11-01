@@ -22,18 +22,33 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-static void handle_sigchld(int i)
+
+static volatile int *volatile child_pid_list = NULL;
+static volatile int child_pid_list_len = 0;
+
+
+static void handle_sigchld(int sig)
 {
-    TR_UNUSED(i);
+    TR_UNUSED(sig);
 
     int rc;
 
-    do
+    for (int i = 0; i < child_pid_list_len; i++)
     {
-        /* FIXME: Only check for our own PIDs */
-        rc = waitpid(-1, NULL, WNOHANG);
+        int pid = child_pid_list[i];
+        if (pid != 0)
+        {
+            do
+            {
+                rc = waitpid(pid, NULL, WNOHANG);
+            }
+            while (rc == -1 && errno == EINTR);
+            if (rc == pid)
+            {
+                child_pid_list[i] = 0;
+            }
+        }
     }
-    while (rc > 0 || (rc == -1 && errno == EINTR));
 
     /* FIXME: Call old handler, if any */
 }
@@ -119,6 +134,43 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     return true;
 }
 
+static void update_child_pid_list(int child_pid)
+{
+    sigset_t block_sigchld;
+
+    sigemptyset(&block_sigchld);
+    sigaddset(&block_sigchld, SIGCHLD);
+    sigprocmask(SIG_BLOCK, &block_sigchld, NULL);
+
+    if (!child_pid_list)
+    {
+        child_pid_list = calloc(10, sizeof(int));
+        child_pid_list_len = 10;
+    }
+
+    int i;
+    for (i = 0; i < child_pid_list_len; i++)
+    {
+        if (child_pid_list[i] == 0)
+        {
+            child_pid_list[i] = child_pid;
+            break;
+        }
+    }
+    if (i == child_pid_list_len)
+    {
+        child_pid_list = realloc((int*)child_pid_list, child_pid_list_len * 2 * sizeof(int));
+        for (; i < child_pid_list_len * 2; i++)
+        {
+            child_pid_list[i] = 0;
+        }
+        child_pid_list[child_pid_list_len] = child_pid;
+        child_pid_list_len = child_pid_list_len*2;
+    }
+
+    sigprocmask(SIG_UNBLOCK, &block_sigchld, NULL);
+}
+
 bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
 {
     static bool sigchld_handler_set = false;
@@ -157,6 +209,11 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
     {
         set_system_error(error, errno, "Call to fork()");
         return false;
+    }
+
+    if (child_pid > 0)
+    {
+        update_child_pid_list(child_pid);
     }
 
     if (child_pid == 0)
