@@ -134,7 +134,7 @@ QString Utils::removeTrailingDirSeparator(QString const& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
+int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -147,7 +147,7 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
         width();
 }
 
-int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
+int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);

@@ -49,8 +49,8 @@ public slots:
 private slots:
     void consentGiven(int result);
     void onSessionSourceChanged();
-    void onTorrentsAdded(torrent_ids_t const& torrents);
-    void onTorrentsCompleted(torrent_ids_t const& torrents);
+    void onTorrentsAdded(torrent_ids_t const& torrents) const;
+    void onTorrentsCompleted(torrent_ids_t const& torrents) const;
     void onTorrentsEdited(torrent_ids_t const& torrents);
     void onTorrentsNeedInfo(torrent_ids_t const& torrents);
     void refreshPref(int key);
@@ -60,7 +60,7 @@ private:
     void maybeUpdateBlocklist();
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
-    void quitLater();
+    void quitLater() const;
 
     Prefs* prefs_ = {};
     Session* session_ = {};
@@ -75,8 +75,8 @@ private:
     QTranslator app_translator_;
     FaviconCache favicons_;
 
-    QString const config_name_;
-    QString const display_name_;
+    QString const config_name_ = QStringLiteral("transmission");
+    QString const display_name_ = QStringLiteral("transmission-qt");
 
     std::unordered_set<QString> interned_strings_;
 };

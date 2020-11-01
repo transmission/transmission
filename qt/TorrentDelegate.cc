@@ -111,9 +111,9 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_
     status_rect = name_rect.adjusted(0, name_rect.height() + 1, 0, status_size.height() + 1);
     bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, BAR_HEIGHT + 1);
     progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height() + 1);
-    icon_rect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(icon_size, icon_size),
+    icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(icon_size, icon_size),
         QRect(top_left, QSize(width, progress_rect.bottom() - name_rect.top())));
-    emblem_rect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignBottom,
+    emblem_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignBottom,
         emblem_icon.actualSize(icon_rect.size() / 2, QIcon::Normal, QIcon::On), icon_rect);
 }
 

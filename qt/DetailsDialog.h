@@ -54,7 +54,7 @@ private:
     void initFilesTab();
     void initOptionsTab();
 
-    QIcon getStockIcon(QString const& freedesktop_name, int fallback);
+    QIcon getStockIcon(QString const& freedesktop_name, int fallback) const;
     void setEnabled(bool);
 
 private slots:
@@ -133,6 +133,6 @@ private:
 
     QMap<QString, QTreeWidgetItem*> peers_;
 
-    QIcon const icon_encrypted_;
-    QIcon const icon_unencrypted_;
+    QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.png"));
+    QIcon const icon_unencrypted_ = {};
 };

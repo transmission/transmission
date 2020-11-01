@@ -23,12 +23,10 @@ AboutDialog::AboutDialog(QWidget* parent) :
 {
     ui_.setupUi(this);
 
-    ui_.iconLabel->setPixmap(qApp->windowIcon().pixmap(48));
+    ui_.iconLabel->setPixmap(QApplication::windowIcon().pixmap(48));
     ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QStringLiteral(LONG_VERSION_STRING)));
 
-    QPushButton* b;
-
-    b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
+    QPushButton const* b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
     connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
 
     b = ui_.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);

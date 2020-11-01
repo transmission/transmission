@@ -61,10 +61,6 @@ private:
     // Internally stored error handler function. Takes the last response future and returns nothing.
     using ErrorHandlerFunction = std::function<void (RpcResponseFuture const&)>;
 
-private slots:
-    void stepFinished();
-
-private:
     void runNext(RpcResponseFuture const& response);
 
     // These overloads convert various forms of input closures to what we store internally.
@@ -143,7 +139,6 @@ private:
             };
     }
 
-private:
     Tag const tag_;
     static Tag next_tag;
     bool tolerate_errors_ = {};
@@ -151,4 +146,7 @@ private:
     QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
     ErrorHandlerFunction next_error_handler_;
     QFutureWatcher<RpcResponse> future_watcher_;
+
+private slots:
+    void stepFinished();
 };
