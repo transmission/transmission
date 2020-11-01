@@ -452,7 +452,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
         for (auto const& tor : torrents)
         {
             auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
-            auto const row = std::distance(torrents_.begin(), it);
+            int const row = std::distance(torrents_.begin(), it);
 
             beginInsertRows(QModelIndex(), row, row);
             torrents_.insert(it, tor);

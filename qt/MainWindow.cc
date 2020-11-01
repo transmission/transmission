@@ -142,11 +142,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
     network_timer_(this),
-    total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
-    total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
-    session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
-    session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
-    show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
     refresh_timer_(this)
 {
     setAcceptDrops(true);

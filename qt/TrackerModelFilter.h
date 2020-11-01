@@ -18,7 +18,7 @@ class TrackerModelFilter : public QSortFilterProxyModel
     TR_DISABLE_COPY_MOVE(TrackerModelFilter)
 
 public:
-    TrackerModelFilter(QObject* parent = nullptr);
+    explicit TrackerModelFilter(QObject* parent = nullptr);
 
     void setShowBackupTrackers(bool);
 

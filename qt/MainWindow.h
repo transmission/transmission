@@ -180,12 +180,11 @@ private:
     QAction* alt_speed_action_ = {};
     QString error_message_;
 
-    QString const total_ratio_stats_mode_name_;
-    QString const total_transfer_stats_mode_name_;
-    QString const session_ratio_stats_mode_name_;
-    QString const session_transfer_stats_mode_name_;
-
-    QString const show_options_checkbox_name_;
+    QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
+    QString const total_transfer_stats_mode_name_ = QStringLiteral("total-transfer");
+    QString const session_ratio_stats_mode_name_ = QStringLiteral("session-ratio");
+    QString const session_transfer_stats_mode_name_ = QStringLiteral("session-transfer");
+    QString const show_options_checkbox_name_ = QStringLiteral("show-options-checkbox");
 
     struct TransferStats
     {

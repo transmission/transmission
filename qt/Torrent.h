@@ -22,6 +22,7 @@
 #include <libtransmission/quark.h>
 
 #include "FaviconCache.h"
+#include "IconCache.h"
 #include "Macros.h"
 #include "Speed.h"
 
@@ -666,7 +667,7 @@ private:
     QString name_;
 
     // mutable because it's a lazy lookup
-    mutable QIcon icon_;
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;

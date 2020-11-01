@@ -63,7 +63,8 @@ private slots:
 private:
     AddData add_;
     FileList files_;
-    QCryptographicHash verify_hash_;
+    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
+
     QDir local_destination_;
     QFile verify_file_;
     QPushButton* verify_button_ = {};

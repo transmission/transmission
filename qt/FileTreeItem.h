@@ -34,7 +34,6 @@ public:
     };
 /* *INDENT-ON* */
 
-public:
     FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0) :
         name_(name),
         total_size_(size),

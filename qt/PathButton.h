@@ -57,5 +57,5 @@ private:
     QString name_filter_;
     QString path_;
     QString title_;
-    Mode mode_;
+    Mode mode_ = DirectoryMode;
 };

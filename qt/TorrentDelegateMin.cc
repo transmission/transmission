@@ -254,21 +254,21 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     if (tor.isDownloading())
     {
-        progress_bar_style_.palette.setBrush(QPalette::Highlight, blue_brush);
-        progress_bar_style_.palette.setColor(QPalette::Base, blue_back);
-        progress_bar_style_.palette.setColor(QPalette::Window, blue_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, BlueBrush);
+        progress_bar_style_.palette.setColor(QPalette::Base, BlueBack);
+        progress_bar_style_.palette.setColor(QPalette::Window, BlueBack);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_.palette.setBrush(QPalette::Highlight, green_brush);
-        progress_bar_style_.palette.setColor(QPalette::Base, green_back);
-        progress_bar_style_.palette.setColor(QPalette::Window, green_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, GreenBrush);
+        progress_bar_style_.palette.setColor(QPalette::Base, GreenBack);
+        progress_bar_style_.palette.setColor(QPalette::Window, GreenBack);
     }
     else
     {
-        progress_bar_style_.palette.setBrush(QPalette::Highlight, silver_brush);
-        progress_bar_style_.palette.setColor(QPalette::Base, silver_back);
-        progress_bar_style_.palette.setColor(QPalette::Window, silver_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, SilverBrush);
+        progress_bar_style_.palette.setColor(QPalette::Base, SilverBack);
+        progress_bar_style_.palette.setColor(QPalette::Window, SilverBack);
     }
 
     progress_bar_style_.state = progress_bar_state;
