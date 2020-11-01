@@ -133,7 +133,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     {
         QNetworkRequest request;
         request.setUrl(url_);
-        request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/') + QString::fromUtf8(
+        request.setRawHeader("User-Agent", (QApplication::applicationName() + QLatin1Char('/') + QString::fromUtf8(
             LONG_VERSION_STRING)).toUtf8());
         request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
         if (!session_id_.isEmpty())

@@ -89,7 +89,7 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_
     status_font(base_font),
     progress_font(base_font)
 {
-    QStyle const* style(qApp->style());
+    QStyle const* style = QApplication::style();
     int const icon_size(style->pixelMetric(QStyle::PM_LargeIconSize));
 
     name_font.setWeight(QFont::Bold);
@@ -377,8 +377,9 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    QSize const m(margin(*qApp->style()));
-    ItemLayout const layout(tor.name(), progressString(tor), statusString(tor), QIcon(), option.font, option.direction,
+    auto const m = QSize(margin(*QApplication::style()));
+    auto const layout = ItemLayout(tor.name(), progressString(tor), statusString(tor),
+        QIcon(), option.font, option.direction,
         QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
@@ -413,7 +414,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
+        icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
     }
 
     return icon;
@@ -450,7 +451,7 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
 
 void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    QStyle const* style(qApp->style());
+    auto const* style = QApplication::style();
 
     bool const is_paused(tor.isPaused());
 

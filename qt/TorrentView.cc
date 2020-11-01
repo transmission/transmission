@@ -19,7 +19,7 @@ public:
         QWidget(parent),
         text_()
     {
-        setFont(qApp->font("QMiniFont"));
+        setFont(QApplication::font("QMiniFont"));
     }
 
     void setText(QString const& text)

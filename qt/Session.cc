@@ -1167,7 +1167,7 @@ void Session::onDuplicatesTimer()
             d->setDetailedText(detail);
         }
 
-        d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+        QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
         d->show();
     }
 }

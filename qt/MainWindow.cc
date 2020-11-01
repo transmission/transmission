@@ -295,7 +295,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addSeparator();
     menu->addAction(ui_.action_Quit);
     tray_icon_.setContextMenu(menu);
-    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), qApp->windowIcon()));
+    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), QApplication::windowIcon()));
 
     connect(&prefs_, &Prefs::changed, this, &MainWindow::refreshPref);
     connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
@@ -1089,7 +1089,7 @@ void MainWindow::toggleWindows(bool do_show)
 
         // activateWindow ();
         raise();
-        qApp->setActiveWindow(this);
+        QApplication::setActiveWindow(this);
     }
 }
 
@@ -1194,7 +1194,7 @@ void MainWindow::refreshPref(int key)
         b = prefs_.getBool(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
-        qApp->setQuitOnLastWindowClosed(!b);
+        QApplication::setQuitOnLastWindowClosed(!b);
         refreshSoon(REFRESH_TRAY_ICON);
         break;
 
@@ -1288,11 +1288,11 @@ void MainWindow::openTorrent()
 
 void MainWindow::openURL()
 {
-    QString str = qApp->clipboard()->text(QClipboard::Selection);
+    QString str = QApplication::clipboard()->text(QClipboard::Selection);
 
     if (!AddData::isSupported(str))
     {
-        str = qApp->clipboard()->text(QClipboard::Clipboard);
+        str = QApplication::clipboard()->text(QClipboard::Clipboard);
     }
 
     if (!AddData::isSupported(str))
@@ -1331,12 +1331,12 @@ void MainWindow::addTorrent(AddData const& addMe, bool show_options)
     {
         auto* o = new OptionsDialog(session_, prefs_, addMe, this);
         o->show();
-        qApp->alert(o);
+        QApplication::alert(o);
     }
     else
     {
         session_.addTorrent(addMe);
-        qApp->alert(this);
+        QApplication::alert(this);
     }
 }
 
