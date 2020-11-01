@@ -1407,9 +1407,11 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
         {
-            if (tr_isPriority(tmp))
+            tr_priority_t const priority = (tr_priority_t)tmp;
+
+            if (tr_isPriority(priority))
             {
-                tr_torrentSetPriority(tor, tmp);
+                tr_torrentSetPriority(tor, priority);
             }
         }
 
@@ -1712,14 +1714,12 @@ static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_time
             stream.avail_out = buflen;
             err = inflate(&stream, Z_NO_FLUSH);
 
-            if (stream.avail_out < buflen)
+            if ((stream.avail_out < buflen) &&
+                (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, NULL, &error)))
             {
-                if (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, NULL, &error))
-                {
-                    tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                    tr_error_clear(&error);
-                    break;
-                }
+                tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+                tr_error_clear(&error);
+                break;
             }
 
             if (err != Z_OK)
@@ -1735,13 +1735,11 @@ static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_time
 
         inflateEnd(&stream);
 
-        if (err == Z_DATA_ERROR) /* couldn't inflate it... it's probably already uncompressed */
+        if ((err == Z_DATA_ERROR) && // couldn't inflate it... it's probably already uncompressed
+            !tr_sys_file_write(fd, response, response_byte_count, NULL, &error))
         {
-            if (!tr_sys_file_write(fd, response, response_byte_count, NULL, &error))
-            {
-                tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_error_clear(&error);
-            }
+            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+            tr_error_clear(&error);
         }
 
         tr_sys_file_close(fd, NULL);
@@ -1916,12 +1914,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     char const* download_dir = NULL;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL) &&
+        tr_sys_path_is_relative(download_dir))
     {
-        if (tr_sys_path_is_relative(download_dir))
-        {
-            return "download directory path is not absolute";
-        }
+        return "download directory path is not absolute";
     }
 
     int64_t i;
@@ -2046,20 +2042,16 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
     char const* download_dir = NULL;
     char const* incomplete_dir = NULL;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL) &&
+        tr_sys_path_is_relative(download_dir))
     {
-        if (tr_sys_path_is_relative(download_dir))
-        {
-            return "download directory path is not absolute";
-        }
+        return "download directory path is not absolute";
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, NULL) &&
+        tr_sys_path_is_relative(incomplete_dir))
     {
-        if (tr_sys_path_is_relative(incomplete_dir))
-        {
-            return "incomplete torrents directory path is not absolute";
-        }
+        return "incomplete torrents directory path is not absolute";
     }
 
     int64_t i;

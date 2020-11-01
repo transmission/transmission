@@ -1295,7 +1295,7 @@ void MainWindow::openURL()
         str.clear();
     }
 
-    addTorrent(str, true);
+    addTorrent(AddData(str), true);
 }
 
 void MainWindow::addTorrents(QStringList const& filenames)
@@ -1316,7 +1316,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     for (QString const& filename : filenames)
     {
-        addTorrent(filename, show_options);
+        addTorrent(AddData(filename), show_options);
     }
 }
 
@@ -1589,7 +1589,7 @@ void MainWindow::dropEvent(QDropEvent* event)
                 key = url.toLocalFile();
             }
 
-            qApp->addTorrent(key);
+            qApp->addTorrent(AddData(key));
         }
     }
 }

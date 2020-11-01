@@ -3042,12 +3042,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!tr_torrentIsStalled(tor))
+        if (!tr_torrentIsStalled(tor) && (tr_torrentGetActivity(tor) == activity))
         {
-            if (tr_torrentGetActivity(tor) == activity)
-            {
-                ++active_count;
-            }
+            ++active_count;
         }
     }
 

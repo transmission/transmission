@@ -1430,6 +1430,8 @@ static void refreshPeerRow(GtkListStore* store, GtkTreeIter* iter, tr_peer_stat 
     char cancelled_by_peer[64] = { '\0' };
     char cancelled_by_client[64] = { '\0' };
 
+    g_return_if_fail(peer != NULL);
+
     if (peer->rateToPeer_KBps > 0.01)
     {
         tr_formatter_speed_KBps(up_speed, peer->rateToPeer_KBps, sizeof(up_speed));
@@ -2906,7 +2908,8 @@ static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocatio
     TR_UNUSED(alloc);
     TR_UNUSED(gdata);
 
-    int w, h;
+    int w = 0;
+    int h = 0;
     gtk_window_get_size(GTK_WINDOW(gtk_window), &w, &h);
     gtr_pref_int_set(TR_KEY_details_window_width, w);
     gtr_pref_int_set(TR_KEY_details_window_height, h);

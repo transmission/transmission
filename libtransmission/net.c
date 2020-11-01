@@ -418,17 +418,13 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #ifdef IPV6_V6ONLY
 
-    if (addr->type == TR_AF_INET6)
+    if ((addr->type == TR_AF_INET6) &&
+        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&optval, sizeof(optval)) == -1) &&
+        (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
-        if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&optval, sizeof(optval)) == -1)
-        {
-            if (sockerrno != ENOPROTOOPT) /* if the kernel doesn't support it, ignore it */
-            {
-                *errOut = sockerrno;
-                tr_netCloseSocket(fd);
-                return TR_BAD_SOCKET;
-            }
-        }
+        *errOut = sockerrno;
+        tr_netCloseSocket(fd);
+        return TR_BAD_SOCKET;
     }
 
 #endif

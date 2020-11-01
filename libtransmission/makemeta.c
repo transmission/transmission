@@ -490,14 +490,13 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
+    if ((builder->result == TR_MAKEMETA_OK) &&
+        (!builder->abortFlag) &&
+        (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
-        if (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0)
-        {
-            builder->my_errno = errno;
-            tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
-            builder->result = TR_MAKEMETA_IO_WRITE;
-        }
+        builder->my_errno = errno;
+        tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
+        builder->result = TR_MAKEMETA_IO_WRITE;
     }
 
     /* cleanup */

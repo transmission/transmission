@@ -36,15 +36,9 @@
 
 static char const* get_event_string(tr_announce_request const* req)
 {
-    if (req->partial_seed)
-    {
-        if (req->event != TR_ANNOUNCE_EVENT_STOPPED)
-        {
-            return "paused";
-        }
-    }
-
-    return tr_announce_event_get_string(req->event);
+    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ?
+        "paused" :
+        tr_announce_event_get_string(req->event);
 }
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
@@ -429,12 +423,10 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
                 response->errmsg = tr_strndup(str, len);
             }
 
-            if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags))
+            if (tr_variantDictFindDict(&top, TR_KEY_flags,
+                &flags) && tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
             {
-                if (tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
-                {
-                    response->min_request_interval = intVal;
-                }
+                response->min_request_interval = intVal;
             }
 
             if (tr_variantDictFindDict(&top, TR_KEY_files, &files))

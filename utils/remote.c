@@ -2339,7 +2339,6 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case 'V': /* show version number */
                 fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
                 exit(0);
-                break;
 
             case TR_OPT_ERR:
                 fprintf(stderr, "invalid option\n");

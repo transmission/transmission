@@ -1012,12 +1012,9 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
         }
     }
 
-    if ((fields & TR_FR_MAX_PEERS) != 0)
+    if (((fields & TR_FR_MAX_PEERS) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
     {
-        if (tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
-        {
-            ret |= TR_FR_MAX_PEERS;
-        }
+        ret |= TR_FR_MAX_PEERS;
     }
 
     if ((fields & TR_FR_DOWNLOAD_DIR) != 0)

@@ -790,12 +790,10 @@ static void getBlockRequestPeers(tr_swarm* s, tr_block_index_t block, tr_ptrArra
 
 static void decrementPendingReqCount(struct block_request const* b)
 {
-    if (b->peer != NULL)
+    if ((b->peer != NULL) &&
+        (b->peer->pendingReqsToPeer > 0))
     {
-        if (b->peer->pendingReqsToPeer > 0)
-        {
-            --b->peer->pendingReqsToPeer;
-        }
+        --b->peer->pendingReqsToPeer;
     }
 }
 
@@ -1100,12 +1098,9 @@ static void pieceListRebuild(tr_swarm* s)
 
         for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
         {
-            if (!inf->pieces[i].dnd)
+            if (!inf->pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i))
             {
-                if (!tr_torrentPieceIsComplete(tor, i))
-                {
-                    pool[poolCount++] = i;
-                }
+                pool[poolCount++] = i;
             }
         }
 
@@ -2207,12 +2202,10 @@ void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t s
         tr_swarm* s = tor->swarm;
         managerLock(s->manager);
 
-        if (!tr_sessionIsAddressBlocked(s->manager->session, &pex->addr))
+        if (!tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
+            tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
-            if (tr_address_is_valid_for_peers(&pex->addr, pex->port))
-            {
-                ensureAtomExists(s, &pex->addr, pex->port, pex->flags, seedProbability, from);
-            }
+            ensureAtomExists(s, &pex->addr, pex->port, pex->flags, seedProbability, from);
         }
 
         managerUnlock(s->manager);

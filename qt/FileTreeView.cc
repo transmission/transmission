@@ -129,26 +129,23 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
 
 void FileTreeView::keyPressEvent(QKeyEvent* event)
 {
-    if (state() != EditingState)
+    if ((state() != EditingState) && (event->key() == Qt::Key_Space))
     {
-        if (event->key() == Qt::Key_Space)
+        // handle using the keyboard to toggle the
+        // wanted/unwanted state or the file priority
+
+        Qt::KeyboardModifiers const modifiers = event->modifiers();
+
+        if (modifiers == Qt::NoModifier)
         {
-            // handle using the keyboard to toggle the
-            // wanted/unwanted state or the file priority
+            model_->twiddleWanted(selectedSourceRows());
+            return;
+        }
 
-            Qt::KeyboardModifiers const modifiers = event->modifiers();
-
-            if (modifiers == Qt::NoModifier)
-            {
-                model_->twiddleWanted(selectedSourceRows());
-                return;
-            }
-
-            if (modifiers == Qt::ShiftModifier)
-            {
-                model_->twiddlePriority(selectedSourceRows());
-                return;
-            }
+        if (modifiers == Qt::ShiftModifier)
+        {
+            model_->twiddlePriority(selectedSourceRows());
+            return;
         }
     }
 

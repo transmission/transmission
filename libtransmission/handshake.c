@@ -172,24 +172,12 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    unsigned char const* peer_id = NULL;
-    uint8_t const* torrentHash;
-    tr_torrent* tor;
-    bool success;
+    uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
+    tr_torrent* const tor = torrent_hash == NULL ? NULL : tr_torrentFindFromHash(handshake->session, torrent_hash);
+    unsigned char const* const peer_id = tor == NULL ? NULL : tr_torrentGetPeerId(tor);
+    bool const success = peer_id != NULL;
 
-    if ((torrentHash = tr_cryptoGetTorrentHash(handshake->crypto)) != NULL)
-    {
-        if ((tor = tr_torrentFindFromHash(handshake->session, torrentHash)) != NULL)
-        {
-            peer_id = tr_torrentGetPeerId(tor);
-        }
-    }
-
-    if (peer_id == NULL)
-    {
-        success = false;
-    }
-    else
+    if (success)
     {
         uint8_t* walk = buf;
 
@@ -208,13 +196,12 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         }
 
         walk += HANDSHAKE_FLAGS_LEN;
-        memcpy(walk, torrentHash, SHA_DIGEST_LENGTH);
+        memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
         walk += SHA_DIGEST_LENGTH;
         memcpy(walk, peer_id, PEER_ID_LEN);
         walk += PEER_ID_LEN;
 
         TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
-        success = true;
     }
 
     return success;

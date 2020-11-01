@@ -25,7 +25,7 @@ public:
     };
 
 public:
-    PathButton(QWidget* parent = nullptr);
+    explicit PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);
     void setTitle(QString const& title);

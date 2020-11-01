@@ -357,22 +357,20 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         success = true;
     }
 
-    if (!success && tr_variantIsInt(v))
+    if ((!success) &&
+        tr_variantIsInt(v) &&
+        (v->val.i == 0 || v->val.i == 1))
     {
-        if (v->val.i == 0 || v->val.i == 1)
-        {
-            *setme = v->val.i != 0;
-            success = true;
-        }
+        *setme = v->val.i != 0;
+        success = true;
     }
 
-    if (!success && tr_variantGetStr(v, &str, NULL))
+    if ((!success) &&
+        tr_variantGetStr(v, &str, NULL) &&
+        (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
     {
-        if (strcmp(str, "true") == 0 || strcmp(str, "false") == 0)
-        {
-            *setme = strcmp(str, "true") == 0;
-            success = true;
-        }
+        *setme = strcmp(str, "true") == 0;
+        success = true;
     }
 
     return success;

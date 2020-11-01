@@ -583,12 +583,9 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
     /* Since we don't want to abuse our bootstrap nodes,
      * we don't ping them if the DHT is in a good state. */
 
-    if (bootstrap)
+    if (bootstrap && (tr_dhtStatus(ss, af, NULL) >= TR_DHT_FIREWALLED))
     {
-        if (tr_dhtStatus(ss, af, NULL) >= TR_DHT_FIREWALLED)
-        {
-            return false;
-        }
+        return false;
     }
 
     if (address->type == TR_AF_INET)

@@ -209,35 +209,35 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     updateWidgetValue(widget, pref_key);
     widgets_.insert(pref_key, widget);
 
-    auto* check_box = qobject_cast<QCheckBox*>(widget);
+    auto const* check_box = qobject_cast<QCheckBox*>(widget);
     if (check_box != nullptr)
     {
         connect(check_box, &QAbstractButton::toggled, this, &PrefsDialog::checkBoxToggled);
         return;
     }
 
-    auto* time_edit = qobject_cast<QTimeEdit*>(widget);
+    auto const* time_edit = qobject_cast<QTimeEdit*>(widget);
     if (time_edit != nullptr)
     {
         connect(time_edit, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::timeEditingFinished);
         return;
     }
 
-    auto* line_edit = qobject_cast<QLineEdit*>(widget);
+    auto const* line_edit = qobject_cast<QLineEdit*>(widget);
     if (line_edit != nullptr)
     {
         connect(line_edit, &QLineEdit::editingFinished, this, &PrefsDialog::lineEditingFinished);
         return;
     }
 
-    auto* path_button = qobject_cast<PathButton*>(widget);
+    auto const* path_button = qobject_cast<PathButton*>(widget);
     if (path_button != nullptr)
     {
         connect(path_button, &PathButton::pathChanged, this, &PrefsDialog::pathChanged);
         return;
     }
 
-    auto* spin_box = qobject_cast<QAbstractSpinBox*>(widget);
+    auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget);
     if (spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
@@ -762,14 +762,11 @@ void PrefsDialog::refreshPref(int key)
     {
         QWidget* w(it.value());
 
-        if (!updateWidgetValue(w, key))
+        if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
-            if (key == Prefs::ENCRYPTION)
-            {
-                auto* combo_box = qobject_cast<QComboBox*>(w);
-                int const index = combo_box->findData(prefs_.getInt(key));
-                combo_box->setCurrentIndex(index);
-            }
+            auto* combo_box = qobject_cast<QComboBox*>(w);
+            int const index = combo_box->findData(prefs_.getInt(key));
+            combo_box->setCurrentIndex(index);
         }
     }
 }

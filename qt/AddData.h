@@ -27,7 +27,7 @@ public:
 public:
     AddData() = default;
 
-    AddData(QString const& str)
+    explicit AddData(QString const& str)
     {
         set(str);
     }

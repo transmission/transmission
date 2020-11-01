@@ -343,7 +343,7 @@ void FilterBar::onActivityIndexChanged(int i)
 {
     if (!is_bootstrapping_)
     {
-        FilterMode const mode = activity_combo_->itemData(i, ACTIVITY_ROLE).toInt();
+        auto const mode = FilterMode(activity_combo_->itemData(i, ACTIVITY_ROLE).toInt());
         prefs_.set(Prefs::FILTER_MODE, mode);
     }
 }

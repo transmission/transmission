@@ -133,7 +133,7 @@ public:
     };
 
 public:
-    Prefs(QString config_dir);
+    explicit Prefs(QString config_dir);
     ~Prefs() override;
 
     bool isCore(int key) const

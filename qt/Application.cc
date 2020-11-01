@@ -185,9 +185,8 @@ Application::Application(int& argc, char** argv) :
 
         for (QString const& filename : filenames)
         {
+            auto const a = AddData(filename);
             QString metainfo;
-
-            AddData a(filename);
 
             switch (a.type)
             {
@@ -290,7 +289,7 @@ Application::Application(int& argc, char** argv) :
     connect(session_, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
     connect(session_, &Session::torrentsRemoved, model_, &TorrentModel::removeTorrents);
     connect(session_, &Session::torrentsUpdated, model_, &TorrentModel::updateTorrents);
-    connect(watch_dir_, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
+    connect(watch_dir_, &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addTorrent));
 
     // init from preferences
     for (auto const key : { Prefs::DIR_WATCH })
@@ -549,6 +548,11 @@ void Application::refreshTorrents()
 /***
 ****
 ***/
+
+void Application::addTorrent(QString const& addme)
+{
+    addTorrent(AddData(addme));
+}
 
 void Application::addTorrent(AddData const& addme)
 {
