@@ -410,7 +410,7 @@ void DetailsDialog::refreshUI()
     QString const none = tr("None");
     QString const mixed = tr("Mixed");
     QString const unknown = tr("Unknown");
-    auto const now = time_t(nullptr);
+    auto const now = time(nullptr);
 
     // build a list of torrents
     for (int const id : ids_)
