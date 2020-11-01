@@ -129,15 +129,14 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkT
              * which breaks this foreach () call. (See #3529)
              * As a workaround: if that's about to happen, temporarily disable
              * sorting until we finish walking the tree. */
-            if (!refresh_data->resort_needed)
+            if (!refresh_data->resort_needed &&
+                (((refresh_data->sort_column_id == FC_PRIORITY) && (priority != old_priority)) ||
+                ((refresh_data->sort_column_id == FC_ENABLED) && (enabled != old_enabled))))
             {
-                if ((refresh_data->resort_needed = (refresh_data->sort_column_id == FC_PRIORITY && priority != old_priority) ||
-                    (refresh_data->sort_column_id == FC_ENABLED && enabled != old_enabled)))
-                {
-                    refresh_data->resort_needed = TRUE;
-                    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->model),
-                        GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
-                }
+                refresh_data->resort_needed = TRUE;
+
+                gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->model),
+                    GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
             }
 
             gtk_tree_store_set(data->store, iter,
