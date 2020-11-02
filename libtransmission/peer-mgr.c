@@ -2567,17 +2567,17 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     }
 
     /* clamp the progress range */
-    if (peer->progress < 0.0f)
+    if (peer->progress < 0.0F)
     {
-        peer->progress = 0.0f;
+        peer->progress = 0.0F;
     }
 
-    if (peer->progress > 1.0f)
+    if (peer->progress > 1.0F)
     {
-        peer->progress = 1.0f;
+        peer->progress = 1.0F;
     }
 
-    if (peer->atom != NULL && peer->progress >= 1.0f)
+    if (peer->atom != NULL && peer->progress >= 1.0F)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }
