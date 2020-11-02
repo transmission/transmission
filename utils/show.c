@@ -11,7 +11,6 @@
 #include <stdlib.h> /* qsort() */
 #include <time.h>
 
-// #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
