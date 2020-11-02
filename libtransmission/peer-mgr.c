@@ -3718,10 +3718,11 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
         {
             tr_swarm* s = tor->swarm;
 
-            for (int i = 0, tn = tr_ptrArraySize(&s->peers); i < tn; ++i, ++n)
+            for (int i = 0, tn = tr_ptrArraySize(&s->peers); i < tn; ++i)
             {
                 peers[n] = tr_ptrArrayNth(&s->peers, i);
                 swarms[n] = s;
+                ++n;
             }
         }
 
