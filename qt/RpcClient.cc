@@ -9,7 +9,6 @@
 #include "RpcClient.h"
 
 #include <cstring>
-#include <iostream>
 
 #include <QApplication>
 #include <QAuthenticator>
@@ -158,14 +157,15 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 
     if (Verbose)
     {
-        std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
+        qInfo() << "sending" << "POST" << qPrintable(url_.path());
 
         for (QByteArray const& b : request_->rawHeaderList())
         {
-            std::cerr << b.constData() << ": " << request_->rawHeader(b).constData() << std::endl;
+            qInfo() << b.constData() << ": " << request_->rawHeader(b).constData();
         }
 
-        std::cerr << "Body:\n" << json_data.constData() << std::endl;
+        qInfo() << "Body:";
+        qInfo() << json_data.constData();
     }
 }
 
@@ -236,14 +236,15 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
     if (Verbose)
     {
-        std::cerr << "http response header: " << std::endl;
+        qInfo() << "http response header:";
 
         for (QByteArray const& b : reply->rawHeaderList())
         {
-            std::cerr << b.constData() << ": " << reply->rawHeader(b).constData() << std::endl;
+            qInfo() << b.constData() << ": " << reply->rawHeader(b).constData();
         }
 
-        std::cerr << "json:\n" << reply->peek(reply->bytesAvailable()).constData() << std::endl;
+        qInfo() << "json:";
+        qInfo() << reply->peek(reply->bytesAvailable()).constData();
     }
 
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&

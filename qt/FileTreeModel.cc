@@ -181,7 +181,7 @@ bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, i
 {
     if (role == Qt::EditRole)
     {
-        FileTreeItem* item = itemFromIndex(index);
+        FileTreeItem const* item = itemFromIndex(index);
 
         emit pathEdited(item->path(), newname.toString());
     }
@@ -270,7 +270,7 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parent_item = parent.isValid() ?
+    FileTreeItem const* parent_item = parent.isValid() ?
         itemFromIndex(parent) :
         root_item_;
 
@@ -602,7 +602,7 @@ bool FileTreeModel::openFile(QModelIndex const& index)
         return false;
     }
 
-    FileTreeItem* const item = itemFromIndex(index);
+    FileTreeItem const* const item = itemFromIndex(index);
 
     if (item->fileIndex() < 0 || !item->isComplete())
     {

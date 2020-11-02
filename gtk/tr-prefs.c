@@ -1114,11 +1114,9 @@ static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
-    // gdk_threads_enter();
     gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
     gtk_widget_set_sensitive(data->portButton, TRUE);
     gtk_widget_set_sensitive(data->portSpin, TRUE);
-    // gdk_threads_leave();
 }
 
 static void onPortTest(GtkButton* button, gpointer vdata)
