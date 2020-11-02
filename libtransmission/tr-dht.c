@@ -446,44 +446,58 @@ void tr_dhtUninit(tr_session* ss)
     }
     else
     {
-        tr_variant benc;
-        struct sockaddr_in sins[300];
-        struct sockaddr_in6 sins6[300];
-        char compact[300 * 6];
-        char compact6[300 * 18];
-        char* dat_file;
-        int num = 300;
-        int num6 = 300;
-        int n = dht_get_nodes(sins, &num, sins6, &num6);
+        enum
+        {
+            MAX_NODES = 300,
+            PORT_LEN = 2,
+            COMPACT_ADDR_LEN = 4,
+            COMPACT_LEN = (COMPACT_ADDR_LEN + PORT_LEN),
+            COMPACT6_ADDR_LEN = 16,
+            COMPACT6_LEN = (COMPACT6_ADDR_LEN + PORT_LEN),
+        };
 
+        struct sockaddr_in sins[MAX_NODES];
+        struct sockaddr_in6 sins6[MAX_NODES];
+        int num = MAX_NODES;
+        int num6 = MAX_NODES;
+        int n = dht_get_nodes(sins, &num, sins6, &num6);
         tr_logAddNamedInfo("DHT", "Saving %d (%d + %d) nodes", n, num, num6);
 
-        for (int i = 0, j = 0; i < num; ++i, j += 6)
+        char compact[MAX_NODES * COMPACT_LEN];
+        char* out = compact;
+        for (struct sockaddr_in const* in = sins; in < sins + num; ++in)
         {
-            memcpy(compact + j, &sins[i].sin_addr, 4);
-            memcpy(compact + j + 4, &sins[i].sin_port, 2);
+            memcpy(out, &in->sin_addr, COMPACT_ADDR_LEN);
+            out += COMPACT_ADDR_LEN;
+            memcpy(out, &in->sin_port, PORT_LEN);
+            out += PORT_LEN;
         }
 
-        for (int i = 0, j = 0; i < num6; ++i, j += 18)
+        char compact6[MAX_NODES * COMPACT6_LEN];
+        char* out6 = compact6;
+        for (struct sockaddr_in6 const* in = sins6; in < sins6 + num6; ++in)
         {
-            memcpy(compact6 + j, &sins6[i].sin6_addr, 16);
-            memcpy(compact6 + j + 16, &sins6[i].sin6_port, 2);
+            memcpy(out6, &in->sin6_addr, COMPACT6_ADDR_LEN);
+            out6 += COMPACT6_ADDR_LEN;
+            memcpy(out6, &in->sin6_port, PORT_LEN);
+            out6 += PORT_LEN;
         }
 
+        tr_variant benc;
         tr_variantInitDict(&benc, 3);
         tr_variantDictAddRaw(&benc, TR_KEY_id, myid, 20);
 
         if (num > 0)
         {
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes, compact, num * 6);
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes, compact, out - compact);
         }
 
         if (num6 > 0)
         {
-            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, num6 * 18);
+            tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        dat_file = tr_buildPath(ss->configDir, "dht.dat", NULL);
+        char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", NULL);
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
         tr_variantFree(&benc);
         tr_free(dat_file);
