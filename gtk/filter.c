@@ -243,7 +243,6 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         /* do something */
         if (remove_row)
         {
-            /* g_message ("removing row and incrementing i"); */
             gtk_tree_store_remove(store, &iter);
         }
         else if (insert_row)

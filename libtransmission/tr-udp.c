@@ -257,9 +257,9 @@ static void event_callback(evutil_socket_t s, short type, void* sv)
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:
-       - all DHT packets start with 'd';
+       - all DHT packets start with 'd'
        - all UDP tracker packets start with a 32-bit (!) "action", which
-         is between 0 and 3;
+         is between 0 and 3
        - the above cannot be ÂµTP packets, since these start with a 4-bit
          version number (1). */
     if (rc > 0)

@@ -159,8 +159,8 @@ static int lpd_unsolicitedMsgCounter;
 * @brief Checks for BT-SEARCH method and separates the parameter section
 * @param[in] s The request string
 * @param[out] ver If non-NULL, gets filled with protocol info from the request
-* @return Returns a relative pointer to the beginning of the parameter section;
-*         if result is NULL, s was invalid and no information will be returned
+* @return Returns a relative pointer to the beginning of the parameter section.
+*         If result is NULL, s was invalid and no information will be returned
 * @remark Note that the returned pointer is only usable as long as the given
 *         pointer s is valid; that is, return storage is temporary.
 *

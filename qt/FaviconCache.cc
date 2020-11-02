@@ -7,7 +7,6 @@
  */
 
 #include <array>
-#include <iostream>
 
 #include <QDir>
 #include <QNetworkAccessManager>

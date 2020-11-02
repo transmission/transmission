@@ -180,8 +180,6 @@ struct tr_peerMsgs
     bool clientSentLtepHandshake;
     bool peerSentLtepHandshake;
 
-    /*bool haveFastSet;*/
-
     int desiredRequestCount;
 
     int prefetchCount;
@@ -224,7 +222,6 @@ struct tr_peerMsgs
     tr_pex* pex;
     tr_pex* pex6;
 
-    /*time_t clientSentPexAt;*/
     time_t clientSentAnythingAt;
 
     time_t chokeChangedAt;
@@ -851,8 +848,6 @@ static bool requestIsValid(tr_peerMsgs const* msgs, struct peer_request const* r
 void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block)
 {
     struct peer_request req;
-    // fprintf(stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n",
-    //     (size_t)block, msgs->peer);
     blockToReq(msgs->torrent, block, &req);
     protocolSendCancel(msgs, &req);
 }
@@ -1330,7 +1325,6 @@ static void updatePeerProgress(tr_peerMsgs* msgs)
 {
     tr_peerUpdateProgress(msgs->torrent, &msgs->peer);
 
-    /* updateFastSet(msgs); */
     updateInterest(msgs);
 }
 
@@ -2546,8 +2540,6 @@ static void sendPex(tr_peerMsgs* msgs)
         tr_free(diffs6.added);
         tr_free(diffs6.dropped);
         tr_free(newPex6);
-
-        /* msgs->clientSentPexAt = tr_time(); */
     }
 }
 

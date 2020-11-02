@@ -41,7 +41,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         return;
     }
 
-    QStyle* style = QApplication::style();
+    QStyle const* style = QApplication::style();
 
     painter->save();
     QItemDelegate::drawBackground(painter, option, index);

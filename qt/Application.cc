@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
-#include <iostream>
 
 #include <QIcon>
 #include <QLibraryInfo>
@@ -19,6 +18,7 @@
 #include <QProcess>
 #include <QRect>
 #include <QSystemTrayIcon>
+#include <QtDebug>
 
 #ifdef QT_DBUS_LIB
 #include <QDBusConnection>
@@ -159,12 +159,12 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
+            qInfo() << qPrintable(display_name_) << LONG_VERSION_STRING;
             quitLater();
             return;
 
         case TR_OPT_ERR:
-            std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
+            qWarning() << qPrintable(QObject::tr("Invalid option"));
             tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
             quitLater();
             return;

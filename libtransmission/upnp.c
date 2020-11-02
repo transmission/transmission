@@ -118,7 +118,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
     *intClient = '\0';
     *intPort = '\0';
 
-    tr_snprintf(portStr, sizeof(portStr), "%d", (int)handle->port);
+    tr_snprintf(portStr, sizeof(portStr), "%d", handle->port);
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
     err = UPNP_GetSpecificPortMappingEntry(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto,

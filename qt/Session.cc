@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <iostream>
 #include <string_view>
 
 #include <QApplication>
@@ -25,6 +24,7 @@
 #include <QMessageBox>
 #include <QStyle>
 #include <QTextStream>
+#include <QtDebug>
 
 #include <libtransmission/session-id.h>
 #include <libtransmission/transmission.h>
@@ -284,7 +284,7 @@ void Session::updatePref(int key)
             break;
 
         default:
-            std::cerr << "unhandled pref: " << key << std::endl;
+            qWarning() << "unhandled pref:" << key;
         }
     }
 }

@@ -91,11 +91,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
         {
             break;
         }
-
-        // fprintf(stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
     }
-
-    // fprintf(stderr, "run is %d long from [%d to %d)\n", len, pos, pos + len);
 
     if (info != NULL)
     {
@@ -152,12 +148,8 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
         rank |= runs[i].is_multi_piece ? MULTIFLAG : 0;
 
         runs[i].rank = rank;
-
-        // fprintf(stderr, "block run at pos %d of length %d and age %ld adjusted +%d\n", runs[i].pos, runs[i].len,
-        //     now - runs[i].last_block_time, rank - runs[i].len);
     }
 
-    // fprintf(stderr, "%d block runs\n", i);
     qsort(runs, i, sizeof(struct run_info), compareRuns);
     return i;
 }

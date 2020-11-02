@@ -722,7 +722,6 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     }
 
     tr_timerAdd(session->nowTimer, 0, usec);
-    /* fprintf (stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
 }
 
 static void loadBlocklists(tr_session* session);

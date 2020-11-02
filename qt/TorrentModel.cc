@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <utility>
 
 #include <libtransmission/transmission.h>
@@ -452,7 +451,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
         for (auto const& tor : torrents)
         {
             auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
-            int const row = std::distance(torrents_.begin(), it);
+            auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex(), row, row);
             torrents_.insert(it, tor);

@@ -23,7 +23,6 @@ public:
     {
     }
 
-public:
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
     void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
