@@ -438,7 +438,6 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
-            /* fprintf(stderr, "single announce: [%s]\n", url); */
         }
     }
 

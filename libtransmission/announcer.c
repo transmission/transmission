@@ -619,13 +619,6 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
 
-    /*
-    for (int i = 0; i < input_count; ++i)
-    {
-        fprintf(stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce);
-    }
-    */
-
     /* build a list of valid trackers */
     for (int i = 0; i < input_count; ++i)
     {
@@ -703,13 +696,6 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     }
 
     tr_free(tmp);
-
-    /*
-    for (int i = 0; i < n; ++i)
-    {
-        fprintf (stderr, "OUT: [%d][%s]\n", ret[i].tier, ret[i].announce);
-    }
-    */
 
     return ret;
 }

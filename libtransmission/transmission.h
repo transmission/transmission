@@ -8,8 +8,8 @@
 
 /*
  * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h;
- * most of the remaining headers in libtransmission are private.
+ * The other public API headers are variant.h and utils.h.
+ * Most of the remaining headers in libtransmission are private.
  */
 
 #pragma once
@@ -958,8 +958,8 @@ void tr_metainfoFree(tr_info* inf);
  * Returns a pointer to the torrent on success, or NULL on failure.
  *
  * @param ctor               the builder struct
- * @param setme_error        TR_PARSE_ERR if the parsing failed;
- *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ * @param setme_error        TR_PARSE_ERR if the parsing failed.
+ *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate.
  *                           TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  * @param setme_duplicate_id when setmeError is TR_PARSE_DUPLICATE,
  *                           this field is set to the duplicate torrent's id.

@@ -747,9 +747,6 @@ static void requestListAdd(tr_swarm* s, tr_block_index_t block, tr_peer* peer)
         ++peer->pendingReqsToPeer;
         TR_ASSERT(peer->pendingReqsToPeer >= 0);
     }
-
-    // fprintf(stderr, "added request of block %lu from peer %s... there are now %d block\n", (unsigned long)block,
-    //     tr_atomAddrStr(peer->atom), s->requestCount);
 }
 
 static struct block_request* requestListLookup(tr_swarm* s, tr_block_index_t block, tr_peer const* peer)
@@ -810,9 +807,6 @@ static void requestListRemove(tr_swarm* s, tr_block_index_t block, tr_peer const
 
         tr_removeElementFromArray(s->requests, pos, sizeof(struct block_request), s->requestCount);
         --s->requestCount;
-
-        // fprintf(stderr, "removing request of block %lu from peer %s... there are now %d block requests left\n", (unsigned long)block,
-        //     tr_atomAddrStr(peer->atom), t->requestCount);
     }
 }
 
@@ -1989,7 +1983,7 @@ static int getMaxPeerCount(tr_torrent const* tor)
 
 static int getPeerCount(tr_swarm const* s)
 {
-    return tr_ptrArraySize(&s->peers); /* + tr_ptrArraySize(&t->outgoingHandshakes); */
+    return tr_ptrArraySize(&s->peers);
 }
 
 static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct peer_atom* atom, tr_quark client)
@@ -3412,12 +3406,6 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
         int const hi = MAX_UPLOAD_IDLE_SECS;
         int const limit = hi - (hi - lo) * strictness;
         int const idleTime = now - MAX(atom->time, atom->piece_data_time);
-
-        /*
-        fprintf(stderr, "strictness is %.3f, limit is %d seconds... time since connect is %d, time since piece is %d ... "
-            "idleTime is %d, doPurge is %d\n", (double)strictness, limit, (int)(now - atom->time),
-            (int)(now - atom->piece_data_time), idleTime, idleTime > limit);
-        */
 
         if (idleTime > limit)
         {

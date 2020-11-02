@@ -467,7 +467,6 @@ static void tr_webThreadFunc(void* vsession)
 
             dbgmsg("adding task to curl: [%s]", task->url);
             curl_multi_add_handle(multi, createEasy(session, web, task));
-            // fprintf(stderr, "adding a task.. taskCount is now %d\n", taskCount);
             ++taskCount;
         }
 
