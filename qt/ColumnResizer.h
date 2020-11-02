@@ -30,7 +30,7 @@ public:
     bool eventFilter(QObject* object, QEvent* event) override;
 
 public slots:
-    void update();
+    void update() const;
 
 private:
     void scheduleUpdate();

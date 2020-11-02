@@ -24,7 +24,6 @@ public:
         METAINFO
     };
 
-public:
     AddData() = default;
 
     explicit AddData(QString const& str)

@@ -167,7 +167,7 @@ QVariant FileTreeItem::data(int column, int role) const
         {
             if (file_index_ < 0)
             {
-                value = qApp->style()->standardIcon(QStyle::SP_DirOpenIcon);
+                value = QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon);
             }
             else
             {

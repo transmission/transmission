@@ -185,7 +185,7 @@ Prefs::Prefs(QString config_dir) :
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant* b(tr_variantDictFind(&top, Items[i].key));
+        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
 
         switch (Items[i].type)
         {

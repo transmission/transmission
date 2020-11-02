@@ -14,7 +14,7 @@
 namespace
 {
 
-int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
+int itemColumnSpan(QGridLayout const* layout, QLayoutItem const* item)
 {
     for (int i = 0, count = layout->count(); i < count; ++i)
     {
@@ -59,15 +59,15 @@ bool ColumnResizer::eventFilter(QObject* object, QEvent* event)
     return QObject::eventFilter(object, event);
 }
 
-void ColumnResizer::update()
+void ColumnResizer::update() const
 {
     int max_width = 0;
 
-    for (QGridLayout* const layout : layouts_)
+    for (QGridLayout const* const layout : layouts_)
     {
         for (int i = 0, count = layout->rowCount(); i < count; ++i)
         {
-            QLayoutItem* item = layout->itemAtPosition(i, 0);
+            QLayoutItem const* const item = layout->itemAtPosition(i, 0);
 
             if (item == nullptr || itemColumnSpan(layout, item) > 1)
             {

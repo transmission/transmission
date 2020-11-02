@@ -72,7 +72,7 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 
     RpcResponseFuture const old_future = future_watcher_.future();
 
-    while (true)
+    for (;;)
     {
         auto next = queue_.dequeue();
         next_error_handler_ = next.second;

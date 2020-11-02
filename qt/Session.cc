@@ -139,7 +139,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
                 auto const link = dictFind<QString>(child, TR_KEY_magnetLink);
                 if (link)
                 {
-                    qApp->clipboard()->setText(*link);
+                    QApplication::clipboard()->setText(*link);
                 }
             }
         });
@@ -518,8 +518,8 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
             auto* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
                 tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)").
                     arg(path).arg(name).arg(r.result), QMessageBox::Close,
-                qApp->activeWindow());
-            d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+                QApplication::activeWindow());
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
@@ -1042,7 +1042,6 @@ void Session::updateInfo(tr_variant* d)
         session_id_.clear();
     }
 
-    // std::cerr << "Session::updateInfo end" << std::endl;
     connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
 
     emit sessionUpdated();
@@ -1095,8 +1094,8 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         {
             auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
-                qApp->activeWindow());
-            d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+                QApplication::activeWindow());
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
@@ -1162,13 +1161,13 @@ void Session::onDuplicatesTimer()
         auto const use_detail = lines.size() > 1;
         auto const text = use_detail ? detail_text : detail;
 
-        auto* d = new QMessageBox(QMessageBox::Warning, title, text, QMessageBox::Close, qApp->activeWindow());
+        auto* d = new QMessageBox(QMessageBox::Warning, title, text, QMessageBox::Close, QApplication::activeWindow());
         if (use_detail)
         {
             d->setDetailedText(detail);
         }
 
-        d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+        QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
         d->show();
     }
 }

@@ -132,7 +132,6 @@ public:
         PREFS_COUNT
     };
 
-public:
     explicit Prefs(QString config_dir);
     ~Prefs() override;
 
@@ -206,7 +205,7 @@ private:
     QString const config_dir_;
 
     QSet<int> temporary_prefs_;
-    QVariant mutable values_[PREFS_COUNT];
+    std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;
 };

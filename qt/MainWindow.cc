@@ -46,9 +46,14 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
-#define PREF_VARIANTS_KEY "pref-variants-list"
-#define STATS_MODE_KEY "stats-mode"
-#define SORT_MODE_KEY "sort-mode"
+namespace
+{
+
+char const* const PrefVariantsKey = "submenu";
+char const* const StatsModeKey = "stats-mode";
+char const* const SortModeKey = "sort-mode";
+
+}
 
 /**
  * This is a proxy-style for that forces it to be always disabled.
@@ -137,11 +142,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
     network_timer_(this),
-    total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
-    total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
-    session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
-    session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
-    show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
     refresh_timer_(this)
 {
     setAcceptDrops(true);
@@ -264,7 +264,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     for (auto const& mode : sort_modes)
     {
-        mode.first->setProperty(SORT_MODE_KEY, mode.second);
+        mode.first->setProperty(SortModeKey, mode.second);
         action_group->addAction(mode.first);
     }
 
@@ -290,7 +290,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addSeparator();
     menu->addAction(ui_.action_Quit);
     tray_icon_.setContextMenu(menu);
-    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), qApp->windowIcon()));
+    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), QApplication::windowIcon()));
 
     connect(&prefs_, &Prefs::changed, this, &MainWindow::refreshPref);
     connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
@@ -368,7 +368,7 @@ void MainWindow::onSessionSourceChanged()
 
 void MainWindow::onSetPrefs()
 {
-    QVariantList const p = sender()->property(PREF_VARIANTS_KEY).toList();
+    QVariantList const p = sender()->property(PrefVariantsKey).toList();
     assert(p.size() % 2 == 0);
 
     for (int i = 0, n = p.size(); i < n; i += 2)
@@ -411,14 +411,14 @@ QMenu* MainWindow::createOptionsMenu()
 
             off_action = menu->addAction(tr("Unlimited"));
             off_action->setCheckable(true);
-            off_action->setProperty(PREF_VARIANTS_KEY, QVariantList{ enabled_pref, false });
+            off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
             action_group->addAction(off_action);
             connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
             on_action =
                 menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
             on_action->setCheckable(true);
-            on_action->setProperty(PREF_VARIANTS_KEY, QVariantList{ pref, current_value, enabled_pref, true });
+            on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
             action_group->addAction(on_action);
             connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
@@ -427,7 +427,7 @@ QMenu* MainWindow::createOptionsMenu()
             for (int const i : stock_speeds)
             {
                 QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
-                action->setProperty(PREF_VARIANTS_KEY, QVariantList{ pref, i, enabled_pref, true });
+                action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
                 connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
             }
         };
@@ -442,13 +442,13 @@ QMenu* MainWindow::createOptionsMenu()
 
             off_action = menu->addAction(tr("Seed Forever"));
             off_action->setCheckable(true);
-            off_action->setProperty(PREF_VARIANTS_KEY, QVariantList{ enabled_pref, false });
+            off_action->setProperty(PrefVariantsKey, QVariantList{ enabled_pref, false });
             action_group->addAction(off_action);
             connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
             on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(current_value)));
             on_action->setCheckable(true);
-            on_action->setProperty(PREF_VARIANTS_KEY, QVariantList{ pref, current_value, enabled_pref, true });
+            on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
             action_group->addAction(on_action);
             connect(on_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
@@ -457,7 +457,7 @@ QMenu* MainWindow::createOptionsMenu()
             for (double const i : stock_ratios)
             {
                 QAction* action = menu->addAction(Formatter::get().ratioToString(i));
-                action->setProperty(PREF_VARIANTS_KEY, QVariantList{ pref, i, enabled_pref, true });
+                action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
                 connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
             }
         };
@@ -492,7 +492,7 @@ QMenu* MainWindow::createStatsModeMenu()
 
     for (auto const& mode : stats_modes)
     {
-        mode.first->setProperty(STATS_MODE_KEY, QString(mode.second));
+        mode.first->setProperty(StatsModeKey, QString(mode.second));
         action_group->addAction(mode.first);
         menu->addAction(mode.first);
     }
@@ -509,7 +509,7 @@ QMenu* MainWindow::createStatsModeMenu()
 
 void MainWindow::onSortModeChanged(QAction* action)
 {
-    prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SORT_MODE_KEY).toInt()));
+    prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SortModeKey).toInt()));
 }
 
 void MainWindow::setSortAscendingPref(bool b)
@@ -1026,7 +1026,7 @@ void MainWindow::reannounceSelected()
 
 void MainWindow::onStatsModeChanged(QAction* action)
 {
-    prefs_.set(Prefs::STATUSBAR_STATS, action->property(STATS_MODE_KEY).toString());
+    prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).toString());
 }
 
 /**
@@ -1084,7 +1084,7 @@ void MainWindow::toggleWindows(bool do_show)
 
         // activateWindow ();
         raise();
-        qApp->setActiveWindow(this);
+        QApplication::setActiveWindow(this);
     }
 }
 
@@ -1119,7 +1119,7 @@ void MainWindow::refreshPref(int key)
 
         for (QAction* action : action_group->actions())
         {
-            action->setChecked(str == action->property(STATS_MODE_KEY).toString());
+            action->setChecked(str == action->property(StatsModeKey).toString());
         }
 
         refreshSoon(REFRESH_STATUS_BAR);
@@ -1136,7 +1136,7 @@ void MainWindow::refreshPref(int key)
 
         for (QAction* action : action_group->actions())
         {
-            action->setChecked(i == action->property(SORT_MODE_KEY).toInt());
+            action->setChecked(i == action->property(SortModeKey).toInt());
         }
 
         break;
@@ -1189,7 +1189,7 @@ void MainWindow::refreshPref(int key)
         b = prefs_.getBool(key);
         ui_.action_TrayIcon->setChecked(b);
         tray_icon_.setVisible(b);
-        qApp->setQuitOnLastWindowClosed(!b);
+        QApplication::setQuitOnLastWindowClosed(!b);
         refreshSoon(REFRESH_TRAY_ICON);
         break;
 
@@ -1283,11 +1283,11 @@ void MainWindow::openTorrent()
 
 void MainWindow::openURL()
 {
-    QString str = qApp->clipboard()->text(QClipboard::Selection);
+    QString str = QApplication::clipboard()->text(QClipboard::Selection);
 
     if (!AddData::isSupported(str))
     {
-        str = qApp->clipboard()->text(QClipboard::Clipboard);
+        str = QApplication::clipboard()->text(QClipboard::Clipboard);
     }
 
     if (!AddData::isSupported(str))
@@ -1326,12 +1326,12 @@ void MainWindow::addTorrent(AddData const& addMe, bool show_options)
     {
         auto* o = new OptionsDialog(session_, prefs_, addMe, this);
         o->show();
-        qApp->alert(o);
+        QApplication::alert(o);
     }
     else
     {
         session_.addTorrent(addMe);
-        qApp->alert(this);
+        QApplication::alert(this);
     }
 }
 

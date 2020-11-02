@@ -382,7 +382,7 @@ void Application::loadTranslations()
     }
 }
 
-void Application::quitLater()
+void Application::quitLater() const
 {
     QTimer::singleShot(0, this, SLOT(quit()));
 }
@@ -405,21 +405,21 @@ QStringList Application::getNames(torrent_ids_t const& ids) const
     return names;
 }
 
-void Application::onTorrentsAdded(torrent_ids_t const& ids)
+void Application::onTorrentsAdded(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        auto const title = tr("Torrent(s) Added", nullptr, ids.size());
+        auto const title = tr("Torrent(s) Added", nullptr, static_cast<int>(ids.size()));
         auto const body = getNames(ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 }
 
-void Application::onTorrentsCompleted(torrent_ids_t const& ids)
+void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        auto const title = tr("Torrent Completed", nullptr, ids.size());
+        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(ids.size()));
         auto const body = getNames(ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
@@ -490,12 +490,9 @@ void Application::refreshPref(int key)
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        {
-            QString const path(prefs_->getString(Prefs::DIR_WATCH));
-            bool const is_enabled(prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
-            watch_dir_->setPath(path, is_enabled);
-            break;
-        }
+        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH),
+            prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        break;
 
     default:
         break;
@@ -643,5 +640,5 @@ int tr_main(int argc, char** argv)
     Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     Application app(argc, argv);
-    return app.exec();
+    return QApplication::exec();
 }

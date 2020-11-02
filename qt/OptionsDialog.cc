@@ -32,7 +32,6 @@ using ::trqt::variant_helpers::listAdd;
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
     BaseDialog(parent),
     add_(std::move(addme)),
-    verify_hash_(QCryptographicHash::Sha1),
     verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
     session_(session),
     is_local_(session_.isLocal())

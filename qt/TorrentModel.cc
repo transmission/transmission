@@ -31,17 +31,17 @@ namespace
 
 struct TorrentIdLessThan
 {
-    bool operator ()(Torrent* left, Torrent* right) const
+    bool operator ()(Torrent const* left, Torrent const* right) const
     {
         return left->id() < right->id();
     }
 
-    bool operator ()(int left_id, Torrent* right) const
+    bool operator ()(int left_id, Torrent const* right) const
     {
         return left_id < right->id();
     }
 
-    bool operator ()(Torrent* left, int right_id) const
+    bool operator ()(Torrent const* left, int right_id) const
     {
         return left->id() < right_id;
     }
@@ -112,7 +112,6 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             break;
 
         default:
-            // std::cerr << "Unhandled role: " << role << std::endl;
             break;
         }
     }
@@ -163,7 +162,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     auto changed_fields = Torrent::fields_t{};
 
     auto const now = time(nullptr);
-    auto const recently_added = [now](auto const& tor)
+    auto const recently_added = [&now](auto const& tor)
         {
             static auto constexpr MaxAge = 60;
             auto const date = tor->dateAdded();
@@ -453,7 +452,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
         for (auto const& tor : torrents)
         {
             auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
-            auto const row = std::distance(torrents_.begin(), it);
+            int const row = std::distance(torrents_.begin(), it);
 
             beginInsertRows(QModelIndex(), row, row);
             torrents_.insert(it, tor);

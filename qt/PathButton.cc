@@ -19,8 +19,7 @@
 #include "Utils.h"
 
 PathButton::PathButton(QWidget* parent) :
-    QToolButton(parent),
-    mode_(DirectoryMode)
+    QToolButton(parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -84,7 +83,8 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    QSize const fake_content_size(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
+    auto const& strut = QApplication::globalStrut();
+    QSize const fake_content_size(qMax(100, strut.width()), qMax(100, strut.height()));
     QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
     int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;

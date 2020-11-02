@@ -71,7 +71,7 @@ enum // peer columns
     N_COLUMNS
 };
 
-int measureViewItem(QTreeWidget* view, int column, QString const& text)
+int measureViewItem(QTreeWidget const* view, int column, QString const& text)
 {
     QTreeWidgetItem const* header_item = view->headerItem();
 
@@ -79,6 +79,41 @@ int measureViewItem(QTreeWidget* view, int column, QString const& text)
     int const header_width = Utils::measureHeaderItem(view->header(), header_item->text(column));
 
     return std::max(item_width, header_width);
+}
+
+QString collateAddress(QString const& address)
+{
+    QString collated;
+
+    QHostAddress ip_address;
+    if (ip_address.setAddress(address))
+    {
+        if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            quint32 const ipv4_address = ip_address.toIPv4Address();
+            collated = QStringLiteral("1-") +
+                QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
+        }
+        else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
+            QByteArray tmp(16, '\0');
+
+            for (int i = 0; i < 16; ++i)
+            {
+                tmp[i] = ipv6_address[i];
+            }
+
+            collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
+        }
+    }
+
+    if (collated.isEmpty())
+    {
+        collated = QStringLiteral("3-") + address.toLower();
+    }
+
+    return collated;
 }
 
 } // namespace
@@ -117,7 +152,7 @@ public:
     bool operator <(QTreeWidgetItem const& other) const override
     {
         auto const* i = dynamic_cast<PeerItem const*>(&other);
-        QTreeWidget* tw(treeWidget());
+        auto const* tw = treeWidget();
         int const column = tw != nullptr ? tw->sortColumn() : 0;
 
         assert(i != nullptr);
@@ -152,34 +187,7 @@ private:
     {
         if (collated_address_.isEmpty())
         {
-            QHostAddress ip_address;
-
-            if (ip_address.setAddress(peer_.address))
-            {
-                if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
-                {
-                    quint32 const ipv4_address = ip_address.toIPv4Address();
-                    collated_address_ = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).
-                        rightJustified(8, '0'));
-                }
-                else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
-                {
-                    Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
-                    QByteArray tmp(16, '\0');
-
-                    for (int i = 0; i < 16; ++i)
-                    {
-                        tmp[i] = ipv6_address[i];
-                    }
-
-                    collated_address_ = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
-                }
-            }
-
-            if (collated_address_.isEmpty())
-            {
-                collated_address_ = QStringLiteral("3-") + peer_.address.toLower();
-            }
+            collated_address_ = collateAddress(peer_.address);
         }
 
         return collated_address_;
@@ -190,7 +198,7 @@ private:
 ****
 ***/
 
-QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback)
+QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback) const
 {
     QIcon icon = QIcon::fromTheme(freedesktop_name);
 
@@ -206,9 +214,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     BaseDialog(parent),
     session_(session),
     prefs_(prefs),
-    model_(model),
-    icon_encrypted_(QStringLiteral(":/icons/encrypted.png")),
-    icon_unencrypted_()
+    model_(model)
 {
     ui_.setupUi(this);
 
@@ -396,8 +402,7 @@ void setIfIdle(QSpinBox* spin, int value)
 
 void DetailsDialog::refreshUI()
 {
-    int const n = ids_.size();
-    bool const single = n == 1;
+    bool const single = ids_.size() == 1;
     QString const blank;
     QFontMetrics const fm(fontMetrics());
     QList<Torrent const*> torrents;
@@ -405,6 +410,7 @@ void DetailsDialog::refreshUI()
     QString const none = tr("None");
     QString const mixed = tr("Mixed");
     QString const unknown = tr("Unknown");
+    auto const now = time(nullptr);
 
     // build a list of torrents
     for (int const id : ids_)
@@ -644,7 +650,6 @@ void DetailsDialog::refreshUI()
         }
         else
         {
-            auto const now = time(nullptr);
             auto const seconds = int(std::difftime(now, baseline));
             string = Formatter::get().timeToString(seconds);
         }
@@ -706,7 +711,6 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        auto const now = time(nullptr);
         auto const seconds = int(std::difftime(now, latest));
 
         if (seconds < 0)
@@ -1141,6 +1145,9 @@ void DetailsDialog::refreshUI()
 
                 case 'T':
                     txt = tr("Peer is connected over uTP");
+                    break;
+
+                default:
                     break;
                 }
 

@@ -51,7 +51,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
-    delegate->setSeparator(model, model->index(1, 0));
+    FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("system-run")), tr("Active"));
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
@@ -196,7 +196,7 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
-    delegate->setSeparator(model, model->index(1, 0));
+    FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
     c->setModel(model);
     return c;
