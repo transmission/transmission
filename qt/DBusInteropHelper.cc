@@ -6,13 +6,12 @@
  *
  */
 
-#include <iostream>
-
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusReply>
 #include <QString>
 #include <QVariant>
+#include <QtDebug>
 
 #include "DBusInteropHelper.h"
 #include "InteropObject.h"
@@ -47,12 +46,12 @@ void DBusInteropHelper::registerObject(QObject* parent)
     auto const service_name = QStringLiteral("com.transmissionbt.Transmission");
     if (!bus.registerService(service_name))
     {
-        std::cerr << "couldn't register " << qPrintable(service_name) << std::endl;
+        qWarning() << "couldn't register" << qPrintable(service_name);
     }
 
     auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
     if (!bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
-        std::cerr << "couldn't register " << qPrintable(object_path) << std::endl;
+        qWarning() << "couldn't register" << qPrintable(object_path);
     }
 }

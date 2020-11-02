@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <utility>
 
 #include <libtransmission/transmission.h>

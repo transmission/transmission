@@ -6,8 +6,6 @@
  *
  */
 
-#include <iostream>
-
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QTimer>
