@@ -377,7 +377,8 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
 
         trackers = tr_new0(tr_tracker_info, n);
 
-        for (int i = 0, validTiers = 0; i < numTiers; i++)
+        int validTiers = 0;
+        for (int i = 0; i < numTiers; ++i)
         {
             tr_variant* tier = tr_variantListChild(tiers, i);
             int const tierSize = tr_variantListSize(tier);
