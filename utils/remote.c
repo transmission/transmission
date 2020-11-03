@@ -3016,7 +3016,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
         char const* const first_colon = strchr(s, ':');
         char const* const last_colon = strrchr(s, ':');
 
-        if (last_colon != NULL && ((*s == '[' && *(last_colon - 1) == ']') || first_colon == last_colon))
+        if (last_colon != NULL && ((*s == '[' && (last_colon > s) && *(last_colon - 1) == ']') || first_colon == last_colon))
         {
             /* user passed in both host and port */
             *host = tr_strndup(s, last_colon - s);
