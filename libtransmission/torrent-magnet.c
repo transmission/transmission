@@ -206,7 +206,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     return ret;
 }
 
-int getPieceNeededIndex(struct tr_incomplete_metadata const* m, int piece)
+static int getPieceNeededIndex(struct tr_incomplete_metadata const* m, int piece)
 {
     for (int i = 0; i < m->piecesNeededCount; ++i)
     {
@@ -219,7 +219,7 @@ int getPieceNeededIndex(struct tr_incomplete_metadata const* m, int piece)
     return -1;
 }
 
-int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
+static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
 {
     return piece + 1 == m->pieceCount ? // last piece
         m->metadata_size - (piece * METADATA_PIECE_SIZE) :
