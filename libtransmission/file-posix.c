@@ -329,7 +329,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     TR_ASSERT(path != NULL);
 
     char* ret = NULL;
-    char* tmp = NULL;
 
 #if defined(HAVE_CANONICALIZE_FILE_NAME)
 
@@ -337,21 +336,9 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 #endif
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L
-
-    /* Better safe than sorry: realpath() officially supports NULL as destination
-       starting off POSIX.1-2008. */
-
     if (ret == NULL)
     {
-        ret = realpath(path, NULL);
-    }
-
-#endif
-
-    if (ret == NULL)
-    {
-        tmp = tr_new(char, PATH_MAX);
+        char tmp[PATH_MAX];
         ret = realpath(path, tmp);
 
         if (ret != NULL)
@@ -364,8 +351,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     {
         set_system_error(error, errno);
     }
-
-    tr_free(tmp);
 
     return ret;
 }
