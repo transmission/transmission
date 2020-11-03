@@ -463,37 +463,37 @@ void tr_dhtUninit(tr_session* ss)
         int n = dht_get_nodes(sins, &num, sins6, &num6);
         tr_logAddNamedInfo("DHT", "Saving %d (%d + %d) nodes", n, num, num6);
 
-        char compact[MAX_NODES * COMPACT_LEN];
-        char* out = compact;
-        for (struct sockaddr_in const* in = sins; in < sins + num; ++in)
-        {
-            memcpy(out, &in->sin_addr, COMPACT_ADDR_LEN);
-            out += COMPACT_ADDR_LEN;
-            memcpy(out, &in->sin_port, PORT_LEN);
-            out += PORT_LEN;
-        }
-
-        char compact6[MAX_NODES * COMPACT6_LEN];
-        char* out6 = compact6;
-        for (struct sockaddr_in6 const* in = sins6; in < sins6 + num6; ++in)
-        {
-            memcpy(out6, &in->sin6_addr, COMPACT6_ADDR_LEN);
-            out6 += COMPACT6_ADDR_LEN;
-            memcpy(out6, &in->sin6_port, PORT_LEN);
-            out6 += PORT_LEN;
-        }
-
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
         tr_variantDictAddRaw(&benc, TR_KEY_id, myid, 20);
 
         if (num > 0)
         {
+            char compact[MAX_NODES * COMPACT_LEN];
+            char* out = compact;
+            for (struct sockaddr_in const* in = sins; in < sins + num; ++in)
+            {
+                memcpy(out, &in->sin_addr, COMPACT_ADDR_LEN);
+                out += COMPACT_ADDR_LEN;
+                memcpy(out, &in->sin_port, PORT_LEN);
+                out += PORT_LEN;
+            }
+
             tr_variantDictAddRaw(&benc, TR_KEY_nodes, compact, out - compact);
         }
 
         if (num6 > 0)
         {
+            char compact6[MAX_NODES * COMPACT6_LEN];
+            char* out6 = compact6;
+            for (struct sockaddr_in6 const* in = sins6; in < sins6 + num6; ++in)
+            {
+                memcpy(out6, &in->sin6_addr, COMPACT6_ADDR_LEN);
+                out6 += COMPACT6_ADDR_LEN;
+                memcpy(out6, &in->sin6_port, PORT_LEN);
+                out6 += PORT_LEN;
+            }
+
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
