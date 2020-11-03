@@ -24,7 +24,7 @@
         <translation>Auteursrecht (c) het Transmission-project</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+4"/>
+        <location filename="../AboutDialog.cc" line="+2"/>
         <source>C&amp;redits</source>
         <translation>M&amp;et dank aan</translation>
     </message>
@@ -42,7 +42,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+333"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission is een programma om bestanden te delen.&lt;/b&gt;</translation>
     </message>
@@ -76,7 +76,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+405"/>
+        <location filename="../DetailsDialog.cc" line="+410"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
@@ -92,7 +92,7 @@
         <translation>Onbekend</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location line="-216"/>
         <source>Finished</source>
         <translation>Klaar</translation>
     </message>
@@ -102,7 +102,7 @@
         <translation>Gepauzeerd</translation>
     </message>
     <message>
-        <location line="+252"/>
+        <location line="+250"/>
         <source>Active now</source>
         <translation>Nu actief</translation>
     </message>
@@ -209,7 +209,7 @@
         <translation>Peer is een inkomende verbinding</translation>
     </message>
     <message numerus="yes">
-        <location line="+131"/>
+        <location line="+134"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -230,7 +230,7 @@
         <translation>Tracker bestaat al.</translation>
     </message>
     <message>
-        <location line="-806"/>
+        <location line="-807"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -258,7 +258,7 @@
         <translation>%1 (verhouding: %2)</translation>
     </message>
     <message>
-        <location line="+275"/>
+        <location line="+273"/>
         <source>N/A</source>
         <translation>n.v.t.</translation>
     </message>
@@ -268,7 +268,7 @@
         <translation>Peer is via uTP verbonden</translation>
     </message>
     <message>
-        <location line="+160"/>
+        <location line="+163"/>
         <source>Add URL </source>
         <translation>URL toevoegen</translation>
     </message>
@@ -558,29 +558,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+294"/>
-        <location filename="../FileTreeView.cc" line="+109"/>
-        <location line="+288"/>
+        <location filename="../FileTreeItem.cc" line="+292"/>
+        <location filename="../FileTreeView.cc" line="+111"/>
+        <location line="+285"/>
         <source>Low</source>
         <translation>Laag</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-288"/>
-        <location line="+286"/>
+        <location filename="../FileTreeView.cc" line="-285"/>
+        <location line="+283"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-286"/>
-        <location line="+287"/>
+        <location filename="../FileTreeView.cc" line="-283"/>
+        <location line="+284"/>
         <source>Normal</source>
         <translation>Normaal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-286"/>
+        <location filename="../FileTreeView.cc" line="-283"/>
         <source>Mixed</source>
         <translation>Gemengd</translation>
     </message>
@@ -616,7 +616,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+278"/>
+        <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
         <translation>Geselecteerde aanvinken</translation>
     </message>
@@ -690,7 +690,7 @@
         <translation>Fout</translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+139"/>
         <source>Show:</source>
         <translation>Tonen:</translation>
     </message>
@@ -1558,7 +1558,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+64"/>
+        <location filename="../OptionsDialog.cc" line="+62"/>
         <source>Open Torrent</source>
         <translation>Open torrent</translation>
     </message>
@@ -1608,7 +1608,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>S&amp;tart op het moment van toevoegen</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="-70"/>
+        <location filename="../OptionsDialog.cc" line="-69"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Verifieer lokale gegevens</translation>
     </message>
@@ -1618,7 +1618,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&amp;Verplaats .torrent naar prullenbak</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+29"/>
+        <location filename="../OptionsDialog.cc" line="+28"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrentbestanden (*.torrent);;Alle bestanden (*.*)</translation>
     </message>
@@ -1631,8 +1631,8 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>PathButton</name>
     <message>
-        <location filename="../PathButton.cc" line="+27"/>
-        <location line="+71"/>
+        <location filename="../PathButton.cc" line="+26"/>
+        <location line="+72"/>
         <source>(None)</source>
         <translation>(geen)</translation>
     </message>
@@ -1695,7 +1695,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&amp;Op dagen:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+336"/>
+        <location filename="../PrefsDialog.cc" line="+349"/>
         <source>Every Day</source>
         <translation>Elke dag</translation>
     </message>
@@ -1710,7 +1710,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Weekenden</translation>
     </message>
     <message>
-        <location line="-184"/>
+        <location line="-197"/>
         <source>Sunday</source>
         <translation>Zondag</translation>
     </message>
@@ -1745,7 +1745,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Zaterdag</translation>
     </message>
     <message>
-        <location line="+245"/>
+        <location line="+258"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>Poort is &lt;b&gt;open&lt;/b&gt;</translation>
     </message>
@@ -1761,7 +1761,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+341"/>
+        <location filename="../PrefsDialog.cc" line="+342"/>
         <source>Status unknown</source>
         <translation>Status onbekend</translation>
     </message>
@@ -1791,7 +1791,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>uTP is een hulpmiddel om netwerkopstoppingen te verminderen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-235"/>
+        <location filename="../PrefsDialog.cc" line="-236"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1854,7 +1854,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Op afstand</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+154"/>
+        <location filename="../PrefsDialog.cc" line="+155"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Zwarte lijst bevat %Ln regel&lt;/i&gt;</numerusform>
@@ -1882,7 +1882,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Maximum aantal peers in het algemeen:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-229"/>
+        <location filename="../PrefsDialog.cc" line="-230"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;Update geslaagd!&lt;/b&gt;&lt;p&gt;Blokkadelijst heeft nu %Ln regel.</numerusform>
@@ -2157,7 +2157,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Netwerk</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+104"/>
+        <location filename="../PrefsDialog.cc" line="+105"/>
         <source>Not supported by remote sessions</source>
         <translation>Niet ondersteund door sessies op afstand</translation>
     </message>
@@ -2165,7 +2165,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-255"/>
         <source>Invalid option</source>
         <translation>Ongeldige optie</translation>
     </message>
@@ -2206,7 +2206,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+519"/>
+        <location filename="../Session.cc" line="+518"/>
         <source>Error Renaming Path</source>
         <translation>Fout hernoemen pad</translation>
     </message>
@@ -2216,29 +2216,29 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&lt;p&gt;&lt;b&gt;Kan ‘%1’ niet naar ‘%2’ hernoemen: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corrigeer de fouten en probeer het opnieuw.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+575"/>
+        <location line="+576"/>
         <source>Error Adding Torrent</source>
         <translation>Fout bij toevoegen van torrent</translation>
     </message>
     <message>
         <location line="+55"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (kopie van %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Dubbele torrent(s)</numerusform>
+            <numerusform>Dubbele torrent(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kon %n gedupliceerde torrent(s) niet toevoegen</numerusform>
+            <numerusform>Kon %n gedupliceerde torrent(s) niet toevoegen</numerusform>
         </translation>
     </message>
 </context>
@@ -2332,7 +2332,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>totaal</translation>
     </message>
     <message numerus="yes">
-        <location filename="../StatsDialog.cc" line="+68"/>
+        <location filename="../StatsDialog.cc" line="+66"/>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>%Ln keer gestart</numerusform>
@@ -2343,7 +2343,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+335"/>
+        <location filename="../Torrent.cc" line="+322"/>
         <source>Verifying local data</source>
         <translation>Lokale gegevens verifiëren</translation>
     </message>
@@ -2401,7 +2401,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+160"/>
+        <location filename="../TorrentDelegate.cc" line="+154"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magneetoverdracht - bezig met ontvangen van metagegevens (%1%)</translation>
@@ -2518,7 +2518,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+209"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2544,24 +2544,24 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Geen updates gepland</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Om meer peers vragen over %1</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Queued to ask for more peers</source>
         <translation>In de wachtrij gezet om naar meer peers te vragen</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Vraagt nu om meer peers... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+18"/>
+        <location line="+24"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2585,24 +2585,24 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>De tracker had %3 geleden %1geen informatie%2 over peeraantallen</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-18"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>Scrape-foutmelding %1‘%2%3’ %4 geleden</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+31"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Om peeraantallen vragen over %1</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>In de wachtrij gezet om naar peeraantallen te vragen</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Vraagt nu om peeraantallen... &lt;small&gt;%1&lt;/small&gt;</translation>
