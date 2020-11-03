@@ -147,15 +147,15 @@ bool tr_address_from_string(tr_address* dst, char const* src)
  */
 int tr_address_compare(tr_address const* a, tr_address const* b)
 {
-    static int const sizes[2] = { sizeof(struct in_addr), sizeof(struct in6_addr) };
-
-    /* IPv6 addresses are always "greater than" IPv4 */
+    // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)
     {
         return a->type == TR_AF_INET ? 1 : -1;
     }
 
-    return memcmp(&a->addr, &b->addr, sizes[a->type]);
+    return a->type == TR_AF_INET ?
+        memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+        memcmp(&a->addr.addr6, &b->addr.addr6, sizeof(a->addr.addr6));
 }
 
 /***********************************************************************
