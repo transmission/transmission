@@ -155,7 +155,7 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
 
     return a->type == TR_AF_INET ?
         memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-        memcmp(&a->addr.addr6, &b->addr.addr6, sizeof(a->addr.addr6));
+        memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 /***********************************************************************
