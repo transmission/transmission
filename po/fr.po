@@ -1359,7 +1359,7 @@ msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:175
 msgid "Stalled"
-msgstr "Bloqué"
+msgstr "À l’arrêt"
 
 #: ../gtk/torrent-cell-renderer.c:207
 #, c-format
