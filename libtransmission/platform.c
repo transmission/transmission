@@ -267,14 +267,14 @@ static char const* getHomeDir(void)
 
 #else
 
-            struct passwd* pw = getpwuid(getuid());
+            struct passwd pwent;
+            struct passwd* pw = NULL;
+            char buf[4096];
 
-            if (pw != NULL)
+            if (!getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw))
             {
-                home = tr_strdup(pw->pw_dir);
+                home = tr_strdup(pwent.pw_dir);
             }
-
-            endpwent();
 
 #endif
         }
