@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isspace */
+#include <errno.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1707,15 +1708,13 @@ static void printTrackers(tr_variant* top)
 static void printSession(tr_variant* top)
 {
     tr_variant* args;
-    char buf[128];
-    char buf2[128];
-    char buf3[128];
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
         bool boolVal;
         char const* str;
+        char buf[128];
 
         printf("VERSION\n");
 
@@ -1821,6 +1820,9 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
+                char buf2[128];
+                char buf3[128];
+
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
@@ -2992,6 +2994,23 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
     return status;
 }
 
+static bool parsePortString(char const* s, int* port)
+{
+    int const errno_stack = errno;
+    errno = 0;
+
+    char* end = NULL;
+    int const i = (int)strtol(s, &end, 10);
+    bool const ok = (end != NULL) && (*end == '\0') && (errno == 0);
+    if (ok)
+    {
+        *port = i;
+    }
+
+    errno = errno_stack;
+    return ok;
+}
+
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
 {
@@ -3001,6 +3020,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
     }
 
     char const* const s = argv[1];
+    char const* const last_colon = strrchr(s, ':');
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
@@ -3011,39 +3031,33 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
         UseSSL = true;
         *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
     }
+    else if (parsePortString(s, port))
+    {
+        // it was just a port
+    }
+    else if (last_colon == NULL)
+    {
+        // it was a non-ipv6 host with no port
+        *host = tr_strdup(s);
+    }
     else
     {
-        char const* const first_colon = strchr(s, ':');
-        char const* const last_colon = strrchr(s, ':');
+        char const* hend;
 
-        if (last_colon != NULL && ((*s == '[' && (last_colon > s) && (last_colon[-1] == ']')) || first_colon == last_colon))
+        // if only one colon, it's probably "$host:$port"
+        if ((strchr(s, ':') == last_colon) && parsePortString(last_colon + 1, port))
         {
-            /* user passed in both host and port */
-            *host = tr_strndup(s, last_colon - s);
-            *port = atoi(last_colon + 1);
+            hend = last_colon;
         }
         else
         {
-            char* end;
-            int const i = strtol(s, &end, 10);
-
-            if (*end == '\0') /* user passed in a port */
-            {
-                *port = i;
-            }
-            else /* user passed in a host */
-            {
-                if (last_colon != NULL && first_colon != last_colon && (*s != '[' || *(s + strlen(s) - 1) != ']'))
-                {
-                    /* looks like IPv6; let's add brackets as we'll be appending the port later on */
-                    *host = tr_strdup_printf("[%s]", s);
-                }
-                else
-                {
-                    *host = tr_strdup(s);
-                }
-            }
+            hend = s + strlen(s);
         }
+
+        bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != NULL);
+
+        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", (int)(hend - s), s) :
+            tr_strndup(s, hend - s);
     }
 
     *argc -= 1;
