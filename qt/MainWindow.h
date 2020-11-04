@@ -91,24 +91,6 @@ protected:
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
 
-private:
-    QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon addEmblem(QIcon icon, QStringList const& emblem_names);
-
-    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
-    void updateNetworkIcon();
-
-    QMenu* createOptionsMenu();
-    QMenu* createStatsModeMenu();
-    void initStatusBar();
-
-    void clearSelection();
-    void addTorrent(AddData const& add_me, bool show_options);
-
-    // QWidget
-    void hideEvent(QHideEvent* event) override;
-    void showEvent(QShowEvent* event) override;
-
 private slots:
     void addTorrents(QStringList const& filenames);
     void copyMagnetLinkToClipboard();
@@ -141,6 +123,23 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
+    QIcon getStockIcon(QString const&, int fallback = -1);
+    QIcon addEmblem(QIcon icon, QStringList const& emblem_names);
+
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
+    void updateNetworkIcon();
+
+    QMenu* createOptionsMenu();
+    QMenu* createStatsModeMenu();
+    void initStatusBar();
+
+    void clearSelection();
+    void addTorrent(AddData const& add_me, bool show_options);
+
+    // QWidget
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+
     Session& session_;
     Prefs& prefs_;
     TorrentModel& model_;

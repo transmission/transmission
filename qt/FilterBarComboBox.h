@@ -25,7 +25,6 @@ public:
         UserRole
     };
 
-public:
     explicit FilterBarComboBox(QWidget* parent = nullptr);
 
     // QWidget

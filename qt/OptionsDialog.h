@@ -39,15 +39,6 @@ public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
     ~OptionsDialog() override;
 
-private:
-    using mybins_t = QMap<uint32_t, int32_t>;
-
-private:
-    void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
-    void clearVerify();
-
 private slots:
     void onAccepted();
     void onPriorityChanged(QSet<int> const& file_indices, int);
@@ -61,6 +52,13 @@ private slots:
     void onSessionUpdated();
 
 private:
+    using mybins_t = QMap<uint32_t, int32_t>;
+
+    void reload();
+    void updateWidgetsLocality();
+    void clearInfo();
+    void clearVerify();
+
     AddData add_;
     FileList files_;
     QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);

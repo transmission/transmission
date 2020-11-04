@@ -69,6 +69,5 @@ private:
     {
     }
 
-private:
     int bytes_per_second_ = {};
 };

@@ -36,7 +36,6 @@ public:
         TrackerRole = Qt::UserRole
     };
 
-public:
     TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
@@ -49,6 +48,5 @@ public:
 private:
     using rows_t = QVector<TrackerInfo>;
 
-private:
     rows_t rows_;
 };
