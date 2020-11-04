@@ -137,7 +137,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     session_(session),
     prefs_(prefs),
     model_(model),
-    lvp_style_(new ListViewProxyStyle{}),
+    lvp_style_(std::make_shared<ListViewProxyStyle>()),
     filter_model_(prefs),
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
