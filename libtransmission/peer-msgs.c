@@ -2686,7 +2686,7 @@ bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs)
 
 bool tr_isPeerMsgs(void const* msgs)
 {
-    return msgs != NULL && ((struct tr_peerMsgs*)msgs)->magic_number == MAGIC_NUMBER;
+    return msgs != NULL && ((struct tr_peerMsgs const*)msgs)->magic_number == MAGIC_NUMBER;
 }
 
 tr_peerMsgs* tr_peerMsgsCast(void* vm)
