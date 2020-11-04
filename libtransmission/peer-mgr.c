@@ -2355,7 +2355,7 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
     return true;
 }
 
-int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t af, uint8_t list_mode, int maxCount)
+int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, uint8_t list_mode, int maxCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(setme_pex != NULL);

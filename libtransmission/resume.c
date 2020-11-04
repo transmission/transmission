@@ -45,7 +45,7 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
     int count;
     tr_pex* pex;
 
-    count = tr_peerMgrGetPeers((tr_torrent*)tor, &pex, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
+    count = tr_peerMgrGetPeers(tor, &pex, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
 
     if (count > 0)
     {
@@ -54,7 +54,7 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
 
     tr_free(pex);
 
-    count = tr_peerMgrGetPeers((tr_torrent*)tor, &pex, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
+    count = tr_peerMgrGetPeers(tor, &pex, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
 
     if (count > 0)
     {
