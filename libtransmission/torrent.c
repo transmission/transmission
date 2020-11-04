@@ -655,39 +655,24 @@ static bool pieceHasFile(tr_piece_index_t piece, tr_file const* file)
     return file->firstPiece <= piece && piece <= file->lastPiece;
 }
 
-static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_index_t piece, int fileHint)
+static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_index_t piece, tr_file_index_t file_hint)
 {
-    tr_file_index_t firstFileIndex;
+    // safeguard against a bad arg
+    tr_info const* const inf = tr_torrentInfo(tor);
+    file_hint = MIN(file_hint, inf->fileCount - 1);
+
+    // find the first file with data in this piece
+    tr_file_index_t first = file_hint;
+    while (first > 0 && pieceHasFile(piece, &inf->files[first - 1]))
+    {
+        --first;
+    }
+
+    // the priority is the max of all the file priorities in the piece
     tr_priority_t priority = TR_PRI_LOW;
-
-    /* find the first file that has data in this piece */
-    if (fileHint >= 0)
+    for (tr_file_index_t i = first; i < inf->fileCount; ++i)
     {
-        firstFileIndex = fileHint;
-
-        while (firstFileIndex > 0 && pieceHasFile(piece, &tor->info.files[firstFileIndex - 1]))
-        {
-            --firstFileIndex;
-        }
-    }
-    else
-    {
-        firstFileIndex = 0;
-
-        for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i, ++firstFileIndex)
-        {
-            if (pieceHasFile(piece, &tor->info.files[i]))
-            {
-                break;
-            }
-        }
-    }
-
-    /* the piece's priority is the max of the priorities
-     * of all the files in that piece */
-    for (tr_file_index_t i = firstFileIndex; i < tor->info.fileCount; ++i)
-    {
-        tr_file const* file = &tor->info.files[i];
+        tr_file const* file = &inf->files[i];
 
         if (!pieceHasFile(piece, file))
         {
@@ -696,7 +681,7 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
 
         priority = MAX(priority, file->priority);
 
-        /* when dealing with multimedia files, getting the first and
+        /* When dealing with multimedia files, getting the first and
            last pieces can sometimes allow you to preview it a bit
            before it's fully downloaded... */
         if ((file->priority >= TR_PRI_NORMAL) && (file->firstPiece == piece || file->lastPiece == piece))
@@ -722,7 +707,7 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
     }
 
     /* build the array of first-file hints to give calculatePiecePriority */
-    int* firstFiles = tr_new(int, inf->pieceCount);
+    tr_file_index_t* firstFiles = tr_new(tr_file_index_t, inf->pieceCount);
     tr_file_index_t f = 0;
 
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)

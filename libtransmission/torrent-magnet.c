@@ -206,6 +206,26 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     return ret;
 }
 
+static int getPieceNeededIndex(struct tr_incomplete_metadata const* m, int piece)
+{
+    for (int i = 0; i < m->piecesNeededCount; ++i)
+    {
+        if (m->piecesNeeded[i].piece == piece)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
+{
+    return piece + 1 == m->pieceCount ? // last piece
+        m->metadata_size - (piece * METADATA_PIECE_SIZE) :
+        METADATA_PIECE_SIZE;
+}
+
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -214,53 +234,36 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
     dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
 
-    /* are we set up to download metadata? */
-    struct tr_incomplete_metadata* m = tor->incompleteMetadata;
-
+    // are we set up to download metadata?
+    struct tr_incomplete_metadata* const m = tor->incompleteMetadata;
     if (m == NULL)
     {
         return;
     }
 
-    /* does this data pass the smell test? */
-    if (piece < 0 || piece >= m->pieceCount)
+    // sanity test: is `piece` in range?
+    if ((piece < 0) || (piece >= m->pieceCount))
     {
         return;
     }
 
-    if (piece < m->pieceCount - 1 ? len != METADATA_PIECE_SIZE : len > METADATA_PIECE_SIZE)
+    // sanity test: is `len` the right size?
+    if (getPieceLength(m, piece) != len)
     {
         return;
     }
 
-    int const offset = piece * METADATA_PIECE_SIZE;
-
-    TR_ASSERT(offset <= m->metadata_size);
-
-    if (len == 0 || len > m->metadata_size - offset)
+    // do we need this piece?
+    int const idx = getPieceNeededIndex(m, piece);
+    if (idx == -1)
     {
         return;
     }
 
-    int neededPieceIndex = 0;
-
-    /* do we need this piece? */
-    for (int i = 0; i < m->piecesNeededCount; ++i, ++neededPieceIndex)
-    {
-        if (m->piecesNeeded[i].piece == piece)
-        {
-            break;
-        }
-    }
-
-    if (neededPieceIndex == m->piecesNeededCount)
-    {
-        return;
-    }
-
+    size_t const offset = piece * METADATA_PIECE_SIZE;
     memcpy(m->metadata + offset, data, len);
 
-    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount);
+    tr_removeElementFromArray(m->piecesNeeded, idx, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
 
     dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);

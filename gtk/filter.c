@@ -114,48 +114,36 @@ static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 
 static gboolean tracker_filter_model_update(gpointer gstore)
 {
-    int all = 0;
-    int store_pos;
-    GtkTreeIter iter;
     GObject* o = G_OBJECT(gstore);
-    GtkTreeStore* store = GTK_TREE_STORE(gstore);
-    GtkTreeModel* model = GTK_TREE_MODEL(gstore);
-    GPtrArray* hosts = g_ptr_array_new();
-    GStringChunk* strings = g_string_chunk_new(4096);
-    GHashTable* hosts_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_free);
-    GtkTreeModel* tmodel = GTK_TREE_MODEL(g_object_get_qdata(o, TORRENT_MODEL_KEY));
-    int const first_tracker_pos = 2; /* offset past the "All" and the separator */
-
     g_object_steal_qdata(o, DIRTY_KEY);
 
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
+    int num_torrents = 0;
+    GPtrArray* hosts = g_ptr_array_new();
+    GStringChunk* strings = g_string_chunk_new(4096);
+    GHashTable* hosts_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_free);
+    GtkTreeModel* tmodel = GTK_TREE_MODEL(g_object_get_qdata(o, TORRENT_MODEL_KEY));
+    GtkTreeIter iter;
     if (gtk_tree_model_iter_nth_child(tmodel, &iter, NULL, 0))
     {
         do
         {
-            tr_torrent* tor;
-            tr_info const* inf;
-            int keyCount;
-            char** keys;
-
+            tr_torrent const* tor;
             gtk_tree_model_get(tmodel, &iter, MC_TORRENT, &tor, -1);
-            inf = tr_torrentInfo(tor);
-            keyCount = 0;
-            keys = g_new(char*, inf->trackerCount);
+            tr_info const* const inf = tr_torrentInfo(tor);
+
+            int keyCount = 0;
+            char** const keys = g_new(char*, inf->trackerCount);
 
             for (unsigned int i = 0; i < inf->trackerCount; ++i)
             {
-                int* count;
-                char buf[1024];
-                char* key;
+                char name[1024];
+                gtr_get_host_from_url(name, sizeof(name), inf->trackers[i].announce);
+                char* const key = g_string_chunk_insert_const(strings, name);
 
-                gtr_get_host_from_url(buf, sizeof(buf), inf->trackers[i].announce);
-                key = g_string_chunk_insert_const(strings, buf);
-
-                count = g_hash_table_lookup(hosts_hash, key);
-
+                int* count = g_hash_table_lookup(hosts_hash, key);
                 if (count == NULL)
                 {
                     count = tr_new0(int, 1);
@@ -184,35 +172,36 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
             g_free(keys);
 
-            ++all;
+            ++num_torrents;
         }
         while (gtk_tree_model_iter_next(tmodel, &iter));
     }
 
     qsort(hosts->pdata, hosts->len, sizeof(char*), pstrcmp);
 
-    /* update the "all" count */
+    // update the "all" count
+    GtkTreeStore* store = GTK_TREE_STORE(gstore);
+    GtkTreeModel* model = GTK_TREE_MODEL(gstore);
     if (gtk_tree_model_iter_children(model, &iter, NULL))
     {
-        tracker_model_update_count(store, &iter, all);
+        tracker_model_update_count(store, &iter, num_torrents);
     }
 
-    store_pos = first_tracker_pos;
-
-    for (int i = 0, n = hosts->len;;)
+    int store_pos = 2; // offset past the "All" and the separator
+    guint i = 0;
+    for (;;)
     {
-        gboolean const new_hosts_done = i >= n;
+        // are we done yet?
+        gboolean const new_hosts_done = i >= hosts->len;
         gboolean const old_hosts_done = !gtk_tree_model_iter_nth_child(model, &iter, NULL, store_pos);
-        gboolean remove_row = FALSE;
-        gboolean insert_row = FALSE;
-
-        /* are we done yet? */
         if (new_hosts_done && old_hosts_done)
         {
             break;
         }
 
-        /* decide what to do */
+        // decide what to do
+        gboolean remove_row = FALSE;
+        gboolean insert_row = FALSE;
         if (new_hosts_done)
         {
             remove_row = TRUE;
@@ -223,10 +212,9 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         }
         else
         {
-            int cmp;
             char* host;
             gtk_tree_model_get(model, &iter, TRACKER_FILTER_COL_HOST, &host, -1);
-            cmp = g_strcmp0(host, hosts->pdata[i]);
+            int const cmp = g_strcmp0(host, hosts->pdata[i]);
 
             if (cmp < 0)
             {
@@ -240,7 +228,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             g_free(host);
         }
 
-        /* do something */
+        // do something
         if (remove_row)
         {
             gtk_tree_store_remove(store, &iter);
@@ -268,9 +256,9 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             ++store_pos;
             ++i;
         }
-        else /* update row */
+        else // update row
         {
-            char const* host = hosts->pdata[i];
+            char const* const host = hosts->pdata[i];
             int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             tracker_model_update_count(store, &iter, count);
             ++store_pos;
@@ -278,7 +266,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         }
     }
 
-    /* cleanup */
+    // cleanup
     g_ptr_array_free(hosts, TRUE);
     g_hash_table_unref(hosts_hash);
     g_string_chunk_free(strings);

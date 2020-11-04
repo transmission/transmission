@@ -3287,12 +3287,14 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
      *
      * If our bandwidth is maxed out, don't unchoke any more peers.
      */
-    int unchokedInterested = 0;
     int checkedChokeCount = 0;
+    int unchokedInterested = 0;
 
-    for (int i = 0; i < size && unchokedInterested < session->uploadSlotsPerTorrent; ++i, ++checkedChokeCount)
+    for (int i = 0; i < size && unchokedInterested < session->uploadSlotsPerTorrent; ++i)
     {
         choke[i].isChoked = isMaxedOut ? choke[i].wasChoked : false;
+
+        ++checkedChokeCount;
 
         if (choke[i].isInterested)
         {
@@ -3622,16 +3624,13 @@ static int comparePeerLiveliness(void const* va, void const* vb)
 
 static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n, uint64_t now, tr_voidptr_compare_func compare)
 {
-    struct peer_liveliness* lives;
-    struct peer_liveliness* l;
-
-    /* build a sortable array of peer + extra info */
-    lives = tr_new0(struct peer_liveliness, n);
-    l = lives;
-
-    for (int i = 0; i < n; ++i, ++l)
+    // build a sortable array of peer + extra info
+    struct peer_liveliness* lives = tr_new0(struct peer_liveliness, n);
+    for (int i = 0; i < n; ++i)
     {
         tr_peer* p = peers[i];
+        struct peer_liveliness* const l = &lives[i];
+
         l->peer = p;
         l->doPurge = p->doPurge;
         l->pieceDataTime = p->atom->piece_data_time;
@@ -3644,15 +3643,14 @@ static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n,
         }
     }
 
-    /* sort 'em */
-    TR_ASSERT(n == l - lives);
+    // sort 'em
     qsort(lives, n, sizeof(struct peer_liveliness), compare);
 
-    l = lives;
-
-    /* build the peer array */
-    for (int i = 0; i < n; ++i, ++l)
+    // build the peer array
+    for (int i = 0; i < n; ++i)
     {
+        struct peer_liveliness* const l = &lives[i];
+
         peers[i] = l->peer;
 
         if (clientData != NULL)
@@ -3661,9 +3659,7 @@ static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n,
         }
     }
 
-    TR_ASSERT(n == l - lives);
-
-    /* cleanup */
+    // cleanup
     tr_free(lives);
 }
 
@@ -3718,10 +3714,11 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
         {
             tr_swarm* s = tor->swarm;
 
-            for (int i = 0, tn = tr_ptrArraySize(&s->peers); i < tn; ++i, ++n)
+            for (int i = 0, tn = tr_ptrArraySize(&s->peers); i < tn; ++i)
             {
                 peers[n] = tr_ptrArrayNth(&s->peers, i);
                 swarms[n] = s;
+                ++n;
             }
         }
 
