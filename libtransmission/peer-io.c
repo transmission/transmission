@@ -392,7 +392,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
     {
         if (e == 0 || e == EAGAIN || e == EINTR || e == EINPROGRESS)
         {
-            goto reschedule;
+            goto RESCHEDULE;
         }
 
         /* error case */
@@ -406,7 +406,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 
     if (res <= 0)
     {
-        goto error;
+        goto ERROR;
     }
 
     if (evbuffer_get_length(io->outbuf) != 0)
@@ -417,7 +417,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
     didWriteWrapper(io, res);
     return;
 
-reschedule:
+RESCHEDULE:
     if (evbuffer_get_length(io->outbuf) != 0)
     {
         tr_peerIoSetEnabled(io, dir, true);
@@ -425,7 +425,7 @@ reschedule:
 
     return;
 
-error:
+ERROR:
     tr_net_strerror(errstr, sizeof(errstr), e);
     dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
 

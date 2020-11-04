@@ -1874,28 +1874,25 @@ static void onVerifyDoneThreadFunc(void* vdata)
     struct verify_data* data = vdata;
     tr_torrent* tor = data->tor;
 
-    if (tor->isDeleting)
+    if (!tor->isDeleting)
     {
-        goto cleanup;
+        if (!data->aborted)
+        {
+            tr_torrentRecheckCompleteness(tor);
+        }
+
+        if (data->callback_func != NULL)
+        {
+            (*data->callback_func)(tor, data->aborted, data->callback_data);
+        }
+
+        if (!data->aborted && tor->startAfterVerify)
+        {
+            tor->startAfterVerify = false;
+            torrentStart(tor, false);
+        }
     }
 
-    if (!data->aborted)
-    {
-        tr_torrentRecheckCompleteness(tor);
-    }
-
-    if (data->callback_func != NULL)
-    {
-        (*data->callback_func)(tor, data->aborted, data->callback_data);
-    }
-
-    if (!data->aborted && tor->startAfterVerify)
-    {
-        tor->startAfterVerify = false;
-        torrentStart(tor, false);
-    }
-
-cleanup:
     tr_free(data);
 }
 

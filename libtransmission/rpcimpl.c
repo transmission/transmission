@@ -115,11 +115,11 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
 
     if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
     {
-        int const n = tr_variantListSize(ids);
+        size_t const n = tr_variantListSize(ids);
 
         torrents = tr_new0(tr_torrent*, n);
 
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             tr_torrent* tor;
             tr_variant const* const node = tr_variantListChild(ids, i);
@@ -1037,11 +1037,11 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
 static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
-    int const n = tr_variantListSize(list);
+    size_t const n = tr_variantListSize(list);
     char const* errmsg = NULL;
     tr_ptrArray labels = TR_PTR_ARRAY_INIT;
     int labelcount = 0;
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; ++i)
     {
         char const* str;
         size_t str_len;
@@ -1100,13 +1100,13 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
 {
     int64_t tmp;
     int fileCount = 0;
-    int const n = tr_variantListSize(list);
+    size_t const n = tr_variantListSize(list);
     char const* errmsg = NULL;
     tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
 
     if (n != 0)
     {
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
@@ -1142,13 +1142,13 @@ static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* lis
 {
     int64_t tmp;
     int fileCount = 0;
-    int const n = tr_variantListSize(list);
+    size_t const n = tr_variantListSize(list);
     char const* errmsg = NULL;
     tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
 
     if (n != 0) /* if argument list, process them */
     {
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
@@ -1335,7 +1335,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
 
         if (tr_variantGetInt(val, &pos) && 0 <= pos && pos < n)
         {
-            tids[t++] = pos;
+            tids[t++] = (int)pos;
         }
 
         ++i;
@@ -1471,12 +1471,12 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tr_torrentSetIdleLimit(tor, tmp);
+            tr_torrentSetIdleLimit(tor, (uint16_t)tmp);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
         {
-            tr_torrentSetIdleMode(tor, tmp);
+            tr_torrentSetIdleMode(tor, (tr_idlelimit)tmp);
         }
 
         if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
@@ -1486,12 +1486,12 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tr_torrentSetRatioMode(tor, tmp);
+            tr_torrentSetRatioMode(tor, (tr_ratiolimit)tmp);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
         {
-            tr_torrentSetQueuePosition(tor, tmp);
+            tr_torrentSetQueuePosition(tor, (int)tmp);
         }
 
         if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
@@ -1631,7 +1631,7 @@ static void portTested(tr_session* session, bool did_connect, bool did_timeout, 
     }
     else /* success */
     {
-        bool const isOpen = response_byte_count != 0 && *(char*)response == '1';
+        bool const isOpen = response_byte_count != 0 && *(char const*)response == '1';
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, isOpen);
         tr_snprintf(result, sizeof(result), "success");
     }
@@ -1936,12 +1936,12 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &i))
     {
-        tr_ctorSetPeerLimit(ctor, TR_FORCE, i);
+        tr_ctorSetPeerLimit(ctor, TR_FORCE, (uint16_t)i);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &i))
     {
-        tr_ctorSetBandwidthPriority(ctor, i);
+        tr_ctorSetBandwidthPriority(ctor, (tr_priority_t)i);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &l))
@@ -2120,7 +2120,7 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindInt(args_in, TR_KEY_download_queue_size, &i))
     {
-        tr_sessionSetQueueSize(session, TR_DOWN, i);
+        tr_sessionSetQueueSize(session, TR_DOWN, (int)i);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &boolVal))
@@ -2220,7 +2220,7 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindInt(args_in, TR_KEY_seed_queue_size, &i))
     {
-        tr_sessionSetQueueSize(session, TR_UP, i);
+        tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
     if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, NULL))
@@ -2705,7 +2705,7 @@ void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr
     tr_variant* const mutable_request = (tr_variant*)request;
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
     char const* result = NULL;
-    struct method* method = NULL;
+    struct method const* method = NULL;
 
     if (callback == NULL)
     {

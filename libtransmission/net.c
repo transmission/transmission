@@ -573,7 +573,7 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (s == TR_BAD_SOCKET)
     {
-        goto fail;
+        goto FAIL;
     }
 
     /* Since it's a UDP socket, this doesn't actually send any packets. */
@@ -581,21 +581,21 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     rc = getsockname(s, src, src_len);
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     evutil_closesocket(s);
 
     return rc;
 
-fail:
+FAIL:
     save = errno;
     evutil_closesocket(s);
     errno = save;

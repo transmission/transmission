@@ -125,7 +125,7 @@ enum
  *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
  *     Returns number of runs.
  */
-static int calcRuns(tr_cache* cache, struct run_info* runs)
+static int calcRuns(tr_cache const* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
     int i = 0;
@@ -376,7 +376,7 @@ int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t
 ****
 ***/
 
-static int findBlockPos(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t block)
+static int findBlockPos(tr_cache const* cache, tr_torrent* torrent, tr_piece_index_t block)
 {
     struct cache_block key;
     key.tor = torrent;

@@ -318,12 +318,12 @@ static inline void managerUnlock(struct tr_peerMgr const* manager)
     tr_sessionUnlock(manager->session);
 }
 
-static inline void swarmLock(tr_swarm* swarm)
+static inline void swarmLock(tr_swarm const* swarm)
 {
     managerLock(swarm->manager);
 }
 
-static inline void swarmUnlock(tr_swarm* swarm)
+static inline void swarmUnlock(tr_swarm const* swarm)
 {
     managerUnlock(swarm->manager);
 }
@@ -585,7 +585,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
     }
 }
 
-static bool isAtomBlocklisted(tr_session* session, struct peer_atom* atom)
+static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 {
     if (atom->blocklisted < 0)
     {

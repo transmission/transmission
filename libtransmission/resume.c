@@ -64,12 +64,12 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
     tr_free(pex);
 }
 
-static int addPeers(tr_torrent* tor, uint8_t const* buf, int buflen)
+static int addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
     int numAdded = 0;
-    int const count = buflen / sizeof(tr_pex);
+    size_t const count = buflen / sizeof(tr_pex);
 
-    for (int i = 0; i < count && numAdded < MAX_REMEMBERED_PEERS; ++i)
+    for (size_t i = 0; i < count && numAdded < MAX_REMEMBERED_PEERS; ++i)
     {
         tr_pex pex;
         memcpy(&pex, buf + i * sizeof(tr_pex), sizeof(tr_pex));
@@ -113,10 +113,10 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 
 static void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
-    int const n = tr_ptrArraySize(&tor->labels);
+    size_t const n = tr_ptrArraySize(&tor->labels);
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, n);
     char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         tr_variantListAddStr(list, labels[i]);
     }

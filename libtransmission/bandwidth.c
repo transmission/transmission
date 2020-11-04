@@ -183,7 +183,7 @@ static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr
     }
 }
 
-static void phaseOne(tr_ptrArray* peerArray, tr_direction dir)
+static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir)
 {
     int n;
     int peerCount = tr_ptrArraySize(peerArray);

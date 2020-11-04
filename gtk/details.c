@@ -1657,7 +1657,7 @@ static void refreshWebseedList(struct DetailsImpl* di, tr_torrent** torrents, in
     /* step 3: update the webseeds */
     for (int i = 0; i < n; ++i)
     {
-        tr_torrent* tor = torrents[i];
+        tr_torrent const* tor = torrents[i];
         tr_info const* inf = tr_torrentInfo(tor);
         double* speeds_KBps = tr_torrentWebSpeeds_KBps(tor);
 
@@ -2583,7 +2583,7 @@ static void get_editable_tracker_list(GString* gstr, tr_torrent const* tor)
 static void on_edit_trackers(GtkButton* button, gpointer data)
 {
     struct DetailsImpl* di = data;
-    tr_torrent* tor = tracker_list_get_current_torrent(di);
+    tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
     if (tor != NULL)
     {
@@ -2642,7 +2642,7 @@ static void on_tracker_list_selection_changed(GtkTreeSelection* sel, gpointer gd
 {
     struct DetailsImpl* di = gdi;
     int const n = gtk_tree_selection_count_selected_rows(sel);
-    tr_torrent* tor = tracker_list_get_current_torrent(di);
+    tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
     gtk_widget_set_sensitive(di->remove_tracker_button, n > 0);
     gtk_widget_set_sensitive(di->add_tracker_button, tor != NULL);
@@ -2697,12 +2697,12 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
     }
 }
 
-static void on_tracker_list_add_button_clicked(GtkButton* button, gpointer gdi)
+static void on_tracker_list_add_button_clicked(GtkButton const* button, gpointer gdi)
 {
     TR_UNUSED(button);
 
     struct DetailsImpl* di = gdi;
-    tr_torrent* tor = tracker_list_get_current_torrent(di);
+    tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
     if (tor != NULL)
     {
@@ -2734,7 +2734,7 @@ static void on_tracker_list_add_button_clicked(GtkButton* button, gpointer gdi)
     }
 }
 
-static void on_tracker_list_remove_button_clicked(GtkButton* button, gpointer gdi)
+static void on_tracker_list_remove_button_clicked(GtkButton const* button, gpointer gdi)
 {
     TR_UNUSED(button);
 
@@ -2903,7 +2903,7 @@ static gboolean periodic_refresh(gpointer data)
     return G_SOURCE_CONTINUE;
 }
 
-static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc, gpointer gdata)
+static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation const* alloc, gconstpointer gdata)
 {
     TR_UNUSED(alloc);
     TR_UNUSED(gdata);
@@ -3010,7 +3010,7 @@ void gtr_torrent_details_dialog_set_torrents(GtkWidget* w, GSList* ids)
     if (len == 1)
     {
         int const id = GPOINTER_TO_INT(ids->data);
-        tr_torrent* tor = gtr_core_find_torrent(di->core, id);
+        tr_torrent const* tor = gtr_core_find_torrent(di->core, id);
         tr_info const* inf = tr_torrentInfo(tor);
         g_snprintf(title, sizeof(title), _("%s Properties"), inf->name);
 

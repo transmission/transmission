@@ -491,22 +491,19 @@ tr_quark tr_quark_new(void const* str, size_t len)
 {
     tr_quark ret = TR_KEY_NONE;
 
-    if (str == NULL)
+    if (str != NULL)
     {
-        goto finish;
+        if (len == TR_BAD_SIZE)
+        {
+            len = strlen(str);
+        }
+
+        if (!tr_quark_lookup(str, len, &ret))
+        {
+            ret = append_new_quark(str, len);
+        }
     }
 
-    if (len == TR_BAD_SIZE)
-    {
-        len = strlen(str);
-    }
-
-    if (!tr_quark_lookup(str, len, &ret))
-    {
-        ret = append_new_quark(str, len);
-    }
-
-finish:
     return ret;
 }
 

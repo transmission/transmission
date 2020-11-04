@@ -204,7 +204,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
 
 static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* context)
 {
-    tr_session* session = context;
+    tr_session const* session = context;
 
     if (!tr_str_has_suffix(name, ".torrent"))
     {
@@ -715,7 +715,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
             if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == NULL)
             {
-                goto cleanup;
+                goto CLEANUP;
             }
         }
     }
@@ -752,13 +752,13 @@ static int daemon_start(void* raw_arg, bool foreground)
         if (status_ev == NULL)
         {
             tr_logAddError("Failed to create status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
             tr_logAddError("Failed to add status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
     }
 
@@ -768,10 +768,10 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (event_base_dispatch(ev_base) == -1)
     {
         tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
-        goto cleanup;
+        goto CLEANUP;
     }
 
-cleanup:
+CLEANUP:
     sd_notify(0, "STATUS=Closing transmission session...\n");
     printf("Closing transmission session...");
 
@@ -828,7 +828,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     /* overwrite settings from the command line */
     if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
@@ -840,7 +840,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (dumpSettings)
@@ -848,12 +848,12 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
         char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     return true;
 
-exit_early:
+EXIT_EARLY:
     tr_variantFree(&data->settings);
     return false;
 }

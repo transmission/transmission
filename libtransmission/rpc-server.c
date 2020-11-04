@@ -182,7 +182,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         /* first look for the session id */
         for (int i = 0; i < n; ++i)
         {
-            struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
+            struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
 
             if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
@@ -206,13 +206,13 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             for (int i = 0; i < n; ++i)
             {
-                struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
+                struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
                 size_t body_len = p->body_len;
                 tr_variant top;
                 tr_variant* args;
                 tr_variant test;
                 bool have_source = false;
-                char* body = p->body;
+                char const* body = p->body;
 
                 if (body_len >= 2 && memcmp(&body[body_len - 2], "\r\n", 2) == 0)
                 {
@@ -819,7 +819,7 @@ static void startServer(void* vserver)
 
     char const* address = tr_rpcGetBindAddress(server);
 
-    int const port = server->port;
+    tr_port const port = server->port;
 
     if (evhttp_bind_socket(httpd, address, port) == -1)
     {
@@ -1137,7 +1137,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        s->port = i;
+        s->port = (tr_port)i;
     }
 
     key = TR_KEY_rpc_url;

@@ -202,19 +202,19 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
                 break;
             }
 
-            goto failure;
+            goto FAILURE;
         }
 
         if (errno != ENOENT)
         {
             set_system_error(&my_error, errno);
-            goto failure;
+            goto FAILURE;
         }
     }
 
     if (ret && pp == path_end)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
     /* Go one level down on each iteration and attempt to create */
@@ -232,10 +232,10 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
 
     if (ret)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
-failure:
+FAILURE:
 
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != NULL);
@@ -243,7 +243,7 @@ failure:
     tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
     tr_error_propagate(error, &my_error);
 
-cleanup:
+CLEANUP:
 
     TR_ASSERT(my_error == NULL);
 
@@ -844,7 +844,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
     if (ret || errno == ENOSPC)
     {
-        goto out;
+        goto OUT;
     }
 
 #endif
@@ -874,7 +874,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -902,7 +902,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -916,13 +916,13 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 #endif
 
 #if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-non_sparse_out:
+NON_SPARSE_OUT:
 #endif
         errno = code;
     }
 
 #ifdef HAVE_FALLOCATE64
-out:
+OUT:
 #endif
 
     if (!ret)

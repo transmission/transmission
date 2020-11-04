@@ -224,7 +224,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
     if (buf_len < 0)
     {
-        goto finish;
+        goto FINISH;
     }
 
 #ifdef _WIN32
@@ -298,7 +298,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
         }
     }
 
-finish:
+FINISH:
     tr_lockUnlock(getMessageLock());
     errno = err;
 }

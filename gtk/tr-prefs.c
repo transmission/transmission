@@ -636,7 +636,7 @@ static void refreshWhitelist(struct remote_page* page)
     g_string_free(gstr, TRUE);
 }
 
-static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* address, gpointer gpage)
+static void onAddressEdited(GtkCellRendererText const* r, gchar const* path_string, gchar* address, gpointer gpage)
 {
     TR_UNUSED(r);
 
@@ -654,7 +654,7 @@ static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* a
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
+static void onAddWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
     TR_UNUSED(b);
 
@@ -670,7 +670,7 @@ static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
     gtk_tree_path_free(path);
 }
 
-static void onRemoveWhitelistClicked(GtkButton* b, gpointer gpage)
+static void onRemoveWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
     TR_UNUSED(b);
 
