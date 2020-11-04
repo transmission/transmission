@@ -229,7 +229,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in* sin = (struct sockaddr_in*)from;
+        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -238,7 +238,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6* sin6 = (struct sockaddr_in6*)from;
+        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
