@@ -136,7 +136,7 @@ struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 static int compare_retry_names(void const* a, void const* b)
 {
-    return strcmp(((tr_watchdir_retry*)a)->name, ((tr_watchdir_retry*)b)->name);
+    return strcmp(((tr_watchdir_retry const*)a)->name, ((tr_watchdir_retry const*)b)->name);
 }
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
