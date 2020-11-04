@@ -98,7 +98,7 @@ QString getCountString(int n)
 }
 
 Torrent::fields_t constexpr TrackerFields = {
-    (uint64_t(1) << Torrent::TRACKER_STATS)
+    uint64_t(1) << Torrent::TRACKER_STATS
     };
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
