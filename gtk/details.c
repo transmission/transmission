@@ -358,14 +358,12 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
 static void torrent_set_bool(struct DetailsImpl* di, tr_quark const key, gboolean value)
 {
     tr_variant top;
-    tr_variant* args;
-    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddBool(args, key, value);
-    ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
+    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
     for (GSList* l = di->ids; l != NULL; l = l->next)
     {
@@ -379,14 +377,12 @@ static void torrent_set_bool(struct DetailsImpl* di, tr_quark const key, gboolea
 static void torrent_set_int(struct DetailsImpl* di, tr_quark const key, int value)
 {
     tr_variant top;
-    tr_variant* args;
-    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddInt(args, key, value);
-    ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
+    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
     for (GSList* l = di->ids; l != NULL; l = l->next)
     {
@@ -400,14 +396,12 @@ static void torrent_set_int(struct DetailsImpl* di, tr_quark const key, int valu
 static void torrent_set_real(struct DetailsImpl* di, tr_quark const key, double value)
 {
     tr_variant top;
-    tr_variant* args;
-    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddReal(args, key, value);
-    ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
+    tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
     for (GSList* l = di->ids; l != NULL; l = l->next)
     {
@@ -623,17 +617,15 @@ static char const* activityString(int activity, bool finished)
  * This way if the user has text selected, refreshing won't deselect it */
 static void gtr_text_buffer_set_text(GtkTextBuffer* b, char const* str)
 {
-    char* old_str;
-    GtkTextIter start;
-    GtkTextIter end;
-
     if (str == NULL)
     {
         str = "";
     }
 
+    GtkTextIter start;
+    GtkTextIter end;
     gtk_text_buffer_get_bounds(b, &start, &end);
-    old_str = gtk_text_buffer_get_text(b, &start, &end, FALSE);
+    char* old_str = gtk_text_buffer_get_text(b, &start, &end, FALSE);
 
     if (old_str == NULL || g_strcmp0(old_str, str) != 0)
     {
@@ -1497,16 +1489,13 @@ static void refreshPeerRow(GtkListStore* store, GtkTreeIter* iter, tr_peer_stat 
 
 static void refreshPeerList(struct DetailsImpl* di, tr_torrent** torrents, int n)
 {
-    int* peerCount;
     GtkTreeIter iter;
-    GtkTreeModel* model;
     GHashTable* hash = di->peer_hash;
     GtkListStore* store = di->peer_store;
-    struct tr_peer_stat** peers;
 
     /* step 1: get all the peers */
-    peers = g_new(struct tr_peer_stat*, n);
-    peerCount = g_new(int, n);
+    struct tr_peer_stat** peers = g_new(struct tr_peer_stat*, n);
+    int* peerCount = g_new(int, n);
 
     for (int i = 0; i < n; ++i)
     {
@@ -1514,7 +1503,7 @@ static void refreshPeerList(struct DetailsImpl* di, tr_torrent** torrents, int n
     }
 
     /* step 2: mark all the peers in the list as not-updated */
-    model = GTK_TREE_MODEL(store);
+    GtkTreeModel* const model = GTK_TREE_MODEL(store);
 
     if (gtk_tree_model_iter_nth_child(model, &iter, NULL, 0))
     {
@@ -1571,8 +1560,6 @@ static void refreshPeerList(struct DetailsImpl* di, tr_torrent** torrents, int n
     }
 
     /* step 5: remove peers that have disappeared */
-    model = GTK_TREE_MODEL(store);
-
     if (gtk_tree_model_iter_nth_child(model, &iter, NULL, 0))
     {
         gboolean more = TRUE;
@@ -1665,13 +1652,11 @@ static void refreshWebseedList(struct DetailsImpl* di, tr_torrent** torrents, in
         {
             char buf[128];
             char key[256];
-            GtkTreePath* p;
-            GtkTreeRowReference* ref;
             char const* url = inf->webseeds[j];
 
             g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
-            ref = g_hash_table_lookup(hash, key);
-            p = gtk_tree_row_reference_get_path(ref);
+            GtkTreeRowReference* const ref = g_hash_table_lookup(hash, key);
+            GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
             if (speeds_KBps[j] > 0)
@@ -1747,7 +1732,6 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
     {
         char* name = NULL;
         char* addr = NULL;
-        char* markup = NULL;
         char* flagstr = NULL;
         struct DetailsImpl* di = gdi;
         GString* gstr = di->gstr;
@@ -1759,7 +1743,7 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
             -1);
 
         g_string_truncate(gstr, 0);
-        markup = g_markup_escape_text(name, -1);
+        char* const markup = g_markup_escape_text(name, -1);
         g_string_append_printf(gstr, "<b>%s</b>\n%s\n \n", markup, addr);
         g_free(markup);
 
@@ -2308,8 +2292,8 @@ static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 
     if (pixbuf != NULL)
     {
-        GtkTreePath* path = gtk_tree_row_reference_get_path(reference);
-        GtkTreeModel* model = gtk_tree_row_reference_get_model(reference);
+        GtkTreePath* const path = gtk_tree_row_reference_get_path(reference);
+        GtkTreeModel* const model = gtk_tree_row_reference_get_model(reference);
 
         if (gtk_tree_model_get_iter(model, &iter, path))
         {
@@ -2325,10 +2309,7 @@ static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 
 static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
 {
-    int* statCount;
-    tr_tracker_stat** stats;
     GtkTreeIter iter;
-    GtkTreeModel* model;
     GString* gstr = di->gstr; /* buffer for temporary strings */
     GHashTable* hash = di->tracker_hash;
     GtkListStore* store = di->tracker_store;
@@ -2336,8 +2317,8 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
     gboolean const showScrape = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(di->scrape_check));
 
     /* step 1: get all the trackers */
-    statCount = g_new0(int, n);
-    stats = g_new0(tr_tracker_stat*, n);
+    int* const statCount = g_new0(int, n);
+    tr_tracker_stat** const stats = g_new0(tr_tracker_stat*, n);
 
     for (int i = 0; i < n; ++i)
     {
@@ -2345,7 +2326,7 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* step 2: mark all the trackers in the list as not-updated */
-    model = GTK_TREE_MODEL(store);
+    GtkTreeModel* const model = GTK_TREE_MODEL(store);
 
     if (gtk_tree_model_iter_nth_child(model, &iter, NULL, 0))
     {
@@ -2496,16 +2477,12 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
 
         if (tor != NULL)
         {
-            tr_tracker_info* trackers;
-            char** tracker_strings;
-            char* tracker_text;
-
             /* build the array of trackers */
             gtk_text_buffer_get_bounds(text_buffer, &start, &end);
-            tracker_text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
-            tracker_strings = g_strsplit(tracker_text, "\n", 0);
+            char* const tracker_text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+            char** const tracker_strings = g_strsplit(tracker_text, "\n", 0);
 
-            trackers = g_new0(tr_tracker_info, g_strv_length(tracker_strings));
+            tr_tracker_info* const trackers = g_new0(tr_tracker_info, g_strv_length(tracker_strings));
             n = 0;
             tier = 0;
 
@@ -2532,9 +2509,9 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
             }
             else
             {
-                GtkWidget* w;
                 char const* text = _("List contains invalid URLs");
-                w = gtk_message_dialog_new(GTK_WINDOW(dialog), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
+                GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(
+                    dialog), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
                     text);
                 gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s",
                     _("Please correct the errors and try again."));
