@@ -455,7 +455,7 @@ static void ratio_spun_cb(GtkSpinButton* s, struct DetailsImpl* di)
 
 static void max_peers_spun_cb(GtkSpinButton* s, struct DetailsImpl* di)
 {
-    torrent_set_int(di, TR_KEY_peer_limit, gtk_spin_button_get_value(s));
+    torrent_set_int(di, TR_KEY_peer_limit, gtk_spin_button_get_value_as_int(s));
 }
 
 static void onPriorityChanged(GtkComboBox* combo_box, struct DetailsImpl* di)
