@@ -188,6 +188,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
     tr_quark key = 0;
 
+    if ((buf_in == NULL) || (bufend_in == NULL) || (top == NULL))
+    {
+        return EINVAL;
+    }
+
     tr_variantInit(top, 0);
 
     while (buf != bufend)
