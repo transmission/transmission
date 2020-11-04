@@ -111,7 +111,7 @@ char* tr_strltime(char* buf, time_t seconds, size_t buflen)
         seconds = 0;
     }
 
-    int const days = seconds / 86400;
+    int const days = (int)(seconds / 86400);
     int const hours = (seconds % 86400) / 3600;
     int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
