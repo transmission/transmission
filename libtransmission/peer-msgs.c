@@ -2276,10 +2276,10 @@ typedef struct
 }
 PexDiffs;
 
-static void pexAddedCb(void* vpex, void* userData)
+static void pexAddedCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     if (diffs->addedCount < MAX_PEX_ADDED)
     {
@@ -2288,10 +2288,10 @@ static void pexAddedCb(void* vpex, void* userData)
     }
 }
 
-static inline void pexDroppedCb(void* vpex, void* userData)
+static inline void pexDroppedCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     if (diffs->droppedCount < MAX_PEX_DROPPED)
     {
@@ -2299,15 +2299,15 @@ static inline void pexDroppedCb(void* vpex, void* userData)
     }
 }
 
-static inline void pexElementCb(void* vpex, void* userData)
+static inline void pexElementCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
-typedef void (* tr_set_func)(void* element, void* userData);
+typedef void (* tr_set_func)(void const* element, void* userData);
 
 /**
  * @brief find the differences and commonalities in two sorted sets
@@ -2334,12 +2334,12 @@ static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t
     {
         if (a == aend)
         {
-            (*in_b_cb)((void*)b, userData);
+            (*in_b_cb)(b, userData);
             b += elementSize;
         }
         else if (b == bend)
         {
-            (*in_a_cb)((void*)a, userData);
+            (*in_a_cb)(a, userData);
             a += elementSize;
         }
         else
@@ -2348,18 +2348,18 @@ static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t
 
             if (val == 0)
             {
-                (*in_both_cb)((void*)a, userData);
+                (*in_both_cb)(a, userData);
                 a += elementSize;
                 b += elementSize;
             }
             else if (val < 0)
             {
-                (*in_a_cb)((void*)a, userData);
+                (*in_a_cb)(a, userData);
                 a += elementSize;
             }
             else if (val > 0)
             {
-                (*in_b_cb)((void*)b, userData);
+                (*in_b_cb)(b, userData);
                 b += elementSize;
             }
         }
