@@ -1159,7 +1159,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             int scrape_fields = 0;
             int seeders = 0;
             int leechers = 0;
-            int downloads = 0;
             bool const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear(tier);
@@ -1182,7 +1181,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
                 if (response->downloads >= 0)
                 {
-                    tracker->downloadCount = downloads = response->downloads;
+                    tracker->downloadCount = response->downloads;
                     ++scrape_fields;
                 }
 
@@ -1644,8 +1643,8 @@ static bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 static int compareTiers(void const* va, void const* vb)
 {
     int ret;
-    tr_tier const* a = *(tr_tier const**)va;
-    tr_tier const* b = *(tr_tier const**)vb;
+    tr_tier const* a = *(tr_tier const* const*)va;
+    tr_tier const* b = *(tr_tier const* const*)vb;
 
     /* primary key: larger stats come before smaller */
     ret = compareTransfer(a->byteCounts[TR_ANN_UP], a->byteCounts[TR_ANN_DOWN], b->byteCounts[TR_ANN_UP],
