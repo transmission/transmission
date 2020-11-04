@@ -259,8 +259,8 @@ static char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_
 
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
 {
-    tr_torrent const* a = *(tr_torrent const**)va;
-    tr_torrent const* b = *(tr_torrent const**)vb;
+    tr_torrent const* a = *(tr_torrent const* const*)va;
+    tr_torrent const* b = *(tr_torrent const* const*)vb;
 
     return a->queuePosition - b->queuePosition;
 }
