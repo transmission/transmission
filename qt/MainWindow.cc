@@ -573,7 +573,10 @@ namespace
 {
 
 // Open Folder & select torrent's file or top folder
+
+#ifdef HAVE_OPEN_SELECT
 #undef HAVE_OPEN_SELECT
+#endif
 
 #if defined(Q_OS_WIN)
 
