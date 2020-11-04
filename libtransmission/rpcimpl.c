@@ -11,6 +11,9 @@
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
 
+#ifndef ZLIB_CONST
+#define ZLIB_CONST
+#endif
 #include <zlib.h>
 
 #include <event2/buffer.h>
@@ -1689,7 +1692,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_time
         stream.zalloc = (alloc_func)Z_NULL;
         stream.zfree = (free_func)Z_NULL;
         stream.opaque = (voidpf)Z_NULL;
-        stream.next_in = (void*)response;
+        stream.next_in = response;
         stream.avail_in = response_byte_count;
         inflateInit2(&stream, windowBits);
 
