@@ -99,11 +99,8 @@ char* tr_strlsize(char* buf, guint64 bytes, size_t buflen)
     return buf;
 }
 
-char* tr_strltime(char* buf, int seconds, size_t buflen)
+char* tr_strltime(char* buf, time_t seconds, size_t buflen)
 {
-    int days;
-    int hours;
-    int minutes;
     char d[128];
     char h[128];
     char m[128];
@@ -114,15 +111,15 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
         seconds = 0;
     }
 
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    int const days = seconds / 86400;
+    int const hours = (seconds % 86400) / 3600;
+    int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
     g_snprintf(d, sizeof(d), ngettext("%'d day", "%'d days", days), days);
     g_snprintf(h, sizeof(h), ngettext("%'d hour", "%'d hours", hours), hours);
     g_snprintf(m, sizeof(m), ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", seconds), seconds);
+    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
 
     if (days != 0)
     {

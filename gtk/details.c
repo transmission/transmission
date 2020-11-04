@@ -1109,7 +1109,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         }
         else
         {
-            int const period = time(NULL) - latest;
+            time_t const period = time(NULL) - latest;
 
             if (period < 5)
             {
