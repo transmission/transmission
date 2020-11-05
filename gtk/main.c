@@ -75,7 +75,7 @@ static char const* LICENSE =
 
 struct cbdata
 {
-    char* config_dir;
+    char const* config_dir;
     gboolean start_paused;
     gboolean is_iconified;
     gboolean is_closing;
@@ -634,7 +634,7 @@ int main(int argc, char** argv)
 
     /* default settings */
     memset(&cbdata, 0, sizeof(struct cbdata));
-    cbdata.config_dir = (char*)tr_getDefaultConfigDir(MY_CONFIG_NAME);
+    cbdata.config_dir = tr_getDefaultConfigDir(MY_CONFIG_NAME);
 
     /* init i18n */
     setlocale(LC_ALL, "");

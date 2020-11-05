@@ -144,6 +144,9 @@ signals:
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
     void httpAuthenticationRequired();
 
+private slots:
+    void onDuplicatesTimer();
+
 private:
     void start();
 
@@ -161,7 +164,6 @@ private:
 
     void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
 
-private:
     QString const config_dir_;
     Prefs& prefs_;
 
@@ -180,7 +182,4 @@ private:
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
-
-private slots:
-    void onDuplicatesTimer();
 };

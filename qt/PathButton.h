@@ -24,7 +24,6 @@ public:
         FileMode
     };
 
-public:
     explicit PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);

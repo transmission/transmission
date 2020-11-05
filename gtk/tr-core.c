@@ -801,8 +801,8 @@ static void core_watchdir_monitor_file(TrCore* core, GFile* file)
 }
 
 /* GFileMonitor noticed a file was created */
-static void on_file_changed_in_watchdir(GFileMonitor* monitor, GFile* file, GFile* other_type, GFileMonitorEvent event_type,
-    gpointer core)
+static void on_file_changed_in_watchdir(GFileMonitor const* monitor, GFile* file, GFile const* other_type,
+    GFileMonitorEvent event_type, gpointer core)
 {
     TR_UNUSED(monitor);
     TR_UNUSED(other_type);

@@ -2217,19 +2217,14 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
 #else
 
-    char* value = getenv(key);
+    char const* value = getenv(key);
 
     if (value == NULL)
     {
-        value = (char*)default_value;
+        value = default_value;
     }
 
-    if (value != NULL)
-    {
-        value = tr_strdup(value);
-    }
-
-    return value;
+    return value != NULL ? tr_strdup(value) : NULL;
 
 #endif
 }

@@ -548,7 +548,7 @@ static void publishError(tr_tier* tier, char const* msg)
     publishMessage(tier, msg, TR_TRACKER_ERROR);
 }
 
-static int8_t getSeedProbability(tr_tier* tier, int seeds, int leechers, int pex_count)
+static int8_t getSeedProbability(tr_tier const* tier, int seeds, int leechers, int pex_count)
 {
     /* special case optimization:
        ocelot omits seeds from peer lists sent to seeds on private trackers.
@@ -613,7 +613,7 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
 /**
  * Massages the incoming list of trackers into something we can use.
  */
-static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count, int* setme_count)
+static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_count, int* setme_count)
 {
     int n = 0;
     struct tr_tracker_info* ret;
@@ -1159,7 +1159,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             int scrape_fields = 0;
             int seeders = 0;
             int leechers = 0;
-            int downloads = 0;
             bool const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear(tier);
@@ -1182,7 +1181,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
                 if (response->downloads >= 0)
                 {
-                    tracker->downloadCount = downloads = response->downloads;
+                    tracker->downloadCount = response->downloads;
                     ++scrape_fields;
                 }
 
@@ -1363,7 +1362,7 @@ static bool multiscrape_too_big(char const* errmsg)
     return false;
 }
 
-static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errmsg)
+static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
 {
     int interval;
 
@@ -1644,8 +1643,8 @@ static bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 static int compareTiers(void const* va, void const* vb)
 {
     int ret;
-    tr_tier const* a = *(tr_tier const**)va;
-    tr_tier const* b = *(tr_tier const**)vb;
+    tr_tier const* a = *(tr_tier const* const*)va;
+    tr_tier const* b = *(tr_tier const* const*)vb;
 
     /* primary key: larger stats come before smaller */
     ret = compareTransfer(a->byteCounts[TR_ANN_UP], a->byteCounts[TR_ANN_DOWN], b->byteCounts[TR_ANN_UP],
@@ -1921,7 +1920,7 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if ((tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
+            if (tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0)
             {
                 found = true;
                 copy_tier_attributes_impl(&tt->tiers[i], j, src);

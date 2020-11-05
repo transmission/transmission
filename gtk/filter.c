@@ -424,7 +424,7 @@ static GtkWidget* tracker_combo_box_new(GtkTreeModel* tmodel)
     return c;
 }
 
-static gboolean test_tracker(tr_torrent* tor, int active_tracker_type, char const* host)
+static gboolean test_tracker(tr_torrent const* tor, int active_tracker_type, char const* host)
 {
     gboolean matches = TRUE;
 

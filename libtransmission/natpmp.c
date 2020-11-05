@@ -231,7 +231,6 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
     case TR_NATPMP_IDLE:
         *public_port = nat->public_port;
         return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
-        break;
 
     case TR_NATPMP_DISCOVER:
         ret = TR_PORT_UNMAPPED;

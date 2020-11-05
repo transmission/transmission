@@ -1905,8 +1905,8 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
 
 static int compareTorrentByCur(void const* va, void const* vb)
 {
-    tr_torrent const* a = *(tr_torrent const**)va;
-    tr_torrent const* b = *(tr_torrent const**)vb;
+    tr_torrent const* a = *(tr_torrent const* const*)va;
+    tr_torrent const* b = *(tr_torrent const* const*)vb;
     uint64_t const aCur = a->downloadedCur + a->uploadedCur;
     uint64_t const bCur = b->downloadedCur + b->uploadedCur;
 

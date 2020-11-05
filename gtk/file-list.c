@@ -116,7 +116,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkT
 
     if (is_file)
     {
-        tr_torrent* tor = refresh_data->tor;
+        tr_torrent const* tor = refresh_data->tor;
         tr_info const* inf = tr_torrentInfo(tor);
         int const enabled = inf->files[index].dnd ? 0 : 1;
         int const priority = inf->files[index].priority;
@@ -648,9 +648,8 @@ static void renderPriority(GtkTreeViewColumn* column, GtkCellRenderer* renderer,
 }
 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
-static char* buildFilename(tr_torrent* tor, GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter)
+static char* buildFilename(tr_torrent const* tor, GtkTreeModel* model, GtkTreePath* path, GtkTreeIter const* iter)
 {
-    char* ret;
     GtkTreeIter child;
     GtkTreeIter parent = *iter;
     int n = gtk_tree_path_get_depth(path);
@@ -664,7 +663,7 @@ static char* buildFilename(tr_torrent* tor, GtkTreeModel* model, GtkTreePath* pa
     }
     while (gtk_tree_model_iter_parent(model, &parent, &child));
 
-    ret = g_build_filenamev(tokens);
+    char* const ret = g_build_filenamev(tokens);
     g_strfreev(tokens);
     return ret;
 }
@@ -675,7 +674,7 @@ static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeView
 
     gboolean handled = FALSE;
     FileData* data = gdata;
-    tr_torrent* tor = gtr_core_find_torrent(data->core, data->torrentId);
+    tr_torrent const* tor = gtr_core_find_torrent(data->core, data->torrentId);
 
     if (tor != NULL)
     {
@@ -776,7 +775,8 @@ static gboolean onViewPathToggled(GtkTreeView* view, GtkTreeViewColumn* col, Gtk
 /**
  * @note 'col' and 'path' are assumed not to be NULL.
  */
-static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton* event, GtkTreeViewColumn** col, GtkTreePath** path)
+static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton const* event, GtkTreeViewColumn** col,
+    GtkTreePath** path)
 {
     GtkTreeSelection* sel;
 
@@ -796,7 +796,7 @@ static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton* eve
     return FALSE;
 }
 
-static gboolean onViewButtonPressed(GtkWidget* w, GdkEventButton* event, gpointer gdata)
+static gboolean onViewButtonPressed(GtkWidget* w, GdkEventButton const* event, gpointer gdata)
 {
     GtkTreeViewColumn* col;
     GtkTreePath* path = NULL;
@@ -865,34 +865,31 @@ static int on_rename_done_idle(struct rename_data* data)
     return G_SOURCE_REMOVE;
 }
 
-static void on_rename_done(tr_torrent* tor G_GNUC_UNUSED, char const* oldpath G_GNUC_UNUSED, char const* newname G_GNUC_UNUSED,
-    int error, struct rename_data* rename_data)
+static void on_rename_done(tr_torrent const* tor G_GNUC_UNUSED, char const* oldpath G_GNUC_UNUSED,
+    char const* newname G_GNUC_UNUSED, int error, struct rename_data* rename_data)
 {
     rename_data->error = error;
     gdk_threads_add_idle((GSourceFunc)on_rename_done_idle, rename_data);
 }
 
-static void cell_edited_callback(GtkCellRendererText* cell G_GNUC_UNUSED, gchar* path_string, gchar* newname, FileData* data)
+static void cell_edited_callback(GtkCellRendererText const* cell G_GNUC_UNUSED, gchar const* path_string, gchar const* newname,
+    FileData* data)
 {
-    tr_torrent* tor;
-    GString* oldpath;
-    GtkTreeIter iter;
-    struct rename_data* rename_data;
-
-    tor = gtr_core_find_torrent(data->core, data->torrentId);
+    tr_torrent* const tor = gtr_core_find_torrent(data->core, data->torrentId);
 
     if (tor == NULL)
     {
         return;
     }
 
+    GtkTreeIter iter;
     if (!gtk_tree_model_get_iter_from_string(data->model, &iter, path_string))
     {
         return;
     }
 
     /* build oldpath */
-    oldpath = g_string_new(NULL);
+    GString* oldpath = g_string_new(NULL);
 
     for (;;)
     {
@@ -913,7 +910,7 @@ static void cell_edited_callback(GtkCellRendererText* cell G_GNUC_UNUSED, gchar*
     }
 
     /* do the renaming */
-    rename_data = g_new0(struct rename_data, 1);
+    struct rename_data* rename_data = g_new0(struct rename_data, 1);
     rename_data->newname = g_strdup(newname);
     rename_data->file_data = data;
     rename_data->path_string = g_strdup(path_string);

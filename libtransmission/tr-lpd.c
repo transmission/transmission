@@ -265,15 +265,11 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
         char const* const new_line = strstr(beg, CRLF);
 
         /* the value is delimited by the next CRLF */
-        int len = new_line - beg;
+        int const len = new_line - beg;
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        if (len < n--)
-        {
-            n = len;
-        }
-
+        n = MIN(len, n - 1);
         strncpy(val, beg, n);
         val[n] = 0;
     }

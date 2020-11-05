@@ -28,7 +28,6 @@ public:
         NUM_MODES
     };
 
-public:
     explicit FilterMode(int mode = SHOW_ALL) :
         mode_(mode)
     {
@@ -76,7 +75,6 @@ public:
         NUM_MODES
     };
 
-public:
     explicit SortMode(int mode = SORT_BY_ID) :
         mode_(mode)
     {

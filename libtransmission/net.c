@@ -229,7 +229,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in* sin = (struct sockaddr_in*)from;
+        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -238,7 +238,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6* sin6 = (struct sockaddr_in6*)from;
+        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
@@ -573,7 +573,7 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (s == TR_BAD_SOCKET)
     {
-        goto fail;
+        goto FAIL;
     }
 
     /* Since it's a UDP socket, this doesn't actually send any packets. */
@@ -581,21 +581,21 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     rc = getsockname(s, src, src_len);
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     evutil_closesocket(s);
 
     return rc;
 
-fail:
+FAIL:
     save = errno;
     evutil_closesocket(s);
     errno = save;

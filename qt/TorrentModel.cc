@@ -185,13 +185,12 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
             keys.push_back(tr_quark_new(str, len));
         }
     }
-    else
+    else if (first_child != nullptr)
     {
         // In 'object' format, every entry is an object with the same set of properties
-        size_t i = 0;
         tr_quark key;
         tr_variant* value;
-        while (first_child && tr_variantDictChild(first_child, i++, &key, &value))
+        for (size_t i = 0; tr_variantDictChild(first_child, i, &key, &value); ++i)
         {
             keys.push_back(key);
         }

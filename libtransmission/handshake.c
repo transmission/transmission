@@ -883,7 +883,7 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
     return READ_NOW;
 }
 
-static ReadState readIA(tr_handshake* handshake, struct evbuffer* inbuf)
+static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
 {
     size_t const needlen = handshake->ia_len;
     struct evbuffer* outbuf;
