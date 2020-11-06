@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 
 #include <QApplication>
@@ -34,7 +35,6 @@ class Application : public QApplication
 
 public:
     Application(int& argc, char** argv);
-    ~Application() override;
 
     void raise();
     bool notifyApp(QString const& title, QString const& body) const;
@@ -55,6 +55,7 @@ private slots:
     void onTorrentsNeedInfo(torrent_ids_t const& torrents);
     void refreshPref(int key);
     void refreshTorrents();
+    void saveGeometry();
 
 private:
     void maybeUpdateBlocklist();
@@ -62,11 +63,11 @@ private:
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
 
-    Prefs* prefs_ = {};
-    Session* session_ = {};
-    TorrentModel* model_ = {};
-    MainWindow* window_ = {};
-    WatchDir* watch_dir_ = {};
+    std::unique_ptr<Prefs> prefs_ = {};
+    std::unique_ptr<Session> session_ = {};
+    std::unique_ptr<TorrentModel> model_ = {};
+    std::unique_ptr<MainWindow> window_ = {};
+    std::unique_ptr<WatchDir> watch_dir_ = {};
     QTimer model_timer_;
     QTimer stats_timer_;
     QTimer session_timer_;
