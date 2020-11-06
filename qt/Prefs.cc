@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QTextCodec>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -20,7 +21,6 @@
 
 #include "CustomVariantType.h"
 #include "Prefs.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictAdd;
@@ -154,6 +154,14 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
     { SortMode::SORT_BY_STATE, "sort-by-state" },
     { SortMode::SORT_BY_ID, "sort-by-id" }
 }};
+
+bool isValidUtf8(QByteArray const& byteArray)
+{
+    static auto* codec = QTextCodec::codecForName("UTF-8");
+    auto state = QTextCodec::ConverterState {};
+    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
+    return state.invalidChars == 0;
+}
 
 } // namespace
 
@@ -433,7 +441,7 @@ QString Prefs::getString(int key) const
     assert(Items[key].type == QVariant::String);
     QByteArray const b = values_[key].toByteArray();
 
-    if (Utils::isValidUtf8(b.constData()))
+    if (isValidUtf8(b.constData()))
     {
         values_[key].setValue(QString::fromUtf8(b.constData()));
     }
