@@ -1547,7 +1547,7 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
         uint64_t const length = tor->info.files[i].length;
         uint64_t const b = isSeed ? length : countFileBytesCompleted(tor, i);
         walk->bytesCompleted = b;
-        walk->progress = length > 0 ? (float)b / length : 1.0F;
+        walk->progress = length > 0 ? (float)b / (float)length : 1.0F;
         ++walk;
     }
 

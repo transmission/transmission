@@ -1531,11 +1531,10 @@ static void printTorrentList(tr_variant* top)
 static void printTrackersImpl(tr_variant* trackerStats)
 {
     char buf[512];
-    tr_variant* t;
 
-    int i = 0;
-    while (((t = tr_variantListChild(trackerStats, i++))) != NULL)
+    for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
+        tr_variant* const t = tr_variantListChild(trackerStats, i);
         int64_t downloadCount;
         bool hasAnnounced;
         bool hasScraped;
