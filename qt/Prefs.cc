@@ -157,7 +157,7 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
 
 bool isValidUtf8(QByteArray const& byteArray)
 {
-    static auto* codec = QTextCodec::codecForName("UTF-8");
+    auto* codec = QTextCodec::codecForName("UTF-8");
     auto state = QTextCodec::ConverterState {};
     auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
