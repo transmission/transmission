@@ -1592,7 +1592,7 @@ void MainWindow::dropEvent(QDropEvent* event)
                 key = url.toLocalFile();
             }
 
-            qApp->addTorrent(AddData(key));
+            trApp->addTorrent(AddData(key));
         }
     }
 }

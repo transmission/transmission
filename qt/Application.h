@@ -82,5 +82,4 @@ private:
     std::unordered_set<QString> interned_strings_;
 };
 
-#undef qApp
-#define qApp static_cast<Application*>(Application::instance())
+#define trApp static_cast<Application*>(Application::instance())

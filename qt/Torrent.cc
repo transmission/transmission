@@ -250,7 +250,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
     field_changed = change(field ## _, child); \
     if (field_changed) \
     { \
-        field ## _ = qApp->intern(field ## _); \
+        field ## _ = trApp->intern(field ## _); \
     } \
     changed.set(bit, field_changed); \
     break;
@@ -370,5 +370,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return qApp->faviconCache().find(favicon_key);
+    return trApp->faviconCache().find(favicon_key);
 }
