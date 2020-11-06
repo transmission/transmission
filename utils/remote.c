@@ -1531,7 +1531,8 @@ static void printTrackersImpl(tr_variant* trackerStats)
     char buf[512];
     tr_variant* t;
 
-    for (int i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
+    int i = 0;
+    while (((t = tr_variantListChild(trackerStats, i++))) != NULL)
     {
         int64_t downloadCount;
         bool hasAnnounced;
