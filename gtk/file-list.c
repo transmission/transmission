@@ -504,14 +504,12 @@ static GNode* find_child(GNode* parent, char const* name)
 
 void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 {
-    GtkTreeStore* store;
-    FileData* data = g_object_get_data(G_OBJECT(w), "file-data");
-
     /* unset the old fields */
+    FileData* const data = g_object_get_data(G_OBJECT(w), "file-data");
     clearData(data);
 
     /* instantiate the model */
-    store = gtk_tree_store_new(N_FILE_COLS,
+    GtkTreeStore* const store = gtk_tree_store_new(N_FILE_COLS,
         GDK_TYPE_PIXBUF, /* icon */
         G_TYPE_STRING, /* label */
         G_TYPE_STRING, /* label esc */
@@ -528,65 +526,64 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
     data->torrentId = torrentId;
 
     /* populate the model */
-    if (torrentId > 0)
+    tr_torrent* const tor = torrentId > 0 ?
+        gtr_core_find_torrent(data->core, torrentId) :
+        NULL;
+    if (tor != NULL)
     {
-        tr_torrent* tor = gtr_core_find_torrent(data->core, torrentId);
+        // build a GNode tree of the files
+        struct row_struct* const root_data = g_new0(struct row_struct, 1);
+        root_data->name = g_strdup(tr_torrentName(tor));
+        root_data->index = -1;
+        root_data->length = 0;
 
-        if (tor != NULL)
+        GNode* const root = g_node_new(root_data);
+
+        tr_info const* inf = tr_torrentInfo(tor);
+        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_info const* inf = tr_torrentInfo(tor);
-            struct row_struct* root_data;
-            GNode* root;
-            struct build_data build;
+            GNode* parent = root;
+            tr_file const* const file = &inf->files[i];
+            char** const tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
 
-            /* build a GNode tree of the files */
-            root_data = g_new0(struct row_struct, 1);
-            root_data->name = g_strdup(tr_torrentName(tor));
-            root_data->index = -1;
-            root_data->length = 0;
-            root = g_node_new(root_data);
-
-            for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
+            for (int j = 0; tokens[j] != NULL; ++j)
             {
-                GNode* parent = root;
-                tr_file const* file = &inf->files[i];
-                char** tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
+                gboolean const isLeaf = tokens[j + 1] == NULL;
+                char const* const name = tokens[j];
+                GNode* node = find_child(parent, name);
 
-                for (int j = 0; tokens[j] != NULL; ++j)
+                if (node == NULL)
                 {
-                    gboolean const isLeaf = tokens[j + 1] == NULL;
-                    char const* name = tokens[j];
-                    GNode* node = find_child(parent, name);
-
-                    if (node == NULL)
-                    {
-                        struct row_struct* row = g_new(struct row_struct, 1);
-                        row->name = g_strdup(name);
-                        row->index = isLeaf ? (int)i : -1;
-                        row->length = isLeaf ? file->length : 0;
-                        node = g_node_new(row);
-                        g_node_append(parent, node);
-                    }
-
-                    parent = node;
+                    struct row_struct* row = g_new(struct row_struct, 1);
+                    row->name = g_strdup(name);
+                    row->index = isLeaf ? (int)i : -1;
+                    row->length = isLeaf ? file->length : 0;
+                    node = g_node_new(row);
+                    g_node_append(parent, node);
                 }
 
-                g_strfreev(tokens);
+                parent = node;
             }
 
-            /* now, add them to the model */
-            build.w = w;
-            build.tor = tor;
-            build.store = data->store;
-            build.iter = NULL;
-            g_node_children_foreach(root, G_TRAVERSE_ALL, buildTree, &build);
-
-            /* cleanup */
-            g_node_destroy(root);
-            g_free(root_data->name);
-            g_free(root_data);
+            g_strfreev(tokens);
         }
 
+        // now, add them to the model
+        struct build_data build;
+        build.w = w;
+        build.tor = tor;
+        build.store = data->store;
+        build.iter = NULL;
+        g_node_children_foreach(root, G_TRAVERSE_ALL, buildTree, &build);
+
+        // cleanup
+        g_node_destroy(root);
+        g_free(root_data->name);
+        g_free(root_data);
+    }
+
+    if (torrentId > 0)
+    {
         refresh(data);
         data->timeout_tag = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, refreshModel, data);
     }
