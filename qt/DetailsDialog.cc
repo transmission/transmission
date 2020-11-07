@@ -253,13 +253,6 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     ui_debounce_timer_.setSingleShot(true);
 }
 
-DetailsDialog::~DetailsDialog()
-{
-    tracker_delegate_->deleteLater();
-    tracker_filter_->deleteLater();
-    tracker_model_->deleteLater();
-}
-
 void DetailsDialog::setIds(torrent_ids_t const& ids)
 {
     if (ids != ids_)
@@ -1449,13 +1442,15 @@ void DetailsDialog::initOptionsTab()
 
 void DetailsDialog::initTrackerTab()
 {
-    tracker_model_ = new TrackerModel();
-    tracker_filter_ = new TrackerModelFilter();
-    tracker_filter_->setSourceModel(tracker_model_);
-    tracker_delegate_ = new TrackerDelegate();
+    auto deleter = [](QObject* o) { o->deleteLater(); };
 
-    ui_.trackersView->setModel(tracker_filter_);
-    ui_.trackersView->setItemDelegate(tracker_delegate_);
+    tracker_model_.reset(new TrackerModel, deleter);
+    tracker_filter_.reset(new TrackerModelFilter, deleter);
+    tracker_filter_->setSourceModel(tracker_model_.get());
+    tracker_delegate_.reset(new TrackerDelegate, deleter);
+
+    ui_.trackersView->setModel(tracker_filter_.get());
+    ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
     ui_.addTrackerButton->setIcon(getStockIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
     ui_.editTrackerButton->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
