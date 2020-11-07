@@ -63,10 +63,10 @@ private:
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
 
-    std::unique_ptr<Prefs> prefs_ = {};
-    std::unique_ptr<Session> session_ = {};
-    std::unique_ptr<TorrentModel> model_ = {};
-    std::unique_ptr<MainWindow> window_ = {};
+    std::unique_ptr<Prefs> prefs_;
+    std::unique_ptr<Session> session_;
+    std::unique_ptr<TorrentModel> model_;
+    std::unique_ptr<MainWindow> window_;
     std::unique_ptr<WatchDir> watch_dir_ = {};
     QTimer model_timer_;
     QTimer stats_timer_;
