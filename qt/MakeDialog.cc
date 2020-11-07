@@ -221,8 +221,11 @@ void MakeDialog::onSourceChanged()
     {
         QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
-        text = tr("%1 in %2; %3 @ %4").arg(Formatter::get().sizeToString(builder_->totalSize)).arg(files).arg(pieces).
-            arg(Formatter::get().sizeToString(builder_->pieceSize));
+        text = tr("%1 in %2; %3 @ %4")
+            .arg(Formatter::get().sizeToString(builder_->totalSize))
+            .arg(files)
+            .arg(pieces)
+            .arg(Formatter::get().sizeToString(static_cast<size_t>(builder_->pieceSize)));
     }
 
     ui_.sourceSizeLabel->setText(text);
