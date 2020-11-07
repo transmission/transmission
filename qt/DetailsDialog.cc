@@ -271,29 +271,18 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
 
 void DetailsDialog::refreshPref(int key)
 {
-    QString str;
-
-    switch (key)
+    if (key == Prefs::SHOW_TRACKER_SCRAPES)
     {
-    case Prefs::SHOW_TRACKER_SCRAPES:
-        {
-            QItemSelectionModel* selection_model(ui_.trackersView->selectionModel());
-            QItemSelection const selection(selection_model->selection());
-            QModelIndex const current_index(selection_model->currentIndex());
-            tracker_delegate_->setShowMore(prefs_.getBool(key));
-            selection_model->clear();
-            ui_.trackersView->reset();
-            selection_model->select(selection, QItemSelectionModel::Select);
-            selection_model->setCurrentIndex(current_index, QItemSelectionModel::NoUpdate);
-            break;
-        }
-
-    case Prefs::SHOW_BACKUP_TRACKERS:
+        auto* selection_model = ui_.trackersView->selectionModel();
+        tracker_delegate_->setShowMore(prefs_.getBool(key));
+        selection_model->clear();
+        ui_.trackersView->reset();
+        selection_model->select(selection_model->selection(), QItemSelectionModel::Select);
+        selection_model->setCurrentIndex(selection_model->currentIndex(), QItemSelectionModel::NoUpdate);
+    }
+    else if (key == Prefs::SHOW_BACKUP_TRACKERS)
+    {
         tracker_filter_->setShowBackupTrackers(prefs_.getBool(key));
-        break;
-
-    default:
-        break;
     }
 }
 
