@@ -36,29 +36,29 @@ class Application : public QApplication
 public:
     Application(int& argc, char** argv);
 
-    void raise();
+    void raise() const;
     bool notifyApp(QString const& title, QString const& body) const;
 
     QString const& intern(QString const& in) { return *interned_strings_.insert(in).first; }
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(AddData const&);
-    void addTorrent(QString const&);
+    void addTorrent(AddData const&) const;
+    void addTorrent(QString const&) const;
 
 private slots:
-    void consentGiven(int result);
-    void onSessionSourceChanged();
+    void consentGiven(int result) const;
+    void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrents) const;
     void onTorrentsCompleted(torrent_ids_t const& torrents) const;
-    void onTorrentsEdited(torrent_ids_t const& torrents);
-    void onTorrentsNeedInfo(torrent_ids_t const& torrents);
-    void refreshPref(int key);
+    void onTorrentsEdited(torrent_ids_t const& torrents) const;
+    void onTorrentsNeedInfo(torrent_ids_t const& torrents) const;
+    void refreshPref(int key) const;
     void refreshTorrents();
-    void saveGeometry();
+    void saveGeometry() const;
 
 private:
-    void maybeUpdateBlocklist();
+    void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;

@@ -388,7 +388,7 @@ void Application::quitLater() const
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-void Application::onTorrentsEdited(torrent_ids_t const& ids)
+void Application::onTorrentsEdited(torrent_ids_t const& ids) const
 {
     // the backend's tr_info has changed, so reload those fields
     session_->initTorrents(ids);
@@ -435,7 +435,7 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
     }
 }
 
-void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
+void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
 {
     if (!ids.empty())
     {
@@ -447,7 +447,7 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
 ****
 ***/
 
-void Application::consentGiven(int result)
+void Application::consentGiven(int result) const
 {
     if (result == QMessageBox::Ok)
     {
@@ -459,7 +459,7 @@ void Application::consentGiven(int result)
     }
 }
 
-void Application::saveGeometry()
+void Application::saveGeometry() const
 {
     if (prefs_ != nullptr && window_ != nullptr)
     {
@@ -475,7 +475,7 @@ void Application::saveGeometry()
 ****
 ***/
 
-void Application::refreshPref(int key)
+void Application::refreshPref(int key) const
 {
     switch (key)
     {
@@ -494,7 +494,7 @@ void Application::refreshPref(int key)
     }
 }
 
-void Application::maybeUpdateBlocklist()
+void Application::maybeUpdateBlocklist() const
 {
     if (!prefs_->getBool(Prefs::BLOCKLIST_UPDATES_ENABLED))
     {
@@ -512,7 +512,7 @@ void Application::maybeUpdateBlocklist()
     }
 }
 
-void Application::onSessionSourceChanged()
+void Application::onSessionSourceChanged() const
 {
     session_->initTorrents();
     session_->refreshSessionStats();
@@ -541,12 +541,12 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(QString const& addme)
+void Application::addTorrent(QString const& addme) const
 {
     addTorrent(AddData(addme));
 }
 
-void Application::addTorrent(AddData const& addme)
+void Application::addTorrent(AddData const& addme) const
 {
     if (addme.type == addme.NONE)
     {
@@ -570,7 +570,7 @@ void Application::addTorrent(AddData const& addme)
 ****
 ***/
 
-void Application::raise()
+void Application::raise() const
 {
     alert(window_.get());
 }
