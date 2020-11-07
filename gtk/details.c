@@ -1650,22 +1650,18 @@ static void refreshWebseedList(struct DetailsImpl* di, tr_torrent** torrents, in
 
         for (unsigned int j = 0; j < inf->webseedCount; ++j)
         {
-            char buf[128];
-            char key[256];
-            char const* url = inf->webseeds[j];
+            char const* const url = inf->webseeds[j];
 
+            char key[256];
             g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
             GtkTreeRowReference* const ref = g_hash_table_lookup(hash, key);
             GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
+            char buf[128] = { 0 };
             if (speeds_KBps[j] > 0)
             {
                 tr_formatter_speed_KBps(buf, speeds_KBps[j], sizeof(buf));
-            }
-            else
-            {
-                *buf = '\0';
             }
 
             gtk_list_store_set(store, &iter,
@@ -2084,7 +2080,14 @@ static GtkWidget* peer_page_new(struct DetailsImpl* di)
 *****
 ****/
 
-/* if it's been longer than a minute, don't bother showing the seconds */
+static char const err_markup_begin[] = "<span color=\"red\">";
+static char const err_markup_end[] = "</span>";
+static char const timeout_markup_begin[] = "<span color=\"#246\">";
+static char const timeout_markup_end[] = "</span>";
+static char const success_markup_begin[] = "<span color=\"#080\">";
+static char const success_markup_end[] = "</span>";
+
+// if it's been longer than a minute, don't bother showing the seconds
 static void tr_strltime_rounded(char* buf, time_t t, size_t buflen)
 {
     if (t > 60)
@@ -2095,21 +2098,108 @@ static void tr_strltime_rounded(char* buf, time_t t, size_t buflen)
     tr_strltime(buf, t, buflen);
 }
 
+static void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, GString* const gstr)
+{
+    char timebuf[256];
+
+    if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
+    {
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastAnnounceTime, sizeof(timebuf));
+
+        if (st->lastAnnounceSucceeded)
+        {
+            g_string_append_printf(gstr, _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
+                success_markup_begin, st->lastAnnouncePeerCount, success_markup_end, timebuf);
+        }
+        else if (st->lastAnnounceTimedOut)
+        {
+            g_string_append_printf(gstr, _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
+                timeout_markup_begin, timeout_markup_end, timebuf);
+        }
+        else
+        {
+            g_string_append_printf(gstr, _("Got an error %1$s\"%2$s\"%3$s %4$s ago"), err_markup_begin,
+                st->lastAnnounceResult, err_markup_end, timebuf);
+        }
+    }
+
+    switch (st->announceState)
+    {
+    case TR_TRACKER_INACTIVE:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("No updates scheduled"));
+        break;
+
+    case TR_TRACKER_WAITING:
+        tr_strltime_rounded(timebuf, st->nextAnnounceTime - now, sizeof(timebuf));
+        g_string_append_c(gstr, '\n');
+        g_string_append_printf(gstr, _("Asking for more peers in %s"), timebuf);
+        break;
+
+    case TR_TRACKER_QUEUED:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("Queued to ask for more peers"));
+        break;
+
+    case TR_TRACKER_ACTIVE:
+        tr_strltime_rounded(timebuf, now - st->lastAnnounceStartTime, sizeof(timebuf));
+        g_string_append_c(gstr, '\n');
+        g_string_append_printf(gstr, _("Asking for more peers now… <small>%s</small>"), timebuf);
+        break;
+    }
+}
+
+static void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, GString* const gstr)
+{
+    char timebuf[256];
+
+    if (st->hasScraped)
+    {
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastScrapeTime, sizeof(timebuf));
+
+        if (st->lastScrapeSucceeded)
+        {
+            g_string_append_printf(gstr, _("Tracker had %s%'d seeders and %'d leechers%s %s ago"), success_markup_begin,
+                st->seederCount, st->leecherCount, success_markup_end, timebuf);
+        }
+        else
+        {
+            g_string_append_printf(gstr, _("Got a scrape error \"%s%s%s\" %s ago"), err_markup_begin,
+                st->lastScrapeResult, err_markup_end, timebuf);
+        }
+    }
+
+    switch (st->scrapeState)
+    {
+    case TR_TRACKER_INACTIVE:
+        break;
+
+    case TR_TRACKER_WAITING:
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, st->nextScrapeTime - now, sizeof(timebuf));
+        g_string_append_printf(gstr, _("Asking for peer counts in %s"), timebuf);
+        break;
+
+    case TR_TRACKER_QUEUED:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("Queued to ask for peer counts"));
+        break;
+
+    case TR_TRACKER_ACTIVE:
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastScrapeStartTime, sizeof(timebuf));
+        g_string_append_printf(gstr, _("Asking for peer counts now… <small>%s</small>"), timebuf);
+        break;
+    }
+}
+
 static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat const* st, gboolean showScrape)
 {
-    char* str;
-    char timebuf[256];
-    time_t const now = time(NULL);
-    char const* const err_markup_begin = "<span color=\"red\">";
-    char const* const err_markup_end = "</span>";
-    char const* const timeout_markup_begin = "<span color=\"#246\">";
-    char const* const timeout_markup_end = "</span>";
-    char const* const success_markup_begin = "<span color=\"#080\">";
-    char const* const success_markup_end = "</span>";
-
     // hostname
     g_string_append(gstr, st->isBackup ? "<i>" : "<b>");
-    str = key != NULL ?
+    char* const str = key != NULL ?
         g_markup_printf_escaped("%s - %s", st->host, key) :
         g_markup_printf_escaped("%s", st->host);
     g_string_append(gstr, str);
@@ -2118,94 +2208,13 @@ static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat 
 
     if (!st->isBackup)
     {
-        if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
-        {
-            g_string_append_c(gstr, '\n');
-            tr_strltime_rounded(timebuf, now - st->lastAnnounceTime, sizeof(timebuf));
+        time_t const now = time(NULL);
 
-            if (st->lastAnnounceSucceeded)
-            {
-                g_string_append_printf(gstr, _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
-                    success_markup_begin, st->lastAnnouncePeerCount, success_markup_end, timebuf);
-            }
-            else if (st->lastAnnounceTimedOut)
-            {
-                g_string_append_printf(gstr, _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
-                    timeout_markup_begin, timeout_markup_end, timebuf);
-            }
-            else
-            {
-                g_string_append_printf(gstr, _("Got an error %1$s\"%2$s\"%3$s %4$s ago"), err_markup_begin,
-                    st->lastAnnounceResult, err_markup_end, timebuf);
-            }
-        }
-
-        switch (st->announceState)
-        {
-        case TR_TRACKER_INACTIVE:
-            g_string_append_c(gstr, '\n');
-            g_string_append(gstr, _("No updates scheduled"));
-            break;
-
-        case TR_TRACKER_WAITING:
-            tr_strltime_rounded(timebuf, st->nextAnnounceTime - now, sizeof(timebuf));
-            g_string_append_c(gstr, '\n');
-            g_string_append_printf(gstr, _("Asking for more peers in %s"), timebuf);
-            break;
-
-        case TR_TRACKER_QUEUED:
-            g_string_append_c(gstr, '\n');
-            g_string_append(gstr, _("Queued to ask for more peers"));
-            break;
-
-        case TR_TRACKER_ACTIVE:
-            tr_strltime_rounded(timebuf, now - st->lastAnnounceStartTime, sizeof(timebuf));
-            g_string_append_c(gstr, '\n');
-            g_string_append_printf(gstr, _("Asking for more peers now… <small>%s</small>"), timebuf);
-            break;
-        }
+        appendAnnounceInfo(st, now, gstr);
 
         if (showScrape)
         {
-            if (st->hasScraped)
-            {
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, now - st->lastScrapeTime, sizeof(timebuf));
-
-                if (st->lastScrapeSucceeded)
-                {
-                    g_string_append_printf(gstr, _("Tracker had %s%'d seeders and %'d leechers%s %s ago"), success_markup_begin,
-                        st->seederCount, st->leecherCount, success_markup_end, timebuf);
-                }
-                else
-                {
-                    g_string_append_printf(gstr, _("Got a scrape error \"%s%s%s\" %s ago"), err_markup_begin,
-                        st->lastScrapeResult, err_markup_end, timebuf);
-                }
-            }
-
-            switch (st->scrapeState)
-            {
-            case TR_TRACKER_INACTIVE:
-                break;
-
-            case TR_TRACKER_WAITING:
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, st->nextScrapeTime - now, sizeof(timebuf));
-                g_string_append_printf(gstr, _("Asking for peer counts in %s"), timebuf);
-                break;
-
-            case TR_TRACKER_QUEUED:
-                g_string_append_c(gstr, '\n');
-                g_string_append(gstr, _("Queued to ask for peer counts"));
-                break;
-
-            case TR_TRACKER_ACTIVE:
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, now - st->lastScrapeStartTime, sizeof(timebuf));
-                g_string_append_printf(gstr, _("Asking for peer counts now… <small>%s</small>"), timebuf);
-                break;
-            }
+            appendScrapeInfo(st, now, gstr);
         }
     }
 }
