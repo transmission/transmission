@@ -668,7 +668,7 @@ static char* buildFilename(tr_torrent const* tor, GtkTreeModel* model, GtkTreePa
     return ret;
 }
 
-static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn* col, gpointer gdata)
+static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn const* col, gpointer gdata)
 {
     TR_UNUSED(col);
 
