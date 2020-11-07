@@ -67,7 +67,7 @@ private:
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;
     std::unique_ptr<MainWindow> window_;
-    std::unique_ptr<WatchDir> watch_dir_ = {};
+    std::unique_ptr<WatchDir> watch_dir_;
     QTimer model_timer_;
     QTimer stats_timer_;
     QTimer session_timer_;
