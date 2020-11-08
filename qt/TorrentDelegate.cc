@@ -149,14 +149,14 @@ QString TorrentDelegate::progressString(Torrent const& tor)
 
     if (is_magnet) // magnet link with no metadata
     {
-        //: First part of torrent progress string;
+        //: First part of torrent progress string,
         //: %1 is the percentage of torrent metadata downloaded
         str = tr("Magnetized transfer - retrieving metadata (%1%)").
             arg(Formatter::get().percentToString(tor.metadataPercentDone() * 100.0));
     }
     else if (!is_done) // downloading
     {
-        //: First part of torrent progress string;
+        //: First part of torrent progress string,
         //: %1 is how much we've got,
         //: %2 is how much we'll have when done,
         //: %3 is a percentage of the two
@@ -169,7 +169,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     {
         if (has_seed_ratio)
         {
-            //: First part of torrent progress string;
+            //: First part of torrent progress string,
             //: %1 is how much we've got,
             //: %2 is the torrent's total size,
             //: %3 is a percentage of the two,
@@ -184,7 +184,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         }
         else
         {
-            //: First part of torrent progress string;
+            //: First part of torrent progress string,
             //: %1 is how much we've got,
             //: %2 is the torrent's total size,
             //: %3 is a percentage of the two,
@@ -200,7 +200,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     {
         if (has_seed_ratio)
         {
-            //: First part of torrent progress string;
+            //: First part of torrent progress string,
             //: %1 is the torrent's total size,
             //: %2 is how much we've uploaded,
             //: %3 is our upload-to-download ratio,
@@ -211,7 +211,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         }
         else // seeding w/o a ratio
         {
-            //: First part of torrent progress string;
+            //: First part of torrent progress string,
             //: %1 is the torrent's total size,
             //: %2 is how much we've uploaded,
             //: %3 is our upload-to-download ratio
@@ -225,14 +225,14 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     {
         if (tor.hasETA())
         {
-            //: Second (optional) part of torrent progress string;
-            //: %1 is duration;
+            //: Second (optional) part of torrent progress string,
+            //: %1 is duration,
             //: notice that leading space (before the dash) is included here
             str += tr(" - %1 left").arg(Formatter::get().timeToString(tor.getETA()));
         }
         else
         {
-            //: Second (optional) part of torrent progress string;
+            //: Second (optional) part of torrent progress string,
             //: notice that leading space (before the dash) is included here
             str += tr(" - Remaining time unknown");
         }
@@ -329,7 +329,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
                 if (tor.webseedsWeAreDownloadingFrom())
                 {
-                    //: Second (optional) part of phrase "Downloading from ... of ... connected peer(s) and ... web seed(s)";
+                    //: Second (optional) part of phrase "Downloading from ... of ... connected peer(s) and ... web seed(s)",
                     //: notice that leading space (before "and") is included here
                     str += tr(" and %Ln web seed(s)", nullptr, tor.webseedsWeAreDownloadingFrom());
                 }
