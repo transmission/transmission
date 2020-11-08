@@ -202,33 +202,7 @@ void FileTreeView::update(FileList const& files, bool update_fields)
 
     if (model_was_empty)
     {
-        // expand up until the item with more than one expandable child
-        for (QModelIndex index = proxy_->index(0, 0); index.isValid();)
-        {
-            QModelIndex const old_index = index;
-
-            expand(old_index);
-
-            index = QModelIndex();
-
-            for (int i = 0, count = proxy_->rowCount(old_index); i < count; ++i)
-            {
-                QModelIndex const new_index = proxy_->index(i, 0, old_index);
-
-                if (proxy_->rowCount(new_index) == 0)
-                {
-                    continue;
-                }
-
-                if (index.isValid())
-                {
-                    index = QModelIndex();
-                    break;
-                }
-
-                index = new_index;
-            }
-        }
+        expand(proxy_->index(0, 0));
     }
 
     proxy_->sort(header()->sortIndicatorSection(), header()->sortIndicatorOrder());

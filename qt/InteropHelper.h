@@ -22,7 +22,7 @@ class InteropHelper
 public:
     bool isConnected() const;
 
-    bool addMetainfo(QString const& metainfo);
+    bool addMetainfo(QString const& metainfo) const;
 
     static void initialize();
     static void registerObject(QObject* parent);
