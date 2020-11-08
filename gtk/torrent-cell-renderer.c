@@ -383,8 +383,8 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
     GdkPixbuf* icon;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    tr_torrent const* tor = p->tor;
-    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_torrent* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached(tor);
     GString* gstr_stat = p->gstr1;
 
     icon = get_icon(tor, COMPACT_ICON_SIZE, widget);
@@ -433,8 +433,8 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
     GdkPixbuf* icon;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    tr_torrent const* tor = p->tor;
-    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_torrent* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached(tor);
     tr_info const* inf = tr_torrentInfo(tor);
     GString* gstr_prog = p->gstr1;
     GString* gstr_stat = p->gstr2;
@@ -588,8 +588,8 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
     bool seed;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    tr_torrent const* tor = p->tor;
-    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_torrent* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached(tor);
     gboolean const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     double const percentDone = get_percent_done(tor, st, &seed);
@@ -666,8 +666,8 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
     bool seed;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    tr_torrent const* tor = p->tor;
-    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_torrent* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached(tor);
     tr_info const* inf = tr_torrentInfo(tor);
     gboolean const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
