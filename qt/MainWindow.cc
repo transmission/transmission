@@ -795,9 +795,10 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
 
 void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    ui_.uploadSpeedLabel->setText(Formatter::get().uploadSpeedToString(stats.speed_up));
+    auto const& fmt = Formatter::get();
+    ui_.uploadSpeedLabel->setText(fmt.uploadSpeedToString(stats.speed_up));
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
-    ui_.downloadSpeedLabel->setText(Formatter::get().downloadSpeedToString(stats.speed_down));
+    ui_.downloadSpeedLabel->setText(fmt.downloadSpeedToString(stats.speed_down));
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
     ui_.networkLabel->setVisible(!session_.isServer());
@@ -808,27 +809,27 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     if (mode == session_ratio_stats_mode_name_)
     {
         str = tr("Ratio: %1")
-            .arg(Formatter::get().ratioToString(session_.getStats().ratio));
+            .arg(fmt.ratioToString(session_.getStats().ratio));
     }
     else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
-            .arg(Formatter::get().sizeToString(st.downloadedBytes))
-            .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(fmt.sizeToString(static_cast<size_t>(st.downloadedBytes)))
+            .arg(fmt.sizeToString(static_cast<size_t>(st.uploadedBytes)));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
-            .arg(Formatter::get().sizeToString(st.downloadedBytes))
-            .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(fmt.sizeToString(static_cast<size_t>(st.downloadedBytes)))
+            .arg(fmt.sizeToString(static_cast<size_t>(st.uploadedBytes)));
     }
     else // default is "total-ratio"
     {
         assert(mode == total_ratio_stats_mode_name_);
         str = tr("Ratio: %1")
-            .arg(Formatter::get().ratioToString(session_.getCumulativeStats().ratio));
+            .arg(fmt.ratioToString(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
