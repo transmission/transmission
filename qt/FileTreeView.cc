@@ -299,16 +299,13 @@ void FileTreeView::onlyCheckSelectedItems()
             {
                 unwanted_indices << child_index;
             }
+            else if (!wanted_indices_parents.contains(child_index))
+            {
+                unwanted_indices << child_index;
+            }
             else
             {
-                if (!wanted_indices_parents.contains(child_index))
-                {
-                    unwanted_indices << child_index;
-                }
-                else
-                {
-                    parents_queue.enqueue(child_index);
-                }
+                parents_queue.enqueue(child_index);
             }
         }
     }
