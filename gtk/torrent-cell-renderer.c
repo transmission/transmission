@@ -480,13 +480,13 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
 static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* widget, GdkRectangle const* cell_area,
     gint* x_offset, gint* y_offset, gint* width, gint* height)
 {
-    TorrentCellRenderer* self = TORRENT_CELL_RENDERER(cell);
+    TorrentCellRenderer const* const self = TORRENT_CELL_RENDERER(cell);
 
     if (self != NULL && self->priv->tor != NULL)
     {
         int w;
         int h;
-        struct TorrentCellRendererPrivate* p = self->priv;
+        struct TorrentCellRendererPrivate const* const p = self->priv;
 
         if (p->compact)
         {
@@ -772,7 +772,7 @@ static void torrent_cell_renderer_render(GtkCellRenderer* cell, GtrDrawable* win
 
     if (self != NULL && self->priv->tor != NULL)
     {
-        struct TorrentCellRendererPrivate* p = self->priv;
+        struct TorrentCellRendererPrivate const* const p = self->priv;
 
         if (p->compact)
         {

@@ -130,7 +130,7 @@ static void onProgressDialogDestroyed(gpointer data, GObject* dead)
 {
     TR_UNUSED(dead);
 
-    MakeMetaUI* ui = data;
+    MakeMetaUI const* ui = data;
     g_source_remove(ui->progress_tag);
 }
 

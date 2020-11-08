@@ -766,16 +766,15 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
 static void updateStats(PrivateData* p)
 {
-    char const* pch;
     char up[32];
     char down[32];
     char ratio[32];
     char buf[512];
     struct tr_session_stats stats;
-    tr_session* session = gtr_core_session(p->core);
+    tr_session const* const session = gtr_core_session(p->core);
 
     /* update the stats */
-    pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
+    char const* pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
     if (g_strcmp0(pch, "session-ratio") == 0)
     {
@@ -815,7 +814,7 @@ static void updateStats(PrivateData* p)
 
 static void updateSpeeds(PrivateData* p)
 {
-    tr_session* session = gtr_core_session(p->core);
+    tr_session const* const session = gtr_core_session(p->core);
 
     if (session != NULL)
     {
