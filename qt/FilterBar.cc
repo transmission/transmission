@@ -132,7 +132,7 @@ void FilterBar::refreshTrackers()
             auto const& key = it->first;
             auto const& display_name = FaviconCache::getDisplayName(key);
             auto const& count = it->second;
-            auto const icon = qApp->faviconCache().find(key);
+            auto const icon = trApp->faviconCache().find(key);
 
             i->setData(display_name, Qt::DisplayRole);
             i->setData(display_name, TRACKER_ROLE);
@@ -244,7 +244,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(&recount_timer_, &QTimer::timeout, this, &FilterBar::recount);
-    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
+    connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
     is_bootstrapping_ = false;

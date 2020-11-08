@@ -169,12 +169,13 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
-    for (int i = 0; files != NULL; ++i)
+    int i = 0;
+    while (files != NULL)
     {
-        struct FileList* tmp = files;
+        struct FileList* const tmp = files;
         files = files->next;
 
-        tr_metainfo_builder_file* file = &ret->files[i];
+        tr_metainfo_builder_file* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
 

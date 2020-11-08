@@ -78,7 +78,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
     tr_block_index_t block = ref->block;
     int len = 0;
 
-    for (int i = pos; i < n; ++i, ++block, ++len)
+    for (int i = pos; i < n; ++i)
     {
         struct cache_block const* b = blocks[i];
 
@@ -91,6 +91,9 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
         {
             break;
         }
+
+        ++block;
+        ++len;
     }
 
     if (info != NULL)

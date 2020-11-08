@@ -1650,22 +1650,18 @@ static void refreshWebseedList(struct DetailsImpl* di, tr_torrent** torrents, in
 
         for (unsigned int j = 0; j < inf->webseedCount; ++j)
         {
-            char buf[128];
-            char key[256];
-            char const* url = inf->webseeds[j];
+            char const* const url = inf->webseeds[j];
 
+            char key[256];
             g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
             GtkTreeRowReference* const ref = g_hash_table_lookup(hash, key);
             GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
+            char buf[128] = { 0 };
             if (speeds_KBps[j] > 0)
             {
                 tr_formatter_speed_KBps(buf, speeds_KBps[j], sizeof(buf));
-            }
-            else
-            {
-                *buf = '\0';
             }
 
             gtk_list_store_set(store, &iter,
@@ -1893,11 +1889,6 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
             sort_col = PEER_COL_ADDRESS_COLLATED;
             break;
 
-        case PEER_COL_CLIENT:
-            r = gtk_cell_renderer_text_new();
-            c = gtk_tree_view_column_new_with_attributes(t, r, "text", col, NULL);
-            break;
-
         case PEER_COL_PROGRESS:
             r = gtk_cell_renderer_progress_new();
             c = gtk_tree_view_column_new_with_attributes(t, r, "value", PEER_COL_PROGRESS, NULL);
@@ -1961,6 +1952,7 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
             sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
             break;
 
+        case PEER_COL_CLIENT:
         case PEER_COL_FLAGS:
             r = gtk_cell_renderer_text_new();
             c = gtk_tree_view_column_new_with_attributes(t, r, "text", col, NULL);
@@ -1979,12 +1971,10 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
        that doesn't look quite correct in any of these columns...
        so create a non-visible column and assign it as the
        'expander column. */
-    {
-        c = gtk_tree_view_column_new();
-        gtk_tree_view_column_set_visible(c, FALSE);
-        gtk_tree_view_append_column(GTK_TREE_VIEW(peer_view), c);
-        gtk_tree_view_set_expander_column(GTK_TREE_VIEW(peer_view), c);
-    }
+    c = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_visible(c, FALSE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(peer_view), c);
+    gtk_tree_view_set_expander_column(GTK_TREE_VIEW(peer_view), c);
 }
 
 static void onMorePeerInfoToggled(GtkToggleButton* button, struct DetailsImpl* di)
@@ -2090,7 +2080,14 @@ static GtkWidget* peer_page_new(struct DetailsImpl* di)
 *****
 ****/
 
-/* if it's been longer than a minute, don't bother showing the seconds */
+static char const err_markup_begin[] = "<span color=\"red\">";
+static char const err_markup_end[] = "</span>";
+static char const timeout_markup_begin[] = "<span color=\"#246\">";
+static char const timeout_markup_end[] = "</span>";
+static char const success_markup_begin[] = "<span color=\"#080\">";
+static char const success_markup_end[] = "</span>";
+
+// if it's been longer than a minute, don't bother showing the seconds
 static void tr_strltime_rounded(char* buf, time_t t, size_t buflen)
 {
     if (t > 60)
@@ -2101,126 +2098,123 @@ static void tr_strltime_rounded(char* buf, time_t t, size_t buflen)
     tr_strltime(buf, t, buflen);
 }
 
-static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat const* st, gboolean showScrape)
+static void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, GString* const gstr)
 {
-    char* str;
     char timebuf[256];
-    time_t const now = time(NULL);
-    char const* err_markup_begin = "<span color=\"red\">";
-    char const* err_markup_end = "</span>";
-    char const* timeout_markup_begin = "<span color=\"#224466\">";
-    char const* timeout_markup_end = "</span>";
-    char const* success_markup_begin = "<span color=\"#008B00\">";
-    char const* success_markup_end = "</span>";
 
-    /* hostname */
+    if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
     {
-        g_string_append(gstr, st->isBackup ? "<i>" : "<b>");
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastAnnounceTime, sizeof(timebuf));
 
-        if (key != NULL)
+        if (st->lastAnnounceSucceeded)
         {
-            str = g_markup_printf_escaped("%s - %s", st->host, key);
+            g_string_append_printf(gstr, _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
+                success_markup_begin, st->lastAnnouncePeerCount, success_markup_end, timebuf);
+        }
+        else if (st->lastAnnounceTimedOut)
+        {
+            g_string_append_printf(gstr, _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
+                timeout_markup_begin, timeout_markup_end, timebuf);
         }
         else
         {
-            str = g_markup_printf_escaped("%s", st->host);
+            g_string_append_printf(gstr, _("Got an error %1$s\"%2$s\"%3$s %4$s ago"), err_markup_begin,
+                st->lastAnnounceResult, err_markup_end, timebuf);
         }
-
-        g_string_append(gstr, str);
-        g_free(str);
-        g_string_append(gstr, st->isBackup ? "</i>" : "</b>");
     }
+
+    switch (st->announceState)
+    {
+    case TR_TRACKER_INACTIVE:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("No updates scheduled"));
+        break;
+
+    case TR_TRACKER_WAITING:
+        tr_strltime_rounded(timebuf, st->nextAnnounceTime - now, sizeof(timebuf));
+        g_string_append_c(gstr, '\n');
+        g_string_append_printf(gstr, _("Asking for more peers in %s"), timebuf);
+        break;
+
+    case TR_TRACKER_QUEUED:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("Queued to ask for more peers"));
+        break;
+
+    case TR_TRACKER_ACTIVE:
+        tr_strltime_rounded(timebuf, now - st->lastAnnounceStartTime, sizeof(timebuf));
+        g_string_append_c(gstr, '\n');
+        g_string_append_printf(gstr, _("Asking for more peers now… <small>%s</small>"), timebuf);
+        break;
+    }
+}
+
+static void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, GString* const gstr)
+{
+    char timebuf[256];
+
+    if (st->hasScraped)
+    {
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastScrapeTime, sizeof(timebuf));
+
+        if (st->lastScrapeSucceeded)
+        {
+            g_string_append_printf(gstr, _("Tracker had %s%'d seeders and %'d leechers%s %s ago"), success_markup_begin,
+                st->seederCount, st->leecherCount, success_markup_end, timebuf);
+        }
+        else
+        {
+            g_string_append_printf(gstr, _("Got a scrape error \"%s%s%s\" %s ago"), err_markup_begin,
+                st->lastScrapeResult, err_markup_end, timebuf);
+        }
+    }
+
+    switch (st->scrapeState)
+    {
+    case TR_TRACKER_INACTIVE:
+        break;
+
+    case TR_TRACKER_WAITING:
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, st->nextScrapeTime - now, sizeof(timebuf));
+        g_string_append_printf(gstr, _("Asking for peer counts in %s"), timebuf);
+        break;
+
+    case TR_TRACKER_QUEUED:
+        g_string_append_c(gstr, '\n');
+        g_string_append(gstr, _("Queued to ask for peer counts"));
+        break;
+
+    case TR_TRACKER_ACTIVE:
+        g_string_append_c(gstr, '\n');
+        tr_strltime_rounded(timebuf, now - st->lastScrapeStartTime, sizeof(timebuf));
+        g_string_append_printf(gstr, _("Asking for peer counts now… <small>%s</small>"), timebuf);
+        break;
+    }
+}
+
+static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat const* st, gboolean showScrape)
+{
+    // hostname
+    g_string_append(gstr, st->isBackup ? "<i>" : "<b>");
+    char* const str = key != NULL ?
+        g_markup_printf_escaped("%s - %s", st->host, key) :
+        g_markup_printf_escaped("%s", st->host);
+    g_string_append(gstr, str);
+    g_free(str);
+    g_string_append(gstr, st->isBackup ? "</i>" : "</b>");
 
     if (!st->isBackup)
     {
-        if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
-        {
-            g_string_append_c(gstr, '\n');
-            tr_strltime_rounded(timebuf, now - st->lastAnnounceTime, sizeof(timebuf));
+        time_t const now = time(NULL);
 
-            if (st->lastAnnounceSucceeded)
-            {
-                g_string_append_printf(gstr, _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
-                    success_markup_begin, st->lastAnnouncePeerCount, success_markup_end, timebuf);
-            }
-            else if (st->lastAnnounceTimedOut)
-            {
-                g_string_append_printf(gstr, _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
-                    timeout_markup_begin, timeout_markup_end, timebuf);
-            }
-            else
-            {
-                g_string_append_printf(gstr, _("Got an error %1$s\"%2$s\"%3$s %4$s ago"), err_markup_begin,
-                    st->lastAnnounceResult, err_markup_end, timebuf);
-            }
-        }
-
-        switch (st->announceState)
-        {
-        case TR_TRACKER_INACTIVE:
-            g_string_append_c(gstr, '\n');
-            g_string_append(gstr, _("No updates scheduled"));
-            break;
-
-        case TR_TRACKER_WAITING:
-            tr_strltime_rounded(timebuf, st->nextAnnounceTime - now, sizeof(timebuf));
-            g_string_append_c(gstr, '\n');
-            g_string_append_printf(gstr, _("Asking for more peers in %s"), timebuf);
-            break;
-
-        case TR_TRACKER_QUEUED:
-            g_string_append_c(gstr, '\n');
-            g_string_append(gstr, _("Queued to ask for more peers"));
-            break;
-
-        case TR_TRACKER_ACTIVE:
-            tr_strltime_rounded(timebuf, now - st->lastAnnounceStartTime, sizeof(timebuf));
-            g_string_append_c(gstr, '\n');
-            g_string_append_printf(gstr, _("Asking for more peers now… <small>%s</small>"), timebuf);
-            break;
-        }
+        appendAnnounceInfo(st, now, gstr);
 
         if (showScrape)
         {
-            if (st->hasScraped)
-            {
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, now - st->lastScrapeTime, sizeof(timebuf));
-
-                if (st->lastScrapeSucceeded)
-                {
-                    g_string_append_printf(gstr, _("Tracker had %s%'d seeders and %'d leechers%s %s ago"), success_markup_begin,
-                        st->seederCount, st->leecherCount, success_markup_end, timebuf);
-                }
-                else
-                {
-                    g_string_append_printf(gstr, _("Got a scrape error \"%s%s%s\" %s ago"), err_markup_begin,
-                        st->lastScrapeResult, err_markup_end, timebuf);
-                }
-            }
-
-            switch (st->scrapeState)
-            {
-            case TR_TRACKER_INACTIVE:
-                break;
-
-            case TR_TRACKER_WAITING:
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, st->nextScrapeTime - now, sizeof(timebuf));
-                g_string_append_printf(gstr, _("Asking for peer counts in %s"), timebuf);
-                break;
-
-            case TR_TRACKER_QUEUED:
-                g_string_append_c(gstr, '\n');
-                g_string_append(gstr, _("Queued to ask for peer counts"));
-                break;
-
-            case TR_TRACKER_ACTIVE:
-                g_string_append_c(gstr, '\n');
-                tr_strltime_rounded(timebuf, now - st->lastScrapeStartTime, sizeof(timebuf));
-                g_string_append_printf(gstr, _("Asking for peer counts now… <small>%s</small>"), timebuf);
-                break;
-            }
+            appendScrapeInfo(st, now, gstr);
         }
     }
 }
@@ -2354,17 +2348,14 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
             if (g_hash_table_lookup(hash, gstr->str) == NULL)
             {
-                GtkTreePath* p;
-                GtkTreeRowReference* ref;
-
                 gtk_list_store_insert_with_values(store, &iter, -1,
                     TRACKER_COL_TORRENT_ID, torrent_id,
                     TRACKER_COL_TRACKER_ID, st->id,
                     TRACKER_COL_KEY, gstr->str,
                     -1);
 
-                p = gtk_tree_model_get_path(model, &iter);
-                ref = gtk_tree_row_reference_new(model, p);
+                GtkTreePath* const p = gtk_tree_model_get_path(model, &iter);
+                GtkTreeRowReference* ref = gtk_tree_row_reference_new(model, p);
                 g_hash_table_insert(hash, g_strdup(gstr->str), ref);
                 ref = gtk_tree_row_reference_new(model, p);
                 gtr_get_favicon_from_url(session, st->announce, favicon_ready_cb, ref);
@@ -2381,15 +2372,13 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
         for (int j = 0; j < statCount[i]; ++j)
         {
-            GtkTreePath* p;
-            GtkTreeRowReference* ref;
             tr_tracker_stat const* st = &stats[i][j];
 
             /* build the key to find the row */
             g_string_truncate(gstr, 0);
             g_string_append_printf(gstr, "%d\t%d\t%s", tr_torrentId(tor), st->tier, st->announce);
-            ref = g_hash_table_lookup(hash, gstr->str);
-            p = gtk_tree_row_reference_get_path(ref);
+            GtkTreeRowReference* const ref = g_hash_table_lookup(hash, gstr->str);
+            GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
             /* update the row */
@@ -2467,24 +2456,22 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        int n;
-        int tier;
-        GtkTextIter start;
-        GtkTextIter end;
         int const torrent_id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(dialog), TORRENT_ID_KEY));
-        GtkTextBuffer* text_buffer = g_object_get_qdata(G_OBJECT(dialog), TEXT_BUFFER_KEY);
-        tr_torrent* tor = gtr_core_find_torrent(di->core, torrent_id);
+        GtkTextBuffer* const text_buffer = g_object_get_qdata(G_OBJECT(dialog), TEXT_BUFFER_KEY);
+        tr_torrent* const tor = gtr_core_find_torrent(di->core, torrent_id);
 
         if (tor != NULL)
         {
             /* build the array of trackers */
+            GtkTextIter start;
+            GtkTextIter end;
             gtk_text_buffer_get_bounds(text_buffer, &start, &end);
             char* const tracker_text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
             char** const tracker_strings = g_strsplit(tracker_text, "\n", 0);
 
             tr_tracker_info* const trackers = g_new0(tr_tracker_info, g_strv_length(tracker_strings));
-            n = 0;
-            tier = 0;
+            int n = 0;
+            int tier = 0;
 
             for (int i = 0; tracker_strings[i] != NULL; ++i)
             {
@@ -2934,8 +2921,8 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
 
     /* return saved window size */
     gtk_window_resize(GTK_WINDOW(d),
-        gtr_pref_int_get(TR_KEY_details_window_width),
-        gtr_pref_int_get(TR_KEY_details_window_height));
+        (gint)gtr_pref_int_get(TR_KEY_details_window_width),
+        (gint)gtr_pref_int_get(TR_KEY_details_window_height));
     g_signal_connect(d, "size-allocate", G_CALLBACK(on_details_window_size_allocated), NULL);
 
     g_signal_connect_swapped(d, "response", G_CALLBACK(gtk_widget_destroy), d);

@@ -18,7 +18,7 @@ InteropObject::InteropObject(QObject* parent) :
 // NOLINTNEXTLINE(readability-identifier-naming)
 bool InteropObject::PresentWindow()
 {
-    qApp->raise();
+    trApp->raise();
     return true;
 }
 
@@ -29,7 +29,7 @@ bool InteropObject::AddMetainfo(QString const& metainfo)
 
     if (addme.type != addme.NONE)
     {
-        qApp->addTorrent(addme);
+        trApp->addTorrent(addme);
     }
 
     return true;

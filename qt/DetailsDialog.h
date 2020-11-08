@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QString>
 #include <QMap>
 #include <QSet>
@@ -37,7 +39,6 @@ class DetailsDialog : public BaseDialog
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
-    ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);
 
@@ -127,9 +128,9 @@ private:
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
 
-    TrackerModel* tracker_model_ = {};
-    TrackerModelFilter* tracker_filter_ = {};
-    TrackerDelegate* tracker_delegate_ = {};
+    std::shared_ptr<TrackerModel> tracker_model_;
+    std::shared_ptr<TrackerModelFilter> tracker_filter_;
+    std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
     QMap<QString, QTreeWidgetItem*> peers_;
 

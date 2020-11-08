@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 
 #include <QApplication>
@@ -34,39 +35,39 @@ class Application : public QApplication
 
 public:
     Application(int& argc, char** argv);
-    ~Application() override;
 
-    void raise();
+    void raise() const;
     bool notifyApp(QString const& title, QString const& body) const;
 
     QString const& intern(QString const& in) { return *interned_strings_.insert(in).first; }
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(AddData const&);
-    void addTorrent(QString const&);
+    void addTorrent(AddData const&) const;
+    void addTorrent(QString const&) const;
 
 private slots:
-    void consentGiven(int result);
-    void onSessionSourceChanged();
+    void consentGiven(int result) const;
+    void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrents) const;
     void onTorrentsCompleted(torrent_ids_t const& torrents) const;
-    void onTorrentsEdited(torrent_ids_t const& torrents);
-    void onTorrentsNeedInfo(torrent_ids_t const& torrents);
-    void refreshPref(int key);
+    void onTorrentsEdited(torrent_ids_t const& torrents) const;
+    void onTorrentsNeedInfo(torrent_ids_t const& torrents) const;
+    void refreshPref(int key) const;
     void refreshTorrents();
+    void saveGeometry() const;
 
 private:
-    void maybeUpdateBlocklist();
+    void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
 
-    Prefs* prefs_ = {};
-    Session* session_ = {};
-    TorrentModel* model_ = {};
-    MainWindow* window_ = {};
-    WatchDir* watch_dir_ = {};
+    std::unique_ptr<Prefs> prefs_;
+    std::unique_ptr<Session> session_;
+    std::unique_ptr<TorrentModel> model_;
+    std::unique_ptr<MainWindow> window_;
+    std::unique_ptr<WatchDir> watch_dir_;
     QTimer model_timer_;
     QTimer stats_timer_;
     QTimer session_timer_;
@@ -81,5 +82,4 @@ private:
     std::unordered_set<QString> interned_strings_;
 };
 
-#undef qApp
-#define qApp static_cast<Application*>(Application::instance())
+#define trApp static_cast<Application*>(Application::instance())

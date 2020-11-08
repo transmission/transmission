@@ -1368,22 +1368,24 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
+static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
 {
-    size_t len;
-    char* str = tr_base64_decode(raw, rawlen, &len);
+    size_t len = 0;
+    char* const str = tr_base64_decode(raw, raw_len, &len);
     printf("  ");
 
-    for (size_t i = 0, k = 0; k < len; ++k)
+    size_t piece = 0;
+    size_t const col_width = 64;
+    for (char const* it = str, * end = it + len; it != end; ++it)
     {
-        for (int e = 0; i < j && e < 8; ++e, ++i)
+        for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (str[k] & (1 << (7 - e))) != 0 ? '1' : '0');
+            printf("%c", (*it & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         printf(" ");
 
-        if (i % 64 == 0)
+        if (piece % col_width == 0)
         {
             printf("\n  ");
         }
@@ -1529,10 +1531,10 @@ static void printTorrentList(tr_variant* top)
 static void printTrackersImpl(tr_variant* trackerStats)
 {
     char buf[512];
-    tr_variant* t;
 
-    for (int i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
+    for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
+        tr_variant* const t = tr_variantListChild(trackerStats, i);
         int64_t downloadCount;
         bool hasAnnounced;
         bool hasScraped;

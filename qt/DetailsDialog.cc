@@ -253,13 +253,6 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     ui_debounce_timer_.setSingleShot(true);
 }
 
-DetailsDialog::~DetailsDialog()
-{
-    tracker_delegate_->deleteLater();
-    tracker_filter_->deleteLater();
-    tracker_model_->deleteLater();
-}
-
 void DetailsDialog::setIds(torrent_ids_t const& ids)
 {
     if (ids != ids_)
@@ -278,29 +271,18 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
 
 void DetailsDialog::refreshPref(int key)
 {
-    QString str;
-
-    switch (key)
+    if (key == Prefs::SHOW_TRACKER_SCRAPES)
     {
-    case Prefs::SHOW_TRACKER_SCRAPES:
-        {
-            QItemSelectionModel* selection_model(ui_.trackersView->selectionModel());
-            QItemSelection const selection(selection_model->selection());
-            QModelIndex const current_index(selection_model->currentIndex());
-            tracker_delegate_->setShowMore(prefs_.getBool(key));
-            selection_model->clear();
-            ui_.trackersView->reset();
-            selection_model->select(selection, QItemSelectionModel::Select);
-            selection_model->setCurrentIndex(current_index, QItemSelectionModel::NoUpdate);
-            break;
-        }
-
-    case Prefs::SHOW_BACKUP_TRACKERS:
+        auto* selection_model = ui_.trackersView->selectionModel();
+        tracker_delegate_->setShowMore(prefs_.getBool(key));
+        selection_model->clear();
+        ui_.trackersView->reset();
+        selection_model->select(selection_model->selection(), QItemSelectionModel::Select);
+        selection_model->setCurrentIndex(selection_model->currentIndex(), QItemSelectionModel::NoUpdate);
+    }
+    else if (key == Prefs::SHOW_BACKUP_TRACKERS)
+    {
         tracker_filter_->setShowBackupTrackers(prefs_.getBool(key));
-        break;
-
-    default:
-        break;
     }
 }
 
@@ -1449,13 +1431,18 @@ void DetailsDialog::initOptionsTab()
 
 void DetailsDialog::initTrackerTab()
 {
-    tracker_model_ = new TrackerModel();
-    tracker_filter_ = new TrackerModelFilter();
-    tracker_filter_->setSourceModel(tracker_model_);
-    tracker_delegate_ = new TrackerDelegate();
+    auto deleter = [](QObject* o) { o->deleteLater(); };
 
-    ui_.trackersView->setModel(tracker_filter_);
-    ui_.trackersView->setItemDelegate(tracker_delegate_);
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
+    tracker_model_.reset(new TrackerModel, deleter);
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
+    tracker_filter_.reset(new TrackerModelFilter, deleter);
+    tracker_filter_->setSourceModel(tracker_model_.get());
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
+    tracker_delegate_.reset(new TrackerDelegate, deleter);
+
+    ui_.trackersView->setModel(tracker_filter_.get());
+    ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
     ui_.addTrackerButton->setIcon(getStockIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
     ui_.editTrackerButton->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
