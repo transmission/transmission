@@ -44,7 +44,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private slots:
-    void onClicked();
+    void onClicked() const;
     void onFileSelected(QString const& path);
 
 private:

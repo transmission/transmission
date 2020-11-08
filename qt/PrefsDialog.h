@@ -53,7 +53,7 @@ private slots:
 private:
     using key2widget_t = QMap<int, QWidget*>;
 
-    bool updateWidgetValue(QWidget* widget, int pref_key);
+    bool updateWidgetValue(QWidget* widget, int pref_key) const;
     void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();

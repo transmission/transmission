@@ -394,7 +394,7 @@ bool Session::isLocal() const
 ****
 ***/
 
-void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
+void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const
 {
     auto constexpr RecentlyActiveKey = std::string_view { "recently-active" };
 
@@ -1234,7 +1234,7 @@ void Session::reannounceTorrents(torrent_ids_t const& ids)
 ****
 ***/
 
-void Session::launchWebInterface()
+void Session::launchWebInterface() const
 {
     QUrl url;
 

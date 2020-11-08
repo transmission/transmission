@@ -198,7 +198,7 @@ private:
         int type;
     };
 
-    void initDefaults(tr_variant*);
+    void initDefaults(tr_variant*) const;
 
     void set(int key, char const* value) = delete;
 

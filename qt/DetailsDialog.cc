@@ -1484,7 +1484,7 @@ void DetailsDialog::initPeersTab()
 ****
 ***/
 
-void DetailsDialog::initFilesTab()
+void DetailsDialog::initFilesTab() const
 {
     connect(ui_.filesView, &FileTreeView::openRequested, this, &DetailsDialog::onOpenRequested);
     connect(ui_.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
@@ -1525,7 +1525,7 @@ void DetailsDialog::onPathEdited(QString const& oldpath, QString const& newname)
     session_.torrentRenamePath(ids_, oldpath, newname);
 }
 
-void DetailsDialog::onOpenRequested(QString const& path)
+void DetailsDialog::onOpenRequested(QString const& path) const
 {
     if (!session_.isLocal())
     {

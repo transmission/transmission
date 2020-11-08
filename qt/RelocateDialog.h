@@ -26,7 +26,7 @@ public:
 
 private slots:
     void onSetLocation();
-    void onMoveToggled(bool);
+    void onMoveToggled(bool) const;
 
 private:
     QString newLocation() const;
