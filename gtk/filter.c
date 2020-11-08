@@ -645,7 +645,7 @@ static void activity_model_update_idle(gpointer activity_model)
     }
 }
 
-static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter,
+static void activity_torrent_model_row_changed(GtkTreeModel const* tmodel, GtkTreePath const* path, GtkTreeIter const* iter,
     gpointer activity_model)
 {
     TR_UNUSED(tmodel);
@@ -655,7 +655,7 @@ static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath
     activity_model_update_idle(activity_model);
 }
 
-static void activity_torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path, gpointer activity_model)
+static void activity_torrent_model_row_deleted_cb(GtkTreeModel const* tmodel, GtkTreePath const* path, gpointer activity_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -726,16 +726,14 @@ static gboolean testText(tr_torrent const* tor, char const* key)
         tr_info const* inf = tr_torrentInfo(tor);
 
         /* test the torrent name... */
-        {
-            char* pch = g_utf8_casefold(tr_torrentName(tor), -1);
-            ret = key == NULL || strstr(pch, key) != NULL;
-            g_free(pch);
-        }
+        char* pch = g_utf8_casefold(tr_torrentName(tor), -1);
+        ret = key == NULL || strstr(pch, key) != NULL;
+        g_free(pch);
 
         /* test the files... */
         for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
         {
-            char* pch = g_utf8_casefold(inf->files[i].name, -1);
+            pch = g_utf8_casefold(inf->files[i].name, -1);
             ret = key == NULL || strstr(pch, key) != NULL;
             g_free(pch);
         }
@@ -916,7 +914,8 @@ static void update_count_label_idle(struct filter_data* data)
     }
 }
 
-static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* path, GtkTreeIter* iter, gpointer data)
+static void on_filter_model_row_inserted(GtkTreeModel const* tree_model, GtkTreePath const* path, GtkTreeIter const* iter,
+    gpointer data)
 {
     TR_UNUSED(tree_model);
     TR_UNUSED(path);
@@ -925,7 +924,7 @@ static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* 
     update_count_label_idle(data);
 }
 
-static void on_filter_model_row_deleted(GtkTreeModel* tree_model, GtkTreePath* path, gpointer data)
+static void on_filter_model_row_deleted(GtkTreeModel const* tree_model, GtkTreePath const* path, gpointer data)
 {
     TR_UNUSED(tree_model);
     TR_UNUSED(path);
