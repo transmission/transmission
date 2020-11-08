@@ -636,7 +636,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
     socklen_t sslen = sizeof(ss);
     struct sockaddr_in sin;
     struct sockaddr_in6 sin6;
-    struct sockaddr* sa;
+    struct sockaddr const* sa;
     socklen_t salen;
     int rc;
 
@@ -647,7 +647,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         sin.sin_family = AF_INET;
         evutil_inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
         sin.sin_port = htons(6969);
-        sa = (struct sockaddr*)&sin;
+        sa = (struct sockaddr const*)&sin;
         salen = sizeof(sin);
         break;
 
@@ -658,7 +658,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
            a native IPv6 address, not Teredo or 6to4. */
         evutil_inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
         sin6.sin6_port = htons(6969);
-        sa = (struct sockaddr*)&sin6;
+        sa = (struct sockaddr const*)&sin6;
         salen = sizeof(sin6);
         break;
 

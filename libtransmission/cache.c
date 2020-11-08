@@ -365,7 +365,7 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pie
 int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len)
 {
     int err = 0;
-    struct cache_block* cb = findBlock(cache, torrent, piece, offset);
+    struct cache_block const* const cb = findBlock(cache, torrent, piece, offset);
 
     if (cb == NULL)
     {

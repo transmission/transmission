@@ -444,7 +444,7 @@ static void replicationNew(tr_swarm* s)
 
         for (int peer_i = 0; peer_i < n; ++peer_i)
         {
-            tr_peer* peer = tr_ptrArrayNth(&s->peers, peer_i);
+            tr_peer const* const peer = tr_ptrArrayNth(&s->peers, peer_i);
 
             if (tr_bitfieldHas(&peer->have, piece_i))
             {
@@ -1113,10 +1113,10 @@ static void pieceListRebuild(tr_swarm* s)
          * the new list so we don't lose its requestCounts */
         if (s->pieces != NULL)
         {
-            struct weighted_piece* o = s->pieces;
-            struct weighted_piece* oend = o + s->pieceCount;
+            struct weighted_piece const* o = s->pieces;
+            struct weighted_piece const* const oend = o + s->pieceCount;
             struct weighted_piece* n = pieces;
-            struct weighted_piece* nend = n + pieceCount;
+            struct weighted_piece const* const nend = n + pieceCount;
 
             pieceListSort(s, PIECES_SORTED_BY_INDEX);
 
@@ -1151,7 +1151,7 @@ static void pieceListRebuild(tr_swarm* s)
 
 static void pieceListRemovePiece(tr_swarm* s, tr_piece_index_t piece)
 {
-    struct weighted_piece* p;
+    struct weighted_piece const* p;
 
     if ((p = pieceListLookup(s, piece)) != NULL)
     {
@@ -1541,7 +1541,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
             for (int i = 0; i < n; ++i)
             {
                 struct block_request const* const request = &s->requests[i];
-                tr_peerMsgs* msgs = PEER_MSGS(request->peer);
+                tr_peerMsgs const* const msgs = PEER_MSGS(request->peer);
 
                 if (msgs != NULL && request->sentAt <= too_old && !tr_peerMsgsIsReadingBlock(msgs, request->block))
                 {
@@ -2094,7 +2094,7 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
         }
         else
         {
-            tr_peer* peer = atom->peer;
+            tr_peer const* const peer = atom->peer;
 
             if (peer != NULL)
             {
@@ -2789,7 +2789,7 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
     {
         char* pch;
         tr_peer* peer = peers[i];
-        tr_peerMsgs* msgs = PEER_MSGS(peer);
+        tr_peerMsgs const* const msgs = PEER_MSGS(peer);
         struct peer_atom const* atom = peer->atom;
         tr_peer_stat* stat = ret + i;
 
@@ -3675,8 +3675,8 @@ static void enforceTorrentPeerLimit(tr_swarm* s, uint64_t now)
 
     if (n > max)
     {
-        void* base = tr_ptrArrayBase(&s->peers);
-        tr_peer** peers = tr_memdup(base, n * sizeof(tr_peer*));
+        void const* const base = tr_ptrArrayBase(&s->peers);
+        tr_peer** const peers = tr_memdup(base, n * sizeof(tr_peer*));
         sortPeersByLiveliness(peers, NULL, n, now);
 
         while (n > max)

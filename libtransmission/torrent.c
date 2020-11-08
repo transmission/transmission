@@ -787,7 +787,7 @@ static void refreshCurrentDir(tr_torrent* tor);
 static void torrentInitFromInfo(tr_torrent* tor)
 {
     uint64_t t;
-    tr_info* info = &tor->info;
+    tr_info const* const info = &tor->info;
 
     tor->blockSize = tr_getBlockSize(info->pieceSize);
 

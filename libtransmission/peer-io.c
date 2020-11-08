@@ -489,7 +489,7 @@ static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
 
 static size_t utp_get_rb_size(void* closure)
 {
-    tr_peerIo* io = closure;
+    tr_peerIo const* const io = closure;
 
     TR_ASSERT(tr_isPeerIo(io));
 

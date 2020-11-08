@@ -71,7 +71,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
     tr_watchdir_t const handle = context;
 #ifdef TR_ENABLE_ASSERTS
-    tr_watchdir_inotify* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+    tr_watchdir_inotify const* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 #endif
     struct inotify_event ev;
     size_t nread;

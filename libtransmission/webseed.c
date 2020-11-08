@@ -201,7 +201,7 @@ static void connection_succeeded(void* vdata)
 
     if (data->real_url != NULL)
     {
-        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
         if (tor != NULL)
         {
@@ -558,8 +558,8 @@ static void webseed_destruct(tr_peer* peer)
     /* if we have an array of file URLs, free it */
     if (w->file_urls != NULL)
     {
-        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
-        tr_info const* inf = tr_torrentInfo(tor);
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_info const* const inf = tr_torrentInfo(tor);
 
         for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {

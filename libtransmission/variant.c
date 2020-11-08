@@ -433,7 +433,7 @@ bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme)
 
 bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len)
 {
-    tr_variant* child = tr_variantDictFind(dict, key);
+    tr_variant const* const child = tr_variantDictFind(dict, key);
     return tr_variantGetStr(child, setme, len);
 }
 

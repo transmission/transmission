@@ -729,7 +729,7 @@ static void loadBlocklists(tr_session* session);
 static void tr_sessionInitImpl(void* vdata)
 {
     struct init_data* data = vdata;
-    tr_variant* clientSettings = data->clientSettings;
+    tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
     TR_ASSERT(tr_amInEventThread(session));

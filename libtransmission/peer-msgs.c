@@ -1065,17 +1065,16 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
 
 static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
-    tr_variant dict;
-    char* msg_end;
-    char const* benc_end;
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    uint8_t* tmp = tr_new(uint8_t, msglen);
+    uint8_t* const tmp = tr_new(uint8_t, msglen);
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-    msg_end = (char*)tmp + msglen;
+    char const* const msg_end = (char const*)tmp + msglen;
 
+    tr_variant dict;
+    char const* benc_end;
     if (tr_variantFromBencFull(&dict, tmp, msglen, NULL, &benc_end) == 0)
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
@@ -1883,7 +1882,7 @@ bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
 
 static void updateDesiredRequestCount(tr_peerMsgs* msgs)
 {
-    tr_torrent* const torrent = msgs->torrent;
+    tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
     if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked || !msgs->client_is_interested)
