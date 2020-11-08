@@ -1433,12 +1433,12 @@ void DetailsDialog::initTrackerTab()
 {
     auto deleter = [](QObject* o) { o->deleteLater(); };
 
-    // NOLINT(modernize-make-shared) no custom deleters in make_shared
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
     tracker_model_.reset(new TrackerModel, deleter);
-    // NOLINT(modernize-make-shared) no custom deleters in make_shared
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
     tracker_filter_.reset(new TrackerModelFilter, deleter);
     tracker_filter_->setSourceModel(tracker_model_.get());
-    // NOLINT(modernize-make-shared) no custom deleters in make_shared
+    // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
     tracker_delegate_.reset(new TrackerDelegate, deleter);
 
     ui_.trackersView->setModel(tracker_filter_.get());
