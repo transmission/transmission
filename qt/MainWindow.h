@@ -123,8 +123,8 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon addEmblem(QIcon icon, QStringList const& emblem_names);
+    QIcon getStockIcon(QString const&, int fallback = -1) const;
+    QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
     torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();

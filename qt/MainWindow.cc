@@ -75,7 +75,7 @@ public:
     }
 };
 
-QIcon MainWindow::getStockIcon(QString const& name, int fallback)
+QIcon MainWindow::getStockIcon(QString const& name, int fallback) const
 {
     QIcon icon = QIcon::fromTheme(name);
 
@@ -87,7 +87,7 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
     return icon;
 }
 
-QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
+QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
 {
     if (base_icon.isNull())
     {
@@ -121,11 +121,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
 
         QPixmap pixmap = base_icon.pixmap(size);
         QPixmap emblem_pixmap = emblem_icon.pixmap(emblem_size);
-
-        {
-            QPainter painter(&pixmap);
-            painter.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
-        }
+        QPainter(&pixmap).drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
 
         icon.addPixmap(pixmap);
     }
