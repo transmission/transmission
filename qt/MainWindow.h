@@ -102,12 +102,12 @@ private slots:
     void onSessionSourceChanged();
     void onSetPrefs();
     void onSetPrefs(bool);
-    void onSortModeChanged(QAction* action);
-    void onStatsModeChanged(QAction* action);
+    void onSortModeChanged(QAction const* action);
+    void onStatsModeChanged(QAction const* action);
     void openAbout();
-    void openDonate();
+    void openDonate() const;
     void openFolder();
-    void openHelp();
+    void openHelp() const;
     void openPreferences();
     void openProperties();
     void openStats();

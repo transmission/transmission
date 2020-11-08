@@ -503,7 +503,7 @@ QMenu* MainWindow::createStatsModeMenu()
 *****
 ****/
 
-void MainWindow::onSortModeChanged(QAction* action)
+void MainWindow::onSortModeChanged(QAction const* action)
 {
     prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SortModeKey).toInt()));
 }
@@ -669,7 +669,7 @@ void MainWindow::openStats()
     Utils::openDialog(stats_dialog_, session_, this);
 }
 
-void MainWindow::openDonate()
+void MainWindow::openDonate() const
 {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
 }
@@ -679,7 +679,7 @@ void MainWindow::openAbout()
     Utils::openDialog(about_dialog_, this);
 }
 
-void MainWindow::openHelp()
+void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
         arg(MINOR_VERSION / 10)));
@@ -759,7 +759,7 @@ void MainWindow::refreshTitle()
 
     if (!url.isEmpty())
     {
-        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
+        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
         title += tr(" - %1:%2").arg(url.host()).arg(url.port());
     }
@@ -1023,7 +1023,7 @@ void MainWindow::reannounceSelected()
 ***
 **/
 
-void MainWindow::onStatsModeChanged(QAction* action)
+void MainWindow::onStatsModeChanged(QAction const* action)
 {
     prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).toString());
 }
@@ -1081,7 +1081,6 @@ void MainWindow::toggleWindows(bool do_show)
             showNormal();
         }
 
-        // activateWindow ();
         raise();
         QApplication::setActiveWindow(this);
     }
@@ -1107,7 +1106,7 @@ void MainWindow::refreshPref(int key)
     bool b;
     int i;
     QString str;
-    QActionGroup* action_group;
+    QActionGroup const* action_group;
 
     switch (key)
     {
