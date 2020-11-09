@@ -559,8 +559,8 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        auto d = size_t{};
-        auto f = size_t{};
+        auto d = uint64_t{};
+        auto f = uint64_t{};
 
         for (Torrent const* const t : torrents)
         {
@@ -590,8 +590,8 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        auto u = size_t{};
-        auto d = size_t{};
+        auto u = uint64_t{};
+        auto d = uint64_t{};
 
         for (Torrent const* const t : torrents)
         {
@@ -755,7 +755,7 @@ void DetailsDialog::refreshUI()
     else
     {
         int pieces = 0;
-        auto size = size_t{};
+        auto size = uint64_t{};
         uint32_t piece_size = torrents[0]->pieceSize();
 
         for (Torrent const* const t : torrents)
