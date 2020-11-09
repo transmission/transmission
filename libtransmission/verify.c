@@ -18,7 +18,7 @@
 #include "platform.h" /* tr_lock() */
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_valloc(), tr_free() */
+#include "utils.h" /* tr_malloc(), tr_free() */
 #include "verify.h"
 
 /***
@@ -32,8 +32,6 @@ enum
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
-    time_t end;
-    tr_sha1_ctx_t sha;
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
     uint64_t filePos = 0;
     bool changed = false;
@@ -44,10 +42,10 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
     time_t const begin = tr_time();
-    size_t const buflen = 1024 * 128; /* 128 KiB buffer */
-    uint8_t* buffer = tr_valloc(buflen);
+    size_t const buflen = 1024 * 128; // 128 KiB buffer
+    uint8_t* const buffer = tr_malloc(buflen);
 
-    sha = tr_sha1_init();
+    tr_sha1_ctx_t sha = tr_sha1_init();
 
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
     tr_torrentSetChecked(tor, 0);
@@ -157,7 +155,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     free(buffer);
 
     /* stopwatch */
-    end = tr_time();
+    time_t const end = tr_time();
     tr_logAddTorDbg(tor, "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
         (int)(end - begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize / (1 + (end - begin))));
 

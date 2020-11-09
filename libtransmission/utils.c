@@ -10,11 +10,6 @@
 #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
 #endif
 
-#if defined(XCODE_BUILD)
-#define HAVE_GETPAGESIZE
-#define HAVE_VALLOC
-#endif
-
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_DIG */
@@ -1749,7 +1744,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     char* buf = NULL;
     tr_sys_path_info info;
     uint64_t bytesLeft;
-    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
+    size_t const buflen = 1024 * 1024; // 1024 KiB buffer
 
     /* make sure the old file exists */
     if (!tr_sys_path_get_info(oldpath, 0, &info, error))
@@ -1801,7 +1796,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         return false;
     }
 
-    buf = tr_valloc(buflen);
+    buf = tr_malloc(buflen);
     bytesLeft = info.size;
 
     while (bytesLeft > 0)
@@ -1847,58 +1842,6 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     return true;
-}
-
-/***
-****
-***/
-
-void* tr_valloc(size_t bufLen)
-{
-    size_t allocLen;
-    void* buf = NULL;
-    static size_t pageSize = 0;
-
-    if (pageSize == 0)
-    {
-#if defined(HAVE_GETPAGESIZE) && !defined(_WIN32)
-        pageSize = (size_t)getpagesize();
-#else /* guess */
-        pageSize = 4096;
-#endif
-    }
-
-    allocLen = pageSize;
-
-    while (allocLen < bufLen)
-    {
-        allocLen += pageSize;
-    }
-
-#ifdef HAVE_POSIX_MEMALIGN
-
-    if ((buf == NULL) && (posix_memalign(&buf, pageSize, allocLen) != 0))
-    {
-        buf = NULL; /* just retry with valloc/malloc */
-    }
-
-#endif
-
-#ifdef HAVE_VALLOC
-
-    if (buf == NULL)
-    {
-        buf = valloc(allocLen);
-    }
-
-#endif
-
-    if (buf == NULL)
-    {
-        buf = tr_malloc(allocLen);
-    }
-
-    return buf;
 }
 
 /***

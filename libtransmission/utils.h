@@ -181,8 +181,6 @@ void* tr_memdup(void const* src, size_t byteCount);
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 /* *INDENT-ON* */
 
-void* tr_valloc(size_t bufLen);
-
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
