@@ -503,7 +503,7 @@ void DetailsDialog::refreshUI()
             100.0 :
             100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
         auto const pct = fmt.percentToString(d);
-        auto const size_when_done_str = fmt.sizeToString(static_cast<size_t>(size_when_done));
+        auto const size_when_done_str = fmt.sizeToString(size_when_done);
 
         if (have_unverified == 0 && left_until_done == 0)
         {

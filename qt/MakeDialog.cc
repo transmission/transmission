@@ -225,7 +225,7 @@ void MakeDialog::onSourceChanged()
             .arg(Formatter::get().sizeToString(builder_->totalSize))
             .arg(files)
             .arg(pieces)
-            .arg(Formatter::get().sizeToString(static_cast<size_t>(builder_->pieceSize)));
+            .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize)));
     }
 
     ui_.sourceSizeLabel->setText(text);

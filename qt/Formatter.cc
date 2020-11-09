@@ -73,7 +73,7 @@ QString Formatter::memToString(int64_t bytes) const
     return QString::fromUtf8(buf.data());
 }
 
-QString Formatter::sizeToString(size_t bytes) const
+QString Formatter::sizeToString(uint64_t bytes) const
 {
     if (bytes == 0)
     {
@@ -92,7 +92,7 @@ QString Formatter::sizeToString(int64_t bytes) const
         return tr("Unknown");
     }
 
-    return Formatter::sizeToString(static_cast<size_t>(bytes));
+    return Formatter::sizeToString(static_cast<uint64_t>(bytes));
 }
 
 QString Formatter::speedToString(Speed const& speed) const

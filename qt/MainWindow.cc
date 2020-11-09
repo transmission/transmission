@@ -815,15 +815,15 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
-            .arg(fmt.sizeToString(static_cast<size_t>(st.downloadedBytes)))
-            .arg(fmt.sizeToString(static_cast<size_t>(st.uploadedBytes)));
+            .arg(fmt.sizeToString(st.downloadedBytes))
+            .arg(fmt.sizeToString(st.uploadedBytes));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
-            .arg(fmt.sizeToString(static_cast<size_t>(st.downloadedBytes)))
-            .arg(fmt.sizeToString(static_cast<size_t>(st.uploadedBytes)));
+            .arg(fmt.sizeToString(st.downloadedBytes))
+            .arg(fmt.sizeToString(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
