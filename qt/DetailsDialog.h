@@ -52,7 +52,7 @@ private:
     void initPeersTab();
     void initTrackerTab();
     void initInfoTab();
-    void initFilesTab();
+    void initFilesTab() const;
     void initOptionsTab();
 
     QIcon getStockIcon(QString const& freedesktop_name, int fallback) const;
@@ -79,7 +79,7 @@ private slots:
     void onFilePriorityChanged(QSet<int> const& file_indices, int);
     void onFileWantedChanged(QSet<int> const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
-    void onOpenRequested(QString const& path);
+    void onOpenRequested(QString const& path) const;
 
     // Options tab
     void onBandwidthPriorityChanged(int);

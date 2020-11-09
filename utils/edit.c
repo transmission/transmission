@@ -107,9 +107,8 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
         while ((tier = tr_variantListChild(announce_list, tierIndex)) != NULL)
         {
-            tr_variant* node;
             int nodeIndex = 0;
-
+            tr_variant const* node;
             while ((node = tr_variantListChild(tier, nodeIndex)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
@@ -163,8 +162,8 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
 static char* replaceSubstr(char const* str, char const* in, char const* out)
 {
-    char* walk;
-    struct evbuffer* buf = evbuffer_new();
+    char const* walk;
+    struct evbuffer* const buf = evbuffer_new();
     size_t const inlen = strlen(in);
     size_t const outlen = strlen(out);
 
@@ -229,17 +228,17 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
 
 static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 {
-    tr_variant* tier;
     int tierCount = 0;
+    tr_variant* tier;
 
     while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
     {
-        tr_variant* node;
-        char const* str;
         int nodeCount = 0;
+        tr_variant const* node;
 
         while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
         {
+            char const* str = NULL;
             if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
             {
                 return true;

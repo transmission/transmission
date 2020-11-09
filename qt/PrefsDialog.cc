@@ -161,7 +161,7 @@ QString qtDayName(int day)
 
 } // namespace
 
-bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key)
+bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 {
     PreferenceWidget pref_widget(widget);
 

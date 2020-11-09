@@ -779,7 +779,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->tiers != NULL);
 
-    struct tr_torrent_tiers* tt = NULL;
+    struct tr_torrent_tiers const* tt = NULL;
 
     if (tor->isRunning)
     {
@@ -801,7 +801,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
 {
     time_t ret = ~(time_t)0;
-    struct tr_torrent_tiers* tt = tor->tiers;
+    struct tr_torrent_tiers const* tt = tor->tiers;
 
     /* find the earliest manual announce time from all peers */
     for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
@@ -989,13 +989,13 @@ static void announce_request_free(tr_announce_request* req);
 
 void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 {
-    struct tr_torrent_tiers* tt = tor->tiers;
+    struct tr_torrent_tiers const* tt = tor->tiers;
 
     if (tt != NULL)
     {
         for (int i = 0; i < tt->tier_count; ++i)
         {
-            tr_tier* tier = &tt->tiers[i];
+            tr_tier const* tier = &tt->tiers[i];
 
             if (tier->isRunning)
             {
@@ -1767,12 +1767,11 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     time_t const now = tr_time();
 
     int out = 0;
-    tr_tracker_stat* ret;
-    struct tr_torrent_tiers* tt = torrent->tiers;
+    struct tr_torrent_tiers const* const tt = torrent->tiers;
 
     /* alloc the stats */
     *setmeTrackerCount = tt->tracker_count;
-    ret = tr_new0(tr_tracker_stat, tt->tracker_count);
+    tr_tracker_stat* const ret = tr_new0(tr_tracker_stat, tt->tracker_count);
 
     /* populate the stats */
     for (int i = 0; i < tt->tier_count; ++i)

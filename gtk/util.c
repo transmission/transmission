@@ -369,7 +369,7 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
 char const* gtr_get_help_uri(void)
 {
-    static char* uri = NULL;
+    static char const* uri = NULL;
 
     if (uri == NULL)
     {
@@ -534,7 +534,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
     if (GTK_IS_WINDOW(w))
     {
         GList* windows = gtk_window_list_toplevels();
-        GtkWindow* window = GTK_WINDOW(w);
+        GtkWindow const* const window = GTK_WINDOW(w);
 
         for (GList* l = windows; l != NULL; l = l->next)
         {
@@ -621,7 +621,7 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 
     for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
-        char* s = text[i];
+        char const* const s = text[i];
 
         if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {

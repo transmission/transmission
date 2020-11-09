@@ -22,7 +22,7 @@
 
 QHash<QString, int> const& FileTreeItem::getMyChildRows()
 {
-    size_t const n = childCount();
+    int const n = childCount();
 
     // ensure that all the rows are hashed
     while (first_unhashed_row_ < n)
@@ -50,7 +50,7 @@ FileTreeItem::~FileTreeItem()
 
 void FileTreeItem::appendChild(FileTreeItem* child)
 {
-    size_t const n = childCount();
+    int const n = childCount();
     child->parent_ = this;
     children_.append(child);
     first_unhashed_row_ = n;

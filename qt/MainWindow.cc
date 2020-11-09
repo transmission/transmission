@@ -75,7 +75,7 @@ public:
     }
 };
 
-QIcon MainWindow::getStockIcon(QString const& name, int fallback)
+QIcon MainWindow::getStockIcon(QString const& name, int fallback) const
 {
     QIcon icon = QIcon::fromTheme(name);
 
@@ -87,7 +87,7 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
     return icon;
 }
 
-QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
+QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
 {
     if (base_icon.isNull())
     {
@@ -121,11 +121,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
 
         QPixmap pixmap = base_icon.pixmap(size);
         QPixmap emblem_pixmap = emblem_icon.pixmap(emblem_size);
-
-        {
-            QPainter painter(&pixmap);
-            painter.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
-        }
+        QPainter(&pixmap).drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
 
         icon.addPixmap(pixmap);
     }
@@ -507,7 +503,7 @@ QMenu* MainWindow::createStatsModeMenu()
 *****
 ****/
 
-void MainWindow::onSortModeChanged(QAction* action)
+void MainWindow::onSortModeChanged(QAction const* action)
 {
     prefs_.set(Prefs::SORT_MODE, SortMode(action->property(SortModeKey).toInt()));
 }
@@ -673,7 +669,7 @@ void MainWindow::openStats()
     Utils::openDialog(stats_dialog_, session_, this);
 }
 
-void MainWindow::openDonate()
+void MainWindow::openDonate() const
 {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
 }
@@ -683,7 +679,7 @@ void MainWindow::openAbout()
     Utils::openDialog(about_dialog_, this);
 }
 
-void MainWindow::openHelp()
+void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
         arg(MINOR_VERSION / 10)));
@@ -763,7 +759,7 @@ void MainWindow::refreshTitle()
 
     if (!url.isEmpty())
     {
-        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
+        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
         title += tr(" - %1:%2").arg(url.host()).arg(url.port());
     }
@@ -799,9 +795,10 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
 
 void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    ui_.uploadSpeedLabel->setText(Formatter::get().uploadSpeedToString(stats.speed_up));
+    auto const& fmt = Formatter::get();
+    ui_.uploadSpeedLabel->setText(fmt.uploadSpeedToString(stats.speed_up));
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
-    ui_.downloadSpeedLabel->setText(Formatter::get().downloadSpeedToString(stats.speed_down));
+    ui_.downloadSpeedLabel->setText(fmt.downloadSpeedToString(stats.speed_down));
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
     ui_.networkLabel->setVisible(!session_.isServer());
@@ -812,27 +809,27 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     if (mode == session_ratio_stats_mode_name_)
     {
         str = tr("Ratio: %1")
-            .arg(Formatter::get().ratioToString(session_.getStats().ratio));
+            .arg(fmt.ratioToString(session_.getStats().ratio));
     }
     else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
-            .arg(Formatter::get().sizeToString(st.downloadedBytes))
-            .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(fmt.sizeToString(st.downloadedBytes))
+            .arg(fmt.sizeToString(st.uploadedBytes));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
-            .arg(Formatter::get().sizeToString(st.downloadedBytes))
-            .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(fmt.sizeToString(st.downloadedBytes))
+            .arg(fmt.sizeToString(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
         assert(mode == total_ratio_stats_mode_name_);
         str = tr("Ratio: %1")
-            .arg(Formatter::get().ratioToString(session_.getCumulativeStats().ratio));
+            .arg(fmt.ratioToString(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
@@ -1027,7 +1024,7 @@ void MainWindow::reannounceSelected()
 ***
 **/
 
-void MainWindow::onStatsModeChanged(QAction* action)
+void MainWindow::onStatsModeChanged(QAction const* action)
 {
     prefs_.set(Prefs::STATUSBAR_STATS, action->property(StatsModeKey).toString());
 }
@@ -1085,7 +1082,6 @@ void MainWindow::toggleWindows(bool do_show)
             showNormal();
         }
 
-        // activateWindow ();
         raise();
         QApplication::setActiveWindow(this);
     }
@@ -1111,7 +1107,7 @@ void MainWindow::refreshPref(int key)
     bool b;
     int i;
     QString str;
-    QActionGroup* action_group;
+    QActionGroup const* action_group;
 
     switch (key)
     {

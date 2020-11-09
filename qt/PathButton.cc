@@ -101,7 +101,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 }
 
-void PathButton::onClicked()
+void PathButton::onClicked() const
 {
     auto* dialog = new QFileDialog(window(), effectiveTitle());
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);

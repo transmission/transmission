@@ -92,7 +92,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
 namespace
 {
 
-QString getCountString(int n)
+QString getCountString(size_t n)
 {
     return QStringLiteral("%L1").arg(n);
 }
@@ -136,7 +136,7 @@ void FilterBar::refreshTrackers()
 
             i->setData(display_name, Qt::DisplayRole);
             i->setData(display_name, TRACKER_ROLE);
-            i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
+            i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
             i->setData(icon, Qt::DecorationRole);
             i->setData(int(count), FilterBarComboBox::CountRole);
 
@@ -192,7 +192,7 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
     row->setData(QString(), TRACKER_ROLE);
     int const count = torrents_.rowCount();
     row->setData(count, FilterBarComboBox::CountRole);
-    row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
+    row->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
@@ -380,7 +380,7 @@ void FilterBar::recount()
             auto const mode = index.data(ACTIVITY_ROLE).toInt();
             auto const count = torrents_per_mode[mode];
             model->setData(index, count, FilterBarComboBox::CountRole);
-            model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+            model->setData(index, getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
         }
     }
 

@@ -976,7 +976,7 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
                 size_t child_pos = 0;
-                tr_variant* child;
+                tr_variant const* child;
                 while ((child = tr_variantListChild(l, child_pos++)))
                 {
                     if (tr_variantGetStr(child, &str, NULL))

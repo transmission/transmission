@@ -33,7 +33,7 @@ FaviconCache::FaviconCache() :
 namespace
 {
 
-QPixmap scale(QPixmap pixmap)
+QPixmap scale(QPixmap const& pixmap)
 {
     return pixmap.scaled(FaviconCache::getIconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }

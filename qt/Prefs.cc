@@ -371,7 +371,7 @@ Prefs::~Prefs()
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-void Prefs::initDefaults(tr_variant* d)
+void Prefs::initDefaults(tr_variant* d) const
 {
     auto constexpr FilterMode = std::string_view { "all" };
     auto constexpr SessionHost = std::string_view { "localhost" };

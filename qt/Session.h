@@ -120,7 +120,7 @@ public:
 
 public slots:
     void addTorrent(AddData const& addme);
-    void launchWebInterface();
+    void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
     void queueMoveTop(torrent_ids_t const& torrentIds = {});
@@ -162,7 +162,7 @@ private:
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const;
 
     QString const config_dir_;
     Prefs& prefs_;

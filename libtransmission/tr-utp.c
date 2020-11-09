@@ -133,7 +133,7 @@ static void incoming(void* closure, struct UTPSocket* s)
 
 void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
-    tr_session* ss = closure;
+    tr_session const* const ss = closure;
 
     if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
     {

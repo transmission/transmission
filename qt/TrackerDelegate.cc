@@ -268,11 +268,11 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             }
             else if (inf.st.seeder_count >= 0 && inf.st.leecher_count >= 0)
             {
-                //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago",
                 //: %1 and %2 are replaced with HTML markup
                 str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seeder_count).arg(success_markup_begin).
                     arg(success_markup_end);
-                //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago",
                 //: %1 and %2 are replaced with HTML markup, %3 is duration;
                 //: notice that leading space (before "and") is included here
                 str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecher_count).arg(success_markup_begin).

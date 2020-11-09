@@ -286,7 +286,7 @@ static void refresh_actions_soon(gpointer gdata)
     }
 }
 
-static void on_selection_changed(GtkTreeSelection* s, gpointer gdata)
+static void on_selection_changed(GtkTreeSelection const* s, gpointer gdata)
 {
     TR_UNUSED(s);
 
@@ -332,7 +332,7 @@ static void ensure_magnet_handler_exists(void)
     }
 }
 
-static void on_main_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc, gpointer gdata)
+static void on_main_window_size_allocated(GtkWidget* gtk_window, GtkAllocation const* alloc, gpointer gdata)
 {
     TR_UNUSED(alloc);
     TR_UNUSED(gdata);
@@ -409,7 +409,7 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed;
-                tr_variant* oldval = tr_variantDictFind(oldvals, key);
+                tr_variant const* oldval = tr_variantDictFind(oldvals, key);
 
                 if (oldval == NULL)
                 {
@@ -591,7 +591,7 @@ static void open_files(GSList* files, gpointer gdata)
     gtr_core_add_files(cbdata->core, files, do_start, do_prompt, do_notify);
 }
 
-static void on_open(GApplication* application, GFile** f, gint file_count, gchar* hint, gpointer gdata)
+static void on_open(GApplication const* application, GFile** f, gint file_count, gchar const* hint, gpointer gdata)
 {
     TR_UNUSED(application);
     TR_UNUSED(hint);
@@ -699,16 +699,16 @@ int main(int argc, char** argv)
     return ret;
 }
 
-static void on_core_busy(TrCore* core, gboolean busy, struct cbdata* c)
+static void on_core_busy(TrCore const* core, gboolean busy, struct cbdata* c)
 {
     TR_UNUSED(core);
 
     gtr_window_set_busy(c->wind, busy);
 }
 
-static void on_core_error(TrCore*, guint, char const*, struct cbdata*);
+static void on_core_error(TrCore const*, guint, char const*, struct cbdata*);
 static void on_add_torrent(TrCore*, tr_ctor*, gpointer);
-static void on_prefs_changed(TrCore* core, tr_quark const key, gpointer);
+static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer);
 static void main_window_setup(struct cbdata* cbdata, GtkWindow* wind);
 static gboolean update_model_loop(gpointer gdata);
 static gboolean update_model_once(gpointer gdata);
@@ -777,6 +777,14 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
     }
 }
 
+static void placeWindowFromPrefs(GtkWindow* window)
+{
+    gtk_window_resize(window, (int)gtr_pref_int_get(TR_KEY_main_window_width),
+        (int)gtr_pref_int_get(TR_KEY_main_window_height));
+    gtk_window_move(window, (int)gtr_pref_int_get(TR_KEY_main_window_x),
+        (int)gtr_pref_int_get(TR_KEY_main_window_y));
+}
+
 static void presentMainWindow(struct cbdata* cbdata)
 {
     GtkWindow* window = cbdata->wind;
@@ -790,8 +798,7 @@ static void presentMainWindow(struct cbdata* cbdata)
 
     if (!gtk_widget_get_visible(GTK_WIDGET(window)))
     {
-        gtk_window_resize(window, gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
-        gtk_window_move(window, gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+        placeWindowFromPrefs(window);
         gtr_widget_set_visible(GTK_WIDGET(window), TRUE);
     }
 
@@ -821,7 +828,7 @@ static void toggleMainWindow(struct cbdata* cbdata)
 
 static void on_app_exit(gpointer vdata);
 
-static gboolean winclose(GtkWidget* w, GdkEvent* event, gpointer gdata)
+static gboolean winclose(GtkWidget const* w, GdkEvent const* event, gpointer gdata)
 {
     TR_UNUSED(w);
     TR_UNUSED(event);
@@ -840,7 +847,7 @@ static gboolean winclose(GtkWidget* w, GdkEvent* event, gpointer gdata)
     return TRUE; /* don't propagate event further */
 }
 
-static void rowChangedCB(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)
+static void rowChangedCB(GtkTreeModel const* model, GtkTreePath* path, GtkTreeIter const* iter, gpointer gdata)
 {
     TR_UNUSED(model);
     TR_UNUSED(iter);
@@ -853,8 +860,8 @@ static void rowChangedCB(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* it
     }
 }
 
-static void on_drag_data_received(GtkWidget* widget, GdkDragContext* drag_context, gint x, gint y,
-    GtkSelectionData* selection_data, guint info, guint time_, gpointer gdata)
+static void on_drag_data_received(GtkWidget const* widget, GdkDragContext* drag_context, gint x, gint y,
+    GtkSelectionData const* selection_data, guint info, guint time_, gpointer gdata)
 {
     TR_UNUSED(widget);
     TR_UNUSED(x);
@@ -956,11 +963,8 @@ static gpointer session_close_threadfunc(gpointer gdata)
     return NULL;
 }
 
-static void exit_now_cb(GtkWidget* w, gpointer data)
+static void exit_now_cb()
 {
-    TR_UNUSED(w);
-    TR_UNUSED(data);
-
     exit(0);
 }
 
@@ -1027,8 +1031,7 @@ static void on_app_exit(gpointer vdata)
     /* ensure the window is in its previous position & size.
      * this seems to be necessary because changing the main window's
      * child seems to unset the size */
-    gtk_window_resize(cbdata->wind, gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
-    gtk_window_move(cbdata->wind, gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
+    placeWindowFromPrefs(cbdata->wind);
 
     /* shut down libT */
     session_close_data = g_new(struct session_close_struct, 1);
@@ -1074,7 +1077,7 @@ static void flush_torrent_errors(struct cbdata* cbdata)
     }
 }
 
-static void on_core_error(TrCore* core, guint code, char const* msg, struct cbdata* c)
+static void on_core_error(TrCore const* core, guint code, char const* msg, struct cbdata* c)
 {
     TR_UNUSED(core);
 
@@ -1098,7 +1101,7 @@ static void on_core_error(TrCore* core, guint code, char const* msg, struct cbda
     }
 }
 
-static gboolean on_main_window_focus_in(GtkWidget* widget, GdkEventFocus* event, gpointer gdata)
+static gboolean on_main_window_focus_in(GtkWidget const* widget, GdkEventFocus const* event, gpointer gdata)
 {
     TR_UNUSED(widget);
     TR_UNUSED(event);
@@ -1128,7 +1131,7 @@ static void on_add_torrent(TrCore* core, tr_ctor* ctor, gpointer gdata)
     gtk_widget_show(w);
 }
 
-static void on_prefs_changed(TrCore* core, tr_quark const key, gpointer data)
+static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer data)
 {
     TR_UNUSED(core);
 

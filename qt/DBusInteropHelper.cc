@@ -21,7 +21,7 @@ bool DBusInteropHelper::isConnected() const
     return QDBusConnection::sessionBus().isConnected();
 }
 
-QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
+QVariant DBusInteropHelper::addMetainfo(QString const& metainfo) const
 {
     auto request = QDBusMessage::createMethodCall(
         QStringLiteral("com.transmissionbt.Transmission"),

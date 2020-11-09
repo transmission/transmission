@@ -798,7 +798,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     uint8_t obfuscatedTorrentHash[SHA_DIGEST_LENGTH];
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
-    tr_torrent* tor;
     size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1', s) */
         SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
         VC_LENGTH + sizeof(crypto_provide) + sizeof(padc_len);
@@ -823,6 +822,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     }
 
+    tr_torrent const* tor;
     if ((tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash)) != NULL)
     {
         bool const clientIsSeed = tr_torrentIsSeed(tor);

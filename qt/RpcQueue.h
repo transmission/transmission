@@ -69,7 +69,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, RpcResponseFuture>
         >::type* = nullptr>
-    QueuedFunction normalizeFunc(Func const& func)
+    QueuedFunction normalizeFunc(Func const& func) const
     {
         return [func](RpcResponseFuture const& r)
             {
@@ -81,7 +81,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func>, RpcResponseFuture>
         >::type* = nullptr>
-    QueuedFunction normalizeFunc(Func const& func)
+    QueuedFunction normalizeFunc(Func const& func) const
     {
         return [func](RpcResponseFuture const&)
             {
@@ -93,7 +93,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>
         >::type* = nullptr>
-    QueuedFunction normalizeFunc(Func const& func)
+    QueuedFunction normalizeFunc(Func const& func) const
     {
         return [func](RpcResponseFuture const& r)
             {
@@ -106,7 +106,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func>, void>
         >::type* = nullptr>
-    QueuedFunction normalizeFunc(Func const& func)
+    QueuedFunction normalizeFunc(Func const& func) const
     {
         return [func](RpcResponseFuture const& r)
             {
@@ -119,7 +119,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>
         >::type* = nullptr>
-    ErrorHandlerFunction normalizeErrorHandler(Func const& func)
+    ErrorHandlerFunction normalizeErrorHandler(Func const& func) const
     {
         return [func](RpcResponseFuture const& r)
             {
@@ -131,7 +131,7 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same_v<typename std::invoke_result_t<Func>, void>
         >::type* = nullptr>
-    ErrorHandlerFunction normalizeErrorHandler(Func const& func)
+    ErrorHandlerFunction normalizeErrorHandler(Func const& func) const
     {
         return [func](RpcResponseFuture const&)
             {

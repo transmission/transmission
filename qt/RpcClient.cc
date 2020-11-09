@@ -297,13 +297,13 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     promise.reportFinished(&result);
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& json)
+int64_t RpcClient::parseResponseTag(tr_variant& json) const
 {
     auto const tag = dictFind<int>(&json, TR_KEY_tag);
     return tag ? *tag : -1;
 }
 
-RpcResponse RpcClient::parseResponseData(tr_variant& json)
+RpcResponse RpcClient::parseResponseData(tr_variant& json) const
 {
     RpcResponse ret;
 

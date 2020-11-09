@@ -49,6 +49,7 @@ public:
 
     QString memToString(int64_t bytes) const;
     QString sizeToString(int64_t bytes) const;
+    QString sizeToString(uint64_t bytes) const;
     QString speedToString(Speed const& speed) const;
     QString percentToString(double x) const;
     QString ratioToString(double ratio) const;

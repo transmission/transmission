@@ -1190,7 +1190,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = NULL;
 
     errno = 0;
-    struct dirent* entry = readdir((DIR*)handle);
+    struct dirent const* const entry = readdir((DIR*)handle);
 
     if (entry != NULL)
     {

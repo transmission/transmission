@@ -26,7 +26,7 @@ void SessionDialog::accept()
     BaseDialog::accept();
 }
 
-void SessionDialog::resensitize()
+void SessionDialog::resensitize() const
 {
     bool const is_remote = ui_.remoteSessionRadio->isChecked();
     bool const use_auth = ui_.authCheck->isChecked();

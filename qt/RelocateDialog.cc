@@ -22,7 +22,7 @@ void RelocateDialog::onSetLocation()
     close();
 }
 
-void RelocateDialog::onMoveToggled(bool b)
+void RelocateDialog::onMoveToggled(bool b) const
 {
     move_flag = b;
 }
