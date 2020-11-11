@@ -242,7 +242,7 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_vo
 
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
 {
-    void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
+    void const* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
 
 #ifndef TR_ENABLE_ASSERTS
 

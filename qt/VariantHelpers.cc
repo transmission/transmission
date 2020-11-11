@@ -165,8 +165,8 @@ bool change(TrackerStat& setme, tr_variant const* value)
         {
             if (key == TR_KEY_announce)
             {
-                setme.announce = qApp->intern(setme.announce);
-                setme.favicon_key = qApp->faviconCache().add(setme.announce);
+                setme.announce = trApp->intern(setme.announce);
+                setme.favicon_key = trApp->faviconCache().add(setme.announce);
             }
 
             changed = true;

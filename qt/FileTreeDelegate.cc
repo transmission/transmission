@@ -41,7 +41,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         return;
     }
 
-    QStyle* style(qApp->style());
+    QStyle const* style = QApplication::style();
 
     painter->save();
     QItemDelegate::drawBackground(painter, option, index);
@@ -50,11 +50,11 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
     {
         QStyleOptionProgressBar p;
         p.state = option.state | QStyle::State_Small;
-        p.direction = qApp->layoutDirection();
+        p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
         p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));
         p.rect.moveCenter(option.rect.center());
-        p.fontMetrics = qApp->fontMetrics();
+        p.fontMetrics = QApplication::fontMetrics();
         p.minimum = 0;
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;

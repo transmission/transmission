@@ -130,7 +130,7 @@ static void onProgressDialogDestroyed(gpointer data, GObject* dead)
 {
     TR_UNUSED(dead);
 
-    MakeMetaUI* ui = data;
+    MakeMetaUI const* ui = data;
     g_source_remove(ui->progress_tag);
 }
 
@@ -386,8 +386,8 @@ static char const* getDefaultSavePath(void)
     return g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
 }
 
-static void on_drag_data_received(GtkWidget* widget, GdkDragContext* drag_context, gint x, gint y,
-    GtkSelectionData* selection_data, guint info, guint time_, gpointer user_data)
+static void on_drag_data_received(GtkWidget const* widget, GdkDragContext* drag_context, gint x, gint y,
+    GtkSelectionData const* selection_data, guint info, guint time_, gpointer user_data)
 {
     TR_UNUSED(widget);
     TR_UNUSED(x);

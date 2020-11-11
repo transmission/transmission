@@ -253,7 +253,7 @@ static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 static char const* getHomeDir(void)
 {
-    static char* home = NULL;
+    static char const* home = NULL;
 
     if (home == NULL)
     {
@@ -267,14 +267,14 @@ static char const* getHomeDir(void)
 
 #else
 
-            struct passwd* pw = getpwuid(getuid());
-
+            struct passwd pwent;
+            struct passwd* pw = NULL;
+            char buf[4096];
+            getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
             if (pw != NULL)
             {
                 home = tr_strdup(pw->pw_dir);
             }
-
-            endpwent();
 
 #endif
         }
@@ -328,7 +328,7 @@ char const* tr_getResumeDir(tr_session const* session)
 
 char const* tr_getDefaultConfigDir(char const* appname)
 {
-    static char* s = NULL;
+    static char const* s = NULL;
 
     if (tr_str_is_empty(appname))
     {
@@ -380,7 +380,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
 char const* tr_getDefaultDownloadDir(void)
 {
-    static char* user_dir = NULL;
+    static char const* user_dir = NULL;
 
     if (user_dir == NULL)
     {
@@ -477,7 +477,7 @@ static bool isWebClientDir(char const* path)
 
 char const* tr_getWebClientDir(tr_session const* session)
 {
-    static char* s = NULL;
+    static char const* s = NULL;
 
     if (s == NULL)
     {

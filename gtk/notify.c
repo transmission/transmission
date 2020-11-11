@@ -76,8 +76,8 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
     g_variant_unref(result);
 }
 
-static void g_signal_callback(GDBusProxy* dbus_proxy, char* sender_name, char* signal_name, GVariant* params,
-    gpointer user_data)
+static void g_signal_callback(GDBusProxy const* dbus_proxy, char const* sender_name, char const* signal_name, GVariant* params,
+    gconstpointer user_data)
 {
     TR_UNUSED(dbus_proxy);
     TR_UNUSED(sender_name);
@@ -102,16 +102,13 @@ static void g_signal_callback(GDBusProxy* dbus_proxy, char* sender_name, char* s
     }
     else if (g_strcmp0(signal_name, "ActionInvoked") == 0 && g_variant_is_of_type(params, G_VARIANT_TYPE("(us)")))
     {
-        char* action;
-        tr_torrent* tor;
-
-        tor = gtr_core_find_torrent(n->core, n->torrent_id);
-
+        tr_torrent const* tor = gtr_core_find_torrent(n->core, n->torrent_id);
         if (tor == NULL)
         {
             return;
         }
 
+        char* action = NULL;
         g_variant_get(params, "(u&s)", NULL, &action);
 
         if (g_strcmp0(action, "folder") == 0)
@@ -180,8 +177,6 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
 
 void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 {
-    TrNotification* n;
-    tr_torrent* tor;
     char const* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
 
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
@@ -196,9 +191,9 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 
     g_return_if_fail(G_IS_DBUS_PROXY(proxy));
 
-    tor = gtr_core_find_torrent(core, torrent_id);
+    tr_torrent const* const tor = gtr_core_find_torrent(core, torrent_id);
 
-    n = g_new0(TrNotification, 1);
+    TrNotification* const n = g_new0(TrNotification, 1);
     g_object_ref(G_OBJECT(core));
     n->core = core;
     n->torrent_id = torrent_id;

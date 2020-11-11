@@ -24,8 +24,7 @@ public:
         FileMode
     };
 
-public:
-    PathButton(QWidget* parent = nullptr);
+    explicit PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);
     void setTitle(QString const& title);
@@ -45,7 +44,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private slots:
-    void onClicked();
+    void onClicked() const;
     void onFileSelected(QString const& path);
 
 private:
@@ -57,5 +56,5 @@ private:
     QString name_filter_;
     QString path_;
     QString title_;
-    Mode mode_;
+    Mode mode_ = DirectoryMode;
 };

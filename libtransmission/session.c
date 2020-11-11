@@ -726,7 +726,6 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     }
 
     tr_timerAdd(session->nowTimer, 0, usec);
-    /* fprintf (stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
 }
 
 static void loadBlocklists(tr_session* session);
@@ -734,7 +733,7 @@ static void loadBlocklists(tr_session* session);
 static void tr_sessionInitImpl(void* vdata)
 {
     struct init_data* data = vdata;
-    tr_variant* clientSettings = data->clientSettings;
+    tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
     TR_ASSERT(tr_amInEventThread(session));
@@ -1924,8 +1923,8 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
 
 static int compareTorrentByCur(void const* va, void const* vb)
 {
-    tr_torrent const* a = *(tr_torrent const**)va;
-    tr_torrent const* b = *(tr_torrent const**)vb;
+    tr_torrent const* a = *(tr_torrent const* const*)va;
+    tr_torrent const* b = *(tr_torrent const* const*)vb;
     uint64_t const aCur = a->downloadedCur + a->uploadedCur;
     uint64_t const bCur = b->downloadedCur + b->uploadedCur;
 
@@ -3088,12 +3087,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!tr_torrentIsStalled(tor))
+        if (!tr_torrentIsStalled(tor) && (tr_torrentGetActivity(tor) == activity))
         {
-            if (tr_torrentGetActivity(tor) == activity)
-            {
-                ++active_count;
-            }
+            ++active_count;
         }
     }
 

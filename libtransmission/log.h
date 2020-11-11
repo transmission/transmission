@@ -56,7 +56,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
 tr_sys_file_t tr_logGetFile(void);
 
-/** @brief return true if deep logging has been enabled by the user; false otherwise */
+/** @brief return true if deep logging has been enabled by the user, false otherwise */
 bool tr_logGetDeepEnabled(void);
 
 void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5) \

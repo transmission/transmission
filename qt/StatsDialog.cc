@@ -20,8 +20,7 @@ enum
 
 StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     BaseDialog(parent),
-    session_(session),
-    timer_(new QTimer(this))
+    session_(session)
 {
     ui_.setupUi(this);
 
@@ -30,21 +29,20 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     cr->addLayout(ui_.totalSectionLayout);
     cr->update();
 
-    timer_->setSingleShot(false);
-    connect(timer_, SIGNAL(timeout()), &session_, SLOT(refreshSessionStats()));
-
-    connect(&session_, SIGNAL(statsUpdated()), this, SLOT(updateStats()));
+    timer_.setSingleShot(false);
+    connect(&timer_, &QTimer::timeout, &session_, &Session::refreshSessionStats);
+    connect(&session_, &Session::statsUpdated, this, &StatsDialog::updateStats);
     updateStats();
     session_.refreshSessionStats();
 }
 
 void StatsDialog::setVisible(bool visible)
 {
-    timer_->stop();
+    timer_.stop();
 
     if (visible)
     {
-        timer_->start(REFRESH_INTERVAL_MSEC);
+        timer_.start(REFRESH_INTERVAL_MSEC);
     }
 
     BaseDialog::setVisible(visible);

@@ -169,12 +169,13 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
-    for (int i = 0; files != NULL; ++i)
+    int i = 0;
+    while (files != NULL)
     {
-        struct FileList* tmp = files;
+        struct FileList* const tmp = files;
         files = files->next;
 
-        tr_metainfo_builder_file* file = &ret->files[i];
+        tr_metainfo_builder_file* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
 
@@ -490,14 +491,13 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
+    if ((builder->result == TR_MAKEMETA_OK) &&
+        (!builder->abortFlag) &&
+        (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
-        if (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0)
-        {
-            builder->my_errno = errno;
-            tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
-            builder->result = TR_MAKEMETA_IO_WRITE;
-        }
+        builder->my_errno = errno;
+        tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
+        builder->result = TR_MAKEMETA_IO_WRITE;
     }
 
     /* cleanup */

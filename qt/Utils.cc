@@ -71,57 +71,6 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
     }
 }
 
-bool Utils::isValidUtf8(char const* s)
-{
-    int n; // number of bytes in a UTF-8 sequence
-
-    for (char const* c = s; *c != '\0'; c += n)
-    {
-        if ((*c & 0x80) == 0x00)
-        {
-            n = 1; // ASCII
-        }
-        else if ((*c & 0xc0) == 0x80)
-        { // NOLINT(bugprone-branch-clone)
-            return false; // not valid
-        }
-        else if ((*c & 0xe0) == 0xc0)
-        {
-            n = 2;
-        }
-        else if ((*c & 0xf0) == 0xe0)
-        {
-            n = 3;
-        }
-        else if ((*c & 0xf8) == 0xf0)
-        {
-            n = 4;
-        }
-        else if ((*c & 0xfc) == 0xf8)
-        {
-            n = 5;
-        }
-        else if ((*c & 0xfe) == 0xfc)
-        {
-            n = 6;
-        }
-        else
-        {
-            return false;
-        }
-
-        for (int m = 1; m < n; m++)
-        {
-            if ((c[m] & 0xc0) != 0x80)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 QString Utils::removeTrailingDirSeparator(QString const& path)
 {
     int i = path.size();
@@ -134,7 +83,7 @@ QString Utils::removeTrailingDirSeparator(QString const& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
+int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -147,7 +96,7 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
         width();
 }
 
-int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
+int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);

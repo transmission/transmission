@@ -68,7 +68,6 @@ private:
 
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
-private:
     FileTreeModel* model_ = {};
     QSortFilterProxyModel* proxy_ = {};
     FileTreeDelegate* delegate_ = {};

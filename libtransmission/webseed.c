@@ -201,7 +201,7 @@ static void connection_succeeded(void* vdata)
 
     if (data->real_url != NULL)
     {
-        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
         if (tor != NULL)
         {
@@ -558,8 +558,8 @@ static void webseed_destruct(tr_peer* peer)
     /* if we have an array of file URLs, free it */
     if (w->file_urls != NULL)
     {
-        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
-        tr_info const* inf = tr_torrentInfo(tor);
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_info const* const inf = tr_torrentInfo(tor);
 
         for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
@@ -608,7 +608,6 @@ tr_webseed* tr_webseedNew(struct tr_torrent* tor, char const* url, tr_peer_callb
     w->callback = callback;
     w->callback_data = callback_data;
     w->file_urls = tr_new0(char*, inf->fileCount);
-    // tr_rcConstruct(&w->download_rate);
     tr_bandwidthConstruct(&w->bandwidth, tor->session, &tor->bandwidth);
     w->timer = evtimer_new(w->session->event_base, webseed_timer_func, w);
     tr_timerAddMsec(w->timer, TR_IDLE_TIMER_MSEC);

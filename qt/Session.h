@@ -120,7 +120,7 @@ public:
 
 public slots:
     void addTorrent(AddData const& addme);
-    void launchWebInterface();
+    void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
     void queueMoveTop(torrent_ids_t const& torrentIds = {});
@@ -144,6 +144,9 @@ signals:
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
     void httpAuthenticationRequired();
 
+private slots:
+    void onDuplicatesTimer();
+
 private:
     void start();
 
@@ -159,9 +162,8 @@ private:
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const;
 
-private:
     QString const config_dir_;
     Prefs& prefs_;
 
@@ -180,7 +182,4 @@ private:
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
-
-private slots:
-    void onDuplicatesTimer();
 };

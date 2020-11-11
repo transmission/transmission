@@ -73,7 +73,7 @@ char* tr_strlsize(char* buf, guint64 size, size_t buflen);
 char* tr_strlratio(char* buf, double ratio, size_t buflen);
 
 /* return a human-readable string for the time given in seconds. */
-char* tr_strltime(char* buf, int secs, size_t buflen);
+char* tr_strltime(char* buf, time_t secs, size_t buflen);
 
 /***
 ****

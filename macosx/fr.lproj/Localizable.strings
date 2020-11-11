@@ -516,7 +516,7 @@
 "Last Announce" = "Dernière annonce";
 
 /* Tracker last scrape */
-"Last Scrape" = "Dernier scrape";
+"Last Scrape" = "Dernier moissonnage";
 
 /* Prefs -> blocklist -> message */
 "Last updated" = "Dernière mise à jour";
@@ -636,10 +636,10 @@
 "Once removed, continuing the transfers will require the torrent files or magnet links." = "Une fois supprimés, la reprise des transferts exigera les fichiers torrent ou les liens magnet.";
 
 /* Remove trackers alert -> message */
-"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Une fois supprimé, Transmission n’essayera plus de le contacter. Ceci ne peut être annulé.";
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Une fois supprimé, Transmission ne tentera plus de le contacter. Cette action est définitive.";
 
 /* Remove trackers alert -> message */
-"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Une fois supprimés, Transmission n’essayera plus de les contacter. Ceci ne peut être annulé.";
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Une fois supprimés, Transmission ne tentera plus de les contacter. Cette action est définitive.";
 
 /* File Outline -> Menu */
 "Only Check Selected" = "Cocher sélectionnés uniquement";
@@ -838,10 +838,10 @@
 "Save" = "Sauver";
 
 /* Tracker last scrape */
-"Scrape error" = "Erreur de scrape";
+"Scrape error" = "Erreur de moissonnage";
 
 /* Tracker last scrape */
-"Scrape timed out" = "Scrape échoué";
+"Scrape timed out" = "Le moissonnage est arrivé au bout de son délai";
 
 /* tracker peer stat */
 "Seeders" = "Propagateurs";

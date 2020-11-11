@@ -35,7 +35,6 @@ public:
         FILTER_BY_TRACKER
     };
 
-public:
     explicit TorrentFilter(Prefs const& prefs);
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 

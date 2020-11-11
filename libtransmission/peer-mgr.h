@@ -107,7 +107,8 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode, int max_peer_count);
+int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode,
+    int max_peer_count);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 

@@ -46,7 +46,9 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 
     memset(out, 0, 20);
 
-    for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
+    size_t index = 0;
+    size_t offset = 0;
+    for (size_t i = 0; i < inlen; ++i)
     {
         int digit;
         int lookup = in[i] - '0';

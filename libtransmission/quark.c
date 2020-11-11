@@ -438,19 +438,16 @@ static tr_ptrArray my_runtime = TR_PTR_ARRAY_INIT_STATIC;
 bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
 {
     static size_t const n_static = TR_N_ELEMENTS(my_static);
-
     TR_ASSERT(n_static == TR_N_KEYS);
 
     struct tr_key_struct tmp;
-    struct tr_key_struct* match;
-    bool success = false;
-
     tmp.str = str;
     tmp.len = len;
 
     /* is it in our static array? */
-    match = bsearch(&tmp, my_static, n_static, sizeof(struct tr_key_struct), compareKeys);
+    struct tr_key_struct const* const match = bsearch(&tmp, my_static, n_static, sizeof(struct tr_key_struct), compareKeys);
 
+    bool success = false;
     if (match != NULL)
     {
         *setme = match - my_static;
@@ -493,22 +490,19 @@ tr_quark tr_quark_new(void const* str, size_t len)
 {
     tr_quark ret = TR_KEY_NONE;
 
-    if (str == NULL)
+    if (str != NULL)
     {
-        goto finish;
+        if (len == TR_BAD_SIZE)
+        {
+            len = strlen(str);
+        }
+
+        if (!tr_quark_lookup(str, len, &ret))
+        {
+            ret = append_new_quark(str, len);
+        }
     }
 
-    if (len == TR_BAD_SIZE)
-    {
-        len = strlen(str);
-    }
-
-    if (!tr_quark_lookup(str, len, &ret))
-    {
-        ret = append_new_quark(str, len);
-    }
-
-finish:
     return ret;
 }
 
