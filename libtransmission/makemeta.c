@@ -265,7 +265,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return ret;
     }
 
-    buf = tr_valloc(b->pieceSize);
+    buf = tr_malloc(b->pieceSize);
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
     fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);

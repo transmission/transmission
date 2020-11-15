@@ -181,8 +181,6 @@ void* tr_memdup(void const* src, size_t byteCount);
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 /* *INDENT-ON* */
 
-void* tr_valloc(size_t bufLen);
-
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -207,11 +205,6 @@ static inline bool tr_str_is_empty(char const* value)
 {
     return value == NULL || *value == '\0';
 }
-
-/**
- * @brief like memcmp() but gracefully handles NULL pointers
- */
-int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 

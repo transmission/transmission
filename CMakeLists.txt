@@ -534,7 +534,6 @@ set(NEEDED_FUNCTIONS
     fallocate64
     flock
     getmntent
-    getpagesize
     gmtime_r
     gmtime_s
     htonll
@@ -545,7 +544,6 @@ set(NEEDED_FUNCTIONS
     ntohll
     posix_fadvise
     posix_fallocate
-    posix_memalign
     pread
     pwrite
     statvfs
@@ -553,8 +551,7 @@ set(NEEDED_FUNCTIONS
     strlcpy
     strsep
     syslog
-    uselocale
-    valloc)
+    uselocale)
 
 foreach(F ${NEEDED_FUNCTIONS})
     tr_make_id("${F}" F_ID)
