@@ -1676,13 +1676,11 @@ static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_time
     }
     else /* successfully fetched the blocklist... */
     {
-        tr_sys_file_t fd;
         int err;
-        char* filename;
         z_stream stream;
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
-        uint8_t* buf = tr_valloc(buflen);
+        uint8_t* const buf = tr_malloc(buflen);
         tr_error* error = NULL;
 
         /* this is an odd Magic Number required by zlib to enable gz support.
@@ -1696,8 +1694,8 @@ static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_time
         stream.avail_in = response_byte_count;
         inflateInit2(&stream, windowBits);
 
-        filename = tr_buildPath(configDir, "blocklist.tmp.XXXXXX", NULL);
-        fd = tr_sys_file_open_temp(filename, &error);
+        char* const filename = tr_buildPath(configDir, "blocklist.tmp.XXXXXX", NULL);
+        tr_sys_file_t const fd = tr_sys_file_open_temp(filename, &error);
 
         if (fd == TR_BAD_SYS_FILE)
         {
@@ -2277,6 +2275,16 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
         }
     }
 
+    if (tr_variantDictFindInt(args_in, TR_KEY_anti_brute_force_threshold, &i))
+    {
+        tr_sessionSetAntiBruteForceThreshold(session, i);
+    }
+
+    if (tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &boolVal))
+    {
+        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
+    }
+
     notify(session, TR_RPC_SESSION_CHANGED, NULL);
 
     return NULL;
@@ -2519,6 +2527,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_queue_stalled_minutes:
         tr_variantDictAddInt(d, key, tr_sessionGetQueueStalledMinutes(s));
+        break;
+
+    case TR_KEY_anti_brute_force_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionGetAntiBruteForceEnabled(s));
+        break;
+
+    case TR_KEY_anti_brute_force_threshold:
+        tr_variantDictAddInt(d, key, tr_sessionGetAntiBruteForceThreshold(s));
         break;
 
     case TR_KEY_units:

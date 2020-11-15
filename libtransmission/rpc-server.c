@@ -65,6 +65,8 @@ struct tr_rpc_server
     tr_list* whitelist;
     tr_list* hostWhitelist;
     int loginattempts;
+    bool isAntiBruteForceEnabled;
+    int antiBruteForceThreshold;
 
     bool isStreamInitialized;
     z_stream stream;
@@ -641,7 +643,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->loginattempts == 100)
+        if (server->isAntiBruteForceEnabled && server->loginattempts >= server->antiBruteForceThreshold)
         {
             send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
@@ -681,7 +683,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            server->loginattempts++;
+            if (server->isAntiBruteForceEnabled)
+            {
+                server->loginattempts++;
+            }
+
             char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
                 server->loginattempts);
             send_simple_response(req, 401, unauthuser);
@@ -1066,6 +1072,30 @@ char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
     return tr_address_to_string(&server->bindAddress);
 }
 
+bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server)
+{
+    return server->isAntiBruteForceEnabled;
+}
+
+void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool isEnabled)
+{
+    server->isAntiBruteForceEnabled = isEnabled;
+    if (!isEnabled)
+    {
+        server->loginattempts = 0;
+    }
+}
+
+int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server)
+{
+    return server->antiBruteForceThreshold;
+}
+
+void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
+{
+    server->antiBruteForceThreshold = badRequests;
+}
+
 /****
 *****  LIFE CYCLE
 ****/
@@ -1226,6 +1256,28 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     else
     {
         tr_rpcSetPassword(s, str);
+    }
+
+    key = TR_KEY_anti_brute_force_enabled;
+
+    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetAntiBruteForceEnabled(s, boolVal);
+    }
+
+    key = TR_KEY_anti_brute_force_threshold;
+
+    if (!tr_variantDictFindInt(settings, key, &i))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetAntiBruteForceThreshold(s, i);
     }
 
     key = TR_KEY_rpc_bind_address;

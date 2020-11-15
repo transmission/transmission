@@ -601,6 +601,15 @@ bool tr_sessionGetDeleteSource(tr_session const*);
 tr_priority_t tr_torrentGetPriority(tr_torrent const*);
 void tr_torrentSetPriority(tr_torrent*, tr_priority_t);
 
+void tr_sessionSetAntiBruteForceThreshold(tr_session*, int bad_requests);
+int tr_sessionGetAntiBruteForceThreshold(tr_session const*);
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session*, bool enabled);
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
+
+/**
+**/
+
 /***
 ****
 ****  Torrent Queueing
