@@ -21,7 +21,7 @@ TEST(Client, clientForId)
         char const* expected_client;
     };
 
-    auto const tests = std::array<LocalTest, 24>{
+    auto const tests = std::array<LocalTest, 27>{
         LocalTest{ "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
         { "-BT791\0-", "BitTorrent 7.9.1" },
         { "-FC1013-", "FileCroc 1.0.1.3" },
@@ -60,7 +60,11 @@ TEST(Client, clientForId)
         { "-I\05O\x08\x03\x01-", "-I%05O%08%03%01-" },
 
         { "\x65\x78\x62\x63\x00\x38\x7A\x44\x63\x10\x2D\x6E\x9A\xD6\x72\x3B\x33\x9F\x35\xA9", "BitComet 0.56" },
-        { "\x65\x78\x62\x63\x00\x38\x4C\x4F\x52\x44\x32\x00\x04\x8E\xCE\xD5\x7B\xD7\x10\x28", "BitLord 0.56" }
+        { "\x65\x78\x62\x63\x00\x38\x4C\x4F\x52\x44\x32\x00\x04\x8E\xCE\xD5\x7B\xD7\x10\x28", "BitLord 0.56" },
+
+        { "-UW110Q-", "\xc2\xb5Torrent Web 1.1.0" },
+        { "-FW6830-", "FrostWire 6.8.3" },
+        { "-BI2300-", "BiglyBT 2.3.0.0" }
     };
 
     for (auto const& test : tests)
