@@ -3634,9 +3634,13 @@ static void removeKeRangerRansomware()
 
     [item setView: button];
 
-    const NSSize buttonSize = NSMakeSize(36.0, 25.0);
-    [item setMinSize: buttonSize];
-    [item setMaxSize: buttonSize];
+    if (@available(macOS 11.0, *)) {
+        // not needed
+    } else {
+        const NSSize buttonSize = NSMakeSize(36.0, 25.0);
+        [item setMinSize: buttonSize];
+        [item setMaxSize: buttonSize];
+    }
 
     return item;
 }
@@ -3729,9 +3733,13 @@ static void removeKeRangerRansomware()
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
 
-        const NSSize groupSize = NSMakeSize(72.0, 25.0);
-        [groupItem setMinSize: groupSize];
-        [groupItem setMaxSize: groupSize];
+        if (@available(macOS 11.0, *)) {
+            // not needed
+        } else {
+            const NSSize groupSize = NSMakeSize(72.0, 25.0);
+            [groupItem setMinSize: groupSize];
+            [groupItem setMaxSize: groupSize];
+        }
 
         [groupItem setLabel: NSLocalizedString(@"Apply All", "All toolbar item -> label")];
         [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label")];
@@ -3774,9 +3782,13 @@ static void removeKeRangerRansomware()
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
 
-        const NSSize groupSize = NSMakeSize(72.0, 25.0);
-        [groupItem setMinSize: groupSize];
-        [groupItem setMaxSize: groupSize];
+        if (@available(macOS 11.0, *)) {
+            // not needed
+        } else {
+            const NSSize groupSize = NSMakeSize(72.0, 25.0);
+            [groupItem setMinSize: groupSize];
+            [groupItem setMaxSize: groupSize];
+        }
 
         [groupItem setLabel: NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label")];
         [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label")];
