@@ -3888,10 +3888,8 @@ static void removeKeRangerRansomware()
     return @[ TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB, TOOLBAR_REMOVE,
               TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
               TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO,
-              NSToolbarSeparatorItemIdentifier,
               NSToolbarSpaceItemIdentifier,
-              NSToolbarFlexibleSpaceItemIdentifier,
-              NSToolbarCustomizeToolbarItemIdentifier ];
+              NSToolbarFlexibleSpaceItemIdentifier ];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
