@@ -102,6 +102,7 @@ $image-upload-download: 'images/up-and-down-arrows.svg';
   --color-fg-disabled: #{$grey-400};
   --color-fg-error: #{$red-500};
   --color-fg-name: #{$grey-800};
+  --color-fg-on-popup: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   @media (prefers-color-scheme: dark) {
@@ -1184,6 +1185,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   background: $background-color;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  color: var(--color-fg-on-popup);
   position: absolute;
   z-index: $z-index-popup;
 
@@ -1223,6 +1225,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   );
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  color: var(--color-fg-on-popup);
   padding: 20px;
   position: fixed;
   width: 200px;
@@ -1253,7 +1256,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   a,
   button,
   label {
-    color: var(--color-fg-primary);
     font-size: 1em;
 
     &:disabled {
@@ -1417,6 +1419,7 @@ $logo-size: 64px;
   }
 
   .dialog-window {
+    color: var(--color-fg-on-popup);
     display: grid;
     grid-column-gap: 12px;
     grid-template-areas:
