@@ -60,6 +60,8 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
+char const* tr_get_mime_type_for_filename(char const* filename);
+
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
@@ -179,8 +181,6 @@ void* tr_memdup(void const* src, size_t byteCount);
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 /* *INDENT-ON* */
 
-void* tr_valloc(size_t bufLen);
-
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -205,11 +205,6 @@ static inline bool tr_str_is_empty(char const* value)
 {
     return value == NULL || *value == '\0';
 }
-
-/**
- * @brief like memcmp() but gracefully handles NULL pointers
- */
-int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
@@ -323,6 +318,9 @@ char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
 
+/** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
+struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
+
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 int tr_gettimeofday(struct timeval* tv);
 
@@ -375,32 +373,30 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-extern unsigned int tr_speed_K;
-extern unsigned int tr_mem_K;
-extern unsigned int tr_size_K;
+extern size_t tr_speed_K;
+extern size_t tr_mem_K;
+extern size_t tr_size_K;
 
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
 
-// FIXME(ckerr): bytes should be a size_t
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
 
 /* format a memory size from MB into a user-readable string. */
 static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
 {
-    return tr_formatter_mem_B(buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
 }
 
-// FIXME(ckerr): bytes should be a size_t
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 

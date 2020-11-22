@@ -6,4 +6,5 @@ services:
     volumes:
       - .:/src
       - ./code_style.sh:/code_style.sh:ro
-    command: ["/bin/sh", "/code_style.sh", "/src"]
+      - ./format:/format:ro
+    command: ["/bin/bash", "-c", "cd /src && ./code_style.sh --check"]

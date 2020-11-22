@@ -41,13 +41,16 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
         int64_t delta = 0;
 
-        for (size_t i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
+        for (size_t i = 0; i < bytes_read; ++i)
         {
             if (buffer[offset] == '\n')
             {
                 delta = i - (int64_t)bytes_read + 1;
                 break;
             }
+
+            ++offset;
+            --buffer_size;
         }
 
         if (delta != 0 || buffer_size == 0 || bytes_read == 0)

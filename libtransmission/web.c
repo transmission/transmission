@@ -113,7 +113,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     /* webseed downloads should be speed limited */
     if (task->torrentId != -1)
     {
-        tr_torrent* tor = tr_torrentFindFromId(task->session, task->torrentId);
+        tr_torrent const* const tor = tr_torrentFindFromId(task->session, task->torrentId);
 
         if (tor != NULL && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
         {
@@ -133,7 +133,7 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 {
     TR_UNUSED(purpose);
 
-    struct tr_web_task* task = vtask;
+    struct tr_web_task const* const task = vtask;
     bool const isScrape = strstr(task->url, "scrape") != NULL;
     bool const isAnnounce = strstr(task->url, "announce") != NULL;
 
@@ -142,8 +142,10 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
     {
         int const sndbuf = isScrape ? 4096 : 1024;
         int const rcvbuf = isScrape ? 4096 : 3072;
-        setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
-        setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
+        /* ignore the sockopt() return values -- these are suggestions
+           rather than hard requirements & it's OK for them to fail */
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
     }
 
     /* return nonzero if this function encountered an error */
@@ -465,7 +467,6 @@ static void tr_webThreadFunc(void* vsession)
 
             dbgmsg("adding task to curl: [%s]", task->url);
             curl_multi_add_handle(multi, createEasy(session, web, task));
-            // fprintf(stderr, "adding a task.. taskCount is now %d\n", taskCount);
             ++taskCount;
         }
 

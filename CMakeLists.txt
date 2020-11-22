@@ -17,6 +17,7 @@ include(TrMacros)
 tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
+        option(ENABLE_WEB           "Build Web client" OFF)
         option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
         option(ENABLE_CLI           "Build command-line client" OFF)
         option(ENABLE_TESTS         "Build unit tests" ON)
@@ -61,23 +62,24 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+    find_package(Git)
+endif()
+
 if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{GIT_COMMIT}")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
-elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
-    find_package(Git)
-    if(GIT_FOUND)
-        execute_process(
-            COMMAND
-                ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-            WORKING_DIRECTORY
-                ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE
-                TR_VCS_REVISION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    endif()
+elseif(GIT_FOUND)
+    execute_process(
+        COMMAND
+            ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
+        WORKING_DIRECTORY
+            ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE
+            TR_VCS_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -532,15 +534,16 @@ set(NEEDED_FUNCTIONS
     fallocate64
     flock
     getmntent
-    getpagesize
+    gmtime_r
+    gmtime_s
     htonll
     localtime_r
+    localtime_s
     memmem
     mkdtemp
     ntohll
     posix_fadvise
     posix_fallocate
-    posix_memalign
     pread
     pwrite
     statvfs
@@ -548,8 +551,7 @@ set(NEEDED_FUNCTIONS
     strlcpy
     strsep
     syslog
-    uselocale
-    valloc)
+    uselocale)
 
 foreach(F ${NEEDED_FUNCTIONS})
     tr_make_id("${F}" F_ID)
@@ -618,10 +620,7 @@ if(ENABLE_TESTS)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web DESTINATION ${DST_DIR}
-        PATTERN *.am EXCLUDE
-        PATTERN *.in EXCLUDE
-        PATTERN *.scss EXCLUDE)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html DESTINATION ${DST_DIR})
 endfunction()
 
 add_subdirectory(libtransmission)
@@ -633,7 +632,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
     add_subdirectory(po)
 endif()
 
-foreach(P daemon cli utils gtk qt mac)
+foreach(P cli daemon gtk mac qt utils web)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
         if(DEFINED ${P_ID}_PROJECT_DIR)
@@ -655,10 +654,44 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
     add_subdirectory(dist/msi)
 endif()
 
-set(CPACK_SOURCE_GENERATOR TBZ2)
+set(CPACK_SOURCE_GENERATOR TXZ)
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
-set(CPACK_SOURCE_IGNORE_FILES
-    \\\\.git
+if(NOT TR_STABLE_RELEASE)
+    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
+endif()
+list(APPEND CPACK_SOURCE_IGNORE_FILES
+    "${CMAKE_BINARY_DIR}"
+    "[.]git"
+    "node_modules"
 )
+set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
+
+## Code Formatting
+
+if(GIT_FOUND)
+    message(STATUS "Looking for uncrustify")
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE TR_GIT_ROOT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/extras/pre-commit"
+            "${TR_GIT_ROOT}/.git/hooks/pre-commit"
+            COPYONLY
+        )
+        add_custom_target(check-format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+        add_custom_target(format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif()
+    unset(TR_GIT_ROOT)
+endif()
 
 include(CPack)

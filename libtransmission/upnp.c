@@ -118,7 +118,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
     *intClient = '\0';
     *intPort = '\0';
 
-    tr_snprintf(portStr, sizeof(portStr), "%d", (int)handle->port);
+    tr_snprintf(portStr, sizeof(portStr), "%d", handle->port);
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
     err = UPNP_GetSpecificPortMappingEntry(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto,
@@ -182,7 +182,7 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
+int tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
 {
     int ret;
 
@@ -212,22 +212,21 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         freeUPNPDevlist(devlist);
     }
 
-    if (handle->state == TR_UPNP_IDLE)
+    if ((handle->state == TR_UPNP_IDLE) &&
+        (handle->isMapped) &&
+        (!isEnabled || handle->port != port))
     {
-        if (handle->isMapped && (!isEnabled || handle->port != port))
-        {
-            handle->state = TR_UPNP_UNMAP;
-        }
+        handle->state = TR_UPNP_UNMAP;
     }
 
-    if (isEnabled && handle->isMapped && doPortCheck)
+    if (isEnabled &&
+        handle->isMapped &&
+        doPortCheck &&
+        ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
+        (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        if (tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
-            tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)
-        {
-            tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
-            handle->isMapped = false;
-        }
+        tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
+        handle->isMapped = false;
     }
 
     if (handle->state == TR_UPNP_UNMAP)
@@ -243,18 +242,13 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         handle->port = -1;
     }
 
-    if (handle->state == TR_UPNP_IDLE)
+    if ((handle->state == TR_UPNP_IDLE) && isEnabled && !handle->isMapped)
     {
-        if (isEnabled && !handle->isMapped)
-        {
-            handle->state = TR_UPNP_MAP;
-        }
+        handle->state = TR_UPNP_MAP;
     }
 
     if (handle->state == TR_UPNP_MAP)
     {
-        int err_tcp = -1;
-        int err_udp = -1;
         errno = 0;
 
         if (handle->urls.controlURL == NULL)
@@ -266,8 +260,8 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
             char desc[64];
             tr_snprintf(desc, sizeof(desc), "%s at %d", TR_NAME, port);
 
-            err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc);
-            err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc);
+            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc);
+            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc);
 
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }

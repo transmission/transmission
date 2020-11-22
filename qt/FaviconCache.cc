@@ -6,6 +6,8 @@
  *
  */
 
+#include <array>
+
 #include <QDir>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -21,7 +23,7 @@
 FaviconCache::FaviconCache() :
     nam_(new QNetworkAccessManager(this))
 {
-    connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
+    connect(nam_, &QNetworkAccessManager::finished, this, &FaviconCache::onRequestFinished);
 }
 
 /***
@@ -31,7 +33,7 @@ FaviconCache::FaviconCache() :
 namespace
 {
 
-QPixmap scale(QPixmap pixmap)
+QPixmap scale(QPixmap const& pixmap)
 {
     return pixmap.scaled(FaviconCache::getIconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
@@ -160,12 +162,49 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     {
         markUrlAsScraped(url_str);
 
-        auto const path = QStringLiteral("http://%1/favicon.").arg(url.host());
-        nam_->get(QNetworkRequest(path + QStringLiteral("gif")));
-        nam_->get(QNetworkRequest(path + QStringLiteral("ico")));
-        nam_->get(QNetworkRequest(path + QStringLiteral("jpg")));
-        nam_->get(QNetworkRequest(path + QStringLiteral("png")));
-        nam_->get(QNetworkRequest(path + QStringLiteral("svg")));
+        auto const scrape = [this](auto const host)
+            {
+                auto const schemes = std::array<QString, 2>{
+                    QStringLiteral("http"),
+                    QStringLiteral("https")
+                };
+                auto const suffixes = std::array<QString, 5>{
+                    QStringLiteral("gif"),
+                    QStringLiteral("ico"),
+                    QStringLiteral("jpg"),
+                    QStringLiteral("png"),
+                    QStringLiteral("svg")
+                };
+                for (auto const& scheme : schemes)
+                {
+                    for (auto const& suffix : suffixes)
+                    {
+                        auto const path = QStringLiteral("%1://%2/favicon.%3").arg(scheme).arg(host).arg(suffix);
+                        nam_->get(QNetworkRequest(path));
+                    }
+                }
+            };
+
+        // tracker.domain.com
+        auto host = url.host();
+        scrape(host);
+
+        auto const delim = QStringLiteral(".");
+        auto const has_subdomain = host.count(delim) > 1;
+        if (has_subdomain)
+        {
+            auto const original_subdomain = host.left(host.indexOf(delim));
+            host.remove(0, original_subdomain.size() + 1);
+            // domain.com
+            scrape(host);
+
+            auto const www = QStringLiteral("www");
+            if (original_subdomain != www)
+            {
+                // www.domain.com
+                scrape(QStringLiteral("%1.%2").arg(www).arg(host));
+            }
+        }
     }
 
     return key;

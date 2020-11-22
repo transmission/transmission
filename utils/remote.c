@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isspace */
+#include <errno.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -543,47 +544,47 @@ static char* getEncodedMetainfo(char const* filename)
     return b64;
 }
 
-static void addIdArg(tr_variant* args, char const* id, char const* fallback)
+static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
 {
-    if (tr_str_is_empty(id))
+    if (tr_str_is_empty(id_str))
     {
-        id = fallback;
+        id_str = fallback;
 
-        if (tr_str_is_empty(id))
+        if (tr_str_is_empty(id_str))
         {
             fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
-            id = "-1"; /* no torrent will have this ID, so will act as a no-op */
+            id_str = "-1"; /* no torrent will have this ID, so will act as a no-op */
         }
     }
 
-    if (tr_strcmp0(id, "active") == 0)
+    if (tr_strcmp0(id_str, "active") == 0)
     {
         tr_variantDictAddStr(args, TR_KEY_ids, "recently-active");
     }
-    else if (strcmp(id, "all") != 0)
+    else if (strcmp(id_str, "all") != 0)
     {
-        bool isList = strchr(id, ',') != NULL || strchr(id, '-') != NULL;
+        bool isList = strchr(id_str, ',') != NULL || strchr(id_str, '-') != NULL;
         bool isNum = true;
 
-        for (char const* pch = id; isNum && *pch != '\0'; ++pch)
+        for (char const* pch = id_str; isNum && *pch != '\0'; ++pch)
         {
             isNum = isdigit(*pch);
         }
 
         if (isNum || isList)
         {
-            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id, strlen(id));
+            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str, strlen(id_str));
         }
         else
         {
-            tr_variantDictAddStr(args, TR_KEY_ids, id); /* it's a torrent sha hash */
+            tr_variantDictAddStr(args, TR_KEY_ids, id_str); /* it's a torrent sha hash */
         }
     }
 }
 
 static void addTime(tr_variant* args, tr_quark const key, char const* arg)
 {
-    int time;
+    int time = 0;
     bool success = false;
 
     if (arg != NULL && strlen(arg) == 4)
@@ -857,7 +858,7 @@ static char* getStatusString(tr_variant* t, char* buf, size_t buflen)
 
                 if (tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
                 {
-                    tr_snprintf(buf, buflen, "%s (%.0f%%)", str, (floor)(percent * 100.0));
+                    tr_snprintf(buf, buflen, "%s (%.0f%%)", str, floor(percent * 100.0));
                 }
                 else
                 {
@@ -922,6 +923,14 @@ static char const* bandwidthPriorityNames[] =
     "Invalid"
 };
 
+static char* format_date(char* buf, size_t buflen, time_t now)
+{
+    struct tm tm;
+    tr_localtime_r(&now, &tm);
+    strftime(buf, buflen, "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    return buf;
+}
+
 static void printDetails(tr_variant* top)
 {
     tr_variant* args;
@@ -967,7 +976,7 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
                 size_t child_pos = 0;
-                tr_variant* child;
+                tr_variant const* child;
                 while ((child = tr_variantListChild(l, child_pos++)))
                 {
                     if (tr_variantGetStr(child, &str, NULL))
@@ -1101,26 +1110,22 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date added:       %s", ctime(&tt));
+                printf("  Date added:       %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date finished:    %s", ctime(&tt));
+                printf("  Date finished:    %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date started:     %s", ctime(&tt));
+                printf("  Date started:     %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Latest activity:  %s", ctime(&tt));
+                printf("  Latest activity:  %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
@@ -1139,8 +1144,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date created: %s", ctime(&tt));
+                printf("  Date created: %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindBool(t, TR_KEY_isPrivate, &boolVal))
@@ -1303,7 +1307,7 @@ static void printFileList(tr_variant* top)
                             break;
                         }
 
-                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, (floor)(100.0 * percent), pristr, wanted ? "Yes" : "No",
+                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, floor(100.0 * percent), pristr, wanted ? "Yes" : "No",
                             sizestr, filename);
                     }
                 }
@@ -1364,22 +1368,24 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
+static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
 {
-    size_t len;
-    char* str = tr_base64_decode(raw, rawlen, &len);
+    size_t len = 0;
+    char* const str = tr_base64_decode(raw, raw_len, &len);
     printf("  ");
 
-    for (size_t i = 0, k = 0; k < len; ++k)
+    size_t piece = 0;
+    size_t const col_width = 64;
+    for (char const* it = str, * end = it + len; it != end; ++it)
     {
-        for (int e = 0; i < j && e < 8; ++e, ++i)
+        for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (str[k] & (1 << (7 - e))) != 0 ? '1' : '0');
+            printf("%c", (*it & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         printf(" ");
 
-        if (i % 64 == 0)
+        if (piece % col_width == 0)
         {
             printf("\n  ");
         }
@@ -1450,7 +1456,7 @@ static void printTorrentList(tr_variant* top)
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
-            int64_t id;
+            int64_t torId;
             int64_t eta;
             int64_t status;
             int64_t up;
@@ -1462,7 +1468,7 @@ static void printTorrentList(tr_variant* top)
             tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) &&
-                tr_variantDictFindInt(d, TR_KEY_id, &id) &&
+                tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
                 tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) &&
                 tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
@@ -1507,7 +1513,7 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
+                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)torId, errorMark, doneStr, haveStr, etaStr,
                     up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)), name);
 
@@ -1525,15 +1531,15 @@ static void printTorrentList(tr_variant* top)
 static void printTrackersImpl(tr_variant* trackerStats)
 {
     char buf[512];
-    tr_variant* t;
 
-    for (int i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
+    for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
+        tr_variant* const t = tr_variantListChild(trackerStats, i);
         int64_t downloadCount;
         bool hasAnnounced;
         bool hasScraped;
         char const* host;
-        int64_t id;
+        int64_t trackerId;
         bool isBackup;
         int64_t lastAnnouncePeerCount;
         char const* lastAnnounceResult;
@@ -1558,7 +1564,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             tr_variantDictFindBool(t, TR_KEY_hasAnnounced, &hasAnnounced) &&
             tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) &&
             tr_variantDictFindStr(t, TR_KEY_host, &host, NULL) &&
-            tr_variantDictFindInt(t, TR_KEY_id, &id) &&
+            tr_variantDictFindInt(t, TR_KEY_id, &trackerId) &&
             tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
             tr_variantDictFindInt(t, TR_KEY_announceState, &announceState) &&
             tr_variantDictFindInt(t, TR_KEY_scrapeState, &scrapeState) &&
@@ -1582,7 +1588,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             time_t const now = time(NULL);
 
             printf("\n");
-            printf("  Tracker %d: %s\n", (int)(id), host);
+            printf("  Tracker %d: %s\n", (int)trackerId, host);
 
             if (isBackup)
             {
@@ -1704,15 +1710,13 @@ static void printTrackers(tr_variant* top)
 static void printSession(tr_variant* top)
 {
     tr_variant* args;
-    char buf[128];
-    char buf2[128];
-    char buf3[128];
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
         bool boolVal;
         char const* str;
+        char buf[128];
 
         printf("VERSION\n");
 
@@ -1818,6 +1822,9 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
+                char buf2[128];
+                char buf3[128];
+
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
@@ -2336,7 +2343,6 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case 'V': /* show version number */
                 fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
                 exit(0);
-                break;
 
             case TR_OPT_ERR:
                 fprintf(stderr, "invalid option\n");
@@ -2990,6 +2996,23 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
     return status;
 }
 
+static bool parsePortString(char const* s, int* port)
+{
+    int const errno_stack = errno;
+    errno = 0;
+
+    char* end = NULL;
+    int const i = (int)strtol(s, &end, 10);
+    bool const ok = (end != NULL) && (*end == '\0') && (errno == 0);
+    if (ok)
+    {
+        *port = i;
+    }
+
+    errno = errno_stack;
+    return ok;
+}
+
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
 {
@@ -2999,6 +3022,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
     }
 
     char const* const s = argv[1];
+    char const* const last_colon = strrchr(s, ':');
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
@@ -3009,39 +3033,33 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
         UseSSL = true;
         *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
     }
+    else if (parsePortString(s, port))
+    {
+        // it was just a port
+    }
+    else if (last_colon == NULL)
+    {
+        // it was a non-ipv6 host with no port
+        *host = tr_strdup(s);
+    }
     else
     {
-        char const* const first_colon = strchr(s, ':');
-        char const* const last_colon = strrchr(s, ':');
+        char const* hend;
 
-        if (last_colon != NULL && ((*s == '[' && *(last_colon - 1) == ']') || first_colon == last_colon))
+        // if only one colon, it's probably "$host:$port"
+        if ((strchr(s, ':') == last_colon) && parsePortString(last_colon + 1, port))
         {
-            /* user passed in both host and port */
-            *host = tr_strndup(s, last_colon - s);
-            *port = atoi(last_colon + 1);
+            hend = last_colon;
         }
         else
         {
-            char* end;
-            int const i = strtol(s, &end, 10);
-
-            if (*end == '\0') /* user passed in a port */
-            {
-                *port = i;
-            }
-            else /* user passed in a host */
-            {
-                if (last_colon != NULL && first_colon != last_colon && (*s != '[' || *(s + strlen(s) - 1) != ']'))
-                {
-                    /* looks like IPv6; let's add brackets as we'll be appending the port later on */
-                    *host = tr_strdup_printf("[%s]", s);
-                }
-                else
-                {
-                    *host = tr_strdup(s);
-                }
-            }
+            hend = s + strlen(s);
         }
+
+        bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != NULL);
+
+        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", (int)(hend - s), s) :
+            tr_strndup(s, hend - s);
     }
 
     *argc -= 1;

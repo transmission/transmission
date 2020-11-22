@@ -29,7 +29,7 @@ bool InteropHelper::isConnected() const
     return is_connected;
 }
 
-bool InteropHelper::addMetainfo(QString const& metainfo)
+bool InteropHelper::addMetainfo(QString const& metainfo) const
 {
 #ifdef ENABLE_DBUS_INTEROP
 

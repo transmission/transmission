@@ -45,7 +45,7 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
     }
 }
 
-static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
+static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
 {
     tr_socket_t sockfd;
 
@@ -530,7 +530,7 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
     dbgmsg(tracker->key, "sending request w/connection id %" PRIu64 "\n", tracker->connection_id);
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, NULL, NULL);
-    tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+    (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -722,7 +722,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+        (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
@@ -899,8 +899,6 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau_transaction_t transaction_id;
     struct evbuffer* buf;
 
-    /*fprintf(stderr, "got an incoming udp message w/len %zu\n", msglen);*/
-
     if (session == NULL || session->announcer_udp == NULL)
     {
         return false;
@@ -926,7 +924,6 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau = session->announcer_udp;
     transaction_id = evbuffer_read_ntoh_32(buf);
 
-    /* fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id); */
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         tr_ptrArray* reqs;

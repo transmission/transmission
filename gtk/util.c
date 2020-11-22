@@ -99,11 +99,8 @@ char* tr_strlsize(char* buf, guint64 bytes, size_t buflen)
     return buf;
 }
 
-char* tr_strltime(char* buf, int seconds, size_t buflen)
+char* tr_strltime(char* buf, time_t seconds, size_t buflen)
 {
-    int days;
-    int hours;
-    int minutes;
     char d[128];
     char h[128];
     char m[128];
@@ -114,15 +111,15 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
         seconds = 0;
     }
 
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    int const days = (int)(seconds / 86400);
+    int const hours = (seconds % 86400) / 3600;
+    int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
     g_snprintf(d, sizeof(d), ngettext("%'d day", "%'d days", days), days);
     g_snprintf(h, sizeof(h), ngettext("%'d hour", "%'d hours", hours), hours);
     g_snprintf(m, sizeof(m), ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", seconds), seconds);
+    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
 
     if (days != 0)
     {
@@ -372,7 +369,7 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
 char const* gtr_get_help_uri(void)
 {
-    static char* uri = NULL;
+    static char const* uri = NULL;
 
     if (uri == NULL)
     {
@@ -537,7 +534,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
     if (GTK_IS_WINDOW(w))
     {
         GList* windows = gtk_window_list_toplevels();
-        GtkWindow* window = GTK_WINDOW(w);
+        GtkWindow const* const window = GTK_WINDOW(w);
 
         for (GList* l = windows; l != NULL; l = l->next)
         {
@@ -624,7 +621,7 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 
     for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
-        char* s = text[i];
+        char const* const s = text[i];
 
         if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {

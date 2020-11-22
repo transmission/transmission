@@ -442,3 +442,12 @@ TEST_F(UtilsTest, env)
     s = makeString(tr_env_get_string(test_key, "c"));
     EXPECT_EQ("135", s);
 }
+
+TEST_F(UtilsTest, mimeTypes)
+{
+    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.flac"));
+    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.FLAC"));
+    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename(".avi"));
+    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"));
+    EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
+}

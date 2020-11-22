@@ -557,21 +557,19 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
 {
     char* out;
     char* outwalk;
-    char* outend;
     struct evbuffer_iovec vec[1];
-    struct jsonWalk* data = vdata;
-    char const* str;
-    size_t len;
+    struct jsonWalk* const data = vdata;
     unsigned char const* it;
-    unsigned char const* end;
 
-    tr_variantGetStr(val, &str, &len);
+    char const* str = NULL;
+    size_t len = 0;
+    (void)tr_variantGetStr(val, &str, &len);
     it = (unsigned char const*)str;
-    end = it + len;
+    unsigned char const* const end = it + len;
 
     evbuffer_reserve_space(data->out, len * 4, vec, 1);
     out = vec[0].iov_base;
-    outend = out + vec[0].iov_len;
+    char const* const outend = out + vec[0].iov_len;
 
     outwalk = out;
     *outwalk++ = '"';

@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
-#include <iostream>
 
 #include <QIcon>
 #include <QLibraryInfo>
@@ -19,6 +18,7 @@
 #include <QProcess>
 #include <QRect>
 #include <QSystemTrayIcon>
+#include <QtDebug>
 
 #ifdef QT_DBUS_LIB
 #include <QDBusConnection>
@@ -159,12 +159,12 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
+            qInfo() << qPrintable(display_name_) << LONG_VERSION_STRING;
             quitLater();
             return;
 
         case TR_OPT_ERR:
-            std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
+            qWarning() << qPrintable(QObject::tr("Invalid option"));
             tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
             quitLater();
             return;
@@ -185,9 +185,8 @@ Application::Application(int& argc, char** argv) :
 
         for (QString const& filename : filenames)
         {
+            auto const a = AddData(filename);
             QString metainfo;
-
-            AddData a(filename);
 
             switch (a.type)
             {
@@ -239,7 +238,7 @@ Application::Application(int& argc, char** argv) :
     bool const first_time = !dir.exists(QStringLiteral("settings.json"));
 
     // initialize the prefs
-    prefs_ = new Prefs(config_dir);
+    prefs_ = std::make_unique<Prefs>(config_dir);
 
     if (!host.isNull())
     {
@@ -277,20 +276,21 @@ Application::Application(int& argc, char** argv) :
         minimized = false;
     }
 
-    session_ = new Session(config_dir, *prefs_);
-    model_ = new TorrentModel(*prefs_);
-    window_ = new MainWindow(*session_, *prefs_, *model_, minimized);
-    watch_dir_ = new WatchDir(*model_);
+    session_ = std::make_unique<Session>(config_dir, *prefs_);
+    model_ = std::make_unique<TorrentModel>(*prefs_);
+    window_ = std::make_unique<MainWindow>(*session_, *prefs_, *model_, minimized);
+    watch_dir_ = std::make_unique<WatchDir>(*model_);
 
-    connect(model_, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
-    connect(model_, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
-    connect(model_, &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
-    connect(model_, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
-    connect(prefs_, &Prefs::changed, this, &Application::refreshPref);
-    connect(session_, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
-    connect(session_, &Session::torrentsRemoved, model_, &TorrentModel::removeTorrents);
-    connect(session_, &Session::torrentsUpdated, model_, &TorrentModel::updateTorrents);
-    connect(watch_dir_, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
+    connect(this, &QCoreApplication::aboutToQuit, this, &Application::saveGeometry);
+    connect(model_.get(), &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
+    connect(model_.get(), &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
+    connect(model_.get(), &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
+    connect(model_.get(), &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
+    connect(prefs_.get(), &Prefs::changed, this, &Application::refreshPref);
+    connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
+    connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
+    connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
+    connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addTorrent));
 
     // init from preferences
     for (auto const key : { Prefs::DIR_WATCH })
@@ -305,13 +305,13 @@ Application::Application(int& argc, char** argv) :
     timer->start();
 
     timer = &stats_timer_;
-    connect(timer, &QTimer::timeout, session_, &Session::refreshSessionStats);
+    connect(timer, &QTimer::timeout, session_.get(), &Session::refreshSessionStats);
     timer->setSingleShot(false);
     timer->setInterval(STATS_REFRESH_INTERVAL_MSEC);
     timer->start();
 
     timer = &session_timer_;
-    connect(timer, &QTimer::timeout, session_, &Session::refreshSessionInfo);
+    connect(timer, &QTimer::timeout, session_.get(), &Session::refreshSessionInfo);
     timer->setSingleShot(false);
     timer->setInterval(SESSION_REFRESH_INTERVAL_MSEC);
     timer->start();
@@ -330,14 +330,14 @@ Application::Application(int& argc, char** argv) :
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
         auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
-            tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, window_);
+            tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, window_.get());
         dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
             "Any content you share is your sole responsibility."));
         dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
         dialog->setDefaultButton(QMessageBox::Ok);
         dialog->setModal(true);
 
-        connect(dialog, SIGNAL(finished(int)), this, SLOT(consentGiven(int)));
+        connect(dialog, &QDialog::finished, this, &Application::consentGiven);
 
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->show();
@@ -383,12 +383,12 @@ void Application::loadTranslations()
     }
 }
 
-void Application::quitLater()
+void Application::quitLater() const
 {
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-void Application::onTorrentsEdited(torrent_ids_t const& ids)
+void Application::onTorrentsEdited(torrent_ids_t const& ids) const
 {
     // the backend's tr_info has changed, so reload those fields
     session_->initTorrents(ids);
@@ -406,21 +406,21 @@ QStringList Application::getNames(torrent_ids_t const& ids) const
     return names;
 }
 
-void Application::onTorrentsAdded(torrent_ids_t const& ids)
+void Application::onTorrentsAdded(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        auto const title = tr("Torrent(s) Added", nullptr, ids.size());
+        auto const title = tr("Torrent(s) Added", nullptr, static_cast<int>(ids.size()));
         auto const body = getNames(ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 }
 
-void Application::onTorrentsCompleted(torrent_ids_t const& ids)
+void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        auto const title = tr("Torrent Completed", nullptr, ids.size());
+        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(ids.size()));
         auto const body = getNames(ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
@@ -435,7 +435,7 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids)
     }
 }
 
-void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
+void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
 {
     if (!ids.empty())
     {
@@ -447,7 +447,7 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
 ****
 ***/
 
-void Application::consentGiven(int result)
+void Application::consentGiven(int result) const
 {
     if (result == QMessageBox::Ok)
     {
@@ -459,7 +459,7 @@ void Application::consentGiven(int result)
     }
 }
 
-Application::~Application()
+void Application::saveGeometry() const
 {
     if (prefs_ != nullptr && window_ != nullptr)
     {
@@ -469,19 +469,13 @@ Application::~Application()
         prefs_->set(Prefs::MAIN_WINDOW_X, geometry.x());
         prefs_->set(Prefs::MAIN_WINDOW_Y, geometry.y());
     }
-
-    delete watch_dir_;
-    delete window_;
-    delete model_;
-    delete session_;
-    delete prefs_;
 }
 
 /***
 ****
 ***/
 
-void Application::refreshPref(int key)
+void Application::refreshPref(int key) const
 {
     switch (key)
     {
@@ -491,19 +485,16 @@ void Application::refreshPref(int key)
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        {
-            QString const path(prefs_->getString(Prefs::DIR_WATCH));
-            bool const is_enabled(prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
-            watch_dir_->setPath(path, is_enabled);
-            break;
-        }
+        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH),
+            prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        break;
 
     default:
         break;
     }
 }
 
-void Application::maybeUpdateBlocklist()
+void Application::maybeUpdateBlocklist() const
 {
     if (!prefs_->getBool(Prefs::BLOCKLIST_UPDATES_ENABLED))
     {
@@ -521,7 +512,7 @@ void Application::maybeUpdateBlocklist()
     }
 }
 
-void Application::onSessionSourceChanged()
+void Application::onSessionSourceChanged() const
 {
     session_->initTorrents();
     session_->refreshSessionStats();
@@ -550,7 +541,12 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(AddData const& addme)
+void Application::addTorrent(QString const& addme) const
+{
+    addTorrent(AddData(addme));
+}
+
+void Application::addTorrent(AddData const& addme) const
 {
     if (addme.type == addme.NONE)
     {
@@ -563,7 +559,7 @@ void Application::addTorrent(AddData const& addme)
     }
     else
     {
-        auto* o = new OptionsDialog(*session_, *prefs_, addme, window_);
+        auto* o = new OptionsDialog(*session_, *prefs_, addme, window_.get());
         o->show();
     }
 
@@ -574,9 +570,9 @@ void Application::addTorrent(AddData const& addme)
 ****
 ***/
 
-void Application::raise()
+void Application::raise() const
 {
-    alert(window_);
+    alert(window_.get());
 }
 
 bool Application::notifyApp(QString const& title, QString const& body) const
@@ -639,5 +635,5 @@ int tr_main(int argc, char** argv)
     Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     Application app(argc, argv);
-    return app.exec();
+    return QApplication::exec();
 }

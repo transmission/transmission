@@ -45,7 +45,7 @@
       <Merge Id="VCRedist" SourceFile="$(var.MsvcCrtMsmFile)" DiskId="1" Language="0" />
       <Directory Id="$(var.PlatformProgramFilesFolder)" Name="PFiles">
         <Directory Id="INSTALLDIR" Name="Transmission">
-          <Directory Id="WEBINSTALLDIR" Name="web" />
+          <Directory Id="WEBINSTALLDIR" Name="public_html" />
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder" Name="Programs"/>

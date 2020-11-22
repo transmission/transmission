@@ -171,9 +171,16 @@ int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, tr_voidptr_comp
 
 static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, tr_voidptr_compare_func compare)
 {
-    for (int i = 0; i < t->n_items - 2; ++i)
+    if (t->items == NULL)
     {
-        TR_ASSERT(compare(t->items[i], t->items[i + 1]) < 0);
+        TR_ASSERT(t->n_items == 0);
+    }
+    else
+    {
+        for (int i = 0; i < t->n_items - 2; ++i)
+        {
+            TR_ASSERT(compare(t->items[i], t->items[i + 1]) < 0);
+        }
     }
 }
 
@@ -235,7 +242,7 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_vo
 
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
 {
-    void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
+    void const* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
 
 #ifndef TR_ENABLE_ASSERTS
 

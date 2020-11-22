@@ -30,7 +30,7 @@ public slots:
     void accept() override;
 
 private slots:
-    void resensitize();
+    void resensitize() const;
 
 private:
     Session& session_;

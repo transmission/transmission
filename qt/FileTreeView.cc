@@ -24,7 +24,12 @@
 #include "Formatter.h"
 #include "Utils.h"
 
-#define PRIORITY_KEY "priority"
+namespace
+{
+
+char const* const PriorityKey = "priority";
+
+}
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable) :
     QTreeView(parent),
@@ -40,15 +45,12 @@ FileTreeView::FileTreeView(QWidget* parent, bool is_editable) :
     setItemDelegate(delegate_);
     sortByColumn(FileTreeModel::COL_NAME, Qt::AscendingOrder);
 
-    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
+    connect(this, &QAbstractItemView::clicked, this, &FileTreeView::onClicked);
 
-    connect(model_, SIGNAL(priorityChanged(QSet<int>, int)), this, SIGNAL(priorityChanged(QSet<int>, int)));
-
-    connect(model_, SIGNAL(wantedChanged(QSet<int>, bool)), this, SIGNAL(wantedChanged(QSet<int>, bool)));
-
-    connect(model_, SIGNAL(pathEdited(QString, QString)), this, SIGNAL(pathEdited(QString, QString)));
-
-    connect(model_, SIGNAL(openRequested(QString)), this, SIGNAL(openRequested(QString)));
+    connect(model_, &FileTreeModel::openRequested, this, &FileTreeView::openRequested);
+    connect(model_, &FileTreeModel::pathEdited, this, &FileTreeView::pathEdited);
+    connect(model_, &FileTreeModel::priorityChanged, this, &FileTreeView::priorityChanged);
+    connect(model_, &FileTreeModel::wantedChanged, this, &FileTreeView::wantedChanged);
 }
 
 void FileTreeView::onClicked(QModelIndex const& proxy_index)
@@ -132,26 +134,23 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
 
 void FileTreeView::keyPressEvent(QKeyEvent* event)
 {
-    if (state() != EditingState)
+    if ((state() != EditingState) && (event->key() == Qt::Key_Space))
     {
-        if (event->key() == Qt::Key_Space)
+        // handle using the keyboard to toggle the
+        // wanted/unwanted state or the file priority
+
+        Qt::KeyboardModifiers const modifiers = event->modifiers();
+
+        if (modifiers == Qt::NoModifier)
         {
-            // handle using the keyboard to toggle the
-            // wanted/unwanted state or the file priority
+            model_->twiddleWanted(selectedSourceRows());
+            return;
+        }
 
-            Qt::KeyboardModifiers const modifiers = event->modifiers();
-
-            if (modifiers == Qt::NoModifier)
-            {
-                model_->twiddleWanted(selectedSourceRows());
-                return;
-            }
-
-            if (modifiers == Qt::ShiftModifier)
-            {
-                model_->twiddlePriority(selectedSourceRows());
-                return;
-            }
+        if (modifiers == Qt::ShiftModifier)
+        {
+            model_->twiddlePriority(selectedSourceRows());
+            return;
         }
     }
 
@@ -203,33 +202,7 @@ void FileTreeView::update(FileList const& files, bool update_fields)
 
     if (model_was_empty)
     {
-        // expand up until the item with more than one expandable child
-        for (QModelIndex index = proxy_->index(0, 0); index.isValid();)
-        {
-            QModelIndex const old_index = index;
-
-            expand(old_index);
-
-            index = QModelIndex();
-
-            for (int i = 0, count = proxy_->rowCount(old_index); i < count; ++i)
-            {
-                QModelIndex const new_index = proxy_->index(i, 0, old_index);
-
-                if (proxy_->rowCount(new_index) == 0)
-                {
-                    continue;
-                }
-
-                if (index.isValid())
-                {
-                    index = QModelIndex();
-                    break;
-                }
-
-                index = new_index;
-            }
-        }
+        expand(proxy_->index(0, 0));
     }
 
     proxy_->sort(header()->sortIndicatorSection(), header()->sortIndicatorOrder());
@@ -326,16 +299,13 @@ void FileTreeView::onlyCheckSelectedItems()
             {
                 unwanted_indices << child_index;
             }
+            else if (!wanted_indices_parents.contains(child_index))
+            {
+                unwanted_indices << child_index;
+            }
             else
             {
-                if (!wanted_indices_parents.contains(child_index))
-                {
-                    unwanted_indices << child_index;
-                }
-                else
-                {
-                    parents_queue.enqueue(child_index);
-                }
+                parents_queue.enqueue(child_index);
             }
         }
     }
@@ -345,9 +315,9 @@ void FileTreeView::onlyCheckSelectedItems()
 
 void FileTreeView::setSelectedItemsPriority()
 {
-    auto* action = qobject_cast<QAction*>(sender());
+    auto const* action = qobject_cast<QAction const*>(sender());
     assert(action != nullptr);
-    model_->setPriority(selectedSourceRows(), action->property(PRIORITY_KEY).toInt());
+    model_->setPriority(selectedSourceRows(), action->property(PriorityKey).toInt());
 }
 
 bool FileTreeView::openSelectedItem()
@@ -396,16 +366,16 @@ void FileTreeView::initContextMenu()
     normal_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Normal"), this, SLOT(setSelectedItemsPriority()));
     low_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Low"), this, SLOT(setSelectedItemsPriority()));
 
-    high_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_HIGH);
-    normal_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_NORMAL);
-    low_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_LOW);
+    high_priority_action_->setProperty(PriorityKey, TR_PRI_HIGH);
+    normal_priority_action_->setProperty(PriorityKey, TR_PRI_NORMAL);
+    low_priority_action_->setProperty(PriorityKey, TR_PRI_LOW);
 
     context_menu_->addSeparator();
 
     open_action_ = context_menu_->addAction(tr("Open"), this, SLOT(openSelectedItem()));
     rename_action_ = context_menu_->addAction(tr("Rename..."), this, SLOT(renameSelectedItem()));
 
-    connect(context_menu_, SIGNAL(aboutToShow()), SLOT(refreshContextMenuActionsSensitivity()));
+    connect(context_menu_, &QMenu::aboutToShow, this, &FileTreeView::refreshContextMenuActionsSensitivity);
 }
 
 QModelIndexList FileTreeView::selectedSourceRows(int column) const

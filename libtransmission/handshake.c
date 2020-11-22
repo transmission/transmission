@@ -131,7 +131,12 @@ struct tr_handshake
 ***
 **/
 
-#define dbgmsg(handshake, ...) tr_logAddDeepNamed(tr_peerIoGetAddrStr((handshake)->io), __VA_ARGS__)
+#define dbgmsg(handshake, ...) \
+    do { \
+        char addrstr[TR_ADDRSTRLEN]; \
+        tr_peerIoGetAddrStr(handshake->io, addrstr, sizeof(addrstr)); \
+        tr_logAddDeepNamed(addrstr, __VA_ARGS__); \
+    } while(0)
 
 static char const* getStateName(handshake_state_t const state)
 {
@@ -167,24 +172,12 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    unsigned char const* peer_id = NULL;
-    uint8_t const* torrentHash;
-    tr_torrent* tor;
-    bool success;
+    uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
+    tr_torrent* const tor = torrent_hash == NULL ? NULL : tr_torrentFindFromHash(handshake->session, torrent_hash);
+    unsigned char const* const peer_id = tor == NULL ? NULL : tr_torrentGetPeerId(tor);
+    bool const success = peer_id != NULL;
 
-    if ((torrentHash = tr_cryptoGetTorrentHash(handshake->crypto)) != NULL)
-    {
-        if ((tor = tr_torrentFindFromHash(handshake->session, torrentHash)) != NULL)
-        {
-            peer_id = tr_torrentGetPeerId(tor);
-        }
-    }
-
-    if (peer_id == NULL)
-    {
-        success = false;
-    }
-    else
+    if (success)
     {
         uint8_t* walk = buf;
 
@@ -203,13 +196,12 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         }
 
         walk += HANDSHAKE_FLAGS_LEN;
-        memcpy(walk, torrentHash, SHA_DIGEST_LENGTH);
+        memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
         walk += SHA_DIGEST_LENGTH;
         memcpy(walk, peer_id, PEER_ID_LEN);
         walk += PEER_ID_LEN;
 
         TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
-        success = true;
     }
 
     return success;
@@ -806,7 +798,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     uint8_t obfuscatedTorrentHash[SHA_DIGEST_LENGTH];
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
-    tr_torrent* tor;
     size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1', s) */
         SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
         VC_LENGTH + sizeof(crypto_provide) + sizeof(padc_len);
@@ -831,6 +822,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     }
 
+    tr_torrent const* tor;
     if ((tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash)) != NULL)
     {
         bool const clientIsSeed = tr_torrentIsSeed(tor);
@@ -891,7 +883,7 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
     return READ_NOW;
 }
 
-static ReadState readIA(tr_handshake* handshake, struct evbuffer* inbuf)
+static ReadState readIA(tr_handshake* handshake, struct evbuffer const* inbuf)
 {
     size_t const needlen = handshake->ia_len;
     struct evbuffer* outbuf;

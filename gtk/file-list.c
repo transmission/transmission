@@ -116,7 +116,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkT
 
     if (is_file)
     {
-        tr_torrent* tor = refresh_data->tor;
+        tr_torrent const* tor = refresh_data->tor;
         tr_info const* inf = tr_torrentInfo(tor);
         int const enabled = inf->files[index].dnd ? 0 : 1;
         int const priority = inf->files[index].priority;
@@ -129,15 +129,14 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkT
              * which breaks this foreach () call. (See #3529)
              * As a workaround: if that's about to happen, temporarily disable
              * sorting until we finish walking the tree. */
-            if (!refresh_data->resort_needed)
+            if (!refresh_data->resort_needed &&
+                (((refresh_data->sort_column_id == FC_PRIORITY) && (priority != old_priority)) ||
+                ((refresh_data->sort_column_id == FC_ENABLED) && (enabled != old_enabled))))
             {
-                if ((refresh_data->resort_needed = (refresh_data->sort_column_id == FC_PRIORITY && priority != old_priority) ||
-                    (refresh_data->sort_column_id == FC_ENABLED && enabled != old_enabled)))
-                {
-                    refresh_data->resort_needed = TRUE;
-                    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->model),
-                        GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
-                }
+                refresh_data->resort_needed = TRUE;
+
+                gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->model),
+                    GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
             }
 
             gtk_tree_store_set(data->store, iter,
@@ -505,14 +504,12 @@ static GNode* find_child(GNode* parent, char const* name)
 
 void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 {
-    GtkTreeStore* store;
-    FileData* data = g_object_get_data(G_OBJECT(w), "file-data");
-
     /* unset the old fields */
+    FileData* const data = g_object_get_data(G_OBJECT(w), "file-data");
     clearData(data);
 
     /* instantiate the model */
-    store = gtk_tree_store_new(N_FILE_COLS,
+    GtkTreeStore* const store = gtk_tree_store_new(N_FILE_COLS,
         GDK_TYPE_PIXBUF, /* icon */
         G_TYPE_STRING, /* label */
         G_TYPE_STRING, /* label esc */
@@ -529,65 +526,64 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
     data->torrentId = torrentId;
 
     /* populate the model */
-    if (torrentId > 0)
+    tr_torrent* const tor = torrentId > 0 ?
+        gtr_core_find_torrent(data->core, torrentId) :
+        NULL;
+    if (tor != NULL)
     {
-        tr_torrent* tor = gtr_core_find_torrent(data->core, torrentId);
+        // build a GNode tree of the files
+        struct row_struct* const root_data = g_new0(struct row_struct, 1);
+        root_data->name = g_strdup(tr_torrentName(tor));
+        root_data->index = -1;
+        root_data->length = 0;
 
-        if (tor != NULL)
+        GNode* const root = g_node_new(root_data);
+
+        tr_info const* inf = tr_torrentInfo(tor);
+        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_info const* inf = tr_torrentInfo(tor);
-            struct row_struct* root_data;
-            GNode* root;
-            struct build_data build;
+            GNode* parent = root;
+            tr_file const* const file = &inf->files[i];
+            char** const tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
 
-            /* build a GNode tree of the files */
-            root_data = g_new0(struct row_struct, 1);
-            root_data->name = g_strdup(tr_torrentName(tor));
-            root_data->index = -1;
-            root_data->length = 0;
-            root = g_node_new(root_data);
-
-            for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
+            for (int j = 0; tokens[j] != NULL; ++j)
             {
-                GNode* parent = root;
-                tr_file const* file = &inf->files[i];
-                char** tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
+                gboolean const isLeaf = tokens[j + 1] == NULL;
+                char const* const name = tokens[j];
+                GNode* node = find_child(parent, name);
 
-                for (int j = 0; tokens[j] != NULL; ++j)
+                if (node == NULL)
                 {
-                    gboolean const isLeaf = tokens[j + 1] == NULL;
-                    char const* name = tokens[j];
-                    GNode* node = find_child(parent, name);
-
-                    if (node == NULL)
-                    {
-                        struct row_struct* row = g_new(struct row_struct, 1);
-                        row->name = g_strdup(name);
-                        row->index = isLeaf ? (int)i : -1;
-                        row->length = isLeaf ? file->length : 0;
-                        node = g_node_new(row);
-                        g_node_append(parent, node);
-                    }
-
-                    parent = node;
+                    struct row_struct* row = g_new(struct row_struct, 1);
+                    row->name = g_strdup(name);
+                    row->index = isLeaf ? (int)i : -1;
+                    row->length = isLeaf ? file->length : 0;
+                    node = g_node_new(row);
+                    g_node_append(parent, node);
                 }
 
-                g_strfreev(tokens);
+                parent = node;
             }
 
-            /* now, add them to the model */
-            build.w = w;
-            build.tor = tor;
-            build.store = data->store;
-            build.iter = NULL;
-            g_node_children_foreach(root, G_TRAVERSE_ALL, buildTree, &build);
-
-            /* cleanup */
-            g_node_destroy(root);
-            g_free(root_data->name);
-            g_free(root_data);
+            g_strfreev(tokens);
         }
 
+        // now, add them to the model
+        struct build_data build;
+        build.w = w;
+        build.tor = tor;
+        build.store = data->store;
+        build.iter = NULL;
+        g_node_children_foreach(root, G_TRAVERSE_ALL, buildTree, &build);
+
+        // cleanup
+        g_node_destroy(root);
+        g_free(root_data->name);
+        g_free(root_data);
+    }
+
+    if (torrentId > 0)
+    {
         refresh(data);
         data->timeout_tag = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, refreshModel, data);
     }
@@ -649,9 +645,8 @@ static void renderPriority(GtkTreeViewColumn* column, GtkCellRenderer* renderer,
 }
 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
-static char* buildFilename(tr_torrent* tor, GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter)
+static char* buildFilename(tr_torrent const* tor, GtkTreeModel* model, GtkTreePath* path, GtkTreeIter const* iter)
 {
-    char* ret;
     GtkTreeIter child;
     GtkTreeIter parent = *iter;
     int n = gtk_tree_path_get_depth(path);
@@ -665,18 +660,18 @@ static char* buildFilename(tr_torrent* tor, GtkTreeModel* model, GtkTreePath* pa
     }
     while (gtk_tree_model_iter_parent(model, &parent, &child));
 
-    ret = g_build_filenamev(tokens);
+    char* const ret = g_build_filenamev(tokens);
     g_strfreev(tokens);
     return ret;
 }
 
-static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn* col, gpointer gdata)
+static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn const* col, gpointer gdata)
 {
     TR_UNUSED(col);
 
     gboolean handled = FALSE;
     FileData* data = gdata;
-    tr_torrent* tor = gtr_core_find_torrent(data->core, data->torrentId);
+    tr_torrent const* tor = gtr_core_find_torrent(data->core, data->torrentId);
 
     if (tor != NULL)
     {
@@ -777,7 +772,8 @@ static gboolean onViewPathToggled(GtkTreeView* view, GtkTreeViewColumn* col, Gtk
 /**
  * @note 'col' and 'path' are assumed not to be NULL.
  */
-static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton* event, GtkTreeViewColumn** col, GtkTreePath** path)
+static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton const* event, GtkTreeViewColumn** col,
+    GtkTreePath** path)
 {
     GtkTreeSelection* sel;
 
@@ -797,7 +793,7 @@ static gboolean getAndSelectEventPath(GtkTreeView* treeview, GdkEventButton* eve
     return FALSE;
 }
 
-static gboolean onViewButtonPressed(GtkWidget* w, GdkEventButton* event, gpointer gdata)
+static gboolean onViewButtonPressed(GtkWidget* w, GdkEventButton const* event, gpointer gdata)
 {
     GtkTreeViewColumn* col;
     GtkTreePath* path = NULL;
@@ -866,34 +862,31 @@ static int on_rename_done_idle(struct rename_data* data)
     return G_SOURCE_REMOVE;
 }
 
-static void on_rename_done(tr_torrent* tor G_GNUC_UNUSED, char const* oldpath G_GNUC_UNUSED, char const* newname G_GNUC_UNUSED,
-    int error, struct rename_data* rename_data)
+static void on_rename_done(tr_torrent const* tor G_GNUC_UNUSED, char const* oldpath G_GNUC_UNUSED,
+    char const* newname G_GNUC_UNUSED, int error, struct rename_data* rename_data)
 {
     rename_data->error = error;
     gdk_threads_add_idle((GSourceFunc)on_rename_done_idle, rename_data);
 }
 
-static void cell_edited_callback(GtkCellRendererText* cell G_GNUC_UNUSED, gchar* path_string, gchar* newname, FileData* data)
+static void cell_edited_callback(GtkCellRendererText const* cell G_GNUC_UNUSED, gchar const* path_string, gchar const* newname,
+    FileData* data)
 {
-    tr_torrent* tor;
-    GString* oldpath;
-    GtkTreeIter iter;
-    struct rename_data* rename_data;
-
-    tor = gtr_core_find_torrent(data->core, data->torrentId);
+    tr_torrent* const tor = gtr_core_find_torrent(data->core, data->torrentId);
 
     if (tor == NULL)
     {
         return;
     }
 
+    GtkTreeIter iter;
     if (!gtk_tree_model_get_iter_from_string(data->model, &iter, path_string))
     {
         return;
     }
 
     /* build oldpath */
-    oldpath = g_string_new(NULL);
+    GString* oldpath = g_string_new(NULL);
 
     for (;;)
     {
@@ -914,7 +907,7 @@ static void cell_edited_callback(GtkCellRendererText* cell G_GNUC_UNUSED, gchar*
     }
 
     /* do the renaming */
-    rename_data = g_new0(struct rename_data, 1);
+    struct rename_data* rename_data = g_new0(struct rename_data, 1);
     rename_data->newname = g_strdup(newname);
     rename_data->file_data = data;
     rename_data->path_string = g_strdup(path_string);

@@ -204,7 +204,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
 
 static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* context)
 {
-    tr_session* session = context;
+    tr_session const* session = context;
 
     if (!tr_str_has_suffix(name, ".torrent"))
     {
@@ -261,20 +261,20 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t logfile, int level, char const* name, char const* message, char const* file, int line)
+static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
 {
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
         if (name != NULL)
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, filename, line);
         }
         else
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, filename, line);
         }
     }
 
@@ -302,11 +302,11 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
         if (name != NULL)
         {
-            syslog(priority, "%s %s (%s:%d)", name, message, file, line);
+            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
         }
         else
         {
-            syslog(priority, "%s (%s:%d)", message, file, line);
+            syslog(priority, "%s (%s:%d)", message, filename, line);
         }
     }
 
@@ -317,18 +317,18 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t logfile)
+static void pumpLogMessages(tr_sys_file_t file)
 {
     tr_log_message* list = tr_logGetQueue();
 
     for (tr_log_message const* l = list; l != NULL; l = l->next)
     {
-        printMessage(logfile, l->level, l->name, l->message, l->file, l->line);
+        printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(logfile, NULL);
+        tr_sys_file_flush(file, NULL);
     }
 
     tr_logFreeQueue(list);
@@ -664,8 +664,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     tr_sessionSaveSettings(session, configDir, settings);
 
     pid_filename = NULL;
-    tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
-
+    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
     if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
@@ -716,7 +715,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
             if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == NULL)
             {
-                goto cleanup;
+                goto CLEANUP;
             }
         }
     }
@@ -753,13 +752,13 @@ static int daemon_start(void* raw_arg, bool foreground)
         if (status_ev == NULL)
         {
             tr_logAddError("Failed to create status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
             tr_logAddError("Failed to add status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
     }
 
@@ -769,10 +768,10 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (event_base_dispatch(ev_base) == -1)
     {
         tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
-        goto cleanup;
+        goto CLEANUP;
     }
 
-cleanup:
+CLEANUP:
     sd_notify(0, "STATUS=Closing transmission session...\n");
     printf("Closing transmission session...");
 
@@ -829,7 +828,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     /* overwrite settings from the command line */
     if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
@@ -841,7 +840,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (dumpSettings)
@@ -849,12 +848,12 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
         char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     return true;
 
-exit_early:
+EXIT_EARLY:
     tr_variantFree(&data->settings);
     return false;
 }

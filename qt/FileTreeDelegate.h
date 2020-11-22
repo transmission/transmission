@@ -18,12 +18,11 @@ class FileTreeDelegate : public QItemDelegate
     TR_DISABLE_COPY_MOVE(FileTreeDelegate)
 
 public:
-    FileTreeDelegate(QObject* parent = nullptr) :
+    explicit FileTreeDelegate(QObject* parent = nullptr) :
         QItemDelegate(parent)
     {
     }
 
-public:
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
     void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;

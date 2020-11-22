@@ -25,12 +25,18 @@ class WatchDir : public QObject
     TR_DISABLE_COPY_MOVE(WatchDir)
 
 public:
-    WatchDir(TorrentModel const&);
+    explicit WatchDir(TorrentModel const&);
 
     void setPath(QString const& path, bool is_enabled);
 
 signals:
     void torrentFileAdded(QString const& filename);
+
+private slots:
+    void watcherActivated(QString const& path);
+    void onTimeout();
+
+    void rescanAllWatchedDirectories();
 
 private:
     enum
@@ -40,16 +46,8 @@ private:
         ERROR
     };
 
-private:
     int metainfoTest(QString const& filename) const;
 
-private slots:
-    void watcherActivated(QString const& path);
-    void onTimeout();
-
-    void rescanAllWatchedDirectories();
-
-private:
     TorrentModel const& model_;
 
     QSet<QString> watch_dir_files_;

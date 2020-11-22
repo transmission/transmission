@@ -58,7 +58,7 @@ class RpcClient : public QObject
     TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
-    RpcClient(QObject* parent = nullptr);
+    explicit RpcClient(QObject* parent = nullptr);
 
     void stop();
     void start(tr_session* session);
@@ -87,8 +87,8 @@ private:
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
-    int64_t parseResponseTag(tr_variant& response);
-    RpcResponse parseResponseData(tr_variant& response);
+    int64_t parseResponseTag(tr_variant& response) const;
+    RpcResponse parseResponseData(tr_variant& response) const;
 
     static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
 

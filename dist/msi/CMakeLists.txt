@@ -53,7 +53,7 @@ png2ico(Transmission.ico
     "${ICONS_DIR}/192x192/transmission-qt.png"
     "${ICONS_DIR}/256x256/transmission-qt.png")
 
-set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/web")
+set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
 set(TRQMSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/translations")
 set(QTQMSRCDIR "${TR_QT_DIR}/translations")
 

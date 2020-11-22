@@ -32,9 +32,7 @@ using ::trqt::variant_helpers::listAdd;
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
     BaseDialog(parent),
     add_(std::move(addme)),
-    verify_hash_(QCryptographicHash::Sha1),
     verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
-    edit_timer_(this),
     session_(session),
     is_local_(session_.isLocal())
 {
@@ -55,7 +53,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 
     edit_timer_.setInterval(2000);
     edit_timer_.setSingleShot(true);
-    connect(&edit_timer_, SIGNAL(timeout()), this, SLOT(onDestinationChanged()));
+    connect(&edit_timer_, &QTimer::timeout, this, &OptionsDialog::onDestinationChanged);
 
     if (add_.type == AddData::FILENAME)
     {
@@ -64,14 +62,14 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         ui_.sourceButton->setTitle(tr("Open Torrent"));
         ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
         ui_.sourceButton->setPath(add_.filename);
-        connect(ui_.sourceButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
+        connect(ui_.sourceButton, &PathButton::pathChanged, this, &OptionsDialog::onSourceChanged);
     }
     else
     {
         ui_.sourceStack->setCurrentWidget(ui_.sourceEdit);
         ui_.sourceEdit->setText(add_.readableName());
         ui_.sourceEdit->selectAll();
-        connect(ui_.sourceEdit, SIGNAL(editingFinished()), this, SLOT(onSourceChanged()));
+        connect(ui_.sourceEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onSourceChanged);
     }
 
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
@@ -95,9 +93,9 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         local_destination_.setPath(download_dir);
     }
 
-    connect(ui_.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
-    connect(ui_.destinationEdit, SIGNAL(textEdited(QString)), &edit_timer_, SLOT(start()));
-    connect(ui_.destinationEdit, SIGNAL(editingFinished()), this, SLOT(onDestinationChanged()));
+    connect(ui_.destinationButton, &PathButton::pathChanged, this, &OptionsDialog::onDestinationChanged);
+    connect(ui_.destinationEdit, &QLineEdit::textEdited, &edit_timer_, qOverload<>(&QTimer::start));
+    connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
 
     ui_.filesView->setEditable(false);
 
@@ -107,20 +105,20 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
     ui_.dialogButtons->addButton(verify_button_, QDialogButtonBox::ActionRole);
-    connect(verify_button_, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
+    connect(verify_button_, &QAbstractButton::clicked, this, &OptionsDialog::onVerify);
 
     ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
     ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
 
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(deleteLater()));
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onAccepted()));
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);
 
-    connect(ui_.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this, SLOT(onPriorityChanged(QSet<int>, int)));
-    connect(ui_.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this, SLOT(onWantedChanged(QSet<int>, bool)));
+    connect(ui_.filesView, &FileTreeView::priorityChanged, this, &OptionsDialog::onPriorityChanged);
+    connect(ui_.filesView, &FileTreeView::wantedChanged, this, &OptionsDialog::onWantedChanged);
 
-    connect(&verify_timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    connect(&verify_timer_, &QTimer::timeout, this, &OptionsDialog::onTimeout);
 
-    connect(&session_, SIGNAL(sessionUpdated()), SLOT(onSessionUpdated()));
+    connect(&session_, &Session::sessionUpdated, this, &OptionsDialog::onSessionUpdated);
 
     updateWidgetsLocality();
     reload();

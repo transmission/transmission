@@ -27,7 +27,7 @@ class FreeSpaceLabel : public QLabel
     TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
 public:
-    FreeSpaceLabel(QWidget* parent = nullptr);
+    explicit FreeSpaceLabel(QWidget* parent = nullptr);
 
     void setSession(Session& session);
     void setPath(QString const& folder);

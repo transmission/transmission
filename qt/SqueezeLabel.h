@@ -51,8 +51,8 @@ class SqueezeLabel : public QLabel
     TR_DISABLE_COPY_MOVE(SqueezeLabel)
 
 public:
-    SqueezeLabel(QWidget* parent = nullptr);
-    SqueezeLabel(QString const& text, QWidget* parent = nullptr);
+    explicit SqueezeLabel(QWidget* parent = nullptr);
+    explicit SqueezeLabel(QString const& text, QWidget* parent = nullptr);
 
 protected:
     // QWidget

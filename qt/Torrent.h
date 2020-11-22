@@ -22,6 +22,7 @@
 #include <libtransmission/quark.h>
 
 #include "FaviconCache.h"
+#include "IconCache.h"
 #include "Macros.h"
 #include "Speed.h"
 
@@ -112,12 +113,12 @@ private:
 public:
     TorrentHash() {}
 
-    TorrentHash(char const* str)
+    explicit TorrentHash(char const* str)
     {
         tr_hex_to_sha1(data_.data(), str);
     }
 
-    TorrentHash(QString const& str)
+    explicit TorrentHash(QString const& str)
     {
         tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }
@@ -284,7 +285,7 @@ public:
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
-        return s ? double(s - l) / s : 0.0;
+        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
     double metadataPercentDone() const
@@ -561,6 +562,7 @@ public:
         ERROR_STRING,
         ETA,
         FAILED_EVER,
+        FILE_COUNT,
         FILES,
         HASH,
         HAVE_UNCHECKED,
@@ -582,6 +584,7 @@ public:
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
+        PRIMARY_MIME_TYPE,
         QUEUE_POSITION,
         RECHECK_PROGRESS,
         SEED_IDLE_LIMIT,
@@ -642,6 +645,7 @@ private:
     uint64_t desired_available_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
+    uint64_t file_count_ = {};
     uint64_t have_unchecked_ = {};
     uint64_t have_verified_ = {};
     uint64_t left_until_done_ = {};
@@ -655,6 +659,7 @@ private:
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
 
+    QString primary_mime_type_;
     QString comment_;
     QString creator_;
     QString download_dir_;
@@ -662,7 +667,7 @@ private:
     QString name_;
 
     // mutable because it's a lazy lookup
-    mutable QIcon icon_;
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;

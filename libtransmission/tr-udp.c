@@ -161,13 +161,13 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     if (s == TR_BAD_SOCKET)
     {
-        goto fail;
+        goto FAIL;
     }
 
 #ifdef IPV6_V6ONLY
     /* Since we always open an IPv4 socket on the same port, this
        shouldn't matter.  But I'm superstitious. */
-    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
+    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
 #endif
 
     memset(&sin6, 0, sizeof(sin6));
@@ -190,7 +190,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     if (ss->udp6_socket == TR_BAD_SOCKET)
@@ -204,7 +204,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
         if (rc == -1)
         {
-            goto fail;
+            goto FAIL;
         }
 
         tr_netCloseSocket(s);
@@ -222,7 +222,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     return;
 
-fail:
+FAIL:
     /* Something went wrong.  It's difficult to recover, so let's simply
        set things up so that we try again next time. */
     tr_logAddNamedError("UDP", "Couldn't rebind IPv6 socket");
@@ -257,9 +257,9 @@ static void event_callback(evutil_socket_t s, short type, void* sv)
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:
-       - all DHT packets start with 'd';
+       - all DHT packets start with 'd'
        - all UDP tracker packets start with a 32-bit (!) "action", which
-         is between 0 and 3;
+         is between 0 and 3
        - the above cannot be ÂµTP packets, since these start with a 4-bit
          version number (1). */
     if (rc > 0)
@@ -318,7 +318,7 @@ void tr_udpInit(tr_session* ss)
     if (ss->udp_socket == TR_BAD_SOCKET)
     {
         tr_logAddNamedError("UDP", "Couldn't create IPv4 socket");
-        goto ipv6;
+        goto IPV6;
     }
 
     memset(&sin, 0, sizeof(sin));
@@ -338,7 +338,7 @@ void tr_udpInit(tr_session* ss)
         tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
         tr_netCloseSocket(ss->udp_socket);
         ss->udp_socket = TR_BAD_SOCKET;
-        goto ipv6;
+        goto IPV6;
     }
 
     ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
@@ -348,7 +348,7 @@ void tr_udpInit(tr_session* ss)
         tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
     }
 
-ipv6:
+IPV6:
     if (tr_globalIPv6() != NULL)
     {
         rebind_ipv6(ss, true);

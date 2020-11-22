@@ -202,19 +202,19 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
                 break;
             }
 
-            goto failure;
+            goto FAILURE;
         }
 
         if (errno != ENOENT)
         {
             set_system_error(&my_error, errno);
-            goto failure;
+            goto FAILURE;
         }
     }
 
     if (ret && pp == path_end)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
     /* Go one level down on each iteration and attempt to create */
@@ -232,10 +232,10 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
 
     if (ret)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
-failure:
+FAILURE:
 
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != NULL);
@@ -243,7 +243,7 @@ failure:
     tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
     tr_error_propagate(error, &my_error);
 
-cleanup:
+CLEANUP:
 
     TR_ASSERT(my_error == NULL);
 
@@ -329,7 +329,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     TR_ASSERT(path != NULL);
 
     char* ret = NULL;
-    char* tmp = NULL;
 
 #if defined(HAVE_CANONICALIZE_FILE_NAME)
 
@@ -337,21 +336,9 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 #endif
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L
-
-    /* Better safe than sorry: realpath() officially supports NULL as destination
-       starting off POSIX.1-2008. */
-
     if (ret == NULL)
     {
-        ret = realpath(path, NULL);
-    }
-
-#endif
-
-    if (ret == NULL)
-    {
-        tmp = tr_new(char, PATH_MAX);
+        char tmp[PATH_MAX];
         ret = realpath(path, tmp);
 
         if (ret != NULL)
@@ -364,8 +351,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     {
         set_system_error(error, errno);
     }
-
-    tr_free(tmp);
 
     return ret;
 }
@@ -859,7 +844,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
     if (ret || errno == ENOSPC)
     {
-        goto out;
+        goto OUT;
     }
 
 #endif
@@ -889,7 +874,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -917,7 +902,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -931,13 +916,13 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 #endif
 
 #if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-non_sparse_out:
+NON_SPARSE_OUT:
 #endif
         errno = code;
     }
 
 #ifdef HAVE_FALLOCATE64
-out:
+OUT:
 #endif
 
     if (!ret)
@@ -1205,7 +1190,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = NULL;
 
     errno = 0;
-    struct dirent* entry = readdir((DIR*)handle);
+    struct dirent const* const entry = readdir((DIR*)handle);
 
     if (entry != NULL)
     {
