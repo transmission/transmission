@@ -32,7 +32,6 @@
 - (void) updateStats;
 
 - (void) performResetStats;
-- (void) resetSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
 @end
 
@@ -145,8 +144,15 @@ tr_session * fLib = NULL;
     [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
     [alert setShowsSuppressionButton: YES];
 
-    [alert beginSheetModalForWindow: [self window] modalDelegate: self
-        didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse returnCode) {
+        [[alert window] orderOut: nil];
+
+        if ([[alert suppressionButton] state] == NSOnState)
+            [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningResetStats"];
+
+        if (returnCode == NSAlertFirstButtonReturn)
+            [self performResetStats];
+    }];
 }
 
 - (NSString *) windowFrameAutosaveName
@@ -213,17 +219,6 @@ tr_session * fLib = NULL;
 {
     tr_sessionClearStats(fLib);
     [self updateStats];
-}
-
-- (void) resetSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
-{
-    [[alert window] orderOut: nil];
-
-    if ([[alert suppressionButton] state] == NSOnState)
-        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningResetStats"];
-
-    if (code == NSAlertFirstButtonReturn)
-        [self performResetStats];
 }
 
 @end
