@@ -528,10 +528,19 @@ typedef GdkRGBA GtrColor;
 static void get_text_color(GtkWidget* w, tr_stat const* st, GtrColor* setme)
 {
     static GdkRGBA const red = { 1.0, 0, 0, 0 };
+    /* XXX(xaiki): randomly hand-picked value
+       this is set to 0.6 so that it  looks good in both Adwaita
+       and Adwaita Dark, eventually it should depend on some
+       theme variable */
+    static GdkRGBA const green = { 0, 0.6, 0, 0 };
 
     if (st->error != 0)
     {
         *setme = red;
+    }
+    else if (st->activity == TR_STATUS_SEED)
+    {
+        *setme = green;
     }
     else if (st->activity == TR_STATUS_STOPPED)
     {
