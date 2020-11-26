@@ -1,3 +1,29 @@
+## [Transmission 3.10](https://github.com/transmission/transmission/releases/tag/3.10) (2020-mm-dd)
+
+### All Platforms
+-
+
+### Mac Client
+- Updates for macOS 11 Big Sur ([#1535](https://github.com/transmission/transmission/pull/1535)
+	- Compressed toolbar
+	- Red accent color
+	- Updated toolbar icons (using SF Symbol)
+
+### GTK+ Client
+- 
+
+### Qt Client
+- 
+
+### Daemon
+- 
+
+### Web Client
+-
+
+### Utils
+-
+
 ## [Transmission 3.00](https://github.com/transmission/transmission/releases/tag/3.00) (2020-05-03)
 
 ### All Platforms
