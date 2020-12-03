@@ -801,8 +801,8 @@ static void core_watchdir_monitor_file(TrCore* core, GFile* file)
 }
 
 /* GFileMonitor noticed a file was created */
-static void on_file_changed_in_watchdir(GFileMonitor* monitor, GFile* file, GFile* other_type, GFileMonitorEvent event_type,
-    gpointer core)
+static void on_file_changed_in_watchdir(GFileMonitor const* monitor, GFile* file, GFile const* other_type,
+    GFileMonitorEvent event_type, gpointer core)
 {
     TR_UNUSED(monitor);
     TR_UNUSED(other_type);
@@ -1023,15 +1023,15 @@ static gboolean find_row_from_torrent_id(GtkTreeModel* model, int id, GtkTreeIte
 
 static gboolean on_torrent_metadata_changed_idle(gpointer gdata)
 {
-    struct notify_callback_data* data = gdata;
-    tr_session* session = gtr_core_session(data->core);
-    tr_torrent* tor = tr_torrentFindFromId(session, data->torrent_id);
+    struct notify_callback_data* const data = gdata;
+    tr_session* const session = gtr_core_session(data->core);
+    tr_torrent const* const tor = tr_torrentFindFromId(session, data->torrent_id);
 
     /* update the torrent's collated name */
     if (tor != NULL)
     {
         GtkTreeIter iter;
-        GtkTreeModel* model = core_raw_model(data->core);
+        GtkTreeModel* const model = core_raw_model(data->core);
 
         if (find_row_from_torrent_id(model, data->torrent_id, &iter))
         {
@@ -1124,15 +1124,14 @@ void gtr_core_add_torrent(TrCore* core, tr_torrent* tor, gboolean do_notify)
 
 static tr_torrent* core_create_new_torrent(TrCore* core, tr_ctor* ctor)
 {
-    tr_torrent* tor;
     bool do_trash = false;
-    tr_session* session = gtr_core_session(core);
+    tr_session const* const session = gtr_core_session(core);
 
     /* let the gtk client handle the removal, since libT
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, FALSE);
-    tor = tr_torrentNew(ctor, NULL, NULL);
+    tr_torrent* const tor = tr_torrentNew(ctor, NULL, NULL);
 
     if (tor != NULL && do_trash)
     {
@@ -1266,7 +1265,7 @@ static void add_file_async_callback(GObject* file, GAsyncResult* result, gpointe
 static bool add_file(TrCore* core, GFile* file, gboolean do_start, gboolean do_prompt, gboolean do_notify)
 {
     bool handled = false;
-    tr_session* session = gtr_core_session(core);
+    tr_session const* const session = gtr_core_session(core);
 
     if (session != NULL)
     {

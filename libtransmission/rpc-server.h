@@ -58,4 +58,12 @@ void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled);
 
 bool tr_rpcIsPasswordEnabled(tr_rpc_server const* session);
 
+bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server);
+
+void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool is_enabled);
+
+int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server);
+
+void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests);
+
 char const* tr_rpcGetBindAddress(tr_rpc_server const* server);

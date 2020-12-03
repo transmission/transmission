@@ -34,7 +34,7 @@ FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
 }
 
 void FreeSpaceLabel::setSession(Session& session)

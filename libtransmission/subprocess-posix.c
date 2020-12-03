@@ -63,24 +63,24 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
         {
             if (putenv(env[i]) != 0)
             {
-                goto fail;
+                goto FAIL;
             }
         }
     }
 
     if (work_dir != NULL && chdir(work_dir) == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     if (execvp(cmd[0], cmd) == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     return true;
 
-fail:
+FAIL:
     (void)write(pipe_fd, &errno, sizeof(errno));
     return false;
 }

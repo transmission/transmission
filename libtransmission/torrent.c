@@ -109,12 +109,9 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHa
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (*tor->info.hash == *torrentHash)
+        if ((*tor->info.hash == *torrentHash) && (memcmp(tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0))
         {
-            if (memcmp(tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0)
-            {
-                return tor;
-            }
+            return tor;
         }
     }
 
@@ -157,24 +154,18 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction))
+    if (tr_torrentUsesSpeedLimit(tor, direction) &&
+        tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
     {
-        if (tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
-        {
-            allowed = false;
-        }
+        allowed = false;
     }
 
     if (tr_torrentUsesSessionLimits(tor))
     {
-        unsigned int limit;
-
-        if (tr_sessionGetActiveSpeedLimit_Bps(tor->session, direction, &limit))
+        unsigned int limit = 0;
+        if (tr_sessionGetActiveSpeedLimit_Bps(tor->session, direction, &limit) && (limit <= 0))
         {
-            if (limit <= 0)
-            {
-                allowed = false;
-            }
+            allowed = false;
         }
     }
 
@@ -209,23 +200,9 @@ static int peerIdTTL(tr_torrent const* tor)
 
 unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
 {
-    bool needs_new_peer_id = false;
-
-    if (*tor->peer_id == '\0')
-    {
-        needs_new_peer_id = true;
-    }
-
-    if (!needs_new_peer_id)
-    {
-        if (!tr_torrentIsPrivate(tor))
-        {
-            if (peerIdTTL(tor) <= 0)
-            {
-                needs_new_peer_id = true;
-            }
-        }
-    }
+    bool const needs_new_peer_id =
+        (*tor->peer_id == '\0') || // doesn't have one
+        (!tr_torrentIsPrivate(tor) && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
@@ -678,39 +655,24 @@ static bool pieceHasFile(tr_piece_index_t piece, tr_file const* file)
     return file->firstPiece <= piece && piece <= file->lastPiece;
 }
 
-static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_index_t piece, int fileHint)
+static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_index_t piece, tr_file_index_t file_hint)
 {
-    tr_file_index_t firstFileIndex;
+    // safeguard against a bad arg
+    tr_info const* const inf = tr_torrentInfo(tor);
+    file_hint = MIN(file_hint, inf->fileCount - 1);
+
+    // find the first file with data in this piece
+    tr_file_index_t first = file_hint;
+    while (first > 0 && pieceHasFile(piece, &inf->files[first - 1]))
+    {
+        --first;
+    }
+
+    // the priority is the max of all the file priorities in the piece
     tr_priority_t priority = TR_PRI_LOW;
-
-    /* find the first file that has data in this piece */
-    if (fileHint >= 0)
+    for (tr_file_index_t i = first; i < inf->fileCount; ++i)
     {
-        firstFileIndex = fileHint;
-
-        while (firstFileIndex > 0 && pieceHasFile(piece, &tor->info.files[firstFileIndex - 1]))
-        {
-            --firstFileIndex;
-        }
-    }
-    else
-    {
-        firstFileIndex = 0;
-
-        for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i, ++firstFileIndex)
-        {
-            if (pieceHasFile(piece, &tor->info.files[i]))
-            {
-                break;
-            }
-        }
-    }
-
-    /* the piece's priority is the max of the priorities
-     * of all the files in that piece */
-    for (tr_file_index_t i = firstFileIndex; i < tor->info.fileCount; ++i)
-    {
-        tr_file const* file = &tor->info.files[i];
+        tr_file const* file = &inf->files[i];
 
         if (!pieceHasFile(piece, file))
         {
@@ -719,15 +681,12 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
 
         priority = MAX(priority, file->priority);
 
-        /* when dealing with multimedia files, getting the first and
+        /* When dealing with multimedia files, getting the first and
            last pieces can sometimes allow you to preview it a bit
            before it's fully downloaded... */
-        if (file->priority >= TR_PRI_NORMAL)
+        if ((file->priority >= TR_PRI_NORMAL) && (file->firstPiece == piece || file->lastPiece == piece))
         {
-            if (file->firstPiece == piece || file->lastPiece == piece)
-            {
-                priority = TR_PRI_HIGH;
-            }
+            priority = TR_PRI_HIGH;
         }
     }
 
@@ -748,7 +707,7 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
     }
 
     /* build the array of first-file hints to give calculatePiecePriority */
-    int* firstFiles = tr_new(int, inf->pieceCount);
+    tr_file_index_t* firstFiles = tr_new(tr_file_index_t, inf->pieceCount);
     tr_file_index_t f = 0;
 
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
@@ -828,7 +787,7 @@ static void refreshCurrentDir(tr_torrent* tor);
 static void torrentInitFromInfo(tr_torrent* tor)
 {
     uint64_t t;
-    tr_info* info = &tor->info;
+    tr_info const* const info = &tor->info;
 
     tor->blockSize = tr_getBlockSize(info->pieceSize);
 
@@ -1583,11 +1542,13 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
     tr_file_stat* walk = files;
     bool const isSeed = tor->completeness == TR_SEED;
 
-    for (tr_file_index_t i = 0; i < n; ++i, ++walk)
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        uint64_t const b = isSeed ? tor->info.files[i].length : countFileBytesCompleted(tor, i);
+        uint64_t const length = tor->info.files[i].length;
+        uint64_t const b = isSeed ? length : countFileBytesCompleted(tor, i);
         walk->bytesCompleted = b;
-        walk->progress = tor->info.files[i].length > 0 ? (float)b / tor->info.files[i].length : 1.0F;
+        walk->progress = length > 0 ? (float)b / (float)length : 1.0F;
+        ++walk;
     }
 
     if (fileCount != NULL)
@@ -1830,7 +1791,6 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     case TR_STATUS_SEED:
     case TR_STATUS_DOWNLOAD:
         return; /* already started */
-        break;
 
     case TR_STATUS_SEED_WAIT:
     case TR_STATUS_DOWNLOAD_WAIT:
@@ -1847,7 +1807,6 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
          * we'll know what completeness to use/announce */
         tor->startAfterVerify = true;
         return;
-        break;
 
     case TR_STATUS_STOPPED:
         if (!bypass_queue && torrentShouldQueue(tor))
@@ -1917,28 +1876,25 @@ static void onVerifyDoneThreadFunc(void* vdata)
     struct verify_data* data = vdata;
     tr_torrent* tor = data->tor;
 
-    if (tor->isDeleting)
+    if (!tor->isDeleting)
     {
-        goto cleanup;
+        if (!data->aborted)
+        {
+            tr_torrentRecheckCompleteness(tor);
+        }
+
+        if (data->callback_func != NULL)
+        {
+            (*data->callback_func)(tor, data->aborted, data->callback_data);
+        }
+
+        if (!data->aborted && tor->startAfterVerify)
+        {
+            tor->startAfterVerify = false;
+            torrentStart(tor, false);
+        }
     }
 
-    if (!data->aborted)
-    {
-        tr_torrentRecheckCompleteness(tor);
-    }
-
-    if (data->callback_func != NULL)
-    {
-        (*data->callback_func)(tor, data->aborted, data->callback_data);
-    }
-
-    if (!data->aborted && tor->startAfterVerify)
-    {
-        tor->startAfterVerify = false;
-        torrentStart(tor, false);
-    }
-
-cleanup:
     tr_free(data);
 }
 
@@ -2776,12 +2732,10 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
     {
-        if (tr_cpFileIsComplete(&tor->completion, i))
+        if (tr_cpFileIsComplete(&tor->completion, i) &&
+            (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked))
         {
-            if (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked)
-            {
-                return true;
-            }
+            return true;
         }
     }
 
@@ -3487,12 +3441,11 @@ static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceInde
     {
         tr_file const* file = &tor->info.files[i];
 
-        if (file->firstPiece <= pieceIndex && pieceIndex <= file->lastPiece)
+        if ((file->firstPiece <= pieceIndex) &&
+            (pieceIndex <= file->lastPiece) &&
+            tr_cpFileIsComplete(&tor->completion, i))
         {
-            if (tr_cpFileIsComplete(&tor->completion, i))
-            {
-                tr_torrentFileCompleted(tor, i);
-            }
+            tr_torrentFileCompleted(tor, i);
         }
     }
 }
@@ -3738,22 +3691,20 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
     while ((walk = tr_torrentNext(tor->session, walk)) != NULL)
     {
-        if (old_pos < pos)
+        if ((old_pos < pos) &&
+            (old_pos <= walk->queuePosition) &&
+            (walk->queuePosition <= pos))
         {
-            if (old_pos <= walk->queuePosition && walk->queuePosition <= pos)
-            {
-                walk->queuePosition--;
-                walk->anyDate = now;
-            }
+            walk->queuePosition--;
+            walk->anyDate = now;
         }
 
-        if (old_pos > pos)
+        if ((old_pos > pos) &&
+            (pos <= walk->queuePosition) &&
+            (walk->queuePosition < old_pos))
         {
-            if (pos <= walk->queuePosition && walk->queuePosition < old_pos)
-            {
-                walk->queuePosition++;
-                walk->anyDate = now;
-            }
+            walk->queuePosition++;
+            walk->anyDate = now;
         }
 
         if (back < walk->queuePosition)

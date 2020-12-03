@@ -8,8 +8,8 @@
 
 /*
  * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h;
- * most of the remaining headers in libtransmission are private.
+ * The other public API headers are variant.h and utils.h.
+ * Most of the remaining headers in libtransmission are private.
  */
 
 #pragma once
@@ -601,6 +601,15 @@ bool tr_sessionGetDeleteSource(tr_session const*);
 tr_priority_t tr_torrentGetPriority(tr_torrent const*);
 void tr_torrentSetPriority(tr_torrent*, tr_priority_t);
 
+void tr_sessionSetAntiBruteForceThreshold(tr_session*, int bad_requests);
+int tr_sessionGetAntiBruteForceThreshold(tr_session const*);
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session*, bool enabled);
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
+
+/**
+**/
+
 /***
 ****
 ****  Torrent Queueing
@@ -958,8 +967,8 @@ void tr_metainfoFree(tr_info* inf);
  * Returns a pointer to the torrent on success, or NULL on failure.
  *
  * @param ctor               the builder struct
- * @param setme_error        TR_PARSE_ERR if the parsing failed;
- *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ * @param setme_error        TR_PARSE_ERR if the parsing failed.
+ *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate.
  *                           TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  * @param setme_duplicate_id when setmeError is TR_PARSE_DUPLICATE,
  *                           this field is set to the duplicate torrent's id.

@@ -45,7 +45,7 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
     }
 }
 
-static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
+static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
 {
     tr_socket_t sockfd;
 
@@ -899,8 +899,6 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau_transaction_t transaction_id;
     struct evbuffer* buf;
 
-    /*fprintf(stderr, "got an incoming udp message w/len %zu\n", msglen);*/
-
     if (session == NULL || session->announcer_udp == NULL)
     {
         return false;
@@ -926,7 +924,6 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau = session->announcer_udp;
     transaction_id = evbuffer_read_ntoh_32(buf);
 
-    /* fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id); */
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         tr_ptrArray* reqs;

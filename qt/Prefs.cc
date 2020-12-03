@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QTextCodec>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -20,7 +21,6 @@
 
 #include "CustomVariantType.h"
 #include "Prefs.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictAdd;
@@ -155,6 +155,14 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
     { SortMode::SORT_BY_ID, "sort-by-id" }
 }};
 
+bool isValidUtf8(QByteArray const& byteArray)
+{
+    auto const* const codec = QTextCodec::codecForName("UTF-8");
+    auto state = QTextCodec::ConverterState {};
+    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
+    return state.invalidChars == 0;
+}
+
 } // namespace
 
 /***
@@ -185,7 +193,7 @@ Prefs::Prefs(QString config_dir) :
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant* b(tr_variantDictFind(&top, Items[i].key));
+        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
 
         switch (Items[i].type)
         {
@@ -363,7 +371,7 @@ Prefs::~Prefs()
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-void Prefs::initDefaults(tr_variant* d)
+void Prefs::initDefaults(tr_variant* d) const
 {
     auto constexpr FilterMode = std::string_view { "all" };
     auto constexpr SessionHost = std::string_view { "localhost" };
@@ -433,7 +441,7 @@ QString Prefs::getString(int key) const
     assert(Items[key].type == QVariant::String);
     QByteArray const b = values_[key].toByteArray();
 
-    if (Utils::isValidUtf8(b.constData()))
+    if (isValidUtf8(b.constData()))
     {
         values_[key].setValue(QString::fromUtf8(b.constData()));
     }

@@ -7,7 +7,6 @@
  */
 
 #include <array>
-#include <iostream>
 
 #include <QDir>
 #include <QNetworkAccessManager>
@@ -24,7 +23,7 @@
 FaviconCache::FaviconCache() :
     nam_(new QNetworkAccessManager(this))
 {
-    connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
+    connect(nam_, &QNetworkAccessManager::finished, this, &FaviconCache::onRequestFinished);
 }
 
 /***
@@ -34,7 +33,7 @@ FaviconCache::FaviconCache() :
 namespace
 {
 
-QPixmap scale(QPixmap pixmap)
+QPixmap scale(QPixmap const& pixmap)
 {
     return pixmap.scaled(FaviconCache::getIconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }

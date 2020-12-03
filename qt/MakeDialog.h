@@ -36,14 +36,13 @@ protected:
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
 
-private:
-    QString getSource() const;
-
 private slots:
     void onSourceChanged();
     void makeTorrent();
 
 private:
+    QString getSource() const;
+
     Session& session_;
 
     Ui::MakeDialog ui_ = {};

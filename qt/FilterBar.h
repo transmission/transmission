@@ -11,7 +11,7 @@
 #include <bitset>
 #include <map>
 
-#include <QString>
+#include <QTimer>
 #include <QWidget>
 
 #include "FaviconCache.h"
@@ -22,7 +22,7 @@
 class QLabel;
 class QLineEdit;
 class QStandardItemModel;
-class QTimer;
+class QString;
 
 class FilterBarComboBox;
 class Prefs;
@@ -64,7 +64,7 @@ private:
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};
     QStandardItemModel* tracker_model_ = {};
-    QTimer* recount_timer_ = {};
+    QTimer recount_timer_;
     QLineEdit* line_edit_ = {};
     Pending pending_ = {};
     bool is_bootstrapping_ = {};

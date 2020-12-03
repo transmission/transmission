@@ -180,8 +180,6 @@ struct tr_peerMsgs
     bool clientSentLtepHandshake;
     bool peerSentLtepHandshake;
 
-    /*bool haveFastSet;*/
-
     int desiredRequestCount;
 
     int prefetchCount;
@@ -224,7 +222,6 @@ struct tr_peerMsgs
     tr_pex* pex;
     tr_pex* pex6;
 
-    /*time_t clientSentPexAt;*/
     time_t clientSentAnythingAt;
 
     time_t chokeChangedAt;
@@ -851,8 +848,6 @@ static bool requestIsValid(tr_peerMsgs const* msgs, struct peer_request const* r
 void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block)
 {
     struct peer_request req;
-    // fprintf(stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n",
-    //     (size_t)block, msgs->peer);
     blockToReq(msgs->torrent, block, &req);
     protocolSendCancel(msgs, &req);
 }
@@ -865,7 +860,6 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
 {
     tr_variant val;
     bool allow_pex;
-    bool allow_metadata_xfer;
     struct evbuffer* payload;
     struct evbuffer* out = msgs->outMessages;
     unsigned char const* ipv6 = tr_globalIPv6();
@@ -885,14 +879,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
-    if (tr_torrentIsPrivate(msgs->torrent))
-    {
-        allow_metadata_xfer = false;
-    }
-    else
-    {
-        allow_metadata_xfer = true;
-    }
+    bool const allow_metadata_xfer = !tr_torrentIsPrivate(msgs->torrent);
 
     /* decide if we want to advertise pex support */
     if (!tr_torrentAllowsPex(msgs->torrent))
@@ -1028,12 +1015,10 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i))
+    if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) &&
+        tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
-        if (tr_torrentSetMetadataSizeHint(msgs->torrent, i))
-        {
-            msgs->metadata_size_hint = (size_t)i;
-        }
+        msgs->metadata_size_hint = (size_t)i;
     }
 
     /* look for upload_only (BEP 21) */
@@ -1050,14 +1035,18 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
         dbgmsg(msgs, "peer's port is now %d", (int)i);
     }
 
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
+    if (tr_peerIoIsIncoming(msgs->io) &&
+        tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) &&
+        addr_len == 4)
     {
         pex.addr.type = TR_AF_INET;
         memcpy(&pex.addr.addr.addr4, addr, 4);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, seedProbability);
     }
 
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
+    if (tr_peerIoIsIncoming(msgs->io) &&
+        tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) &&
+        addr_len == 16)
     {
         pex.addr.type = TR_AF_INET6;
         memcpy(&pex.addr.addr.addr6, addr, 16);
@@ -1076,17 +1065,16 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
 
 static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
-    tr_variant dict;
-    char* msg_end;
-    char const* benc_end;
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    uint8_t* tmp = tr_new(uint8_t, msglen);
+    uint8_t* const tmp = tr_new(uint8_t, msglen);
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-    msg_end = (char*)tmp + msglen;
+    char const* const msg_end = (char const*)tmp + msglen;
 
+    tr_variant dict;
+    char const* benc_end;
     if (tr_variantFromBencFull(&dict, tmp, msglen, NULL, &benc_end) == 0)
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
@@ -1336,7 +1324,6 @@ static void updatePeerProgress(tr_peerMsgs* msgs)
 {
     tr_peerUpdateProgress(msgs->torrent, &msgs->peer);
 
-    /* updateFastSet(msgs); */
     updateInterest(msgs);
 }
 
@@ -1895,7 +1882,7 @@ bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
 
 static void updateDesiredRequestCount(tr_peerMsgs* msgs)
 {
-    tr_torrent* const torrent = msgs->torrent;
+    tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
     if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked || !msgs->client_is_interested)
@@ -1933,12 +1920,9 @@ static void updateDesiredRequestCount(tr_peerMsgs* msgs)
         msgs->desiredRequestCount = MAX(floor, estimatedBlocksInPeriod);
 
         /* honor the peer's maximum request count, if specified */
-        if (msgs->reqq > 0)
+        if ((msgs->reqq > 0) && (msgs->desiredRequestCount > msgs->reqq))
         {
-            if (msgs->desiredRequestCount > msgs->reqq)
-            {
-                msgs->desiredRequestCount = msgs->reqq;
-            }
+            msgs->desiredRequestCount = msgs->reqq;
         }
     }
 }
@@ -2291,10 +2275,10 @@ typedef struct
 }
 PexDiffs;
 
-static void pexAddedCb(void* vpex, void* userData)
+static void pexAddedCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     if (diffs->addedCount < MAX_PEX_ADDED)
     {
@@ -2303,10 +2287,10 @@ static void pexAddedCb(void* vpex, void* userData)
     }
 }
 
-static inline void pexDroppedCb(void* vpex, void* userData)
+static inline void pexDroppedCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     if (diffs->droppedCount < MAX_PEX_DROPPED)
     {
@@ -2314,15 +2298,15 @@ static inline void pexDroppedCb(void* vpex, void* userData)
     }
 }
 
-static inline void pexElementCb(void* vpex, void* userData)
+static inline void pexElementCb(void const* vpex, void* userData)
 {
     PexDiffs* diffs = userData;
-    tr_pex* pex = vpex;
+    tr_pex const* pex = vpex;
 
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
-typedef void (* tr_set_func)(void* element, void* userData);
+typedef void (* tr_set_func)(void const* element, void* userData);
 
 /**
  * @brief find the differences and commonalities in two sorted sets
@@ -2349,12 +2333,12 @@ static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t
     {
         if (a == aend)
         {
-            (*in_b_cb)((void*)b, userData);
+            (*in_b_cb)(b, userData);
             b += elementSize;
         }
         else if (b == bend)
         {
-            (*in_a_cb)((void*)a, userData);
+            (*in_a_cb)(a, userData);
             a += elementSize;
         }
         else
@@ -2363,18 +2347,18 @@ static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t
 
             if (val == 0)
             {
-                (*in_both_cb)((void*)a, userData);
+                (*in_both_cb)(a, userData);
                 a += elementSize;
                 b += elementSize;
             }
             else if (val < 0)
             {
-                (*in_a_cb)((void*)a, userData);
+                (*in_a_cb)(a, userData);
                 a += elementSize;
             }
             else if (val > 0)
             {
-                (*in_b_cb)((void*)b, userData);
+                (*in_b_cb)(b, userData);
                 b += elementSize;
             }
         }
@@ -2555,8 +2539,6 @@ static void sendPex(tr_peerMsgs* msgs)
         tr_free(diffs6.added);
         tr_free(diffs6.dropped);
         tr_free(newPex6);
-
-        /* msgs->clientSentPexAt = tr_time(); */
     }
 }
 
@@ -2703,7 +2685,7 @@ bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs)
 
 bool tr_isPeerMsgs(void const* msgs)
 {
-    return msgs != NULL && ((struct tr_peerMsgs*)msgs)->magic_number == MAGIC_NUMBER;
+    return msgs != NULL && ((struct tr_peerMsgs const*)msgs)->magic_number == MAGIC_NUMBER;
 }
 
 tr_peerMsgs* tr_peerMsgsCast(void* vm)

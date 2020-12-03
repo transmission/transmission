@@ -92,7 +92,7 @@ static gboolean onTimer(gpointer gdata)
     return G_SOURCE_CONTINUE;
 }
 
-static void onResponse(GtkDialog* dialog, int response, gpointer user_data)
+static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
 {
     TR_UNUSED(user_data);
 

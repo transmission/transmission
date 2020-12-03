@@ -404,6 +404,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
@@ -475,6 +477,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
@@ -722,7 +726,6 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     }
 
     tr_timerAdd(session->nowTimer, 0, usec);
-    /* fprintf (stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
 }
 
 static void loadBlocklists(tr_session* session);
@@ -730,7 +733,7 @@ static void loadBlocklists(tr_session* session);
 static void tr_sessionInitImpl(void* vdata)
 {
     struct init_data* data = vdata;
-    tr_variant* clientSettings = data->clientSettings;
+    tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
     TR_ASSERT(tr_amInEventThread(session));
@@ -1143,6 +1146,20 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
         session->scrapePausedTorrents = boolVal;
+    }
+
+    /**
+    ***  BruteForce
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
+    {
+        tr_sessionSetAntiBruteForceThreshold(session, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
+    {
+        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
     data->done = true;
@@ -1906,8 +1923,8 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
 
 static int compareTorrentByCur(void const* va, void const* vb)
 {
-    tr_torrent const* a = *(tr_torrent const**)va;
-    tr_torrent const* b = *(tr_torrent const**)vb;
+    tr_torrent const* a = *(tr_torrent const* const*)va;
+    tr_torrent const* b = *(tr_torrent const* const*)vb;
     uint64_t const aCur = a->downloadedCur + a->uploadedCur;
     uint64_t const bCur = b->downloadedCur + b->uploadedCur;
 
@@ -2948,6 +2965,34 @@ int tr_sessionGetQueueStalledMinutes(tr_session const* session)
     return session->queueStalledMinutes;
 }
 
+void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
+{
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(bad_requests > 0);
+    tr_rpcSetAntiBruteForceThreshold(session->rpcServer, bad_requests);
+}
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, is_enabled);
+}
+
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcGetAntiBruteForceEnabled(session->rpcServer);
+}
+
+int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
+}
+
 struct TorrentAndPosition
 {
     tr_torrent* tor;
@@ -3042,12 +3087,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!tr_torrentIsStalled(tor))
+        if (!tr_torrentIsStalled(tor) && (tr_torrentGetActivity(tor) == activity))
         {
-            if (tr_torrentGetActivity(tor) == activity)
-            {
-                ++active_count;
-            }
+            ++active_count;
         }
     }
 

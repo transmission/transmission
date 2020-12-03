@@ -17,6 +17,7 @@ include(TrMacros)
 tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
+        option(ENABLE_WEB           "Build Web client" OFF)
         option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
         option(ENABLE_CLI           "Build command-line client" OFF)
         option(ENABLE_TESTS         "Build unit tests" ON)
@@ -533,7 +534,6 @@ set(NEEDED_FUNCTIONS
     fallocate64
     flock
     getmntent
-    getpagesize
     gmtime_r
     gmtime_s
     htonll
@@ -544,7 +544,6 @@ set(NEEDED_FUNCTIONS
     ntohll
     posix_fadvise
     posix_fallocate
-    posix_memalign
     pread
     pwrite
     statvfs
@@ -552,8 +551,7 @@ set(NEEDED_FUNCTIONS
     strlcpy
     strsep
     syslog
-    uselocale
-    valloc)
+    uselocale)
 
 foreach(F ${NEEDED_FUNCTIONS})
     tr_make_id("${F}" F_ID)
@@ -622,10 +620,7 @@ if(ENABLE_TESTS)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web DESTINATION ${DST_DIR}
-        PATTERN *.am EXCLUDE
-        PATTERN *.in EXCLUDE
-        PATTERN *.scss EXCLUDE)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html DESTINATION ${DST_DIR})
 endfunction()
 
 add_subdirectory(libtransmission)
@@ -637,7 +632,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
     add_subdirectory(po)
 endif()
 
-foreach(P daemon cli utils gtk qt mac)
+foreach(P cli daemon gtk mac qt utils web)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
         if(DEFINED ${P_ID}_PROJECT_DIR)
@@ -664,7 +659,11 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
 if(NOT TR_STABLE_RELEASE)
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
 endif()
-list(APPEND CPACK_SOURCE_IGNORE_FILES [.]git)
+list(APPEND CPACK_SOURCE_IGNORE_FILES
+    "${CMAKE_BINARY_DIR}"
+    "[.]git"
+    "node_modules"
+)
 set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting

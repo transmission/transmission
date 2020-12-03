@@ -392,7 +392,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
     {
         if (e == 0 || e == EAGAIN || e == EINTR || e == EINPROGRESS)
         {
-            goto reschedule;
+            goto RESCHEDULE;
         }
 
         /* error case */
@@ -406,7 +406,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 
     if (res <= 0)
     {
-        goto error;
+        goto FAIL;
     }
 
     if (evbuffer_get_length(io->outbuf) != 0)
@@ -417,7 +417,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
     didWriteWrapper(io, res);
     return;
 
-reschedule:
+RESCHEDULE:
     if (evbuffer_get_length(io->outbuf) != 0)
     {
         tr_peerIoSetEnabled(io, dir, true);
@@ -425,7 +425,7 @@ reschedule:
 
     return;
 
-error:
+FAIL:
     tr_net_strerror(errstr, sizeof(errstr), e);
     dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
 
@@ -489,7 +489,7 @@ static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
 
 static size_t utp_get_rb_size(void* closure)
 {
-    tr_peerIo* io = closure;
+    tr_peerIo const* const io = closure;
 
     TR_ASSERT(tr_isPeerIo(io));
 

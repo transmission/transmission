@@ -30,25 +30,6 @@ class PrefsDialog : public BaseDialog
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
 
-private:
-    using key2widget_t = QMap<int, QWidget*>;
-
-private:
-    bool updateWidgetValue(QWidget* widget, int pref_key);
-    void linkWidgetToPref(QWidget* widget, int pref_key);
-    void updateBlocklistLabel();
-    void updateDownloadingWidgetsLocality();
-
-    void setPref(int key, QVariant const& v);
-
-    void initDownloadingTab();
-    void initSeedingTab();
-    void initSpeedTab();
-    void initPrivacyTab();
-    void initNetworkTab();
-    void initDesktopTab();
-    void initRemoteTab();
-
 private slots:
     void checkBoxToggled(bool checked);
     void spinBoxEditingFinished();
@@ -70,6 +51,23 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
+    using key2widget_t = QMap<int, QWidget*>;
+
+    bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    void linkWidgetToPref(QWidget* widget, int pref_key);
+    void updateBlocklistLabel();
+    void updateDownloadingWidgetsLocality();
+
+    void setPref(int key, QVariant const& v);
+
+    void initDownloadingTab();
+    void initSeedingTab();
+    void initSpeedTab();
+    void initPrivacyTab();
+    void initNetworkTab();
+    void initDesktopTab();
+    void initRemoteTab();
+
     Session& session_;
     Prefs& prefs_;
 

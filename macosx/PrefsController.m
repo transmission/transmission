@@ -236,7 +236,11 @@
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: NSImageNamePreferencesGeneral];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"gearshape" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: NSImageNamePreferencesGeneral];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -244,7 +248,11 @@
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: @"Transfers"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"arrow.up.arrow.down" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"Transfers"];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -252,7 +260,11 @@
     else if ([ident isEqualToString: TOOLBAR_GROUPS])
     {
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: @"Groups"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"pin" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"Groups"];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -260,7 +272,11 @@
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: @"Bandwidth"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"speedometer" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"Bandwidth"];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -268,7 +284,11 @@
     else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: NSImageNameUserGroup];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"person.2" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: NSImageNameUserGroup];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -276,7 +296,11 @@
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: NSImageNameNetwork];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"network" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: NSImageNameNetwork];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -284,7 +308,11 @@
     else if ([ident isEqualToString: TOOLBAR_REMOTE])
     {
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
-        item.image = [NSImage imageNamed: @"Remote"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"antenna.radiowaves.left.and.right" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"Remote"];
+        }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;

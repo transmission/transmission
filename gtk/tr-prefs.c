@@ -449,12 +449,12 @@ static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
-    char const* s = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
     struct blocklist_data* data = gdata;
     GtkMessageDialog* d = GTK_MESSAGE_DIALOG(data->updateBlocklistDialog);
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
     gtk_message_dialog_set_markup(d, success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"));
-    gtk_message_dialog_format_secondary_text(d, s, count);
+    char const* const fmt = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
+    gtk_message_dialog_format_secondary_text(d, fmt, count);
     updateBlocklistText(data->label, core);
 }
 
@@ -636,7 +636,7 @@ static void refreshWhitelist(struct remote_page* page)
     g_string_free(gstr, TRUE);
 }
 
-static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* address, gpointer gpage)
+static void onAddressEdited(GtkCellRendererText const* r, gchar const* path_string, gchar* address, gpointer gpage)
 {
     TR_UNUSED(r);
 
@@ -654,7 +654,7 @@ static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* a
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
+static void onAddWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
     TR_UNUSED(b);
 
@@ -670,7 +670,7 @@ static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
     gtk_tree_path_free(path);
 }
 
-static void onRemoveWhitelistClicked(GtkButton* b, gpointer gpage)
+static void onRemoveWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
     TR_UNUSED(b);
 
@@ -1114,11 +1114,9 @@ static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
-    // gdk_threads_enter();
     gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
     gtk_widget_set_sensitive(data->portButton, TRUE);
     gtk_widget_set_sensitive(data->portSpin, TRUE);
-    // gdk_threads_leave();
 }
 
 static void onPortTest(GtkButton* button, gpointer vdata)

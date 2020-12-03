@@ -22,6 +22,7 @@
 #include <libtransmission/quark.h>
 
 #include "FaviconCache.h"
+#include "IconCache.h"
 #include "Macros.h"
 #include "Speed.h"
 
@@ -112,12 +113,12 @@ private:
 public:
     TorrentHash() {}
 
-    TorrentHash(char const* str)
+    explicit TorrentHash(char const* str)
     {
         tr_hex_to_sha1(data_.data(), str);
     }
 
-    TorrentHash(QString const& str)
+    explicit TorrentHash(QString const& str)
     {
         tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }
@@ -284,7 +285,7 @@ public:
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
-        return s ? double(s - l) / s : 0.0;
+        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
     double metadataPercentDone() const
@@ -666,7 +667,7 @@ private:
     QString name_;
 
     // mutable because it's a lazy lookup
-    mutable QIcon icon_;
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;

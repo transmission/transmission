@@ -52,7 +52,6 @@ static void setLabelFromRatio(GtkLabel* l, double d)
 static gboolean updateStats(gpointer gdata)
 {
     char buf[128];
-    char const* fmt;
     tr_session_stats one;
     tr_session_stats all;
     size_t const buflen = sizeof(buf);
@@ -66,7 +65,7 @@ static gboolean updateStats(gpointer gdata)
     setLabel(ui->one_time_lb, tr_strltime(buf, one.secondsActive, buflen));
     setLabelFromRatio(ui->one_ratio_lb, one.ratio);
 
-    fmt = ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount);
+    char const* const fmt = ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount);
     g_snprintf(buf, buflen, fmt, (int)all.sessionCount);
     setLabel(ui->all_sessions_lb, buf);
     setLabel(ui->all_up_lb, tr_strlsize(buf, all.uploadedBytes, buflen));

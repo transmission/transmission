@@ -22,7 +22,7 @@ class AboutDialog : public BaseDialog
     TR_DISABLE_COPY_MOVE(AboutDialog)
 
 public:
-    AboutDialog(QWidget* parent = nullptr);
+    explicit AboutDialog(QWidget* parent = nullptr);
 
 private slots:
     void showCredits();

@@ -14,6 +14,7 @@
 
 #include <unordered_map>
 
+#include <QFileIconProvider>
 #include <QIcon>
 #include <QString>
 
@@ -36,11 +37,11 @@ public:
     QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 
 protected:
-    IconCache();
+    IconCache() = default;
 
 private:
-    QIcon const folder_icon_;
-    QIcon const file_icon_;
+    QIcon const folder_icon_ = QFileIconProvider().icon(QFileIconProvider::Folder);
+    QIcon const file_icon_ = QFileIconProvider().icon(QFileIconProvider::File);
 
     mutable std::unordered_map<QString, QIcon> name_to_icon_;
     mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;

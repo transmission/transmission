@@ -128,8 +128,6 @@ typedef NS_ENUM(unsigned int, addType) {
 - (void) openURL: (NSString *) urlString;
 - (void) openURLShowSheet: (id) sender;
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
-
 @property (nonatomic, readonly) tr_session *sessionHandle;
 
 - (void) createFile: (id) sender;
@@ -147,8 +145,6 @@ typedef NS_ENUM(unsigned int, addType) {
 - (void) stopTorrents:              (NSArray *) torrents;
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
-                        contextInfo: (void *) contextInfo;
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;

@@ -495,6 +495,11 @@ static void removeKeRangerRansomware()
         "Main window -> 1st bottom left button (action) tooltip");
     fSpeedLimitButton.toolTip = NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
+  
+    if (@available(macOS 11.0, *)) {
+        fActionButton.image = [NSImage imageWithSystemSymbolName: @"gearshape.fill" accessibilityDescription: nil];
+        fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName: @"tortoise.fill" accessibilityDescription: nil];
+    }
     fClearCompletedButton.toolTip = NSLocalizedString(@"Remove all transfers that have completed seeding.",
         "Main window -> 3rd bottom left button (remove all) tooltip");
 
@@ -848,11 +853,15 @@ static void removeKeRangerRansomware()
             fPendingTorrentDownloads = nil;
         }
 
-        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title"),
-            [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
-            "Download not a torrent -> message"), suggestedName,
-            [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
-            NSLocalizedString(@"OK", "Download not a torrent -> button"), nil, nil);
+        NSString * message = [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
+        "Download not a torrent -> message"), suggestedName,
+        [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]];
+
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Download not a torrent -> button")];
+        alert.messageText = NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title");
+        alert.informativeText = message;
+        [alert runModal];
     }
     else
         [download setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: suggestedName.lastPathComponent]
@@ -867,11 +876,16 @@ static void removeKeRangerRansomware()
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
-    NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Torrent download error -> title"),
-        [NSString stringWithFormat: NSLocalizedString(@"The torrent could not be downloaded from %@: %@.",
-        "Torrent download failed -> message"),
-        [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding],
-        error.localizedDescription], NSLocalizedString(@"OK", "Torrent download failed -> button"), nil, nil);
+    NSString * message = [NSString stringWithFormat: NSLocalizedString(@"The torrent could not be downloaded from %@: %@.",
+    "Torrent download failed -> message"),
+    [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding],
+    error.localizedDescription];
+
+    NSAlert * alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent download failed -> button")];
+    alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
+    alert.informativeText = message;
+    [alert runModal];
 
     [fPendingTorrentDownloads removeObjectForKey: download.request.URL];
     if (fPendingTorrentDownloads.count == 0)
@@ -3631,9 +3645,13 @@ static void removeKeRangerRansomware()
 
     item.view = button;
 
-    const NSSize buttonSize = NSMakeSize(36.0, 25.0);
-    item.minSize = buttonSize;
-    item.maxSize = buttonSize;
+    if (@available(macOS 11.0, *)) {
+        // not needed
+    } else {
+        const NSSize buttonSize = NSMakeSize(36.0, 25.0);
+        item.minSize = buttonSize;
+        item.maxSize = buttonSize;
+    }
 
     return item;
 }
@@ -3647,7 +3665,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarCreateTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"doc.badge.plus" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarCreateTemplate"];
+        }
         item.target = self;
         item.action = @selector(createFile:);
         item.autovalidates = NO;
@@ -3661,7 +3683,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarOpenTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"folder" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarOpenTemplate"];
+        }
         item.target = self;
         item.action = @selector(openShowSheet:);
         item.autovalidates = NO;
@@ -3675,7 +3701,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarOpenWebTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"globe" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarOpenWebTemplate"];
+        }
         item.target = self;
         item.action = @selector(openURLShowSheet:);
         item.autovalidates = NO;
@@ -3689,7 +3719,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarRemoveTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"nosign" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarRemoveTemplate"];
+        }
         item.target = self;
         item.action = @selector(removeNoDelete:);
         item.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
@@ -3704,7 +3738,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarInfoTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"info.circle" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarInfoTemplate"];
+        }
         item.target = self;
         item.action = @selector(showInfo:);
 
@@ -3726,9 +3764,13 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        const NSSize groupSize = NSMakeSize(72.0, 25.0);
-        groupItem.minSize = groupSize;
-        groupItem.maxSize = groupSize;
+        if (@available(macOS 11.0, *)) {
+            // not needed
+        } else {
+            const NSSize groupSize = NSMakeSize(72.0, 25.0);
+            groupItem.minSize = groupSize;
+            groupItem.maxSize = groupSize;
+        }
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -3738,12 +3780,21 @@ static void removeKeRangerRansomware()
         [groupItem setIdentifiers: @[TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL]];
 
         [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseAllTemplate"] forSegment: TOOLBAR_PAUSE_TAG];
+        if (@available(macOS 11.0, *)) {
+            [segmentedControl setImage: [[NSImage imageWithSystemSymbolName: @"pause.circle.fill" accessibilityDescription: nil] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]] forSegment: TOOLBAR_PAUSE_TAG];
+        } else {
+            [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseAllTemplate"] forSegment: TOOLBAR_PAUSE_TAG];
+        }
         [segmentedCell setToolTip: NSLocalizedString(@"Pause all transfers",
                                     "All toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
 
         [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
         [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeAllTemplate"] forSegment: TOOLBAR_RESUME_TAG];
+        if (@available(macOS 11.0, *)) {
+            [segmentedControl setImage: [[NSImage imageWithSystemSymbolName: @"arrow.clockwise.circle.fill" accessibilityDescription: nil] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]] forSegment: TOOLBAR_RESUME_TAG];
+        } else {
+            [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeAllTemplate"] forSegment: TOOLBAR_RESUME_TAG];
+        }
         [segmentedCell setToolTip: NSLocalizedString(@"Resume all transfers",
                                     "All toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
 
@@ -3771,9 +3822,13 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        const NSSize groupSize = NSMakeSize(72.0, 25.0);
-        groupItem.minSize = groupSize;
-        groupItem.maxSize = groupSize;
+        if (@available(macOS 11.0, *)) {
+            // not needed
+        } else {
+            const NSSize groupSize = NSMakeSize(72.0, 25.0);
+            groupItem.minSize = groupSize;
+            groupItem.maxSize = groupSize;
+        }
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
@@ -3783,12 +3838,20 @@ static void removeKeRangerRansomware()
         [groupItem setIdentifiers: @[TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED]];
 
         [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseSelectedTemplate"] forSegment: TOOLBAR_PAUSE_TAG];
+        if (@available(macOS 11.0, *)) {
+            [segmentedControl setImage: [[NSImage imageWithSystemSymbolName: @"pause" accessibilityDescription: nil] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]] forSegment: TOOLBAR_PAUSE_TAG];
+        } else {
+            [segmentedControl setImage: [NSImage imageNamed: @"ToolbarPauseSelectedTemplate"] forSegment: TOOLBAR_PAUSE_TAG];
+        }
         [segmentedCell setToolTip: NSLocalizedString(@"Pause selected transfers",
                                     "Selected toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
 
         [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeSelectedTemplate"] forSegment: TOOLBAR_RESUME_TAG];
+        if (@available(macOS 11.0, *)) {
+            [segmentedControl setImage: [NSImage imageWithSystemSymbolName: @"arrow.clockwise" accessibilityDescription: nil] forSegment: TOOLBAR_RESUME_TAG];
+        } else {
+            [segmentedControl setImage: [NSImage imageNamed: @"ToolbarResumeSelectedTemplate"] forSegment: TOOLBAR_RESUME_TAG];
+        }
         [segmentedCell setToolTip: NSLocalizedString(@"Resume selected transfers",
                                     "Selected toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
 
@@ -3808,7 +3871,11 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
-        item.image = [NSImage imageNamed: @"ToolbarFilterTemplate"];
+        if (@available(macOS 11.0, *)) {
+            item.image = [NSImage imageWithSystemSymbolName: @"magnifyingglass" accessibilityDescription: nil];
+        } else {
+            item.image = [NSImage imageNamed: @"ToolbarFilterTemplate"];
+        }
         item.target = self;
         item.action = @selector(toggleFilterBar:);
 
@@ -3885,10 +3952,8 @@ static void removeKeRangerRansomware()
     return @[ TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB, TOOLBAR_REMOVE,
               TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
               TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO,
-              NSToolbarSeparatorItemIdentifier,
               NSToolbarSpaceItemIdentifier,
-              NSToolbarFlexibleSpaceItemIdentifier,
-              NSToolbarCustomizeToolbarItemIdentifier ];
+              NSToolbarFlexibleSpaceItemIdentifier ];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar

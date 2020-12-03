@@ -40,12 +40,6 @@ IconCache& IconCache::get()
     return singleton;
 }
 
-IconCache::IconCache() :
-    folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
-    file_icon_(QFileIconProvider().icon(QFileIconProvider::File))
-{
-}
-
 QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 {
     QIcon icon;

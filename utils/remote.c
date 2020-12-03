@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <ctype.h> /* isspace */
+#include <errno.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -975,7 +976,7 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
                 size_t child_pos = 0;
-                tr_variant* child;
+                tr_variant const* child;
                 while ((child = tr_variantListChild(l, child_pos++)))
                 {
                     if (tr_variantGetStr(child, &str, NULL))
@@ -1367,22 +1368,24 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
+static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
 {
-    size_t len;
-    char* str = tr_base64_decode(raw, rawlen, &len);
+    size_t len = 0;
+    char* const str = tr_base64_decode(raw, raw_len, &len);
     printf("  ");
 
-    for (size_t i = 0, k = 0; k < len; ++k)
+    size_t piece = 0;
+    size_t const col_width = 64;
+    for (char const* it = str, * end = it + len; it != end; ++it)
     {
-        for (int e = 0; i < j && e < 8; ++e, ++i)
+        for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (str[k] & (1 << (7 - e))) != 0 ? '1' : '0');
+            printf("%c", (*it & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         printf(" ");
 
-        if (i % 64 == 0)
+        if (piece % col_width == 0)
         {
             printf("\n  ");
         }
@@ -1528,10 +1531,10 @@ static void printTorrentList(tr_variant* top)
 static void printTrackersImpl(tr_variant* trackerStats)
 {
     char buf[512];
-    tr_variant* t;
 
-    for (int i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
+    for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
+        tr_variant* const t = tr_variantListChild(trackerStats, i);
         int64_t downloadCount;
         bool hasAnnounced;
         bool hasScraped;
@@ -1707,15 +1710,13 @@ static void printTrackers(tr_variant* top)
 static void printSession(tr_variant* top)
 {
     tr_variant* args;
-    char buf[128];
-    char buf2[128];
-    char buf3[128];
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
         bool boolVal;
         char const* str;
+        char buf[128];
 
         printf("VERSION\n");
 
@@ -1821,6 +1822,9 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
+                char buf2[128];
+                char buf3[128];
+
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
@@ -2339,7 +2343,6 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case 'V': /* show version number */
                 fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
                 exit(0);
-                break;
 
             case TR_OPT_ERR:
                 fprintf(stderr, "invalid option\n");
@@ -2993,6 +2996,23 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
     return status;
 }
 
+static bool parsePortString(char const* s, int* port)
+{
+    int const errno_stack = errno;
+    errno = 0;
+
+    char* end = NULL;
+    int const i = (int)strtol(s, &end, 10);
+    bool const ok = (end != NULL) && (*end == '\0') && (errno == 0);
+    if (ok)
+    {
+        *port = i;
+    }
+
+    errno = errno_stack;
+    return ok;
+}
+
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
 {
@@ -3002,6 +3022,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
     }
 
     char const* const s = argv[1];
+    char const* const last_colon = strrchr(s, ':');
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
@@ -3012,39 +3033,33 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
         UseSSL = true;
         *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
     }
+    else if (parsePortString(s, port))
+    {
+        // it was just a port
+    }
+    else if (last_colon == NULL)
+    {
+        // it was a non-ipv6 host with no port
+        *host = tr_strdup(s);
+    }
     else
     {
-        char const* const first_colon = strchr(s, ':');
-        char const* const last_colon = strrchr(s, ':');
+        char const* hend;
 
-        if (last_colon != NULL && ((*s == '[' && *(last_colon - 1) == ']') || first_colon == last_colon))
+        // if only one colon, it's probably "$host:$port"
+        if ((strchr(s, ':') == last_colon) && parsePortString(last_colon + 1, port))
         {
-            /* user passed in both host and port */
-            *host = tr_strndup(s, last_colon - s);
-            *port = atoi(last_colon + 1);
+            hend = last_colon;
         }
         else
         {
-            char* end;
-            int const i = strtol(s, &end, 10);
-
-            if (*end == '\0') /* user passed in a port */
-            {
-                *port = i;
-            }
-            else /* user passed in a host */
-            {
-                if (last_colon != NULL && first_colon != last_colon && (*s != '[' || *(s + strlen(s) - 1) != ']'))
-                {
-                    /* looks like IPv6; let's add brackets as we'll be appending the port later on */
-                    *host = tr_strdup_printf("[%s]", s);
-                }
-                else
-                {
-                    *host = tr_strdup(s);
-                }
-            }
+            hend = s + strlen(s);
         }
+
+        bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != NULL);
+
+        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", (int)(hend - s), s) :
+            tr_strndup(s, hend - s);
     }
 
     *argc -= 1;
