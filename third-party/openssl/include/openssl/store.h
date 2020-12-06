@@ -1,556 +1,266 @@
-/* crypto/store/store.h -*- mode:C; c-file-style: "eay" -*- */
-/* Written by Richard Levitte (richard@levitte.org) for the OpenSSL
- * project 2003.
- */
-/* ====================================================================
- * Copyright (c) 2003 The OpenSSL Project.  All rights reserved.
+/*
+ * Copyright 2016-2019 The OpenSSL Project Authors. All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. All advertising materials mentioning features or use of this
- *    software must display the following acknowledgment:
- *    "This product includes software developed by the OpenSSL Project
- *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
- *
- * 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
- *    endorse or promote products derived from this software without
- *    prior written permission. For written permission, please contact
- *    openssl-core@openssl.org.
- *
- * 5. Products derived from this software may not be called "OpenSSL"
- *    nor may "OpenSSL" appear in their names without prior written
- *    permission of the OpenSSL Project.
- *
- * 6. Redistributions of any form whatsoever must retain the following
- *    acknowledgment:
- *    "This product includes software developed by the OpenSSL Project
- *    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
- *
- * THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
- * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- * ====================================================================
- *
- * This product includes cryptographic software written by Eric Young
- * (eay@cryptsoft.com).  This product includes software written by Tim
- * Hudson (tjh@cryptsoft.com).
- *
+ * Licensed under the OpenSSL license (the "License").  You may not use
+ * this file except in compliance with the License.  You can obtain a copy
+ * in the file LICENSE in the source distribution or at
+ * https://www.openssl.org/source/license.html
  */
 
-#ifndef HEADER_STORE_H
-#define HEADER_STORE_H
+#ifndef HEADER_OSSL_STORE_H
+# define HEADER_OSSL_STORE_H
 
-#include <AvailabilityMacros.h>
+# include <stdarg.h>
+# include <openssl/ossl_typ.h>
+# include <openssl/pem.h>
+# include <openssl/storeerr.h>
 
-#include <openssl/ossl_typ.h>
-#ifndef OPENSSL_NO_DEPRECATED
-#include <openssl/evp.h>
-#include <openssl/bn.h>
-#include <openssl/x509.h>
-#endif
-
-#ifdef  __cplusplus
+# ifdef  __cplusplus
 extern "C" {
-#endif
+# endif
 
-/* Already defined in ossl_typ.h */
-/* typedef struct store_st STORE; */
-/* typedef struct store_method_st STORE_METHOD; */
-
-
-/* All the following functions return 0, a negative number or NULL on error.
-   When everything is fine, they return a positive value or a non-NULL
-   pointer, all depending on their purpose. */
-
-/* Creators and destructor.   */
-STORE *STORE_new_method(const STORE_METHOD *method) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE *STORE_new_engine(ENGINE *engine) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void STORE_free(STORE *ui) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-
-/* Give a user interface parametrised control commands.  This can be used to
-   send down an integer, a data pointer or a function pointer, as well as
-   be used to get information from a STORE. */
-int STORE_ctrl(STORE *store, int cmd, long i, void *p, void (*f)(void)) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* A control to set the directory with keys and certificates.  Used by the
-   built-in directory level method. */
-#define STORE_CTRL_SET_DIRECTORY	0x0001
-/* A control to set a file to load.  Used by the built-in file level method. */
-#define STORE_CTRL_SET_FILE		0x0002
-/* A control to set a configuration file to load.  Can be used by any method
-   that wishes to load a configuration file. */
-#define STORE_CTRL_SET_CONF_FILE	0x0003
-/* A control to set a the section of the loaded configuration file.  Can be
-   used by any method that wishes to load a configuration file. */
-#define STORE_CTRL_SET_CONF_SECTION	0x0004
-
-
-/* Some methods may use extra data */
-#define STORE_set_app_data(s,arg)	STORE_set_ex_data(s,0,arg)
-#define STORE_get_app_data(s)		STORE_get_ex_data(s,0)
-int STORE_get_ex_new_index(long argl, void *argp, CRYPTO_EX_new *new_func,
-	CRYPTO_EX_dup *dup_func, CRYPTO_EX_free *free_func) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_set_ex_data(STORE *r,int idx,void *arg) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void *STORE_get_ex_data(STORE *r, int idx) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* Use specific methods instead of the built-in one */
-const STORE_METHOD *STORE_get_method(STORE *store) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-const STORE_METHOD *STORE_set_method(STORE *store, const STORE_METHOD *meth) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* The standard OpenSSL methods. */
-/* This is the in-memory method.  It does everything except revoking and updating,
-   and is of course volatile.  It's used by other methods that have an in-memory
-   cache. */
-const STORE_METHOD *STORE_Memory(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-#if 0 /* Not yet implemented */
-/* This is the directory store.  It does everything except revoking and updating,
-   and uses STORE_Memory() to cache things in memory. */
-const STORE_METHOD *STORE_Directory(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-/* This is the file store.  It does everything except revoking and updating,
-   and uses STORE_Memory() to cache things in memory.  Certificates are added
-   to it with the store operation, and it will only get cached certificates. */
-const STORE_METHOD *STORE_File(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-#endif
-
-/* Store functions take a type code for the type of data they should store
-   or fetch */
-typedef enum STORE_object_types
-	{
-	STORE_OBJECT_TYPE_X509_CERTIFICATE=	0x01, /* X509 * */
-	STORE_OBJECT_TYPE_X509_CRL=		0x02, /* X509_CRL * */
-	STORE_OBJECT_TYPE_PRIVATE_KEY=		0x03, /* EVP_PKEY * */
-	STORE_OBJECT_TYPE_PUBLIC_KEY=		0x04, /* EVP_PKEY * */
-	STORE_OBJECT_TYPE_NUMBER=		0x05, /* BIGNUM * */
-	STORE_OBJECT_TYPE_ARBITRARY=		0x06, /* BUF_MEM * */
-	STORE_OBJECT_TYPE_NUM=			0x06  /* The amount of known
-							 object types */
-	} STORE_OBJECT_TYPES;
-/* List of text strings corresponding to the object types. */
-extern const char * const STORE_object_type_string[STORE_OBJECT_TYPE_NUM+1];
-
-/* Some store functions take a parameter list.  Those parameters come with
-   one of the following codes. The comments following the codes below indicate
-   what type the value should be a pointer to. */
-typedef enum STORE_params
-	{
-	STORE_PARAM_EVP_TYPE=			0x01, /* int */
-	STORE_PARAM_BITS=			0x02, /* size_t */
-	STORE_PARAM_KEY_PARAMETERS=		0x03, /* ??? */
-	STORE_PARAM_KEY_NO_PARAMETERS=		0x04, /* N/A */
-	STORE_PARAM_AUTH_PASSPHRASE=		0x05, /* char * */
-	STORE_PARAM_AUTH_KRB5_TICKET=		0x06, /* void * */
-	STORE_PARAM_TYPE_NUM=			0x06  /* The amount of known
-							 parameter types */
-	} STORE_PARAM_TYPES;
-/* Parameter value sizes.  -1 means unknown, anything else is the required size. */
-extern const int STORE_param_sizes[STORE_PARAM_TYPE_NUM+1];
-
-/* Store functions take attribute lists.  Those attributes come with codes.
-   The comments following the codes below indicate what type the value should
-   be a pointer to. */
-typedef enum STORE_attribs
-	{
-	STORE_ATTR_END=				0x00,
-	STORE_ATTR_FRIENDLYNAME=		0x01, /* C string */
-	STORE_ATTR_KEYID=			0x02, /* 160 bit string (SHA1) */
-	STORE_ATTR_ISSUERKEYID=			0x03, /* 160 bit string (SHA1) */
-	STORE_ATTR_SUBJECTKEYID=		0x04, /* 160 bit string (SHA1) */
-	STORE_ATTR_ISSUERSERIALHASH=		0x05, /* 160 bit string (SHA1) */
-	STORE_ATTR_ISSUER=			0x06, /* X509_NAME * */
-	STORE_ATTR_SERIAL=			0x07, /* BIGNUM * */
-	STORE_ATTR_SUBJECT=			0x08, /* X509_NAME * */
-	STORE_ATTR_CERTHASH=			0x09, /* 160 bit string (SHA1) */
-	STORE_ATTR_EMAIL=			0x0a, /* C string */
-	STORE_ATTR_FILENAME=			0x0b, /* C string */
-	STORE_ATTR_TYPE_NUM=			0x0b, /* The amount of known
-							 attribute types */
-	STORE_ATTR_OR=				0xff  /* This is a special
-							 separator, which
-							 expresses the OR
-							 operation.  */
-	} STORE_ATTR_TYPES;
-/* Attribute value sizes.  -1 means unknown, anything else is the required size. */
-extern const int STORE_attr_sizes[STORE_ATTR_TYPE_NUM+1];
-
-typedef enum STORE_certificate_status
-	{
-	STORE_X509_VALID=			0x00,
-	STORE_X509_EXPIRED=			0x01,
-	STORE_X509_SUSPENDED=			0x02,
-	STORE_X509_REVOKED=			0x03
-	} STORE_CERTIFICATE_STATUS;
-
-/* Engine store functions will return a structure that contains all the necessary
- * information, including revokation status for certificates.  This is really not
- * needed for application authors, as the ENGINE framework functions will extract
- * the OpenSSL-specific information when at all possible.  However, for engine
- * authors, it's crucial to know this structure.  */
-typedef struct STORE_OBJECT_st
-	{
-	STORE_OBJECT_TYPES type;
-	union
-		{
-		struct
-			{
-			STORE_CERTIFICATE_STATUS status;
-			X509 *certificate;
-			} x509;
-		X509_CRL *crl;
-		EVP_PKEY *key;
-		BIGNUM *number;
-		BUF_MEM *arbitrary;
-		} data;
-	} STORE_OBJECT;
-DECLARE_STACK_OF(STORE_OBJECT)
-STORE_OBJECT *STORE_OBJECT_new(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void STORE_OBJECT_free(STORE_OBJECT *data) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-
-
-/* The following functions handle the storage. They return 0, a negative number
-   or NULL on error, anything else on success. */
-X509 *STORE_get_certificate(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_certificate(STORE *e, X509 *data, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_certificate(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_attributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_revoke_certificate(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_certificate(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void *STORE_list_certificate_start(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-X509 *STORE_list_certificate_next(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_certificate_end(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_certificate_endp(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-EVP_PKEY *STORE_generate_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-EVP_PKEY *STORE_get_private_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_private_key(STORE *e, EVP_PKEY *data,
-	OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_private_key(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_sttributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_revoke_private_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_private_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void *STORE_list_private_key_start(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-EVP_PKEY *STORE_list_private_key_next(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_private_key_end(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_private_key_endp(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-EVP_PKEY *STORE_get_public_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_public_key(STORE *e, EVP_PKEY *data, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_public_key(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_sttributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_revoke_public_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_public_key(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void *STORE_list_public_key_start(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-EVP_PKEY *STORE_list_public_key_next(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_public_key_end(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_public_key_endp(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-X509_CRL *STORE_generate_crl(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-X509_CRL *STORE_get_crl(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_crl(STORE *e, X509_CRL *data, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_crl(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_sttributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_crl(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void *STORE_list_crl_start(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-X509_CRL *STORE_list_crl_next(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_crl_end(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_list_crl_endp(STORE *e, void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_number(STORE *e, BIGNUM *data, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_number(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_sttributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-BIGNUM *STORE_get_number(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_number(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_store_arbitrary(STORE *e, BUF_MEM *data, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_modify_arbitrary(STORE *e, OPENSSL_ITEM search_attributes[],
-	OPENSSL_ITEM add_sttributes[], OPENSSL_ITEM modify_attributes[],
-	OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-BUF_MEM *STORE_get_arbitrary(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_delete_arbitrary(STORE *e, OPENSSL_ITEM attributes[],
-	OPENSSL_ITEM parameters[]) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-
-/* Create and manipulate methods */
-STORE_METHOD *STORE_create_method(char *name) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-void STORE_destroy_method(STORE_METHOD *store_method) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* These callback types are use for store handlers */
-typedef int (*STORE_INITIALISE_FUNC_PTR)(STORE *);
-typedef void (*STORE_CLEANUP_FUNC_PTR)(STORE *);
-typedef STORE_OBJECT *(*STORE_GENERATE_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef STORE_OBJECT *(*STORE_GET_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef void *(*STORE_START_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef STORE_OBJECT *(*STORE_NEXT_OBJECT_FUNC_PTR)(STORE *, void *handle);
-typedef int (*STORE_END_OBJECT_FUNC_PTR)(STORE *, void *handle);
-typedef int (*STORE_HANDLE_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef int (*STORE_STORE_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, STORE_OBJECT *data, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef int (*STORE_MODIFY_OBJECT_FUNC_PTR)(STORE *, STORE_OBJECT_TYPES type, OPENSSL_ITEM search_attributes[], OPENSSL_ITEM add_attributes[], OPENSSL_ITEM modify_attributes[], OPENSSL_ITEM delete_attributes[], OPENSSL_ITEM parameters[]);
-typedef int (*STORE_GENERIC_FUNC_PTR)(STORE *, OPENSSL_ITEM attributes[], OPENSSL_ITEM parameters[]);
-typedef int (*STORE_CTRL_FUNC_PTR)(STORE *, int cmd, long l, void *p, void (*f)(void));
-
-int STORE_method_set_initialise_function(STORE_METHOD *sm, STORE_INITIALISE_FUNC_PTR init_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_cleanup_function(STORE_METHOD *sm, STORE_CLEANUP_FUNC_PTR clean_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_generate_function(STORE_METHOD *sm, STORE_GENERATE_OBJECT_FUNC_PTR generate_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_get_function(STORE_METHOD *sm, STORE_GET_OBJECT_FUNC_PTR get_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_store_function(STORE_METHOD *sm, STORE_STORE_OBJECT_FUNC_PTR store_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_modify_function(STORE_METHOD *sm, STORE_MODIFY_OBJECT_FUNC_PTR store_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_revoke_function(STORE_METHOD *sm, STORE_HANDLE_OBJECT_FUNC_PTR revoke_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_delete_function(STORE_METHOD *sm, STORE_HANDLE_OBJECT_FUNC_PTR delete_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_list_start_function(STORE_METHOD *sm, STORE_START_OBJECT_FUNC_PTR list_start_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_list_next_function(STORE_METHOD *sm, STORE_NEXT_OBJECT_FUNC_PTR list_next_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_list_end_function(STORE_METHOD *sm, STORE_END_OBJECT_FUNC_PTR list_end_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_update_store_function(STORE_METHOD *sm, STORE_GENERIC_FUNC_PTR) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_lock_store_function(STORE_METHOD *sm, STORE_GENERIC_FUNC_PTR) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_unlock_store_function(STORE_METHOD *sm, STORE_GENERIC_FUNC_PTR) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_method_set_ctrl_function(STORE_METHOD *sm, STORE_CTRL_FUNC_PTR ctrl_f) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-STORE_INITIALISE_FUNC_PTR STORE_method_get_initialise_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_CLEANUP_FUNC_PTR STORE_method_get_cleanup_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_GENERATE_OBJECT_FUNC_PTR STORE_method_get_generate_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_GET_OBJECT_FUNC_PTR STORE_method_get_get_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_STORE_OBJECT_FUNC_PTR STORE_method_get_store_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_MODIFY_OBJECT_FUNC_PTR STORE_method_get_modify_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_HANDLE_OBJECT_FUNC_PTR STORE_method_get_revoke_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_HANDLE_OBJECT_FUNC_PTR STORE_method_get_delete_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_START_OBJECT_FUNC_PTR STORE_method_get_list_start_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_NEXT_OBJECT_FUNC_PTR STORE_method_get_list_next_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_END_OBJECT_FUNC_PTR STORE_method_get_list_end_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_GENERIC_FUNC_PTR STORE_method_get_update_store_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_GENERIC_FUNC_PTR STORE_method_get_lock_store_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_GENERIC_FUNC_PTR STORE_method_get_unlock_store_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_CTRL_FUNC_PTR STORE_method_get_ctrl_function(STORE_METHOD *sm) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* Method helper structures and functions. */
-
-/* This structure is the result of parsing through the information in a list
-   of OPENSSL_ITEMs.  It stores all the necessary information in a structured
-   way.*/
-typedef struct STORE_attr_info_st STORE_ATTR_INFO;
-
-/* Parse a list of OPENSSL_ITEMs and return a pointer to a STORE_ATTR_INFO.
-   Note that we do this in the list form, since the list of OPENSSL_ITEMs can
-   come in blocks separated with STORE_ATTR_OR.  Note that the value returned
-   by STORE_parse_attrs_next() must be freed with STORE_ATTR_INFO_free(). */
-void *STORE_parse_attrs_start(OPENSSL_ITEM *attributes) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-STORE_ATTR_INFO *STORE_parse_attrs_next(void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_parse_attrs_end(void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_parse_attrs_endp(void *handle) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* Creator and destructor */
-STORE_ATTR_INFO *STORE_ATTR_INFO_new(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_free(STORE_ATTR_INFO *attrs) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* Manipulators */
-char *STORE_ATTR_INFO_get0_cstr(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-unsigned char *STORE_ATTR_INFO_get0_sha1str(STORE_ATTR_INFO *attrs,
-	STORE_ATTR_TYPES code) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-X509_NAME *STORE_ATTR_INFO_get0_dn(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-BIGNUM *STORE_ATTR_INFO_get0_number(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_set_cstr(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	char *cstr, size_t cstr_size) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_set_sha1str(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	unsigned char *sha1str, size_t sha1str_size) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_set_dn(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	X509_NAME *dn) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_set_number(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	BIGNUM *number) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_modify_cstr(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	char *cstr, size_t cstr_size) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_modify_sha1str(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	unsigned char *sha1str, size_t sha1str_size) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_modify_dn(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	X509_NAME *dn) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-int STORE_ATTR_INFO_modify_number(STORE_ATTR_INFO *attrs, STORE_ATTR_TYPES code,
-	BIGNUM *number) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-/* Compare on basis of a bit pattern formed by the STORE_ATTR_TYPES values
-   in each contained attribute. */
-int STORE_ATTR_INFO_compare(STORE_ATTR_INFO *a, STORE_ATTR_INFO *b) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-/* Check if the set of attributes in a is within the range of attributes
-   set in b. */
-int STORE_ATTR_INFO_in_range(STORE_ATTR_INFO *a, STORE_ATTR_INFO *b) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-/* Check if the set of attributes in a are also set in b. */
-int STORE_ATTR_INFO_in(STORE_ATTR_INFO *a, STORE_ATTR_INFO *b) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-/* Same as STORE_ATTR_INFO_in(), but also checks the attribute values. */
-int STORE_ATTR_INFO_in_ex(STORE_ATTR_INFO *a, STORE_ATTR_INFO *b) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
-
-
-/* BEGIN ERROR CODES */
-/* The following lines are auto generated by the script mkerr.pl. Any changes
- * made after this point may be overwritten when the script is next run.
+/*-
+ *  The main OSSL_STORE functions.
+ *  ------------------------------
+ *
+ *  These allow applications to open a channel to a resource with supported
+ *  data (keys, certs, crls, ...), read the data a piece at a time and decide
+ *  what to do with it, and finally close.
  */
-void ERR_load_STORE_strings(void) DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER;
 
-/* Error codes for the STORE functions. */
+typedef struct ossl_store_ctx_st OSSL_STORE_CTX;
 
-/* Function codes. */
-#define STORE_F_MEM_DELETE				 134
-#define STORE_F_MEM_GENERATE				 135
-#define STORE_F_MEM_LIST_END				 168
-#define STORE_F_MEM_LIST_NEXT				 136
-#define STORE_F_MEM_LIST_START				 137
-#define STORE_F_MEM_MODIFY				 169
-#define STORE_F_MEM_STORE				 138
-#define STORE_F_STORE_ATTR_INFO_GET0_CSTR		 139
-#define STORE_F_STORE_ATTR_INFO_GET0_DN			 140
-#define STORE_F_STORE_ATTR_INFO_GET0_NUMBER		 141
-#define STORE_F_STORE_ATTR_INFO_GET0_SHA1STR		 142
-#define STORE_F_STORE_ATTR_INFO_MODIFY_CSTR		 143
-#define STORE_F_STORE_ATTR_INFO_MODIFY_DN		 144
-#define STORE_F_STORE_ATTR_INFO_MODIFY_NUMBER		 145
-#define STORE_F_STORE_ATTR_INFO_MODIFY_SHA1STR		 146
-#define STORE_F_STORE_ATTR_INFO_SET_CSTR		 147
-#define STORE_F_STORE_ATTR_INFO_SET_DN			 148
-#define STORE_F_STORE_ATTR_INFO_SET_NUMBER		 149
-#define STORE_F_STORE_ATTR_INFO_SET_SHA1STR		 150
-#define STORE_F_STORE_CERTIFICATE			 170
-#define STORE_F_STORE_CTRL				 161
-#define STORE_F_STORE_DELETE_ARBITRARY			 158
-#define STORE_F_STORE_DELETE_CERTIFICATE		 102
-#define STORE_F_STORE_DELETE_CRL			 103
-#define STORE_F_STORE_DELETE_NUMBER			 104
-#define STORE_F_STORE_DELETE_PRIVATE_KEY		 105
-#define STORE_F_STORE_DELETE_PUBLIC_KEY			 106
-#define STORE_F_STORE_GENERATE_CRL			 107
-#define STORE_F_STORE_GENERATE_KEY			 108
-#define STORE_F_STORE_GET_ARBITRARY			 159
-#define STORE_F_STORE_GET_CERTIFICATE			 109
-#define STORE_F_STORE_GET_CRL				 110
-#define STORE_F_STORE_GET_NUMBER			 111
-#define STORE_F_STORE_GET_PRIVATE_KEY			 112
-#define STORE_F_STORE_GET_PUBLIC_KEY			 113
-#define STORE_F_STORE_LIST_CERTIFICATE_END		 114
-#define STORE_F_STORE_LIST_CERTIFICATE_ENDP		 153
-#define STORE_F_STORE_LIST_CERTIFICATE_NEXT		 115
-#define STORE_F_STORE_LIST_CERTIFICATE_START		 116
-#define STORE_F_STORE_LIST_CRL_END			 117
-#define STORE_F_STORE_LIST_CRL_ENDP			 154
-#define STORE_F_STORE_LIST_CRL_NEXT			 118
-#define STORE_F_STORE_LIST_CRL_START			 119
-#define STORE_F_STORE_LIST_PRIVATE_KEY_END		 120
-#define STORE_F_STORE_LIST_PRIVATE_KEY_ENDP		 155
-#define STORE_F_STORE_LIST_PRIVATE_KEY_NEXT		 121
-#define STORE_F_STORE_LIST_PRIVATE_KEY_START		 122
-#define STORE_F_STORE_LIST_PUBLIC_KEY_END		 123
-#define STORE_F_STORE_LIST_PUBLIC_KEY_ENDP		 156
-#define STORE_F_STORE_LIST_PUBLIC_KEY_NEXT		 124
-#define STORE_F_STORE_LIST_PUBLIC_KEY_START		 125
-#define STORE_F_STORE_MODIFY_ARBITRARY			 162
-#define STORE_F_STORE_MODIFY_CERTIFICATE		 163
-#define STORE_F_STORE_MODIFY_CRL			 164
-#define STORE_F_STORE_MODIFY_NUMBER			 165
-#define STORE_F_STORE_MODIFY_PRIVATE_KEY		 166
-#define STORE_F_STORE_MODIFY_PUBLIC_KEY			 167
-#define STORE_F_STORE_NEW_ENGINE			 133
-#define STORE_F_STORE_NEW_METHOD			 132
-#define STORE_F_STORE_PARSE_ATTRS_END			 151
-#define STORE_F_STORE_PARSE_ATTRS_ENDP			 172
-#define STORE_F_STORE_PARSE_ATTRS_NEXT			 152
-#define STORE_F_STORE_PARSE_ATTRS_START			 171
-#define STORE_F_STORE_REVOKE_CERTIFICATE		 129
-#define STORE_F_STORE_REVOKE_PRIVATE_KEY		 130
-#define STORE_F_STORE_REVOKE_PUBLIC_KEY			 131
-#define STORE_F_STORE_STORE_ARBITRARY			 157
-#define STORE_F_STORE_STORE_CERTIFICATE			 100
-#define STORE_F_STORE_STORE_CRL				 101
-#define STORE_F_STORE_STORE_NUMBER			 126
-#define STORE_F_STORE_STORE_PRIVATE_KEY			 127
-#define STORE_F_STORE_STORE_PUBLIC_KEY			 128
+/*
+ * Typedef for the OSSL_STORE_INFO post processing callback.  This can be used
+ * to massage the given OSSL_STORE_INFO, or to drop it entirely (by returning
+ * NULL).
+ */
+typedef OSSL_STORE_INFO *(*OSSL_STORE_post_process_info_fn)(OSSL_STORE_INFO *,
+                                                            void *);
 
-/* Reason codes. */
-#define STORE_R_ALREADY_HAS_A_VALUE			 127
-#define STORE_R_FAILED_DELETING_ARBITRARY		 132
-#define STORE_R_FAILED_DELETING_CERTIFICATE		 100
-#define STORE_R_FAILED_DELETING_KEY			 101
-#define STORE_R_FAILED_DELETING_NUMBER			 102
-#define STORE_R_FAILED_GENERATING_CRL			 103
-#define STORE_R_FAILED_GENERATING_KEY			 104
-#define STORE_R_FAILED_GETTING_ARBITRARY		 133
-#define STORE_R_FAILED_GETTING_CERTIFICATE		 105
-#define STORE_R_FAILED_GETTING_KEY			 106
-#define STORE_R_FAILED_GETTING_NUMBER			 107
-#define STORE_R_FAILED_LISTING_CERTIFICATES		 108
-#define STORE_R_FAILED_LISTING_KEYS			 109
-#define STORE_R_FAILED_MODIFYING_ARBITRARY		 138
-#define STORE_R_FAILED_MODIFYING_CERTIFICATE		 139
-#define STORE_R_FAILED_MODIFYING_CRL			 140
-#define STORE_R_FAILED_MODIFYING_NUMBER			 141
-#define STORE_R_FAILED_MODIFYING_PRIVATE_KEY		 142
-#define STORE_R_FAILED_MODIFYING_PUBLIC_KEY		 143
-#define STORE_R_FAILED_REVOKING_CERTIFICATE		 110
-#define STORE_R_FAILED_REVOKING_KEY			 111
-#define STORE_R_FAILED_STORING_ARBITRARY		 134
-#define STORE_R_FAILED_STORING_CERTIFICATE		 112
-#define STORE_R_FAILED_STORING_KEY			 113
-#define STORE_R_FAILED_STORING_NUMBER			 114
-#define STORE_R_NOT_IMPLEMENTED				 128
-#define STORE_R_NO_CONTROL_FUNCTION			 144
-#define STORE_R_NO_DELETE_ARBITRARY_FUNCTION		 135
-#define STORE_R_NO_DELETE_NUMBER_FUNCTION		 115
-#define STORE_R_NO_DELETE_OBJECT_FUNCTION		 116
-#define STORE_R_NO_GENERATE_CRL_FUNCTION		 117
-#define STORE_R_NO_GENERATE_OBJECT_FUNCTION		 118
-#define STORE_R_NO_GET_OBJECT_ARBITRARY_FUNCTION	 136
-#define STORE_R_NO_GET_OBJECT_FUNCTION			 119
-#define STORE_R_NO_GET_OBJECT_NUMBER_FUNCTION		 120
-#define STORE_R_NO_LIST_OBJECT_ENDP_FUNCTION		 131
-#define STORE_R_NO_LIST_OBJECT_END_FUNCTION		 121
-#define STORE_R_NO_LIST_OBJECT_NEXT_FUNCTION		 122
-#define STORE_R_NO_LIST_OBJECT_START_FUNCTION		 123
-#define STORE_R_NO_MODIFY_OBJECT_FUNCTION		 145
-#define STORE_R_NO_REVOKE_OBJECT_FUNCTION		 124
-#define STORE_R_NO_STORE				 129
-#define STORE_R_NO_STORE_OBJECT_ARBITRARY_FUNCTION	 137
-#define STORE_R_NO_STORE_OBJECT_FUNCTION		 125
-#define STORE_R_NO_STORE_OBJECT_NUMBER_FUNCTION		 126
-#define STORE_R_NO_VALUE				 130
+/*
+ * Open a channel given a URI.  The given UI method will be used any time the
+ * loader needs extra input, for example when a password or pin is needed, and
+ * will be passed the same user data every time it's needed in this context.
+ *
+ * Returns a context reference which represents the channel to communicate
+ * through.
+ */
+OSSL_STORE_CTX *OSSL_STORE_open(const char *uri, const UI_METHOD *ui_method,
+                                void *ui_data,
+                                OSSL_STORE_post_process_info_fn post_process,
+                                void *post_process_data);
 
-#ifdef  __cplusplus
+/*
+ * Control / fine tune the OSSL_STORE channel.  |cmd| determines what is to be
+ * done, and depends on the underlying loader (use OSSL_STORE_get0_scheme to
+ * determine which loader is used), except for common commands (see below).
+ * Each command takes different arguments.
+ */
+int OSSL_STORE_ctrl(OSSL_STORE_CTX *ctx, int cmd, ... /* args */);
+int OSSL_STORE_vctrl(OSSL_STORE_CTX *ctx, int cmd, va_list args);
+
+/*
+ * Common ctrl commands that different loaders may choose to support.
+ */
+/* int on = 0 or 1; STORE_ctrl(ctx, STORE_C_USE_SECMEM, &on); */
+# define OSSL_STORE_C_USE_SECMEM      1
+/* Where custom commands start */
+# define OSSL_STORE_C_CUSTOM_START    100
+
+/*
+ * Read one data item (a key, a cert, a CRL) that is supported by the OSSL_STORE
+ * functionality, given a context.
+ * Returns a OSSL_STORE_INFO pointer, from which OpenSSL typed data can be
+ * extracted with OSSL_STORE_INFO_get0_PKEY(), OSSL_STORE_INFO_get0_CERT(), ...
+ * NULL is returned on error, which may include that the data found at the URI
+ * can't be figured out for certain or is ambiguous.
+ */
+OSSL_STORE_INFO *OSSL_STORE_load(OSSL_STORE_CTX *ctx);
+
+/*
+ * Check if end of data (end of file) is reached
+ * Returns 1 on end, 0 otherwise.
+ */
+int OSSL_STORE_eof(OSSL_STORE_CTX *ctx);
+
+/*
+ * Check if an error occurred
+ * Returns 1 if it did, 0 otherwise.
+ */
+int OSSL_STORE_error(OSSL_STORE_CTX *ctx);
+
+/*
+ * Close the channel
+ * Returns 1 on success, 0 on error.
+ */
+int OSSL_STORE_close(OSSL_STORE_CTX *ctx);
+
+
+/*-
+ *  Extracting OpenSSL types from and creating new OSSL_STORE_INFOs
+ *  ---------------------------------------------------------------
+ */
+
+/*
+ * Types of data that can be ossl_stored in a OSSL_STORE_INFO.
+ * OSSL_STORE_INFO_NAME is typically found when getting a listing of
+ * available "files" / "tokens" / what have you.
+ */
+# define OSSL_STORE_INFO_NAME           1   /* char * */
+# define OSSL_STORE_INFO_PARAMS         2   /* EVP_PKEY * */
+# define OSSL_STORE_INFO_PKEY           3   /* EVP_PKEY * */
+# define OSSL_STORE_INFO_CERT           4   /* X509 * */
+# define OSSL_STORE_INFO_CRL            5   /* X509_CRL * */
+
+/*
+ * Functions to generate OSSL_STORE_INFOs, one function for each type we
+ * support having in them, as well as a generic constructor.
+ *
+ * In all cases, ownership of the object is transferred to the OSSL_STORE_INFO
+ * and will therefore be freed when the OSSL_STORE_INFO is freed.
+ */
+OSSL_STORE_INFO *OSSL_STORE_INFO_new_NAME(char *name);
+int OSSL_STORE_INFO_set0_NAME_description(OSSL_STORE_INFO *info, char *desc);
+OSSL_STORE_INFO *OSSL_STORE_INFO_new_PARAMS(EVP_PKEY *params);
+OSSL_STORE_INFO *OSSL_STORE_INFO_new_PKEY(EVP_PKEY *pkey);
+OSSL_STORE_INFO *OSSL_STORE_INFO_new_CERT(X509 *x509);
+OSSL_STORE_INFO *OSSL_STORE_INFO_new_CRL(X509_CRL *crl);
+
+/*
+ * Functions to try to extract data from a OSSL_STORE_INFO.
+ */
+int OSSL_STORE_INFO_get_type(const OSSL_STORE_INFO *info);
+const char *OSSL_STORE_INFO_get0_NAME(const OSSL_STORE_INFO *info);
+char *OSSL_STORE_INFO_get1_NAME(const OSSL_STORE_INFO *info);
+const char *OSSL_STORE_INFO_get0_NAME_description(const OSSL_STORE_INFO *info);
+char *OSSL_STORE_INFO_get1_NAME_description(const OSSL_STORE_INFO *info);
+EVP_PKEY *OSSL_STORE_INFO_get0_PARAMS(const OSSL_STORE_INFO *info);
+EVP_PKEY *OSSL_STORE_INFO_get1_PARAMS(const OSSL_STORE_INFO *info);
+EVP_PKEY *OSSL_STORE_INFO_get0_PKEY(const OSSL_STORE_INFO *info);
+EVP_PKEY *OSSL_STORE_INFO_get1_PKEY(const OSSL_STORE_INFO *info);
+X509 *OSSL_STORE_INFO_get0_CERT(const OSSL_STORE_INFO *info);
+X509 *OSSL_STORE_INFO_get1_CERT(const OSSL_STORE_INFO *info);
+X509_CRL *OSSL_STORE_INFO_get0_CRL(const OSSL_STORE_INFO *info);
+X509_CRL *OSSL_STORE_INFO_get1_CRL(const OSSL_STORE_INFO *info);
+
+const char *OSSL_STORE_INFO_type_string(int type);
+
+/*
+ * Free the OSSL_STORE_INFO
+ */
+void OSSL_STORE_INFO_free(OSSL_STORE_INFO *info);
+
+
+/*-
+ *  Functions to construct a search URI from a base URI and search criteria
+ *  -----------------------------------------------------------------------
+ */
+
+/* OSSL_STORE search types */
+# define OSSL_STORE_SEARCH_BY_NAME              1 /* subject in certs, issuer in CRLs */
+# define OSSL_STORE_SEARCH_BY_ISSUER_SERIAL     2
+# define OSSL_STORE_SEARCH_BY_KEY_FINGERPRINT   3
+# define OSSL_STORE_SEARCH_BY_ALIAS             4
+
+/* To check what search types the scheme handler supports */
+int OSSL_STORE_supports_search(OSSL_STORE_CTX *ctx, int search_type);
+
+/* Search term constructors */
+/*
+ * The input is considered to be owned by the caller, and must therefore
+ * remain present throughout the lifetime of the returned OSSL_STORE_SEARCH
+ */
+OSSL_STORE_SEARCH *OSSL_STORE_SEARCH_by_name(X509_NAME *name);
+OSSL_STORE_SEARCH *OSSL_STORE_SEARCH_by_issuer_serial(X509_NAME *name,
+                                                      const ASN1_INTEGER
+                                                      *serial);
+OSSL_STORE_SEARCH *OSSL_STORE_SEARCH_by_key_fingerprint(const EVP_MD *digest,
+                                                        const unsigned char
+                                                        *bytes, size_t len);
+OSSL_STORE_SEARCH *OSSL_STORE_SEARCH_by_alias(const char *alias);
+
+/* Search term destructor */
+void OSSL_STORE_SEARCH_free(OSSL_STORE_SEARCH *search);
+
+/* Search term accessors */
+int OSSL_STORE_SEARCH_get_type(const OSSL_STORE_SEARCH *criterion);
+X509_NAME *OSSL_STORE_SEARCH_get0_name(OSSL_STORE_SEARCH *criterion);
+const ASN1_INTEGER *OSSL_STORE_SEARCH_get0_serial(const OSSL_STORE_SEARCH
+                                                  *criterion);
+const unsigned char *OSSL_STORE_SEARCH_get0_bytes(const OSSL_STORE_SEARCH
+                                                  *criterion, size_t *length);
+const char *OSSL_STORE_SEARCH_get0_string(const OSSL_STORE_SEARCH *criterion);
+const EVP_MD *OSSL_STORE_SEARCH_get0_digest(const OSSL_STORE_SEARCH *criterion);
+
+/*
+ * Add search criterion and expected return type (which can be unspecified)
+ * to the loading channel.  This MUST happen before the first OSSL_STORE_load().
+ */
+int OSSL_STORE_expect(OSSL_STORE_CTX *ctx, int expected_type);
+int OSSL_STORE_find(OSSL_STORE_CTX *ctx, OSSL_STORE_SEARCH *search);
+
+
+/*-
+ *  Function to register a loader for the given URI scheme.
+ *  -------------------------------------------------------
+ *
+ *  The loader receives all the main components of an URI except for the
+ *  scheme.
+ */
+
+typedef struct ossl_store_loader_st OSSL_STORE_LOADER;
+OSSL_STORE_LOADER *OSSL_STORE_LOADER_new(ENGINE *e, const char *scheme);
+const ENGINE *OSSL_STORE_LOADER_get0_engine(const OSSL_STORE_LOADER *loader);
+const char *OSSL_STORE_LOADER_get0_scheme(const OSSL_STORE_LOADER *loader);
+/* struct ossl_store_loader_ctx_st is defined differently by each loader */
+typedef struct ossl_store_loader_ctx_st OSSL_STORE_LOADER_CTX;
+typedef OSSL_STORE_LOADER_CTX *(*OSSL_STORE_open_fn)(const OSSL_STORE_LOADER
+                                                     *loader,
+                                                     const char *uri,
+                                                     const UI_METHOD *ui_method,
+                                                     void *ui_data);
+int OSSL_STORE_LOADER_set_open(OSSL_STORE_LOADER *loader,
+                               OSSL_STORE_open_fn open_function);
+typedef int (*OSSL_STORE_ctrl_fn)(OSSL_STORE_LOADER_CTX *ctx, int cmd,
+                                  va_list args);
+int OSSL_STORE_LOADER_set_ctrl(OSSL_STORE_LOADER *loader,
+                               OSSL_STORE_ctrl_fn ctrl_function);
+typedef int (*OSSL_STORE_expect_fn)(OSSL_STORE_LOADER_CTX *ctx, int expected);
+int OSSL_STORE_LOADER_set_expect(OSSL_STORE_LOADER *loader,
+                                 OSSL_STORE_expect_fn expect_function);
+typedef int (*OSSL_STORE_find_fn)(OSSL_STORE_LOADER_CTX *ctx,
+                                  OSSL_STORE_SEARCH *criteria);
+int OSSL_STORE_LOADER_set_find(OSSL_STORE_LOADER *loader,
+                               OSSL_STORE_find_fn find_function);
+typedef OSSL_STORE_INFO *(*OSSL_STORE_load_fn)(OSSL_STORE_LOADER_CTX *ctx,
+                                               const UI_METHOD *ui_method,
+                                               void *ui_data);
+int OSSL_STORE_LOADER_set_load(OSSL_STORE_LOADER *loader,
+                               OSSL_STORE_load_fn load_function);
+typedef int (*OSSL_STORE_eof_fn)(OSSL_STORE_LOADER_CTX *ctx);
+int OSSL_STORE_LOADER_set_eof(OSSL_STORE_LOADER *loader,
+                              OSSL_STORE_eof_fn eof_function);
+typedef int (*OSSL_STORE_error_fn)(OSSL_STORE_LOADER_CTX *ctx);
+int OSSL_STORE_LOADER_set_error(OSSL_STORE_LOADER *loader,
+                                OSSL_STORE_error_fn error_function);
+typedef int (*OSSL_STORE_close_fn)(OSSL_STORE_LOADER_CTX *ctx);
+int OSSL_STORE_LOADER_set_close(OSSL_STORE_LOADER *loader,
+                                OSSL_STORE_close_fn close_function);
+void OSSL_STORE_LOADER_free(OSSL_STORE_LOADER *loader);
+
+int OSSL_STORE_register_loader(OSSL_STORE_LOADER *loader);
+OSSL_STORE_LOADER *OSSL_STORE_unregister_loader(const char *scheme);
+
+/*-
+ *  Functions to list STORE loaders
+ *  -------------------------------
+ */
+int OSSL_STORE_do_all_loaders(void (*do_function) (const OSSL_STORE_LOADER
+                                                   *loader, void *do_arg),
+                              void *do_arg);
+
+# ifdef  __cplusplus
 }
-#endif
+# endif
 #endif

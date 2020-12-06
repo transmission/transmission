@@ -49,6 +49,7 @@
 		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		5DC03AF1257D3892003D5E7F /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DC03AF0257D3892003D5E7F /* evutil_time.c */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -540,6 +541,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Torrent.m; sourceTree = "<group>"; };
 		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
+		5DC03AF0257D3892003D5E7F /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoWindowController.h; sourceTree = "<group>"; };
@@ -1696,6 +1698,7 @@
 				A2074F9812BEAAAF00F70985 /* evthread.c */,
 				A2074FA212BEAAC600F70985 /* evutil.c */,
 				A29E653513F1603100048D71 /* evutil_rand.c */,
+				5DC03AF0257D3892003D5E7F /* evutil_time.c */,
 				A2074FAA12BEAAFF00F70985 /* http.c */,
 				A2074FBE12BEAB9A00F70985 /* kqueue.c */,
 				A2074FB612BEAB1E00F70985 /* listener.c */,
@@ -2326,7 +2329,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e config.h -a ! ../../../macosx-libevent-config.h -ef config.h ]; then\n    ln -s ../../../macosx-libevent-config.h config.h;\nfi\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n";
+			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e config.h -a ! ../../../macosx-libevent-config.h -ef config.h ]; then\n    ln -s ../../../macosx-libevent-config.h config.h;\nfi\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n\ncd ..\n\nif [ ! -e evconfig-private.h -a ! ../../macosx-libevent-evconfig-private.h -ef evconfig-private.h ]; then\n    ln -s ../../macosx-libevent-evconfig-private.h evconfig-private.h;\nfi\n";
 		};
 		C12F197C1E1AE55A0005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2612,6 +2615,7 @@
 				A2074FC712BEABC800F70985 /* log.c in Sources */,
 				A2074FDE12BEAC5000F70985 /* signal.c in Sources */,
 				A207503512BEAD9C00F70985 /* select.c in Sources */,
+				5DC03AF1257D3892003D5E7F /* evutil_time.c in Sources */,
 				A207503712BEADA200F70985 /* poll.c in Sources */,
 				A20750B812BEB66900F70985 /* bufferevent_ratelim.c in Sources */,
 				A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */,
