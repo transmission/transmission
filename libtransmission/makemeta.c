@@ -433,6 +433,14 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 {
     tr_variant top;
 
+    /* fail early if we can't write the torrent file */
+    if (!tr_canWriteFile(builder->outputFile))
+    {
+        builder->my_errno = errno;
+        tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
+        builder->result = TR_MAKEMETA_IO_WRITE;
+    }
+
     /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
     for (int i = 0; i < builder->trackerCount && builder->result == TR_MAKEMETA_OK; ++i)
     {
