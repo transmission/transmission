@@ -85,6 +85,12 @@ char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GN
 int64_t tr_getDirFreeSpace(char const* path);
 
 /**
+ * @brief Returns wethter we can or not write on a file
+ * @return 1 if can write on file, 0 if we can't
+ */
+bool tr_canWriteFile(char const* path);
+
+/**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
  * @param timer         the timer to set
  * @param seconds       seconds to wait

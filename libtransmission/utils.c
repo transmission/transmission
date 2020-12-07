@@ -19,6 +19,7 @@
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
 #include <time.h> /* nanosleep() */
+#include <fcntl.h> /* open() */
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -401,6 +402,21 @@ int64_t tr_getDirFreeSpace(char const* dir)
     }
 
     return free_space;
+}
+
+bool tr_canWriteFile(char const* path)
+{
+    int fd = open(path, O_RDWR | O_CREAT | O_EXCL, 0644);
+    int open_error = errno;
+
+    if (fd > 0)
+    {
+        close(fd);
+        return 1;
+    }
+
+    /* if the file exists don't treat as error */
+    return open_error == EEXIST;
 }
 
 /****
