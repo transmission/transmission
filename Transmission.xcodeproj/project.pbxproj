@@ -49,6 +49,8 @@
 		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		5D4C1722258550DF00940E7C /* libcrypto.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5D4C1723258550E300940E7C /* libssl.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5DC03AF1257D3892003D5E7F /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DC03AF0257D3892003D5E7F /* evutil_time.c */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -471,6 +473,8 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */,
+				5D4C1722258550DF00940E7C /* libcrypto.dylib in Copy Files */,
+				5D4C1723258550E300940E7C /* libssl.dylib in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
