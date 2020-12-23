@@ -24,11 +24,6 @@
 
 @implementation NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnYosemiteOrBetter
-{
-    return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9;
-}
-
 - (BOOL) isOnMojaveOrBetter
 {
     return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_13;

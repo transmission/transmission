@@ -69,12 +69,6 @@
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setTitle: NSLocalizedString(@"Error", "Message window -> level string")];
     [[fLevelButton itemAtIndex: LEVEL_INFO] setTitle: NSLocalizedString(@"Info", "Message window -> level string")];
     [[fLevelButton itemAtIndex: LEVEL_DEBUG] setTitle: NSLocalizedString(@"Debug", "Message window -> level string")];
-    if (![NSApp isOnYosemiteOrBetter])
-    {
-        [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: [NSImage imageNamed: @"RedDotGlossy"]];
-        [[fLevelButton itemAtIndex: LEVEL_INFO] setImage: [NSImage imageNamed: @"YellowDotGlossy"]];
-        [[fLevelButton itemAtIndex: LEVEL_DEBUG] setImage: [NSImage imageNamed: @"PurpleDotGlossy"]];
-    }
 
     const CGFloat levelButtonOldWidth = NSWidth([fLevelButton frame]);
     [fLevelButton sizeToFit];
@@ -261,11 +255,11 @@
         switch (level)
         {
             case TR_LOG_ERROR:
-                return [NSImage imageNamed: ([NSApp isOnYosemiteOrBetter] ? @"RedDotFlat" : @"RedDotGlossy")];
+                return [NSImage imageNamed: @"RedDotFlat"];
             case TR_LOG_INFO:
-                return [NSImage imageNamed: ([NSApp isOnYosemiteOrBetter] ? @"YellowDotFlat" : @"YellowDotGlossy")];
+                return [NSImage imageNamed: @"YellowDotFlat"];
             case TR_LOG_DEBUG:
-                return [NSImage imageNamed: ([NSApp isOnYosemiteOrBetter] ? @"PurpleDotFlat" : @"PurpleDotGlossy")];
+                return [NSImage imageNamed: @"PurpleDotFlat"];
             default:
                 NSAssert1(NO, @"Unknown message log level: %ld", level);
                 return nil;

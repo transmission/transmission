@@ -1841,26 +1841,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
+            NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
             NSDictionary * quarantineProperties = @{ (NSString *)kLSQuarantineTypeKey : (NSString *)kLSQuarantineTypeOtherDownload };
-            if ([NSApp isOnYosemiteOrBetter])
-            {
-                NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
-                NSError * error = nil;
-                if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
-                    NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
-            }
-            else
-            {
-                NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
-                FSRef ref;
-                if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
-                {
-                    if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, (__bridge CFTypeRef)(quarantineProperties)) != noErr)
-                        NSLog(@"Failed to quarantine: %@", dataLocation);
-                }
-                else
-                    NSLog(@"Could not find file to quarantine: %@", dataLocation);
-            }
+            NSError * error = nil;
+            if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
+                NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
             break;
         }
         case TR_LEECH:
@@ -1991,25 +1976,17 @@ bool trashDataFile(const char * filename, tr_error ** error)
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
 
-    NSString * idleString;
-
-    if ([NSApp isOnYosemiteOrBetter]) {
-        static NSDateComponentsFormatter *formatter;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            formatter = [NSDateComponentsFormatter new];
-            formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
-            formatter.maximumUnitCount = 2;
-            formatter.collapsesLargestUnit = YES;
-            formatter.includesTimeRemainingPhrase = YES;
-        });
-
-        idleString = [formatter stringFromTimeInterval: eta];
-    }
-    else {
-        idleString = [NSString timeString: eta includesTimeRemainingPhrase: YES showSeconds: YES maxFields: 2];
-    }
-
+    static NSDateComponentsFormatter *formatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [NSDateComponentsFormatter new];
+        formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+        formatter.maximumUnitCount = 2;
+        formatter.collapsesLargestUnit = YES;
+        formatter.includesTimeRemainingPhrase = YES;
+    });
+    NSString * idleString = [formatter stringFromTimeInterval: eta];
+    
     if (fromIdle) {
         idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
     }
