@@ -12,9 +12,9 @@ replace_if_differs() {
 
 echo "creating libtransmission/version.h"
 
-user_agent_prefix=$(grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_agent_prefix | cut -d , -f 6)
+user_agent_prefix=$(grep 'set[(]TR_USER_AGENT_PREFIX' CMakeLists.txt | cut -d \" -f 2)
 
-peer_id_prefix=$(grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_prefix | cut -d , -f 6)
+peer_id_prefix=$(grep 'set[(]TR_PEER_ID_PREFIX' CMakeLists.txt | cut -d \" -f 2)
 
 major_version=$(echo "${user_agent_prefix}" | awk -F . '{print $1}')
 minor_version=$(echo "${user_agent_prefix}" | awk -F . '{print $2 + 0}')
