@@ -3760,10 +3760,7 @@ static void removeKeRangerRansomware()
         [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
-
-        if ([NSApp isOnYosemiteOrBetter]) {
-            segmentedControl.segmentStyle = NSSegmentStyleSeparated;
-        }
+        segmentedControl.segmentStyle = NSSegmentStyleSeparated;
 
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
@@ -3818,10 +3815,7 @@ static void removeKeRangerRansomware()
         [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
-
-        if ([NSApp isOnYosemiteOrBetter]) {
-            segmentedControl.segmentStyle = NSSegmentStyleSeparated;
-        }
+        segmentedControl.segmentStyle = NSSegmentStyleSeparated;
 
         [segmentedControl setSegmentCount: 2];
         [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
