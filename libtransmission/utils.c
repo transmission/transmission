@@ -15,6 +15,7 @@
 #include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
 #include <math.h> /* fabs(), floor() */
+#include <stdint.h> /* SIZE_MAX */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
