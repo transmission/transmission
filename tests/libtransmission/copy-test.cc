@@ -58,8 +58,8 @@ private:
 
             tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read, NULL);
 
-            TR_ASSERT(buf_pos + bytes_read <= buf_len);
-            TR_ASSERT(bytes_read <= bytes_remaining);
+            EXPECT_LE(buf_pos + bytes_read, buf_len);
+            EXPECT_LE(bytes_read, bytes_remaining);
             buf_pos += bytes_read;
             bytes_remaining -= bytes_read;
         }
