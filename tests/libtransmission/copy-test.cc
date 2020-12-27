@@ -7,6 +7,7 @@
  */
 
 #include "transmission.h"
+#include "error.h"
 #include "file.h"
 
 #include "test-fixtures.h"
@@ -32,8 +33,12 @@ protected:
 
         auto const path2 = tr_buildPath(sandboxDir().data(), filename2, NULL);
 
+        tr_error* err = nullptr;
         /* Copy it. */
-        EXPECT_TRUE(tr_sys_path_copy(path1, path2, NULL));
+        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
+
+        EXPECT_EQ(nullptr, err);
+        tr_error_clear(&err);
 
         EXPECT_TRUE(files_are_identical(path1, path2));
 
