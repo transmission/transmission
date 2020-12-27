@@ -513,7 +513,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
 
     size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
-    char* buf = tr_valloc(buflen);
+    char* buf = tr_malloc(buflen);
 
     while (file_size > 0)
     {
