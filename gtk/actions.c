@@ -39,8 +39,11 @@ static GtkRadioActionEntry sort_radio_entries[] =
     { "sort-by-size", NULL, N_("Sort by Si_ze"), NULL, NULL, 8 }
 };
 
-static void sort_changed_cb(GtkAction* action UNUSED, GtkRadioAction* current, gpointer user_data UNUSED)
+static void sort_changed_cb(GtkAction* action, GtkRadioAction* current, gpointer user_data)
 {
+    TR_UNUSED(action);
+    TR_UNUSED(user_data);
+
     tr_quark const key = TR_KEY_sort_mode;
     int const i = gtk_radio_action_get_current_value(current);
     char const* val = sort_radio_entries[i].name;
@@ -54,8 +57,10 @@ static GtkToggleActionEntry show_toggle_entries[] =
     { "toggle-message-log", NULL, N_("Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
-static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data UNUSED)
+static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     char const* key = gtk_action_get_name(GTK_ACTION(action));
     gboolean const val = gtk_toggle_action_get_active(action);
 
@@ -81,36 +86,37 @@ static GtkActionEntry entries[] =
     { "queue-menu", NULL, N_("_Queue"), NULL, NULL, NULL },
     { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
     { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
-    { "copy-magnet-link-to-clipboard", GTK_STOCK_COPY, N_("Copy _Magnet Link to Clipboard"), "", NULL, G_CALLBACK(action_cb) },
-    { "open-torrent-from-url", GTK_STOCK_OPEN, N_("Open _URL…"), "<control>U", N_("Open URL…"), G_CALLBACK(action_cb) },
-    { "open-torrent-toolbar", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
-    { "open-torrent-menu", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
-    { "torrent-start", GTK_STOCK_MEDIA_PLAY, N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
-    { "torrent-start-now", GTK_STOCK_MEDIA_PLAY, N_("Start _Now"), "<shift><control>S", N_("Start torrent now"),
+    { "copy-magnet-link-to-clipboard", "edit-copy", N_("Copy _Magnet Link to Clipboard"), "", NULL, G_CALLBACK(action_cb) },
+    { "open-torrent-from-url", "document-open", N_("Open _URL…"), "<control>U", N_("Open URL…"), G_CALLBACK(action_cb) },
+    { "open-torrent-toolbar", "document-open", N_("_Open"), NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
+    { "open-torrent-menu", "document-open", N_("_Open"), NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
+    { "torrent-start", "media-playback-start", N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
+    { "torrent-start-now", "media-playback-start", N_("Start _Now"), "<shift><control>S", N_("Start torrent now"),
         G_CALLBACK(action_cb) },
     { "show-stats", NULL, N_("_Statistics"), NULL, NULL, G_CALLBACK(action_cb) },
     { "donate", NULL, N_("_Donate"), NULL, NULL, G_CALLBACK(action_cb) },
     { "torrent-verify", NULL, N_("_Verify Local Data"), "<control>V", NULL, G_CALLBACK(action_cb) },
-    { "torrent-stop", GTK_STOCK_MEDIA_PAUSE, N_("_Pause"), "<control>P", N_("Pause torrent"), G_CALLBACK(action_cb) },
-    { "pause-all-torrents", GTK_STOCK_MEDIA_PAUSE, N_("_Pause All"), NULL, N_("Pause all torrents"), G_CALLBACK(action_cb) },
-    { "start-all-torrents", GTK_STOCK_MEDIA_PLAY, N_("_Start All"), NULL, N_("Start all torrents"), G_CALLBACK(action_cb) },
+    { "torrent-stop", "media-playback-pause", N_("_Pause"), "<control>P", N_("Pause torrent"), G_CALLBACK(action_cb) },
+    { "pause-all-torrents", "media-playback-pause", N_("_Pause All"), NULL, N_("Pause all torrents"), G_CALLBACK(action_cb) },
+    { "start-all-torrents", "media-playback-start", N_("_Start All"), NULL, N_("Start all torrents"), G_CALLBACK(action_cb) },
     { "relocate-torrent", NULL, N_("Set _Location…"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "remove-torrent", GTK_STOCK_REMOVE, NULL, "Delete", N_("Remove torrent"), G_CALLBACK(action_cb) },
-    { "delete-torrent", GTK_STOCK_DELETE, N_("_Delete Files and Remove"), "<shift>Delete", NULL, G_CALLBACK(action_cb) },
-    { "new-torrent", GTK_STOCK_NEW, N_("_New…"), NULL, N_("Create a torrent"), G_CALLBACK(action_cb) },
-    { "quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "select-all", GTK_STOCK_SELECT_ALL, N_("Select _All"), "<control>A", NULL, G_CALLBACK(action_cb) },
+    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", NULL, G_CALLBACK(action_cb) },
+    { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", NULL, G_CALLBACK(action_cb) },
+    { "new-torrent", "document-new", N_("_New…"), NULL, N_("Create a torrent"), G_CALLBACK(action_cb) },
+    { "quit", "application-exit", N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "select-all", "edit-select-all", N_("Select _All"), "<control>A", NULL, G_CALLBACK(action_cb) },
     { "deselect-all", NULL, N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
-    { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },
-    { "show-torrent-properties", GTK_STOCK_PROPERTIES, NULL, "<alt>Return", N_("Torrent properties"), G_CALLBACK(action_cb) },
-    { "open-torrent-folder", GTK_STOCK_OPEN, N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
-    { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
-    { "help", GTK_STOCK_HELP, N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
-    { "torrent-reannounce", GTK_STOCK_NETWORK, N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-top", GTK_STOCK_GOTO_TOP, N_("Move to _Top"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-up", GTK_STOCK_GO_UP, N_("Move _Up"), "<control>Up", NULL, G_CALLBACK(action_cb) },
-    { "queue-move-down", GTK_STOCK_GO_DOWN, N_("Move _Down"), "<control>Down", NULL, G_CALLBACK(action_cb) },
-    { "queue-move-bottom", GTK_STOCK_GOTO_BOTTOM, N_("Move to _Bottom"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "edit-preferences", "preferences-system", N_("_Preferences"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "show-torrent-properties", "document-properties", N_("_Properties"), "<alt>Return", N_("Torrent properties"), G_CALLBACK(
+        action_cb) },
+    { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
+    { "show-about-dialog", "help-about", N_("_About"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "help", "help-browser", N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
+    { "torrent-reannounce", "network-workgroup", N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "queue-move-top", "go-top", N_("Move to _Top"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "queue-move-up", "go-up", N_("Move _Up"), "<control>Up", NULL, G_CALLBACK(action_cb) },
+    { "queue-move-down", "go-down", N_("Move _Down"), "<control>Down", NULL, G_CALLBACK(action_cb) },
+    { "queue-move-bottom", "go-bottom", N_("Move to _Bottom"), NULL, NULL, G_CALLBACK(action_cb) },
     { "present-main-window", NULL, N_("Present Main Window"), NULL, NULL, G_CALLBACK(action_cb) }
 };
 

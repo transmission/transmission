@@ -21,20 +21,18 @@
 AboutDialog::AboutDialog(QWidget* parent) :
     BaseDialog(parent)
 {
-    ui.setupUi(this);
+    ui_.setupUi(this);
 
-    ui.iconLabel->setPixmap(qApp->windowIcon().pixmap(48));
-    ui.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QString::fromUtf8(LONG_VERSION_STRING)));
+    ui_.iconLabel->setPixmap(QApplication::windowIcon().pixmap(48));
+    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QStringLiteral(LONG_VERSION_STRING)));
 
-    QPushButton* b;
+    QPushButton const* b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
 
-    b = ui.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showCredits()));
+    b = ui_.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showLicense);
 
-    b = ui.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showLicense()));
-
-    ui.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
+    ui_.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
 }
 
 void AboutDialog::showCredits()
@@ -47,5 +45,5 @@ void AboutDialog::showCredits()
 
 void AboutDialog::showLicense()
 {
-    Utils::openDialog(myLicenseDialog, this);
+    Utils::openDialog(license_dialog_, this);
 }

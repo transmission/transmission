@@ -6,6 +6,9 @@ endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
+)
+include_directories(
+    SYSTEM
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
 )

@@ -16,8 +16,11 @@
 #include "completion.h" /* tr_completion */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
 #include "ptrarray.h"
+
+TR_BEGIN_DECLS
 
 struct tr_torrent_tiers;
 struct tr_magnet_info;
@@ -92,6 +95,10 @@ void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
 void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
+
+/** Return the mime-type (e.g. "audio/x-flac") that matches more of the
+    torrent's content than any other mime-type. */
+char const* tr_torrentPrimaryMimeType(tr_torrent const* tor);
 
 typedef enum
 {
@@ -366,7 +373,7 @@ uint32_t tr_getBlockSize(uint32_t pieceSize);
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 
 /**
- * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath;
+ * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath.
  *
  * If the file is found, "tr_buildPath(base, subpath, NULL)"
  * will generate the complete filename.
@@ -466,3 +473,5 @@ static inline tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
 {
     return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
+
+TR_END_DECLS

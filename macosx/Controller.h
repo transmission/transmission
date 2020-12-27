@@ -129,8 +129,6 @@ typedef enum
 - (void) openURL: (NSString *) urlString;
 - (void) openURLShowSheet: (id) sender;
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
-
 - (tr_session *) sessionHandle;
 
 - (void) createFile: (id) sender;
@@ -148,8 +146,6 @@ typedef enum
 - (void) stopTorrents:              (NSArray *) torrents;
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
-                        contextInfo: (void *) contextInfo;
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;

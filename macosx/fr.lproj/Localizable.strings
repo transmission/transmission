@@ -516,7 +516,7 @@
 "Last Announce" = "Dernière annonce";
 
 /* Tracker last scrape */
-"Last Scrape" = "Dernier scrape";
+"Last Scrape" = "Dernier moissonnage";
 
 /* Prefs -> blocklist -> message */
 "Last updated" = "Dernière mise à jour";
@@ -636,10 +636,10 @@
 "Once removed, continuing the transfers will require the torrent files or magnet links." = "Une fois supprimés, la reprise des transferts exigera les fichiers torrent ou les liens magnet.";
 
 /* Remove trackers alert -> message */
-"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Une fois supprimé, Transmission n’essayera plus de le contacter. Ceci ne peut être annulé.";
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Une fois supprimé, Transmission ne tentera plus de le contacter. Cette action est définitive.";
 
 /* Remove trackers alert -> message */
-"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Une fois supprimés, Transmission n’essayera plus de les contacter. Ceci ne peut être annulé.";
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Une fois supprimés, Transmission ne tentera plus de les contacter. Cette action est définitive.";
 
 /* File Outline -> Menu */
 "Only Check Selected" = "Cocher sélectionnés uniquement";
@@ -838,10 +838,10 @@
 "Save" = "Sauver";
 
 /* Tracker last scrape */
-"Scrape error" = "Erreur de scrape";
+"Scrape error" = "Erreur de moissonnage";
 
 /* Tracker last scrape */
-"Scrape timed out" = "Scrape échoué";
+"Scrape timed out" = "Le moissonnage est arrivé au bout de son délai";
 
 /* tracker peer stat */
 "Seeders" = "Propagateurs";
@@ -987,7 +987,7 @@
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Ce transfert ne peut être ajouté, car il est un doublon d’un transfert déjà existant.";
 
 /* Torrent disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert va être arrêté. Faites de la place sur %@ ou désélectionner des fichers dans l’inspecteur pour continuer.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera interrompu. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
 
 /* Create torrent -> blank address -> message */
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Le transfert ne contactera pas de traqueurs pour obtenir des pairs et ne devra dépendre que de méthodes de découverte décentralisées qui ne s’appuient pas sur les traqueurs, telles que PEX et DHT, pour télécharger et propager.";

@@ -20,6 +20,7 @@
 
 #include "net.h" /* tr_address */
 #include "peer-common.h"
+#include "peer-socket.h"
 #include "quark.h"
 
 /**
@@ -87,7 +88,7 @@ bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr
 
 void tr_peerMgrRebuildRequests(tr_torrent* torrent);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket socket);
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);
 
 tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
     size_t* setme_pex_count);
@@ -106,7 +107,8 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode, int max_peer_count);
+int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode,
+    int max_peer_count);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 
