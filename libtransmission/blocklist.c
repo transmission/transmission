@@ -221,13 +221,12 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
  */
 static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 {
-    char* walk;
     int b[4];
     int e[4];
     char str[64];
     tr_address addr;
 
-    walk = strrchr(line, ':');
+    char const* walk = strrchr(line, ':');
 
     if (walk == NULL)
     {

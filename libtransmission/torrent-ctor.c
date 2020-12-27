@@ -80,7 +80,7 @@ static void clearMetainfo(tr_ctor* ctor)
     setSourceFile(ctor, NULL);
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     int err;
 
@@ -151,12 +151,10 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         {
             char const* name;
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL))
+            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL) &&
+                !tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
             {
-                if (!tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
-                {
-                    name = NULL;
-                }
+                name = NULL;
             }
 
             if (tr_str_is_empty(name))
