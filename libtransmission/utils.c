@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
-#include <math.h> /* pow(), fabs(), floor() */
+#include <math.h> /* fabs(), floor() */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
