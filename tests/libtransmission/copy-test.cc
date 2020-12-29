@@ -21,7 +21,7 @@ namespace test
 class CopyTest : public SandboxedTest
 {
 protected:
-    void testImpl(char const* filename1, char const* filename2, const size_t file_length)
+    void testImpl(char const* filename1, char const* filename2, size_t const file_length)
     {
         auto const path1 = tr_buildPath(sandboxDir().data(), filename1, nullptr);
 
