@@ -20,8 +20,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <QuartzCore/QuartzCore.h>
-
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
 
@@ -32,37 +30,6 @@
 @end
 
 @implementation StatusBarView
-
-- (id) initWithFrame: (NSRect) rect
-{
-    if ((self = [super initWithFrame: rect]))
-    {
-        NSColor * lightColor = [NSColor colorWithCalibratedRed: 160.0/255.0 green: 160.0/255.0 blue: 160.0/255.0 alpha: 1.0];
-        NSColor * darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
-        fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        
-        CIFilter * randomFilter = [CIFilter filterWithName: @"CIRandomGenerator"];
-        [randomFilter setDefaults];
-        
-        fNoiseImage = [randomFilter valueForKey: @"outputImage"];
-        
-        CIFilter * monochromeFilter = [CIFilter filterWithName: @"CIColorMonochrome"];
-        [monochromeFilter setDefaults];
-        [monochromeFilter setValue: fNoiseImage forKey: @"inputImage"];
-        CIColor * monoFilterColor = [CIColor colorWithRed: 1.0 green: 1.0 blue: 1.0];
-        [monochromeFilter setValue: monoFilterColor forKey: @"inputColor"];
-        fNoiseImage = [monochromeFilter valueForKey:@"outputImage"];
-        
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: [self window]];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: [self window]];
-    }
-    return self;
-}
-
-- (void) dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-}
 
 - (BOOL) mouseDownCanMoveWindow
 {
