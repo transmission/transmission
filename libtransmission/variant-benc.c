@@ -13,9 +13,7 @@
 
 #include <event2/buffer.h>
 
-#include "ConvertUTF.h"
-
-#define __LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ptrarray.h"
@@ -39,8 +37,10 @@
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, int64_t* setme_val)
+int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme_end, int64_t* setme_val)
 {
+    uint8_t const* const buf = (uint8_t const*)vbuf;
+    uint8_t const* const bufend = (uint8_t const*)vbufend;
     char* endptr;
     void const* begin;
     void const* end;
@@ -88,9 +88,12 @@ int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
+int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme_end, uint8_t const** setme_str,
     size_t* setme_strlen)
 {
+    uint8_t const* const buf = (uint8_t const*)vbuf;
+    uint8_t const* const bufend = (uint8_t const*)vbufend;
+
     void const* end;
     size_t len;
     char* ulend;
@@ -99,19 +102,19 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
 
     if (buf >= bufend)
     {
-        goto err;
+        goto ERR;
     }
 
     if (!isdigit(*buf))
     {
-        goto err;
+        goto ERR;
     }
 
     end = memchr(buf, ':', bufend - buf);
 
     if (end == NULL)
     {
-        goto err;
+        goto ERR;
     }
 
     errno = 0;
@@ -119,7 +122,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
 
     if (errno != 0 || ulend != end || len > MAX_BENC_STR_LENGTH)
     {
-        goto err;
+        goto ERR;
     }
 
     strbegin = (uint8_t const*)end + 1;
@@ -127,7 +130,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
 
     if (strend < strbegin || strend > bufend)
     {
-        goto err;
+        goto ERR;
     }
 
     *setme_end = (uint8_t const*)end + 1 + len;
@@ -135,7 +138,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
     *setme_strlen = len;
     return 0;
 
-err:
+ERR:
     *setme_end = NULL;
     *setme_str = NULL;
     *setme_strlen = 0;
@@ -184,6 +187,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     uint8_t const* bufend = bufend_in;
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
     tr_quark key = 0;
+
+    if ((buf_in == NULL) || (bufend_in == NULL) || (top == NULL))
+    {
+        return EINVAL;
+    }
 
     tr_variantInit(top, 0);
 
@@ -361,18 +369,24 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveDictBeginFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveListBeginFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveContainerEndFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "e", 1);
 }
 

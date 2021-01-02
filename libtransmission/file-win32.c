@@ -251,9 +251,9 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
 
 static bool create_dir(char const* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_UNUSED(permissions);
 
-    (void)permissions;
+    TR_ASSERT(path != NULL);
 
     bool ret;
     DWORD error_code = ERROR_SUCCESS;
@@ -820,10 +820,10 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
 {
+    TR_UNUSED(permissions);
+
     TR_ASSERT(path != NULL);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
-
-    (void)permissions;
 
     tr_sys_file_t ret;
     DWORD native_access = 0;
@@ -1140,15 +1140,15 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 
 bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
 {
+    TR_UNUSED(handle);
+    TR_UNUSED(offset);
+    TR_UNUSED(size);
+    TR_UNUSED(advice);
+    TR_UNUSED(error);
+
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
     TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
-
-    (void)handle;
-    (void)offset;
-    (void)size;
-    (void)advice;
-    (void)error;
 
     bool ret = true;
 
@@ -1210,10 +1210,10 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 
 bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 {
+    TR_UNUSED(size);
+
     TR_ASSERT(address != NULL);
     TR_ASSERT(size > 0);
-
-    (void)size;
 
     bool ret = UnmapViewOfFile(address);
 

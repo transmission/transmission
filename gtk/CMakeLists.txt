@@ -1,5 +1,7 @@
 project(trgtk)
 
+add_compile_options(${C_WARNING_FLAGS})
+
 if(WITH_LIBAPPINDICATOR)
     add_definitions(-DHAVE_LIBAPPINDICATOR)
 endif()
@@ -35,8 +37,7 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
-        icons/hicolor_apps_24x24_transmission.png
-        icons/hicolor_apps_48x48_transmission.png
+        icons/hicolor_apps_scalable_transmission.svg
         icons/lock.png
         icons/ratio.png
         icons/turtle-blue.png
@@ -120,6 +121,9 @@ set(${PROJECT_NAME}_HEADERS
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+include_directories(
+    SYSTEM
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -167,6 +171,11 @@ target_link_libraries(${TR_NAME}-gtk
     ${EVENT2_LIBRARIES}
 )
 
+if(NOT MSVC)
+    # https://github.com/transmission/transmission/issues/1381 patches welcome
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+endif()
+
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
@@ -174,13 +183,8 @@ endif()
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
-    hicolor_apps_16x16_transmission.png
-    hicolor_apps_22x22_transmission.png
-    hicolor_apps_24x24_transmission.png
-    hicolor_apps_32x32_transmission.png
-    hicolor_apps_48x48_transmission.png
-    hicolor_apps_256x256_transmission.png
     hicolor_apps_scalable_transmission.svg
+    hicolor_apps_scalable_transmission-devel.svg
     hicolor_apps_symbolic_transmission-symbolic.svg
 )
 

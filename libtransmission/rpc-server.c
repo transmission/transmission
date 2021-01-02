@@ -65,6 +65,8 @@ struct tr_rpc_server
     tr_list* whitelist;
     tr_list* hostWhitelist;
     int loginattempts;
+    bool isAntiBruteForceEnabled;
+    int antiBruteForceThreshold;
 
     bool isStreamInitialized;
     z_stream stream;
@@ -182,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         /* first look for the session id */
         for (int i = 0; i < n; ++i)
         {
-            struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
+            struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
 
             if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
@@ -206,13 +208,13 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             for (int i = 0; i < n; ++i)
             {
-                struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
+                struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
                 size_t body_len = p->body_len;
                 tr_variant top;
                 tr_variant* args;
                 tr_variant test;
                 bool have_source = false;
-                char* body = p->body;
+                char const* body = p->body;
 
                 if (body_len >= 2 && memcmp(&body[body_len - 2], "\r\n", 2) == 0)
                 {
@@ -279,7 +281,8 @@ static char const* mimetype_guess(char const* path)
         { "html", "text/html" },
         { "ico", "image/vnd.microsoft.icon" },
         { "js", "application/javascript" },
-        { "png", "image/png" }
+        { "png", "image/png" },
+        { "svg", "image/svg+xml" }
     };
     char const* dot = strrchr(path, '.');
 
@@ -368,16 +371,20 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
 
 static void add_time_header(struct evkeyvalq* headers, char const* key, time_t value)
 {
+    char buf[128];
+    struct tm tm;
     /* According to RFC 2616 this must follow RFC 1123's date format,
        so use gmtime instead of localtime... */
-    char buf[128];
-    struct tm tm = *gmtime(&value);
+    tr_gmtime_r(&value, &tm);
     strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
     evhttp_add_header(headers, key, buf);
 }
 
-static void evbuffer_ref_cleanup_tr_free(void const* data UNUSED, size_t datalen UNUSED, void* extra)
+static void evbuffer_ref_cleanup_tr_free(void const* data, size_t datalen, void* extra)
 {
+    TR_UNUSED(data);
+    TR_UNUSED(datalen);
+
     tr_free(extra);
 }
 
@@ -476,8 +483,10 @@ struct rpc_response_data
     struct tr_rpc_server* server;
 };
 
-static void rpc_response_func(tr_session* session UNUSED, tr_variant* response, void* user_data)
+static void rpc_response_func(tr_session* session, tr_variant* response, void* user_data)
 {
+    TR_UNUSED(session);
+
     struct rpc_response_data* data = user_data;
     struct evbuffer* response_buf = tr_variantToBuf(response, TR_VARIANT_FMT_JSON_LEAN);
     struct evbuffer* buf = evbuffer_new();
@@ -634,7 +643,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->loginattempts == 100)
+        if (server->isAntiBruteForceEnabled && server->loginattempts >= server->antiBruteForceThreshold)
         {
             send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
@@ -674,7 +683,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            server->loginattempts++;
+            if (server->isAntiBruteForceEnabled)
+            {
+                server->loginattempts++;
+            }
+
             char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
                 server->loginattempts);
             send_simple_response(req, 401, unauthuser);
@@ -764,8 +777,11 @@ enum
 
 static void startServer(void* vserver);
 
-static void rpc_server_on_start_retry(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void rpc_server_on_start_retry(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     startServer(context);
 }
 
@@ -809,7 +825,7 @@ static void startServer(void* vserver)
 
     char const* address = tr_rpcGetBindAddress(server);
 
-    int const port = server->port;
+    tr_port const port = server->port;
 
     if (evhttp_bind_socket(httpd, address, port) == -1)
     {
@@ -1056,6 +1072,30 @@ char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
     return tr_address_to_string(&server->bindAddress);
 }
 
+bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server)
+{
+    return server->isAntiBruteForceEnabled;
+}
+
+void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool isEnabled)
+{
+    server->isAntiBruteForceEnabled = isEnabled;
+    if (!isEnabled)
+    {
+        server->loginattempts = 0;
+    }
+}
+
+int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server)
+{
+    return server->antiBruteForceThreshold;
+}
+
+void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
+{
+    server->antiBruteForceThreshold = badRequests;
+}
+
 /****
 *****  LIFE CYCLE
 ****/
@@ -1127,7 +1167,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        s->port = i;
+        s->port = (tr_port)i;
     }
 
     key = TR_KEY_rpc_url;
@@ -1218,6 +1258,28 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         tr_rpcSetPassword(s, str);
     }
 
+    key = TR_KEY_anti_brute_force_enabled;
+
+    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetAntiBruteForceEnabled(s, boolVal);
+    }
+
+    key = TR_KEY_anti_brute_force_threshold;
+
+    if (!tr_variantDictFindInt(settings, key, &i))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetAntiBruteForceThreshold(s, i);
+    }
+
     key = TR_KEY_rpc_bind_address;
 
     if (!tr_variantDictFindStr(settings, key, &str, NULL))
@@ -1253,6 +1315,12 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         {
             tr_logAddNamedInfo(MY_NAME, "%s", _("Password required"));
         }
+    }
+
+    char const* webClientDir = tr_getWebClientDir(s->session);
+    if (!tr_str_is_empty(webClientDir))
+    {
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
     }
 
     return s;

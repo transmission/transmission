@@ -251,7 +251,7 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     uint32_t offset = 0;
     bool success = true;
     size_t const buflen = tor->blockSize;
-    void* buffer = tr_valloc(buflen);
+    void* const buffer = tr_malloc(buflen);
     tr_sha1_ctx_t sha;
 
     TR_ASSERT(buffer != NULL);

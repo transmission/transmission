@@ -12,6 +12,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
+
 struct evbuffer;
 
 typedef struct tr_cache tr_cache;
@@ -49,3 +53,5 @@ int tr_cacheFlushDone(tr_cache* cache);
 int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent);
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t file);
+
+TR_END_DECLS

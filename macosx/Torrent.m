@@ -264,7 +264,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     //if data existed in original download location, unexclude it before changing the location
     [self setTimeMachineExclude: NO];
 
-    tr_torrentSetDownloadDir(fHandle, [folder fileSystemRepresentation]);
+    tr_torrentSetDownloadDir(fHandle, [folder UTF8String]);
 
     fDownloadFolderDetermination = determinationType;
 }
@@ -562,7 +562,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     }
 
     volatile int status;
-    tr_torrentSetLocation(fHandle, [folder fileSystemRepresentation], YES, NULL, &status);
+    tr_torrentSetLocation(fHandle, [folder UTF8String], YES, NULL, &status);
 
     while (status == TR_LOC_MOVING) //block while moving (for now)
         [NSThread sleepForTimeInterval: 0.05];
@@ -846,7 +846,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSDictionary * contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
 
     NSString * oldPath = [[node path] stringByAppendingPathComponent: [node name]];
-    tr_torrentRenamePath(fHandle, [oldPath fileSystemRepresentation], [newName UTF8String], renameCallback, (__bridge_retained void *)(contextInfo));
+    tr_torrentRenamePath(fHandle, [oldPath UTF8String], [newName UTF8String], renameCallback, (__bridge_retained void *)(contextInfo));
 }
 
 - (CGFloat) progress
@@ -1662,13 +1662,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
         if (downloadFolder)
-            tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder fileSystemRepresentation]);
+            tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder UTF8String]);
         if (incompleteFolder)
-            tr_ctorSetIncompleteDir(ctor, [incompleteFolder fileSystemRepresentation]);
+            tr_ctorSetIncompleteDir(ctor, [incompleteFolder UTF8String]);
 
         tr_parse_result result = TR_PARSE_ERR;
         if (path)
-            result = tr_ctorSetMetainfoFromFile(ctor, [path fileSystemRepresentation]);
+            result = tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
 
         if (result != TR_PARSE_OK && magnetAddress)
             result = tr_ctorSetMetainfoFromMagnetLink(ctor, [magnetAddress UTF8String]);
@@ -1841,26 +1841,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
+            NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
             NSDictionary * quarantineProperties = @{ (NSString *)kLSQuarantineTypeKey : (NSString *)kLSQuarantineTypeOtherDownload };
-            if ([NSApp isOnYosemiteOrBetter])
-            {
-                NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
-                NSError * error = nil;
-                if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
-                    NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
-            }
-            else
-            {
-                NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
-                FSRef ref;
-                if (FSPathMakeRef((const UInt8 *)[dataLocation fileSystemRepresentation], &ref, NULL) == noErr)
-                {
-                    if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, (__bridge CFTypeRef)(quarantineProperties)) != noErr)
-                        NSLog(@"Failed to quarantine: %@", dataLocation);
-                }
-                else
-                    NSLog(@"Could not find file to quarantine: %@", dataLocation);
-            }
+            NSError * error = nil;
+            if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
+                NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
             break;
         }
         case TR_LEECH:
@@ -1991,25 +1976,17 @@ bool trashDataFile(const char * filename, tr_error ** error)
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
 
-    NSString * idleString;
-
-    if ([NSApp isOnYosemiteOrBetter]) {
-        static NSDateComponentsFormatter *formatter;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            formatter = [NSDateComponentsFormatter new];
-            formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
-            formatter.maximumUnitCount = 2;
-            formatter.collapsesLargestUnit = YES;
-            formatter.includesTimeRemainingPhrase = YES;
-        });
-
-        idleString = [formatter stringFromTimeInterval: eta];
-    }
-    else {
-        idleString = [NSString timeString: eta includesTimeRemainingPhrase: YES showSeconds: YES maxFields: 2];
-    }
-
+    static NSDateComponentsFormatter *formatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [NSDateComponentsFormatter new];
+        formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+        formatter.maximumUnitCount = 2;
+        formatter.collapsesLargestUnit = YES;
+        formatter.includesTimeRemainingPhrase = YES;
+    });
+    NSString * idleString = [formatter stringFromTimeInterval: eta];
+    
     if (fromIdle) {
         idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
     }

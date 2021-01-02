@@ -38,8 +38,6 @@ static int const base32Lookup[] =
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static int const base32LookupLen = TR_N_ELEMENTS(base32Lookup);
-
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     TR_ASSERT(inlen == 32);
@@ -48,13 +46,15 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 
     memset(out, 0, 20);
 
-    for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
+    size_t index = 0;
+    size_t offset = 0;
+    for (size_t i = 0; i < inlen; ++i)
     {
         int digit;
         int lookup = in[i] - '0';
 
         /* Skip chars outside the lookup table */
-        if (lookup < 0 || lookup >= base32LookupLen)
+        if (lookup < 0)
         {
             continue;
         }
@@ -174,7 +174,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 }
             }
 
-            if (vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
+            if (displayName == NULL && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
             {
                 displayName = tr_http_unescape(val, vallen);
             }
@@ -211,6 +211,20 @@ tr_magnet_info* tr_magnetParse(char const* uri)
         info->webseedCount = wsCount;
         info->webseeds = tr_memdup(ws, sizeof(char*) * wsCount);
         memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
+    }
+    else
+    {
+        for (int i = 0; i < trCount; i++)
+        {
+            tr_free(tr[i]);
+        }
+
+        for (int i = 0; i < wsCount; i++)
+        {
+            tr_free(ws[i]);
+        }
+
+        tr_free(displayName);
     }
 
     return info;

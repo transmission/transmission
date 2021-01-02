@@ -1,8 +1,3 @@
 FROM alpine
 
-RUN apk add --no-cache \
-        npm \
-        perl \
-        uncrustify \
-    && npm install -g \
-        js-beautify
+RUN apk add --no-cache bash git perl uncrustify yarn 

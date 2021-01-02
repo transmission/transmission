@@ -8,10 +8,12 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <string_view>
 
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QTextCodec>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -19,16 +21,19 @@
 
 #include "CustomVariantType.h"
 #include "Prefs.h"
-#include "Utils.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::getValue;
 
 /***
 ****
 ***/
 
-Prefs::PrefItem Prefs::myItems[] =
+std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
 {
     /* gui settings */
-    { OPTIONS_PROMPT, TR_KEY_show_options_window, QVariant::Bool },
+    PrefItem{ OPTIONS_PROMPT, TR_KEY_show_options_window, QVariant::Bool },
     { OPEN_DIALOG_FOLDER, TR_KEY_open_dialog_dir, QVariant::String },
     { INHIBIT_HIBERNATION, TR_KEY_inhibit_desktop_hibernation, QVariant::Bool },
     { DIR_WATCH, TR_KEY_watch_dir, QVariant::String },
@@ -121,98 +126,153 @@ Prefs::PrefItem Prefs::myItems[] =
     { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int }
 };
 
+namespace
+{
+
+auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>
+{{
+    { FilterMode::SHOW_ALL, "show-all" },
+    { FilterMode::SHOW_ACTIVE, "show-active" },
+    { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
+    { FilterMode::SHOW_SEEDING, "show-seeding" },
+    { FilterMode::SHOW_PAUSED, "show-paused" },
+    { FilterMode::SHOW_FINISHED, "show-finished" },
+    { FilterMode::SHOW_VERIFYING, "show-verifying" },
+    { FilterMode::SHOW_ERROR, "show-error" }
+}};
+
+auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>
+{{
+    { SortMode::SORT_BY_NAME, "sort-by-name" },
+    { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
+    { SortMode::SORT_BY_AGE, "sort-by-age" },
+    { SortMode::SORT_BY_ETA, "sort-by-eta" },
+    { SortMode::SORT_BY_PROGRESS, "sort-by-progress" },
+    { SortMode::SORT_BY_QUEUE, "sort-by-queue" },
+    { SortMode::SORT_BY_RATIO, "sort-by-ratio" },
+    { SortMode::SORT_BY_SIZE, "sort-by-size" },
+    { SortMode::SORT_BY_STATE, "sort-by-state" },
+    { SortMode::SORT_BY_ID, "sort-by-id" }
+}};
+
+bool isValidUtf8(QByteArray const& byteArray)
+{
+    auto const* const codec = QTextCodec::codecForName("UTF-8");
+    auto state = QTextCodec::ConverterState {};
+    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
+    return state.invalidChars == 0;
+}
+
+} // namespace
+
 /***
 ****
 ***/
 
-Prefs::Prefs(QString const& configDir) :
-    myConfigDir(configDir)
+Prefs::Prefs(QString config_dir) :
+    config_dir_(std::move(config_dir))
 {
-    assert(sizeof(myItems) / sizeof(myItems[0]) == PREFS_COUNT);
+    static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
 #ifndef NDEBUG
-
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        assert(myItems[i].id == i);
+        assert(Items[i].id == i);
     }
 
 #endif
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    myTemporaryPrefs << FILTER_TEXT;
+    temporary_prefs_ << FILTER_TEXT;
 
     tr_variant top;
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
-    tr_sessionLoadSettings(&top, myConfigDir.toUtf8().constData(), nullptr);
+    tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        double d;
-        bool boolVal;
-        int64_t intVal;
-        char const* str;
-        size_t strLen;
-        tr_variant* b(tr_variantDictFind(&top, myItems[i].key));
+        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
 
-        switch (myItems[i].type)
+        switch (Items[i].type)
         {
         case QVariant::Int:
-            if (tr_variantGetInt(b, &intVal))
             {
-                myValues[i].setValue(static_cast<qlonglong>(intVal));
+                auto const value = getValue<int64_t>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case CustomVariantType::SortModeType:
-            if (tr_variantGetStr(b, &str, nullptr))
             {
-                myValues[i] = QVariant::fromValue(SortMode(QString::fromUtf8(str)));
+                auto const value = getValue<std::string_view>(b);
+                if (value)
+                {
+                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    // NOLINTNEXTLINE(readability-qualified-auto)
+                    auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
+                    auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
+                    values_[i] = QVariant::fromValue(SortMode(pair.first));
+                }
             }
-
             break;
 
         case CustomVariantType::FilterModeType:
-            if (tr_variantGetStr(b, &str, nullptr))
             {
-                myValues[i] = QVariant::fromValue(FilterMode(QString::fromUtf8(str)));
+                auto const value = getValue<std::string_view>(b);
+                if (value)
+                {
+                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    // NOLINTNEXTLINE(readability-qualified-auto)
+                    auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
+                    auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                    values_[i] = QVariant::fromValue(FilterMode(pair.first));
+                }
             }
-
             break;
 
         case QVariant::String:
-            if (tr_variantGetStr(b, &str, &strLen))
             {
-                myValues[i].setValue(QString::fromUtf8(str, strLen));
+                auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::Bool:
-            if (tr_variantGetBool(b, &boolVal))
             {
-                myValues[i].setValue(static_cast<bool>(boolVal));
+                auto const value = getValue<bool>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::Double:
-            if (tr_variantGetReal(b, &d))
             {
-                myValues[i].setValue(d);
+                auto const value = getValue<double>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::DateTime:
-            if (tr_variantGetInt(b, &intVal))
             {
-                myValues[i].setValue(QDateTime::fromTime_t(intVal));
+                auto const value = getValue<time_t>(b);
+                if (value)
+                {
+                    values_[i].setValue(QDateTime::fromTime_t(*value));
+                }
             }
-
             break;
 
         default:
@@ -232,55 +292,56 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (myTemporaryPrefs.contains(i))
+        if (temporary_prefs_.contains(i))
         {
             continue;
         }
 
-        tr_quark const key = myItems[i].key;
-        QVariant const& val = myValues[i];
+        tr_quark const key = Items[i].key;
+        QVariant const& val = values_[i];
 
-        switch (myItems[i].type)
+        switch (Items[i].type)
         {
         case QVariant::Int:
-            tr_variantDictAddInt(&current_settings, key, val.toInt());
+            dictAdd(&current_settings, key, val.toInt());
             break;
 
         case CustomVariantType::SortModeType:
-            tr_variantDictAddStr(&current_settings, key, val.value<SortMode>().name().toUtf8().constData());
-            break;
-
-        case CustomVariantType::FilterModeType:
-            tr_variantDictAddStr(&current_settings, key, val.value<FilterMode>().name().toUtf8().constData());
-            break;
-
-        case QVariant::String:
             {
-                QByteArray const ba(val.toByteArray());
-                char const* s = ba.constData();
-
-                if (Utils::isValidUtf8(s))
-                {
-                    tr_variantDictAddStr(&current_settings, key, s);
-                }
-                else
-                {
-                    tr_variantDictAddStr(&current_settings, key, val.toString().toUtf8().constData());
-                }
-
+                auto const mode = val.value<SortMode>().mode();
+                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
+                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
+                dictAdd(&current_settings, key, pair.second);
                 break;
             }
 
+        case CustomVariantType::FilterModeType:
+            {
+                auto const mode = val.value<FilterMode>().mode();
+                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
+                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                dictAdd(&current_settings, key, pair.second);
+                break;
+            }
+
+        case QVariant::String:
+            dictAdd(&current_settings, key, val.toString());
+            break;
+
         case QVariant::Bool:
-            tr_variantDictAddBool(&current_settings, key, val.toBool());
+            dictAdd(&current_settings, key, val.toBool());
             break;
 
         case QVariant::Double:
-            tr_variantDictAddReal(&current_settings, key, val.toDouble());
+            dictAdd(&current_settings, key, val.toDouble());
             break;
 
         case QVariant::DateTime:
-            tr_variantDictAddInt(&current_settings, key, val.toDateTime().toTime_t());
+            dictAdd(&current_settings, key, val.toDateTime().toTime_t());
             break;
 
         default:
@@ -291,7 +352,7 @@ Prefs::~Prefs()
 
     // update settings.json with our settings
     tr_variant file_settings;
-    QFile const file(QDir(myConfigDir).absoluteFilePath(QLatin1String("settings.json")));
+    QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
     if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
@@ -310,48 +371,59 @@ Prefs::~Prefs()
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-void Prefs::initDefaults(tr_variant* d)
+void Prefs::initDefaults(tr_variant* d) const
 {
+    auto constexpr FilterMode = std::string_view { "all" };
+    auto constexpr SessionHost = std::string_view { "localhost" };
+    auto constexpr SessionPassword = std::string_view { "" };
+    auto constexpr SessionUsername = std::string_view { "" };
+    auto constexpr SortMode = std::string_view { "sort-by-name" };
+    auto constexpr SoundCommand =
+        std::string_view { "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" };
+    auto constexpr StatsMode = std::string_view { "total-ratio" };
+    auto constexpr WindowLayout = std::string_view { "menu,toolbar,filter,list,statusbar" };
+
+    auto const download_dir = std::string_view { tr_getDefaultDownloadDir() };
+
     tr_variantDictReserve(d, 38);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_compact_view, false);
-    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
-    tr_variantDictAddBool(d, TR_KEY_prompt_before_exit, true);
-    tr_variantDictAddBool(d, TR_KEY_remote_session_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_remote_session_requres_authentication, false);
-    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
-    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
-    tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
-    tr_variantDictAddBool(d, TR_KEY_start_minimized, false);
-    tr_variantDictAddBool(d, TR_KEY_show_options_window, true);
-    tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
-    tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
-    tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_torrent_complete_sound_command,
-        "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
-    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_blocklist_date, 0);
-    tr_variantDictAddInt(d, TR_KEY_main_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
-    tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
-    tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
-    tr_variantDictAddInt(d, TR_KEY_remote_session_port, atoi(TR_DEFAULT_RPC_PORT_STR));
-    tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
-    tr_variantDictAddStr(d, TR_KEY_filter_mode, "all");
-    tr_variantDictAddStr(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath().toUtf8());
-    tr_variantDictAddStr(d, TR_KEY_remote_session_host, "localhost");
-    tr_variantDictAddStr(d, TR_KEY_remote_session_password, "");
-    tr_variantDictAddStr(d, TR_KEY_remote_session_username, "");
-    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name");
-    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, tr_getDefaultDownloadDir());
+    dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
+    dictAdd(d, TR_KEY_compact_view, false);
+    dictAdd(d, TR_KEY_inhibit_desktop_hibernation, false);
+    dictAdd(d, TR_KEY_prompt_before_exit, true);
+    dictAdd(d, TR_KEY_remote_session_enabled, false);
+    dictAdd(d, TR_KEY_remote_session_requres_authentication, false);
+    dictAdd(d, TR_KEY_show_backup_trackers, false);
+    dictAdd(d, TR_KEY_show_extra_peer_details, false);
+    dictAdd(d, TR_KEY_show_filterbar, true);
+    dictAdd(d, TR_KEY_show_notification_area_icon, false);
+    dictAdd(d, TR_KEY_start_minimized, false);
+    dictAdd(d, TR_KEY_show_options_window, true);
+    dictAdd(d, TR_KEY_show_statusbar, true);
+    dictAdd(d, TR_KEY_show_toolbar, true);
+    dictAdd(d, TR_KEY_show_tracker_scrapes, false);
+    dictAdd(d, TR_KEY_sort_reversed, false);
+    dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
+    dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
+    dictAdd(d, TR_KEY_torrent_complete_sound_command, SoundCommand);
+    dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
+    dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
+    dictAdd(d, TR_KEY_watch_dir_enabled, false);
+    dictAdd(d, TR_KEY_blocklist_date, 0);
+    dictAdd(d, TR_KEY_main_window_height, 500);
+    dictAdd(d, TR_KEY_main_window_width, 300);
+    dictAdd(d, TR_KEY_main_window_x, 50);
+    dictAdd(d, TR_KEY_main_window_y, 50);
+    dictAdd(d, TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
+    dictAdd(d, TR_KEY_download_dir, download_dir);
+    dictAdd(d, TR_KEY_filter_mode, FilterMode);
+    dictAdd(d, TR_KEY_main_window_layout_order, WindowLayout);
+    dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath());
+    dictAdd(d, TR_KEY_remote_session_host, SessionHost);
+    dictAdd(d, TR_KEY_remote_session_password, SessionPassword);
+    dictAdd(d, TR_KEY_remote_session_username, SessionUsername);
+    dictAdd(d, TR_KEY_sort_mode, SortMode);
+    dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
+    dictAdd(d, TR_KEY_watch_dir, download_dir);
 }
 
 /***
@@ -360,39 +432,39 @@ void Prefs::initDefaults(tr_variant* d)
 
 bool Prefs::getBool(int key) const
 {
-    assert(myItems[key].type == QVariant::Bool);
-    return myValues[key].toBool();
+    assert(Items[key].type == QVariant::Bool);
+    return values_[key].toBool();
 }
 
 QString Prefs::getString(int key) const
 {
-    assert(myItems[key].type == QVariant::String);
-    QByteArray const b = myValues[key].toByteArray();
+    assert(Items[key].type == QVariant::String);
+    QByteArray const b = values_[key].toByteArray();
 
-    if (Utils::isValidUtf8(b.constData()))
+    if (isValidUtf8(b.constData()))
     {
-        myValues[key].setValue(QString::fromUtf8(b.constData()));
+        values_[key].setValue(QString::fromUtf8(b.constData()));
     }
 
-    return myValues[key].toString();
+    return values_[key].toString();
 }
 
 int Prefs::getInt(int key) const
 {
-    assert(myItems[key].type == QVariant::Int);
-    return myValues[key].toInt();
+    assert(Items[key].type == QVariant::Int);
+    return values_[key].toInt();
 }
 
 double Prefs::getDouble(int key) const
 {
-    assert(myItems[key].type == QVariant::Double);
-    return myValues[key].toDouble();
+    assert(Items[key].type == QVariant::Double);
+    return values_[key].toDouble();
 }
 
 QDateTime Prefs::getDateTime(int key) const
 {
-    assert(myItems[key].type == QVariant::DateTime);
-    return myValues[key].toDateTime();
+    assert(Items[key].type == QVariant::DateTime);
+    return values_[key].toDateTime();
 }
 
 /***

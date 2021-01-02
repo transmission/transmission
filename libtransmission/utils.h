@@ -13,10 +13,9 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /***
 ****
@@ -60,6 +59,8 @@ char const* tr_strip_positional_args(char const* fmt);
 ****/
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
+
+char const* tr_get_mime_type_for_filename(char const* filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
@@ -180,8 +181,6 @@ void* tr_memdup(void const* src, size_t byteCount);
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 /* *INDENT-ON* */
 
-void* tr_valloc(size_t bufLen);
-
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -207,11 +206,6 @@ static inline bool tr_str_is_empty(char const* value)
     return value == NULL || *value == '\0';
 }
 
-/**
- * @brief like memcmp() but gracefully handles NULL pointers
- */
-int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
-
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
@@ -229,10 +223,10 @@ char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2)
 char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
-size_t tr_strlcpy(char* dst, void const* src, size_t siz);
+size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
-int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
+int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
 /** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
     @param errnum the error number to describe */
@@ -254,14 +248,17 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
+/** @brief Concatenates array of strings with delimiter in between elements */
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
+
 /***
 ****
 ***/
 
 int compareInt(void const* va, void const* vb);
 
-void tr_binary_to_hex(void const* input, char* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(char const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -321,6 +318,9 @@ char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
 
+/** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
+struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
+
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 int tr_gettimeofday(struct timeval* tv);
 
@@ -331,7 +331,7 @@ int tr_gettimeofday(struct timeval* tv);
 bool tr_moveFile(char const* oldpath, char const* newpath, struct tr_error** error) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to remove an item from an array */
-void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t sizeof_element, size_t nmemb);
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb);
 
 /***
 ****
@@ -373,30 +373,30 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-extern unsigned int tr_speed_K;
-extern unsigned int tr_mem_K;
-extern unsigned int tr_size_K;
+extern size_t tr_speed_K;
+extern size_t tr_mem_K;
+extern size_t tr_size_K;
 
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
 
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
 
 /* format a memory size from MB into a user-readable string. */
 static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
 {
-    return tr_formatter_mem_B(buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 
@@ -419,12 +419,6 @@ char* tr_env_get_string(char const* key, char const* default_value);
 
 void tr_net_init(void);
 
-/***
-****
-***/
-
-#ifdef __cplusplus
-}
-#endif
-
 /** @} */
+
+TR_END_DECLS

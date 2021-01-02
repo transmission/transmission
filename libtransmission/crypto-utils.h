@@ -13,12 +13,10 @@
 #include <stddef.h>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 /**
 *** @addtogroup utils Utilities
@@ -193,7 +191,7 @@ void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 /**
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
+static inline void tr_sha1_to_hex(void* hex, void const* sha1)
 {
     tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);
 }
@@ -201,15 +199,13 @@ static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_hex_to_sha1(uint8_t* sha1, char const* hex)
+static inline void tr_hex_to_sha1(void* sha1, void const* hex)
 {
     tr_hex_to_binary(hex, sha1, SHA_DIGEST_LENGTH);
 }
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS
 
 #endif /* TR_CRYPTO_UTILS_H */
