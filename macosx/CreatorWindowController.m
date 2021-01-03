@@ -465,7 +465,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     [panel setMessage: NSLocalizedString(@"Select a file or folder for the torrent file.", "Create torrent -> select file")];
 
-    BOOL success = [panel runModal] == NSOKButton;
+    BOOL success = [panel runModal] == NSModalResponseOK;
     return success ? [panel URLs][0] : nil;
 }
 
