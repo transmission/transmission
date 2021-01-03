@@ -1332,17 +1332,6 @@ static void removeKeRangerRansomware()
     }
 }
 
-- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    if (returnCode == 1)
-    {
-        NSString * urlString = [fUrlSheetController urlString];
-        [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
-    }
-
-    fUrlSheetController = nil;
-}
-
 - (void) createFile: (id) sender
 {
     [CreatorWindowController createTorrentFile: fLib];
