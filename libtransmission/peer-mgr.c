@@ -79,7 +79,10 @@ enum
     /* */
     NO_BLOCKS_CANCEL_HISTORY = 120,
     /* */
-    CANCEL_HISTORY_SEC = 60
+    CANCEL_HISTORY_SEC = 60,
+    /* UPLOAD/DOWNLOAD RATE SMOOTHING, 1 = no smoothing, upwards increases smoothing */
+    SMOOTHING_RATE_UP = (5 / 4),
+    SMOOTHING_RATE_DOWN = (3 / 2)
 };
 
 tr_peer_event const TR_PEER_EVENT_INIT =
@@ -2800,8 +2803,31 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->progress = peer->progress;
         stat->isUTP = tr_peerMsgsIsUtpConnection(msgs);
         stat->isEncrypted = tr_peerMsgsIsEncrypted(msgs);
-        stat->rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-        stat->rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+        // The rates jump around a lot, so smooth them out. We are considering this a data collection issue rather than
+        // presentation issue, and so are smoothing here rather than within the respective UIs.
+        double newRateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
+        if (newRateToPeer_KBps > stat->rateToPeer_KBps)
+        {
+            stat->rateToPeer_KBps = stat->rateToPeer_KBps + ((newRateToPeer_KBps - stat->rateToPeer_KBps) / SMOOTHING_RATE_UP);
+        }
+        else
+        {
+            stat->rateToPeer_KBps = stat->rateToPeer_KBps +
+                ((newRateToPeer_KBps - stat->rateToPeer_KBps) / SMOOTHING_RATE_DOWN);
+        }
+
+        double newRateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+        if (newRateToClient_KBps > stat->rateToClient_KBps)
+        {
+            stat->rateToClient_KBps = stat->rateToClient_KBps +
+                ((newRateToClient_KBps - stat->rateToClient_KBps) / SMOOTHING_RATE_UP);
+        }
+        else
+        {
+            stat->rateToClient_KBps = stat->rateToClient_KBps +
+                ((newRateToClient_KBps - stat->rateToClient_KBps) / SMOOTHING_RATE_DOWN);
+        }
+
         stat->peerIsChoked = tr_peerMsgsIsPeerChoked(msgs);
         stat->peerIsInterested = tr_peerMsgsIsPeerInterested(msgs);
         stat->clientIsChoked = tr_peerMsgsIsClientChoked(msgs);
