@@ -1319,19 +1319,17 @@ static void removeKeRangerRansomware()
     {
         fUrlSheetController = [[URLSheetWindowController alloc] initWithController: self];
 
-        [NSApp beginSheet: [fUrlSheetController window] modalForWindow: fWindow modalDelegate: self didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
+        [fWindow beginSheet: fUrlSheetController.window completionHandler:^(NSModalResponse returnCode) {
+            if (returnCode == 1)
+            {
+                NSString * urlString = [fUrlSheetController urlString];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self openURL: urlString];
+                });
+            }
+            fUrlSheetController = nil;
+        }];
     }
-}
-
-- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    if (returnCode == 1)
-    {
-        NSString * urlString = [fUrlSheetController urlString];
-        [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
-    }
-
-    fUrlSheetController = nil;
 }
 
 - (void) createFile: (id) sender

@@ -146,7 +146,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     BlocklistDownloader * downloader = [BlocklistDownloader downloader];
     [downloader setViewController: self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text
 
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
+    [fPrefsController.window beginSheet: fStatusWindow completionHandler:nil];
 }
 
 @end
