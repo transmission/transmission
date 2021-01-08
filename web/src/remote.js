@@ -176,7 +176,7 @@ export class Remote {
   removeTracker(torrentId, trackerid) {
     const arguments_ = {
       ids: [torrentId],
-      trackerRemove: [trackerid]
+      trackerRemove: [trackerid],
     };
     this.sendRequest(
       {

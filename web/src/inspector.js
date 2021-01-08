@@ -706,7 +706,6 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-
       tor.getTrackers().forEach((tracker, index) => {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
@@ -778,7 +777,10 @@ export class Inspector extends EventTarget {
         function ondeleteclick(torrentid, trackerid) {
           controller.remote.removeTracker(torrentid, trackerid);
         }
-        button.addEventListener('click', ondeleteclick.bind(this, tor.getId(), tracker.tier));
+        button.addEventListener(
+          'click',
+          ondeleteclick.bind(this, tor.getId(), tracker.tier)
+        );
         tier_div.append(button);
 
         rows.push(tier_div);
