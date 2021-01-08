@@ -173,6 +173,22 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
+  removeTracker(torrentId, trackerid) {
+    const arguments_ = {
+      ids: [torrentId],
+      trackerRemove: [trackerid]
+    };
+    this.sendRequest(
+      {
+        arguments: arguments_,
+        method: 'torrent-set',
+      },
+      () => {
+        this._controller.refreshTorrents([torrentId]);
+      }
+    );
+  }
+
   sendTorrentActionRequests(method, torrent_ids, callback, context) {
     this.sendTorrentSetRequests(method, torrent_ids, null, callback, context);
   }

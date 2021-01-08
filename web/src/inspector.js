@@ -690,7 +690,7 @@ export class Inspector extends EventTarget {
   _updateTiers() {
     const na = 'N/A';
     const { list } = this.elements.tiers;
-    const { torrents } = this;
+    const { controller, torrents } = this;
 
     const rows = [];
     for (const tor of torrents) {
@@ -705,6 +705,7 @@ export class Inspector extends EventTarget {
         setTextContent(title, tor.getName());
         rows.push(title);
       }
+
 
       tor.getTrackers().forEach((tracker, index) => {
         const announceState = Inspector.getAnnounceState(tracker);
@@ -771,6 +772,14 @@ export class Inspector extends EventTarget {
           }`
         );
         tier_div.append(element);
+        const button = document.createElement('button');
+        button.classList.add('tracker-delete-button');
+        button.textContent = 'Delete ';
+        function ondeleteclick(torrentid, trackerid) {
+          controller.remote.removeTracker(torrentid, trackerid);
+        }
+        button.addEventListener('click', ondeleteclick.bind(this, tor.getId(), tracker.tier));
+        tier_div.append(button);
 
         rows.push(tier_div);
       });
