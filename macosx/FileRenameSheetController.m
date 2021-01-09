@@ -10,29 +10,20 @@
 #import "FileListNode.h"
 #import "Torrent.h"
 
-typedef void (^CompletionBlock)(BOOL);
-
 @interface FileRenameSheetController ()
 
 @property (nonatomic, strong) Torrent * torrent;
 @property (nonatomic, strong) FileListNode * node;
-@property (nonatomic, copy) CompletionBlock completionHandler;
-
 @property (nonatomic, copy) NSString * originalName;
 
 @end
 
 @implementation FileRenameSheetController
-
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize torrent = _torrent;
-@synthesize node = _node;
-@synthesize completionHandler = _completionHandler;
-@synthesize originalName = _originalName;
-@synthesize labelField = _labelField;
-@synthesize inputField = _inputField;
-@synthesize renameButton = _renameButton;
-@synthesize cancelButton = _cancelButton;
+{
+    Torrent * _torrent;
+    FileListNode * _node;
+    NSString * _originalName;
+}
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
 {
@@ -42,9 +33,11 @@ typedef void (^CompletionBlock)(BOOL);
     FileRenameSheetController * renamer = [[FileRenameSheetController alloc] initWithWindowNibName: @"FileRenameSheetController"];
 
     renamer.torrent = torrent;
-    renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
+    [window beginSheet:[renamer window] completionHandler:^(NSModalResponse returnCode) {
+        completionHandler(returnCode == NSModalResponseOK);
+        [[renamer window] orderOut:self];
+    }];
 }
 
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
@@ -56,21 +49,12 @@ typedef void (^CompletionBlock)(BOOL);
 
     renamer.torrent = [node torrent];
     renamer.node = node;
-    renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
+    [window beginSheet:[renamer window] completionHandler:^(NSModalResponse returnCode) {
+        completionHandler(returnCode == NSModalResponseOK);
+        [[renamer window] orderOut:self];
+    }];
 }
-
-+ (void) sheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    FileRenameSheetController * renamer = (__bridge_transfer FileRenameSheetController *)(contextInfo);
-    NSParameterAssert([renamer isKindOfClass:[FileRenameSheetController class]]);
-
-    renamer.completionHandler(returnCode == NSOKButton);
-
-    [sheet orderOut: self];
-}
-
 
 - (void) windowDidLoad
 {
@@ -114,7 +98,7 @@ typedef void (^CompletionBlock)(BOOL);
 {
     void (^completionHandler)(BOOL) = ^(BOOL didRename) {
         if (didRename)
-            [NSApp endSheet: [self window] returnCode: NSOKButton];
+            [[[self window] sheetParent] endSheet:[self window] returnCode:NSModalResponseOK];
         else
         {
             #warning more thorough error
@@ -130,7 +114,7 @@ typedef void (^CompletionBlock)(BOOL);
 
 - (IBAction) cancelRename: (id) sender
 {
-    [NSApp endSheet: [self window] returnCode: NSCancelButton];
+    [[[self window] sheetParent] endSheet:[self window] returnCode:NSModalResponseCancel];
 }
 
 - (void) controlTextDidChange: (NSNotification *) notification
