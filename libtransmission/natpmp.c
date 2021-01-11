@@ -30,32 +30,7 @@ static char const* getKey(void)
     return _("Port Forwarding (NAT-PMP)");
 }
 
-typedef enum
-{
-    TR_NATPMP_IDLE,
-    TR_NATPMP_ERR,
-    TR_NATPMP_DISCOVER,
-    TR_NATPMP_RECV_PUB,
-    TR_NATPMP_SEND_MAP,
-    TR_NATPMP_RECV_MAP,
-    TR_NATPMP_SEND_UNMAP,
-    TR_NATPMP_RECV_UNMAP
-}
-tr_natpmp_state;
 
-struct tr_natpmp
-{
-    bool has_discovered;
-    bool is_mapped;
-
-    tr_port public_port;
-    tr_port private_port;
-
-    time_t renew_time;
-    time_t command_time;
-    tr_natpmp_state state;
-    natpmp_t natpmp;
-};
 
 /**
 ***
@@ -110,7 +85,7 @@ static void setCommandTime(struct tr_natpmp* nat)
     nat->command_time = tr_time() + COMMAND_WAIT_SECS;
 }
 
-int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
+int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port, tr_port *real_private_port)
 {
     int ret;
 
@@ -230,6 +205,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
     {
     case TR_NATPMP_IDLE:
         *public_port = nat->public_port;
+        *real_private_port = nat->private_port;
         return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
     case TR_NATPMP_DISCOVER:
