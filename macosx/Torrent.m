@@ -130,8 +130,35 @@ bool trashDataFile(const char * filename, tr_error ** error)
 }
 
 @implementation Torrent
+{
+    tr_torrent * fHandle;
+    const tr_info * fInfo;
+    const tr_stat * fStat;
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
+    NSUserDefaults * fDefaults;
+
+    NSImage * fIcon;
+
+    NSString * fHashString;
+
+    tr_file_stat * fFileStat;
+    NSArray * fFileList, * fFlatFileList;
+
+    NSIndexSet * fPreviousFinishedIndexes;
+    NSDate * fPreviousFinishedIndexesDate;
+
+    BOOL fRemoveWhenFinishSeeding;
+
+    NSInteger fGroupValue;
+    TorrentDeterminationType fGroupValueDetermination;
+
+    TorrentDeterminationType fDownloadFolderDetermination;
+
+    BOOL fResumeOnWake;
+
+    BOOL fTimeMachineExcludeInitialized;
+}
+
 @synthesize removeWhenFinishSeeding = fRemoveWhenFinishSeeding;
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete

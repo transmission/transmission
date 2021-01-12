@@ -29,8 +29,18 @@
 @end
 
 @implementation FileListNode
+{
+    NSMutableIndexSet * fIndexes;
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
+    NSString * fName;
+    NSString * fPath;
+    Torrent * __weak fTorrent;
+    uint64_t fSize;
+    NSImage * fIcon;
+    BOOL fIsFolder;
+    NSMutableArray * fChildren;
+}
+
 @synthesize name = fName;
 @synthesize path = fPath;
 @synthesize torrent = fTorrent;

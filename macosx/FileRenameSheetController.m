@@ -23,16 +23,12 @@ typedef void (^CompletionBlock)(BOOL);
 @end
 
 @implementation FileRenameSheetController
-
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize torrent = _torrent;
-@synthesize node = _node;
-@synthesize completionHandler = _completionHandler;
-@synthesize originalName = _originalName;
-@synthesize labelField = _labelField;
-@synthesize inputField = _inputField;
-@synthesize renameButton = _renameButton;
-@synthesize cancelButton = _cancelButton;
+{
+    Torrent * _torrent;
+    FileListNode * _node;
+    void (^_completionHandler)(BOOL);
+    NSString * _originalName;
+}
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
 {

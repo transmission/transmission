@@ -234,8 +234,51 @@ static void removeKeRangerRansomware()
 }
 
 @implementation Controller
+{
+    tr_session                      * fLib;
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
+    NSMutableArray                  * fTorrents, * fDisplayedTorrents;
+
+    PrefsController                 * fPrefsController;
+    InfoWindowController            * fInfoController;
+    MessageWindowController         * fMessageController;
+
+    NSUserDefaults                  * fDefaults;
+
+    NSString                        * fConfigDirectory;
+
+    DragOverlayWindow               * fOverlayWindow;
+
+    io_connect_t                    fRootPort;
+    NSTimer                         * fTimer;
+
+    VDKQueue                        * fFileWatcherQueue;
+
+    StatusBarController             * fStatusBar;
+
+    FilterBarController             * fFilterBar;
+
+    QLPreviewPanel                  * fPreviewPanel;
+    BOOL                            fQuitting;
+    BOOL                            fQuitRequested;
+    BOOL                            fPauseOnLaunch;
+
+    Badger                          * fBadger;
+
+    NSMutableArray                  * fAutoImportedNames;
+    NSTimer                         * fAutoImportTimer;
+
+    NSMutableDictionary             * fPendingTorrentDownloads;
+
+    NSMutableSet                    * fAddingTransfers;
+
+    NSMutableSet                    * fAddWindows;
+    URLSheetWindowController        * fUrlSheetController;
+
+    BOOL                            fGlobalPopoverShown;
+    BOOL                            fSoundPlaying;
+}
+
 @synthesize prefsController = fPrefsController;
 @synthesize messageWindowController = fMessageController;
 @synthesize fileWatcherQueue = fFileWatcherQueue;
