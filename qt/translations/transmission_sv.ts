@@ -1038,7 +1038,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Toolbar</source>
-        <translation>Ve%rktygsfält</translation>
+        <translation>Verktygsfält</translation>
     </message>
     <message>
         <location line="+8"/>
