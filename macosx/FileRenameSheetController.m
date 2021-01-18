@@ -23,12 +23,6 @@ typedef void (^CompletionBlock)(BOOL);
 @end
 
 @implementation FileRenameSheetController
-{
-    Torrent * _torrent;
-    FileListNode * _node;
-    void (^_completionHandler)(BOOL);
-    NSString * _originalName;
-}
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
 {

@@ -239,7 +239,6 @@ static void removeKeRangerRansomware()
 
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
 
-    PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
     MessageWindowController         * fMessageController;
 
@@ -251,8 +250,6 @@ static void removeKeRangerRansomware()
 
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
-
-    VDKQueue                        * fFileWatcherQueue;
 
     StatusBarController             * fStatusBar;
 
@@ -278,10 +275,6 @@ static void removeKeRangerRansomware()
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;
 }
-
-@synthesize prefsController = fPrefsController;
-@synthesize messageWindowController = fMessageController;
-@synthesize fileWatcherQueue = fFileWatcherQueue;
 
 + (void) initialize
 {
@@ -485,10 +478,10 @@ static void removeKeRangerRansomware()
         fInfoController = [[InfoWindowController alloc] init];
 
         //needs to be done before init-ing the prefs controller
-        fFileWatcherQueue = [[VDKQueue alloc] init];
-        [fFileWatcherQueue setDelegate: self];
+        _fileWatcherQueue = [[VDKQueue alloc] init];
+        [_fileWatcherQueue setDelegate: self];
 
-        fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
+        _prefsController = [[PrefsController alloc] initWithHandle: fLib];
 
         fQuitting = NO;
         fGlobalPopoverShown = NO;
@@ -860,7 +853,7 @@ static void removeKeRangerRansomware()
     [self updateTorrentHistory];
     [fTableView saveCollapsedGroups];
     
-    fFileWatcherQueue = nil;
+    _fileWatcherQueue = nil;
 
     //complete cleanup
     tr_sessionClose(fLib);
@@ -1842,7 +1835,7 @@ static void removeKeRangerRansomware()
 
 - (void) showPreferenceWindow: (id) sender
 {
-    NSWindow * window = [fPrefsController window];
+    NSWindow * window = [_prefsController window];
     if (![window isVisible])
         [window center];
 
@@ -4675,7 +4668,7 @@ static void removeKeRangerRansomware()
                     break;
 
                 case TR_RPC_SESSION_CHANGED:
-                    [fPrefsController rpcUpdatePrefs];
+                    [_prefsController rpcUpdatePrefs];
                     break;
 
                 case TR_RPC_SESSION_CLOSE:

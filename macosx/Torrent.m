@@ -147,8 +147,6 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
 
-    BOOL fRemoveWhenFinishSeeding;
-
     NSInteger fGroupValue;
     TorrentDeterminationType fGroupValueDetermination;
 
@@ -158,8 +156,6 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     BOOL fTimeMachineExcludeInitialized;
 }
-
-@synthesize removeWhenFinishSeeding = fRemoveWhenFinishSeeding;
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib
@@ -257,7 +253,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             @"Active": @([self isActive]),
             @"WaitToStart": @([self waitingToStart]),
             @"GroupValue": @(fGroupValue),
-            @"RemoveWhenFinishSeeding": @(fRemoveWhenFinishSeeding)};
+            @"RemoveWhenFinishSeeding": @(_removeWhenFinishSeeding)};
 }
 
 - (void) dealloc
@@ -1744,7 +1740,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         fGroupValue = [[GroupsController groups] groupIndexForTorrent: self];
     }
 
-    fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
+    _removeWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
