@@ -91,7 +91,7 @@ static void natPulse(tr_shared* s, bool do_check)
 
     oldStatus = tr_sharedTraversalStatus(s);
 
-    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port,&received_private_port);
+    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
     {
