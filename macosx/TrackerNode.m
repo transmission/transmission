@@ -25,16 +25,16 @@
 #import "NSStringAdditions.h"
 
 @implementation TrackerNode
-
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize torrent = fTorrent;
+{
+    tr_tracker_stat fStat;
+}
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {
         fStat = *stat;
-        fTorrent = torrent; //weak reference
+        _torrent = torrent; //weak reference
     }
 
     return self;
