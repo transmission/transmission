@@ -11,8 +11,8 @@
 #include <QMap>
 
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Prefs.h"
-
 #include "ui_PrefsDialog.h"
 
 class QHttp;
@@ -25,29 +25,10 @@ class Session;
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
-    virtual ~PrefsDialog();
-
-private:
-    using key2widget_t = QMap<int, QWidget*>;
-
-private:
-    bool updateWidgetValue(QWidget* widget, int prefKey);
-    void linkWidgetToPref(QWidget* widget, int prefKey);
-    void updateBlocklistLabel();
-    void updateDownloadingWidgetsLocality();
-
-    void setPref(int key, QVariant const& v);
-
-    void initDownloadingTab();
-    void initSeedingTab();
-    void initSpeedTab();
-    void initPrivacyTab();
-    void initNetworkTab();
-    void initDesktopTab();
-    void initRemoteTab();
 
 private slots:
     void checkBoxToggled(bool checked);
@@ -70,25 +51,42 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
+    using key2widget_t = QMap<int, QWidget*>;
 
-    Ui::PrefsDialog ui;
+    bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    void linkWidgetToPref(QWidget* widget, int pref_key);
+    void updateBlocklistLabel();
+    void updateDownloadingWidgetsLocality();
 
-    bool const myIsServer;
-    bool myIsLocal;
+    void setPref(int key, QVariant const& v);
 
-    key2widget_t myWidgets;
-    QWidgetList myWebWidgets;
-    QWidgetList myWebAuthWidgets;
-    QWidgetList myWebWhitelistWidgets;
-    QWidgetList myProxyWidgets;
-    QWidgetList myProxyAuthWidgets;
-    QWidgetList mySchedWidgets;
-    QWidgetList myBlockWidgets;
-    QWidgetList myUnsupportedWhenRemote;
+    void initDownloadingTab();
+    void initSeedingTab();
+    void initSpeedTab();
+    void initPrivacyTab();
+    void initNetworkTab();
+    void initDesktopTab();
+    void initRemoteTab();
 
-    int myBlocklistHttpTag;
-    QHttp* myBlocklistHttp;
-    QMessageBox* myBlocklistDialog;
+    Session& session_;
+    Prefs& prefs_;
+
+    Ui::PrefsDialog ui_ = {};
+
+    bool const is_server_;
+    bool is_local_ = {};
+
+    key2widget_t widgets_;
+    QWidgetList web_widgets_;
+    QWidgetList web_auth_widgets_;
+    QWidgetList web_whitelist_widgets_;
+    QWidgetList proxy_widgets_;
+    QWidgetList proxy_auth_widgets_;
+    QWidgetList sched_widgets_;
+    QWidgetList block_widgets_;
+    QWidgetList unsupported_when_remote_;
+
+    int blocklist_http_tag_ = {};
+    QHttp* blocklist_http_ = {};
+    QMessageBox* blocklist_dialog_ = {};
 };

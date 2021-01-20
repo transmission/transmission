@@ -11,9 +11,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/select.h>
 #endif
 
 #include <curl/curl.h>
@@ -30,6 +27,7 @@
 #include "platform.h" /* mutex */
 #include "session.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h" /* User-Agent */
@@ -115,7 +113,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     /* webseed downloads should be speed limited */
     if (task->torrentId != -1)
     {
-        tr_torrent* tor = tr_torrentFindFromId(task->session, task->torrentId);
+        tr_torrent const* const tor = tr_torrentFindFromId(task->session, task->torrentId);
 
         if (tor != NULL && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
         {
@@ -131,9 +129,11 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose UNUSED)
+static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 {
-    struct tr_web_task* task = vtask;
+    TR_UNUSED(purpose);
+
+    struct tr_web_task const* const task = vtask;
     bool const isScrape = strstr(task->url, "scrape") != NULL;
     bool const isAnnounce = strstr(task->url, "announce") != NULL;
 
@@ -142,8 +142,10 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose U
     {
         int const sndbuf = isScrape ? 4096 : 1024;
         int const rcvbuf = isScrape ? 4096 : 3072;
-        setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
-        setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
+        /* ignore the sockopt() return values -- these are suggestions
+           rather than hard requirements & it's OK for them to fail */
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
     }
 
     /* return nonzero if this function encountered an error */
@@ -154,8 +156,8 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose U
 
 static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 {
-    (void)curl;
-    (void)user_data;
+    TR_UNUSED(curl);
+    TR_UNUSED(user_data);
 
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == NULL)
@@ -391,49 +393,14 @@ struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char cons
     return tr_webRunImpl(tor->session, tr_torrentId(tor), url, range, NULL, done_func, done_func_user_data, buffer);
 }
 
-/**
- * Portability wrapper for select().
- *
- * http://msdn.microsoft.com/en-us/library/ms740141%28VS.85%29.aspx
- * On win32, any two of the parameters, readfds, writefds, or exceptfds,
- * can be given as null. At least one must be non-null, and any non-null
- * descriptor set must contain at least one handle to a socket.
- */
-static void tr_select(int nfds, fd_set* r_fd_set, fd_set* w_fd_set, fd_set* c_fd_set, struct timeval* t)
-{
-#ifdef _WIN32
-
-    (void)nfds;
-
-    if (r_fd_set->fd_count == 0 && w_fd_set->fd_count == 0 && c_fd_set->fd_count == 0)
-    {
-        long int const msec = t->tv_sec * 1000 + t->tv_usec / 1000;
-        tr_wait_msec(msec);
-    }
-    else if (select(0, r_fd_set->fd_count != 0 ? r_fd_set : NULL, w_fd_set->fd_count != 0 ? w_fd_set : NULL,
-        c_fd_set->fd_count != 0 ? c_fd_set : NULL, t) == -1)
-    {
-        char errstr[512];
-        int const e = EVUTIL_SOCKET_ERROR();
-        tr_net_strerror(errstr, sizeof(errstr), e);
-        dbgmsg("Error: select (%d) %s", e, errstr);
-    }
-
-#else
-
-    select(nfds, r_fd_set, w_fd_set, c_fd_set, t);
-
-#endif
-}
-
 static void tr_webThreadFunc(void* vsession)
 {
     char* str;
     CURLM* multi;
     struct tr_web* web;
     int taskCount = 0;
-    struct tr_web_task* task;
     tr_session* session = vsession;
+    uint32_t repeats = 0;
 
     /* try to enable ssl for https support; but if that fails,
      * try a plain vanilla init */
@@ -473,6 +440,7 @@ static void tr_webThreadFunc(void* vsession)
     for (;;)
     {
         long msec;
+        int numfds;
         int unused;
         CURLMsg* msg;
         CURLMcode mcode;
@@ -493,13 +461,12 @@ static void tr_webThreadFunc(void* vsession)
         while (web->tasks != NULL)
         {
             /* pop the task */
-            task = web->tasks;
+            struct tr_web_task* task = web->tasks;
             web->tasks = task->next;
             task->next = NULL;
 
             dbgmsg("adding task to curl: [%s]", task->url);
             curl_multi_add_handle(multi, createEasy(session, web, task));
-            // fprintf(stderr, "adding a task.. taskCount is now %d\n", taskCount);
             ++taskCount;
         }
 
@@ -538,28 +505,27 @@ static void tr_webThreadFunc(void* vsession)
 
         if (msec > 0)
         {
-            int usec;
-            int max_fd;
-            struct timeval t;
-            fd_set r_fd_set;
-            fd_set w_fd_set;
-            fd_set c_fd_set;
-
-            max_fd = 0;
-            FD_ZERO(&r_fd_set);
-            FD_ZERO(&w_fd_set);
-            FD_ZERO(&c_fd_set);
-            curl_multi_fdset(multi, &r_fd_set, &w_fd_set, &c_fd_set, &max_fd);
-
             if (msec > THREADFUNC_MAX_SLEEP_MSEC)
             {
                 msec = THREADFUNC_MAX_SLEEP_MSEC;
             }
 
-            usec = msec * 1000;
-            t.tv_sec = usec / 1000000;
-            t.tv_usec = usec % 1000000;
-            tr_select(max_fd + 1, &r_fd_set, &w_fd_set, &c_fd_set, &t);
+            curl_multi_wait(multi, NULL, 0, msec, &numfds);
+            if (!numfds)
+            {
+                repeats++;
+                if (repeats > 1)
+                {
+                    /* curl_multi_wait() returns immediately if there are
+                     * no fds to wait for, so we need an explicit wait here
+                     * to emulate select() behavior */
+                    tr_wait_msec(MIN(msec, THREADFUNC_MAX_SLEEP_MSEC / 2));
+                }
+            }
+            else
+            {
+                repeats = 0;
+            }
         }
 
         /* call curl_multi_perform() */
@@ -600,7 +566,7 @@ static void tr_webThreadFunc(void* vsession)
      * This is rare, but can happen on shutdown with unresponsive trackers. */
     while (web->tasks != NULL)
     {
-        task = web->tasks;
+        struct tr_web_task* task = web->tasks;
         web->tasks = task->next;
         dbgmsg("Discarding task \"%s\"", task->url);
         task_free(task);
@@ -632,9 +598,18 @@ void tr_webClose(tr_session* session, tr_web_close_mode close_mode)
     }
 }
 
-void tr_webGetTaskInfo(struct tr_web_task* task, tr_web_task_info info, void* dst)
+long tr_webGetTaskResponseCode(struct tr_web_task* task)
 {
-    curl_easy_getinfo(task->curl_easy, (CURLINFO)info, dst);
+    long code = 0;
+    curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
+    return code;
+}
+
+char const* tr_webGetTaskRealUrl(struct tr_web_task* task)
+{
+    char* url = NULL;
+    curl_easy_getinfo(task->curl_easy, CURLINFO_EFFECTIVE_URL, &url);
+    return url;
 }
 
 /*****

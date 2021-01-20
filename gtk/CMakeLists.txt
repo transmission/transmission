@@ -1,5 +1,7 @@
 project(trgtk)
 
+add_compile_options(${C_WARNING_FLAGS})
+
 if(WITH_LIBAPPINDICATOR)
     add_definitions(-DHAVE_LIBAPPINDICATOR)
 endif()
@@ -119,6 +121,9 @@ set(${PROJECT_NAME}_HEADERS
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+include_directories(
+    SYSTEM
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -165,6 +170,11 @@ target_link_libraries(${TR_NAME}-gtk
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+if(NOT MSVC)
+    # https://github.com/transmission/transmission/issues/1381 patches welcome
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+endif()
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")

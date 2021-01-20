@@ -28,18 +28,18 @@ int getHSpacing(QWidget const* w)
 
 FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo) :
     QItemDelegate(parent),
-    myCombo(combo)
+    combo_(combo)
 {
 }
 
 bool FilterBarComboBoxDelegate::isSeparator(QModelIndex const& index)
 {
-    return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1String("separator");
+    return index.data(Qt::AccessibleDescriptionRole).toString() == QStringLiteral("separator");
 }
 
 void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIndex const& index)
 {
-    model->setData(index, QString::fromLatin1("separator"), Qt::AccessibleDescriptionRole);
+    model->setData(index, QStringLiteral("separator"), Qt::AccessibleDescriptionRole);
 
     if (auto* m = qobject_cast<QStandardItemModel*>(model))
     {
@@ -63,39 +63,39 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
         QStyleOption opt;
         opt.rect = rect;
-        myCombo->style()->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &opt, painter, myCombo);
+        combo_->style()->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &opt, painter, combo_);
     }
     else
     {
-        QStyleOptionViewItem disabledOption = option;
-        QPalette::ColorRole const disabledColorRole = (disabledOption.state & QStyle::State_Selected) != 0 ?
+        QStyleOptionViewItem disabled_option = option;
+        QPalette::ColorRole const disabled_color_role = (disabled_option.state & QStyle::State_Selected) != 0 ?
             QPalette::HighlightedText : QPalette::Text;
-        disabledOption.palette.setColor(disabledColorRole, Utils::getFadedColor(disabledOption.palette.color(
-            disabledColorRole)));
+        disabled_option.palette.setColor(disabled_color_role, Utils::getFadedColor(disabled_option.palette.color(
+            disabled_color_role)));
 
-        QRect boundingBox = option.rect;
+        QRect bounding_box = option.rect;
 
-        int const hmargin = getHSpacing(myCombo);
-        boundingBox.adjust(hmargin, 0, -hmargin, 0);
+        int const hmargin = getHSpacing(combo_);
+        bounding_box.adjust(hmargin, 0, -hmargin, 0);
 
-        QRect decorationRect = rect(option, index, Qt::DecorationRole);
-        decorationRect.setSize(myCombo->iconSize());
-        decorationRect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter, decorationRect.size(),
-            boundingBox);
-        Utils::narrowRect(boundingBox, decorationRect.width() + hmargin, 0, option.direction);
+        QRect decoration_rect = rect(option, index, Qt::DecorationRole);
+        decoration_rect.setSize(combo_->iconSize());
+        decoration_rect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter, decoration_rect.size(),
+            bounding_box);
+        Utils::narrowRect(bounding_box, decoration_rect.width() + hmargin, 0, option.direction);
 
-        QRect countRect = rect(option, index, FilterBarComboBox::CountStringRole);
-        countRect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter, countRect.size(), boundingBox);
-        Utils::narrowRect(boundingBox, 0, countRect.width() + hmargin, option.direction);
-        QRect const displayRect = boundingBox;
+        QRect count_rect = rect(option, index, FilterBarComboBox::CountStringRole);
+        count_rect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter, count_rect.size(), bounding_box);
+        Utils::narrowRect(bounding_box, 0, count_rect.width() + hmargin, option.direction);
+        QRect const display_rect = bounding_box;
 
         QIcon const icon = Utils::getIconFromIndex(index);
 
         drawBackground(painter, option, index);
-        icon.paint(painter, decorationRect, Qt::AlignCenter, StyleHelper::getIconMode(option.state), QIcon::Off);
-        drawDisplay(painter, option, displayRect, index.data(Qt::DisplayRole).toString());
-        drawDisplay(painter, disabledOption, countRect, index.data(FilterBarComboBox::CountStringRole).toString());
-        drawFocus(painter, option, displayRect | countRect);
+        icon.paint(painter, decoration_rect, Qt::AlignCenter, StyleHelper::getIconMode(option.state), QIcon::Off);
+        drawDisplay(painter, option, display_rect, index.data(Qt::DisplayRole).toString());
+        drawDisplay(painter, disabled_option, count_rect, index.data(FilterBarComboBox::CountStringRole).toString());
+        drawFocus(painter, option, display_rect | count_rect);
     }
 }
 
@@ -103,16 +103,16 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
 {
     if (isSeparator(index))
     {
-        int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, myCombo);
+        int const pm = combo_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, combo_);
         return QSize(pm, pm + 10);
     }
 
-    QStyle* s = myCombo->style();
-    int const hmargin = getHSpacing(myCombo);
+    QStyle* s = combo_->style();
+    int const hmargin = getHSpacing(combo_);
 
     QSize size = QItemDelegate::sizeHint(option, index);
-    size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));
-    size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, myCombo);
+    size.setHeight(qMax(size.height(), combo_->iconSize().height() + 6));
+    size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, combo_);
     size.rwidth() += rect(option, index, FilterBarComboBox::CountStringRole).width();
     size.rwidth() += hmargin * 4;
     return size;

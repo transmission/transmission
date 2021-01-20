@@ -24,6 +24,14 @@
 
 @implementation PrefsWindow
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    if (@available(macOS 11.0, *)) {
+        self.toolbarStyle = NSWindowToolbarStylePreference;
+    }
+}
+
 - (void) keyDown: (NSEvent *) event
 {
     if ([event keyCode] == 53) //esc key

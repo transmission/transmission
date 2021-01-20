@@ -113,15 +113,15 @@ tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent
     uint8_t const* torrentHash, bool isSeed, bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    struct tr_peer_socket socket);
+    struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io))
 
 void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io))
 
 #define PEER_IO_MAGIC_NUMBER 206745
 
@@ -182,9 +182,7 @@ static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
     return io->session;
 }
 
-char const* tr_peerIoAddrStr(struct tr_address const* addr, tr_port port);
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io);
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 

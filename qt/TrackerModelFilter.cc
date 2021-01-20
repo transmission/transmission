@@ -10,20 +10,19 @@
 #include "TrackerModelFilter.h"
 
 TrackerModelFilter::TrackerModelFilter(QObject* parent) :
-    QSortFilterProxyModel(parent),
-    myShowBackups(false)
+    QSortFilterProxyModel(parent)
 {
 }
 
 void TrackerModelFilter::setShowBackupTrackers(bool b)
 {
-    myShowBackups = b;
+    show_backups_ = b;
     invalidateFilter();
 }
 
-bool TrackerModelFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const
+bool TrackerModelFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    auto const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
-    return myShowBackups || !trackerInfo.st.isBackup;
+    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+    auto const tracker_info = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    return show_backups_ || !tracker_info.st.is_backup;
 }

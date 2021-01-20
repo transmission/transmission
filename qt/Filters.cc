@@ -8,54 +8,33 @@
 
 #include "Filters.h"
 
-QString const FilterMode::names[NUM_MODES] =
+// NB: if you change this function, update TorrentFields too
+bool FilterMode::test(Torrent const& tor, int mode)
 {
-    QLatin1String("show-all"),
-    QLatin1String("show-active"),
-    QLatin1String("show-downloading"),
-    QLatin1String("show-seeding"),
-    QLatin1String("show-paused"),
-    QLatin1String("show-finished"),
-    QLatin1String("show-verifying"),
-    QLatin1String("show-error")
-};
-
-int FilterMode::modeFromName(QString const& name)
-{
-    for (int i = 0; i < NUM_MODES; ++i)
+    switch (mode)
     {
-        if (names[i] == name)
-        {
-            return i;
-        }
+    case SHOW_ACTIVE:
+        return tor.peersWeAreUploadingTo() > 0 || tor.peersWeAreDownloadingFrom() > 0 || tor.isVerifying();
+
+    case SHOW_DOWNLOADING:
+        return tor.isDownloading() || tor.isWaitingToDownload();
+
+    case SHOW_ERROR:
+        return tor.hasError();
+
+    case SHOW_FINISHED:
+        return tor.isFinished();
+
+    case SHOW_PAUSED:
+        return tor.isPaused();
+
+    case SHOW_SEEDING:
+        return tor.isSeeding() || tor.isWaitingToSeed();
+
+    case SHOW_VERIFYING:
+        return tor.isVerifying() || tor.isWaitingToVerify();
+
+    default: // SHOW_ALL
+        return true;
     }
-
-    return FilterMode().mode(); // use the default value
-}
-
-QString const SortMode::names[NUM_MODES] =
-{
-    QLatin1String("sort-by-activity"),
-    QLatin1String("sort-by-age"),
-    QLatin1String("sort-by-eta"),
-    QLatin1String("sort-by-name"),
-    QLatin1String("sort-by-progress"),
-    QLatin1String("sort-by-queue"),
-    QLatin1String("sort-by-ratio"),
-    QLatin1String("sort-by-size"),
-    QLatin1String("sort-by-state"),
-    QLatin1String("sort-by-id")
-};
-
-int SortMode::modeFromName(QString const& name)
-{
-    for (int i = 0; i < NUM_MODES; ++i)
-    {
-        if (names[i] == name)
-        {
-            return i;
-        }
-    }
-
-    return SortMode().mode(); // use the default value
 }

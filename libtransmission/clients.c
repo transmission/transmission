@@ -138,7 +138,7 @@ static bool isMainlineStyle(uint8_t const* peer_id)
 
 static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
-    char const* chid = (char*)id;
+    char const* chid = (char const*)id;
     bool is_bitlord;
     int major;
     int minor;
@@ -186,7 +186,7 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
     uint8_t const* id = id_in;
-    char const* chid = (char*)id;
+    char const* chid = (char const*)id;
 
     *buf = '\0';
 

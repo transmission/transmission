@@ -35,35 +35,6 @@ typedef enum {
 #define kTorrentDidChangeGroupNotification @"TorrentDidChangeGroup"
 
 @interface Torrent : NSObject <NSCopying, QLPreviewItem>
-{
-    tr_torrent * fHandle;
-    const tr_info * fInfo;
-    const tr_stat * fStat;
-
-    NSUserDefaults * fDefaults;
-
-    NSImage * fIcon;
-
-    NSString * fHashString;
-
-    tr_file_stat * fFileStat;
-    NSArray * fFileList, * fFlatFileList;
-
-    NSIndexSet * fPreviousFinishedIndexes;
-    NSDate * fPreviousFinishedIndexesDate;
-
-    BOOL fRemoveWhenFinishSeeding;
-
-    NSInteger fGroupValue;
-    TorrentDeterminationType fGroupValueDetermination;
-
-    TorrentDeterminationType fDownloadFolderDetermination;
-
-    BOOL fResumeOnWake;
-
-    BOOL fTimeMachineExcludeInitialized;
-}
-
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib;
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib;

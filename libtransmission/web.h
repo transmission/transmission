@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <curl/curl.h>
+#include "tr-macros.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 struct tr_address;
 struct tr_web_task;
-
-typedef enum
-{
-    TR_WEB_GET_CODE = CURLINFO_RESPONSE_CODE,
-    TR_WEB_GET_REDIRECTS = CURLINFO_REDIRECT_COUNT,
-    TR_WEB_GET_REAL_URL = CURLINFO_EFFECTIVE_URL
-}
-tr_web_task_info;
 
 typedef enum
 {
@@ -50,7 +39,9 @@ struct evbuffer;
 struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char const* range, tr_web_done_func done_func,
     void* done_func_user_data, struct evbuffer* buffer);
 
-void tr_webGetTaskInfo(struct tr_web_task* task, tr_web_task_info info, void* dst);
+long tr_webGetTaskResponseCode(struct tr_web_task* task);
+
+char const* tr_webGetTaskRealUrl(struct tr_web_task* task);
 
 void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool escape_slashes);
 
@@ -58,6 +49,4 @@ void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
 char* tr_http_unescape(char const* str, size_t len);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS
