@@ -234,20 +234,20 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
     char const* const comment = "This is the comment";
     bool const is_private = false;
 
-    tr_info infFoobar;
-    testSingleFileImpl(infFoobar, trackers.data(), tracker_count,
+    tr_info inf_foobar;
+    testSingleFileImpl(inf_foobar, trackers.data(), tracker_count,
         payload.data(), payload.size(),
         comment, is_private, "FOOBAR");
 
-    tr_info infTestme;
-    testSingleFileImpl(infTestme, trackers.data(), tracker_count,
+    tr_info inf_testme;
+    testSingleFileImpl(inf_testme, trackers.data(), tracker_count,
         payload.data(), payload.size(),
         comment, is_private, "TESTME");
 
-    EXPECT_TRUE(std::memcmp(infFoobar.hash, infTestme.hash, sizeof(infFoobar.hash)) != 0);
+    EXPECT_TRUE(std::memcmp(inf_foobar.hash, inf_testme.hash, sizeof(inf_foobar.hash)) != 0);
 
-    tr_metainfoFree(&infFoobar);
-    tr_metainfoFree(&infTestme);
+    tr_metainfoFree(&inf_foobar);
+    tr_metainfoFree(&inf_testme);
 }
 
 TEST_F(MakemetaTest, singleDirectoryRandomPayload)
