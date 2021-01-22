@@ -274,6 +274,7 @@ static void removeKeRangerRansomware()
 
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;
+    id                              fNoNapActivity;
 }
 
 + (void) initialize
@@ -695,8 +696,8 @@ static void removeKeRangerRansomware()
 {
     [NSApp setServicesProvider: self];
 
-    noNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions: NSActivityUserInitiatedAllowingIdleSystemSleep
-                                                                 reason: NSLocalizedString( @"No napping on the job!", nil )];
+    fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions: NSActivityUserInitiatedAllowingIdleSystemSleep
+                                                                  reason: NSLocalizedString( @"No napping on the job!", nil )];
 
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
@@ -807,7 +808,7 @@ static void removeKeRangerRansomware()
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
-    [NSProcessInfo.processInfo endActivity: noNapActivity];
+    [NSProcessInfo.processInfo endActivity: fNoNapActivity];
 
     fQuitting = YES;
 
