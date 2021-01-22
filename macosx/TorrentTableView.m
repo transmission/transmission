@@ -77,6 +77,10 @@
         [self setDelegate: self];
 
         fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
+        
+        if (@available(macOS 11.0, *)) {
+            self.style = NSTableViewStyleFullWidth;
+        }
     }
 
     return self;

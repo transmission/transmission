@@ -135,9 +135,14 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 
 static bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_session* session UNUSED, bool did_connect UNUSED, bool did_timeout UNUSED,
-    long response_code UNUSED, void const* response, size_t response_byte_count, void* ctor)
+static void onTorrentFileDownloaded(tr_session* session, bool did_connect, bool did_timeout, long response_code,
+    void const* response, size_t response_byte_count, void* ctor)
 {
+    TR_UNUSED(session);
+    TR_UNUSED(did_connect);
+    TR_UNUSED(did_timeout);
+    TR_UNUSED(response_code);
+
     tr_ctorSetMetainfo(ctor, response, response_byte_count);
     waitingOnWeb = false;
 }
@@ -257,18 +262,16 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL))
+    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL) &&
+        !tr_sys_path_exists(str, NULL))
     {
-        if (!tr_sys_path_exists(str, NULL))
-        {
-            tr_error* error = NULL;
+        tr_error* error = NULL;
 
-            if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
-            {
-                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
-                tr_error_free(error);
-                return EXIT_FAILURE;
-            }
+        if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+        {
+            fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
+            tr_error_free(error);
+            return EXIT_FAILURE;
         }
     }
 
