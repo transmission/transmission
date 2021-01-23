@@ -24,7 +24,7 @@ tr_natpmp* tr_natpmpInit(void);
 
 void tr_natpmpClose(tr_natpmp*);
 
-int tr_natpmpPulse(tr_natpmp*, tr_port port, bool isEnabled, tr_port* public_port, tr_port * real_private_port);
+int tr_natpmpPulse(tr_natpmp*, tr_port port, bool isEnabled, tr_port* public_port, tr_port* real_private_port);
 
 typedef enum
 {
