@@ -807,6 +807,16 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
+  editTorrents(torrents, args) {
+    this.remote.editTorrents(
+      Transmission._getTorrentIds(torrents),
+      args,
+      this.refreshTorrents,
+      this
+    );
+  }
+
   changeFileCommand(torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
   }

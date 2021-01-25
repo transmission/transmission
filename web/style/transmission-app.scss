@@ -51,6 +51,7 @@ $image-play-circle-idle: 'images/play-circle-idle.svg';
 $image-speed: 'images/checkered-flag.svg';
 $image-tiers: 'images/diagram-3-fill.svg';
 $image-upload-download: 'images/up-and-down-arrows.svg';
+$image-settings: 'images/gear-fill.svg';
 
 @mixin for-phone-only {
   @media (max-width: 599px) {
@@ -673,6 +674,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   @include tab-image($image-files);
 }
 
+#inspector-tab-settings {
+  @include tab-image($image-settings);
+}
+
 #inspector,
 #prefs-dialog {
   @include for-phone-only {
@@ -902,7 +907,8 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
 }
 
-.inspector-info-page {
+.inspector-info-page,
+.inspector-settings-page {
   // TODO: this is (mostly) copied from prefs-dialog.
   // can it be folded into a single set of rules?
 

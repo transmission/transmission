@@ -668,3 +668,6 @@ Torrent.Fields.StatsExtra = [
   'startDate',
   'trackerStats',
 ];
+
+// settings users can change, which should be refreshed when they do
+Torrent.Fields.SettingsExtra = ['seedRatioLimit', 'seedRatioMode'];

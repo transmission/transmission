@@ -190,6 +190,16 @@ export class Remote {
     );
   }
 
+  editTorrents(torrent_ids, args, callback, context) {
+    this.sendTorrentSetRequests(
+      'torrent-set',
+      torrent_ids,
+      args,
+      callback,
+      context
+    );
+  }
+
   moveTorrents(torrent_ids, new_location, callback, context) {
     this.sendTorrentSetRequests(
       'torrent-set-location',

@@ -14,6 +14,8 @@ import {
   OutsideClickListener,
   Utils,
   createTabsContainer,
+  makeUUID,
+  setEditableContent,
   setTextContent,
 } from './utils.js';
 
@@ -31,6 +33,8 @@ export class Inspector extends EventTarget {
   constructor(controller) {
     super();
 
+    this.updating = false;
+    this.settings_dirty = false;
     this.closed = false;
     this.controller = controller;
     this.elements = this._create();
@@ -52,6 +56,10 @@ export class Inspector extends EventTarget {
       this.selection_listener
     );
     this._setTorrents(this.controller.getSelectedTorrents());
+
+    const on_change = this._onTorrentSettingsChanged.bind(this);
+    this.elements.settings.ratio_limit.addEventListener('change', on_change);
+    this.elements.settings.ratio_mode.addEventListener('change', on_change);
 
     document.body.append(this.elements.root);
   }
@@ -170,11 +178,54 @@ export class Inspector extends EventTarget {
     };
   }
 
+  static _createSettingsPage() {
+    const root = document.createElement('div');
+    root.classList.add('inspector-settings-page');
+
+    let label = document.createElement('div');
+    label.textContent = 'Torrent Settings';
+    label.classList.add('section-label');
+    root.append(label);
+
+    label = document.createElement('label');
+    label.textContent = 'Ratio Limit:';
+    root.append(label);
+
+    let input = document.createElement('input');
+    input.type = 'number';
+    input.step = '0.01';
+    input.id = makeUUID();
+    input.dataset.key = 'seedRatioLimit';
+    label.setAttribute('for', input.id);
+    root.append(input);
+    const ratio_limit = input;
+
+    label = document.createElement('label');
+    label.textContent = 'Ratio Mode:';
+    root.append(label);
+
+    input = document.createElement('select');
+    input.id = makeUUID();
+    input.dataset.key = 'seedRatioMode';
+    input.add(new Option('Use Global Limit', 0));
+    input.add(new Option('Use Per-Torrent Limit', 1));
+    input.add(new Option('Unlimited', 2));
+    label.setAttribute('for', input.id);
+    root.append(input);
+    const ratio_mode = input;
+
+    label = document.createElement('label');
+    label.textContent = 'Ratio';
+
+    return { ratio_limit, ratio_mode, root };
+  }
+
   _create() {
     const pages = {
       files: Inspector._createFilesPage(),
       info: Inspector._createInfoPage(),
       peers: Inspector._createPeersPage(),
+      settings: Inspector._createSettingsPage(),
       tiers: Inspector._createTiersPage(),
     };
 
@@ -190,6 +241,7 @@ export class Inspector extends EventTarget {
         ['inspector-tab-peers', pages.peers.root],
         ['inspector-tab-tiers', pages.tiers.root],
         ['inspector-tab-files', pages.files.root],
+        ['inspector-tab-settings', pages.settings.root],
       ],
       on_activated.bind(this)
     );
@@ -222,6 +274,10 @@ export class Inspector extends EventTarget {
       if (Inspector._needsExtraInfo(torrents)) {
         fields.push(...Torrent.Fields.InfoExtra);
       }
+      if (this.settings_dirty) {
+        this.settings_dirty = false;
+        fields.push(...Torrent.Fields.SettingsExtra);
+      }
 
       controller.updateTorrents(ids, fields);
     }
@@ -229,6 +285,7 @@ export class Inspector extends EventTarget {
 
   _updateCurrentPage() {
     const { elements } = this;
+    this.updating = true;
     switch (this.current_page) {
       case elements.files.root:
         this._updateFiles();
@@ -242,10 +299,14 @@ export class Inspector extends EventTarget {
       case elements.tiers.root:
         this._updateTiers();
         break;
+      case elements.settings.root:
+        this._updateSettings();
+        break;
       default:
         console.warn('unexpected page');
         console.log(this.current_page);
     }
+    this.updating = false;
   }
 
   _updateInfo() {
@@ -781,6 +842,72 @@ export class Inspector extends EventTarget {
       list.firstChild.remove();
     }
     list.append(...rows);
+  }
+
+  ///  SETTINGS PAGE
+
+  _onTorrentSettingsChanged(event_) {
+    if (this.updating) {
+      return;
+    }
+
+    const { key } = event_.target.dataset;
+    const { torrents, controller } = this;
+    const val = Inspector._getValue(event_.target);
+
+    if (val === '') {
+      return;
+    }
+
+    event_.target.lastvalue = val;
+
+    const args = { [key]: val };
+    controller.editTorrents(torrents, args);
+    this.settings_dirty = true;
+  }
+
+  static _getValue(e) {
+    switch (e.type) {
+      case 'select-one':
+      case 'select-multiple':
+      case 'number':
+      case 'text':
+      case 'url': {
+        const string = e.value;
+        const n = Number(string);
+        if (!Number.isNaN(n)) {
+          return n;
+        }
+        return string;
+      }
+      default:
+        return null;
+    }
+  }
+
+  _updateSettings() {
+    const { torrents, elements } = this;
+    let limit = '';
+    let mode = '';
+    if (
+      torrents.every(
+        (v) => v.fields.seedRatioLimit === torrents[0].fields.seedRatioLimit
+      ) &&
+      torrents.length > 0
+    ) {
+      limit = torrents[0].fields.seedRatioLimit;
+    }
+    if (
+      torrents.every(
+        (v) => v.fields.seedRatioMode === torrents[0].fields.seedRatioMode
+      ) &&
+      torrents.length > 0
+    ) {
+      mode = torrents[0].fields.seedRatioMode;
+    }
+
+    setEditableContent(elements.settings.ratio_limit, limit);
+    setEditableContent(elements.settings.ratio_mode, mode);
   }
 
   ///  FILES PAGE

@@ -278,3 +278,10 @@ export function setTextContent(e, text) {
     e.textContent = text;
   }
 }
+
+export function setEditableContent(e, text) {
+  if (e.lastvalue !== text) {
+    e.lastvalue = text;
+    e.value = text;
+  }
+}
