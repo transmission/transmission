@@ -889,22 +889,19 @@ export class Inspector extends EventTarget {
     const { torrents, elements } = this;
     let limit = '';
     let mode = '';
-    if (
-      torrents.every(
-        (v) => v.fields.seedRatioLimit === torrents[0].fields.seedRatioLimit
-      ) &&
-      torrents.length > 0
-    ) {
-      limit = torrents[0].fields.seedRatioLimit;
-    }
-    if (
-      torrents.every(
-        (v) => v.fields.seedRatioMode === torrents[0].fields.seedRatioMode
-      ) &&
-      torrents.length > 0
-    ) {
-      mode = torrents[0].fields.seedRatioMode;
-    }
+
+    const get_common_value_for_field = (field) => {
+      if (
+        torrents.every((v) => v.fields[field] === torrents[0].fields[field]) &&
+        torrents.length > 0
+      ) {
+        return torrents[0].fields[field];
+      }
+      return '';
+    };
+
+    limit = get_common_value_for_field('seedRatioLimit');
+    mode = get_common_value_for_field('seedRatioMode');
 
     setEditableContent(elements.settings.ratio_limit, limit);
     setEditableContent(elements.settings.ratio_mode, mode);
