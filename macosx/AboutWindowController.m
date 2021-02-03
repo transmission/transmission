@@ -73,7 +73,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     fLicenseView.string = licenseText;
     fLicenseCloseButton.title = NSLocalizedString(@"OK", "About window -> license close button");
 
-    [NSApp beginSheet: fLicenseSheet modalForWindow: self.window modalDelegate: nil didEndSelector: nil contextInfo: nil];
+    [self.window beginSheet: fLicenseSheet completionHandler:nil];
 }
 
 - (IBAction) hideLicense: (id) sender

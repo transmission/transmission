@@ -178,25 +178,19 @@
 
         //uses a relative date, so can't be set once
         fDateAddedField.objectValue = torrent.dateAdded;
-
-        if (NSApp.onYosemiteOrBetter) {
-            static NSDateComponentsFormatter *timeFormatter;
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                timeFormatter = [NSDateComponentsFormatter new];
-                timeFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
-                timeFormatter.allowedUnits = NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-                timeFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
-            });
-
-            fDownloadTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsDownloading];
-            fSeedTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsSeeding];
-        }
-        else {
-            fDownloadTimeField.stringValue = [NSString timeString: [torrent secondsDownloading] includesTimeRemainingPhrase:NO showSeconds: YES];
-            fSeedTimeField.stringValue = [NSString timeString: [torrent secondsSeeding] includesTimeRemainingPhrase:NO showSeconds: YES];
-        }
-
+        
+        static NSDateComponentsFormatter *timeFormatter;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            timeFormatter = [NSDateComponentsFormatter new];
+            timeFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+            timeFormatter.allowedUnits = NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+            timeFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
+        });
+        
+        fDownloadTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsDownloading];
+        fSeedTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsSeeding];
+        
         [fPiecesView updateView];
     }
     else if (numberSelected > 1)

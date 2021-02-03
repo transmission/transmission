@@ -240,9 +240,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     PriorityLowTemplate
     PriorityNormalTemplate
     PurpleDotFlat
-    PurpleDotGlossy
     RedDotFlat
-    RedDotGlossy
     Remote
     ResumeHover
     ResumeNoWaitHover
@@ -268,7 +266,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
-    YellowDotGlossy
     YingYangGroupTemplate
     YingYangTemplate
 )
