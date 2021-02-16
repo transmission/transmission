@@ -1,21 +1,57 @@
-html {
-  color: rgb(0,0,0);
-  font-family: 'Lucida Grande', Sans-serif;
-  text-align: left;
+:root {
+    --bg-color: #ffffff;
+    --text: #24292f;
+    --th-color: rgb(50,50,50);
+    --td-color: rgb(80,80,80);
+    --hr: rgb(219, 219, 219);
+    --desc_tex_color: #292929;
+  }
+  
+html
+{   background-color: var(--bg-color);
+	color: var(--text);
+	font-family: -apple-system, sans-serif;
+    text-align:left;
+    font-size: 13px;
+} 
+p { color: var(--desc_tex_color);
+    line-height: 5px;
+    font-style: italic;
+    /* text-align: center; */
 }
-
-th {
-  color: rgb(50,50,50);
-  font-weight: bold;
-  text-align: left;
+/* title */ 
+h2 { font-size: 15px;
+line-height: 1.6em;
+}
+hr { 
+    border: 1px solid var(--hr);
+}
+th { 
+	color: var(--th-color);
+	font-weight: bold;
+    text-align:left; 
+    font-size: 14px;
 }
 
 td {
-  color: rgb(80,80,80);
-  text-align: left;
+	color: var(--td-color);
+    font-size: 13px;
+    text-align:left; 
+} 
+img.icon
+{   
+    width: 15px; 
+    height: auto ; 
+    margin-right:8px;
 }
-
-img.icon {
-  margin-right: 8px;
-  vertical-align: text-bottom;
-}
+@media (prefers-color-scheme: dark) {
+    :root {
+    --bg-color: #1E1E1E;
+    --text: rgba(255, 255, 255, 0.80);
+    --th-color: rgb(0, 174, 255);
+    /* trackers and files text color */
+    --td-color: rgb(221, 221, 221);
+    --hr: rgb(75, 75, 75);
+    --desc_tex_color: #b1b1b1;
+    }
+} 
