@@ -1073,9 +1073,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
     if (tr_str_is_empty(str))
     {
-        str = _("No errors tooooooooooooooooooooooooooooooooooooooooooooooooooo
-        oooooooooooooooooooooooooooooooooooooooooo lllllllllllllllllooooooooooo
-        ooooooooooooooooooooooooonnnnnnnnnnnnnnnnnnnng");
+        str = _("No errors tooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo llllllllllllllllloooooooooooooooooooooooooooooooooooonnnnnnnnnnnnnnnnnnnng");
     }
 
     gtr_label_set_text(GTK_LABEL(di->error_lb), str);
