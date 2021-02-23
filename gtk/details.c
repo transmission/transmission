@@ -1180,6 +1180,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
     hig_workarea_add_row(t, &row, _("Error:"), l, NULL);
     di->error_lb = l;
+    gtk_label_set_line_wrap(GTK_LABEL(l), TRUE);
 
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Details"));
