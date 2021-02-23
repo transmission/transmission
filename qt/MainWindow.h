@@ -91,6 +91,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent*) override;
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
+    bool event(QEvent*) override;
 
 private slots:
     void addTorrents(QStringList const& filenames);

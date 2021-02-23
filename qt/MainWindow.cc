@@ -1598,6 +1598,44 @@ void MainWindow::dropEvent(QDropEvent* event)
     }
 }
 
+bool MainWindow::event(QEvent* e)
+{
+    if (e->type() == QEvent::WindowActivate)
+    {
+        QClipboard* clipboard = QGuiApplication::clipboard();
+        if (clipboard->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+            clipboard->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+        {
+            QStringList list = clipboard->text().trimmed().split(QLatin1Char('\n'));
+
+            for (QString const& entry : list)
+            {
+                QString key = entry.trimmed();
+
+                if (!key.isEmpty())
+                {
+                    QUrl const url(key);
+
+                    if (url.isLocalFile())
+                    {
+                        key = url.toLocalFile();
+                    }
+
+                    static QStringList processed;
+
+                    if (!processed.contains(key))
+                    {
+                        processed.append(key);
+                        trApp->addTorrent(AddData(key));
+                    }
+                }
+            }
+        }
+    }
+
+    return QWidget::event(e);
+}
+
 /***
 ****
 ***/
