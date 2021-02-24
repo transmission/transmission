@@ -1073,7 +1073,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
     if (tr_str_is_empty(str))
     {
-        str = _("No errors tooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo llllllllllllllllloooooooooooooooooooooooooooooooooooonnnnnnnnnnnnnnnnnnnng");
+        str = _("No errors");
     }
 
     gtr_label_set_text(GTK_LABEL(di->error_lb), str);
@@ -1179,10 +1179,11 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     /* error */
     l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
     hig_workarea_add_row(t, &row, _("Error:"), l, NULL);
-    di->error_lb = l;
     gtk_label_set_line_wrap(GTK_LABEL(l), TRUE);
-    gtk_label_set_lines(GTK_LABEL(l),10);
+    gtk_label_set_lines(GTK_LABEL(l), 5);
+    di->error_lb = l;
 
+    /* details */
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Details"));
 
