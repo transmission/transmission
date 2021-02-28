@@ -1612,7 +1612,7 @@ bool MainWindow::event(QEvent* e)
         return QMainWindow::event(e);
     }
 
-    QClipboard* const clipboard = QGuiApplication::clipboard();
+    QClipboard const* clipboard = QGuiApplication::clipboard();
     if (clipboard->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
         clipboard->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
