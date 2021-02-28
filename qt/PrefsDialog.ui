@@ -346,9 +346,9 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QCheckBox" name="PasteTorrentFromClipboard">
+          <widget class="QCheckBox" name="detectTorrentFromClipboard">
            <property name="text">
-            <string>Paste torrent from clipboard</string>
+            <string>Detect new torrents from clipboard</string>
            </property>
           </widget>
          </item>

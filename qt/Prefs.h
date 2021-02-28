@@ -74,6 +74,7 @@ public:
         COMPLETE_SOUND_COMMAND,
         COMPLETE_SOUND_ENABLED,
         USER_HAS_GIVEN_INFORMED_CONSENT,
+        READ_CLIPBOARD,
         /* core prefs */
         FIRST_CORE_PREF,
         ALT_SPEED_LIMIT_UP = FIRST_CORE_PREF,
