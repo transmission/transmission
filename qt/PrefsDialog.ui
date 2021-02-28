@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>545</width>
+    <width>601</width>
     <height>547</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -273,6 +273,13 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
+         <item row="5" column="0">
+          <widget class="QLabel" name="downloadDirLabel">
+           <property name="text">
+            <string>Save to &amp;Location:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QCheckBox" name="watchDirCheck">
            <property name="text">
@@ -280,6 +287,37 @@
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QCheckBox" name="startAddedTorrentsCheck">
+           <property name="text">
+            <string>&amp;Start added torrents</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
+           <property name="text">
+            <string>Show the Torrent Options &amp;dialog</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="QCheckBox" name="trashTorrentFileCheck">
+           <property name="text">
+            <string>Mo&amp;ve the .torrent file to the trash</string>
            </property>
           </widget>
          </item>
@@ -295,35 +333,7 @@
            <widget class="QLineEdit" name="watchDirEdit"/>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
-           <property name="text">
-            <string>Show the Torrent Options &amp;dialog</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="startAddedTorrentsCheck">
-           <property name="text">
-            <string>&amp;Start added torrents</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QCheckBox" name="trashTorrentFileCheck">
-           <property name="text">
-            <string>Mo&amp;ve the .torrent file to the trash</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="downloadDirLabel">
-           <property name="text">
-            <string>Save to &amp;Location:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QStackedWidget" name="downloadDirStack">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -335,13 +345,10 @@
            <widget class="QLineEdit" name="downloadDirEdit"/>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="PasteTorrentFromClipboard">
            <property name="text">
-            <string notr="true">...</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <string>Paste torrent from clipboard</string>
            </property>
           </widget>
          </item>
