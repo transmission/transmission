@@ -1607,34 +1607,34 @@ void MainWindow::dropEvent(QDropEvent* event)
 
 bool MainWindow::event(QEvent* e)
 {
-    if (e->type() == QEvent::WindowActivate && read_from_clipboard_)
+    if (e->type() != QEvent::WindowActivate || !read_from_clipboard_)
     {
-        QClipboard* clipboard = QGuiApplication::clipboard();
-        if (clipboard->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-            clipboard->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+        return QMainWindow::event(e);
+    }
+
+    QClipboard* const clipboard = QGuiApplication::clipboard();
+    if (clipboard->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        clipboard->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+    {
+        QStringList list = clipboard->text().trimmed().split(QLatin1Char('\n'));
+
+        for (QString const& entry : list)
         {
-            QStringList list = clipboard->text().trimmed().split(QLatin1Char('\n'));
+            QString key = entry.trimmed();
 
-            for (QString const& entry : list)
+            if (!key.isEmpty())
             {
-                QString key = entry.trimmed();
-
-                if (!key.isEmpty())
+                if (QUrl const url(key); url.isLocalFile())
                 {
-                    QUrl const url(key);
+                    key = url.toLocalFile();
+                }
 
-                    if (url.isLocalFile())
-                    {
-                        key = url.toLocalFile();
-                    }
+                static QStringList processed;
 
-                    static QStringList processed;
-
-                    if (!processed.contains(key))
-                    {
-                        processed.append(key);
-                        trApp->addTorrent(AddData(key));
-                    }
+                if (!processed.contains(key))
+                {
+                    processed.append(key);
+                    trApp->addTorrent(AddData(key));
                 }
             }
         }
