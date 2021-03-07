@@ -45,6 +45,7 @@ void TorrentFilter::onPrefChanged(int key)
         break;
 
     case Prefs::FILTER_MODE:
+    case Prefs::FILTER_PATH:
     case Prefs::FILTER_TRACKERS:
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
@@ -252,6 +253,12 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
         auto const text = prefs_.getString(Prefs::FILTER_TEXT);
         accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive) ||
             tor.hash().toString().contains(text, Qt::CaseInsensitive);
+    }
+
+    if (accepts)
+    {
+        auto const path = prefs_.getString(Prefs::FILTER_PATH);
+        accepts = path.isEmpty() || tor.getPath() == path;
     }
 
     return accepts;

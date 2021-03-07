@@ -7,6 +7,7 @@
 
 #include <bitset>
 #include <map>
+#include <unordered_map>
 
 #include <QTimer>
 #include <QWidget>
@@ -19,6 +20,7 @@
 
 class QLabel;
 class QLineEdit;
+class QStandardItem;
 class QStandardItemModel;
 class QString;
 
@@ -39,8 +41,15 @@ public slots:
     void clear();
 
 private:
+    using Map = std::map<QString, int>;
+    using MapIter = Map::const_iterator;
+    using Counts = std::unordered_map<QString, int>;
+    using MapUpdate = QStandardItem* (*)(QStandardItem* i, MapIter const& it);
+
     FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
     FilterBarComboBox* createActivityCombo();
+    FilterBarComboBox* createPathCombo(QStandardItemModel*);
+    void refreshFilter(Map& map, QStandardItemModel* model, Counts& counts, MapUpdate update, int key);
     void refreshTrackers();
 
     enum
@@ -57,10 +66,13 @@ private:
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<QString, int> sitename_counts_;
+    Map path_counts_;
+    Map sitename_counts_;
     FilterBarComboBox* activity_combo_ = {};
+    FilterBarComboBox* path_combo_ = {};
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};
+    QStandardItemModel* path_model_ = {};
     QStandardItemModel* tracker_model_ = {};
     QTimer recount_timer_;
     QLineEdit* line_edit_ = {};
@@ -88,6 +100,7 @@ private slots:
 
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
+    void onPathIndexChanged(int index);
     void onTextChanged(QString const&);
     void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void onTrackerIndexChanged(int index);
