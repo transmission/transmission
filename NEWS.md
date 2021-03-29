@@ -8,6 +8,7 @@
 	- Compressed toolbar
 	- Red accent color
 	- Updated toolbar icons (using SF Symbol)
+- A wonderful new icon designed for Big Sur by Rodger Werner ([#1535](https://github.com/transmission/transmission/pull/1535)
 
 ### GTK+ Client
 - 
