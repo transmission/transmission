@@ -597,6 +597,20 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
     tr_timerAdd(session->saveTimer, SAVE_INTERVAL_SECS, 0);
 }
 
+static char const* tr_assembleHttpUserAgent(char const* comment)
+{
+    char const* ua_base = TR_NAME "/" SHORT_VERSION_STRING;
+
+    if (!comment || !*comment)
+    {
+        return tr_strdup(ua_base);
+    }
+    else
+    {
+        return tr_strdup_printf("%s %s", ua_base, comment);
+    }
+}
+
 /***
 ****
 ***/
@@ -612,7 +626,8 @@ struct init_data
     tr_variant* clientSettings;
 };
 
-tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr_variant* clientSettings)
+tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr_variant* clientSettings,
+    char const* userAgentComment)
 {
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
@@ -630,6 +645,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
+    session->http_user_agent = tr_assembleHttpUserAgent(userAgentComment);
     tr_bandwidthConstruct(&session->bandwidth, session, NULL);
     tr_variantInitList(&session->removedTorrents, 0);
 
@@ -2118,6 +2134,7 @@ void tr_sessionClose(tr_session* session)
     tr_bandwidthDestruct(&session->bandwidth);
     tr_bitfieldDestruct(&session->turtle.minutes);
     tr_session_id_free(session->session_id);
+    tr_free(session->http_user_agent);
     tr_lockFree(session->lock);
 
     if (session->metainfoLookup != NULL)

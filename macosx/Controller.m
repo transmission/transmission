@@ -461,7 +461,7 @@ static void removeKeRangerRansomware()
                                     [tbString UTF8String]);
 
         const char * configDir = tr_getDefaultConfigDir("Transmission");
-        fLib = tr_sessionInit(configDir, YES, &settings);
+        fLib = tr_sessionInit(configDir, YES, &settings, "macOS");
         tr_variantFree(&settings);
 
         fConfigDirectory = [[NSString alloc] initWithUTF8String: configDir];

@@ -189,6 +189,8 @@ struct tr_session
 
     char* blocklist_url;
 
+    char const* http_user_agent;
+
     struct tr_device_info* downloadDir;
 
     struct tr_list* blocklists;

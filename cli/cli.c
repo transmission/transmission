@@ -275,7 +275,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    h = tr_sessionInit(configDir, false, &settings);
+    h = tr_sessionInit(configDir, false, &settings, "CLI");
 
     ctor = tr_ctorNew(h);
 

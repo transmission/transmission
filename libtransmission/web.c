@@ -280,7 +280,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeout_secs);
     curl_easy_setopt(e, CURLOPT_URL, task->url);
-    curl_easy_setopt(e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING);
+    curl_easy_setopt(e, CURLOPT_USERAGENT, s->http_user_agent);
     curl_easy_setopt(e, CURLOPT_VERBOSE, (long)(web->curl_verbose ? 1 : 0));
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
     curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);

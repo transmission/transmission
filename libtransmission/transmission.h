@@ -199,11 +199,13 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, struct t
  * @param configDir where Transmission will look for resume files, blocklists, etc.
  * @param messageQueueingEnabled if false, messages will be dumped to stderr
  * @param settings libtransmission settings
+ * @param userAgentComment comment to be appended to the User-Agent in HTTP requests
  * @see tr_sessionGetDefaultSettings()
  * @see tr_sessionLoadSettings()
  * @see tr_getDefaultConfigDir()
  */
-tr_session* tr_sessionInit(char const* configDir, bool messageQueueingEnabled, struct tr_variant* settings);
+tr_session* tr_sessionInit(char const* configDir, bool messageQueueingEnabled, struct tr_variant* settings,
+    char const* userAgentComment);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in tr_sessionInit() */

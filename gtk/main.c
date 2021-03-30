@@ -524,7 +524,7 @@ static void on_startup(GApplication* application, gpointer user_data)
     }
 
     /* initialize the libtransmission session */
-    session = tr_sessionInit(cbdata->config_dir, TRUE, gtr_pref_get_all());
+    session = tr_sessionInit(cbdata->config_dir, TRUE, gtr_pref_get_all(), "GTK");
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));
