@@ -12,8 +12,13 @@
 #error only libtransmission should #include this header.
 #endif
 
-#define TR_PATH_DELIMITER '/'
-#define TR_PATH_DELIMITER_STR "/"
+#ifdef _WIN32
+    #define TR_PATH_DELIMITER '\\'
+    #define TR_PATH_DELIMITER_STR "\\"
+#else
+    #define TR_PATH_DELIMITER '/'
+    #define TR_PATH_DELIMITER_STR "/"
+#endif
 
 /**
  * @addtogroup tr_session Session
