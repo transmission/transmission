@@ -44,11 +44,6 @@ export class ActionManager extends EventTarget {
       'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
       'select-all': { enabled: false, shortcut: 'Alt+A', text: 'Select all' },
       'show-about-dialog': { enabled: true, text: 'About' },
-      'show-client-ip': {
-        enabled: true,
-        shortcut: 'Alt+K',
-        text: "Show IP address"
-      },
       'show-inspector': {
         enabled: true,
         shortcut: 'Alt+I',
