@@ -8,6 +8,7 @@
  */
 
 import isEqual from 'lodash.isequal';
+import https from 'https';
 
 export class Utils {
   /**
@@ -277,4 +278,23 @@ export function setTextContent(e, text) {
   if (e.textContent !== text) {
     e.textContent = text;
   }
+}
+
+
+export function getPublicIP() {
+  return new Promise((resolve, reject) => {
+    https.get('https://api64.ipify.org?format=json', (resp) => {
+    let data = '';
+
+    resp.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    resp.on('end', () => {
+      resolve(JSON.parse(data));
+    });
+  }).on('error', (error) => {
+    reject(error);
+  });
+  });
 }

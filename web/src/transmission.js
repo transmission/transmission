@@ -33,6 +33,7 @@ import {
   setEnabled,
   setTextContent,
   movePopup,
+  getPublicIP,
 } from './utils.js';
 
 export class Transmission extends EventTarget {
@@ -54,6 +55,7 @@ export class Transmission extends EventTarget {
     this._torrents = {};
     this._rows = [];
     this.dirtyTorrents = new Set();
+    this.publicIP = '';
 
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
@@ -253,8 +255,13 @@ export class Transmission extends EventTarget {
 
     // this.updateButtonsSoon();
 
-    this.prefs.addEventListener('change', ({ key, value }) =>
-      this._onPrefChanged(key, value)
+    this.prefs.addEventListener('change', ({ key, value }) => {
+      // Sometimes the key is an array containing the key and the value
+      if (Array.isArray(key)) {
+        return this._onPrefChanged(key[0], key[2]);
+      }
+      return this._onPrefChanged(key, value);
+    }
     );
     this.prefs
       .entries()
@@ -309,7 +316,10 @@ export class Transmission extends EventTarget {
       case Prefs.SortMode:
         this.refilterAllSoon();
         break;
-
+      
+      case Prefs.ShowPublicIP:
+        this._showPublicIP(value);
+        break;
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
         const callback = this.refreshTorrents.bind(this);
@@ -873,6 +883,7 @@ TODO: fix this when notifications get fixed
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
+
   _updateFilterSelect() {
     const trackers = this._getTrackers();
     const names = Object.keys(trackers).sort();
@@ -1083,6 +1094,34 @@ TODO: fix this when notifications get fixed
     }
 
     return returnValue;
+  }
+
+  async _setPublicIP() {
+    const response = await getPublicIP();
+    if (response.ip) {
+      this.publicIP = response.ip;
+    }
+  }
+
+  /**
+   * Show public IP in the status bar. The IP is currently queried once, when
+   * the IP is shown for the first time. 
+   * 
+   * @param {Boolean} show When true, show IP
+   */
+  async _showPublicIP(show) {
+    if (show) {
+      if (this.publicIP === '') {
+        try {
+          await this._setPublicIP();
+        } catch(error) {
+          console.log(`Unable to show public IP! Error: ${error}`);
+        }
+      }
+      setTextContent(document.querySelector('#public-ip-addr-label'), this.publicIP);
+    } else {
+      setTextContent(document.querySelector('#public-ip-addr-label'), '');
+    }
   }
 
   ///

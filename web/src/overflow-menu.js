@@ -246,6 +246,29 @@ export class OverflowMenu extends EventTarget {
         : Prefs.DisplayFull;
     });
 
+    // IP addr
+
+    div = document.createElement('div');
+    options.append(div);
+
+    check = document.createElement('input');
+    check.id = 'show-public-ip-check';
+    check.type = 'checkbox';
+    div.append(check);
+
+    label = document.createElement('label');
+    label.id = 'show-public-ip-label';
+    label.setAttribute('for', check.id);
+    label.textContent = 'Show IP';
+    div.append(label);
+    
+    check.checked = this.prefs.show_public_ip;
+    check.addEventListener('change', (event_) => {
+      const { checked } = event_.target;
+      this.prefs.show_public_ip = checked;
+    });
+
+
     // fullscreen
 
     div = document.createElement('div');

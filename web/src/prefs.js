@@ -106,6 +106,7 @@ Prefs.FilterPaused = 'paused';
 Prefs.FilterSeeding = 'seeding';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
+Prefs.ShowPublicIP = 'show-public-ip';
 Prefs.SortAscending = 'ascending';
 Prefs.SortByActivity = 'activity';
 Prefs.SortByAge = 'age';
@@ -125,6 +126,7 @@ Prefs._Defaults = {
   [Prefs.FilterMode]: Prefs.FilterAll,
   [Prefs.NotificationsEnabled]: false,
   [Prefs.RefreshRate]: 5,
+  [Prefs.ShowPublicIP]: false,
   [Prefs.SortDirection]: Prefs.SortAscending,
   [Prefs.SortMode]: Prefs.SortByName,
 };
