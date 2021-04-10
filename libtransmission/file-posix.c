@@ -406,6 +406,16 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     TR_ASSERT(dst_path != NULL);
 
     bool ret = rename(src_path, dst_path) != -1;
+    int errsv = errno;
+
+    // Use system mv's copy-on-write mechanism for move
+    // from a filesystem to another:
+    if (errsv == EXDEV)
+    {
+        char base[500] = "mv ";
+        char const* cmd = strcat(strcat(strcat(base, src_path), " "), dst_path);
+        ret = system(cmd) != -1;
+    }
 
     if (!ret)
     {
