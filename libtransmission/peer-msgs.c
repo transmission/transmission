@@ -862,7 +862,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     bool allow_pex;
     struct evbuffer* payload;
     struct evbuffer* out = msgs->outMessages;
-    unsigned char const* ipv6 = tr_globalIPv6();
+    unsigned char const* ipv6 = tr_globalIPv6(msgs->io->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -2743,7 +2743,7 @@ tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr
         /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
         struct tr_address const* addr = tr_peerIoGetAddress(m->io, NULL);
 
-        if (addr->type == TR_AF_INET || tr_globalIPv6() != NULL)
+        if (addr->type == TR_AF_INET || tr_globalIPv6(NULL) != NULL)
         {
             protocolSendPort(m, tr_dhtPort(torrent->session));
         }
