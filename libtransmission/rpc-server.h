@@ -21,6 +21,7 @@
 struct event;
 struct evhttp;
 struct tr_variant;
+struct tr_rpc_address;
 struct libdeflate_compressor;
 
 class tr_rpc_server
@@ -43,7 +44,7 @@ public:
     std::string whitelistStr;
     std::string url;
 
-    struct tr_address bindAddress;
+    struct tr_rpc_address* bindAddress;
 
     struct event* start_retry_timer = nullptr;
     struct evhttp* httpd = nullptr;
