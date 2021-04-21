@@ -82,6 +82,7 @@ typedef enum tr_address_type
 {
     TR_AF_INET,
     TR_AF_INET6,
+    TR_AF_UNIX,
     NUM_TR_AF_INET_TYPES
 }
 tr_address_type;
@@ -93,6 +94,7 @@ typedef struct tr_address
     {
         struct in6_addr addr6;
         struct in_addr addr4;
+        char unixSocketPath[TR_UNIX_ADDRSTRLEN];
     }
     addr;
 }
@@ -115,9 +117,14 @@ int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
-static inline bool tr_address_is_valid(tr_address const* a)
+static inline bool tr_address_is_valid_inet(tr_address const* a)
 {
     return a != NULL && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
+}
+
+static inline bool tr_address_is_valid(tr_address const* a)
+{
+    return tr_address_is_valid_inet(a) || a->type == TR_AF_UNIX;
 }
 
 /***********************************************************************

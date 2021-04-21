@@ -9,12 +9,16 @@
 #include <errno.h>
 #include <string.h> /* memcpy */
 
+#include <sys/un.h>
+#include <sys/stat.h>
+
 #include <zlib.h>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/http_struct.h> /* TODO: eventually remove this */
+#include <event2/listener.h>
 
 #include "transmission.h"
 #include "crypto.h" /* tr_ssha1_matches() */
@@ -812,6 +816,30 @@ static void rpc_server_start_retry_cancel(tr_rpc_server* server)
     server->start_retry_counter = 0;
 }
 
+static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char const* path)
+{
+    unlink(path);
+
+    struct sockaddr_un addr;
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+
+    struct evconnlistener* lev = evconnlistener_new_bind(
+        base, NULL, NULL, LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&addr, sizeof(addr));
+    if (!lev)
+    {
+        return false;
+    }
+
+    struct evhttp_bound_socket* handle = evhttp_bind_listener(httpd, lev);
+    if (!handle)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 static void startServer(void* vserver)
 {
     tr_rpc_server* server = vserver;
@@ -821,13 +849,29 @@ static void startServer(void* vserver)
         return;
     }
 
-    struct evhttp* httpd = evhttp_new(server->session->event_base);
+    struct event_base* base = server->session->event_base;
+
+    struct evhttp* httpd = evhttp_new(base);
 
     char const* address = tr_rpcGetBindAddress(server);
 
     tr_port const port = server->port;
 
-    if (evhttp_bind_socket(httpd, address, port) == -1)
+    char portString[7];
+    bool success;
+
+    if (server->bindAddress.type == TR_AF_UNIX)
+    {
+        strcpy(portString, "");
+        success = bindUnixSocket(base, httpd, address);
+    }
+    else
+    {
+        tr_snprintf(portString, sizeof(portString), ":%d", port);
+        success = evhttp_bind_socket(httpd, address, port) != -1;
+    }
+
+    if (!success)
     {
         evhttp_free(httpd);
 
@@ -835,11 +879,11 @@ static void startServer(void* vserver)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
+            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s%s, retrying in %d seconds", address, portString, retry_delay);
             return;
         }
 
-        tr_logAddNamedError(MY_NAME, "Unable to bind to %s:%d after %d attempts, giving up", address, port,
+        tr_logAddNamedError(MY_NAME, "Unable to bind to %s%s after %d attempts, giving up", address, portString,
             SERVER_START_RETRY_COUNT);
     }
     else
@@ -847,7 +891,7 @@ static void startServer(void* vserver)
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd = httpd;
 
-        tr_logAddNamedDbg(MY_NAME, "Started listening on %s:%d", address, port);
+        tr_logAddNamedDbg(MY_NAME, "Started listening on %s%s", address, portString);
     }
 
     rpc_server_start_retry_cancel(server);
@@ -1292,18 +1336,34 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         tr_logAddNamedError(MY_NAME, _("%s is not a valid address"), str);
         address = tr_inaddr_any;
     }
-    else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
+    else if (address.type != TR_AF_INET && address.type != TR_AF_INET6 && address.type != TR_AF_UNIX)
     {
-        tr_logAddNamedError(MY_NAME, _("%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"), str);
+        tr_logAddNamedError(MY_NAME,
+            _("%s is not an IPv4, IPv6 or unix socket address. RPC listeners must be IPv4, IPv6 or unix sockets"), str);
         address = tr_inaddr_any;
+    }
+
+    if (address.type == TR_AF_UNIX)
+    {
+        s->isWhitelistEnabled = false;
+        s->isHostWhitelistEnabled = false;
     }
 
     s->bindAddress = address;
 
     if (s->isEnabled)
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port,
-            s->url);
+        if (s->bindAddress.type == TR_AF_UNIX)
+        {
+            tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on unix:%s:%s"),
+                tr_rpcGetBindAddress(s), s->url);
+        }
+        else
+        {
+            tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"),
+                tr_rpcGetBindAddress(s), (int)s->port, s->url);
+        }
+
         tr_runInEventThread(session, startServer, s);
 
         if (s->isWhitelistEnabled)

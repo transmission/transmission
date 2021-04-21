@@ -164,7 +164,13 @@
 
 #define TR_INET6_ADDRSTRLEN 46
 
+#define TR_UNIX_ADDRSTRLEN 108
+
 #define TR_ADDRSTRLEN 64
+
+#define TR_UNIX_SOCKET_PREFIX "unix:"
+
+#define TR_UNIX_LISTEN_BACKLOG 10
 
 #define TR_BAD_SIZE ((size_t)-1)
 

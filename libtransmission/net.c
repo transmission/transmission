@@ -88,6 +88,11 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
 
 char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
 {
+    if (addr->type == TR_AF_UNIX)
+    {
+        return NULL;
+    }
+
     char addr_buf[INET6_ADDRSTRLEN];
     tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
     tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
@@ -98,13 +103,20 @@ char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, siz
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    if (addr->type == TR_AF_INET)
+    switch (addr->type)
     {
+    case TR_AF_INET:
         return evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen);
-    }
-    else
-    {
+
+    case TR_AF_INET6:
         return evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
+
+    case TR_AF_UNIX:
+        strncpy(buf, addr->addr.unixSocketPath, buflen - 1);
+        return buf;
+
+    default:
+        return NULL;
     }
 }
 
@@ -124,7 +136,13 @@ bool tr_address_from_string(tr_address* dst, char const* src)
 {
     bool success = false;
 
-    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
+    if (strncmp(TR_UNIX_SOCKET_PREFIX, src, strlen(TR_UNIX_SOCKET_PREFIX)) == 0)
+    {
+        dst->type = TR_AF_UNIX;
+        strncpy(dst->addr.unixSocketPath, src + strlen(TR_UNIX_SOCKET_PREFIX), sizeof(dst->addr) - 1);
+        success = true;
+    }
+    else if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
         success = true;
@@ -139,7 +157,7 @@ bool tr_address_from_string(tr_address* dst, char const* src)
 }
 
 /*
- * Compare two tr_address structures.
+ * Compare two tr_address structures, both of which are not of type TR_AF_UNIX.
  * Returns:
  * <0 if a < b
  * >0 if a > b
@@ -769,7 +787,7 @@ static bool isMartianAddr(struct tr_address const* a)
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
-    return port != 0 && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
+    return port != 0 && tr_address_is_valid_inet(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
         !isMartianAddr(addr);
 }
 
