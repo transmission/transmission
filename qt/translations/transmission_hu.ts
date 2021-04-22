@@ -2242,7 +2242,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Csatalkozás &amp;távoli munkamenethez</translation>
+        <translation>Csatlakozás &amp;távoli munkamenethez</translation>
     </message>
     <message>
         <location line="+7"/>
