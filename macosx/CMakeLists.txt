@@ -9,6 +9,7 @@ else()
 endif()
 
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
+find_program(ICONUTIL_EXECUTABLE iconutil REQUIRED)
 find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
 find_program(INSTALL_NAME_TOOL_EXECUTABLE install_name_tool REQUIRED)
 
@@ -195,12 +196,42 @@ set(${PROJECT_NAME}_XIB_FILES
     URLSheetWindow.xib
 )
 
+set(APPICONSET_DIR "${PROJECT_SOURCE_DIR}/Images/Images.xcassets/AppIcon.appiconset")
+set(APPICON_FILE "${PROJECT_BINARY_DIR}/Transmission.icns")
+add_custom_command(
+    OUTPUT "${APPICON_FILE}"
+    COMMAND "${CMAKE_COMMAND}" -E rm -f
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${APPICONSET_DIR}"
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    COMMAND "${CMAKE_COMMAND}" -E rm
+        "${PROJECT_BINARY_DIR}/Transmission.iconset/Contents.json"
+    COMMAND "${ICONUTIL_EXECUTABLE}"
+        --convert icns
+        --output "${APPICON_FILE}"
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    DEPENDS
+        "${APPICONSET_DIR}/icon_128x128.png"
+        "${APPICONSET_DIR}/icon_128x128@2x.png"
+        "${APPICONSET_DIR}/icon_16x16.png"
+        "${APPICONSET_DIR}/icon_16x16@2x.png"
+        "${APPICONSET_DIR}/icon_256x256.png"
+        "${APPICONSET_DIR}/icon_256x256@2x.png"
+        "${APPICONSET_DIR}/icon_32x32.png"
+        "${APPICONSET_DIR}/icon_32x32@2x.png"
+        "${APPICONSET_DIR}/icon_512x512.png"
+        "${APPICONSET_DIR}/icon_512x512@2x.png"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    VERBATIM
+)
+
 set(${PROJECT_NAME}_RESOURCES
     Defaults.plist
     Credits.rtf
     sparkle_dsa_pub.pem
     ../COPYING
-    Images/Transmission.icns
+    "${APPICON_FILE}"
     Images/TransmissionDocument.icns
 )
 
