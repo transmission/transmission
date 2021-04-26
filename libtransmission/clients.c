@@ -826,7 +826,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
     else if (strncmp(chid, "-BL", 3) == 0)
     {
-        tr_snprintf(buf, buflen, "BitLord %c.%c.%c-%c%c", id[3], id[4], id[5], id[6], id[7]);
+        tr_snprintf(buf, buflen, "BitLord %c.%c.%c-%c%c%c", id[3], id[4], id[5], id[6], id[7], id[8]);
     }
 
     /* Shad0w-style */

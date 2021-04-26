@@ -67,7 +67,7 @@ TEST(Client, clientForId)
         { "-BI2300-", "BiglyBT 2.3.0.0" },
         { "A2-1-18-8-", "aria2 1.18.8" },
         { "A2-1-2-0-", "aria2 1.2.0" },
-        { "-BL24632", "BitLord 2.4.6-32" },
+        { "-BL246326", "BitLord 2.4.6-326" }, // Style used after BitLord 0.59
         { "-WW0007-", "WebTorrent 0.0.0.7" },
         { "-WS1000-", "HTTP Seed" }
     };
