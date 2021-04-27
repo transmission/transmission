@@ -654,10 +654,11 @@
 
    Response arguments:
 
-   string      | value type & description
-   ------------+----------------------------------------------------------
-   "path"      | string  same as the Request argument
-   "size-bytes"| number  the size, in bytes, of the free space in that directory
+   string       | value type & description
+   -------------+----------------------------------------------------------
+   "path"       | string  same as the Request argument
+   "size-bytes" | number  the size, in bytes, of the free space in that directory
+   "total-bytes"| number  the total size, in bytes, that exists in that directory
 
 
 5.0.  Protocol Versions
