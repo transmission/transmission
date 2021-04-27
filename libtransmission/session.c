@@ -1220,11 +1220,11 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 
     if (tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0)
     {
-        free_space = tr_device_info_get_free_space(session->downloadDir);
+        free_space = tr_device_info_get_disk_space(session->downloadDir).free;
     }
     else
     {
-        free_space = tr_getDirFreeSpace(dir);
+        free_space = tr_getDirFreeSpace(dir).free;
     }
 
     return free_space;

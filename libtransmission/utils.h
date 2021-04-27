@@ -82,7 +82,7 @@ char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GN
  * @brief Get available disk space (in bytes) for the specified folder.
  * @return zero or positive integer on success, -1 in case of error.
  */
-int64_t tr_getDirFreeSpace(char const* path);
+struct tr_disk_space tr_getDirFreeSpace(char const* path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds

@@ -25,7 +25,7 @@
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
-#include "platform-quota.h" /* tr_device_info_get_free_space() */
+#include "platform-quota.h" /* tr_device_info_get_disk_space() */
 #include "rpcimpl.h"
 #include "session.h"
 #include "session-id.h"
@@ -2398,7 +2398,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_device_info_get_free_space(s->downloadDir));
+        tr_variantDictAddInt(d, key, tr_device_info_get_disk_space(s->downloadDir).free);
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2623,7 +2623,7 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     int tmperr;
     char const* path = NULL;
     char const* err = NULL;
-    int64_t free_space = -1;
+    struct tr_disk_space disk_space = { -1, -1 };
 
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, NULL))
     {
@@ -2638,9 +2638,9 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     /* get the free space */
     tmperr = errno;
     errno = 0;
-    free_space = tr_sessionGetDirFreeSpace(session, path);
+    disk_space = tr_getDirFreeSpace(path);
 
-    if (free_space < 0)
+    if (disk_space.free < 0)
     {
         err = tr_strerror(errno);
     }
@@ -2653,7 +2653,8 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
         tr_variantDictAddStr(args_out, TR_KEY_path, path);
     }
 
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, free_space);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, disk_space.free);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, disk_space.total);
     return err;
 }
 
