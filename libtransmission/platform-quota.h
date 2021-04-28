@@ -24,14 +24,15 @@ struct tr_device_info
     char* fstype;
 };
 
-struct tr_disk_space {
+struct tr_disk_space
+{
    int64_t  free;
    int64_t  total;
 };
 
 struct tr_device_info* tr_device_info_create(char const* path);
 
-/** This returns an array where the zeroth value represents the free space available and the second value represents the total space on disk.
+/** Values represents the total space on disk.
     If the disk quota (free space) is enabled and readable, this returns how much is available in the quota.
     Otherwise, it returns how much is available on the disk, or { -1, -1 } on error. */
 struct tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const* info);

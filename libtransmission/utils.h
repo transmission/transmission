@@ -25,8 +25,6 @@ struct evbuffer;
 struct event;
 struct timeval;
 
-struct tr_disk_space;
-
 struct tr_error;
 
 /**
