@@ -2640,7 +2640,7 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     errno = 0;
     disk_space = tr_getDirFreeSpace(path);
 
-    if (disk_space.free < 0)
+    if (disk_space.free < 0 || disk_space.total < 0)
     {
         err = tr_strerror(errno);
     }
