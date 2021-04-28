@@ -2623,7 +2623,8 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     int tmperr;
     char const* path = NULL;
     char const* err = NULL;
-    struct tr_disk_space disk_space = { -1, -1 };
+    int64_t free_space = -1;
+    int64_t total_space = -1;
 
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, NULL))
     {
@@ -2638,9 +2639,10 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     /* get the free space */
     tmperr = errno;
     errno = 0;
-    disk_space = tr_getDirFreeSpace(path);
+    free_space = tr_getDirFreeSpace(path);
+    total_space = tr_getDirTotalSpace(path);
 
-    if (disk_space.free < 0 || disk_space.total < 0)
+    if (free_space < 0 || total_space < 0)
     {
         err = tr_strerror(errno);
     }
@@ -2653,8 +2655,8 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
         tr_variantDictAddStr(args_out, TR_KEY_path, path);
     }
 
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, disk_space.free);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, disk_space.total);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, free_space);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, total_space);
     return err;
 }
 

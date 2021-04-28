@@ -1224,7 +1224,7 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
     }
     else
     {
-        free_space = tr_getDirFreeSpace(dir).free;
+        free_space = tr_getDirFreeSpace(dir);
     }
 
     return free_space;

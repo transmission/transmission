@@ -383,7 +383,7 @@ char* tr_buildPath(char const* first_element, ...)
     return buf;
 }
 
-struct tr_disk_space tr_getDirFreeSpace(char const* dir)
+int64_t tr_getDirFreeSpace(char const* dir)
 {
     struct tr_disk_space disk_space = { -1, -1 };
 
@@ -397,8 +397,26 @@ struct tr_disk_space tr_getDirFreeSpace(char const* dir)
     info = tr_device_info_create(dir);
     disk_space = tr_device_info_get_disk_space(info);
     tr_device_info_free(info);
-    return disk_space;
+    return disk_space.free;
 }
+
+int64_t tr_getDirTotalSpace(char const* dir)
+{
+    struct tr_disk_space disk_space = { -1, -1 };
+
+    if (tr_str_is_empty(dir))
+    {
+        errno = EINVAL;
+        return disk_space;
+    }
+
+    struct tr_device_info* info;
+    info = tr_device_info_create(dir);
+    disk_space = tr_device_info_get_disk_space(info);
+    tr_device_info_free(info);
+    return disk_space.total;
+}
+
 
 /****
 *****
