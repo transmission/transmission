@@ -2639,10 +2639,9 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     /* get the free space */
     tmperr = errno;
     errno = 0;
-    free_space = tr_getDirFreeSpace(path);
-    total_space = tr_getDirTotalSpace(path);
+    dir_space = tr_getDirSpace(path);
 
-    if (free_space < 0 || total_space < 0)
+    if (dir_space.free < 0 || dir_space.total < 0)
     {
         err = tr_strerror(errno);
     }
@@ -2655,8 +2654,8 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
         tr_variantDictAddStr(args_out, TR_KEY_path, path);
     }
 
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, free_space);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, total_space);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
     return err;
 }
 
