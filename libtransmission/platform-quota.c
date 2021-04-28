@@ -406,6 +406,8 @@ static struct tr_disk_space getquota(char const* device)
 
 static struct tr_disk_space getxfsquota(char* device)
 {
+    int64_t limit;
+    int64_t freespace;
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
 
