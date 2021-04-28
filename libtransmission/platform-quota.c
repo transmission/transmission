@@ -270,14 +270,16 @@ struct tr_disk_space getquota(char const* device)
     struct quotahandle* qh;
     struct quotakey qk;
     struct quotaval qv;
-    struct tr_disk_space disk_space;
+    struct tr_disk_space disk_space = { -1, -1 };
+    int64_t limit;
+    int64_t freespace;
     int64_t spaceused;
 
     qh = quota_open(device);
 
     if (qh == NULL)
     {
-        return { -1, -1 };
+        return disk_space;
     }
 
     qk.qk_idtype = QUOTA_IDTYPE_USER;
@@ -287,7 +289,7 @@ struct tr_disk_space getquota(char const* device)
     if (quota_get(qh, &qk, &qv) == -1)
     {
         quota_close(qh);
-        return { -1, -1 };
+        return disk_space;
     }
 
     if (qv.qv_softlimit > 0)
@@ -301,7 +303,7 @@ struct tr_disk_space getquota(char const* device)
     else
     {
         quota_close(qh);
-        return { -1, -1 };
+        return disk_space;
     }
 
     spaceused = qv.qv_usage;
@@ -404,7 +406,7 @@ static struct tr_disk_space getquota(char const* device)
 
 static struct tr_disk_space getxfsquota(char* device)
 {
-    struct tr_disk_space disk_space = { -1, -1 }
+    struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
 
     if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
@@ -426,10 +428,10 @@ static struct tr_disk_space getxfsquota(char* device)
 
         freespace = limit - (dq.d_bcount >> 1);
         freespace = freespace < 0 ? 0 : (freespace * 1024);
-        limit = limit < 0 ? 0 : (limit * 1024)
+        limit = limit < 0 ? 0 : (limit * 1024);
         disk_space.free = freespace;
         disk_space.total = limit;
-        return disk_space
+        return disk_space;
     }
 
     /* something went wrong */
