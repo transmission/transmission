@@ -21,6 +21,7 @@ class Session;
 extern "C"
 {
 struct tr_metainfo_builder;
+struct tr_disk_space;
 }
 
 class MakeDialog : public BaseDialog

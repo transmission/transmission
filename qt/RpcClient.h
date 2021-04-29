@@ -37,6 +37,7 @@ extern "C"
 {
 struct evbuffer;
 struct tr_session;
+struct tr_disk_space;
 }
 
 struct RpcResponse
