@@ -383,7 +383,7 @@ char* tr_buildPath(char const* first_element, ...)
     return buf;
 }
 
-struct tr_disk_space* tr_getDirSpace(char const* dir)
+struct tr_disk_space tr_getDirSpace(char const* dir)
 {
     struct tr_disk_space disk_space = { -1, -1 };
 
