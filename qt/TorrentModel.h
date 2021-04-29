@@ -24,7 +24,6 @@ class Speed;
 extern "C"
 {
 struct tr_variant;
-struct tr_disk_space;
 }
 
 class TorrentModel : public QAbstractListModel

@@ -46,7 +46,6 @@ class TorrentModel;
 extern "C"
 {
 struct tr_variant;
-struct tr_disk_space;
 }
 
 class MainWindow : public QMainWindow
