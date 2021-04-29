@@ -2623,7 +2623,8 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     int tmperr;
     char const* path = NULL;
     char const* err = NULL;
-    struct tr_disk_space dir_space = { -1, -1 };
+    int64_t free_space = -1;
+    int64_t total_space = -1;
 
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, NULL))
     {
