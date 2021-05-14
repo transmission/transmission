@@ -130,9 +130,32 @@ bool trashDataFile(const char * filename, tr_error ** error)
 }
 
 @implementation Torrent
+{
+    tr_torrent * fHandle;
+    const tr_info * fInfo;
+    const tr_stat * fStat;
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize removeWhenFinishSeeding = fRemoveWhenFinishSeeding;
+    NSUserDefaults * fDefaults;
+
+    NSImage * fIcon;
+
+    NSString * fHashString;
+
+    tr_file_stat * fFileStat;
+    NSArray * fFileList, * fFlatFileList;
+
+    NSIndexSet * fPreviousFinishedIndexes;
+    NSDate * fPreviousFinishedIndexesDate;
+
+    NSInteger fGroupValue;
+    TorrentDeterminationType fGroupValueDetermination;
+
+    TorrentDeterminationType fDownloadFolderDetermination;
+
+    BOOL fResumeOnWake;
+
+    BOOL fTimeMachineExcludeInitialized;
+}
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib
@@ -230,7 +253,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             @"Active": @([self isActive]),
             @"WaitToStart": @([self waitingToStart]),
             @"GroupValue": @(fGroupValue),
-            @"RemoveWhenFinishSeeding": @(fRemoveWhenFinishSeeding)};
+            @"RemoveWhenFinishSeeding": @(_removeWhenFinishSeeding)};
 }
 
 - (void) dealloc
@@ -1717,7 +1740,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         fGroupValue = [[GroupsController groups] groupIndexForTorrent: self];
     }
 
-    fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
+    _removeWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
