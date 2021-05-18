@@ -460,7 +460,8 @@ export class OverflowMenu extends EventTarget {
     e.textContent = 'Source Code';
     options.append(e);
 
-    Object.values(actions).forEach(this._updateElement.bind(this));
+    this._updateElement = this._updateElement.bind(this);
+
     return { actions, elements, root };
   }
 }
