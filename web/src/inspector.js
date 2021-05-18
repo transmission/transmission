@@ -201,9 +201,13 @@ export class Inspector extends EventTarget {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
     const callback = this.torrent_listener;
-    for (const t of this.torrents)  {t.removeEventListener(key, callback);}
+    for (const t of this.torrents) {
+      t.removeEventListener(key, callback);
+    }
     this.torrents = [...torrents];
-    for (const t of this.torrents)  {t.addEventListener(key, callback);}
+    for (const t of this.torrents) {
+      t.addEventListener(key, callback);
+    }
 
     this._refreshTorrents();
     this._updateCurrentPage();
@@ -922,7 +926,9 @@ export class Inspector extends EventTarget {
       list.append(fragment);
     } else {
       // ...refresh the already-existing file list
-      for (const row of file_rows)  {row.refresh();}
+      for (const row of file_rows) {
+        row.refresh();
+      }
     }
   }
 }

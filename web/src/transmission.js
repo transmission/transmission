@@ -256,8 +256,9 @@ export class Transmission extends EventTarget {
     this.prefs.addEventListener('change', ({ key, value }) =>
       this._onPrefChanged(key, value)
     );
-    for (const [key, value] of this.prefs
-      .entries())  {this._onPrefChanged(key, value);}
+    for (const [key, value] of this.prefs.entries()) {
+      this._onPrefChanged(key, value);
+    }
   }
 
   loadDaemonPrefs() {
@@ -418,9 +419,9 @@ export class Transmission extends EventTarget {
   _dispatchSelectionChanged() {
     const nonselected = [];
     const selected = [];
-    for (const r of this._rows) 
-      {(r.isSelected() ? selected : nonselected).push(r.getTorrent())
-    ;}
+    for (const r of this._rows) {
+      (r.isSelected() ? selected : nonselected).push(r.getTorrent());
+    }
 
     const event = new Event('torrent-selection-changed');
     event.nonselected = nonselected;
@@ -480,12 +481,7 @@ export class Transmission extends EventTarget {
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (
-      !is_input_focused &&
-      !any_popup_active &&
-      !metaKey &&
-      !ctrlKey
-    ) {
+    if (!is_input_focused && !any_popup_active && !metaKey && !ctrlKey) {
       const shift_key = keyCode === 16; // shift key pressed
       const up_key = keyCode === 38; // up key pressed
       const dn_key = keyCode === 40; // down key pressed
@@ -585,7 +581,9 @@ export class Transmission extends EventTarget {
       .getData(type)
       .split('\n')
       .map((string) => string.trim())
-      .filter((string) => Transmission._isValidURL(string)))  {this.remote.addTorrentByUrl(uri, paused);}
+      .filter((string) => Transmission._isValidURL(string))) {
+      this.remote.addTorrentByUrl(uri, paused);
+    }
 
     event_.preventDefault();
     return false;
@@ -654,7 +652,11 @@ export class Transmission extends EventTarget {
 
       if (needinfo.length > 0) {
         // whee, new torrents! get their initial information.
-        const more_fields = ['id', ...Torrent.Fields.Metadata, ...Torrent.Fields.Stats ];
+        const more_fields = [
+          'id',
+          ...Torrent.Fields.Metadata,
+          ...Torrent.Fields.Stats,
+        ];
         this.updateTorrents(needinfo, more_fields);
         this.refilterSoon();
       }
@@ -905,7 +907,9 @@ TODO: fix this when notifications get fixed
       this.prefs.sort_mode,
       this.prefs.sort_direction
     );
-    for (const [index, tor] of torrents.entries())  {(rows[index] = id2row[tor.getId()]);}
+    for (const [index, tor] of torrents.entries()) {
+      rows[index] = id2row[tor.getId()];
+    }
   }
 
   _refilter(rebuildEverything) {
@@ -1031,12 +1035,11 @@ TODO: fix this when notifications get fixed
     this.dirtyTorrents.clear();
 
     // set the odd/even property
-    for (const [index, e] of rows
-      .map((row) => row.getElement()).entries()) {
-        const even = index % 2 === 0;
-        e.classList.toggle('even', even);
-        e.classList.toggle('odd', !even);
-      }
+    for (const [index, e] of rows.map((row) => row.getElement()).entries()) {
+      const even = index % 2 === 0;
+      e.classList.toggle('even', even);
+      e.classList.toggle('odd', !even);
+    }
 
     this._updateStatusbar();
     if (
