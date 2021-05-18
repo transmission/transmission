@@ -454,7 +454,7 @@ export class Transmission extends EventTarget {
 
   // Process key events
   _keyDown(event_) {
-    const { keyCode } = event_;
+    const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
     const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(event_);
@@ -473,7 +473,7 @@ export class Transmission extends EventTarget {
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const is_input_focused = event_.target.matches('input');
+    const is_input_focused = target.matches('input');
     const rows = this._rows;
 
     // Some shortcuts can only be used if the following conditions are met:
@@ -483,8 +483,8 @@ export class Transmission extends EventTarget {
     if (
       !is_input_focused &&
       !any_popup_active &&
-      !event_.metaKey &&
-      !event_.ctrlKey
+      !metaKey &&
+      !ctrlKey
     ) {
       const shift_key = keyCode === 16; // shift key pressed
       const up_key = keyCode === 38; // up key pressed
@@ -519,7 +519,7 @@ export class Transmission extends EventTarget {
             this._deselectRow(rows[last]);
           }
         } else {
-          if (event_.shiftKey) {
+          if (shiftKey) {
             this._selectRange(r);
           } else {
             this._setSelectedRow(r);
