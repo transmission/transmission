@@ -33,8 +33,6 @@
 	<string>TransmissionHelp</string>
 	<key>CFBundleHelpBookName</key>
 	<string>Transmission Help</string>
-	<key>CFBundleIconFile</key>
-	<string>Transmission</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.m0k.transmission</string>
 	<key>CFBundleInfoDictionaryVersion</key>

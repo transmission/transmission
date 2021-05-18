@@ -276,7 +276,6 @@
 		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
 		A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
-		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F7CF5513035F7B0016FF10 /* URLSheetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */; };
 		A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.m */; };
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
@@ -507,7 +506,6 @@
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PrefsController.m; sourceTree = "<group>"; };
 		4D18389709DEC0030047D688 /* libtransmission.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtransmission.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D2784360905709500687951 /* Transmission.icns */ = {isa = PBXFileReference; explicitFileType = image.icns; name = Transmission.icns; path = Images/Transmission.icns; sourceTree = "<group>"; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TorrentTableView.m; sourceTree = "<group>"; };
 		4D36BA600CA2F00800A63CA5 /* crypto.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = crypto.c; sourceTree = "<group>"; };
@@ -1335,7 +1333,6 @@
 				A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */,
 				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				F63480621E1D7274005B9E09 /* Images.xcassets */,
-				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 			);
 			name = Resources;
@@ -2241,7 +2238,6 @@
 				4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */,
 				4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */,
 				A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */,
-				A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */,
 				A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */,
@@ -2987,6 +2983,7 @@
 		0053D3D50C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -3177,6 +3174,7 @@
 		4DF0C599089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -3334,6 +3332,7 @@
 		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
