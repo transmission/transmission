@@ -9,11 +9,11 @@
 
 import isEqual from 'lodash.isequal';
 
-export class Utils {
+export const Utils = {
   /**
    * Checks to see if the content actually changed before poking the DOM.
    */
-  static setInnerHTML(e, html) {
+  setInnerHTML(e, html) {
     if (!e) {
       return;
     }
@@ -25,10 +25,10 @@ export class Utils {
       e.currentHTML = html;
       e.innerHTML = html;
     }
-  }
+  },
 
   /** Given a numerator and denominator, return a ratio string */
-  static ratio(numerator, denominator) {
+  ratio(numerator, denominator) {
     let result = Math.floor((100 * numerator) / denominator) / 100;
 
     // check for special cases
@@ -42,8 +42,8 @@ export class Utils {
     }
 
     return result;
-  }
-}
+  },
+};
 
 export function createTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');

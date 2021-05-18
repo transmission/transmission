@@ -256,9 +256,8 @@ export class Transmission extends EventTarget {
     this.prefs.addEventListener('change', ({ key, value }) =>
       this._onPrefChanged(key, value)
     );
-    this.prefs
-      .entries()
-      .forEach(([key, value]) => this._onPrefChanged(key, value));
+    for (const [key, value] of this.prefs
+      .entries())  {this._onPrefChanged(key, value);}
   }
 
   loadDaemonPrefs() {
@@ -419,9 +418,9 @@ export class Transmission extends EventTarget {
   _dispatchSelectionChanged() {
     const nonselected = [];
     const selected = [];
-    this._rows.forEach((r) =>
-      (r.isSelected() ? selected : nonselected).push(r.getTorrent())
-    );
+    for (const r of this._rows) 
+      {(r.isSelected() ? selected : nonselected).push(r.getTorrent())
+    ;}
 
     const event = new Event('torrent-selection-changed');
     event.nonselected = nonselected;
@@ -582,12 +581,11 @@ export class Transmission extends EventTarget {
     const type = event_.data.Transfer.types
       .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
       .pop();
-    event_.dataTransfer
+    for (const uri of event_.dataTransfer
       .getData(type)
       .split('\n')
       .map((string) => string.trim())
-      .filter((string) => Transmission._isValidURL(string))
-      .forEach((uri) => this.remote.addTorrentByUrl(uri, paused));
+      .filter((string) => Transmission._isValidURL(string)))  {this.remote.addTorrentByUrl(uri, paused);}
 
     event_.preventDefault();
     return false;
@@ -632,9 +630,9 @@ export class Transmission extends EventTarget {
       const keys = table.shift();
       const o = {};
       for (const row of table) {
-        keys.forEach((key, index) => {
+        for (const [index, key] of keys.entries()) {
           o[key] = row[index];
-        });
+        }
         const { id } = o;
         let t = this._torrents[id];
         if (t) {
@@ -910,7 +908,7 @@ TODO: fix this when notifications get fixed
       this.prefs.sort_mode,
       this.prefs.sort_direction
     );
-    torrents.forEach((tor, index) => (rows[index] = id2row[tor.getId()]));
+    for (const [index, tor] of torrents.entries())  {(rows[index] = id2row[tor.getId()]);}
   }
 
   _refilter(rebuildEverything) {
@@ -1036,13 +1034,12 @@ TODO: fix this when notifications get fixed
     this.dirtyTorrents.clear();
 
     // set the odd/even property
-    rows
-      .map((row) => row.getElement())
-      .forEach((e, index) => {
+    for (const [index, e] of rows
+      .map((row) => row.getElement()).entries()) {
         const even = index % 2 === 0;
         e.classList.toggle('even', even);
         e.classList.toggle('odd', !even);
-      });
+      }
 
     this._updateStatusbar();
     if (

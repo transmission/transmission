@@ -150,7 +150,7 @@ export class Inspector extends EventTarget {
     const thead = document.createElement('thead');
     const tr = document.createElement('tr');
     const names = ['', 'Up', 'Down', 'Done', 'Status', 'Address', 'Client'];
-    names.forEach((name, index) => {
+    for (const [index, name] of names.entries()) {
       const th = document.createElement('th');
       const classname = peer_column_classes[index];
       if (classname === 'encryption') {
@@ -159,7 +159,7 @@ export class Inspector extends EventTarget {
       th.classList.add(classname);
       setTextContent(th, name);
       tr.append(th);
-    });
+    }
     const tbody = document.createElement('tbody');
     thead.append(tr);
     table.append(thead);
@@ -201,9 +201,9 @@ export class Inspector extends EventTarget {
     // update the inspector when a selected torrent's data changes.
     const key = 'dataChanged';
     const callback = this.torrent_listener;
-    this.torrents.forEach((t) => t.removeEventListener(key, callback));
+    for (const t of this.torrents)  {t.removeEventListener(key, callback);}
     this.torrents = [...torrents];
-    this.torrents.forEach((t) => t.addEventListener(key, callback));
+    for (const t of this.torrents)  {t.addEventListener(key, callback);}
 
     this._refreshTorrents();
     this._updateCurrentPage();
@@ -502,7 +502,7 @@ export class Inspector extends EventTarget {
       const date = get(torrents[0]);
       const mixed_date = !torrents.every((t) => get(t) === date);
 
-      const empty_creator = !creator || !creator.length;
+      const empty_creator = !creator || creator.length === 0;
       const empty_date = !date;
       if (mixed_creator || mixed_date) {
         string = mixed;
@@ -598,12 +598,12 @@ export class Inspector extends EventTarget {
       for (const peer of tor.getPeers()) {
         const tr = document.createElement('tr');
         tr.classList.add('peer-row');
-        cell_setters.forEach((setter, index) => {
+        for (const [index, setter] of cell_setters.entries()) {
           const td = document.createElement('td');
           td.classList.add(peer_column_classes[index]);
           setter(peer, td);
           tr.append(td);
-        });
+        }
         rows.push(tr);
       }
 
@@ -624,7 +624,7 @@ export class Inspector extends EventTarget {
       case Torrent._TrackerWaiting: {
         const timeUntilAnnounce = Math.max(
           0,
-          tracker.nextAnnounceTime - new Date().getTime() / 1000
+          tracker.nextAnnounceTime - Date.now() / 1000
         );
         return `Next announce in ${Formatter.timeInterval(timeUntilAnnounce)}`;
       }
@@ -706,7 +706,7 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-      tor.getTrackers().forEach((tracker, index) => {
+      for (const [index, tracker] of tor.getTrackers().entries()) {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
@@ -773,7 +773,7 @@ export class Inspector extends EventTarget {
         tier_div.append(element);
 
         rows.push(tier_div);
-      });
+      }
     }
 
     // TODO: modify instead of rebuilding wholesale?
@@ -836,7 +836,7 @@ export class Inspector extends EventTarget {
       file_indices: [],
     };
 
-    tor.getFiles().forEach((file, index) => {
+    for (const [index, file] of tor.getFiles().entries()) {
       const { name } = file;
       const tokens = name.split('/');
       let walk = tree;
@@ -856,7 +856,7 @@ export class Inspector extends EventTarget {
       walk.file_index = index;
       delete walk.children;
       leaves.push(walk);
-    });
+    }
 
     for (const leaf of leaves) {
       const { file_index } = leaf;
@@ -923,7 +923,7 @@ export class Inspector extends EventTarget {
       list.append(fragment);
     } else {
       // ...refresh the already-existing file list
-      this.file_rows.forEach((row) => row.refresh());
+      for (const row of this.file_rows)  {row.refresh();}
     }
   }
 }

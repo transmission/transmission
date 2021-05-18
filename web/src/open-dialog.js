@@ -93,7 +93,7 @@ export class OpenDialog extends EventTarget {
 
     let url = url_input.value.trim();
     if (url.length > 0) {
-      if (url.match(/^[\da-f]{40}$/i)) {
+      if (/^[\da-f]{40}$/i.test(url)) {
         url = `magnet:?xt=urn:btih:${url}`;
       }
       const o = {
