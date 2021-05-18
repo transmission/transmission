@@ -654,10 +654,7 @@ export class Transmission extends EventTarget {
 
       if (needinfo.length > 0) {
         // whee, new torrents! get their initial information.
-        const more_fields = ['id'].concat(
-          Torrent.Fields.Metadata,
-          Torrent.Fields.Stats
-        );
+        const more_fields = ['id', ...Torrent.Fields.Metadata, ...Torrent.Fields.Stats ];
         this.updateTorrents(needinfo, more_fields);
         this.refilterSoon();
       }
@@ -689,12 +686,12 @@ TODO: fix this when notifications get fixed
 */
 
   refreshTorrents() {
-    const fields = ['id'].concat(Torrent.Fields.Stats);
+    const fields = ['id', ...Torrent.Fields.Stats];
     this.updateTorrents('recently-active', fields);
   }
 
   _initializeTorrents() {
-    const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+    const fields = ['id', ...Torrent.Fields.Metadata, ...Torrent.Fields.Stats];
     this.updateTorrents(null, fields);
   }
 
