@@ -228,8 +228,8 @@ export class Inspector extends EventTarget {
   }
 
   _updateCurrentPage() {
-    const { elements } = this;
-    switch (this.current_page) {
+    const { current_page, elements } = this;
+    switch (current_page) {
       case elements.files.root:
         this._updateFiles();
         break;
@@ -244,7 +244,7 @@ export class Inspector extends EventTarget {
         break;
       default:
         console.warn('unexpected page');
-        console.log(this.current_page);
+        console.log(current_page);
     }
   }
 
@@ -254,8 +254,7 @@ export class Inspector extends EventTarget {
     const unknown = 'Unknown';
     const fmt = Formatter;
     const now = Date.now();
-    const { torrents } = this;
-    const e = this.elements;
+    const { elements: e, torrents } = this;
     const sizeWhenDone = torrents.reduce(
       (accumulator, t) => accumulator + t.getSizeWhenDone(),
       0
@@ -557,8 +556,8 @@ export class Inspector extends EventTarget {
 
   _updatePeers() {
     const fmt = Formatter;
-    const { torrents } = this;
-    const { tbody } = this.elements.peers;
+    const { elements, torrents } = this;
+    const { tbody } = elements.peers;
 
     const cell_setters = [
       (peer, td) => {
@@ -901,7 +900,7 @@ export class Inspector extends EventTarget {
 
   _updateFiles() {
     const { list } = this.elements.files;
-    const { torrents } = this;
+    const { file_rows, file_torrent, file_torrent_n, torrents } = this;
 
     // only show one torrent at a time
     if (torrents.length !== 1) {
@@ -911,7 +910,7 @@ export class Inspector extends EventTarget {
 
     const [tor] = torrents;
     const n = tor.getFiles().length;
-    if (tor !== this.file_torrent || n !== this.file_torrent_n) {
+    if (tor !== file_torrent || n !== file_torrent_n) {
       // rebuild the file list...
       this._clearFileList();
       this.file_torrent = tor;
@@ -923,7 +922,7 @@ export class Inspector extends EventTarget {
       list.append(fragment);
     } else {
       // ...refresh the already-existing file list
-      for (const row of this.file_rows)  {row.refresh();}
+      for (const row of file_rows)  {row.refresh();}
     }
   }
 }
