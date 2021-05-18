@@ -10,23 +10,6 @@
 import isEqual from 'lodash.isequal';
 
 export const Utils = {
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
-  },
-
   /** Given a numerator and denominator, return a ratio string */
   ratio(numerator, denominator) {
     let result = Math.floor((100 * numerator) / denominator) / 100;
@@ -42,6 +25,23 @@ export const Utils = {
     }
 
     return result;
+  },
+
+  /**
+   * Checks to see if the content actually changed before poking the DOM.
+   */
+  setInnerHTML(e, html) {
+    if (!e) {
+      return;
+    }
+
+    /* innerHTML is listed as a string, but the browser seems to change it.
+     * For example, "&infin;" gets changed to "∞" somewhere down the line.
+     * So, let's use an arbitrary  different field to test our state... */
+    if (e.currentHTML !== html) {
+      e.currentHTML = html;
+      e.innerHTML = html;
+    }
   },
 };
 
