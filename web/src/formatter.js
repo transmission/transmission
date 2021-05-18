@@ -31,6 +31,12 @@ const fmt_MBps = new Intl.NumberFormat(current_locale, {
 });
 
 export const Formatter = {
+  /** Round a string of a number to a specified number of decimal places */
+  _toTruncFixed(number, places) {
+    const returnValue = Math.floor(number * 10 ** places) / 10 ** places;
+    return returnValue.toFixed(places);
+  },
+
   countString(msgid, msgid_plural, n) {
     return `${this.number(n)} ${this.ngettext(msgid, msgid_plural, n)}`;
   },
@@ -59,6 +65,10 @@ export const Formatter = {
 
   ngettext(msgid, msgid_plural, n) {
     return plural_rules.select(n) === 'one' ? msgid : msgid_plural;
+  },
+
+  number(number) {
+    return number_format.format(number);
   },
 
   // format a percentage to a string
@@ -172,15 +182,5 @@ export const Formatter = {
 
   toKBps(Bps) {
     return Math.floor(Bps / kilo);
-  },
-
-  number(number) {
-    return number_format.format(number);
-  },
-
-  /** Round a string of a number to a specified number of decimal places */
-  _toTruncFixed(number, places) {
-    const returnValue = Math.floor(number * 10 ** places) / 10 ** places;
-    return returnValue.toFixed(places);
   },
 };
