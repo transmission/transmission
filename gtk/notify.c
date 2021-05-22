@@ -177,11 +177,18 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
 
 void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 {
-    char const* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
-
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
-        g_spawn_command_line_async(cmd, NULL);
+        char** argv = gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command);
+        g_spawn_async(NULL /*cwd*/,
+            argv,
+            NULL /*envp*/,
+            G_SPAWN_SEARCH_PATH,
+            NULL /*GSpawnChildSetupFunc*/,
+            NULL /*user_data*/,
+            NULL /*child_pid*/,
+            NULL);
+        g_strfreev(argv);
     }
 
     if (!gtr_pref_flag_get(TR_KEY_torrent_complete_notification_enabled))
