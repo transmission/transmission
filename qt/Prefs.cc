@@ -375,8 +375,8 @@ void Prefs::initDefaults(tr_variant* d) const
 {
     auto constexpr FilterMode = std::string_view { "all" };
     auto constexpr SessionHost = std::string_view { "localhost" };
-    auto constexpr SessionPassword = std::string_view { "" };
-    auto constexpr SessionUsername = std::string_view { "" };
+    auto constexpr SessionPassword = std::string_view {};
+    auto constexpr SessionUsername = std::string_view {};
     auto constexpr SortMode = std::string_view { "sort-by-name" };
     auto constexpr SoundCommand =
         std::string_view { "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" };
