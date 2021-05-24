@@ -66,6 +66,7 @@ export class Prefs extends EventTarget {
   static _setCookie(key, value) {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
+    // eslint-disable-next-line unicorn/no-document-cookie
     document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
   }
 
@@ -80,7 +81,7 @@ export class Prefs extends EventTarget {
     if (value === 'false') {
       return false;
     }
-    if (value.match(/^\d+$/)) {
+    if (/^\d+$/.test(value)) {
       return Number.parseInt(value, 10);
     }
     return value;

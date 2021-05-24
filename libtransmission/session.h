@@ -223,8 +223,8 @@ struct tr_session
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* public_ipv4;
-    struct tr_bindinfo* public_ipv6;
+    struct tr_bindinfo* bind_ipv4;
+    struct tr_bindinfo* bind_ipv6;
 };
 
 static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
