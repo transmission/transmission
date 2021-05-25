@@ -91,8 +91,6 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
     tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_torrent_complete_sound_command,
-        "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_show_options_window, TRUE);
     tr_variantDictAddBool(d, TR_KEY_main_window_is_maximized, FALSE);
@@ -108,6 +106,24 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_compact_view, FALSE);
 }
 
+static void ensure_sound_cmd_is_a_list(tr_variant* dict)
+{
+    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_variant* list = NULL;
+    if (tr_variantDictFindList(dict, key, &list))
+    {
+        return;
+    }
+
+    tr_variantDictRemove(dict, key);
+    list = tr_variantDictAddList(dict, key, 5);
+    tr_variantListAddStr(list, "canberra-gtk-play");
+    tr_variantListAddStr(list, "-i");
+    tr_variantListAddStr(list, "complete-download");
+    tr_variantListAddStr(list, "-d");
+    tr_variantListAddStr(list, "transmission torrent downloaded");
+}
+
 static tr_variant* getPrefs(void)
 {
     static tr_variant settings;
@@ -118,6 +134,7 @@ static tr_variant* getPrefs(void)
         tr_variantInitDict(&settings, 0);
         tr_prefs_init_defaults(&settings);
         tr_sessionLoadSettings(&settings, gl_confdir, MY_CONFIG_NAME);
+        ensure_sound_cmd_is_a_list(&settings);
         loaded = TRUE;
     }
 
@@ -176,6 +193,31 @@ void gtr_pref_flag_set(tr_quark const key, gboolean value)
 /***
 ****
 ***/
+
+char** gtr_pref_strv_get(tr_quark const key)
+{
+    char** ret = NULL;
+
+    tr_variant* list = NULL;
+    if (tr_variantDictFindList(getPrefs(), key, &list))
+    {
+        size_t out = 0;
+        size_t const n = tr_variantListSize(list);
+        ret = g_new0(char*, n + 1);
+
+        for (size_t i = 0; i < n; ++i)
+        {
+            char const* str = NULL;
+            size_t len = 0;
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &len))
+            {
+                ret[out++] = g_strndup(str, len);
+            }
+        }
+    }
+
+    return ret;
+}
 
 char const* gtr_pref_string_get(tr_quark const key)
 {

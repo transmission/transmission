@@ -1067,6 +1067,13 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
         if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
         {
+            // if types differ, ensure that target will overwrite source
+            tr_variant* const target_child = tr_variantDictFind(target, key);
+            if (target_child && !tr_variantIsType(target_child, val->type))
+            {
+                tr_variantDictRemove(target, key);
+            }
+
             if (tr_variantIsBool(val))
             {
                 bool boolVal = false;
