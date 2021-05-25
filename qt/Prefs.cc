@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cassert>
 #include <cstdlib>
 #include <string_view>
@@ -43,12 +44,11 @@ void ensureSoundCommandIsAList(tr_variant* dict)
     }
 
     tr_variantDictRemove(dict, key);
-    list = tr_variantDictAddList(dict, key, 5);
-    tr_variantListAddStr(list, "canberra-gtk-play");
-    tr_variantListAddStr(list, "-i");
-    tr_variantListAddStr(list, "complete-download");
-    tr_variantListAddStr(list, "-d");
-    tr_variantListAddStr(list, "transmission torrent downloaded");
+    dictAdd(dict, key, std::array<std::string_view, 5>{
+            "canberra-gtk-play",
+            "-i", "complete-download",
+            "-d", "transmission torrent downloaded"
+        });
 }
 
 } // anonymous namespace
