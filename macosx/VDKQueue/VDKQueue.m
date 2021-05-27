@@ -54,9 +54,9 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 
 - (instancetype) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags NS_DESIGNATED_INITIALIZER;
 
-@property (copy) NSString *path;
-@property int watchedFD;
-@property u_int subscriptionFlags;
+@property (atomic, copy) NSString *path;
+@property (atomic, assign) int watchedFD;
+@property (atomic, assign) u_int subscriptionFlags;
 
 @end
 
@@ -183,7 +183,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
         
         if (pathEntry)
         {
-            EV_SET(&ev, pathEntry.watchedFD, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
+            EV_SET(&ev, [pathEntry watchedFD], EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
             
             pathEntry.subscriptionFlags = flags;
             
@@ -247,7 +247,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                             NSString *fpath = ((VDKQueuePathEntry *)pe).path;
                             if (!fpath) continue;
                             
-                            [NSWorkspace.sharedWorkspace noteFileSystemChanged:fpath];
+                            [[NSWorkspace sharedWorkspace] noteFileSystemChanged:fpath];
                             
                             // Clear any old notifications
                             [notesToPost removeAllObjects];
@@ -296,7 +296,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                                                    if (!_delegate || _alwaysPostNotifications)
                                                    {
                                                        NSDictionary * userInfoDict = @{@"path": fpath};
-                                                       [NSWorkspace.sharedWorkspace.notificationCenter postNotificationName:note object:self userInfo:userInfoDict];
+                                                       [[NSWorkspace sharedWorkspace].notificationCenter postNotificationName:note object:self userInfo:userInfoDict];
                                                    }
                                                }
                                                
