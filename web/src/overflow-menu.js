@@ -318,7 +318,7 @@ export class OverflowMenu extends EventTarget {
     select.addEventListener('change', (event_) => {
       const { value } = event_.target;
       console.log(event_);
-      if (event_.target.value === unlimited) {
+      if (value === unlimited) {
         this.remote.savePrefs({ [RPC._UpSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
@@ -361,7 +361,7 @@ export class OverflowMenu extends EventTarget {
     select.addEventListener('change', (event_) => {
       const { value } = event_.target;
       console.log(event_);
-      if (event_.target.value === unlimited) {
+      if (value === unlimited) {
         this.remote.savePrefs({ [RPC._DownSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
@@ -460,7 +460,8 @@ export class OverflowMenu extends EventTarget {
     e.textContent = 'Source Code';
     options.append(e);
 
-    Object.values(actions).forEach(this._updateElement.bind(this));
+    this._updateElement = this._updateElement.bind(this);
+
     return { actions, elements, root };
   }
 }

@@ -38,12 +38,12 @@ export class RemoveDialog extends EventTarget {
   }
 
   _onConfirm() {
-    const { torrents } = this.options;
+    const { remote, torrents, trash } = this.options;
     if (torrents.length > 0) {
-      if (this.options.trash) {
-        this.options.remote.removeTorrentsAndData(torrents);
+      if (trash) {
+        remote.removeTorrentsAndData(torrents);
       } else {
-        this.options.remote.removeTorrents(torrents);
+        remote.removeTorrents(torrents);
       }
     }
 
@@ -64,13 +64,13 @@ export class RemoveDialog extends EventTarget {
   static _createMessage(options) {
     let heading = null;
     let message = null;
-    const { torrents } = options;
+    const { torrents, trash } = options;
     const [torrent] = torrents;
-    if (options.trash && torrents.length === 1) {
+    if (trash && torrents.length === 1) {
       heading = `Remove ${torrent.getName()} and delete data?`;
       message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
-    } else if (options.trash) {
+    } else if (trash) {
       heading = `Remove ${torrents.length} transfers and delete data?`;
       message =
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';

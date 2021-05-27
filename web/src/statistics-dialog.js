@@ -72,14 +72,14 @@ export class StatisticsDialog extends EventTarget {
 
   static _create() {
     const elements = createDialogContainer('statistics-dialog');
-    const { workarea } = elements;
-    elements.confirm.remove();
-    elements.dismiss.textContent = 'Close';
+    const { confirm, dismiss, heading, root, workarea } = elements;
+    confirm.remove();
+    dismiss.textContent = 'Close';
     delete elements.confirm;
 
     const heading_text = 'Statistics';
-    elements.root.setAttribute('aria-label', heading_text);
-    elements.heading.textContent = heading_text;
+    root.setAttribute('aria-label', heading_text);
+    heading.textContent = heading_text;
 
     const labels = ['Uploaded:', 'Downloaded:', 'Ratio:', 'Running time:'];
     let section = createInfoSection('Current session', labels);
