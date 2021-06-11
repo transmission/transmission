@@ -487,6 +487,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) |
         ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) |
         ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) |
+        ((flags & TR_SYS_FILE_O_DIRECT) != 0 ? O_DIRECT : 0) |
         O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);

@@ -171,7 +171,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         TR_ASSERT(tor->infoDictLength > 0);
 
-        fd = tr_sys_file_open(tor->info.torrent, TR_SYS_FILE_READ, 0, NULL);
+        fd = tr_sys_file_open(tor->info.torrent, TR_SYS_FILE_READ | TR_SYS_FILE_O_DIRECT, 0, NULL);
 
         if (fd != TR_BAD_SYS_FILE)
         {

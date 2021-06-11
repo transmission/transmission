@@ -68,7 +68,8 @@ typedef enum
     TR_SYS_FILE_CREATE_NEW = (1 << 3),
     TR_SYS_FILE_APPEND = (1 << 4),
     TR_SYS_FILE_TRUNCATE = (1 << 5),
-    TR_SYS_FILE_SEQUENTIAL = (1 << 6)
+    TR_SYS_FILE_SEQUENTIAL = (1 << 6),
+    TR_SYS_FILE_O_DIRECT = (1 << 7),
 }
 tr_sys_file_open_flags_t;
 

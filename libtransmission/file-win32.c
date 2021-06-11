@@ -859,6 +859,8 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         native_flags |= FILE_FLAG_SEQUENTIAL_SCAN;
     }
 
+    /* if ((flags & TR_SYS_FILE_O_DIRECT) != 0)  // ignore for now */
+
     ret = open_file(path, native_access, native_disposition, native_flags, error);
 
     success = ret != TR_BAD_SYS_FILE;
