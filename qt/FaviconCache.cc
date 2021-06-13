@@ -14,6 +14,9 @@
 #include <QNetworkRequest>
 #include <QStandardPaths>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #include "FaviconCache.h"
 
 /***
@@ -113,15 +116,10 @@ QString FaviconCache::getDisplayName(Key const& key)
 
 FaviconCache::Key FaviconCache::getKey(QUrl const& url)
 {
-    auto host = url.host();
-
-    // remove tld
-    auto const suffix = url.topLevelDomain();
-    host.truncate(host.size() - suffix.size());
-
-    // remove subdomain
-    auto const pos = host.indexOf(QLatin1Char('.'));
-    return pos < 0 ? host : host.remove(0, pos + 1);
+    char* const domain = tr_get_stripped_domain(url.host().toUtf8().constData());
+    auto const ret = QString::fromUtf8(domain);
+    tr_free(domain);
+    return ret;
 }
 
 FaviconCache::Key FaviconCache::getKey(QString const& displayName)
