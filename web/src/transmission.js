@@ -871,7 +871,7 @@ TODO: fix this when notifications get fixed
   }
 
   _updateFilterSelect() {
-    const trackers = this._getTrackers();
+    const trackers = this._getTrackerCounts();
     const names = Object.keys(trackers).sort();
 
     // build the new html
@@ -880,9 +880,8 @@ TODO: fix this when notifications get fixed
       ? '<option value="all" selected="selected">All</option>'
       : '<option value="all">All</option>';
     for (const name of names) {
-      const o = trackers[name];
-      string += `<option value="${o.domain}"`;
-      if (trackers[name].domain === this.filterTracker) {
+      string += `<option value="${name}"`;
+      if (name === this.filterTracker) {
         string += ' selected="selected"';
       }
       string += `>${name}</option>`;
@@ -1050,36 +1049,27 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  setFilterTracker(domain) {
+  setFilterTracker(registered_name) {
     const e = document.querySelector('#filter-tracker');
-    e.value = domain ? Transmission._getReadableDomain(domain) : 'all';
+    e.value = registered_name
+      ? Transmission._getReadableDomain(registered_name)
+      : 'all';
 
-    this.filterTracker = domain;
+    this.filterTracker = registered_name;
     this.refilterAllSoon();
   }
 
-  _getTrackers() {
-    const returnValue = {};
+  _getTrackerCounts() {
+    const counts = {};
 
     for (const torrent of this._getAllTorrents()) {
-      const names = new Set();
-
       for (const tracker of torrent.getTrackers()) {
-        const { domain, name } = tracker;
-
-        if (!returnValue[name]) {
-          returnValue[name] = { count: 0, domain };
-        }
-
-        names.add(name);
-      }
-
-      for (const name of names.values()) {
-        ++returnValue[name].count;
+        const { registered_name: name } = tracker;
+        counts[name] = (counts[name] || 0) + 1;
       }
     }
 
-    return returnValue;
+    return counts;
   }
 
   ///

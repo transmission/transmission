@@ -721,9 +721,9 @@ export class Inspector extends EventTarget {
         element.classList.add('tier-list-tracker');
         setTextContent(
           element,
-          `${tracker.domain || tracker.host || tracker.announce} - tier ${
-            tracker.tier + 1
-          }`
+          `${
+            tracker.registered_name || tracker.host || tracker.announce
+          } - tier ${tracker.tier + 1}`
         );
         element.setAttribute('title', tracker.announce);
         tier_div.append(element);
