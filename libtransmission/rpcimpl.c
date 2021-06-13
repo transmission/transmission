@@ -38,7 +38,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION 16
+#define RPC_VERSION 18
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
@@ -497,11 +497,12 @@ static void addTrackers(tr_info const* info, tr_variant* trackers)
     for (unsigned int i = 0; i < info->trackerCount; ++i)
     {
         tr_tracker_info const* t = &info->trackers[i];
-        tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddStr(d, TR_KEY_announce, t->announce);
+        tr_variant* d = tr_variantListAddDict(trackers, 5);
         tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStr(d, TR_KEY_scrape, t->scrape);
         tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
+        tr_variantDictAddStr(d, TR_KEY_announce, t->announce);
+        tr_variantDictAddStr(d, TR_KEY_registered_name, t->registered_name);
+        tr_variantDictAddStr(d, TR_KEY_scrape, t->scrape);
     }
 }
 

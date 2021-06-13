@@ -1235,6 +1235,13 @@ typedef struct tr_tracker_info
 {
     int tier;
     char* announce;
+
+    // If the announce URL's host is an IP address, host is used verbatim.
+    // If the announce URL's host is a domain name, the first label of the
+    // registerable name is used, e.g. url 'https://www.example.com' will be
+    // have registered_name 'example'
+    char* registered_name;
+
     char* scrape;
     uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
 }

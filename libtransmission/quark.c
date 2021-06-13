@@ -286,6 +286,7 @@ static struct tr_key_struct const my_static[] =
     Q("recent-download-dir-3"),
     Q("recent-download-dir-4"),
     Q("recheckProgress"),
+    Q("registered-name"),
     Q("remote-session-enabled"),
     Q("remote-session-host"),
     Q("remote-session-password"),

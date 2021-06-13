@@ -313,6 +313,7 @@
                       +-------------------------+------------+
                       | announce                | string     | tr_tracker_info
                       | id                      | number     | tr_tracker_info
+                      | registered-name         | string     | tr_tracker_info
                       | scrape                  | string     | tr_tracker_info
                       | tier                    | number     | tr_tracker_info
    -------------------+--------------------------------------+
@@ -814,6 +815,8 @@
    ------+---------+-----------+----------------------+-------------------------------
    17    | 3.01    | yes       | torrent-get          | new arg "file-count"
          |         | yes       | torrent-get          | new arg "primary-mime-type"
+   ------+---------+-----------+----------------------+-------------------------------
+   18    | ?       | yes       | torrent-get          | new arg "torrents.registered-name"
 
 
 5.1.  Upcoming Breakage

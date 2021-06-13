@@ -396,9 +396,15 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
                     }
                     else
                     {
+                        char host[TR_HOST_NAME_MAX] = { '\0' };
+                        tr_url_get_host(host, url, sizeof(host));
+                        char name[TR_HOST_NAME_MAX] = { '\0' };
+                        tr_host_get_registered_name(name, host, sizeof(name));
+
                         tr_tracker_info* t = trackers + trackerCount;
                         t->tier = validTiers;
                         t->announce = url;
+                        t->registered_name = tr_strdup(name);
                         t->scrape = tr_convertAnnounceToScrape(url);
                         t->id = trackerCount;
 

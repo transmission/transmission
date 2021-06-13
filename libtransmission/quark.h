@@ -285,6 +285,7 @@ enum
     TR_KEY_recent_download_dir_3,
     TR_KEY_recent_download_dir_4,
     TR_KEY_recheckProgress,
+    TR_KEY_registered_name,
     TR_KEY_remote_session_enabled,
     TR_KEY_remote_session_host,
     TR_KEY_remote_session_password,
