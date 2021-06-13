@@ -462,3 +462,14 @@ TEST_F(UtilsTest, topLevelDomain)
     EXPECT_STREQ("example.co.uk", domain);
     tr_free(domain);
 }
+
+TEST_F(UtilsTest, getStrippedDomain)
+{
+    char* domain = tr_get_stripped_domain("www.example.com");
+    EXPECT_STREQ("example", domain);
+    tr_free(domain);
+
+    domain = tr_get_stripped_domain("www.example.co.uk");
+    EXPECT_STREQ("example", domain);
+    tr_free(domain);
+}

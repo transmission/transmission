@@ -422,6 +422,9 @@ void tr_net_init(void);
 /** @brief www.example.com -> example.com */
 char* tr_get_top_level_domain(char const* domain);
 
+/** @brief www.example.com -> example */
+char* tr_get_stripped_domain(char const* domain);
+
 /** @} */
 
 TR_END_DECLS

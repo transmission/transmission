@@ -2227,3 +2227,20 @@ char* tr_get_top_level_domain(char const* domain)
 
     return ret;
 }
+
+// www.example.com -> example
+char* tr_get_stripped_domain(char const* domain)
+{
+    char* top = tr_get_top_level_domain(domain);
+
+    if (top != NULL)
+    {
+        char* const dot = strchr(top, '.');
+        if (dot != NULL)
+        {
+            *dot = '\0';
+        }
+    }
+
+    return top;
+}
