@@ -263,6 +263,9 @@ void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GN
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
 
+/** @brief www.example.com -> example */
+char* tr_get_stripped_domain(char const* domain);
+
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
 bool tr_urlIsValidTracker(char const* url);
 
@@ -418,12 +421,6 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ***/
 
 void tr_net_init(void);
-
-/** @brief www.example.com -> example.com */
-char* tr_get_top_level_domain(char const* domain);
-
-/** @brief www.example.com -> example */
-char* tr_get_stripped_domain(char const* domain);
 
 /** @} */
 

@@ -895,6 +895,34 @@ bool tr_addressIsIP(char const* str)
     return tr_address_from_string(&tmp, str);
 }
 
+// www.example.com -> example
+char* tr_get_stripped_domain(char const* host)
+{
+    if (tr_addressIsIP(host))
+    {
+        return tr_strdup(host);
+    }
+
+    char* ret = NULL;
+    char* host_lc = NULL;
+    if (PSL_SUCCESS == psl_str_to_utf8lower(host, NULL, NULL, &host_lc))
+    {
+        ret = tr_strdup(psl_registrable_domain(psl_builtin(), host_lc));
+        psl_free_string(host_lc);
+    }
+
+    if (ret != NULL)
+    {
+        char* const dot = strchr(ret, '.');
+        if (dot != NULL)
+        {
+            *dot = '\0';
+        }
+    }
+
+    return ret;
+}
+
 static int parse_port(char const* port, size_t port_len)
 {
     char* tmp = tr_strndup(port, port_len);
@@ -2209,38 +2237,4 @@ char const* tr_get_mime_type_for_filename(char const* filename)
     }
 
     return info != NULL ? info->mime_type : NULL;
-}
-
-/// top-level domain
-
-// www.example.com -> example.com
-char* tr_get_top_level_domain(char const* domain)
-{
-    char* ret = NULL;
-
-    char* lower = NULL;
-    if (PSL_SUCCESS == psl_str_to_utf8lower(domain, NULL, NULL, &lower))
-    {
-        ret = tr_strdup(psl_registrable_domain(psl_builtin(), lower));
-        psl_free_string(lower);
-    }
-
-    return ret;
-}
-
-// www.example.com -> example
-char* tr_get_stripped_domain(char const* domain)
-{
-    char* top = tr_get_top_level_domain(domain);
-
-    if (top != NULL)
-    {
-        char* const dot = strchr(top, '.');
-        if (dot != NULL)
-        {
-            *dot = '\0';
-        }
-    }
-
-    return top;
 }
