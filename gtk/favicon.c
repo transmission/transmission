@@ -6,14 +6,15 @@
  *
  */
 
-#include <glib/gstdio.h> /* g_remove() */
+#include <glib/gstdio.h> // g_remove()
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/web.h> /* tr_webRun() */
+#include <libtransmission/web.h> // tr_webRun()
+#include <libtransmission/utils.h> // tr_url_get_host(), tr_host_get_registered_domain()
 
 #include "favicon.h"
-#include "util.h" /* gtr_get_host_from_url() */
+#include "util.h" // gtr_get_host_from_url()
 
 #define IMAGE_TYPES 4
 static char const* image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
@@ -160,7 +161,9 @@ void gtr_get_favicon(tr_session* session, char const* host, GFunc pixbuf_ready_f
 
 void gtr_get_favicon_from_url(tr_session* session, char const* url, GFunc pixbuf_ready_func, gpointer pixbuf_ready_func_data)
 {
-    char host[1024];
-    gtr_get_host_from_url(host, sizeof(host), url);
-    gtr_get_favicon(session, host, pixbuf_ready_func, pixbuf_ready_func_data);
+    char host[TR_HOST_NAME_MAX] = { '\0' };
+    tr_url_get_host(host, url, sizeof(host));
+    char registered_domain[TR_HOST_NAME_MAX] = { '\0' };
+    tr_host_get_registered_name(registered_domain, host, sizeof(registered_domain));
+    gtr_get_favicon(session, registered_domain, pixbuf_ready_func, pixbuf_ready_func_data);
 }

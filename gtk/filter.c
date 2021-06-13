@@ -18,7 +18,6 @@
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
 #include "tr-core.h" /* MC_TORRENT */
-#include "util.h" /* gtr_get_host_from_url() */
 
 static GQuark DIRTY_KEY = 0;
 static GQuark SESSION_KEY = 0;
@@ -53,28 +52,11 @@ static int pstrcmp(void const* a, void const* b)
     return g_strcmp0(*(char const* const*)a, *(char const* const*)b);
 }
 
-/* human-readable name; ie, Legaltorrents */
-static char* get_name_from_host(char const* host)
+// human-readable name; e.g. www.legaltorrents.com -> Legaltorrents
+void get_name_from_host(char* buf, char const* host, size_t buflen)
 {
-    char* name;
-    char const* dot = strrchr(host, '.');
-
-    if (tr_addressIsIP(host))
-    {
-        name = g_strdup(host);
-    }
-    else if (dot != NULL)
-    {
-        name = g_strndup(host, dot - host);
-    }
-    else
-    {
-        name = g_strdup(host);
-    }
-
-    *name = g_ascii_toupper(*name);
-
-    return name;
+    tr_host_get_registered_name(buf, host, buflen);
+    *buf = g_ascii_toupper(*buf);
 }
 
 static void tracker_model_update_count(GtkTreeStore* store, GtkTreeIter* iter, int n)
@@ -139,9 +121,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
             for (unsigned int i = 0; i < inf->trackerCount; ++i)
             {
-                char name[1024];
-                gtr_get_host_from_url(name, sizeof(name), inf->trackers[i].announce);
-                char* const key = g_string_chunk_insert_const(strings, name);
+                char* const key = g_string_chunk_insert_const(strings, inf->trackers[i].registered_name);
 
                 int* count = g_hash_table_lookup(hosts_hash, key);
                 if (count == NULL)
@@ -235,12 +215,13 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         }
         else if (insert_row)
         {
+            char name[TR_HOST_NAME_MAX];
             GtkTreeIter add;
             GtkTreePath* path;
             GtkTreeRowReference* reference;
             tr_session* session = g_object_get_qdata(G_OBJECT(store), SESSION_KEY);
             char const* host = hosts->pdata[i];
-            char* name = get_name_from_host(host);
+            get_name_from_host(name, host, sizeof(name));
             int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             gtk_tree_store_insert_with_values(store, &add, NULL, store_pos,
                 TRACKER_FILTER_COL_HOST, host,
@@ -252,7 +233,6 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             reference = gtk_tree_row_reference_new(model, path);
             gtr_get_favicon(session, host, favicon_ready_cb, reference);
             gtk_tree_path_free(path);
-            g_free(name);
             ++store_pos;
             ++i;
         }
@@ -430,15 +410,13 @@ static gboolean test_tracker(tr_torrent const* tor, int active_tracker_type, cha
 
     if (active_tracker_type == TRACKER_FILTER_TYPE_HOST)
     {
-        char tmp[1024];
         tr_info const* const inf = tr_torrentInfo(tor);
 
         matches = FALSE;
 
         for (unsigned int i = 0; !matches && i < inf->trackerCount; ++i)
         {
-            gtr_get_host_from_url(tmp, sizeof(tmp), inf->trackers[i].announce);
-            matches = g_strcmp0(tmp, host) == 0;
+            matches = g_strcmp0(inf->trackers[i].registered_name, host) == 0;
         }
     }
 

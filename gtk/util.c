@@ -162,44 +162,6 @@ char* tr_strltime(char* buf, time_t seconds, size_t buflen)
     return buf;
 }
 
-/* pattern-matching text; ie, legaltorrents.com */
-void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
-{
-    char host[1024];
-    char const* pch;
-
-    if ((pch = strstr(url, "://")) != NULL)
-    {
-        size_t const hostlen = strcspn(pch + 3, ":/");
-        size_t const copylen = MIN(hostlen, sizeof(host) - 1);
-        memcpy(host, pch + 3, copylen);
-        host[copylen] = '\0';
-    }
-    else
-    {
-        *host = '\0';
-    }
-
-    if (tr_addressIsIP(host))
-    {
-        g_strlcpy(buf, url, buflen);
-    }
-    else
-    {
-        char const* first_dot = strchr(host, '.');
-        char const* last_dot = strrchr(host, '.');
-
-        if (first_dot != NULL && last_dot != NULL && first_dot != last_dot)
-        {
-            g_strlcpy(buf, first_dot + 1, buflen);
-        }
-        else
-        {
-            g_strlcpy(buf, host, buflen);
-        }
-    }
-}
-
 static gboolean gtr_is_supported_url(char const* str)
 {
     return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||

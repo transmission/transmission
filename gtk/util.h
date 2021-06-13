@@ -79,9 +79,6 @@ char* tr_strltime(char* buf, time_t secs, size_t buflen);
 ****
 ***/
 
-/* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-void gtr_get_host_from_url(char* buf, size_t buflen, char const* url);
-
 gboolean gtr_is_magnet_link(char const* str);
 
 gboolean gtr_is_hex_hashcode(char const* str);
