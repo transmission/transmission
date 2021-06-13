@@ -36,6 +36,7 @@
 
 #include <event2/buffer.h>
 #include <event2/event.h>
+#include <libpsl.h>
 
 #include "transmission.h"
 #include "error.h"
@@ -2208,4 +2209,21 @@ char const* tr_get_mime_type_for_filename(char const* filename)
     }
 
     return info != NULL ? info->mime_type : NULL;
+}
+
+/// top-level domain
+
+// www.example.com -> example.com
+char* tr_get_top_level_domain(char const* domain)
+{
+    char* ret = NULL;
+
+    char* lower = NULL;
+    if (PSL_SUCCESS == psl_str_to_utf8lower(domain, NULL, NULL, &lower))
+    {
+        ret = tr_strdup(psl_registrable_domain(psl_builtin(), lower));
+        psl_free_string(lower);
+    }
+
+    return ret;
 }

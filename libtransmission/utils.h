@@ -419,6 +419,9 @@ char* tr_env_get_string(char const* key, char const* default_value);
 
 void tr_net_init(void);
 
+/** @brief www.example.com -> example.com */
+char* tr_get_top_level_domain(char const* domain);
+
 /** @} */
 
 TR_END_DECLS

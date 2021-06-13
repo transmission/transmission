@@ -451,3 +451,14 @@ TEST_F(UtilsTest, mimeTypes)
     EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"));
     EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
 }
+
+TEST_F(UtilsTest, topLevelDomain)
+{
+    char* domain = tr_get_top_level_domain("www.example.com");
+    EXPECT_STREQ("example.com", domain);
+    tr_free(domain);
+
+    domain = tr_get_top_level_domain("www.example.co.uk");
+    EXPECT_STREQ("example.co.uk", domain);
+    tr_free(domain);
+}

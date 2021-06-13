@@ -99,6 +99,7 @@ string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(PSL_MINIMUM             0.19.0)
 set(CURL_MINIMUM            7.28.0)
 set(EVENT2_MINIMUM          2.0.10)
 set(OPENSSL_MINIMUM         0.9.7)
@@ -287,6 +288,10 @@ find_package(ZLIB ${ZLIB_MINIMUM})
 if(ZLIB_FOUND)
     add_definitions(-DHAVE_ZLIB)
 endif()
+
+# FIXME(ckerr) this is just for a proof-of-concept;
+# need to bundle if not found
+pkg_check_modules(PSL libpsl>=${PSL_MINIMUM})
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
