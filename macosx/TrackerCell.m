@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> //tr_addressIsIP()
+#include <libtransmission/utils.h> // tr_host_is_ip()
 
 #import "TrackerCell.h"
 #import "TrackerNode.h"
@@ -182,7 +182,7 @@ NSMutableSet * fTrackerIconLoading;
     if ((host = [address host]))
     {
         //don't try to parse ip address
-        const BOOL separable = !tr_addressIsIP([host UTF8String]);
+        const BOOL separable = !tr_host_is_ip([host UTF8String]);
 
         NSArray * hostComponents = separable ? [host componentsSeparatedByString: @"."] : nil;
 

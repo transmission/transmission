@@ -261,21 +261,16 @@ void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GN
 void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
-bool tr_addressIsIP(char const* address);
+bool tr_host_is_ip(char const* address);
 
-#if defined(HOST_NAME_MAX)
-#define TR_HOST_NAME_MAX HOST_NAME_MAX
-#elif defined(MAXHOSTNAMELEN)
-#define TR_HOST_NAME_MAX MAXHOSTNAMELEN
-#else
-#define TR_HOST_NAME_MAX 1024
-#endif
+/** @brief get a url host's registrable domain, e.g. www.example.com -> example.com */
+void tr_host_get_registered_domain(char* buf, char const* host, size_t buflen);
 
-/** @brief strips subdomains, e.g. www.example.com -> example.com */
-void tr_get_domain(char const* host, char* buf, size_t buflen);
+/** @brief get the first label of a url host's registered domain, e.g. www.example.com -> example */
+void tr_host_get_registered_name(char* buf, char const* host, size_t buflen);
 
-/** @brief www.example.com -> example */
-void tr_get_stripped_domain(char const* host, char* buf, size_t buflen);
+/** @brief get the host from a URL */
+bool tr_url_get_host(char* buf, > const < char* url, size_t buflen);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
 bool tr_urlIsValidTracker(char const* url);

@@ -889,20 +889,20 @@ bool tr_urlIsValid(char const* url, size_t url_len)
             memcmp(url, "sftp://", 7) == 0);
 }
 
-bool tr_addressIsIP(char const* str)
+bool tr_host_is_ip(char const* host)
 {
     tr_address tmp;
-    return str != NULL && tr_address_from_string(&tmp, str);
+    return host != NULL && tr_address_from_string(&tmp, host);
 }
 
 // www.example.com -> example.com
-void tr_get_domain(char const* host, char* buf, size_t buflen)
+void tr_host_get_registered_domain(char* buf, char const* host, size_t buflen)
 {
     if (host == NULL)
     {
         *buf = '\0';
     }
-    else if (tr_addressIsIP(host))
+    else if (tr_host_is_ip(host))
     {
         tr_strlcpy(buf, host, buflen);
     }
@@ -923,19 +923,19 @@ void tr_get_domain(char const* host, char* buf, size_t buflen)
 }
 
 // www.example.com -> example
-void tr_get_stripped_domain(char const* host, char* buf, size_t buflen)
+void tr_host_get_registered_name(char* buf, char const* host, size_t buflen)
 {
     if (host == NULL)
     {
         *buf = '\0';
     }
-    else if (tr_addressIsIP(host))
+    else if (tr_host_is_ip(host))
     {
         tr_strlcpy(buf, host, buflen);
     }
     else
     {
-        tr_get_domain(host, buf, buflen);
+        tr_host_get_registered_domain(buf, host, buflen);
         char* const dot = strchr(buf, '.');
         if (dot != NULL)
         {
@@ -1071,6 +1071,20 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
         }
     }
 
+    return true;
+}
+
+bool tr_url_get_host(char* buf, char const* url, size_t buflen)
+{
+    char* host = NULL;
+
+    if (!tr_urlParse(url, TR_BAD_SIZE, NULL, &host, NULL, NULL))
+    {
+        return false;
+    }
+
+    tr_strlcpy(buf, host, buflen);
+    tr_free(host);
     return true;
 }
 

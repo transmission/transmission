@@ -168,6 +168,14 @@
 
 #define TR_BAD_SIZE ((size_t)-1)
 
+#if defined(HOST_NAME_MAX)
+#define TR_HOST_NAME_MAX HOST_NAME_MAX
+#elif defined(MAXHOSTNAMELEN)
+#define TR_HOST_NAME_MAX MAXHOSTNAMELEN
+#else
+#define TR_HOST_NAME_MAX 1024
+#endif
+
 /* Guard C code in headers, while including them from C++ */
 #ifdef  __cplusplus
 #define TR_BEGIN_DECLS  extern "C" {

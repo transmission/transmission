@@ -452,7 +452,7 @@ TEST_F(UtilsTest, mimeTypes)
     EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
 }
 
-TEST_F(UtilsTest, getDomain)
+TEST_F(UtilsTest, hostGetRegisteredDomain)
 {
     struct TestCase
     {
@@ -471,12 +471,12 @@ TEST_F(UtilsTest, getDomain)
     for (auto const& test : Tests)
     {
         auto domain = std::array<char, TR_HOST_NAME_MAX>{};
-        tr_get_domain(test.in, domain.data(), domain.size());
+        tr_host_get_registered_domain(domain.data(), test.in, domain.size());
         EXPECT_STREQ(test.expected, domain.data());
     }
 }
 
-TEST_F(UtilsTest, getStrippedDomain)
+TEST_F(UtilsTest, hostGetRegisteredName)
 {
     struct TestCase
     {
@@ -495,7 +495,7 @@ TEST_F(UtilsTest, getStrippedDomain)
     for (auto const& test : Tests)
     {
         auto domain = std::array<char, TR_HOST_NAME_MAX>{};
-        tr_get_stripped_domain(test.in, domain.data(), domain.size());
+        tr_host_get_registered_name(domain.data(), test.in, domain.size());
         EXPECT_STREQ(test.expected, domain.data());
     }
 }
