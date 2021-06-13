@@ -270,7 +270,7 @@ void tr_host_get_registered_domain(char* buf, char const* host, size_t buflen);
 void tr_host_get_registered_name(char* buf, char const* host, size_t buflen);
 
 /** @brief get the host from a URL */
-bool tr_url_get_host(char* buf, > const < char* url, size_t buflen);
+bool tr_url_get_host(char* buf, char const* url, size_t buflen);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
 bool tr_urlIsValidTracker(char const* url);
