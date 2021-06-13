@@ -452,17 +452,50 @@ TEST_F(UtilsTest, mimeTypes)
     EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
 }
 
+TEST_F(UtilsTest, getDomain)
+{
+    struct TestCase
+    {
+        char const* const in;
+        char const* const expected;
+    };
+
+    auto constexpr Tests = std::array<TestCase, 4>
+    {{
+        { "192.168.1.1", "192.168.1.1" },
+        { "www.example.co.uk", "example.co.uk" },
+        { "www.example.com", "example.com" },
+        { NULL, "" },
+    }};
+
+    for (auto const& test : Tests)
+    {
+        auto domain = std::array<char, TR_HOST_NAME_MAX>{};
+        tr_get_domain(test.in, domain.data(), domain.size());
+        EXPECT_STREQ(test.expected, domain.data());
+    }
+}
+
 TEST_F(UtilsTest, getStrippedDomain)
 {
-    char* domain = tr_get_stripped_domain("www.example.com");
-    EXPECT_STREQ("example", domain);
-    tr_free(domain);
+    struct TestCase
+    {
+        char const* const in;
+        char const* const expected;
+    };
 
-    domain = tr_get_stripped_domain("www.example.co.uk");
-    EXPECT_STREQ("example", domain);
-    tr_free(domain);
+    auto constexpr Tests = std::array<TestCase, 4>
+    {{
+        { "192.168.1.1", "192.168.1.1" },
+        { "www.example.co.uk", "example" },
+        { "www.example.com", "example" },
+        { NULL, "" },
+    }};
 
-    domain = tr_get_stripped_domain("192.168.1.1");
-    EXPECT_STREQ("192.168.1.1", domain);
-    tr_free(domain);
+    for (auto const& test : Tests)
+    {
+        auto domain = std::array<char, TR_HOST_NAME_MAX>{};
+        tr_get_stripped_domain(test.in, domain.data(), domain.size());
+        EXPECT_STREQ(test.expected, domain.data());
+    }
 }

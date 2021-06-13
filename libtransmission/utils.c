@@ -892,35 +892,56 @@ bool tr_urlIsValid(char const* url, size_t url_len)
 bool tr_addressIsIP(char const* str)
 {
     tr_address tmp;
-    return tr_address_from_string(&tmp, str);
+    return str != NULL && tr_address_from_string(&tmp, str);
+}
+
+// www.example.com -> example.com
+void tr_get_domain(char const* host, char* buf, size_t buflen)
+{
+    if (host == NULL)
+    {
+        *buf = '\0';
+    }
+    else if (tr_addressIsIP(host))
+    {
+        tr_strlcpy(buf, host, buflen);
+    }
+    else
+    {
+        char* lower = NULL;
+        if (PSL_SUCCESS == psl_str_to_utf8lower(host, NULL, NULL, &lower))
+        {
+            char const* const top = psl_registrable_domain(psl_builtin(), lower);
+            tr_strlcpy(buf, top, buflen);
+            psl_free_string(lower);
+        }
+        else
+        {
+            tr_strlcpy(buf, host, buflen);
+        }
+    }
 }
 
 // www.example.com -> example
-char* tr_get_stripped_domain(char const* host)
+void tr_get_stripped_domain(char const* host, char* buf, size_t buflen)
 {
-    if (tr_addressIsIP(host))
+    if (host == NULL)
     {
-        return tr_strdup(host);
+        *buf = '\0';
     }
-
-    char* ret = NULL;
-    char* host_lc = NULL;
-    if (PSL_SUCCESS == psl_str_to_utf8lower(host, NULL, NULL, &host_lc))
+    else if (tr_addressIsIP(host))
     {
-        ret = tr_strdup(psl_registrable_domain(psl_builtin(), host_lc));
-        psl_free_string(host_lc);
+        tr_strlcpy(buf, host, buflen);
     }
-
-    if (ret != NULL)
+    else
     {
-        char* const dot = strchr(ret, '.');
+        tr_get_domain(host, buf, buflen);
+        char* const dot = strchr(buf, '.');
         if (dot != NULL)
         {
             *dot = '\0';
         }
     }
-
-    return ret;
 }
 
 static int parse_port(char const* port, size_t port_len)

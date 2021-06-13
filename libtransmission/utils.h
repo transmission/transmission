@@ -263,8 +263,19 @@ void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GN
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
 
+#if defined(HOST_NAME_MAX)
+#define TR_HOST_NAME_MAX HOST_NAME_MAX
+#elif defined(MAXHOSTNAMELEN)
+#define TR_HOST_NAME_MAX MAXHOSTNAMELEN
+#else
+#define TR_HOST_NAME_MAX 1024
+#endif
+
+/** @brief strips subdomains, e.g. www.example.com -> example.com */
+void tr_get_domain(char const* host, char* buf, size_t buflen);
+
 /** @brief www.example.com -> example */
-char* tr_get_stripped_domain(char const* domain);
+void tr_get_stripped_domain(char const* host, char* buf, size_t buflen);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
 bool tr_urlIsValidTracker(char const* url);
