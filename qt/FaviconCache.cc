@@ -117,7 +117,7 @@ QString FaviconCache::getDisplayName(Key const& key)
 FaviconCache::Key FaviconCache::getKey(QUrl const& url)
 {
     auto domain = std::array<char, TR_HOST_NAME_MAX>{};
-    tr_get_stripped_domain(url.host().toUtf8().constData(), domain.data(), domain.size());
+    tr_host_get_registered_name(domain.data(), url.host().toUtf8().constData(), domain.size());
     return QString::fromUtf8(domain.data());
 }
 
