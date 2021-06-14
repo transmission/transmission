@@ -465,7 +465,7 @@ TEST_F(UtilsTest, hostGetRegisteredDomain)
         { "192.168.1.1", "192.168.1.1" },
         { "www.example.co.uk", "example.co.uk" },
         { "www.example.com", "example.com" },
-        { NULL, "" },
+        { nullptr, "" },
     }};
 
     for (auto const& test : Tests)
@@ -489,7 +489,7 @@ TEST_F(UtilsTest, hostGetRegisteredName)
         { "192.168.1.1", "192.168.1.1" },
         { "www.example.co.uk", "example" },
         { "www.example.com", "example" },
-        { NULL, "" },
+        { nullptr, "" },
     }};
 
     for (auto const& test : Tests)
