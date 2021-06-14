@@ -268,6 +268,7 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
            ${MINIUPNPC_UPSTREAM_TARGET}
            ${DHT_UPSTREAM_TARGET}
            ${UTP_UPSTREAM_TARGET}
+           ${PSL_UPSTREAM_TARGET}
            ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()

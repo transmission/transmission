@@ -26,12 +26,13 @@ tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_NLS           "Enable native language support" ON)
         option(INSTALL_DOC          "Build/install documentation" ON)
         option(INSTALL_LIB          "Install the library" OFF)
-tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
+tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT       "Use system dht library" AUTO)
+tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
+tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
-tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
 tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
@@ -289,10 +290,6 @@ if(ZLIB_FOUND)
     add_definitions(-DHAVE_ZLIB)
 endif()
 
-# FIXME(ckerr) this is just for a proof-of-concept;
-# need to bundle if not found
-pkg_check_modules(PSL libpsl>=${PSL_MINIMUM})
-
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 if(WIN32)
@@ -333,6 +330,8 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 
 tr_add_external_auto_library(DHT dht dht)
+
+tr_add_external_auto_library(PSL libpsl psl)
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp)
