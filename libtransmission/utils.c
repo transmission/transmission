@@ -898,22 +898,44 @@ bool tr_host_is_ip(char const* host)
 // www.example.com -> example.com
 void tr_host_get_registered_domain(char* buf, char const* host, size_t buflen)
 {
-    if (host == NULL)
+    bool done = false;
+
+    if (!done && (host == NULL))
     {
         *buf = '\0';
+        done = true;
     }
-    else if (tr_host_is_ip(host))
+
+    if (!done && tr_host_is_ip(host))
     {
         tr_strlcpy(buf, host, buflen);
+        done = true;
     }
-    else
+
+    if (!done)
     {
         char* lower = NULL;
         if (PSL_SUCCESS == psl_str_to_utf8lower(host, NULL, NULL, &lower))
         {
             char const* const top = psl_registrable_domain(psl_builtin(), lower);
-            tr_strlcpy(buf, top, buflen);
+            if (top != NULL)
+            {
+                tr_strlcpy(buf, top, buflen);
+                done = true;
+            }
+
             psl_free_string(lower);
+        }
+    }
+
+    if (!done) // huh. Well let's just remove the first subdomain
+    {
+        char const* const first_dot = strchr(host, '.');
+        char const* const last_dot = strrchr(host, '.');
+
+        if ((first_dot != NULL) && (first_dot != last_dot))
+        {
+            tr_strlcpy(buf, first_dot + 1, buflen);
         }
         else
         {
