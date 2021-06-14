@@ -36,7 +36,7 @@ for:
           appveyor UpdateBuild -Version "${Version}+${BuildIndex}"
       }
 
-      git submodule update --init --recursive
+      git submodule update --recursive --init
 
       choco install ActivePerl
       choco install nasm

@@ -44,7 +44,7 @@ If you're new to building programs from source code, this is typically easier th
 
     $ git clone https://github.com/transmission/transmission Transmission
     $ cd Transmission
-    $ git submodule update --init
+    $ git submodule update --recursive --init
     $ mkdir build
     $ cd build
     $ cmake ..
@@ -56,7 +56,7 @@ If you're new to building programs from source code, this is typically easier th
     $ cd Transmission/build
     $ make clean
     $ git pull --rebase --prune
-    $ git submodule update
+    $ git submodule update --recursive
     $ cmake ..
     $ make
     $ sudo make install
