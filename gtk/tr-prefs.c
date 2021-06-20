@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -1255,6 +1256,135 @@ static void on_core_prefs_changed(TrCore* core, tr_quark const key, gpointer gda
     }
 }
 
+// https://github.com/mate-desktop/mate-control-center/blob/master/capplets/common/capplet-util.c
+// for gtk34_scrolltabs source function is capplet_dialog_page_scroll_event_cb
+// of mate-appearance-properties from mate-control-center, GNU GPL 2+
+
+#if GTK_CHECK_VERSION (4,0,0)
+
+static void gtk40_scrolltabs(GtkEventControllerScroll *event, double dx, double dy, GtkWidget *widget) {
+
+    // gtk-scroll-tabs for GTK 4.x
+    GtkWidget *child, *event_widget, *action_widget;
+    GtkNotebook *notebook;
+
+    while (!GTK_IS_NOTEBOOK(widget)) {
+        widget = gtk_widget_get_parent(widget);
+    }
+
+    notebook = GTK_NOTEBOOK(widget);
+
+    child = gtk_notebook_get_nth_page(notebook, gtk_notebook_get_current_page(notebook));
+    if (child == NULL) {
+        return;
+    }
+
+    // ignore scroll events from the content of the page
+    event_widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(event));
+    if (event_widget == NULL || event_widget == child || gtk_widget_is_ancestor(event_widget, child)) {
+        return;
+    }
+
+    // and also from the action widgets
+    action_widget = gtk_notebook_get_action_widget(notebook, GTK_PACK_START);
+    if (event_widget == action_widget || (action_widget != NULL && gtk_widget_is_ancestor(event_widget, action_widget))) {
+        return;
+    }
+    action_widget = gtk_notebook_get_action_widget(notebook, GTK_PACK_END);
+    if (event_widget == action_widget || (action_widget != NULL && gtk_widget_is_ancestor(event_widget, action_widget))) {
+        return;
+    }
+
+    if ((dy > 0) || (dx > 0)) {
+        gtk_notebook_next_page(notebook);
+    }
+    else if ((dy < 0) || (dx < 0)) {
+        gtk_notebook_prev_page(notebook);
+    }
+}
+
+#elif GTK_CHECK_VERSION (3,4,0)
+
+static void gtk34_scrolltabs(GtkWidget *widget, GdkEventScroll *event) {
+
+    // gtk-scroll-tabs for GTK 3.4 to 3.24
+    GtkNotebook *notebook = GTK_NOTEBOOK(widget);
+    GtkWidget *child, *event_widget, *action_widget;
+
+    child = gtk_notebook_get_nth_page(notebook, gtk_notebook_get_current_page(notebook));
+    if (child == NULL) {
+        return;
+    }
+
+    // ignore scroll events from the content of the page
+    event_widget = gtk_get_event_widget((GdkEvent*) event);
+    if (event_widget == NULL || event_widget == child || gtk_widget_is_ancestor(event_widget, child)) {
+        return;
+    }
+
+    // and also from the action widgets
+    action_widget = gtk_notebook_get_action_widget(notebook, GTK_PACK_START);
+    if (event_widget == action_widget || (action_widget != NULL && gtk_widget_is_ancestor(event_widget, action_widget))) {
+        return;
+    }
+    action_widget = gtk_notebook_get_action_widget(notebook, GTK_PACK_END);
+    if (event_widget == action_widget || (action_widget != NULL && gtk_widget_is_ancestor(event_widget, action_widget))) {
+        return;
+    }
+
+    switch (event->direction) {
+        case GDK_SCROLL_RIGHT:
+        case GDK_SCROLL_DOWN:
+            gtk_notebook_next_page(notebook);
+            break;
+        case GDK_SCROLL_LEFT:
+        case GDK_SCROLL_UP:
+            gtk_notebook_prev_page(notebook);
+            break;
+        case GDK_SCROLL_SMOOTH:
+            switch (gtk_notebook_get_tab_pos(notebook)) {
+                case GTK_POS_LEFT:
+                case GTK_POS_RIGHT:
+                    if (event->delta_y > 0) {
+                        gtk_notebook_next_page(notebook);
+                    }
+                    else if (event->delta_y < 0) {
+                        gtk_notebook_prev_page(notebook);
+                    }
+                    break;
+                case GTK_POS_TOP:
+                case GTK_POS_BOTTOM:
+                    if (event->delta_x > 0) {
+                        gtk_notebook_next_page(notebook);
+                    }
+                    else if (event->delta_x < 0) {
+                        gtk_notebook_prev_page(notebook);
+                    }
+                    break;
+            }
+            break;
+    }
+}
+
+#endif
+
+
+void gtr_prefs_create_tab(GtkNotebook* notebook, GtkWidget* content, const char* text)
+{
+    GtkWidget* h;
+    
+    h = gtk_label_new (text);
+    gtk_notebook_append_page (notebook, content, h);
+
+    #if GTK_CHECK_VERSION (4,0,0)
+        // gtk-scroll-tabs for GTK 4.x
+        GtkEventController *event;
+        event = gtk_event_controller_scroll_new (GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES | GTK_EVENT_CONTROLLER_SCROLL_DISCRETE);
+        g_signal_connect (event, "scroll", G_CALLBACK (gtk40_scrolltabs), notebook);
+        gtk_widget_add_controller (gtk_widget_get_parent (h), event);
+    #endif
+}
+
 GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
 {
     GtkWidget* d;
@@ -1277,13 +1407,19 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     n = gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(n), GUI_PAD);
 
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), speedPage(core), gtk_label_new(_("Speed")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), downloadingPage(core, data), gtk_label_new(C_("Gerund", "Downloading")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), seedingPage(core), gtk_label_new(C_("Gerund", "Seeding")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), privacyPage(core), gtk_label_new(_("Privacy")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), networkPage(core), gtk_label_new(_("Network")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), desktopPage(core), gtk_label_new(_("Desktop")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), remotePage(core), gtk_label_new(_("Remote")));
+    #if GTK_CHECK_VERSION (3,4,0) && !GTK_CHECK_VERSION (4,0,0)
+        // gtk-scroll-tabs for GTK 3.4 to 3.24
+        gtk_widget_add_events(n, GDK_SCROLL_MASK);
+        g_signal_connect(n, "scroll-event", G_CALLBACK(gtk34_scrolltabs), NULL);
+    #endif
+    
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), speedPage(core), _("Speed"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), downloadingPage(core, data), C_("Gerund", "Downloading"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), seedingPage(core), C_("Gerund", "Seeding"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), privacyPage(core), _("Privacy"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), networkPage(core), _("Network"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), desktopPage(core), _("Desktop"));
+    gtr_prefs_create_tab(GTK_NOTEBOOK(n), remotePage(core), _("Remote"));
 
     /* init from prefs keys */
     for (size_t i = 0; i < G_N_ELEMENTS(prefs_quarks); ++i)
