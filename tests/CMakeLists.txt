@@ -1,7 +1,5 @@
 #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-include(GoogleTest)
-
 include_directories(
   SYSTEM
   ${CMAKE_SOURCE_DIR}/third-party/googletest/googletest/include
