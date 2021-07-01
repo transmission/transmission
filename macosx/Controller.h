@@ -51,34 +51,12 @@ typedef enum
 
 @interface Controller : NSObject <NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
-    tr_session                      * fLib;
-
-    NSMutableArray                  * fTorrents, * fDisplayedTorrents;
-
-    PrefsController                 * fPrefsController;
-    InfoWindowController            * fInfoController;
-    MessageWindowController         * fMessageController;
-
-    NSUserDefaults                  * fDefaults;
-
-    NSString                        * fConfigDirectory;
-
     IBOutlet NSWindow               * fWindow;
-    DragOverlayWindow               * fOverlayWindow;
     IBOutlet TorrentTableView       * fTableView;
-
-    io_connect_t                    fRootPort;
-    NSTimer                         * fTimer;
-
-    VDKQueue                        * fFileWatcherQueue;
 
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton, * fClearCompletedButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
-
-    StatusBarController             * fStatusBar;
-
-    FilterBarController             * fFilterBar;
     IBOutlet NSMenuItem             * fNextFilterItem;
 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
@@ -89,26 +67,6 @@ typedef enum
 
     IBOutlet NSMenu                 * fShareMenu, * fShareContextMenu;
     IBOutlet NSMenuItem             * fShareMenuItem, * fShareContextMenuItem; // remove when dropping 10.6
-
-    QLPreviewPanel                  * fPreviewPanel;
-    BOOL                            fQuitting;
-    BOOL                            fQuitRequested;
-    BOOL                            fPauseOnLaunch;
-
-    Badger                          * fBadger;
-
-    NSMutableArray                  * fAutoImportedNames;
-    NSTimer                         * fAutoImportTimer;
-
-    NSMutableDictionary             * fPendingTorrentDownloads;
-
-    NSMutableSet                    * fAddingTransfers;
-
-    NSMutableSet                    * fAddWindows;
-    URLSheetWindowController        * fUrlSheetController;
-
-    BOOL                            fGlobalPopoverShown;
-    BOOL                            fSoundPlaying;
 }
 
 - (void) openFiles: (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;

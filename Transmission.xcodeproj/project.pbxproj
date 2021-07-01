@@ -44,14 +44,6 @@
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.m */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.m */; };
-		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
-		5D4C1722258550DF00940E7C /* libcrypto.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		5D4C1723258550E300940E7C /* libssl.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		5DC03AF1257D3892003D5E7F /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DC03AF0257D3892003D5E7F /* evutil_time.c */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -120,6 +112,10 @@
 		A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A22B00AF116A9E90003315FC /* connecthostport.h */; };
 		A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */ = {isa = PBXBuildFile; fileRef = A22B00AE116A9E90003315FC /* connecthostport.c */; };
@@ -225,6 +221,7 @@
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
+		A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AB883C16A399A6008FAD50 /* VDKQueue.m */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2AF23C816B44FA0003BC59E /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AF23C616B44FA0003BC59E /* log.c */; };
@@ -279,7 +276,6 @@
 		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
 		A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
-		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F7CF5513035F7B0016FF10 /* URLSheetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */; };
 		A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.m */; };
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
@@ -375,6 +371,7 @@
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
+		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -473,8 +470,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */,
-				5D4C1722258550DF00940E7C /* libcrypto.dylib in Copy Files */,
-				5D4C1723258550E300940E7C /* libssl.dylib in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -512,7 +507,6 @@
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PrefsController.m; sourceTree = "<group>"; };
 		4D18389709DEC0030047D688 /* libtransmission.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtransmission.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D2784360905709500687951 /* Transmission.icns */ = {isa = PBXFileReference; explicitFileType = image.icns; name = Transmission.icns; path = Images/Transmission.icns; sourceTree = "<group>"; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TorrentTableView.m; sourceTree = "<group>"; };
 		4D36BA600CA2F00800A63CA5 /* crypto.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = crypto.c; sourceTree = "<group>"; };
@@ -544,8 +538,6 @@
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Torrent.m; sourceTree = "<group>"; };
-		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
-		5DC03AF0257D3892003D5E7F /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoWindowController.h; sourceTree = "<group>"; };
@@ -654,6 +646,7 @@
 		A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareToolbarItem.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileNameCell.m; sourceTree = "<group>"; };
+		A2290D2D1442B23200B95A09 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
 		A22B00AE116A9E90003315FC /* connecthostport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = connecthostport.c; sourceTree = "<group>"; };
 		A22B00AF116A9E90003315FC /* connecthostport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = connecthostport.h; sourceTree = "<group>"; };
 		A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSMutableArrayAdditions.h; sourceTree = "<group>"; };
@@ -1032,6 +1025,7 @@
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressGradients.m; sourceTree = "<group>"; };
+		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1050,7 +1044,7 @@
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
-				558699542570759E00F77A43 /* libcurl.tbd in Frameworks */,
+				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				C139E3B322BE71180007870C /* libssl.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
@@ -1067,7 +1061,7 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
-				55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */,
+				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				C139E3B122BE70FB0007870C /* libssl.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
@@ -1101,7 +1095,7 @@
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
 				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
-				55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */,
+				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
 				C139E3B222BE71030007870C /* libssl.dylib in Frameworks */,
 				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 			);
@@ -1141,7 +1135,7 @@
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
-				558699602570759F00F77A43 /* libcurl.tbd in Frameworks */,
+				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				C139E3B422BE71250007870C /* libssl.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
@@ -1155,7 +1149,7 @@
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
-				5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */,
+				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				C139E3B522BE712C0007870C /* libssl.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
@@ -1341,7 +1335,6 @@
 				A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */,
 				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				F63480621E1D7274005B9E09 /* Images.xcassets */,
-				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 			);
 			name = Resources;
@@ -1528,6 +1521,7 @@
 			isa = PBXGroup;
 			children = (
 				A27653A714369C5C009D3CCF /* libcrypto.dylib */,
+				A2290D2D1442B23200B95A09 /* libcurl.4.dylib */,
 				A296EF3411E5605E004A2781 /* libiconv.dylib */,
 				A2B6141B1395ADE9000E0975 /* libz.dylib */,
 			);
@@ -1612,7 +1606,6 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				55869925257074EC00F77A43 /* libcurl.tbd */,
 				C139E3B022BE70FA0007870C /* libssl.dylib */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
@@ -1696,13 +1689,13 @@
 				A20750B712BEB66900F70985 /* bufferevent_ratelim.c */,
 				A2074F5412BEA8E000F70985 /* bufferevent_sock.c */,
 				A2074F5512BEA8E000F70985 /* bufferevent.c */,
+				EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */,
 				A2AA9BE2132CAE2000FA131E /* evdns.c */,
 				A2074F7312BEAA3300F70985 /* event.c */,
 				A2074F8412BEAA6600F70985 /* evmap.c */,
 				A2074F9812BEAAAF00F70985 /* evthread.c */,
 				A2074FA212BEAAC600F70985 /* evutil.c */,
 				A29E653513F1603100048D71 /* evutil_rand.c */,
-				5DC03AF0257D3892003D5E7F /* evutil_time.c */,
 				A2074FAA12BEAAFF00F70985 /* http.c */,
 				A2074FBE12BEAB9A00F70985 /* kqueue.c */,
 				A2074FB612BEAB1E00F70985 /* listener.c */,
@@ -2248,7 +2241,6 @@
 				4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */,
 				4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */,
 				A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */,
-				A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */,
 				A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A231274C0D11D0B7003F9AFF /* AboutWindow.xib in Resources */,
@@ -2333,7 +2325,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e config.h -a ! ../../../macosx-libevent-config.h -ef config.h ]; then\n    ln -s ../../../macosx-libevent-config.h config.h;\nfi\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n\ncd ..\n\nif [ ! -e evconfig-private.h -a ! ../../macosx-libevent-evconfig-private.h -ef evconfig-private.h ]; then\n    ln -s ../../macosx-libevent-evconfig-private.h evconfig-private.h;\nfi\n";
+			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n\nif [ ! -e ../evconfig-private.h -a ! ../../macosx-libevent-evconfig-private.h -ef ../evconfig-private.h ]; then\n    ln -s ../../macosx-libevent-evconfig-private.h ../evconfig-private.h;\nfi\n";
 		};
 		C12F197C1E1AE55A0005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2619,7 +2611,7 @@
 				A2074FC712BEABC800F70985 /* log.c in Sources */,
 				A2074FDE12BEAC5000F70985 /* signal.c in Sources */,
 				A207503512BEAD9C00F70985 /* select.c in Sources */,
-				5DC03AF1257D3892003D5E7F /* evutil_time.c in Sources */,
+				EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */,
 				A207503712BEADA200F70985 /* poll.c in Sources */,
 				A20750B812BEB66900F70985 /* bufferevent_ratelim.c in Sources */,
 				A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */,
@@ -2955,9 +2947,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"third-party/openssl/include",
+					"third-party/libevent/include",
+				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party/libevent/compat third-party/libevent/include";
 			};
 			name = Debug;
 		};
@@ -2995,6 +2990,7 @@
 		0053D3D50C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -3055,6 +3051,7 @@
 		0053D3DA0C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -3089,7 +3086,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/openssl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3097,7 +3097,10 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = "third-party/openssl/lib";
+				LIBRARY_SEARCH_PATHS = (
+					"third-party/curl/lib",
+					"third-party/openssl/lib",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -3179,6 +3182,7 @@
 		4DF0C599089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -3196,6 +3200,7 @@
 		4DF0C59D089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -3229,7 +3234,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/openssl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3237,7 +3245,10 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = "third-party/openssl/lib";
+				LIBRARY_SEARCH_PATHS = (
+					"third-party/curl/lib",
+					"third-party/openssl/lib",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-DNDEBUG";
 				SDKROOT = macosx;
@@ -3271,6 +3282,7 @@
 		A250CFEB0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -3305,7 +3317,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/openssl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3313,7 +3328,10 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = "third-party/openssl/lib";
+				LIBRARY_SEARCH_PATHS = (
+					"third-party/curl/lib",
+					"third-party/openssl/lib",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -3324,6 +3342,7 @@
 		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
@@ -3416,9 +3435,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"third-party/openssl/include",
+					"third-party/libevent/include",
+				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party/libevent/compat third-party/libevent/include";
 			};
 			name = "Release - Debug";
 		};
@@ -3531,9 +3553,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"third-party/openssl/include",
+					"third-party/libevent/include",
+				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party/libevent/compat third-party/libevent/include";
 			};
 			name = Release;
 		};

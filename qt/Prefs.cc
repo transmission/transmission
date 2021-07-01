@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cassert>
 #include <cstdlib>
 #include <string_view>
@@ -29,6 +30,28 @@ using ::trqt::variant_helpers::getValue;
 /***
 ****
 ***/
+
+namespace
+{
+
+void ensureSoundCommandIsAList(tr_variant* dict)
+{
+    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_variant* list = nullptr;
+    if (tr_variantDictFindList(dict, key, &list))
+    {
+        return;
+    }
+
+    tr_variantDictRemove(dict, key);
+    dictAdd(dict, key, std::array<std::string_view, 5>{
+            "canberra-gtk-play",
+            "-i", "complete-download",
+            "-d", "transmission torrent downloaded"
+        });
+}
+
+} // anonymous namespace
 
 std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
 {
@@ -68,7 +91,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QVariant::String },
     { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password, QVariant::String },
-    { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::String },
+    { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::StringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QVariant::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QVariant::Bool },
 
@@ -190,6 +213,7 @@ Prefs::Prefs(QString config_dir) :
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
     tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&top);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
@@ -238,6 +262,16 @@ Prefs::Prefs(QString config_dir) :
         case QVariant::String:
             {
                 auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
+            }
+            break;
+
+        case QVariant::StringList:
+            {
+                auto const value = getValue<QStringList>(b);
                 if (value)
                 {
                     values_[i].setValue(*value);
@@ -332,6 +366,10 @@ Prefs::~Prefs()
             dictAdd(&current_settings, key, val.toString());
             break;
 
+        case QVariant::StringList:
+            dictAdd(&current_settings, key, val.toStringList());
+            break;
+
         case QVariant::Bool:
             dictAdd(&current_settings, key, val.toBool());
             break;
@@ -375,11 +413,9 @@ void Prefs::initDefaults(tr_variant* d) const
 {
     auto constexpr FilterMode = std::string_view { "all" };
     auto constexpr SessionHost = std::string_view { "localhost" };
-    auto constexpr SessionPassword = std::string_view { "" };
-    auto constexpr SessionUsername = std::string_view { "" };
+    auto constexpr SessionPassword = std::string_view {};
+    auto constexpr SessionUsername = std::string_view {};
     auto constexpr SortMode = std::string_view { "sort-by-name" };
-    auto constexpr SoundCommand =
-        std::string_view { "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" };
     auto constexpr StatsMode = std::string_view { "total-ratio" };
     auto constexpr WindowLayout = std::string_view { "menu,toolbar,filter,list,statusbar" };
 
@@ -404,7 +440,6 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_sort_reversed, false);
     dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
     dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
-    dictAdd(d, TR_KEY_torrent_complete_sound_command, SoundCommand);
     dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
     dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
     dictAdd(d, TR_KEY_watch_dir_enabled, false);

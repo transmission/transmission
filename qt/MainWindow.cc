@@ -676,7 +676,7 @@ void MainWindow::openDonate() const
 
 void MainWindow::openAbout()
 {
-    Utils::openDialog(about_dialog_, this);
+    Utils::openDialog(about_dialog_, session_, this);
 }
 
 void MainWindow::openHelp() const

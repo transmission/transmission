@@ -105,6 +105,7 @@
 
         //set auto import
         NSString * autoPath;
+        VDKQueue* x = [(Controller *)[NSApp delegate] fileWatcherQueue];
         if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
             [[(Controller *)[NSApp delegate] fileWatcherQueue] addPath: [autoPath stringByExpandingTildeInPath] notifyingAbout: VDKQueueNotifyAboutWrite];
 
@@ -709,7 +710,7 @@
 + (NSInteger) dateToTimeSum: (NSDate *) date
 {
     NSCalendar * calendar = [NSCalendar currentCalendar];
-    NSDateComponents * components = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: date];
+    NSDateComponents * components = [calendar components: NSCalendarUnitHour | NSCalendarUnitMinute fromDate: date];
     return [components hour] * 60 + [components minute];
 }
 

@@ -9,26 +9,9 @@
 
 import isEqual from 'lodash.isequal';
 
-export class Utils {
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  static setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
-  }
-
+export const Utils = {
   /** Given a numerator and denominator, return a ratio string */
-  static ratio(numerator, denominator) {
+  ratio(numerator, denominator) {
     let result = Math.floor((100 * numerator) / denominator) / 100;
 
     // check for special cases
@@ -42,8 +25,25 @@ export class Utils {
     }
 
     return result;
-  }
-}
+  },
+
+  /**
+   * Checks to see if the content actually changed before poking the DOM.
+   */
+  setInnerHTML(e, html) {
+    if (!e) {
+      return;
+    }
+
+    /* innerHTML is listed as a string, but the browser seems to change it.
+     * For example, "&infin;" gets changed to "∞" somewhere down the line.
+     * So, let's use an arbitrary  different field to test our state... */
+    if (e.currentHTML !== html) {
+      e.currentHTML = html;
+      e.innerHTML = html;
+    }
+  },
+};
 
 export function createTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');
