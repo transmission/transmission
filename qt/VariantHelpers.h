@@ -103,6 +103,37 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
+template<typename C, typename T = typename C::value_type,
+    typename std::enable_if<
+    std::is_same_v<C, QStringList>||
+    std::is_same_v<C, QList<T>>||
+    std::is_same_v<C, std::vector<T>>
+    >::type* = nullptr
+    >
+auto getValue(tr_variant const* variant)
+{
+    std::optional<C> ret;
+
+    if (tr_variantIsList(variant))
+    {
+        auto list = C {};
+
+        for (size_t i = 0, n = tr_variantListSize(variant); i < n; ++i)
+        {
+            tr_variant* const child = tr_variantListChild(const_cast<tr_variant*>(variant), i);
+            auto const value = getValue<T>(child);
+            if (value)
+            {
+                list.push_back(*value);
+            }
+        }
+
+        ret = list;
+    }
+
+    return ret;
+}
+
 template<typename T>
 bool change(T& setme, T const& value)
 {
