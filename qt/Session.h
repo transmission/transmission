@@ -15,6 +15,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
@@ -40,7 +41,7 @@ class Session : public QObject
 
 public:
     Session(QString config_dir, Prefs& prefs);
-    virtual ~Session();
+    ~Session() override;
 
     void stop();
     void restart();
@@ -119,7 +120,7 @@ public:
 
 public slots:
     void addTorrent(AddData const& addme);
-    void launchWebInterface();
+    void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
     void queueMoveTop(torrent_ids_t const& torrentIds = {});
@@ -143,6 +144,9 @@ signals:
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
     void httpAuthenticationRequired();
 
+private slots:
+    void onDuplicatesTimer();
+
 private:
     void start();
 
@@ -158,9 +162,8 @@ private:
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const;
 
-private:
     QString const config_dir_;
     Prefs& prefs_;
 
@@ -176,4 +179,7 @@ private:
     bool is_definitely_local_session_ = true;
     RpcClient rpc_;
     torrent_ids_t const RecentlyActiveIDs = { -1 };
+
+    std::map<QString, QString> duplicates_;
+    QTimer duplicates_timer_;
 };

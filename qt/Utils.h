@@ -45,9 +45,6 @@ class Utils
 public:
     static QIcon getIconFromIndex(QModelIndex const& index);
 
-    // Test if string is UTF-8 or not
-    static bool isValidUtf8(char const* s);
-
     static QString removeTrailingDirSeparator(QString const& path);
 
     static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
@@ -60,8 +57,8 @@ public:
         rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem(QAbstractItemView* view, QString const& text);
-    static int measureHeaderItem(QHeaderView* view, QString const& text);
+    static int measureViewItem(QAbstractItemView const* view, QString const& text);
+    static int measureHeaderItem(QHeaderView const* view, QString const& text);
 
     static QColor getFadedColor(QColor const& color);
 

@@ -548,7 +548,7 @@ static void publishError(tr_tier* tier, char const* msg)
     publishMessage(tier, msg, TR_TRACKER_ERROR);
 }
 
-static int8_t getSeedProbability(tr_tier* tier, int seeds, int leechers, int pex_count)
+static int8_t getSeedProbability(tr_tier const* tier, int seeds, int leechers, int pex_count)
 {
     /* special case optimization:
        ocelot omits seeds from peer lists sent to seeds on private trackers.
@@ -613,18 +613,11 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
 /**
  * Massages the incoming list of trackers into something we can use.
  */
-static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count, int* setme_count)
+static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_count, int* setme_count)
 {
     int n = 0;
     struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
-
-    /*
-    for (int i = 0; i < input_count; ++i)
-    {
-        fprintf(stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce);
-    }
-    */
 
     /* build a list of valid trackers */
     for (int i = 0; i < input_count; ++i)
@@ -703,13 +696,6 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     }
 
     tr_free(tmp);
-
-    /*
-    for (int i = 0; i < n; ++i)
-    {
-        fprintf (stderr, "OUT: [%d][%s]\n", ret[i].tier, ret[i].announce);
-    }
-    */
 
     return ret;
 }
@@ -793,7 +779,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->tiers != NULL);
 
-    struct tr_torrent_tiers* tt = NULL;
+    struct tr_torrent_tiers const* tt = NULL;
 
     if (tor->isRunning)
     {
@@ -815,7 +801,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
 {
     time_t ret = ~(time_t)0;
-    struct tr_torrent_tiers* tt = tor->tiers;
+    struct tr_torrent_tiers const* tt = tor->tiers;
 
     /* find the earliest manual announce time from all peers */
     for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
@@ -1003,13 +989,13 @@ static void announce_request_free(tr_announce_request* req);
 
 void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 {
-    struct tr_torrent_tiers* tt = tor->tiers;
+    struct tr_torrent_tiers const* tt = tor->tiers;
 
     if (tt != NULL)
     {
         for (int i = 0; i < tt->tier_count; ++i)
         {
-            tr_tier* tier = &tt->tiers[i];
+            tr_tier const* tier = &tt->tiers[i];
 
             if (tier->isRunning)
             {
@@ -1173,7 +1159,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             int scrape_fields = 0;
             int seeders = 0;
             int leechers = 0;
-            int downloads = 0;
             bool const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear(tier);
@@ -1196,7 +1181,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
                 if (response->downloads >= 0)
                 {
-                    tracker->downloadCount = downloads = response->downloads;
+                    tracker->downloadCount = response->downloads;
                     ++scrape_fields;
                 }
 
@@ -1377,7 +1362,7 @@ static bool multiscrape_too_big(char const* errmsg)
     return false;
 }
 
-static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errmsg)
+static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
 {
     int interval;
 
@@ -1514,30 +1499,34 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     if (multiscrape_too_big(response->errmsg))
     {
         char const* url = response->url;
-        int* multiscrape_max = &tr_announcerGetScrapeInfo(announcer, url)->multiscrape_max;
-
-        /* Lower the max only if it hasn't already lowered for a similar error.
-           For example if N parallel multiscrapes all have the same `max` and
-           error out, lower the value once for that batch, not N times. */
-        if (*multiscrape_max >= response->row_count)
+        struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+        if (scrape_info != NULL)
         {
-            int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
-            if (*multiscrape_max != n)
-            {
-                char* scheme = NULL;
-                char* host = NULL;
-                int port;
-                if (tr_urlParse(url, strlen(url), &scheme, &host, &port, NULL))
-                {
-                    /* don't log the full URL, since that might have a personal announce id */
-                    char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
-                    tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
-                    tr_free(sanitized_url);
-                    tr_free(host);
-                    tr_free(scheme);
-                }
+            int* multiscrape_max = &scrape_info->multiscrape_max;
 
-                *multiscrape_max = n;
+            /* Lower the max only if it hasn't already lowered for a similar error.
+               For example if N parallel multiscrapes all have the same `max` and
+               error out, lower the value once for that batch, not N times. */
+            if (*multiscrape_max >= response->row_count)
+            {
+                int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
+                if (*multiscrape_max != n)
+                {
+                    char* scheme = NULL;
+                    char* host = NULL;
+                    int port;
+                    if (tr_urlParse(url, strlen(url), &scheme, &host, &port, NULL))
+                    {
+                        /* don't log the full URL, since that might have a personal announce id */
+                        char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
+                        tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
+                        tr_free(sanitized_url);
+                        tr_free(host);
+                        tr_free(scheme);
+                    }
+
+                    *multiscrape_max = n;
+                }
             }
         }
     }
@@ -1654,8 +1643,8 @@ static bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 static int compareTiers(void const* va, void const* vb)
 {
     int ret;
-    tr_tier const* a = *(tr_tier const**)va;
-    tr_tier const* b = *(tr_tier const**)vb;
+    tr_tier const* a = *(tr_tier const* const*)va;
+    tr_tier const* b = *(tr_tier const* const*)vb;
 
     /* primary key: larger stats come before smaller */
     ret = compareTransfer(a->byteCounts[TR_ANN_UP], a->byteCounts[TR_ANN_DOWN], b->byteCounts[TR_ANN_UP],
@@ -1778,12 +1767,11 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     time_t const now = tr_time();
 
     int out = 0;
-    tr_tracker_stat* ret;
-    struct tr_torrent_tiers* tt = torrent->tiers;
+    struct tr_torrent_tiers const* const tt = torrent->tiers;
 
     /* alloc the stats */
     *setmeTrackerCount = tt->tracker_count;
-    ret = tr_new0(tr_tracker_stat, tt->tracker_count);
+    tr_tracker_stat* const ret = tr_new0(tr_tracker_stat, tt->tracker_count);
 
     /* populate the stats */
     for (int i = 0; i < tt->tier_count; ++i)
@@ -1931,8 +1919,9 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if ((found = tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
+            if (tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0)
             {
+                found = true;
                 copy_tier_attributes_impl(&tt->tiers[i], j, src);
             }
         }

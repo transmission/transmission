@@ -105,7 +105,7 @@ static char const* getdev(char const* path)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
@@ -181,7 +181,7 @@ static char const* getfstype(char const* device)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 

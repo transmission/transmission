@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <array>
 #include <bitset>
 #include <ctime> // time_t
 
@@ -17,9 +18,11 @@
 #include <QString>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
 
 #include "FaviconCache.h"
+#include "IconCache.h"
 #include "Macros.h"
 #include "Speed.h"
 
@@ -84,7 +87,6 @@ struct TrackerStat
     int tier;
     FaviconCache::Key favicon_key;
     QString announce;
-    QString host;
     QString last_announce_result;
     QString last_scrape_result;
 };
@@ -102,6 +104,47 @@ struct TorrentFile
 };
 
 using FileList = QVector<TorrentFile>;
+
+class TorrentHash
+{
+private:
+    std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
+
+public:
+    TorrentHash() {}
+
+    explicit TorrentHash(char const* str)
+    {
+        tr_hex_to_sha1(data_.data(), str);
+    }
+
+    explicit TorrentHash(QString const& str)
+    {
+        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
+    }
+
+    bool operator ==(TorrentHash const& that) const
+    {
+        return data_ == that.data_;
+    }
+
+    bool operator !=(TorrentHash const& that) const
+    {
+        return data_ != that.data_;
+    }
+
+    bool operator <(TorrentHash const& that) const
+    {
+        return data_ < that.data_;
+    }
+
+    QString toString() const
+    {
+        char str[SHA_DIGEST_LENGTH * 2 + 1];
+        tr_sha1_to_hex(str, data_.data());
+        return QString::fromUtf8(str, SHA_DIGEST_LENGTH * 2);
+    }
+};
 
 class Torrent : public QObject
 {
@@ -148,9 +191,9 @@ public:
 
     QString getError() const;
 
-    QString const& hashString() const
+    TorrentHash const& hash() const
     {
-        return hash_string_;
+        return hash_;
     }
 
     bool hasError() const
@@ -242,7 +285,7 @@ public:
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
-        return s ? double(s - l) / s : 0.0;
+        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
     double metadataPercentDone() const
@@ -498,10 +541,7 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    QIcon getMimeTypeIcon() const
-    {
-        return icon_;
-    }
+    QIcon getMimeTypeIcon() const;
 
     enum Field
     {
@@ -522,8 +562,9 @@ public:
         ERROR_STRING,
         ETA,
         FAILED_EVER,
+        FILE_COUNT,
         FILES,
-        HASH_STRING,
+        HASH,
         HAVE_UNCHECKED,
         HAVE_VERIFIED,
         HONORS_SESSION_LIMITS,
@@ -543,6 +584,7 @@ public:
         PERCENT_DONE,
         PIECE_COUNT,
         PIECE_SIZE,
+        PRIMARY_MIME_TYPE,
         QUEUE_POSITION,
         RECHECK_PROGRESS,
         SEED_IDLE_LIMIT,
@@ -567,8 +609,6 @@ public:
     fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
-    void updateMimeIcon();
-
     int const id_;
 
     bool download_limited_ = {};
@@ -605,6 +645,7 @@ private:
     uint64_t desired_available_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
+    uint64_t file_count_ = {};
     uint64_t have_unchecked_ = {};
     uint64_t have_verified_ = {};
     uint64_t left_until_done_ = {};
@@ -618,14 +659,15 @@ private:
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
 
+    QString primary_mime_type_;
     QString comment_;
     QString creator_;
     QString download_dir_;
     QString error_string_;
-    QString hash_string_;
     QString name_;
 
-    QIcon icon_;
+    // mutable because it's a lazy lookup
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;
@@ -637,6 +679,8 @@ private:
     Speed download_speed_;
 
     Prefs const& prefs_;
+
+    TorrentHash hash_;
 };
 
 Q_DECLARE_METATYPE(Torrent const*)

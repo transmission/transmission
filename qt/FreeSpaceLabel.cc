@@ -34,7 +34,7 @@ FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
 }
 
 void FreeSpaceLabel::setSession(Session& session)
@@ -71,7 +71,7 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue();
+    auto* q = new RpcQueue(this);
 
     q->add([this, &args]()
         {

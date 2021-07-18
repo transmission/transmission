@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <iostream>
 #include <string_view>
 
 #include <QApplication>
@@ -25,6 +24,7 @@
 #include <QMessageBox>
 #include <QStyle>
 #include <QTextStream>
+#include <QtDebug>
 
 #include <libtransmission/session-id.h>
 #include <libtransmission/transmission.h>
@@ -139,7 +139,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
                 auto const link = dictFind<QString>(child, TR_KEY_magnetLink);
                 if (link)
                 {
-                    qApp->clipboard()->setText(*link);
+                    QApplication::clipboard()->setText(*link);
                 }
             }
         });
@@ -284,7 +284,7 @@ void Session::updatePref(int key)
             break;
 
         default:
-            std::cerr << "unhandled pref: " << key << std::endl;
+            qWarning() << "unhandled pref:" << key;
         }
     }
 }
@@ -297,20 +297,18 @@ Session::Session(QString config_dir, Prefs& prefs) :
     config_dir_(std::move(config_dir)),
     prefs_(prefs)
 {
+    stats_ = {};
     stats_.ratio = TR_RATIO_NA;
-    stats_.uploadedBytes = 0;
-    stats_.downloadedBytes = 0;
-    stats_.filesAdded = 0;
-    stats_.sessionCount = 0;
-    stats_.secondsActive = 0;
     cumulative_stats_ = stats_;
 
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
-    connect(&rpc_, SIGNAL(httpAuthenticationRequired()), this, SIGNAL(httpAuthenticationRequired()));
-    connect(&rpc_, SIGNAL(dataReadProgress()), this, SIGNAL(dataReadProgress()));
-    connect(&rpc_, SIGNAL(dataSendProgress()), this, SIGNAL(dataSendProgress()));
-    connect(&rpc_, SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)), this,
-        SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)));
+    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
+    connect(&rpc_, &RpcClient::httpAuthenticationRequired, this, &Session::httpAuthenticationRequired);
+    connect(&rpc_, &RpcClient::dataReadProgress, this, &Session::dataReadProgress);
+    connect(&rpc_, &RpcClient::dataSendProgress, this, &Session::dataSendProgress);
+    connect(&rpc_, &RpcClient::networkResponse, this, &Session::networkResponse);
+
+    duplicates_timer_.setSingleShot(true);
+    connect(&duplicates_timer_, &QTimer::timeout, this, &Session::onDuplicatesTimer);
 }
 
 Session::~Session()
@@ -396,7 +394,7 @@ bool Session::isLocal() const
 ****
 ***/
 
-void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
+void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const
 {
     auto constexpr RecentlyActiveKey = std::string_view { "recently-active" };
 
@@ -520,7 +518,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
             auto* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
                 tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)").
                     arg(path).arg(name).arg(r.result), QMessageBox::Close,
-                qApp->activeWindow());
+                QApplication::activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
@@ -540,11 +538,13 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
     if (names.empty())
     {
         // unchanging fields needed by the main window
-        static auto constexpr MainInfoKeys = std::array<tr_quark, 6>{
+        static auto constexpr MainInfoKeys = std::array<tr_quark, 8>{
             TR_KEY_addedDate,
             TR_KEY_downloadDir,
+            TR_KEY_file_count,
             TR_KEY_hashString,
             TR_KEY_name,
+            TR_KEY_primary_mime_type,
             TR_KEY_totalSize,
             TR_KEY_trackers,
         };
@@ -856,28 +856,28 @@ RpcResponseFuture Session::exec(std::string_view method, tr_variant* args)
 
 void Session::updateStats(tr_variant* d, tr_session_stats* stats)
 {
-    auto value = dictFind<int>(d, TR_KEY_uploadedBytes);
+    auto value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes);
     if (value)
     {
         stats->uploadedBytes = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_downloadedBytes)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes)))
     {
         stats->downloadedBytes = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_filesAdded)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_filesAdded)))
     {
         stats->filesAdded = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_sessionCount)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_sessionCount)))
     {
         stats->sessionCount = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_secondsActive)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_secondsActive)))
     {
         stats->secondsActive = *value;
     }
@@ -904,7 +904,7 @@ void Session::updateStats(tr_variant* d)
 
 void Session::updateInfo(tr_variant* d)
 {
-    disconnect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
+    disconnect(&prefs_, &Prefs::changed, this, &Session::updatePref);
 
     for (int i = Prefs::FIRST_CORE_PREF; i <= Prefs::LAST_CORE_PREF; ++i)
     {
@@ -1042,8 +1042,7 @@ void Session::updateInfo(tr_variant* d)
         session_id_.clear();
     }
 
-    // std::cerr << "Session::updateInfo end" << std::endl;
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
+    connect(&prefs_, &Prefs::changed, this, &Session::updatePref);
 
     emit sessionUpdated();
 }
@@ -1095,28 +1094,35 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         {
             auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
-                qApp->activeWindow());
+                QApplication::activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([add_me](RpcResponse const& r)
+    q->add([this, add_me](RpcResponse const& r)
         {
             tr_variant* dup;
+            bool session_has_torrent = false;
 
-            if (!tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
+            if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
             {
-                return;
+                session_has_torrent = true;
+            }
+            else if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
+            {
+                session_has_torrent = true;
+
+                auto const hash = dictFind<QString>(dup, TR_KEY_hashString);
+                if (hash)
+                {
+                    duplicates_.try_emplace(add_me.readableShortName(), *hash);
+                    duplicates_timer_.start(1000);
+                }
             }
 
-            auto const name = dictFind<QString>(dup, TR_KEY_name);
-            if (name)
+            if (session_has_torrent && !add_me.filename.isEmpty())
             {
-                auto* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
-                    tr(R"(<p><b>Unable to add "%1".</b></p><p>It is a duplicate of "%2" which is already added.</p>)").
-                        arg(add_me.readableShortName()).arg(*name), QMessageBox::Close, qApp->activeWindow());
-                QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
-                d->show();
+                QFile(add_me.filename).rename(QStringLiteral("%1.added").arg(add_me.filename));
             }
         });
 
@@ -1131,6 +1137,39 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
     }
 
     q->run();
+}
+
+void Session::onDuplicatesTimer()
+{
+    decltype(duplicates_) duplicates;
+    duplicates.swap(duplicates_);
+
+    QStringList lines;
+    for (auto it : duplicates)
+    {
+        lines.push_back(tr("%1 (copy of %2)")
+            .arg(it.first)
+            .arg(it.second.left(7)));
+    }
+
+    if (!lines.empty())
+    {
+        lines.sort(Qt::CaseInsensitive);
+        auto const title = tr("Duplicate Torrent(s)", "", lines.size());
+        auto const detail = lines.join(QStringLiteral("\n"));
+        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", lines.size());
+        auto const use_detail = lines.size() > 1;
+        auto const text = use_detail ? detail_text : detail;
+
+        auto* d = new QMessageBox(QMessageBox::Warning, title, text, QMessageBox::Close, QApplication::activeWindow());
+        if (use_detail)
+        {
+            d->setDetailedText(detail);
+        }
+
+        QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+        d->show();
+    }
 }
 
 void Session::addTorrent(AddData const& add_me)
@@ -1195,7 +1234,7 @@ void Session::reannounceTorrents(torrent_ids_t const& ids)
 ****
 ***/
 
-void Session::launchWebInterface()
+void Session::launchWebInterface() const
 {
     QUrl url;
 

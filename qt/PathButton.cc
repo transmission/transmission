@@ -19,8 +19,7 @@
 #include "Utils.h"
 
 PathButton::PathButton(QWidget* parent) :
-    QToolButton(parent),
-    mode_(DirectoryMode)
+    QToolButton(parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -28,7 +27,7 @@ PathButton::PathButton(QWidget* parent) :
 
     updateAppearance();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(onClicked()));
+    connect(this, &QAbstractButton::clicked, this, &PathButton::onClicked);
 }
 
 void PathButton::setMode(Mode mode)
@@ -84,7 +83,8 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    QSize const fake_content_size(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
+    auto const& strut = QApplication::globalStrut();
+    QSize const fake_content_size(qMax(100, strut.width()), qMax(100, strut.height()));
     QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
     int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
@@ -101,7 +101,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 }
 
-void PathButton::onClicked()
+void PathButton::onClicked() const
 {
     auto* dialog = new QFileDialog(window(), effectiveTitle());
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);
@@ -131,7 +131,7 @@ void PathButton::onClicked()
         }
     }
 
-    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(onFileSelected(QString)));
+    connect(dialog, &QFileDialog::fileSelected, this, &PathButton::onFileSelected);
 
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();

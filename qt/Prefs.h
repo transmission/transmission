@@ -132,9 +132,8 @@ public:
         PREFS_COUNT
     };
 
-public:
-    Prefs(QString config_dir);
-    virtual ~Prefs();
+    explicit Prefs(QString config_dir);
+    ~Prefs() override;
 
     bool isCore(int key) const
     {
@@ -199,16 +198,14 @@ private:
         int type;
     };
 
-    void initDefaults(tr_variant*);
+    void initDefaults(tr_variant*) const;
 
     void set(int key, char const* value) = delete;
 
     QString const config_dir_;
-    std::array<std::pair<int, QString>, FilterMode::NUM_MODES> const FilterModes;
-    std::array<std::pair<int, QString>, SortMode::NUM_MODES> const SortModes;
 
     QSet<int> temporary_prefs_;
-    QVariant mutable values_[PREFS_COUNT];
+    std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;
 };

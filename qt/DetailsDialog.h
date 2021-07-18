@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QString>
 #include <QMap>
 #include <QSet>
@@ -37,7 +39,6 @@ class DetailsDialog : public BaseDialog
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
-    virtual ~DetailsDialog();
 
     void setIds(torrent_ids_t const& ids);
 
@@ -51,10 +52,10 @@ private:
     void initPeersTab();
     void initTrackerTab();
     void initInfoTab();
-    void initFilesTab();
+    void initFilesTab() const;
     void initOptionsTab();
 
-    QIcon getStockIcon(QString const& freedesktop_name, int fallback);
+    QIcon getStockIcon(QString const& freedesktop_name, int fallback) const;
     void setEnabled(bool);
 
 private slots:
@@ -78,7 +79,7 @@ private slots:
     void onFilePriorityChanged(QSet<int> const& file_indices, int);
     void onFileWantedChanged(QSet<int> const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
-    void onOpenRequested(QString const& path);
+    void onOpenRequested(QString const& path) const;
 
     // Options tab
     void onBandwidthPriorityChanged(int);
@@ -127,12 +128,12 @@ private:
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
 
-    TrackerModel* tracker_model_ = {};
-    TrackerModelFilter* tracker_filter_ = {};
-    TrackerDelegate* tracker_delegate_ = {};
+    std::shared_ptr<TrackerModel> tracker_model_;
+    std::shared_ptr<TrackerModelFilter> tracker_filter_;
+    std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
     QMap<QString, QTreeWidgetItem*> peers_;
 
-    QIcon const icon_encrypted_;
-    QIcon const icon_unencrypted_;
+    QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.png"));
+    QIcon const icon_unencrypted_ = {};
 };

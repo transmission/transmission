@@ -55,7 +55,8 @@
 ****
 ***/
 
-#define TR_UNUSED(x) (void)(x)
+// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
+#define TR_UNUSED(x) do { ((void)sizeof(x)); } while(0)
 
 /***
 ****
@@ -138,7 +139,7 @@
 #elif __has_feature(c_static_assert) || __has_extension(c_static_assert) || TR_GNUC_CHECK_VERSION(4, 6)
 #define TR_STATIC_ASSERT _Static_assert
 #else
-#define TR_STATIC_ASSERT(x, msg) (void)(x)
+#define TR_STATIC_ASSERT(x, msg) do { ((void)sizeof(x)); } while(0)
 #endif
 
 /* Sometimes the system defines MAX/MIN, sometimes not.
@@ -162,6 +163,8 @@
 #define SHA_DIGEST_LENGTH 20
 
 #define TR_INET6_ADDRSTRLEN 46
+
+#define TR_ADDRSTRLEN 64
 
 #define TR_BAD_SIZE ((size_t)-1)
 

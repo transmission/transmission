@@ -13,6 +13,7 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 bool RelocateDialog::move_flag = true;
 
 void RelocateDialog::onSetLocation()
@@ -21,7 +22,7 @@ void RelocateDialog::onSetLocation()
     close();
 }
 
-void RelocateDialog::onMoveToggled(bool b)
+void RelocateDialog::onMoveToggled(bool b) const
 {
     move_flag = b;
 }
@@ -84,9 +85,9 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         ui_.findDataRadio->setChecked(true);
     }
 
-    connect(ui_.moveDataRadio, SIGNAL(toggled(bool)), this, SLOT(onMoveToggled(bool)));
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onSetLocation()));
+    connect(ui_.moveDataRadio, &QAbstractButton::toggled, this, &RelocateDialog::onMoveToggled);
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &RelocateDialog::close);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &RelocateDialog::onSetLocation);
 }
 
 QString RelocateDialog::newLocation() const

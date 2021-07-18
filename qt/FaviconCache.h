@@ -9,11 +9,11 @@
 #pragma once
 
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 
-#include <QString>
 #include <QObject>
 #include <QPixmap>
+#include <QString>
 
 #include "Macros.h"
 #include "Utils.h" // std::hash<QString>
@@ -31,16 +31,15 @@ public:
     FaviconCache();
 
     using Key = QString;
-    using Keys = std::unordered_set<Key>;
+    using Keys = std::vector<Key>;
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
     QPixmap find(Key const& key);
-    QPixmap find(QUrl const& url) { return find(getKey(url)); }
 
     static Key getKey(QString const& display_name);
 
     // This will emit a signal when (if) the icon becomes ready.
-    Key add(QUrl const& url);
+    Key add(QString const& url);
 
     static QString getDisplayName(Key const& key);
     static QSize getIconSize();
@@ -53,9 +52,9 @@ private slots:
 
 private:
     static Key getKey(QUrl const& url);
-    QString getCacheDir();
     void ensureCacheDirHasBeenScanned();
 
     QNetworkAccessManager* nam_ = {};
     std::unordered_map<Key, QPixmap> pixmaps_;
+    std::unordered_map<QString, Key> keys_;
 };

@@ -39,6 +39,12 @@ bool change(Speed& setme, tr_variant const* variant)
     return value && change(setme, Speed::fromBps(*value));
 }
 
+bool change(TorrentHash& setme, tr_variant const* value)
+{
+    auto const hash_string = getValue<std::string_view>(value);
+    return hash_string && change(setme, TorrentHash(hash_string->data()));
+}
+
 bool change(Peer& setme, tr_variant const* value)
 {
     bool changed = false;
@@ -130,7 +136,6 @@ bool change(TrackerStat& setme, tr_variant const* value)
             HANDLE_KEY(downloadCount, download_count)
             HANDLE_KEY(hasAnnounced, has_announced)
             HANDLE_KEY(hasScraped, has_scraped)
-            HANDLE_KEY(host, host)
             HANDLE_KEY(id, id)
             HANDLE_KEY(isBackup, is_backup)
             HANDLE_KEY(lastAnnouncePeerCount, last_announce_peer_count)
@@ -160,7 +165,8 @@ bool change(TrackerStat& setme, tr_variant const* value)
         {
             if (key == TR_KEY_announce)
             {
-                setme.favicon_key = qApp->faviconCache().add(QUrl(setme.announce));
+                setme.announce = trApp->intern(setme.announce);
+                setme.favicon_key = trApp->faviconCache().add(setme.announce);
             }
 
             changed = true;

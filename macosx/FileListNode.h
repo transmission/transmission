@@ -25,17 +25,6 @@
 @class Torrent;
 
 @interface FileListNode : NSObject <NSCopying>
-{
-    NSMutableIndexSet * fIndexes;
-
-    NSString * fName;
-    NSString * fPath;
-    Torrent * __weak fTorrent;
-    uint64_t fSize;
-    NSImage * fIcon;
-    BOOL fIsFolder;
-    NSMutableArray * fChildren;
-}
 
 @property (nonatomic, copy, readonly) NSString * name;
 @property (nonatomic, copy, readonly) NSString * path;

@@ -17,14 +17,14 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QIcon>
+#include <QMimeDatabase>
 #include <QObject>
+#include <QPainter>
+#include <QStyle>
 
 #ifdef _WIN32
 #include <QPixmapCache>
 #include <QtWin>
-#else
-#include <QMimeDatabase>
-#include <QMimeType>
 #endif
 
 #include <libtransmission/transmission.h>
@@ -35,21 +35,16 @@
 
 IconCache& IconCache::get()
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     static auto& singleton = *new IconCache();
     return singleton;
 }
 
-IconCache::IconCache() :
-    folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
-    file_icon_(QFileIconProvider().icon(QFileIconProvider::Folder))
+QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 {
-}
-
-QIcon IconCache::guessMimeIcon(QString const& filename) const
-{
-#ifdef _WIN32
-
     QIcon icon;
+
+#ifdef _WIN32
 
     if (!filename.isEmpty())
     {
@@ -60,13 +55,70 @@ QIcon IconCache::guessMimeIcon(QString const& filename) const
         addAssociatedFileIcon(file_info, SHGFI_LARGEICON, icon);
     }
 
-    return icon;
-
 #else
 
-    return getMimeIcon(filename);
+    icon = getMimeIcon(filename);
 
 #endif
+
+    if (icon.isNull())
+    {
+        icon = fallback;
+    }
+
+    return icon;
+}
+
+QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) const
+{
+    auto& icon = (multifile ? name_to_emblem_icon_ : name_to_icon_)[mime_type_name];
+
+    if (!icon.isNull())
+    {
+        return icon;
+    }
+
+    if (!multifile)
+    {
+        QMimeDatabase mime_db;
+        auto const type = mime_db.mimeTypeForName(mime_type_name);
+        icon = QIcon::fromTheme(type.iconName());
+
+        if (icon.isNull())
+        {
+            icon = QIcon::fromTheme(type.genericIconName());
+        }
+
+        if (icon.isNull())
+        {
+            icon = file_icon_;
+        }
+
+        return icon;
+    }
+
+    auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
+    for (auto const& size : { QSize(24, 24), QSize(32, 32), QSize(48, 48) })
+    {
+        // upper left corner
+        auto const folder_size = size / 2;
+        auto const folder_rect = QRect(QPoint(), folder_size);
+
+        // fullsize
+        auto const mime_size = size;
+        auto const mime_rect = QRect(QPoint(), mime_size);
+
+        // build the icon
+        auto pixmap = QPixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        painter.drawPixmap(folder_rect, folder_icon_.pixmap(folder_size));
+        painter.drawPixmap(mime_rect, mime_icon.pixmap(mime_size));
+        icon.addPixmap(pixmap);
+    }
+
+    return icon;
 }
 
 /***
@@ -75,7 +127,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename) const
 
 #ifdef _WIN32
 
-void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const
+void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int icon_size, QIcon& icon) const
 {
     QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
         file_info.suffix();
@@ -111,8 +163,6 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size
 
 QIcon IconCache::getMimeIcon(QString const& filename) const
 {
-    // If the suffix doesn't match a mime type, treat it as a folder.
-    // This heuristic is fast and yields good results for torrent names.
     if (suffixes_.empty())
     {
         for (auto const& type : QMimeDatabase().allMimeTypes())
@@ -125,14 +175,14 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     auto const ext = QFileInfo(filename).suffix();
     if (suffixes_.count(ext) == 0)
     {
-        return folder_icon_;
+        return {};
     }
 
-    QIcon& icon = icon_cache_[ext];
+    QIcon& icon = ext_to_icon_[ext];
     if (icon.isNull()) // cache miss
     {
         QMimeDatabase mime_db;
-        QMimeType type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
+        auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
             icon = QIcon::fromTheme(type.iconName());
@@ -145,7 +195,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
 
         if (icon.isNull())
         {
-            icon = file_icon_;
+            icon = {};
         }
     }
 

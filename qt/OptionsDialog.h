@@ -37,16 +37,7 @@ class OptionsDialog : public BaseDialog
 
 public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
-    virtual ~OptionsDialog();
-
-private:
-    using mybins_t = QMap<uint32_t, int32_t>;
-
-private:
-    void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
-    void clearVerify();
+    ~OptionsDialog() override;
 
 private slots:
     void onAccepted();
@@ -61,9 +52,17 @@ private slots:
     void onSessionUpdated();
 
 private:
+    using mybins_t = QMap<uint32_t, int32_t>;
+
+    void reload();
+    void updateWidgetsLocality();
+    void clearInfo();
+    void clearVerify();
+
     AddData add_;
     FileList files_;
-    QCryptographicHash verify_hash_;
+    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
+
     QDir local_destination_;
     QFile verify_file_;
     QPushButton* verify_button_ = {};

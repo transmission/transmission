@@ -93,13 +93,13 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
         handle)) == NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     if (event_add(backend->event, &tr_watchdir_generic_interval) == -1)
     {
         log_error("Failed to add event: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     /* Run initial scan on startup */
@@ -107,7 +107,7 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 
     return BACKEND_DOWNCAST(backend);
 
-fail:
+FAIL:
     tr_watchdir_generic_free(BACKEND_DOWNCAST(backend));
     return NULL;
 }

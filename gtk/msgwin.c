@@ -121,20 +121,12 @@ static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 }
 
 /* similar to asctime, but is utf8-clean */
-static char* gtr_localtime(time_t time)
+static char* gtr_asctime(time_t t)
 {
-    char buf[256];
-    char* eoln;
-    struct tm const tm = *localtime(&time);
-
-    g_strlcpy(buf, asctime(&tm), sizeof(buf));
-
-    if ((eoln = strchr(buf, '\n')) != NULL)
-    {
-        *eoln = '\0';
-    }
-
-    return g_locale_to_utf8(buf, -1, NULL, NULL, NULL);
+    GDateTime* date_time = g_date_time_new_from_unix_local(t);
+    gchar* ret = g_date_time_format(date_time, "%a %b %2e %T %Y%n"); /* ctime equiv */
+    g_date_time_unref(date_time);
+    return ret;
 }
 
 static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename)
@@ -158,12 +150,11 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
         {
             do
             {
-                char* date;
                 char const* levelStr;
                 struct tr_log_message const* node;
 
                 gtk_tree_model_get(model, &iter, COL_TR_MSG, &node, -1);
-                date = gtr_localtime(node->when);
+                gchar* date = gtr_asctime(node->when);
 
                 switch (node->level)
                 {
@@ -271,14 +262,13 @@ static void renderTime(GtkTreeViewColumn* column, GtkCellRenderer* renderer, Gtk
     TR_UNUSED(column);
     TR_UNUSED(data);
 
-    struct tm tm;
-    char buf[16];
     struct tr_log_message const* node;
-
     gtk_tree_model_get(tree_model, iter, COL_TR_MSG, &node, -1);
-    tm = *localtime(&node->when);
-    g_snprintf(buf, sizeof(buf), "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+    GDateTime* date_time = g_date_time_new_from_unix_local(node->when);
+    gchar* buf = g_date_time_format(date_time, "%T");
     g_object_set(renderer, "text", buf, "foreground", getForegroundColor(node->level), NULL);
+    g_free(buf);
+    g_date_time_unref(date_time);
 }
 
 static void appendColumn(GtkTreeView* view, int col)

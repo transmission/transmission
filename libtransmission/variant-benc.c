@@ -13,8 +13,6 @@
 
 #include <event2/buffer.h>
 
-#include "ConvertUTF.h"
-
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
@@ -104,19 +102,19 @@ int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme
 
     if (buf >= bufend)
     {
-        goto err;
+        goto ERR;
     }
 
     if (!isdigit(*buf))
     {
-        goto err;
+        goto ERR;
     }
 
     end = memchr(buf, ':', bufend - buf);
 
     if (end == NULL)
     {
-        goto err;
+        goto ERR;
     }
 
     errno = 0;
@@ -124,7 +122,7 @@ int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme
 
     if (errno != 0 || ulend != end || len > MAX_BENC_STR_LENGTH)
     {
-        goto err;
+        goto ERR;
     }
 
     strbegin = (uint8_t const*)end + 1;
@@ -132,7 +130,7 @@ int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme
 
     if (strend < strbegin || strend > bufend)
     {
-        goto err;
+        goto ERR;
     }
 
     *setme_end = (uint8_t const*)end + 1 + len;
@@ -140,7 +138,7 @@ int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme
     *setme_strlen = len;
     return 0;
 
-err:
+ERR:
     *setme_end = NULL;
     *setme_str = NULL;
     *setme_strlen = 0;
@@ -189,6 +187,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     uint8_t const* bufend = bufend_in;
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
     tr_quark key = 0;
+
+    if ((buf_in == NULL) || (bufend_in == NULL) || (top == NULL))
+    {
+        return EINVAL;
+    }
 
     tr_variantInit(top, 0);
 

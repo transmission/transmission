@@ -105,6 +105,8 @@ char const* tr_address_to_string(tr_address const* addr);
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port);
+
 bool tr_address_from_string(tr_address* setme, char const* string);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);

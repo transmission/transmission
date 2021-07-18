@@ -43,9 +43,8 @@ public:
         CompleteRole
     };
 
-public:
     FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
-    ~FileTreeModel();
+    ~FileTreeModel() override;
 
     void setEditable(bool editable);
 
@@ -89,7 +88,6 @@ private:
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
-private:
     QMap<int, FileTreeItem*> index_cache_;
     FileTreeItem* root_item_ = {};
     bool is_editable_ = {};

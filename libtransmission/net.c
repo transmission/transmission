@@ -41,7 +41,7 @@
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
-#include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
+#include "peer-socket.h" /* for struct tr_peer_socket */
 #include "session.h" /* tr_sessionGetPublicAddress() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -86,6 +86,14 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
     return buf;
 }
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
+{
+    char addr_buf[INET6_ADDRSTRLEN];
+    tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
+    tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
+    return buf;
+}
+
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
 {
     TR_ASSERT(tr_address_is_valid(addr));
@@ -114,22 +122,20 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool ok;
+    bool success = false;
 
-    if ((ok = evutil_inet_pton(AF_INET, src, &dst->addr) == 1))
+    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
+        success = true;
     }
-
-    if (!ok) /* try IPv6 */
+    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
     {
-        if ((ok = evutil_inet_pton(AF_INET6, src, &dst->addr) == 1))
-        {
-            dst->type = TR_AF_INET6;
-        }
+        dst->type = TR_AF_INET6;
+        success = true;
     }
 
-    return ok;
+    return success;
 }
 
 /*
@@ -141,15 +147,15 @@ bool tr_address_from_string(tr_address* dst, char const* src)
  */
 int tr_address_compare(tr_address const* a, tr_address const* b)
 {
-    static int const sizes[2] = { sizeof(struct in_addr), sizeof(struct in6_addr) };
-
-    /* IPv6 addresses are always "greater than" IPv4 */
+    // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)
     {
         return a->type == TR_AF_INET ? 1 : -1;
     }
 
-    return memcmp(&a->addr, &b->addr, sizes[a->type]);
+    return a->type == TR_AF_INET ?
+        memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+        memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 /***********************************************************************
@@ -223,7 +229,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in* sin = (struct sockaddr_in*)from;
+        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -232,7 +238,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6* sin6 = (struct sockaddr_in6*)from;
+        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
@@ -352,8 +358,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
-            tr_peerIoAddrStr(addr, port));
+        char addrstr[TR_ADDRSTRLEN];
+        tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
     }
 
     return ret;
@@ -406,22 +413,18 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     }
 
     optval = 1;
-    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
 
 #ifdef IPV6_V6ONLY
 
-    if (addr->type == TR_AF_INET6)
+    if ((addr->type == TR_AF_INET6) &&
+        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&optval, sizeof(optval)) == -1) &&
+        (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
-        if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&optval, sizeof(optval)) == -1)
-        {
-            if (sockerrno != ENOPROTOOPT) /* if the kernel doesn't support it, ignore it */
-            {
-                *errOut = sockerrno;
-                tr_netCloseSocket(fd);
-                return TR_BAD_SOCKET;
-            }
-        }
+        *errOut = sockerrno;
+        tr_netCloseSocket(fd);
+        return TR_BAD_SOCKET;
     }
 
 #endif
@@ -476,7 +479,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 #endif
 
     optval = 5;
-    setsockopt(fd, SOL_TCP, TCP_FASTOPEN, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_TCP, TCP_FASTOPEN, (void const*)&optval, sizeof(optval));
 
 #endif
 
@@ -570,7 +573,7 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (s == TR_BAD_SOCKET)
     {
-        goto fail;
+        goto FAIL;
     }
 
     /* Since it's a UDP socket, this doesn't actually send any packets. */
@@ -578,21 +581,21 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     rc = getsockname(s, src, src_len);
 
     if (rc == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     evutil_closesocket(s);
 
     return rc;
 
-fail:
+FAIL:
     save = errno;
     evutil_closesocket(s);
     errno = save;
@@ -633,7 +636,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
     socklen_t sslen = sizeof(ss);
     struct sockaddr_in sin;
     struct sockaddr_in6 sin6;
-    struct sockaddr* sa;
+    struct sockaddr const* sa;
     socklen_t salen;
     int rc;
 
@@ -644,7 +647,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         sin.sin_family = AF_INET;
         evutil_inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
         sin.sin_port = htons(6969);
-        sa = (struct sockaddr*)&sin;
+        sa = (struct sockaddr const*)&sin;
         salen = sizeof(sin);
         break;
 
@@ -655,7 +658,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
            a native IPv6 address, not Teredo or 6to4. */
         evutil_inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
         sin6.sin6_port = htons(6969);
-        sa = (struct sockaddr*)&sin6;
+        sa = (struct sockaddr const*)&sin6;
         salen = sizeof(sin6);
         break;
 

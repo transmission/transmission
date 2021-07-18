@@ -151,12 +151,10 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         {
             char const* name;
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL))
+            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL) &&
+                !tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
             {
-                if (!tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
-                {
-                    name = NULL;
-                }
+                name = NULL;
             }
 
             if (tr_str_is_empty(name))

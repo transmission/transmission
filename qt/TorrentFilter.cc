@@ -221,7 +221,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
     if (val == 0)
     {
-        val = compare(a->hashString(), b->hashString());
+        val = compare(a->hash(), b->hash());
     }
 
     return val < 0;

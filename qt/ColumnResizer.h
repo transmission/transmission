@@ -10,11 +10,11 @@
 
 #include <QObject>
 #include <QSet>
+#include <QTimer>
 
 #include "Macros.h"
 
 class QGridLayout;
-class QTimer;
 
 class ColumnResizer : public QObject
 {
@@ -22,7 +22,7 @@ class ColumnResizer : public QObject
     TR_DISABLE_COPY_MOVE(ColumnResizer)
 
 public:
-    ColumnResizer(QObject* parent = nullptr);
+    explicit ColumnResizer(QObject* parent = nullptr);
 
     void addLayout(QGridLayout* layout);
 
@@ -30,11 +30,11 @@ public:
     bool eventFilter(QObject* object, QEvent* event) override;
 
 public slots:
-    void update();
+    void update() const;
 
 private:
     void scheduleUpdate();
 
-    QTimer* timer_ = {};
+    QTimer timer_;
     QSet<QGridLayout*> layouts_;
 };

@@ -27,11 +27,6 @@
 @class Torrent;
 
 @interface TrackerNode : NSObject
-{
-    tr_tracker_stat fStat;
-
-    Torrent * __weak fTorrent;
-}
 
 @property (nonatomic, weak, readonly) Torrent * torrent;
 

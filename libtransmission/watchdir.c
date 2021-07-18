@@ -55,15 +55,12 @@ struct tr_watchdir
 static bool is_regular_file(char const* dir, char const* name)
 {
     char* const path = tr_buildPath(dir, name, NULL);
-    tr_sys_path_info path_info;
+    tr_sys_path_info path_info = { 0 };
     tr_error* error = NULL;
-    bool ret;
 
-    if ((ret = tr_sys_path_get_info(path, 0, &path_info, &error)))
-    {
-        ret = path_info.type == TR_SYS_PATH_IS_FILE;
-    }
-    else
+    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+
+    if (error != NULL)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
@@ -139,7 +136,7 @@ struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 static int compare_retry_names(void const* a, void const* b)
 {
-    return strcmp(((tr_watchdir_retry*)a)->name, ((tr_watchdir_retry*)b)->name);
+    return strcmp(((tr_watchdir_retry const*)a)->name, ((tr_watchdir_retry const*)b)->name);
 }
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
@@ -237,33 +234,14 @@ tr_watchdir_t tr_watchdir_new(char const* path, tr_watchdir_cb callback, void* c
     handle->event_base = event_base;
     tr_watchdir_retries_init(&handle->active_retries);
 
-    if (!force_generic)
+    if (!force_generic && (handle->backend == NULL))
     {
-#ifdef WITH_INOTIFY
-
-        if (handle->backend == NULL)
-        {
-            handle->backend = tr_watchdir_inotify_new(handle);
-        }
-
-#endif
-
-#ifdef WITH_KQUEUE
-
-        if (handle->backend == NULL)
-        {
-            handle->backend = tr_watchdir_kqueue_new(handle);
-        }
-
-#endif
-
-#ifdef _WIN32
-
-        if (handle->backend == NULL)
-        {
-            handle->backend = tr_watchdir_win32_new(handle);
-        }
-
+#if defined(WITH_INOTIFY)
+        handle->backend = tr_watchdir_inotify_new(handle);
+#elif defined(WITH_KQUEUE)
+        handle->backend = tr_watchdir_kqueue_new(handle);
+#elif defined(_WIN32)
+        handle->backend = tr_watchdir_win32_new(handle);
 #endif
     }
 
