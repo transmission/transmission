@@ -2829,8 +2829,8 @@ void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr
  * We have very loose typing on this to make the URIs as simple as possible:
  * - anything not a 'tag' or 'method' is automatically in 'arguments'
  * - values that are all-digits are numbers
- * - values that are all-digits or commas are number lists
- * - all other values are strings
+ * - values that are all-digits or commas are number lists (single element list can be made like "2,")
+ * - other values with commas are string list (single element list can be made like "string,")
  */
 void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
 {
@@ -2839,7 +2839,38 @@ void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
 
     if (valueCount == 0)
     {
-        tr_variantInitStr(setme, str, len);
+        char* mutableStr = tr_strndup(str, len);
+        char* comma = strchr(mutableStr, ',');
+        if (comma == NULL) // single string
+        {
+            tr_variantInitStr(setme, mutableStr, len);
+        }
+        else // string list
+        {
+            tr_variantInitList(setme, 0);
+            for (size_t i = 0; i < len; i++)
+            {
+                if (mutableStr[i] == ',')
+                {
+                    mutableStr[i] = '\0';
+                }
+            }
+
+            char* start = mutableStr;
+            char* end = start + len;
+            while (start < end)
+            {
+                int currLen = strlen(start);
+                if (currLen > 0) // ignore empty strings
+                {
+                    tr_variantListAddStr(setme, start);
+                }
+
+                start += currLen + 1;
+            }
+        }
+
+        tr_free(mutableStr);
     }
     else if (valueCount == 1)
     {
@@ -2868,14 +2899,15 @@ void tr_rpc_request_exec_uri(tr_session* session, void const* request_uri, size_
 
     tr_variantInitDict(&top, 3);
     args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
-
+/* REDUNDANT BECAUSE ALREADY DONE BY CALLER AND CAN CALUSE PROBLEM IF ONE OF THE ARG HAS A '?'
     pch = strchr(request, '?');
 
     if (pch == NULL)
     {
         pch = request;
     }
-
+*/
+    pch = request;
     while (pch != NULL)
     {
         char const* delim = strchr(pch, '=');
