@@ -27,6 +27,8 @@ struct timeval;
 
 struct tr_error;
 
+struct tr_disk_space;
+
 /**
  * @addtogroup utils Utilities
  * @{
