@@ -430,7 +430,7 @@ static struct tr_disk_space getxfsquota(char* device)
 
         freespace = limit - (dq.d_bcount >> 1);
         freespace = freespace < 0 ? 0 : (freespace * 1024);
-        limit = limit < 0 ? 0 : (limit * 1024);
+        limit = limit * 1024;
         disk_space.free = freespace;
         disk_space.total = limit;
         return disk_space;

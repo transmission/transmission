@@ -79,8 +79,8 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
 /**
- * @brief Get available disk space (in bytes) for the specified folder.
- * @return zero or positive integer on success, -1 in case of error.
+ * @brief Get available disk space and free space (in bytes) for the specified folder.
+ * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
 struct tr_disk_space tr_getDirSpace(char const* path);
 
