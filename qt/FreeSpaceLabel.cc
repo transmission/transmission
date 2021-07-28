@@ -71,39 +71,31 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue();
-
-    auto* alive = new bool(true);
-    connect(this, &QObject::destroyed, [alive] { *alive = false; });
+    auto* q = new RpcQueue(this);
 
     q->add([this, &args]()
         {
             return session_->exec("free-space", &args);
         });
 
-    q->add([this, alive](RpcResponse const& r)
+    q->add([this](RpcResponse const& r)
         {
-            if (*alive)
+            // update the label
+            auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
+            if (bytes && *bytes > 1)
             {
-                // update the label
-                auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
-                if (bytes && *bytes > 1)
-                {
-                    setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
-                }
-                else
-                {
-                    clear();
-                }
-
-                // update the tooltip
-                auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
-                setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
-
-                timer_.start();
+                setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
+            }
+            else
+            {
+                setText(QString());
             }
 
-            delete alive;
+            // update the tooltip
+            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+            setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
+
+            timer_.start();
         });
 
     q->run();

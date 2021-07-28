@@ -1368,12 +1368,12 @@ void DetailsDialog::onRemoveTrackerClicked()
     // make a map of torrentIds to announce URLs to remove
     QItemSelectionModel* selection_model = ui_.trackersView->selectionModel();
     QModelIndexList selected_rows = selection_model->selectedRows();
-    QMap<int, int> torrent_id_to_tracker_ids;
+    QMultiMap<int, int> torrent_id_to_tracker_ids;
 
     for (QModelIndex const& i : selected_rows)
     {
         auto const inf = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
-        torrent_id_to_tracker_ids.insertMulti(inf.torrent_id, inf.st.id);
+        torrent_id_to_tracker_ids.insert(inf.torrent_id, inf.st.id);
     }
 
     // batch all of a tracker's torrents into one command

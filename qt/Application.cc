@@ -430,7 +430,9 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         beep();
 #else
-        QProcess::execute(prefs_->getString(Prefs::COMPLETE_SOUND_COMMAND));
+        auto args = prefs_->get<QStringList>(Prefs::COMPLETE_SOUND_COMMAND);
+        auto const command = args.takeFirst();
+        QProcess::execute(command, args);
 #endif
     }
 }

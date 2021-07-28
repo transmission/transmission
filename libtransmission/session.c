@@ -148,19 +148,19 @@ static void close_bindinfo(struct tr_bindinfo* b)
 
 static void close_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    close_bindinfo(session->public_ipv6);
+    close_bindinfo(session->bind_ipv4);
+    close_bindinfo(session->bind_ipv6);
 }
 
 static void free_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    tr_free(session->public_ipv4);
-    session->public_ipv4 = NULL;
+    close_bindinfo(session->bind_ipv4);
+    tr_free(session->bind_ipv4);
+    session->bind_ipv4 = NULL;
 
-    close_bindinfo(session->public_ipv6);
-    tr_free(session->public_ipv6);
-    session->public_ipv6 = NULL;
+    close_bindinfo(session->bind_ipv6);
+    tr_free(session->bind_ipv6);
+    session->bind_ipv6 = NULL;
 }
 
 static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
@@ -193,7 +193,7 @@ static void open_incoming_peer_port(tr_session* session)
     struct tr_bindinfo* b;
 
     /* bind an ipv4 port to listen for incoming peers... */
-    b = session->public_ipv4;
+    b = session->bind_ipv4;
     b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
     if (b->socket != TR_BAD_SOCKET)
@@ -205,7 +205,7 @@ static void open_incoming_peer_port(tr_session* session)
     /* and do the exact same thing for ipv6, if it's supported... */
     if (tr_net_hasIPv6(session->private_peer_port))
     {
-        b = session->public_ipv6;
+        b = session->bind_ipv6;
         b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
         if (b->socket != TR_BAD_SOCKET)
@@ -224,12 +224,12 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
     switch (tr_af_type)
     {
     case TR_AF_INET:
-        bindinfo = session->public_ipv4;
+        bindinfo = session->bind_ipv4;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
         break;
 
     case TR_AF_INET6:
-        bindinfo = session->public_ipv6;
+        bindinfo = session->bind_ipv6;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
         break;
 
@@ -473,8 +473,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_umask, s->umask);
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->public_ipv4->addr));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->bind_ipv4->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->bind_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -794,7 +794,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 
     /* cleanup */
@@ -994,7 +994,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
     if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) ||
         !tr_address_from_string(&b.addr, str) ||
@@ -1004,7 +1004,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -2342,7 +2342,7 @@ static void toggleLPDImpl(void* data)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 }
 
