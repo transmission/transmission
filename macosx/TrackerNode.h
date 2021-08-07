@@ -27,31 +27,26 @@
 @class Torrent;
 
 @interface TrackerNode : NSObject
-{
-    tr_tracker_stat fStat;
-
-    Torrent * __weak fTorrent;
-}
 
 @property (nonatomic, weak, readonly) Torrent * torrent;
 
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
+- (instancetype) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 
 - (BOOL) isEqual: (id) object;
 
-- (NSString *) host;
-- (NSString *) fullAnnounceAddress;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSString *fullAnnounceAddress;
 
-- (NSInteger) tier;
+@property (nonatomic, readonly) NSInteger tier;
 
-- (NSUInteger) identifier;
+@property (nonatomic, readonly) NSUInteger identifier;
 
-- (NSInteger) totalSeeders;
-- (NSInteger) totalLeechers;
-- (NSInteger) totalDownloaded;
+@property (nonatomic, readonly) NSInteger totalSeeders;
+@property (nonatomic, readonly) NSInteger totalLeechers;
+@property (nonatomic, readonly) NSInteger totalDownloaded;
 
-- (NSString *) lastAnnounceStatusString;
-- (NSString *) nextAnnounceStatusString;
-- (NSString *) lastScrapeStatusString;
+@property (nonatomic, readonly) NSString *lastAnnounceStatusString;
+@property (nonatomic, readonly) NSString *nextAnnounceStatusString;
+@property (nonatomic, readonly) NSString *lastScrapeStatusString;
 
 @end

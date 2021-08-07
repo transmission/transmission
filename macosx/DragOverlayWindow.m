@@ -32,41 +32,41 @@
 
 @implementation DragOverlayWindow
 
-- (id) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window
+- (instancetype) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window
 {
-    if ((self = ([super initWithContentRect: [window frame] styleMask: NSBorderlessWindowMask
+    if ((self = ([super initWithContentRect: window.frame styleMask: NSBorderlessWindowMask
                     backing: NSBackingStoreBuffered defer: NO])))
     {
         fLib = lib;
 
-        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
-        [self setAlphaValue: 0.0];
-        [self setOpaque: NO];
-        [self setHasShadow: NO];
+        self.backgroundColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5];
+        self.alphaValue = 0.0;
+        self.opaque = NO;
+        self.hasShadow = NO;
 
-        DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: [self frame]];
-        [self setContentView: view];
+        DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: self.frame];
+        self.contentView = view;
 
-        [self setReleasedWhenClosed: NO];
-        [self setIgnoresMouseEvents: YES];
+        self.releasedWhenClosed = NO;
+        self.ignoresMouseEvents = YES;
 
         fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
                                                                               @{NSViewAnimationTargetKey: self,
                                                                                 NSViewAnimationEffectKey: NSViewAnimationFadeInEffect}
                                                                               ]];
-        [fFadeInAnimation setDuration: 0.15];
-        [fFadeInAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
+        fFadeInAnimation.duration = 0.15;
+        fFadeInAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
 
         fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
                                                                                @{NSViewAnimationTargetKey: self,
                                                                                  NSViewAnimationEffectKey: NSViewAnimationFadeOutEffect}
                                                                                ]];
-        [fFadeOutAnimation setDuration: 0.5];
-        [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
+        fFadeOutAnimation.duration = 0.5;
+        fFadeOutAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
 
         [window addChildWindow: self ordered: NSWindowAbove];
 
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeWindow)
+        [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(resizeWindow)
             name: NSWindowDidResizeNotification object: window];
     }
     return self;
@@ -74,7 +74,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setTorrents: (NSArray *) files
@@ -88,11 +88,11 @@
 
     for (NSString * file in files)
     {
-        if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"]
-            || [[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+        if ([[NSWorkspace.sharedWorkspace typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"]
+            || [file.pathExtension caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             tr_ctor * ctor = tr_ctorNew(fLib);
-            tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
+            tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
             tr_info info;
             if (tr_torrentParse(ctor, &info) == TR_PARSE_OK)
             {
@@ -130,7 +130,7 @@
 
     NSImage * icon;
     if (count == 1)
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension]];
+        icon = [NSWorkspace.sharedWorkspace iconForFileType: folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension];
     else
     {
         name = [NSString stringWithFormat: NSLocalizedString(@"%@ Torrent Files", "Drag overlay -> torrents"),
@@ -139,20 +139,20 @@
         icon = [NSImage imageNamed: @"TransmissionDocument.icns"];
     }
 
-    [[self contentView] setOverlay: icon mainLine: name subLine: secondString];
+    [self.contentView setOverlay: icon mainLine: name subLine: secondString];
     [self fadeIn];
 }
 
 - (void) setFile: (NSString *) file
 {
-    [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge"]
+    [self.contentView setOverlay: [NSImage imageNamed: @"CreateLarge"]
         mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
     [self fadeIn];
 }
 
 - (void) setURL: (NSString *) url
 {
-    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe"]
+    [self.contentView setOverlay: [NSImage imageNamed: @"Globe"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     [self fadeIn];
 }
@@ -160,10 +160,10 @@
 - (void) fadeIn
 {
     //stop other animation and set to same progress
-    if ([fFadeOutAnimation isAnimating])
+    if (fFadeOutAnimation.animating)
     {
         [fFadeOutAnimation stopAnimation];
-        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
+        fFadeInAnimation.currentProgress = 1.0 - fFadeOutAnimation.currentProgress;
     }
     [fFadeInAnimation startAnimation];
 }
@@ -171,12 +171,12 @@
 - (void) fadeOut
 {
     //stop other animation and set to same progress
-    if ([fFadeInAnimation isAnimating])
+    if (fFadeInAnimation.animating)
     {
         [fFadeInAnimation stopAnimation];
-        [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
+        fFadeOutAnimation.currentProgress = 1.0 - fFadeInAnimation.currentProgress;
     }
-    if ([self alphaValue] > 0.0)
+    if (self.alphaValue > 0.0)
         [fFadeOutAnimation startAnimation];
 }
 
@@ -186,7 +186,7 @@
 
 - (void) resizeWindow
 {
-    [self setFrame: [[self parentWindow] frame] display: NO];
+    [self setFrame: self.parentWindow.frame display: NO];
 }
 
 @end

@@ -291,7 +291,10 @@ endif()
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 if(WIN32)
-    tr_add_external_auto_library(EVENT2 libevent event)
+    tr_add_external_auto_library(EVENT2 libevent event
+        CMAKE_ARGS
+            "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
+            "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
 else()
     set(EVENT2_CONFIGURE_FLAGS)
     if(APPLE)
@@ -304,7 +307,7 @@ else()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" ${EVENT2_CONFIGURE_FLAGS})
+                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" "--disable-samples" ${EVENT2_CONFIGURE_FLAGS})
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)

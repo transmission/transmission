@@ -30,11 +30,11 @@
     NSComparisonPredicate * predicate = (NSComparisonPredicate *)[super predicateWithSubpredicates: subpredicates];
 
     //construct a near-identical predicate
-    return [NSComparisonPredicate predicateWithLeftExpression: [predicate leftExpression]
-                                              rightExpression: [predicate rightExpression]
+    return [NSComparisonPredicate predicateWithLeftExpression: predicate.leftExpression
+                                              rightExpression: predicate.rightExpression
                                                      modifier: NSAnyPredicateModifier
-                                                         type: [predicate predicateOperatorType]
-                                                      options: [predicate options]];
+                                                         type: predicate.predicateOperatorType
+                                                      options: predicate.options];
 }
 
 @end

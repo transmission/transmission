@@ -67,7 +67,7 @@
     NSString * fRPCPassword;
 }
 
-- (id) initWithHandle: (tr_session *) handle;
+- (instancetype) initWithHandle: (tr_session *) handle;
 
 - (void) setAutoUpdateToBeta: (id) sender;
 
@@ -78,7 +78,7 @@
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
 
-- (NSArray *) sounds;
+@property (nonatomic, readonly) NSArray *sounds;
 - (void) setSound: (id) sender;
 
 - (void) setUTP: (id) sender;

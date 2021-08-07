@@ -25,21 +25,20 @@
 
 @implementation InfoTabButtonBack
 
-
 - (void) drawRect: (NSRect) rect
 {
     NSInteger count = 0;
     NSRect gridRects[2];
     NSColor * colorRects[2];
 
-    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight(self.bounds) - 1.0, NSWidth(rect), 1.0);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         gridRects[count] = lineBorderRect;
         if (@available(macOS 10.14, *)) {
-            colorRects[count] = [NSColor separatorColor];
+            colorRects[count] = NSColor.separatorColor;
         } else {
-            colorRects[count] = [NSColor grayColor];
+            colorRects[count] = NSColor.grayColor;
         }
         ++count;
 
@@ -51,9 +50,9 @@
     {
         gridRects[count] = lineBorderRect;
         if (@available(macOS 10.14, *)) {
-            colorRects[count] = [NSColor separatorColor];
+            colorRects[count] = NSColor.separatorColor;
         } else {
-            colorRects[count] = [NSColor grayColor];
+            colorRects[count] = NSColor.grayColor;
         }
         ++count;
 
@@ -65,7 +64,7 @@
 
     NSGradient *gradient;
 
-    if ([NSApp isDarkMode]) {
+    if (NSApp.isDarkMode) {
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 60.0/255.0 green: 60.0/255.0 blue: 60.0/255.0 alpha: 1.0];
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 90.0/255.0 green: 90.0/255.0 blue: 90.0/255.0 alpha: 1.0];
         gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];

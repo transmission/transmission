@@ -26,14 +26,14 @@
 
 - (void) validate
 {
-    [self setEnabled: [[self target] validateToolbarItem: self]];
+    self.enabled = [self.target validateToolbarItem: self];
 }
 
 - (NSMenuItem *) menuFormRepresentation
 {
-    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: [self action] keyEquivalent: @""];
-    [menuItem setTarget: [self target]];
-    [menuItem setEnabled: [[self target] validateToolbarItem: self]];
+    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: self.label action: self.action keyEquivalent: @""];
+    menuItem.target = self.target;
+    menuItem.enabled = [self.target validateToolbarItem: self];
 
     return menuItem;
 }

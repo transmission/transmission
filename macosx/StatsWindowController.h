@@ -33,7 +33,7 @@
     NSTimer * fTimer;
 }
 
-+ (StatsWindowController *) statsWindow;
+@property (nonatomic, class, readonly) StatsWindowController * statsWindow;
 
 - (void) resetStats: (id) sender;
 

@@ -24,12 +24,12 @@
 
 - (NSArray *) shareTorrentURLs
 {
-    NSArray * torrents = [(Controller *)[NSApp delegate] selectedTorrents];
-    NSMutableArray * fileURLs = [NSMutableArray arrayWithCapacity: [torrents count]];
+    NSArray * torrents = ((Controller *)NSApp.delegate).selectedTorrents;
+    NSMutableArray * fileURLs = [NSMutableArray arrayWithCapacity: torrents.count];
     for (Torrent * torrent in torrents)
     {
-        NSString * location = [torrent torrentLocation];
-        if ([location length] > 0) {
+        NSString * location = torrent.torrentLocation;
+        if (location.length > 0) {
             [fileURLs addObject: [NSURL fileURLWithPath: location]];
         }
     }
@@ -38,8 +38,8 @@
 
 - (NSArray *) menuItems
 {
-    NSArray * services = [NSSharingService sharingServicesForItems: [self shareTorrentURLs]];
-    NSMutableArray * items = [NSMutableArray arrayWithCapacity: [services count]];
+    NSArray * services = [NSSharingService sharingServicesForItems: self.shareTorrentURLs];
+    NSMutableArray * items = [NSMutableArray arrayWithCapacity: services.count];
     for (NSSharingService * service in services)
     {
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: service.title // 10.9: change to menuItemTitle
@@ -47,7 +47,7 @@
                                                keyEquivalent: @""];
         item.image = service.image;
         item.representedObject = service;
-        service.delegate = (Controller *)[NSApp delegate];
+        service.delegate = (Controller *)NSApp.delegate;
         item.target = self;
         [items addObject: item];
     }
@@ -58,7 +58,7 @@
 - (void) performShareAction: (NSMenuItem *) item
 {
     NSSharingService * service = item.representedObject;
-    [service performWithItems: [self shareTorrentURLs]]; // on 10.9, use attachmentFileURLs?
+    [service performWithItems: self.shareTorrentURLs]; // on 10.9, use attachmentFileURLs?
 }
 
 @end

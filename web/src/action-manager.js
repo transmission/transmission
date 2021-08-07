@@ -137,11 +137,12 @@ export class ActionManager extends EventTarget {
   }
 
   static _recount(selected, nonselected) {
-    const test = (tor) => tor.isStopped();
     const total = selected.length + nonselected.length;
-    const selected_paused = selected.filter(test).length;
+    const selected_paused = selected.filter((tor) => tor.isStopped()).length;
     const selected_active = selected.length - selected_paused;
-    const nonselected_paused = nonselected.filter(test).length;
+    const nonselected_paused = nonselected.filter((tor) =>
+      tor.isStopped()
+    ).length;
     const nonselected_active = nonselected.length - nonselected_paused;
     const paused = selected_paused + nonselected_paused;
     const active = selected_active + nonselected_active;

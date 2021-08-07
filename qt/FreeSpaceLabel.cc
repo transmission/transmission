@@ -71,7 +71,7 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue();
+    auto* q = new RpcQueue(this);
 
     q->add([this, &args]()
         {

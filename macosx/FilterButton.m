@@ -25,7 +25,7 @@
 
 @implementation FilterButton
 
-- (id) initWithCoder: (NSCoder *) coder
+- (instancetype) initWithCoder: (NSCoder *) coder
 {
     if ((self = [super initWithCoder: coder]))
     {
@@ -41,9 +41,9 @@
 
     fCount = count;
 
-    [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip")
+    self.toolTip = fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip")
         : [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Filter Bar Button -> tool tip"),
-            [NSString formattedUInteger: fCount]]];
+            [NSString formattedUInteger: fCount]];
 }
 
 @end
