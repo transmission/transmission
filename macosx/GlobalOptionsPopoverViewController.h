@@ -36,7 +36,7 @@
     NSString * fInitialString;
 }
 
-- (id) initWithHandle: (tr_session *) handle;
+- (instancetype) initWithHandle: (tr_session *) handle;
 
 - (IBAction) updatedDisplayString: (id) sender;
 

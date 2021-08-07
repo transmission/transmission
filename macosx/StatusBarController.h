@@ -35,7 +35,7 @@
     CGFloat fPreviousDownloadRate, fPreviousUploadRate;
 }
 
-- (id) initWithLib: (tr_session *) lib;
+- (instancetype) initWithLib: (tr_session *) lib;
 
 - (void) updateWithDownload: (CGFloat) dlRate upload: (CGFloat) ulRate;
 - (void) setStatusLabel: (id) sender;

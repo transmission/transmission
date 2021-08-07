@@ -67,8 +67,8 @@
 - (void) setActionButtonHover: (NSInteger) row;
 
 - (void) selectValues: (NSArray *) values;
-- (NSArray *) selectedValues;
-- (NSArray *) selectedTorrents;
+@property (nonatomic, readonly) NSArray *selectedValues;
+@property (nonatomic, readonly) NSArray *selectedTorrents;
 
 - (NSRect) iconRectForRow: (NSInteger) row;
 
@@ -88,7 +88,7 @@
 - (void) setPriority: (id) sender;
 
 - (void) togglePiecesBar;
-- (CGFloat) piecesBarPercent;
+@property (nonatomic, readonly) CGFloat piecesBarPercent;
 
 - (void) selectAndScrollToRow: (NSInteger) row;
 

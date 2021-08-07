@@ -27,7 +27,7 @@
     NSTimer * fTimer;
 }
 
-+ (BlocklistScheduler *) scheduler;
+@property (nonatomic, class, readonly) BlocklistScheduler * scheduler;
 
 - (void) updateSchedule;
 - (void) cancelSchedule;
