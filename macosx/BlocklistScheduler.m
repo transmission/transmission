@@ -48,19 +48,19 @@ BlocklistScheduler * fScheduler = nil;
 
 - (void) updateSchedule
 {
-    if ([BlocklistDownloader isRunning])
+    if (BlocklistDownloader.isRunning)
         return;
 
     [self cancelSchedule];
 
     NSString * blocklistURL;
-    if (![[NSUserDefaults standardUserDefaults] boolForKey: @"BlocklistNew"]
-        || !((blocklistURL = [[NSUserDefaults standardUserDefaults] stringForKey: @"BlocklistURL"]) &&
+    if (![NSUserDefaults.standardUserDefaults boolForKey: @"BlocklistNew"]
+        || !((blocklistURL = [NSUserDefaults.standardUserDefaults stringForKey: @"BlocklistURL"]) &&
                 ![blocklistURL isEqualToString: @""])
-        || ![[NSUserDefaults standardUserDefaults] boolForKey: @"BlocklistAutoUpdate"])
+        || ![NSUserDefaults.standardUserDefaults boolForKey: @"BlocklistAutoUpdate"])
         return;
 
-    NSDate * lastUpdateDate = [[NSUserDefaults standardUserDefaults] objectForKey: @"BlocklistNewLastUpdate"];
+    NSDate * lastUpdateDate = [NSUserDefaults.standardUserDefaults objectForKey: @"BlocklistNewLastUpdate"];
     if (lastUpdateDate)
         lastUpdateDate = [lastUpdateDate dateByAddingTimeInterval: FULL_WAIT];
     NSDate * closeDate = [NSDate dateWithTimeIntervalSinceNow: SMALL_DELAY];
@@ -70,7 +70,7 @@ BlocklistScheduler * fScheduler = nil;
     fTimer = [[NSTimer alloc] initWithFireDate: useDate interval: 0 target: self selector: @selector(runUpdater) userInfo: nil repeats: NO];
 
     //current run loop usually means a second update won't work
-    NSRunLoop * loop = [NSRunLoop mainRunLoop];
+    NSRunLoop * loop = NSRunLoop.mainRunLoop;
     [loop addTimer: fTimer forMode: NSDefaultRunLoopMode];
     [loop addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [loop addTimer: fTimer forMode: NSEventTrackingRunLoopMode];

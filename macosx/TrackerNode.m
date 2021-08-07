@@ -25,16 +25,16 @@
 #import "NSStringAdditions.h"
 
 @implementation TrackerNode
+{
+    tr_tracker_stat fStat;
+}
 
-#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
-@synthesize torrent = fTorrent;
-
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
+- (instancetype) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {
         fStat = *stat;
-        fTorrent = torrent; //weak reference
+        _torrent = torrent; //weak reference
     }
 
     return self;
@@ -42,7 +42,7 @@
 
 - (NSString *) description
 {
-    return [@"Tracker: " stringByAppendingString: [self fullAnnounceAddress]];
+    return [@"Tracker: " stringByAppendingString: self.fullAnnounceAddress];
 }
 
 - (id) copyWithZone: (NSZone *) zone
@@ -58,11 +58,12 @@
 
     if (![object isKindOfClass: [self class]])
         return NO;
-
-    if ([self torrent] != [object torrent])
+    
+    typeof(self) other = (typeof(self))object;
+    if (self.torrent != other.torrent)
         return NO;
 
-    return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
+    return self.tier == other.tier && [self.fullAnnounceAddress isEqualToString: other.fullAnnounceAddress];
 }
 
 - (NSString *) host
@@ -106,9 +107,9 @@
     if (fStat.hasAnnounced)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-        [dateFormatter setDoesRelativeDateFormatting: YES];
+        dateFormatter.dateStyle = NSDateFormatterFullStyle;
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
+        dateFormatter.doesRelativeDateFormatting = YES;
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
     }
@@ -155,24 +156,18 @@
 
         case TR_TRACKER_WAITING:
         {
-            const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970];
-
-            NSString *timeString;
-            if ([NSApp isOnYosemiteOrBetter]) {
-                static NSDateComponentsFormatter *formatter;
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    formatter = [NSDateComponentsFormatter new];
-                    formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
-                    formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
-                    formatter.collapsesLargestUnit = YES;
-                });
-
-                timeString = [formatter stringFromTimeInterval: nextAnnounceTimeLeft];
-            }
-            else {
-                timeString = [NSString timeString: nextAnnounceTimeLeft includesTimeRemainingPhrase: NO showSeconds: YES];
-            }
+            const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [NSDate date].timeIntervalSince1970;
+            
+            static NSDateComponentsFormatter *formatter;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                formatter = [NSDateComponentsFormatter new];
+                formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
+                formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
+                formatter.collapsesLargestUnit = YES;
+            });
+            
+            NSString *timeString = [formatter stringFromTimeInterval: nextAnnounceTimeLeft];
             return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
                     timeString];
         }
@@ -195,9 +190,9 @@
     if (fStat.hasScraped)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-        [dateFormatter setDoesRelativeDateFormatting: YES];
+        dateFormatter.dateStyle = NSDateFormatterFullStyle;
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
+        dateFormatter.doesRelativeDateFormatting = YES;
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
     }

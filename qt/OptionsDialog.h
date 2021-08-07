@@ -18,8 +18,8 @@
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Torrent.h" // FileList
-
 #include "ui_OptionsDialog.h"
 
 class Prefs;
@@ -33,24 +33,16 @@ struct tr_variant;
 class OptionsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent = nullptr);
-    virtual ~OptionsDialog();
-
-private:
-    typedef QMap<uint32_t, int32_t> mybins_t;
-
-private:
-    void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
-    void clearVerify();
+    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
+    ~OptionsDialog() override;
 
 private slots:
     void onAccepted();
-    void onPriorityChanged(QSet<int> const& fileIndices, int);
-    void onWantedChanged(QSet<int> const& fileIndices, bool);
+    void onPriorityChanged(QSet<int> const& file_indices, int);
+    void onWantedChanged(QSet<int> const& file_indices, bool);
     void onVerify();
     void onTimeout();
 
@@ -60,29 +52,34 @@ private slots:
     void onSessionUpdated();
 
 private:
-    Session& mySession;
-    AddData myAdd;
+    using mybins_t = QMap<uint32_t, int32_t>;
 
-    Ui::OptionsDialog ui;
+    void reload();
+    void updateWidgetsLocality();
+    void clearInfo();
+    void clearVerify();
 
-    bool myIsLocal;
-    QDir myLocalDestination;
-    bool myHaveInfo;
-    tr_info myInfo;
-    QPushButton* myVerifyButton;
-    QVector<int> myPriorities;
-    QVector<bool> myWanted;
-    FileList myFiles;
+    AddData add_;
+    FileList files_;
+    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
 
-    QTimer myVerifyTimer;
-    char myVerifyBuf[2048 * 4];
-    QFile myVerifyFile;
-    uint64_t myVerifyFilePos;
-    int myVerifyFileIndex;
-    uint32_t myVerifyPieceIndex;
-    uint32_t myVerifyPiecePos;
-    QVector<bool> myVerifyFlags;
-    QCryptographicHash myVerifyHash;
-    mybins_t myVerifyBins;
-    QTimer myEditTimer;
+    QDir local_destination_;
+    QFile verify_file_;
+    QPushButton* verify_button_ = {};
+    QTimer edit_timer_;
+    QTimer verify_timer_;
+    QVector<bool> verify_flags_;
+    QVector<bool> wanted_;
+    QVector<int> priorities_;
+    Session& session_;
+    Ui::OptionsDialog ui_ = {};
+    mybins_t verify_bins_;
+    tr_info info_ = {};
+    uint64_t verify_file_pos_ = {};
+    uint32_t verify_piece_index_ = {};
+    uint32_t verify_piece_pos_ = {};
+    int verify_file_index_ = {};
+    char verify_buf_[2048 * 4] = {};
+    bool have_info_ = {};
+    bool is_local_ = {};
 };

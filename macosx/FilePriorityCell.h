@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+
 #import "FileOutlineView.h"
 
 @interface FilePriorityCell : NSSegmentedCell

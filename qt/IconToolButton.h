@@ -10,17 +10,20 @@
 
 #include <QToolButton>
 
+#include "Macros.h"
+
 class IconToolButton : public QToolButton
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(IconToolButton)
 
 public:
-    IconToolButton(QWidget* parent = nullptr);
+    explicit IconToolButton(QWidget* parent = nullptr);
 
     // QWidget
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const override;
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 };

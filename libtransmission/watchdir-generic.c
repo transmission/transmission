@@ -10,7 +10,7 @@
 
 #include <event2/event.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "log.h"
@@ -49,8 +49,11 @@ struct timeval tr_watchdir_generic_interval = { .tv_sec = 10, .tv_usec = 0 };
 ****
 ***/
 
-static void tr_watchdir_generic_on_event(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_generic_on_event(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     tr_watchdir_t const handle = context;
     tr_watchdir_generic* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
@@ -87,16 +90,16 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
     backend->base.free_func = &tr_watchdir_generic_free;
 
     if ((backend->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event,
-            handle)) == NULL)
+        handle)) == NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     if (event_add(backend->event, &tr_watchdir_generic_interval) == -1)
     {
         log_error("Failed to add event: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     /* Run initial scan on startup */
@@ -104,7 +107,7 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 
     return BACKEND_DOWNCAST(backend);
 
-fail:
+FAIL:
     tr_watchdir_generic_free(BACKEND_DOWNCAST(backend));
     return NULL;
 }

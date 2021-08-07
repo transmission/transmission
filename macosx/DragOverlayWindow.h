@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+
+#include <libtransmission/transmission.h>
 
 @interface DragOverlayWindow : NSWindow
 {
@@ -30,7 +31,7 @@
     NSViewAnimation * fFadeInAnimation, * fFadeOutAnimation;
 }
 
-- (id) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window;
+- (instancetype) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window;
 
 - (void) setTorrents: (NSArray *) files;
 - (void) setFile: (NSString *) file;

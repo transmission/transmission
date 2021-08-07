@@ -12,10 +12,7 @@
 
 #include "tr-macros.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 /**
  * @addtogroup error Error reporting
@@ -31,17 +28,6 @@ typedef struct tr_error
     char* message;
 }
 tr_error;
-
-/**
- * @brief Create new error object using `printf`-style formatting.
- *
- * @param[in] code           Error code (platform-specific).
- * @param[in] message_format Error message format string.
- * @param[in] ...            Format arguments.
- *
- * @return Newly allocated error object on success, `NULL` otherwise.
- */
-tr_error* tr_error_new(int code, char const* message_format, ...) TR_GNUC_PRINTF(2, 3);
 
 /**
  * @brief Create new error object using literal error message.
@@ -62,7 +48,7 @@ tr_error* tr_error_new_literal(int code, char const* message);
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error* tr_error_new_valist(int code, char const* message_format, va_list args);
+tr_error* tr_error_new_valist(int code, char const* message_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 /**
  * @brief Free memory used by error object.
@@ -145,6 +131,4 @@ void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, cha
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

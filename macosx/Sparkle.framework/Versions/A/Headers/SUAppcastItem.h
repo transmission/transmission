@@ -9,40 +9,45 @@
 #ifndef SUAPPCASTITEM_H
 #define SUAPPCASTITEM_H
 
-@interface SUAppcastItem : NSObject {
-	NSString *title;
-	NSDate *date;
-	NSString *itemDescription;
-	
-	NSURL *releaseNotesURL;
-	
-	NSString *DSASignature;	
-	NSString *minimumSystemVersion;
-    NSString *tag;
-	
-	NSURL *fileURL;
-	NSString *versionString;
-	NSString *displayVersionString;
-	
-	NSDictionary *propertiesDictionary;
-}
+#if __has_feature(modules)
+@import Foundation;
+#else
+#import <Foundation/Foundation.h>
+#endif
+#import "SUExport.h"
+@class SUSignatures;
+
+SU_EXPORT @interface SUAppcastItem : NSObject
+@property (copy, readonly) NSString *title;
+@property (copy, readonly) NSString *dateString;
+@property (copy, readonly) NSDate *date;
+@property (copy, readonly) NSString *itemDescription;
+@property (strong, readonly) NSURL *releaseNotesURL;
+@property (strong, readonly) SUSignatures *signatures;
+@property (copy, readonly) NSString *minimumSystemVersion;
+@property (copy, readonly) NSString *maximumSystemVersion;
+@property (strong, readonly) NSURL *fileURL;
+@property (nonatomic, readonly) uint64_t contentLength;
+@property (copy, readonly) NSString *versionString;
+@property (copy, readonly) NSString *osString;
+@property (copy, readonly) NSString *displayVersionString;
+@property (copy, readonly) NSDictionary *deltaUpdates;
+@property (strong, readonly) NSURL *infoURL;
+@property (copy, readonly) NSNumber* phasedRolloutInterval;
 
 // Initializes with data from a dictionary provided by the RSS class.
-- initWithDictionary:(NSDictionary *)dict;
+- (instancetype)initWithDictionary:(NSDictionary *)dict;
+- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString **)error;
 
-- (NSString *)title;
-- (NSString *)versionString;
-- (NSString *)displayVersionString;
-- (NSDate *)date;
-- (NSString *)itemDescription;
-- (NSURL *)releaseNotesURL;
-- (NSURL *)fileURL;
-- (NSString *)DSASignature;
-- (NSString *)minimumSystemVersion;
-- (NSString *)tag;
+@property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
+@property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
+@property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
+@property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
-- (NSDictionary *)propertiesDictionary;
+@property (readonly, copy) NSDictionary *propertiesDictionary;
+
+- (NSURL *)infoURL;
 
 @end
 

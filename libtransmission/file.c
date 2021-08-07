@@ -26,7 +26,9 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     while (buffer_size > 0)
     {
-        ret = tr_sys_file_read(handle, buffer + offset, MIN(buffer_size, 1024u), &bytes_read, error);
+        size_t const bytes_needed = MIN(buffer_size, 1024u);
+
+        ret = tr_sys_file_read(handle, buffer + offset, bytes_needed, &bytes_read, error);
 
         if (!ret || (offset == 0 && bytes_read == 0))
         {
@@ -34,15 +36,21 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
             break;
         }
 
+        TR_ASSERT(bytes_read <= bytes_needed);
+        TR_ASSERT(bytes_read <= buffer_size);
+
         int64_t delta = 0;
 
-        for (size_t i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
+        for (size_t i = 0; i < bytes_read; ++i)
         {
             if (buffer[offset] == '\n')
             {
                 delta = i - (int64_t)bytes_read + 1;
                 break;
             }
+
+            ++offset;
+            --buffer_size;
         }
 
         if (delta != 0 || buffer_size == 0 || bytes_read == 0)

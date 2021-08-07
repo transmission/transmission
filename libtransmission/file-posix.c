@@ -11,9 +11,10 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate() */
+#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
+#include <stdint.h> /* SIZE_MAX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,27 @@
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
 #endif
+
+/* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
+#if defined(__linux__)
+#   include <linux/version.h>
+/* Linux's copy_file_range(2) is buggy prior to 5.3. */
+#   if defined(HAVE_COPY_FILE_RANGE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+#       define USE_COPY_FILE_RANGE
+#   elif defined(HAVE_SENDFILE64)
+#       include <sys/sendfile.h>
+#       define USE_SENDFILE64
+#   endif
+#elif defined(__APPLE__) && defined(HAVE_COPYFILE)
+#   include <copyfile.h>
+#   ifndef COPYFILE_CLONE /* macos < 10.12 */
+#       define COPYFILE_CLONE 0
+#   endif
+#   define USE_COPYFILE
+#elif defined(HAVE_COPY_FILE_RANGE)
+/* Presently this is only FreeBSD 13+. */
+#   define USE_COPY_FILE_RANGE
+#endif /* __linux__ */
 
 #include "transmission.h"
 #include "error.h"
@@ -202,19 +224,19 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
                 break;
             }
 
-            goto failure;
+            goto FAILURE;
         }
 
         if (errno != ENOENT)
         {
             set_system_error(&my_error, errno);
-            goto failure;
+            goto FAILURE;
         }
     }
 
     if (ret && pp == path_end)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
     /* Go one level down on each iteration and attempt to create */
@@ -232,10 +254,10 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
 
     if (ret)
     {
-        goto cleanup;
+        goto CLEANUP;
     }
 
-failure:
+FAILURE:
 
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != NULL);
@@ -243,7 +265,7 @@ failure:
     tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
     tr_error_propagate(error, &my_error);
 
-cleanup:
+CLEANUP:
 
     TR_ASSERT(my_error == NULL);
 
@@ -329,7 +351,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     TR_ASSERT(path != NULL);
 
     char* ret = NULL;
-    char* tmp = NULL;
 
 #if defined(HAVE_CANONICALIZE_FILE_NAME)
 
@@ -337,21 +358,9 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 #endif
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L
-
-    /* Better safe than sorry: realpath() officially supports NULL as destination
-       starting off POSIX.1-2008. */
-
     if (ret == NULL)
     {
-        ret = realpath(path, NULL);
-    }
-
-#endif
-
-    if (ret == NULL)
-    {
-        tmp = tr_new(char, PATH_MAX);
+        char tmp[PATH_MAX];
         ret = realpath(path, tmp);
 
         if (ret != NULL)
@@ -364,8 +373,6 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     {
         set_system_error(error, errno);
     }
-
-    tr_free(tmp);
 
     return ret;
 }
@@ -430,6 +437,125 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     return ret;
 }
 
+/* We try to do a fast (in-kernel) copy using a variety of non-portable system
+ * calls. If the current implementation does not support in-kernel copying, we
+ * use a user-space fallback instead. */
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
+{
+    TR_ASSERT(src_path != NULL);
+    TR_ASSERT(dst_path != NULL);
+
+#if defined(USE_COPYFILE)
+    if (copyfile(src_path, dst_path, NULL, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    {
+        set_system_error(error, errno);
+        return false;
+    }
+
+    return true;
+
+#else /* USE_COPYFILE */
+
+    /* Other OSes require us to copy between file descriptors, so open them. */
+    tr_sys_file_t in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    if (in == TR_BAD_SYS_FILE)
+    {
+        tr_error_prefix(error, "Unable to open source file: ");
+        return false;
+    }
+
+    tr_sys_path_info info;
+    if (!tr_sys_file_get_info(in, &info, error))
+    {
+        tr_error_prefix(error, "Unable to get information on source file: ");
+        tr_sys_file_close(in, NULL);
+        return false;
+    }
+
+    tr_sys_file_t out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
+    if (out == TR_BAD_SYS_FILE)
+    {
+        tr_error_prefix(error, "Unable to open destination file: ");
+        tr_sys_file_close(in, NULL);
+        return false;
+    }
+
+    uint64_t file_size = info.size;
+
+#if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
+
+    while (file_size > 0)
+    {
+        size_t const chunk_size = MIN(file_size, SSIZE_MAX);
+        ssize_t const copied =
+#ifdef USE_COPY_FILE_RANGE
+            copy_file_range(in, NULL, out, NULL, chunk_size, 0);
+#elif defined(USE_SENDFILE64)
+            sendfile64(out, in, NULL, chunk_size);
+#else
+#error File copy mechanism not implemented.
+#endif
+        TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
+
+        if (copied == -1)
+        {
+            set_system_error(error, errno);
+            break;
+        }
+
+        TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
+        TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
+        file_size -= copied;
+    }
+
+#else /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+
+    /* Fallback to user-space copy. */
+
+    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
+    char* buf = tr_malloc(buflen);
+
+    while (file_size > 0)
+    {
+        uint64_t const chunk_size = MIN(file_size, buflen);
+        uint64_t bytes_read;
+        uint64_t bytes_written;
+
+        if (!tr_sys_file_read(in, buf, chunk_size, &bytes_read, error))
+        {
+            break;
+        }
+
+        if (!tr_sys_file_write(out, buf, bytes_read, &bytes_written, error))
+        {
+            break;
+        }
+
+        TR_ASSERT(bytes_read == bytes_written);
+        TR_ASSERT(bytes_written <= file_size);
+        file_size -= bytes_written;
+    }
+
+    /* cleanup */
+    tr_free(buf);
+
+#endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+
+    /* cleanup */
+    tr_sys_file_close(out, NULL);
+    tr_sys_file_close(in, NULL);
+
+    if (file_size != 0)
+    {
+        tr_error_prefix(error, "Unable to read/write: ");
+        return false;
+    }
+
+    return true;
+
+#endif /* USE_COPYFILE */
+}
+
 bool tr_sys_path_remove(char const* path, tr_error** error)
 {
     TR_ASSERT(path != NULL);
@@ -487,28 +613,28 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
     {
         native_flags |= O_RDWR;
     }
-    else if (flags & TR_SYS_FILE_READ)
+    else if ((flags & TR_SYS_FILE_READ) != 0)
     {
         native_flags |= O_RDONLY;
     }
-    else if (flags & TR_SYS_FILE_WRITE)
+    else if ((flags & TR_SYS_FILE_WRITE) != 0)
     {
         native_flags |= O_WRONLY;
     }
 
     native_flags |=
-        (flags & TR_SYS_FILE_CREATE ? O_CREAT : 0) |
-        (flags & TR_SYS_FILE_CREATE_NEW ? O_CREAT | O_EXCL : 0) |
-        (flags & TR_SYS_FILE_APPEND ? O_APPEND : 0) |
-        (flags & TR_SYS_FILE_TRUNCATE ? O_TRUNC : 0) |
-        (flags & TR_SYS_FILE_SEQUENTIAL ? O_SEQUENTIAL : 0) |
+        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) |
+        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) |
+        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) |
+        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) |
+        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) |
         O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {
-        if (flags & TR_SYS_FILE_SEQUENTIAL)
+        if ((flags & TR_SYS_FILE_SEQUENTIAL) != 0)
         {
             set_file_for_single_pass(ret);
         }
@@ -831,11 +957,11 @@ skip_darwin_fcntl:
 
 #else
 
-    (void)handle;
-    (void)offset;
-    (void)size;
-    (void)advice;
-    (void)error;
+    TR_UNUSED(handle);
+    TR_UNUSED(offset);
+    TR_UNUSED(size);
+    TR_UNUSED(advice);
+    TR_UNUSED(error);
 
 #endif
 
@@ -844,6 +970,8 @@ skip_darwin_fcntl:
 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
 {
+    TR_UNUSED(size);
+
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     bool ret = false;
@@ -857,7 +985,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
     if (ret || errno == ENOSPC)
     {
-        goto out;
+        goto OUT;
     }
 
 #endif
@@ -887,7 +1015,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -915,7 +1043,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
             if (ret || code == ENOSPC)
             {
-                goto non_sparse_out;
+                goto NON_SPARSE_OUT;
             }
         }
 
@@ -929,13 +1057,13 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 #endif
 
 #if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-non_sparse_out:
+NON_SPARSE_OUT:
 #endif
         errno = code;
     }
 
 #ifdef HAVE_FALLOCATE64
-out:
+OUT:
 #endif
 
     if (!ret)
@@ -985,6 +1113,41 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
+
+#if defined(F_OFD_SETLK)
+
+    struct flock fl = { 0 };
+
+    switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
+    {
+    case TR_SYS_FILE_LOCK_SH:
+        fl.l_type = F_RDLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_EX:
+        fl.l_type = F_WRLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_UN:
+        fl.l_type = F_UNLCK;
+        break;
+    }
+
+    fl.l_whence = SEEK_SET;
+
+    do
+    {
+        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+    if (!ret && errno == EAGAIN)
+    {
+        errno = EWOULDBLOCK;
+    }
+
+#elif defined(HAVE_FLOCK)
+
     int native_operation = 0;
 
     if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
@@ -1007,7 +1170,21 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         native_operation |= LOCK_UN;
     }
 
-    ret = flock(handle, native_operation) != -1;
+    do
+    {
+        ret = flock(handle, native_operation) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+#else
+
+    TR_UNUSED(handle);
+    TR_UNUSED(operation);
+
+    errno = ENOSYS;
+    ret = false;
+
+#endif
 
     if (!ret)
     {
@@ -1134,21 +1311,17 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-#ifndef __clang__
-    /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == NULL, "values should match");
-#endif
-
     TR_ASSERT(path != NULL);
 
-    tr_sys_dir_t ret = opendir(path);
+    DIR* ret = opendir(path);
 
-    if (ret == TR_BAD_SYS_DIR)
+    if (ret == NULL)
     {
         set_system_error(error, errno);
+        return TR_BAD_SYS_DIR;
     }
 
-    return ret;
+    return (tr_sys_dir_t)ret;
 }
 
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
@@ -1158,7 +1331,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = NULL;
 
     errno = 0;
-    struct dirent* entry = readdir(handle);
+    struct dirent const* const entry = readdir((DIR*)handle);
 
     if (entry != NULL)
     {
@@ -1176,7 +1349,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool ret = closedir(handle) != -1;
+    bool ret = closedir((DIR*)handle) != -1;
 
     if (!ret)
     {

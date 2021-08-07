@@ -18,7 +18,7 @@
 #include <event2/event.h>
 #include <event2/util.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "log.h"
@@ -63,7 +63,7 @@ tr_watchdir_win32;
 static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, LPDWORD bytes_transferred, DWORD timeout,
     BOOL alertable)
 {
-    typedef BOOL (WINAPI * impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+    typedef BOOL (WINAPI* impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
 
     static impl_t real_impl = NULL;
     static bool is_real_impl_valid = false;
@@ -132,8 +132,11 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
     return 0;
 }
 
-static void tr_watchdir_win32_on_first_scan(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_win32_on_first_scan(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     tr_watchdir_t const handle = context;
 
     tr_watchdir_scan(handle, NULL);
@@ -268,7 +271,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     }
 
     if ((backend->fd = CreateFileW(wide_path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-            OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL)) == INVALID_HANDLE_VALUE)
+        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL)) == INVALID_HANDLE_VALUE)
     {
         log_error("Failed to open directory \"%s\"", path);
         goto fail;

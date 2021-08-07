@@ -1,15 +1,23 @@
 project(trutils)
 
-include_directories(${CMAKE_SOURCE_DIR})
+add_compile_options(${C_WARNING_FLAGS})
 
-foreach(P create edit show)
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+)
+include_directories(
+    SYSTEM
+    ${EVENT2_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
+)
+
+foreach(P create edit remote show)
     tr_win32_app_info(${PROJECT_NAME}_${P}_WIN32_RC_FILE
         "Transmission Utility ('${P}')"
         "${TR_NAME}-${P}"
         "${TR_NAME}-${P}.exe")
 
     add_executable(${TR_NAME}-${P} ${P}.c ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
-    include_directories(${TR_NAME}-${P} ${EVENT2_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
     target_link_libraries(${TR_NAME}-${P} ${TR_NAME})
 
     install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})

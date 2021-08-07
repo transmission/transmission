@@ -35,6 +35,10 @@
 #include <netinet/in.h>
 #endif
 
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
+
 #ifdef _WIN32
 typedef SOCKET tr_socket_t;
 #define TR_BAD_SOCKET INVALID_SOCKET
@@ -101,6 +105,8 @@ char const* tr_address_to_string(tr_address const* addr);
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port);
+
 bool tr_address_from_string(tr_address* setme, char const* string);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
@@ -118,11 +124,16 @@ static inline bool tr_address_is_valid(tr_address const* a)
  * Sockets
  **********************************************************************/
 
+/* https://en.wikipedia.org/wiki/Differentiated_services#Class_Selector */
+enum
+{
+    TR_IPTOS_LOWCOST = 0x38, /* AF13: low prio, high drop */
+    TR_IPTOS_LOWDELAY = 0x70, /* AF32: high prio, mid drop */
+    TR_IPTOS_THRUPUT = 0x20, /* CS1: low prio, undef drop */
+    TR_IPTOS_RELIABLE = 0x28 /* AF11: low prio, low drop */
+};
+
 struct tr_session;
-
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
@@ -145,3 +156,5 @@ bool tr_net_hasIPv6(tr_port);
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
+
+TR_END_DECLS

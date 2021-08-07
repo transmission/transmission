@@ -78,7 +78,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
     tr_block_index_t block = ref->block;
     int len = 0;
 
-    for (int i = pos; i < n; ++i, ++block, ++len)
+    for (int i = pos; i < n; ++i)
     {
         struct cache_block const* b = blocks[i];
 
@@ -92,10 +92,9 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
             break;
         }
 
-        // fprintf(stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
+        ++block;
+        ++len;
     }
-
-    // fprintf(stderr, "run is %d long from [%d to %d)\n", len, pos, pos + len);
 
     if (info != NULL)
     {
@@ -129,7 +128,7 @@ enum
  *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
  *     Returns number of runs.
  */
-static int calcRuns(tr_cache* cache, struct run_info* runs)
+static int calcRuns(tr_cache const* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
     int i = 0;
@@ -152,12 +151,8 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
         rank |= runs[i].is_multi_piece ? MULTIFLAG : 0;
 
         runs[i].rank = rank;
-
-        // fprintf(stderr, "block run at pos %d of length %d and age %ld adjusted +%d\n", runs[i].pos, runs[i].len,
-        //     now - runs[i].last_block_time, rank - runs[i].len);
     }
 
-    // fprintf(stderr, "%d block runs\n", i);
     qsort(runs, i, sizeof(struct run_info), compareRuns);
     return i;
 }
@@ -370,7 +365,7 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pie
 int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len)
 {
     int err = 0;
-    struct cache_block* cb = findBlock(cache, torrent, piece, offset);
+    struct cache_block const* const cb = findBlock(cache, torrent, piece, offset);
 
     if (cb == NULL)
     {
@@ -384,7 +379,7 @@ int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t
 ****
 ***/
 
-static int findBlockPos(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t block)
+static int findBlockPos(tr_cache const* cache, tr_torrent* torrent, tr_piece_index_t block)
 {
     struct cache_block key;
     key.tor = torrent;

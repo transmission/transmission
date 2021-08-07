@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+
+#include <libtransmission/transmission.h>
 
 @class Controller;
 @class Torrent;
@@ -66,8 +67,8 @@
 - (void) setActionButtonHover: (NSInteger) row;
 
 - (void) selectValues: (NSArray *) values;
-- (NSArray *) selectedValues;
-- (NSArray *) selectedTorrents;
+@property (nonatomic, readonly) NSArray *selectedValues;
+@property (nonatomic, readonly) NSArray *selectedTorrents;
 
 - (NSRect) iconRectForRow: (NSInteger) row;
 
@@ -87,7 +88,7 @@
 - (void) setPriority: (id) sender;
 
 - (void) togglePiecesBar;
-- (CGFloat) piecesBarPercent;
+@property (nonatomic, readonly) CGFloat piecesBarPercent;
 
 - (void) selectAndScrollToRow: (NSInteger) row;
 

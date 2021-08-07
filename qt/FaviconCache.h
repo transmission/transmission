@@ -8,10 +8,15 @@
 
 #pragma once
 
-#include <QMap>
-#include <QString>
+#include <unordered_map>
+#include <vector>
+
 #include <QObject>
 #include <QPixmap>
+#include <QString>
+
+#include "Macros.h"
+#include "Utils.h" // std::hash<QString>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -20,34 +25,36 @@ class QUrl;
 class FaviconCache : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FaviconCache)
 
 public:
     FaviconCache();
-    virtual ~FaviconCache();
+
+    using Key = QString;
+    using Keys = std::vector<Key>;
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap find(QUrl const& url);
+    QPixmap find(Key const& key);
 
-    // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap findFromHost(QString const& host);
+    static Key getKey(QString const& display_name);
 
-    // this will emit a signal when (if) the icon becomes ready
-    void add(QUrl const& url);
+    // This will emit a signal when (if) the icon becomes ready.
+    Key add(QString const& url);
 
-    static QString getHost(QUrl const& url);
+    static QString getDisplayName(Key const& key);
     static QSize getIconSize();
 
 signals:
-    void pixmapReady(QString const& host);
-
-private:
-    QString getCacheDir();
-    void ensureCacheDirHasBeenScanned();
+    void pixmapReady(Key const& key);
 
 private slots:
     void onRequestFinished(QNetworkReply* reply);
 
 private:
-    QNetworkAccessManager* myNAM;
-    QMap<QString, QPixmap> myPixmaps;
+    static Key getKey(QUrl const& url);
+    void ensureCacheDirHasBeenScanned();
+
+    QNetworkAccessManager* nam_ = {};
+    std::unordered_map<Key, QPixmap> pixmaps_;
+    std::unordered_map<QString, Key> keys_;
 };

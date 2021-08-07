@@ -66,11 +66,11 @@ void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
     QFontMetrics fm = fontMetrics();
     QStyleOption opt;
     opt.initFrom(this);
-    QString const fullText = text();
-    QString const elidedText = fm.elidedText(fullText, Qt::ElideRight, width());
-    style()->drawItemText(&painter, contentsRect(), alignment(), opt.palette, isEnabled(), elidedText, foregroundRole());
+    auto const full_text = text();
+    auto const elided_text = fm.elidedText(full_text, Qt::ElideRight, width());
+    style()->drawItemText(&painter, contentsRect(), alignment(), opt.palette, isEnabled(), elided_text, foregroundRole());
 
 #ifndef QT_NO_TOOLTIP
-    setToolTip(fullText != elidedText ? fullText : QString());
+    setToolTip(full_text != elided_text ? full_text : QString{});
 #endif
 }

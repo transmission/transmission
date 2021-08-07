@@ -24,9 +24,18 @@
 
 @implementation NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnYosemiteOrBetter
+- (BOOL) isOnMojaveOrBetter
 {
-    return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9;
+    return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_13;
+}
+
+- (BOOL) isDarkMode
+{
+    if (@available(macOS 10.14, *)) {
+        return [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
+    } else {
+        return NO;
+    }
 }
 
 @end

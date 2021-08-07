@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+
+#include <libtransmission/transmission.h>
 
 @class PortChecker;
 
@@ -66,7 +67,7 @@
     NSString * fRPCPassword;
 }
 
-- (id) initWithHandle: (tr_session *) handle;
+- (instancetype) initWithHandle: (tr_session *) handle;
 
 - (void) setAutoUpdateToBeta: (id) sender;
 
@@ -77,7 +78,7 @@
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
 
-- (NSArray *) sounds;
+@property (nonatomic, readonly) NSArray *sounds;
 - (void) setSound: (id) sender;
 
 - (void) setUTP: (id) sender;
