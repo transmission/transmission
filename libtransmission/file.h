@@ -145,6 +145,19 @@ tr_sys_path_info;
 /* Path-related wrappers */
 
 /**
+ * @brief Portability wrapper for various in-kernel file copy functions, with a
+ *        fallback to a userspace read/write loop.
+ *
+ * @param[in]  src_path  Path to source file.
+ * @param[in]  dst_path  Path to destination file.
+ * @param[out] error     Pointer to error object. Optional, pass `NULL` if you
+ *                       are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_error** error);
+
+/**
  * @brief Portability wrapper for `stat()`.
  *
  * @param[in]  path  Path to file or directory.
