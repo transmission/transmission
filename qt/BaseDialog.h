@@ -13,7 +13,7 @@
 class BaseDialog : public QDialog
 {
 public:
-    BaseDialog(QWidget* parent = nullptr, Qt::WindowFlags flags = 0) :
+    BaseDialog(QWidget* parent = nullptr, Qt::WindowFlags flags = {}) :
         QDialog(parent, flags)
     {
         setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);

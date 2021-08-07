@@ -43,7 +43,7 @@
 
 - (NSString *) stringByAppendingEllipsis
 {
-    return [self stringByAppendingString: [NSString ellipsis]];
+    return [self stringByAppendingString: NSString.ellipsis];
 }
 
 #warning use localizedStringWithFormat: directly when 10.9-only and stringsdict translations are in place
@@ -76,7 +76,7 @@
         partialUnitsSame = magnitudePartial == magnitudeFull;
     }
 
-    [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
+    fileSizeFormatter.includesUnit = !partialUnitsSame;
     NSString * partialString = [fileSizeFormatter stringFromByteCount: partialSize];
 
 
@@ -124,79 +124,19 @@
         return [NSString localizedStringWithFormat: @"%.1f%%", tr_truncd(progress * 100.0, 1)];
 }
 
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds
-{
-    return [NSString timeString: seconds
-    includesTimeRemainingPhrase: includesTimeRemainingPhrase
-                    showSeconds: showSeconds
-                      maxFields: NSUIntegerMax];
-}
-
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
-{
-    NSAssert(![NSApp isOnYosemiteOrBetter], @"you should be using NSDateComponentsFormatter on >= 10.10");
-    NSParameterAssert(max > 0);
-
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5u)];
-    NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
-
-    if (seconds >= 31557600) //official amount of seconds in one year
-    {
-        const NSUInteger years = remaining / 31557600;
-        if (years == 1)
-            [timeArray addObject: NSLocalizedString(@"1 year", "time string")];
-        else
-            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u years", "time string"), years]];
-        remaining %= 31557600;
-        --max;
-    }
-    if (max > 0 && seconds >= (24 * 60 * 60))
-    {
-        const NSUInteger days = remaining / (24 * 60 * 60);
-        if (days == 1)
-            [timeArray addObject: NSLocalizedString(@"1 day", "time string")];
-        else
-            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u days", "time string"), days]];
-        remaining %= (24 * 60 * 60);
-        --max;
-    }
-    if (max > 0 && seconds >= (60 * 60))
-    {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u hr", "time string"), remaining / (60 * 60)]];
-        remaining %= (60 * 60);
-        --max;
-    }
-    if (max > 0 && (!showSeconds || seconds >= 60))
-    {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u min", "time string"), remaining / 60]];
-        remaining %= 60;
-        --max;
-    }
-    if (max > 0 && showSeconds)
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u sec", "time string"), remaining]];
-
-    NSString * timeString = [timeArray componentsJoinedByString: @" "];
-
-    if (includesTimeRemainingPhrase) {
-        timeString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "time remaining string"), timeString];
-    }
-
-    return timeString;
-}
-
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
     const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
-    return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
+    return [self compare: string options: comparisonOptions range: NSMakeRange(0, self.length) locale: NSLocale.currentLocale];
 }
 
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators
 {
     NSMutableArray * components = [NSMutableArray array];
 
-    NSCharacterSet * includededCharSet = [separators invertedSet];
+    NSCharacterSet * includededCharSet = separators.invertedSet;
     NSUInteger index = 0;
-    const NSUInteger fullLength = [self length];
+    const NSUInteger fullLength = self.length;
     do
     {
         const NSUInteger start = [self rangeOfCharacterFromSet: includededCharSet options: 0 range: NSMakeRange(index, fullLength - index)].location;
@@ -255,9 +195,9 @@
 
     //match Finder's behavior
     NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
-    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-    [numberFormatter setMinimumFractionDigits: 0];
-    [numberFormatter setMaximumFractionDigits: decimals];
+    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    numberFormatter.minimumFractionDigits = 0;
+    numberFormatter.maximumFractionDigits = decimals;
 
     NSString * fileSizeString = [numberFormatter stringFromNumber: @(convertedSize)];
 

@@ -13,6 +13,7 @@
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -69,7 +70,12 @@ static size_t guessPacketOverhead(size_t d)
 ***
 **/
 
-#define dbgmsg(io, ...) tr_logAddDeepNamed(tr_peerIoGetAddrStr(io), __VA_ARGS__)
+#define dbgmsg(io, ...) \
+    do { \
+        char addrstr[TR_ADDRSTRLEN]; \
+        tr_peerIoGetAddrStr(io, addrstr, sizeof(addrstr)); \
+        tr_logAddDeepNamed(addrstr, __VA_ARGS__); \
+    } while(0)
 
 /**
 ***
@@ -259,8 +265,10 @@ static void canReadWrapper(tr_peerIo* io)
     tr_peerIoUnref(io);
 }
 
-static void event_read_cb(evutil_socket_t fd, short event UNUSED, void* vio)
+static void event_read_cb(evutil_socket_t fd, short event, void* vio)
 {
+    TR_UNUSED(event);
+
     tr_peerIo* io = vio;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -345,8 +353,10 @@ static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
     return n;
 }
 
-static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
+static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 {
+    TR_UNUSED(event);
+
     tr_peerIo* io = vio;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -382,7 +392,7 @@ static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
     {
         if (e == 0 || e == EAGAIN || e == EINTR || e == EINPROGRESS)
         {
-            goto reschedule;
+            goto RESCHEDULE;
         }
 
         /* error case */
@@ -396,7 +406,7 @@ static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
 
     if (res <= 0)
     {
-        goto error;
+        goto FAIL;
     }
 
     if (evbuffer_get_length(io->outbuf) != 0)
@@ -407,7 +417,7 @@ static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
     didWriteWrapper(io, res);
     return;
 
-reschedule:
+RESCHEDULE:
     if (evbuffer_get_length(io->outbuf) != 0)
     {
         tr_peerIoSetEnabled(io, dir, true);
@@ -415,7 +425,7 @@ reschedule:
 
     return;
 
-error:
+FAIL:
     tr_net_strerror(errstr, sizeof(errstr), e);
     dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
 
@@ -479,7 +489,7 @@ static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
 
 static size_t utp_get_rb_size(void* closure)
 {
-    tr_peerIo* io = closure;
+    tr_peerIo const* const io = closure;
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -554,8 +564,10 @@ static void utp_on_error(void* closure, int errcode)
     }
 }
 
-static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type UNUSED)
+static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
 {
+    TR_UNUSED(type);
+
     tr_peerIo* io = closure;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -579,35 +591,51 @@ static struct UTPFunctionTable utp_function_table =
 /* We switch a UTP socket to use these after the associated peerIo has been
    destroyed -- see io_dtor. */
 
-static void dummy_read(void* closure UNUSED, unsigned char const* buf UNUSED, size_t buflen UNUSED)
+static void dummy_read(void* closure, unsigned char const* buf, size_t buflen)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(buf);
+    TR_UNUSED(buflen);
+
     /* This cannot happen, as far as I'm aware. */
     tr_logAddNamedError("UTP", "On_read called on closed socket");
 }
 
-static void dummy_write(void* closure UNUSED, unsigned char* buf, size_t buflen)
+static void dummy_write(void* closure, unsigned char* buf, size_t buflen)
 {
+    TR_UNUSED(closure);
+
     /* This can very well happen if we've shut down a peer connection that
        had unflushed buffers.  Complain and send zeroes. */
     tr_logAddNamedDbg("UTP", "On_write called on closed socket");
     memset(buf, 0, buflen);
 }
 
-static size_t dummy_get_rb_size(void* closure UNUSED)
+static size_t dummy_get_rb_size(void* closure)
 {
+    TR_UNUSED(closure);
+
     return 0;
 }
 
-static void dummy_on_state_change(void* closure UNUSED, int state UNUSED)
+static void dummy_on_state_change(void* closure, int state)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(state);
 }
 
-static void dummy_on_error(void* closure UNUSED, int errcode UNUSED)
+static void dummy_on_error(void* closure, int errcode)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(errcode);
 }
 
-static void dummy_on_overhead(void* closure UNUSED, uint8_t /* bool */ send UNUSED, size_t count UNUSED, int type UNUSED)
+static void dummy_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(send);
+    TR_UNUSED(count);
+    TR_UNUSED(type);
 }
 
 static struct UTPFunctionTable dummy_utp_function_table =
@@ -943,16 +971,18 @@ tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
     return &io->addr;
 }
 
-char const* tr_peerIoAddrStr(tr_address const* addr, tr_port port)
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen)
 {
-    static char buf[512];
-    tr_snprintf(buf, sizeof(buf), "[%s]:%u", tr_address_to_string(addr), ntohs(port));
-    return buf;
-}
+    if (tr_isPeerIo(io))
+    {
+        tr_address_and_port_to_string(buf, buflen, &io->addr, io->port);
+    }
+    else
+    {
+        tr_strlcpy(buf, "error", buflen);
+    }
 
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io)
-{
-    return tr_isPeerIo(io) ? tr_peerIoAddrStr(&io->addr, io->port) : "error";
+    return buf;
 }
 
 void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)
@@ -1032,13 +1062,15 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    if ((io->peerIdIsSet = peer_id != NULL))
+    if (peer_id == NULL)
     {
-        memcpy(io->peerId, peer_id, 20);
+        memset(io->peerId, '\0', sizeof(io->peerId));
+        io->peerIdIsSet = false;
     }
     else
     {
-        memset(io->peerId, '\0', 20);
+        memcpy(io->peerId, peer_id, sizeof(io->peerId));
+        io->peerIdIsSet = true;
     }
 }
 

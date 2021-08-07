@@ -40,45 +40,22 @@
 @class TorrentTableView;
 @class URLSheetWindowController;
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, addType) {
     ADD_MANUAL,
     ADD_AUTO,
     ADD_SHOW_OPTIONS,
     ADD_URL,
     ADD_CREATED
-} addType;
+};
 
-@interface Controller : NSObject <NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
+@interface Controller : NSObject <NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
-    tr_session                      * fLib;
-
-    NSMutableArray                  * fTorrents, * fDisplayedTorrents;
-
-    PrefsController                 * fPrefsController;
-    InfoWindowController            * fInfoController;
-    MessageWindowController         * fMessageController;
-
-    NSUserDefaults                  * fDefaults;
-
-    NSString                        * fConfigDirectory;
-
     IBOutlet NSWindow               * fWindow;
-    DragOverlayWindow               * fOverlayWindow;
     IBOutlet TorrentTableView       * fTableView;
-
-    io_connect_t                    fRootPort;
-    NSTimer                         * fTimer;
-
-    VDKQueue                        * fFileWatcherQueue;
 
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton, * fClearCompletedButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
-
-    StatusBarController             * fStatusBar;
-
-    FilterBarController             * fFilterBar;
     IBOutlet NSMenuItem             * fNextFilterItem;
 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
@@ -89,26 +66,6 @@ typedef enum
 
     IBOutlet NSMenu                 * fShareMenu, * fShareContextMenu;
     IBOutlet NSMenuItem             * fShareMenuItem, * fShareContextMenuItem; // remove when dropping 10.6
-
-    QLPreviewPanel                  * fPreviewPanel;
-    BOOL                            fQuitting;
-    BOOL                            fQuitRequested;
-    BOOL                            fPauseOnLaunch;
-
-    Badger                          * fBadger;
-
-    NSMutableArray                  * fAutoImportedNames;
-    NSTimer                         * fAutoImportTimer;
-
-    NSMutableDictionary             * fPendingTorrentDownloads;
-
-    NSMutableSet                    * fAddingTransfers;
-
-    NSMutableSet                    * fAddWindows;
-    URLSheetWindowController        * fUrlSheetController;
-
-    BOOL                            fGlobalPopoverShown;
-    BOOL                            fSoundPlaying;
 }
 
 - (void) openFiles: (NSArray *) filenames addType: (addType) type forcePath: (NSString *) path;
@@ -129,9 +86,7 @@ typedef enum
 - (void) openURL: (NSString *) urlString;
 - (void) openURLShowSheet: (id) sender;
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
-
-- (tr_session *) sessionHandle;
+@property (nonatomic, readonly) tr_session *sessionHandle;
 
 - (void) createFile: (id) sender;
 
@@ -148,8 +103,6 @@ typedef enum
 - (void) stopTorrents:              (NSArray *) torrents;
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
-                        contextInfo: (void *) contextInfo;
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;
@@ -173,7 +126,7 @@ typedef enum
 - (void) verifySelectedTorrents: (id) sender;
 - (void) verifyTorrents: (NSArray *) torrents;
 
-- (NSArray *)selectedTorrents;
+@property (nonatomic, readonly) NSArray *selectedTorrents;
 
 @property (nonatomic, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;
@@ -245,10 +198,10 @@ typedef enum
 - (void) selectedToolbarClicked: (id) sender;
 
 - (void) setWindowSizeToFit;
-- (NSRect) sizedWindowFrame;
+@property (nonatomic, readonly) NSRect sizedWindowFrame;
 - (void) updateForAutoSize;
 - (void) setWindowMinMaxToCurrent;
-- (CGFloat) minWindowContentSizeAllowed;
+@property (nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 
 - (void) updateForExpandCollape;
 

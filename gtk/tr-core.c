@@ -87,7 +87,7 @@ static int core_is_disposed(TrCore const* core)
     return core == NULL || core->priv->sorted_model == NULL;
 }
 
-G_DEFINE_TYPE_WITH_CODE(TrCore, tr_core, G_TYPE_OBJECT, G_ADD_PRIVATE(TrCore));
+G_DEFINE_TYPE_WITH_CODE(TrCore, tr_core, G_TYPE_OBJECT, G_ADD_PRIVATE(TrCore))
 
 static void core_dispose(GObject* o)
 {
@@ -404,8 +404,10 @@ static int compare_time(time_t a, time_t b)
     return ret;
 }
 
-static int compare_by_name(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data UNUSED)
+static int compare_by_name(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     char const* ca;
     char const* cb;
     gtk_tree_model_get(m, a, MC_NAME_COLLATED, &ca, -1);
@@ -413,8 +415,10 @@ static int compare_by_name(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoi
     return g_strcmp0(ca, cb);
 }
 
-static int compare_by_queue(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data UNUSED)
+static int compare_by_queue(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     tr_torrent* ta;
     tr_torrent* tb;
     tr_stat const* sa;
@@ -797,9 +801,12 @@ static void core_watchdir_monitor_file(TrCore* core, GFile* file)
 }
 
 /* GFileMonitor noticed a file was created */
-static void on_file_changed_in_watchdir(GFileMonitor* monitor UNUSED, GFile* file, GFile* other_type UNUSED,
+static void on_file_changed_in_watchdir(GFileMonitor const* monitor, GFile* file, GFile const* other_type,
     GFileMonitorEvent event_type, gpointer core)
 {
+    TR_UNUSED(monitor);
+    TR_UNUSED(other_type);
+
     if (event_type == G_FILE_MONITOR_EVENT_CREATED)
     {
         core_watchdir_monitor_file(core, file);
@@ -865,8 +872,10 @@ static void core_watchdir_update(TrCore* core)
 ****
 ***/
 
-static void on_pref_changed(TrCore* core, tr_quark const key, gpointer data UNUSED)
+static void on_pref_changed(TrCore* core, tr_quark const key, gpointer data)
 {
+    TR_UNUSED(data);
+
     switch (key)
     {
     case TR_KEY_sort_mode:
@@ -1014,15 +1023,15 @@ static gboolean find_row_from_torrent_id(GtkTreeModel* model, int id, GtkTreeIte
 
 static gboolean on_torrent_metadata_changed_idle(gpointer gdata)
 {
-    struct notify_callback_data* data = gdata;
-    tr_session* session = gtr_core_session(data->core);
-    tr_torrent* tor = tr_torrentFindFromId(session, data->torrent_id);
+    struct notify_callback_data* const data = gdata;
+    tr_session* const session = gtr_core_session(data->core);
+    tr_torrent const* const tor = tr_torrentFindFromId(session, data->torrent_id);
 
     /* update the torrent's collated name */
     if (tor != NULL)
     {
         GtkTreeIter iter;
-        GtkTreeModel* model = core_raw_model(data->core);
+        GtkTreeModel* const model = core_raw_model(data->core);
 
         if (find_row_from_torrent_id(model, data->torrent_id, &iter))
         {
@@ -1115,15 +1124,14 @@ void gtr_core_add_torrent(TrCore* core, tr_torrent* tor, gboolean do_notify)
 
 static tr_torrent* core_create_new_torrent(TrCore* core, tr_ctor* ctor)
 {
-    tr_torrent* tor;
     bool do_trash = false;
-    tr_session* session = gtr_core_session(core);
+    tr_session const* const session = gtr_core_session(core);
 
     /* let the gtk client handle the removal, since libT
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, FALSE);
-    tor = tr_torrentNew(ctor, NULL, NULL);
+    tr_torrent* const tor = tr_torrentNew(ctor, NULL, NULL);
 
     if (tor != NULL && do_trash)
     {
@@ -1257,7 +1265,7 @@ static void add_file_async_callback(GObject* file, GAsyncResult* result, gpointe
 static bool add_file(TrCore* core, GFile* file, gboolean do_start, gboolean do_prompt, gboolean do_notify)
 {
     bool handled = false;
-    tr_session* session = gtr_core_session(core);
+    tr_session const* const session = gtr_core_session(core);
 
     if (session != NULL)
     {
@@ -1274,7 +1282,7 @@ static bool add_file(TrCore* core, GFile* file, gboolean do_start, gboolean do_p
         {
             char* str = g_file_get_path(file);
 
-            if ((tried = g_file_test(str, G_FILE_TEST_EXISTS)))
+            if ((tried = (str != NULL) && g_file_test(str, G_FILE_TEST_EXISTS)))
             {
                 loaded = !tr_ctorSetMetainfoFromFile(ctor, str);
             }
@@ -1788,8 +1796,11 @@ static gboolean core_read_rpc_response_idle(void* vresponse)
     return G_SOURCE_REMOVE;
 }
 
-static void core_read_rpc_response(tr_session* session UNUSED, tr_variant* response, void* unused UNUSED)
+static void core_read_rpc_response(tr_session* session, tr_variant* response, void* user_data)
 {
+    TR_UNUSED(session);
+    TR_UNUSED(user_data);
+
     tr_variant* response_copy = tr_new(tr_variant, 1);
 
     *response_copy = *response;
@@ -1840,8 +1851,10 @@ static void core_send_rpc_request(TrCore* core, tr_variant const* request, int t
 ****  Sending a test-port request via RPC
 ***/
 
-static void on_port_test_response(TrCore* core, tr_variant* response, gpointer u UNUSED)
+static void on_port_test_response(TrCore* core, tr_variant* response, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     tr_variant* args;
     bool is_open;
 
@@ -1871,8 +1884,10 @@ void gtr_core_port_test(TrCore* core)
 ****  Updating a blocklist via RPC
 ***/
 
-static void on_blocklist_response(TrCore* core, tr_variant* response, gpointer data UNUSED)
+static void on_blocklist_response(TrCore* core, tr_variant* response, gpointer data)
 {
+    TR_UNUSED(data);
+
     tr_variant* args;
     int64_t ruleCount;
 

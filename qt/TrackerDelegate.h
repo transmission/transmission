@@ -10,6 +10,8 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class QStyle;
 
 class Session;
@@ -18,11 +20,11 @@ struct TrackerInfo;
 class TrackerDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TrackerDelegate)
 
 public:
-    TrackerDelegate(QObject* parent = nullptr) :
-        QItemDelegate(parent),
-        myShowMore(false)
+    explicit TrackerDelegate(QObject* parent = nullptr) :
+        QItemDelegate(parent)
     {
     }
 
@@ -34,11 +36,10 @@ public:
 
 protected:
     QString getText(TrackerInfo const&) const;
-    QSize margin(QStyle const& style) const;
 
     QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
     void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
 
 private:
-    bool myShowMore;
+    bool show_more_ = false;
 };

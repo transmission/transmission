@@ -26,7 +26,7 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    [[self window] makeKeyWindow];
+    [self.window makeKeyWindow];
     [super mouseDown: event];
 }
 
@@ -37,25 +37,25 @@
 
 - (void) copy: (id) sender
 {
-    NSIndexSet * indexes = [self selectedRowIndexes];
-    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: [indexes count]];
+    NSIndexSet * indexes = self.selectedRowIndexes;
+    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: indexes.count];
     [fWebSeeds enumerateObjectsAtIndexes: indexes options: 0 usingBlock: ^(NSDictionary * webSeed, NSUInteger idx, BOOL * stop) {
         [addresses addObject: webSeed[@"Address"]];
     }];
 
     NSString * text = [addresses componentsJoinedByString: @"\n"];
 
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    NSPasteboard * pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
     [pb writeObjects: @[text]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    const SEL action = [menuItem action];
+    const SEL action = menuItem.action;
 
     if (action == @selector(copy:))
-        return [self numberOfSelectedRows] > 0;
+        return self.numberOfSelectedRows > 0;
 
     return YES;
 }
