@@ -21,6 +21,7 @@
 #include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 // #define TR_SHOW_DEPRECATED
@@ -147,23 +148,25 @@ static void close_bindinfo(struct tr_bindinfo* b)
 
 static void close_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    close_bindinfo(session->public_ipv6);
+    close_bindinfo(session->bind_ipv4);
+    close_bindinfo(session->bind_ipv6);
 }
 
 static void free_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    tr_free(session->public_ipv4);
-    session->public_ipv4 = NULL;
+    close_bindinfo(session->bind_ipv4);
+    tr_free(session->bind_ipv4);
+    session->bind_ipv4 = NULL;
 
-    close_bindinfo(session->public_ipv6);
-    tr_free(session->public_ipv6);
-    session->public_ipv6 = NULL;
+    close_bindinfo(session->bind_ipv6);
+    tr_free(session->bind_ipv6);
+    session->bind_ipv6 = NULL;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(what);
+
     tr_socket_t clientSocket;
     tr_port clientPort;
     tr_address clientAddr;
@@ -173,8 +176,14 @@ static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vs
 
     if (clientSocket != TR_BAD_SOCKET)
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
-            tr_peerIoAddrStr(&clientAddr, clientPort));
+        if (tr_logGetDeepEnabled())
+        {
+            char addrstr[TR_ADDRSTRLEN];
+            tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
+            tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
+                addrstr);
+        }
+
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
 }
@@ -184,7 +193,7 @@ static void open_incoming_peer_port(tr_session* session)
     struct tr_bindinfo* b;
 
     /* bind an ipv4 port to listen for incoming peers... */
-    b = session->public_ipv4;
+    b = session->bind_ipv4;
     b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
     if (b->socket != TR_BAD_SOCKET)
@@ -196,7 +205,7 @@ static void open_incoming_peer_port(tr_session* session)
     /* and do the exact same thing for ipv6, if it's supported... */
     if (tr_net_hasIPv6(session->private_peer_port))
     {
-        b = session->public_ipv6;
+        b = session->bind_ipv6;
         b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
         if (b->socket != TR_BAD_SOCKET)
@@ -215,12 +224,12 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
     switch (tr_af_type)
     {
     case TR_AF_INET:
-        bindinfo = session->public_ipv4;
+        bindinfo = session->bind_ipv4;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
         break;
 
     case TR_AF_INET6:
-        bindinfo = session->public_ipv6;
+        bindinfo = session->bind_ipv6;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
         break;
 
@@ -265,27 +274,27 @@ static int parse_tos(char const* str)
 
     if (evutil_ascii_strcasecmp(str, "lowcost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "mincost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "throughput") == 0)
     {
-        return 0x08;
+        return TR_IPTOS_THRUPUT;
     }
 
     if (evutil_ascii_strcasecmp(str, "reliability") == 0)
     {
-        return 0x04;
+        return TR_IPTOS_RELIABLE;
     }
 
     if (evutil_ascii_strcasecmp(str, "lowdelay") == 0)
     {
-        return 0x02;
+        return TR_IPTOS_LOWDELAY;
     }
 
     value = strtol(str, &p, 0);
@@ -307,16 +316,16 @@ static char const* format_tos(int value)
     case 0:
         return "default";
 
-    case 0x10:
+    case TR_IPTOS_LOWCOST:
         return "lowcost";
 
-    case 0x08:
+    case TR_IPTOS_THRUPUT:
         return "throughput";
 
-    case 0x04:
+    case TR_IPTOS_RELIABLE:
         return "reliability";
 
-    case 0x02:
+    case TR_IPTOS_LOWDELAY:
         return "lowdelay";
 
     default:
@@ -373,7 +382,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, true);
     tr_variantDictAddStr(d, TR_KEY_rpc_host_whitelist, TR_DEFAULT_RPC_HOST_WHITELIST);
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_rpc_port, atoi(TR_DEFAULT_RPC_PORT_STR));
+    tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStr(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, "");
@@ -395,6 +404,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
@@ -462,10 +473,12 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_umask, s->umask);
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->public_ipv4->addr));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->bind_ipv4->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->bind_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
@@ -487,7 +500,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     tr_variantFree(&oldDict);
 
     /* if caller didn't specify a config dir, use the default */
-    if (configDir == NULL || *configDir == '\0')
+    if (tr_str_is_empty(configDir))
     {
         configDir = tr_getDefaultConfigDir(appName);
     }
@@ -561,8 +574,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor = NULL;
     tr_session* session = vsession;
 
@@ -646,8 +662,11 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_session* session = vsession;
 
     TR_ASSERT(tr_isSession(session));
@@ -707,7 +726,6 @@ static void onNowTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsess
     }
 
     tr_timerAdd(session->nowTimer, 0, usec);
-    /* fprintf (stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
 }
 
 static void loadBlocklists(tr_session* session);
@@ -715,7 +733,7 @@ static void loadBlocklists(tr_session* session);
 static void tr_sessionInitImpl(void* vdata)
 {
     struct init_data* data = vdata;
-    tr_variant* clientSettings = data->clientSettings;
+    tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
     TR_ASSERT(tr_amInEventThread(session));
@@ -776,7 +794,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 
     /* cleanup */
@@ -968,25 +986,25 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET6)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -1128,6 +1146,20 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
         session->scrapePausedTorrents = boolVal;
+    }
+
+    /**
+    ***  BruteForce
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
+    {
+        tr_sessionSetAntiBruteForceThreshold(session, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
+    {
+        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
     data->done = true;
@@ -1485,7 +1517,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
                 end += MINUTES_PER_DAY;
             }
 
-            for (int i = begin; i < end; ++i)
+            for (time_t i = begin; i < end; ++i)
             {
                 tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }
@@ -1782,11 +1814,6 @@ void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* 
     session->turtle.callbackUserData = userData;
 }
 
-void tr_sessionClearAltSpeedFunc(tr_session* session)
-{
-    tr_sessionSetAltSpeedFunc(session, NULL, NULL);
-}
-
 /***
 ****
 ***/
@@ -1896,8 +1923,8 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
 
 static int compareTorrentByCur(void const* va, void const* vb)
 {
-    tr_torrent const* a = *(tr_torrent const**)va;
-    tr_torrent const* b = *(tr_torrent const**)vb;
+    tr_torrent const* a = *(tr_torrent const* const*)va;
+    tr_torrent const* b = *(tr_torrent const* const*)vb;
     uint64_t const aCur = a->downloadedCur + a->uploadedCur;
     uint64_t const bCur = b->downloadedCur + b->uploadedCur;
 
@@ -1911,7 +1938,7 @@ static int compareTorrentByCur(void const* va, void const* vb)
 
 static void closeBlocklists(tr_session*);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession);
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
 
 static void sessionCloseImplStart(tr_session* session)
 {
@@ -1973,8 +2000,11 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_session* session = vsession;
 
     TR_ASSERT(tr_isSession(session));
@@ -2021,7 +2051,7 @@ static void sessionCloseImpl(void* vsession)
     sessionCloseImplStart(session);
 }
 
-static int deadlineReached(time_t const deadline)
+static bool deadlineReached(time_t const deadline)
 {
     return time(NULL) >= deadline;
 }
@@ -2124,15 +2154,16 @@ static void sessionLoadTorrents(void* vdata)
 
     int i;
     int n = 0;
-    tr_sys_path_info info;
-    tr_sys_dir_t odir = NULL;
     tr_list* list = NULL;
-    char const* dirname = tr_getTorrentDir(data->session);
 
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(data->session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
+
+    if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
 
@@ -2311,7 +2342,7 @@ static void toggleLPDImpl(void* data)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 }
 
@@ -2392,7 +2423,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static int tr_stringEndsWith(char const* str, char const* end)
+static bool tr_stringEndsWith(char const* str, char const* end)
 {
     size_t const slen = strlen(str);
     size_t const elen = strlen(end);
@@ -2634,24 +2665,24 @@ static void metainfoLookupInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_sys_path_info info;
-    char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir;
-    tr_ctor* ctor = NULL;
-    tr_variant* lookup;
+    tr_variant* lookup = tr_new0(tr_variant, 1);
+    tr_variantInitDict(lookup, 0);
+
     int n = 0;
 
-    /* walk through the directory and find the mappings */
-    lookup = tr_new0(tr_variant, 1);
-    tr_variantInitDict(lookup, 0);
-    ctor = tr_ctorNew(session);
-    tr_ctorSetSave(ctor, false); /* since we already have them */
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    if (odir != TR_BAD_SYS_DIR)
     {
+        tr_ctor* ctor = tr_ctorNew(session);
+        tr_ctorSetSave(ctor, false); /* since we already have them */
+
         char const* name;
 
+        /* walk through the directory and find the mappings */
         while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
         {
             if (tr_str_has_suffix(name, ".torrent"))
@@ -2671,9 +2702,8 @@ static void metainfoLookupInit(tr_session* session)
         }
 
         tr_sys_dir_close(odir, NULL);
+        tr_ctorFree(ctor);
     }
-
-    tr_ctorFree(ctor);
 
     session->metainfoLookup = lookup;
     tr_logAddDebug("Found %d torrents in \"%s\"", n, dirname);
@@ -2681,15 +2711,13 @@ static void metainfoLookupInit(tr_session* session)
 
 char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString)
 {
-    char const* filename = NULL;
-
     if (session->metainfoLookup == NULL)
     {
         metainfoLookupInit((tr_session*)session);
     }
 
-    tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
-
+    char const* filename = NULL;
+    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
     return filename;
 }
 
@@ -2937,6 +2965,34 @@ int tr_sessionGetQueueStalledMinutes(tr_session const* session)
     return session->queueStalledMinutes;
 }
 
+void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
+{
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(bad_requests > 0);
+    tr_rpcSetAntiBruteForceThreshold(session->rpcServer, bad_requests);
+}
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, is_enabled);
+}
+
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcGetAntiBruteForceEnabled(session->rpcServer);
+}
+
+int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
+}
+
 struct TorrentAndPosition
 {
     tr_torrent* tor;
@@ -3031,12 +3087,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!tr_torrentIsStalled(tor))
+        if (!tr_torrentIsStalled(tor) && (tr_torrentGetActivity(tor) == activity))
         {
-            if (tr_torrentGetActivity(tor) == activity)
-            {
-                ++active_count;
-            }
+            ++active_count;
         }
     }
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,7 @@
 
 @interface NSString (NSStringAdditions)
 
-+ (NSString *) ellipsis;
+@property (nonatomic, class, readonly) NSString * ellipsis;
 - (NSString *) stringByAppendingEllipsis;
 
 + (NSString *) formattedUInteger: (NSUInteger) value;
@@ -37,9 +37,6 @@
 + (NSString *) stringForRatio: (CGFloat) ratio;
 
 + (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals;
-
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds;
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
 
 - (NSComparisonResult) compareNumeric: (NSString *) string; //simple compare method for strings with numbers (works for IP addresses)
 

@@ -6,6 +6,7 @@
  *
  */
 
+/* *INDENT-OFF* */
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
 #define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
@@ -24,6 +25,7 @@
 #include API_HEADER_CRYPT(random.h)
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
+/* *INDENT-ON* */
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -33,6 +35,7 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
+#define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.c"
 
 struct tr_dh_ctx
@@ -236,8 +239,10 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
     tr_free(handle);
 }
 
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length UNUSED, uint8_t* public_key, size_t* public_key_length)
+bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
+    TR_UNUSED(private_key_length);
+
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
 

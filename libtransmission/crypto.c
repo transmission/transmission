@@ -90,7 +90,7 @@ uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 ***
 **/
 
-static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, char const* key)
+static void initRC4(tr_crypto const* crypto, tr_rc4_ctx_t* setme, char const* key)
 {
     TR_ASSERT(crypto->torrentHashIsSet);
 

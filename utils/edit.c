@@ -30,11 +30,11 @@ static char const* replace[2] = { NULL, NULL };
 
 static tr_option options[] =
 {
-    { 'a', "add", "Add a tracker's announce URL", "a", 1, "<url>" },
-    { 'd', "delete", "Delete a tracker's announce URL", "d", 1, "<url>" },
-    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", 1, "<old> <new>" },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
+    { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
+    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
@@ -107,9 +107,8 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
         while ((tier = tr_variantListChild(announce_list, tierIndex)) != NULL)
         {
-            tr_variant* node;
             int nodeIndex = 0;
-
+            tr_variant const* node;
             while ((node = tr_variantListChild(tier, nodeIndex)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
@@ -146,18 +145,14 @@ static bool removeURL(tr_variant* metainfo, char const* url)
      * use it as the "announce" field */
     if (changed && !tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL))
     {
-        tr_variant* tier;
-        tr_variant* node;
-
-        if ((tier = tr_variantListChild(announce_list, 0)) != NULL)
+        tr_variant* const tier = tr_variantListChild(announce_list, 0);
+        if (tier != NULL)
         {
-            if ((node = tr_variantListChild(tier, 0)) != NULL)
+            tr_variant const* const node = tr_variantListChild(tier, 0);
+            if ((node != NULL) && tr_variantGetStr(node, &str, NULL))
             {
-                if (tr_variantGetStr(node, &str, NULL))
-                {
-                    tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
-                    printf("\tAdded \"%s\" to announce\n", str);
-                }
+                tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
+                printf("\tAdded \"%s\" to announce\n", str);
             }
         }
     }
@@ -167,8 +162,8 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
 static char* replaceSubstr(char const* str, char const* in, char const* out)
 {
-    char* walk;
-    struct evbuffer* buf = evbuffer_new();
+    char const* walk;
+    struct evbuffer* const buf = evbuffer_new();
     size_t const inlen = strlen(in);
     size_t const outlen = strlen(out);
 
@@ -204,23 +199,27 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
         tr_variant* tier;
         int tierCount = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
+        while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
         {
             tr_variant* node;
             int nodeCount = 0;
 
-            while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
+            while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strstr(str, in) != NULL)
                 {
                     char* newstr = replaceSubstr(str, in, out);
-                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount, str, newstr);
+                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
                     tr_variantFree(node);
                     tr_variantInitStr(node, newstr, TR_BAD_SIZE);
                     tr_free(newstr);
                     changed = true;
                 }
+
+                ++nodeCount;
             }
+
+            ++tierCount;
         }
     }
 
@@ -229,22 +228,26 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
 
 static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 {
-    tr_variant* tier;
     int tierCount = 0;
+    tr_variant* tier;
 
-    while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
+    while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
     {
-        tr_variant* node;
-        char const* str;
         int nodeCount = 0;
+        tr_variant const* node;
 
-        while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
+        while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
         {
+            char const* str = NULL;
             if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
             {
                 return true;
             }
+
+            ++nodeCount;
         }
+
+        ++tierCount;
     }
 
     return false;
@@ -371,6 +374,6 @@ int tr_main(int argc, char* argv[])
 
     printf("Changed %d files\n", changedCount);
 
-    tr_free(files);
+    tr_free((void*)files);
     return EXIT_SUCCESS;
 }

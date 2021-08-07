@@ -66,6 +66,7 @@
 #endif
 
 #include "transmission.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "platform-quota.h"
 
@@ -104,7 +105,7 @@ static char const* getdev(char const* path)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
@@ -180,7 +181,7 @@ static char const* getfstype(char const* device)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
@@ -325,12 +326,9 @@ static int64_t getquota(char const* device)
     int64_t spaceused;
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) == 0)
     {
-
 #elif defined(__sun)
-
     struct quotctl op;
     int fd = open(device, O_RDONLY);
 
@@ -346,14 +344,10 @@ static int64_t getquota(char const* device)
     if (ioctl(fd, Q_QUOTACTL, &op) == 0)
     {
         close(fd);
-
 #else
-
     if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
     {
-
 #endif
-
         if (dq.dqb_bsoftlimit > 0)
         {
             /* Use soft limit first */
@@ -386,7 +380,7 @@ static int64_t getquota(char const* device)
 #ifdef __APPLE__
         return freespace < 0 ? 0 : freespace;
 #else
-        return freespace < 0 ? 0 : freespace * 1024;
+        return freespace < 0 ? 0 : (freespace * 1024);
 #endif
     }
 
@@ -426,7 +420,7 @@ static int64_t getxfsquota(char* device)
         }
 
         freespace = limit - (dq.d_bcount >> 1);
-        return freespace < 0 ? 0 : freespace * 1024;
+        return freespace < 0 ? 0 : (freespace * 1024);
     }
 
     /* something went wrong */
@@ -456,7 +450,7 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 
 #else /* _WIN32 */
 
-    (void)info;
+    TR_UNUSED(info);
 
 #endif /* _WIN32 */
 

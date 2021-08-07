@@ -11,7 +11,6 @@
 #include <stdlib.h> /* qsort() */
 #include <time.h>
 
-#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
@@ -30,10 +29,11 @@
 
 static tr_option options[] =
 {
-    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", 0, NULL },
-    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", 0, NULL },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
+    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
+    { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
@@ -43,6 +43,7 @@ static char const* getUsage(void)
 
 static bool magnetFlag = false;
 static bool scrapeFlag = false;
+static bool unsorted = false;
 static bool showVersion = false;
 char const* filename = NULL;
 
@@ -61,6 +62,10 @@ static int parseCommandLine(int argc, char const* const* argv)
 
         case 's':
             scrapeFlag = true;
+            break;
+
+        case 'u':
+            unsorted = true;
             break;
 
         case 'V':
@@ -93,6 +98,20 @@ static int compare_files_by_name(void const* va, void const* vb)
     return strcmp(a->name, b->name);
 }
 
+static char const* time_t_to_str(time_t timestamp)
+{
+    if (timestamp == 0)
+    {
+        return "Unknown";
+    }
+
+    struct tm tm;
+    tr_localtime_r(&timestamp, &tm);
+    static char buf[32];
+    strftime(buf, sizeof(buf), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    return buf;
+}
+
 static void showInfo(tr_info const* inf)
 {
     char buf[128];
@@ -107,18 +126,9 @@ static void showInfo(tr_info const* inf)
     printf("  Name: %s\n", inf->name);
     printf("  Hash: %s\n", inf->hashString);
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
+    printf("  Created on: %s\n", time_t_to_str(inf->dateCreated));
 
-    if (inf->dateCreated == 0)
-    {
-        printf("  Created on: Unknown\n");
-    }
-    else
-    {
-        struct tm tm = *localtime(&inf->dateCreated);
-        printf("  Created on: %s", asctime(&tm));
-    }
-
-    if (inf->comment != NULL && *inf->comment != '\0')
+    if (!tr_str_is_empty(inf->comment))
     {
         printf("  Comment: %s\n", inf->comment);
     }
@@ -171,7 +181,10 @@ static void showInfo(tr_info const* inf)
         files[i] = &inf->files[i];
     }
 
-    qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
+    if (!unsorted)
+    {
+        qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
+    }
 
     for (unsigned int i = 0; i < inf->fileCount; ++i)
     {
@@ -252,21 +265,31 @@ static void doScrape(tr_info const* inf)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {
-                        int i = 0;
+                        size_t child_pos = 0;
                         tr_quark key;
                         tr_variant* val;
 
-                        while (tr_variantDictChild(files, i++, &key, &val))
+                        while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
                             if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
-                                int64_t seeders = -1;
-                                int64_t leechers = -1;
-                                tr_variantDictFindInt(val, TR_KEY_complete, &seeders);
-                                tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers);
+                                int64_t seeders;
+                                if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
+                                {
+                                    seeders = -1;
+                                }
+
+                                int64_t leechers;
+                                if (!tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers))
+                                {
+                                    leechers = -1;
+                                }
+
                                 printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                                 matched = true;
                             }
+
+                            ++child_pos;
                         }
                     }
 

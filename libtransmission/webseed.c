@@ -190,7 +190,6 @@ struct connection_succeeded_data
 
 static void connection_succeeded(void* vdata)
 {
-    tr_torrent* tor;
     struct connection_succeeded_data* data = vdata;
     struct tr_webseed* w = data->webseed;
 
@@ -200,15 +199,20 @@ static void connection_succeeded(void* vdata)
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
     }
 
-    if (data->real_url != NULL && (tor = tr_torrentFindFromId(w->session, w->torrent_id)) != NULL)
+    if (data->real_url != NULL)
     {
-        uint64_t file_offset;
-        tr_file_index_t file_index;
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
-        tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
-        tr_free(w->file_urls[file_index]);
-        w->file_urls[file_index] = data->real_url;
-        data->real_url = NULL;
+        if (tor != NULL)
+        {
+            uint64_t file_offset;
+            tr_file_index_t file_index;
+
+            tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
+            tr_free(w->file_urls[file_index]);
+            w->file_urls[file_index] = data->real_url;
+            data->real_url = NULL;
+        }
     }
 
     tr_free(data->real_url);
@@ -238,19 +242,14 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
         if (task->response_code == 0)
         {
-            tr_webGetTaskInfo(task->web_task, TR_WEB_GET_CODE, &task->response_code);
+            task->response_code = tr_webGetTaskResponseCode(task->web_task);
 
             if (task->response_code == 206)
             {
-                char const* url;
                 struct connection_succeeded_data* data;
-
-                url = NULL;
-                tr_webGetTaskInfo(task->web_task, TR_WEB_GET_REAL_URL, &url);
-
                 data = tr_new(struct connection_succeeded_data, 1);
                 data->webseed = w;
-                data->real_url = tr_strdup(url);
+                data->real_url = tr_strdup(tr_webGetTaskRealUrl(task->web_task));
                 data->piece_index = task->piece_index;
                 data->piece_offset = task->piece_offset + task->blocks_done * task->block_size + len - 1;
 
@@ -280,7 +279,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             /* we don't use locking on this evbuffer so we must copy out the data
                that will be needed when writing the block in a different thread */
-            evbuffer_remove_buffer(task->content, data->content, block_size * completed);
+            evbuffer_remove_buffer(task->content, data->content, (size_t)block_size * (size_t)completed);
 
             tr_runInEventThread(w->session, write_block_func, data);
             task->blocks_done += completed;
@@ -357,13 +356,18 @@ static void on_idle(tr_webseed* w)
     }
 }
 
-static void web_response_func(tr_session* session, bool did_connect UNUSED, bool did_timeout UNUSED, long response_code,
-    void const* response UNUSED, size_t response_byte_count UNUSED, void* vtask)
+static void web_response_func(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* response,
+    size_t response_byte_count, void* vtask)
 {
+    TR_UNUSED(did_connect);
+    TR_UNUSED(did_timeout);
+    TR_UNUSED(response);
+    TR_UNUSED(response_byte_count);
+
     tr_webseed* w;
     tr_torrent* tor;
     struct tr_webseed_task* t = vtask;
-    int const success = (response_code == 206);
+    bool const success = response_code == 206;
 
     if (t->dead)
     {
@@ -471,7 +475,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 
         uint64_t const total_offset = tr_pieceOffset(tor, t->piece_index, t->piece_offset, t->length - remain);
         tr_piece_index_t const step_piece = total_offset / inf->pieceSize;
-        uint64_t const step_piece_offset = total_offset - inf->pieceSize * step_piece;
+        uint64_t const step_piece_offset = total_offset - (uint64_t)inf->pieceSize * step_piece;
 
         tr_file_index_t file_index;
         tr_file const* file;
@@ -482,7 +486,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         file = &inf->files[file_index];
         this_pass = MIN(remain, file->length - file_offset);
 
-        if (!urls[file_index])
+        if (urls[file_index] == NULL)
         {
             urls[file_index] = evbuffer_free_to_str(make_url(t->webseed, file), NULL);
         }
@@ -497,8 +501,11 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 ****
 ***/
 
-static void webseed_timer_func(evutil_socket_t foo UNUSED, short bar UNUSED, void* vw)
+static void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_webseed* w = vw;
 
     if (w->retry_tickcount != 0)
@@ -551,8 +558,8 @@ static void webseed_destruct(tr_peer* peer)
     /* if we have an array of file URLs, free it */
     if (w->file_urls != NULL)
     {
-        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
-        tr_info const* inf = tr_torrentInfo(tor);
+        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_info const* const inf = tr_torrentInfo(tor);
 
         for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
@@ -601,7 +608,6 @@ tr_webseed* tr_webseedNew(struct tr_torrent* tor, char const* url, tr_peer_callb
     w->callback = callback;
     w->callback_data = callback_data;
     w->file_urls = tr_new0(char*, inf->fileCount);
-    // tr_rcConstruct(&w->download_rate);
     tr_bandwidthConstruct(&w->bandwidth, tor->session, &tor->bandwidth);
     w->timer = evtimer_new(w->session->event_base, webseed_timer_func, w);
     tr_timerAddMsec(w->timer, TR_IDLE_TIMER_MSEC);

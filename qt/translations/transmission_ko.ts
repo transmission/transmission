@@ -9,12 +9,12 @@
         <translation>Transmission에 대하여</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+28"/>
+        <location filename="../AboutDialog.cc" line="+27"/>
         <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>빠르고 편리한 BitTorrent 클라이언트</translation>
     </message>
@@ -24,9 +24,9 @@
         <translation>저작권 (c) The Transmission Project</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+4"/>
+        <location filename="../AboutDialog.cc" line="+2"/>
         <source>C&amp;redits</source>
-        <translation>크레딧 (&amp;r)</translation>
+        <translation>크레딧 (&amp;R)</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -42,14 +42,14 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+355"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission은 파일 공유 프로그램 입니다.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>토런트를 사용하실때, 다른 사람이 사용하도록 여러분의 데이터를 업로드 합니다.
+        <translation>Torrent를 사용하시게 되면, 다른 사람이 이를 사용하도록 여러분의 데이터를 업로드 합니다.
 여러분께서 사용하시는 컨텐츠에 대한 책임은 여러분이 지셔야 합니다.</translation>
     </message>
     <message>
@@ -57,21 +57,25 @@
         <source>I &amp;Agree</source>
         <translation>동의합니다 (&amp;A)</translation>
     </message>
-    <message>
-        <location line="+92"/>
-        <source>Torrent Completed</source>
-        <translation>Torrent 완료됨</translation>
+    <message numerus="yes">
+        <location line="+77"/>
+        <source>Torrent(s) Added</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <location line="+26"/>
-        <source>Torrent Added</source>
-        <translation>Torrent 추가됨</translation>
+    <message numerus="yes">
+        <location line="+10"/>
+        <source>Torrent Completed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+408"/>
+        <location filename="../DetailsDialog.cc" line="+410"/>
         <source>None</source>
         <translation>아님</translation>
     </message>
@@ -82,7 +86,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+271"/>
+        <location line="+272"/>
         <source>Unknown</source>
         <translation>알려지지 않음</translation>
     </message>
@@ -121,7 +125,7 @@
         </translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
         <translation>이 트래커를 비공개로 하기 -- DHT, PEX 비활성화</translation>
     </message>
@@ -136,17 +140,17 @@
         <translation>%1 에 의해 만들어짐</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created on %1</source>
         <translation>%1 에 의해 만듬</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created by %1 on %2</source>
         <translation>%2에 %1이 만듬</translation>
     </message>
     <message>
-        <location line="+185"/>
+        <location line="+183"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>암호화된 연결</translation>
@@ -202,7 +206,7 @@
         <translation>들어오는 연결에 피어가 있습니다</translation>
     </message>
     <message numerus="yes">
-        <location line="+136"/>
+        <location line="+134"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -210,19 +214,19 @@
         </translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <location line="+16"/>
-        <location line="+30"/>
+        <location line="+28"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-28"/>
         <source>Tracker already exists.</source>
         <translation>트래커가 이미 존재합니다.</translation>
     </message>
     <message>
-        <location line="-815"/>
+        <location line="-807"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -234,13 +238,13 @@
         <translation>%1 / %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
         <translation>%1 / %2 (%3%), %4 검증되지 않음</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+41"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 손상됨)</translation>
     </message>
@@ -250,7 +254,7 @@
         <translation>%1 (비율: %2)</translation>
     </message>
     <message>
-        <location line="+276"/>
+        <location line="+273"/>
         <source>N/A</source>
         <translation>해당사항 없음</translation>
     </message>
@@ -260,7 +264,7 @@
         <translation>피어가 uTP로 접속했습니다</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+163"/>
         <source>Add URL </source>
         <translation>URL 추가</translation>
     </message>
@@ -271,7 +275,7 @@
     </message>
     <message>
         <location line="+9"/>
-        <location line="+46"/>
+        <location line="+44"/>
         <source>Invalid URL &quot;%1&quot;</source>
         <translation>잘못된 URL &quot;%1&quot;</translation>
     </message>
@@ -286,7 +290,7 @@
         <translation>트래커 안내 URL 수정:</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+57"/>
         <source>High</source>
         <translation>높음</translation>
     </message>
@@ -327,7 +331,7 @@
         <translation>비활성화 되면 시드 중지</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+64"/>
         <source>Up</source>
         <translation>업</translation>
     </message>
@@ -479,12 +483,12 @@
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>더많은 세부사항 보이기 (&amp;m)</translation>
+        <translation>더많은 세부사항 보이기 (&amp;M)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>백업 트래커 보이기 (&amp;b)</translation>
+        <translation>백업 트래커 보이기 (&amp;B)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -509,17 +513,17 @@
     <message>
         <location line="+7"/>
         <source>Limit &amp;download speed:</source>
-        <translation>다운로드 속도 제한 (&amp;d)</translation>
+        <translation>다운로드 속도 제한 (&amp;D)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>업로드 속도 제한 (&amp;u)</translation>
+        <translation>업로드 속도 제한 (&amp;U)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Torrent &amp;priority:</source>
-        <translation>토런트 &amp; 속성:</translation>
+        <translation>Torrent &amp; 속성 (&amp;P) :</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -550,8 +554,8 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
-        <location filename="../FileTreeView.cc" line="+108"/>
+        <location filename="../FileTreeItem.cc" line="+292"/>
+        <location filename="../FileTreeView.cc" line="+111"/>
         <location line="+285"/>
         <source>Low</source>
         <translation>낮음</translation>
@@ -580,7 +584,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+205"/>
+        <location filename="../FileTreeModel.cc" line="+199"/>
         <source>File</source>
         <translation>파일</translation>
     </message>
@@ -641,13 +645,13 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+67"/>
-        <location line="+167"/>
+        <location filename="../FilterBar.cc" line="+49"/>
+        <location line="+142"/>
         <source>All</source>
         <translation>전체</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-135"/>
         <source>Active</source>
         <translation>활동중</translation>
     </message>
@@ -682,7 +686,7 @@
         <translation>오류</translation>
     </message>
     <message>
-        <location line="+165"/>
+        <location line="+139"/>
         <source>Show:</source>
         <translation>보기:</translation>
     </message>
@@ -695,78 +699,78 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+33"/>
+        <location filename="../Formatter.cc" line="+27"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>kB/s</source>
         <translation>kB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MB/s</source>
         <translation>MB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GB/s</source>
         <translation>GB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TB/s</source>
         <translation>TB/s</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+9"/>
+        <location line="+1"/>
+        <location line="+1"/>
         <source>B</source>
         <translation>B</translation>
     </message>
     <message>
-        <location line="-8"/>
+        <location line="-1"/>
         <source>kB</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MB</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GB</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TB</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
         <source>KiB</source>
         <translation>KiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MiB</source>
         <translation>MiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GiB</source>
         <translation>GiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TiB</source>
         <translation>TiB</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+34"/>
         <location line="+17"/>
         <source>Unknown</source>
         <translation>알려지지 않음</translation>
@@ -784,7 +788,7 @@
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+36"/>
+        <location line="+23"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln 일</numerusform>
@@ -812,7 +816,7 @@
         </translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <location line="+11"/>
         <location line="+11"/>
         <source>%1, %2</source>
@@ -822,12 +826,12 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+52"/>
+        <location filename="../FreeSpaceLabel.cc" line="+55"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation>여유 공간 계산중...</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+32"/>
         <source>%1 free</source>
         <translation>%1 남음</translation>
     </message>
@@ -850,7 +854,7 @@
     <message>
         <location line="+175"/>
         <source>&amp;Torrent</source>
-        <translation>토런트 (&amp;T)</translation>
+        <translation>Torrent (&amp;T)</translation>
     </message>
     <message>
         <location line="+30"/>
@@ -880,7 +884,7 @@
     <message>
         <location line="+3"/>
         <source>Create a new torrent</source>
-        <translation>새 토런트 만들기</translation>
+        <translation>새 Torrent 만들기</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -890,12 +894,12 @@
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>토런트 속성 보기</translation>
+        <translation>Torrent 속성 보기</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>토런트 폴더 열기</translation>
+        <translation>Torrent 폴더 열기</translation>
     </message>
     <message>
         <location line="-161"/>
@@ -915,12 +919,12 @@
     <message>
         <location line="+3"/>
         <source>Open a torrent</source>
-        <translation>토런트 열기</translation>
+        <translation>Torrent 열기</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Open Fold&amp;er</source>
-        <translation>폴더 열기 (&amp;e)</translation>
+        <translation>폴더 열기 (&amp;E)</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -930,7 +934,7 @@
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>토런트 시작</translation>
+        <translation>Torrent 시작</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -950,7 +954,7 @@
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>토런트 일시 정지</translation>
+        <translation>Torrent 일시 정지</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -970,17 +974,17 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>토런트 삭제</translation>
+        <translation>Torrent 삭제</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>토런트 파일과 데이터 삭제 (&amp;D)</translation>
+        <translation>Torrent 파일과 데이터 삭제 (&amp;D)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>토런트 파일과 데이터 삭제</translation>
+        <translation>Torrent 파일과 데이터 삭제</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1046,7 +1050,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>받은 기한대로 정렬 (&amp;g)</translation>
+        <translation>받은 기한대로 정렬 (&amp;G)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1066,22 +1070,22 @@
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>비율에 따라 정렬 (&amp;o)</translation>
+        <translation>비율에 따라 정렬 (&amp;O)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>크기에 따라 정렬 (&amp;z)</translation>
+        <translation>크기에 따라 정렬 (&amp;Z)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>상태에 따라 정렬 (&amp;e)</translation>
+        <translation>상태에 따라 정렬 (&amp;E)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>트래커에 따라 정렬 (&amp;r)</translation>
+        <translation>트래커에 따라 정렬 (&amp;R)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1106,7 +1110,7 @@
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>순서에 따라 정렬 뒤집기 (&amp;v)</translation>
+        <translation>순서에 따라 정렬 뒤집기 (&amp;V)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1220,24 +1224,24 @@
         <translation>큐 순서에 따라 정렬 (&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+467"/>
         <source>Limit Download Speed</source>
         <translation>다운로드 속도 제한</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-55"/>
         <source>Unlimited</source>
         <translation>무제한</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location line="+702"/>
-        <location line="+8"/>
+        <location line="+7"/>
+        <location line="+730"/>
+        <location line="+9"/>
         <source>Limited at %1</source>
         <translation>%1 에 한정</translation>
     </message>
     <message>
-        <location line="-661"/>
+        <location line="-689"/>
         <source>Limit Upload Speed</source>
         <translation>업로드 속도 제한</translation>
     </message>
@@ -1253,60 +1257,60 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+689"/>
+        <location line="+718"/>
         <source>Stop at Ratio (%1)</source>
         <translation>비율에 따라 정지 (%1)</translation>
     </message>
     <message>
-        <location line="-441"/>
+        <location line="-402"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+16"/>
         <source>Idle</source>
         <translation>비활성</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <location line="+17"/>
+        <location line="+30"/>
+        <location line="+20"/>
         <source>Ratio: %1</source>
         <translation>비율: %1</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+6"/>
+        <location line="-14"/>
+        <location line="+7"/>
         <source>Down: %1, Up: %2</source>
         <translation>다운: %1, 업: %2</translation>
     </message>
     <message>
-        <location line="+470"/>
+        <location line="+441"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent 파일 (*.torrent);;전체 파일 (*.*)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Show &amp;options dialog</source>
-        <translation>다이어로그 설정및 보기 (&amp;o)</translation>
+        <translation>다이얼로그 설정및 보기 (&amp;O)</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>Open Torrent</source>
-        <translation>토런트 열기</translation>
+        <translation>Torrent 열기</translation>
     </message>
     <message>
-        <location line="-972"/>
+        <location line="-990"/>
         <source>Speed Limits</source>
         <translation>속도 제한</translation>
     </message>
     <message>
-        <location line="+454"/>
+        <location line="+503"/>
         <source>Network Error</source>
         <translation>네트워크 오류</translation>
     </message>
     <message>
-        <location line="+484"/>
+        <location line="+460"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>클릭하여 일시적으로 속도 제한 해제하기
@@ -1320,7 +1324,7 @@
  (%1 다운, %2 업)</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+135"/>
         <source>Remove torrent?</source>
         <translation>Torrent를 삭제하시겠습니까?</translation>
     </message>
@@ -1337,17 +1341,17 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-555"/>
+        <location line="-524"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>%L1 / %Ln Torrent 보이기</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+560"/>
+        <location line="+529"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>이 %Ln 토런트의 다운로드된 파일들을 삭제하시겠습니까?</numerusform>
+            <numerusform>이 %Ln Torrent의 다운로드된 파일들을 삭제하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
@@ -1401,7 +1405,7 @@
         <translation>Torrent 파일들중 몇몇개의 Torrent의 다운로드가 끝나지 않았습니다.</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+69"/>
         <source>%1 has not responded yet</source>
         <translation>%1가 반응하지 않고 있습니다</translation>
     </message>
@@ -1429,7 +1433,7 @@
         <translation>새 Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+217"/>
+        <location filename="../MakeDialog.cc" line="+218"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;아무런 출처도 선택되지 않았습니다&lt;/i&gt;</translation>
     </message>
@@ -1460,17 +1464,17 @@
     <message>
         <location line="+12"/>
         <source>Sa&amp;ve to:</source>
-        <translation>저장 (&amp;v)</translation>
+        <translation>저장 위치 (&amp;V):</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>소스 폴더 (&amp;o)</translation>
+        <translation>소스 폴더 (&amp;O)</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Source &amp;file:</source>
-        <translation>소스 파일 (&amp;f)</translation>
+        <translation>소스 파일 (&amp;O)</translation>
     </message>
     <message>
         <location line="+41"/>
@@ -1492,7 +1496,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+8"/>
         <source>Co&amp;mment:</source>
-        <translation>주석 (&amp;m)</translation>
+        <translation>주석 (&amp;M)</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1591,17 +1595,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>추가시 시작 (&amp;t)</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="-70"/>
+        <location filename="../OptionsDialog.cc" line="-69"/>
         <source>&amp;Verify Local Data</source>
         <translation>로컬 데이터 검증 (&amp;V)</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>.torrent 파일을 휴지통으로 이동 (&amp;v)</translation>
+        <translation>.torrent 파일을 휴지통으로 이동 (&amp;V)</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+29"/>
+        <location filename="../OptionsDialog.cc" line="+28"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent 파일 (*.torrent);;전체 파일 (*.*)</translation>
     </message>
@@ -1614,8 +1618,8 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>PathButton</name>
     <message>
-        <location filename="../PathButton.cc" line="+30"/>
-        <location line="+71"/>
+        <location filename="../PathButton.cc" line="+26"/>
+        <location line="+72"/>
         <source>(None)</source>
         <translation>(아님)</translation>
     </message>
@@ -1635,7 +1639,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="+1139"/>
         <source>Use &amp;authentication</source>
-        <translation>인증 사용 (&amp;a)</translation>
+        <translation>인증 사용 (&amp;A)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1645,7 +1649,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>비밀번호 (&amp;w)</translation>
+        <translation>비밀번호 (&amp;W)</translation>
     </message>
     <message>
         <location line="-53"/>
@@ -1678,7 +1682,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>날들 중에 (&amp;O): </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+335"/>
+        <location filename="../PrefsDialog.cc" line="+349"/>
         <source>Every Day</source>
         <translation>모든 날</translation>
     </message>
@@ -1693,7 +1697,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>주말</translation>
     </message>
     <message>
-        <location line="-183"/>
+        <location line="-197"/>
         <source>Sunday</source>
         <translation>일요일</translation>
     </message>
@@ -1728,7 +1732,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>토요일</translation>
     </message>
     <message>
-        <location line="+244"/>
+        <location line="+258"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>포트가 &lt;b&gt;열려있습니다&lt;/b&gt;</translation>
     </message>
@@ -1744,7 +1748,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+335"/>
+        <location filename="../PrefsDialog.cc" line="+342"/>
         <source>Status unknown</source>
         <translation>상태 알수 없음</translation>
     </message>
@@ -1774,7 +1778,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>uTP는 네트워크 혼잡을 줄이는 도구입니다.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-230"/>
+        <location filename="../PrefsDialog.cc" line="-236"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1792,12 +1796,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-638"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>여기에 있는 .torrent 파일 자동으로 추가 (&amp;f)</translation>
+        <translation>여기에 있는 .torrent 파일 자동으로 추가 (&amp;F)</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Torrent 옵션과 다이어로그 보기 (&amp;d)</translation>
+        <translation>Torrent 옵션과 다이얼로그 보기 (&amp;F)</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1807,7 +1811,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>.torrent 파일을 휴지통으로 이동 (&amp;v)</translation>
+        <translation>.torrent 파일을 휴지통으로 이동 (&amp;V)</translation>
     </message>
     <message>
         <location line="+57"/>
@@ -1817,7 +1821,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>최대 활성 다운로드 수 (&amp;x): </translation>
+        <translation>최대 활성 다운로드 수 (&amp;X): </translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1835,7 +1839,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>리모트</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+149"/>
+        <location filename="../PrefsDialog.cc" line="+155"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;블록리스트는 %Ln 규칙을 포함하고 있습니다&lt;/i&gt;</numerusform>
@@ -1844,7 +1848,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-287"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>항상 Transmission 시작시 무작위 포트 선택 (&amp;r)</translation>
+        <translation>항상 Transmission 시작시 무작위 포트 선택 (&amp;R)</translation>
     </message>
     <message>
         <location line="-252"/>
@@ -1854,15 +1858,15 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+299"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>Torrent당 최대 피어수(&amp;t): </translation>
+        <translation>Torrent당 최대 피어수(&amp;T): </translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>최대 총 피어수(&amp;o): </translation>
+        <translation>최대 총 피어수(&amp;O): </translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-223"/>
+        <location filename="../PrefsDialog.cc" line="-230"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;업데이트 완료!&lt;/b&gt;&lt;p&gt;블록리스트에 %Ln 규칙이 추가되었습니다.</numerusform>
@@ -1881,7 +1885,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+42"/>
         <source>Enable &amp;automatic updates</source>
-        <translation>자동 업데이트 허용 (&amp;a)</translation>
+        <translation>자동 업데이트 허용 (&amp;A)</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+15"/>
@@ -1906,7 +1910,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-403"/>
         <source>&amp;to</source>
-        <translation>에게 (&amp;t)</translation>
+        <translation>에게 (&amp;T)</translation>
     </message>
     <message>
         <location line="+763"/>
@@ -1917,17 +1921,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>알람 영역에 Transmission 아이콘 보이기 (&amp;n)</translation>
+        <translation>알람 영역에 Transmission 아이콘 보이기 (&amp;N)</translation>
     </message>
     <message>
         <location line="-213"/>
         <source>Te&amp;st Port</source>
-        <translation>포트 테스트 (&amp;s)</translation>
+        <translation>포트 테스트 (&amp;S)</translation>
     </message>
     <message>
         <location line="-101"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>블록리스트 허용 (&amp;b)</translation>
+        <translation>블록리스트 사용 (&amp;B)</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1947,17 +1951,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Allow &amp;remote access</source>
-        <translation>원격 조종 허용 (&amp;r)</translation>
+        <translation>리모트 액서스 허용 (&amp;R)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation>HTTP 포트 (&amp;p): </translation>
+        <translation>HTTP 포트 (&amp;P): </translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation>이 IP 주소들만 허용 (&amp;d): </translation>
+        <translation>이 IP 주소들만 허용 (&amp;D): </translation>
     </message>
     <message>
         <location line="-1128"/>
@@ -1977,12 +1981,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+21"/>
         <source>U&amp;pload:</source>
-        <translation>업로드 (&amp;p):</translation>
+        <translation>업로드 (&amp;P):</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation>다운로드 (&amp;w):</translation>
+        <translation>다운로드 (&amp;W):</translation>
     </message>
     <message>
         <location line="+836"/>
@@ -1997,17 +2001,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Torrent가 추가시 알람 보이기 (&amp;d)</translation>
+        <translation>Torrent 추가시 알람 보이기 (&amp;D)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Torrent가 완료시 알람 보이기 (&amp;f)</translation>
+        <translation>Torrent 완료시 알람 보이기 (&amp;F)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>Torrent가 완료시 소리 재생하기 (&amp;s)</translation>
+        <translation>Torrent 완료시 소리 재생하기 (&amp;S)</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-73"/>
@@ -2055,7 +2059,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>암호화</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+141"/>
+        <location filename="../PrefsDialog.cc" line="+142"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
         <translation>&quot;Torrent Done&quot; 스크립트 선택</translation>
     </message>
@@ -2108,7 +2112,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+170"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
-        <translation>Torrent 파일이 완료시 스크립트 실행 (&amp;t):</translation>
+        <translation>Torrent 완료시 스크립트 실행 (&amp;T):</translation>
     </message>
     <message>
         <location line="+59"/>
@@ -2118,7 +2122,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation>비활성화 되면 시드 중지 (&amp;n)</translation>
+        <translation>비활성화 되면 시드 중지 (&amp;N)</translation>
     </message>
     <message>
         <location line="-557"/>
@@ -2136,7 +2140,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>네트워크</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+95"/>
+        <location filename="../PrefsDialog.cc" line="+105"/>
         <source>Not supported by remote sessions</source>
         <translation>리모트 세션은 지원하지 않습니다</translation>
     </message>
@@ -2144,7 +2148,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-301"/>
+        <location filename="../Application.cc" line="-255"/>
         <source>Invalid option</source>
         <translation>잘못된 옵션</translation>
     </message>
@@ -2152,7 +2156,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+65"/>
+        <location filename="../RelocateDialog.cc" line="+66"/>
         <source>Select Location</source>
         <translation>위치 선택</translation>
     </message>
@@ -2179,13 +2183,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>이미 있는 로컬 데이터 (&amp;a)</translation>
+        <translation>이미 있는 로컬 데이터 (&amp;A)</translation>
     </message>
 </context>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+518"/>
         <source>Error Renaming Path</source>
         <translation>이름변경 위치 오류</translation>
     </message>
@@ -2195,19 +2199,28 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot; 을 &quot;%2&quot;로 변경할수 없습니다: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;오류를 수정하고 다시 시도해주십시오.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+449"/>
+        <location line="+576"/>
         <source>Error Adding Torrent</source>
-        <translation>토런트 추가 오류</translation>
+        <translation>Torrent 추가 오류</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>Add Torrent</source>
-        <translation>Torrent 추가</translation>
+        <location line="+55"/>
+        <source>%1 (copy of %2)</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location line="+1"/>
-        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;를 추가할수 없습니다.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;이미 추가된 &quot;%2&quot;와 중복됩니다.&lt;/p&gt;</translation>
+    <message numerus="yes">
+        <location line="+8"/>
+        <source>Duplicate Torrent(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+2"/>
+        <source>Unable to add %n duplicate torrent(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2255,7 +2268,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>비밀번호 (&amp;w)</translation>
+        <translation>비밀번호 (&amp;W)</translation>
     </message>
 </context>
 <context>
@@ -2300,7 +2313,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>총</translation>
     </message>
     <message numerus="yes">
-        <location filename="../StatsDialog.cc" line="+72"/>
+        <location filename="../StatsDialog.cc" line="+66"/>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>%Ln 번 시작함</numerusform>
@@ -2310,7 +2323,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1014"/>
+        <location filename="../Torrent.cc" line="+322"/>
         <source>Verifying local data</source>
         <translation>로컬 데이터 검증중</translation>
     </message>
@@ -2368,19 +2381,19 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+177"/>
+        <location filename="../TorrentDelegate.cc" line="+154"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>마그넷 전송 - 메타데이터 가져오는 중 (%1%)</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
         <translation>%1 / %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
         <translation>%1 / %2 (%3%), 업로드 %4 (비율: %5 목표: %6)</translation>
@@ -2421,7 +2434,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>비율: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+44"/>
+        <location line="+45"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2436,12 +2449,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+18"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>%Ln 피어로부터 메타데이터 다운로드중 (%1% 완료)</numerusform>
@@ -2471,12 +2484,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Error</source>
-        <translation>오류</translation>
-    </message>
-    <message>
-        <location line="-81"/>
+        <location line="-76"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>로컬 데이터 검증중 (%1% 완료됨)</translation>
     </message>
@@ -2484,7 +2492,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2509,24 +2517,24 @@ To add another primary URL, add it after a blank line.</source>
         <translation>업데이트 일정 없음</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>%1 로부터 피어를 더 받아올수 있는지 물어봄</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Queued to ask for more peers</source>
         <translation>피어를 더 받아올수 있는지 물어봄 큐</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>지금 피어를 더 받아올수 있는지 물어봄... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+18"/>
+        <location line="+24"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2548,24 +2556,24 @@ To add another primary URL, add it after a blank line.</source>
         <translation>%3 전 트래커에게 피어 수에 대한 %1정보가 없었음%2</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-18"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>%1&quot;%2&quot;%3 %4 전에 긁어오기 오류 가져옴</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+31"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>%1 에 피어 수 물어보기</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>피어 수 물어봄 큐</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>지금 피어 수를 물어봄... &lt;small&gt;%1&lt;/small&gt;</translation>

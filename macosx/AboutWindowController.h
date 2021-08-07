@@ -30,7 +30,7 @@
     IBOutlet NSPanel * fLicenseSheet;
 }
 
-+ (AboutWindowController *) aboutController;
+@property (nonatomic, class, readonly) AboutWindowController * aboutController;
 
 - (IBAction) showLicense: (id) sender;
 - (IBAction) hideLicense: (id) sender;
