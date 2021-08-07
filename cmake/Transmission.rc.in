@@ -32,7 +32,7 @@ BEGIN
             VALUE "FileDescription",  "${TR_FILE_DESCRIPTION}"
             VALUE "FileVersion",      LONG_VERSION_STRING
             VALUE "InternalName",     "${TR_INTERNAL_NAME}"
-            VALUE "LegalCopyright",   "2005-2016 Transmission Project"
+            VALUE "LegalCopyright",   "2005-2020 Transmission Project"
             VALUE "OriginalFilename", "${TR_ORIGINAL_FILENAME}"
             VALUE "ProductName",      "Transmission"
             VALUE "ProductVersion",   LONG_VERSION_STRING

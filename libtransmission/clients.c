@@ -138,7 +138,7 @@ static bool isMainlineStyle(uint8_t const* peer_id)
 
 static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
-    char const* chid = (char*)id;
+    char const* chid = (char const*)id;
     bool is_bitlord;
     int major;
     int minor;
@@ -186,7 +186,7 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
     uint8_t const* id = id_in;
-    char const* chid = (char*)id;
+    char const* chid = (char const*)id;
 
     *buf = '\0';
 
@@ -234,6 +234,11 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
                 strint(id + 5, 1), getMnemonicEnd(id[6]));
         }
+        else if (strncmp(chid + 1, "UW", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Web %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5,
+                1), getMnemonicEnd(id[6]));
+        }
         /* */
         else if (strncmp(chid + 1, "AZ", 2) == 0)
         {
@@ -279,10 +284,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "Avicora", id + 3);
         }
-        else if (strncmp(chid + 1, "BB", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitBuddy", id + 3);
-        }
         else if (strncmp(chid + 1, "BE", 2) == 0)
         {
             four_digits(buf, buflen, "BitTorrent SDK", id + 3);
@@ -294,6 +295,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "BH", 2) == 0)
         {
             four_digits(buf, buflen, "BitZilla", id + 3);
+        }
+        else if (strncmp(chid + 1, "BI", 2) == 0)
+        {
+            four_digits(buf, buflen, "BiglyBT", id + 3);
         }
         else if (strncmp(chid + 1, "BM", 2) == 0)
         {
@@ -318,10 +323,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "BW", 2) == 0)
         {
             four_digits(buf, buflen, "BitWombat", id + 3);
-        }
-        else if (strncmp(chid + 1, "BX", 2) == 0)
-        {
-            four_digits(buf, buflen, "BittorrentX", id + 3);
         }
         else if (strncmp(chid + 1, "EB", 2) == 0)
         {
@@ -475,6 +476,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "FireTorrent", id + 3);
         }
+        else if (strncmp(chid + 1, "WW", 2) == 0)
+        {
+            four_digits(buf, buflen, "WebTorrent", id + 3);
+        }
         else if (strncmp(chid + 1, "XL", 2) == 0)
         {
             four_digits(buf, buflen, "Xunlei", id + 3);
@@ -500,10 +505,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             four_digits(buf, buflen, "Zona", id + 3);
         }
         /* */
-        else if (strncmp(chid + 1, "AG", 2) == 0)
-        {
-            three_digits(buf, buflen, "Ares", id + 3);
-        }
         else if (strncmp(chid + 1, "A~", 2) == 0)
         {
             three_digits(buf, buflen, "Ares", id + 3);
@@ -511,6 +512,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "ES", 2) == 0)
         {
             three_digits(buf, buflen, "Electric Sheep", id + 3);
+        }
+        else if (strncmp(chid + 1, "FW", 2) == 0)
+        {
+            three_digits(buf, buflen, "FrostWire", id + 3);
         }
         else if (strncmp(chid + 1, "HL", 2) == 0)
         {
@@ -531,10 +536,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "pb", 2) == 0)
         {
             three_digits(buf, buflen, "pbTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "TT", 2) == 0)
-        {
-            three_digits(buf, buflen, "TuoTu", id + 3);
         }
         else if (strncmp(chid + 1, "qB", 2) == 0)
         {
@@ -638,8 +639,12 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             tr_snprintf(buf, buflen, "Baidu Netdisk");
         }
+        else if (strncmp(chid + 1, "WS", 2) == 0)
+        {
+            no_version(buf, buflen, "HTTP Seed");
+        }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -663,8 +668,13 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
                 strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
+        else if (strncmp(chid + 1, "UW", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Web %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5,
+                2), getMnemonicEnd(id[7]));
+        }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -683,7 +693,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             mainline_style(buf, buflen, "Queen Bee", id);
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -804,9 +814,28 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         two_major_two_minor(buf, buflen, "Tixati", id + 3);
     }
+    else if (strncmp(chid, "A2", 2) == 0)
+    {
+        if (id[4] == '-' && id[6] == '-' && id[8] == '-')
+        {
+            tr_snprintf(buf, buflen, "aria2 %c.%c.%c", id[3], id[5], id[7]);
+        }
+        else if (id[4] == '-' && id[7] == '-' && id[9] == '-')
+        {
+            tr_snprintf(buf, buflen, "aria2 %c.%c%c.%c", id[3], id[5], id[6], id[8]);
+        }
+        else
+        {
+            no_version(buf, buflen, "aria2");
+        }
+    }
+    else if (strncmp(chid, "-BL", 3) == 0)
+    {
+        tr_snprintf(buf, buflen, "BitLord %c.%c.%c-%c%c%c", id[3], id[4], id[5], id[6], id[7], id[8]);
+    }
 
     /* Shad0w-style */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         int a;
         int b;
@@ -856,7 +885,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* No match */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         char out[32];
         char* walk = out;

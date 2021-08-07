@@ -8,6 +8,7 @@
 
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* strtoul(), EXIT_FAILURE */
+#include <inttypes.h> /* PRIu32 */
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
@@ -34,13 +35,13 @@ static uint32_t piecesize_kib = 0;
 
 static tr_option options[] =
 {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", 0, NULL },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", 1, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", 1, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", 1, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, NULL },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
+    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
+    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
@@ -187,8 +188,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    printf("Creating torrent \"%s\" ...", outfile);
-    fflush(stdout);
+    printf("Creating torrent \"%s\"\n", outfile);
 
     b = tr_metaInfoBuilderCreate(infile);
 
@@ -203,13 +203,27 @@ int tr_main(int argc, char* argv[])
         tr_metaInfoBuilderSetPieceSize(b, piecesize_kib * KiB);
     }
 
+    char buf[128];
+    printf(b->fileCount > 1 ? " %" PRIu32 " files, %s\n" : " %" PRIu32 " file, %s\n", b->fileCount,
+        tr_formatter_size_B(buf, b->totalSize, sizeof(buf)));
+    printf(b->pieceCount > 1 ? " %" PRIu32 " pieces, %s each\n" : " %" PRIu32 " piece, %s\n", b->pieceCount,
+        tr_formatter_size_B(buf, b->pieceSize, sizeof(buf)));
+
     tr_makeMetaInfo(b, outfile, trackers, trackerCount, comment, isPrivate);
 
+    uint32_t last = UINT32_MAX;
     while (!b->isDone)
     {
         tr_wait_msec(500);
-        putc('.', stdout);
-        fflush(stdout);
+
+        uint32_t current = b->pieceIndex;
+        if (current != last)
+        {
+            printf("\rPiece %" PRIu32 "/%" PRIu32 " ...", current, b->pieceCount);
+            fflush(stdout);
+
+            last = current;
+        }
     }
 
     putc(' ', stdout);

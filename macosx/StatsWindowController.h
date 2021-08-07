@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+
+#include <libtransmission/transmission.h>
 
 @interface StatsWindowController : NSWindowController
 {
@@ -32,7 +33,7 @@
     NSTimer * fTimer;
 }
 
-+ (StatsWindowController *) statsWindow;
+@property (nonatomic, class, readonly) StatsWindowController * statsWindow;
 
 - (void) resetStats: (id) sender;
 

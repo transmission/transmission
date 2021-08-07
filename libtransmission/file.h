@@ -15,10 +15,9 @@
 #include <windows.h>
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 struct tr_error;
 
@@ -144,6 +143,19 @@ tr_sys_path_info;
  */
 
 /* Path-related wrappers */
+
+/**
+ * @brief Portability wrapper for various in-kernel file copy functions, with a
+ *        fallback to a userspace read/write loop.
+ *
+ * @param[in]  src_path  Path to source file.
+ * @param[in]  dst_path  Path to destination file.
+ * @param[out] error     Pointer to error object. Optional, pass `NULL` if you
+ *                       are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `stat()`.
@@ -578,7 +590,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...);
+bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...) TR_GNUC_PRINTF(2, 4);
 
 /* Directory-related wrappers */
 
@@ -664,6 +676,4 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error);
 /** @} */
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

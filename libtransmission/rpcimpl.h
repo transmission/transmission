@@ -8,13 +8,11 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "transmission.h"
+#include "tr-macros.h"
 #include "variant.h"
+
+TR_BEGIN_DECLS
 
 /***
 ****  RPC processing
@@ -32,6 +30,4 @@ void tr_rpc_request_exec_uri(tr_session* session, void const* request_uri, size_
 
 void tr_rpc_parse_list_str(tr_variant* setme, char const* list_str, size_t list_str_len);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

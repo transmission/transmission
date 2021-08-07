@@ -89,7 +89,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
             int const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE : tor->session->preallocationMode;
 
             if ((fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc,
-                    file->length)) == TR_BAD_SYS_FILE)
+                file->length)) == TR_BAD_SYS_FILE)
             {
                 err = errno;
                 tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror(err));
@@ -251,7 +251,7 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     uint32_t offset = 0;
     bool success = true;
     size_t const buflen = tor->blockSize;
-    void* buffer = tr_valloc(buflen);
+    void* const buffer = tr_malloc(buflen);
     tr_sha1_ctx_t sha;
 
     TR_ASSERT(buffer != NULL);

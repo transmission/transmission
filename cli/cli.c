@@ -75,32 +75,32 @@ static char const* torrentPath = NULL;
 
 static struct tr_option const options[] =
 {
-    { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
-    { 'd', "downlimit", "Set max download speed in "SPEED_K_STR, "d", 1, "<speed>" },
-    { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
-    { 'f', "finish", "Run a script when the torrent finishes", "f", 1, "<script>" },
-    { 'g', "config-dir", "Where to find configuration files", "g", 1, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
-    { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
-    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", 1, "<tos>" },
-    { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", 1, "<speed>" },
-    { 'U', "no-uplimit", "Don't limit the upload speed", "U", 0, NULL },
-    { 'v', "verify", "Verify the specified torrent", "v", 0, NULL },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
+    { 'd', "downlimit", "Set max download speed in "SPEED_K_STR, "d", true, "<speed>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", false, NULL },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL },
+    { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
+    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
+    { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", true, "<speed>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, NULL },
+    { 'v', "verify", "Verify the specified torrent", "v", false, NULL },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
 {
     return "A fast and easy BitTorrent client\n"
-           "\n"
-           "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
+        "\n"
+        "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
 }
 
 static int parseCommandLine(tr_variant*, int argc, char const** argv);
@@ -135,9 +135,14 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 
 static bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_session* session UNUSED, bool did_connect UNUSED, bool did_timeout UNUSED,
-    long response_code UNUSED, void const* response, size_t response_byte_count, void* ctor)
+static void onTorrentFileDownloaded(tr_session* session, bool did_connect, bool did_timeout, long response_code,
+    void const* response, size_t response_byte_count, void* ctor)
 {
+    TR_UNUSED(session);
+    TR_UNUSED(did_connect);
+    TR_UNUSED(did_timeout);
+    TR_UNUSED(response_code);
+
     tr_ctorSetMetainfo(ctor, response, response_byte_count);
     waitingOnWeb = false;
 }
@@ -257,18 +262,16 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL))
+    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL) &&
+        !tr_sys_path_exists(str, NULL))
     {
-        if (!tr_sys_path_exists(str, NULL))
-        {
-            tr_error* error = NULL;
+        tr_error* error = NULL;
 
-            if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
-            {
-                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
-                tr_error_free(error);
-                return EXIT_FAILURE;
-            }
+        if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+        {
+            fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
+            tr_error_free(error);
+            return EXIT_FAILURE;
         }
     }
 

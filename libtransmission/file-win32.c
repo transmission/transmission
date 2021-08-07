@@ -87,11 +87,11 @@ static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_h
     TR_ASSERT(mtime != NULL);
     TR_ASSERT(info != NULL);
 
-    if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+    if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
     {
         info->type = TR_SYS_PATH_IS_DIRECTORY;
     }
-    else if (!(attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)))
+    else if ((attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)) == 0)
     {
         info->type = TR_SYS_PATH_IS_FILE;
     }
@@ -251,9 +251,9 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
 
 static bool create_dir(char const* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_UNUSED(permissions);
 
-    (void)permissions;
+    TR_ASSERT(path != NULL);
 
     bool ret;
     DWORD error_code = ERROR_SUCCESS;
@@ -278,8 +278,7 @@ static bool create_dir(char const* path, int flags, int permissions, bool okay_i
     {
         DWORD const attributes = GetFileAttributesW(wide_path);
 
-        if (attributes != INVALID_FILE_ATTRIBUTES &&
-            (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+        if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
             ret = true;
         }
@@ -357,7 +356,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
-            if (attributes & FILE_ATTRIBUTE_REPARSE_POINT)
+            if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
             {
                 handle = CreateFileW(wide_path, 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
                 ret = handle != INVALID_HANDLE_VALUE;
@@ -595,7 +594,7 @@ cleanup:
 
 char* tr_sys_path_basename(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }
@@ -635,7 +634,7 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
 
 char* tr_sys_path_dirname(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }
@@ -734,6 +733,41 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     return ret;
 }
 
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
+{
+    TR_ASSERT(src_path != NULL);
+    TR_ASSERT(dst_path != NULL);
+
+    bool ret = false;
+
+    wchar_t* wide_src_path = path_to_native_path(src_path);
+    wchar_t* wide_dst_path = path_to_native_path(dst_path);
+
+    if (wide_src_path == NULL || wide_dst_path == NULL)
+    {
+        set_system_error(error, ERROR_INVALID_PARAMETER);
+        goto out;
+    }
+
+    LPBOOL cancel = FALSE;
+    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
+    if (CopyFileExW(wide_src_path, wide_dst_path, NULL, NULL, &cancel, flags) == 0)
+    {
+        set_system_error(error, GetLastError());
+        goto out;
+    }
+    else
+    {
+        ret = true;
+    }
+
+out:
+    tr_free(wide_src_path);
+    tr_free(wide_dst_path);
+
+    return ret;
+}
+
 bool tr_sys_path_remove(char const* path, tr_error** error)
 {
     TR_ASSERT(path != NULL);
@@ -821,10 +855,10 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
 {
+    TR_UNUSED(permissions);
+
     TR_ASSERT(path != NULL);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
-
-    (void)permissions;
 
     tr_sys_file_t ret;
     DWORD native_access = 0;
@@ -1141,15 +1175,15 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 
 bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
 {
+    TR_UNUSED(handle);
+    TR_UNUSED(offset);
+    TR_UNUSED(size);
+    TR_UNUSED(advice);
+    TR_UNUSED(error);
+
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
     TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
-
-    (void)handle;
-    (void)offset;
-    (void)size;
-    (void)advice;
-    (void)error;
 
     bool ret = true;
 
@@ -1211,10 +1245,10 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 
 bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 {
+    TR_UNUSED(size);
+
     TR_ASSERT(address != NULL);
     TR_ASSERT(size > 0);
-
-    (void)size;
 
     bool ret = UnmapViewOfFile(address);
 

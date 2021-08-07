@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+
 #import "Torrent.h"
 
 @class Controller;
@@ -49,9 +50,9 @@
     TorrentDeterminationType fGroupDeterminationType;
 }
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
+- (instancetype) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
 
-- (Torrent *) torrent;
+@property (nonatomic, readonly) Torrent *torrent;
 
 - (void) setDestination: (id) sender;
 

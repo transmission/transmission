@@ -20,11 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> //tr_addressIsIP()
+
 #import "TrackerCell.h"
 #import "TrackerNode.h"
-
-#import "transmission.h" // required by utils.h
-#import "utils.h" //tr_addressIsIP()
 
 #define PADDING_HORIZONAL 3.0
 #define PADDING_STATUS_HORIZONAL 3.0
@@ -38,7 +38,7 @@
 
 @interface TrackerCell (Private)
 
-- (NSImage *) favIcon;
+@property (nonatomic, readonly) NSImage *favIcon;
 - (void) loadTrackerIcon: (NSString *) baseAddress;
 
 - (NSRect) imageRectForBounds: (NSRect) bounds;
@@ -48,7 +48,7 @@
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) aboveRect withRightRect: (NSRect) rightRect
             inBounds: (NSRect) bounds;
 
-- (NSAttributedString *) attributedName;
+@property (nonatomic, readonly) NSAttributedString *attributedName;
 - (NSAttributedString *) attributedStatusWithString: (NSString *) statusString;
 - (NSAttributedString *) attributedCount: (NSInteger) count;
 
@@ -66,12 +66,12 @@ NSMutableSet * fTrackerIconLoading;
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
 
-- (id) init
+- (instancetype) init
 {
     if ((self = [super init]))
     {
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+        paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
         fNameAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                             [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
@@ -99,38 +99,38 @@ NSMutableSet * fTrackerIconLoading;
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     //icon
-    [[self favIcon] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
+    [self.favIcon drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
 
     //set table colors
     NSColor * nameColor, * statusColor;
-    if ([self backgroundStyle] == NSBackgroundStyleDark)
-        nameColor = statusColor = [NSColor whiteColor];
+    if (self.backgroundStyle == NSBackgroundStyleDark)
+        nameColor = statusColor = NSColor.whiteColor;
     else
     {
-        nameColor = [NSColor controlTextColor];
-        statusColor = [NSColor darkGrayColor];
+        nameColor = NSColor.labelColor;
+        statusColor = NSColor.secondaryLabelColor;
     }
 
     fNameAttributes[NSForegroundColorAttributeName] = nameColor;
     fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
-    TrackerNode * node = (TrackerNode *)[self objectValue];
+    TrackerNode * node = (TrackerNode *)self.objectValue;
 
     //name
-    NSAttributedString * nameString = [self attributedName];
+    NSAttributedString * nameString = self.attributedName;
     const NSRect nameRect = [self rectForNameWithString: nameString inBounds: cellFrame];
     [nameString drawInRect: nameRect];
 
     //count strings
-    NSAttributedString * seederString = [self attributedCount: [node totalSeeders]];
+    NSAttributedString * seederString = [self attributedCount: node.totalSeeders];
     const NSRect seederRect = [self rectForCountWithString: seederString withAboveRect: nameRect inBounds: cellFrame];
     [seederString drawInRect: seederRect];
 
-    NSAttributedString * leecherString = [self attributedCount: [node totalLeechers]];
+    NSAttributedString * leecherString = [self attributedCount: node.totalLeechers];
     const NSRect leecherRect = [self rectForCountWithString: leecherString withAboveRect: seederRect inBounds: cellFrame];
     [leecherString drawInRect: leecherRect];
 
-    NSAttributedString * downloadedString = [self attributedCount: [node totalDownloaded]];
+    NSAttributedString * downloadedString = [self attributedCount: node.totalDownloaded];
     const NSRect downloadedRect = [self rectForCountWithString: downloadedString withAboveRect: leecherRect inBounds: cellFrame];
     [downloadedString drawInRect: downloadedRect];
 
@@ -154,17 +154,17 @@ NSMutableSet * fTrackerIconLoading;
     [downloadedLabelString drawInRect: downloadedLabelRect];
 
     //status strings
-    NSAttributedString * lastAnnounceString = [self attributedStatusWithString: [node lastAnnounceStatusString]];
+    NSAttributedString * lastAnnounceString = [self attributedStatusWithString: node.lastAnnounceStatusString];
     const NSRect lastAnnounceRect = [self rectForStatusWithString: lastAnnounceString withAboveRect: nameRect
                                         withRightRect: seederLabelRect inBounds: cellFrame];
     [lastAnnounceString drawInRect: lastAnnounceRect];
 
-    NSAttributedString * nextAnnounceString = [self attributedStatusWithString: [node nextAnnounceStatusString]];
+    NSAttributedString * nextAnnounceString = [self attributedStatusWithString: node.nextAnnounceStatusString];
     const NSRect nextAnnounceRect = [self rectForStatusWithString: nextAnnounceString withAboveRect: lastAnnounceRect
                                         withRightRect: leecherLabelRect inBounds: cellFrame];
     [nextAnnounceString drawInRect: nextAnnounceRect];
 
-    NSAttributedString * lastScrapeString = [self attributedStatusWithString: [node lastScrapeStatusString]];
+    NSAttributedString * lastScrapeString = [self attributedStatusWithString: node.lastScrapeStatusString];
     const NSRect lastScrapeRect = [self rectForStatusWithString: lastScrapeString withAboveRect: nextAnnounceRect
                                     withRightRect: downloadedLabelRect inBounds: cellFrame];
     [lastScrapeString drawInRect: lastScrapeRect];
@@ -177,29 +177,26 @@ NSMutableSet * fTrackerIconLoading;
 - (NSImage *) favIcon
 {
     id icon = nil;
-    NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] fullAnnounceAddress]];
+    NSURL * address = [NSURL URLWithString: ((TrackerNode *)self.objectValue).fullAnnounceAddress];
     NSString * host;
-    if ((host = [address host]))
+    if ((host = address.host))
     {
         //don't try to parse ip address
-        const BOOL separable = !tr_addressIsIP([host UTF8String]);
+        const BOOL separable = !tr_addressIsIP(host.UTF8String);
 
         NSArray * hostComponents = separable ? [host componentsSeparatedByString: @"."] : nil;
 
         //let's try getting the tracker address without using any subdomains
         NSString * baseAddress;
-        if (separable && [hostComponents count] > 1)
+        if (separable && hostComponents.count > 1)
             baseAddress = [NSString stringWithFormat: @"http://%@.%@",
-                            hostComponents[[hostComponents count]-2], [hostComponents lastObject]];
+                            hostComponents[hostComponents.count-2], hostComponents.lastObject];
         else
             baseAddress = [NSString stringWithFormat: @"http://%@", host];
 
         icon = [fTrackerIconCache objectForKey: baseAddress];
-        if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
-        {
-            [fTrackerIconLoading addObject: baseAddress];
-            [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
-        }
+        if (!icon)
+            [self loadTrackerIcon: baseAddress];
     }
 
     return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon"];
@@ -208,38 +205,43 @@ NSMutableSet * fTrackerIconLoading;
 #warning better favicon detection
 - (void) loadTrackerIcon: (NSString *) baseAddress
 {
-    @autoreleasepool
-    {
-        //try favicon.png
-        NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.png"]];
-
-        NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                                    timeoutInterval: 30.0];
-        NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-        NSImage * icon = [[NSImage alloc] initWithData: iconData];
-
-        //try favicon.ico
-        if (!icon)
-        {
-            favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
-
-            request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                        timeoutInterval: 30.0];
-            iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-            icon = [[NSImage alloc] initWithData: iconData];
-        }
-
-        if (icon)
-        {
-            [fTrackerIconCache setObject: icon forKey: baseAddress];
-
-            [[self controlView] setNeedsDisplay: YES];
-        }
-        else
-            [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
-
-        [fTrackerIconLoading removeObject: baseAddress];
+    if ([fTrackerIconLoading containsObject: baseAddress]) {
+        return;
     }
+    [fTrackerIconLoading addObject: baseAddress];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSImage *icon = nil;
+        
+        NSArray<NSString *> *filenamesToTry = @[ @"favicon.png", @"favicon.ico" ];
+        for (NSString *filename in filenamesToTry) {
+            NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent:filename]];
+            
+            NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                                  timeoutInterval: 30.0];
+            
+            NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+            if (iconData) {
+                icon = [[NSImage alloc] initWithData: iconData];
+                if (icon) {
+                    break;
+                }
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (icon)
+            {
+                [fTrackerIconCache setObject: icon forKey: baseAddress];
+                
+                [[self controlView] setNeedsDisplay: YES];
+            }
+            else
+                [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+            
+            [fTrackerIconLoading removeObject: baseAddress];
+        });
+    });
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
@@ -290,7 +292,7 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSAttributedString *) attributedName
 {
-    NSString * name = [(TrackerNode *)[self objectValue] host];
+    NSString * name = ((TrackerNode *)self.objectValue).host;
     return [[NSAttributedString alloc] initWithString: name attributes: fNameAttributes];
 }
 

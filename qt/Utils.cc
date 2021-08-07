@@ -6,6 +6,10 @@
  *
  */
 
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
@@ -16,7 +20,7 @@
 #include <QColor>
 #include <QDataStream>
 #include <QFile>
-#include <QFileDialog>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QIcon>
@@ -25,7 +29,6 @@
 #include <QMimeType>
 #include <QObject>
 #include <QPixmapCache>
-#include <QSet>
 #include <QStyle>
 
 #ifdef _WIN32
@@ -44,81 +47,12 @@
 namespace
 {
 
-#ifdef _WIN32
-void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon)
-{
-    QString const pixmapCacheKey = QLatin1String("tr_file_ext_") + QString::number(iconSize) + QLatin1Char('_') +
-        fileInfo.suffix();
-
-    QPixmap pixmap;
-
-    if (!QPixmapCache::find(pixmapCacheKey, &pixmap))
-    {
-        QString const filename = fileInfo.fileName();
-
-        SHFILEINFO shellFileInfo;
-
-        if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shellFileInfo,
-            sizeof(shellFileInfo), SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
-        {
-            if (shellFileInfo.hIcon != nullptr)
-            {
-                pixmap = QtWin::fromHICON(shellFileInfo.hIcon);
-                ::DestroyIcon(shellFileInfo.hIcon);
-            }
-        }
-
-        QPixmapCache::insert(pixmapCacheKey, pixmap);
-    }
-
-    if (!pixmap.isNull())
-    {
-        icon.addPixmap(pixmap);
-    }
-}
-#endif
-
 bool isSlashChar(QChar const& c)
 {
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
 } // namespace
-
-QIcon Utils::guessMimeIcon(QString const& filename)
-{
-    static QIcon const fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
-
-#ifdef _WIN32
-
-    QIcon icon;
-
-    if (!filename.isEmpty())
-    {
-        QFileInfo const fileInfo(filename);
-
-        addAssociatedFileIcon(fileInfo, SHGFI_SMALLICON, icon);
-        addAssociatedFileIcon(fileInfo, 0, icon);
-        addAssociatedFileIcon(fileInfo, SHGFI_LARGEICON, icon);
-    }
-
-    if (!icon.isNull())
-    {
-        return icon;
-    }
-
-#endif
-
-    QMimeDatabase mimeDb;
-    QMimeType mimeType = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
-
-    if (mimeType.isValid())
-    {
-        return QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
-    }
-
-    return fallback;
-}
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {
@@ -137,57 +71,6 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
     }
 }
 
-bool Utils::isValidUtf8(char const* s)
-{
-    int n; // number of bytes in a UTF-8 sequence
-
-    for (char const* c = s; *c != '\0'; c += n)
-    {
-        if ((*c & 0x80) == 0x00)
-        {
-            n = 1; // ASCII
-        }
-        else if ((*c & 0xc0) == 0x80)
-        {
-            return false; // not valid
-        }
-        else if ((*c & 0xe0) == 0xc0)
-        {
-            n = 2;
-        }
-        else if ((*c & 0xf0) == 0xe0)
-        {
-            n = 3;
-        }
-        else if ((*c & 0xf8) == 0xf0)
-        {
-            n = 4;
-        }
-        else if ((*c & 0xfc) == 0xf8)
-        {
-            n = 5;
-        }
-        else if ((*c & 0xfe) == 0xfc)
-        {
-            n = 6;
-        }
-        else
-        {
-            return false;
-        }
-
-        for (int m = 1; m < n; m++)
-        {
-            if ((c[m] & 0xc0) != 0x80)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 QString Utils::removeTrailingDirSeparator(QString const& path)
 {
     int i = path.size();
@@ -200,7 +83,7 @@ QString Utils::removeTrailingDirSeparator(QString const& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
+int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -210,10 +93,10 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
     option.font = view->font();
 
     return view->style()->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).
-               width();
+        width();
 }
 
-int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
+int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);
@@ -225,7 +108,7 @@ int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
 
 QColor Utils::getFadedColor(QColor const& color)
 {
-    QColor fadedColor(color);
-    fadedColor.setAlpha(128);
-    return fadedColor;
+    QColor faded_color(color);
+    faded_color.setAlpha(128);
+    return faded_color;
 }

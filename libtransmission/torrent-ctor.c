@@ -80,13 +80,13 @@ static void clearMetainfo(tr_ctor* ctor)
     setSourceFile(ctor, NULL);
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     int err;
 
     clearMetainfo(ctor);
     err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
-    ctor->isSet_metainfo = !err;
+    ctor->isSet_metainfo = err == 0;
     return err;
 }
 
@@ -151,15 +151,13 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         {
             char const* name;
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL))
+            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL) &&
+                !tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
             {
-                if (!tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
-                {
-                    name = NULL;
-                }
+                name = NULL;
             }
 
-            if (name == NULL || *name == '\0')
+            if (tr_str_is_empty(name))
             {
                 char* base = tr_sys_path_basename(filename, NULL);
 
@@ -338,7 +336,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     args->downloadDir = NULL;
     args->isSet_downloadDir = false;
 
-    if (directory != NULL && *directory != '\0')
+    if (!tr_str_is_empty(directory))
     {
         args->isSet_downloadDir = true;
         args->downloadDir = tr_strdup(directory);

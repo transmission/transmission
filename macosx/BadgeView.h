@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+
+#include <libtransmission/transmission.h>
 
 @interface BadgeView : NSView
 {
@@ -33,7 +34,7 @@
     BOOL fQuitting;
 }
 
-- (id) initWithLib: (tr_session *) lib;
+- (instancetype) initWithLib: (tr_session *) lib;
 
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;

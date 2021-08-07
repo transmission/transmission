@@ -35,7 +35,7 @@
 
 @implementation PortChecker
 
-- (id) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate
+- (instancetype) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate
 {
     if ((self = [super init]))
     {
@@ -71,7 +71,7 @@
 
 - (void) connection: (NSURLConnection *) connection didReceiveResponse: (NSURLResponse *) response
 {
-    [fPortProbeData setLength: 0];
+    fPortProbeData.length = 0;
 }
 
 - (void) connection: (NSURLConnection *) connection didReceiveData: (NSData *) data
@@ -81,7 +81,7 @@
 
 - (void) connection: (NSURLConnection *) connection didFailWithError: (NSError *) error
 {
-    NSLog(@"Unable to get port status: connection failed (%@)", [error localizedDescription]);
+    NSLog(@"Unable to get port status: connection failed (%@)", error.localizedDescription);
     [self callBackWithStatus: PORT_STATUS_ERROR];
 }
 

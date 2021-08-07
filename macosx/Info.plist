@@ -33,8 +33,6 @@
 	<string>TransmissionHelp</string>
 	<key>CFBundleHelpBookName</key>
 	<string>Transmission Help</string>
-	<key>CFBundleIconFile</key>
-	<string>Transmission</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.m0k.transmission</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -59,7 +57,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>VCS_REVISION_NUM</string>
+	<string>BUILD_STRING_INFOPLIST</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -72,7 +70,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2005-2016 The Transmission Project</string>
+	<string>Copyright © 2005-2020 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

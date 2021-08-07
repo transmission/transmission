@@ -27,8 +27,8 @@
     NSNetService * fService;
 }
 
-+ (BonjourController *) defaultController;
-+ (BOOL) defaultControllerExists;
+@property (nonatomic, class, readonly) BonjourController * defaultController;
+@property (nonatomic, class, readonly) BOOL defaultControllerExists;
 
 - (void) startWithPort: (int) port;
 - (void) stop;

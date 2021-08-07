@@ -8,16 +8,11 @@
 
 /*
  * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h;
- * most of the remaining headers in libtransmission are private.
+ * The other public API headers are variant.h and utils.h.
+ * Most of the remaining headers in libtransmission are private.
  */
 
 #pragma once
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /***
 ****
@@ -31,6 +26,8 @@ extern "C"
 #include <time.h> /* time_t */
 
 #include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
@@ -48,6 +45,8 @@ struct tr_error;
 struct tr_variant;
 
 typedef int8_t tr_priority_t;
+
+typedef int (* tr_voidptr_compare_func)(void const* lhs, void const* rhs);
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
@@ -111,6 +110,7 @@ char const* tr_getDefaultDownloadDir(void);
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 #define TR_DEFAULT_RPC_HOST_WHITELIST ""
 #define TR_DEFAULT_RPC_PORT_STR "9091"
+#define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "default"
@@ -142,7 +142,7 @@ void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
- * FIXME: this probably belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param session          the session to query
  * @param setme_dictionary the dictionary to populate
@@ -154,7 +154,7 @@ void tr_sessionGetSettings(tr_session* session, struct tr_variant* setme_diction
  * Load settings from the configuration directory's settings.json file,
  * using libtransmission's default settings as fallbacks for missing keys.
  *
- * FIXME: this belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param dictionary pointer to an uninitialized tr_variant
  * @param configDir the configuration directory to find settings.json
@@ -170,7 +170,7 @@ bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* configDir
  * Add the session's configuration settings to the benc dictionary
  * and save it to the configuration directory's settings.json file.
  *
- * FIXME: this belongs in libtransmissionapp
+ * TODO: if we ever make libtransmissionapp, this would go there.
  *
  * @param session    the session to save
  * @param configDir  the directory to write to
@@ -564,7 +564,6 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 typedef void (* tr_altSpeedFunc)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionClearAltSpeedFunc(tr_session*);
 void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);
@@ -601,6 +600,15 @@ bool tr_sessionGetDeleteSource(tr_session const*);
 
 tr_priority_t tr_torrentGetPriority(tr_torrent const*);
 void tr_torrentSetPriority(tr_torrent*, tr_priority_t);
+
+void tr_sessionSetAntiBruteForceThreshold(tr_session*, int bad_requests);
+int tr_sessionGetAntiBruteForceThreshold(tr_session const*);
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session*, bool enabled);
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
+
+/**
+**/
 
 /***
 ****
@@ -719,6 +727,7 @@ void tr_sessionSetTorrentDoneScript(tr_session*, char const* scriptFilename);
 
 typedef enum
 {
+    TR_LOG_SILENT = 0,
     TR_LOG_ERROR = 1,
     TR_LOG_INFO = 2,
     TR_LOG_DEBUG = 3,
@@ -852,7 +861,7 @@ void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet);
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len);
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len);
 
 /** @brief Set the constructor's metainfo from a local .torrent file */
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);
@@ -958,8 +967,8 @@ void tr_metainfoFree(tr_info* inf);
  * Returns a pointer to the torrent on success, or NULL on failure.
  *
  * @param ctor               the builder struct
- * @param setme_error        TR_PARSE_ERR if the parsing failed;
- *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ * @param setme_error        TR_PARSE_ERR if the parsing failed.
+ *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate.
  *                           TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  * @param setme_duplicate_id when setmeError is TR_PARSE_DUPLICATE,
  *                           this field is set to the duplicate torrent's id.
@@ -1572,8 +1581,8 @@ typedef struct tr_file
     uint64_t length; /* Length of the file, in bytes */
     char* name; /* Path to the file */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
-    int8_t is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
+    bool dnd; /* "do not download" flag */
+    bool is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
     tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
     tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     uint64_t offset; /* file begins at the torrent's nth byte */
@@ -1586,7 +1595,7 @@ typedef struct tr_piece
     time_t timeChecked; /* the last time we tested this piece */
     uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
+    bool dnd; /* "do not download" flag */
 }
 tr_piece;
 
@@ -1636,7 +1645,8 @@ struct tr_info
 
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tr_torrentInfo(tor)->fileCount > 0;
+    tr_info const* const inf = tr_torrentInfo(tor);
+    return (inf != NULL) && (inf->fileCount > 0);
 }
 
 /**
@@ -1826,6 +1836,12 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
 
+    /** The last time during this session that a rarely-changing field
+        changed -- e.g. any tr_info field (trackers, filenames, name)
+        or download directory. RPC clients can monitor this to know when
+        to reload fields that rarely change. */
+    time_t editDate;
+
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
     int idleSecs;
@@ -1860,13 +1876,16 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateAdded() instead */
 TR_DEPRECATED void tr_torrentSetAddedDate(tr_torrent* torrent, time_t addedDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateActive() instead */
 TR_DEPRECATED void tr_torrentSetActivityDate(tr_torrent* torrent, time_t activityDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateDone() instead */
 TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 
 /** @} */
@@ -1877,6 +1896,4 @@ static inline bool tr_isDirection(tr_direction d)
     return d == TR_UP || d == TR_DOWN;
 }
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

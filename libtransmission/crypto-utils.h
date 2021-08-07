@@ -13,12 +13,10 @@
 #include <stddef.h>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 /**
 *** @addtogroup utils Utilities
@@ -33,6 +31,12 @@ typedef void* tr_rc4_ctx_t;
 typedef void* tr_dh_ctx_t;
 /** @brief Opaque DH secret key type. */
 typedef void* tr_dh_secret_t;
+/** @brief Opaque SSL context type. */
+typedef void* tr_ssl_ctx_t;
+/** @brief Opaque X509 certificate store type. */
+typedef void* tr_x509_store_t;
+/** @brief Opaque X509 certificate type. */
+typedef void* tr_x509_cert_t;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.
@@ -113,6 +117,26 @@ void tr_dh_secret_free(tr_dh_secret_t handle);
 void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size);
 
 /**
+ * @brief Get X509 certificate store from SSL context.
+ */
+tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle);
+
+/**
+ * @brief Add certificate to X509 certificate store.
+ */
+bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
+
+/**
+ * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
+ */
+tr_x509_cert_t tr_x509_cert_new(void const* der_data, size_t der_data_size);
+
+/**
+ * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
+ */
+void tr_x509_cert_free(tr_x509_cert_t handle);
+
+/**
  * @brief Returns a random number in the range of [0...upper_bound).
  */
 int tr_rand_int(int upper_bound);
@@ -167,7 +191,7 @@ void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 /**
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
+static inline void tr_sha1_to_hex(void* hex, void const* sha1)
 {
     tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);
 }
@@ -175,15 +199,13 @@ static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_hex_to_sha1(uint8_t* sha1, char const* hex)
+static inline void tr_hex_to_sha1(void* sha1, void const* hex)
 {
     tr_hex_to_binary(hex, sha1, SHA_DIGEST_LENGTH);
 }
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS
 
 #endif /* TR_CRYPTO_UTILS_H */
