@@ -24,7 +24,7 @@
 
 @interface FileListNode (Private)
 
-- (id) initWithFolder: (BOOL) isFolder name: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
+- (instancetype) initWithFolder: (BOOL) isFolder name: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
 
 @end
 
@@ -35,7 +35,7 @@
     NSMutableArray * _children;
 }
 
-- (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
+- (instancetype) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
 {
     if ((self = [self initWithFolder: YES name: name path: path torrent: torrent]))
     {
@@ -46,7 +46,7 @@
     return self;
 }
 
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent
+- (instancetype) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent
 {
     if ((self = [self initWithFolder: NO name: name path: path torrent: torrent]))
     {
@@ -82,7 +82,7 @@
 - (NSString *) description
 {
     if (!_isFolder)
-        return [NSString stringWithFormat: @"%@ (%ld)", _name, [_indexes firstIndex]];
+        return [NSString stringWithFormat: @"%@ (%ld)", _name, _indexes.firstIndex];
     else
         return [NSString stringWithFormat: @"%@ (folder: %@)", _name, _indexes];
 }
@@ -90,8 +90,8 @@
 - (NSImage *) icon
 {
     if (!_icon)
-        _icon = [[NSWorkspace sharedWorkspace] iconForFileType: _isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
-                                                                          : [_name pathExtension]];
+        _icon = [NSWorkspace.sharedWorkspace iconForFileType: _isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
+                                                                          : _name.pathExtension];
     return _icon;
 }
 
@@ -113,8 +113,8 @@
     NSParameterAssert(newName != nil);
     NSParameterAssert(path != nil);
 
-    NSArray * lookupPathComponents = [path pathComponents];
-    NSArray * thesePathComponents = [self.path pathComponents];
+    NSArray * lookupPathComponents = path.pathComponents;
+    NSArray * thesePathComponents = self.path.pathComponents;
 
     if ([lookupPathComponents isEqualToArray: thesePathComponents]) //this node represents what's being renamed
     {
@@ -125,7 +125,7 @@
             return YES;
         }
     }
-    else if ([lookupPathComponents count] < [thesePathComponents count]) //what's being renamed is part of this node's path
+    else if (lookupPathComponents.count < thesePathComponents.count) //what's being renamed is part of this node's path
     {
         lookupPathComponents = [lookupPathComponents arrayByAddingObject: oldName];
         const BOOL allSame = NSNotFound == [lookupPathComponents indexOfObjectWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(NSString * name, NSUInteger idx, BOOL * stop) {
@@ -137,7 +137,7 @@
             NSString * oldPathPrefix = [path stringByAppendingPathComponent: oldName];
             NSString * newPathPrefix = [path stringByAppendingPathComponent: newName];
 
-            _path = [_path stringByReplacingCharactersInRange: NSMakeRange(0, [oldPathPrefix length]) withString: newPathPrefix];
+            _path = [_path stringByReplacingCharactersInRange: NSMakeRange(0, oldPathPrefix.length) withString: newPathPrefix];
             return YES;
         }
     }
@@ -149,7 +149,7 @@
 
 @implementation FileListNode (Private)
 
-- (id) initWithFolder: (BOOL) isFolder name: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
+- (instancetype) initWithFolder: (BOOL) isFolder name: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {

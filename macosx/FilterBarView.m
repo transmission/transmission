@@ -37,13 +37,13 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    [[NSColor windowBackgroundColor] setFill];
+    [NSColor.windowBackgroundColor setFill];
     NSRectFill(rect);
     
     const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
-        [[NSColor gridColor] setFill];
+        [NSColor.gridColor setFill];
         NSRectFill(lineBorderRect);
     }
 }

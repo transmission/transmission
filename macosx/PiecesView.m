@@ -62,27 +62,27 @@ enum
 {
     [self clearView];
 
-    fTorrent = (torrent && ![torrent isMagnet]) ? torrent : nil;
+    fTorrent = (torrent && !torrent.magnet) ? torrent : nil;
     if (fTorrent)
     {
         //determine relevant values
-        fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
+        fNumPieces = MIN(fTorrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
 
-        const CGFloat width = [self bounds].size.width;
+        const CGFloat width = self.bounds.size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
 
-    NSImage * back = [[NSImage alloc] initWithSize: [self bounds].size];
+    NSImage * back = [[NSImage alloc] initWithSize: self.bounds.size];
     [back lockFocus];
 
     NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
                                 endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
-    [gradient drawInRect: [self bounds] angle: 90.0];
+    [gradient drawInRect: self.bounds angle: 90.0];
     [back unlockFocus];
 
-    [self setImage: back];
+    self.image = back;
 
     [self setNeedsDisplay];
 }
@@ -106,7 +106,7 @@ enum
     int8_t * pieces = NULL;
     float * piecesPercent = NULL;
 
-    const BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    const BOOL showAvailablity = [NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
     {
         pieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
@@ -118,7 +118,7 @@ enum
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
 
-    NSImage * image = [self image];
+    NSImage * image = self.image;
 
     NSRect fillRects[fNumPieces];
     NSColor * fillColors[fNumPieces];
@@ -135,7 +135,7 @@ enum
             {
                 if (!first && fPieces[index] != PIECE_FLASHING)
                 {
-                    pieceColor = [NSColor orangeColor];
+                    pieceColor = NSColor.orangeColor;
                     fPieces[index] = PIECE_FLASHING;
                 }
                 else
@@ -149,7 +149,7 @@ enum
         {
             if (first || fPieces[index] != PIECE_NONE)
             {
-                pieceColor = [NSColor whiteColor];
+                pieceColor = NSColor.whiteColor;
                 fPieces[index] = PIECE_NONE;
             }
         }
@@ -166,7 +166,7 @@ enum
             //always redraw "mixed"
             CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
             NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
-            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
+            pieceColor = [NSColor.whiteColor blendedColorWithFraction: percent ofColor: fullColor];
             fPieces[index] = PIECE_SOME;
         }
 
@@ -175,7 +175,7 @@ enum
             const NSInteger across = index % fAcross,
                             down = index / fAcross;
             fillRects[usedCount] = NSMakeRect(across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                                [image size].width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
+                                                image.size.width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
                                                 fWidth, fWidth);
             fillColors[usedCount] = pieceColor;
 
@@ -204,10 +204,10 @@ enum
 {
     if (fTorrent)
     {
-        const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
-        [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+        const BOOL availability = ![NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
+        [NSUserDefaults.standardUserDefaults setBool: availability forKey: @"PiecesViewShowAvailability"];
 
-        [self sendAction:[self action] to:[self target]];
+        [self sendAction:self.action to:self.target];
     }
 
     [super mouseDown: event];

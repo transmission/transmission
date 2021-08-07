@@ -24,7 +24,7 @@
 
 @interface NSString (NSStringAdditions)
 
-+ (NSString *) ellipsis;
+@property (nonatomic, class, readonly) NSString * ellipsis;
 - (NSString *) stringByAppendingEllipsis;
 
 + (NSString *) formattedUInteger: (NSUInteger) value;

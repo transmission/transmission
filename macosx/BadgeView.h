@@ -34,7 +34,7 @@
     BOOL fQuitting;
 }
 
-- (id) initWithLib: (tr_session *) lib;
+- (instancetype) initWithLib: (tr_session *) lib;
 
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;

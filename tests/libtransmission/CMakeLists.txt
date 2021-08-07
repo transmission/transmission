@@ -28,7 +28,7 @@ include_directories(
 set_property(DIRECTORY PROPERTY FOLDER "UnitTests")
 set_property(DIRECTORY PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-foreach(T bitfield blocklist clients crypto error file getopt
+foreach(T bitfield blocklist clients copy crypto error file getopt
           history json magnet makemeta metainfo move peer-msgs
           quark rename rpc session subprocess utils variant watchdir)
   set(TP libtransmission-test-${T})

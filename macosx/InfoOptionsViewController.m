@@ -44,11 +44,11 @@
 
 @implementation InfoOptionsViewController
 
-- (id) init
+- (instancetype) init
 {
     if ((self = [super initWithNibName: @"InfoOptionsView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"Options", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"Options", "Inspector view -> title");
     }
 
     return self;
@@ -58,13 +58,13 @@
 {
     [self setGlobalLabels];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateOptionsNotification:) name: @"UpdateOptionsNotification" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateOptionsNotification:) name: @"UpdateOptionsNotification" object: nil];
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
@@ -85,7 +85,7 @@
 
 - (void) updateOptions
 {
-    if ([fTorrents count] == 0)
+    if (fTorrents.count == 0)
         return;
 
     //get bandwidth info
@@ -96,7 +96,7 @@
                 uploadSpeedLimit = [torrent speedLimit: YES],
                 downloadUseSpeedLimit = [torrent usesSpeedLimit: NO] ? NSOnState : NSOffState,
                 downloadSpeedLimit = [torrent speedLimit: NO],
-                globalUseSpeedLimit = [torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState;
+                globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState;
 
     while ((torrent = [enumerator nextObject])
             && (uploadUseSpeedLimit != NSMixedState || uploadSpeedLimit != INVALID
@@ -115,61 +115,61 @@
         if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
             downloadSpeedLimit = INVALID;
 
-        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != ([torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState))
+        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != (torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState))
             globalUseSpeedLimit = NSMixedState;
     }
 
     //set upload view
-    [fUploadLimitCheck setState: uploadUseSpeedLimit];
-    [fUploadLimitCheck setEnabled: YES];
+    fUploadLimitCheck.state = uploadUseSpeedLimit;
+    fUploadLimitCheck.enabled = YES;
 
-    [fUploadLimitLabel setEnabled: uploadUseSpeedLimit == NSOnState];
-    [fUploadLimitField setEnabled: uploadUseSpeedLimit == NSOnState];
+    fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSOnState;
+    fUploadLimitField.enabled = uploadUseSpeedLimit == NSOnState;
     if (uploadSpeedLimit != INVALID)
-        [fUploadLimitField setIntValue: uploadSpeedLimit];
+        fUploadLimitField.intValue = uploadSpeedLimit;
     else
-        [fUploadLimitField setStringValue: @""];
+        fUploadLimitField.stringValue = @"";
 
     //set download view
-    [fDownloadLimitCheck setState: downloadUseSpeedLimit];
-    [fDownloadLimitCheck setEnabled: YES];
+    fDownloadLimitCheck.state = downloadUseSpeedLimit;
+    fDownloadLimitCheck.enabled = YES;
 
-    [fDownloadLimitLabel setEnabled: downloadUseSpeedLimit == NSOnState];
-    [fDownloadLimitField setEnabled: downloadUseSpeedLimit == NSOnState];
+    fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSOnState;
+    fDownloadLimitField.enabled = downloadUseSpeedLimit == NSOnState;
     if (downloadSpeedLimit != INVALID)
-        [fDownloadLimitField setIntValue: downloadSpeedLimit];
+        fDownloadLimitField.intValue = downloadSpeedLimit;
     else
-        [fDownloadLimitField setStringValue: @""];
+        fDownloadLimitField.stringValue = @"";
 
     //set global check
-    [fGlobalLimitCheck setState: globalUseSpeedLimit];
-    [fGlobalLimitCheck setEnabled: YES];
+    fGlobalLimitCheck.state = globalUseSpeedLimit;
+    fGlobalLimitCheck.enabled = YES;
 
     //get ratio and idle info
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger checkRatio = [torrent ratioSetting], checkIdle = [torrent idleSetting],
-            removeWhenFinishSeeding = [torrent removeWhenFinishSeeding] ? NSOnState : NSOffState;
-    CGFloat ratioLimit = [torrent ratioLimit];
-    NSUInteger idleLimit = [torrent idleLimitMinutes];
+    NSInteger checkRatio = torrent.ratioSetting, checkIdle = torrent.idleSetting,
+            removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSOnState : NSOffState;
+    CGFloat ratioLimit = torrent.ratioLimit;
+    NSUInteger idleLimit = torrent.idleLimitMinutes;
 
     while ((torrent = [enumerator nextObject])
             && (checkRatio != INVALID || ratioLimit != INVALID || checkIdle != INVALID || idleLimit != INVALID))
     {
-        if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
+        if (checkRatio != INVALID && checkRatio != torrent.ratioSetting)
             checkRatio = INVALID;
 
-        if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
+        if (ratioLimit != INVALID && ratioLimit != torrent.ratioLimit)
             ratioLimit = INVALID;
 
-        if (checkIdle != INVALID && checkIdle != [torrent idleSetting])
+        if (checkIdle != INVALID && checkIdle != torrent.idleSetting)
             checkIdle = INVALID;
 
-        if (idleLimit != INVALID && idleLimit != [torrent idleLimitMinutes])
+        if (idleLimit != INVALID && idleLimit != torrent.idleLimitMinutes)
             idleLimit = INVALID;
 
-        if (removeWhenFinishSeeding != NSMixedState && removeWhenFinishSeeding != ([torrent removeWhenFinishSeeding] ? NSOnState : NSOffState))
+        if (removeWhenFinishSeeding != NSMixedState && removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSOnState : NSOffState))
             removeWhenFinishSeeding = NSMixedState;
     }
 
@@ -184,15 +184,15 @@
     else
         index = -1;
     [fRatioPopUp selectItemAtIndex: index];
-    [fRatioPopUp setEnabled: YES];
+    fRatioPopUp.enabled = YES;
 
-    [fRatioLimitField setHidden: checkRatio != TR_RATIOLIMIT_SINGLE];
+    fRatioLimitField.hidden = checkRatio != TR_RATIOLIMIT_SINGLE;
     if (ratioLimit != INVALID)
-        [fRatioLimitField setFloatValue: ratioLimit];
+        fRatioLimitField.floatValue = ratioLimit;
     else
-        [fRatioLimitField setStringValue: @""];
+        fRatioLimitField.stringValue = @"";
 
-    [fRatioLimitGlobalLabel setHidden: checkRatio != TR_RATIOLIMIT_GLOBAL];
+    fRatioLimitGlobalLabel.hidden = checkRatio != TR_RATIOLIMIT_GLOBAL;
 
     //set idle view
     if (checkIdle == TR_IDLELIMIT_SINGLE)
@@ -204,30 +204,30 @@
     else
         index = -1;
     [fIdlePopUp selectItemAtIndex: index];
-    [fIdlePopUp setEnabled: YES];
+    fIdlePopUp.enabled = YES;
 
-    [fIdleLimitField setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
+    fIdleLimitField.hidden = checkIdle != TR_IDLELIMIT_SINGLE;
     if (idleLimit != INVALID)
-        [fIdleLimitField setIntegerValue: idleLimit];
+        fIdleLimitField.integerValue = idleLimit;
     else
-        [fIdleLimitField setStringValue: @""];
-    [fIdleLimitLabel setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
+        fIdleLimitField.stringValue = @"";
+    fIdleLimitLabel.hidden = checkIdle != TR_IDLELIMIT_SINGLE;
 
-    [fIdleLimitGlobalLabel setHidden: checkIdle != TR_IDLELIMIT_GLOBAL];
+    fIdleLimitGlobalLabel.hidden = checkIdle != TR_IDLELIMIT_GLOBAL;
 
     //set remove transfer when seeding finishes
-    [fRemoveSeedingCompleteCheck setState: removeWhenFinishSeeding];
-    [fRemoveSeedingCompleteCheck setEnabled: YES];
+    fRemoveSeedingCompleteCheck.state = removeWhenFinishSeeding;
+    fRemoveSeedingCompleteCheck.enabled = YES;
 
     //get priority info
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger priority = [torrent priority];
+    NSInteger priority = torrent.priority;
 
     while ((torrent = [enumerator nextObject]) && priority != INVALID)
     {
-        if (priority != INVALID && priority != [torrent priority])
+        if (priority != INVALID && priority != torrent.priority)
             priority = INVALID;
     }
 
@@ -241,17 +241,17 @@
     else
         index = -1;
     [fPriorityPopUp selectItemAtIndex: index];
-    [fPriorityPopUp setEnabled: YES];
+    fPriorityPopUp.enabled = YES;
 
     //get peer info
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger maxPeers = [torrent maxPeerConnect];
+    NSInteger maxPeers = torrent.maxPeerConnect;
 
     while ((torrent = [enumerator nextObject]))
     {
-        if (maxPeers != [torrent maxPeerConnect])
+        if (maxPeers != torrent.maxPeerConnect)
         {
             maxPeers = INVALID;
             break;
@@ -259,49 +259,49 @@
     }
 
     //set peer view
-    [fPeersConnectField setEnabled: YES];
-    [fPeersConnectLabel setEnabled: YES];
+    fPeersConnectField.enabled = YES;
+    fPeersConnectLabel.enabled = YES;
     if (maxPeers != INVALID)
-        [fPeersConnectField setIntValue: maxPeers];
+        fPeersConnectField.intValue = maxPeers;
     else
-        [fPeersConnectField setStringValue: @""];
+        fPeersConnectField.stringValue = @"";
 }
 
 - (void) setUseSpeedLimit: (id) sender
 {
     const BOOL upload = sender == fUploadLimitCheck;
 
-    if ([(NSButton *)sender state] == NSMixedState)
+    if (((NSButton *)sender).state == NSMixedState)
         [sender setState: NSOnState];
-    const BOOL limit = [(NSButton *)sender state] == NSOnState;
+    const BOOL limit = ((NSButton *)sender).state == NSOnState;
 
     for (Torrent * torrent in fTorrents)
         [torrent setUseSpeedLimit: limit upload: upload];
 
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
-    [field setEnabled: limit];
+    field.enabled = limit;
     if (limit)
     {
         [field selectText: self];
-        [[[self view] window] makeKeyAndOrderFront: self];
+        [self.view.window makeKeyAndOrderFront: self];
     }
 
     NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
-    [label setEnabled: limit];
+    label.enabled = limit;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setUseGlobalSpeedLimit: (id) sender
 {
-    if ([(NSButton *)sender state] == NSMixedState)
+    if (((NSButton *)sender).state == NSMixedState)
         [sender setState: NSOnState];
-    const BOOL limit = [(NSButton *)sender state] == NSOnState;
+    const BOOL limit = ((NSButton *)sender).state == NSOnState;
 
     for (Torrent * torrent in fTorrents)
-        [torrent setUseGlobalSpeedLimit: limit];
+        torrent.usesGlobalSpeedLimit = limit;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setSpeedLimit: (id) sender
@@ -312,7 +312,7 @@
     for (Torrent * torrent in fTorrents)
         [torrent setSpeedLimit: limit upload: upload];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setRatioSetting: (id) sender
@@ -337,18 +337,18 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setRatioSetting: setting];
+        torrent.ratioSetting = setting;
 
-    [fRatioLimitField setHidden: !single];
+    fRatioLimitField.hidden = !single;
     if (single)
     {
         [fRatioLimitField selectText: self];
-        [[[self view] window] makeKeyAndOrderFront: self];
+        [self.view.window makeKeyAndOrderFront: self];
     }
 
-    [fRatioLimitGlobalLabel setHidden: setting != TR_RATIOLIMIT_GLOBAL];
+    fRatioLimitGlobalLabel.hidden = setting != TR_RATIOLIMIT_GLOBAL;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setRatioLimit: (id) sender
@@ -356,9 +356,9 @@
     const CGFloat limit = [sender floatValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setRatioLimit: limit];
+        torrent.ratioLimit =  limit;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setIdleSetting: (id) sender
@@ -383,19 +383,19 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setIdleSetting: setting];
+        torrent.idleSetting = setting;
 
-    [fIdleLimitField setHidden: !single];
-    [fIdleLimitLabel setHidden: !single];
+    fIdleLimitField.hidden = !single;
+    fIdleLimitLabel.hidden = !single;
     if (single)
     {
         [fIdleLimitField selectText: self];
-        [[[self view] window] makeKeyAndOrderFront: self];
+        [self.view.window makeKeyAndOrderFront: self];
     }
 
-    [fIdleLimitGlobalLabel setHidden: setting != TR_IDLELIMIT_GLOBAL];
+    fIdleLimitGlobalLabel.hidden = setting != TR_IDLELIMIT_GLOBAL;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setIdleLimit: (id) sender
@@ -403,21 +403,21 @@
     const NSUInteger limit = [sender integerValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setIdleLimitMinutes: limit];
+        torrent.idleLimitMinutes = limit;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (IBAction) setRemoveWhenSeedingCompletes: (id) sender
 {
-    if ([(NSButton *)sender state] == NSMixedState)
+    if (((NSButton *)sender).state == NSMixedState)
         [sender setState: NSOnState];
-    const BOOL enable = [(NSButton *)sender state] == NSOnState;
+    const BOOL enable = ((NSButton *)sender).state == NSOnState;
 
     for (Torrent * torrent in fTorrents)
-        [torrent setRemoveWhenFinishSeeding: enable];
+        torrent.removeWhenFinishSeeding = enable;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setPriority: (id) sender
@@ -440,11 +440,11 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setPriority: priority];
+        torrent.priority = priority;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setPeersConnectLimit: (id) sender
@@ -452,14 +452,14 @@
     NSInteger limit = [sender intValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setMaxPeerConnect: limit];
+        torrent.maxPeerConnect = limit;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    fInitialString = [control stringValue];
+    fInitialString = control.stringValue;
 
     return YES;
 }
@@ -469,7 +469,7 @@
     NSBeep();
     if (fInitialString)
     {
-        [control setStringValue: fInitialString];
+        control.stringValue = fInitialString;
         fInitialString = nil;
     }
     return NO;
@@ -481,45 +481,45 @@
 
 - (void) setupInfo
 {
-    if ([fTorrents count] == 0)
+    if (fTorrents.count == 0)
     {
-        [fUploadLimitCheck setEnabled: NO];
-        [fUploadLimitCheck setState: NSOffState];
-        [fUploadLimitField setEnabled: NO];
-        [fUploadLimitLabel setEnabled: NO];
-        [fUploadLimitField setStringValue: @""];
+        fUploadLimitCheck.enabled = NO;
+        fUploadLimitCheck.state = NSOffState;
+        fUploadLimitField.enabled = NO;
+        fUploadLimitLabel.enabled = NO;
+        fUploadLimitField.stringValue = @"";
 
-        [fDownloadLimitCheck setEnabled: NO];
-        [fDownloadLimitCheck setState: NSOffState];
-        [fDownloadLimitField setEnabled: NO];
-        [fDownloadLimitLabel setEnabled: NO];
-        [fDownloadLimitField setStringValue: @""];
+        fDownloadLimitCheck.enabled = NO;
+        fDownloadLimitCheck.state = NSOffState;
+        fDownloadLimitField.enabled = NO;
+        fDownloadLimitLabel.enabled = NO;
+        fDownloadLimitField.stringValue = @"";
 
-        [fGlobalLimitCheck setEnabled: NO];
-        [fGlobalLimitCheck setState: NSOffState];
+        fGlobalLimitCheck.enabled = NO;
+        fGlobalLimitCheck.state = NSOffState;
 
-        [fPriorityPopUp setEnabled: NO];
+        fPriorityPopUp.enabled = NO;
         [fPriorityPopUp selectItemAtIndex: -1];
 
-        [fRatioPopUp setEnabled: NO];
+        fRatioPopUp.enabled = NO;
         [fRatioPopUp selectItemAtIndex: -1];
-        [fRatioLimitField setHidden: YES];
-        [fRatioLimitField setStringValue: @""];
-        [fRatioLimitGlobalLabel setHidden: YES];
+        fRatioLimitField.hidden = YES;
+        fRatioLimitField.stringValue = @"";
+        fRatioLimitGlobalLabel.hidden = YES;
 
-        [fIdlePopUp setEnabled: NO];
+        fIdlePopUp.enabled = NO;
         [fIdlePopUp selectItemAtIndex: -1];
-        [fIdleLimitField setHidden: YES];
-        [fIdleLimitField setStringValue: @""];
-        [fIdleLimitLabel setHidden: YES];
-        [fIdleLimitGlobalLabel setHidden: YES];
+        fIdleLimitField.hidden = YES;
+        fIdleLimitField.stringValue = @"";
+        fIdleLimitLabel.hidden = YES;
+        fIdleLimitGlobalLabel.hidden = YES;
 
-        [fRemoveSeedingCompleteCheck setEnabled: NO];
-        [fRemoveSeedingCompleteCheck setState: NSOffState];
+        fRemoveSeedingCompleteCheck.enabled = NO;
+        fRemoveSeedingCompleteCheck.state = NSOffState;
 
-        [fPeersConnectField setEnabled: NO];
-        [fPeersConnectField setStringValue: @""];
-        [fPeersConnectLabel setEnabled: NO];
+        fPeersConnectField.enabled = NO;
+        fPeersConnectField.stringValue = @"";
+        fPeersConnectLabel.enabled = NO;
     }
     else
         [self updateOptions];
@@ -527,27 +527,27 @@
 
 - (void) setGlobalLabels
 {
-    NSString * global = [[NSUserDefaults standardUserDefaults] boolForKey: @"RatioCheck"]
-        ? [NSString stringForRatio: [[NSUserDefaults standardUserDefaults] floatForKey: @"RatioLimit"]]
+    NSString * global = [NSUserDefaults.standardUserDefaults boolForKey: @"RatioCheck"]
+        ? [NSString stringForRatio: [NSUserDefaults.standardUserDefaults floatForKey: @"RatioLimit"]]
         : NSLocalizedString(@"disabled", "Info options -> global setting");
-    [fRatioLimitGlobalLabel setStringValue: global];
+    fRatioLimitGlobalLabel.stringValue = global;
 
     //idle field
     NSString * globalIdle;
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"IdleLimitCheck"])
+    if ([NSUserDefaults.standardUserDefaults boolForKey: @"IdleLimitCheck"])
     {
-        const NSInteger globalMin = [[NSUserDefaults standardUserDefaults] integerForKey: @"IdleLimitMinutes"];
+        const NSInteger globalMin = [NSUserDefaults.standardUserDefaults integerForKey: @"IdleLimitMinutes"];
         globalIdle = globalMin == 1 ? NSLocalizedString(@"1 minute", "Info options -> global setting")
             : [NSString localizedStringWithFormat: NSLocalizedString(@"%d minutes", "Info options -> global setting"), globalMin];
     }
     else
         globalIdle = NSLocalizedString(@"disabled", "Info options -> global setting");
-    [fIdleLimitGlobalLabel setStringValue: globalIdle];
+    fIdleLimitGlobalLabel.stringValue = globalIdle;
 }
 
 - (void) updateOptionsNotification: (NSNotification *) notification
 {
-    if ([notification object] != self)
+    if (notification.object != self)
         [self updateOptions];
 }
 

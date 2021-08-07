@@ -50,7 +50,7 @@
 + (CreatorWindowController *) createTorrentFile: (tr_session *) handle;
 + (CreatorWindowController *) createTorrentFile: (tr_session *) handle forFile: (NSURL *) file;
 
-- (id) initWithHandle: (tr_session *) handle path: (NSURL *) path;
+- (instancetype) initWithHandle: (tr_session *) handle path: (NSURL *) path;
 
 - (IBAction) setLocation: (id) sender;
 - (IBAction) create: (id) sender;
