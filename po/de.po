@@ -1831,7 +1831,7 @@ msgstr "Port ist <b>offen</b>"
 
 #: ../gtk/tr-prefs.c:1129
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>TCP-Port wird getestet …<i>"
+msgstr "<i>TCP-Port wird getestet …</i>"
 
 #: ../gtk/tr-prefs.c:1155
 msgid "Listening Port"
