@@ -124,6 +124,35 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
     }
 }
 
+void c_tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
+{
+    tr_block_index_t f;
+    tr_block_index_t l;
+    tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
+
+    for (tr_block_index_t i = f; i <= l; ++i)
+    {
+        c_tr_cpBlockAdd(cp, i);
+    }
+    tr_bitfieldAddRange(&cp->blockBitfield, f, l+1); // l+1 because tr_bitfieldAddRange Sets bit range [begin, end) to 1
+}
+
+void c_tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
+{
+    tr_torrent const* tor = cp->tor;
+
+    if (!tr_cpBlockIsComplete(cp, block))
+    {
+        tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
+
+        //c_tr_bitfieldAdd(&cp->blockBitfield, block); //replaced by tr_bitfieldAddRange for performance optimization
+        cp->sizeNow += tr_torBlockCountBytes(tor, block);
+
+        cp->haveValidIsDirty = true;
+        cp->sizeWhenDoneIsDirty = cp->sizeWhenDoneIsDirty || tor->info.pieces[piece].dnd;
+    }
+}
+
 /***
 ****
 ***/

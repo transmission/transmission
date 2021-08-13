@@ -881,6 +881,32 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+static bool fileExists( const char * filename, time_t * optional_mtime )
+{
+    tr_sys_file_t fd = TR_BAD_SYS_FILE;
+    fd = filename == NULL ? TR_BAD_SYS_FILE : tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    if (fd != TR_BAD_SYS_FILE)
+    {
+        tr_sys_file_close(fd, NULL);
+        return true;
+    }
+    else return false;
+}
+
+static bool
+torrentDataExists( const tr_torrent * tor )
+{
+    char * path;
+    bool exists;
+    if( !tr_torrentHasMetadata( tor ) )
+        return false;
+    path = tr_buildPath( tr_torrentGetCurrentDir( tor ),
+                         tr_torrentName( tor ), NULL );
+    exists = fileExists( path, NULL );
+    tr_free( path );
+    return exists;
+}
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -1649,6 +1675,21 @@ void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool ha
     }
 }
 
+void c_tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool has)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(pieceIndex < tor->info.pieceCount);
+
+    if (has)
+    {
+        c_tr_cpPieceAdd(&tor->completion, pieceIndex);
+    }
+    else
+    {
+        tr_cpPieceRem(&tor->completion, pieceIndex);
+    }
+}
+
 /***
 ****
 ***/
@@ -1914,6 +1955,19 @@ static void onVerifyDone(tr_torrent* tor, bool aborted, void* vdata)
     tr_runInEventThread(tor->session, onVerifyDoneThreadFunc, data);
 }
 
+static bool
+quickVerify( tr_torrent * tor )
+{
+    if( torrentDataExists( tor ) )
+        {
+            return false;
+        }
+    tr_cpDestruct( &tor->completion );
+    tor->anyDate = tr_time( );
+    tr_torrentSetDirty( tor );
+    return true;
+}
+
 static void verifyTorrent(void* vdata)
 {
     bool startAfter;
@@ -1945,7 +1999,10 @@ static void verifyTorrent(void* vdata)
     }
     else
     {
-        tr_verifyAdd(tor, onVerifyDone, data);
+        if( quickVerify( tor ) )
+            onVerifyDone( tor, false, data);
+        else
+            tr_verifyAdd(tor, onVerifyDone, data);
     }
 
 unlock:
@@ -1962,6 +2019,64 @@ void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* 
     data->callback_func = callback_func;
     data->callback_data = callback_data;
     tr_runInEventThread(tor->session, verifyTorrent, data);
+}
+
+static void
+setExistingFilesVerified( tr_torrent * tor )
+{
+    tr_file_index_t fi;
+    tr_piece_index_t pi;
+    const tr_info * info = tr_torrentInfo( tor );
+    bool * missing = tr_new0( bool, info->pieceCount );
+    
+    for( fi = 0; fi < info->fileCount; ++fi  )
+    {
+        const tr_file * file = &info->files[fi];
+        const bool have = !file->dnd
+            && tr_torrentFindFile2( tor, fi, NULL, NULL, NULL );
+
+        for( pi = file->firstPiece; pi <= file->lastPiece; ++pi )
+            if( !missing[pi] && !have )
+                missing[pi] = true;
+    }
+    for( pi = 0; pi < info->pieceCount; ++pi )
+    {
+        c_tr_torrentSetHasPiece( tor, pi, !missing[pi] );
+        tr_torrentSetPieceChecked( tor, pi );
+    }
+    tr_free( missing );
+}
+
+static void
+setTorrentFilesVerified( void * vtor )
+{
+    tr_torrent * tor = vtor;
+    bool startAfter = true;
+
+    TR_ASSERT( tr_isTorrent( tor ) );
+    tr_sessionLock( tor->session );
+
+    tr_verifyRemove( tor );
+    if( tor->startAfterVerify || tor->isRunning ) {
+        startAfter = !tor->isStopping;
+        tr_torrentStop( tor );
+    }
+
+    setExistingFilesVerified( tor );
+    tor->anyDate = tr_time( );
+    tr_torrentRecheckCompleteness( tor );
+
+    if( startAfter )
+        torrentStart( tor, true );
+
+    tr_sessionUnlock( tor->session );
+}
+
+void
+tr_torrentSetFilesVerified( tr_torrent * tor )
+{
+    if( tr_isTorrent( tor ) )
+        tr_runInEventThread( tor->session, setTorrentFilesVerified, tor );
 }
 
 void tr_torrentSave(tr_torrent* tor)

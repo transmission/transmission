@@ -425,7 +425,28 @@ static char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_va
     for (int i = 0; i < torrentCount; ++i)
     {
         tr_torrent* tor = torrents[i];
-        tr_torrentVerify(tor, NULL, NULL);
+        tr_torrentVerify(tor, NULL, NULL); 
+        notify(session, TR_RPC_TORRENT_CHANGED, tor);
+    }
+
+    tr_free(torrents);
+    return NULL;
+}
+
+static char const* torrentSkipVerify(tr_session* session, tr_variant* args_in, tr_variant* args_out,
+    struct tr_rpc_idle_data* idle_data)
+{
+    TR_UNUSED(args_out);
+    TR_UNUSED(idle_data);
+    TR_ASSERT(idle_data == NULL);
+
+    int torrentCount;
+    tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
+
+    for (int i = 0; i < torrentCount; ++i)
+    {
+        tr_torrent* tor = torrents[i];
+        tr_torrentSetFilesVerified( tor );
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 
@@ -2703,6 +2724,7 @@ methods[] =
     { "torrent-start-now", true, torrentStartNow },
     { "torrent-stop", true, torrentStop },
     { "torrent-verify", true, torrentVerify },
+    { "torrent-skip-verify", true, torrentSkipVerify },
     { "torrent-reannounce", true, torrentReannounce },
     { "queue-move-top", true, queueMoveTop },
     { "queue-move-up", true, queueMoveUp },

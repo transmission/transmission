@@ -338,6 +338,7 @@ static tr_option opts[] =
     { 830, "utp", "Enable uTP for peer connections", NULL, false, NULL },
     { 831, "no-utp", "Disable uTP for peer connections", NULL, false, NULL },
     { 'v', "verify", "Verify the current torrent(s)", "v", false, NULL },
+    { 'T', "skip-verify", "Skip verifying the current torrent(s)", "T", false, NULL },
     { 'V', "version", "Show version number and exit", "V", false, NULL },
     { 'w', "download-dir", "When used in conjunction with --add, set the new torrent's download folder. "
         "Otherwise, set the default download folder", "w", true, "<path>" },
@@ -385,7 +386,8 @@ enum
     MODE_SESSION_STATS = (1 << 11),
     MODE_SESSION_CLOSE = (1 << 12),
     MODE_BLOCKLIST_UPDATE = (1 << 13),
-    MODE_PORT_TEST = (1 << 14)
+    MODE_PORT_TEST = (1 << 14),
+    MODE_TORRENT_SKIP_VERIFY = (1 << 15)
 };
 
 static int getOptMode(int val)
@@ -502,6 +504,9 @@ static int getOptMode(int val)
 
     case 'v': /* verify */
         return MODE_TORRENT_VERIFY;
+
+    case 'T': /* skip verify */
+	return MODE_TORRENT_SKIP_VERIFY;
 
     case 600: /* reannounce */
         return MODE_TORRENT_REANNOUNCE;
@@ -2934,6 +2939,24 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStr(top, TR_KEY_method, "torrent-verify");
+                    addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, NULL);
+                    status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 'T':
+                {
+                    tr_variant* top;
+
+                    if (tset != NULL)
+                    {
+                        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
+                        status |= flush(rpcurl, &tset);
+                    }
+
+                    top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStr(top, TR_KEY_method, "torrent-skip-verify");
                     addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, NULL);
                     status |= flush(rpcurl, &top);
                     break;
