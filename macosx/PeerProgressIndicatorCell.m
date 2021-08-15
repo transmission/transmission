@@ -25,35 +25,36 @@
 
 @implementation PeerProgressIndicatorCell
 
-- (id) copyWithZone: (NSZone *) zone
+- (id)copyWithZone:(NSZone*)zone
 {
-    PeerProgressIndicatorCell * copy = [super copyWithZone: zone];
+    PeerProgressIndicatorCell* copy = [super copyWithZone:zone];
     copy->fAttributes = fAttributes;
 
     return copy;
 }
 
-
-- (void) setSeed: (BOOL) seed
+- (void)setSeed:(BOOL)seed
 {
     fSeed = seed;
 }
 
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
-    if ([NSUserDefaults.standardUserDefaults boolForKey: @"DisplayPeerProgressBarNumber"])
+    if ([NSUserDefaults.standardUserDefaults boolForKey:@"DisplayPeerProgressBarNumber"])
     {
         if (!fAttributes)
         {
-            NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+            NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
             paragraphStyle.alignment = NSRightTextAlignment;
 
-            fAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 11.0],
-                            NSForegroundColorAttributeName: NSColor.labelColor,
-                            NSParagraphStyleAttributeName: paragraphStyle};
+            fAttributes = @{
+                NSFontAttributeName : [NSFont systemFontOfSize:11.0],
+                NSForegroundColorAttributeName : NSColor.labelColor,
+                NSParagraphStyleAttributeName : paragraphStyle
+            };
         }
 
-        [[NSString percentString: self.floatValue longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
+        [[NSString percentString:self.floatValue longDecimals:NO] drawInRect:cellFrame withAttributes:fAttributes];
     }
     else
     {
@@ -63,17 +64,20 @@
             fAttributes = nil;
         }
 
-        [super drawWithFrame: cellFrame inView: controlView];
+        [super drawWithFrame:cellFrame inView:controlView];
         if (fSeed)
         {
-            NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck"];
+            NSImage* checkImage = [NSImage imageNamed:@"CompleteCheck"];
 
-            const NSSize imageSize = checkImage.size;
-            const NSRect rect = NSMakeRect(floor(NSMidX(cellFrame) - imageSize.width * 0.5),
-                                            floor(NSMidY(cellFrame) - imageSize.height * 0.5),
-                                            imageSize.width, imageSize.height);
+            NSSize const imageSize = checkImage.size;
+            NSRect const rect = NSMakeRect(
+                floor(NSMidX(cellFrame) - imageSize.width * 0.5),
+                floor(NSMidY(cellFrame) - imageSize.height * 0.5),
+                imageSize.width,
+                imageSize.height);
 
-            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
+            [checkImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+                             hints:nil];
         }
     }
 }

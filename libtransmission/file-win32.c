@@ -19,7 +19,7 @@
 #include "utils.h"
 
 #ifndef MAXSIZE_T
-#define MAXSIZE_T ((SIZE_T)~((SIZE_T)0))
+#define MAXSIZE_T ((SIZE_T) ~((SIZE_T)0))
 #endif
 
 /* MSDN (http://msdn.microsoft.com/en-us/library/2k2xf226.aspx) only mentions
@@ -81,7 +81,11 @@ static time_t filetime_to_unix_time(FILETIME const* t)
     return tmp / 1000000UL;
 }
 
-static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, FILETIME const* mtime,
+static void stat_to_sys_path_info(
+    DWORD attributes,
+    DWORD size_low,
+    DWORD size_high,
+    FILETIME const* mtime,
     tr_sys_path_info* info)
 {
     TR_ASSERT(mtime != NULL);
@@ -153,8 +157,9 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     bool const is_unc = is_unc_path(path);
 
     /* `-2` for UNC since we overwrite existing prefix slashes */
-    int const extra_chars_before = is_relative ? 0 : (is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) - 2 :
-        TR_N_ELEMENTS(native_local_path_prefix));
+    int const extra_chars_before = is_relative ?
+        0 :
+        (is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) - 2 : TR_N_ELEMENTS(native_local_path_prefix));
 
     /* TODO (?): TR_ASSERT(!is_relative); */
 
@@ -213,7 +218,7 @@ static char* native_path_to_path(wchar_t const* wide_path)
     bool const is_local = !is_unc && wcsncmp(wide_path, native_local_path_prefix, TR_N_ELEMENTS(native_local_path_prefix)) == 0;
 
     size_t const skip_chars = is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) :
-        (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
+                                       (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
 
     char* const path = tr_win32_native_to_utf8_ex(wide_path + skip_chars, -1, is_unc ? 2 : 0, 0, NULL);
 
@@ -235,7 +240,13 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
 
     if (wide_path != NULL)
     {
-        ret = CreateFileW(wide_path, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, disposition, flags,
+        ret = CreateFileW(
+            wide_path,
+            access,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            NULL,
+            disposition,
+            flags,
             NULL);
     }
 
@@ -294,8 +305,11 @@ static bool create_dir(char const* path, int flags, int permissions, bool okay_i
     return ret;
 }
 
-static void create_temp_path(char* path_template, void (* callback)(char const* path, void* param,
-    tr_error** error), void* callback_param, tr_error** error)
+static void create_temp_path(
+    char* path_template,
+    void (*callback)(char const* path, void* param, tr_error** error),
+    void* callback_param,
+    tr_error** error)
 {
     TR_ASSERT(path_template != NULL);
     TR_ASSERT(callback != NULL);
@@ -428,8 +442,12 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
 
         if (ret)
         {
-            stat_to_sys_path_info(attributes.dwFileAttributes, attributes.nFileSizeLow, attributes.nFileSizeHigh,
-                &attributes.ftLastWriteTime, info);
+            stat_to_sys_path_info(
+                attributes.dwFileAttributes,
+                attributes.nFileSizeLow,
+                attributes.nFileSizeHigh,
+                &attributes.ftLastWriteTime,
+                info);
         }
         else
         {
@@ -543,8 +561,14 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
         goto fail;
     }
 
-    handle = CreateFileW(wide_path, FILE_READ_EA, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    handle = CreateFileW(
+        wide_path,
+        FILE_READ_EA,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS,
+        NULL);
 
     if (handle == INVALID_HANDLE_VALUE)
     {
@@ -961,8 +985,12 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
     if (ret)
     {
-        stat_to_sys_path_info(attributes.dwFileAttributes, attributes.nFileSizeLow, attributes.nFileSizeHigh,
-            &attributes.ftLastWriteTime, info);
+        stat_to_sys_path_info(
+            attributes.dwFileAttributes,
+            attributes.nFileSizeLow,
+            attributes.nFileSizeHigh,
+            &attributes.ftLastWriteTime,
+            info);
     }
     else
     {
@@ -1035,7 +1063,12 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     return ret;
 }
 
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+bool tr_sys_file_read_at(
+    tr_sys_file_t handle,
+    void* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_read,
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -1104,7 +1137,12 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     return ret;
 }
 
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_written,
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -1264,8 +1302,8 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
-    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) +
-        !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+    TR_ASSERT(
+        !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
     OVERLAPPED overlapped = { .Pointer = 0, .hEvent = NULL };

@@ -82,23 +82,21 @@ enum
     CANCEL_HISTORY_SEC = 60
 };
 
-tr_peer_event const TR_PEER_EVENT_INIT =
-{
+tr_peer_event const TR_PEER_EVENT_INIT = {
     .eventType = TR_PEER_CLIENT_GOT_BLOCK,
     .pieceIndex = 0,
     .bitfield = NULL,
     .offset = 0,
     .length = 0,
     .err = 0,
-    .port = 0
+    .port = 0,
 };
 
-tr_swarm_stats const TR_SWARM_STATS_INIT =
-{
+tr_swarm_stats const TR_SWARM_STATS_INIT = {
     .activePeerCount = { 0, 0 },
     .activeWebseedCount = 0,
     .peerCount = 0,
-    .peerFromCount = { 0, 0, 0, 0, 0, 0, 0 }
+    .peerFromCount = { 0, 0, 0, 0, 0, 0, 0 },
 };
 
 /**
@@ -156,9 +154,7 @@ static bool tr_isAtom(struct peer_atom const* atom)
 static char const* tr_atomAddrStr(struct peer_atom const* atom)
 {
     static char addrstr[TR_ADDRSTRLEN];
-    return atom != NULL ?
-        tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port) :
-        "[no atom]";
+    return atom != NULL ? tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port) : "[no atom]";
 }
 
 struct block_request
@@ -225,8 +221,7 @@ typedef struct tr_swarm
      * requests are considered 'fast' are allowed to request a block that's
      * already been requested from another (slower?) peer. */
     int endgame;
-}
-tr_swarm;
+} tr_swarm;
 
 struct tr_peerMgr
 {
@@ -735,8 +730,8 @@ static void requestListAdd(tr_swarm* s, tr_block_index_t block, tr_peer* peer)
     /* insert the request to our array... */
     {
         bool exact;
-        int const pos = tr_lowerBound(&key, s->requests, s->requestCount, sizeof(struct block_request), compareReqByBlock,
-            &exact);
+        int const
+            pos = tr_lowerBound(&key, s->requests, s->requestCount, sizeof(struct block_request), compareReqByBlock, &exact);
         TR_ASSERT(!exact);
         memmove(s->requests + pos + 1, s->requests + pos, sizeof(struct block_request) * (s->requestCount++ - pos));
         s->requests[pos] = key;
@@ -787,8 +782,7 @@ static void getBlockRequestPeers(tr_swarm* s, tr_block_index_t block, tr_ptrArra
 
 static void decrementPendingReqCount(struct block_request const* b)
 {
-    if ((b->peer != NULL) &&
-        (b->peer->pendingReqsToPeer > 0))
+    if ((b->peer != NULL) && (b->peer->pendingReqsToPeer > 0))
     {
         --b->peer->pendingReqsToPeer;
     }
@@ -1335,7 +1329,12 @@ void tr_peerMgrRebuildRequests(tr_torrent* tor)
     pieceListRebuild(tor->swarm);
 }
 
-void tr_peerMgrGetNextRequests(tr_torrent* tor, tr_peer* peer, int numwant, tr_block_index_t* setme, int* numgot,
+void tr_peerMgrGetNextRequests(
+    tr_torrent* tor,
+    tr_peer* peer,
+    int numwant,
+    tr_block_index_t* setme,
+    int* numgot,
     bool get_intervals)
 {
     /* sanity clause */
@@ -1382,7 +1381,7 @@ void tr_peerMgrGetNextRequests(tr_torrent* tor, tr_peer* peer, int numwant, tr_b
             tr_torGetPieceBlockRange(tor, p->index, &first, &last);
 
             for (tr_block_index_t b = first; b <= last && (got < numwant || (get_intervals && setme[2 * got - 1] == b - 1));
-                ++b)
+                 ++b)
             {
                 int peerCount;
                 tr_peer** peers;
@@ -1474,8 +1473,13 @@ void tr_peerMgrGetNextRequests(tr_torrent* tor, tr_peer* peer, int numwant, tr_b
             bool exact;
 
             /* relative position! */
-            int const newpos = tr_lowerBound(&s->pieces[i], &s->pieces[i + 1], s->pieceCount - (i + 1),
-                sizeof(struct weighted_piece), comparePieceByWeight, &exact);
+            int const newpos = tr_lowerBound(
+                &s->pieces[i],
+                &s->pieces[i + 1],
+                s->pieceCount - (i + 1),
+                sizeof(struct weighted_piece),
+                comparePieceByWeight,
+                &exact);
 
             if (newpos > 0)
             {
@@ -1887,8 +1891,10 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         {
             /* some protocol error from the peer */
             peer->doPurge = true;
-            tordbg(s, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error", tr_atomAddrStr(
-                peer->atom));
+            tordbg(
+                s,
+                "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                tr_atomAddrStr(peer->atom));
         }
         else
         {
@@ -1936,8 +1942,13 @@ static int getDefaultShelfLife(uint8_t from)
     }
 }
 
-static void ensureAtomExists(tr_swarm* s, tr_address const* addr, tr_port const port, uint8_t const flags,
-    int8_t const seedProbability, uint8_t const from)
+static void ensureAtomExists(
+    tr_swarm* s,
+    tr_address const* addr,
+    tr_port const port,
+    uint8_t const flags,
+    int8_t const seedProbability,
+    uint8_t const from)
 {
     TR_ASSERT(tr_address_is_valid(addr));
     TR_ASSERT(from < TR_PEER_FROM__MAX);
@@ -2012,8 +2023,13 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
 }
 
 /* FIXME: this is kind of a mess. */
-static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readAnythingFromPeer, bool isConnected,
-    uint8_t const* peer_id, void* vmanager)
+static bool myHandshakeDoneCB(
+    tr_handshake* handshake,
+    tr_peerIo* io,
+    bool readAnythingFromPeer,
+    bool isConnected,
+    uint8_t const* peer_id,
+    void* vmanager)
 {
     TR_ASSERT(io != NULL);
 
@@ -2114,7 +2130,8 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
                     client = TR_KEY_NONE;
                 }
 
-                tr_peerIo* stolen = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete() */
+                /* this steals its refcount too, which is balanced by our unref in peerDelete() */
+                tr_peerIo* stolen = tr_handshakeStealIO(handshake);
                 tr_peerIoSetParent(stolen, &s->tor->bandwidth);
                 createBitTorrentPeer(s->tor, stolen, atom, client);
 
@@ -2206,7 +2223,11 @@ void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t s
     }
 }
 
-tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+tr_pex* tr_peerMgrCompactToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* pexCount)
 {
     size_t n = compactLen / 6;
@@ -2231,7 +2252,11 @@ tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t c
     return pex;
 }
 
-tr_pex* tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+tr_pex* tr_peerMgrCompact6ToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* pexCount)
 {
     size_t n = compactLen / 18;
@@ -2271,7 +2296,11 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 
         if (tr_bitfieldHas(&peer->blame, pieceIndex))
         {
-            tordbg(s, "peer %s contributed to corrupt piece (%d); now has %d strikes", tr_atomAddrStr(peer->atom), pieceIndex,
+            tordbg(
+                s,
+                "peer %s contributed to corrupt piece (%d); now has %d strikes",
+                tr_atomAddrStr(peer->atom),
+                pieceIndex,
                 (int)peer->strikes + 1);
             addStrike(s, peer);
         }
@@ -2932,8 +2961,7 @@ typedef enum
     RECHOKE_STATE_GOOD,
     RECHOKE_STATE_UNTESTED,
     RECHOKE_STATE_BAD
-}
-tr_rechoke_state;
+} tr_rechoke_state;
 
 struct tr_rechoke_info
 {
@@ -3018,7 +3046,10 @@ static void rechokeDownloads(tr_swarm* s)
             double const cancelRate = cancels / (double)(cancels + blocks);
             double const mult = 1 - MIN(cancelRate, 0.5);
             maxPeers = s->interestedCount * mult;
-            tordbg(s, "cancel rate is %.3f -- reducing the number of peers we're interested in by %.0f percent", cancelRate,
+            tordbg(
+                s,
+                "cancel rate is %.3f -- reducing the number of peers we're interested in by %.0f percent",
+                cancelRate,
                 mult * 100);
             s->lastCancel = now;
         }
@@ -3032,8 +3063,11 @@ static void rechokeDownloads(tr_swarm* s)
             double const mult = MIN(timeSinceCancel, maxHistory) / (double)maxHistory;
             int const inc = maxIncrease * mult;
             maxPeers = s->maxPeers + inc;
-            tordbg(s, "time since last cancel is %jd -- increasing the number of peers we're interested in by %d",
-                (intmax_t)timeSinceCancel, inc);
+            tordbg(
+                s,
+                "time since last cancel is %jd -- increasing the number of peers we're interested in by %d",
+                (intmax_t)timeSinceCancel,
+                inc);
         }
     }
 
@@ -3189,8 +3223,8 @@ static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
      * because there may only be a small window of opportunity to share */
     else if (tr_torrentIsPrivate(tor))
     {
-        Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_PEER_TO_CLIENT) + tr_peerGetPieceSpeed_Bps(atom->peer, now,
-            TR_CLIENT_TO_PEER);
+        Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_PEER_TO_CLIENT) +
+            tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_CLIENT_TO_PEER);
     }
     /* downloading a public torrent */
     else
@@ -3403,7 +3437,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peerCount >= relaxStrictnessIfFewerThanN ? 1.0 :
-            peerCount / (float)relaxStrictnessIfFewerThanN;
+                                                                            peerCount / (float)relaxStrictnessIfFewerThanN;
         int const lo = MIN_UPLOAD_IDLE_SECS;
         int const hi = MAX_UPLOAD_IDLE_SECS;
         int const limit = hi - (hi - lo) * strictness;
@@ -4324,8 +4358,14 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
     tordbg(s, "Starting an OUTGOING%s connection with %s", utp ? " µTP" : "", tr_atomAddrStr(atom));
 
-    io = tr_peerIoNewOutgoing(mgr->session, &mgr->session->bandwidth, &atom->addr, atom->port, s->tor->info.hash,
-        s->tor->completeness == TR_SEED, utp);
+    io = tr_peerIoNewOutgoing(
+        mgr->session,
+        &mgr->session->bandwidth,
+        &atom->addr,
+        atom->port,
+        s->tor->info.hash,
+        s->tor->completeness == TR_SEED,
+        utp);
 
     if (io == NULL)
     {

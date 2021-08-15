@@ -34,8 +34,7 @@ typedef struct
     GtkIconTheme* icon_theme;
     int icon_size;
     GHashTable* cache;
-}
-IconCache;
+} IconCache;
 
 static IconCache* icon_cache[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
@@ -66,8 +65,7 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, int icon_size)
     icons->icon_size = get_size_in_pixels(icon_size);
     icons->cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_object_unref);
 
-    g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size,
-        icons->icon_size));
+    g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
 
     return icons;
 }

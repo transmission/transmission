@@ -31,52 +31,59 @@
 
 @interface BlocklistScheduler (Private)
 
-- (void) runUpdater;
+- (void)runUpdater;
 
 @end
 
 @implementation BlocklistScheduler
 
-BlocklistScheduler * fScheduler = nil;
-+ (BlocklistScheduler *) scheduler
+BlocklistScheduler* fScheduler = nil;
+
++ (BlocklistScheduler*)scheduler
 {
     if (!fScheduler)
+    {
         fScheduler = [[BlocklistScheduler alloc] init];
+    }
 
     return fScheduler;
 }
 
-- (void) updateSchedule
+- (void)updateSchedule
 {
     if (BlocklistDownloader.isRunning)
         return;
 
     [self cancelSchedule];
 
-    NSString * blocklistURL;
-    if (![NSUserDefaults.standardUserDefaults boolForKey: @"BlocklistNew"]
-        || !((blocklistURL = [NSUserDefaults.standardUserDefaults stringForKey: @"BlocklistURL"]) &&
-                ![blocklistURL isEqualToString: @""])
-        || ![NSUserDefaults.standardUserDefaults boolForKey: @"BlocklistAutoUpdate"])
+    NSString* blocklistURL;
+    if (![NSUserDefaults.standardUserDefaults boolForKey:@"BlocklistNew"] ||
+        !((blocklistURL = [NSUserDefaults.standardUserDefaults stringForKey:@"BlocklistURL"]) && ![blocklistURL isEqualToString:@""]) ||
+        ![NSUserDefaults.standardUserDefaults boolForKey:@"BlocklistAutoUpdate"])
+    {
         return;
+    }
 
-    NSDate * lastUpdateDate = [NSUserDefaults.standardUserDefaults objectForKey: @"BlocklistNewLastUpdate"];
+    NSDate* lastUpdateDate = [NSUserDefaults.standardUserDefaults objectForKey:@"BlocklistNewLastUpdate"];
     if (lastUpdateDate)
-        lastUpdateDate = [lastUpdateDate dateByAddingTimeInterval: FULL_WAIT];
-    NSDate * closeDate = [NSDate dateWithTimeIntervalSinceNow: SMALL_DELAY];
+    {
+        lastUpdateDate = [lastUpdateDate dateByAddingTimeInterval:FULL_WAIT];
+    }
+    NSDate* closeDate = [NSDate dateWithTimeIntervalSinceNow:SMALL_DELAY];
 
-    NSDate * useDate = lastUpdateDate ? [lastUpdateDate laterDate: closeDate] : closeDate;
+    NSDate* useDate = lastUpdateDate ? [lastUpdateDate laterDate:closeDate] : closeDate;
 
-    fTimer = [[NSTimer alloc] initWithFireDate: useDate interval: 0 target: self selector: @selector(runUpdater) userInfo: nil repeats: NO];
+    fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 target:self selector:@selector(runUpdater) userInfo:nil
+                                       repeats:NO];
 
     //current run loop usually means a second update won't work
-    NSRunLoop * loop = NSRunLoop.mainRunLoop;
-    [loop addTimer: fTimer forMode: NSDefaultRunLoopMode];
-    [loop addTimer: fTimer forMode: NSModalPanelRunLoopMode];
-    [loop addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    NSRunLoop* loop = NSRunLoop.mainRunLoop;
+    [loop addTimer:fTimer forMode:NSDefaultRunLoopMode];
+    [loop addTimer:fTimer forMode:NSModalPanelRunLoopMode];
+    [loop addTimer:fTimer forMode:NSEventTrackingRunLoopMode];
 }
 
-- (void) cancelSchedule
+- (void)cancelSchedule
 {
     [fTimer invalidate];
     fTimer = nil;
@@ -86,7 +93,7 @@ BlocklistScheduler * fScheduler = nil;
 
 @implementation BlocklistScheduler (Private)
 
-- (void) runUpdater
+- (void)runUpdater
 {
     fTimer = nil;
     [BlocklistDownloader downloader];

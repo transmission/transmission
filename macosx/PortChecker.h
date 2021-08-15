@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(unsigned int, port_status_t) {
+typedef NS_ENUM(unsigned int, port_status_t) { //
     PORT_STATUS_CHECKING,
     PORT_STATUS_OPEN,
     PORT_STATUS_CLOSED,
@@ -34,15 +34,15 @@ typedef NS_ENUM(unsigned int, port_status_t) {
     id fDelegate;
     port_status_t fStatus;
 
-    NSURLConnection * fConnection;
-    NSMutableData * fPortProbeData;
+    NSURLConnection* fConnection;
+    NSMutableData* fPortProbeData;
 
-    NSTimer * fTimer;
+    NSTimer* fTimer;
 }
 
-- (instancetype) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate;
-- (void) cancelProbe;
+- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id)delegate;
+- (void)cancelProbe;
 
-@property (nonatomic, readonly) port_status_t status;
+@property(nonatomic, readonly) port_status_t status;
 
 @end

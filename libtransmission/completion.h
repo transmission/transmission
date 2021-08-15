@@ -40,8 +40,7 @@ typedef struct tr_completion
 
     /* number of bytes we want or have now. [0..sizeWhenDone] */
     uint64_t sizeNow;
-}
-tr_completion;
+} tr_completion;
 
 /**
 *** Life Cycle

@@ -24,9 +24,10 @@
 
 @interface FileNameCell : NSActionCell
 {
-    NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
+    NSMutableDictionary* fTitleAttributes;
+    NSMutableDictionary* fStatusAttributes;
 }
 
-- (NSRect) imageRectForBounds: (NSRect) bounds;
+- (NSRect)imageRectForBounds:(NSRect)bounds;
 
 @end

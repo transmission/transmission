@@ -24,11 +24,11 @@
 
 @protocol InfoViewController
 
-- (void) setInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfo;
+- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)updateInfo;
 
 @optional
-- (void) clearView;
-- (void) saveViewSize;
+- (void)clearView;
+- (void)saveViewSize;
 
 @end

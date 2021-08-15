@@ -28,17 +28,17 @@
 
 @interface Badger : NSObject
 {
-    tr_session * fLib;
+    tr_session* fLib;
 
-    NSMutableSet * fHashes;
+    NSMutableSet* fHashes;
 }
 
-- (instancetype) initWithLib: (tr_session *) lib;
+- (instancetype)initWithLib:(tr_session*)lib;
 
-- (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
-- (void) addCompletedTorrent: (Torrent *) torrent;
-- (void) removeTorrent: (Torrent *) torrent;
-- (void) clearCompleted;
-- (void) setQuitting;
+- (void)updateBadgeWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
+- (void)addCompletedTorrent:(Torrent*)torrent;
+- (void)removeTorrent:(Torrent*)torrent;
+- (void)clearCompleted;
+- (void)setQuitting;
 
 @end

@@ -41,8 +41,7 @@ static void tier_build_log_name(struct tr_tier const* tier, char* buf, size_t bu
             tier_build_log_name(tier, name, TR_N_ELEMENTS(name)); \
             tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
         } \
-    } \
-    while (0)
+    } while (0)
 
 enum
 {
@@ -176,8 +175,7 @@ typedef struct tr_announcer
     int slotsAvailable;
     int key;
     time_t tauUpkeepAt;
-}
-tr_announcer;
+} tr_announcer;
 
 static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
 {
@@ -262,8 +260,7 @@ typedef struct
     int consecutiveFailures;
 
     uint32_t id;
-}
-tr_tracker;
+} tr_tracker;
 
 /* format: host+':'+ port */
 static char* getKey(char const* url)
@@ -353,8 +350,7 @@ typedef struct tr_tier
 
     char lastAnnounceStr[128];
     char lastScrapeStr[128];
-}
-tr_tier;
+} tr_tier;
 
 static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tier, int interval)
 {
@@ -404,7 +400,11 @@ static void tierDestruct(tr_tier* tier)
 
 static void tier_build_log_name(tr_tier const* tier, char* buf, size_t buflen)
 {
-    tr_snprintf(buf, buflen, "[%s---%s]", (tier != NULL && tier->tor != NULL) ? tr_torrentName(tier->tor) : "?",
+    tr_snprintf(
+        buf,
+        buflen,
+        "[%s---%s]",
+        (tier != NULL && tier->tor != NULL) ? tr_torrentName(tier->tor) : "?",
         (tier != NULL && tier->currentTracker != NULL) ? tier->currentTracker->key : "?");
 }
 
@@ -444,8 +444,7 @@ typedef struct tr_torrent_tiers
 
     tr_tracker_callback callback;
     void* callbackData;
-}
-tr_torrent_tiers;
+} tr_torrent_tiers;
 
 static tr_torrent_tiers* tiersNew(void)
 {
@@ -505,14 +504,13 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 ****  PUBLISH
 ***/
 
-static tr_tracker_event const TRACKER_EVENT_INIT =
-{
+static tr_tracker_event const TRACKER_EVENT_INIT = {
     .messageType = TR_TRACKER_WARNING,
     .text = NULL,
     .tracker = NULL,
     .pex = NULL,
     .pexCount = 0,
-    .seedProbability = 0
+    .seedProbability = 0,
 };
 
 static void publishMessage(tr_tier* tier, char const* msg, int type)
@@ -964,7 +962,10 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
 ****
 ***/
 
-static tr_announce_request* announce_request_new(tr_announcer const* announcer, tr_torrent* tor, tr_tier const* tier,
+static tr_announce_request* announce_request_new(
+    tr_announcer const* announcer,
+    tr_torrent* tor,
+    tr_tier const* tier,
     tr_announce_event event)
 {
     tr_announce_request* req = tr_new0(tr_announce_request, 1);
@@ -1098,7 +1099,8 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
     {
         tr_tracker* tracker;
 
-        dbgmsg(tier,
+        dbgmsg(
+            tier,
             "Got announce response: "
             "connected:%d "
             "timeout:%d "
@@ -1229,8 +1231,11 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                then a separate scrape isn't needed */
             if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == NULL))
             {
-                tr_logAddTorDbg(tier->tor, "Announce response contained scrape info; "
-                    "rescheduling next scrape to %d seconds from now.", tier->scrapeIntervalSec);
+                tr_logAddTorDbg(
+                    tier->tor,
+                    "Announce response contained scrape info; "
+                    "rescheduling next scrape to %d seconds from now.",
+                    tier->scrapeIntervalSec);
                 tier->scrapeAt = get_next_scrape_time(announcer->session, tier, tier->scrapeIntervalSec);
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
@@ -1273,7 +1278,10 @@ static void announce_request_free(tr_announce_request* req)
     tr_free(req);
 }
 
-static void announce_request_delegate(tr_announcer* announcer, tr_announce_request* request, tr_announce_response_func callback,
+static void announce_request_delegate(
+    tr_announcer* announcer,
+    tr_announce_request* request,
+    tr_announce_response_func callback,
     void* callback_data)
 {
     tr_session* session = announcer->session;
@@ -1339,11 +1347,10 @@ static bool multiscrape_too_big(char const* errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
-    static char const* const too_long_errors[] =
-    {
+    static char const* const too_long_errors[] = {
         "Bad Request",
         "GET string too long",
-        "Request-URI Too Long"
+        "Request-URI Too Long",
     };
 
     if (errmsg == NULL)
@@ -1396,9 +1403,7 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
-        if (tracker != NULL &&
-            tracker->scrape_info != NULL &&
-            tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
+        if (tracker != NULL && tracker->scrape_info != NULL && tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
         {
             return &tt->tiers[i];
         }
@@ -1424,7 +1429,8 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
             if (tier != NULL)
             {
-                dbgmsg(tier,
+                dbgmsg(
+                    tier,
                     "scraped url:%s -- "
                     "did_connect:%d "
                     "did_timeout:%d "
@@ -1537,7 +1543,10 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     }
 }
 
-static void scrape_request_delegate(tr_announcer* announcer, tr_scrape_request const* request, tr_scrape_response_func callback,
+static void scrape_request_delegate(
+    tr_announcer* announcer,
+    tr_scrape_request const* request,
+    tr_scrape_response_func callback,
     void* callback_data)
 {
     tr_session* session = announcer->session;
@@ -1647,7 +1656,10 @@ static int compareTiers(void const* va, void const* vb)
     tr_tier const* b = *(tr_tier const* const*)vb;
 
     /* primary key: larger stats come before smaller */
-    ret = compareTransfer(a->byteCounts[TR_ANN_UP], a->byteCounts[TR_ANN_DOWN], b->byteCounts[TR_ANN_UP],
+    ret = compareTransfer(
+        a->byteCounts[TR_ANN_UP],
+        a->byteCounts[TR_ANN_DOWN],
+        b->byteCounts[TR_ANN_UP],
         b->byteCounts[TR_ANN_DOWN]);
 
     /* secondary key: announcements that have been waiting longer go first */

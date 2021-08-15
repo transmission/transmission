@@ -39,7 +39,7 @@ std::string getSelfPath()
 
 std::string getCmdSelfPath()
 {
-    auto const new_suffix = std::string { ".cmd" };
+    auto const new_suffix = std::string{ ".cmd" };
     auto exec = getSelfPath();
     // replace ".exe" suffix with ".cmd"
     exec.resize(exec.size() - new_suffix.size());
@@ -47,9 +47,9 @@ std::string getCmdSelfPath()
     return exec;
 }
 
-class SubprocessTest :
-    public ::testing::Test,
-    public testing::WithParamInterface<std::string>
+class SubprocessTest
+    : public ::testing::Test
+    , public testing::WithParamInterface<std::string>
 {
 protected:
     Sandbox sandbox_;
@@ -70,9 +70,9 @@ protected:
         return path;
     }
 
-    std::string const arg_dump_args_ { "--dump-args" };
-    std::string const arg_dump_env_ { "--dump-env" };
-    std::string const arg_dump_cwd_ { "--dump-cwd" };
+    std::string const arg_dump_args_{ "--dump-args" };
+    std::string const arg_dump_env_{ "--dump-env" };
+    std::string const arg_dump_cwd_{ "--dump-cwd" };
 
     std::string self_path_;
 
@@ -93,9 +93,11 @@ protected:
         auto const& test_action = argv[2];
         auto const tmp_result_path = result_path + ".tmp";
 
-        auto fd = tr_sys_file_open(tmp_result_path.data(), // NOLINT
+        auto fd = tr_sys_file_open(
+            tmp_result_path.data(), // NOLINT
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-            0644, nullptr);
+            0644,
+            nullptr);
 
         if (fd == TR_BAD_SYS_FILE)
         {
@@ -137,7 +139,10 @@ protected:
 
     void waitForFileToExist(std::string const& path)
     {
-        auto const test = [path]() { return tr_sys_path_exists(path.data(), nullptr); };
+        auto const test = [path]()
+        {
+            return tr_sys_path_exists(path.data(), nullptr);
+        };
         EXPECT_TRUE(waitFor(test, 30000));
     }
 
@@ -150,7 +155,7 @@ protected:
 
 TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 {
-    auto const missing_exe_path = std::string { TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "") };
+    auto const missing_exe_path = std::string{ TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "") };
 
     auto args = std::array<char*, 2>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
@@ -173,10 +178,10 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     auto const result_path = buildSandboxPath("result.txt");
     bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_str_has_suffix(self_path_.c_str(), ".cmd");
 
-    auto const test_arg1 = std::string { "arg1 " };
-    auto const test_arg2 = std::string { " arg2" };
-    auto const test_arg3 = std::string {};
-    auto const test_arg4 = std::string { "\"arg3'^! $PATH %PATH% \\" };
+    auto const test_arg1 = std::string{ "arg1 " };
+    auto const test_arg2 = std::string{ " arg2" };
+    auto const test_arg3 = std::string{};
+    auto const test_arg4 = std::string{ "\"arg3'^! $PATH %PATH% \\" };
 
     auto args = std::array<char*, 8>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
@@ -226,31 +231,31 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 {
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto const test_env_key1 = std::string { "VAR1" };
-    auto const test_env_key2 = std::string { "_VAR_2_" };
-    auto const test_env_key3 = std::string { "vAr#" };
-    auto const test_env_key4 = std::string { "FOO" };
-    auto const test_env_key5 = std::string { "ZOO" };
-    auto const test_env_key6 = std::string { "TR_MISSING_TEST_ENV_KEY" };
+    auto const test_env_key1 = std::string{ "VAR1" };
+    auto const test_env_key2 = std::string{ "_VAR_2_" };
+    auto const test_env_key3 = std::string{ "vAr#" };
+    auto const test_env_key4 = std::string{ "FOO" };
+    auto const test_env_key5 = std::string{ "ZOO" };
+    auto const test_env_key6 = std::string{ "TR_MISSING_TEST_ENV_KEY" };
 
-    auto const test_env_value1 = std::string { "value1 " };
-    auto const test_env_value2 = std::string { " value2" };
-    auto const test_env_value3 = std::string { " \"value3'^! $PATH %PATH% " };
-    auto const test_env_value4 = std::string { "bar" };
-    auto const test_env_value5 = std::string { "jar" };
+    auto const test_env_value1 = std::string{ "value1 " };
+    auto const test_env_value2 = std::string{ " value2" };
+    auto const test_env_value3 = std::string{ " \"value3'^! $PATH %PATH% " };
+    auto const test_env_value4 = std::string{ "bar" };
+    auto const test_env_value5 = std::string{ "jar" };
 
     auto args = std::array<char*, 10>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()),
-        tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_env_.data()),
-        tr_strdup(test_env_key1.data()),
-        tr_strdup(test_env_key2.data()),
-        tr_strdup(test_env_key3.data()),
-        tr_strdup(test_env_key4.data()),
-        tr_strdup(test_env_key5.data()),
-        tr_strdup(test_env_key6.data()),
-        nullptr
+        tr_strdup(self_path_.c_str()), //
+        tr_strdup(result_path.data()), //
+        tr_strdup(arg_dump_env_.data()), //
+        tr_strdup(test_env_key1.data()), //
+        tr_strdup(test_env_key2.data()), //
+        tr_strdup(test_env_key3.data()), //
+        tr_strdup(test_env_key4.data()), //
+        tr_strdup(test_env_key5.data()), //
+        tr_strdup(test_env_key6.data()), //
+        nullptr, //
     };
 
     auto env = std::array<char*, 5>{
@@ -259,7 +264,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
         tr_strdup_printf("%s=%s", test_env_key2.data(), test_env_value2.data()),
         tr_strdup_printf("%s=%s", test_env_key3.data(), test_env_value3.data()),
         tr_strdup_printf("%s=%s", test_env_key5.data(), test_env_value5.data()),
-        nullptr
+        nullptr,
     };
 
     setenv("FOO", "bar", true); // inherited
@@ -330,7 +335,8 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     auto buffer = std::array<char, 1024>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
-    EXPECT_EQ(makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
+    EXPECT_EQ(
+        makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
         tr_sys_path_native_separators(&buffer.front()));
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
@@ -390,17 +396,18 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
 }
 
 #ifdef _WIN32
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_SUITE_P( //
     Subprocess,
     SubprocessTest,
-    ::testing::Values(getSelfPath(), getCmdSelfPath())
-    );
+    ::testing::Values( //
+        getSelfPath(),
+        getCmdSelfPath()));
 #else
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_SUITE_P( //
     Subprocess,
     SubprocessTest,
-    ::testing::Values(getSelfPath())
-    );
+    ::testing::Values( //
+        getSelfPath()));
 #endif
 
 } // namespace test

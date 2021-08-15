@@ -57,8 +57,7 @@ typedef enum
     TR_STD_SYS_FILE_IN,
     TR_STD_SYS_FILE_OUT,
     TR_STD_SYS_FILE_ERR
-}
-tr_std_sys_file_t;
+} tr_std_sys_file_t;
 
 typedef enum
 {
@@ -69,16 +68,14 @@ typedef enum
     TR_SYS_FILE_APPEND = (1 << 4),
     TR_SYS_FILE_TRUNCATE = (1 << 5),
     TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-}
-tr_sys_file_open_flags_t;
+} tr_sys_file_open_flags_t;
 
 typedef enum
 {
     TR_SEEK_SET,
     TR_SEEK_CUR,
     TR_SEEK_END
-}
-tr_seek_origin_t;
+} tr_seek_origin_t;
 
 typedef enum
 {
@@ -86,49 +83,42 @@ typedef enum
     TR_SYS_FILE_LOCK_EX = (1 << 1),
     TR_SYS_FILE_LOCK_NB = (1 << 2),
     TR_SYS_FILE_LOCK_UN = (1 << 3)
-}
-tr_sys_file_lock_flags_t;
+} tr_sys_file_lock_flags_t;
 
 typedef enum
 {
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
-}
-tr_sys_path_get_info_flags_t;
+} tr_sys_path_get_info_flags_t;
 
 typedef enum
 {
     TR_SYS_FILE_ADVICE_WILL_NEED,
     TR_SYS_FILE_ADVICE_DONT_NEED
-}
-tr_sys_file_advice_t;
+} tr_sys_file_advice_t;
 
 typedef enum
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
-}
-tr_sys_file_preallocate_flags_t;
+} tr_sys_file_preallocate_flags_t;
 
 typedef enum
 {
     TR_SYS_DIR_CREATE_PARENTS = (1 << 0)
-}
-tr_sys_dir_create_flags_t;
+} tr_sys_dir_create_flags_t;
 
 typedef enum
 {
     TR_SYS_PATH_IS_FILE,
     TR_SYS_PATH_IS_DIRECTORY,
     TR_SYS_PATH_IS_OTHER
-}
-tr_sys_path_type_t;
+} tr_sys_path_type_t;
 
 typedef struct tr_sys_path_info
 {
     tr_sys_path_type_t type;
     uint64_t size;
     time_t last_modified_at;
-}
-tr_sys_path_info;
+} tr_sys_path_info;
 
 /**
  * @name Platform-specific wrapper functions
@@ -369,7 +359,11 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct t
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset,
+bool tr_sys_file_seek(
+    tr_sys_file_t handle,
+    int64_t offset,
+    tr_seek_origin_t origin,
+    uint64_t* new_offset,
     struct tr_error** error);
 
 /**
@@ -402,7 +396,12 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+bool tr_sys_file_read_at(
+    tr_sys_file_t handle,
+    void* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_read,
     struct tr_error** error);
 
 /**
@@ -418,7 +417,11 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written,
+bool tr_sys_file_write(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
@@ -436,7 +439,12 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
@@ -473,7 +481,11 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, struct tr_error**
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice,
+bool tr_sys_file_advise(
+    tr_sys_file_t handle,
+    uint64_t offset,
+    uint64_t size,
+    tr_sys_file_advice_t advice,
     struct tr_error** error);
 
 /**

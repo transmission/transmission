@@ -149,7 +149,11 @@ void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
 ****
 ***/
 
-static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec,
+static void allocateBandwidth(
+    tr_bandwidth* b,
+    tr_priority_t parent_priority,
+    tr_direction dir,
+    unsigned int period_msec,
     tr_ptrArray* peer_pool)
 {
     TR_ASSERT(tr_isBandwidth(b));
@@ -386,8 +390,14 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 
     if (dir == DEBUG_DIRECTION && band->isLimited)
     {
-        fprintf(stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n", b, byteCount,
-            isPieceData ? "piece" : "raw", oldBytesLeft, band->bytesLeft);
+        fprintf(
+            stderr,
+            "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n",
+            b,
+            byteCount,
+            isPieceData ? "piece" : "raw",
+            oldBytesLeft,
+            band->bytesLeft);
     }
 
 #endif

@@ -26,26 +26,30 @@
 
 @implementation AboutWindowController
 
-AboutWindowController * fAboutBoxInstance = nil;
-+ (AboutWindowController *) aboutController
+AboutWindowController* fAboutBoxInstance = nil;
+
++ (AboutWindowController*)aboutController
 {
     if (!fAboutBoxInstance)
-        fAboutBoxInstance = [[self alloc] initWithWindowNibName: @"AboutWindow"];
+    {
+        fAboutBoxInstance = [[self alloc] initWithWindowNibName:@"AboutWindow"];
+    }
     return fAboutBoxInstance;
 }
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
     fVersionField.stringValue = @(LONG_VERSION_STRING);
 
-    fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey: @"NSHumanReadableCopyright"
-                                        value: nil table: @"InfoPlist"];
+    fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey:@"NSHumanReadableCopyright" value:nil
+                                                                       table:@"InfoPlist"];
 
-    [fTextView.textStorage setAttributedString: [[NSAttributedString alloc] initWithPath:
-            [NSBundle.mainBundle pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil]];
+    [fTextView.textStorage setAttributedString:[[NSAttributedString alloc] initWithPath:[NSBundle.mainBundle pathForResource:@"Credits"
+                                                                                                                      ofType:@"rtf"]
+                                                                     documentAttributes:nil]];
 
     //size license button
-    const CGFloat oldButtonWidth = NSWidth(fLicenseButton.frame);
+    CGFloat const oldButtonWidth = NSWidth(fLicenseButton.frame);
 
     fLicenseButton.title = NSLocalizedString(@"License", "About window -> license button");
     [fLicenseButton sizeToFit];
@@ -56,30 +60,31 @@ AboutWindowController * fAboutBoxInstance = nil;
     fLicenseButton.frame = buttonFrame;
 }
 
-- (void) windowDidLoad
+- (void)windowDidLoad
 {
     [self.window center];
 }
 
-- (void) windowWillClose: (id) sender
+- (void)windowWillClose:(id)sender
 {
     fAboutBoxInstance = nil;
 }
 
-- (IBAction) showLicense: (id) sender
+- (IBAction)showLicense:(id)sender
 {
-    NSString * licenseText = [NSString stringWithContentsOfFile: [NSBundle.mainBundle pathForResource: @"COPYING" ofType: nil]
-                                usedEncoding: nil error: NULL];
+    NSString* licenseText = [NSString stringWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"COPYING" ofType:nil]
+                                                  usedEncoding:nil
+                                                         error:NULL];
     fLicenseView.string = licenseText;
     fLicenseCloseButton.title = NSLocalizedString(@"OK", "About window -> license close button");
 
-    [self.window beginSheet: fLicenseSheet completionHandler:nil];
+    [self.window beginSheet:fLicenseSheet completionHandler:nil];
 }
 
-- (IBAction) hideLicense: (id) sender
+- (IBAction)hideLicense:(id)sender
 {
-    [fLicenseSheet orderOut: nil];
-    [NSApp endSheet: fLicenseSheet];
+    [fLicenseSheet orderOut:nil];
+    [NSApp endSheet:fLicenseSheet];
 }
 
 @end

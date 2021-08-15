@@ -98,8 +98,8 @@ QString getCountString(size_t n)
 }
 
 Torrent::fields_t constexpr TrackerFields = {
-    uint64_t(1) << Torrent::TRACKER_STATS
-    };
+    uint64_t(1) << Torrent::TRACKER_STATS,
+};
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
 
@@ -109,7 +109,9 @@ void FilterBar::refreshTrackers()
 {
     enum
     {
-        ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
+        ROW_TOTALS = 0,
+        ROW_SEPARATOR,
+        ROW_FIRST_TRACKER
     };
 
     auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
@@ -128,20 +130,20 @@ void FilterBar::refreshTrackers()
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
-        {
-            auto const& key = it->first;
-            auto const& display_name = FaviconCache::getDisplayName(key);
-            auto const& count = it->second;
-            auto const icon = trApp->faviconCache().find(key);
+    {
+        auto const& key = it->first;
+        auto const& display_name = FaviconCache::getDisplayName(key);
+        auto const& count = it->second;
+        auto const icon = trApp->faviconCache().find(key);
 
-            i->setData(display_name, Qt::DisplayRole);
-            i->setData(display_name, TRACKER_ROLE);
-            i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
-            i->setData(icon, Qt::DecorationRole);
-            i->setData(int(count), FilterBarComboBox::CountRole);
+        i->setData(display_name, Qt::DisplayRole);
+        i->setData(display_name, TRACKER_ROLE);
+        i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
+        i->setData(icon, Qt::DecorationRole);
+        i->setData(int(count), FilterBarComboBox::CountRole);
 
-            return i;
-        };
+        return i;
+    };
 
     auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
     auto old_it = tracker_counts_.cbegin();
@@ -206,12 +208,12 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ****
 ***/
 
-FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent) :
-    QWidget(parent),
-    prefs_(prefs),
-    torrents_(torrents),
-    filter_(filter),
-    is_bootstrapping_(true)
+FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
+    : QWidget(parent)
+    , prefs_(prefs)
+    , torrents_(torrents)
+    , filter_(filter)
+    , is_bootstrapping_(true)
 {
     auto* h = new QHBoxLayout(this);
     h->setContentsMargins(3, 3, 3, 3);

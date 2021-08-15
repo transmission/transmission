@@ -30,23 +30,23 @@
 
 /* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
 #if defined(__linux__)
-#   include <linux/version.h>
+#include <linux/version.h>
 /* Linux's copy_file_range(2) is buggy prior to 5.3. */
-#   if defined(HAVE_COPY_FILE_RANGE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
-#       define USE_COPY_FILE_RANGE
-#   elif defined(HAVE_SENDFILE64)
-#       include <sys/sendfile.h>
-#       define USE_SENDFILE64
-#   endif
+#if defined(HAVE_COPY_FILE_RANGE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+#define USE_COPY_FILE_RANGE
+#elif defined(HAVE_SENDFILE64)
+#include <sys/sendfile.h>
+#define USE_SENDFILE64
+#endif
 #elif defined(__APPLE__) && defined(HAVE_COPYFILE)
-#   include <copyfile.h>
-#   ifndef COPYFILE_CLONE /* macos < 10.12 */
-#       define COPYFILE_CLONE 0
-#   endif
-#   define USE_COPYFILE
+#include <copyfile.h>
+#ifndef COPYFILE_CLONE /* macos < 10.12 */
+#define COPYFILE_CLONE 0
+#endif
+#define USE_COPYFILE
 #elif defined(HAVE_COPY_FILE_RANGE)
 /* Presently this is only FreeBSD 13+. */
-#   define USE_COPY_FILE_RANGE
+#define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
 #include "transmission.h"
@@ -622,12 +622,12 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         native_flags |= O_WRONLY;
     }
 
-    native_flags |=
-        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) |
-        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) |
-        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) |
-        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) |
-        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) |
+    native_flags |= //
+        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) | //
+        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) | //
+        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) | //
+        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) | //
+        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) | //
         O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);
@@ -759,7 +759,12 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     return ret;
 }
 
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+bool tr_sys_file_read_at(
+    tr_sys_file_t handle,
+    void* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_read,
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -835,7 +840,12 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     return ret;
 }
 
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_written,
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -920,7 +930,8 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
 
 #if defined(HAVE_POSIX_FADVISE)
 
-    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ? POSIX_FADV_WILLNEED :
+    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ?
+        POSIX_FADV_WILLNEED :
         (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
 
     TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
@@ -940,10 +951,9 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
         goto skip_darwin_fcntl;
     }
 
-    struct radvisory const radv =
-    {
+    struct radvisory const radv = {
         .ra_offset = offset,
-        .ra_count = size
+        .ra_count = size,
     };
 
     ret = fcntl(handle, F_RDADVISE, &radv) != -1;
@@ -1109,8 +1119,8 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
-    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) +
-        !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+    TR_ASSERT(
+        !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
 
@@ -1138,8 +1148,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     do
     {
         ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
-    }
-    while (!ret && errno == EINTR);
+    } while (!ret && errno == EINTR);
 
     if (!ret && errno == EAGAIN)
     {
@@ -1173,8 +1182,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     do
     {
         ret = flock(handle, native_operation) != -1;
-    }
-    while (!ret && errno == EINTR);
+    } while (!ret && errno == EINTR);
 
 #else
 
@@ -1216,8 +1224,7 @@ char* tr_sys_dir_get_current(tr_error** error)
 
             ret = getcwd(tmp, size);
             size += 2048;
-        }
-        while (ret == NULL && errno == ERANGE);
+        } while (ret == NULL && errno == ERANGE);
 
         if (ret == NULL)
         {

@@ -32,8 +32,7 @@ static void handle_sigchld(int i)
     {
         /* FIXME: Only check for our own PIDs */
         rc = waitpid(-1, NULL, WNOHANG);
-    }
-    while (rc > 0 || (rc == -1 && errno == EINTR));
+    } while (rc > 0 || (rc == -1 && errno == EINTR));
 
     /* FIXME: Call old handler, if any */
 }
@@ -95,8 +94,7 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     do
     {
         count = read(pipe_fd, &child_errno, sizeof(child_errno));
-    }
-    while (count == -1 && errno == EINTR);
+    } while (count == -1 && errno == EINTR);
 
     close(pipe_fd);
 

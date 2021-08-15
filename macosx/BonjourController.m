@@ -26,8 +26,9 @@
 
 @implementation BonjourController
 
-BonjourController * fDefaultController = nil;
-+ (BonjourController *) defaultController
+BonjourController* fDefaultController = nil;
+
++ (BonjourController*)defaultController
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -37,38 +38,40 @@ BonjourController * fDefaultController = nil;
     return fDefaultController;
 }
 
-+ (BOOL) defaultControllerExists
++ (BOOL)defaultControllerExists
 {
     return fDefaultController != nil;
 }
 
-
-- (void) startWithPort: (int) port
+- (void)startWithPort:(int)port
 {
     [self stop];
 
-    NSMutableString * serviceName = [NSMutableString stringWithFormat: @"Transmission (%@ - %@)", NSUserName(), [NSHost currentHost].localizedName];
+    NSMutableString* serviceName = [NSMutableString
+        stringWithFormat:@"Transmission (%@ - %@)", NSUserName(), [NSHost currentHost].localizedName];
     if (serviceName.length > BONJOUR_SERVICE_NAME_MAX_LENGTH)
-        [serviceName deleteCharactersInRange: NSMakeRange(BONJOUR_SERVICE_NAME_MAX_LENGTH, serviceName.length - BONJOUR_SERVICE_NAME_MAX_LENGTH)];
+    {
+        [serviceName deleteCharactersInRange:NSMakeRange(BONJOUR_SERVICE_NAME_MAX_LENGTH, serviceName.length - BONJOUR_SERVICE_NAME_MAX_LENGTH)];
+    }
 
-    fService = [[NSNetService alloc] initWithDomain: @"" type: @"_http._tcp." name: serviceName port: port];
+    fService = [[NSNetService alloc] initWithDomain:@"" type:@"_http._tcp." name:serviceName port:port];
     fService.delegate = self;
 
     [fService publish];
 }
 
-- (void) stop
+- (void)stop
 {
     [fService stop];
     fService = nil;
 }
 
-- (void) netService: (NSNetService *) sender didNotPublish: (NSDictionary *) errorDict
+- (void)netService:(NSNetService*)sender didNotPublish:(NSDictionary*)errorDict
 {
     NSLog(@"Failed to publish the web interface service on port %ld, with error: %@", sender.port, errorDict);
 }
 
-- (void) netService: (NSNetService *) sender didNotResolve: (NSDictionary *) errorDict
+- (void)netService:(NSNetService*)sender didNotResolve:(NSDictionary*)errorDict
 {
     NSLog(@"Failed to resolve the web interface service on port %ld, with error: %@", sender.port, errorDict);
 }

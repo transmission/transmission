@@ -24,16 +24,16 @@
 
 @implementation ButtonToolbarItem
 
-- (void) validate
+- (void)validate
 {
-    self.enabled = [self.target validateToolbarItem: self];
+    self.enabled = [self.target validateToolbarItem:self];
 }
 
-- (NSMenuItem *) menuFormRepresentation
+- (NSMenuItem*)menuFormRepresentation
 {
-    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: self.label action: self.action keyEquivalent: @""];
+    NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:self.label action:self.action keyEquivalent:@""];
     menuItem.target = self.target;
-    menuItem.enabled = [self.target validateToolbarItem: self];
+    menuItem.enabled = [self.target validateToolbarItem:self];
 
     return menuItem;
 }

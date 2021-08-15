@@ -22,15 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-int main( int argc, char ** argv )
+int main(int argc, char** argv)
 {
-    if( argc > 1 && strncmp( argv[1], "-v", 2 ) == 0 )
+    if (argc > 1 && strncmp(argv[1], "-v", 2) == 0)
     {
-        char * env;
-        int    debug = atoi( &argv[1][2] );
-        asprintf( &env, "TR_DEBUG=%d", debug );
-        putenv( env );
-        free( env );
+        char* env;
+        int debug = atoi(&argv[1][2]);
+        asprintf(&env, "TR_DEBUG=%d", debug);
+        putenv(env);
+        free(env);
     }
-    return NSApplicationMain( argc, (const char **) argv );
+    return NSApplicationMain(argc, (char const**)argv);
 }

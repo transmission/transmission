@@ -24,22 +24,24 @@
 
 @interface NSString (NSStringAdditions)
 
-@property (nonatomic, class, readonly) NSString * ellipsis;
-- (NSString *) stringByAppendingEllipsis;
+@property(nonatomic, class, readonly) NSString* ellipsis;
+- (NSString*)stringByAppendingEllipsis;
 
-+ (NSString *) formattedUInteger: (NSUInteger) value;
++ (NSString*)formattedUInteger:(NSUInteger)value;
 
-+ (NSString *) stringForFileSize: (uint64_t) size;
-+ (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize;
++ (NSString*)stringForFileSize:(uint64_t)size;
++ (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize;
 
-+ (NSString *) stringForSpeed: (CGFloat) speed;
-+ (NSString *) stringForSpeedAbbrev: (CGFloat) speed;
-+ (NSString *) stringForRatio: (CGFloat) ratio;
++ (NSString*)stringForSpeed:(CGFloat)speed;
++ (NSString*)stringForSpeedAbbrev:(CGFloat)speed;
++ (NSString*)stringForRatio:(CGFloat)ratio;
 
-+ (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals;
++ (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals;
 
-- (NSComparisonResult) compareNumeric: (NSString *) string; //simple compare method for strings with numbers (works for IP addresses)
+// simple compare method for strings with numbers (works for IP addresses)
+- (NSComparisonResult)compareNumeric:(NSString*)string;
 
-- (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators; //like componentsSeparatedByCharactersInSet:, but excludes blank values
+// like componentsSeparatedByCharactersInSet:, but excludes blank values
+- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
 @end

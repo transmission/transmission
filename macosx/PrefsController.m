@@ -38,76 +38,82 @@
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
-#define DOWNLOAD_FOLDER     0
-#define DOWNLOAD_TORRENT    2
+#define DOWNLOAD_FOLDER 0
+#define DOWNLOAD_TORRENT 2
 
-#define RPC_IP_ADD_TAG      0
-#define RPC_IP_REMOVE_TAG   1
+#define RPC_IP_ADD_TAG 0
+#define RPC_IP_REMOVE_TAG 1
 
-#define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
-#define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
-#define TOOLBAR_GROUPS      @"TOOLBAR_GROUPS"
-#define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
-#define TOOLBAR_PEERS       @"TOOLBAR_PEERS"
-#define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
-#define TOOLBAR_REMOTE      @"TOOLBAR_REMOTE"
+#define TOOLBAR_GENERAL @"TOOLBAR_GENERAL"
+#define TOOLBAR_TRANSFERS @"TOOLBAR_TRANSFERS"
+#define TOOLBAR_GROUPS @"TOOLBAR_GROUPS"
+#define TOOLBAR_BANDWIDTH @"TOOLBAR_BANDWIDTH"
+#define TOOLBAR_PEERS @"TOOLBAR_PEERS"
+#define TOOLBAR_NETWORK @"TOOLBAR_NETWORK"
+#define TOOLBAR_REMOTE @"TOOLBAR_REMOTE"
 
-#define RPC_KEYCHAIN_SERVICE    "Transmission:Remote"
-#define RPC_KEYCHAIN_NAME       "Remote"
+#define RPC_KEYCHAIN_SERVICE "Transmission:Remote"
+#define RPC_KEYCHAIN_NAME "Remote"
 
-#define WEBUI_URL   @"http://localhost:%ld/"
+#define WEBUI_URL @"http://localhost:%ld/"
 
 @interface PrefsController (Private)
 
-- (void) setPrefView: (id) sender;
+- (void)setPrefView:(id)sender;
 
-- (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username;
+- (void)setKeychainPassword:(char const*)password forService:(char const*)service username:(char const*)username;
 
 @end
 
 @implementation PrefsController
 
-- (instancetype) initWithHandle: (tr_session *) handle
+- (instancetype)initWithHandle:(tr_session*)handle
 {
-    if ((self = [super initWithWindowNibName: @"PrefsWindow"]))
+    if ((self = [super initWithWindowNibName:@"PrefsWindow"]))
     {
         fHandle = handle;
 
         fDefaults = NSUserDefaults.standardUserDefaults;
 
         //check for old version download location (before 1.1)
-        NSString * choice;
-        if ((choice = [fDefaults stringForKey: @"DownloadChoice"]))
+        NSString* choice;
+        if ((choice = [fDefaults stringForKey:@"DownloadChoice"]))
         {
-            [fDefaults setBool: [choice isEqualToString: @"Constant"] forKey: @"DownloadLocationConstant"];
-            [fDefaults setBool: YES forKey: @"DownloadAsk"];
+            [fDefaults setBool:[choice isEqualToString:@"Constant"] forKey:@"DownloadLocationConstant"];
+            [fDefaults setBool:YES forKey:@"DownloadAsk"];
 
-            [fDefaults removeObjectForKey: @"DownloadChoice"];
+            [fDefaults removeObjectForKey:@"DownloadChoice"];
         }
 
         //check for old version blocklist (before 2.12)
-        NSDate * blocklistDate;
-        if ((blocklistDate = [fDefaults objectForKey: @"BlocklistLastUpdate"]))
+        NSDate* blocklistDate;
+        if ((blocklistDate = [fDefaults objectForKey:@"BlocklistLastUpdate"]))
         {
-            [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdateSuccess"];
-            [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdate"];
-            [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
+            [fDefaults setObject:blocklistDate forKey:@"BlocklistNewLastUpdateSuccess"];
+            [fDefaults setObject:blocklistDate forKey:@"BlocklistNewLastUpdate"];
+            [fDefaults removeObjectForKey:@"BlocklistLastUpdate"];
 
-            NSURL * blocklistDir = [[NSFileManager.defaultManager URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask][0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
-            [NSFileManager.defaultManager moveItemAtURL: [blocklistDir URLByAppendingPathComponent: @"level1.bin"]
-                toURL: [blocklistDir URLByAppendingPathComponent: @DEFAULT_BLOCKLIST_FILENAME]
-                error: nil];
+            NSURL* blocklistDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationDirectory inDomains:NSUserDomainMask][0]
+                URLByAppendingPathComponent:@"Transmission/blocklists/"];
+            [NSFileManager.defaultManager moveItemAtURL:[blocklistDir URLByAppendingPathComponent:@"level1.bin"]
+                                                  toURL:[blocklistDir URLByAppendingPathComponent:@DEFAULT_BLOCKLIST_FILENAME]
+                                                  error:nil];
         }
 
         //save a new random port
-        if ([fDefaults boolForKey: @"RandomPort"])
-            [fDefaults setInteger: tr_sessionGetPeerPort(fHandle) forKey: @"BindPort"];
+        if ([fDefaults boolForKey:@"RandomPort"])
+        {
+            [fDefaults setInteger:tr_sessionGetPeerPort(fHandle) forKey:@"BindPort"];
+        }
 
         //set auto import
-        NSString * autoPath;
-        VDKQueue* x = [(Controller *)[NSApp delegate] fileWatcherQueue];
-        if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
-            [((Controller *)NSApp.delegate).fileWatcherQueue addPath: autoPath.stringByExpandingTildeInPath notifyingAbout: VDKQueueNotifyAboutWrite];
+        NSString* autoPath;
+        VDKQueue* x = [(Controller*)[NSApp delegate] fileWatcherQueue];
+        if ([fDefaults boolForKey:@"AutoImport"] && (autoPath = [fDefaults stringForKey:@"AutoImportDirectory"]))
+        {
+            [((Controller*)NSApp.delegate).fileWatcherQueue addPath:autoPath.stringByExpandingTildeInPath
+                                                     notifyingAbout:VDKQueueNotifyAboutWrite];
+        }
 
         //set special-handling of magnet link add window checkbox
         [self updateShowAddMagnetWindowField];
@@ -116,33 +122,35 @@
         [BlocklistScheduler.scheduler updateSchedule];
 
         //set encryption
-        [self setEncryptionMode: nil];
+        [self setEncryptionMode:nil];
 
         //update rpc whitelist
         [self updateRPCPassword];
 
-        fRPCWhitelistArray = [[fDefaults arrayForKey: @"RPCWhitelist"] mutableCopy];
+        fRPCWhitelistArray = [[fDefaults arrayForKey:@"RPCWhitelist"] mutableCopy];
         if (!fRPCWhitelistArray)
-            fRPCWhitelistArray = [NSMutableArray arrayWithObject: @"127.0.0.1"];
+        {
+            fRPCWhitelistArray = [NSMutableArray arrayWithObject:@"127.0.0.1"];
+        }
         [self updateRPCWhitelist];
 
         //reset old Sparkle settings from previous versions
-        [fDefaults removeObjectForKey: @"SUScheduledCheckInterval"];
-        if ([fDefaults objectForKey: @"CheckForUpdates"])
+        [fDefaults removeObjectForKey:@"SUScheduledCheckInterval"];
+        if ([fDefaults objectForKey:@"CheckForUpdates"])
         {
-            [[SUUpdater sharedUpdater] setAutomaticallyChecksForUpdates: [fDefaults boolForKey: @"CheckForUpdates"]];
-            [fDefaults removeObjectForKey: @"CheckForUpdates"];
+            [[SUUpdater sharedUpdater] setAutomaticallyChecksForUpdates:[fDefaults boolForKey:@"CheckForUpdates"]];
+            [fDefaults removeObjectForKey:@"CheckForUpdates"];
         }
 
-        [self setAutoUpdateToBeta: nil];
+        [self setAutoUpdateToBeta:nil];
     }
 
     return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 
     [fPortStatusTimer invalidate];
     if (fPortChecker)
@@ -151,13 +159,13 @@
     }
 }
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
     fHasLoaded = YES;
 
     self.window.restorationClass = [self class];
 
-    NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
+    NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"Preferences Toolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = NO;
     toolbar.displayMode = NSToolbarDisplayModeIconAndLabel;
@@ -165,154 +173,184 @@
     toolbar.selectedItemIdentifier = TOOLBAR_GENERAL;
     self.window.toolbar = toolbar;
 
-    [self setPrefView: nil];
+    [self setPrefView:nil];
 
     //set download folder
-    [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
+    [fFolderPopUp selectItemAtIndex:[fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
 
     //set stop ratio
-    fRatioStopField.floatValue = [fDefaults floatForKey: @"RatioLimit"];
+    fRatioStopField.floatValue = [fDefaults floatForKey:@"RatioLimit"];
 
     //set idle seeding minutes
-    fIdleStopField.integerValue = [fDefaults integerForKey: @"IdleLimitMinutes"];
+    fIdleStopField.integerValue = [fDefaults integerForKey:@"IdleLimitMinutes"];
 
     //set limits
     [self updateLimitFields];
 
     //set speed limit
-    fSpeedLimitUploadField.intValue = [fDefaults integerForKey: @"SpeedLimitUploadLimit"];
-    fSpeedLimitDownloadField.intValue = [fDefaults integerForKey: @"SpeedLimitDownloadLimit"];
+    fSpeedLimitUploadField.intValue = [fDefaults integerForKey:@"SpeedLimitUploadLimit"];
+    fSpeedLimitDownloadField.intValue = [fDefaults integerForKey:@"SpeedLimitDownloadLimit"];
 
     //set port
-    fPortField.intValue = [fDefaults integerForKey: @"BindPort"];
+    fPortField.intValue = [fDefaults integerForKey:@"BindPort"];
     fNatStatus = -1;
 
     [self updatePortStatus];
-    fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
+    fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus) userInfo:nil
+                                                       repeats:YES];
 
     //set peer connections
-    fPeersGlobalField.intValue = [fDefaults integerForKey: @"PeersTotal"];
-    fPeersTorrentField.intValue = [fDefaults integerForKey: @"PeersTorrent"];
+    fPeersGlobalField.intValue = [fDefaults integerForKey:@"PeersTotal"];
+    fPeersTorrentField.intValue = [fDefaults integerForKey:@"PeersTorrent"];
 
     //set queue values
-    fQueueDownloadField.intValue = [fDefaults integerForKey: @"QueueDownloadNumber"];
-    fQueueSeedField.intValue = [fDefaults integerForKey: @"QueueSeedNumber"];
-    fStalledField.intValue = [fDefaults integerForKey: @"StalledMinutes"];
+    fQueueDownloadField.intValue = [fDefaults integerForKey:@"QueueDownloadNumber"];
+    fQueueSeedField.intValue = [fDefaults integerForKey:@"QueueSeedNumber"];
+    fStalledField.intValue = [fDefaults integerForKey:@"StalledMinutes"];
 
     //set blocklist
-    NSString * blocklistURL = [fDefaults stringForKey: @"BlocklistURL"];
+    NSString* blocklistURL = [fDefaults stringForKey:@"BlocklistURL"];
     if (blocklistURL)
+    {
         fBlocklistURLField.stringValue = blocklistURL;
+    }
 
     [self updateBlocklistButton];
     [self updateBlocklistFields];
 
-    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateLimitFields)
-                                                 name: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateLimitFields)
+                                               name:@"UpdateSpeedLimitValuesOutsidePrefs"
+                                             object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateRatioStopField)
-                                                 name: @"UpdateRatioStopValueOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateRatioStopField)
+                                               name:@"UpdateRatioStopValueOutsidePrefs"
+                                             object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateLimitStopField)
-                                                 name: @"UpdateIdleStopValueOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateLimitStopField)
+                                               name:@"UpdateIdleStopValueOutsidePrefs"
+                                             object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateBlocklistFields)
-        name: @"BlocklistUpdated" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateBlocklistFields) name:@"BlocklistUpdated"
+                                             object:nil];
 
-    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateBlocklistURLField)
-        name: NSControlTextDidChangeNotification object: fBlocklistURLField];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateBlocklistURLField)
+                                               name:NSControlTextDidChangeNotification
+                                             object:fBlocklistURLField];
 
     //set rpc port
-    fRPCPortField.intValue = [fDefaults integerForKey: @"RPCPort"];
+    fRPCPortField.intValue = [fDefaults integerForKey:@"RPCPort"];
 
     //set rpc password
     if (fRPCPassword)
+    {
         fRPCPasswordField.stringValue = fRPCPassword;
+    }
 }
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+- (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag
 {
-    NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
+    NSToolbarItem* item = [[NSToolbarItem alloc] initWithItemIdentifier:ident];
 
-    if ([ident isEqualToString: TOOLBAR_GENERAL])
+    if ([ident isEqualToString:TOOLBAR_GENERAL])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"gearshape" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: NSImageNamePreferencesGeneral];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"gearshape" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:NSImageNamePreferencesGeneral];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
+    else if ([ident isEqualToString:TOOLBAR_TRANSFERS])
     {
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"arrow.up.arrow.down" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: @"Transfers"];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"arrow.up.arrow.down" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:@"Transfers"];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_GROUPS])
+    else if ([ident isEqualToString:TOOLBAR_GROUPS])
     {
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"pin" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: @"Groups"];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"pin" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:@"Groups"];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
+    else if ([ident isEqualToString:TOOLBAR_BANDWIDTH])
     {
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"speedometer" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: @"Bandwidth"];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"speedometer" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:@"Bandwidth"];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_PEERS])
+    else if ([ident isEqualToString:TOOLBAR_PEERS])
     {
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"person.2" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: NSImageNameUserGroup];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"person.2" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:NSImageNameUserGroup];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_NETWORK])
+    else if ([ident isEqualToString:TOOLBAR_NETWORK])
     {
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"network" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: NSImageNameNetwork];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"network" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:NSImageNameNetwork];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
     }
-    else if ([ident isEqualToString: TOOLBAR_REMOTE])
+    else if ([ident isEqualToString:TOOLBAR_REMOTE])
     {
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *)) {
-            item.image = [NSImage imageWithSystemSymbolName: @"antenna.radiowaves.left.and.right" accessibilityDescription: nil];
-        } else {
-            item.image = [NSImage imageNamed: @"Remote"];
+        if (@available(macOS 11.0, *))
+        {
+            item.image = [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right" accessibilityDescription:nil];
+        }
+        else
+        {
+            item.image = [NSImage imageNamed:@"Remote"];
         }
         item.target = self;
         item.action = @selector(setPrefView:);
@@ -326,25 +364,34 @@
     return item;
 }
 
-- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
+- (NSArray*)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
-    return @[TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_GROUPS, TOOLBAR_BANDWIDTH,
-                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE];
+    return @[
+        TOOLBAR_GENERAL,
+        TOOLBAR_TRANSFERS,
+        TOOLBAR_GROUPS,
+        TOOLBAR_BANDWIDTH,
+        TOOLBAR_PEERS,
+        TOOLBAR_NETWORK,
+        TOOLBAR_REMOTE
+    ];
 }
 
-- (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar
+- (NSArray*)toolbarSelectableItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [self toolbarAllowedItemIdentifiers: toolbar];
+    return [self toolbarAllowedItemIdentifiers:toolbar];
 }
 
-- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
+- (NSArray*)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [self toolbarAllowedItemIdentifiers: toolbar];
+    return [self toolbarAllowedItemIdentifiers:toolbar];
 }
 
-+ (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler
++ (void)restoreWindowWithIdentifier:(NSString*)identifier
+                              state:(NSCoder*)state
+                  completionHandler:(void (^)(NSWindow*, NSError*))completionHandler
 {
-    NSWindow * window = ((Controller *)NSApp.delegate).prefsController.window;
+    NSWindow* window = ((Controller*)NSApp.delegate).prefsController.window;
     completionHandler(window, nil);
 }
 
@@ -352,50 +399,50 @@
 #if defined(TR_BETA_RELEASE)
 #define SPARKLE_TAG YES
 #else
-#define SPARKLE_TAG [fDefaults boolForKey: @"AutoUpdateBeta"]
+#define SPARKLE_TAG [fDefaults boolForKey:@"AutoUpdateBeta"]
 #endif
-- (void) setAutoUpdateToBeta: (id) sender
+- (void)setAutoUpdateToBeta:(id)sender
 {
     // TODO: Support beta releases (if/when necessary)
 }
 
-- (void) setPort: (id) sender
+- (void)setPort:(id)sender
 {
-    const tr_port port = [sender intValue];
-    [fDefaults setInteger: port forKey: @"BindPort"];
+    tr_port const port = [sender intValue];
+    [fDefaults setInteger:port forKey:@"BindPort"];
     tr_sessionSetPeerPort(fHandle, port);
 
     fPeerPort = -1;
     [self updatePortStatus];
 }
 
-- (void) randomPort: (id) sender
+- (void)randomPort:(id)sender
 {
-    const tr_port port = tr_sessionSetPeerPortRandom(fHandle);
-    [fDefaults setInteger: port forKey: @"BindPort"];
+    tr_port const port = tr_sessionSetPeerPortRandom(fHandle);
+    [fDefaults setInteger:port forKey:@"BindPort"];
     fPortField.intValue = port;
 
     fPeerPort = -1;
     [self updatePortStatus];
 }
 
-- (void) setRandomPortOnStart: (id) sender
+- (void)setRandomPortOnStart:(id)sender
 {
-    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton *)sender).state == NSOnState);
+    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton*)sender).state == NSOnState);
 }
 
-- (void) setNat: (id) sender
+- (void)setNat:(id)sender
 {
-    tr_sessionSetPortForwardingEnabled(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
+    tr_sessionSetPortForwardingEnabled(fHandle, [fDefaults boolForKey:@"NatTraversal"]);
 
     fNatStatus = -1;
     [self updatePortStatus];
 }
 
-- (void) updatePortStatus
+- (void)updatePortStatus
 {
-    const tr_port_forwarding fwd = tr_sessionGetPortForwarding(fHandle);
-    const int port = tr_sessionGetPeerPort(fHandle);
+    tr_port_forwarding const fwd = tr_sessionGetPortForwarding(fHandle);
+    int const port = tr_sessionGetPeerPort(fHandle);
     BOOL natStatusChanged = (fNatStatus != fwd);
     BOOL peerPortChanged = (fPeerPort != port);
 
@@ -406,60 +453,62 @@
 
         fPortStatusField.stringValue = @"";
         fPortStatusImage.image = nil;
-        [fPortStatusProgress startAnimation: self];
+        [fPortStatusProgress startAnimation:self];
 
         if (fPortChecker)
         {
             [fPortChecker cancelProbe];
         }
         BOOL delay = natStatusChanged || tr_sessionIsPortForwardingEnabled(fHandle);
-        fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: delay withDelegate: self];
+        fPortChecker = [[PortChecker alloc] initForPort:fPeerPort delay:delay withDelegate:self];
     }
 }
 
-- (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
+- (void)portCheckerDidFinishProbing:(PortChecker*)portChecker
 {
-    [fPortStatusProgress stopAnimation: self];
+    [fPortStatusProgress stopAnimation:self];
     switch (fPortChecker.status)
     {
-        case PORT_STATUS_OPEN:
-            fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
-            fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusAvailable];
-            break;
-        case PORT_STATUS_CLOSED:
-            fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
-            fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusUnavailable];
-            break;
-        case PORT_STATUS_ERROR:
-            fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
-            fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusPartiallyAvailable];
-            break;
-        default:
-            NSAssert1(NO, @"Port checker returned invalid status: %d", fPortChecker.status);
-            break;
+    case PORT_STATUS_OPEN:
+        fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
+        fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusAvailable];
+        break;
+    case PORT_STATUS_CLOSED:
+        fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
+        fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusUnavailable];
+        break;
+    case PORT_STATUS_ERROR:
+        fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
+        fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
+        break;
+    default:
+        NSAssert1(NO, @"Port checker returned invalid status: %d", fPortChecker.status);
+        break;
     }
     fPortChecker = nil;
 }
 
-- (NSArray *) sounds
+- (NSArray*)sounds
 {
-    NSMutableArray * sounds = [NSMutableArray array];
+    NSMutableArray* sounds = [NSMutableArray array];
 
-    NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
+    NSArray* directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
 
-    for (__strong NSString * directory in directories)
+    for (__strong NSString* directory in directories)
     {
-        directory = [directory stringByAppendingPathComponent: @"Sounds"];
+        directory = [directory stringByAppendingPathComponent:@"Sounds"];
 
         BOOL isDirectory;
-        if ([NSFileManager.defaultManager fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
+        if ([NSFileManager.defaultManager fileExistsAtPath:directory isDirectory:&isDirectory] && isDirectory)
         {
-            NSArray * directoryContents = [NSFileManager.defaultManager contentsOfDirectoryAtPath: directory error: NULL];
-            for (__strong NSString * sound in directoryContents)
+            NSArray* directoryContents = [NSFileManager.defaultManager contentsOfDirectoryAtPath:directory error:NULL];
+            for (__strong NSString* sound in directoryContents)
             {
                 sound = sound.stringByDeletingPathExtension;
-                if ([NSSound soundNamed: sound])
-                    [sounds addObject: sound];
+                if ([NSSound soundNamed:sound])
+                {
+                    [sounds addObject:sound];
+                }
             }
         }
     }
@@ -467,266 +516,282 @@
     return sounds;
 }
 
-- (void) setSound: (id) sender
+- (void)setSound:(id)sender
 {
     //play sound when selecting
-    NSSound * sound;
-    if ((sound = [NSSound soundNamed: [sender titleOfSelectedItem]]))
+    NSSound* sound;
+    if ((sound = [NSSound soundNamed:[sender titleOfSelectedItem]]))
+    {
         [sound play];
+    }
 }
 
-- (void) setUTP: (id) sender
+- (void)setUTP:(id)sender
 {
-    tr_sessionSetUTPEnabled(fHandle, [fDefaults boolForKey: @"UTPGlobal"]);
+    tr_sessionSetUTPEnabled(fHandle, [fDefaults boolForKey:@"UTPGlobal"]);
 }
 
-- (void) setPeersGlobal: (id) sender
+- (void)setPeersGlobal:(id)sender
 {
-    const int count = [sender intValue];
-    [fDefaults setInteger: count forKey: @"PeersTotal"];
+    int const count = [sender intValue];
+    [fDefaults setInteger:count forKey:@"PeersTotal"];
     tr_sessionSetPeerLimit(fHandle, count);
 }
 
-- (void) setPeersTorrent: (id) sender
+- (void)setPeersTorrent:(id)sender
 {
-    const int count = [sender intValue];
-    [fDefaults setInteger: count forKey: @"PeersTorrent"];
+    int const count = [sender intValue];
+    [fDefaults setInteger:count forKey:@"PeersTorrent"];
     tr_sessionSetPeerLimitPerTorrent(fHandle, count);
 }
 
-- (void) setPEX: (id) sender
+- (void)setPEX:(id)sender
 {
-    tr_sessionSetPexEnabled(fHandle, [fDefaults boolForKey: @"PEXGlobal"]);
+    tr_sessionSetPexEnabled(fHandle, [fDefaults boolForKey:@"PEXGlobal"]);
 }
 
-- (void) setDHT: (id) sender
+- (void)setDHT:(id)sender
 {
-    tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
+    tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey:@"DHTGlobal"]);
 }
 
-- (void) setLPD: (id) sender
+- (void)setLPD:(id)sender
 {
-    tr_sessionSetLPDEnabled(fHandle, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
+    tr_sessionSetLPDEnabled(fHandle, [fDefaults boolForKey:@"LocalPeerDiscoveryGlobal"]);
 }
 
-- (void) setEncryptionMode: (id) sender
+- (void)setEncryptionMode:(id)sender
 {
-    const tr_encryption_mode mode = [fDefaults boolForKey: @"EncryptionPrefer"] ?
-        ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_CLEAR_PREFERRED;
+    tr_encryption_mode const mode = [fDefaults boolForKey:@"EncryptionPrefer"] ?
+        ([fDefaults boolForKey:@"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) :
+        TR_CLEAR_PREFERRED;
     tr_sessionSetEncryption(fHandle, mode);
 }
 
-- (void) setBlocklistEnabled: (id) sender
+- (void)setBlocklistEnabled:(id)sender
 {
-    tr_blocklistSetEnabled(fHandle, [fDefaults boolForKey: @"BlocklistNew"]);
+    tr_blocklistSetEnabled(fHandle, [fDefaults boolForKey:@"BlocklistNew"]);
 
     [BlocklistScheduler.scheduler updateSchedule];
 
     [self updateBlocklistButton];
 }
 
-- (void) updateBlocklist: (id) sender
+- (void)updateBlocklist:(id)sender
 {
-    [BlocklistDownloaderViewController downloadWithPrefsController: self];
+    [BlocklistDownloaderViewController downloadWithPrefsController:self];
 }
 
-- (void) setBlocklistAutoUpdate: (id) sender
+- (void)setBlocklistAutoUpdate:(id)sender
 {
     [BlocklistScheduler.scheduler updateSchedule];
 }
 
-- (void) updateBlocklistFields
+- (void)updateBlocklistFields
 {
-    const BOOL exists = tr_blocklistExists(fHandle);
+    BOOL const exists = tr_blocklistExists(fHandle);
 
     if (exists)
     {
-        NSString * countString = [NSString formattedUInteger: tr_blocklistGetRuleCount(fHandle)];
-        fBlocklistMessageField.stringValue = [NSString stringWithFormat: NSLocalizedString(@"%@ IP address rules in list",
-            "Prefs -> blocklist -> message"), countString];
+        NSString* countString = [NSString formattedUInteger:tr_blocklistGetRuleCount(fHandle)];
+        fBlocklistMessageField.stringValue = [NSString
+            stringWithFormat:NSLocalizedString(@"%@ IP address rules in list", "Prefs -> blocklist -> message"), countString];
     }
     else
-        fBlocklistMessageField.stringValue = NSLocalizedString(@"A blocklist must first be downloaded",
-            "Prefs -> blocklist -> message");
+    {
+        fBlocklistMessageField.stringValue = NSLocalizedString(@"A blocklist must first be downloaded", "Prefs -> blocklist -> message");
+    }
 
-    NSString * updatedDateString;
+    NSString* updatedDateString;
     if (exists)
     {
-        NSDate * updatedDate = [fDefaults objectForKey: @"BlocklistNewLastUpdateSuccess"];
+        NSDate* updatedDate = [fDefaults objectForKey:@"BlocklistNewLastUpdateSuccess"];
 
         if (updatedDate)
-            updatedDateString = [NSDateFormatter localizedStringFromDate: updatedDate dateStyle: NSDateFormatterFullStyle timeStyle: NSDateFormatterShortStyle];
+        {
+            updatedDateString = [NSDateFormatter localizedStringFromDate:updatedDate dateStyle:NSDateFormatterFullStyle
+                                                               timeStyle:NSDateFormatterShortStyle];
+        }
         else
+        {
             updatedDateString = NSLocalizedString(@"N/A", "Prefs -> blocklist -> message");
+        }
     }
     else
+    {
         updatedDateString = NSLocalizedString(@"Never", "Prefs -> blocklist -> message");
+    }
 
-    fBlocklistDateField.stringValue = [NSString stringWithFormat: @"%@: %@",
-        NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString];
+    fBlocklistDateField.stringValue = [NSString
+        stringWithFormat:@"%@: %@", NSLocalizedString(@"Last updated", "Prefs -> blocklist -> message"), updatedDateString];
 }
 
-- (void) updateBlocklistURLField
+- (void)updateBlocklistURLField
 {
-    NSString * blocklistString = fBlocklistURLField.stringValue;
+    NSString* blocklistString = fBlocklistURLField.stringValue;
 
-    [fDefaults setObject: blocklistString forKey: @"BlocklistURL"];
+    [fDefaults setObject:blocklistString forKey:@"BlocklistURL"];
     tr_blocklistSetURL(fHandle, blocklistString.UTF8String);
 
     [self updateBlocklistButton];
 }
 
-- (void) updateBlocklistButton
+- (void)updateBlocklistButton
 {
-    NSString * blocklistString = [fDefaults objectForKey: @"BlocklistURL"];
-    const BOOL enable = (blocklistString && ![blocklistString isEqualToString: @""])
-                            && [fDefaults boolForKey: @"BlocklistNew"];
+    NSString* blocklistString = [fDefaults objectForKey:@"BlocklistURL"];
+    BOOL const enable = (blocklistString && ![blocklistString isEqualToString:@""]) && [fDefaults boolForKey:@"BlocklistNew"];
     fBlocklistButton.enabled = enable;
 }
 
-- (void) setAutoStartDownloads: (id) sender
+- (void)setAutoStartDownloads:(id)sender
 {
-    tr_sessionSetPaused(fHandle, ![fDefaults boolForKey: @"AutoStartDownload"]);
+    tr_sessionSetPaused(fHandle, ![fDefaults boolForKey:@"AutoStartDownload"]);
 }
 
-- (void) applySpeedSettings: (id) sender
+- (void)applySpeedSettings:(id)sender
 {
-    tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
-    tr_sessionSetSpeedLimit_KBps(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
+    tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey:@"CheckUpload"]);
+    tr_sessionSetSpeedLimit_KBps(fHandle, TR_UP, [fDefaults integerForKey:@"UploadLimit"]);
 
-    tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
-    tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
+    tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey:@"CheckDownload"]);
+    tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, [fDefaults integerForKey:@"DownloadLimit"]);
 
-    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }
 
-- (void) applyAltSpeedSettings
+- (void)applyAltSpeedSettings
 {
-    tr_sessionSetAltSpeed_KBps(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-    tr_sessionSetAltSpeed_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+    tr_sessionSetAltSpeed_KBps(fHandle, TR_UP, [fDefaults integerForKey:@"SpeedLimitUploadLimit"]);
+    tr_sessionSetAltSpeed_KBps(fHandle, TR_DOWN, [fDefaults integerForKey:@"SpeedLimitDownloadLimit"]);
 
-    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }
 
-- (void) applyRatioSetting: (id) sender
+- (void)applyRatioSetting:(id)sender
 {
-    tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
-    tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey: @"RatioLimit"]);
+    tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey:@"RatioCheck"]);
+    tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey:@"RatioLimit"]);
 
     //reload main table for seeding progress
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 
     //reload global settings in inspector
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGlobalOptions" object:nil];
 }
 
-- (void) setRatioStop: (id) sender
+- (void)setRatioStop:(id)sender
 {
-    [fDefaults setFloat: [sender floatValue] forKey: @"RatioLimit"];
+    [fDefaults setFloat:[sender floatValue] forKey:@"RatioLimit"];
 
-    [self applyRatioSetting: nil];
+    [self applyRatioSetting:nil];
 }
 
-- (void) updateRatioStopField
+- (void)updateRatioStopField
 {
     if (fHasLoaded)
-        fRatioStopField.floatValue = [fDefaults floatForKey: @"RatioLimit"];
+    {
+        fRatioStopField.floatValue = [fDefaults floatForKey:@"RatioLimit"];
+    }
 }
 
-- (void) updateRatioStopFieldOld
+- (void)updateRatioStopFieldOld
 {
     [self updateRatioStopField];
 
-    [self applyRatioSetting: nil];
+    [self applyRatioSetting:nil];
 }
 
-- (void) applyIdleStopSetting: (id) sender
+- (void)applyIdleStopSetting:(id)sender
 {
-    tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
-    tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey: @"IdleLimitMinutes"]);
+    tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey:@"IdleLimitCheck"]);
+    tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey:@"IdleLimitMinutes"]);
 
     //reload main table for remaining seeding time
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 
     //reload global settings in inspector
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGlobalOptions" object:nil];
 }
 
-- (void) setIdleStop: (id) sender
+- (void)setIdleStop:(id)sender
 {
-    [fDefaults setInteger: [sender integerValue] forKey: @"IdleLimitMinutes"];
+    [fDefaults setInteger:[sender integerValue] forKey:@"IdleLimitMinutes"];
 
-    [self applyIdleStopSetting: nil];
+    [self applyIdleStopSetting:nil];
 }
 
-- (void) updateLimitStopField
+- (void)updateLimitStopField
 {
     if (fHasLoaded)
-        fIdleStopField.integerValue = [fDefaults integerForKey: @"IdleLimitMinutes"];
+    {
+        fIdleStopField.integerValue = [fDefaults integerForKey:@"IdleLimitMinutes"];
+    }
 }
 
-- (void) updateLimitFields
+- (void)updateLimitFields
 {
     if (!fHasLoaded)
+    {
         return;
+    }
 
-    fUploadField.intValue = [fDefaults integerForKey: @"UploadLimit"];
-    fDownloadField.intValue = [fDefaults integerForKey: @"DownloadLimit"];
+    fUploadField.intValue = [fDefaults integerForKey:@"UploadLimit"];
+    fDownloadField.intValue = [fDefaults integerForKey:@"DownloadLimit"];
 }
 
-- (void) setGlobalLimit: (id) sender
+- (void)setGlobalLimit:(id)sender
 {
-    [fDefaults setInteger: [sender intValue] forKey: sender == fUploadField ? @"UploadLimit" : @"DownloadLimit"];
-    [self applySpeedSettings: self];
+    [fDefaults setInteger:[sender intValue] forKey:sender == fUploadField ? @"UploadLimit" : @"DownloadLimit"];
+    [self applySpeedSettings:self];
 }
 
-- (void) setSpeedLimit: (id) sender
+- (void)setSpeedLimit:(id)sender
 {
-    [fDefaults setInteger: [sender intValue] forKey: sender == fSpeedLimitUploadField
-                                                        ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
+    [fDefaults setInteger:[sender intValue]
+                   forKey:sender == fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
     [self applyAltSpeedSettings];
 }
 
-- (void) setAutoSpeedLimit: (id) sender
+- (void)setAutoSpeedLimit:(id)sender
 {
-    tr_sessionUseAltSpeedTime(fHandle, [fDefaults boolForKey: @"SpeedLimitAuto"]);
+    tr_sessionUseAltSpeedTime(fHandle, [fDefaults boolForKey:@"SpeedLimitAuto"]);
 }
 
-- (void) setAutoSpeedLimitTime: (id) sender
+- (void)setAutoSpeedLimitTime:(id)sender
 {
-    tr_sessionSetAltSpeedBegin(fHandle, [PrefsController dateToTimeSum: [fDefaults objectForKey: @"SpeedLimitAutoOnDate"]]);
-    tr_sessionSetAltSpeedEnd(fHandle, [PrefsController dateToTimeSum: [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
+    tr_sessionSetAltSpeedBegin(fHandle, [PrefsController dateToTimeSum:[fDefaults objectForKey:@"SpeedLimitAutoOnDate"]]);
+    tr_sessionSetAltSpeedEnd(fHandle, [PrefsController dateToTimeSum:[fDefaults objectForKey:@"SpeedLimitAutoOffDate"]]);
 }
 
-- (void) setAutoSpeedLimitDay: (id) sender
+- (void)setAutoSpeedLimitDay:(id)sender
 {
     tr_sessionSetAltSpeedDay(fHandle, [sender selectedItem].tag);
 }
 
-+ (NSInteger) dateToTimeSum: (NSDate *) date
++ (NSInteger)dateToTimeSum:(NSDate*)date
 {
-    NSCalendar * calendar = NSCalendar.currentCalendar;
-    NSDateComponents * components = [calendar components: NSCalendarUnitHour | NSCalendarUnitMinute fromDate: date];
+    NSCalendar* calendar = NSCalendar.currentCalendar;
+    NSDateComponents* components = [calendar components:NSCalendarUnitHour | NSCalendarUnitMinute fromDate:date];
     return components.hour * 60 + components.minute;
 }
 
-+ (NSDate *) timeSumToDate: (NSInteger) sum
++ (NSDate*)timeSumToDate:(NSInteger)sum
 {
-    NSDateComponents * comps = [[NSDateComponents alloc] init];
+    NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;
     comps.minute = sum % 60;
 
-    return [NSCalendar.currentCalendar dateFromComponents: comps];
+    return [NSCalendar.currentCalendar dateFromComponents:comps];
 }
 
-- (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
+- (BOOL)control:(NSControl*)control textShouldBeginEditing:(NSText*)fieldEditor
 {
     fInitialString = control.stringValue;
 
     return YES;
 }
 
-- (BOOL) control: (NSControl *) control didFailToFormatString: (NSString *) string errorDescription: (NSString *) error
+- (BOOL)control:(NSControl*)control didFailToFormatString:(NSString*)string errorDescription:(NSString*)error
 {
     NSBeep();
     if (fInitialString)
@@ -737,86 +802,88 @@
     return NO;
 }
 
-- (void) setBadge: (id) sender
+- (void)setBadge:(id)sender
 {
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:self];
 }
 
-- (IBAction) openNotificationSystemPrefs: (NSButton *) sender
+- (IBAction)openNotificationSystemPrefs:(NSButton*)sender
 {
-    [NSWorkspace.sharedWorkspace openURL: [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
 }
 
-- (void) resetWarnings: (id) sender
+- (void)resetWarnings:(id)sender
 {
-    [fDefaults removeObjectForKey: @"WarningDuplicate"];
-    [fDefaults removeObjectForKey: @"WarningRemainingSpace"];
-    [fDefaults removeObjectForKey: @"WarningFolderDataSameName"];
-    [fDefaults removeObjectForKey: @"WarningResetStats"];
-    [fDefaults removeObjectForKey: @"WarningCreatorBlankAddress"];
-    [fDefaults removeObjectForKey: @"WarningCreatorPrivateBlankAddress"];
-    [fDefaults removeObjectForKey: @"WarningRemoveTrackers"];
-    [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
-    [fDefaults removeObjectForKey: @"WarningRemoveCompleted"];
-    [fDefaults removeObjectForKey: @"WarningDonate"];
+    [fDefaults removeObjectForKey:@"WarningDuplicate"];
+    [fDefaults removeObjectForKey:@"WarningRemainingSpace"];
+    [fDefaults removeObjectForKey:@"WarningFolderDataSameName"];
+    [fDefaults removeObjectForKey:@"WarningResetStats"];
+    [fDefaults removeObjectForKey:@"WarningCreatorBlankAddress"];
+    [fDefaults removeObjectForKey:@"WarningCreatorPrivateBlankAddress"];
+    [fDefaults removeObjectForKey:@"WarningRemoveTrackers"];
+    [fDefaults removeObjectForKey:@"WarningInvalidOpen"];
+    [fDefaults removeObjectForKey:@"WarningRemoveCompleted"];
+    [fDefaults removeObjectForKey:@"WarningDonate"];
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }
 
-- (void) setDefaultForMagnets: (id) sender
+- (void)setDefaultForMagnets:(id)sender
 {
-    NSString * bundleID = NSBundle.mainBundle.bundleIdentifier;
-    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (__bridge CFStringRef)bundleID);
+    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
+    OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
     if (result != noErr)
+    {
         NSLog(@"Failed setting default magnet link handler");
+    }
 }
 
-- (void) setQueue: (id) sender
+- (void)setQueue:(id)sender
 {
     //let's just do both - easier that way
-    tr_sessionSetQueueEnabled(fHandle, TR_DOWN, [fDefaults boolForKey: @"Queue"]);
-    tr_sessionSetQueueEnabled(fHandle, TR_UP, [fDefaults boolForKey: @"QueueSeed"]);
+    tr_sessionSetQueueEnabled(fHandle, TR_DOWN, [fDefaults boolForKey:@"Queue"]);
+    tr_sessionSetQueueEnabled(fHandle, TR_UP, [fDefaults boolForKey:@"QueueSeed"]);
 
     //handle if any transfers switch from queued to paused
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateQueue" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
 }
 
-- (void) setQueueNumber: (id) sender
+- (void)setQueueNumber:(id)sender
 {
-    const NSInteger number = [sender intValue];
-    const BOOL seed = sender == fQueueSeedField;
+    NSInteger const number = [sender intValue];
+    BOOL const seed = sender == fQueueSeedField;
 
-    [fDefaults setInteger: number forKey: seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
+    [fDefaults setInteger:number forKey:seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
 
     tr_sessionSetQueueSize(fHandle, seed ? TR_UP : TR_DOWN, number);
 }
 
-- (void) setStalled: (id) sender
+- (void)setStalled:(id)sender
 {
-    tr_sessionSetQueueStalledEnabled(fHandle, [fDefaults boolForKey: @"CheckStalled"]);
+    tr_sessionSetQueueStalledEnabled(fHandle, [fDefaults boolForKey:@"CheckStalled"]);
 
     //reload main table for stalled status
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 }
 
-- (void) setStalledMinutes: (id) sender
+- (void)setStalledMinutes:(id)sender
 {
-    const NSInteger min = [sender intValue];
-    [fDefaults setInteger: min forKey: @"StalledMinutes"];
+    NSInteger const min = [sender intValue];
+    [fDefaults setInteger:min forKey:@"StalledMinutes"];
     tr_sessionSetQueueStalledMinutes(fHandle, min);
 
     //reload main table for stalled status
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:self];
 }
 
-- (void) setDownloadLocation: (id) sender
+- (void)setDownloadLocation:(id)sender
 {
-    [fDefaults setBool: fFolderPopUp.indexOfSelectedItem == DOWNLOAD_FOLDER forKey: @"DownloadLocationConstant"];
+    [fDefaults setBool:fFolderPopUp.indexOfSelectedItem == DOWNLOAD_FOLDER forKey:@"DownloadLocationConstant"];
     [self updateShowAddMagnetWindowField];
 }
 
-- (void) folderSheetShow: (id) sender
+- (void)folderSheetShow:(id)sender
 {
-    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
 
     panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
     panel.allowsMultipleSelection = NO;
@@ -824,14 +891,14 @@
     panel.canChooseDirectories = YES;
     panel.canCreateDirectories = YES;
 
-    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+            [fFolderPopUp selectItemAtIndex:DOWNLOAD_FOLDER];
 
-            NSString * folder = panel.URLs[0].path;
-            [fDefaults setObject: folder forKey: @"DownloadFolder"];
-            [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
+            NSString* folder = panel.URLs[0].path;
+            [fDefaults setObject:folder forKey:@"DownloadFolder"];
+            [fDefaults setBool:YES forKey:@"DownloadLocationConstant"];
             [self updateShowAddMagnetWindowField];
 
             assert(folder.length > 0);
@@ -840,14 +907,14 @@
         else
         {
             //reset if cancelled
-            [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
+            [fFolderPopUp selectItemAtIndex:[fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
         }
     }];
 }
 
-- (void) incompleteFolderSheetShow: (id) sender
+- (void)incompleteFolderSheetShow:(id)sender
 {
-    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
 
     panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
     panel.allowsMultipleSelection = NO;
@@ -855,22 +922,22 @@
     panel.canChooseDirectories = YES;
     panel.canCreateDirectories = YES;
 
-    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * folder = panel.URLs[0].path;
-            [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
+            NSString* folder = panel.URLs[0].path;
+            [fDefaults setObject:folder forKey:@"IncompleteDownloadFolder"];
 
             assert(folder.length > 0);
             tr_sessionSetIncompleteDir(fHandle, folder.fileSystemRepresentation);
         }
-        [fIncompleteFolderPopUp selectItemAtIndex: 0];
+        [fIncompleteFolderPopUp selectItemAtIndex:0];
     }];
 }
 
-- (void) doneScriptSheetShow:(id)sender
+- (void)doneScriptSheetShow:(id)sender
 {
-    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
 
     panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
     panel.allowsMultipleSelection = NO;
@@ -878,41 +945,41 @@
     panel.canChooseDirectories = NO;
     panel.canCreateDirectories = NO;
 
-    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * filePath = panel.URLs[0].path;
+            NSString* filePath = panel.URLs[0].path;
 
             assert(filePath.length > 0);
 
-            [fDefaults setObject: filePath forKey: @"DoneScriptPath"];
+            [fDefaults setObject:filePath forKey:@"DoneScriptPath"];
             tr_sessionSetTorrentDoneScript(fHandle, filePath.fileSystemRepresentation);
 
-            [fDefaults setBool: YES forKey: @"DoneScriptEnabled"];
+            [fDefaults setBool:YES forKey:@"DoneScriptEnabled"];
             tr_sessionSetTorrentDoneScriptEnabled(fHandle, YES);
         }
-        [fDoneScriptPopUp selectItemAtIndex: 0];
+        [fDoneScriptPopUp selectItemAtIndex:0];
     }];
 }
 
-- (void) setUseIncompleteFolder: (id) sender
+- (void)setUseIncompleteFolder:(id)sender
 {
-    tr_sessionSetIncompleteDirEnabled(fHandle, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
+    tr_sessionSetIncompleteDirEnabled(fHandle, [fDefaults boolForKey:@"UseIncompleteDownloadFolder"]);
 }
 
-- (void) setRenamePartialFiles: (id) sender
+- (void)setRenamePartialFiles:(id)sender
 {
-    tr_sessionSetIncompleteFileNamingEnabled(fHandle, [fDefaults boolForKey: @"RenamePartialFiles"]);
+    tr_sessionSetIncompleteFileNamingEnabled(fHandle, [fDefaults boolForKey:@"RenamePartialFiles"]);
 }
 
-- (void) setShowAddMagnetWindow: (id) sender
+- (void)setShowAddMagnetWindow:(id)sender
 {
-    [fDefaults setBool: (fShowMagnetAddWindowCheck.state == NSOnState) forKey: @"MagnetOpenAsk"];
+    [fDefaults setBool:(fShowMagnetAddWindowCheck.state == NSOnState) forKey:@"MagnetOpenAsk"];
 }
 
-- (void) updateShowAddMagnetWindowField
+- (void)updateShowAddMagnetWindowField
 {
-    if (![fDefaults boolForKey: @"DownloadLocationConstant"])
+    if (![fDefaults boolForKey:@"DownloadLocationConstant"])
     {
         //always show the add window for magnet links when the download location is the same as the torrent file
         fShowMagnetAddWindowCheck.state = NSOnState;
@@ -920,45 +987,50 @@
     }
     else
     {
-        fShowMagnetAddWindowCheck.state = [fDefaults boolForKey: @"MagnetOpenAsk"];
+        fShowMagnetAddWindowCheck.state = [fDefaults boolForKey:@"MagnetOpenAsk"];
         fShowMagnetAddWindowCheck.enabled = YES;
     }
 }
 
-- (void) setDoneScriptEnabled: (id) sender
+- (void)setDoneScriptEnabled:(id)sender
 {
-    if ([fDefaults boolForKey: @"DoneScriptEnabled"] && ![NSFileManager.defaultManager fileExistsAtPath: [fDefaults stringForKey:@"DoneScriptPath"]])
+    if ([fDefaults boolForKey:@"DoneScriptEnabled"] &&
+        ![NSFileManager.defaultManager fileExistsAtPath:[fDefaults stringForKey:@"DoneScriptPath"]])
     {
         // enabled is set but script file doesn't exist, so prompt for one and disable until they pick one
-        [fDefaults setBool: NO forKey: @"DoneScriptEnabled"];
-        [self doneScriptSheetShow: sender];
+        [fDefaults setBool:NO forKey:@"DoneScriptEnabled"];
+        [self doneScriptSheetShow:sender];
     }
-    tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey: @"DoneScriptEnabled"]);
+    tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey:@"DoneScriptEnabled"]);
 }
 
-- (void) setAutoImport: (id) sender
+- (void)setAutoImport:(id)sender
 {
-    NSString * path;
-    if ((path = [fDefaults stringForKey: @"AutoImportDirectory"]))
+    NSString* path;
+    if ((path = [fDefaults stringForKey:@"AutoImportDirectory"]))
     {
-        VDKQueue * watcherQueue = ((Controller *)NSApp.delegate).fileWatcherQueue;
-        if ([fDefaults boolForKey: @"AutoImport"])
+        VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
+        if ([fDefaults boolForKey:@"AutoImport"])
         {
             path = path.stringByExpandingTildeInPath;
-            [watcherQueue addPath: path notifyingAbout: VDKQueueNotifyAboutWrite];
+            [watcherQueue addPath:path notifyingAbout:VDKQueueNotifyAboutWrite];
         }
         else
+        {
             [watcherQueue removeAllPaths];
+        }
 
-        [NSNotificationCenter.defaultCenter postNotificationName: @"AutoImportSettingChange" object: self];
+        [NSNotificationCenter.defaultCenter postNotificationName:@"AutoImportSettingChange" object:self];
     }
     else
-        [self importFolderSheetShow: nil];
+    {
+        [self importFolderSheetShow:nil];
+    }
 }
 
-- (void) importFolderSheetShow: (id) sender
+- (void)importFolderSheetShow:(id)sender
 {
-    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
 
     panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
     panel.allowsMultipleSelection = NO;
@@ -966,178 +1038,199 @@
     panel.canChooseDirectories = YES;
     panel.canCreateDirectories = YES;
 
-    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            VDKQueue * watcherQueue = ((Controller *)NSApp.delegate).fileWatcherQueue;
+            VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
             [watcherQueue removeAllPaths];
 
-            NSString * path = (panel.URLs[0]).path;
-            [fDefaults setObject: path forKey: @"AutoImportDirectory"];
-            [watcherQueue addPath: path.stringByExpandingTildeInPath notifyingAbout: VDKQueueNotifyAboutWrite];
+            NSString* path = (panel.URLs[0]).path;
+            [fDefaults setObject:path forKey:@"AutoImportDirectory"];
+            [watcherQueue addPath:path.stringByExpandingTildeInPath notifyingAbout:VDKQueueNotifyAboutWrite];
 
-            [NSNotificationCenter.defaultCenter postNotificationName: @"AutoImportSettingChange" object: self];
+            [NSNotificationCenter.defaultCenter postNotificationName:@"AutoImportSettingChange" object:self];
         }
         else
         {
-            NSString * path = [fDefaults stringForKey: @"AutoImportDirectory"];
+            NSString* path = [fDefaults stringForKey:@"AutoImportDirectory"];
             if (!path)
-                [fDefaults setBool: NO forKey: @"AutoImport"];
+                [fDefaults setBool:NO forKey:@"AutoImport"];
         }
 
-        [fImportFolderPopUp selectItemAtIndex: 0];
+        [fImportFolderPopUp selectItemAtIndex:0];
     }];
 }
 
-- (void) setAutoSize: (id) sender
+- (void)setAutoSize:(id)sender
 {
-    [NSNotificationCenter.defaultCenter postNotificationName: @"AutoSizeSettingChange" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"AutoSizeSettingChange" object:self];
 }
 
-- (void) setRPCEnabled: (id) sender
+- (void)setRPCEnabled:(id)sender
 {
-    BOOL enable = [fDefaults boolForKey: @"RPC"];
+    BOOL enable = [fDefaults boolForKey:@"RPC"];
     tr_sessionSetRPCEnabled(fHandle, enable);
 
-    [self setRPCWebUIDiscovery: nil];
+    [self setRPCWebUIDiscovery:nil];
 }
 
-- (void) linkWebUI: (id) sender
+- (void)linkWebUI:(id)sender
 {
-    NSString * urlString = [NSString stringWithFormat: WEBUI_URL, [fDefaults integerForKey: @"RPCPort"]];
-    [NSWorkspace.sharedWorkspace openURL: [NSURL URLWithString: urlString]];
+    NSString* urlString = [NSString stringWithFormat:WEBUI_URL, [fDefaults integerForKey:@"RPCPort"]];
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:urlString]];
 }
 
-- (void) setRPCAuthorize: (id) sender
+- (void)setRPCAuthorize:(id)sender
 {
-    tr_sessionSetRPCPasswordEnabled(fHandle, [fDefaults boolForKey: @"RPCAuthorize"]);
+    tr_sessionSetRPCPasswordEnabled(fHandle, [fDefaults boolForKey:@"RPCAuthorize"]);
 }
 
-- (void) setRPCUsername: (id) sender
+- (void)setRPCUsername:(id)sender
 {
-    tr_sessionSetRPCUsername(fHandle, [fDefaults stringForKey: @"RPCUsername"].UTF8String);
+    tr_sessionSetRPCUsername(fHandle, [fDefaults stringForKey:@"RPCUsername"].UTF8String);
 }
 
-- (void) setRPCPassword: (id) sender
+- (void)setRPCPassword:(id)sender
 {
     fRPCPassword = [[sender stringValue] copy];
 
-    const char * password = [sender stringValue].UTF8String;
-    [self setKeychainPassword: password forService: RPC_KEYCHAIN_SERVICE username: RPC_KEYCHAIN_NAME];
+    char const* password = [sender stringValue].UTF8String;
+    [self setKeychainPassword:password forService:RPC_KEYCHAIN_SERVICE username:RPC_KEYCHAIN_NAME];
 
     tr_sessionSetRPCPassword(fHandle, password);
 }
 
-- (void) updateRPCPassword
+- (void)updateRPCPassword
 {
     UInt32 passwordLength;
-    const char * password = nil;
-    SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
-        strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
+    char const* password = nil;
+    SecKeychainFindGenericPassword(
+        NULL,
+        strlen(RPC_KEYCHAIN_SERVICE),
+        RPC_KEYCHAIN_SERVICE,
+        strlen(RPC_KEYCHAIN_NAME),
+        RPC_KEYCHAIN_NAME,
+        &passwordLength,
+        (void**)&password,
+        NULL);
 
     if (password != NULL)
     {
-        char fullPassword[passwordLength+1];
+        char fullPassword[passwordLength + 1];
         strncpy(fullPassword, password, passwordLength);
         fullPassword[passwordLength] = '\0';
-        SecKeychainItemFreeContent(NULL, (void *)password);
+        SecKeychainItemFreeContent(NULL, (void*)password);
 
         tr_sessionSetRPCPassword(fHandle, fullPassword);
 
-        fRPCPassword = [[NSString alloc] initWithUTF8String: fullPassword];
+        fRPCPassword = [[NSString alloc] initWithUTF8String:fullPassword];
         fRPCPasswordField.stringValue = fRPCPassword;
     }
     else
-        fRPCPassword = nil;
-}
-
-- (void) setRPCPort: (id) sender
-{
-    int port = [sender intValue];
-    [fDefaults setInteger: port forKey: @"RPCPort"];
-    tr_sessionSetRPCPort(fHandle, port);
-
-    [self setRPCWebUIDiscovery: nil];
-}
-
-- (void) setRPCUseWhitelist: (id) sender
-{
-    tr_sessionSetRPCWhitelistEnabled(fHandle, [fDefaults boolForKey: @"RPCUseWhitelist"]);
-}
-
-- (void) setRPCWebUIDiscovery: (id) sender
-{
-    if ([fDefaults boolForKey:@"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
-        [BonjourController.defaultController startWithPort: [fDefaults integerForKey: @"RPCPort"]];
-    else
     {
-        if (BonjourController.defaultControllerExists)
-            [BonjourController.defaultController stop];
+        fRPCPassword = nil;
     }
 }
 
-- (void) updateRPCWhitelist
+- (void)setRPCPort:(id)sender
 {
-    NSString * string = [fRPCWhitelistArray componentsJoinedByString: @","];
+    int port = [sender intValue];
+    [fDefaults setInteger:port forKey:@"RPCPort"];
+    tr_sessionSetRPCPort(fHandle, port);
+
+    [self setRPCWebUIDiscovery:nil];
+}
+
+- (void)setRPCUseWhitelist:(id)sender
+{
+    tr_sessionSetRPCWhitelistEnabled(fHandle, [fDefaults boolForKey:@"RPCUseWhitelist"]);
+}
+
+- (void)setRPCWebUIDiscovery:(id)sender
+{
+    if ([fDefaults boolForKey:@"RPC"] && [fDefaults boolForKey:@"RPCWebDiscovery"])
+    {
+        [BonjourController.defaultController startWithPort:[fDefaults integerForKey:@"RPCPort"]];
+    }
+    else
+    {
+        if (BonjourController.defaultControllerExists)
+        {
+            [BonjourController.defaultController stop];
+        }
+    }
+}
+
+- (void)updateRPCWhitelist
+{
+    NSString* string = [fRPCWhitelistArray componentsJoinedByString:@","];
     tr_sessionSetRPCWhitelist(fHandle, string.UTF8String);
 }
 
-- (void) addRemoveRPCIP: (id) sender
+- (void)addRemoveRPCIP:(id)sender
 {
     //don't allow add/remove when currently adding - it leads to weird results
     if (fRPCWhitelistTable.editedRow != -1)
-        return;
-
-    if ([[sender cell] tagForSegment: [sender selectedSegment]] == RPC_IP_REMOVE_TAG)
     {
-        [fRPCWhitelistArray removeObjectsAtIndexes: fRPCWhitelistTable.selectedRowIndexes];
-        [fRPCWhitelistTable deselectAll: self];
+        return;
+    }
+
+    if ([[sender cell] tagForSegment:[sender selectedSegment]] == RPC_IP_REMOVE_TAG)
+    {
+        [fRPCWhitelistArray removeObjectsAtIndexes:fRPCWhitelistTable.selectedRowIndexes];
+        [fRPCWhitelistTable deselectAll:self];
         [fRPCWhitelistTable reloadData];
 
-        [fDefaults setObject: fRPCWhitelistArray forKey: @"RPCWhitelist"];
+        [fDefaults setObject:fRPCWhitelistArray forKey:@"RPCWhitelist"];
         [self updateRPCWhitelist];
     }
     else
     {
-        [fRPCWhitelistArray addObject: @""];
+        [fRPCWhitelistArray addObject:@""];
         [fRPCWhitelistTable reloadData];
 
-        const int row = fRPCWhitelistArray.count - 1;
-        [fRPCWhitelistTable selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-        [fRPCWhitelistTable editColumn: 0 row: row withEvent: nil select: YES];
+        int const row = fRPCWhitelistArray.count - 1;
+        [fRPCWhitelistTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        [fRPCWhitelistTable editColumn:0 row:row withEvent:nil select:YES];
     }
 }
 
-- (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
     return fRPCWhitelistArray.count;
 }
 
-- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
+- (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
     return fRPCWhitelistArray[row];
 }
 
-- (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
-    row: (NSInteger) row
+- (void)tableView:(NSTableView*)tableView
+    setObjectValue:(id)object
+    forTableColumn:(NSTableColumn*)tableColumn
+               row:(NSInteger)row
 {
-    NSArray * components = [object componentsSeparatedByString: @"."];
-    NSMutableArray * newComponents = [NSMutableArray arrayWithCapacity: 4];
+    NSArray* components = [object componentsSeparatedByString:@"."];
+    NSMutableArray* newComponents = [NSMutableArray arrayWithCapacity:4];
 
     //create better-formatted ip string
     BOOL valid = false;
     if (components.count == 4)
     {
         valid = true;
-        for (NSString * component in components)
+        for (NSString* component in components)
         {
-            if ([component isEqualToString: @"*"])
-                [newComponents addObject: component];
+            if ([component isEqualToString:@"*"])
+            {
+                [newComponents addObject:component];
+            }
             else
             {
                 int num = component.intValue;
                 if (num >= 0 && num < 256)
-                    [newComponents addObject: @(num).stringValue];
+                {
+                    [newComponents addObject:@(num).stringValue];
+                }
                 else
                 {
                     valid = false;
@@ -1147,210 +1240,214 @@
         }
     }
 
-    NSString * newIP;
+    NSString* newIP;
     if (valid)
     {
-        newIP = [newComponents componentsJoinedByString: @"."];
+        newIP = [newComponents componentsJoinedByString:@"."];
 
         //don't allow the same ip address
-        if ([fRPCWhitelistArray containsObject: newIP] && ![fRPCWhitelistArray[row] isEqualToString: newIP])
+        if ([fRPCWhitelistArray containsObject:newIP] && ![fRPCWhitelistArray[row] isEqualToString:newIP])
+        {
             valid = false;
+        }
     }
 
     if (valid)
     {
         fRPCWhitelistArray[row] = newIP;
-        [fRPCWhitelistArray sortUsingSelector: @selector(compareNumeric:)];
+        [fRPCWhitelistArray sortUsingSelector:@selector(compareNumeric:)];
     }
     else
     {
         NSBeep();
-        if ([fRPCWhitelistArray[row] isEqualToString: @""])
-            [fRPCWhitelistArray removeObjectAtIndex: row];
+        if ([fRPCWhitelistArray[row] isEqualToString:@""])
+        {
+            [fRPCWhitelistArray removeObjectAtIndex:row];
+        }
     }
 
-    [fRPCWhitelistTable deselectAll: self];
+    [fRPCWhitelistTable deselectAll:self];
     [fRPCWhitelistTable reloadData];
 
-    [fDefaults setObject: fRPCWhitelistArray forKey: @"RPCWhitelist"];
+    [fDefaults setObject:fRPCWhitelistArray forKey:@"RPCWhitelist"];
     [self updateRPCWhitelist];
 }
 
-- (void) tableViewSelectionDidChange: (NSNotification *) notification
+- (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [fRPCAddRemoveControl setEnabled: fRPCWhitelistTable.numberOfSelectedRows > 0 forSegment: RPC_IP_REMOVE_TAG];
+    [fRPCAddRemoveControl setEnabled:fRPCWhitelistTable.numberOfSelectedRows > 0 forSegment:RPC_IP_REMOVE_TAG];
 }
 
-- (void) helpForScript: (id) sender
+- (void)helpForScript:(id)sender
 {
-    [NSHelpManager.sharedHelpManager openHelpAnchor: @"script"
-        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor:@"script"
+                                             inBook:[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleHelpBookName"]];
 }
 
-- (void) helpForPeers: (id) sender
+- (void)helpForPeers:(id)sender
 {
-    [NSHelpManager.sharedHelpManager openHelpAnchor: @"peers"
-        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor:@"peers"
+                                             inBook:[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleHelpBookName"]];
 }
 
-- (void) helpForNetwork: (id) sender
+- (void)helpForNetwork:(id)sender
 {
-    [NSHelpManager.sharedHelpManager openHelpAnchor: @"network"
-        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor:@"network"
+                                             inBook:[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleHelpBookName"]];
 }
 
-- (void) helpForRemote: (id) sender
+- (void)helpForRemote:(id)sender
 {
-    [NSHelpManager.sharedHelpManager openHelpAnchor: @"remote"
-        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor:@"remote"
+                                             inBook:[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleHelpBookName"]];
 }
 
-- (void) rpcUpdatePrefs
+- (void)rpcUpdatePrefs
 {
     //encryption
-    const tr_encryption_mode encryptionMode = tr_sessionGetEncryption(fHandle);
-    [fDefaults setBool: encryptionMode != TR_CLEAR_PREFERRED forKey: @"EncryptionPrefer"];
-    [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
+    tr_encryption_mode const encryptionMode = tr_sessionGetEncryption(fHandle);
+    [fDefaults setBool:encryptionMode != TR_CLEAR_PREFERRED forKey:@"EncryptionPrefer"];
+    [fDefaults setBool:encryptionMode == TR_ENCRYPTION_REQUIRED forKey:@"EncryptionRequire"];
 
     //download directory
-    NSString * downloadLocation = @(tr_sessionGetDownloadDir(fHandle)).stringByStandardizingPath;
-    [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
+    NSString* downloadLocation = @(tr_sessionGetDownloadDir(fHandle)).stringByStandardizingPath;
+    [fDefaults setObject:downloadLocation forKey:@"DownloadFolder"];
 
-    NSString * incompleteLocation = @(tr_sessionGetIncompleteDir(fHandle)).stringByStandardizingPath;
-    [fDefaults setObject: incompleteLocation forKey: @"IncompleteDownloadFolder"];
+    NSString* incompleteLocation = @(tr_sessionGetIncompleteDir(fHandle)).stringByStandardizingPath;
+    [fDefaults setObject:incompleteLocation forKey:@"IncompleteDownloadFolder"];
 
-    const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
-    [fDefaults setBool: useIncomplete forKey: @"UseIncompleteDownloadFolder"];
+    BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
+    [fDefaults setBool:useIncomplete forKey:@"UseIncompleteDownloadFolder"];
 
-    const BOOL usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(fHandle);
-    [fDefaults setBool: usePartialFileRanaming forKey: @"RenamePartialFiles"];
+    BOOL const usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(fHandle);
+    [fDefaults setBool:usePartialFileRanaming forKey:@"RenamePartialFiles"];
 
     //utp
-    const BOOL utp = tr_sessionIsUTPEnabled(fHandle);
-    [fDefaults setBool: utp forKey: @"UTPGlobal"];
+    BOOL const utp = tr_sessionIsUTPEnabled(fHandle);
+    [fDefaults setBool:utp forKey:@"UTPGlobal"];
 
     //peers
-    const uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
-    [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
+    uint16_t const peersTotal = tr_sessionGetPeerLimit(fHandle);
+    [fDefaults setInteger:peersTotal forKey:@"PeersTotal"];
 
-    const uint16_t peersTorrent = tr_sessionGetPeerLimitPerTorrent(fHandle);
-    [fDefaults setInteger: peersTorrent forKey: @"PeersTorrent"];
+    uint16_t const peersTorrent = tr_sessionGetPeerLimitPerTorrent(fHandle);
+    [fDefaults setInteger:peersTorrent forKey:@"PeersTorrent"];
 
     //pex
-    const BOOL pex = tr_sessionIsPexEnabled(fHandle);
-    [fDefaults setBool: pex forKey: @"PEXGlobal"];
+    BOOL const pex = tr_sessionIsPexEnabled(fHandle);
+    [fDefaults setBool:pex forKey:@"PEXGlobal"];
 
     //dht
-    const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
-    [fDefaults setBool: dht forKey: @"DHTGlobal"];
+    BOOL const dht = tr_sessionIsDHTEnabled(fHandle);
+    [fDefaults setBool:dht forKey:@"DHTGlobal"];
 
     //lpd
-    const BOOL lpd = tr_sessionIsLPDEnabled(fHandle);
-    [fDefaults setBool: lpd forKey: @"LocalPeerDiscoveryGlobal"];
+    BOOL const lpd = tr_sessionIsLPDEnabled(fHandle);
+    [fDefaults setBool:lpd forKey:@"LocalPeerDiscoveryGlobal"];
 
     //auto start
-    const BOOL autoStart = !tr_sessionGetPaused(fHandle);
-    [fDefaults setBool: autoStart forKey: @"AutoStartDownload"];
+    BOOL const autoStart = !tr_sessionGetPaused(fHandle);
+    [fDefaults setBool:autoStart forKey:@"AutoStartDownload"];
 
     //port
-    const tr_port port = tr_sessionGetPeerPort(fHandle);
-    [fDefaults setInteger: port forKey: @"BindPort"];
+    tr_port const port = tr_sessionGetPeerPort(fHandle);
+    [fDefaults setInteger:port forKey:@"BindPort"];
 
-    const BOOL nat = tr_sessionIsPortForwardingEnabled(fHandle);
-    [fDefaults setBool: nat forKey: @"NatTraversal"];
+    BOOL const nat = tr_sessionIsPortForwardingEnabled(fHandle);
+    [fDefaults setBool:nat forKey:@"NatTraversal"];
 
     fPeerPort = -1;
     fNatStatus = -1;
     [self updatePortStatus];
 
-    const BOOL randomPort = tr_sessionGetPeerPortRandomOnStart(fHandle);
-    [fDefaults setBool: randomPort forKey: @"RandomPort"];
+    BOOL const randomPort = tr_sessionGetPeerPortRandomOnStart(fHandle);
+    [fDefaults setBool:randomPort forKey:@"RandomPort"];
 
     //speed limit - down
-    const BOOL downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
-    [fDefaults setBool: downLimitEnabled forKey: @"CheckDownload"];
+    BOOL const downLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_DOWN);
+    [fDefaults setBool:downLimitEnabled forKey:@"CheckDownload"];
 
-    const int downLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_DOWN);
-    [fDefaults setInteger: downLimit forKey: @"DownloadLimit"];
+    int const downLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_DOWN);
+    [fDefaults setInteger:downLimit forKey:@"DownloadLimit"];
 
     //speed limit - up
-    const BOOL upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
-    [fDefaults setBool: upLimitEnabled forKey: @"CheckUpload"];
+    BOOL const upLimitEnabled = tr_sessionIsSpeedLimited(fHandle, TR_UP);
+    [fDefaults setBool:upLimitEnabled forKey:@"CheckUpload"];
 
-    const int upLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_UP);
-    [fDefaults setInteger: upLimit forKey: @"UploadLimit"];
+    int const upLimit = tr_sessionGetSpeedLimit_KBps(fHandle, TR_UP);
+    [fDefaults setInteger:upLimit forKey:@"UploadLimit"];
 
     //alt speed limit enabled
-    const BOOL useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
-    [fDefaults setBool: useAltSpeed forKey: @"SpeedLimit"];
+    BOOL const useAltSpeed = tr_sessionUsesAltSpeed(fHandle);
+    [fDefaults setBool:useAltSpeed forKey:@"SpeedLimit"];
 
     //alt speed limit - down
-    const int downLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_DOWN);
-    [fDefaults setInteger: downLimitAlt forKey: @"SpeedLimitDownloadLimit"];
+    int const downLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_DOWN);
+    [fDefaults setInteger:downLimitAlt forKey:@"SpeedLimitDownloadLimit"];
 
     //alt speed limit - up
-    const int upLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_UP);
-    [fDefaults setInteger: upLimitAlt forKey: @"SpeedLimitUploadLimit"];
+    int const upLimitAlt = tr_sessionGetAltSpeed_KBps(fHandle, TR_UP);
+    [fDefaults setInteger:upLimitAlt forKey:@"SpeedLimitUploadLimit"];
 
     //alt speed limit schedule
-    const BOOL useAltSpeedSched = tr_sessionUsesAltSpeedTime(fHandle);
-    [fDefaults setBool: useAltSpeedSched forKey: @"SpeedLimitAuto"];
+    BOOL const useAltSpeedSched = tr_sessionUsesAltSpeedTime(fHandle);
+    [fDefaults setBool:useAltSpeedSched forKey:@"SpeedLimitAuto"];
 
-    NSDate * limitStartDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedBegin(fHandle)];
-    [fDefaults setObject: limitStartDate forKey: @"SpeedLimitAutoOnDate"];
+    NSDate* limitStartDate = [PrefsController timeSumToDate:tr_sessionGetAltSpeedBegin(fHandle)];
+    [fDefaults setObject:limitStartDate forKey:@"SpeedLimitAutoOnDate"];
 
-    NSDate * limitEndDate = [PrefsController timeSumToDate: tr_sessionGetAltSpeedEnd(fHandle)];
-    [fDefaults setObject: limitEndDate forKey: @"SpeedLimitAutoOffDate"];
+    NSDate* limitEndDate = [PrefsController timeSumToDate:tr_sessionGetAltSpeedEnd(fHandle)];
+    [fDefaults setObject:limitEndDate forKey:@"SpeedLimitAutoOffDate"];
 
-    const int limitDay = tr_sessionGetAltSpeedDay(fHandle);
-    [fDefaults setInteger: limitDay forKey: @"SpeedLimitAutoDay"];
+    int const limitDay = tr_sessionGetAltSpeedDay(fHandle);
+    [fDefaults setInteger:limitDay forKey:@"SpeedLimitAutoDay"];
 
     //blocklist
-    const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
-    [fDefaults setBool: blocklist forKey: @"BlocklistNew"];
+    BOOL const blocklist = tr_blocklistIsEnabled(fHandle);
+    [fDefaults setBool:blocklist forKey:@"BlocklistNew"];
 
-    NSString * blocklistURL = @(tr_blocklistGetURL(fHandle));
-    [fDefaults setObject: blocklistURL forKey: @"BlocklistURL"];
+    NSString* blocklistURL = @(tr_blocklistGetURL(fHandle));
+    [fDefaults setObject:blocklistURL forKey:@"BlocklistURL"];
 
     //seed ratio
-    const BOOL ratioLimited = tr_sessionIsRatioLimited(fHandle);
-    [fDefaults setBool: ratioLimited forKey: @"RatioCheck"];
+    BOOL const ratioLimited = tr_sessionIsRatioLimited(fHandle);
+    [fDefaults setBool:ratioLimited forKey:@"RatioCheck"];
 
-    const float ratioLimit = tr_sessionGetRatioLimit(fHandle);
-    [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
+    float const ratioLimit = tr_sessionGetRatioLimit(fHandle);
+    [fDefaults setFloat:ratioLimit forKey:@"RatioLimit"];
 
     //idle seed limit
-    const BOOL idleLimited = tr_sessionIsIdleLimited(fHandle);
-    [fDefaults setBool: idleLimited forKey: @"IdleLimitCheck"];
+    BOOL const idleLimited = tr_sessionIsIdleLimited(fHandle);
+    [fDefaults setBool:idleLimited forKey:@"IdleLimitCheck"];
 
-    const NSUInteger idleLimitMin = tr_sessionGetIdleLimit(fHandle);
-    [fDefaults setInteger: idleLimitMin forKey: @"IdleLimitMinutes"];
+    NSUInteger const idleLimitMin = tr_sessionGetIdleLimit(fHandle);
+    [fDefaults setInteger:idleLimitMin forKey:@"IdleLimitMinutes"];
 
     //queue
-    const BOOL downloadQueue = tr_sessionGetQueueEnabled(fHandle, TR_DOWN);
-    [fDefaults setBool: downloadQueue forKey: @"Queue"];
+    BOOL const downloadQueue = tr_sessionGetQueueEnabled(fHandle, TR_DOWN);
+    [fDefaults setBool:downloadQueue forKey:@"Queue"];
 
-    const int downloadQueueNum = tr_sessionGetQueueSize(fHandle, TR_DOWN);
-    [fDefaults setInteger: downloadQueueNum forKey: @"QueueDownloadNumber"];
+    int const downloadQueueNum = tr_sessionGetQueueSize(fHandle, TR_DOWN);
+    [fDefaults setInteger:downloadQueueNum forKey:@"QueueDownloadNumber"];
 
-    const BOOL seedQueue = tr_sessionGetQueueEnabled(fHandle, TR_UP);
-    [fDefaults setBool: seedQueue forKey: @"QueueSeed"];
+    BOOL const seedQueue = tr_sessionGetQueueEnabled(fHandle, TR_UP);
+    [fDefaults setBool:seedQueue forKey:@"QueueSeed"];
 
-    const int seedQueueNum = tr_sessionGetQueueSize(fHandle, TR_UP);
-    [fDefaults setInteger: seedQueueNum forKey: @"QueueSeedNumber"];
+    int const seedQueueNum = tr_sessionGetQueueSize(fHandle, TR_UP);
+    [fDefaults setInteger:seedQueueNum forKey:@"QueueSeedNumber"];
 
-    const BOOL checkStalled = tr_sessionGetQueueStalledEnabled(fHandle);
-    [fDefaults setBool: checkStalled forKey: @"CheckStalled"];
+    BOOL const checkStalled = tr_sessionGetQueueStalledEnabled(fHandle);
+    [fDefaults setBool:checkStalled forKey:@"CheckStalled"];
 
-    const int stalledMinutes = tr_sessionGetQueueStalledMinutes(fHandle);
-    [fDefaults setInteger: stalledMinutes forKey: @"StalledMinutes"];
+    int const stalledMinutes = tr_sessionGetQueueStalledMinutes(fHandle);
+    [fDefaults setInteger:stalledMinutes forKey:@"StalledMinutes"];
 
     //done script
-    const BOOL doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
-    [fDefaults setBool: doneScriptEnabled forKey: @"DoneScriptEnabled"];
+    BOOL const doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
+    [fDefaults setBool:doneScriptEnabled forKey:@"DoneScriptEnabled"];
 
-    NSString * doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
-    [fDefaults setObject: doneScriptPath forKey: @"DoneScriptPath"];
+    NSString* doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
+    [fDefaults setObject:doneScriptPath forKey:@"DoneScriptPath"];
 
     //update gui if loaded
     if (fHasLoaded)
@@ -1406,40 +1503,54 @@
         fStalledField.intValue = stalledMinutes;
     }
 
-    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 
     //reload global settings in inspector
-    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGlobalOptions" object:nil];
 }
 
 @end
 
 @implementation PrefsController (Private)
 
-- (void) setPrefView: (id) sender
+- (void)setPrefView:(id)sender
 {
-    NSString * identifier;
+    NSString* identifier;
     if (sender)
     {
         identifier = [sender itemIdentifier];
-        [NSUserDefaults.standardUserDefaults setObject: identifier forKey: @"SelectedPrefView"];
+        [NSUserDefaults.standardUserDefaults setObject:identifier forKey:@"SelectedPrefView"];
     }
     else
-        identifier = [NSUserDefaults.standardUserDefaults stringForKey: @"SelectedPrefView"];
+    {
+        identifier = [NSUserDefaults.standardUserDefaults stringForKey:@"SelectedPrefView"];
+    }
 
-    NSView * view;
-    if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
+    NSView* view;
+    if ([identifier isEqualToString:TOOLBAR_TRANSFERS])
+    {
         view = fTransfersView;
-    else if ([identifier isEqualToString: TOOLBAR_GROUPS])
+    }
+    else if ([identifier isEqualToString:TOOLBAR_GROUPS])
+    {
         view = fGroupsView;
-    else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
+    }
+    else if ([identifier isEqualToString:TOOLBAR_BANDWIDTH])
+    {
         view = fBandwidthView;
-    else if ([identifier isEqualToString: TOOLBAR_PEERS])
+    }
+    else if ([identifier isEqualToString:TOOLBAR_PEERS])
+    {
         view = fPeersView;
-    else if ([identifier isEqualToString: TOOLBAR_NETWORK])
+    }
+    else if ([identifier isEqualToString:TOOLBAR_NETWORK])
+    {
         view = fNetworkView;
-    else if ([identifier isEqualToString: TOOLBAR_REMOTE])
+    }
+    else if ([identifier isEqualToString:TOOLBAR_REMOTE])
+    {
         view = fRemoteView;
+    }
     else
     {
         identifier = TOOLBAR_GENERAL; //general view is the default selected
@@ -1448,42 +1559,48 @@
 
     self.window.toolbar.selectedItemIdentifier = identifier;
 
-    NSWindow * window = self.window;
+    NSWindow* window = self.window;
     if (window.contentView == view)
+    {
         return;
+    }
 
     NSRect windowRect = window.frame;
-    const CGFloat difference = NSHeight(view.frame) - NSHeight(window.contentView.frame);
+    CGFloat const difference = NSHeight(view.frame) - NSHeight(window.contentView.frame);
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
 
     view.hidden = YES;
     window.contentView = view;
-    [window setFrame: windowRect display: YES animate: YES];
+    [window setFrame:windowRect display:YES animate:YES];
     view.hidden = NO;
 
     //set title label
     if (sender)
+    {
         window.title = [sender label];
+    }
     else
     {
-        NSToolbar * toolbar = window.toolbar;
-        NSString * itemIdentifier = toolbar.selectedItemIdentifier;
-        for (NSToolbarItem * item in toolbar.items)
-            if ([item.itemIdentifier isEqualToString: itemIdentifier])
+        NSToolbar* toolbar = window.toolbar;
+        NSString* itemIdentifier = toolbar.selectedItemIdentifier;
+        for (NSToolbarItem* item in toolbar.items)
+        {
+            if ([item.itemIdentifier isEqualToString:itemIdentifier])
             {
                 window.title = item.label;
                 break;
             }
+        }
     }
 }
 
-static NSString * getOSStatusDescription(OSStatus errorCode)
+static NSString* getOSStatusDescription(OSStatus errorCode)
 {
-    return [NSError errorWithDomain: NSOSStatusErrorDomain code: errorCode userInfo: NULL].description;
+    return [NSError errorWithDomain:NSOSStatusErrorDomain code:errorCode userInfo:NULL].description;
 }
 
-- (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username
+- (void)setKeychainPassword:(char const*)password forService:(char const*)service username:(char const*)username
 {
     SecKeychainItemRef item = NULL;
     NSUInteger passwordLength = strlen(password);
@@ -1493,9 +1610,11 @@ static NSString * getOSStatusDescription(OSStatus errorCode)
     {
         if (passwordLength > 0) //found, so update
         {
-            result = SecKeychainItemModifyAttributesAndData(item, NULL, passwordLength, (const void *)password);
+            result = SecKeychainItemModifyAttributesAndData(item, NULL, passwordLength, (void const*)password);
             if (result != noErr)
+            {
                 NSLog(@"Problem updating Keychain item: %@", getOSStatusDescription(result));
+            }
         }
         else //remove the item
         {
@@ -1510,14 +1629,17 @@ static NSString * getOSStatusDescription(OSStatus errorCode)
     {
         if (passwordLength > 0)
         {
-            result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username,
-                        passwordLength, (const void *)password, NULL);
+            result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username, passwordLength, (void const*)password, NULL);
             if (result != noErr)
+            {
                 NSLog(@"Problem adding Keychain item: %@", getOSStatusDescription(result));
+            }
         }
     }
     else
+    {
         NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
+    }
 }
 
 @end

@@ -711,9 +711,7 @@ TEST_F(FileTest, pathBasenameDirname)
         XnameTestData{ "/", "/" },
         { "", "." },
 #ifdef _WIN32
-        {
-            "\\", "/"
-        },
+        { "\\", "/" },
         /* Invalid paths */
         { "\\\\\\", nullptr },
         { "123:", nullptr },
@@ -738,11 +736,9 @@ TEST_F(FileTest, pathBasenameDirname)
         { "c:\\a\\b\"c\\d", nullptr },
         { "c:\\a\\b|c\\d", nullptr },
         { "c:\\a\\b?c\\d", nullptr },
-        { "c:\\a\\b*c\\d", nullptr }
+        { "c:\\a\\b*c\\d", nullptr },
 #else
-        {
-            "////", "/"
-        }
+        { "////", "/" },
 #endif
     };
 
@@ -756,9 +752,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "/a/b/c", "c" },
         { "/a/b/c/", "c" },
 #ifdef _WIN32
-        {
-            "c:\\a\\b\\c", "c"
-        },
+        { "c:\\a\\b\\c", "c" },
         { "c:", "/" },
         { "c:/", "/" },
         { "c:\\", "/" },
@@ -770,7 +764,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "\\\\a", "a" },
         { "\\\\1.2.3.4", "1.2.3.4" },
         { "\\", "/" },
-        { "\\a", "a" }
+        { "\\a", "a" },
 #endif
     };
 
@@ -783,9 +777,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "a", "." },
         { "a/", "." },
 #ifdef _WIN32
-        {
-            "C:\\a/b\\c", "C:\\a/b"
-        },
+        { "C:\\a/b\\c", "C:\\a/b" },
         { "C:\\a/b\\c\\", "C:\\a/b" },
         { "C:\\a/b", "C:\\a" },
         { "C:/a", "C:" },
@@ -802,7 +794,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "\\\\a", "\\\\" },
         { "\\\\1.2.3.4", "\\\\" },
         { "\\\\", "\\\\" },
-        { "a/b\\c", "a/b" }
+        { "a/b\\c", "a/b" },
 #endif
     };
 
@@ -982,8 +974,7 @@ TEST_F(FileTest, pathNativeSeparators)
         std::string expected_output;
     };
 
-    auto const tests = std::array<LocalTest, 5>
-    {
+    auto const tests = std::array<LocalTest, 5>{
         LocalTest{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
         { "/", TR_IF_WIN32("\\", "/") },
@@ -1069,7 +1060,7 @@ TEST_F(FileTest, fileOpen)
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err);
     tr_sys_file_write(fd, "s", 1, nullptr, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
-    auto n = uint64_t {};
+    auto n = uint64_t{};
     tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, nullptr);
     EXPECT_EQ(5, n);
     tr_sys_file_close(fd, nullptr);
@@ -1281,7 +1272,7 @@ TEST_F(FileTest, map)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto const contents = std::string { "test" };
+    auto const contents = std::string{ "test" };
     createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
@@ -1295,8 +1286,8 @@ TEST_F(FileTest, map)
 
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
 
-    auto const contents_2 = std::string { "more" };
-    auto n_written = uint64_t {};
+    auto const contents_2 = std::string{ "more" };
+    auto n_written = uint64_t{};
     tr_sys_file_write_at(fd, contents_2.data(), contents_2.size(), 0, &n_written, &err);
     EXPECT_EQ(map_len, contents_2.size());
     EXPECT_EQ(map_len, n_written);
@@ -1320,7 +1311,7 @@ TEST_F(FileTest, fileUtilities)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto const contents = std::string { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
+    auto const contents = std::string{ "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
     createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);

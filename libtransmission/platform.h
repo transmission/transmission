@@ -50,7 +50,7 @@ char* tr_getSessionIdDir(void);
 typedef struct tr_thread tr_thread;
 
 /** @brief Instantiate a new process thread */
-tr_thread* tr_threadNew(void (* func)(void*), void* arg);
+tr_thread* tr_threadNew(void (*func)(void*), void* arg);
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */

@@ -24,38 +24,40 @@
 
 @implementation WebSeedTableView
 
-- (void) mouseDown: (NSEvent *) event
+- (void)mouseDown:(NSEvent*)event
 {
     [self.window makeKeyWindow];
-    [super mouseDown: event];
+    [super mouseDown:event];
 }
 
-- (void) setWebSeeds: (NSArray *) webSeeds
+- (void)setWebSeeds:(NSArray*)webSeeds
 {
     fWebSeeds = webSeeds;
 }
 
-- (void) copy: (id) sender
+- (void)copy:(id)sender
 {
-    NSIndexSet * indexes = self.selectedRowIndexes;
-    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: indexes.count];
-    [fWebSeeds enumerateObjectsAtIndexes: indexes options: 0 usingBlock: ^(NSDictionary * webSeed, NSUInteger idx, BOOL * stop) {
-        [addresses addObject: webSeed[@"Address"]];
+    NSIndexSet* indexes = self.selectedRowIndexes;
+    NSMutableArray* addresses = [NSMutableArray arrayWithCapacity:indexes.count];
+    [fWebSeeds enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(NSDictionary* webSeed, NSUInteger idx, BOOL* stop) {
+        [addresses addObject:webSeed[@"Address"]];
     }];
 
-    NSString * text = [addresses componentsJoinedByString: @"\n"];
+    NSString* text = [addresses componentsJoinedByString:@"\n"];
 
-    NSPasteboard * pb = NSPasteboard.generalPasteboard;
+    NSPasteboard* pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
-    [pb writeObjects: @[text]];
+    [pb writeObjects:@[ text ]];
 }
 
-- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+- (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
-    const SEL action = menuItem.action;
+    SEL const action = menuItem.action;
 
     if (action == @selector(copy:))
+    {
         return self.numberOfSelectedRows > 0;
+    }
 
     return YES;
 }
