@@ -6,6 +6,8 @@
  *
  */
 
+#pragma once
+
 #include "crypto-utils.h" // tr_base64_decode_str()
 #include "error.h"
 #include "file.h" // tr_sys_file_*()
@@ -31,14 +33,14 @@ namespace libtransmission
 namespace test
 {
 
-auto const makeString = [](char*&& s)
+inline std::string makeString(char*&& s)
 {
     auto const ret = std::string(s != nullptr ? s : "");
     tr_free(s);
     return ret;
-};
+}
 
-bool waitFor(std::function<bool()> const& test, int msec)
+inline bool waitFor(std::function<bool()> const& test, int msec)
 {
     auto const deadline = std::chrono::milliseconds{ msec };
     auto const begin = std::chrono::steady_clock::now();
@@ -256,7 +258,7 @@ private:
     Sandbox sandbox_;
 };
 
-void ensureFormattersInited()
+inline void ensureFormattersInited()
 {
     static constexpr int MEM_K = 1024;
     static char const constexpr* const MEM_K_STR = "KiB";
@@ -477,8 +479,9 @@ protected:
 
     virtual void SetUp() override
     {
-        session_ = sessionInit(settings());
         SandboxedTest::SetUp();
+
+        session_ = sessionInit(settings());
     }
 
     virtual void TearDown() override

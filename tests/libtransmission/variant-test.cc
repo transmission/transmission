@@ -446,6 +446,7 @@ TEST_F(VariantTest, stackSmash)
     // confirm that we can serialize it back again
     size_t len;
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
+    EXPECT_NE(nullptr, saved);
     EXPECT_EQ(in, std::string(saved, len));
     tr_free(saved);
 

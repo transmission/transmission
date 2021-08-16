@@ -9,6 +9,7 @@
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
+#include "platform.h"
 #include "subprocess.h"
 #include "utils.h"
 
@@ -31,20 +32,11 @@ namespace libtransmission
 namespace test
 {
 
-std::string getSelfPath()
+std::string getTestProgramPath(std::string const& filename)
 {
-    auto const exec = ::testing::internal::GetArgvs().front();
-    return makeString(tr_sys_path_resolve(exec.data(), nullptr));
-}
-
-std::string getCmdSelfPath()
-{
-    auto const new_suffix = std::string{ ".cmd" };
-    auto exec = getSelfPath();
-    // replace ".exe" suffix with ".cmd"
-    exec.resize(exec.size() - new_suffix.size());
-    exec.append(new_suffix.data(), new_suffix.size());
-    return exec;
+    auto const exe_path = makeString(tr_sys_path_resolve(testing::internal::GetArgvs().front().data(), nullptr));
+    auto const exe_dir = makeString(tr_sys_path_dirname(exe_path.data(), nullptr));
+    return exe_dir + TR_PATH_DELIMITER + filename;
 }
 
 class SubprocessTest
@@ -76,67 +68,6 @@ protected:
 
     std::string self_path_;
 
-    // If command-line args were passed in, then this test is being
-    // invoked as a subprocess: it should dump the info requested by
-    // the command-line flags and then exit without running tests.
-    // FIXME: cleanup does not happen when we exit(). move this all
-    // to a standalone file similar to the .cmd file on Windows
-    void processCommandLineArgs() const
-    {
-        auto const argv = ::testing::internal::GetArgvs();
-        if (argv.size() < 3)
-        {
-            return;
-        }
-
-        auto const& result_path = argv[1];
-        auto const& test_action = argv[2];
-        auto const tmp_result_path = result_path + ".tmp";
-
-        auto fd = tr_sys_file_open(
-            tmp_result_path.data(), // NOLINT
-            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-            0644,
-            nullptr);
-
-        if (fd == TR_BAD_SYS_FILE)
-        {
-            exit(1);
-        }
-
-        if (test_action == arg_dump_args_)
-        {
-            for (size_t i = 3; i < argv.size(); ++i)
-            {
-                tr_sys_file_write_line(fd, argv[i].data(), nullptr);
-            }
-        }
-        else if (test_action == arg_dump_env_)
-        {
-            for (size_t i = 3; i < argv.size(); ++i)
-            {
-                auto const value = makeString(tr_env_get_string(argv[i].data(), "<null>"));
-                tr_sys_file_write_line(fd, value.data(), nullptr);
-            }
-        }
-        else if (test_action == arg_dump_cwd_)
-        {
-            char* const value = tr_sys_dir_get_current(nullptr);
-            tr_sys_file_write_line(fd, value != nullptr ? value : "<null>", nullptr);
-            tr_free(value);
-        }
-        else
-        {
-            tr_sys_file_close(fd, nullptr);
-            tr_sys_path_remove(tmp_result_path.data(), nullptr);
-            exit(1);
-        }
-
-        tr_sys_file_close(fd, nullptr);
-        tr_sys_path_rename(tmp_result_path.data(), result_path.data(), nullptr);
-        exit(0);
-    }
-
     void waitForFileToExist(std::string const& path)
     {
         auto const test = [path]()
@@ -148,7 +79,6 @@ protected:
 
     void SetUp() override
     {
-        processCommandLineArgs();
         self_path_ = GetParam();
     }
 };
@@ -395,20 +325,15 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
     tr_error_clear(&error);
 }
 
-#ifdef _WIN32
-INSTANTIATE_TEST_SUITE_P( //
+INSTANTIATE_TEST_SUITE_P(
     Subprocess,
     SubprocessTest,
-    ::testing::Values( //
-        getSelfPath(),
-        getCmdSelfPath()));
-#else
-INSTANTIATE_TEST_SUITE_P( //
-    Subprocess,
-    SubprocessTest,
-    ::testing::Values( //
-        getSelfPath()));
-#endif
+    TR_IF_WIN32(
+        ::testing::Values( //
+            getTestProgramPath("subprocess-test.exe"),
+            getTestProgramPath("subprocess-test.cmd")),
+        ::testing::Values( //
+            getTestProgramPath("subprocess-test"))));
 
 } // namespace test
 
