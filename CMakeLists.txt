@@ -5,6 +5,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
 
+if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
