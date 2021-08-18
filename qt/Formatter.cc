@@ -22,29 +22,32 @@ Formatter& Formatter::get()
     return singleton;
 }
 
-Formatter::Formatter() :
-    UnitStrings{{
-        { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
-        { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
-        { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
-    }}
+Formatter::Formatter()
+    : UnitStrings{ {
+          { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
+          { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
+          { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
+      } }
 {
     auto const& speed = UnitStrings[SPEED];
-    tr_formatter_speed_init(SpeedBase,
+    tr_formatter_speed_init(
+        SpeedBase,
         speed[KB].toUtf8().constData(),
         speed[MB].toUtf8().constData(),
         speed[GB].toUtf8().constData(),
         speed[TB].toUtf8().constData());
 
     auto const& size = UnitStrings[SIZE];
-    tr_formatter_size_init(SizeBase,
+    tr_formatter_size_init(
+        SizeBase,
         size[KB].toUtf8().constData(),
         size[MB].toUtf8().constData(),
         size[GB].toUtf8().constData(),
         size[TB].toUtf8().constData());
 
     auto const& mem = UnitStrings[MEM];
-    tr_formatter_mem_init(MemBase,
+    tr_formatter_mem_init(
+        MemBase,
         mem[KB].toUtf8().constData(),
         mem[MB].toUtf8().constData(),
         mem[GB].toUtf8().constData(),

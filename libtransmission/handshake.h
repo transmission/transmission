@@ -25,11 +25,19 @@ struct tr_peerIo;
 typedef struct tr_handshake tr_handshake;
 
 /* returns true on success, false on error */
-typedef bool (* handshakeDoneCB)(struct tr_handshake* handshake, struct tr_peerIo* io, bool readAnythingFromPeer,
-    bool isConnected, uint8_t const* peerId, void* userData);
+typedef bool (*handshakeDoneCB)(
+    struct tr_handshake* handshake,
+    struct tr_peerIo* io,
+    bool readAnythingFromPeer,
+    bool isConnected,
+    uint8_t const* peerId,
+    void* userData);
 
 /** @brief instantiate a new handshake */
-tr_handshake* tr_handshakeNew(struct tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB,
+tr_handshake* tr_handshakeNew(
+    struct tr_peerIo* io,
+    tr_encryption_mode encryptionMode,
+    handshakeDoneCB doneCB,
     void* doneUserData);
 
 tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);

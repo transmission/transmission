@@ -69,10 +69,15 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
     int const d_width = 80 - d_indent;
     char const* d = opt->description;
 
-    printf(" %s%-*s %s%-*s %-*s ", tr_str_is_empty(shortName) ? " " : "-", shortWidth, shortName,
-        tr_str_is_empty(longName) ? "  " : "--", longWidth, longName, argWidth, arg);
+    printf(
+        " %s%-*s %s%-*s %-*s ",
+        tr_str_is_empty(shortName) ? " " : "-",
+        TR_ARG_TUPLE(shortWidth, shortName),
+        tr_str_is_empty(longName) ? "  " : "--",
+        TR_ARG_TUPLE(longWidth, longName),
+        TR_ARG_TUPLE(argWidth, arg));
     len = get_next_line_len(d, d_width);
-    printf("%*.*s\n", len, len, d);
+    printf("%*.*s\n", TR_ARG_TUPLE(len, len, d));
 
     d += len;
 
@@ -83,7 +88,7 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
     while ((len = get_next_line_len(d, d_width)) != 0)
     {
-        printf("%*.*s%*.*s\n", d_indent, d_indent, "", len, len, d);
+        printf("%*.*s%*.*s\n", TR_ARG_TUPLE(d_indent, d_indent, ""), TR_ARG_TUPLE(len, len, d));
         d += len;
 
         while (isspace(*d))

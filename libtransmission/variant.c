@@ -129,12 +129,11 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static struct tr_variant_string const STRING_INIT =
-{
+static struct tr_variant_string const STRING_INIT = {
     .type = TR_STRING_TYPE_QUARK,
     .quark = TR_KEY_NONE,
     .len = 0,
-    .str.str = ""
+    .str.str = "",
 };
 
 static void tr_variant_string_clear(struct tr_variant_string* str)
@@ -357,17 +356,13 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         success = true;
     }
 
-    if ((!success) &&
-        tr_variantIsInt(v) &&
-        (v->val.i == 0 || v->val.i == 1))
+    if ((!success) && tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
     {
         *setme = v->val.i != 0;
         success = true;
     }
 
-    if ((!success) &&
-        tr_variantGetStr(v, &str, NULL) &&
-        (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+    if ((!success) && tr_variantGetStr(v, &str, NULL) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
     {
         *setme = strcmp(str, "true") == 0;
         success = true;
@@ -957,15 +952,14 @@ static void freeContainerEndFunc(tr_variant const* v, void* user_data)
     tr_free(v->val.l.vals);
 }
 
-static struct VariantWalkFuncs const freeWalkFuncs =
-{
-    freeDummyFunc,
-    freeDummyFunc,
-    freeDummyFunc,
-    freeStringFunc,
-    freeDummyFunc,
-    freeDummyFunc,
-    freeContainerEndFunc
+static struct VariantWalkFuncs const freeWalkFuncs = {
+    freeDummyFunc, //
+    freeDummyFunc, //
+    freeDummyFunc, //
+    freeStringFunc, //
+    freeDummyFunc, //
+    freeDummyFunc, //
+    freeContainerEndFunc, //
 };
 
 void tr_variantFree(tr_variant* v)
@@ -1067,6 +1061,13 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
         if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
         {
+            // if types differ, ensure that target will overwrite source
+            tr_variant* const target_child = tr_variantDictFind(target, key);
+            if (target_child && !tr_variantIsType(target_child, val->type))
+            {
+                tr_variantDictRemove(target, key);
+            }
+
             if (tr_variantIsBool(val))
             {
                 bool boolVal = false;
@@ -1277,7 +1278,12 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filen
     return ret;
 }
 
-int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, size_t buflen, char const* optional_source,
+int tr_variantFromBuf(
+    tr_variant* setme,
+    tr_variant_fmt fmt,
+    void const* buf,
+    size_t buflen,
+    char const* optional_source,
     char const** setme_end)
 {
     int err;

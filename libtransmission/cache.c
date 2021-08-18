@@ -312,7 +312,12 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
     return tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare);
 }
 
-int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t length,
+int tr_cacheWriteBlock(
+    tr_cache* cache,
+    tr_torrent* torrent,
+    tr_piece_index_t piece,
+    uint32_t offset,
+    uint32_t length,
     struct evbuffer* writeme)
 {
     TR_ASSERT(tr_amInEventThread(torrent->session));
@@ -344,7 +349,12 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
     return cacheTrim(cache);
 }
 
-int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
+int tr_cacheReadBlock(
+    tr_cache* cache,
+    tr_torrent* torrent,
+    tr_piece_index_t piece,
+    uint32_t offset,
+    uint32_t len,
     uint8_t* setme)
 {
     int err = 0;

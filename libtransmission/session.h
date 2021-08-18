@@ -28,16 +28,14 @@ typedef enum
     TR_NET_OK,
     TR_NET_ERROR,
     TR_NET_WAIT
-}
-tr_tristate_t;
+} tr_tristate_t;
 
 typedef enum
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-}
-tr_auto_switch_state_t;
+} tr_auto_switch_state_t;
 
 enum
 {
@@ -223,8 +221,8 @@ struct tr_session
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* public_ipv4;
-    struct tr_bindinfo* public_ipv6;
+    struct tr_bindinfo* bind_ipv4;
+    struct tr_bindinfo* bind_ipv6;
 };
 
 static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)

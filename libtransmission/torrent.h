@@ -68,13 +68,23 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 
 uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
-void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, tr_piece_index_t* piece, uint32_t* offset,
+void tr_torrentGetBlockLocation(
+    tr_torrent const* tor,
+    tr_block_index_t block,
+    tr_piece_index_t* piece,
+    uint32_t* offset,
     uint32_t* length);
 
-void tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file, tr_block_index_t* first,
+void tr_torGetFileBlockRange(
+    tr_torrent const* tor,
+    tr_file_index_t const file,
+    tr_block_index_t* first,
     tr_block_index_t* last);
 
-void tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece, tr_block_index_t* first,
+void tr_torGetPieceBlockRange(
+    tr_torrent const* tor,
+    tr_piece_index_t const piece,
+    tr_block_index_t* first,
     tr_block_index_t* last);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
@@ -105,8 +115,7 @@ typedef enum
     TR_VERIFY_NONE,
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
-}
-tr_verify_state;
+} tr_verify_state;
 
 void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
 
@@ -223,7 +232,7 @@ struct tr_torrent
     void* idle_limit_hit_func_user_data;
 
     void* queue_started_user_data;
-    void (* queue_started_callback)(tr_torrent*, void* queue_started_user_data);
+    void (*queue_started_callback)(tr_torrent*, void* queue_started_user_data);
 
     bool isRunning;
     bool isStopping;

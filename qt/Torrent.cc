@@ -28,9 +28,9 @@
 
 using ::trqt::variant_helpers::change;
 
-Torrent::Torrent(Prefs const& prefs, int id) :
-    id_(id),
-    prefs_(prefs)
+Torrent::Torrent(Prefs const& prefs, int id)
+    : id_(id)
+    , prefs_(prefs)
 {
 }
 
@@ -186,10 +186,11 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
         switch (key)
         {
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit) \
+    case TR_KEY_##key: \
+        field_changed = change(field##_, child); \
+        changed.set(bit, field_changed); \
+        break;
 
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
@@ -246,14 +247,15 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
 #undef HANDLE_KEY
 
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    if (field_changed) \
-    { \
-        field ## _ = trApp->intern(field ## _); \
-    } \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit) \
+    case TR_KEY_##key: \
+        field_changed = change(field##_, child); \
+        if (field_changed) \
+        { \
+            field##_ = trApp->intern(field##_); \
+        } \
+        changed.set(bit, field_changed); \
+        break;
 
             HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(creator, creator, CREATOR)

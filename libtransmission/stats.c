@@ -18,14 +18,13 @@
 ****
 ***/
 
-struct tr_session_stats const TR_SESSION_STATS_INIT =
-{
+struct tr_session_stats const TR_SESSION_STATS_INIT = {
     .ratio = 0.0F,
     .uploadedBytes = 0,
     .downloadedBytes = 0,
     .filesAdded = 0,
     .sessionCount = 0,
-    .secondsActive = 0
+    .secondsActive = 0,
 };
 
 /** @brief Opaque, per-session data structure for bandwidth use statistics */

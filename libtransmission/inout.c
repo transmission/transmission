@@ -37,8 +37,14 @@ enum
 };
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr_file_index_t fileIndex, uint64_t fileOffset,
-    void* buf, size_t buflen)
+static int readOrWriteBytes(
+    tr_session* session,
+    tr_torrent* tor,
+    int ioMode,
+    tr_file_index_t fileIndex,
+    uint64_t fileOffset,
+    void* buf,
+    size_t buflen)
 {
     tr_sys_file_t fd;
     int err = 0;
@@ -79,7 +85,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
             /* figure out where the file should go, so we can create it */
             base = tr_torrentGetCurrentDir(tor);
             subpath = tr_sessionIsIncompleteFileNamingEnabled(tor->session) ? tr_torrentBuildPartial(tor, fileIndex) :
-                tr_strdup(file->name);
+                                                                              tr_strdup(file->name);
         }
 
         if (err == 0)
@@ -88,8 +94,8 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
             char* filename = tr_buildPath(base, subpath, NULL);
             int const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE : tor->session->preallocationMode;
 
-            if ((fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc,
-                file->length)) == TR_BAD_SYS_FILE)
+            if ((fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc, file->length)) ==
+                TR_BAD_SYS_FILE)
             {
                 err = errno;
                 tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror(err));
@@ -163,7 +169,11 @@ static int compareOffsetToFile(void const* a, void const* b)
     return 0;
 }
 
-void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, uint32_t pieceOffset, tr_file_index_t* fileIndex,
+void tr_ioFindFileLocation(
+    tr_torrent const* tor,
+    tr_piece_index_t pieceIndex,
+    uint32_t pieceOffset,
+    tr_file_index_t* fileIndex,
     uint64_t* fileOffset)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -185,7 +195,12 @@ void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, u
 }
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceIndex, uint32_t pieceOffset, uint8_t* buf,
+static int readOrWritePiece(
+    tr_torrent* tor,
+    int ioMode,
+    tr_piece_index_t pieceIndex,
+    uint32_t pieceOffset,
+    uint8_t* buf,
     size_t buflen)
 {
     int err = 0;

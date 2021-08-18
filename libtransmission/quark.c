@@ -21,10 +21,12 @@ struct tr_key_struct
     size_t len;
 };
 
-#define Q(name) { "" name "", sizeof("" name "") - 1 }
+#define Q(name) \
+    { \
+        "" name "", sizeof("" name "") - 1, \
+    }
 
-static struct tr_key_struct const my_static[] =
-{
+static struct tr_key_struct const my_static[] = {
     Q(""),
     Q("activeTorrentCount"),
     Q("activity-date"),
@@ -412,7 +414,7 @@ static struct tr_key_struct const my_static[] =
     Q("watch-dir"),
     Q("watch-dir-enabled"),
     Q("webseeds"),
-    Q("webseedsSendingToUs")
+    Q("webseedsSendingToUs"),
 };
 
 #undef Q

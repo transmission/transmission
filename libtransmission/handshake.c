@@ -103,8 +103,7 @@ typedef enum
     AWAITING_PAD_D,
     /* */
     N_STATES
-}
-handshake_state_t;
+} handshake_state_t;
 
 struct tr_handshake
 {
@@ -132,16 +131,16 @@ struct tr_handshake
 **/
 
 #define dbgmsg(handshake, ...) \
-    do { \
+    do \
+    { \
         char addrstr[TR_ADDRSTRLEN]; \
         tr_peerIoGetAddrStr(handshake->io, addrstr, sizeof(addrstr)); \
         tr_logAddDeepNamed(addrstr, __VA_ARGS__); \
-    } while(0)
+    } while (0)
 
 static char const* getStateName(handshake_state_t const state)
 {
-    static char const* const state_strings[N_STATES] =
-    {
+    static char const* const state_strings[N_STATES] = {
         "awaiting handshake", /* AWAITING_HANDSHAKE */
         "awaiting peer id", /* AWAITING_PEER_ID */
         "awaiting ya", /* AWAITING_YA */
@@ -215,8 +214,7 @@ typedef enum
     HANDSHAKE_ENCRYPTION_WRONG,
     HANDSHAKE_BAD_TORRENT,
     HANDSHAKE_PEER_IS_SELF,
-}
-handshake_parse_err_t;
+} handshake_parse_err_t;
 
 static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {
@@ -261,7 +259,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 
     /* peer id */
     handshake->havePeerID = true;
-    dbgmsg(handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN, peer_id);
+    dbgmsg(handshake, "peer-id is [%*.*s]", TR_ARG_TUPLE(PEER_ID_LEN, PEER_ID_LEN, peer_id));
 
     tor = tr_torrentFindFromHash(handshake->session, hash);
 
@@ -1093,8 +1091,13 @@ static ReadState canRead(struct tr_peerIo* io, void* arg, size_t* piece)
 static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
 {
     uint8_t const* peer_id = (isConnected && handshake->havePeerID) ? tr_peerIoGetPeersId(handshake->io) : NULL;
-    bool const success = (*handshake->doneCB)(handshake, handshake->io, handshake->haveReadAnythingFromPeer, isConnected,
-        peer_id, handshake->doneUserData);
+    bool const success = (*handshake->doneCB)(
+        handshake,
+        handshake->io,
+        handshake->haveReadAnythingFromPeer,
+        isConnected,
+        peer_id,
+        handshake->doneUserData);
 
     return success;
 }

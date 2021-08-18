@@ -5,6 +5,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
 
+if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -291,7 +295,10 @@ endif()
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 if(WIN32)
-    tr_add_external_auto_library(EVENT2 libevent event)
+    tr_add_external_auto_library(EVENT2 libevent event
+        CMAKE_ARGS
+            "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
+            "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
 else()
     set(EVENT2_CONFIGURE_FLAGS)
     if(APPLE)
@@ -304,7 +311,7 @@ else()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" ${EVENT2_CONFIGURE_FLAGS})
+                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" "--disable-samples" ${EVENT2_CONFIGURE_FLAGS})
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
@@ -530,6 +537,8 @@ endforeach()
 set(NEEDED_FUNCTIONS
     _configthreadlocale
     canonicalize_file_name
+    copy_file_range
+    copyfile
     daemon
     fallocate64
     flock
@@ -546,6 +555,7 @@ set(NEEDED_FUNCTIONS
     posix_fallocate
     pread
     pwrite
+    sendfile64
     statvfs
     strcasestr
     strlcpy
@@ -669,7 +679,6 @@ set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLink
 ## Code Formatting
 
 if(GIT_FOUND)
-    message(STATUS "Looking for uncrustify")
     execute_process(COMMAND
         "${GIT_EXECUTABLE}" rev-parse --show-toplevel
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -683,11 +692,11 @@ if(GIT_FOUND)
             COPYONLY
         )
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
     endif()

@@ -11,11 +11,10 @@
 #include "platform.h"
 #include "utils.h"
 
-static tr_list const TR_LIST_CLEAR =
-{
+static tr_list const TR_LIST_CLEAR = {
     .data = NULL,
     .next = NULL,
-    .prev = NULL
+    .prev = NULL,
 };
 
 static tr_list* recycled_nodes = NULL;

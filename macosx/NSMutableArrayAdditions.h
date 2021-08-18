@@ -24,6 +24,6 @@
 
 @interface NSMutableArray (NSMutableArrayAdditions)
 
-- (void) moveObjectAtIndex: (NSUInteger) fromIndex toIndex: (NSUInteger) toIndex;
+- (void)moveObjectAtIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex;
 
 @end

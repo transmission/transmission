@@ -1,47 +1,77 @@
-set(crypto-test_ADD_SOURCES crypto-test-ref.h)
-set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
+add_executable(libtransmission-test
+    bitfield-test.cc
+    blocklist-test.cc
+    clients-test.cc
+    copy-test.cc
+    crypto-test-ref.h
+    crypto-test.cc
+    error-test.cc
+    file-test.cc
+    getopt-test.cc
+    history-test.cc
+    json-test.cc
+    magnet-test.cc
+    makemeta-test.cc
+    metainfo-test.cc
+    move-test.cc
+    peer-msgs-test.cc
+    quark-test.cc
+    rename-test.cc
+    rpc-test.cc
+    session-test.cc
+    subprocess-test-script.cmd
+    subprocess-test.cc
+    test-fixtures.h
+    utils-test.cc
+    variant-test.cc
+    watchdir-test.cc)
 
-add_compile_options(
-  ${CXX_WARNING_FLAGS}
-)
+target_compile_definitions(libtransmission-test
+    PRIVATE
+        __TRANSMISSION__)
 
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-  # patches welcomed
-  add_compile_options(-Wno-sign-compare)
-endif()
+target_include_directories(libtransmission-test
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/libtransmission
+        ${CMAKE_BINARY_DIR}/libtransmission)
 
-add_definitions(
-  -D__TRANSMISSION__
-)
+target_include_directories(libtransmission-test SYSTEM
+    PRIVATE
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS})
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/libtransmission
-  ${CMAKE_SOURCE_DIR}/tests/libtransmission
-  ${CMAKE_BINARY_DIR}/libtransmission
-)
-include_directories(
-  SYSTEM
-  ${CURL_INCLUDE_DIRS}
-  ${EVENT2_INCLUDE_DIRS}
-)
+target_compile_options(libtransmission-test
+    PRIVATE
+        ${CXX_WARNING_FLAGS}
+        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 
-set_property(DIRECTORY PROPERTY FOLDER "UnitTests")
-set_property(DIRECTORY PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+target_link_libraries(libtransmission-test
+    PRIVATE
+        ${TR_NAME}
+        gtestall)
 
-foreach(T bitfield blocklist clients crypto error file getopt
-          history json magnet makemeta metainfo move peer-msgs
-          quark rename rpc session subprocess utils variant watchdir)
-  set(TP libtransmission-test-${T})
-  add_executable(${TP} ${T}-test.cc)
-  target_link_libraries(${TP} gtestall ${TR_NAME})
-  add_test(NAME ${TP} COMMAND ${TP})
-endforeach()
+add_test(
+    NAME libtransmission-test
+    COMMAND libtransmission-test)
 
 add_custom_command(
-  TARGET libtransmission-test-subprocess
-  PRE_BUILD
-  COMMAND
-    ${CMAKE_COMMAND} -E copy_if_different
-      ${PROJECT_SOURCE_DIR}/tests/libtransmission/subprocess-test.cmd
-      $<TARGET_FILE_DIR:libtransmission-test-subprocess>/libtransmission-test-subprocess.cmd
-)
+    TARGET libtransmission-test
+    PRE_BUILD
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_SOURCE_DIR}/subprocess-test-script.cmd
+            $<TARGET_FILE_DIR:libtransmission-test>/subprocess-test.cmd)
+
+add_executable(subprocess-test
+    subprocess-test-program.cc)
+
+target_include_directories(subprocess-test
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/libtransmission)
+
+target_link_libraries(subprocess-test
+    PRIVATE
+        ${TR_NAME})
+
+add_dependencies(libtransmission-test
+    subprocess-test)

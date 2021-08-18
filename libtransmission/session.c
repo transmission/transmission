@@ -148,19 +148,19 @@ static void close_bindinfo(struct tr_bindinfo* b)
 
 static void close_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    close_bindinfo(session->public_ipv6);
+    close_bindinfo(session->bind_ipv4);
+    close_bindinfo(session->bind_ipv6);
 }
 
 static void free_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    tr_free(session->public_ipv4);
-    session->public_ipv4 = NULL;
+    close_bindinfo(session->bind_ipv4);
+    tr_free(session->bind_ipv4);
+    session->bind_ipv4 = NULL;
 
-    close_bindinfo(session->public_ipv6);
-    tr_free(session->public_ipv6);
-    session->public_ipv6 = NULL;
+    close_bindinfo(session->bind_ipv6);
+    tr_free(session->bind_ipv6);
+    session->bind_ipv6 = NULL;
 }
 
 static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
@@ -180,7 +180,12 @@ static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
         {
             char addrstr[TR_ADDRSTRLEN];
             tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-            tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
+            tr_logAddDeep(
+                __FILE__,
+                __LINE__,
+                NULL,
+                "new incoming connection %" PRIdMAX " (%s)",
+                (intmax_t)clientSocket,
                 addrstr);
         }
 
@@ -193,7 +198,7 @@ static void open_incoming_peer_port(tr_session* session)
     struct tr_bindinfo* b;
 
     /* bind an ipv4 port to listen for incoming peers... */
-    b = session->public_ipv4;
+    b = session->bind_ipv4;
     b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
     if (b->socket != TR_BAD_SOCKET)
@@ -205,7 +210,7 @@ static void open_incoming_peer_port(tr_session* session)
     /* and do the exact same thing for ipv6, if it's supported... */
     if (tr_net_hasIPv6(session->private_peer_port))
     {
-        b = session->public_ipv6;
+        b = session->bind_ipv6;
         b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
 
         if (b->socket != TR_BAD_SOCKET)
@@ -224,12 +229,12 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
     switch (tr_af_type)
     {
     case TR_AF_INET:
-        bindinfo = session->public_ipv4;
+        bindinfo = session->bind_ipv4;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
         break;
 
     case TR_AF_INET6:
-        bindinfo = session->public_ipv6;
+        bindinfo = session->bind_ipv6;
         default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
         break;
 
@@ -473,8 +478,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_umask, s->umask);
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->public_ipv4->addr));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->bind_ipv4->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->bind_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
@@ -794,7 +799,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 
     /* cleanup */
@@ -986,25 +991,23 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL) ||
-        !tr_address_from_string(&b.addr, str) ||
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL) || !tr_address_from_string(&b.addr, str) ||
         b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) ||
-        !tr_address_from_string(&b.addr, str) ||
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) || !tr_address_from_string(&b.addr, str) ||
         b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->public_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -2064,7 +2067,10 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(NULL) + SHUTDOWN_MAX_SECONDS;
 
-    dbgmsg("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session, (size_t)time(NULL),
+    dbgmsg(
+        "shutting down transmission session %p... now is %zu, deadline is %zu",
+        (void*)session,
+        (size_t)time(NULL),
         (size_t)deadline);
 
     /* close the session */
@@ -2081,10 +2087,14 @@ void tr_sessionClose(tr_session* session)
      * for a bit while they tell the router & tracker
      * that we're closing now */
     while ((session->shared != NULL || session->web != NULL || session->announcer != NULL || session->announcer_udp != NULL) &&
-        !deadlineReached(deadline))
+           !deadlineReached(deadline))
     {
-        dbgmsg("waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu", (void*)session->shared,
-            (void*)session->announcer, (size_t)time(NULL), (size_t)deadline);
+        dbgmsg(
+            "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
+            (void*)session->shared,
+            (void*)session->announcer,
+            (size_t)time(NULL),
+            (size_t)deadline);
         tr_wait_msec(50);
     }
 
@@ -2161,7 +2171,8 @@ static void sessionLoadTorrents(void* vdata)
     tr_sys_path_info info;
     char const* dirname = tr_getTorrentDir(data->session);
     tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
+        tr_sys_dir_open(dirname, NULL) :
+        TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -2342,7 +2353,7 @@ static void toggleLPDImpl(void* data)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 }
 
@@ -2486,7 +2497,8 @@ static void loadBlocklists(tr_session* session)
 
                 tr_blocklistFileFree(b);
             }
-            else if (tr_sys_path_get_info(path, 0, &path_info, NULL) &&
+            else if (
+                tr_sys_path_get_info(path, 0, &path_info, NULL) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
                 char* old;
@@ -2673,7 +2685,8 @@ static void metainfoLookupInit(tr_session* session)
     tr_sys_path_info info;
     char const* dirname = tr_getTorrentDir(session);
     tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
+        tr_sys_dir_open(dirname, NULL) :
+        TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -3056,7 +3069,11 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     }
     else if (num_wanted < num_candidates)
     {
-        tr_quickfindFirstK(candidates, num_candidates, sizeof(struct TorrentAndPosition), compareTorrentAndPositions,
+        tr_quickfindFirstK(
+            candidates,
+            num_candidates,
+            sizeof(struct TorrentAndPosition),
+            compareTorrentAndPositions,
             num_wanted);
     }
 

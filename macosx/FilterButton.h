@@ -27,6 +27,6 @@
     NSUInteger fCount;
 }
 
-- (void) setCount: (NSUInteger) count;
+- (void)setCount:(NSUInteger)count;
 
 @end

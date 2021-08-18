@@ -100,7 +100,14 @@ static void three_digits(char* buf, size_t buflen, char const* name, uint8_t con
 
 static void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
-    tr_snprintf(buf, buflen, "%s %d.%d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]),
+    tr_snprintf(
+        buf,
+        buflen,
+        "%s %d.%d.%d.%d",
+        name,
+        charint(digits[0]),
+        charint(digits[1]),
+        charint(digits[2]),
         charint(digits[3]));
 }
 
@@ -210,29 +217,69 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
             else /* current client style: -TR111Z- is 1.11+ */
             {
-                tr_snprintf(buf, buflen, "Transmission %d.%02d%s", strint(id + 3, 1), strint(id + 4, 2),
+                tr_snprintf(
+                    buf,
+                    buflen,
+                    "Transmission %d.%02d%s",
+                    strint(id + 3, 1),
+                    strint(id + 4, 2),
                     (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
             }
         }
         else if (strncmp(chid + 1, "UT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 1),
                 getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "BT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "BitTorrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
+            tr_snprintf(
+                buf,
+                buflen,
+                "BitTorrent %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 1),
                 getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "UM", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Mac %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 1),
                 getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "UE", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
-                strint(id + 5, 1), getMnemonicEnd(id[6]));
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Embedded %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 1),
+                getMnemonicEnd(id[6]));
+        }
+        else if (strncmp(chid + 1, "UW", 2) == 0)
+        {
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Web %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 1),
+                getMnemonicEnd(id[6]));
         }
         /* */
         else if (strncmp(chid + 1, "AZ", 2) == 0)
@@ -290,6 +337,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "BH", 2) == 0)
         {
             four_digits(buf, buflen, "BitZilla", id + 3);
+        }
+        else if (strncmp(chid + 1, "BI", 2) == 0)
+        {
+            four_digits(buf, buflen, "BiglyBT", id + 3);
         }
         else if (strncmp(chid + 1, "BM", 2) == 0)
         {
@@ -467,6 +518,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "FireTorrent", id + 3);
         }
+        else if (strncmp(chid + 1, "WW", 2) == 0)
+        {
+            four_digits(buf, buflen, "WebTorrent", id + 3);
+        }
         else if (strncmp(chid + 1, "XL", 2) == 0)
         {
             four_digits(buf, buflen, "Xunlei", id + 3);
@@ -499,6 +554,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "ES", 2) == 0)
         {
             three_digits(buf, buflen, "Electric Sheep", id + 3);
+        }
+        else if (strncmp(chid + 1, "FW", 2) == 0)
+        {
+            three_digits(buf, buflen, "FrostWire", id + 3);
         }
         else if (strncmp(chid + 1, "HL", 2) == 0)
         {
@@ -622,6 +681,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             tr_snprintf(buf, buflen, "Baidu Netdisk");
         }
+        else if (strncmp(chid + 1, "WS", 2) == 0)
+        {
+            no_version(buf, buflen, "HTTP Seed");
+        }
 
         if (!tr_str_is_empty(buf))
         {
@@ -634,18 +697,47 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         if (strncmp(chid + 1, "UT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2),
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 2),
                 getMnemonicEnd(id[7]));
         }
         else if (strncmp(chid + 1, "UM", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2),
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Mac %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 2),
                 getMnemonicEnd(id[7]));
         }
         else if (strncmp(chid + 1, "UE", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
-                strint(id + 5, 2), getMnemonicEnd(id[7]));
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Embedded %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 2),
+                getMnemonicEnd(id[7]));
+        }
+        else if (strncmp(chid + 1, "UW", 2) == 0)
+        {
+            tr_snprintf(
+                buf,
+                buflen,
+                "\xc2\xb5Torrent Web %d.%d.%d%s",
+                strint(id + 3, 1),
+                strint(id + 4, 1),
+                strint(id + 5, 2),
+                getMnemonicEnd(id[7]));
         }
 
         if (!tr_str_is_empty(buf))
@@ -787,6 +879,25 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "TIX", 3) == 0)
     {
         two_major_two_minor(buf, buflen, "Tixati", id + 3);
+    }
+    else if (strncmp(chid, "A2", 2) == 0)
+    {
+        if (id[4] == '-' && id[6] == '-' && id[8] == '-')
+        {
+            tr_snprintf(buf, buflen, "aria2 %c.%c.%c", id[3], id[5], id[7]);
+        }
+        else if (id[4] == '-' && id[7] == '-' && id[9] == '-')
+        {
+            tr_snprintf(buf, buflen, "aria2 %c.%c%c.%c", id[3], id[5], id[6], id[8]);
+        }
+        else
+        {
+            no_version(buf, buflen, "aria2");
+        }
+    }
+    else if (strncmp(chid, "-BL", 3) == 0)
+    {
+        tr_snprintf(buf, buflen, "BitLord %c.%c.%c-%c%c%c", id[3], id[4], id[5], id[6], id[7], id[8]);
     }
 
     /* Shad0w-style */

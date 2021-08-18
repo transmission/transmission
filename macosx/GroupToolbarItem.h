@@ -24,11 +24,11 @@
 
 @interface GroupToolbarItem : NSToolbarItem
 {
-    NSArray * fIdentifiers;
+    NSArray* fIdentifiers;
 }
 
-- (void) setIdentifiers: (NSArray *) identifiers;
+- (void)setIdentifiers:(NSArray*)identifiers;
 
-- (void) createMenu: (NSArray *) labels;
+- (void)createMenu:(NSArray*)labels;
 
 @end

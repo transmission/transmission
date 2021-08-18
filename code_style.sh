@@ -3,70 +3,69 @@
 # Usage: ./code_style.sh
 # Usage: ./code_style.sh --check
 
+set -o noglob
+
 if [[ "x$1" == *"check"* ]]; then
   echo "checking code format"
 else
   fix=1
 fi
 
-root="$(git rev-parse --show-toplevel)"
-if [ -n "${root}" ]; then
-  cd "${root}" || exit 1
-fi
+root="$(dirname "$0")"
+root="$(cd "${root}" && pwd)"
+cd "${root}" || exit 1
 
-skipfiles=(
-  libtransmission/ConvertUTF\.[ch]
-  libtransmission/jsonsl\.[ch]
-  libtransmission/wildmat\.c
+cfile_includes=(
+  '*.c'
+  '*.cc'
+  '*.h'
+  '*.m'
 )
-cfile_candidates=(
-  cli/*\.[ch]
-  daemon/*\.[ch]
-  gtk/*\.[ch]
-  libtransmission/*\.[ch]
-  qt/*\.cc
-  qt/*\.h
-  tests/*/*\.cc
-  tests/*/*\.h
-  utils/*\.[ch]
+cfile_excludes=(
+  'libtransmission/ConvertUTF.*'
+  'libtransmission/jsonsl.*'
+  'libtransmission/wildmat.*'
+  'macosx/Sparkle.framework/*'
+  'macosx/VDKQueue/*'
+  'third-party/*'
+  'web/*'
 )
-for file in "${cfile_candidates[@]}"; do
-  if [[ ! " ${skipfiles[*]} " =~ ${file} ]]; then
-    cfiles+=("${file}");
-  fi
-done
+
+get_find_path_args() {
+  local args=$(printf " -o -path ./%s" "$@")
+  echo "${args:4}"
+}
+
+find_cfiles() {
+  find . \( $(get_find_path_args "${cfile_includes[@]}") \) ! \( $(get_find_path_args "${cfile_excludes[@]}") \) "$@"
+}
 
 # format C/C++
-cores=$(($(nproc) + 1))
-if [ -n "$fix" ]; then
-  printf "%s\0" "${cfiles[@]}" | xargs -0 -P$cores -I FILE uncrustify -c uncrustify.cfg --no-backup -q FILE
-else
-  printf "%s\0" "${cfiles[@]}" | xargs -0 -P$cores -I FILE uncrustify -c uncrustify.cfg --check FILE > /dev/null
-  if [ "${PIPESTATUS[1]}" -ne "0" ]; then
-    echo 'C/C++ code needs formatting'
-    exitcode=1
-  fi
+clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
+if ! find_cfiles -exec clang-format $clang_format_args '{}' '+'; then
+  [ -n "$fix" ] || echo 'C/C++ code needs formatting'
+  exitcode=1
 fi
 
 # enforce east const
-matches="$(perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' "${cfiles[@]}")"
+matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' '{}' '+')"
 if [ -n "$matches" ]; then
   echo "$matches"
   exitcode=1
 fi
 if [ -n "$fix" ]; then
-  perl -pi -e 's/((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' "${cfiles[@]}"
+  find_cfiles -exec perl -pi -e 's/((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' '{}' '+'
 fi
 
 # format JS
 cd "${root}/web" || exit 1
-if [ -n "$fix" ]; then
-  cd "${root}/web" && yarn --silent install && yarn --silent 'lint:fix'
-elif ! yarn -s install; then
-  echo 'JS code could not be checked -- "yarn install" failed'
+yarn_args='--silent --no-progress --non-interactive'
+yarn_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
+if ! yarn $yarn_args install; then
+  [ -n "$fix" ] || echo 'JS code could not be checked -- "yarn install" failed'
   exitcode=1
-elif ! yarn --silent lint; then
-  echo 'JS code needs formatting'
+elif ! yarn $yarn_args $yarn_lint_args; then
+  [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi
 
