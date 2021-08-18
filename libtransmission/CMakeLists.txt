@@ -294,3 +294,8 @@ endif()
 if(WIN32)
     target_link_libraries(${TR_NAME} crypt32 shlwapi)
 endif()
+
+if(INSTALL_LIB)
+    install(TARGETS ${TR_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(FILES ${${PROJECT_NAME}_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
+endif()

@@ -61,12 +61,11 @@ typedef struct
     GtkTreeModel* filter_model;
     TrCore* core;
     gulong pref_handler_id;
-}
-PrivateData;
+} PrivateData;
 
 static TR_DEFINE_QUARK(private_data, private_data)
 
-static PrivateData* get_private_data(GtkWindow * w)
+static PrivateData* get_private_data(GtkWindow* w)
 {
     return g_object_get_qdata(G_OBJECT(w), private_data_quark());
 }
@@ -98,7 +97,11 @@ static void view_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTre
     gtr_action_activate("show-torrent-properties");
 }
 
-static gboolean tree_view_search_equal_func(GtkTreeModel* model, gint column, gchar const* key, GtkTreeIter* iter,
+static gboolean tree_view_search_equal_func(
+    GtkTreeModel* model,
+    gint column,
+    gchar const* key,
+    GtkTreeIter* iter,
     gpointer search_data)
 {
     TR_UNUSED(column);
@@ -133,8 +136,12 @@ static GtkWidget* makeview(PrivateData* p)
 
     p->selection = gtk_tree_view_get_selection(tree_view);
 
-    p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(GTK_TYPE_TREE_VIEW_COLUMN, "title", _("Torrent"), "resizable", TRUE,
-        "sizing", GTK_TREE_VIEW_COLUMN_FIXED, NULL));
+    p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(
+        GTK_TYPE_TREE_VIEW_COLUMN,
+        TR_ARG_TUPLE("title", _("Torrent")),
+        TR_ARG_TUPLE("resizable", TRUE),
+        TR_ARG_TUPLE("sizing", GTK_TREE_VIEW_COLUMN_FIXED),
+        NULL));
 
     p->renderer = r = torrent_cell_renderer_new();
     gtk_tree_view_column_pack_start(col, r, FALSE);
@@ -234,13 +241,11 @@ static struct
 {
     char const* val;
     char const* i18n;
-}
-stats_modes[] =
-{
+} stats_modes[] = {
     { "total-ratio", N_("Total Ratio") },
     { "session-ratio", N_("Session Ratio") },
     { "total-transfer", N_("Total Transfer") },
-    { "session-transfer", N_("Session Transfer") }
+    { "session-transfer", N_("Session Transfer") },
 };
 
 static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivate)
@@ -264,9 +269,8 @@ static void syncAltSpeedButton(PrivateData* p)
     char d[32];
     tr_formatter_speed_KBps(d, gtr_pref_int_get(TR_KEY_alt_speed_down), sizeof(d));
 
-    char* const str = b ?
-        g_strdup_printf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
-        g_strdup_printf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
+    char* const str = b ? g_strdup_printf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
+                          g_strdup_printf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
@@ -300,7 +304,12 @@ static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path, GtkTreeI
     *maxTime = MAX(*maxTime, torStat->manualAnnounceTime);
 }
 
-static gboolean onAskTrackerQueryTooltip(GtkWidget* widget, gint x, gint y, gboolean keyboard_tip, GtkTooltip* tooltip,
+static gboolean onAskTrackerQueryTooltip(
+    GtkWidget* widget,
+    gint x,
+    gint y,
+    gboolean keyboard_tip,
+    GtkTooltip* tooltip,
     gpointer gdata)
 {
     TR_UNUSED(widget);
@@ -560,7 +569,11 @@ static void onOptionsClicked(GtkButton* button, gpointer vp)
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(b ? p->ratio_on_item : p->ratio_off_item), TRUE);
 
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(p->options_menu), GTK_WIDGET(button), GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_SOUTH_WEST,
+    gtk_menu_popup_at_widget(
+        GTK_MENU(p->options_menu),
+        GTK_WIDGET(button),
+        GDK_GRAVITY_NORTH_WEST,
+        GDK_GRAVITY_SOUTH_WEST,
         NULL);
 #else
     gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
@@ -615,7 +628,9 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
     css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
+    gtk_style_context_add_provider_for_screen(
+        gdk_screen_get_default(),
+        GTK_STYLE_PROVIDER(css_provider),
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     /* window's main container */
@@ -835,18 +850,19 @@ static void updateSpeeds(PrivateData* p)
                 int dc;
                 double us;
                 double ds;
-                gtk_tree_model_get(model, &iter,
-                    MC_SPEED_UP, &us,
-                    MC_SPEED_DOWN, &ds,
-                    MC_ACTIVE_PEERS_UP, &uc,
-                    MC_ACTIVE_PEERS_DOWN, &dc,
+                gtk_tree_model_get(
+                    model,
+                    &iter,
+                    TR_ARG_TUPLE(MC_SPEED_UP, &us),
+                    TR_ARG_TUPLE(MC_SPEED_DOWN, &ds),
+                    TR_ARG_TUPLE(MC_ACTIVE_PEERS_UP, &uc),
+                    TR_ARG_TUPLE(MC_ACTIVE_PEERS_DOWN, &dc),
                     -1);
                 upSpeed += us;
                 upCount += uc;
                 downSpeed += ds;
                 downCount += dc;
-            }
-            while (gtk_tree_model_iter_next(model, &iter));
+            } while (gtk_tree_model_iter_next(model, &iter));
         }
 
         tr_formatter_speed_KBps(speed_str, downSpeed, sizeof(speed_str));

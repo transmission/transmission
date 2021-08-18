@@ -349,7 +349,10 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     return ret;
 }
 
-static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* file, tr_variant* uninitialized_length,
+static void getFileInfo(
+    char const* topFile,
+    tr_metainfo_builder_file const* file,
+    tr_variant* uninitialized_length,
     tr_variant* uninitialized_path)
 {
     size_t offset;
@@ -491,8 +494,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if ((builder->result == TR_MAKEMETA_OK) &&
-        (!builder->abortFlag) &&
+    if ((builder->result == TR_MAKEMETA_OK) && (!builder->abortFlag) &&
         (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
         builder->my_errno = errno;
@@ -565,8 +567,13 @@ static void makeMetaWorkerFunc(void* user_data)
     workerThread = NULL;
 }
 
-void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate)
+void tr_makeMetaInfo(
+    tr_metainfo_builder* builder,
+    char const* outputFile,
+    tr_tracker_info const* trackers,
+    int trackerCount,
+    char const* comment,
+    bool isPrivate)
 {
     tr_lock* lock;
 

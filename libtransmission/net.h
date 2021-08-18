@@ -83,8 +83,7 @@ typedef enum tr_address_type
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
-}
-tr_address_type;
+} tr_address_type;
 
 typedef struct tr_address
 {
@@ -93,10 +92,8 @@ typedef struct tr_address
     {
         struct in6_addr addr6;
         struct in_addr addr4;
-    }
-    addr;
-}
-tr_address;
+    } addr;
+} tr_address;
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;

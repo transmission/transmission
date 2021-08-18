@@ -97,7 +97,10 @@ private:
        until we know the server has processed the request. This keeps
        the UI from appearing to undo the change if we receive a refresh
        that was already in-flight _before_ the property was edited. */
-    bool canEdit() const { return std::empty(pending_changes_tags_); }
+    bool canEdit() const
+    {
+        return std::empty(pending_changes_tags_);
+    }
     std::unordered_set<Session::Tag> pending_changes_tags_;
     QMetaObject::Connection pending_changes_connection_;
 

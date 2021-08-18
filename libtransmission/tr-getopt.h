@@ -28,8 +28,7 @@ typedef struct tr_option
     char const* shortName; /* short form */
     bool has_arg; /* 0 for no argument, 1 for argument */
     char const* argName; /* argument's description for tr_getopt_usage() */
-}
-tr_option;
+} tr_option;
 
 enum
 {

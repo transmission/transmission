@@ -73,7 +73,7 @@ static bool tr_areThreadsEqual(tr_thread_id a, tr_thread_id b)
 /** @brief portability wrapper around OS-dependent threads */
 struct tr_thread
 {
-    void (* func)(void*);
+    void (*func)(void*);
     void* arg;
     tr_thread_id thread;
 
@@ -113,7 +113,7 @@ static ThreadFuncReturnType ThreadFunc(void* _t)
 #endif
 }
 
-tr_thread* tr_threadNew(void (* func)(void*), void* arg)
+tr_thread* tr_threadNew(void (*func)(void*), void* arg)
 {
     tr_thread* t = tr_new0(tr_thread, 1);
 
@@ -529,11 +529,10 @@ char const* tr_getWebClientDir(tr_session const* session)
             /* Generally, Web interface should be stored in a Web subdir of
              * calling executable dir. */
 
-            static REFKNOWNFOLDERID known_folder_ids[] =
-            {
+            static REFKNOWNFOLDERID known_folder_ids[] = {
                 &FOLDERID_LocalAppData,
                 &FOLDERID_RoamingAppData,
-                &FOLDERID_ProgramData
+                &FOLDERID_ProgramData,
             };
 
             for (size_t i = 0; s == NULL && i < TR_N_ELEMENTS(known_folder_ids); ++i)

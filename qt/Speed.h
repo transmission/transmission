@@ -37,35 +37,35 @@ public:
         bytes_per_second_ = Bps;
     }
 
-    Speed& operator +=(Speed const& that)
+    Speed& operator+=(Speed const& that)
     {
         bytes_per_second_ += that.bytes_per_second_;
         return *this;
     }
 
-    [[nodiscard]] Speed operator +(Speed const& that) const
+    [[nodiscard]] Speed operator+(Speed const& that) const
     {
         return Speed{ getBps() + that.getBps() };
     }
 
-    [[nodiscard]] bool operator <(Speed const& that) const
+    [[nodiscard]] bool operator<(Speed const& that) const
     {
         return getBps() < that.getBps();
     }
 
-    [[nodiscard]] bool operator ==(Speed const& that) const
+    [[nodiscard]] bool operator==(Speed const& that) const
     {
         return getBps() == that.getBps();
     }
 
-    [[nodiscard]] bool operator !=(Speed const& that) const
+    [[nodiscard]] bool operator!=(Speed const& that) const
     {
         return getBps() != that.getBps();
     }
 
 private:
-    explicit Speed(int bytes_per_second) :
-        bytes_per_second_{bytes_per_second}
+    explicit Speed(int bytes_per_second)
+        : bytes_per_second_{ bytes_per_second }
     {
     }
 

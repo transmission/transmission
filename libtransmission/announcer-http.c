@@ -36,9 +36,7 @@
 
 static char const* get_event_string(tr_announce_request const* req)
 {
-    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ?
-        "paused" :
-        tr_announce_event_get_string(req->event);
+    return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
@@ -52,14 +50,15 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
 
     evbuffer_expand(buf, 1024);
 
-    evbuffer_add_printf(buf,
+    evbuffer_add_printf(
+        buf,
         "%s"
         "%c"
         "info_hash=%s"
         "&peer_id=%*.*s"
         "&port=%d"
-        "&uploaded=%" PRIu64
-        "&downloaded=%" PRIu64
+        "&uploaded=%" PRIu64 //
+        "&downloaded=%" PRIu64 //
         "&left=%" PRIu64
         "&numwant=%d"
         "&key=%x"
@@ -68,7 +67,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         req->url,
         strchr(req->url, '?') != NULL ? '&' : '?',
         escaped_info_hash,
-        PEER_ID_LEN, PEER_ID_LEN, req->peer_id,
+        TR_ARG_TUPLE(PEER_ID_LEN, PEER_ID_LEN, req->peer_id),
         req->port,
         req->up,
         req->down,
@@ -199,8 +198,14 @@ static void on_announce_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_announce_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
-    size_t msglen, void* vdata)
+static void on_announce_done(
+    tr_session* session,
+    bool did_connect,
+    bool did_timeout,
+    long response_code,
+    void const* msg,
+    size_t msglen,
+    void* vdata)
 {
     tr_announce_response* response;
     struct announce_data* data = vdata;
@@ -318,7 +323,10 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
     tr_runInEventThread(session, on_announce_done_eventthread, data);
 }
 
-void tr_tracker_http_announce(tr_session* session, tr_announce_request const* request, tr_announce_response_func response_func,
+void tr_tracker_http_announce(
+    tr_session* session,
+    tr_announce_request const* request,
+    tr_announce_response_func response_func,
     void* response_func_user_data)
 {
     struct announce_data* d;
@@ -367,8 +375,14 @@ static void on_scrape_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
-    size_t msglen, void* vdata)
+static void on_scrape_done(
+    tr_session* session,
+    bool did_connect,
+    bool did_timeout,
+    long response_code,
+    void const* msg,
+    size_t msglen,
+    void* vdata)
 {
     tr_scrape_response* response;
     struct scrape_data* data = vdata;
@@ -423,8 +437,8 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
                 response->errmsg = tr_strndup(str, len);
             }
 
-            if (tr_variantDictFindDict(&top, TR_KEY_flags,
-                &flags) && tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
+            if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags) &&
+                tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
             {
                 response->min_request_interval = intVal;
             }
@@ -495,7 +509,10 @@ static char* scrape_url_new(tr_scrape_request const* req)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* request, tr_scrape_response_func response_func,
+void tr_tracker_http_scrape(
+    tr_session* session,
+    tr_scrape_request const* request,
+    tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
     struct scrape_data* d;

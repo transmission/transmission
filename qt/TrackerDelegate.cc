@@ -55,7 +55,11 @@ private:
     QTextDocument text_document_;
 };
 
-ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction, QPoint const& top_left,
+ItemLayout::ItemLayout(
+    QString const& text,
+    bool suppress_colors,
+    Qt::LayoutDirection direction,
+    QPoint const& top_left,
     int width)
 {
     QSize const icon_size = FaviconCache::getIconSize();
@@ -137,12 +141,13 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
         painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-    tracker_icon.paint(painter, layout.icon_rect, Qt::AlignCenter, is_item_selected ? QIcon::Selected : QIcon::Normal,
-        QIcon::On);
+    tracker_icon
+        .paint(painter, layout.icon_rect, Qt::AlignCenter, is_item_selected ? QIcon::Selected : QIcon::Normal, QIcon::On);
 
     QAbstractTextDocumentLayout::PaintContext paint_context;
     paint_context.clip = layout.text_rect.translated(-layout.text_rect.topLeft());
-    paint_context.palette.setColor(QPalette::Text,
+    paint_context.palette.setColor(
+        QPalette::Text,
         option.palette.color(is_item_selected ? QPalette::HighlightedText : QPalette::Text));
     painter->translate(layout.text_rect.topLeft());
     layout.textLayout()->draw(painter, paint_context);
@@ -182,8 +187,14 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     auto const success_markup_end = QStringLiteral("</span>");
 
     auto const now = time(nullptr);
-    auto const time_until = [&now](auto t) { return timeToStringRounded(static_cast<int>(t - now)); };
-    auto const time_since = [&now](auto t) { return timeToStringRounded(static_cast<int>(now - t)); };
+    auto const time_until = [&now](auto t)
+    {
+        return timeToStringRounded(static_cast<int>(t - now));
+    };
+    auto const time_since = [&now](auto t)
+    {
+        return timeToStringRounded(static_cast<int>(now - t));
+    };
 
     // hostname
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
@@ -208,20 +219,27 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             if (inf.st.last_announce_succeeded)
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, inf.st.last_announce_peer_count).
-                    arg(success_markup_begin).arg(success_markup_end).arg(tstr);
+                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, inf.st.last_announce_peer_count)
+                           .arg(success_markup_begin)
+                           .arg(success_markup_end)
+                           .arg(tstr);
             }
             else if (inf.st.last_announce_timed_out)
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Peer list request %1timed out%2 %3 ago; will retry").arg(timeout_markup_begin).
-                    arg(timeout_markup_end).arg(tstr);
+                str += tr("Peer list request %1timed out%2 %3 ago; will retry")
+                           .arg(timeout_markup_begin)
+                           .arg(timeout_markup_end)
+                           .arg(tstr);
             }
             else
             {
                 //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                str += tr("Got an error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.last_announce_result).
-                    arg(err_markup_end).arg(tstr);
+                str += tr("Got an error %1\"%2\"%3 %4 ago")
+                           .arg(err_markup_begin)
+                           .arg(inf.st.last_announce_result)
+                           .arg(err_markup_end)
+                           .arg(tstr);
             }
         }
 
@@ -263,26 +281,34 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             if (!inf.st.last_scrape_succeeded)
             {
                 //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                str += tr("Got a scrape error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.last_scrape_result).
-                    arg(err_markup_end).arg(tstr);
+                str += tr("Got a scrape error %1\"%2\"%3 %4 ago")
+                           .arg(err_markup_begin)
+                           .arg(inf.st.last_scrape_result)
+                           .arg(err_markup_end)
+                           .arg(tstr);
             }
             else if (inf.st.seeder_count >= 0 && inf.st.leecher_count >= 0)
             {
                 //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago",
                 //: %1 and %2 are replaced with HTML markup
-                str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seeder_count).arg(success_markup_begin).
-                    arg(success_markup_end);
+                str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seeder_count)
+                           .arg(success_markup_begin)
+                           .arg(success_markup_end);
                 //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago",
                 //: %1 and %2 are replaced with HTML markup, %3 is duration;
                 //: notice that leading space (before "and") is included here
-                str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecher_count).arg(success_markup_begin).
-                    arg(success_markup_end).arg(tstr);
+                str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecher_count)
+                           .arg(success_markup_begin)
+                           .arg(success_markup_end)
+                           .arg(tstr);
             }
             else
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Tracker had %1no information%2 on peer counts %3 ago").arg(success_markup_begin).
-                    arg(success_markup_end).arg(tstr);
+                str += tr("Tracker had %1no information%2 on peer counts %3 ago")
+                           .arg(success_markup_begin)
+                           .arg(success_markup_end)
+                           .arg(tstr);
             }
         }
 

@@ -16,8 +16,8 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
-TorrentFilter::TorrentFilter(Prefs const& prefs) :
-    prefs_(prefs)
+TorrentFilter::TorrentFilter(Prefs const& prefs)
+    : prefs_(prefs)
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -142,7 +142,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         if (val == 0)
         {
-            val = compare(a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
+            val = compare(
+                a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
                 b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
         }
 

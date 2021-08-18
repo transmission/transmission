@@ -116,18 +116,25 @@ char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
 #ifdef _WIN32
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
-char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before, int extra_chars_after,
+char* tr_win32_native_to_utf8_ex(
+    wchar_t const* text,
+    int text_size,
+    int extra_chars_before,
+    int extra_chars_after,
     int* real_result_size);
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size);
-wchar_t* tr_win32_utf8_to_native_ex(char const* text, int text_size, int extra_chars_before, int extra_chars_after,
+wchar_t* tr_win32_utf8_to_native_ex(
+    char const* text,
+    int text_size,
+    int extra_chars_before,
+    int extra_chars_after,
     int* real_result_size);
 char* tr_win32_format_message(uint32_t code);
 
 void tr_win32_make_args_utf8(int* argc, char*** argv);
 
-int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
+int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
-/* *INDENT-OFF* */
 #define tr_main(...) \
     main_impl(__VA_ARGS__); \
     int main(int argc, char* argv[]) \
@@ -135,7 +142,6 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
         return tr_main_win32(argc, argv, &main_impl); \
     } \
     int main_impl(__VA_ARGS__)
-/* *INDENT-ON* */
 
 #else
 
@@ -170,16 +176,11 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-/* *INDENT-OFF* */
-#define tr_new(struct_type, n_structs) \
-    ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
 
-#define tr_new0(struct_type, n_structs) \
-    ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
 
-#define tr_renew(struct_type, mem, n_structs) \
-    ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
-/* *INDENT-ON* */
+#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -209,7 +210,12 @@ static inline bool tr_str_is_empty(char const* value)
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+int tr_lowerBound(
+    void const* key,
+    void const* base,
+    size_t nmemb,
+    size_t size,
+    tr_voidptr_compare_func compar,
     bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /** @brief moves the best k items to the first slots in the array. O(n) */
@@ -271,8 +277,8 @@ bool tr_urlIsValid(char const* url, size_t url_len);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port,
-    char** setme_path) TR_GNUC_NONNULL(1);
+bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
+    TR_GNUC_NONNULL(1);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */

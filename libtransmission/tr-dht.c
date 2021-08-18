@@ -731,8 +731,12 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
         if (rc >= 0)
         {
-            tr_logAddTorInfo(tor, "Starting %s DHT announce (%s, %d nodes)", af == AF_INET6 ? "IPv6" : "IPv4",
-                tr_dhtPrintableStatus(status), numnodes);
+            tr_logAddTorInfo(
+                tor,
+                "Starting %s DHT announce (%s, %d nodes)",
+                af == AF_INET6 ? "IPv6" : "IPv4",
+                tr_dhtPrintableStatus(status),
+                numnodes);
 
             if (af == AF_INET)
             {
@@ -747,13 +751,22 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         }
         else
         {
-            tr_logAddTorErr(tor, "%s DHT announce failed (%s, %d nodes): %s", af == AF_INET6 ? "IPv6" : "IPv4",
-                tr_dhtPrintableStatus(status), numnodes, tr_strerror(errno));
+            tr_logAddTorErr(
+                tor,
+                "%s DHT announce failed (%s, %d nodes): %s",
+                af == AF_INET6 ? "IPv6" : "IPv4",
+                tr_dhtPrintableStatus(status),
+                numnodes,
+                tr_strerror(errno));
         }
     }
     else
     {
-        tr_logAddTorDbg(tor, "%s DHT not ready (%s, %d nodes)", af == AF_INET6 ? "IPv6" : "IPv4", tr_dhtPrintableStatus(status),
+        tr_logAddTorDbg(
+            tor,
+            "%s DHT not ready (%s, %d nodes)",
+            af == AF_INET6 ? "IPv6" : "IPv4",
+            tr_dhtPrintableStatus(status),
             numnodes);
     }
 

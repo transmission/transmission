@@ -157,12 +157,11 @@ typedef struct tr_event_handle
     tr_thread* thread;
     struct event_base* base;
     struct event* pipeEvent;
-}
-tr_event_handle;
+} tr_event_handle;
 
 struct tr_run_data
 {
-    void (* func)(void*);
+    void (*func)(void*);
     void* user_data;
 };
 
@@ -182,8 +181,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
     do
     {
         ret = piperead(fd, &ch, 1);
-    }
-    while (!eh->die && ret == -1 && errno == EAGAIN);
+    } while (!eh->die && ret == -1 && errno == EAGAIN);
 
     dbgmsg("command is [%c], ret is %d, errno is %d", ch, ret, (int)errno);
 
@@ -329,7 +327,7 @@ bool tr_amInEventThread(tr_session const* session)
 ***
 **/
 
-void tr_runInEventThread(tr_session* session, void (* func)(void*), void* user_data)
+void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_data)
 {
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(session->events != NULL);

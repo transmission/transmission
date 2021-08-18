@@ -235,7 +235,9 @@ enum
 
 static char const* getUsage(void)
 {
-    return MY_NAME " " LONG_VERSION_STRING "\n"
+    // clang-format off
+    return
+        MY_NAME " " LONG_VERSION_STRING "\n"
         "A fast and easy BitTorrent client\n"
         "https://transmissionbt.com/\n"
         "\n"
@@ -245,6 +247,7 @@ static char const* getUsage(void)
         "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
         "\n"
         "See the man page for detailed explanations and many examples.";
+    // clang-format on
 }
 
 /***
@@ -253,13 +256,12 @@ static char const* getUsage(void)
 ****
 ***/
 
-static tr_option opts[] =
-{
+static tr_option opts[] = {
     { 'a', "add", "Add torrent files by filename or URL", "a", false, NULL },
     { 970, "alt-speed", "Use the alternate Limits", "as", false, NULL },
     { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, NULL },
-    { 972, "alt-speed-downlimit", "max alternate download speed (in "SPEED_K_STR ")", "asd", true, "<speed>" },
-    { 973, "alt-speed-uplimit", "max alternate upload speed (in "SPEED_K_STR ")", "asu", true, "<speed>" },
+    { 972, "alt-speed-downlimit", "max alternate download speed (in " SPEED_K_STR ")", "asd", true, "<speed>" },
+    { 973, "alt-speed-uplimit", "max alternate upload speed (in " SPEED_K_STR ")", "asu", true, "<speed>" },
     { 974, "alt-speed-scheduler", "Use the scheduled on/off times", "asc", false, NULL },
     { 975, "no-alt-speed-scheduler", "Don't use the scheduled on/off times", "ASC", false, NULL },
     { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", NULL, true, "<time>" },
@@ -269,8 +271,12 @@ static tr_option opts[] =
     { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", true, "<dir>" },
     { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", false, NULL },
     { 'b', "debug", "Print debugging information", "b", false, NULL },
-    { 'd', "downlimit", "Set the max download speed in "SPEED_K_STR " for the current torrent(s) or globally", "d", true,
-        "<speed>" },
+    { 'd',
+      "downlimit",
+      "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
+      "d",
+      true,
+      "<speed>" },
     { 'D', "no-downlimit", "Disable max download speed for the current torrent(s) or globally", "D", false, NULL },
     { 'e', "cache", "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", true, "<size>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
@@ -317,10 +323,18 @@ static tr_option opts[] =
     { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", true, "ratio" },
     { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", false, NULL },
     { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", false, NULL },
-    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-        "gsr", true, "ratio" },
-    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-        "GSR", false, NULL },
+    { 953,
+      "global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+      "gsr",
+      true,
+      "ratio" },
+    { 954,
+      "no-global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+      "GSR",
+      false,
+      NULL },
     { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
     { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
     { 's', "start", "Start the current torrent(s)", "s", false, NULL },
@@ -332,15 +346,24 @@ static tr_option opts[] =
     { 993, "no-trash-torrent", "Do not delete torrents after adding", NULL, false, NULL },
     { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, NULL },
     { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, NULL },
-    { 'u', "uplimit", "Set the max upload speed in "SPEED_K_STR " for the current torrent(s) or globally", "u", true,
-        "<speed>" },
+    { 'u',
+      "uplimit",
+      "Set the max upload speed in " SPEED_K_STR " for the current torrent(s) or globally",
+      "u",
+      true,
+      "<speed>" },
     { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", false, NULL },
     { 830, "utp", "Enable uTP for peer connections", NULL, false, NULL },
     { 831, "no-utp", "Disable uTP for peer connections", NULL, false, NULL },
     { 'v', "verify", "Verify the current torrent(s)", "v", false, NULL },
     { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 'w', "download-dir", "When used in conjunction with --add, set the new torrent's download folder. "
-        "Otherwise, set the default download folder", "w", true, "<path>" },
+    { 'w',
+      "download-dir",
+      "When used in conjunction with --add, set the new torrent's download folder. "
+      "Otherwise, set the default download folder",
+      "w",
+      true,
+      "<path>" },
     { 'x', "pex", "Enable peer exchange (PEX)", "x", false, NULL },
     { 'X', "no-pex", "Disable peer exchange (PEX)", "X", false, NULL },
     { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, NULL },
@@ -697,16 +720,14 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static tr_quark const files_keys[] =
-{
+static tr_quark const files_keys[] = {
     TR_KEY_files,
     TR_KEY_name,
     TR_KEY_priorities,
-    TR_KEY_wanted
+    TR_KEY_wanted,
 };
 
-static tr_quark const details_keys[] =
-{
+static tr_quark const details_keys[] = {
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -755,25 +776,24 @@ static tr_quark const details_keys[] =
     TR_KEY_uploadLimit,
     TR_KEY_uploadLimited,
     TR_KEY_webseeds,
-    TR_KEY_webseedsSendingToUs
+    TR_KEY_webseedsSendingToUs,
 };
 
-static tr_quark const list_keys[] =
-{
-    TR_KEY_error,
-    TR_KEY_errorString,
-    TR_KEY_eta,
-    TR_KEY_id,
-    TR_KEY_isFinished,
-    TR_KEY_leftUntilDone,
-    TR_KEY_name,
-    TR_KEY_peersGettingFromUs,
-    TR_KEY_peersSendingToUs,
-    TR_KEY_rateDownload,
-    TR_KEY_rateUpload,
-    TR_KEY_sizeWhenDone,
-    TR_KEY_status,
-    TR_KEY_uploadRatio
+static tr_quark const list_keys[] = {
+    TR_KEY_error, //
+    TR_KEY_errorString, //
+    TR_KEY_eta, //
+    TR_KEY_id, //
+    TR_KEY_isFinished, //
+    TR_KEY_leftUntilDone, //
+    TR_KEY_name, //
+    TR_KEY_peersGettingFromUs, //
+    TR_KEY_peersSendingToUs, //
+    TR_KEY_rateDownload, //
+    TR_KEY_rateUpload, //
+    TR_KEY_sizeWhenDone, //
+    TR_KEY_status, //
+    TR_KEY_uploadRatio, //
 };
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* buf)
@@ -915,12 +935,11 @@ static char* getStatusString(tr_variant* t, char* buf, size_t buflen)
     return buf;
 }
 
-static char const* bandwidthPriorityNames[] =
-{
+static char const* bandwidthPriorityNames[] = {
     "Low",
     "Normal",
     "High",
-    "Invalid"
+    "Invalid",
 };
 
 static char* format_date(char* buf, size_t buflen, time_t now)
@@ -1307,8 +1326,14 @@ static void printFileList(tr_variant* top)
                             break;
                         }
 
-                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, floor(100.0 * percent), pristr, wanted ? "Yes" : "No",
-                            sizestr, filename);
+                        printf(
+                            "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
+                            j,
+                            floor(100.0 * percent),
+                            pristr,
+                            wanted ? "Yes" : "No",
+                            sizestr,
+                            filename);
                     }
                 }
             }
@@ -1332,13 +1357,18 @@ static void printPeersImpl(tr_variant* peers)
 
         if (tr_variantDictFindStr(d, TR_KEY_address, &address, NULL) &&
             tr_variantDictFindStr(d, TR_KEY_clientName, &client, NULL) &&
-            tr_variantDictFindReal(d, TR_KEY_progress, &progress) &&
-            tr_variantDictFindStr(d, TR_KEY_flagStr, &flagstr, NULL) &&
+            tr_variantDictFindReal(d, TR_KEY_progress, &progress) && tr_variantDictFindStr(d, TR_KEY_flagStr, &flagstr, NULL) &&
             tr_variantDictFindInt(d, TR_KEY_rateToClient, &rateToClient) &&
             tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
-            printf("%-40s  %-12s  %-5.1f %6.1f  %6.1f  %s\n", address, flagstr, (progress * 100.0),
-                rateToClient / (double)tr_speed_K, rateToPeer / (double)tr_speed_K, client);
+            printf(
+                "%-40s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
+                address,
+                flagstr,
+                (progress * 100.0),
+                rateToClient / (double)tr_speed_K,
+                rateToPeer / (double)tr_speed_K,
+                client);
         }
     }
 }
@@ -1376,7 +1406,7 @@ static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_cou
 
     size_t piece = 0;
     size_t const col_width = 64;
-    for (char const* it = str, * end = it + len; it != end; ++it)
+    for (char const *it = str, *end = it + len; it != end; ++it)
     {
         for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
@@ -1451,8 +1481,17 @@ static void printTorrentList(tr_variant* top)
         double total_down = 0;
         char haveStr[32];
 
-        printf("%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio",
-            "Status", "Name");
+        printf(
+            "%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
+            "ID",
+            "Done",
+            "Have",
+            "ETA",
+            "Up",
+            "Down",
+            "Ratio",
+            "Status",
+            "Name");
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
@@ -1467,15 +1506,12 @@ static void printTorrentList(tr_variant* top)
             char const* name;
             tr_variant* d = tr_variantListChild(list, i);
 
-            if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) &&
-                tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
+            if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
-                tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) &&
-                tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
+                tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) && tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
                 tr_variantDictFindInt(d, TR_KEY_rateUpload, &up) &&
                 tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) &&
-                tr_variantDictFindInt(d, TR_KEY_status, &status) &&
-                tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
+                tr_variantDictFindInt(d, TR_KEY_status, &status) && tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
             {
                 char etaStr[16];
                 char statusStr[64];
@@ -1513,9 +1549,18 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)torId, errorMark, doneStr, haveStr, etaStr,
-                    up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
-                    getStatusString(d, statusStr, sizeof(statusStr)), name);
+                printf(
+                    "%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
+                    (int)torId,
+                    errorMark,
+                    doneStr,
+                    haveStr,
+                    etaStr,
+                    up / (double)tr_speed_K,
+                    down / (double)tr_speed_K,
+                    strlratio2(ratioStr, ratio, sizeof(ratioStr)),
+                    getStatusString(d, statusStr, sizeof(statusStr)),
+                    name);
 
                 total_up += up;
                 total_down += down;
@@ -1523,8 +1568,11 @@ static void printTorrentList(tr_variant* top)
             }
         }
 
-        printf("Sum:           %9s            %6.1f  %6.1f\n", strlsize(haveStr, total_size, sizeof(haveStr)),
-            total_up / (double)tr_speed_K, total_down / (double)tr_speed_K);
+        printf(
+            "Sum:           %9s            %6.1f  %6.1f\n",
+            strlsize(haveStr, total_size, sizeof(haveStr)),
+            total_up / (double)tr_speed_K,
+            total_down / (double)tr_speed_K);
     }
 }
 
@@ -1562,10 +1610,8 @@ static void printTrackersImpl(tr_variant* trackerStats)
 
         if (tr_variantDictFindInt(t, TR_KEY_downloadCount, &downloadCount) &&
             tr_variantDictFindBool(t, TR_KEY_hasAnnounced, &hasAnnounced) &&
-            tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) &&
-            tr_variantDictFindStr(t, TR_KEY_host, &host, NULL) &&
-            tr_variantDictFindInt(t, TR_KEY_id, &trackerId) &&
-            tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
+            tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) && tr_variantDictFindStr(t, TR_KEY_host, &host, NULL) &&
+            tr_variantDictFindInt(t, TR_KEY_id, &trackerId) && tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
             tr_variantDictFindInt(t, TR_KEY_announceState, &announceState) &&
             tr_variantDictFindInt(t, TR_KEY_scrapeState, &scrapeState) &&
             tr_variantDictFindInt(t, TR_KEY_lastAnnouncePeerCount, &lastAnnouncePeerCount) &&
@@ -1582,8 +1628,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             tr_variantDictFindInt(t, TR_KEY_leecherCount, &leecherCount) &&
             tr_variantDictFindInt(t, TR_KEY_nextAnnounceTime, &nextAnnounceTime) &&
             tr_variantDictFindInt(t, TR_KEY_nextScrapeTime, &nextScrapeTime) &&
-            tr_variantDictFindInt(t, TR_KEY_seederCount, &seederCount) &&
-            tr_variantDictFindInt(t, TR_KEY_tier, &tier))
+            tr_variantDictFindInt(t, TR_KEY_seederCount, &seederCount) && tr_variantDictFindInt(t, TR_KEY_tier, &tier))
         {
             time_t const now = time(NULL);
 
@@ -1852,9 +1897,13 @@ static void printSession(tr_variant* top)
                     tr_strlcpy(buf, "Unlimited", sizeof(buf));
                 }
 
-                printf("  Upload speed limit: %s (%s limit: %s; %s turtle limit: %s)\n", buf,
-                    upEnabled ? "Enabled" : "Disabled", tr_formatter_speed_KBps(buf2, upLimit, sizeof(buf2)),
-                    altEnabled ? "Enabled" : "Disabled", tr_formatter_speed_KBps(buf3, altUp, sizeof(buf3)));
+                printf(
+                    "  Upload speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
+                    buf,
+                    upEnabled ? "Enabled" : "Disabled",
+                    tr_formatter_speed_KBps(buf2, upLimit, sizeof(buf2)),
+                    altEnabled ? "Enabled" : "Disabled",
+                    tr_formatter_speed_KBps(buf3, altUp, sizeof(buf3)));
 
                 if (altEnabled)
                 {
@@ -1869,14 +1918,22 @@ static void printSession(tr_variant* top)
                     tr_strlcpy(buf, "Unlimited", sizeof(buf));
                 }
 
-                printf("  Download speed limit: %s (%s limit: %s; %s turtle limit: %s)\n", buf,
-                    downEnabled ? "Enabled" : "Disabled", tr_formatter_speed_KBps(buf2, downLimit, sizeof(buf2)),
-                    altEnabled ? "Enabled" : "Disabled", tr_formatter_speed_KBps(buf3, altDown, sizeof(buf3)));
+                printf(
+                    "  Download speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
+                    buf,
+                    downEnabled ? "Enabled" : "Disabled",
+                    tr_formatter_speed_KBps(buf2, downLimit, sizeof(buf2)),
+                    altEnabled ? "Enabled" : "Disabled",
+                    tr_formatter_speed_KBps(buf3, altDown, sizeof(buf3)));
 
                 if (altTimeEnabled)
                 {
-                    printf("  Turtle schedule: %02d:%02d - %02d:%02d  ", (int)(altBegin / 60), (int)(altBegin % 60),
-                        (int)(altEnd / 60), (int)(altEnd % 60));
+                    printf(
+                        "  Turtle schedule: %02d:%02d - %02d:%02d  ",
+                        (int)(altBegin / 60),
+                        (int)(altBegin % 60),
+                        (int)(altEnd / 60),
+                        (int)(altEnd % 60));
 
                     if ((altDay & TR_SCHED_SUN) != 0)
                     {
@@ -1958,10 +2015,8 @@ static void printSessionStats(tr_variant* top)
         }
 
         if (tr_variantDictFindDict(args, TR_KEY_cumulative_stats, &d) &&
-            tr_variantDictFindInt(d, TR_KEY_sessionCount, &sessions) &&
-            tr_variantDictFindInt(d, TR_KEY_uploadedBytes, &up) &&
-            tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) &&
-            tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
+            tr_variantDictFindInt(d, TR_KEY_sessionCount, &sessions) && tr_variantDictFindInt(d, TR_KEY_uploadedBytes, &up) &&
+            tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) && tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
         {
             printf("\nTOTAL\n");
             printf("  Started %lu times\n", (unsigned long)sessions);
@@ -1982,13 +2037,19 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
 
     if (debug)
     {
-        fprintf(stderr, "got response (len %d):\n--------\n%*.*s\n--------\n", (int)len, (int)len, (int)len,
-            (char const*)response);
+        fprintf(
+            stderr,
+            "got response (len %d):\n--------\n%*.*s\n--------\n",
+            (int)len,
+            TR_ARG_TUPLE((int)len, (int)len, (char const*)response));
     }
 
     if (tr_variantFromJson(&top, response, len) != 0)
     {
-        tr_logAddNamedError(MY_NAME, "Unable to parse response \"%*.*s\"", (int)len, (int)len, (char const*)response);
+        tr_logAddNamedError(
+            MY_NAME,
+            "Unable to parse response \"%*.*s\"",
+            TR_ARG_TUPLE((int)len, (int)len, (char const*)response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2051,8 +2112,7 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
                         tr_variant* b = &top;
 
                         if (tr_variantDictFindDict(&top, ARGUMENTS, &b) &&
-                            tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) &&
-                            tr_variantDictFindInt(b, TR_KEY_id, &i))
+                            tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
                             tr_snprintf(id, sizeof(id), "%" PRId64, i);
                         }
@@ -3058,8 +3118,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != NULL);
 
-        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", (int)(hend - s), s) :
-            tr_strndup(s, hend - s);
+        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", TR_ARG_TUPLE((int)(hend - s), s)) : tr_strndup(s, hend - s);
     }
 
     *argc -= 1;

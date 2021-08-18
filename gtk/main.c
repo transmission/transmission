@@ -455,8 +455,11 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
     return G_SOURCE_REMOVE;
 }
 
-static tr_rpc_callback_status on_rpc_changed(tr_session* session G_GNUC_UNUSED, tr_rpc_callback_type type,
-    struct tr_torrent* tor, void* gdata)
+static tr_rpc_callback_status on_rpc_changed(
+    tr_session* session G_GNUC_UNUSED,
+    tr_rpc_callback_type type,
+    struct tr_torrent* tor,
+    void* gdata)
 {
     struct cbdata* cbdata = gdata;
     struct on_rpc_changed_struct* data;
@@ -547,8 +550,7 @@ static void on_startup(GApplication* application, gpointer user_data)
     tr_sessionSetRPCCallback(session, on_rpc_changed, cbdata);
 
     /* check & see if it's time to update the blocklist */
-    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) &&
-        gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
+    if (gtr_pref_flag_get(TR_KEY_blocklist_enabled) && gtr_pref_flag_get(TR_KEY_blocklist_updates_enabled))
     {
         int64_t const last_time = gtr_pref_int_get(TR_KEY_blocklist_date);
         int const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
@@ -623,8 +625,7 @@ int main(int argc, char** argv)
     GError* error = NULL;
     struct cbdata cbdata;
 
-    GOptionEntry option_entries[] =
-    {
+    GOptionEntry option_entries[] = {
         { "config-dir", 'g', 0, G_OPTION_ARG_FILENAME, &cbdata.config_dir, _("Where to look for configuration files"), NULL },
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &cbdata.start_paused, _("Start with all torrents paused"), NULL },
         { "minimized", 'm', 0, G_OPTION_ARG_NONE, &cbdata.is_iconified, _("Start minimized in notification area"), NULL },
@@ -687,7 +688,9 @@ int main(int argc, char** argv)
 
     /* init the application for the specified config dir */
     stat(cbdata.config_dir, &sb);
-    application_id = g_strdup_printf("com.transmissionbt.transmission_%lu_%lu", (unsigned long)sb.st_dev,
+    application_id = g_strdup_printf(
+        "com.transmissionbt.transmission_%lu_%lu",
+        (unsigned long)sb.st_dev,
         (unsigned long)sb.st_ino);
     app = gtk_application_new(application_id, G_APPLICATION_HANDLES_OPEN);
     g_signal_connect(app, "open", G_CALLBACK(on_open), &cbdata);
@@ -756,9 +759,14 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
 
     if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
     {
-        GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(wind), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER,
-            GTK_BUTTONS_NONE, "%s", _("Transmission is a file sharing program. When you run a torrent, its data will be "
-            "made available to others by means of upload. Any content you share is your sole responsibility."));
+        GtkWidget* w = gtk_message_dialog_new(
+            GTK_WINDOW(wind),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_OTHER,
+            GTK_BUTTONS_NONE,
+            "%s",
+            _("Transmission is a file sharing program. When you run a torrent, its data will be "
+              "made available to others by means of upload. Any content you share is your sole responsibility."));
         gtk_dialog_add_button(GTK_DIALOG(w), _("_Cancel"), GTK_RESPONSE_REJECT);
         gtk_dialog_add_button(GTK_DIALOG(w), _("I _Agree"), GTK_RESPONSE_ACCEPT);
         gtk_dialog_set_default_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT);
@@ -779,10 +787,11 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
 
 static void placeWindowFromPrefs(GtkWindow* window)
 {
-    gtk_window_resize(window, (int)gtr_pref_int_get(TR_KEY_main_window_width),
+    gtk_window_resize(
+        window,
+        (int)gtr_pref_int_get(TR_KEY_main_window_width),
         (int)gtr_pref_int_get(TR_KEY_main_window_height));
-    gtk_window_move(window, (int)gtr_pref_int_get(TR_KEY_main_window_x),
-        (int)gtr_pref_int_get(TR_KEY_main_window_y));
+    gtk_window_move(window, (int)gtr_pref_int_get(TR_KEY_main_window_x), (int)gtr_pref_int_get(TR_KEY_main_window_y));
 }
 
 static void presentMainWindow(struct cbdata* cbdata)
@@ -860,8 +869,15 @@ static void rowChangedCB(GtkTreeModel const* model, GtkTreePath* path, GtkTreeIt
     }
 }
 
-static void on_drag_data_received(GtkWidget const* widget, GdkDragContext* drag_context, gint x, gint y,
-    GtkSelectionData const* selection_data, guint info, guint time_, gpointer gdata)
+static void on_drag_data_received(
+    GtkWidget const* widget,
+    GdkDragContext* drag_context,
+    gint x,
+    gint y,
+    GtkSelectionData const* selection_data,
+    guint info,
+    guint time_,
+    gpointer gdata)
 {
     TR_UNUSED(widget);
     TR_UNUSED(x);
@@ -1000,8 +1016,11 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    p =
-        g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER,
+    p = g_object_new(
+        GTK_TYPE_GRID,
+        TR_ARG_TUPLE("column-spacing", GUI_PAD_BIG),
+        TR_ARG_TUPLE("halign", GTK_ALIGN_CENTER),
+        TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER),
         NULL);
     gtk_container_add(GTK_CONTAINER(c), p);
 
@@ -1066,14 +1085,21 @@ static void flush_torrent_errors(struct cbdata* cbdata)
 {
     if (cbdata->error_list != NULL)
     {
-        show_torrent_errors(cbdata->wind, ngettext("Couldn't add corrupt torrent", "Couldn't add corrupt torrents",
-            g_slist_length(cbdata->error_list)), &cbdata->error_list);
+        show_torrent_errors(
+            cbdata->wind,
+            ngettext("Couldn't add corrupt torrent", "Couldn't add corrupt torrents", g_slist_length(cbdata->error_list)),
+            &cbdata->error_list);
     }
 
     if (cbdata->duplicates_list != NULL)
     {
-        show_torrent_errors(cbdata->wind, ngettext("Couldn't add duplicate torrent", "Couldn't add duplicate torrents",
-            g_slist_length(cbdata->duplicates_list)), &cbdata->duplicates_list);
+        show_torrent_errors(
+            cbdata->wind,
+            ngettext(
+                "Couldn't add duplicate torrent",
+                "Couldn't add duplicate torrents",
+                g_slist_length(cbdata->duplicates_list)),
+            &cbdata->duplicates_list);
     }
 }
 
@@ -1388,30 +1414,30 @@ static gboolean update_model_loop(gpointer gdata)
 static void show_about_dialog(GtkWindow* parent)
 {
     char const* uri = "https://transmissionbt.com/";
-    char const* authors[] =
-    {
+    char const* authors[] = {
         "Charles Kerr (Backend; GTK+)",
         "Mitchell Livingston (Backend; OS X)",
         "Mike Gelfand",
-        NULL
+        NULL,
     };
 
-    gtk_show_about_dialog(parent,
-        "authors", authors,
-        "comments", _("A fast and easy BitTorrent client"),
-        "copyright", _("Copyright (c) The Transmission Project"),
-        "logo-icon-name", MY_CONFIG_NAME,
-        "name", g_get_application_name(),
+    gtk_show_about_dialog(
+        parent,
+        TR_ARG_TUPLE("authors", authors),
+        TR_ARG_TUPLE("comments", _("A fast and easy BitTorrent client")),
+        TR_ARG_TUPLE("copyright", _("Copyright (c) The Transmission Project")),
+        TR_ARG_TUPLE("logo-icon-name", MY_CONFIG_NAME),
+        TR_ARG_TUPLE("name", g_get_application_name()),
         /* Translators: translate "translator-credits" as your name
            to have it appear in the credits in the "About"
            dialog */
-        "translator-credits", _("translator-credits"),
-        "version", LONG_VERSION_STRING,
-        "website", uri,
-        "website-label", uri,
+        TR_ARG_TUPLE("translator-credits", _("translator-credits")),
+        TR_ARG_TUPLE("version", LONG_VERSION_STRING),
+        TR_ARG_TUPLE("website", uri),
+        TR_ARG_TUPLE("website-label", uri),
 #ifdef SHOW_LICENSE
-        "license", LICENSE,
-        "wrap-license", TRUE,
+        TR_ARG_TUPLE("license", LICENSE),
+        TR_ARG_TUPLE("wrap-license", TRUE),
 #endif
         NULL);
 }
@@ -1605,7 +1631,8 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
             gtk_widget_show(w);
         }
     }
-    else if (g_strcmp0(action_name, "torrent-start") == 0 || g_strcmp0(action_name, "torrent-start-now") == 0 ||
+    else if (
+        g_strcmp0(action_name, "torrent-start") == 0 || g_strcmp0(action_name, "torrent-start-now") == 0 ||
         g_strcmp0(action_name, "torrent-stop") == 0 || g_strcmp0(action_name, "torrent-reannounce") == 0 ||
         g_strcmp0(action_name, "torrent-verify") == 0 || g_strcmp0(action_name, "queue-move-top") == 0 ||
         g_strcmp0(action_name, "queue-move-up") == 0 || g_strcmp0(action_name, "queue-move-down") == 0 ||

@@ -68,7 +68,11 @@ void tr_peerMsgsPulse(tr_peerMsgs* msgs);
 
 void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block);
 
-size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSize, size_t pieceCount, uint8_t const* infohash,
+size_t tr_generateAllowedSet(
+    tr_piece_index_t* setmePieces,
+    size_t desiredSetSize,
+    size_t pieceCount,
+    uint8_t const* infohash,
     struct tr_address const* addr);
 
 /* @} */

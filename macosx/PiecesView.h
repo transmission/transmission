@@ -26,17 +26,21 @@
 
 @interface PiecesView : NSImageView
 {
-    int8_t  * fPieces;
+    int8_t* fPieces;
 
-    NSColor * fGreenAvailabilityColor, * fBluePieceColor;
+    NSColor* fGreenAvailabilityColor;
+    NSColor* fBluePieceColor;
 
-    Torrent * fTorrent;
-    NSInteger fNumPieces, fAcross, fWidth, fExtraBorder;
+    Torrent* fTorrent;
+    NSInteger fNumPieces;
+    NSInteger fAcross;
+    NSInteger fWidth;
+    NSInteger fExtraBorder;
 }
 
-- (void) setTorrent: (Torrent *) torrent;
+- (void)setTorrent:(Torrent*)torrent;
 
-- (void) clearView;
-- (void) updateView;
+- (void)clearView;
+- (void)updateView;
 
 @end

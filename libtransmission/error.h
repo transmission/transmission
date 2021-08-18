@@ -26,8 +26,7 @@ typedef struct tr_error
     int code;
     /** @brief Error message */
     char* message;
-}
-tr_error;
+} tr_error;
 
 /**
  * @brief Create new error object using literal error message.
@@ -126,8 +125,8 @@ void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_P
  * @param[in] prefix_format Prefix format string.
  * @param[in] ... Format arguments.
  */
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...) TR_GNUC_PRINTF(3,
-    4);
+void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
+    TR_GNUC_PRINTF(3, 4);
 
 /** @} */
 

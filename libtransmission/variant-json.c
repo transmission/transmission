@@ -85,8 +85,12 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 
     if (data->source != NULL)
     {
-        tr_logAddError("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"", data->source, jsn->pos,
-            jsonsl_strerror(error), buf);
+        tr_logAddError(
+            "JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
+            data->source,
+            jsn->pos,
+            jsonsl_strerror(error),
+            buf);
     }
     else
     {
@@ -161,8 +165,7 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
         {
             return false;
         }
-    }
-    while (++in != end);
+    } while (++in != end);
 
     *setme = val;
     return true;
@@ -694,15 +697,14 @@ static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-static struct VariantWalkFuncs const walk_funcs =
-{
-    jsonIntFunc,
-    jsonBoolFunc,
-    jsonRealFunc,
-    jsonStringFunc,
-    jsonDictBeginFunc,
-    jsonListBeginFunc,
-    jsonContainerEndFunc
+static struct VariantWalkFuncs const walk_funcs = {
+    jsonIntFunc, //
+    jsonBoolFunc, //
+    jsonRealFunc, //
+    jsonStringFunc, //
+    jsonDictBeginFunc, //
+    jsonListBeginFunc, //
+    jsonContainerEndFunc, //
 };
 
 void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
