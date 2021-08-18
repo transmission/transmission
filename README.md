@@ -30,8 +30,8 @@ For a more detailed description, and dependencies, visit: https://github.com/tra
     $ cd transmission-2.92
     $ mkdir build
     $ cd build
-    $ # Use -DCMAKE_BUILD_TYPE=Release to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
@@ -48,8 +48,8 @@ If you're new to building programs from source code, this is typically easier th
     $ git submodule update --init
     $ mkdir build
     $ cd build
-    $ # Use -DCMAKE_BUILD_TYPE=Release to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
@@ -59,8 +59,8 @@ If you're new to building programs from source code, this is typically easier th
     $ make clean
     $ git pull --rebase --prune
     $ git submodule update
-    $ # Use -DCMAKE_BUILD_TYPE=Release to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
