@@ -6,11 +6,10 @@
  *
  */
 
-/* *INDENT-OFF* */
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
 #define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
-#define API(x) wc_ ## x
+#define API(x) wc_##x
 #define API_VERSION_HEX LIBWOLFSSL_VERSION_HEX
 #else
 #define API_HEADER(x) <cyassl/x>
@@ -25,7 +24,6 @@
 #include API_HEADER_CRYPT(random.h)
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
-/* *INDENT-ON* */
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -204,7 +202,10 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 ****
 ***/
 
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+tr_dh_ctx_t tr_dh_new(
+    uint8_t const* prime_num,
+    size_t prime_num_length,
+    uint8_t const* generator_num,
     size_t generator_num_length)
 {
     TR_ASSERT(prime_num != NULL);
@@ -239,8 +240,10 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
     tr_free(handle);
 }
 
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length UNUSED, uint8_t* public_key, size_t* public_key_length)
+bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
+    TR_UNUSED(private_key_length);
+
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
 
@@ -256,8 +259,13 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length UNUSED, ui
 
     tr_lockLock(rng_lock);
 
-    if (!check_result(API(DhGenerateKeyPair)(&handle->dh, get_rng(), handle->private_key, &my_private_key_length, public_key,
-        &my_public_key_length)))
+    if (!check_result(API(DhGenerateKeyPair)(
+            &handle->dh,
+            get_rng(),
+            handle->private_key,
+            &my_private_key_length,
+            public_key,
+            &my_public_key_length)))
     {
         tr_lockUnlock(rng_lock);
         return false;
@@ -288,8 +296,14 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
     ret = tr_dh_secret_new(handle->key_length);
 
-    if (check_result(API(DhAgree)(&handle->dh, ret->key, &my_secret_key_length, handle->private_key, handle->private_key_length,
-        other_public_key, other_public_key_length)))
+    if (check_result(API(DhAgree)(
+            &handle->dh,
+            ret->key,
+            &my_secret_key_length,
+            handle->private_key,
+            handle->private_key_length,
+            other_public_key,
+            other_public_key_length)))
     {
         tr_dh_secret_align(ret, my_secret_key_length);
     }

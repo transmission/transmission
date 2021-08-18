@@ -8,17 +8,22 @@
 
 #pragma once
 
+#include <array>
+#include <bitset>
 #include <ctime> // time_t
 
 #include <QIcon>
 #include <QMetaType>
 #include <QObject>
 #include <QString>
-#include <QStringList>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
 
+#include "FaviconCache.h"
+#include "IconCache.h"
+#include "Macros.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -31,7 +36,7 @@ class Prefs;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 struct Peer
@@ -80,8 +85,8 @@ struct TrackerStat
     int scrape_state;
     int seeder_count;
     int tier;
+    FaviconCache::Key favicon_key;
     QString announce;
-    QString host;
     QString last_announce_result;
     QString last_scrape_result;
 };
@@ -100,9 +105,53 @@ struct TorrentFile
 
 using FileList = QVector<TorrentFile>;
 
+class TorrentHash
+{
+private:
+    std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
+
+public:
+    TorrentHash()
+    {
+    }
+
+    explicit TorrentHash(char const* str)
+    {
+        tr_hex_to_sha1(data_.data(), str);
+    }
+
+    explicit TorrentHash(QString const& str)
+    {
+        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
+    }
+
+    bool operator==(TorrentHash const& that) const
+    {
+        return data_ == that.data_;
+    }
+
+    bool operator!=(TorrentHash const& that) const
+    {
+        return data_ != that.data_;
+    }
+
+    bool operator<(TorrentHash const& that) const
+    {
+        return data_ < that.data_;
+    }
+
+    QString toString() const
+    {
+        char str[SHA_DIGEST_LENGTH * 2 + 1];
+        tr_sha1_to_hex(str, data_.data());
+        return QString::fromUtf8(str, SHA_DIGEST_LENGTH * 2);
+    }
+};
+
 class Torrent : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Torrent)
 
 public:
     Torrent(Prefs const&, int id);
@@ -144,9 +193,9 @@ public:
 
     QString getError() const;
 
-    QString const& hashString() const
+    TorrentHash const& hash() const
     {
-        return hash_string_;
+        return hash_;
     }
 
     bool hasError() const
@@ -238,7 +287,7 @@ public:
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
-        return s ? double(s - l) / s : 0.0;
+        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
     double metadataPercentDone() const
@@ -293,6 +342,11 @@ public:
     time_t dateCreated() const
     {
         return date_created_;
+    }
+
+    time_t dateEdited() const
+    {
+        return edit_date_;
     }
 
     time_t manualAnnounceTime() const
@@ -350,7 +404,12 @@ public:
         return recheck_progress_;
     }
 
-    bool hasTrackerSubstring(QString const& substr) const;
+    bool includesTracker(FaviconCache::Key const& key) const;
+
+    FaviconCache::Keys const& trackerKeys() const
+    {
+        return tracker_keys_;
+    }
 
     Speed uploadLimit() const
     {
@@ -405,16 +464,6 @@ public:
     TrackerStatsList const& trackerStats() const
     {
         return tracker_stats_;
-    }
-
-    QStringList const& trackers() const
-    {
-        return trackers_;
-    }
-
-    QStringList const& trackerDisplayNames() const
-    {
-        return tracker_display_names_;
     }
 
     PeerList const& peers() const
@@ -494,22 +543,72 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    bool update(tr_quark const* keys, tr_variant const* const* values, size_t n);
+    QIcon getMimeTypeIcon() const;
 
-    QIcon getMimeTypeIcon() const
+    enum Field
     {
-        return icon_;
-    }
+        ACTIVITY_DATE,
+        ADDED_DATE,
+        BANDWIDTH_PRIORITY,
+        COMMENT,
+        CREATOR,
+        DATE_CREATED,
+        DESIRED_AVAILABLE,
+        DOWNLOADED_EVER,
+        DOWNLOAD_DIR,
+        DOWNLOAD_LIMIT,
+        DOWNLOAD_LIMITED,
+        DOWNLOAD_SPEED,
+        EDIT_DATE,
+        ERROR,
+        ERROR_STRING,
+        ETA,
+        FAILED_EVER,
+        FILE_COUNT,
+        FILES,
+        HASH,
+        HAVE_UNCHECKED,
+        HAVE_VERIFIED,
+        HONORS_SESSION_LIMITS,
+        ICON,
+        IS_FINISHED,
+        IS_PRIVATE,
+        IS_STALLED,
+        LEFT_UNTIL_DONE,
+        MANUAL_ANNOUNCE_TIME,
+        METADATA_PERCENT_COMPLETE,
+        NAME,
+        PEERS,
+        PEERS_CONNECTED,
+        PEERS_GETTING_FROM_US,
+        PEERS_SENDING_TO_US,
+        PEER_LIMIT,
+        PERCENT_DONE,
+        PIECE_COUNT,
+        PIECE_SIZE,
+        PRIMARY_MIME_TYPE,
+        QUEUE_POSITION,
+        RECHECK_PROGRESS,
+        SEED_IDLE_LIMIT,
+        SEED_IDLE_MODE,
+        SEED_RATIO_LIMIT,
+        SEED_RATIO_MODE,
+        SIZE_WHEN_DONE,
+        START_DATE,
+        STATUS,
+        TOTAL_SIZE,
+        TRACKER_STATS,
+        UPLOADED_EVER,
+        UPLOAD_LIMIT,
+        UPLOAD_LIMITED,
+        UPLOAD_SPEED,
+        WEBSEEDS_SENDING_TO_US,
 
-    using KeyList = QSet<tr_quark>;
-    static KeyList const allMainKeys;
-    static KeyList const detailInfoKeys;
-    static KeyList const detailStatKeys;
-    static KeyList const mainInfoKeys;
-    static KeyList const mainStatKeys;
+        N_FIELDS
+    };
+    using fields_t = std::bitset<N_FIELDS>;
 
-private:
-    void updateMimeIcon();
+    fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
     int const id_;
@@ -548,6 +647,7 @@ private:
     uint64_t desired_available_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
+    uint64_t file_count_ = {};
     uint64_t have_unchecked_ = {};
     uint64_t have_verified_ = {};
     uint64_t left_until_done_ = {};
@@ -561,26 +661,28 @@ private:
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
 
+    QString primary_mime_type_;
     QString comment_;
     QString creator_;
     QString download_dir_;
     QString error_string_;
-    QString hash_string_;
     QString name_;
 
-    QIcon icon_;
+    // mutable because it's a lazy lookup
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;
 
-    QStringList trackers_;
-    QStringList tracker_display_names_;
+    FaviconCache::Keys tracker_keys_;
     TrackerStatsList tracker_stats_;
 
     Speed upload_speed_;
     Speed download_speed_;
 
     Prefs const& prefs_;
+
+    TorrentHash hash_;
 };
 
 Q_DECLARE_METATYPE(Torrent const*)

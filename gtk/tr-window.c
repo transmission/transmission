@@ -61,12 +61,11 @@ typedef struct
     GtkTreeModel* filter_model;
     TrCore* core;
     gulong pref_handler_id;
-}
-PrivateData;
+} PrivateData;
 
 static TR_DEFINE_QUARK(private_data, private_data)
 
-static PrivateData* get_private_data(GtkWindow * w)
+static PrivateData* get_private_data(GtkWindow* w)
 {
     return g_object_get_qdata(G_OBJECT(w), private_data_quark());
 }
@@ -75,8 +74,10 @@ static PrivateData* get_private_data(GtkWindow * w)
 ****
 ***/
 
-static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
+static void on_popup_menu(GtkWidget* self, GdkEventButton* event)
 {
+    TR_UNUSED(self);
+
     GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
 
 #if GTK_CHECK_VERSION(3, 22, 0)
@@ -86,15 +87,26 @@ static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 #endif
 }
 
-static void view_row_activated(GtkTreeView* tree_view UNUSED, GtkTreePath* path UNUSED, GtkTreeViewColumn* column UNUSED,
-    gpointer user_data UNUSED)
+static void view_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data)
 {
+    TR_UNUSED(tree_view);
+    TR_UNUSED(path);
+    TR_UNUSED(column);
+    TR_UNUSED(user_data);
+
     gtr_action_activate("show-torrent-properties");
 }
 
-static gboolean tree_view_search_equal_func(GtkTreeModel* model, gint column UNUSED, gchar const* key, GtkTreeIter* iter,
-    gpointer search_data UNUSED)
+static gboolean tree_view_search_equal_func(
+    GtkTreeModel* model,
+    gint column,
+    gchar const* key,
+    GtkTreeIter* iter,
+    gpointer search_data)
 {
+    TR_UNUSED(column);
+    TR_UNUSED(search_data);
+
     gboolean match;
     char* lower;
     char const* name = NULL;
@@ -124,8 +136,12 @@ static GtkWidget* makeview(PrivateData* p)
 
     p->selection = gtk_tree_view_get_selection(tree_view);
 
-    p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(GTK_TYPE_TREE_VIEW_COLUMN, "title", _("Torrent"), "resizable", TRUE,
-        "sizing", GTK_TREE_VIEW_COLUMN_FIXED, NULL));
+    p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(
+        GTK_TYPE_TREE_VIEW_COLUMN,
+        TR_ARG_TUPLE("title", _("Torrent")),
+        TR_ARG_TUPLE("resizable", TRUE),
+        TR_ARG_TUPLE("sizing", GTK_TREE_VIEW_COLUMN_FIXED),
+        NULL));
 
     p->renderer = r = torrent_cell_renderer_new();
     gtk_tree_view_column_pack_start(col, r, FALSE);
@@ -152,8 +168,10 @@ static GtkWidget* makeview(PrivateData* p)
 
 static void syncAltSpeedButton(PrivateData* p);
 
-static void prefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer wind)
+static void prefsChanged(TrCore* core, tr_quark const key, gpointer wind)
 {
+    TR_UNUSED(core);
+
     gboolean isEnabled;
     PrivateData* p = get_private_data(GTK_WINDOW(wind));
 
@@ -204,8 +222,10 @@ static void privateFree(gpointer vprivate)
     g_free(p);
 }
 
-static void onYinYangClicked(GtkWidget* w UNUSED, gpointer vprivate)
+static void onYinYangClicked(GtkWidget* w, gpointer vprivate)
 {
+    TR_UNUSED(w);
+
     PrivateData* p = vprivate;
 
 #if GTK_CHECK_VERSION(3, 22, 0)
@@ -221,13 +241,11 @@ static struct
 {
     char const* val;
     char const* i18n;
-}
-stats_modes[] =
-{
+} stats_modes[] = {
     { "total-ratio", N_("Total Ratio") },
     { "session-ratio", N_("Session Ratio") },
     { "total-transfer", N_("Total Transfer") },
-    { "session-transfer", N_("Session Transfer") }
+    { "session-transfer", N_("Session Transfer") },
 };
 
 static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivate)
@@ -242,19 +260,17 @@ static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivat
 
 static void syncAltSpeedButton(PrivateData* p)
 {
-    char u[32];
-    char d[32];
-    char* str;
-    char const* fmt;
     gboolean const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
-    char const* stock = b ? "alt-speed-on" : "alt-speed-off";
-    GtkWidget* w = p->alt_speed_button;
+    char const* const stock = b ? "alt-speed-on" : "alt-speed-off";
+    GtkWidget* const w = p->alt_speed_button;
 
+    char u[32];
     tr_formatter_speed_KBps(u, gtr_pref_int_get(TR_KEY_alt_speed_up), sizeof(u));
+    char d[32];
     tr_formatter_speed_KBps(d, gtr_pref_int_get(TR_KEY_alt_speed_down), sizeof(d));
-    fmt = b ? _("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)") :
-        _("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)");
-    str = g_strdup_printf(fmt, d, u);
+
+    char* const str = b ? g_strdup_printf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
+                          g_strdup_printf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
@@ -275,8 +291,10 @@ static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 ****  FILTER
 ***/
 
-static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gmaxTime)
+static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gmaxTime)
 {
+    TR_UNUSED(path);
+
     tr_torrent* tor;
     tr_stat const* torStat;
     time_t* maxTime = gmaxTime;
@@ -286,9 +304,19 @@ static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, G
     *maxTime = MAX(*maxTime, torStat->manualAnnounceTime);
 }
 
-static gboolean onAskTrackerQueryTooltip(GtkWidget* widget UNUSED, gint x UNUSED, gint y UNUSED, gboolean keyboard_tip UNUSED,
-    GtkTooltip* tooltip, gpointer gdata)
+static gboolean onAskTrackerQueryTooltip(
+    GtkWidget* widget,
+    gint x,
+    gint y,
+    gboolean keyboard_tip,
+    GtkTooltip* tooltip,
+    gpointer gdata)
 {
+    TR_UNUSED(widget);
+    TR_UNUSED(x);
+    TR_UNUSED(y);
+    TR_UNUSED(keyboard_tip);
+
     gboolean handled;
     time_t maxTime = 0;
     PrivateData* p = gdata;
@@ -324,8 +352,12 @@ static gboolean onAltSpeedToggledIdle(gpointer vp)
     return G_SOURCE_REMOVE;
 }
 
-static void onAltSpeedToggled(tr_session* s UNUSED, bool isEnabled UNUSED, bool byUser UNUSED, void* p)
+static void onAltSpeedToggled(tr_session* s, bool isEnabled, bool byUser, void* p)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(isEnabled);
+    TR_UNUSED(byUser);
+
     gdk_threads_add_idle(onAltSpeedToggledIdle, p);
 }
 
@@ -537,7 +569,11 @@ static void onOptionsClicked(GtkButton* button, gpointer vp)
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(b ? p->ratio_on_item : p->ratio_off_item), TRUE);
 
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(p->options_menu), GTK_WIDGET(button), GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_SOUTH_WEST,
+    gtk_menu_popup_at_widget(
+        GTK_MENU(p->options_menu),
+        GTK_WIDGET(button),
+        GDK_GRAVITY_NORTH_WEST,
+        GDK_GRAVITY_SOUTH_WEST,
         NULL);
 #else
     gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
@@ -592,7 +628,9 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
     css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
+    gtk_style_context_add_provider_for_screen(
+        gdk_screen_get_default(),
+        GTK_STYLE_PROVIDER(css_provider),
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     /* window's main container */
@@ -710,13 +748,13 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
     {
         /* this is to determine the maximum width/height for the label */
-        int w = 0;
-        int h = 0;
+        int width = 0;
+        int height = 0;
         PangoLayout* pango_layout;
         pango_layout = gtk_widget_create_pango_layout(ul_lb, "999.99 kB/s");
-        pango_layout_get_pixel_size(pango_layout, &w, &h);
-        gtk_widget_set_size_request(ul_lb, w, h);
-        gtk_widget_set_size_request(dl_lb, w, h);
+        pango_layout_get_pixel_size(pango_layout, &width, &height);
+        gtk_widget_set_size_request(ul_lb, width, height);
+        gtk_widget_set_size_request(dl_lb, width, height);
         g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_unref(G_OBJECT(pango_layout));
@@ -743,16 +781,15 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
 static void updateStats(PrivateData* p)
 {
-    char const* pch;
     char up[32];
     char down[32];
     char ratio[32];
     char buf[512];
     struct tr_session_stats stats;
-    tr_session* session = gtr_core_session(p->core);
+    tr_session const* const session = gtr_core_session(p->core);
 
     /* update the stats */
-    pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
+    char const* pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
     if (g_strcmp0(pch, "session-ratio") == 0)
     {
@@ -792,7 +829,7 @@ static void updateStats(PrivateData* p)
 
 static void updateSpeeds(PrivateData* p)
 {
-    tr_session* session = gtr_core_session(p->core);
+    tr_session const* const session = gtr_core_session(p->core);
 
     if (session != NULL)
     {
@@ -813,18 +850,19 @@ static void updateSpeeds(PrivateData* p)
                 int dc;
                 double us;
                 double ds;
-                gtk_tree_model_get(model, &iter,
-                    MC_SPEED_UP, &us,
-                    MC_SPEED_DOWN, &ds,
-                    MC_ACTIVE_PEERS_UP, &uc,
-                    MC_ACTIVE_PEERS_DOWN, &dc,
+                gtk_tree_model_get(
+                    model,
+                    &iter,
+                    TR_ARG_TUPLE(MC_SPEED_UP, &us),
+                    TR_ARG_TUPLE(MC_SPEED_DOWN, &ds),
+                    TR_ARG_TUPLE(MC_ACTIVE_PEERS_UP, &uc),
+                    TR_ARG_TUPLE(MC_ACTIVE_PEERS_DOWN, &dc),
                     -1);
                 upSpeed += us;
                 upCount += uc;
                 downSpeed += ds;
                 downCount += dc;
-            }
-            while (gtk_tree_model_iter_next(model, &iter));
+            } while (gtk_tree_model_iter_next(model, &iter));
         }
 
         tr_formatter_speed_KBps(speed_str, downSpeed, sizeof(speed_str));

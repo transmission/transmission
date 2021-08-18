@@ -13,6 +13,7 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 
 extern int const mem_K;
 extern char const* mem_K_str;
@@ -39,15 +40,15 @@ extern char const* speed_T_str;
 #else
 
 #define TR_DEFINE_QUARK(QN, q_n) \
-    GQuark q_n ## _quark(void) \
+    GQuark q_n##_quark(void) \
     { \
         static GQuark q; \
-        \
-        if G_UNLIKELY(q == 0) \
+\
+        if (G_UNLIKELY(q == 0)) \
         { \
             q = g_quark_from_static_string(#QN); \
         } \
-        \
+\
         return q; \
     }
 
@@ -73,7 +74,7 @@ char* tr_strlsize(char* buf, guint64 size, size_t buflen);
 char* tr_strlratio(char* buf, double ratio, size_t buflen);
 
 /* return a human-readable string for the time given in seconds. */
-char* tr_strltime(char* buf, int secs, size_t buflen);
+char* tr_strltime(char* buf, time_t secs, size_t buflen);
 
 /***
 ****

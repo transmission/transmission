@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <QMetaType>
-#include <QString>
-#include <QVariant>
+#include <array>
+
+#include "Torrent.h"
 
 class FilterMode
 {
@@ -28,14 +28,8 @@ public:
         NUM_MODES
     };
 
-public:
-    FilterMode(int mode = SHOW_ALL) :
-        mode_(mode)
-    {
-    }
-
-    FilterMode(QString const& name) :
-        mode_(modeFromName(name))
+    explicit FilterMode(int mode = SHOW_ALL)
+        : mode_(mode)
     {
     }
 
@@ -44,22 +38,24 @@ public:
         return mode_;
     }
 
-    QString const& name() const
-    {
-        return nameFromMode(mode_);
-    }
+    /* The Torrent properties that can affect this filter.
+       When one of these changes, it's time to refilter. */
+    static Torrent::fields_t constexpr TorrentFields = //
+        (uint64_t(1) << Torrent::ERROR) | //
+        (uint64_t(1) << Torrent::IS_FINISHED) | //
+        (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) | //
+        (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) | //
+        (uint64_t(1) << Torrent::STATUS);
 
-    static int modeFromName(QString const& name);
+    static bool test(Torrent const& tor, int mode);
 
-    static QString const& nameFromMode(int mode)
+    bool test(Torrent const& tor) const
     {
-        return names_[mode];
+        return test(tor, mode());
     }
 
 private:
     int mode_;
-
-    static QString const names_[];
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -82,14 +78,8 @@ public:
         NUM_MODES
     };
 
-public:
-    SortMode(int mode = SORT_BY_ID) :
-        mode_(mode)
-    {
-    }
-
-    SortMode(QString const& name) :
-        mode_(modeFromName(name))
+    explicit SortMode(int mode = SORT_BY_ID)
+        : mode_(mode)
     {
     }
 
@@ -98,18 +88,8 @@ public:
         return mode_;
     }
 
-    QString const& name() const
-    {
-        return names_[mode_];
-    }
-
-    static int modeFromName(QString const& name);
-    static QString const& nameFromMode(int mode);
-
 private:
     int mode_ = SORT_BY_ID;
-
-    static QString const names_[];
 };
 
 Q_DECLARE_METATYPE(SortMode)

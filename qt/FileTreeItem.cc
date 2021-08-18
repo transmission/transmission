@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <set>
 
 #include <QApplication>
 #include <QStyle>
@@ -17,11 +18,11 @@
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
 #include "Formatter.h"
-#include "Utils.h" // mime icons
+#include "IconCache.h"
 
 QHash<QString, int> const& FileTreeItem::getMyChildRows()
 {
-    size_t const n = childCount();
+    int const n = childCount();
 
     // ensure that all the rows are hashed
     while (first_unhashed_row_ < n)
@@ -49,7 +50,7 @@ FileTreeItem::~FileTreeItem()
 
 void FileTreeItem::appendChild(FileTreeItem* child)
 {
-    size_t const n = childCount();
+    int const n = childCount();
     child->parent_ = this;
     children_.append(child);
     first_unhashed_row_ = n;
@@ -166,11 +167,12 @@ QVariant FileTreeItem::data(int column, int role) const
         {
             if (file_index_ < 0)
             {
-                value = qApp->style()->standardIcon(QStyle::SP_DirOpenIcon);
+                value = QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon);
             }
             else
             {
-                value = Utils::guessMimeIcon(name());
+                auto const& icon_cache = IconCache::get();
+                value = childCount() > 0 ? icon_cache.folderIcon() : icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
             }
         }
 
@@ -204,7 +206,7 @@ double FileTreeItem::progress() const
 
     if (total != 0)
     {
-        d = have / double(total);
+        d = static_cast<double>(have) / static_cast<double>(total);
     }
 
     return d;
@@ -212,7 +214,7 @@ double FileTreeItem::progress() const
 
 QString FileTreeItem::sizeString() const
 {
-    return Formatter::sizeToString(size());
+    return Formatter::get().sizeToString(size());
 }
 
 uint64_t FileTreeItem::size() const
@@ -230,8 +232,7 @@ uint64_t FileTreeItem::size() const
 
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
-    int changed_count = 0;
-    int changed_columns[4];
+    auto changed_columns = std::set<int>{};
 
     if (name_ != name)
     {
@@ -241,7 +242,7 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
         }
 
         name_ = name;
-        changed_columns[changed_count++] = FileTreeModel::COL_NAME;
+        changed_columns.insert(FileTreeModel::COL_NAME);
     }
 
     if (fileIndex() != -1)
@@ -249,7 +250,7 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
         if (have_size_ != have_size)
         {
             have_size_ = have_size;
-            changed_columns[changed_count++] = FileTreeModel::COL_PROGRESS;
+            changed_columns.insert(FileTreeModel::COL_PROGRESS);
         }
 
         if (update_fields)
@@ -257,24 +258,23 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
             if (is_wanted_ != wanted)
             {
                 is_wanted_ = wanted;
-                changed_columns[changed_count++] = FileTreeModel::COL_WANTED;
+                changed_columns.insert(FileTreeModel::COL_WANTED);
             }
 
             if (priority_ != priority)
             {
                 priority_ = priority;
-                changed_columns[changed_count++] = FileTreeModel::COL_PRIORITY;
+                changed_columns.insert(FileTreeModel::COL_PRIORITY);
             }
         }
     }
 
     std::pair<int, int> changed(-1, -1);
 
-    if (changed_count > 0)
+    if (!changed_columns.empty())
     {
-        std::sort(changed_columns, changed_columns + changed_count);
-        changed.first = changed_columns[0];
-        changed.second = changed_columns[changed_count - 1];
+        changed.first = *std::cbegin(changed_columns);
+        changed.second = *std::crbegin(changed_columns);
     }
 
     return changed;

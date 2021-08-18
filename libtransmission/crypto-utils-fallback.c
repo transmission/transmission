@@ -13,6 +13,7 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h"
 
 /***
@@ -42,16 +43,28 @@ static void tr_dh_secret_align(struct tr_dh_secret* handle, size_t current_key_l
     tr_dh_align_key(handle->key, current_key_length, handle->key_length);
 }
 
-bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
-    size_t append_data_size, uint8_t* hash)
+bool tr_dh_secret_derive(
+    tr_dh_secret_t raw_handle,
+    void const* prepend_data,
+    size_t prepend_data_size,
+    void const* append_data,
+    size_t append_data_size,
+    uint8_t* hash)
 {
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(hash != NULL);
 
     struct tr_dh_secret* handle = raw_handle;
 
-    return tr_sha1(hash, prepend_data == NULL ? "" : prepend_data, prepend_data == NULL ? 0 : (int)prepend_data_size,
-        handle->key, (int)handle->key_length, append_data, append_data == NULL ? 0 : (int)append_data_size, NULL);
+    return tr_sha1(
+        hash,
+        prepend_data == NULL ? "" : prepend_data,
+        prepend_data == NULL ? 0 : (int)prepend_data_size,
+        handle->key,
+        (int)handle->key_length,
+        append_data,
+        append_data == NULL ? 0 : (int)append_data_size,
+        NULL);
 }
 
 void tr_dh_secret_free(tr_dh_secret_t handle)
@@ -65,30 +78,30 @@ void tr_dh_secret_free(tr_dh_secret_t handle)
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 {
-    (void)handle;
+    TR_UNUSED(handle);
 
     return NULL;
 }
 
 bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
 {
-    (void)handle;
-    (void)cert;
+    TR_UNUSED(handle);
+    TR_UNUSED(cert);
 
     return false;
 }
 
 tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 {
-    (void)der;
-    (void)der_length;
+    TR_UNUSED(der);
+    TR_UNUSED(der_length);
 
     return NULL;
 }
 
 void tr_x509_cert_free(tr_x509_cert_t handle)
 {
-    (void)handle;
+    TR_UNUSED(handle);
 }
 
 #endif /* TR_CRYPTO_X509_FALLBACK */

@@ -15,23 +15,26 @@
 #include "FreeSpaceLabel.h"
 #include "RpcQueue.h"
 #include "Session.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::dictFind;
 
 namespace
 {
 
-int const INTERVAL_MSEC = 15000;
+int const IntervalMSec = 15000;
 
 } // namespace
 
-FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
-    QLabel(parent),
-    session_(nullptr),
-    timer_(this)
+FreeSpaceLabel::FreeSpaceLabel(QWidget* parent)
+    : QLabel(parent)
+    , timer_(this)
 {
     timer_.setSingleShot(true);
-    timer_.setInterval(INTERVAL_MSEC);
+    timer_.setInterval(IntervalMSec);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
 }
 
 void FreeSpaceLabel::setSession(Session& session)
@@ -66,25 +69,20 @@ void FreeSpaceLabel::onTimer()
 
     tr_variant args;
     tr_variantInitDict(&args, 1);
-    tr_variantDictAddStr(&args, TR_KEY_path, path_.toUtf8().constData());
+    dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue();
+    auto* q = new RpcQueue(this);
 
-    q->add([this, &args]()
+    q->add([this, &args]() { return session_->exec("free-space", &args); });
+
+    q->add(
+        [this](RpcResponse const& r)
         {
-            return session_->exec("free-space", &args);
-        });
-
-    q->add([this](RpcResponse const& r)
-        {
-            QString str;
-
             // update the label
-            int64_t bytes = -1;
-
-            if (tr_variantDictFindInt(r.args.get(), TR_KEY_size_bytes, &bytes) && bytes >= 0)
+            auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
+            if (bytes && *bytes > 1)
             {
-                setText(tr("%1 free").arg(Formatter::sizeToString(bytes)));
+                setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
             }
             else
             {
@@ -92,11 +90,8 @@ void FreeSpaceLabel::onTimer()
             }
 
             // update the tooltip
-            size_t len = 0;
-            char const* path = nullptr;
-            tr_variantDictFindStr(r.args.get(), TR_KEY_path, &path, &len);
-            str = QString::fromUtf8(path, len);
-            setToolTip(QDir::toNativeSeparators(str));
+            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+            setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
 
             timer_.start();
         });

@@ -24,39 +24,32 @@
 
 @class Torrent;
 
-@interface FileListNode : NSObject <NSCopying>
-{
-    NSMutableIndexSet * fIndexes;
+@interface FileListNode : NSObject<NSCopying>
 
-    NSString * fName;
-    NSString * fPath;
-    Torrent * __weak fTorrent;
-    uint64_t fSize;
-    NSImage * fIcon;
-    BOOL fIsFolder;
-    NSMutableArray * fChildren;
-}
+@property(nonatomic, readonly) NSString* name;
+@property(nonatomic, readonly) NSString* path;
 
-@property (nonatomic, copy, readonly) NSString * name;
-@property (nonatomic, copy, readonly) NSString * path;
+@property(nonatomic, weak, readonly) Torrent* torrent;
 
-@property (nonatomic, weak, readonly) Torrent * torrent;
+@property(nonatomic, readonly) uint64_t size;
+@property(nonatomic, readonly) NSImage* icon;
+@property(nonatomic, readonly) BOOL isFolder;
+@property(nonatomic, readonly) NSMutableArray* children;
 
-@property (nonatomic, readonly) uint64_t size;
-@property (nonatomic, strong, readonly) NSImage * icon;
-@property (nonatomic, readonly) BOOL isFolder;
-@property (nonatomic, strong, readonly) NSMutableArray * children;
+@property(nonatomic, readonly) NSIndexSet* indexes;
 
-@property (nonatomic, strong, readonly) NSIndexSet * indexes;
+- (instancetype)initWithFolderName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
+- (instancetype)initWithFileName:(NSString*)name
+                            path:(NSString*)path
+                            size:(uint64_t)size
+                           index:(NSUInteger)index
+                         torrent:(Torrent*)torrent;
 
-- (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
+- (void)insertChild:(FileListNode*)child;
+- (void)insertIndex:(NSUInteger)index withSize:(uint64_t)size;
 
-- (void) insertChild: (FileListNode *) child;
-- (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
+@property(nonatomic, readonly) NSString* description;
 
-- (NSString *) description;
-
-- (BOOL) updateFromOldName: (NSString *) oldName toNewName: (NSString *) newName inPath: (NSString *) path;
+- (BOOL)updateFromOldName:(NSString*)oldName toNewName:(NSString*)newName inPath:(NSString*)path;
 
 @end

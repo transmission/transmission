@@ -26,17 +26,18 @@
 
 @interface BadgeView : NSView
 {
-    tr_session * fLib;
+    tr_session* fLib;
 
-    NSMutableDictionary * fAttributes;
+    NSMutableDictionary* fAttributes;
 
-    CGFloat fDownloadRate, fUploadRate;
+    CGFloat fDownloadRate;
+    CGFloat fUploadRate;
     BOOL fQuitting;
 }
 
-- (id) initWithLib: (tr_session *) lib;
+- (instancetype)initWithLib:(tr_session*)lib;
 
-- (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
-- (void) setQuitting;
+- (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
+- (void)setQuitting;
 
 @end

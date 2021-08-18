@@ -42,8 +42,10 @@ struct prefs_dialog_data
 
 #define PREF_KEY "pref-key"
 
-static void response_cb(GtkDialog* dialog, int response, gpointer unused UNUSED)
+static void response_cb(GtkDialog* dialog, int response, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     if (response == GTK_RESPONSE_HELP)
     {
         char* uri = g_strconcat(gtr_get_help_uri(), "/html/preferences.html", NULL);
@@ -98,7 +100,7 @@ static gboolean spun_cb_idle(gpointer spin)
     struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
 
     /* has the user stopped making changes? */
-    if (g_timer_elapsed(data->last_change, NULL) > 0.33F)
+    if (g_timer_elapsed(data->last_change, NULL) > 0.33)
     {
         /* update the core */
         tr_quark const key = GPOINTER_TO_INT(g_object_get_data(o, PREF_KEY));
@@ -415,8 +417,10 @@ static void updateBlocklistText(GtkWidget* w, TrCore* core)
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
-static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void privacyPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct blocklist_data* data = gdata;
 
     if (data->updateBlocklistTag > 0)
@@ -428,8 +432,10 @@ static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
 }
 
 /* user hit "close" in the blocklist-update dialog */
-static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response UNUSED, gpointer gdata)
+static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response, gpointer gdata)
 {
+    TR_UNUSED(response);
+
     struct blocklist_data* data = gdata;
     gtk_widget_destroy(GTK_WIDGET(dialog));
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
@@ -443,12 +449,12 @@ static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
-    char const* s = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
     struct blocklist_data* data = gdata;
     GtkMessageDialog* d = GTK_MESSAGE_DIALOG(data->updateBlocklistDialog);
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
     gtk_message_dialog_set_markup(d, success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"));
-    gtk_message_dialog_format_secondary_text(d, s, count);
+    char const* const fmt = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
+    gtk_message_dialog_format_secondary_text(d, fmt, count);
     updateBlocklistText(data->label, core);
 }
 
@@ -457,8 +463,13 @@ static void onBlocklistUpdate(GtkButton* w, gpointer gdata)
 {
     GtkWidget* d;
     struct blocklist_data* data = gdata;
-    d = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))), GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", _("Update Blocklist"));
+    d = gtk_message_dialog_new(
+        GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))),
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_INFO,
+        GTK_BUTTONS_CLOSE,
+        "%s",
+        _("Update Blocklist"));
     gtk_widget_set_sensitive(data->updateBlocklistButton, FALSE);
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(d), "%s", _("Getting new blocklist…"));
     data->updateBlocklistDialog = d;
@@ -485,8 +496,11 @@ static void onIntComboChanged(GtkComboBox* combo_box, gpointer core)
 
 static GtkWidget* new_encryption_combo(GObject* core, tr_quark const key)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(_("Allow encryption"), TR_CLEAR_PREFERRED, _("Prefer encryption"),
-        TR_ENCRYPTION_PREFERRED, _("Require encryption"), TR_ENCRYPTION_REQUIRED, NULL);
+    GtkWidget* w = gtr_combo_box_new_enum(
+        TR_ARG_TUPLE(_("Allow encryption"), TR_CLEAR_PREFERRED),
+        TR_ARG_TUPLE(_("Prefer encryption"), TR_ENCRYPTION_PREFERRED),
+        TR_ARG_TUPLE(_("Require encryption"), TR_ENCRYPTION_REQUIRED),
+        NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
     g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
@@ -566,9 +580,7 @@ enum
 static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
 {
     char** rules;
-    GtkListStore* store = gtk_list_store_new(N_COLS,
-        G_TYPE_STRING,
-        G_TYPE_STRING);
+    GtkListStore* store = gtk_list_store_new(N_COLS, G_TYPE_STRING, G_TYPE_STRING);
 
     rules = g_strsplit(whitelist, ",", 0);
 
@@ -619,8 +631,7 @@ static void refreshWhitelist(struct remote_page* page)
             g_string_append(gstr, address);
             g_string_append(gstr, ",");
             g_free(address);
-        }
-        while (gtk_tree_model_iter_next(model, &iter));
+        } while (gtk_tree_model_iter_next(model, &iter));
     }
 
     g_string_truncate(gstr, gstr->len - 1); /* remove the trailing comma */
@@ -630,8 +641,10 @@ static void refreshWhitelist(struct remote_page* page)
     g_string_free(gstr, TRUE);
 }
 
-static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, gchar* address, gpointer gpage)
+static void onAddressEdited(GtkCellRendererText const* r, gchar const* path_string, gchar* address, gpointer gpage)
 {
+    TR_UNUSED(r);
+
     GtkTreeIter iter;
     struct remote_page* page = gpage;
     GtkTreeModel* model = GTK_TREE_MODEL(page->store);
@@ -646,8 +659,10 @@ static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, g
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onAddWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     GtkTreeIter iter;
     GtkTreePath* path;
     struct remote_page* page = gpage;
@@ -660,8 +675,10 @@ static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
     gtk_tree_path_free(path);
 }
 
-static void onRemoveWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onRemoveWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     struct remote_page* page = gpage;
     GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
     GtkTreeIter iter;
@@ -700,18 +717,25 @@ static void refreshRPCSensitivity(struct remote_page* page)
     gtk_widget_set_sensitive(page->remove_button, rpc_active && have_addr && n_rules > 1);
 }
 
-static void onRPCToggled(GtkToggleButton* tb UNUSED, gpointer page)
+static void onRPCToggled(GtkToggleButton* tb, gpointer page)
 {
+    TR_UNUSED(tb);
+
     refreshRPCSensitivity(page);
 }
 
-static void onWhitelistSelectionChanged(GtkTreeSelection* sel UNUSED, gpointer page)
+static void onWhitelistSelectionChanged(GtkTreeSelection* sel, gpointer page)
 {
+    TR_UNUSED(sel);
+
     refreshRPCSensitivity(page);
 }
 
-static void onLaunchClutchCB(GtkButton* w UNUSED, gpointer data UNUSED)
+static void onLaunchClutchCB(GtkButton* w, gpointer data)
 {
+    TR_UNUSED(w);
+    TR_UNUSED(data);
+
     char* uri;
     int const port = gtr_pref_int_get(TR_KEY_rpc_port);
 
@@ -804,8 +828,6 @@ static GtkWidget* remotePage(GObject* core)
         GtkCellRenderer* r;
         GtkTreeSelection* sel;
         GtkTreeView* v;
-        GtkWidget* w;
-        GtkWidget* h;
 
         page->store = GTK_LIST_STORE(m);
         w = gtk_tree_view_new_with_model(m);
@@ -815,8 +837,7 @@ static GtkWidget* remotePage(GObject* core)
         v = page->view = GTK_TREE_VIEW(w);
         gtk_widget_set_tooltip_text(w, _("IP addresses may use wildcards, such as 192.168.*.*"));
         sel = gtk_tree_view_get_selection(v);
-        g_signal_connect(sel, "changed",
-            G_CALLBACK(onWhitelistSelectionChanged), page);
+        g_signal_connect(sel, "changed", G_CALLBACK(onWhitelistSelectionChanged), page);
         g_object_unref(G_OBJECT(m));
         gtk_tree_view_set_headers_visible(v, TRUE);
         w = gtk_frame_new(NULL);
@@ -834,17 +855,22 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, "margin-top", GUI_PAD, "margin-bottom", GUI_PAD,
+        g_object_set(
+            w,
+            TR_ARG_TUPLE("halign", GTK_ALIGN_START),
+            TR_ARG_TUPLE("valign", GTK_ALIGN_START),
+            TR_ARG_TUPLE("margin-top", GUI_PAD),
+            TR_ARG_TUPLE("margin-bottom", GUI_PAD),
             NULL);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-        w = gtk_button_new_from_stock(GTK_STOCK_REMOVE);
+        w = gtk_button_new_with_mnemonic(_("_Remove"));
         g_signal_connect(w, "clicked", G_CALLBACK(onRemoveWhitelistClicked), page);
         page->remove_button = w;
         onWhitelistSelectionChanged(sel, page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_button_new_from_stock(GTK_STOCK_ADD);
+        w = gtk_button_new_with_mnemonic(_("_Add"));
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
         g_object_set(h, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
@@ -876,8 +902,10 @@ static void refreshSchedSensitivity(struct BandwidthPage* p)
     }
 }
 
-static void onSchedToggled(GtkToggleButton* tb UNUSED, gpointer user_data)
+static void onSchedToggled(GtkToggleButton* tb, gpointer user_data)
 {
+    TR_UNUSED(tb);
+
     refreshSchedSensitivity(user_data);
 }
 
@@ -932,16 +960,16 @@ static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
 static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
 {
     GtkWidget* w = gtr_combo_box_new_enum(
-        _("Every Day"), TR_SCHED_ALL,
-        _("Weekdays"), TR_SCHED_WEEKDAY,
-        _("Weekends"), TR_SCHED_WEEKEND,
-        _("Sunday"), TR_SCHED_SUN,
-        _("Monday"), TR_SCHED_MON,
-        _("Tuesday"), TR_SCHED_TUES,
-        _("Wednesday"), TR_SCHED_WED,
-        _("Thursday"), TR_SCHED_THURS,
-        _("Friday"), TR_SCHED_FRI,
-        _("Saturday"), TR_SCHED_SAT,
+        TR_ARG_TUPLE(_("Every Day"), TR_SCHED_ALL),
+        TR_ARG_TUPLE(_("Weekdays"), TR_SCHED_WEEKDAY),
+        TR_ARG_TUPLE(_("Weekends"), TR_SCHED_WEEKEND),
+        TR_ARG_TUPLE(_("Sunday"), TR_SCHED_SUN),
+        TR_ARG_TUPLE(_("Monday"), TR_SCHED_MON),
+        TR_ARG_TUPLE(_("Tuesday"), TR_SCHED_TUES),
+        TR_ARG_TUPLE(_("Wednesday"), TR_SCHED_WED),
+        TR_ARG_TUPLE(_("Thursday"), TR_SCHED_THURS),
+        TR_ARG_TUPLE(_("Friday"), TR_SCHED_FRI),
+        TR_ARG_TUPLE(_("Saturday"), TR_SCHED_SAT),
         NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
@@ -1056,8 +1084,10 @@ struct network_page_data
     gulong prefsTag;
 };
 
-static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer gdata)
+static void onCorePrefsChanged(TrCore* core, tr_quark const key, gpointer gdata)
 {
+    TR_UNUSED(core);
+
     if (key == TR_KEY_peer_port)
     {
         struct network_page_data* data = gdata;
@@ -1067,8 +1097,10 @@ static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer
     }
 }
 
-static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void networkPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct network_page_data* data = gdata;
 
     if (data->prefsTag > 0)
@@ -1084,20 +1116,22 @@ static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
     g_free(data);
 }
 
-static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
+static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
 {
+    TR_UNUSED(core);
+
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
-    // gdk_threads_enter();
     gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
     gtk_widget_set_sensitive(data->portButton, TRUE);
     gtk_widget_set_sensitive(data->portSpin, TRUE);
-    // gdk_threads_leave();
 }
 
-static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
+static void onPortTest(GtkButton* button, gpointer vdata)
 {
+    TR_UNUSED(button);
+
     struct network_page_data* data = vdata;
     gtk_widget_set_sensitive(data->portButton, FALSE);
     gtk_widget_set_sensitive(data->portSpin, FALSE);
@@ -1241,8 +1275,13 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core = TR_CORE(core);
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
-    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_HELP,
-        GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(
+        _("Transmission Preferences"),
+        parent,
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        TR_ARG_TUPLE(_("_Help"), GTK_RESPONSE_HELP),
+        TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
+        NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

@@ -12,22 +12,24 @@
 #include <vector>
 
 #include <QAbstractListModel>
-// #include <QVector>
+#include <QVector>
 
-#include <Typedefs.h>
+#include "Macros.h"
+#include "Torrent.h"
+#include "Typedefs.h"
 
 class Prefs;
 class Speed;
-class Torrent;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class TorrentModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
     enum Role
@@ -36,16 +38,20 @@ public:
     };
 
     explicit TorrentModel(Prefs const& prefs);
-    virtual ~TorrentModel() override;
+    ~TorrentModel() override;
     void clear();
 
-    bool hasTorrent(QString const& hash_string) const;
+    bool hasTorrent(TorrentHash const& hash) const;
 
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
     using torrents_t = QVector<Torrent*>;
-    torrents_t const& torrents() const { return torrents_; }
+
+    torrents_t const& torrents() const
+    {
+        return torrents_;
+    }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
@@ -57,7 +63,7 @@ public slots:
 
 signals:
     void torrentsAdded(torrent_ids_t const&);
-    void torrentsChanged(torrent_ids_t const&);
+    void torrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void torrentsCompleted(torrent_ids_t const&);
     void torrentsEdited(torrent_ids_t const&);
     void torrentsNeedInfo(torrent_ids_t const&);

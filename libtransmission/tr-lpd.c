@@ -57,6 +57,8 @@ typedef uint16_t in_port_t; /* all missing */
 #include "utils.h"
 #include "version.h"
 
+#define SIZEOF_HASH_STRING (sizeof(((struct tr_info*)0)->hashString))
+
 /**
 * @brief Local Peer Discovery
 * @file tr-lpd.c
@@ -80,7 +82,6 @@ static tr_socket_t lpd_socket2; /**<and multicast send socket */
 static struct event* lpd_event = NULL;
 static tr_port lpd_port;
 
-static tr_torrent* lpd_torStaticType UNUSED; /* just a helper for static type analysis */
 static tr_session* session;
 
 enum
@@ -158,8 +159,8 @@ static int lpd_unsolicitedMsgCounter;
 * @brief Checks for BT-SEARCH method and separates the parameter section
 * @param[in] s The request string
 * @param[out] ver If non-NULL, gets filled with protocol info from the request
-* @return Returns a relative pointer to the beginning of the parameter section;
-*         if result is NULL, s was invalid and no information will be returned
+* @return Returns a relative pointer to the beginning of the parameter section.
+*         If result is NULL, s was invalid and no information will be returned
 * @remark Note that the returned pointer is only usable as long as the given
 *         pointer s is valid; that is, return storage is temporary.
 *
@@ -264,15 +265,11 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
         char const* const new_line = strstr(beg, CRLF);
 
         /* the value is delimited by the next CRLF */
-        int len = new_line - beg;
+        int const len = new_line - beg;
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        if (len < n--)
-        {
-            n = len;
-        }
-
+        n = MIN(len, n - 1);
         strncpy(val, beg, n);
         val[n] = 0;
     }
@@ -295,8 +292,16 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
+int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
 {
+    TR_UNUSED(tr_addr);
+
+    /* if this check fails (i.e. the definition of hashString changed), update
+     * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
+     * However, the code should work as long as interfaces to the rest of
+     * libtransmission are compatible with char* strings. */
+    TR_STATIC_ASSERT(sizeof(((struct tr_info*)0)->hashString[0]) == sizeof(char), "");
+
     struct ip_mreq mcastReq;
     int const opt_on = 1;
     int const opt_off = 0;
@@ -453,21 +458,6 @@ bool tr_lpdEnabled(tr_session const* ss)
 }
 
 /**
-* @cond
-* @brief Performs some (internal) software consistency checks at compile time.
-* @remark Declared inline for the compiler not to allege us of feeding unused
-* functions. In any other respect, lpd_consistencyCheck is an orphaned function.
-*/
-UNUSED static inline void lpd_consistencyCheck(void)
-{
-    /* if the following check fails, the definition of a hash string has changed
-     * without our knowledge; revise string handling in functions tr_lpdSendAnnounce
-     * and tr_lpdConsiderAnnounce. However, the code is designed to function as long
-     * as interfaces to the rest of the lib remain compatible with char* strings. */
-    TR_STATIC_ASSERT(sizeof(lpd_torStaticType->info.hashString[0]) == sizeof(char), "");
-}
-
-/**
 * @endcond */
 
 /**
@@ -487,15 +477,15 @@ UNUSED static inline void lpd_consistencyCheck(void)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    char const fmt[] =
-        "BT-SEARCH * HTTP/%u.%u" CRLF
-        "Host: %s:%u" CRLF
-        "Port: %u" CRLF
-        "Infohash: %s" CRLF
-        CRLF
-        CRLF;
+    char const fmt[] = //
+        "BT-SEARCH * HTTP/%u.%u" CRLF //
+        "Host: %s:%u" CRLF //
+        "Port: %u" CRLF //
+        "Infohash: %s" CRLF //
+        "" CRLF //
+        "" CRLF;
 
-    char hashString[lengthof(t->info.hashString)];
+    char hashString[SIZEOF_HASH_STRING];
     char query[lpd_maxDatagramLength + 1] = { 0 };
 
     if (t == NULL)
@@ -518,7 +508,12 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 
         /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr,
+        int res = sendto(
+            lpd_socket2,
+            (void const*)query,
+            len,
+            0,
+            (struct sockaddr const*)&lpd_mcastAddr,
             sizeof(lpd_mcastAddr));
 
         if (res != len)
@@ -551,7 +546,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     enum
     {
         maxValueLen = 25,
-        maxHashLen = lengthof(lpd_torStaticType->info.hashString)
+        maxHashLen = SIZEOF_HASH_STRING
     };
 
     struct lpd_protocolVersion ver = { .major = -1, .minor = -1 };
@@ -622,7 +617,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 * Further, by setting interval to zero (or negative) the caller may actually disable LPD
 * announces on a per-interval basis.
 *
-* FIXME: since this function's been made private and is called by a periodic timer,
+* TODO: since this function's been made private and is called by a periodic timer,
 * most of the previous paragraph isn't true anymore... we weren't using that functionality
 * before. are there cases where we should? if not, should we remove the bells & whistles?
 */
@@ -682,7 +677,10 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
 
         if (lpd_unsolicitedMsgCounter < 0)
         {
-            tr_logAddNamedInfo("LPD", "Dropped %d announces in the last interval (max. %d allowed)", -lpd_unsolicitedMsgCounter,
+            tr_logAddNamedInfo(
+                "LPD",
+                "Dropped %d announces in the last interval (max. %d allowed)",
+                -lpd_unsolicitedMsgCounter,
                 maxAnnounceCap);
         }
 
@@ -692,8 +690,12 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession UNUSED)
+static void on_upkeep_timer(evutil_socket_t s, short type, void* user_data)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+    TR_UNUSED(user_data);
+
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UPKEEP_INTERVAL_SECS);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
@@ -703,8 +705,11 @@ static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* 
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UNUSED)
+static void event_callback(evutil_socket_t s, short type, void* user_data)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(user_data);
+
     TR_ASSERT(tr_isSession(session));
 
     /* do not allow announces to be processed if LPD is disabled */
@@ -720,7 +725,12 @@ static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UN
         char foreignMsg[lpd_maxDatagramLength + 1];
 
         /* process local announcement from foreign peer */
-        int res = recvfrom(lpd_socket, (void*)foreignMsg, lpd_maxDatagramLength, 0, (struct sockaddr*)&foreignAddr,
+        int res = recvfrom(
+            lpd_socket,
+            (void*)foreignMsg,
+            lpd_maxDatagramLength,
+            0,
+            (struct sockaddr*)&foreignAddr,
             (socklen_t*)&addrLen);
 
         /* besides, do we get flooded? then bail out! */
@@ -731,10 +741,9 @@ static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UN
 
         if (res > 0 && res <= lpd_maxDatagramLength)
         {
-            struct tr_pex foreignPeer =
-            {
+            struct tr_pex foreignPeer = {
                 .port = 0, /* the peer-to-peer port is yet unknown */
-                .flags = 0
+                .flags = 0,
             };
 
             /* be paranoid enough about zero terminating the foreign string */

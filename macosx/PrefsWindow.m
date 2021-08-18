@@ -24,17 +24,31 @@
 
 @implementation PrefsWindow
 
-- (void) keyDown: (NSEvent *) event
+- (void)awakeFromNib
 {
-    if ([event keyCode] == 53) //esc key
-        [self close];
-    else
-        [super keyDown: event];
+    [super awakeFromNib];
+
+    if (@available(macOS 11.0, *))
+    {
+        self.toolbarStyle = NSWindowToolbarStylePreference;
+    }
 }
 
-- (void) close
+- (void)keyDown:(NSEvent*)event
 {
-    [self makeFirstResponder: nil]; //essentially saves pref changes on window close
+    if (event.keyCode == 53) //esc key
+    {
+        [self close];
+    }
+    else
+    {
+        [super keyDown:event];
+    }
+}
+
+- (void)close
+{
+    [self makeFirstResponder:nil]; //essentially saves pref changes on window close
     [super close];
 }
 

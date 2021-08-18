@@ -221,13 +221,12 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
  */
 static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 {
-    char* walk;
     int b[4];
     int e[4];
     char str[64];
     tr_address addr;
 
-    walk = strrchr(line, ':');
+    char const* walk = strrchr(line, ':');
 
     if (walk == NULL)
     {
@@ -236,12 +235,16 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 
     ++walk; /* walk past the colon */
 
-    if (sscanf(walk, "%d.%d.%d.%d-%d.%d.%d.%d", &b[0], &b[1], &b[2], &b[3], &e[0], &e[1], &e[2], &e[3]) != 8)
+    if (sscanf(
+            walk,
+            "%d.%d.%d.%d-%d.%d.%d.%d",
+            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
+            TR_ARG_TUPLE(&e[0], &e[1], &e[2], &e[3])) != 8)
     {
         return false;
     }
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", b[0], b[1], b[2], b[3]);
+    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
 
     if (!tr_address_from_string(&addr, str))
     {
@@ -250,7 +253,7 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 
     range->begin = ntohl(addr.addr.addr4.s_addr);
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", e[0], e[1], e[2], e[3]);
+    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(e[0], e[1], e[2], e[3]));
 
     if (!tr_address_from_string(&addr, str))
     {
@@ -274,13 +277,17 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
     char str[32];
     tr_address addr;
 
-    if (sscanf(line, "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ", &a[0], &a[1], &a[2], &a[3], &b[0], &b[1], &b[2], &b[3],
-        &unk) != 9)
+    if (sscanf(
+            line,
+            "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ",
+            TR_ARG_TUPLE(&a[0], &a[1], &a[2], &a[3]),
+            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
+            &unk) != 9)
     {
         return false;
     }
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
+    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(a[0], a[1], a[2], a[3]));
 
     if (!tr_address_from_string(&addr, str))
     {
@@ -289,7 +296,7 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 
     range->begin = ntohl(addr.addr.addr4.s_addr);
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", b[0], b[1], b[2], b[3]);
+    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
 
     if (!tr_address_from_string(&addr, str))
     {
@@ -312,7 +319,7 @@ static bool parseLine3(char const* line, struct tr_ipv4_range* range)
     uint32_t ip_u;
     uint32_t mask = 0xffffffff;
 
-    if (sscanf(line, "%u.%u.%u.%u/%u", &ip[0], &ip[1], &ip[2], &ip[3], &pflen) != 5)
+    if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
     {
         return false;
     }

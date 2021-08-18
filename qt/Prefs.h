@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <QObject>
 #include <QSet>
 #include <QString>
@@ -16,17 +18,19 @@
 #include <libtransmission/quark.h>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QDateTime;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class Prefs : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -128,9 +132,8 @@ public:
         PREFS_COUNT
     };
 
-public:
-    Prefs(QString const& config_dir);
-    virtual ~Prefs();
+    explicit Prefs(QString config_dir);
+    ~Prefs() override;
 
     bool isCore(int key) const
     {
@@ -142,19 +145,14 @@ public:
         return !isCore(key);
     }
 
-    char const* keyStr(int i) const
-    {
-        return tr_quark_get_string(items_[i].key, nullptr);
-    }
-
     tr_quark getKey(int i) const
     {
-        return items_[i].key;
+        return Items[i].key;
     }
 
     int type(int i) const
     {
-        return items_[i].type;
+        return Items[i].type;
     }
 
     QVariant const& variant(int i) const
@@ -200,17 +198,14 @@ private:
         int type;
     };
 
-private:
-    void initDefaults(tr_variant*);
+    void initDefaults(tr_variant*) const;
 
-    // Intentionally not implemented
-    void set(int key, char const* value);
+    void set(int key, char const* value) = delete;
 
-private:
     QString const config_dir_;
 
     QSet<int> temporary_prefs_;
-    QVariant mutable values_[PREFS_COUNT];
+    std::array<QVariant, PREFS_COUNT> mutable values_;
 
-    static PrefItem items_[];
+    static std::array<PrefItem, PREFS_COUNT> const Items;
 };

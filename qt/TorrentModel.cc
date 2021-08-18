@@ -7,7 +7,7 @@
  */
 
 #include <algorithm>
-#include <iostream>
+#include <cassert>
 #include <utility>
 
 #include <libtransmission/transmission.h>
@@ -17,6 +17,9 @@
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::getValue;
 
 /***
 ****
@@ -27,17 +30,17 @@ namespace
 
 struct TorrentIdLessThan
 {
-    bool operator ()(Torrent* left, Torrent* right) const
+    bool operator()(Torrent const* left, Torrent const* right) const
     {
         return left->id() < right->id();
     }
 
-    bool operator ()(int left_id, Torrent* right) const
+    bool operator()(int left_id, Torrent const* right) const
     {
         return left_id < right->id();
     }
 
-    bool operator ()(Torrent* left, int right_id) const
+    bool operator()(Torrent const* left, int right_id) const
     {
         return left->id() < right_id;
     }
@@ -48,7 +51,7 @@ auto getIds(Iter it, Iter end)
 {
     torrent_ids_t ids;
 
-    for ( ; it != end; ++it)
+    for (; it != end; ++it)
     {
         ids.insert((*it)->id());
     }
@@ -62,8 +65,8 @@ auto getIds(Iter it, Iter end)
 ****
 ***/
 
-TorrentModel::TorrentModel(Prefs const& prefs) :
-    prefs_(prefs)
+TorrentModel::TorrentModel(Prefs const& prefs)
+    : prefs_(prefs)
 {
 }
 
@@ -89,8 +92,6 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
 
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    QVariant var;
-
     Torrent const* t = torrents_.value(index.row(), nullptr);
 
     if (t != nullptr)
@@ -98,24 +99,23 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
         switch (role)
         {
         case Qt::DisplayRole:
-            var.setValue(t->name());
+            return t->name();
             break;
 
         case Qt::DecorationRole:
-            var.setValue(t->getMimeTypeIcon());
+            return t->getMimeTypeIcon();
             break;
 
         case TorrentRole:
-            var = QVariant::fromValue(t);
+            return QVariant::fromValue(t);
             break;
 
         default:
-            // std::cerr << "Unhandled role: " << role << std::endl;
             break;
         }
     }
 
-    return var;
+    return {};
 }
 
 /***
@@ -131,17 +131,14 @@ void TorrentModel::removeTorrents(tr_variant* list)
     tr_variant* child;
     while ((child = tr_variantListChild(list, i++)) != nullptr)
     {
-        int64_t id;
-        Torrent* torrent = nullptr;
-
-        if (tr_variantGetInt(child, &id))
+        auto const id = getValue<int>(child);
+        if (id)
         {
-            torrent = getTorrentFromId(id);
-        }
-
-        if (torrent != nullptr)
-        {
-            torrents.push_back(torrent);
+            auto* torrent = getTorrentFromId(*id);
+            if (torrent != nullptr)
+            {
+                torrents.push_back(torrent);
+            }
         }
     }
 
@@ -157,17 +154,19 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     auto added = torrent_ids_t{};
     auto changed = torrent_ids_t{};
     auto completed = torrent_ids_t{};
+    auto edited = torrent_ids_t{};
     auto instantiated = torrents_t{};
     auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
+    auto changed_fields = Torrent::fields_t{};
 
     auto const now = time(nullptr);
-    auto const recently_added = [now](auto const& tor)
-        {
-            static auto constexpr max_age = 60;
-            auto const date = tor->dateAdded();
-            return (date != 0) && (difftime(now, date) < max_age);
-        };
+    auto const recently_added = [&now](auto const& tor)
+    {
+        static auto constexpr MaxAge = 60;
+        auto const date = tor->dateAdded();
+        return (date != 0) && (difftime(now, date) < MaxAge);
+    };
 
     // build a list of the property keys
     tr_variant* const first_child = tr_variantListChild(torrents, 0);
@@ -186,13 +185,12 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
             keys.push_back(tr_quark_new(str, len));
         }
     }
-    else
+    else if (first_child != nullptr)
     {
         // In 'object' format, every entry is an object with the same set of properties
-        size_t i = 0;
         tr_quark key;
         tr_variant* value;
-        while (first_child && tr_variantDictChild(first_child, i++, &key, &value))
+        for (size_t i = 0; tr_variantDictChild(first_child, i, &key, &value); ++i)
         {
             keys.push_back(key);
         }
@@ -240,46 +238,49 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
         }
 
         // Find the torrent id
-        int64_t id;
-        if (!tr_variantGetInt(values[id_pos], &id))
+        auto const id = getValue<int>(values[id_pos]);
+        if (!id)
         {
             continue;
         }
 
-        Torrent* tor = getTorrentFromId(id);
-        std::optional<uint64_t> left_until_done;
+        Torrent* tor = getTorrentFromId(*id);
         bool is_new = false;
 
         if (tor == nullptr)
         {
-            tor = new Torrent(prefs_, id);
+            tor = new Torrent(prefs_, *id);
             instantiated.push_back(tor);
             is_new = true;
         }
-        else
+
+        auto const fields = tor->update(keys.data(), values.data(), keys.size());
+
+        if (fields.any())
         {
-            left_until_done = tor->leftUntilDone();
+            changed_fields |= fields;
+            changed.insert(*id);
         }
 
-        if (tor->update(keys.data(), values.data(), keys.size()))
+        if (fields.test(Torrent::EDIT_DATE))
         {
-            changed.insert(id);
+            edited.insert(*id);
         }
 
         if (is_new && !tor->hasName())
         {
-            needinfo.insert(id);
+            needinfo.insert(*id);
         }
 
-        if (recently_added(tor) && tor->hasName() && !already_added_.count(id))
+        if (recently_added(tor) && tor->hasName() && !already_added_.count(*id))
         {
-            added.insert(id);
-            already_added_.insert(id);
+            added.insert(*id);
+            already_added_.insert(*id);
         }
 
-        if (left_until_done && (*left_until_done > 0) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
+        if (fields.test(Torrent::LEFT_UNTIL_DONE) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
         {
-            completed.insert(id);
+            completed.insert(*id);
         }
 
         processed.push_back(tor);
@@ -290,6 +291,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     if (!instantiated.empty())
     {
         rowsAdd(instantiated);
+    }
+
+    if (!edited.empty())
+    {
+        emit torrentsEdited(edited);
     }
 
     if (!changed.empty())
@@ -311,7 +317,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
 
     if (!changed.empty())
     {
-        emit torrentsChanged(changed);
+        emit torrentsChanged(changed, changed_fields);
     }
 
     if (!completed.empty())
@@ -444,7 +450,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
         for (auto const& tor : torrents)
         {
             auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
-            auto const row = std::distance(torrents_.begin(), it);
+            auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex(), row, row);
             torrents_.insert(it, tor);
@@ -474,8 +480,11 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
 ****
 ***/
 
-bool TorrentModel::hasTorrent(QString const& hash_string) const
+bool TorrentModel::hasTorrent(TorrentHash const& hash) const
 {
-    auto test = [hash_string](auto const& tor) { return tor->hashString() == hash_string; };
+    auto test = [hash](auto const& tor)
+    {
+        return tor->hash() == hash;
+    };
     return std::any_of(torrents_.cbegin(), torrents_.cend(), test);
 }

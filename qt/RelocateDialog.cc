@@ -13,23 +13,24 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
-bool RelocateDialog::move_flag_ = true;
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+bool RelocateDialog::move_flag = true;
 
 void RelocateDialog::onSetLocation()
 {
-    session_.torrentSetLocation(ids_, newLocation(), move_flag_);
+    session_.torrentSetLocation(ids_, newLocation(), move_flag);
     close();
 }
 
-void RelocateDialog::onMoveToggled(bool b)
+void RelocateDialog::onMoveToggled(bool b) const
 {
-    move_flag_ = b;
+    move_flag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    ids_(ids)
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , ids_(std::move(ids))
 {
     ui_.setupUi(this);
 
@@ -45,7 +46,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
         else if (path != tor->getPath())
         {
-            if (session_.isServer())
+            if (session_.isLocal())
             {
                 path = QDir::homePath();
             }
@@ -58,7 +59,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
     }
 
-    if (session_.isServer())
+    if (session_.isLocal())
     {
         ui_.newLocationStack->setCurrentWidget(ui_.newLocationButton);
         ui_.newLocationButton->setMode(PathButton::DirectoryMode);
@@ -75,7 +76,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
     ui_.newLocationStack->setFixedHeight(ui_.newLocationStack->currentWidget()->sizeHint().height());
     ui_.newLocationLabel->setBuddy(ui_.newLocationStack->currentWidget());
 
-    if (move_flag_)
+    if (move_flag)
     {
         ui_.moveDataRadio->setChecked(true);
     }
@@ -84,13 +85,13 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         ui_.findDataRadio->setChecked(true);
     }
 
-    connect(ui_.moveDataRadio, SIGNAL(toggled(bool)), this, SLOT(onMoveToggled(bool)));
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onSetLocation()));
+    connect(ui_.moveDataRadio, &QAbstractButton::toggled, this, &RelocateDialog::onMoveToggled);
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &RelocateDialog::close);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &RelocateDialog::onSetLocation);
 }
 
 QString RelocateDialog::newLocation() const
 {
     return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
-        ui_.newLocationEdit->text();
+                                                                            ui_.newLocationEdit->text();
 }

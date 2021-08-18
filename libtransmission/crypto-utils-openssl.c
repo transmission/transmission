@@ -81,10 +81,9 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 }
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
-#define check_result_eq(result, x_result) check_openssl_result((result), (x_result), true, __FILE__, __LINE__)
 #define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
-static bool check_openssl_pointer(void* pointer, char const* file, int line)
+static bool check_openssl_pointer(void const* pointer, char const* file, int line)
 {
     bool const ret = pointer != NULL;
 
@@ -298,7 +297,10 @@ static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM cons
 
 #endif
 
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+tr_dh_ctx_t tr_dh_new(
+    uint8_t const* prime_num,
+    size_t prime_num_length,
+    uint8_t const* generator_num,
     size_t generator_num_length)
 {
     TR_ASSERT(prime_num != NULL);

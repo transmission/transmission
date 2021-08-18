@@ -44,8 +44,7 @@ struct bratecontrol
     {
         uint64_t date;
         uint64_t size;
-    }
-    transfers[HISTORY_SIZE];
+    } transfers[HISTORY_SIZE];
     uint64_t cache_time;
     unsigned int cache_val;
 };
@@ -114,8 +113,7 @@ typedef struct tr_bandwidth
     tr_session* session;
     tr_ptrArray children; /* struct tr_bandwidth */
     struct tr_peerIo* peer;
-}
-tr_bandwidth;
+} tr_bandwidth;
 
 /**
 ***

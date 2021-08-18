@@ -7,6 +7,9 @@
  */
 
 #include <gtk/gtk.h>
+
+#include <libtransmission/tr-macros.h>
+
 #include "hig.h"
 
 GtkWidget* hig_workarea_create(void)
@@ -84,14 +87,14 @@ void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
     gtk_widget_set_margin_left(w, 18);
 #endif
 
-    if (GTK_IS_MISC(w))
-    {
-        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
-    }
-
     if (GTK_IS_LABEL(w))
     {
-        gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
+        g_object_set(
+            w,
+            TR_ARG_TUPLE("halign", GTK_ALIGN_START),
+            TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER),
+            TR_ARG_TUPLE("use-markup", TRUE),
+            NULL);
     }
 
     gtk_grid_attach(GTK_GRID(t), w, 0, row, 1, 1);
@@ -99,9 +102,9 @@ void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
 
 static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* control)
 {
-    if (GTK_IS_MISC(control))
+    if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), NULL);
     }
 
     g_object_set(control, "expand", TRUE, NULL);
@@ -110,9 +113,9 @@ static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* co
 
 static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control)
 {
-    if (GTK_IS_MISC(control))
+    if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), NULL);
     }
 
     gtk_widget_set_hexpand(control, TRUE);
@@ -140,7 +143,11 @@ GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_s
     return l;
 }
 
-GtkWidget* hig_workarea_add_tall_row(GtkWidget* table, guint* row, char const* mnemonic_string, GtkWidget* control,
+GtkWidget* hig_workarea_add_tall_row(
+    GtkWidget* table,
+    guint* row,
+    char const* mnemonic_string,
+    GtkWidget* control,
     GtkWidget* mnemonic)
 {
     GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);

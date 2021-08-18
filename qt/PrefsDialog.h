@@ -11,8 +11,8 @@
 #include <QMap>
 
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Prefs.h"
-
 #include "ui_PrefsDialog.h"
 
 class QHttp;
@@ -25,29 +25,10 @@ class Session;
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
-    virtual ~PrefsDialog();
-
-private:
-    using key2widget_t = QMap<int, QWidget*>;
-
-private:
-    bool updateWidgetValue(QWidget* widget, int pref_key);
-    void linkWidgetToPref(QWidget* widget, int pref_key);
-    void updateBlocklistLabel();
-    void updateDownloadingWidgetsLocality();
-
-    void setPref(int key, QVariant const& v);
-
-    void initDownloadingTab();
-    void initSeedingTab();
-    void initSpeedTab();
-    void initPrivacyTab();
-    void initNetworkTab();
-    void initDesktopTab();
-    void initRemoteTab();
 
 private slots:
     void checkBoxToggled(bool checked);
@@ -70,10 +51,27 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
+    using key2widget_t = QMap<int, QWidget*>;
+
+    bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    void linkWidgetToPref(QWidget* widget, int pref_key);
+    void updateBlocklistLabel();
+    void updateDownloadingWidgetsLocality();
+
+    void setPref(int key, QVariant const& v);
+
+    void initDownloadingTab();
+    void initSeedingTab();
+    void initSpeedTab();
+    void initPrivacyTab();
+    void initNetworkTab();
+    void initDesktopTab();
+    void initRemoteTab();
+
     Session& session_;
     Prefs& prefs_;
 
-    Ui::PrefsDialog ui_;
+    Ui::PrefsDialog ui_ = {};
 
     bool const is_server_;
     bool is_local_ = {};

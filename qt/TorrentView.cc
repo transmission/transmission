@@ -15,11 +15,10 @@
 class TorrentView::HeaderWidget : public QWidget
 {
 public:
-    HeaderWidget(TorrentView* parent) :
-        QWidget(parent),
-        text_()
+    explicit HeaderWidget(TorrentView* parent)
+        : QWidget(parent)
     {
-        setFont(qApp->font("QMiniFont"));
+        setFont(QApplication::font("QMiniFont"));
     }
 
     void setText(QString const& text)
@@ -29,14 +28,14 @@ public:
     }
 
     // QWidget
-    QSize sizeHint() const override
+    [[nodiscard]] QSize sizeHint() const override
     {
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);
 
-        QRect const labelRect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
+        QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
-        return QSize(100, fontMetrics().height() + (option.rect.height() - labelRect.height()));
+        return QSize(100, fontMetrics().height() + (option.rect.height() - label_rect.height()));
     }
 
 protected:
@@ -64,9 +63,9 @@ private:
     QString text_;
 };
 
-TorrentView::TorrentView(QWidget* parent) :
-    QListView(parent),
-    header_widget_(new HeaderWidget(this))
+TorrentView::TorrentView(QWidget* parent)
+    : QListView(parent)
+    , header_widget_(new HeaderWidget(this))
 {
 }
 

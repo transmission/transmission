@@ -18,8 +18,8 @@
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Torrent.h" // FileList
-
 #include "ui_OptionsDialog.h"
 
 class Prefs;
@@ -27,25 +27,17 @@ class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class OptionsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent = nullptr);
-    virtual ~OptionsDialog();
-
-private:
-    using mybins_t = QMap<uint32_t, int32_t>;
-
-private:
-    void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
-    void clearVerify();
+    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
+    ~OptionsDialog() override;
 
 private slots:
     void onAccepted();
@@ -60,9 +52,17 @@ private slots:
     void onSessionUpdated();
 
 private:
+    using mybins_t = QMap<uint32_t, int32_t>;
+
+    void reload();
+    void updateWidgetsLocality();
+    void clearInfo();
+    void clearVerify();
+
     AddData add_;
     FileList files_;
-    QCryptographicHash verify_hash_;
+    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
+
     QDir local_destination_;
     QFile verify_file_;
     QPushButton* verify_button_ = {};
@@ -72,9 +72,9 @@ private:
     QVector<bool> wanted_;
     QVector<int> priorities_;
     Session& session_;
-    Ui::OptionsDialog ui_;
+    Ui::OptionsDialog ui_ = {};
     mybins_t verify_bins_;
-    tr_info info_;
+    tr_info info_ = {};
     uint64_t verify_file_pos_ = {};
     uint32_t verify_piece_index_ = {};
     uint32_t verify_piece_pos_ = {};

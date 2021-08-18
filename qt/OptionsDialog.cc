@@ -20,19 +20,21 @@
 #include "Session.h"
 #include "Torrent.h"
 #include "Utils.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::listAdd;
 
 /***
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent) :
-    BaseDialog(parent),
-    add_(addme),
-    verify_hash_(QCryptographicHash::Sha1),
-    verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
-    edit_timer_(this),
-    session_(session),
-    is_local_(session_.isLocal())
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
+    : BaseDialog(parent)
+    , add_(std::move(addme))
+    , verify_button_(new QPushButton(tr("&Verify Local Data"), this))
+    , session_(session)
+    , is_local_(session_.isLocal())
 {
     ui_.setupUi(this);
 
@@ -51,7 +53,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
 
     edit_timer_.setInterval(2000);
     edit_timer_.setSingleShot(true);
-    connect(&edit_timer_, SIGNAL(timeout()), this, SLOT(onDestinationChanged()));
+    connect(&edit_timer_, &QTimer::timeout, this, &OptionsDialog::onDestinationChanged);
 
     if (add_.type == AddData::FILENAME)
     {
@@ -60,21 +62,21 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
         ui_.sourceButton->setTitle(tr("Open Torrent"));
         ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
         ui_.sourceButton->setPath(add_.filename);
-        connect(ui_.sourceButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
+        connect(ui_.sourceButton, &PathButton::pathChanged, this, &OptionsDialog::onSourceChanged);
     }
     else
     {
         ui_.sourceStack->setCurrentWidget(ui_.sourceEdit);
         ui_.sourceEdit->setText(add_.readableName());
         ui_.sourceEdit->selectAll();
-        connect(ui_.sourceEdit, SIGNAL(editingFinished()), this, SLOT(onSourceChanged()));
+        connect(ui_.sourceEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onSourceChanged);
     }
 
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
-    QFontMetrics const fontMetrics(font());
-    int const width = fontMetrics.size(0, QString::fromUtf8("This is a pretty long torrent filename indeed.torrent")).width();
+    QFontMetrics const font_metrics(font());
+    int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
     QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
@@ -91,9 +93,9 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
         local_destination_.setPath(download_dir);
     }
 
-    connect(ui_.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
-    connect(ui_.destinationEdit, SIGNAL(textEdited(QString)), &edit_timer_, SLOT(start()));
-    connect(ui_.destinationEdit, SIGNAL(editingFinished()), this, SLOT(onDestinationChanged()));
+    connect(ui_.destinationButton, &PathButton::pathChanged, this, &OptionsDialog::onDestinationChanged);
+    connect(ui_.destinationEdit, &QLineEdit::textEdited, &edit_timer_, qOverload<>(&QTimer::start));
+    connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
 
     ui_.filesView->setEditable(false);
 
@@ -103,20 +105,20 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
     ui_.priorityCombo->setCurrentIndex(1); // Normal
 
     ui_.dialogButtons->addButton(verify_button_, QDialogButtonBox::ActionRole);
-    connect(verify_button_, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
+    connect(verify_button_, &QAbstractButton::clicked, this, &OptionsDialog::onVerify);
 
     ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
     ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
 
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(deleteLater()));
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onAccepted()));
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &QObject::deleteLater);
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &OptionsDialog::onAccepted);
 
-    connect(ui_.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this, SLOT(onPriorityChanged(QSet<int>, int)));
-    connect(ui_.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this, SLOT(onWantedChanged(QSet<int>, bool)));
+    connect(ui_.filesView, &FileTreeView::priorityChanged, this, &OptionsDialog::onPriorityChanged);
+    connect(ui_.filesView, &FileTreeView::wantedChanged, this, &OptionsDialog::onWantedChanged);
 
-    connect(&verify_timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    connect(&verify_timer_, &QTimer::timeout, this, &OptionsDialog::onTimeout);
 
-    connect(&session_, SIGNAL(sessionUpdated()), SLOT(onSessionUpdated()));
+    connect(&session_, &Session::sessionUpdated, this, &OptionsDialog::onSessionUpdated);
 
     updateWidgetsLocality();
     reload();
@@ -160,7 +162,7 @@ void OptionsDialog::reload()
         break;
 
     case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(add_.metainfo.constData()), add_.metainfo.size());
+        tr_ctorSetMetainfo(ctor, add_.metainfo.constData(), add_.metainfo.size());
         break;
 
     default:
@@ -260,15 +262,15 @@ void OptionsDialog::onAccepted()
         download_dir = ui_.destinationEdit->text();
     }
 
-    tr_variantDictAddStr(&args, TR_KEY_download_dir, download_dir.toUtf8().constData());
+    dictAdd(&args, TR_KEY_download_dir, download_dir);
 
     // paused
-    tr_variantDictAddBool(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
+    dictAdd(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
 
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    tr_variantDictAddInt(&args, TR_KEY_bandwidthPriority, priority);
+    dictAdd(&args, TR_KEY_bandwidthPriority, priority);
 
     // files-unwanted
     int count = wanted_.count(false);
@@ -281,7 +283,7 @@ void OptionsDialog::onAccepted()
         {
             if (!wanted_.at(i))
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }
@@ -297,7 +299,7 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_LOW)
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }
@@ -313,7 +315,7 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_HIGH)
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }
@@ -422,11 +424,11 @@ void OptionsDialog::onTimeout()
 
     if (verify_file_.isOpen() && verify_file_.seek(verify_file_pos_))
     {
-        int64_t numRead = verify_file_.read(verify_buf_, bytes_this_pass);
+        int64_t num_read = verify_file_.read(verify_buf_, bytes_this_pass);
 
-        if (numRead == bytes_this_pass)
+        if (num_read == bytes_this_pass)
         {
-            verify_hash_.addData(verify_buf_, numRead);
+            verify_hash_.addData(verify_buf_, num_read);
         }
     }
 

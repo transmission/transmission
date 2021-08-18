@@ -8,17 +8,16 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+#include "transmission.h"
+
+TR_BEGIN_DECLS
 
 typedef struct tr_metainfo_builder_file
 {
     char* filename;
     uint64_t size;
-}
-tr_metainfo_builder_file;
+} tr_metainfo_builder_file;
 
 typedef enum
 {
@@ -27,8 +26,7 @@ typedef enum
     TR_MAKEMETA_CANCELLED,
     TR_MAKEMETA_IO_READ, /* see builder.errfile, builder.my_errno */
     TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
-}
-tr_metainfo_builder_err;
+} tr_metainfo_builder_err;
 
 typedef struct tr_metainfo_builder
 {
@@ -82,8 +80,7 @@ typedef struct tr_metainfo_builder
     **/
 
     struct tr_metainfo_builder* nextBuilder;
-}
-tr_metainfo_builder;
+} tr_metainfo_builder;
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFile);
 
@@ -114,9 +111,12 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  *
  * @param trackerCount size of the `trackers' array
  */
-void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate);
+void tr_makeMetaInfo(
+    tr_metainfo_builder* builder,
+    char const* outputFile,
+    tr_tracker_info const* trackers,
+    int trackerCount,
+    char const* comment,
+    bool isPrivate);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

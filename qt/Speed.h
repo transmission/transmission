@@ -13,62 +13,61 @@ class Speed
 public:
     Speed() = default;
 
-    double KBps() const;
+    double getKBps() const;
 
-    int Bps() const
+    [[nodiscard]] int getBps() const
     {
-        return _Bps;
+        return bytes_per_second_;
     }
 
-    bool isZero() const
+    [[nodiscard]] bool isZero() const
     {
-        return _Bps == 0;
+        return bytes_per_second_ == 0;
     }
 
     static Speed fromKBps(double KBps);
 
     static Speed fromBps(int Bps)
     {
-        return Speed(Bps);
+        return Speed{ Bps };
     }
 
     void setBps(int Bps)
     {
-        _Bps = Bps;
+        bytes_per_second_ = Bps;
     }
 
-    Speed& operator +=(Speed const& that)
+    Speed& operator+=(Speed const& that)
     {
-        _Bps += that._Bps;
+        bytes_per_second_ += that.bytes_per_second_;
         return *this;
     }
 
-    Speed operator +(Speed const& that) const
+    [[nodiscard]] Speed operator+(Speed const& that) const
     {
-        return Speed(_Bps + that._Bps);
+        return Speed{ getBps() + that.getBps() };
     }
 
-    bool operator <(Speed const& that) const
+    [[nodiscard]] bool operator<(Speed const& that) const
     {
-        return _Bps < that._Bps;
+        return getBps() < that.getBps();
     }
 
-    bool operator ==(Speed const& that) const
+    [[nodiscard]] bool operator==(Speed const& that) const
     {
-        return _Bps == that._Bps;
+        return getBps() == that.getBps();
     }
 
-    bool operator !=(Speed const& that) const
+    [[nodiscard]] bool operator!=(Speed const& that) const
     {
-        return _Bps != that._Bps;
-    }
-
-private:
-    Speed(int Bps) :
-        _Bps(Bps)
-    {
+        return getBps() != that.getBps();
     }
 
 private:
-    int _Bps = 0;
+    explicit Speed(int bytes_per_second)
+        : bytes_per_second_{ bytes_per_second }
+    {
+    }
+
+    int bytes_per_second_ = {};
 };

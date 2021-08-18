@@ -11,6 +11,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 
+#include "Macros.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -27,6 +28,7 @@ Q_DECLARE_METATYPE(TrackerInfo)
 class TrackerModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TrackerModel)
 
 public:
     enum Role
@@ -34,7 +36,6 @@ public:
         TrackerRole = Qt::UserRole
     };
 
-public:
     TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
@@ -47,6 +48,5 @@ public:
 private:
     using rows_t = QVector<TrackerInfo>;
 
-private:
     rows_t rows_;
 };

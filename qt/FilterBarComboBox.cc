@@ -24,8 +24,8 @@ int getHSpacing(QWidget const* w)
 
 } // namespace
 
-FilterBarComboBox::FilterBarComboBox(QWidget* parent) :
-    QComboBox(parent)
+FilterBarComboBox::FilterBarComboBox(QWidget* parent)
+    : QComboBox(parent)
 {
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
 }
@@ -70,7 +70,7 @@ QSize FilterBarComboBox::calculateSize(QSize const& text_size, QSize const& coun
     content_size.rwidth() += hmargin + text_size.width();
     content_size.rwidth() += hmargin + count_size.width();
 
-    return style()->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this).expandedTo(qApp->globalStrut());
+    return style()->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this).expandedTo(QApplication::globalStrut());
 }
 
 void FilterBarComboBox::paintEvent(QPaintEvent* e)
@@ -113,8 +113,11 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
         {
             QPen const pen = painter.pen();
             painter.setPen(Utils::getFadedColor(pen.color()));
-            QRect const text_rect = QStyle::alignedRect(opt.direction, Qt::AlignRight | Qt::AlignVCenter,
-                QSize(opt.fontMetrics.boundingRect(text).width(), rect.height()), rect);
+            QRect const text_rect = QStyle::alignedRect(
+                opt.direction,
+                Qt::AlignRight | Qt::AlignVCenter,
+                QSize(opt.fontMetrics.boundingRect(text).width(), rect.height()),
+                rect);
             painter.drawText(text_rect, Qt::AlignRight | Qt::AlignVCenter, text);
             Utils::narrowRect(rect, 0, text_rect.width() + hmargin, opt.direction);
             painter.setPen(pen);

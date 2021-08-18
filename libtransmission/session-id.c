@@ -184,17 +184,15 @@ bool tr_session_id_is_local(char const* session_id)
         }
         else
         {
-            if (!tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error))
-            {
+            if (!tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error) &&
 #ifndef _WIN32
-                if (error->code == EWOULDBLOCK)
+                (error->code == EWOULDBLOCK))
 #else
-                if (error->code == ERROR_LOCK_VIOLATION)
+                (error->code == ERROR_LOCK_VIOLATION))
 #endif
-                {
-                    ret = true;
-                    tr_error_clear(&error);
-                }
+            {
+                ret = true;
+                tr_error_clear(&error);
             }
 
             tr_sys_file_close(lock_file, NULL);

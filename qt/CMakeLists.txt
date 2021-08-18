@@ -19,6 +19,7 @@ set(${PROJECT_NAME}_SOURCES
     Filters.cc
     Formatter.cc
     FreeSpaceLabel.cc
+    IconCache.cc
     IconToolButton.cc
     InteropHelper.cc
     InteropObject.cc
@@ -47,8 +48,14 @@ set(${PROJECT_NAME}_SOURCES
     TrackerModel.cc
     TrackerModelFilter.cc
     Utils.cc
+    VariantHelpers.cc
     WatchDir.cc
 )
+
+string(REPLACE ";" " " CXX_WARNING_FLAGS_STR "${CXX_WARNING_FLAGS}")
+foreach(FILE ${${PROJECT_NAME}_SOURCES})
+    set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${CXX_WARNING_FLAGS_STR}")
+endforeach()
 
 if (NOT ENABLE_QT_COM_INTEROP)
     set_source_files_properties(ComInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
@@ -78,6 +85,7 @@ set(${PROJECT_NAME}_HEADERS
     Filters.h
     Formatter.h
     FreeSpaceLabel.h
+    IconCache.h
     IconToolButton.h
     InteropHelper.h
     InteropObject.h
@@ -108,6 +116,7 @@ set(${PROJECT_NAME}_HEADERS
     TrackerModelFilter.h
     Typedefs.h
     Utils.h
+    VariantHelpers.h
     WatchDir.h
 )
 
@@ -182,6 +191,9 @@ endif()
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}
+)
+include_directories(
+    SYSTEM
     ${PROJECT_BINARY_DIR}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}

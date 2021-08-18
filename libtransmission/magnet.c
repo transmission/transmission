@@ -24,8 +24,7 @@
 /* this base32 code converted from code by Robert Kaye and Gordon Mohr
  * and is public domain. see http://bitzi.com/publicdomain for more info */
 
-static int const base32Lookup[] =
-{
+static int const base32Lookup[] = {
     0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, /* '0', '1', '2', '3', '4', '5', '6', '7' */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* '8', '9', ':', ';', '<', '=', '>', '?' */
     0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, /* '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G' */
@@ -38,8 +37,6 @@ static int const base32Lookup[] =
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static int const base32LookupLen = TR_N_ELEMENTS(base32Lookup);
-
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     TR_ASSERT(inlen == 32);
@@ -48,13 +45,15 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 
     memset(out, 0, 20);
 
-    for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
+    size_t index = 0;
+    size_t offset = 0;
+    for (size_t i = 0; i < inlen; ++i)
     {
         int digit;
         int lookup = in[i] - '0';
 
         /* Skip chars outside the lookup table */
-        if (lookup < 0 || lookup >= base32LookupLen)
+        if (lookup < 0)
         {
             continue;
         }

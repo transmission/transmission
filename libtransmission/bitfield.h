@@ -13,6 +13,9 @@
 #endif
 
 #include "transmission.h"
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
 typedef struct tr_bitfield
@@ -28,8 +31,7 @@ typedef struct tr_bitfield
        This occurs when a magnet link's peers send have all / have none */
     bool have_all_hint;
     bool have_none_hint;
-}
-tr_bitfield;
+} tr_bitfield;
 
 /***
 ****
@@ -91,3 +93,5 @@ static inline bool tr_bitfieldHasNone(tr_bitfield const* b)
 }
 
 bool tr_bitfieldHas(tr_bitfield const* b, size_t n);
+
+TR_END_DECLS

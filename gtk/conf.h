@@ -37,6 +37,8 @@ void gtr_pref_double_set(tr_quark const key, double value);
 gboolean gtr_pref_flag_get(tr_quark const key);
 void gtr_pref_flag_set(tr_quark const key, gboolean value);
 
+char** gtr_pref_strv_get(tr_quark const key);
+
 char const* gtr_pref_string_get(tr_quark const key);
 void gtr_pref_string_set(tr_quark const key, char const* value);
 

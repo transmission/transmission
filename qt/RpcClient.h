@@ -9,10 +9,13 @@
 #pragma once
 
 #include <memory>
+#include <optional>
+#include <string_view>
 
 #include <QFuture>
 #include <QFutureInterface>
 #include <QHash>
+#include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
@@ -22,6 +25,8 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
+#include "Macros.h"
+
 class QByteArray;
 class QNetworkAccessManager;
 
@@ -30,8 +35,8 @@ Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
 {
-struct evbuffer;
-struct tr_session;
+    struct evbuffer;
+    struct tr_session;
 }
 
 struct RpcResponse
@@ -50,10 +55,10 @@ using RpcResponseFuture = QFuture<RpcResponse>;
 class RpcClient : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
-    RpcClient(QObject* parent = nullptr);
-    virtual ~RpcClient() = default;
+    explicit RpcClient(QObject* parent = nullptr);
 
     void stop();
     void start(tr_session* session);
@@ -63,7 +68,7 @@ public:
     QUrl const& url() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(char const* method, tr_variant* args);
+    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
 signals:
     void httpAuthenticationRequired();
@@ -82,10 +87,12 @@ private:
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
-    int64_t parseResponseTag(tr_variant& response);
-    RpcResponse parseResponseData(tr_variant& response);
+    int64_t parseResponseTag(tr_variant& response) const;
+    RpcResponse parseResponseData(tr_variant& response) const;
 
-    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself);
+    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
+
+    std::optional<QNetworkRequest> request_;
 
     tr_session* session_ = {};
     QString session_id_;

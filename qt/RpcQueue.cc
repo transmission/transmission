@@ -10,10 +10,14 @@
 
 #include "RpcQueue.h"
 
-RpcQueue::RpcQueue(QObject* parent) :
-    QObject(parent)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+RpcQueue::Tag RpcQueue::next_tag = {};
+
+RpcQueue::RpcQueue(QObject* parent)
+    : QObject(parent)
+    , tag_(next_tag++)
 {
-    connect(&future_watcher_, SIGNAL(finished()), SLOT(stepFinished()));
+    connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }
 
 void RpcQueue::stepFinished()
@@ -66,15 +70,15 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 {
     assert(!queue_.isEmpty());
 
-    RpcResponseFuture const oldFuture = future_watcher_.future();
+    RpcResponseFuture const old_future = future_watcher_.future();
 
-    while (true)
+    for (;;)
     {
         auto next = queue_.dequeue();
         next_error_handler_ = next.second;
         future_watcher_.setFuture((next.first)(response));
 
-        if (oldFuture != future_watcher_.future())
+        if (old_future != future_watcher_.future())
         {
             break;
         }

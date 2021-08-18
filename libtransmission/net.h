@@ -35,6 +35,10 @@
 #include <netinet/in.h>
 #endif
 
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
+
 #ifdef _WIN32
 typedef SOCKET tr_socket_t;
 #define TR_BAD_SOCKET INVALID_SOCKET
@@ -79,8 +83,7 @@ typedef enum tr_address_type
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
-}
-tr_address_type;
+} tr_address_type;
 
 typedef struct tr_address
 {
@@ -89,10 +92,8 @@ typedef struct tr_address
     {
         struct in6_addr addr6;
         struct in_addr addr4;
-    }
-    addr;
-}
-tr_address;
+    } addr;
+} tr_address;
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
@@ -100,6 +101,8 @@ extern tr_address const tr_in6addr_any;
 char const* tr_address_to_string(tr_address const* addr);
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
+
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port);
 
 bool tr_address_from_string(tr_address* setme, char const* string);
 
@@ -129,10 +132,6 @@ enum
 
 struct tr_session;
 
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
@@ -154,3 +153,5 @@ bool tr_net_hasIPv6(tr_port);
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
+
+TR_END_DECLS

@@ -8,18 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cstdint> // uint64_t
 
 #include <QAbstractItemModel>
-#include <QList>
 #include <QMap>
 #include <QSet>
+
+#include "Macros.h"
 
 class FileTreeItem;
 
 class FileTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeModel)
 
 public:
     enum
@@ -41,14 +43,19 @@ public:
         CompleteRole
     };
 
-public:
     FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
-    ~FileTreeModel();
+    ~FileTreeModel() override;
 
     void setEditable(bool editable);
 
     void clear();
-    void addFile(int index, QString const& filename, bool wanted, int priority, uint64_t size, uint64_t have,
+    void addFile(
+        int index,
+        QString const& filename,
+        bool wanted,
+        int priority,
+        uint64_t size,
+        uint64_t have,
         bool torrent_changed);
 
     bool openFile(QModelIndex const& index);
@@ -80,14 +87,16 @@ signals:
 private:
     void clearSubtree(QModelIndex const&);
     QModelIndex indexOf(FileTreeItem*, int column) const;
-    void emitParentsChanged(QModelIndex const&, int first_column, int last_column,
+    void emitParentsChanged(
+        QModelIndex const&,
+        int first_column,
+        int last_column,
         QSet<QModelIndex>* visited_parent_indices = nullptr);
     void emitSubtreeChanged(QModelIndex const&, int first_column, int last_column);
     FileTreeItem* findItemForFileIndex(int file_index) const;
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
-private:
     QMap<int, FileTreeItem*> index_cache_;
     FileTreeItem* root_item_ = {};
     bool is_editable_ = {};

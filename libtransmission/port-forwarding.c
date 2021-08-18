@@ -103,7 +103,10 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (newStatus != oldStatus)
     {
-        tr_logAddNamedInfo(getKey(), _("State changed from \"%1$s\" to \"%2$s\""), getNatStateStr(oldStatus),
+        tr_logAddNamedInfo(
+            getKey(),
+            _("State changed from \"%1$s\" to \"%2$s\""),
+            getNatStateStr(oldStatus),
             getNatStateStr(newStatus));
     }
 }
@@ -140,8 +143,11 @@ static void set_evtimer_from_status(tr_shared* s)
     }
 }
 
-static void onTimer(evutil_socket_t fd UNUSED, short what UNUSED, void* vshared)
+static void onTimer(evutil_socket_t fd, short what, void* vshared)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_shared* s = vshared;
 
     TR_ASSERT(s != NULL);
@@ -223,14 +229,16 @@ static void start_timer(tr_shared* s)
     set_evtimer_from_status(s);
 }
 
-void tr_sharedTraversalEnable(tr_shared* s, bool isEnabled)
+void tr_sharedTraversalEnable(tr_shared* s, bool enable)
 {
-    if ((s->isEnabled = isEnabled))
+    if (enable)
     {
+        s->isEnabled = true;
         start_timer(s);
     }
     else
     {
+        s->isEnabled = false;
         stop_forwarding(s);
     }
 }

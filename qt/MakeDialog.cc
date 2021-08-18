@@ -6,19 +6,20 @@
  *
  */
 
+#include "MakeDialog.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
 #include <QTimer>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
-#include "MakeDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
@@ -41,22 +42,22 @@ private slots:
 private:
     Session& session_;
     tr_metainfo_builder& builder_;
-    Ui::MakeProgressDialog ui_;
+    Ui::MakeProgressDialog ui_ = {};
     QTimer timer_;
 };
 
 } // namespace
 
-MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(builder)
+MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , builder_(builder)
 {
     ui_.setupUi(this);
 
-    connect(ui_.dialogButtons, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &MakeProgressDialog::onButtonBoxClicked);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onProgress()));
+    connect(&timer_, &QTimer::timeout, this, &MakeProgressDialog::onProgress);
     timer_.start(100);
 
     onProgress();
@@ -67,7 +68,8 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     switch (ui_.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(QString::fromUtf8(builder_.outputFile),
+        session_.addNewlyCreatedTorrent(
+            QString::fromUtf8(builder_.outputFile),
             QFileInfo(QString::fromUtf8(builder_.top)).dir().path());
         break;
 
@@ -112,13 +114,11 @@ void MakeProgressDialog::onProgress()
     }
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
-        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
-        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
 
     ui_.progressLabel->setText(str);
@@ -165,7 +165,7 @@ void MakeDialog::makeTorrent()
 
     // the file to create
     QString const path = QString::fromUtf8(builder_->top);
-    QString const torrent_name = QFileInfo(path).completeBaseName() + QLatin1String(".torrent");
+    auto const torrent_name = QFileInfo(path).completeBaseName() + QStringLiteral(".torrent");
     QString const target = QDir(ui_.destinationButton->path()).filePath(torrent_name);
 
     // comment
@@ -177,8 +177,13 @@ void MakeDialog::makeTorrent()
     }
 
     // start making the torrent
-    tr_makeMetaInfo(builder_.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
-        trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui_.privateCheck->isChecked());
+    tr_makeMetaInfo(
+        builder_.get(),
+        target.toUtf8().constData(),
+        trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.size(),
+        comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
+        ui_.privateCheck->isChecked());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);
@@ -220,17 +225,20 @@ void MakeDialog::onSourceChanged()
     {
         QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
-        text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(builder_->totalSize)).arg(files).arg(pieces).
-            arg(Formatter::sizeToString(builder_->pieceSize));
+        text = tr("%1 in %2; %3 @ %4")
+                   .arg(Formatter::get().sizeToString(builder_->totalSize))
+                   .arg(files)
+                   .arg(pieces)
+                   .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize)));
     }
 
     ui_.sourceSizeLabel->setText(text);
 }
 
-MakeDialog::MakeDialog(Session& session, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(nullptr, &tr_metaInfoBuilderFree)
+MakeDialog::MakeDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , builder_(nullptr, &tr_metaInfoBuilderFree)
 {
     ui_.setupUi(this);
 
@@ -247,18 +255,16 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent) :
 
     resize(minimumSizeHint());
 
-    connect(ui_.sourceFolderRadio, SIGNAL(toggled(bool)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFolderButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFileRadio, SIGNAL(toggled(bool)), this, SLOT(onSourceChanged()));
-    connect(ui_.sourceFileButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
+    connect(ui_.sourceFolderRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFolderButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFileRadio, &QAbstractButton::toggled, this, &MakeDialog::onSourceChanged);
+    connect(ui_.sourceFileButton, &PathButton::pathChanged, this, &MakeDialog::onSourceChanged);
 
-    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(makeTorrent()));
-    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
+    connect(ui_.dialogButtons, &QDialogButtonBox::accepted, this, &MakeDialog::makeTorrent);
+    connect(ui_.dialogButtons, &QDialogButtonBox::rejected, this, &MakeDialog::close);
 
     onSourceChanged();
 }
-
-MakeDialog::~MakeDialog() = default;
 
 /***
 ****
