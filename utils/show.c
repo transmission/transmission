@@ -11,7 +11,6 @@
 #include <stdlib.h> /* qsort() */
 #include <time.h>
 
-#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
@@ -28,8 +27,7 @@
 #define MY_NAME "transmission-show"
 #define TIMEOUT_SECS 30
 
-static tr_option options[] =
-{
+static tr_option options[] = {
     { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
     { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
     { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },
@@ -99,31 +97,18 @@ static int compare_files_by_name(void const* va, void const* vb)
     return strcmp(a->name, b->name);
 }
 
-static char const* unix_timestamp_to_str(time_t timestamp)
+static char const* time_t_to_str(time_t timestamp)
 {
     if (timestamp == 0)
     {
         return "Unknown";
     }
 
-    struct tm const* const local_time = localtime(&timestamp);
-
-    if (local_time == NULL)
-    {
-        return "Invalid";
-    }
-
-    static char buffer[32];
-    tr_strlcpy(buffer, asctime(local_time), TR_N_ELEMENTS(buffer));
-
-    char* const newline_pos = strchr(buffer, '\n');
-
-    if (newline_pos != NULL)
-    {
-        *newline_pos = '\0';
-    }
-
-    return buffer;
+    struct tm tm;
+    tr_localtime_r(&timestamp, &tm);
+    static char buf[32];
+    strftime(buf, sizeof(buf), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    return buf;
 }
 
 static void showInfo(tr_info const* inf)
@@ -140,7 +125,7 @@ static void showInfo(tr_info const* inf)
     printf("  Name: %s\n", inf->name);
     printf("  Hash: %s\n", inf->hashString);
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
-    printf("  Created on: %s\n", unix_timestamp_to_str(inf->dateCreated));
+    printf("  Created on: %s\n", time_t_to_str(inf->dateCreated));
 
     if (!tr_str_is_empty(inf->comment))
     {
@@ -279,11 +264,11 @@ static void doScrape(tr_info const* inf)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {
-                        int i = 0;
+                        size_t child_pos = 0;
                         tr_quark key;
                         tr_variant* val;
 
-                        while (tr_variantDictChild(files, i, &key, &val))
+                        while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
                             if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
@@ -303,7 +288,7 @@ static void doScrape(tr_info const* inf)
                                 matched = true;
                             }
 
-                            ++i;
+                            ++child_pos;
                         }
                     }
 

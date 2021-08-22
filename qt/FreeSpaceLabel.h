@@ -12,23 +12,22 @@
 #include <QString>
 #include <QTimer>
 
+#include "Macros.h"
+
 class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class FreeSpaceLabel : public QLabel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
 public:
-    FreeSpaceLabel(QWidget* parent = nullptr);
-
-    virtual ~FreeSpaceLabel()
-    {
-    }
+    explicit FreeSpaceLabel(QWidget* parent = nullptr);
 
     void setSession(Session& session);
     void setPath(QString const& folder);
@@ -37,7 +36,7 @@ private slots:
     void onTimer();
 
 private:
-    Session* mySession;
-    QString myPath;
-    QTimer myTimer;
+    Session* session_ = {};
+    QString path_;
+    QTimer timer_;
 };

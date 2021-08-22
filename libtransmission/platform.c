@@ -73,7 +73,7 @@ static bool tr_areThreadsEqual(tr_thread_id a, tr_thread_id b)
 /** @brief portability wrapper around OS-dependent threads */
 struct tr_thread
 {
-    void (* func)(void*);
+    void (*func)(void*);
     void* arg;
     tr_thread_id thread;
 
@@ -113,7 +113,7 @@ static ThreadFuncReturnType ThreadFunc(void* _t)
 #endif
 }
 
-tr_thread* tr_threadNew(void (* func)(void*), void* arg)
+tr_thread* tr_threadNew(void (*func)(void*), void* arg)
 {
     tr_thread* t = tr_new0(tr_thread, 1);
 
@@ -253,7 +253,7 @@ static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 static char const* getHomeDir(void)
 {
-    static char* home = NULL;
+    static char const* home = NULL;
 
     if (home == NULL)
     {
@@ -267,14 +267,14 @@ static char const* getHomeDir(void)
 
 #else
 
-            struct passwd* pw = getpwuid(getuid());
-
+            struct passwd pwent;
+            struct passwd* pw = NULL;
+            char buf[4096];
+            getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
             if (pw != NULL)
             {
                 home = tr_strdup(pw->pw_dir);
             }
-
-            endpwent();
 
 #endif
         }
@@ -328,7 +328,7 @@ char const* tr_getResumeDir(tr_session const* session)
 
 char const* tr_getDefaultConfigDir(char const* appname)
 {
-    static char* s = NULL;
+    static char const* s = NULL;
 
     if (tr_str_is_empty(appname))
     {
@@ -380,7 +380,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
 char const* tr_getDefaultDownloadDir(void)
 {
-    static char* user_dir = NULL;
+    static char const* user_dir = NULL;
 
     if (user_dir == NULL)
     {
@@ -475,9 +475,9 @@ static bool isWebClientDir(char const* path)
     return ret;
 }
 
-char const* tr_getWebClientDir(tr_session const* session UNUSED)
+char const* tr_getWebClientDir(tr_session const* session)
 {
-    static char* s = NULL;
+    static char const* s = NULL;
 
     if (s == NULL)
     {
@@ -493,7 +493,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 #ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
 
             /* Look in the Application Support folder */
-            s = tr_buildPath(tr_sessionGetConfigDir(session), "web", NULL);
+            s = tr_buildPath(tr_sessionGetConfigDir(session), "public_html", NULL);
 
             if (!isWebClientDir(s))
             {
@@ -511,7 +511,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
                 CFRelease(appRef);
 
                 /* Fallback to the app bundle */
-                s = tr_buildPath(appString, "Contents", "Resources", "web", NULL);
+                s = tr_buildPath(appString, "Contents", "Resources", "public_html", NULL);
 
                 if (!isWebClientDir(s))
                 {
@@ -524,14 +524,15 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
 #elif defined(_WIN32)
 
+            TR_UNUSED(session);
+
             /* Generally, Web interface should be stored in a Web subdir of
              * calling executable dir. */
 
-            static REFKNOWNFOLDERID known_folder_ids[] =
-            {
+            static REFKNOWNFOLDERID known_folder_ids[] = {
                 &FOLDERID_LocalAppData,
                 &FOLDERID_RoamingAppData,
-                &FOLDERID_ProgramData
+                &FOLDERID_ProgramData,
             };
 
             for (size_t i = 0; s == NULL && i < TR_N_ELEMENTS(known_folder_ids); ++i)
@@ -572,6 +573,8 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
 #else /* everyone else, follow the XDG spec */
 
+            TR_UNUSED(session);
+
             tr_list* candidates = NULL;
             char* tmp;
 
@@ -591,10 +594,10 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
             /* XDG_DATA_DIRS are the backup directories */
             {
-                char const* pkg = PACKAGE_DATA_DIR;
+                char const* const pkg = PACKAGE_DATA_DIR;
                 char* xdg = tr_env_get_string("XDG_DATA_DIRS", NULL);
                 char const* fallback = "/usr/local/share:/usr/share";
-                char* buf = tr_strdup_printf("%s:%s:%s", pkg != NULL ? pkg : "", xdg != NULL ? xdg : "", fallback);
+                char* buf = tr_strdup_printf("%s:%s:%s", pkg, xdg != NULL ? xdg : "", fallback);
                 tr_free(xdg);
                 tmp = buf;
 
@@ -624,7 +627,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
             /* walk through the candidates & look for a match */
             for (tr_list* l = candidates; l != NULL; l = l->next)
             {
-                char* path = tr_buildPath(l->data, "transmission", "web", NULL);
+                char* path = tr_buildPath(l->data, "transmission", "public_html", NULL);
                 bool const found = isWebClientDir(path);
 
                 if (found)

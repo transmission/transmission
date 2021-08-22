@@ -43,12 +43,11 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return NULL;
     }
 
-    char* buf;
+    char* buf = tr_buildPath(dir, base, NULL);
+    (void)tr_sys_path_native_separators(buf);
+
     tr_sys_path_info info;
     tr_error* error = NULL;
-
-    buf = tr_buildPath(dir, base, NULL);
-
     if (!tr_sys_path_get_info(buf, 0, &info, &error))
     {
         tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
@@ -170,12 +169,13 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
-    for (int i = 0; files != NULL; ++i)
+    int i = 0;
+    while (files != NULL)
     {
-        struct FileList* tmp = files;
+        struct FileList* const tmp = files;
         files = files->next;
 
-        tr_metainfo_builder_file* file = &ret->files[i];
+        tr_metainfo_builder_file* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
 
@@ -265,7 +265,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return ret;
     }
 
-    buf = tr_valloc(b->pieceSize);
+    buf = tr_malloc(b->pieceSize);
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
     fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
@@ -293,7 +293,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         {
             uint64_t const n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
-            tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
             bufptr += n_read;
             off += n_read;
             leftInPiece -= n_read;
@@ -349,7 +349,10 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     return ret;
 }
 
-static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* file, tr_variant* uninitialized_length,
+static void getFileInfo(
+    char const* topFile,
+    tr_metainfo_builder_file const* file,
+    tr_variant* uninitialized_length,
     tr_variant* uninitialized_path)
 {
     size_t offset;
@@ -491,14 +494,12 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
+    if ((builder->result == TR_MAKEMETA_OK) && (!builder->abortFlag) &&
+        (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
-        if (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0)
-        {
-            builder->my_errno = errno;
-            tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
-            builder->result = TR_MAKEMETA_IO_WRITE;
-        }
+        builder->my_errno = errno;
+        tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
+        builder->result = TR_MAKEMETA_IO_WRITE;
     }
 
     /* cleanup */
@@ -534,8 +535,10 @@ static tr_lock* getQueueLock(void)
     return lock;
 }
 
-static void makeMetaWorkerFunc(void* unused UNUSED)
+static void makeMetaWorkerFunc(void* user_data)
 {
+    TR_UNUSED(user_data);
+
     for (;;)
     {
         tr_metainfo_builder* builder = NULL;
@@ -564,8 +567,13 @@ static void makeMetaWorkerFunc(void* unused UNUSED)
     workerThread = NULL;
 }
 
-void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate)
+void tr_makeMetaInfo(
+    tr_metainfo_builder* builder,
+    char const* outputFile,
+    tr_tracker_info const* trackers,
+    int trackerCount,
+    char const* comment,
+    bool isPrivate)
 {
     tr_lock* lock;
 

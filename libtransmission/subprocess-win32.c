@@ -305,7 +305,10 @@ static void append_argument(char** arguments, char const* argument)
 static bool contains_batch_metachars(char const* text)
 {
     /* First part - chars explicitly documented by `cmd.exe /?` as "special" */
-    return strpbrk(text, "&<>()@^|" "%!^\"") != NULL;
+    return strpbrk(
+               text,
+               "&<>()@^|"
+               "%!^\"") != NULL;
 }
 
 static enum tr_app_type get_app_type(char const* app)
@@ -392,17 +395,25 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
 
     wchar_t* current_dir = work_dir != NULL ? tr_win32_utf8_to_native(work_dir, -1) : NULL;
 
-    STARTUPINFOW si =
-    {
+    STARTUPINFOW si = {
         .cb = sizeof(si),
         .dwFlags = STARTF_USESHOWWINDOW,
-        .wShowWindow = SW_HIDE
+        .wShowWindow = SW_HIDE,
     };
 
     PROCESS_INFORMATION pi;
 
-    bool const ret = CreateProcessW(NULL, cmd_line, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT |
-        CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE, env_block, current_dir, &si, &pi);
+    bool const ret = CreateProcessW(
+        NULL,
+        cmd_line,
+        NULL,
+        NULL,
+        FALSE,
+        NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE,
+        env_block,
+        current_dir,
+        &si,
+        &pi);
 
     if (ret)
     {

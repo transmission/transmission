@@ -26,6 +26,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -38,12 +39,16 @@
 
 #else
 
-static void sd_notify(int status UNUSED, char const* str UNUSED)
+static void sd_notify(int status, char const* str)
 {
+    TR_UNUSED(status);
+    TR_UNUSED(str);
 }
 
-static void sd_notifyf(int status UNUSED, char const* fmt UNUSED, ...)
+static void sd_notifyf(int status, char const* fmt, ...)
 {
+    TR_UNUSED(status);
+    TR_UNUSED(fmt);
 }
 
 #endif
@@ -86,7 +91,9 @@ static struct event_base* ev_base = NULL;
 
 static char const* getUsage(void)
 {
-    return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
+    // clang-format off
+    return
+        "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
         "A fast and easy BitTorrent client\n"
         "\n"
         MY_NAME " is a headless Transmission session\n"
@@ -94,10 +101,10 @@ static char const* getUsage(void)
         "or the web interface.\n"
         "\n"
         "Usage: " MY_NAME " [options]";
+    // clang-format on
 }
 
-static struct tr_option const options[] =
-{
+static struct tr_option const options[] = {
     { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
@@ -129,20 +136,36 @@ static struct tr_option const options[] =
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
-    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", true,
-        "<limit>" },
-    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l",
-        true, "<limit>" },
+    { 'L',
+      "peerlimit-global",
+      "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
+      "L",
+      true,
+      "<limit>" },
+    { 'l',
+      "peerlimit-torrent",
+      "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
+      "l",
+      true,
+      "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL },
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>" },
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>" },
-    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-        "gsr", true, "ratio" },
-    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-        "GSR", false, NULL },
+    { 953,
+      "global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+      "gsr",
+      true,
+      "ratio" },
+    { 954,
+      "no-global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+      "GSR",
+      false,
+      NULL },
     { 'x', "pid-file", "Enable PID file", "x", true, "<pid-file>" },
     { 0, NULL, NULL, NULL, false, NULL }
 };
@@ -151,8 +174,11 @@ static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
     tr_sys_file_t const old_log_file = logfile;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
-        0666, &error);
+    tr_sys_file_t const new_log_file = tr_sys_file_open(
+        filename,
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666,
+        &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
@@ -199,7 +225,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
 
 static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* context)
 {
-    tr_session* session = context;
+    tr_session const* session = context;
 
     if (!tr_str_has_suffix(name, ".torrent"))
     {
@@ -256,20 +282,20 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t logfile, int level, char const* name, char const* message, char const* file, int line)
+static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
 {
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
         if (name != NULL)
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, filename, line);
         }
         else
         {
-            tr_sys_file_write_fmt(logfile, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, filename, line);
         }
     }
 
@@ -297,33 +323,33 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
         if (name != NULL)
         {
-            syslog(priority, "%s %s (%s:%d)", name, message, file, line);
+            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
         }
         else
         {
-            syslog(priority, "%s (%s:%d)", message, file, line);
+            syslog(priority, "%s (%s:%d)", message, filename, line);
         }
     }
 
 #else
 
-    (void)level;
+    TR_UNUSED(level);
 
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t logfile)
+static void pumpLogMessages(tr_sys_file_t file)
 {
     tr_log_message* list = tr_logGetQueue();
 
     for (tr_log_message const* l = list; l != NULL; l = l->next)
     {
-        printMessage(logfile, l->level, l->name, l->message, l->file, l->line);
+        printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(logfile, NULL);
+        tr_sys_file_flush(file, NULL);
     }
 
     tr_logFreeQueue(list);
@@ -344,15 +370,26 @@ static void reportStatus(void)
     }
 }
 
-static void periodicUpdate(evutil_socket_t fd UNUSED, short what UNUSED, void* context UNUSED)
+static void periodicUpdate(evutil_socket_t fd, short what, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+    TR_UNUSED(context);
+
     pumpLogMessages(logfile);
     reportStatus();
 }
 
-static tr_rpc_callback_status on_rpc_callback(tr_session* session UNUSED, tr_rpc_callback_type type,
-    struct tr_torrent* tor UNUSED, void* user_data UNUSED)
+static tr_rpc_callback_status on_rpc_callback(
+    tr_session* session,
+    tr_rpc_callback_type type,
+    struct tr_torrent* tor,
+    void* user_data)
 {
+    TR_UNUSED(session);
+    TR_UNUSED(tor);
+    TR_UNUSED(user_data);
+
     if (type == TR_RPC_SESSION_CLOSE)
     {
         event_base_loopexit(ev_base, NULL);
@@ -361,7 +398,13 @@ static tr_rpc_callback_status on_rpc_callback(tr_session* session UNUSED, tr_rpc
     return TR_RPC_OK;
 }
 
-static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* paused, bool* dump_settings, bool* foreground,
+static bool parse_args(
+    int argc,
+    char const** argv,
+    tr_variant* settings,
+    bool* paused,
+    bool* dump_settings,
+    bool* foreground,
     int* exit_code)
 {
     int c;
@@ -570,8 +613,10 @@ struct daemon_data
     bool paused;
 };
 
-static void daemon_reconfigure(void* arg UNUSED)
+static void daemon_reconfigure(void* arg)
 {
+    TR_UNUSED(arg);
+
     if (mySession == NULL)
     {
         tr_logAddInfo("Deferring reload until session is fully started.");
@@ -599,13 +644,19 @@ static void daemon_reconfigure(void* arg UNUSED)
     }
 }
 
-static void daemon_stop(void* arg UNUSED)
+static void daemon_stop(void* arg)
 {
+    TR_UNUSED(arg);
+
     event_base_loopexit(ev_base, NULL);
 }
 
 static int daemon_start(void* raw_arg, bool foreground)
 {
+#ifndef HAVE_SYSLOG
+    TR_UNUSED(foreground);
+#endif
+
     bool boolVal;
     char const* pid_filename;
     bool pidfile_created = false;
@@ -616,10 +667,6 @@ static int daemon_start(void* raw_arg, bool foreground)
     struct daemon_data* const arg = raw_arg;
     tr_variant* const settings = &arg->settings;
     char const* const configDir = arg->configDir;
-
-#ifndef HAVE_SYSLOG
-    (void)foreground;
-#endif
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
@@ -647,12 +694,14 @@ static int daemon_start(void* raw_arg, bool foreground)
     tr_sessionSaveSettings(session, configDir, settings);
 
     pid_filename = NULL;
-    tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
-
+    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
     if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
-        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
+        tr_sys_file_t fp = tr_sys_file_open(
+            pid_filename,
+            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+            0666,
             &error);
 
         if (fp != TR_BAD_SYS_FILE)
@@ -699,7 +748,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
             if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == NULL)
             {
-                goto cleanup;
+                goto CLEANUP;
             }
         }
     }
@@ -736,13 +785,13 @@ static int daemon_start(void* raw_arg, bool foreground)
         if (status_ev == NULL)
         {
             tr_logAddError("Failed to create status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
             tr_logAddError("Failed to add status event %s", tr_strerror(errno));
-            goto cleanup;
+            goto CLEANUP;
         }
     }
 
@@ -752,10 +801,10 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (event_base_dispatch(ev_base) == -1)
     {
         tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
-        goto cleanup;
+        goto CLEANUP;
     }
 
-cleanup:
+CLEANUP:
     sd_notify(0, "STATUS=Closing transmission session...\n");
     printf("Closing transmission session...");
 
@@ -812,7 +861,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     /* overwrite settings from the command line */
     if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
@@ -824,7 +873,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     if (dumpSettings)
@@ -832,12 +881,12 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
         char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto exit_early;
+        goto EXIT_EARLY;
     }
 
     return true;
 
-exit_early:
+EXIT_EARLY:
     tr_variantFree(&data->settings);
     return false;
 }
@@ -856,8 +905,7 @@ int tr_main(int argc, char* argv[])
         return ret;
     }
 
-    dtr_callbacks const cb =
-    {
+    dtr_callbacks const cb = {
         .on_start = &daemon_start,
         .on_stop = &daemon_stop,
         .on_reconfigure = &daemon_reconfigure,

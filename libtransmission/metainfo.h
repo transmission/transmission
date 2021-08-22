@@ -14,6 +14,9 @@
 
 #include "transmission.h"
 #include "variant.h"
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 enum tr_metainfo_basename_format
 {
@@ -21,15 +24,24 @@ enum tr_metainfo_basename_format
     TR_METAINFO_BASENAME_HASH
 };
 
-bool tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_info* setmeInfo, bool* setmeHasInfoDict,
+bool tr_metainfoParse(
+    tr_session const* session,
+    tr_variant const* variant,
+    tr_info* setmeInfo,
+    bool* setmeHasInfoDict,
     size_t* setmeInfoDictLength);
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 
 char* tr_metainfoGetBasename(tr_info const*, enum tr_metainfo_basename_format format);
 
-void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info, enum tr_metainfo_basename_format old_format,
+void tr_metainfoMigrateFile(
+    tr_session const* session,
+    tr_info const* info,
+    enum tr_metainfo_basename_format old_format,
     enum tr_metainfo_basename_format new_format);
 
 /** @brief Private function that's exposed here only for unit tests */
 char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted);
+
+TR_END_DECLS

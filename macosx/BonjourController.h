@@ -22,15 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface BonjourController : NSObject <NSNetServiceDelegate>
+@interface BonjourController : NSObject<NSNetServiceDelegate>
 {
-    NSNetService * fService;
+    NSNetService* fService;
 }
 
-+ (BonjourController *) defaultController;
-+ (BOOL) defaultControllerExists;
+@property(nonatomic, class, readonly) BonjourController* defaultController;
+@property(nonatomic, class, readonly) BOOL defaultControllerExists;
 
-- (void) startWithPort: (int) port;
-- (void) stop;
+- (void)startWithPort:(int)port;
+- (void)stop;
 
 @end

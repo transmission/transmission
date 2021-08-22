@@ -99,11 +99,8 @@ char* tr_strlsize(char* buf, guint64 bytes, size_t buflen)
     return buf;
 }
 
-char* tr_strltime(char* buf, int seconds, size_t buflen)
+char* tr_strltime(char* buf, time_t seconds, size_t buflen)
 {
-    int days;
-    int hours;
-    int minutes;
     char d[128];
     char h[128];
     char m[128];
@@ -114,15 +111,15 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
         seconds = 0;
     }
 
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    int const days = (int)(seconds / 86400);
+    int const hours = (seconds % 86400) / 3600;
+    int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
     g_snprintf(d, sizeof(d), ngettext("%'d day", "%'d days", days), days);
     g_snprintf(h, sizeof(h), ngettext("%'d hour", "%'d hours", hours), hours);
     g_snprintf(m, sizeof(m), ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", seconds), seconds);
+    g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
 
     if (days != 0)
     {
@@ -205,8 +202,8 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 
 static gboolean gtr_is_supported_url(char const* str)
 {
-    return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
-        g_str_has_prefix(str, "https://"));
+    return str != NULL &&
+        (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") || g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)
@@ -259,7 +256,9 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" is already in use by \"%s.\""), filename,
+        secondary = g_strdup_printf(
+            _("The torrent file \"%s\" is already in use by \"%s.\""),
+            filename,
             tr_torrentName(duplicate_torrent));
     }
     else
@@ -267,7 +266,12 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
         secondary = g_strdup_printf(_("The torrent file \"%s\" encountered an unknown error."), filename);
     }
 
-    w = gtk_message_dialog_new(win, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
+    w = gtk_message_dialog_new(
+        win,
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_ERROR,
+        GTK_BUTTONS_CLOSE,
+        "%s",
         _("Error opening torrent"));
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", secondary);
     g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
@@ -275,7 +279,7 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
     g_free(secondary);
 }
 
-typedef void (* PopupFunc)(GtkWidget*, GdkEventButton*);
+typedef void (*PopupFunc)(GtkWidget*, GdkEventButton*);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
@@ -313,8 +317,10 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer unused UNUSED)
+gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     GtkTreeView* tv = GTK_TREE_VIEW(view);
 
     if (!gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, NULL, NULL, NULL, NULL))
@@ -370,12 +376,11 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
 char const* gtr_get_help_uri(void)
 {
-    static char* uri = NULL;
+    static char const* uri = NULL;
 
     if (uri == NULL)
     {
-        char const* fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
-        uri = g_strdup_printf(fmt, MAJOR_VERSION, MINOR_VERSION / 10);
+        uri = g_strdup_printf("https://transmissionbt.com/help/gtk/%d.%dx", MAJOR_VERSION, MINOR_VERSION / 10);
     }
 
     return uri;
@@ -485,8 +490,7 @@ GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
             int const val = va_arg(vl, int);
             gtk_list_store_insert_with_values(store, NULL, INT_MAX, 0, val, 1, text, -1);
             text = va_arg(vl, char const*);
-        }
-        while (text != NULL);
+        } while (text != NULL);
 
         va_end(vl);
     }
@@ -517,9 +521,9 @@ int gtr_combo_box_get_active_enum(GtkComboBox* combo_box)
 GtkWidget* gtr_priority_combo_new(void)
 {
     return gtr_combo_box_new_enum(
-        _("High"), TR_PRI_HIGH,
-        _("Normal"), TR_PRI_NORMAL,
-        _("Low"), TR_PRI_LOW,
+        TR_ARG_TUPLE(_("High"), TR_PRI_HIGH),
+        TR_ARG_TUPLE(_("Normal"), TR_PRI_NORMAL),
+        TR_ARG_TUPLE(_("Low"), TR_PRI_LOW),
         NULL);
 }
 
@@ -535,7 +539,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
     if (GTK_IS_WINDOW(w))
     {
         GList* windows = gtk_window_list_toplevels();
-        GtkWindow* window = GTK_WINDOW(w);
+        GtkWindow const* const window = GTK_WINDOW(w);
 
         for (GList* l = windows; l != NULL; l = l->next)
         {
@@ -583,19 +587,6 @@ void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content)
 ****
 ***/
 
-void gtr_http_failure_dialog(GtkWidget* parent, char const* url, long response_code)
-{
-    GtkWindow* window = getWindow(parent);
-
-    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Error opening \"%s\""), url);
-
-    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("Server returned \"%1$ld %2$s\""), response_code,
-        tr_webGetResponseStr(response_code));
-
-    g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
-    gtk_widget_show(w);
-}
-
 void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 {
     char const* xt = "xt=urn:btih";
@@ -611,8 +602,11 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
     if (gtr_is_magnet_link(url) && strstr(url, xt) == NULL)
     {
         g_string_append_printf(gstr, "\n \n");
-        g_string_append_printf(gstr, _("This magnet link appears to be intended for something other than BitTorrent. "
-            "BitTorrent magnet links have a section containing \"%s\"."), xt);
+        g_string_append_printf(
+            gstr,
+            _("This magnet link appears to be intended for something other than BitTorrent. "
+              "BitTorrent magnet links have a section containing \"%s\"."),
+            xt);
     }
 
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", gstr->str);
@@ -627,15 +621,14 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
 void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 {
-    char* text[] =
-    {
+    char* text[] = {
         g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY))),
-        g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD)))
+        g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD))),
     };
 
     for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
-        char* s = text[i];
+        char const* const s = text[i];
 
         if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {

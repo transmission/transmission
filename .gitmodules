@@ -22,3 +22,6 @@
 	path = third-party/miniupnpc
 	url = https://github.com/transmission/miniupnpc
 	branch = post-2.0.20170509-transmission
+[submodule "third-party/googletest"]
+	path = third-party/googletest
+	url = https://github.com/google/googletest.git

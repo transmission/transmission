@@ -40,22 +40,20 @@ typedef enum
     READ_NOW,
     READ_LATER,
     READ_ERR
-}
-ReadState;
+} ReadState;
 
 typedef enum
 {
     /* these match the values in MSE's crypto_select */
     PEER_ENCRYPTION_NONE = (1 << 0),
     PEER_ENCRYPTION_RC4 = (1 << 1)
-}
-tr_encryption_type;
+} tr_encryption_type;
 
-typedef ReadState (* tr_can_read_cb)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+typedef ReadState (*tr_can_read_cb)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
 
-typedef void (* tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+typedef void (*tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
 
-typedef void (* tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
+typedef void (*tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
 
 typedef struct tr_peerIo
 {
@@ -102,26 +100,35 @@ typedef struct tr_peerIo
 
     struct event* event_read;
     struct event* event_write;
-}
-tr_peerIo;
+} tr_peerIo;
 
 /**
 ***
 **/
 
-tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    uint8_t const* torrentHash, bool isSeed, bool utp);
+tr_peerIo* tr_peerIoNewOutgoing(
+    tr_session* session,
+    struct tr_bandwidth* parent,
+    struct tr_address const* addr,
+    tr_port port,
+    uint8_t const* torrentHash,
+    bool isSeed,
+    bool utp);
 
-tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    struct tr_peer_socket socket);
+tr_peerIo* tr_peerIoNewIncoming(
+    tr_session* session,
+    struct tr_bandwidth* parent,
+    struct tr_address const* addr,
+    tr_port port,
+    struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io))
 
 void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io))
 
 #define PEER_IO_MAGIC_NUMBER 206745
 
@@ -182,9 +189,7 @@ static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
     return io->session;
 }
 
-char const* tr_peerIoAddrStr(struct tr_address const* addr, tr_port port);
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io);
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 

@@ -11,20 +11,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-tr_error* tr_error_new(int code, char const* message_format, ...)
-{
-    TR_ASSERT(message_format != NULL);
-
-    tr_error* error;
-    va_list args;
-
-    va_start(args, message_format);
-    error = tr_error_new_valist(code, message_format, args);
-    va_end(args);
-
-    return error;
-}
-
 tr_error* tr_error_new_literal(int code, char const* message)
 {
     TR_ASSERT(message != NULL);

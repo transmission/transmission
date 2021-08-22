@@ -72,8 +72,10 @@ static void send_signal_to_pipe(int sig)
     errno = old_errno;
 }
 
-static void* signal_handler_thread_main(void* arg UNUSED)
+static void* signal_handler_thread_main(void* arg)
 {
+    TR_UNUSED(arg);
+
     int sig;
 
     while (read(signal_pipe[0], &sig, sizeof(sig)) == sizeof(sig) && sig != 0)

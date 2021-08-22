@@ -21,7 +21,7 @@
 
 #include <event2/event.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "log.h"
@@ -35,8 +35,9 @@
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
+#define log_error(...) \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
+                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
 
 /***
 ****
@@ -50,8 +51,7 @@ typedef struct tr_watchdir_kqueue
     int dirfd;
     struct event* event;
     tr_ptrArray dir_entries;
-}
-tr_watchdir_kqueue;
+} tr_watchdir_kqueue;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_kqueue*)(b))
 
@@ -61,8 +61,11 @@ tr_watchdir_kqueue;
 ****
 ***/
 
-static void tr_watchdir_kqueue_on_event(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_kqueue_on_event(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     tr_watchdir_t const handle = context;
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct kevent ke;
@@ -144,8 +147,12 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     }
 
     /* Create libevent task for event descriptor */
-    if ((backend->event = event_new(tr_watchdir_get_event_base(handle), backend->kq, EV_READ | EV_ET | EV_PERSIST,
-        &tr_watchdir_kqueue_on_event, handle)) == NULL)
+    if ((backend->event = event_new(
+             tr_watchdir_get_event_base(handle),
+             backend->kq,
+             EV_READ | EV_ET | EV_PERSIST,
+             &tr_watchdir_kqueue_on_event,
+             handle)) == NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto fail;

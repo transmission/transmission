@@ -18,14 +18,13 @@
 ****
 ***/
 
-struct tr_session_stats const TR_SESSION_STATS_INIT =
-{
+struct tr_session_stats const TR_SESSION_STATS_INIT = {
     .ratio = 0.0F,
     .uploadedBytes = 0,
     .downloadedBytes = 0,
     .filesAdded = 0,
     .sessionCount = 0,
-    .secondsActive = 0
+    .secondsActive = 0,
 };
 
 /** @brief Opaque, per-session data structure for bandwidth use statistics */
@@ -110,7 +109,11 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
 
     filename = getFilename(session);
-    tr_logAddDeep(__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+    if (tr_logGetDeepEnabled())
+    {
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+    }
+
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
 
     tr_free(filename);

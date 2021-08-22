@@ -17,7 +17,7 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "log.h"
@@ -30,8 +30,9 @@
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:inotify", __VA_ARGS__))
+#define log_error(...) \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
+                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:inotify", __VA_ARGS__))
 
 /***
 ****
@@ -44,8 +45,7 @@ typedef struct tr_watchdir_inotify
     int infd;
     int inwd;
     struct bufferevent* event;
-}
-tr_watchdir_inotify;
+} tr_watchdir_inotify;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_inotify*)(b))
 
@@ -55,8 +55,11 @@ tr_watchdir_inotify;
 ****
 ***/
 
-static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     tr_watchdir_t const handle = context;
 
     tr_watchdir_scan(handle, NULL);
@@ -68,7 +71,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
     tr_watchdir_t const handle = context;
 #ifdef TR_ENABLE_ASSERTS
-    tr_watchdir_inotify* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+    tr_watchdir_inotify const* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 #endif
     struct inotify_event ev;
     size_t nread;
@@ -163,19 +166,19 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     if ((backend->infd = inotify_init()) == -1)
     {
         log_error("Unable to inotify_init: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     if ((backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR)) == -1)
     {
         log_error("Failed to setup watchdir \"%s\": %s (%d)", path, tr_strerror(errno), errno);
-        goto fail;
+        goto FAIL;
     }
 
     if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0)) == NULL)
     {
         log_error("Failed to create event buffer: %s", tr_strerror(errno));
-        goto fail;
+        goto FAIL;
     }
 
     /* Guarantees at least the sizeof an inotify event will be available in the
@@ -185,15 +188,15 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     bufferevent_enable(backend->event, EV_READ);
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_inotify_on_first_scan, handle,
-        NULL) == -1)
+    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_inotify_on_first_scan, handle, NULL) ==
+        -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
     }
 
     return BACKEND_DOWNCAST(backend);
 
-fail:
+FAIL:
     tr_watchdir_inotify_free(BACKEND_DOWNCAST(backend));
     return NULL;
 }

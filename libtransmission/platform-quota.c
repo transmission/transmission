@@ -66,6 +66,7 @@
 #endif
 
 #include "transmission.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "platform-quota.h"
 
@@ -104,7 +105,7 @@ static char const* getdev(char const* path)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
@@ -180,7 +181,7 @@ static char const* getfstype(char const* device)
 
 #else
 
-    struct mntent* mnt;
+    struct mntent const* mnt;
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
@@ -325,8 +326,10 @@ static int64_t getquota(char const* device)
     int64_t spaceused;
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-    if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) == 0)
+    if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
     {
+        return -1;
+    }
 #elif defined(__sun)
     struct quotctl op;
     int fd = open(device, O_RDONLY);
@@ -340,55 +343,54 @@ static int64_t getquota(char const* device)
     op.uid = getuid();
     op.addr = (caddr_t)&dq;
 
-    if (ioctl(fd, Q_QUOTACTL, &op) == 0)
+    if (ioctl(fd, Q_QUOTACTL, &op) != 0)
     {
         close(fd);
-#else
-    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
-    {
-#endif
-        if (dq.dqb_bsoftlimit > 0)
-        {
-            /* Use soft limit first */
-            limit = dq.dqb_bsoftlimit;
-        }
-        else if (dq.dqb_bhardlimit > 0)
-        {
-            limit = dq.dqb_bhardlimit;
-        }
-        else
-        {
-            /* No quota enabled for this user */
-            return -1;
-        }
-
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-        spaceused = (int64_t)dq.dqb_curblocks >> 1;
-#elif defined(__APPLE__)
-        spaceused = (int64_t)dq.dqb_curbytes;
-#elif defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(1, 0, 18)
-        spaceused = (int64_t)btodb(dq.dqb_curblocks);
-#elif defined(__sun) || (defined(_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2)
-        spaceused = (int64_t)dq.dqb_curblocks >> 1;
-#else
-        spaceused = btodb(dq.dqb_curspace);
-#endif
-
-        freespace = limit - spaceused;
-
-#ifdef __APPLE__
-        return freespace < 0 ? 0 : freespace;
-#else
-        return freespace < 0 ? 0 : (freespace * 1024);
-#endif
+        return -1;
     }
 
-#if defined(__sun)
     close(fd);
+#else
+    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) != 0)
+    {
+        return -1;
+    }
 #endif
 
-    /* something went wrong */
-    return -1;
+    if (dq.dqb_bsoftlimit > 0)
+    {
+        /* Use soft limit first */
+        limit = dq.dqb_bsoftlimit;
+    }
+    else if (dq.dqb_bhardlimit > 0)
+    {
+        limit = dq.dqb_bhardlimit;
+    }
+    else
+    {
+        /* No quota enabled for this user */
+        return -1;
+    }
+
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+    spaceused = (int64_t)dq.dqb_curblocks >> 1;
+#elif defined(__APPLE__)
+    spaceused = (int64_t)dq.dqb_curbytes;
+#elif defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(1, 0, 18)
+    spaceused = (int64_t)btodb(dq.dqb_curblocks);
+#elif defined(__sun) || (defined(_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2)
+    spaceused = (int64_t)dq.dqb_curblocks >> 1;
+#else
+    spaceused = btodb(dq.dqb_curspace);
+#endif
+
+    freespace = limit - spaceused;
+
+#ifdef __APPLE__
+    return freespace < 0 ? 0 : freespace;
+#else
+    return freespace < 0 ? 0 : (freespace * 1024);
+#endif
 }
 
 #endif
@@ -449,7 +451,7 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 
 #else /* _WIN32 */
 
-    (void)info;
+    TR_UNUSED(info);
 
 #endif /* _WIN32 */
 

@@ -13,6 +13,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include "daemon.h"
@@ -60,13 +61,12 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
     do \
     { \
         DWORD const local_code = (code); \
-        \
+\
         if (tr_logLevelIsActive((level))) \
         { \
             do_log_system_error(__FILE__, __LINE__, (level), local_code, (message)); \
         } \
-    } \
-    while (0)
+    } while (0)
 
 /***
 ****
@@ -74,20 +74,25 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
 
 static BOOL WINAPI handle_console_ctrl(DWORD control_type)
 {
-    (void)control_type;
+    TR_UNUSED(control_type);
 
     callbacks->on_stop(callback_arg);
     return TRUE;
 }
 
-static void update_service_status(DWORD new_state, DWORD win32_exit_code, DWORD service_specific_exit_code, DWORD check_point,
+static void update_service_status(
+    DWORD new_state,
+    DWORD win32_exit_code,
+    DWORD service_specific_exit_code,
+    DWORD check_point,
     DWORD wait_hint)
 {
     SERVICE_STATUS status;
     status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     status.dwCurrentState = new_state;
-    status.dwControlsAccepted = new_state != SERVICE_RUNNING ? 0 : SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN |
-        SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
+    status.dwControlsAccepted = new_state != SERVICE_RUNNING ?
+        0 :
+        SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
     status.dwWin32ExitCode = service_specific_exit_code == 0 ? win32_exit_code : ERROR_SERVICE_SPECIFIC_ERROR;
     status.dwServiceSpecificExitCode = service_specific_exit_code;
     status.dwCheckPoint = check_point;
@@ -141,9 +146,9 @@ static void stop_service(void)
 
 static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LPVOID event_data, LPVOID context)
 {
-    (void)event_type;
-    (void)event_data;
-    (void)context;
+    TR_UNUSED(event_type);
+    TR_UNUSED(event_data);
+    TR_UNUSED(context);
 
     switch (control_code)
     {
@@ -167,15 +172,15 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LP
 
 static unsigned int __stdcall service_thread_main(void* context)
 {
-    (void)context;
+    TR_UNUSED(context);
 
     return callbacks->on_start(callback_arg, false);
 }
 
 static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
 {
-    (void)argc;
-    (void)argv;
+    TR_UNUSED(argc);
+    TR_UNUSED(argv);
 
     status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, NULL);
 
@@ -243,10 +248,9 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
     }
     else
     {
-        SERVICE_TABLE_ENTRY const service_table[] =
-        {
+        SERVICE_TABLE_ENTRY const service_table[] = {
             { (LPWSTR)service_name, &service_main },
-            { NULL, NULL }
+            { NULL, NULL },
         };
 
         if (!StartServiceCtrlDispatcherW(service_table))

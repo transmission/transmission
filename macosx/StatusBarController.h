@@ -26,20 +26,23 @@
 
 @interface StatusBarController : NSViewController
 {
-    IBOutlet NSButton * fStatusButton;
-    IBOutlet NSTextField * fTotalDLField, * fTotalULField;
-    IBOutlet NSImageView * fTotalDLImageView, * fTotalULImageView;
+    IBOutlet NSButton* fStatusButton;
+    IBOutlet NSTextField* fTotalDLField;
+    IBOutlet NSTextField* fTotalULField;
+    IBOutlet NSImageView* fTotalDLImageView;
+    IBOutlet NSImageView* fTotalULImageView;
 
-    tr_session * fLib;
+    tr_session* fLib;
 
-    CGFloat fPreviousDownloadRate, fPreviousUploadRate;
+    CGFloat fPreviousDownloadRate;
+    CGFloat fPreviousUploadRate;
 }
 
-- (id) initWithLib: (tr_session *) lib;
+- (instancetype)initWithLib:(tr_session*)lib;
 
-- (void) updateWithDownload: (CGFloat) dlRate upload: (CGFloat) ulRate;
-- (void) setStatusLabel: (id) sender;
+- (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate;
+- (void)setStatusLabel:(id)sender;
 
-- (void) updateSpeedFieldsToolTips;
+- (void)updateSpeedFieldsToolTips;
 
 @end

@@ -26,35 +26,42 @@
 
 @interface InfoGeneralViewController (Private)
 
-- (void) setupInfo;
+- (void)setupInfo;
 
 @end
 
 @implementation InfoGeneralViewController
 
-- (id) init
+- (instancetype)init
 {
-    if ((self = [super initWithNibName: @"InfoGeneralView" bundle: nil]))
+    if ((self = [super initWithNibName:@"InfoGeneralView" bundle:nil]))
     {
-        [self setTitle: NSLocalizedString(@"General Info", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"General Info", "Inspector view -> title");
     }
 
     return self;
 }
 
-
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
-    #warning remove when 10.7-only with auto layout
+#warning remove when 10.7-only with auto layout
     [fInfoSectionLabel sizeToFit];
     [fWhereSectionLabel sizeToFit];
 
-    NSArray * labels = @[ fPiecesLabel, fHashLabel, fSecureLabel, fCreatorLabel, fDateCreatedLabel, fCommentLabel, fDataLocationLabel ];
+    NSArray* labels = @[
+        fPiecesLabel,
+        fHashLabel,
+        fSecureLabel,
+        fCreatorLabel,
+        fDateCreatedLabel,
+        fCommentLabel,
+        fDataLocationLabel,
+    ];
 
     CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
-    for (NSTextField * label in labels)
+    for (NSTextField* label in labels)
     {
-        const NSRect oldFrame = [label frame];
+        NSRect const oldFrame = label.frame;
         if (oldFrame.size.width > oldMaxWidth)
         {
             oldMaxWidth = oldFrame.size.width;
@@ -62,30 +69,41 @@
         }
 
         [label sizeToFit];
-        const CGFloat newWidth = [label bounds].size.width;
+        CGFloat const newWidth = label.bounds.size.width;
         if (newWidth > newMaxWidth)
+        {
             newMaxWidth = newWidth;
+        }
     }
 
-    for (NSTextField * label in labels)
+    for (NSTextField* label in labels)
     {
-        NSRect frame = [label frame];
+        NSRect frame = label.frame;
         frame.origin.x = originX + (newMaxWidth - frame.size.width);
-        [label setFrame: frame];
+        label.frame = frame;
     }
 
-    NSArray * fields = @[ fPiecesField, fHashField, fSecureField, fCreatorField, fDateCreatedField, fCommentScrollView, fDataLocationField ];
+    NSArray* fields = @[
+        fPiecesField,
+        fHashField,
+        fSecureField,
+        fCreatorField,
+        fDateCreatedField,
+        fCommentScrollView,
+        fDataLocationField,
+    ];
 
-    const CGFloat widthIncrease = newMaxWidth - oldMaxWidth;
-    for (NSView * field in fields) {
-        NSRect frame = [field frame];
+    CGFloat const widthIncrease = newMaxWidth - oldMaxWidth;
+    for (NSView* field in fields)
+    {
+        NSRect frame = field.frame;
         frame.origin.x += widthIncrease;
         frame.size.width -= widthIncrease;
-        [field setFrame: frame];
+        field.frame = frame;
     }
 }
 
-- (void) setInfoForTorrents: (NSArray *) torrents
+- (void)setInfoForTorrents:(NSArray*)torrents
 {
     //don't check if it's the same in case the metadata changed
     fTorrents = torrents;
@@ -93,82 +111,88 @@
     fSet = NO;
 }
 
-- (void) updateInfo
+- (void)updateInfo
 {
     if (!fSet)
+    {
         [self setupInfo];
+    }
 
-    if ([fTorrents count] != 1)
+    if (fTorrents.count != 1)
+    {
         return;
+    }
 
-    Torrent * torrent = fTorrents[0];
+    Torrent* torrent = fTorrents[0];
 
-    NSString * location = [torrent dataLocation];
-    [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
-    [fDataLocationField setToolTip: location ? location : @""];
+    NSString* location = torrent.dataLocation;
+    fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";
+    fDataLocationField.toolTip = location ? location : @"";
 
-    [fRevealDataButton setHidden: !location];
+    fRevealDataButton.hidden = !location;
 }
 
-- (void) revealDataFile: (id) sender
+- (void)revealDataFile:(id)sender
 {
-    Torrent * torrent = fTorrents[0];
-    NSString * location = [torrent dataLocation];
+    Torrent* torrent = fTorrents[0];
+    NSString* location = torrent.dataLocation;
     if (!location)
+    {
         return;
+    }
 
-    NSURL * file = [NSURL fileURLWithPath: location];
-    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
+    NSURL* file = [NSURL fileURLWithPath:location];
+    [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[ file ]];
 }
 
 @end
 
 @implementation InfoGeneralViewController (Private)
 
-- (void) setupInfo
+- (void)setupInfo
 {
-    if ([fTorrents count] == 1)
+    if (fTorrents.count == 1)
     {
-        Torrent * torrent = fTorrents[0];
+        Torrent* torrent = fTorrents[0];
 
-        #warning candidate for localizedStringWithFormat (although then we'll get two commas)
-        NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%ld, %@", [torrent pieceCount],
-                                        [NSString stringForFileSize: [torrent pieceSize]]] : @"";
-        [fPiecesField setStringValue: piecesString];
+#warning candidate for localizedStringWithFormat (although then we'll get two commas)
+        NSString* piecesString = !torrent.magnet ?
+            [NSString stringWithFormat:@"%ld, %@", torrent.pieceCount, [NSString stringForFileSize:torrent.pieceSize]] :
+            @"";
+        fPiecesField.stringValue = piecesString;
 
-        NSString * hashString = [torrent hashString];
-        [fHashField setStringValue: hashString];
-        [fHashField setToolTip: hashString];
-        [fSecureField setStringValue: [torrent privateTorrent]
-                        ? NSLocalizedString(@"Private Torrent, non-tracker peer discovery disabled", "Inspector -> private torrent")
-                        : NSLocalizedString(@"Public Torrent", "Inspector -> private torrent")];
+        NSString* hashString = torrent.hashString;
+        fHashField.stringValue = hashString;
+        fHashField.toolTip = hashString;
+        fSecureField.stringValue = torrent.privateTorrent ?
+            NSLocalizedString(@"Private Torrent, non-tracker peer discovery disabled", "Inspector -> private torrent") :
+            NSLocalizedString(@"Public Torrent", "Inspector -> private torrent");
 
-        NSString * commentString = [torrent comment];
-        [fCommentView setString: commentString];
+        NSString* commentString = torrent.comment;
+        fCommentView.string = commentString;
 
-        NSString * creatorString = [torrent creator];
-        [fCreatorField setStringValue: creatorString];
-        [fDateCreatedField setObjectValue: [torrent dateCreated]];
+        NSString* creatorString = torrent.creator;
+        fCreatorField.stringValue = creatorString;
+        fDateCreatedField.objectValue = torrent.dateCreated;
     }
     else
     {
-        [fPiecesField setStringValue: @""];
-        [fHashField setStringValue: @""];
-        [fHashField setToolTip: nil];
-        [fSecureField setStringValue: @""];
-        [fCommentView setString: @""];
+        fPiecesField.stringValue = @"";
+        fHashField.stringValue = @"";
+        fHashField.toolTip = nil;
+        fSecureField.stringValue = @"";
+        fCommentView.string = @"";
 
-        [fCreatorField setStringValue: @""];
-        [fDateCreatedField setStringValue: @""];
+        fCreatorField.stringValue = @"";
+        fDateCreatedField.stringValue = @"";
 
-        [fDataLocationField setStringValue: @""];
-        [fDataLocationField setToolTip: nil];
+        fDataLocationField.stringValue = @"";
+        fDataLocationField.toolTip = nil;
 
-        [fRevealDataButton setHidden: YES];
+        fRevealDataButton.hidden = YES;
     }
 
     fSet = YES;
 }
 
 @end
-

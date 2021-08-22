@@ -22,16 +22,17 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-static void handle_sigchld(int i UNUSED)
+static void handle_sigchld(int i)
 {
+    TR_UNUSED(i);
+
     int rc;
 
     do
     {
         /* FIXME: Only check for our own PIDs */
         rc = waitpid(-1, NULL, WNOHANG);
-    }
-    while (rc > 0 || (rc == -1 && errno == EINTR));
+    } while (rc > 0 || (rc == -1 && errno == EINTR));
 
     /* FIXME: Call old handler, if any */
 }
@@ -61,25 +62,25 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
         {
             if (putenv(env[i]) != 0)
             {
-                goto fail;
+                goto FAIL;
             }
         }
     }
 
     if (work_dir != NULL && chdir(work_dir) == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     if (execvp(cmd[0], cmd) == -1)
     {
-        goto fail;
+        goto FAIL;
     }
 
     return true;
 
-fail:
-    write(pipe_fd, &errno, sizeof(errno));
+FAIL:
+    (void)write(pipe_fd, &errno, sizeof(errno));
     return false;
 }
 
@@ -93,8 +94,7 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     do
     {
         count = read(pipe_fd, &child_errno, sizeof(child_errno));
-    }
-    while (count == -1 && errno == EINTR);
+    } while (count == -1 && errno == EINTR);
 
     close(pipe_fd);
 
