@@ -5,6 +5,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
 
+if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -675,7 +679,6 @@ set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLink
 ## Code Formatting
 
 if(GIT_FOUND)
-    message(STATUS "Looking for uncrustify")
     execute_process(COMMAND
         "${GIT_EXECUTABLE}" rev-parse --show-toplevel
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -689,11 +692,11 @@ if(GIT_FOUND)
             COPYONLY
         )
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
     endif()

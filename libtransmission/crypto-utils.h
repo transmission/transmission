@@ -81,7 +81,10 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 /**
  * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
  */
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+tr_dh_ctx_t tr_dh_new(
+    uint8_t const* prime_num,
+    size_t prime_num_length,
+    uint8_t const* generator_num,
     size_t generator_num_length);
 
 /**
@@ -103,8 +106,13 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
  * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
  *        given data to the key during calculation.
  */
-bool tr_dh_secret_derive(tr_dh_secret_t handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
-    size_t append_data_size, uint8_t* hash);
+bool tr_dh_secret_derive(
+    tr_dh_secret_t handle,
+    void const* prepend_data,
+    size_t prepend_data_size,
+    void const* append_data,
+    size_t append_data_size,
+    uint8_t* hash);
 
 /**
  * @brief Free DH secret key returned by @ref tr_dh_agree.

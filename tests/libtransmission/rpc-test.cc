@@ -81,7 +81,7 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [] (tr_session* /*session*/, tr_variant* response, void* setme) noexcept
+    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
     {
         *static_cast<tr_variant*>(setme) = *response;
         tr_variantInitBool(response, false);
@@ -154,7 +154,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_trash_original_torrent_files,
         TR_KEY_units,
         TR_KEY_utp_enabled,
-        TR_KEY_version
+        TR_KEY_version,
     };
 
     // what we got
@@ -168,16 +168,22 @@ TEST_F(RpcTest, sessionGet)
     }
 
     auto missing_keys = std::vector<tr_quark>{};
-    std::set_difference(std::begin(expected_keys), std::end(expected_keys),
-        std::begin(actual_keys), std::end(actual_keys),
+    std::set_difference(
+        std::begin(expected_keys),
+        std::end(expected_keys),
+        std::begin(actual_keys),
+        std::end(actual_keys),
         std::inserter(missing_keys, std::begin(missing_keys)));
-    EXPECT_EQ(decltype(missing_keys) {}, missing_keys);
+    EXPECT_EQ(decltype(missing_keys){}, missing_keys);
 
     auto unexpected_keys = std::vector<tr_quark>{};
-    std::set_difference(std::begin(actual_keys), std::end(actual_keys),
-        std::begin(expected_keys), std::end(expected_keys),
+    std::set_difference(
+        std::begin(actual_keys),
+        std::end(actual_keys),
+        std::begin(expected_keys),
+        std::end(expected_keys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
-    EXPECT_EQ(decltype(unexpected_keys) {}, unexpected_keys);
+    EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
     tr_variantFree(&response);

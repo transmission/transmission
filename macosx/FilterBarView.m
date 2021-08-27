@@ -25,22 +25,22 @@
 
 @implementation FilterBarView
 
-- (BOOL) mouseDownCanMoveWindow
+- (BOOL)mouseDownCanMoveWindow
 {
     return NO;
 }
 
-- (BOOL) isOpaque
+- (BOOL)isOpaque
 {
     return YES;
 }
 
-- (void) drawRect: (NSRect) rect
+- (void)drawRect:(NSRect)rect
 {
     [NSColor.windowBackgroundColor setFill];
     NSRectFill(rect);
-    
-    const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+
+    NSRect const lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         [NSColor.gridColor setFill];

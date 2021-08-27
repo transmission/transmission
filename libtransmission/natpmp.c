@@ -40,8 +40,7 @@ typedef enum
     TR_NATPMP_RECV_MAP,
     TR_NATPMP_SEND_UNMAP,
     TR_NATPMP_RECV_UNMAP
-}
-tr_natpmp_state;
+} tr_natpmp_state;
 
 struct tr_natpmp
 {
@@ -74,7 +73,13 @@ static void logVal(char const* func, int ret)
     }
     else
     {
-        tr_logAddNamedDbg(getKey(), "%s failed. Natpmp returned %d (%s); errno is %d (%s)", func, ret, strnatpmperr(ret), errno,
+        tr_logAddNamedDbg(
+            getKey(),
+            "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
+            func,
+            ret,
+            strnatpmperr(ret),
+            errno,
             tr_strerror(errno));
     }
 }
@@ -144,8 +149,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         }
     }
 
-    if ((nat->state == TR_NATPMP_IDLE || nat->state == TR_NATPMP_ERR) &&
-        (nat->is_mapped) &&
+    if ((nat->state == TR_NATPMP_IDLE || nat->state == TR_NATPMP_ERR) && (nat->is_mapped) &&
         (!is_enabled || nat->private_port != private_port))
     {
         nat->state = TR_NATPMP_SEND_UNMAP;

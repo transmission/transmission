@@ -49,19 +49,17 @@
 #include "utils.h" /* tr_time(), tr_logAddDebug() */
 
 #ifndef IN_MULTICAST
-#define IN_MULTICAST(a) (((a) & 0xf0000000) == 0xe0000000)
+#define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-tr_address const tr_in6addr_any =
-{
+tr_address const tr_in6addr_any = {
     .type = TR_AF_INET6,
-    .addr.addr6 = IN6ADDR_ANY_INIT
+    .addr.addr6 = IN6ADDR_ANY_INIT,
 };
 
-tr_address const tr_inaddr_any =
-{
+tr_address const tr_inaddr_any = {
     .type = TR_AF_INET,
-    .addr.addr4.s_addr = INADDR_ANY
+    .addr.addr4.s_addr = INADDR_ANY,
 };
 
 char* tr_net_strerror(char* buf, size_t buflen, int err)
@@ -153,9 +151,8 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
         return a->type == TR_AF_INET ? 1 : -1;
     }
 
-    return a->type == TR_AF_INET ?
-        memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-        memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
+    return a->type == TR_AF_INET ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
+                                   memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
 }
 
 /***********************************************************************
@@ -213,8 +210,11 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)
     if (setsockopt(s, IPPROTO_TCP, TCP_CONGESTION, (void const*)algorithm, strlen(algorithm) + 1) == -1)
     {
         char err_buf[512];
-        tr_logAddNamedInfo("Net", "Can't set congestion control algorithm '%s': %s", algorithm, tr_net_strerror(err_buf,
-            sizeof(err_buf), sockerrno));
+        tr_logAddNamedInfo(
+            "Net",
+            "Can't set congestion control algorithm '%s': %s",
+            algorithm,
+            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
 #else
@@ -309,7 +309,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)) == -1)
         {
-            tr_logAddInfo("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t)s,
+            tr_logAddInfo(
+                "Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s",
+                (intmax_t)s,
                 tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         }
     }
@@ -329,7 +331,10 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
-        tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
+        tr_logAddError(
+            _("Couldn't set source address %s on %" PRIdMAX ": %s"),
+            tr_address_to_string(source_addr),
+            (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         tr_netClose(session, s);
         return ret;
@@ -345,8 +350,13 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            tr_logAddError(_("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"), (intmax_t)s,
-                tr_address_to_string(addr), (int)ntohs(port), tmperrno, tr_net_strerror(err_buf, sizeof(err_buf), tmperrno));
+            tr_logAddError(
+                _("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"),
+                (intmax_t)s,
+                tr_address_to_string(addr),
+                (int)ntohs(port),
+                tmperrno,
+                tr_net_strerror(err_buf, sizeof(err_buf), tmperrno));
         }
 
         tr_netClose(session, s);

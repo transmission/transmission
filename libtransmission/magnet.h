@@ -29,8 +29,7 @@ typedef struct tr_magnet_info
 
     int webseedCount;
     char** webseeds;
-}
-tr_magnet_info;
+} tr_magnet_info;
 
 tr_magnet_info* tr_magnetParse(char const* uri);
 

@@ -28,11 +28,11 @@
 ****
 ***/
 
-#define log_debug(...) (!tr_logLevelIsActive(TR_LOG_DEBUG) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_DEBUG, "watchdir", __VA_ARGS__))
+#define log_debug(...) \
+    (!tr_logLevelIsActive(TR_LOG_DEBUG) ? (void)0 : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_DEBUG, "watchdir", __VA_ARGS__))
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir", __VA_ARGS__))
+#define log_error(...) \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir", __VA_ARGS__))
 
 /***
 ****
@@ -120,8 +120,7 @@ typedef struct tr_watchdir_retry
     unsigned int counter;
     struct event* timer;
     struct timeval interval;
-}
-tr_watchdir_retry;
+} tr_watchdir_retry;
 
 /* Non-static and mutable for unit tests */
 unsigned int tr_watchdir_retry_limit = 3;
@@ -129,7 +128,7 @@ struct timeval tr_watchdir_retry_start_interval = { .tv_sec = 1, .tv_usec = 0 };
 struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 #define tr_watchdir_retries_init(r) (void)0
-#define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc) & tr_watchdir_retry_free)
+#define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc)&tr_watchdir_retry_free)
 #define tr_watchdir_retries_insert(r, v) tr_ptrArrayInsertSorted((r), (v), &compare_retry_names)
 #define tr_watchdir_retries_remove(r, v) tr_ptrArrayRemoveSortedPointer((r), (v), &compare_retry_names)
 #define tr_watchdir_retries_find(r, v) tr_ptrArrayFindSorted((r), (v), &compare_retry_names)
@@ -222,8 +221,12 @@ static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 ****
 ***/
 
-tr_watchdir_t tr_watchdir_new(char const* path, tr_watchdir_cb callback, void* callback_user_data,
-    struct event_base* event_base, bool force_generic)
+tr_watchdir_t tr_watchdir_new(
+    char const* path,
+    tr_watchdir_cb callback,
+    void* callback_user_data,
+    struct event_base* event_base,
+    bool force_generic)
 {
     tr_watchdir_t handle;
 

@@ -7,8 +7,7 @@
 
 #include "mime-types.h"
 
-struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
-{
+struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] = {
     { "123", "application/vnd.lotus-1-2-3" },
     { "1km", "application/vnd.1000minds.decision-model+xml" },
     { "3dml", "text/vnd.in3d.3dml" },

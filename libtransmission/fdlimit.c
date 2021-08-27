@@ -146,7 +146,11 @@ static void cached_file_close(struct tr_cached_file* o)
  * errno values include ENOENT if the parent folder doesn't exist,
  * plus the errno values set by tr_sys_dir_create () and tr_sys_file_open ().
  */
-static int cached_file_open(struct tr_cached_file* o, char const* filename, bool writable, tr_preallocation_mode allocation,
+static int cached_file_open(
+    struct tr_cached_file* o,
+    char const* filename,
+    bool writable,
+    tr_preallocation_mode allocation,
     uint64_t file_size)
 {
     int flags;
@@ -214,8 +218,12 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
         if (!success)
         {
-            tr_logAddError(_("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
-                filename, type, file_size, error->message);
+            tr_logAddError(
+                _("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
+                filename,
+                type,
+                file_size,
+                error->message);
             goto FAIL;
         }
 
@@ -263,13 +271,12 @@ struct tr_fileset
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
-    struct tr_cached_file const TR_CACHED_FILE_INIT =
-    {
+    struct tr_cached_file const TR_CACHED_FILE_INIT = {
         .is_writable = false,
         .fd = TR_BAD_SYS_FILE,
         .torrent_id = 0,
         .file_index = 0,
-        .used_at = 0
+        .used_at = 0,
     };
 
     set->begin = tr_new(struct tr_cached_file, n);
@@ -468,8 +475,14 @@ void tr_fdTorrentClose(tr_session* session, int torrent_id)
 }
 
 /* returns an fd on success, or a TR_BAD_SYS_FILE on failure and sets errno */
-tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t i, char const* filename, bool writable,
-    tr_preallocation_mode allocation, uint64_t file_size)
+tr_sys_file_t tr_fdFileCheckout(
+    tr_session* session,
+    int torrent_id,
+    tr_file_index_t i,
+    char const* filename,
+    bool writable,
+    tr_preallocation_mode allocation,
+    uint64_t file_size)
 {
     struct tr_fileset* set = get_fileset(session);
     struct tr_cached_file* o = fileset_lookup(set, torrent_id, i);

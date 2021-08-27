@@ -25,11 +25,10 @@ typedef struct tr_list
     void* data;
     struct tr_list* next;
     struct tr_list* prev;
-}
-tr_list;
+} tr_list;
 
 typedef tr_voidptr_compare_func TrListCompareFunc;
-typedef void (* TrListForeachFunc)(void*);
+typedef void (*TrListForeachFunc)(void*);
 
 /**
  * @brief return the number of items in the list

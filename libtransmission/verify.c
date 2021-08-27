@@ -67,8 +67,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
             char* filename = tr_torrentFindFile(tor, fileIndex);
-            fd = filename == NULL ? TR_BAD_SYS_FILE : tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
-                NULL);
+            fd = filename == NULL ? TR_BAD_SYS_FILE :
+                                    tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
             tr_free(filename);
             prevFileIndex = fileIndex;
         }
@@ -156,8 +156,12 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
     /* stopwatch */
     time_t const end = tr_time();
-    tr_logAddTorDbg(tor, "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
-        (int)(end - begin), tor->info.totalSize, (uint64_t)(tor->info.totalSize / (1 + (end - begin))));
+    tr_logAddTorDbg(
+        tor,
+        "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
+        (int)(end - begin),
+        tor->info.totalSize,
+        (uint64_t)(tor->info.totalSize / (1 + (end - begin))));
 
     return changed;
 }

@@ -28,16 +28,14 @@ typedef enum
     TR_NET_OK,
     TR_NET_ERROR,
     TR_NET_WAIT
-}
-tr_tristate_t;
+} tr_tristate_t;
 
 typedef enum
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-}
-tr_auto_switch_state_t;
+} tr_auto_switch_state_t;
 
 enum
 {

@@ -297,7 +297,10 @@ static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM cons
 
 #endif
 
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+tr_dh_ctx_t tr_dh_new(
+    uint8_t const* prime_num,
+    size_t prime_num_length,
+    uint8_t const* generator_num,
     size_t generator_num_length)
 {
     TR_ASSERT(prime_num != NULL);

@@ -4,7 +4,10 @@ services:
   code_style:
     build: docker/code_style
     volumes:
-      - .:/src
-      - ./code_style.sh:/code_style.sh:ro
-      - ./format:/format:ro
-    command: ["/bin/bash", "-c", "cd /src && ./code_style.sh --check"]
+    - .:/src
+    working_dir: /src
+    command:
+    - ./code_style.sh
+    - --check
+    environment:
+      HOME: /tmp

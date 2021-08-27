@@ -207,8 +207,13 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
     }
     else
     {
-        tr_logAddTorDbg(tor, "Couldn't load DND flags. DND list (%p) has %zu" " children; torrent has %d files", (void*)list,
-            tr_variantListSize(list), (int)n);
+        tr_logAddTorDbg(
+            tor,
+            "Couldn't load DND flags. DND list (%p) has %zu"
+            " children; torrent has %d files",
+            (void*)list,
+            tr_variantListSize(list),
+            (int)n);
     }
 
     return ret;
@@ -930,8 +935,8 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         fieldsLoaded |= TR_FR_TIME_DOWNLOADING;
     }
 
-    if ((fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY) != 0 &&
-        tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) && tr_isPriority(i))
+    if ((fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
+        tr_isPriority(i))
     {
         tr_torrentSetPriority(tor, i);
         fieldsLoaded |= TR_FR_BANDWIDTH_PRIORITY;

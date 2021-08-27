@@ -24,8 +24,9 @@
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:generic", __VA_ARGS__))
+#define log_error(...) \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
+                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:generic", __VA_ARGS__))
 
 /***
 ****
@@ -37,8 +38,7 @@ typedef struct tr_watchdir_generic
 
     struct event* event;
     tr_ptrArray dir_entries;
-}
-tr_watchdir_generic;
+} tr_watchdir_generic;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_generic*)(b))
 
@@ -89,8 +89,9 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
     backend = tr_new0(tr_watchdir_generic, 1);
     backend->base.free_func = &tr_watchdir_generic_free;
 
-    if ((backend->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event,
-        handle)) == NULL)
+    if ((backend
+             ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
+        NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto FAIL;
