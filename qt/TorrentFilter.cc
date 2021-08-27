@@ -254,7 +254,8 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
     if (accepts)
     {
         auto const text = prefs_.getString(Prefs::FILTER_TEXT);
-        accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive);
+        accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive) ||
+            tor.hash().toString().contains(text, Qt::CaseInsensitive);
     }
 
     return accepts;
