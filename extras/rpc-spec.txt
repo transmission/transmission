@@ -237,7 +237,7 @@
    seedRatioMode               | number                      | tr_ratiolimit
    sizeWhenDone                | number                      | tr_stat
    startDate                   | number                      | tr_stat
-   status                      | number                      | tr_stat
+   status                      | number (see below)          | tr_stat
    trackers                    | array (see below)           | n/a
    trackerStats                | array (see below)           | n/a
    totalSize                   | number                      | tr_info
@@ -308,6 +308,15 @@
    priorities         | an array of tr_info.filecount        | tr_info
                       | numbers. each is the tr_priority_t   |
                       | mode for the corresponding file.     |
+   -------------------+--------------------------------------+
+   status             | a number between 0 and 6, where:     | tr_stat
+                      | 0: Torrent is stopped                |
+                      | 1: Queued to check files             |
+                      | 2: Checking files                    |
+                      | 3: Queued to download                |
+                      | 4: Downloading                       |
+                      | 5: Queued to seed                    |
+                      | 6: Seeding                           |
    -------------------+--------------------------------------+
    trackers           | array of objects, each containing:   |
                       +-------------------------+------------+
