@@ -1020,8 +1020,16 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
-        tor->startAfterVerify = doStart;
-        tr_torrentVerify(tor, NULL, NULL);
+        if (!tr_torrentHasMetadata(tor) && !doStart)
+        {
+            tor->prefetchMagnetMetadata = true;
+            tr_torrentStartNow(tor);
+        }
+        else
+        {
+            tor->startAfterVerify = doStart;
+            tr_torrentVerify(tor, NULL, NULL);
+        }
     }
     else if (doStart)
     {
@@ -2025,6 +2033,7 @@ void tr_torrentStop(tr_torrent* tor)
 
         tor->isRunning = false;
         tor->isStopping = false;
+        tor->prefetchMagnetMetadata = false;
         tr_torrentSetDirty(tor);
         tr_runInEventThread(tor->session, stopTorrent, tor);
 
