@@ -22,6 +22,7 @@ cfile_includes=(
   '*.m'
 )
 cfile_excludes=(
+  'build/*'
   'libtransmission/ConvertUTF.*'
   'libtransmission/jsonsl.*'
   'libtransmission/wildmat.*'
