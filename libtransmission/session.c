@@ -3150,30 +3150,11 @@ void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
 {
     ++session->torrentCount;
 
-#if 0
-    // update session->torrentList
-    if (session->torrentList == NULL)
-    {
-        session->torrentList = tor;
-    }
-    else
-    {
-        tr_torrent* it = session->torrentList;
-
-        while (it->next != NULL)
-        {
-            it = it->next;
-        }
-
-        it->next = tor;
-    }
-
-#else
+    /* add tor to tr_session.torrentList */
     tor->next = session->torrentList;
     session->torrentList = tor;
-#endif
 
-    // update torrentsSortedBy
+    /* add tor to tr_session.torrentsSortedByFoo */
     tr_ptrArrayInsertSorted(&session->torrentsSortedById, tor, compareTorrentsById);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
