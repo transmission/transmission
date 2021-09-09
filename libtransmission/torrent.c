@@ -75,7 +75,7 @@ int tr_torrentId(tr_torrent const* tor)
 
 static int compareKeyToTorrentId(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
+    tr_torrent const* const a = va;
     int const b = *(int const*)vb;
     return a->uniqueId - b;
 }
@@ -87,8 +87,8 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 
 static int compareKeyToTorrentHashString(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
-    char const* b = vb;
+    tr_torrent const* const a = va;
+    char const* const b = vb;
     return evutil_ascii_strcasecmp(a->info.hashString, b);
 }
 
@@ -99,8 +99,8 @@ tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
 
 static int compareKeyToTorrentHash(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
-    uint8_t const* b = vb;
+    tr_torrent const* const a = va;
+    uint8_t const* const b = vb;
     return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
 }
 

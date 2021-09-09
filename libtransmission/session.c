@@ -3127,22 +3127,22 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static int compareTorrentsById(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
-    tr_torrent const* b = vb;
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
     return a->uniqueId - b->uniqueId;
 }
 
 static int compareTorrentsByHashString(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
-    tr_torrent const* b = vb;
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
     return evutil_ascii_strcasecmp(a->info.hashString, b->info.hashString);
 }
 
 static int compareTorrentsByHash(void const* va, void const* vb)
 {
-    tr_torrent const* a = va;
-    tr_torrent const* b = vb;
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
     return memcmp(a->info.hash, b->info.hash, SHA_DIGEST_LENGTH);
 }
 
@@ -3188,5 +3188,4 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
     /* decrement the torrent count */
     TR_ASSERT(session->torrentCount >= 1);
     session->torrentCount--;
-
 }
