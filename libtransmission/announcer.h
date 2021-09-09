@@ -26,7 +26,8 @@ typedef enum
     TR_TRACKER_WARNING,
     TR_TRACKER_ERROR,
     TR_TRACKER_ERROR_CLEAR,
-    TR_TRACKER_PEERS
+    TR_TRACKER_PEERS,
+    TR_TRACKER_COUNTS,
 } TrackerEventType;
 
 struct tr_pex;
@@ -45,8 +46,9 @@ typedef struct
     struct tr_pex const* pex;
     size_t pexCount;
 
-    /* [0...100] for probability a peer is a seed. calculated by the leecher/seeder ratio */
-    int8_t seedProbability;
+    /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
+    int leechers;
+    int seeders;
 } tr_tracker_event;
 
 typedef void (*tr_tracker_callback)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);

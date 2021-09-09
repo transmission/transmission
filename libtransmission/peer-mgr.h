@@ -108,10 +108,9 @@ tr_pex* tr_peerMgrCompact6ToPex(
     size_t added_f_len,
     size_t* pexCount);
 
-/**
- * @param seedProbability [0..100] for likelihood that the peer is a seed; -1 for unknown
- */
-void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t seedProbability);
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
+
+void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
 
 enum
 {

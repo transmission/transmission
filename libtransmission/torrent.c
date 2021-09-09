@@ -559,26 +559,17 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
+        tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, event->pex, event->pexCount);
+        break;
+
+    case TR_TRACKER_COUNTS:
+        if (tr_torrentIsPrivate(tor) && (event->leechers == 0))
         {
-            int8_t const seedProbability = event->seedProbability;
-            bool const allAreSeeds = seedProbability == 100;
-
-            if (allAreSeeds)
-            {
-                tr_logAddTorDbg(tor, "Got %zu seeds from tracker", event->pexCount);
-            }
-            else
-            {
-                tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
-            }
-
-            for (size_t i = 0; i < event->pexCount; ++i)
-            {
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, &event->pex[i], seedProbability);
-            }
-
-            break;
+            tr_peerMgrSetSwarmIsAllSeeds(tor);
         }
+
+        break;
 
     case TR_TRACKER_WARNING:
         tr_logAddTorErr(tor, _("Tracker warning: \"%s\""), event->text);

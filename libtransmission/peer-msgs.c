@@ -951,7 +951,6 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     uint8_t const* addr;
     size_t addr_len;
     tr_pex pex;
-    int8_t seedProbability = -1;
 
     memset(&pex, 0, sizeof(tr_pex));
 
@@ -1023,7 +1022,7 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     /* look for upload_only (BEP 21) */
     if (tr_variantDictFindInt(&val, TR_KEY_upload_only, &i))
     {
-        seedProbability = i == 0 ? 0 : 100;
+        pex.flags |= ADDED_F_SEED_FLAG;
     }
 
     /* get peer's listening port */
@@ -1038,14 +1037,14 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     {
         pex.addr.type = TR_AF_INET;
         memcpy(&pex.addr.addr.addr4, addr, 4);
-        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, seedProbability);
+        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
     if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
     {
         pex.addr.type = TR_AF_INET6;
         memcpy(&pex.addr.addr.addr6, addr, 16);
-        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, seedProbability);
+        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
     /* get peer's maximum request queue size */
@@ -1166,20 +1165,8 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         }
 
         pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-
         n = MIN(n, MAX_PEX_PEER_COUNT);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            int seedProbability = -1;
-
-            if (i < added_f_len)
-            {
-                seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
-            }
-
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
-        }
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
 
         tr_free(pex);
     }
@@ -1198,20 +1185,8 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         }
 
         pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-
         n = MIN(n, MAX_PEX_PEER_COUNT);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            int seedProbability = -1;
-
-            if (i < added_f_len)
-            {
-                seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
-            }
-
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
-        }
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
 
         tr_free(pex);
     }
