@@ -3148,8 +3148,6 @@ static int compareTorrentsByHash(void const* va, void const* vb)
 
 void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
 {
-    ++session->torrentCount;
-
     /* add tor to tr_session.torrentList */
     tor->next = session->torrentList;
     session->torrentList = tor;
@@ -3158,10 +3156,14 @@ void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
     tr_ptrArrayInsertSorted(&session->torrentsSortedById, tor, compareTorrentsById);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
+
+    /* increment the torrent count */
+    ++session->torrentCount;
 }
 
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 {
+    /* remove tor from tr_session.torrentList */
     if (tor == session->torrentList)
     {
         session->torrentList = tor->next;
@@ -3178,7 +3180,13 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
         }
     }
 
+    /* remove tor from tr_session.torrentsSortedByFoo */
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedById, tor, compareTorrentsById);
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
+
+    /* decrement the torrent count */
+    TR_ASSERT(session->torrentCount >= 1);
+    session->torrentCount--;
+
 }

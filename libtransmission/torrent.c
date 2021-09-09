@@ -1665,10 +1665,6 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_sessionRemoveTorrent(session, tor);
 
-    /* decrement the torrent count */
-    TR_ASSERT(session->torrentCount >= 1);
-    session->torrentCount--;
-
     /* resequence the queue positions */
     tr_torrent* t = NULL;
 
