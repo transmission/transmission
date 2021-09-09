@@ -4311,9 +4311,10 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
             continue;
         }
 
-        /* if we are all seeds */
+        /* if everyone in the swarm is seeds and pex is disabled because
+         * the torrent is private, then don't initiate connections */
         bool const seeding = tr_torrentIsSeed(tor);
-        if (seeding && swarmIsAllSeeds(tor->swarm))
+        if (seeding && swarmIsAllSeeds(tor->swarm) && tr_torrentIsPrivate(tor))
         {
             continue;
         }
