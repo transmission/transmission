@@ -176,9 +176,6 @@ typedef struct tr_announcer
     struct event* upkeepTimer;
     int key;
     time_t tauUpkeepAt;
-
-    size_t total_scrapes;
-    size_t total_announces;
 } tr_announcer;
 
 static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
@@ -1614,7 +1611,6 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
             found = true;
-            ++announcer->total_scrapes;
         }
 
         /* otherwise, if there's room for another request, build a new one */
@@ -1627,7 +1623,6 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
             memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
-            ++announcer->total_scrapes;
         }
     }
 
@@ -1744,14 +1739,6 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
         }
     }
 
-    fprintf(
-        stderr,
-        "announcer: %d need announce, %d need scrape, %zu total scrapes, %zu total announces\n",
-        tr_ptrArraySize(&announceMe),
-        tr_ptrArraySize(&scrapeMe),
-        announcer->total_scrapes,
-        announcer->total_announces);
-
     /* First, scrape what we can. We handle scrapes first because
      * we can work through that queue much faster than announces
      * (thanks to multiscrape) _and_ the scrape responses will tell
@@ -1768,8 +1755,6 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
         dbgmsg(tier, "announcing tier %d of %d", i, n);
         tierAnnounce(announcer, tier);
     }
-
-    announcer->total_announces += n;
 
     /* cleanup */
     tr_ptrArrayDestruct(&scrapeMe, NULL);
