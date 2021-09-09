@@ -504,14 +504,13 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 ****  PUBLISH
 ***/
 
-static tr_tracker_event const TRACKER_EVENT_INIT = {
-    .messageType = TR_TRACKER_WARNING,
-    .text = NULL,
-    .tracker = NULL,
-    .pex = NULL,
-    .pexCount = 0,
-    .seedProbability = 0,
-};
+static tr_tracker_event const TRACKER_EVENT_INIT = { .messageType = TR_TRACKER_WARNING,
+                                                     .text = NULL,
+                                                     .tracker = NULL,
+                                                     .pex = NULL,
+                                                     .pexCount = 0,
+                                                     .seeders = 0,
+                                                     .leechers = 0 };
 
 static void publishMessage(tr_tier* tier, char const* msg, int type)
 {
@@ -546,34 +545,31 @@ static void publishError(tr_tier* tier, char const* msg)
     publishMessage(tier, msg, TR_TRACKER_ERROR);
 }
 
-static int8_t getSeedProbability(tr_tier const* tier, int seeds, int leechers, int pex_count)
+static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
 {
-    /* special case optimization:
-       ocelot omits seeds from peer lists sent to seeds on private trackers.
-       so check for that case... */
-    if (leechers == pex_count && tr_torrentIsPrivate(tier->tor) && tr_torrentIsSeed(tier->tor) && seeds + leechers < NUMWANT)
+    if (tier->tor->tiers->callback != NULL)
     {
-        return 0;
-    }
+        tr_tracker_event e = TRACKER_EVENT_INIT;
+        e.messageType = TR_TRACKER_COUNTS;
+        e.seeders = seeders;
+        e.leechers = leechers;
+        dbgmsg(tier, "peer counts: %d seeders, %d leechers.", seeders, leechers);
 
-    if (seeds >= 0 && leechers >= 0 && seeds + leechers > 0)
-    {
-        return (int8_t)(100.0 * seeds / (seeds + leechers));
+        (*tier->tor->tiers->callback)(tier->tor, &e, NULL);
     }
-
-    return -1; /* unknown */
 }
 
-static void publishPeersPex(tr_tier* tier, int seeds, int leechers, tr_pex const* pex, int n)
+static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex const* pex, int n)
 {
     if (tier->tor->tiers->callback != NULL)
     {
         tr_tracker_event e = TRACKER_EVENT_INIT;
         e.messageType = TR_TRACKER_PEERS;
-        e.seedProbability = getSeedProbability(tier, seeds, leechers, n);
+        e.seeders = seeders;
+        e.leechers = leechers;
         e.pex = pex;
         e.pexCount = n;
-        dbgmsg(tier, "got %d peers; seed prob %d", n, (int)e.seedProbability);
+        dbgmsg(tier, "tracker knows of %d seeders and %d leechers and gave a list of %d peers.", seeders, leechers, n);
 
         (*tier->tor->tiers->callback)(tier->tor, &e, NULL);
     }
@@ -1225,6 +1221,8 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 publishPeersPex(tier, seeders, leechers, response->pex6, response->pex6_count);
             }
 
+            publishPeerCounts(tier, seeders, leechers);
+
             tier->isRunning = data->isRunningOnSuccess;
 
             /* if the tracker included scrape fields in its announce response,
@@ -1495,6 +1493,11 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
                         tracker->downloaderCount = row->downloaders;
                         tracker->consecutiveFailures = 0;
+                    }
+
+                    if (row->seeders >= 0 && row->leechers >= 0 && row->downloads >= 0)
+                    {
+                        publishPeerCounts(tier, row->seeders, row->leechers);
                     }
                 }
             }

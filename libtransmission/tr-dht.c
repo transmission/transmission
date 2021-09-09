@@ -674,10 +674,7 @@ static void callback(void* ignore, int event, unsigned char const* info_hash, vo
                 pex = tr_peerMgrCompact6ToPex(data, data_len, NULL, 0, &n);
             }
 
-            for (size_t i = 0; i < n; ++i)
-            {
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex + i, -1);
-            }
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n);
 
             tr_free(pex);
             tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");

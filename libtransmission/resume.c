@@ -64,24 +64,14 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
     tr_free(pex);
 }
 
-static int addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
+static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
-    int numAdded = 0;
-    size_t const count = buflen / sizeof(tr_pex);
+    size_t const n_in = buflen / sizeof(tr_pex);
+    size_t const n_pex = MIN(n_in, MAX_REMEMBERED_PEERS);
 
-    for (size_t i = 0; i < count && numAdded < MAX_REMEMBERED_PEERS; ++i)
-    {
-        tr_pex pex;
-        memcpy(&pex, buf + i * sizeof(tr_pex), sizeof(tr_pex));
-
-        if (tr_isPex(&pex))
-        {
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, &pex, -1);
-            ++numAdded;
-        }
-    }
-
-    return numAdded;
+    tr_pex pex[MAX_REMEMBERED_PEERS];
+    memcpy(pex, buf, sizeof(tr_pex) * n_pex);
+    return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, pex, n_pex);
 }
 
 static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
@@ -92,15 +82,15 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
-        int const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %d IPv4 peers from resume file", numAdded);
+        size_t const numAdded = addPeers(tor, str, len);
+        tr_logAddTorDbg(tor, "Loaded %zu IPv4 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
-        int const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %d IPv6 peers from resume file", numAdded);
+        size_t const numAdded = addPeers(tor, str, len);
+        tr_logAddTorDbg(tor, "Loaded %zu IPv6 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
