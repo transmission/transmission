@@ -43,6 +43,7 @@
 #include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
+#include "ptrarray.h"
 #include "rpc-server.h"
 #include "session.h"
 #include "session-id.h"
@@ -635,6 +636,9 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
+    session->torrentsSortedByHash = TR_PTR_ARRAY_INIT;
+    session->torrentsSortedByHashString = TR_PTR_ARRAY_INIT;
+    session->torrentsSortedById = TR_PTR_ARRAY_INIT;
     tr_bandwidthConstruct(&session->bandwidth, session, NULL);
     tr_variantInitList(&session->removedTorrents, 0);
 
@@ -2137,6 +2141,9 @@ void tr_sessionClose(tr_session* session)
     }
 
     tr_device_info_free(session->downloadDir);
+    tr_ptrArrayDestruct(&session->torrentsSortedByHash, NULL);
+    tr_ptrArrayDestruct(&session->torrentsSortedByHashString, NULL);
+    tr_ptrArrayDestruct(&session->torrentsSortedById, NULL);
     tr_free(session->torrentDoneScript);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
@@ -3116,4 +3123,69 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     }
 
     return max - active_count;
+}
+
+static int compareTorrentsById(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
+    return a->uniqueId - b->uniqueId;
+}
+
+static int compareTorrentsByHashString(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
+    return evutil_ascii_strcasecmp(a->info.hashString, b->info.hashString);
+}
+
+static int compareTorrentsByHash(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    tr_torrent const* const b = vb;
+    return memcmp(a->info.hash, b->info.hash, SHA_DIGEST_LENGTH);
+}
+
+void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
+{
+    /* add tor to tr_session.torrentList */
+    tor->next = session->torrentList;
+    session->torrentList = tor;
+
+    /* add tor to tr_session.torrentsSortedByFoo */
+    tr_ptrArrayInsertSorted(&session->torrentsSortedById, tor, compareTorrentsById);
+    tr_ptrArrayInsertSorted(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
+    tr_ptrArrayInsertSorted(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
+
+    /* increment the torrent count */
+    ++session->torrentCount;
+}
+
+void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
+{
+    /* remove tor from tr_session.torrentList */
+    if (tor == session->torrentList)
+    {
+        session->torrentList = tor->next;
+    }
+    else
+    {
+        for (tr_torrent* t = session->torrentList; t != NULL; t = t->next)
+        {
+            if (t->next == tor)
+            {
+                t->next = tor->next;
+                break;
+            }
+        }
+    }
+
+    /* remove tor from tr_session.torrentsSortedByFoo */
+    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedById, tor, compareTorrentsById);
+    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
+    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
+
+    /* decrement the torrent count */
+    TR_ASSERT(session->torrentCount >= 1);
+    session->torrentCount--;
 }
