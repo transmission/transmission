@@ -421,11 +421,10 @@ static struct tr_key_struct const my_static[] = {
 
 static int compareKeys(void const* va, void const* vb)
 {
-    int ret;
-    struct tr_key_struct const* a = va;
-    struct tr_key_struct const* b = vb;
+    auto const* a = static_cast<struct tr_key_struct const*>(va);
+    auto const* b = static_cast<struct tr_key_struct const*>(vb);
 
-    ret = memcmp(a->str, b->str, MIN(a->len, b->len));
+    int ret = memcmp(a->str, b->str, MIN(a->len, b->len));
 
     if (ret == 0 && a->len != b->len)
     {
@@ -443,11 +442,12 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     TR_ASSERT(n_static == TR_N_KEYS);
 
     struct tr_key_struct tmp;
-    tmp.str = str;
+    tmp.str = static_cast<char const*>(str);
     tmp.len = len;
 
     /* is it in our static array? */
-    struct tr_key_struct const* const match = bsearch(&tmp, my_static, n_static, sizeof(struct tr_key_struct), compareKeys);
+    auto const* match = static_cast<struct tr_key_struct const*>(
+        bsearch(&tmp, my_static, n_static, sizeof(struct tr_key_struct), compareKeys));
 
     bool success = false;
     if (match != NULL)
@@ -496,7 +496,7 @@ tr_quark tr_quark_new(void const* str, size_t len)
     {
         if (len == TR_BAD_SIZE)
         {
-            len = strlen(str);
+            len = strlen(static_cast<char const*>(str));
         }
 
         if (!tr_quark_lookup(str, len, &ret))
@@ -518,7 +518,7 @@ char const* tr_quark_get_string(tr_quark q, size_t* len)
     }
     else
     {
-        tmp = tr_ptrArrayNth(&my_runtime, q - TR_N_KEYS);
+        tmp = static_cast<struct tr_key_struct const*>(tr_ptrArrayNth(&my_runtime, q - TR_N_KEYS));
     }
 
     if (len != NULL)
