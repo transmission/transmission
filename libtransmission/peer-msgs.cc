@@ -1235,7 +1235,7 @@ static void parseLtep(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf
     }
 }
 
-static int readBtLength(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtLength(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint32_t len;
 
@@ -1259,9 +1259,9 @@ static int readBtLength(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
     return READ_NOW;
 }
 
-static int readBtMessage(tr_peerMsgs*, struct evbuffer*, size_t);
+static ReadState readBtMessage(tr_peerMsgs*, struct evbuffer*, size_t);
 
-static int readBtId(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtId(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint8_t id;
 
@@ -1410,7 +1410,7 @@ static bool messageLengthIsCorrect(tr_peerMsgs const* msg, uint8_t id, uint32_t 
 
 static int clientGotBlock(tr_peerMsgs* msgs, struct evbuffer* block, struct peer_request const* req);
 
-static int readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
+static ReadState readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
 {
     TR_ASSERT(evbuffer_get_length(inbuf) >= inlen);
 
@@ -1480,7 +1480,7 @@ static int readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen, 
 
 static void updateDesiredRequestCount(tr_peerMsgs* msgs);
 
-static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint8_t const id = msgs->incoming.id;
 #ifdef TR_ENABLE_ASSERTS
@@ -1788,7 +1788,7 @@ static void peerPulse(void* vmsgs);
 
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
 {
-    tr_peerMsgs* msgs = vmsgs;
+    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
 
     if (wasPieceData)
     {
@@ -1804,7 +1804,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     ReadState ret;
-    tr_peerMsgs* msgs = vmsgs;
+    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
     struct evbuffer* in = tr_peerIoGetReadBuffer(io);
     size_t const inlen = evbuffer_get_length(in);
 
@@ -1999,11 +1999,10 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
     if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
     {
-        char* data;
         size_t dataLen;
         bool ok = false;
 
-        data = tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen);
+        auto* data = static_cast<char*>(tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen));
 
         if (data != NULL)
         {
@@ -2089,7 +2088,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
                       req.index,
                       req.offset,
                       req.length,
-                      iovec[0].iov_base) != 0;
+                      static_cast<uint8_t*>(iovec[0].iov_base)) != 0;
             iovec[0].iov_len = req.length;
             evbuffer_commit_space(out, iovec, 1);
 
@@ -2160,7 +2159,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
 static void peerPulse(void* vmsgs)
 {
-    tr_peerMsgs* msgs = vmsgs;
+    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
     time_t const now = tr_time();
 
     if (tr_isPeerIo(msgs->io))
@@ -2189,19 +2188,21 @@ void tr_peerMsgsPulse(tr_peerMsgs* msgs)
 
 static void gotError(tr_peerIo* io, short what, void* vmsgs)
 {
+    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+
     TR_UNUSED(io);
 
     if ((what & BEV_EVENT_TIMEOUT) != 0)
     {
-        dbgmsg(vmsgs, "libevent got a timeout, what=%hd", what);
+        dbgmsg(msgs, "libevent got a timeout, what=%hd", what);
     }
 
     if ((what & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) != 0)
     {
-        dbgmsg(vmsgs, "libevent got an error! what=%hd, errno=%d (%s)", what, errno, tr_strerror(errno));
+        dbgmsg(msgs, "libevent got an error! what=%hd, errno=%d (%s)", what, errno, tr_strerror(errno));
     }
 
-    fireError(vmsgs, ENOTCONN);
+    fireError(msgs, ENOTCONN);
 }
 
 static void sendBitfield(tr_peerMsgs* msgs)
@@ -2262,8 +2263,8 @@ typedef struct
 
 static void pexAddedCb(void const* vpex, void* userData)
 {
-    PexDiffs* diffs = userData;
-    tr_pex const* pex = vpex;
+    auto* diffs = static_cast<PexDiffs*>(userData);
+    auto const* pex = static_cast<tr_pex const*>(vpex);
 
     if (diffs->addedCount < MAX_PEX_ADDED)
     {
@@ -2274,8 +2275,8 @@ static void pexAddedCb(void const* vpex, void* userData)
 
 static inline void pexDroppedCb(void const* vpex, void* userData)
 {
-    PexDiffs* diffs = userData;
-    tr_pex const* pex = vpex;
+    auto* diffs = static_cast<PexDiffs*>(userData);
+    auto const* pex = static_cast<tr_pex const*>(vpex);
 
     if (diffs->droppedCount < MAX_PEX_DROPPED)
     {
@@ -2285,8 +2286,8 @@ static inline void pexDroppedCb(void const* vpex, void* userData)
 
 static inline void pexElementCb(void const* vpex, void* userData)
 {
-    PexDiffs* diffs = userData;
-    tr_pex const* pex = vpex;
+    auto* diffs = static_cast<PexDiffs*>(userData);
+    auto const* pex = static_cast<tr_pex const*>(vpex);
 
     diffs->elements[diffs->elementCount++] = *pex;
 }
@@ -2318,8 +2319,8 @@ static void tr_set_compare(
     tr_set_func in_both_cb,
     void* userData)
 {
-    uint8_t const* a = va;
-    uint8_t const* b = vb;
+    auto* a = static_cast<uint8_t const*>(va);
+    auto* b = static_cast<uint8_t const*>(vb);
     uint8_t const* aend = a + elementSize * aCount;
     uint8_t const* bend = b + elementSize * bCount;
 
@@ -2568,7 +2569,7 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    struct tr_peerMsgs* msgs = vmsgs;
+    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
 
     sendPex(msgs);
 
@@ -2713,7 +2714,8 @@ bool tr_isPeerMsgs(void const* msgs)
 
 tr_peerMsgs* tr_peerMsgsCast(void* vm)
 {
-    return tr_isPeerMsgs(vm) ? vm : NULL;
+    auto* m = static_cast<tr_peerMsgs*>(vm);
+    return tr_isPeerMsgs(m) ? m : NULL;
 }
 
 tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr_peer_callback callback, void* callbackData)
