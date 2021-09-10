@@ -3119,7 +3119,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         /* is it stalled? */
         if (stalled_enabled)
         {
-            >const< int idle_secs = (int)difftime(now, MAX(tor->startDate, tor->activityDate));
+            int const idle_secs = (int)difftime(now, MAX(tor->startDate, tor->activityDate));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
                 continue;
         }

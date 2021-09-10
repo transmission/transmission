@@ -1242,15 +1242,14 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
 
 static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
-    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0)
-        ? (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate))
-        : -1;
+    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
+        (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) :
+        -1;
 }
 
 static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
 {
-    return tr_sessionGetQueueStalledEnabled(tor->session) &&
-        idle_secs > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
+    return tr_sessionGetQueueStalledEnabled(tor->session) && idle_secs > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
 }
 
 static double getVerifyProgress(tr_torrent const* tor)
