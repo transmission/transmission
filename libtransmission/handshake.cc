@@ -567,7 +567,7 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
 
     tr_peerIoDrain(handshake->io, inbuf, needlen);
 
-    tr_peerIoSetEncryption(handshake->io, handshake->crypto_select);
+    tr_peerIoSetEncryption(handshake->io, static_cast<tr_encryption_type>(handshake->crypto_select));
 
     setState(handshake, AWAITING_HANDSHAKE);
     return READ_NOW;
@@ -999,12 +999,13 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 ****
 ***/
 
-static ReadState canRead(struct tr_peerIo* io, void* arg, size_t* piece)
+static ReadState canRead(struct tr_peerIo* io, void* vhandshake, size_t* piece)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
     ReadState ret;
-    tr_handshake* handshake = arg;
+    auto* handshake = static_cast<tr_handshake*>(vhandshake);
+
     struct evbuffer* inbuf = tr_peerIoGetReadBuffer(io);
     bool readyForMore = true;
 
@@ -1141,7 +1142,7 @@ void tr_handshakeAbort(tr_handshake* handshake)
 static void gotError(tr_peerIo* io, short what, void* vhandshake)
 {
     int errcode = errno;
-    tr_handshake* handshake = vhandshake;
+    auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
     if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming && handshake->state == AWAITING_YB)
     {
@@ -1204,7 +1205,7 @@ static void handshakeTimeout(evutil_socket_t s, short type, void* handshake)
     TR_UNUSED(s);
     TR_UNUSED(type);
 
-    tr_handshakeAbort(handshake);
+    tr_handshakeAbort(static_cast<tr_handshake*>(handshake));
 }
 
 tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB, void* doneUserData)
