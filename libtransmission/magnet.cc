@@ -206,9 +206,9 @@ tr_magnet_info* tr_magnetParse(char const* uri)
         info = tr_new0(tr_magnet_info, 1);
         info->displayName = displayName;
         info->trackerCount = trCount;
-        info->trackers = tr_memdup(tr, sizeof(char*) * trCount);
+        info->trackers = static_cast<char**>(tr_memdup(tr, sizeof(char*) * trCount));
         info->webseedCount = wsCount;
-        info->webseeds = tr_memdup(ws, sizeof(char*) * wsCount);
+        info->webseeds = static_cast<char**>(tr_memdup(ws, sizeof(char*) * wsCount));
         memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
     }
     else
