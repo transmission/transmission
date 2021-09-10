@@ -1240,27 +1240,16 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     return ret;
 }
 
-static int torrentGetIdleSecs(tr_torrent const* tor)
+static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
-    int idle_secs;
-    tr_torrent_activity const activity = tr_torrentGetActivity(tor);
-
-    if ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0)
-    {
-        idle_secs = (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate));
-    }
-    else
-    {
-        idle_secs = -1;
-    }
-
-    return idle_secs;
+    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
+        (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) :
+        -1;
 }
 
-bool tr_torrentIsStalled(tr_torrent const* tor)
+static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
 {
-    return tr_sessionGetQueueStalledEnabled(tor->session) &&
-        torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
+    return tr_sessionGetQueueStalledEnabled(tor->session) && idle_secs > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
 }
 
 static double getVerifyProgress(tr_torrent const* tor)
@@ -1316,7 +1305,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->isStalled = tr_torrentIsStalled(tor);
+    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
+    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
     tr_strlcpy(s->errorString, tor->errorString, sizeof(s->errorString));
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
@@ -1351,7 +1341,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->startDate = tor->startDate;
     s->secondsSeeding = tor->secondsSeeding;
     s->secondsDownloading = tor->secondsDownloading;
-    s->idleSecs = torrentGetIdleSecs(tor);
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
