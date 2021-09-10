@@ -85,8 +85,8 @@ static void bytesUsed(uint64_t const now, struct bratecontrol* r, size_t size)
 
 static int compareBandwidth(void const* va, void const* vb)
 {
-    tr_bandwidth const* a = va;
-    tr_bandwidth const* b = vb;
+    auto const* a = static_cast<tr_bandwidth const*>(va);
+    auto const* b = static_cast<tr_bandwidth const*>(vb);
     return a->uniqueKey - b->uniqueKey;
 }
 
