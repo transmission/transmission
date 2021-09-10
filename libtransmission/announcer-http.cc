@@ -183,7 +183,7 @@ struct announce_data
 
 static void on_announce_done_eventthread(void* vdata)
 {
-    struct announce_data* data = vdata;
+    auto* data = static_cast<struct announce_data*>(vdata);
 
     if (data->response_func != NULL)
     {
@@ -208,7 +208,7 @@ static void on_announce_done(
     void* vdata)
 {
     tr_announce_response* response;
-    struct announce_data* data = vdata;
+    auto* data = static_cast<struct announce_data*>(vdata);
 
     response = &data->response;
     response->did_connect = did_connect;
@@ -363,7 +363,7 @@ struct scrape_data
 
 static void on_scrape_done_eventthread(void* vdata)
 {
-    struct scrape_data* data = vdata;
+    auto* data = static_cast<struct scrape_data*>(vdata);
 
     if (data->response_func != NULL)
     {
@@ -384,10 +384,9 @@ static void on_scrape_done(
     size_t msglen,
     void* vdata)
 {
-    tr_scrape_response* response;
-    struct scrape_data* data = vdata;
+    auto* data = static_cast<struct scrape_data*>(vdata);
 
-    response = &data->response;
+    tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
     dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url);
