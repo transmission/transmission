@@ -8,6 +8,8 @@
 
 #include <string.h> /* memcpy(), memmove(), memset() */
 
+#include <arc4.h>
+
 #include "transmission.h"
 #include "crypto.h"
 #include "crypto-utils.h"
@@ -63,8 +65,8 @@ void tr_cryptoDestruct(tr_crypto* crypto)
 {
     tr_dh_secret_free(crypto->mySecret);
     tr_dh_free(crypto->dh);
-    tr_rc4_free(crypto->enc_key);
-    tr_rc4_free(crypto->dec_key);
+    tr_free(crypto->enc_key);
+    tr_free(crypto->dec_key);
 }
 
 /**
@@ -89,71 +91,57 @@ uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 ***
 **/
 
-static void initRC4(tr_crypto const* crypto, tr_rc4_ctx_t* setme, char const* key)
+static void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, char const* key)
 {
     TR_ASSERT(crypto->torrentHashIsSet);
 
     if (*setme == NULL)
     {
-        *setme = tr_rc4_new();
+        *setme = tr_new0(struct arc4_context, 1);
     }
 
     uint8_t buf[SHA_DIGEST_LENGTH];
 
     if (tr_cryptoSecretKeySha1(crypto, key, 4, crypto->torrentHash, SHA_DIGEST_LENGTH, buf))
     {
-        tr_rc4_set_key(*setme, buf, SHA_DIGEST_LENGTH);
+        arc4_init(*setme, buf, SHA_DIGEST_LENGTH);
+        arc4_discard(*setme, 1024);
     }
+}
+
+static void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_in, void* buf_out)
+{
+    if (key == NULL)
+    {
+        if (buf_in != buf_out)
+        {
+            memmove(buf_out, buf_in, buf_len);
+        }
+
+        return;
+    }
+
+    arc4_process(key, buf_in, buf_out, buf_len);
 }
 
 void tr_cryptoDecryptInit(tr_crypto* crypto)
 {
-    uint8_t discard[1024];
-    char const* txt = crypto->isIncoming ? "keyA" : "keyB";
-
-    initRC4(crypto, &crypto->dec_key, txt);
-    tr_rc4_process(crypto->dec_key, discard, discard, sizeof(discard));
+    init_rc4(crypto, &crypto->dec_key, crypto->isIncoming ? "keyA" : "keyB");
 }
 
 void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    /* FIXME: someone calls this function with uninitialized key */
-    if (crypto->dec_key == NULL)
-    {
-        if (buf_in != buf_out)
-        {
-            memmove(buf_out, buf_in, buf_len);
-        }
-
-        return;
-    }
-
-    tr_rc4_process(crypto->dec_key, buf_in, buf_out, buf_len);
+    crypt_rc4(crypto->dec_key, buf_len, buf_in, buf_out);
 }
 
 void tr_cryptoEncryptInit(tr_crypto* crypto)
 {
-    uint8_t discard[1024];
-    char const* txt = crypto->isIncoming ? "keyB" : "keyA";
-
-    initRC4(crypto, &crypto->enc_key, txt);
-    tr_rc4_process(crypto->enc_key, discard, discard, sizeof(discard));
+    init_rc4(crypto, &crypto->enc_key, crypto->isIncoming ? "keyB" : "keyA");
 }
 
 void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    /* FIXME: someone calls this function with uninitialized key */
-    if (crypto->enc_key == NULL)
-    {
-        if (buf_in != buf_out)
-        {
-            memmove(buf_out, buf_in, buf_len);
-        }
-
-        return;
-    }
-
-    tr_rc4_process(crypto->enc_key, buf_in, buf_out, buf_len);
+    crypt_rc4(crypto->enc_key, buf_len, buf_in, buf_out);
 }
 
 bool tr_cryptoSecretKeySha1(
