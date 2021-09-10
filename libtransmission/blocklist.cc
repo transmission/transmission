@@ -85,7 +85,7 @@ static void blocklistLoad(tr_blocklistFile* b)
         return;
     }
 
-    b->rules = tr_sys_file_map_for_reading(fd, 0, byteCount, &error);
+    b->rules = static_cast<struct tr_ipv4_range*>(tr_sys_file_map_for_reading(fd, 0, byteCount, &error));
 
     if (b->rules == NULL)
     {
@@ -114,8 +114,8 @@ static void blocklistEnsureLoaded(tr_blocklistFile* b)
 
 static int compareAddressToRange(void const* va, void const* vb)
 {
-    uint32_t const* a = va;
-    struct tr_ipv4_range const* b = vb;
+    auto const* a = static_cast<uint32_t const*>(va);
+    auto const* b = static_cast<struct tr_ipv4_range const*>(vb);
 
     if (*a < b->begin)
     {
@@ -193,7 +193,6 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
     TR_ASSERT(tr_address_is_valid(addr));
 
     uint32_t needle;
-    struct tr_ipv4_range const* range;
 
     if (!b->isEnabled || addr->type == TR_AF_INET6)
     {
@@ -209,7 +208,8 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 
     needle = ntohl(addr->addr.addr4.s_addr);
 
-    range = bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange);
+    auto const* range = static_cast<struct tr_ipv4_range const*>(
+        bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange));
 
     return range != NULL;
 }
@@ -347,8 +347,8 @@ static bool parseLine(char const* line, struct tr_ipv4_range* range)
 
 static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
 {
-    struct tr_ipv4_range const* a = va;
-    struct tr_ipv4_range const* b = vb;
+    auto const* a = static_cast<struct tr_ipv4_range const*>(va);
+    auto const* b = static_cast<struct tr_ipv4_range const*>(vb);
 
     if (a->begin != b->begin)
     {
