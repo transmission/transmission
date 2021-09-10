@@ -112,8 +112,8 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 /* higher rank comes before lower rank */
 static int compareRuns(void const* va, void const* vb)
 {
-    struct run_info const* a = va;
-    struct run_info const* b = vb;
+    auto* a = static_cast<struct run_info const*>(va);
+    auto* b = static_cast<struct run_info const*>(vb);
     return b->rank - a->rank;
 }
 
@@ -285,8 +285,8 @@ void tr_cacheFree(tr_cache* cache)
 
 static int cache_block_compare(void const* va, void const* vb)
 {
-    struct cache_block const* a = va;
-    struct cache_block const* b = vb;
+    auto const* a = static_cast<struct cache_block const*>(va);
+    auto const* b = static_cast<struct cache_block const*>(vb);
 
     /* primary key: torrent id */
     if (a->tor->uniqueId != b->tor->uniqueId)
@@ -309,7 +309,7 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
     struct cache_block key;
     key.tor = torrent;
     key.block = _tr_block(torrent, piece, offset);
-    return tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare);
+    return static_cast<struct cache_block*>(tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare));
 }
 
 int tr_cacheWriteBlock(
@@ -437,7 +437,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
     /* flush out all the blocks in that file */
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
-        struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
+        auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
 
         if (b->tor != torrent)
         {
@@ -463,7 +463,7 @@ int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
     /* flush out all the blocks in that torrent */
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
-        struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
+        auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
 
         if (b->tor != torrent)
         {
