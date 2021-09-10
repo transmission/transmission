@@ -192,8 +192,8 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
-    uint8_t const* id = id_in;
-    char const* chid = (char const*)id;
+    auto const* id = static_cast<uint8_t const*>(id_in);
+    auto const* chid = static_cast<char const*>(id_in);
 
     *buf = '\0';
 
