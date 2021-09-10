@@ -75,38 +75,40 @@ int tr_torrentId(tr_torrent const* tor)
 
 static int compareKeyToTorrentId(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    int const b = *(int const*)vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const b = *static_cast<int const*>(vb);
     return a->uniqueId - b;
 }
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
-    return tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId);
+    return static_cast<tr_torrent*>(tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId));
 }
 
 static int compareKeyToTorrentHashString(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    char const* const b = vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const* const b = static_cast<char const*>(vb);
     return evutil_ascii_strcasecmp(a->info.hashString, b);
 }
 
 tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
 {
-    return tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString);
+    return static_cast<tr_torrent*>(
+        tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString));
 }
 
 static int compareKeyToTorrentHash(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    uint8_t const* const b = vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const* const b = static_cast<uint8_t const*>(vb);
     return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
 }
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHash)
 {
-    return tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash);
+    return static_cast<tr_torrent*>(
+        tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash));
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
@@ -1164,7 +1166,7 @@ void tr_torrentChangeMyPort(tr_torrent* tor)
 
 static inline void tr_torrentManualUpdateImpl(void* vtor)
 {
-    tr_torrent* tor = vtor;
+    auto* tor = static_cast<tr_torrent*>(vtor);
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1677,7 +1679,7 @@ static void torrentSetQueued(tr_torrent* tor, bool queued);
 
 static void torrentStartImpl(void* vtor)
 {
-    tr_torrent* tor = vtor;
+    auto* tor = static_cast<tr_torrent*>(vtor);
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1822,7 +1824,7 @@ struct verify_data
 
 static void onVerifyDoneThreadFunc(void* vdata)
 {
-    struct verify_data* data = vdata;
+    auto* data = static_cast<struct verify_data*>(vdata);
     tr_torrent* tor = data->tor;
 
     if (!tor->isDeleting)
@@ -1849,7 +1851,7 @@ static void onVerifyDoneThreadFunc(void* vdata)
 
 static void onVerifyDone(tr_torrent* tor, bool aborted, void* vdata)
 {
-    struct verify_data* data = vdata;
+    auto* data = static_cast<struct verify_data*>(vdata);
 
     TR_ASSERT(data->tor == tor);
 
@@ -1865,8 +1867,8 @@ static void onVerifyDone(tr_torrent* tor, bool aborted, void* vdata)
 
 static void verifyTorrent(void* vdata)
 {
+    auto* data = static_cast<struct verify_data*>(vdata);
     bool startAfter;
-    struct verify_data* data = vdata;
     tr_torrent* tor = data->tor;
     tr_sessionLock(tor->session);
 
@@ -1903,9 +1905,7 @@ unlock:
 
 void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
-    struct verify_data* data;
-
-    data = tr_new(struct verify_data, 1);
+    struct verify_data* const data = tr_new(struct verify_data, 1);
     data->tor = tor;
     data->aborted = false;
     data->callback_func = callback_func;
@@ -1926,7 +1926,7 @@ void tr_torrentSave(tr_torrent* tor)
 
 static void stopTorrent(void* vtor)
 {
-    tr_torrent* tor = vtor;
+    auto* tor = static_cast<tr_torrent*>(vtor);
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1979,7 +1979,7 @@ void tr_torrentStop(tr_torrent* tor)
 
 static void closeTorrent(void* vtor)
 {
-    tr_torrent* tor = vtor;
+    auto* tor = static_cast<tr_torrent*>(vtor);
 
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2030,7 +2030,7 @@ static void tr_torrentDeleteLocalData(tr_torrent*, tr_fileFunc);
 
 static void removeTorrent(void* vdata)
 {
-    struct remove_data* data = vdata;
+    auto* data = static_cast<struct remove_data*>(vdata);
     tr_session* session = data->tor->session;
     tr_sessionLock(session);
 
@@ -2713,8 +2713,8 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 
 static int compareTrackerByTier(void const* va, void const* vb)
 {
-    tr_tracker_info const* a = va;
-    tr_tracker_info const* b = vb;
+    auto const* const a = static_cast<tr_tracker_info const*>(va);
+    auto const* const b = static_cast<tr_tracker_info const*>(vb);
 
     /* sort by tier */
     if (a->tier != b->tier)
@@ -2734,10 +2734,9 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 
     tr_variant metainfo;
     bool ok = true;
-    tr_tracker_info* trackers;
 
     /* ensure the trackers' tiers are in ascending order */
-    trackers = tr_memdup(trackers_in, sizeof(tr_tracker_info) * trackerCount);
+    auto* trackers = static_cast<tr_tracker_info*>(tr_memdup(trackers_in, sizeof(tr_tracker_info) * trackerCount));
     qsort(trackers, trackerCount, sizeof(tr_tracker_info), compareTrackerByTier);
 
     /* look for bad URLs */
@@ -3139,7 +3138,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 
     for (int i = 0, n = tr_ptrArraySize(&folders); i < n; ++i)
     {
-        removeEmptyFoldersAndJunkFiles(tr_ptrArrayNth(&folders, i));
+        removeEmptyFoldersAndJunkFiles(static_cast<char const*>(tr_ptrArrayNth(&folders, i)));
     }
 
     /* cleanup */
@@ -3180,7 +3179,7 @@ struct LocationData
 
 static void setLocation(void* vdata)
 {
-    struct LocationData* data = vdata;
+    auto* data = static_cast<struct LocationData*>(vdata);
     tr_torrent* tor = data->tor;
 
     TR_ASSERT(tr_isTorrent(tor));
@@ -3492,7 +3491,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     tr_file const* file;
     char const* b = NULL;
     char const* s = NULL;
-    tr_sys_path_info file_info = { 0 };
+    auto file_info = tr_sys_path_info{};
 
     file = &tor->info.files[fileNum];
 
@@ -3690,7 +3689,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
 void tr_torrentsQueueMoveTop(tr_torrent** torrents_in, int n)
 {
-    tr_torrent** torrents = tr_memdup(torrents_in, sizeof(tr_torrent*) * n);
+    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
     for (int i = n - 1; i >= 0; --i)
@@ -3703,9 +3702,7 @@ void tr_torrentsQueueMoveTop(tr_torrent** torrents_in, int n)
 
 void tr_torrentsQueueMoveUp(tr_torrent** torrents_in, int n)
 {
-    tr_torrent** torrents;
-
-    torrents = tr_memdup(torrents_in, sizeof(tr_torrent*) * n);
+    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
     for (int i = 0; i < n; ++i)
@@ -3718,9 +3715,7 @@ void tr_torrentsQueueMoveUp(tr_torrent** torrents_in, int n)
 
 void tr_torrentsQueueMoveDown(tr_torrent** torrents_in, int n)
 {
-    tr_torrent** torrents;
-
-    torrents = tr_memdup(torrents_in, sizeof(tr_torrent*) * n);
+    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
     for (int i = n - 1; i >= 0; --i)
@@ -3733,9 +3728,7 @@ void tr_torrentsQueueMoveDown(tr_torrent** torrents_in, int n)
 
 void tr_torrentsQueueMoveBottom(tr_torrent** torrents_in, int n)
 {
-    tr_torrent** torrents;
-
-    torrents = tr_memdup(torrents_in, sizeof(tr_torrent*) * n);
+    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
     for (int i = 0; i < n; ++i)
@@ -3929,7 +3922,7 @@ struct rename_data
 
 static void torrentRenamePath(void* vdata)
 {
-    struct rename_data* data = vdata;
+    auto* data = static_cast<struct rename_data*>(vdata);
     tr_torrent* const tor = data->tor;
 
     TR_ASSERT(tr_isTorrent(tor));
