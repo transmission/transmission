@@ -77,7 +77,7 @@ static size_t guessPacketOverhead(size_t d)
         { \
             char addrstr[TR_ADDRSTRLEN]; \
             tr_peerIoGetAddrStr(io, addrstr, sizeof(addrstr)); \
-            tr_logAddDeepNamed(addrstr, __VA_ARGS__); \
+            tr_logAddDeep(__FILE__, __LINE__, addrstr, __VA_ARGS__); \
         } \
     } while (0)
 
