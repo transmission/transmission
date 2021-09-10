@@ -176,14 +176,11 @@ static void allocateBandwidth(
     }
 
     /* traverse & repeat for the subtree */
-    if (true)
+    struct tr_bandwidth** children = (struct tr_bandwidth**)tr_ptrArrayBase(&b->children);
+    struct tr_bandwidth** const end = children + tr_ptrArraySize(&b->children);
+    for ( ; children != end; ++children)
     {
-        struct tr_bandwidth** children = (struct tr_bandwidth**)tr_ptrArrayBase(&b->children);
-
-        for (int i = 0, n = tr_ptrArraySize(&b->children); i < n; ++i)
-        {
-            allocateBandwidth(children[i], priority, dir, period_msec, peer_pool);
-        }
+        allocateBandwidth(*children, priority, dir, period_msec, peer_pool);
     }
 }
 

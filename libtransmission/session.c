@@ -3096,8 +3096,6 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 {
-    tr_torrent* tor;
-    int active_count;
     int const max = tr_sessionGetQueueSize(session, dir);
     tr_torrent_activity const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
@@ -3106,20 +3104,31 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         return INT_MAX;
     }
 
-    tor = NULL;
-    active_count = 0;
-
+    /* count how many torrents are active */
+    int active_count = 0;
+    bool const stalled_enabled = tr_sessionGetQueueStalledEnabled(session);
+    int const stalled_if_idle_for_n_seconds = tr_sessionGetQueueStalledMinutes(session) * 60;
+    time_t const now = tr_time();
+    tr_torrent* tor = NULL;
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!tr_torrentIsStalled(tor) && (tr_torrentGetActivity(tor) == activity))
-        {
-            ++active_count;
-        }
-    }
+        /* is it the right activity? */
+        if (activity != tr_torrentGetActivity(tor))
+            continue;
 
-    if (active_count >= max)
-    {
-        return 0;
+        /* is it stalled? */
+        if (stalled_enabled)
+        {
+            >const< int idle_secs = (int)difftime(now, MAX(tor->startDate, tor->activityDate));
+            if (idle_secs >= stalled_if_idle_for_n_seconds)
+                continue;
+        }
+
+        ++active_count;
+
+        /* if we've reached the limit, no need to keep counting */
+        if (active_count >= max)
+            return 0;
     }
 
     return max - active_count;
