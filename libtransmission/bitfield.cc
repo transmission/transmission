@@ -365,7 +365,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
         byte_count = MIN(byte_count, get_bytes_needed(b->bit_count));
     }
 
-    b->bits = tr_memdup(bits, byte_count);
+    b->bits = static_cast<uint8_t*>(tr_memdup(bits, byte_count));
     b->alloc_count = byte_count;
 
     if (bounded)
