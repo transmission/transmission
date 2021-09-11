@@ -263,7 +263,10 @@ static char const* getblkdev(char const* path)
 
 #if defined(__NetBSD__) && __NetBSD_Version__ >= 600000000
 
+extern "C"
+{
 #include <quota.h>
+}
 
 static int64_t getquota(char const* device)
 {
