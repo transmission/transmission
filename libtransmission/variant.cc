@@ -455,7 +455,7 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const**
 void tr_variantInitRaw(tr_variant* v, void const* src, size_t byteCount)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&v->val.s, src, byteCount);
+    tr_variant_string_set_string(&v->val.s, static_cast<char const*>(src), byteCount);
 }
 
 void tr_variantInitQuark(tr_variant* v, tr_quark const q)
@@ -467,7 +467,7 @@ void tr_variantInitQuark(tr_variant* v, tr_quark const q)
 void tr_variantInitStr(tr_variant* v, void const* str, size_t len)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&v->val.s, str, len);
+    tr_variant_string_set_string(&v->val.s, static_cast<char const*>(str), len);
 }
 
 void tr_variantInitBool(tr_variant* v, bool value)
@@ -745,8 +745,8 @@ struct KeyIndex
 
 static int compareKeyIndex(void const* va, void const* vb)
 {
-    struct KeyIndex const* a = va;
-    struct KeyIndex const* b = vb;
+    auto const* const a = static_cast<struct KeyIndex const*>(va);
+    auto const* const b = static_cast<struct KeyIndex const*>(vb);
 
     return strcmp(a->keystr, b->keystr);
 }
