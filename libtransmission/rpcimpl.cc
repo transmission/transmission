@@ -59,9 +59,9 @@ typedef enum
 ****
 ***/
 
-static tr_rpc_callback_status notify(tr_session* session, int type, tr_torrent* tor)
+static tr_rpc_callback_status notify(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor)
 {
-    tr_rpc_callback_status status = 0;
+    tr_rpc_callback_status status = TR_RPC_OK;
 
     if (session->rpc_func != NULL)
     {
@@ -799,7 +799,7 @@ static void initField(
         {
             size_t byte_count = 0;
             void* bytes = tr_torrentCreatePieceBitfield(tor, &byte_count);
-            char* enc = tr_base64_encode(bytes, byte_count, NULL);
+            auto* enc = static_cast<char*>(tr_base64_encode(bytes, byte_count, NULL));
             tr_variantInitStr(initme, enc != NULL ? enc : "", TR_BAD_SIZE);
             tr_free(enc);
             tr_free(bytes);
@@ -1606,7 +1606,7 @@ static char const* torrentSetLocation(
 static void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
 {
     char const* result;
-    struct tr_rpc_idle_data* data = user_data;
+    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     tr_variantDictAddInt(data->args_out, TR_KEY_id, tr_torrentId(tor));
     tr_variantDictAddStr(data->args_out, TR_KEY_path, oldpath);
@@ -1673,7 +1673,7 @@ static void portTested(
     TR_UNUSED(did_timeout);
 
     char result[1024];
-    struct tr_rpc_idle_data* data = user_data;
+    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (response_code != 200)
     {
@@ -1723,7 +1723,7 @@ static void gotNewBlocklist(
     TR_UNUSED(did_timeout);
 
     char result[1024];
-    struct tr_rpc_idle_data* data = user_data;
+    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     *result = '\0';
 
@@ -1742,7 +1742,7 @@ static void gotNewBlocklist(
         z_stream stream;
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
-        uint8_t* const buf = tr_malloc(buflen);
+        auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
         tr_error* error = NULL;
 
         /* this is an odd Magic Number required by zlib to enable gz support.
@@ -1752,7 +1752,7 @@ static void gotNewBlocklist(
         stream.zalloc = (alloc_func)Z_NULL;
         stream.zfree = (free_func)Z_NULL;
         stream.opaque = (voidpf)Z_NULL;
-        stream.next_in = response;
+        stream.next_in = static_cast<Bytef const*>(response);
         stream.avail_in = response_byte_count;
         inflateInit2(&stream, windowBits);
 
@@ -1767,7 +1767,7 @@ static void gotNewBlocklist(
 
         for (;;)
         {
-            stream.next_out = (void*)buf;
+            stream.next_out = static_cast<Bytef*>(buf);
             stream.avail_out = buflen;
             err = inflate(&stream, Z_NO_FLUSH);
 
@@ -1907,7 +1907,7 @@ static void gotMetadataFromURL(
     TR_UNUSED(did_connect);
     TR_UNUSED(did_timeout);
 
-    struct add_torrent_idle_data* data = user_data;
+    auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
     dbgmsg(
         "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
@@ -2079,7 +2079,7 @@ static char const* torrentAdd(
         if (fname == NULL)
         {
             size_t len;
-            char* metainfo = tr_base64_decode_str(metainfo_base64, &len);
+            auto* metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &len));
             tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, len);
             tr_free(metainfo);
         }
@@ -2165,7 +2165,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_day, &i))
     {
-        tr_sessionSetAltSpeedDay(session, i);
+        tr_sessionSetAltSpeedDay(session, tr_sched_day(i));
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_alt_speed_time_enabled, &boolVal))
