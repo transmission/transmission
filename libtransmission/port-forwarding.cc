@@ -148,7 +148,7 @@ static void onTimer(evutil_socket_t fd, short what, void* vshared)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_shared* s = vshared;
+    auto* s = static_cast<tr_shared*>(vshared);
 
     TR_ASSERT(s != NULL);
     TR_ASSERT(s->timer != NULL);

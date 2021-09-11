@@ -223,9 +223,9 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-int tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
 {
-    int ret;
+    tr_port_forwarding ret;
 
     if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {

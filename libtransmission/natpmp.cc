@@ -115,9 +115,9 @@ static void setCommandTime(struct tr_natpmp* nat)
     nat->command_time = tr_time() + COMMAND_WAIT_SECS;
 }
 
-int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
+tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
 {
-    int ret;
+    tr_port_forwarding ret;
 
     if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
