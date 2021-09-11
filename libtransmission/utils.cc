@@ -276,7 +276,6 @@ void tr_timerAddMsec(struct event* timer, int msec)
 
 uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
-    uint8_t* buf;
     tr_sys_path_info info;
     tr_sys_file_t fd;
     tr_error* my_error = NULL;
@@ -313,7 +312,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
         return NULL;
     }
 
-    buf = tr_malloc(info.size + 1);
+    auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
 
     if (!tr_sys_file_read(fd, buf, info.size, NULL, &my_error))
     {
@@ -426,7 +425,7 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
 
 char* tr_strdup(void const* in)
 {
-    return tr_strndup(in, in != NULL ? strlen(in) : 0);
+    return tr_strndup(in, in != NULL ? strlen(static_cast<char const*>(in)) : 0);
 }
 
 char* tr_strndup(void const* in, size_t len)
@@ -439,7 +438,7 @@ char* tr_strndup(void const* in, size_t len)
     }
     else if (in != NULL)
     {
-        out = tr_malloc(len + 1);
+        out = static_cast<char*>(tr_malloc(len + 1));
 
         if (out != NULL)
         {
@@ -455,7 +454,7 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
 {
 #ifdef HAVE_MEMMEM
 
-    return memmem(haystack, haystacklen, needle, needlelen);
+    return static_cast<char const*>(memmem(haystack, haystacklen, needle, needlelen));
 
 #else
 
@@ -709,11 +708,10 @@ void tr_wait_msec(long int msec)
 
 int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
 {
-    int len;
     va_list args;
 
     va_start(args, fmt);
-    len = evutil_vsnprintf(buf, buflen, fmt, args);
+    int len = evutil_vsnprintf(static_cast<char*>(buf), buflen, fmt, args);
     va_end(args);
     return len;
 }
@@ -734,8 +732,8 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz)
 
 #else
 
-    char* d = dst;
-    char const* s = src;
+    auto* d = static_cast<char*>(dst);
+    auto const* s = static_cast<char const*>(src);
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
@@ -796,8 +794,8 @@ void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
 
-    uint8_t const* input = vinput;
-    char* output = voutput;
+    auto const* input = static_cast<uint8_t const*>(vinput);
+    auto* output = static_cast<char*>(voutput);
 
     /* go from back to front to allow for in-place conversion */
     input += byte_length;
@@ -817,8 +815,8 @@ void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
 
-    uint8_t const* input = (uint8_t const*)vinput;
-    uint8_t* output = voutput;
+    auto const* input = static_cast<uint8_t const*>(vinput);
+    auto* output = static_cast<uint8_t*>(voutput);
 
     for (size_t i = 0; i < byte_length; ++i)
     {
@@ -966,7 +964,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
     url_len -= scheme_len + 3;
 
     char const* authority = url;
-    char const* authority_end = memchr(authority, '/', url_len);
+    auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
 
     if (authority_end == NULL)
     {
@@ -983,7 +981,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
     url += authority_len;
     url_len -= authority_len;
 
-    char const* host_end = memchr(authority, ':', authority_len);
+    auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
 
     size_t const host_len = host_end != NULL ? (size_t)(host_end - authority) : authority_len;
 
@@ -1030,7 +1028,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 
 void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
 {
-    char* a = array;
+    auto* a = static_cast<char*>(array);
 
     memmove(
         a + sizeof_element * index_to_remove,
@@ -1047,7 +1045,7 @@ int tr_lowerBound(
     bool* exact_match)
 {
     size_t first = 0;
-    char const* cbase = base;
+    auto const* cbase = static_cast<char const*>(base);
     bool exact = false;
 
     while (nmemb != 0)
@@ -1086,9 +1084,9 @@ int tr_lowerBound(
 #define SWAP(a, b, size) \
     do \
     { \
-        register size_t __size = (size); \
-        register char* __a = (a); \
-        register char* __b = (b); \
+        size_t __size = (size); \
+        char* __a = (a); \
+        char* __b = (b); \
         if (__a != __b) \
         { \
             do \
@@ -1198,7 +1196,7 @@ void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compar
 {
     if (k < nmemb)
     {
-        quickfindFirstK(base, 0, nmemb - 1, size, compar, k);
+        quickfindFirstK(static_cast<char*>(base), 0, nmemb - 1, size, compar, k);
 
 #ifdef TR_ENABLE_ASSERTS
         checkBestScoresComeFirst(base, nmemb, size, compar, k);
@@ -1626,7 +1624,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
         for (tr_list* l = ranges; l != NULL; l = l->next)
         {
-            struct number_range const* r = l->data;
+            auto const* r = static_cast<struct number_range const*>(l->data);
             n += r->high + 1 - r->low;
         }
 
@@ -1641,7 +1639,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
         {
             for (tr_list* l = ranges; l != NULL; l = l->next)
             {
-                struct number_range const* r = l->data;
+                auto const* r = static_cast<struct number_range const*>(l->data);
 
                 for (int i = r->low; i <= r->high; ++i)
                 {
@@ -2008,7 +2006,7 @@ char* tr_formatter_mem_B(char* buf, size_t bytes_per_second, size_t buflen)
 void tr_formatter_get_units(void* vdict)
 {
     tr_variant* l;
-    tr_variant* dict = vdict;
+    auto* dict = static_cast<tr_variant*>(vdict);
 
     tr_variantDictReserve(dict, 6);
 
@@ -2151,8 +2149,8 @@ void tr_net_init(void)
 
 static int compareSuffix(void const* va, void const* vb)
 {
-    char const* suffix = va;
-    struct mime_type_suffix const* entry = vb;
+    auto const* suffix = static_cast<char const*>(va);
+    auto const* entry = static_cast<struct mime_type_suffix const*>(vb);
     return tr_strcmp0(suffix, entry->suffix);
 }
 
@@ -2175,12 +2173,12 @@ char const* tr_get_mime_type_for_filename(char const* filename)
 
             *out = '\0';
 
-            info = bsearch(
+            info = static_cast<struct mime_type_suffix const*>(bsearch(
                 lowercase_suffix,
                 mime_type_suffixes,
                 TR_N_ELEMENTS(mime_type_suffixes),
                 sizeof(*mime_type_suffixes),
-                compareSuffix);
+                compareSuffix));
         }
     }
 
