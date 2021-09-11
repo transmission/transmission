@@ -104,16 +104,16 @@ void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct
 
 #define UTP_INTERVAL_US 50000
 
-static void incoming(void* closure, struct UTPSocket* s)
+static void incoming(void* vsession, struct UTPSocket* s)
 {
-    tr_session* ss = closure;
+    auto* session = static_cast<tr_session*>(vsession);
     struct sockaddr_storage from_storage;
     struct sockaddr* from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
     tr_port port;
 
-    if (!tr_sessionIsUTPEnabled(ss))
+    if (!tr_sessionIsUTPEnabled(session))
     {
         UTP_Close(s);
         return;
@@ -128,12 +128,12 @@ static void incoming(void* closure, struct UTPSocket* s)
         return;
     }
 
-    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
+    tr_peerMgrAddIncoming(session->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
 void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
-    tr_session const* const ss = closure;
+    auto const* const ss = static_cast<tr_session const*>(closure);
 
     if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
     {
@@ -169,14 +169,14 @@ static void reset_timer(tr_session* ss)
     tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
-static void timer_callback(evutil_socket_t s, short type, void* closure)
+static void timer_callback(evutil_socket_t s, short type, void* vsession)
 {
     TR_UNUSED(s);
     TR_UNUSED(type);
 
-    tr_session* ss = closure;
+    auto* session = static_cast<tr_session*>(vsession);
     UTP_CheckTimeouts();
-    reset_timer(ss);
+    reset_timer(session);
 }
 
 int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
