@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         /* first look for the session id */
         for (int i = 0; i < n; ++i)
         {
-            struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
+            auto const* const p = static_cast<struct tr_mimepart const*>(tr_ptrArrayNth(&parts, i));
 
             if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
@@ -208,7 +208,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             for (int i = 0; i < n; ++i)
             {
-                struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
+                auto const* const p = static_cast<struct tr_mimepart const*>(tr_ptrArrayNth(&parts, i));
                 size_t body_len = p->body_len;
                 tr_variant top;
                 tr_variant* args;
@@ -233,7 +233,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                 }
                 else if (tr_variantFromBenc(&test, body, body_len) == 0)
                 {
-                    char* b64 = tr_base64_encode(body, body_len, NULL);
+                    auto* b64 = static_cast<char*>(tr_base64_encode(body, body_len, NULL));
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
                     tr_free(b64);
                     have_source = true;
@@ -335,14 +335,14 @@ static void add_response(
             deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
         }
 
-        server->stream.next_in = content_ptr;
+        server->stream.next_in = static_cast<Bytef*>(content_ptr);
         server->stream.avail_in = content_len;
 
         /* allocate space for the raw data and call deflate() just once --
          * we won't use the deflated data if it's longer than the raw data,
          * so it's okay to let deflate() run out of output buffer space */
         evbuffer_reserve_space(out, content_len, iovec, 1);
-        server->stream.next_out = iovec[0].iov_base;
+        server->stream.next_out = static_cast<Bytef*>(iovec[0].iov_base);
         server->stream.avail_out = iovec[0].iov_len;
         state = deflate(&server->stream, Z_FINISH);
 
@@ -493,7 +493,7 @@ static void rpc_response_func(tr_session* session, tr_variant* response, void* u
 {
     TR_UNUSED(session);
 
-    struct rpc_response_data* data = user_data;
+    auto* data = static_cast<struct rpc_response_data*>(user_data);
     struct evbuffer* response_buf = tr_variantToBuf(response, TR_VARIANT_FMT_JSON_LEAN);
     struct evbuffer* buf = evbuffer_new();
 
@@ -562,7 +562,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 
     for (tr_list* l = server->whitelist; l != NULL; l = l->next)
     {
-        if (tr_wildmat(address, l->data))
+        if (tr_wildmat(address, static_cast<char const*>(l->data)))
         {
             return true;
         }
@@ -621,7 +621,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
     /* Otherwise, hostname must be whitelisted. */
     for (tr_list* l = server->hostWhitelist; l != NULL; l = l->next)
     {
-        if (tr_wildmat(hostname, l->data))
+        if (tr_wildmat(hostname, static_cast<char const*>(l->data)))
         {
             tr_free(hostname);
             return true;
@@ -642,7 +642,7 @@ static bool test_session_id(struct tr_rpc_server* server, struct evhttp_request*
 
 static void handle_request(struct evhttp_request* req, void* arg)
 {
-    struct tr_rpc_server* server = arg;
+    auto* server = static_cast<struct tr_rpc_server*>(arg);
 
     if (req != NULL && req->evcon != NULL)
     {
@@ -674,7 +674,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
-            char* p = tr_base64_decode_str(auth + 6, NULL);
+            auto* p = static_cast<char*>(tr_base64_decode_str(auth + 6, NULL));
 
             if (p != NULL)
             {
@@ -827,7 +827,7 @@ static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 
 static void startServer(void* vserver)
 {
-    tr_rpc_server* server = vserver;
+    auto* server = static_cast<tr_rpc_server*>(vserver);
 
     if (server->httpd != NULL)
     {
@@ -892,7 +892,7 @@ static void stopServer(tr_rpc_server* server)
 
 static void onEnabledChanged(void* vserver)
 {
-    tr_rpc_server* server = vserver;
+    auto* server = static_cast<tr_rpc_server*>(vserver);
 
     if (!server->isEnabled)
     {
@@ -918,7 +918,7 @@ bool tr_rpcIsEnabled(tr_rpc_server const* server)
 
 static void restartServer(void* vserver)
 {
-    tr_rpc_server* server = vserver;
+    auto* server = static_cast<tr_rpc_server*>(vserver);
 
     if (server->isEnabled)
     {
@@ -1122,25 +1122,25 @@ void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
 static void closeServer(void* vserver)
 {
     void* tmp;
-    tr_rpc_server* s = vserver;
+    auto* server = static_cast<tr_rpc_server*>(vserver);
 
-    stopServer(s);
+    stopServer(server);
 
-    while ((tmp = tr_list_pop_front(&s->whitelist)) != NULL)
+    while ((tmp = tr_list_pop_front(&server->whitelist)) != NULL)
     {
         tr_free(tmp);
     }
 
-    if (s->isStreamInitialized)
+    if (server->isStreamInitialized)
     {
-        deflateEnd(&s->stream);
+        deflateEnd(&server->stream);
     }
 
-    tr_free(s->url);
-    tr_free(s->whitelistStr);
-    tr_free(s->username);
-    tr_free(s->password);
-    tr_free(s);
+    tr_free(server->url);
+    tr_free(server->whitelistStr);
+    tr_free(server->username);
+    tr_free(server->password);
+    tr_free(server);
 }
 
 void tr_rpcClose(tr_rpc_server** ps)
@@ -1157,14 +1157,13 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 {
-    tr_rpc_server* s;
     bool boolVal;
     int64_t i;
     char const* str;
     tr_quark key;
     tr_address address;
 
-    s = tr_new0(tr_rpc_server, 1);
+    tr_rpc_server* s = tr_new0(tr_rpc_server, 1);
     s->session = session;
 
     key = TR_KEY_rpc_enabled;
