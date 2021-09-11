@@ -1242,8 +1242,11 @@ static char* to_utf8(char const* in, size_t inlen)
 
     for (size_t i = 0; ret == NULL && i < TR_N_ELEMENTS(encodings); ++i)
     {
-        // iconv's second argument is sometimes const, sometimes not
+#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
+        auto const* inbuf = in;
+#else
         auto* inbuf = const_cast<char*>(in);
+#endif
         char* outbuf = out;
         size_t inbytesleft = inlen;
         size_t outbytesleft = buflen;
