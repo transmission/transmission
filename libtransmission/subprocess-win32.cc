@@ -398,7 +398,7 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
     wchar_t* current_dir = work_dir != NULL ? tr_win32_utf8_to_native(work_dir, -1) : NULL;
 
     auto si = STARTUPINFOW{};
-    si.cb = sizeof(cb);
+    si.cb = sizeof(si);
     si.dwFlags = STARTF_USESHOWWINDOW;
     si.wShowWindow = SW_HIDE;
 
