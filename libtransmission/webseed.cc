@@ -84,7 +84,7 @@ static void publish(tr_webseed* w, tr_peer_event* e)
 
 static void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_index_t block, tr_block_index_t count)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_REJ;
     tr_torrentGetBlockLocation(tor, block, &e.pieceIndex, &e.offset, &e.length);
 
@@ -102,7 +102,7 @@ static void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_index_
 
 static void fire_client_got_blocks(tr_torrent* tor, tr_webseed* w, tr_block_index_t block, tr_block_index_t count)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     tr_torrentGetBlockLocation(tor, block, &e.pieceIndex, &e.offset, &e.length);
 
@@ -120,7 +120,7 @@ static void fire_client_got_blocks(tr_torrent* tor, tr_webseed* w, tr_block_inde
 
 static void fire_client_got_piece_data(tr_webseed* w, uint32_t length)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
     e.length = length;
     publish(w, &e);

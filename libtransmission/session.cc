@@ -636,9 +636,9 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
-    session->torrentsSortedByHash = TR_PTR_ARRAY_INIT;
-    session->torrentsSortedByHashString = TR_PTR_ARRAY_INIT;
-    session->torrentsSortedById = TR_PTR_ARRAY_INIT;
+    session->torrentsSortedByHash = {};
+    session->torrentsSortedByHashString = {};
+    session->torrentsSortedById = {};
     tr_bandwidthConstruct(&session->bandwidth, session, NULL);
     tr_variantInitList(&session->removedTorrents, 0);
 
@@ -2455,7 +2455,7 @@ static void loadBlocklists(tr_session* session)
     char* dirname;
     char const* name;
     tr_list* blocklists = NULL;
-    tr_ptrArray loadme = TR_PTR_ARRAY_INIT;
+    auto loadme = tr_ptrArray{};
     bool const isEnabled = session->isBlocklistEnabled;
 
     /* walk the blocklist directory... */

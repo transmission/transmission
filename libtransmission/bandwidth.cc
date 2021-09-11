@@ -99,7 +99,7 @@ void tr_bandwidthConstruct(tr_bandwidth* b, tr_session* session, tr_bandwidth* p
     static unsigned int uniqueKey = 0;
 
     b->session = session;
-    b->children = TR_PTR_ARRAY_INIT;
+    b->children = {};
     b->magicNumber = BANDWIDTH_MAGIC_NUMBER;
     b->uniqueKey = uniqueKey++;
     b->band[TR_UP].honorParentLimits = true;
@@ -224,10 +224,10 @@ static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir)
 void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period_msec)
 {
     int peerCount;
-    tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
-    tr_ptrArray low = TR_PTR_ARRAY_INIT;
-    tr_ptrArray high = TR_PTR_ARRAY_INIT;
-    tr_ptrArray normal = TR_PTR_ARRAY_INIT;
+    auto tmp = tr_ptrArray{};
+    auto low = tr_ptrArray{};
+    auto high = tr_ptrArray{};
+    auto normal = tr_ptrArray{};
     struct tr_peerIo** peers;
 
     /* allocateBandwidth () is a helper function with two purposes:

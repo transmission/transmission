@@ -37,8 +37,6 @@ struct tr_peer_socket
     union tr_peer_socket_handle handle;
 };
 
-static struct tr_peer_socket constexpr TR_PEER_SOCKET_INIT = { TR_PEER_SOCKET_TYPE_NONE, {} };
-
 struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle);
 
 struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle);

@@ -377,7 +377,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.has_content = false;
     data.key = NULL;
     data.top = setme_variant;
-    data.stack = TR_PTR_ARRAY_INIT;
+    data.stack = {};
     data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();

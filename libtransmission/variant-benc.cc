@@ -186,7 +186,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     int err = 0;
     auto const* buf = static_cast<uint8_t const*>(buf_in);
     auto const* const bufend = static_cast<uint8_t const*>(bufend_in);
-    tr_ptrArray stack = TR_PTR_ARRAY_INIT;
+    auto stack = tr_ptrArray{};
     tr_quark key = 0;
 
     if ((buf_in == NULL) || (bufend_in == NULL) || (top == NULL))

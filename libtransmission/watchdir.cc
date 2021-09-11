@@ -123,9 +123,9 @@ typedef struct tr_watchdir_retry
 } tr_watchdir_retry;
 
 /* Non-static and mutable for unit tests */
-unsigned int tr_watchdir_retry_limit = 3;
-struct timeval tr_watchdir_retry_start_interval = { .tv_sec = 1, .tv_usec = 0 };
-struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
+auto tr_watchdir_retry_limit = int{ 3 };
+auto tr_watchdir_retry_start_interval = timeval{ 1, 0 };
+auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 
 #define tr_watchdir_retries_init(r) (void)0
 #define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc)&tr_watchdir_retry_free)
@@ -333,7 +333,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
 {
     tr_sys_dir_t dir;
     char const* name;
-    tr_ptrArray new_dir_entries = TR_PTR_ARRAY_INIT_STATIC;
+    auto new_dir_entries = tr_ptrArray{};
     PtrArrayCompareFunc const name_compare_func = (PtrArrayCompareFunc)&strcmp;
     tr_error* error = NULL;
 

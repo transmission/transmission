@@ -884,7 +884,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
-    tor->labels = TR_PTR_ARRAY_INIT;
+    tor->labels = {};
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, NULL);
 
@@ -1289,17 +1289,13 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     uint16_t seedIdleMinutes;
     unsigned int pieceUploadSpeed_Bps;
     unsigned int pieceDownloadSpeed_Bps;
-    struct tr_swarm_stats swarm_stats;
+    auto swarm_stats = tr_swarm_stats{};
 
     tor->lastStatTime = tr_time();
 
     if (tor->swarm != NULL)
     {
         tr_swarmGetStats(tor->swarm, &swarm_stats);
-    }
-    else
-    {
-        swarm_stats = TR_SWARM_STATS_INIT;
     }
 
     s = &tor->stats;
@@ -2442,7 +2438,7 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
     tr_torrentLock(tor);
 
     tr_ptrArrayDestruct(&tor->labels, tr_free);
-    tor->labels = TR_PTR_ARRAY_INIT;
+    tor->labels = {};
     char** l = (char**)tr_ptrArrayBase(labels);
     int const n = tr_ptrArraySize(labels);
     for (int i = 0; i < n; i++)
@@ -2984,11 +2980,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
  */
 static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 {
-    char* base;
-    tr_sys_dir_t odir;
-    char* tmpdir = NULL;
-    tr_ptrArray files = TR_PTR_ARRAY_INIT;
-    tr_ptrArray folders = TR_PTR_ARRAY_INIT;
+    auto files = tr_ptrArray{};
+    auto folders = tr_ptrArray{};
     PtrArrayCompareFunc vstrcmp = (PtrArrayCompareFunc)strcmp;
     char const* const top = tor->currentDir;
 
@@ -3008,8 +3001,8 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ****  Move the local data to a new tmpdir
     ***/
 
-    base = tr_strdup_printf("%s__XXXXXX", tr_torrentName(tor));
-    tmpdir = tr_buildPath(top, base, NULL);
+    char* base = tr_strdup_printf("%s__XXXXXX", tr_torrentName(tor));
+    char* tmpdir = tr_buildPath(top, base, NULL);
     tr_sys_dir_create_temp(tmpdir, NULL);
     tr_free(base);
 
@@ -3054,6 +3047,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
+    tr_sys_dir_t odir;
     if ((odir = tr_sys_dir_open(tmpdir, NULL)) != TR_BAD_SYS_DIR)
     {
         char const* name;

@@ -588,7 +588,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         uint8_t const* raw;
         size_t rawlen;
         tr_variant* l;
-        struct tr_bitfield blocks = TR_BITFIELD_INIT;
+        struct tr_bitfield blocks = {};
 
         if (tr_variantDictFindList(prog, TR_KEY_time_checked, &l))
         {

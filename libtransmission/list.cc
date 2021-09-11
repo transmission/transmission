@@ -11,12 +11,6 @@
 #include "platform.h"
 #include "utils.h"
 
-static tr_list const TR_LIST_CLEAR = {
-    .data = NULL,
-    .next = NULL,
-    .prev = NULL,
-};
-
 static tr_list* recycled_nodes = NULL;
 
 static tr_lock* getRecycledNodesLock(void)
@@ -51,7 +45,7 @@ static tr_list* node_alloc(void)
         ret = tr_new(tr_list, 1);
     }
 
-    *ret = TR_LIST_CLEAR;
+    *ret = {};
     return ret;
 }
 
@@ -61,7 +55,7 @@ static void node_free(tr_list* node)
 
     if (node != NULL)
     {
-        *node = TR_LIST_CLEAR;
+        *node = {};
         tr_lockLock(lock);
         node->next = recycled_nodes;
         recycled_nodes = node;

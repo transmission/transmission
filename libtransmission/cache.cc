@@ -265,7 +265,7 @@ int64_t tr_cacheGetLimit(tr_cache const* cache)
 tr_cache* tr_cacheNew(int64_t max_bytes)
 {
     tr_cache* cache = tr_new0(tr_cache, 1);
-    cache->blocks = TR_PTR_ARRAY_INIT;
+    cache->blocks = {};
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
     return cache;

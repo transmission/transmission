@@ -173,7 +173,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
     {
         int n;
         bool hasSessionId = false;
-        tr_ptrArray parts = TR_PTR_ARRAY_INIT;
+        auto parts = tr_ptrArray{};
 
         char const* query = strchr(req->uri, '?');
         bool const paused = query != NULL && strstr(query + 1, "paused=true") != NULL;

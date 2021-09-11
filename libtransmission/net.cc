@@ -273,7 +273,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
+    auto ret = tr_peer_socket{};
 
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     tr_socket_t s;
@@ -374,7 +374,7 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address co
 {
     TR_UNUSED(clientIsSeed);
 
-    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
+    auto ret = tr_peer_socket{};
 
     if (tr_address_is_valid_for_peers(addr, port))
     {

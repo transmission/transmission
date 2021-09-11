@@ -94,12 +94,6 @@ struct tr_datatype
 
 static struct tr_datatype* datatype_pool = NULL;
 
-static struct tr_datatype const TR_DATATYPE_INIT = {
-    .next = NULL,
-    .length = 0,
-    .isPieceData = false,
-};
-
 static struct tr_datatype* datatype_new(void)
 {
     struct tr_datatype* ret;
@@ -114,7 +108,7 @@ static struct tr_datatype* datatype_new(void)
         datatype_pool = datatype_pool->next;
     }
 
-    *ret = TR_DATATYPE_INIT;
+    *ret = {};
     return ret;
 }
 
@@ -585,13 +579,8 @@ static void utp_on_overhead(void* vio, bool send, size_t count, int type)
     tr_bandwidthUsed(&io->bandwidth, send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
-static struct UTPFunctionTable utp_function_table = {
-    .on_read = utp_on_read,
-    .on_write = utp_on_write,
-    .get_rb_size = utp_get_rb_size,
-    .on_state = utp_on_state_change,
-    .on_error = utp_on_error,
-    .on_overhead = utp_on_overhead,
+static auto utp_function_table = UTPFunctionTable{
+    utp_on_read, utp_on_write, utp_get_rb_size, utp_on_state_change, utp_on_error, utp_on_overhead,
 };
 
 /* Dummy UTP callbacks. */
@@ -645,13 +634,8 @@ static void dummy_on_overhead(void* closure, bool send, size_t count, int type)
     TR_UNUSED(type);
 }
 
-static struct UTPFunctionTable dummy_utp_function_table = {
-    .on_read = dummy_read,
-    .on_write = dummy_write,
-    .get_rb_size = dummy_get_rb_size,
-    .on_state = dummy_on_state_change,
-    .on_error = dummy_on_error,
-    .on_overhead = dummy_on_overhead,
+static auto dummy_utp_function_table = UTPFunctionTable{
+    dummy_read, dummy_write, dummy_get_rb_size, dummy_on_state_change, dummy_on_error, dummy_on_overhead,
 };
 
 #endif /* #ifdef WITH_UTP */
@@ -758,7 +742,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
     TR_ASSERT(tr_address_is_valid(addr));
     TR_ASSERT(torrentHash != NULL);
 
-    struct tr_peer_socket socket = TR_PEER_SOCKET_INIT;
+    auto socket = tr_peer_socket{};
 
     if (utp)
     {
@@ -911,7 +895,7 @@ static void io_close_socket(tr_peerIo* io)
         TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
     }
 
-    io->socket = TR_PEER_SOCKET_INIT;
+    io->socket = {};
 
     if (io->event_read != NULL)
     {

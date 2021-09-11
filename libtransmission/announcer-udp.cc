@@ -496,7 +496,7 @@ static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, 
     }
 
     tr_ptrArrayDestruct(reqs, (PtrArrayForeachFunc)tau_scrape_request_free);
-    *reqs = TR_PTR_ARRAY_INIT;
+    *reqs = {};
 
     /* fail all the announces */
     reqs = &tracker->announces;
@@ -508,7 +508,7 @@ static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, 
     }
 
     tr_ptrArrayDestruct(reqs, (PtrArrayForeachFunc)tau_announce_request_free);
-    *reqs = TR_PTR_ARRAY_INIT;
+    *reqs = {};
 }
 
 static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* vtracker)
@@ -786,7 +786,7 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
     }
 
     tau = tr_new0(struct tr_announcer_udp, 1);
-    tau->trackers = TR_PTR_ARRAY_INIT;
+    tau->trackers = {};
     tau->session = session;
     session->announcer_udp = tau;
     return tau;
@@ -823,8 +823,8 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
         tracker->key = key;
         tracker->host = host;
         tracker->port = port;
-        tracker->scrapes = TR_PTR_ARRAY_INIT;
-        tracker->announces = TR_PTR_ARRAY_INIT;
+        tracker->scrapes = {};
+        tracker->announces = {};
         tr_ptrArrayAppend(&tau->trackers, tracker);
         dbgmsg(tracker->key, "New tau_tracker created");
     }

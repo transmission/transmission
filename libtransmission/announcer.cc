@@ -185,7 +185,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
     if (!tr_str_is_empty(url))
     {
         bool found;
-        struct tr_scrape_info const key = { .url = (char*)url };
+        auto const key = tr_scrape_info{ const_cast<char*>(url), {} };
         int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
         if (found)
         {
@@ -210,7 +210,7 @@ void tr_announcerInit(tr_session* session)
     TR_ASSERT(tr_isSession(session));
 
     tr_announcer* a = tr_new0(tr_announcer, 1);
-    a->stops = TR_PTR_ARRAY_INIT;
+    a->stops = {};
     a->key = tr_rand_int(INT_MAX);
     a->session = session;
     a->upkeepTimer = evtimer_new(session->event_base, onUpkeepTimer, a);
@@ -505,20 +505,12 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 ****  PUBLISH
 ***/
 
-static tr_tracker_event const TRACKER_EVENT_INIT = { .messageType = TR_TRACKER_WARNING,
-                                                     .text = nullptr,
-                                                     .tracker = nullptr,
-                                                     .pex = nullptr,
-                                                     .pexCount = 0,
-                                                     .leechers = 0,
-                                                     .seeders = 0 };
-
 static void publishMessage(tr_tier* tier, char const* msg, TrackerEventType type)
 {
     if (tier != NULL && tier->tor != NULL && tier->tor->tiers != NULL && tier->tor->tiers->callback != NULL)
     {
         tr_torrent_tiers* tiers = tier->tor->tiers;
-        tr_tracker_event event = TRACKER_EVENT_INIT;
+        auto event = tr_tracker_event{};
         event.messageType = type;
         event.text = msg;
 
@@ -550,7 +542,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
 {
     if (tier->tor->tiers->callback != NULL)
     {
-        tr_tracker_event e = TRACKER_EVENT_INIT;
+        auto e = tr_tracker_event{};
         e.messageType = TR_TRACKER_COUNTS;
         e.seeders = seeders;
         e.leechers = leechers;
@@ -564,7 +556,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 {
     if (tier->tor->tiers->callback != NULL)
     {
-        tr_tracker_event e = TRACKER_EVENT_INIT;
+        auto e = tr_tracker_event{};
         e.messageType = TR_TRACKER_PEERS;
         e.seeders = seeders;
         e.leechers = leechers;
@@ -1722,8 +1714,8 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     time_t const now = tr_time();
 
     /* build a list of tiers that need to be announced */
-    tr_ptrArray announceMe = TR_PTR_ARRAY_INIT;
-    tr_ptrArray scrapeMe = TR_PTR_ARRAY_INIT;
+    auto announceMe = tr_ptrArray{};
+    auto scrapeMe = tr_ptrArray{};
     tr_torrent* tor = NULL;
     while ((tor = tr_torrentNext(announcer->session, tor)) != NULL)
     {

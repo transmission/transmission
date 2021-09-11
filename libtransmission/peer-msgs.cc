@@ -457,7 +457,7 @@ static void publish(tr_peerMsgs* msgs, tr_peer_event* e)
 
 static void fireError(tr_peerMsgs* msgs, int err)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_ERROR;
     e.err = err;
     publish(msgs, &e);
@@ -465,7 +465,7 @@ static void fireError(tr_peerMsgs* msgs, int err)
 
 static void fireGotBlock(tr_peerMsgs* msgs, struct peer_request const* req)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = req->index;
     e.offset = req->offset;
@@ -475,7 +475,7 @@ static void fireGotBlock(tr_peerMsgs* msgs, struct peer_request const* req)
 
 static void fireGotRej(tr_peerMsgs* msgs, struct peer_request const* req)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_REJ;
     e.pieceIndex = req->index;
     e.offset = req->offset;
@@ -485,28 +485,28 @@ static void fireGotRej(tr_peerMsgs* msgs, struct peer_request const* req)
 
 static void fireGotChoke(tr_peerMsgs* msgs)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
     publish(msgs, &e);
 }
 
 static void fireClientGotHaveAll(tr_peerMsgs* msgs)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
     publish(msgs, &e);
 }
 
 static void fireClientGotHaveNone(tr_peerMsgs* msgs)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
     publish(msgs, &e);
 }
 
 static void fireClientGotPieceData(tr_peerMsgs* msgs, uint32_t length)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.length = length;
     e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
     publish(msgs, &e);
@@ -514,7 +514,7 @@ static void fireClientGotPieceData(tr_peerMsgs* msgs, uint32_t length)
 
 static void firePeerGotPieceData(tr_peerMsgs* msgs, uint32_t length)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.length = length;
     e.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
     publish(msgs, &e);
@@ -522,7 +522,7 @@ static void firePeerGotPieceData(tr_peerMsgs* msgs, uint32_t length)
 
 static void fireClientGotSuggest(tr_peerMsgs* msgs, uint32_t pieceIndex)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
     e.pieceIndex = pieceIndex;
     publish(msgs, &e);
@@ -530,7 +530,7 @@ static void fireClientGotSuggest(tr_peerMsgs* msgs, uint32_t pieceIndex)
 
 static void fireClientGotPort(tr_peerMsgs* msgs, tr_port port)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_PORT;
     e.port = port;
     publish(msgs, &e);
@@ -538,7 +538,7 @@ static void fireClientGotPort(tr_peerMsgs* msgs, tr_port port)
 
 static void fireClientGotAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
     e.pieceIndex = pieceIndex;
     publish(msgs, &e);
@@ -546,7 +546,7 @@ static void fireClientGotAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
 
 static void fireClientGotBitfield(tr_peerMsgs* msgs, tr_bitfield* bitfield)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
     e.bitfield = bitfield;
     publish(msgs, &e);
@@ -554,7 +554,7 @@ static void fireClientGotBitfield(tr_peerMsgs* msgs, tr_bitfield* bitfield)
 
 static void fireClientGotHave(tr_peerMsgs* msgs, tr_piece_index_t index)
 {
-    tr_peer_event e = TR_PEER_EVENT_INIT;
+    auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE;
     e.pieceIndex = index;
     publish(msgs, &e);

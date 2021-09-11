@@ -434,7 +434,7 @@ static int compareKeys(void const* va, void const* vb)
     return ret;
 }
 
-static tr_ptrArray my_runtime = TR_PTR_ARRAY_INIT_STATIC;
+static tr_ptrArray my_runtime = {};
 
 bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
 {

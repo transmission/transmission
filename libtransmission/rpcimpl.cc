@@ -1075,7 +1075,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
     size_t const n = tr_variantListSize(list);
     char const* errmsg = NULL;
-    tr_ptrArray labels = TR_PTR_ARRAY_INIT;
+    auto labels = tr_ptrArray{};
     int labelcount = 0;
     for (size_t i = 0; i < n; ++i)
     {
@@ -2382,9 +2382,8 @@ static char const* sessionStats(
 
     int running = 0;
     int total = 0;
-    tr_variant* d;
-    tr_session_stats currentStats = TR_SESSION_STATS_INIT;
-    tr_session_stats cumulativeStats = TR_SESSION_STATS_INIT;
+    auto currentStats = tr_session_stats{};
+    auto cumulativeStats = tr_session_stats{};
     tr_torrent* tor = NULL;
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
@@ -2406,7 +2405,7 @@ static char const* sessionStats(
     tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
     tr_variantDictAddReal(args_out, TR_KEY_uploadSpeed, tr_sessionGetPieceSpeed_Bps(session, TR_UP));
 
-    d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
+    tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
     tr_variantDictAddInt(d, TR_KEY_downloadedBytes, cumulativeStats.downloadedBytes);
     tr_variantDictAddInt(d, TR_KEY_filesAdded, cumulativeStats.filesAdded);
     tr_variantDictAddInt(d, TR_KEY_secondsActive, cumulativeStats.secondsActive);

@@ -82,23 +82,6 @@ enum
     CANCEL_HISTORY_SEC = 60
 };
 
-tr_peer_event const TR_PEER_EVENT_INIT = {
-    .eventType = TR_PEER_CLIENT_GOT_BLOCK,
-    .pieceIndex = 0,
-    .bitfield = NULL,
-    .offset = 0,
-    .length = 0,
-    .err = 0,
-    .port = 0,
-};
-
-tr_swarm_stats const TR_SWARM_STATS_INIT = {
-    .activePeerCount = { 0, 0 },
-    .activeWebseedCount = 0,
-    .peerCount = 0,
-    .peerFromCount = { 0, 0, 0, 0, 0, 0, 0 },
-};
-
 /**
 ***
 **/
@@ -471,7 +454,7 @@ static void swarmFree(void* vs)
     tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)tr_free);
     tr_ptrArrayDestruct(&s->outgoingHandshakes, NULL);
     tr_ptrArrayDestruct(&s->peers, NULL);
-    s->stats = TR_SWARM_STATS_INIT;
+    s->stats = {};
 
     replicationFree(s);
 
@@ -488,7 +471,7 @@ static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
 
     /* clear the array */
     tr_ptrArrayDestruct(&s->webseeds, (PtrArrayForeachFunc)tr_peerFree);
-    s->webseeds = TR_PTR_ARRAY_INIT;
+    s->webseeds = {};
     s->stats.activeWebseedCount = 0;
 
     /* repopulate it */
@@ -506,10 +489,10 @@ static tr_swarm* swarmNew(tr_peerMgr* manager, tr_torrent* tor)
     s = tr_new0(tr_swarm, 1);
     s->manager = manager;
     s->tor = tor;
-    s->pool = TR_PTR_ARRAY_INIT;
-    s->peers = TR_PTR_ARRAY_INIT;
-    s->webseeds = TR_PTR_ARRAY_INIT;
-    s->outgoingHandshakes = TR_PTR_ARRAY_INIT;
+    s->pool = {};
+    s->peers = {};
+    s->webseeds = {};
+    s->outgoingHandshakes = {};
 
     rebuildWebseedArray(s, tor);
 
@@ -522,7 +505,7 @@ tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
     tr_peerMgr* m = tr_new0(tr_peerMgr, 1);
     m->session = session;
-    m->incomingHandshakes = TR_PTR_ARRAY_INIT;
+    m->incomingHandshakes = {};
     ensureMgrTimersExist(m);
     return m;
 }
@@ -1362,7 +1345,7 @@ void tr_peerMgrGetNextRequests(
         {
             tr_block_index_t first;
             tr_block_index_t last;
-            tr_ptrArray peerArr = TR_PTR_ARRAY_INIT;
+            tr_ptrArray peerArr = {};
 
             tr_torGetPieceBlockRange(tor, p->index, &first, &last);
 
@@ -1690,13 +1673,11 @@ static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 
 static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_peer* no_notify)
 {
-    int peerCount;
-    tr_peer** peers;
-    tr_ptrArray peerArr;
-
-    peerArr = TR_PTR_ARRAY_INIT;
+    auto peerArr = tr_ptrArray{};
     getBlockRequestPeers(s, block, &peerArr);
-    peers = (tr_peer**)tr_ptrArrayPeek(&peerArr, &peerCount);
+
+    int peerCount;
+    tr_peer** peers = (tr_peer**)tr_ptrArrayPeek(&peerArr, &peerCount);
 
     for (int i = 0; i < peerCount; ++i)
     {
@@ -3342,7 +3323,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     if (s->optimistic == NULL && !isMaxedOut && checkedChokeCount < size)
     {
         int n;
-        tr_ptrArray randPool = TR_PTR_ARRAY_INIT;
+        auto randPool = tr_ptrArray{};
 
         for (int i = checkedChokeCount; i < size; ++i)
         {
@@ -3862,7 +3843,7 @@ static void queuePulse(tr_session* session, tr_direction dir)
 
     if (tr_sessionGetQueueEnabled(session, dir))
     {
-        tr_ptrArray torrents = TR_PTR_ARRAY_INIT;
+        auto torrents = tr_ptrArray{};
 
         tr_sessionGetNextQueuedTorrents(session, dir, tr_sessionCountQueueFreeSlots(session, dir), &torrents);
 
@@ -4042,7 +4023,7 @@ static void atomPulse(evutil_socket_t fd, short what, void* vmgr)
 
             /* rebuild Torrent.pool with what's left */
             tr_ptrArrayDestruct(&s->pool, NULL);
-            s->pool = TR_PTR_ARRAY_INIT;
+            s->pool = {};
             qsort(keep, keepCount, sizeof(struct peer_atom*), compareAtomPtrsByAddress);
 
             for (i = 0; i < keepCount; ++i)
