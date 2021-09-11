@@ -234,7 +234,7 @@ void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, si
     TR_ASSERT(input != NULL);
     TR_ASSERT(output != NULL);
 
-    API(arc4_crypt)(handle, length, static_cast<unsigned char*>(input), output);
+    API(arc4_crypt)(handle, length, static_cast<unsigned char const*>(input), output);
 }
 
 /***
