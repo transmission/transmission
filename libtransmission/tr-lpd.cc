@@ -741,10 +741,7 @@ static void event_callback(evutil_socket_t s, short type, void* user_data)
 
         if (res > 0 && res <= lpd_maxDatagramLength)
         {
-            struct tr_pex foreignPeer = {
-                .port = 0, /* the peer-to-peer port is yet unknown */
-                .flags = 0,
-            };
+            auto foreignPeer = tr_pex{};
 
             /* be paranoid enough about zero terminating the foreign string */
             foreignMsg[res] = '\0';
