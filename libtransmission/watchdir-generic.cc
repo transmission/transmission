@@ -54,7 +54,7 @@ static void tr_watchdir_generic_on_event(evutil_socket_t fd, short type, void* c
     TR_UNUSED(fd);
     TR_UNUSED(type);
 
-    tr_watchdir_t const handle = context;
+    auto const handle = static_cast<tr_watchdir_t const>(context);
     tr_watchdir_generic* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
     tr_watchdir_scan(handle, &backend->dir_entries);
