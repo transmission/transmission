@@ -129,11 +129,11 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static struct tr_variant_string const STRING_INIT = {
-    .type = TR_STRING_TYPE_QUARK,
-    .quark = TR_KEY_NONE,
-    .len = 0,
-    .str.str = "",
+static auto constexpr STRING_INIT = tr_variant_string{
+    TR_STRING_TYPE_QUARK,
+    TR_KEY_NONE,
+    0,
+    {},
 };
 
 static void tr_variant_string_clear(struct tr_variant_string* str)
