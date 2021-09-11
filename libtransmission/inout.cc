@@ -92,7 +92,8 @@ static int readOrWriteBytes(
         {
             /* open (and maybe create) the file */
             char* filename = tr_buildPath(base, subpath, NULL);
-            int const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE : tor->session->preallocationMode;
+            tr_preallocation_mode const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE :
+                                                                             tor->session->preallocationMode;
 
             if ((fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc, file->length)) ==
                 TR_BAD_SYS_FILE)
@@ -153,8 +154,8 @@ static int readOrWriteBytes(
 
 static int compareOffsetToFile(void const* a, void const* b)
 {
-    uint64_t const offset = *(uint64_t const*)a;
-    tr_file const* file = b;
+    auto const offset = *static_cast<uint64_t const*>(a);
+    auto const* file = static_cast<tr_file const*>(b);
 
     if (offset < file->offset)
     {
@@ -179,16 +180,14 @@ void tr_ioFindFileLocation(
     TR_ASSERT(tr_isTorrent(tor));
 
     uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
-
     TR_ASSERT(offset < tor->info.totalSize);
 
-    tr_file const* file = bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile);
-
+    auto const* file = static_cast<tr_file const*>(
+        bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile));
     TR_ASSERT(file != NULL);
 
     *fileIndex = file - tor->info.files;
     *fileOffset = offset - file->offset;
-
     TR_ASSERT(*fileIndex < tor->info.fileCount);
     TR_ASSERT(*fileOffset < file->length);
     TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
@@ -280,7 +279,7 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     while (bytesLeft != 0)
     {
         size_t const len = MIN(bytesLeft, buflen);
-        success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, buffer) == 0;
+        success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, static_cast<uint8_t*>(buffer)) == 0;
 
         if (!success)
         {
