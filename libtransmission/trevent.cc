@@ -169,15 +169,14 @@ struct tr_run_data
 
 static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
 {
-    char ch;
-    int ret;
-    tr_event_handle* eh = veh;
+    auto* eh = static_cast<tr_event_handle*>(veh);
 
     dbgmsg("readFromPipe: eventType is %hd", eventType);
 
     /* read the command type */
-    ch = '\0';
+    char ch = '\0';
 
+    int ret;
     do
     {
         ret = piperead(fd, &ch, 1);
@@ -233,8 +232,7 @@ static void logFunc(int severity, char const* message)
 
 static void libeventThreadFunc(void* veh)
 {
-    struct event_base* base;
-    tr_event_handle* eh = veh;
+    auto* eh = static_cast<tr_event_handle*>(veh);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -242,7 +240,7 @@ static void libeventThreadFunc(void* veh)
 #endif
 
     /* create the libevent bases */
-    base = event_base_new();
+    struct event_base* base = event_base_new();
 
     /* set the struct's fields */
     eh->base = base;
