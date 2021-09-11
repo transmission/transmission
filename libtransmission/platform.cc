@@ -99,7 +99,7 @@ static ThreadFuncReturnType ThreadFunc(void* _t)
     pthread_detach(pthread_self());
 #endif
 
-    tr_thread* t = _t;
+    auto* t = static_cast<tr_thread*>(_t);
 
     t->func(t->arg);
 
@@ -115,7 +115,7 @@ static ThreadFuncReturnType ThreadFunc(void* _t)
 
 tr_thread* tr_threadNew(void (*func)(void*), void* arg)
 {
-    tr_thread* t = tr_new0(tr_thread, 1);
+    auto* t = static_cast<tr_thread*>(tr_new0(tr_thread, 1));
 
     t->func = func;
     t->arg = arg;
@@ -627,7 +627,7 @@ char const* tr_getWebClientDir(tr_session const* session)
             /* walk through the candidates & look for a match */
             for (tr_list* l = candidates; l != NULL; l = l->next)
             {
-                char* path = tr_buildPath(l->data, "transmission", "public_html", NULL);
+                char* path = tr_buildPath(static_cast<char const*>(l->data), "transmission", "public_html", NULL);
                 bool const found = isWebClientDir(path);
 
                 if (found)
