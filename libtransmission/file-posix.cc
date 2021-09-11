@@ -513,7 +513,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
 
     size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
-    char* buf = tr_malloc(buflen);
+    auto* buf = static_cast<char*>(tr_malloc(buflen));
 
     while (file_size > 0)
     {
@@ -951,10 +951,9 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
         goto skip_darwin_fcntl;
     }
 
-    struct radvisory const radv = {
-        .ra_offset = offset,
-        .ra_count = size,
-    };
+    auto radv = radvisory{};
+    radv.ra_offset = offset;
+    radv.ra_count = size;
 
     ret = fcntl(handle, F_RDADVISE, &radv) != -1;
 
