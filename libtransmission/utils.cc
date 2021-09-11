@@ -721,8 +721,11 @@ int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
  * will be copied. Always NUL terminates (unless siz == 0).
  * Returns strlen (src); if retval >= siz, truncation occurred.
  */
-size_t tr_strlcpy(void* dst, void const* src, size_t siz)
+size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 {
+    auto* dst = static_cast<char*>(vdst);
+    auto const* const src = static_cast<char const*>(vsrc);
+
     TR_ASSERT(dst != NULL);
     TR_ASSERT(src != NULL);
 
@@ -732,8 +735,8 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz)
 
 #else
 
-    auto* d = static_cast<char*>(dst);
-    auto const* s = static_cast<char const*>(src);
+    auto* d = dst;
+    auto* s = src;
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
