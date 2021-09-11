@@ -162,7 +162,7 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != NULL);
 
-    API(sha1_update)(handle, data, data_length);
+    API(sha1_update)(handle, static_cast<unsigned char const*>(data), data_length);
     return true;
 }
 
@@ -200,25 +200,30 @@ tr_rc4_ctx_t tr_rc4_new(void)
     return handle;
 }
 
-void tr_rc4_free(tr_rc4_ctx_t handle)
+void tr_rc4_free(tr_rc4_ctx_t raw_handle)
 {
 #if API_VERSION_NUMBER >= 0x01030800
+    auto* handle = static_cast<api_arc4_context*>(raw_handle);
     API(arc4_free)(handle);
 #endif
 
-    tr_free(handle);
+    tr_free(raw_handle);
 }
 
-void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
+void tr_rc4_set_key(tr_rc4_ctx_t raw_handle, uint8_t const* key, size_t key_length)
 {
+    auto* handle = static_cast<api_arc4_context*>(raw_handle);
+
     TR_ASSERT(handle != NULL);
     TR_ASSERT(key != NULL);
 
     API(arc4_setup)(handle, key, key_length);
 }
 
-void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
+void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, size_t length)
 {
+    auto* handle = static_cast<api_arc4_context*>(raw_handle);
+
     TR_ASSERT(handle != NULL);
 
     if (length == 0)
