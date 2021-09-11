@@ -144,7 +144,7 @@ struct write_block_data
 
 static void write_block_func(void* vdata)
 {
-    struct write_block_data* data = vdata;
+    auto* data = static_cast<struct write_block_data*>(vdata);
     struct tr_webseed* w = data->webseed;
     struct evbuffer* buf = data->content;
     struct tr_torrent* tor;
@@ -190,7 +190,7 @@ struct connection_succeeded_data
 
 static void connection_succeeded(void* vdata)
 {
-    struct connection_succeeded_data* data = vdata;
+    auto* data = static_cast<struct connection_succeeded_data*>(vdata);
     struct tr_webseed* w = data->webseed;
 
     if (++w->active_transfers >= w->retry_challenge && w->retry_challenge != 0)
@@ -226,7 +226,7 @@ static void connection_succeeded(void* vdata)
 static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info const* info, void* vtask)
 {
     size_t const n_added = info->n_added;
-    struct tr_webseed_task* task = vtask;
+    auto* task = static_cast<struct tr_webseed_task*>(vtask);
     tr_session* session = task->session;
 
     tr_sessionLock(session);
@@ -370,9 +370,7 @@ static void web_response_func(
     TR_UNUSED(response);
     TR_UNUSED(response_byte_count);
 
-    tr_webseed* w;
-    tr_torrent* tor;
-    struct tr_webseed_task* t = vtask;
+    auto* t = static_cast<struct tr_webseed_task*>(vtask);
     bool const success = response_code == 206;
 
     if (t->dead)
@@ -382,8 +380,8 @@ static void web_response_func(
         return;
     }
 
-    w = t->webseed;
-    tor = tr_torrentFindFromId(session, w->torrent_id);
+    tr_webseed* w = t->webseed;
+    tr_torrent* tor = tr_torrentFindFromId(session, w->torrent_id);
 
     if (tor != NULL)
     {
@@ -512,7 +510,7 @@ static void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_webseed* w = vw;
+    auto* w = static_cast<tr_webseed*>(vw);
 
     if (w->retry_tickcount != 0)
     {
@@ -555,7 +553,7 @@ static void webseed_destruct(tr_peer* peer)
     /* flag all the pending tasks as dead */
     for (tr_list* l = w->tasks; l != NULL; l = l->next)
     {
-        struct tr_webseed_task* task = l->data;
+        auto* task = static_cast<struct tr_webseed_task*>(l->data);
         task->dead = true;
     }
 
