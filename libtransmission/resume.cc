@@ -345,7 +345,7 @@ static uint64_t loadRatioLimits(tr_variant* dict, tr_torrent* tor)
 
         if (tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
-            tr_torrentSetRatioMode(tor, i);
+            tr_torrentSetRatioMode(tor, tr_ratiolimit(i));
         }
 
         ret = TR_FR_RATIOLIMIT;
@@ -371,7 +371,7 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 
         if (tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
-            tr_torrentSetIdleMode(tor, i);
+            tr_torrentSetIdleMode(tor, tr_idlelimit(i));
         }
 
         ret = TR_FR_IDLELIMIT;
@@ -482,7 +482,7 @@ static void bitfieldToBenc(tr_bitfield const* b, tr_variant* benc)
     else
     {
         size_t byte_count = 0;
-        uint8_t* raw = tr_bitfieldGetRaw(b, &byte_count);
+        auto* raw = static_cast<uint8_t*>(tr_bitfieldGetRaw(b, &byte_count));
         tr_variantInitRaw(benc, raw, byte_count);
         tr_free(raw);
     }
@@ -992,7 +992,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     return fieldsLoaded;
 }
 
-static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* ctor, int mode)
+static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* ctor, tr_ctorMode mode)
 {
     uint64_t ret = 0;
 
