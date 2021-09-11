@@ -158,7 +158,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
     auto const handle = static_cast<tr_watchdir_t const>(context);
     size_t nread;
     size_t name_size = MAX_PATH * sizeof(WCHAR);
-    char* buffer = tr_malloc(sizeof(FILE_NOTIFY_INFORMATION) + name_size);
+    auto* buffer = static_cast<char*>(tr_malloc(sizeof(FILE_NOTIFY_INFORMATION) + name_size));
     PFILE_NOTIFY_INFORMATION ev = (PFILE_NOTIFY_INFORMATION)buffer;
     size_t const header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
 

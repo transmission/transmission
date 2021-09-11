@@ -62,7 +62,7 @@ static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* 
 {
     TR_ASSERT(part != NULL);
 
-    wchar_t* const equals_pos = wcschr(part, L'=');
+    auto const* const equals_pos = wcschr(part, L'=');
 
     if (equals_pos == NULL)
     {
@@ -395,11 +395,10 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
 
     wchar_t* current_dir = work_dir != NULL ? tr_win32_utf8_to_native(work_dir, -1) : NULL;
 
-    STARTUPINFOW si = {
-        .cb = sizeof(si),
-        .dwFlags = STARTF_USESHOWWINDOW,
-        .wShowWindow = SW_HIDE,
-    };
+    auto si = STARTUPINFOW{};
+    si.cb = sizeof(cb);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE;
 
     PROCESS_INFORMATION pi;
 
