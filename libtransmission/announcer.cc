@@ -119,8 +119,8 @@ static int compareTransfer(uint64_t a_uploaded, uint64_t a_downloaded, uint64_t 
 static int compareStops(void const* va, void const* vb)
 {
     int i;
-    tr_announce_request const* a = va;
-    tr_announce_request const* b = vb;
+    auto const* a = static_cast<tr_announce_request const*>(va);
+    auto const* b = static_cast<tr_announce_request const*>(vb);
 
     /* primary key: volume of data transferred. */
     if ((i = compareTransfer(a->up, a->down, b->up, b->down)) != 0)
@@ -151,7 +151,7 @@ struct tr_scrape_info
 
 static void scrapeInfoFree(void* va)
 {
-    struct tr_scrape_info* a = va;
+    auto* a = static_cast<struct tr_scrape_info*>(va);
 
     tr_free(a->url);
     tr_free(a);
@@ -159,8 +159,8 @@ static void scrapeInfoFree(void* va)
 
 static int compareScrapeInfo(void const* va, void const* vb)
 {
-    struct tr_scrape_info const* a = va;
-    struct tr_scrape_info const* b = vb;
+    auto const* a = static_cast<struct tr_scrape_info const*>(va);
+    auto const* b = static_cast<struct tr_scrape_info const*>(vb);
     return tr_strcmp0(a->url, b->url);
 }
 
@@ -189,7 +189,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
         int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
         if (found)
         {
-            info = tr_ptrArrayNth(&announcer->scrape_info, pos);
+            info = static_cast<struct tr_scrape_info*>(tr_ptrArrayNth(&announcer->scrape_info, pos));
         }
         else
         {
@@ -506,14 +506,14 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 ***/
 
 static tr_tracker_event const TRACKER_EVENT_INIT = { .messageType = TR_TRACKER_WARNING,
-                                                     .text = NULL,
-                                                     .tracker = NULL,
-                                                     .pex = NULL,
+                                                     .text = nullptr,
+                                                     .tracker = nullptr,
+                                                     .pex = nullptr,
                                                      .pexCount = 0,
-                                                     .seeders = 0,
-                                                     .leechers = 0 };
+                                                     .leechers = 0,
+                                                     .seeders = 0 };
 
-static void publishMessage(tr_tier* tier, char const* msg, int type)
+static void publishMessage(tr_tier* tier, char const* msg, TrackerEventType type)
 {
     if (tier != NULL && tier->tor != NULL && tier->tor->tiers != NULL && tier->tor->tiers->callback != NULL)
     {
@@ -594,8 +594,8 @@ struct ann_tracker_info
  * secondary key: udp comes before http */
 static int filter_trackers_compare_func(void const* va, void const* vb)
 {
-    struct ann_tracker_info const* a = va;
-    struct ann_tracker_info const* b = vb;
+    auto* a = static_cast<struct ann_tracker_info const*>(va);
+    auto* b = static_cast<struct ann_tracker_info const*>(vb);
 
     if (a->info.tier != b->info.tier)
     {
@@ -1099,7 +1099,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 
 static void on_announce_done(tr_announce_response const* response, void* vdata)
 {
-    struct announce_data* data = vdata;
+    auto* data = static_cast<struct announce_data*>(vdata);
     tr_announcer* announcer = data->session->announcer;
     tr_tier* tier = getTier(announcer, response->info_hash, data->tierId);
     time_t const now = tr_time();
@@ -1426,7 +1426,7 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
 static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 {
     time_t const now = tr_time();
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
     tr_announcer* announcer = session->announcer;
 
     for (int i = 0; i < response->row_count; ++i)
@@ -1580,12 +1580,12 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     size_t request_count = 0;
     time_t const now = tr_time();
     size_t const tier_count = tr_ptrArraySize(tiers);
-    tr_scrape_request requests[MAX_SCRAPES_PER_UPKEEP] = { 0 };
+    tr_scrape_request requests[MAX_SCRAPES_PER_UPKEEP] = {};
 
     /* batch as many info_hashes into a request as we can */
     for (size_t i = 0; i < tier_count; ++i)
     {
-        tr_tier* tier = tr_ptrArrayNth(tiers, i);
+        auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(tiers, i));
         struct tr_scrape_info* const scrape_info = tier->currentTracker->scrape_info;
         uint8_t const* hash = tier->tor->info.hash;
         bool found = false;
@@ -1637,7 +1637,11 @@ static void flushCloseMessages(tr_announcer* announcer)
 {
     for (int i = 0, n = tr_ptrArraySize(&announcer->stops); i < n; ++i)
     {
-        announce_request_delegate(announcer, tr_ptrArrayNth(&announcer->stops, i), NULL, NULL);
+        announce_request_delegate(
+            announcer,
+            static_cast<tr_announce_request*>(tr_ptrArrayNth(&announcer->stops, i)),
+            nullptr,
+            nullptr);
     }
 
     tr_ptrArrayClear(&announcer->stops);
@@ -1752,7 +1756,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     int n = MIN(tr_ptrArraySize(&announceMe), MAX_ANNOUNCES_PER_UPKEEP);
     for (int i = 0; i < n; ++i)
     {
-        tr_tier* tier = tr_ptrArrayNth(&announceMe, i);
+        auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(&announceMe, i));
         tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
         dbgmsg(tier, "announcing tier %d of %d", i, n);
         tierAnnounce(announcer, tier);
@@ -1768,7 +1772,7 @@ static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_announcer* announcer = vannouncer;
+    auto* announcer = static_cast<tr_announcer*>(vannouncer);
     tr_session* session = announcer->session;
     bool const is_closing = session->isClosed;
     time_t const now = tr_time();
@@ -1940,7 +1944,8 @@ static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_
     tgt->wasCopied = true;
     tgt->trackers = keep.trackers;
     tgt->tracker_count = keep.tracker_count;
-    tgt->announce_events = tr_memdup(src->announce_events, sizeof(tr_announce_event) * src->announce_event_count);
+    tgt->announce_events = static_cast<tr_announce_event*>(
+        tr_memdup(src->announce_events, sizeof(tr_announce_event) * src->announce_event_count));
     tgt->announce_event_priority = src->announce_event_priority;
     tgt->announce_event_count = src->announce_event_count;
     tgt->announce_event_alloc = src->announce_event_count;
