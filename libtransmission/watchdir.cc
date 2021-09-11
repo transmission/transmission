@@ -55,7 +55,7 @@ struct tr_watchdir
 static bool is_regular_file(char const* dir, char const* name)
 {
     char* const path = tr_buildPath(dir, name, NULL);
-    tr_sys_path_info path_info = { 0 };
+    auto path_info = tr_sys_path_info{};
     tr_error* error = NULL;
 
     bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
@@ -147,7 +147,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t fd, short type, void* con
 
     TR_ASSERT(context != NULL);
 
-    tr_watchdir_retry* const retry = context;
+    auto* const retry = static_cast<tr_watchdir_retry*>(context);
     tr_watchdir_t const handle = retry->handle;
 
     if (tr_watchdir_process_impl(handle, retry->name) == TR_WATCHDIR_RETRY)
@@ -314,9 +314,9 @@ void tr_watchdir_process(tr_watchdir_t handle, char const* name)
     TR_ASSERT(handle != NULL);
 
     tr_watchdir_retry const search_key = { .name = (char*)name };
-    tr_watchdir_retry* existing_retry;
 
-    if ((existing_retry = tr_watchdir_retries_find(&handle->active_retries, &search_key)) != NULL)
+    auto* existing_retry = static_cast<tr_watchdir_retry*>(tr_watchdir_retries_find(&handle->active_retries, &search_key));
+    if (existing_retry != nullptr)
     {
         tr_watchdir_retry_restart(existing_retry);
         return;
