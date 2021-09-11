@@ -385,10 +385,11 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
+    auto* handle = static_cast<DH*>(raw_handle);
+
     TR_ASSERT(handle != NULL);
     TR_ASSERT(other_public_key != NULL);
 
-    auto* handle = static_cast<DH*>(raw_handle);
     struct tr_dh_secret* ret;
     int dh_size;
     int secret_key_length;
