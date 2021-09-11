@@ -272,7 +272,7 @@ static void event_read_cb(evutil_socket_t fd, short event, void* vio)
 {
     TR_UNUSED(event);
 
-    tr_peerIo* io = vio;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
@@ -365,7 +365,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 {
     TR_UNUSED(event);
 
-    tr_peerIo* io = vio;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
@@ -458,9 +458,9 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorith
 #ifdef WITH_UTP
 /* UTP callbacks */
 
-static void utp_on_read(void* closure, unsigned char const* buf, size_t buflen)
+static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
 {
-    tr_peerIo* io = closure;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -477,9 +477,9 @@ static void utp_on_read(void* closure, unsigned char const* buf, size_t buflen)
     canReadWrapper(io);
 }
 
-static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
+static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
 {
-    tr_peerIo* io = closure;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -495,9 +495,9 @@ static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
     didWriteWrapper(io, buflen);
 }
 
-static size_t utp_get_rb_size(void* closure)
+static size_t utp_get_rb_size(void* vio)
 {
-    tr_peerIo const* const io = closure;
+    auto const* const io = static_cast<tr_peerIo const*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -519,9 +519,9 @@ static void utp_on_writable(tr_peerIo* io)
     tr_peerIoSetEnabled(io, TR_UP, n != 0 && evbuffer_get_length(io->outbuf) != 0);
 }
 
-static void utp_on_state_change(void* closure, int state)
+static void utp_on_state_change(void* vio, int state)
 {
-    tr_peerIo* io = closure;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -557,9 +557,9 @@ static void utp_on_state_change(void* closure, int state)
     }
 }
 
-static void utp_on_error(void* closure, int errcode)
+static void utp_on_error(void* vio, int errcode)
 {
-    tr_peerIo* io = closure;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -572,11 +572,11 @@ static void utp_on_error(void* closure, int errcode)
     }
 }
 
-static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
+static void utp_on_overhead(void* vio, bool send, size_t count, int type)
 {
     TR_UNUSED(type);
 
-    tr_peerIo* io = closure;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -637,7 +637,7 @@ static void dummy_on_error(void* closure, int errcode)
     TR_UNUSED(errcode);
 }
 
-static void dummy_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
+static void dummy_on_overhead(void* closure, bool send, size_t count, int type)
 {
     TR_UNUSED(closure);
     TR_UNUSED(send);
@@ -928,7 +928,7 @@ static void io_close_socket(tr_peerIo* io)
 
 static void io_dtor(void* vio)
 {
-    tr_peerIo* io = vio;
+    auto* io = static_cast<tr_peerIo*>(vio);
 
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_amInEventThread(io->session));
