@@ -41,10 +41,6 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
 {
     uint8_t const* const buf = (uint8_t const*)vbuf;
     uint8_t const* const bufend = (uint8_t const*)vbufend;
-    char* endptr;
-    void const* begin;
-    void const* end;
-    int64_t val;
 
     if (buf >= bufend)
     {
@@ -56,8 +52,8 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
         return EILSEQ;
     }
 
-    begin = buf + 1;
-    end = memchr(begin, 'e', (bufend - buf) - 1);
+    void const* begin = buf + 1;
+    void const* end = memchr(begin, 'e', (bufend - buf) - 1);
 
     if (end == NULL)
     {
@@ -65,7 +61,8 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
     }
 
     errno = 0;
-    val = evutil_strtoll(begin, &endptr, 10);
+    char* endptr;
+    int64_t val = evutil_strtoll(static_cast<char const*>(begin), &endptr, 10);
 
     if (errno != 0 || endptr != end) /* incomplete parse */
     {
@@ -159,7 +156,7 @@ static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, 
     }
     else
     {
-        tr_variant* parent = tr_ptrArrayBack(stack);
+        auto* parent = static_cast<tr_variant*>(tr_ptrArrayBack(stack));
 
         if (tr_variantIsList(parent))
         {
@@ -187,8 +184,8 @@ static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, 
 int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top, char const** setme_end)
 {
     int err = 0;
-    uint8_t const* buf = buf_in;
-    uint8_t const* bufend = bufend_in;
+    auto const* buf = static_cast<uint8_t const*>(buf_in);
+    auto const* const bufend = static_cast<uint8_t const*>(bufend_in);
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
     tr_quark key = 0;
 
@@ -286,7 +283,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if (key == 0 && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
+            if (key == 0 && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(static_cast<tr_variant*>(tr_ptrArrayBack(&stack))))
             {
                 key = tr_quark_new(str, str_len);
             }
@@ -332,13 +329,15 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 *****
 ****/
 
-static void saveIntFunc(tr_variant const* val, void* evbuf)
+static void saveIntFunc(tr_variant const* val, void* vevbuf)
 {
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
 }
 
-static void saveBoolFunc(tr_variant const* val, void* evbuf)
+static void saveBoolFunc(tr_variant const* val, void* vevbuf)
 {
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     if (val->val.b)
     {
         evbuffer_add(evbuf, "i1e", 3);
@@ -349,17 +348,17 @@ static void saveBoolFunc(tr_variant const* val, void* evbuf)
     }
 }
 
-static void saveRealFunc(tr_variant const* val, void* evbuf)
+static void saveRealFunc(tr_variant const* val, void* vevbuf)
 {
-    int len;
     char buf[128];
+    int const len = tr_snprintf(buf, sizeof(buf), "%f", val->val.d);
 
-    len = tr_snprintf(buf, sizeof(buf), "%f", val->val.d);
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add_printf(evbuf, "%d:", len);
     evbuffer_add(evbuf, buf, len);
 }
 
-static void saveStringFunc(tr_variant const* v, void* evbuf)
+static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
     size_t len;
     char const* str;
@@ -369,28 +368,32 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
         str = NULL;
     }
 
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add_printf(evbuf, "%zu:", len);
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc(tr_variant const* val, void* evbuf)
+static void saveDictBeginFunc(tr_variant const* val, void* vevbuf)
 {
     TR_UNUSED(val);
 
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc(tr_variant const* val, void* evbuf)
+static void saveListBeginFunc(tr_variant const* val, void* vevbuf)
 {
     TR_UNUSED(val);
 
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc(tr_variant const* val, void* evbuf)
+static void saveContainerEndFunc(tr_variant const* val, void* vevbuf)
 {
     TR_UNUSED(val);
 
+    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);
 }
 
