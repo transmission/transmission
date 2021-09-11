@@ -118,7 +118,6 @@ struct peer_atom
     uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags; /* these match the added_f flags */
     uint8_t flags2; /* flags that aren't defined in added_f */
-    int8_t seedProbability; /* how likely is this to be a seed... [0..100] or -1 for unknown */
     int8_t blocklisted; /* -1 for unknown, true for blocklisted, false for not blocklisted */
 
     tr_port port;
@@ -194,6 +193,8 @@ typedef struct tr_swarm
     tr_peerMsgs* optimistic; /* the optimistic peer, or NULL if none */
     int optimisticUnchokeTimeScaler;
 
+    bool poolIsAllSeeds;
+    bool poolIsAllSeedsDirty; /* true if poolIsAllSeeds needs to be recomputed */
     bool isRunning;
     bool needsCompletenessCheck;
 
@@ -594,37 +595,16 @@ static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 ****
 ***/
 
-static void atomSetSeedProbability(struct peer_atom* atom, int seedProbability)
-{
-    TR_ASSERT(atom != NULL);
-    TR_ASSERT(seedProbability >= -1);
-    TR_ASSERT(seedProbability <= 100);
-
-    atom->seedProbability = seedProbability;
-
-    if (seedProbability == 100)
-    {
-        atom->flags |= ADDED_F_SEED_FLAG;
-    }
-    else if (seedProbability != -1)
-    {
-        atom->flags &= ~ADDED_F_SEED_FLAG;
-    }
-}
-
 static inline bool atomIsSeed(struct peer_atom const* atom)
 {
-    return atom->seedProbability == 100;
+    return (atom->flags & ADDED_F_SEED_FLAG) != 0;
 }
 
-static void atomSetSeed(tr_swarm const* s, struct peer_atom* atom)
+static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 {
-    if (!atomIsSeed(atom))
-    {
-        tordbg(s, "marking peer %s as a seed", tr_atomAddrStr(atom));
-
-        atomSetSeedProbability(atom, 100);
-    }
+    tordbg(s, "marking peer %s as a seed", tr_atomAddrStr(atom));
+    atom->flags |= ADDED_F_SEED_FLAG;
+    s->poolIsAllSeedsDirty = true;
 }
 
 bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const* addr)
@@ -1942,12 +1922,11 @@ static int getDefaultShelfLife(uint8_t from)
     }
 }
 
-static void ensureAtomExists(
+static struct peer_atom* ensureAtomExists(
     tr_swarm* s,
     tr_address const* addr,
     tr_port const port,
     uint8_t const flags,
-    int8_t const seedProbability,
     uint8_t const from)
 {
     TR_ASSERT(tr_address_is_valid(addr));
@@ -1966,7 +1945,6 @@ static void ensureAtomExists(
         a->fromBest = from;
         a->shelf_date = tr_time() + getDefaultShelfLife(from) + jitter;
         a->blocklisted = -1;
-        atomSetSeedProbability(a, seedProbability);
         tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
 
         tordbg(s, "got a new atom: %s", tr_atomAddrStr(a));
@@ -1978,13 +1956,12 @@ static void ensureAtomExists(
             a->fromBest = from;
         }
 
-        if (a->seedProbability == -1)
-        {
-            atomSetSeedProbability(a, seedProbability);
-        }
-
         a->flags |= flags;
     }
+
+    s->poolIsAllSeedsDirty = true;
+
+    return a;
 }
 
 static int getMaxPeerCount(tr_torrent const* tor)
@@ -2076,12 +2053,7 @@ static bool myHandshakeDoneCB(
     }
     else /* looking good */
     {
-        struct peer_atom* atom;
-
-        ensureAtomExists(s, addr, port, 0, -1, TR_PEER_FROM_INCOMING);
-        atom = getExistingAtom(s, addr);
-
-        TR_ASSERT(atom != NULL);
+        struct peer_atom* atom = ensureAtomExists(s, addr, port, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
         atom->piece_data_time = 0;
@@ -2206,21 +2178,43 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
     managerUnlock(manager);
 }
 
-void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t seedProbability)
+void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 {
-    if (tr_isPex(pex)) /* safeguard against corrupt data */
-    {
-        tr_swarm* s = tor->swarm;
-        managerLock(s->manager);
+    tr_torrentLock(tor);
 
-        if (!tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
+    tr_swarm* const swarm = tor->swarm;
+    int atomCount;
+    struct peer_atom** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &atomCount);
+    for (int i = 0; i < atomCount; ++i)
+    {
+        atomSetSeed(swarm, atoms[i]);
+    }
+
+    swarm->poolIsAllSeeds = true;
+    swarm->poolIsAllSeedsDirty = false;
+
+    tr_torrentUnlock(tor);
+}
+
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
+{
+    size_t n_used = 0;
+    tr_swarm* s = tor->swarm;
+    managerLock(s->manager);
+
+    for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
+    {
+        if (tr_isPex(pex) && /* safeguard against corrupt data */
+            !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
             tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
-            ensureAtomExists(s, &pex->addr, pex->port, pex->flags, seedProbability, from);
+            ensureAtomExists(s, &pex->addr, pex->port, pex->flags, from);
+            ++n_used;
         }
-
-        managerUnlock(s->manager);
     }
+
+    managerUnlock(s->manager);
+    return n_used;
 }
 
 tr_pex* tr_peerMgrCompactToPex(
@@ -2515,7 +2509,8 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     s->maxPeers = tor->maxConnectedPeers;
     s->pieceSortState = PIECES_UNSORTED;
 
-    rechokePulse(0, 0, s->manager);
+    // rechoke soon
+    tr_timerAddMsec(s->manager->rechokeTimer, 100);
 }
 
 static void removeAllPeers(tr_swarm*);
@@ -4169,22 +4164,9 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
     i = (atom->flags & ADDED_F_CONNECTABLE) != 0 ? 0 : 1;
     score = addValToKey(score, 1, i);
 
-    /* prefer peers that we might have a chance of uploading to...
-    so lower seed probability is better */
-    if (atom->seedProbability == 100)
-    {
-        i = 101;
-    }
-    else if (atom->seedProbability == -1)
-    {
-        i = 100;
-    }
-    else
-    {
-        i = atom->seedProbability;
-    }
-
-    score = addValToKey(score, 8, i);
+    /* prefer peers that we might be able to upload to */
+    i = (atom->flags & ADDED_F_SEED_FLAG) == 0 ? 0 : 1;
+    score = addValToKey(score, 1, i);
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest' values indicate more trusted sources */
@@ -4255,6 +4237,33 @@ static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, in
 
 #endif /* TR_ENABLE_ASSERTS */
 
+static bool calculateAllSeeds(struct tr_swarm* swarm)
+{
+    int nAtoms = 0;
+    struct peer_atom** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &nAtoms);
+
+    for (int i = 0; i < nAtoms; ++i)
+    {
+        if (!atomIsSeed(atoms[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool swarmIsAllSeeds(struct tr_swarm* swarm)
+{
+    if (swarm->poolIsAllSeedsDirty)
+    {
+        swarm->poolIsAllSeeds = calculateAllSeeds(swarm);
+        swarm->poolIsAllSeedsDirty = false;
+    }
+
+    return swarm->poolIsAllSeeds;
+}
+
 /** @return an array of all the atoms we might want to connect to */
 static struct peer_candidate* getPeerCandidates(tr_session* session, int* candidateCount, int max)
 {
@@ -4302,6 +4311,14 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
             continue;
         }
 
+        /* if everyone in the swarm is seeds and pex is disabled because
+         * the torrent is private, then don't initiate connections */
+        bool const seeding = tr_torrentIsSeed(tor);
+        if (seeding && swarmIsAllSeeds(tor->swarm) && tr_torrentIsPrivate(tor))
+        {
+            continue;
+        }
+
         /* if we've already got enough peers in this torrent... */
         if (tr_torrentGetPeerLimit(tor) <= tr_ptrArraySize(&tor->swarm->peers))
         {
@@ -4309,7 +4326,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (tr_torrentIsSeed(tor) && isBandwidthMaxedOut(&tor->bandwidth, now_msec, TR_UP))
+        if (seeding && isBandwidthMaxedOut(&tor->bandwidth, now_msec, TR_UP))
         {
             continue;
         }
@@ -4392,8 +4409,8 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
 {
 #if 0
 
-    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] seedProbability==%d; %s, %s\n", tr_atomAddrStr(c->atom),
-        tr_torrentName(c->tor), (int)c->atom->seedProbability, tr_torrentIsPrivate(c->tor) ? "private" : "public",
+    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", tr_atomAddrStr(c->atom),
+        tr_torrentName(c->tor), tr_torrentIsPrivate(c->tor) ? "private" : "public",
         tr_torrentIsSeed(c->tor) ? "seed" : "downloader");
 
 #endif
@@ -4404,9 +4421,7 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
 static void makeNewPeerConnections(struct tr_peerMgr* mgr, int const max)
 {
     int n;
-    struct peer_candidate* candidates;
-
-    candidates = getPeerCandidates(mgr->session, &n, max);
+    struct peer_candidate* candidates = getPeerCandidates(mgr->session, &n, max);
 
     for (int i = 0; i < n && i < max; ++i)
     {

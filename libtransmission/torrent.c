@@ -73,49 +73,40 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != NULL ? tor->uniqueId : -1;
 }
 
+static int compareKeyToTorrentId(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    int const b = *(int const*)vb;
+    return a->uniqueId - b;
+}
+
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
-    tr_torrent* tor = NULL;
+    return tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId);
+}
 
-    while ((tor = tr_torrentNext(session, tor)) != NULL)
-    {
-        if (tor->uniqueId == id)
-        {
-            return tor;
-        }
-    }
-
-    return NULL;
+static int compareKeyToTorrentHashString(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    char const* const b = vb;
+    return evutil_ascii_strcasecmp(a->info.hashString, b);
 }
 
 tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
 {
-    tr_torrent* tor = NULL;
+    return tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString);
+}
 
-    while ((tor = tr_torrentNext(session, tor)) != NULL)
-    {
-        if (evutil_ascii_strcasecmp(str, tor->info.hashString) == 0)
-        {
-            return tor;
-        }
-    }
-
-    return NULL;
+static int compareKeyToTorrentHash(void const* va, void const* vb)
+{
+    tr_torrent const* const a = va;
+    uint8_t const* const b = vb;
+    return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
 }
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHash)
 {
-    tr_torrent* tor = NULL;
-
-    while ((tor = tr_torrentNext(session, tor)) != NULL)
-    {
-        if ((*tor->info.hash == *torrentHash) && (memcmp(tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0))
-        {
-            return tor;
-        }
-    }
-
-    return NULL;
+    return tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash);
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
@@ -568,26 +559,17 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
+        tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, event->pex, event->pexCount);
+        break;
+
+    case TR_TRACKER_COUNTS:
+        if (tr_torrentIsPrivate(tor) && (event->leechers == 0))
         {
-            int8_t const seedProbability = event->seedProbability;
-            bool const allAreSeeds = seedProbability == 100;
-
-            if (allAreSeeds)
-            {
-                tr_logAddTorDbg(tor, "Got %zu seeds from tracker", event->pexCount);
-            }
-            else
-            {
-                tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
-            }
-
-            for (size_t i = 0; i < event->pexCount; ++i)
-            {
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, &event->pex[i], seedProbability);
-            }
-
-            break;
+            tr_peerMgrSetSwarmIsAllSeeds(tor);
         }
+
+        break;
 
     case TR_TRACKER_WARNING:
         tr_logAddTorErr(tor, _("Tracker warning: \"%s\""), event->text);
@@ -975,24 +957,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
     }
 
-    /* add the torrent to tr_session.torrentList */
-    session->torrentCount++;
-
-    if (session->torrentList == NULL)
-    {
-        session->torrentList = tor;
-    }
-    else
-    {
-        tr_torrent* it = session->torrentList;
-
-        while (it->next != NULL)
-        {
-            it = it->next;
-        }
-
-        it->next = tor;
-    }
+    tr_sessionAddTorrent(session, tor);
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
     isNewTorrent = !tr_sys_path_exists(tor->info.torrent, NULL);
@@ -1275,27 +1240,16 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     return ret;
 }
 
-static int torrentGetIdleSecs(tr_torrent const* tor)
+static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
-    int idle_secs;
-    tr_torrent_activity const activity = tr_torrentGetActivity(tor);
-
-    if ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0)
-    {
-        idle_secs = (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate));
-    }
-    else
-    {
-        idle_secs = -1;
-    }
-
-    return idle_secs;
+    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
+        (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) :
+        -1;
 }
 
-bool tr_torrentIsStalled(tr_torrent const* tor)
+static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
 {
-    return tr_sessionGetQueueStalledEnabled(tor->session) &&
-        torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
+    return tr_sessionGetQueueStalledEnabled(tor->session) && idle_secs > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
 }
 
 static double getVerifyProgress(tr_torrent const* tor)
@@ -1351,7 +1305,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->isStalled = tr_torrentIsStalled(tor);
+    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
+    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
     tr_strlcpy(s->errorString, tor->errorString, sizeof(s->errorString));
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
@@ -1386,7 +1341,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->startDate = tor->startDate;
     s->secondsSeeding = tor->secondsSeeding;
     s->secondsDownloading = tor->secondsDownloading;
-    s->idleSecs = torrentGetIdleSecs(tor);
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
@@ -1689,25 +1643,7 @@ static void freeTorrent(tr_torrent* tor)
     tr_free(tor->downloadDir);
     tr_free(tor->incompleteDir);
 
-    if (tor == session->torrentList)
-    {
-        session->torrentList = tor->next;
-    }
-    else
-    {
-        for (tr_torrent* t = session->torrentList; t != NULL; t = t->next)
-        {
-            if (t->next == tor)
-            {
-                t->next = tor->next;
-                break;
-            }
-        }
-    }
-
-    /* decrement the torrent count */
-    TR_ASSERT(session->torrentCount >= 1);
-    session->torrentCount--;
+    tr_sessionRemoveTorrent(session, tor);
 
     /* resequence the queue positions */
     tr_torrent* t = NULL;
