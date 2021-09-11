@@ -95,51 +95,32 @@ int tr_bencParseStr(
     uint8_t const* const buf = (uint8_t const*)vbuf;
     uint8_t const* const bufend = (uint8_t const*)vbufend;
 
-    void const* end;
-    size_t len;
-    char* ulend;
-    uint8_t const* strbegin;
-    uint8_t const* strend;
-
-    if (buf >= bufend)
+    if ((buf < bufend) && isdigit(*buf))
     {
-        goto ERR;
+        void const* end = memchr(buf, ':', bufend - buf);
+
+        if (end != NULL)
+        {
+            errno = 0;
+            char* ulend;
+            size_t len = strtoul((char const*)buf, &ulend, 10);
+
+            if (errno == 0 && ulend == end && len <= MAX_BENC_STR_LENGTH)
+            {
+                uint8_t const* strbegin = (uint8_t const*)end + 1;
+                uint8_t const* strend = strbegin + len;
+
+                if (strbegin <= strend && strend <= bufend)
+                {
+                    *setme_end = (uint8_t const*)end + 1 + len;
+                    *setme_str = (uint8_t const*)end + 1;
+                    *setme_strlen = len;
+                    return 0;
+                }
+            }
+        }
     }
 
-    if (!isdigit(*buf))
-    {
-        goto ERR;
-    }
-
-    end = memchr(buf, ':', bufend - buf);
-
-    if (end == NULL)
-    {
-        goto ERR;
-    }
-
-    errno = 0;
-    len = strtoul((char const*)buf, &ulend, 10);
-
-    if (errno != 0 || ulend != end || len > MAX_BENC_STR_LENGTH)
-    {
-        goto ERR;
-    }
-
-    strbegin = (uint8_t const*)end + 1;
-    strend = strbegin + len;
-
-    if (strend < strbegin || strend > bufend)
-    {
-        goto ERR;
-    }
-
-    *setme_end = (uint8_t const*)end + 1 + len;
-    *setme_str = (uint8_t const*)end + 1;
-    *setme_strlen = len;
-    return 0;
-
-ERR:
     *setme_end = NULL;
     *setme_str = NULL;
     *setme_strlen = 0;
