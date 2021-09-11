@@ -773,7 +773,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         goto out;
     }
 
-    LPBOOL cancel = FALSE;
+    auto cancel = BOOL{ FALSE };
     DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
     if (CopyFileExW(wide_src_path, wide_dst_path, NULL, NULL, &cancel, flags) == 0)
     {
