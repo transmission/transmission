@@ -438,7 +438,6 @@ else()
         -Wint-in-bool-context
         -Wlogical-op
         -Wmissing-format-attribute
-        -Wnested-externs
         -Wnull-dereference
         -Wpointer-arith
         -Wredundant-decls
@@ -453,7 +452,6 @@ else()
         -Wshadow
         -Wsign-compare
         -Wsometimes-uninitialized
-        -Wstrict-prototypes
         -Wstring-conversion
         -Wsuggest-destructor-override
         -Wsuggest-override
