@@ -171,7 +171,7 @@ static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
     tr_socket_t clientSocket;
     tr_port clientPort;
     tr_address clientAddr;
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
 
     clientSocket = tr_netAccept(session, fd, &clientAddr, &clientPort);
 
@@ -585,8 +585,8 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_torrent* tor = NULL;
-    tr_session* session = vsession;
+    tr_torrent* tor = nullptr;
+    auto* session = static_cast<tr_session*>(vsession);
 
     if (tr_cacheFlushDone(session->cache) != 0)
     {
@@ -645,7 +645,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     /* nice to start logging at the very beginning */
     if (tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
     {
-        tr_logSetLevel(i);
+        tr_logSetLevel(tr_log_level(i));
     }
 
     /* start the libtransmission thread */
@@ -676,7 +676,7 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(session->nowTimer != NULL);
@@ -741,7 +741,7 @@ static void loadBlocklists(tr_session* session);
 
 static void tr_sessionInitImpl(void* vdata)
 {
-    struct init_data* data = vdata;
+    auto* data = static_cast<struct init_data*>(vdata);
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
@@ -816,7 +816,7 @@ static void setPeerPort(tr_session* session, tr_port port);
 
 static void sessionSetImpl(void* vdata)
 {
-    struct init_data* data = vdata;
+    auto* data = static_cast<struct init_data*>(vdata);
     tr_session* session = data->session;
     tr_variant* settings = data->clientSettings;
 
@@ -833,7 +833,7 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
     {
-        tr_logSetLevel(i);
+        tr_logSetLevel(tr_log_level(i));
     }
 
 #ifndef _WIN32
@@ -879,7 +879,7 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindInt(settings, TR_KEY_encryption, &i))
     {
-        tr_sessionSetEncryption(session, i);
+        tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_peer_socket_tos, &str, NULL))
@@ -960,7 +960,7 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindInt(settings, TR_KEY_preallocation, &i))
     {
-        session->preallocationMode = i;
+        session->preallocationMode = tr_preallocation_mode(i);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &str, NULL))
@@ -1002,7 +1002,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->bind_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
     if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) || !tr_address_from_string(&b.addr, str) ||
         b.addr.type != TR_AF_INET6)
@@ -1011,7 +1011,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     b.socket = TR_BAD_SOCKET;
-    session->bind_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
+    session->bind_ipv6 = static_cast<tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -1121,7 +1121,7 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_day, &i))
     {
-        turtle->days = i;
+        turtle->days = tr_sched_day(i);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_alt_speed_time_enabled, &boolVal))
@@ -1319,12 +1319,13 @@ bool tr_sessionIsLocked(tr_session const* session)
 ****  Peer Port
 ***/
 
-static void peerPortChanged(void* session)
+static void peerPortChanged(void* vsession)
 {
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isSession(vsession));
 
     tr_torrent* tor = NULL;
 
+    auto* session = static_cast<tr_session*>(vsession);
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
     tr_sharedPortChanged(session);
@@ -1382,7 +1383,7 @@ tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_sharedTraversalStatus(session->shared);
+    return tr_port_forwarding(tr_sharedTraversalStatus(session->shared));
 }
 
 /***
@@ -1534,7 +1535,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
 static void altSpeedToggled(void* vsession)
 {
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2012,7 +2013,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void*
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2051,7 +2052,7 @@ static void sessionCloseImplFinish(tr_session* session)
 
 static void sessionCloseImpl(void* vsession)
 {
-    tr_session* session = vsession;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2165,8 +2166,7 @@ struct sessionLoadTorrentsData
 
 static void sessionLoadTorrents(void* vdata)
 {
-    struct sessionLoadTorrentsData* data = vdata;
-
+    auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
     TR_ASSERT(tr_isSession(data->session));
 
     int i;
@@ -2281,9 +2281,9 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
     return session->isDHTEnabled;
 }
 
-static void toggleDHTImpl(void* data)
+static void toggleDHTImpl(void* vsession)
 {
-    tr_session* session = data;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2317,9 +2317,9 @@ bool tr_sessionIsUTPEnabled(tr_session const* session)
 #endif
 }
 
-static void toggle_utp(void* data)
+static void toggle_utp(void* vsession)
 {
-    tr_session* session = data;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2345,9 +2345,9 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 ****
 ***/
 
-static void toggleLPDImpl(void* data)
+static void toggleLPDImpl(void* vsession)
 {
-    tr_session* session = data;
+    auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2416,7 +2416,7 @@ struct port_forwarding_data
 
 static void setPortForwardingEnabled(void* vdata)
 {
-    struct port_forwarding_data* data = vdata;
+    auto* data = static_cast<struct port_forwarding_data*>(vdata);
     tr_sharedTraversalEnable(data->shared, data->enabled);
     tr_free(data);
 }
@@ -2587,7 +2587,8 @@ int tr_blocklistGetRuleCount(tr_session const* session)
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
-        n += tr_blocklistFileGetRuleCount(l->data);
+        auto const* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
+        n += tr_blocklistFileGetRuleCount(blocklistFile);
     }
 
     return n;
@@ -2608,7 +2609,8 @@ void tr_blocklistSetEnabled(tr_session* session, bool isEnabled)
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
-        tr_blocklistFileSetEnabled(l->data, isEnabled);
+        auto* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
+        tr_blocklistFileSetEnabled(blocklistFile, isEnabled);
     }
 }
 
@@ -2628,9 +2630,10 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
     for (tr_list* l = session->blocklists; b == NULL && l != NULL; l = l->next)
     {
-        if (tr_stringEndsWith(tr_blocklistFileGetFilename(l->data), defaultName))
+        auto const* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
+        if (tr_stringEndsWith(tr_blocklistFileGetFilename(blocklistFile), defaultName))
         {
-            b = l->data;
+            b = static_cast<tr_blocklistFile*>(l->data);
         }
     }
 
@@ -2653,7 +2656,7 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
-        if (tr_blocklistFileHasAddress(l->data, addr))
+        if (tr_blocklistFileHasAddress(static_cast<tr_blocklistFile*>(l->data), addr))
         {
             return true;
         }
@@ -3022,8 +3025,8 @@ struct TorrentAndPosition
 static int compareTorrentAndPositions(void const* va, void const* vb)
 {
     int ret;
-    struct TorrentAndPosition const* a = va;
-    struct TorrentAndPosition const* b = vb;
+    auto const* a = static_cast<struct TorrentAndPosition const*>(va);
+    auto const* b = static_cast<struct TorrentAndPosition const*>(vb);
 
     if (a->position > b->position)
     {
@@ -3136,22 +3139,22 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static int compareTorrentsById(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    tr_torrent const* const b = vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const* const b = static_cast<tr_torrent const*>(vb);
     return a->uniqueId - b->uniqueId;
 }
 
 static int compareTorrentsByHashString(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    tr_torrent const* const b = vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const* const b = static_cast<tr_torrent const*>(vb);
     return evutil_ascii_strcasecmp(a->info.hashString, b->info.hashString);
 }
 
 static int compareTorrentsByHash(void const* va, void const* vb)
 {
-    tr_torrent const* const a = va;
-    tr_torrent const* const b = vb;
+    auto const* const a = static_cast<tr_torrent const*>(va);
+    auto const* const b = static_cast<tr_torrent const*>(vb);
     return memcmp(a->info.hash, b->info.hash, SHA_DIGEST_LENGTH);
 }
 
