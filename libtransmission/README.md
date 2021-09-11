@@ -12,3 +12,6 @@
   For example, use std::vector instead of tr_ptrArray. Any private tools
   such as tr_ptrArray should eventually be removed.
 
+- Please keep modernization patches reasonably focused so that they will
+  be easy to review.
+
