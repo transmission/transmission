@@ -52,12 +52,11 @@ struct json_wrapper_data
 
 static tr_variant* get_node(struct jsonsl_st* jsn)
 {
-    tr_variant* parent;
+    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
+
+    auto* parent = static_cast<tr_variant*>(tr_ptrArrayEmpty(&data->stack) ? NULL : tr_ptrArrayBack(&data->stack));
+
     tr_variant* node = NULL;
-    struct json_wrapper_data* data = jsn->data;
-
-    parent = tr_ptrArrayEmpty(&data->stack) ? NULL : tr_ptrArrayBack(&data->stack);
-
     if (parent == NULL)
     {
         node = data->top;
@@ -81,7 +80,7 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 {
     TR_UNUSED(state);
 
-    struct json_wrapper_data* data = jsn->data;
+    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if (data->source != NULL)
     {
@@ -112,7 +111,7 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct js
     TR_UNUSED(buf);
 
     tr_variant* node;
-    struct json_wrapper_data* data = jsn->data;
+    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
@@ -248,7 +247,7 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, 
                             UTF8* str8_walk = str8_buf;
                             UTF8* str8_end = str8_buf + 8;
 
-                            if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
+                            if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, {}) == 0)
                             {
                                 evbuffer_add(buf, str8_buf, str8_walk - str8_buf);
                                 unescaped = true;
@@ -310,7 +309,7 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
     TR_UNUSED(action);
     TR_UNUSED(buf);
 
-    struct json_wrapper_data* data = jsn->data;
+    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if (state->type == JSONSL_T_STRING)
     {
@@ -327,7 +326,7 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
         int const depth = tr_ptrArraySize(&data->stack);
-        tr_variant const* v = tr_ptrArrayPop(&data->stack);
+        auto* v = static_cast<tr_variant const*>(tr_ptrArrayPop(&data->stack));
         if (depth < MAX_DEPTH)
         {
             data->preallocGuess[depth] = v->val.l.count;
@@ -388,7 +387,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     }
 
     /* parse it */
-    jsonsl_feed(jsn, vbuf, len);
+    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
 
     /* EINVAL if there was no content */
     if (data.error == 0 && !data.has_content)
@@ -449,7 +448,7 @@ static void jsonChildFunc(struct jsonWalk* data)
 {
     if (data->parents != NULL && data->parents->data != NULL)
     {
-        struct ParentState* pstate = data->parents->data;
+        auto* pstate = static_cast<struct ParentState*>(data->parents->data);
 
         switch (pstate->variantType)
         {
@@ -519,14 +518,14 @@ static void jsonPopParent(struct jsonWalk* data)
 
 static void jsonIntFunc(tr_variant const* val, void* vdata)
 {
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
     evbuffer_add_printf(data->out, "%" PRId64, val->val.i);
     jsonChildFunc(data);
 }
 
 static void jsonBoolFunc(tr_variant const* val, void* vdata)
 {
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
 
     if (val->val.b)
     {
@@ -542,7 +541,7 @@ static void jsonBoolFunc(tr_variant const* val, void* vdata)
 
 static void jsonRealFunc(tr_variant const* val, void* vdata)
 {
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
@@ -558,23 +557,20 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
 
 static void jsonStringFunc(tr_variant const* val, void* vdata)
 {
-    char* out;
-    char* outwalk;
     struct evbuffer_iovec vec[1];
-    struct jsonWalk* const data = vdata;
-    unsigned char const* it;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
 
     char const* str = NULL;
     size_t len = 0;
     (void)tr_variantGetStr(val, &str, &len);
-    it = (unsigned char const*)str;
+    auto const* it = reinterpret_cast<unsigned char const*>(str);
     unsigned char const* const end = it + len;
 
     evbuffer_reserve_space(data->out, len * 4, vec, 1);
-    out = vec[0].iov_base;
+    auto* out = static_cast<char*>(vec[0].iov_base);
     char const* const outend = out + vec[0].iov_len;
 
-    outwalk = out;
+    char* outwalk = out;
     *outwalk++ = '"';
 
     for (; it != end; ++it)
@@ -626,7 +622,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
                 UTF8 const* tmp = it;
                 UTF32 buf[1] = { 0 };
                 UTF32* u32 = buf;
-                ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, 0);
+                ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, {});
 
                 if ((result == conversionOK || result == targetExhausted) && tmp != it)
                 {
@@ -648,7 +644,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
 
 static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 {
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     evbuffer_add(data->out, "{", 1);
@@ -662,7 +658,7 @@ static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
     size_t const nChildren = tr_variantListSize(val);
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     evbuffer_add(data->out, "[", 1);
@@ -675,7 +671,7 @@ static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 
 static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
-    struct jsonWalk* data = vdata;
+    auto* data = static_cast<struct jsonWalk*>(vdata);
     bool emptyContainer = false;
 
     jsonPopParent(data);
