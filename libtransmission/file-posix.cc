@@ -946,23 +946,19 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
 
 #elif defined(__APPLE__)
 
-    if (advice != TR_SYS_FILE_ADVICE_WILL_NEED)
+    if (advice == TR_SYS_FILE_ADVICE_WILL_NEED)
     {
-        goto skip_darwin_fcntl;
+        auto radv = radvisory{};
+        radv.ra_offset = offset;
+        radv.ra_count = size;
+
+        ret = fcntl(handle, F_RDADVISE, &radv) != -1;
+
+        if (!ret)
+        {
+            set_system_error(error, errno);
+        }
     }
-
-    auto radv = radvisory{};
-    radv.ra_offset = offset;
-    radv.ra_count = size;
-
-    ret = fcntl(handle, F_RDADVISE, &radv) != -1;
-
-    if (!ret)
-    {
-        set_system_error(error, errno);
-    }
-
-skip_darwin_fcntl:
 
 #else
 
