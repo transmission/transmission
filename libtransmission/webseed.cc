@@ -583,8 +583,8 @@ static void webseed_destruct(tr_peer* peer)
 }
 
 static struct tr_peer_virtual_funcs const my_funcs = {
-    .destruct = webseed_destruct,
-    .is_transferring_pieces = webseed_is_transferring_pieces,
+    webseed_destruct,
+    webseed_is_transferring_pieces,
 };
 
 /***

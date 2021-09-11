@@ -313,8 +313,7 @@ void tr_watchdir_process(tr_watchdir_t handle, char const* name)
 {
     TR_ASSERT(handle != NULL);
 
-    tr_watchdir_retry const search_key = { .name = (char*)name };
-
+    auto const search_key = tr_watchdir_retry{ {}, const_cast<char*>(name), {}, {}, {} };
     auto* existing_retry = static_cast<tr_watchdir_retry*>(tr_watchdir_retries_find(&handle->active_retries, &search_key));
     if (existing_retry != nullptr)
     {

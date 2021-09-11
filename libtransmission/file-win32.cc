@@ -1306,7 +1306,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
-    OVERLAPPED overlapped = { .Pointer = 0, .hEvent = NULL };
+    auto overlapped = OVERLAPPED{};
 
     if ((operation & TR_SYS_FILE_LOCK_UN) == 0)
     {

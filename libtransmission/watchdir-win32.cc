@@ -103,7 +103,7 @@ static BOOL tr_get_overlapped_result_ex(
 
 static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
 {
-    tr_watchdir_t const handle = context;
+    auto const handle = static_cast<tr_watchdir_t const>(context);
     tr_watchdir_win32* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     DWORD bytes_transferred;
 
@@ -148,14 +148,14 @@ static void tr_watchdir_win32_on_first_scan(evutil_socket_t fd, short type, void
     TR_UNUSED(fd);
     TR_UNUSED(type);
 
-    tr_watchdir_t const handle = context;
+    auto const handle = static_cast<tr_watchdir_t const>(context);
 
     tr_watchdir_scan(handle, NULL);
 }
 
 static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 {
-    tr_watchdir_t const handle = context;
+    auto const handle = static_cast<tr_watchdir_t const>(context);
     size_t nread;
     size_t name_size = MAX_PATH * sizeof(WCHAR);
     char* buffer = tr_malloc(sizeof(FILE_NOTIFY_INFORMATION) + name_size);
@@ -187,7 +187,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         if (nleft > name_size)
         {
             name_size = nleft;
-            buffer = tr_realloc(buffer, sizeof(FILE_NOTIFY_INFORMATION) + name_size);
+            buffer = static_cast<char*>(tr_realloc(buffer, sizeof(FILE_NOTIFY_INFORMATION) + name_size));
             ev = (PFILE_NOTIFY_INFORMATION)buffer;
         }
 

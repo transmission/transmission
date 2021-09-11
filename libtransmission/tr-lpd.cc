@@ -549,7 +549,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         maxHashLen = SIZEOF_HASH_STRING
     };
 
-    struct lpd_protocolVersion ver = { .major = -1, .minor = -1 };
+    auto ver = lpd_protocolVersion{ -1, -1 };
     char value[maxValueLen] = { 0 };
     char hashString[maxHashLen] = { 0 };
     int res = 0;
