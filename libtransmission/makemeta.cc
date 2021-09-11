@@ -126,8 +126,8 @@ static uint32_t bestPieceSize(uint64_t totalSize)
 
 static int builderFileCompare(void const* va, void const* vb)
 {
-    tr_metainfo_builder_file const* a = va;
-    tr_metainfo_builder_file const* b = vb;
+    auto const* a = static_cast<tr_metainfo_builder_file const*>(va);
+    auto const* b = static_cast<tr_metainfo_builder_file const*>(vb);
 
     return evutil_ascii_strcasecmp(a->filename, b->filename);
 }
@@ -254,10 +254,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     uint32_t fileIndex = 0;
     uint8_t* ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
     uint8_t* walk = ret;
-    uint8_t* buf;
-    uint64_t totalRemain;
     uint64_t off = 0;
-    tr_sys_file_t fd;
     tr_error* error = NULL;
 
     if (b->totalSize == 0)
@@ -265,11 +262,11 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return ret;
     }
 
-    buf = tr_malloc(b->pieceSize);
+    auto* const buf = static_cast<uint8_t*>(tr_malloc(b->pieceSize));
     b->pieceIndex = 0;
-    totalRemain = b->totalSize;
-    fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+    uint64_t totalRemain = b->totalSize;
 
+    tr_sys_file_t fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
     {
         b->my_errno = error->code;
@@ -589,7 +586,7 @@ void tr_makeMetaInfo(
 
     /* initialize the builder variables */
     builder->abortFlag = false;
-    builder->result = 0;
+    builder->result = TR_MAKEMETA_OK;
     builder->isDone = false;
     builder->pieceIndex = 0;
     builder->trackerCount = trackerCount;
