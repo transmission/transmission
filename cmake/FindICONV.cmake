@@ -17,12 +17,12 @@ find_package_handle_standard_args(ICONV
 )
 
 if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
-    include(CheckCSourceCompiles)
+    include(CheckCXXSourceCompiles)
 
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIRS})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
 
-    check_c_source_compiles("
+    check_cxx_source_compiles("
         #include <iconv.h>
         int main()
         {
