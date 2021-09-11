@@ -1708,7 +1708,9 @@ static int compareAnnounceTiers(void const* va, void const* vb)
         return a->announceAt < b->announceAt ? -1 : 1;
     }
 
-    return 0;
+    // the tiers are effectively equal priority, but add an arbitrary
+    // differentiation because ptrArray sorted mode hates equal items.
+    return a < b ? -1 : 1;
 }
 
 static void scrapeAndAnnounceMore(tr_announcer* announcer)

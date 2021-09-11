@@ -1993,7 +1993,11 @@ bool trashDataFile(char const* filename, tr_error** error)
                 tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
             }
 
-            [self insertPathForComponents:pathComponents withComponentIndex:1 forParent:tempNode fileSize:file->length index:i
+            [self insertPathForComponents:pathComponents
+                       withComponentIndex:1
+                                forParent:tempNode
+                                 fileSize:file->length
+                                    index:i
                                  flatList:flatFileList];
         }
 
