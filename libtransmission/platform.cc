@@ -538,13 +538,16 @@ char const* tr_getWebClientDir(tr_session const* session)
             for (size_t i = 0; s == NULL && i < TR_N_ELEMENTS(known_folder_ids); ++i)
             {
                 char* dir = win32_get_known_folder(known_folder_ids[i]);
-                s = tr_buildPath(dir, "Transmission", "Web", NULL);
+                char* path = tr_buildPath(dir, "Transmission", "Web", NULL);
                 tr_free(dir);
 
-                if (!isWebClientDir(s))
+                if (isWebClientDir(path))
                 {
-                    tr_free(s);
-                    s = NULL;
+                    s = path;
+                }
+                else
+                {
+                    tr_free(path);
                 }
             }
 
