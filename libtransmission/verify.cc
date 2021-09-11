@@ -43,7 +43,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_piece_index_t pieceIndex = 0;
     time_t const begin = tr_time();
     size_t const buflen = 1024 * 128; // 128 KiB buffer
-    uint8_t* const buffer = tr_malloc(buflen);
+    auto* const buffer = static_cast<uint8_t*>(tr_malloc(buflen));
 
     tr_sha1_ctx_t sha = tr_sha1_init();
 
@@ -203,11 +203,10 @@ static void verifyThreadFunc(void* user_data)
     {
         bool changed = false;
         tr_torrent* tor;
-        struct verify_node* node;
 
         tr_lockLock(getVerifyLock());
         stopCurrent = false;
-        node = verifyList != NULL ? verifyList->data : NULL;
+        auto* node = static_cast<struct verify_node*>(verifyList != NULL ? verifyList->data : NULL);
 
         if (node == NULL)
         {
@@ -244,8 +243,8 @@ static void verifyThreadFunc(void* user_data)
 
 static int compareVerifyByPriorityAndSize(void const* va, void const* vb)
 {
-    struct verify_node const* a = va;
-    struct verify_node const* b = vb;
+    auto const* a = static_cast<struct verify_node const*>(va);
+    auto const* b = static_cast<struct verify_node const*>(vb);
 
     /* higher priority comes before lower priority */
     tr_priority_t const pa = tr_torrentGetPriority(a->torrent);
@@ -295,8 +294,8 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
 
 static int compareVerifyByTorrent(void const* va, void const* vb)
 {
-    struct verify_node const* a = va;
-    tr_torrent const* b = vb;
+    auto const* const a = static_cast<struct verify_node const*>(va);
+    auto const* const b = static_cast<tr_torrent const*>(vb);
     return a->torrent - b;
 }
 
@@ -320,7 +319,7 @@ void tr_verifyRemove(tr_torrent* tor)
     }
     else
     {
-        struct verify_node* node = tr_list_remove(&verifyList, tor, compareVerifyByTorrent);
+        auto* node = static_cast<struct verify_node*>(tr_list_remove(&verifyList, tor, compareVerifyByTorrent));
 
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
 
