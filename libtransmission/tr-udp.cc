@@ -212,7 +212,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     if (ss->udp6_bound == NULL)
     {
-        ss->udp6_bound = malloc(16);
+        ss->udp6_bound = static_cast<unsigned char*>(malloc(16));
     }
 
     if (ss->udp6_bound != NULL)
@@ -239,7 +239,7 @@ FAIL:
     }
 }
 
-static void event_callback(evutil_socket_t s, short type, void* sv)
+static void event_callback(evutil_socket_t s, short type, void* vsession)
 {
     TR_UNUSED(type);
 
@@ -250,7 +250,7 @@ static void event_callback(evutil_socket_t s, short type, void* sv)
     socklen_t fromlen;
     unsigned char buf[4096];
     struct sockaddr_storage from;
-    tr_session* ss = sv;
+    auto* session = static_cast<tr_session*>(vsession);
 
     fromlen = sizeof(from);
     rc = recvfrom(s, (void*)buf, 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
@@ -266,15 +266,15 @@ static void event_callback(evutil_socket_t s, short type, void* sv)
     {
         if (buf[0] == 'd')
         {
-            if (tr_sessionAllowsDHT(ss))
+            if (tr_sessionAllowsDHT(session))
             {
                 buf[rc] = '\0'; /* required by the DHT code */
-                tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
+                tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, vsession);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            rc = tau_handle_message(ss, buf, rc);
+            rc = tau_handle_message(session, buf, rc);
 
             if (rc == 0)
             {
@@ -283,9 +283,9 @@ static void event_callback(evutil_socket_t s, short type, void* sv)
         }
         else
         {
-            if (tr_sessionIsUTPEnabled(ss))
+            if (tr_sessionIsUTPEnabled(session))
             {
-                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
+                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session);
 
                 if (rc == 0)
                 {
