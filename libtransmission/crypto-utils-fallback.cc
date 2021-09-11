@@ -33,7 +33,7 @@ struct tr_dh_secret
 
 static struct tr_dh_secret* tr_dh_secret_new(size_t key_length)
 {
-    struct tr_dh_secret* handle = tr_malloc(sizeof(struct tr_dh_secret) + key_length);
+    auto* handle = static_cast<struct tr_dh_secret*>(tr_malloc(sizeof(struct tr_dh_secret) + key_length));
     handle->key_length = key_length;
     return handle;
 }
@@ -54,7 +54,7 @@ bool tr_dh_secret_derive(
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(hash != NULL);
 
-    struct tr_dh_secret* handle = raw_handle;
+    auto* handle = static_cast<struct tr_dh_secret*>(raw_handle);
 
     return tr_sha1(
         hash,
