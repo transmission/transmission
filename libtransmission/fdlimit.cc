@@ -456,7 +456,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, time_t* mtime)
 {
     struct tr_cached_file const* o = fileset_lookup(get_fileset(s), torrent_id, i);
-    tr_sys_path_info info = { 0 };
+    auto info = tr_sys_path_info{};
     bool const success = o != NULL && tr_sys_file_get_info(o->fd, &info, NULL);
 
     if (success)
