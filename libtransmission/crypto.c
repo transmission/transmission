@@ -126,22 +126,22 @@ static void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_
 
 void tr_cryptoDecryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->dec_key, crypto->isIncoming ? "keyA" : "keyB");
+    init_rc4(crypto, &crypto->dec_key, crypto->isIncoming ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(crypto->dec_key, buf_len, buf_in, buf_out);
+    crypt_rc4(crypto->dec_key, buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoEncryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->enc_key, crypto->isIncoming ? "keyB" : "keyA");
+    init_rc4(crypto, &crypto->enc_key, crypto->isIncoming ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    crypt_rc4(crypto->enc_key, buf_len, buf_in, buf_out);
+    crypt_rc4(crypto->enc_key, buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 bool tr_cryptoSecretKeySha1(
