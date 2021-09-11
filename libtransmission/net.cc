@@ -52,15 +52,9 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-tr_address const tr_in6addr_any = {
-    .type = TR_AF_INET6,
-    .addr.addr6 = IN6ADDR_ANY_INIT,
-};
+tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
-tr_address const tr_inaddr_any = {
-    .type = TR_AF_INET,
-    .addr.addr4.s_addr = INADDR_ANY,
-};
+tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
 
 char* tr_net_strerror(char* buf, size_t buflen, int err)
 {
@@ -756,7 +750,7 @@ static bool isMartianAddr(struct tr_address const* a)
 {
     TR_ASSERT(tr_address_is_valid(a));
 
-    static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static unsigned char const zeroes[16] = {};
 
     switch (a->type)
     {
@@ -786,13 +780,15 @@ bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
 {
     TR_ASSERT(handle != TR_BAD_SOCKET);
-    struct tr_peer_socket const ret = { .type = TR_PEER_SOCKET_TYPE_TCP, .handle.tcp = handle };
-    return ret;
+
+    return { TR_PEER_SOCKET_TYPE_TCP, { handle } };
 }
 
 struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
 {
     TR_ASSERT(handle != NULL);
-    struct tr_peer_socket const ret = { .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
+
+    auto ret = tr_peer_socket{ TR_PEER_SOCKET_TYPE_UTP, {} };
+    ret.handle.utp = handle;
     return ret;
 }
