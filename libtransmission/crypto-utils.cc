@@ -10,8 +10,11 @@
 #include <stdlib.h> /* abs(), srand(), rand() */
 #include <string.h> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 
+extern "C"
+{
 #include <b64/cdecode.h>
 #include <b64/cencode.h>
+}
 
 #include "transmission.h"
 #include "crypto-utils.h"

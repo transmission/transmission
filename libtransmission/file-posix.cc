@@ -1126,7 +1126,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 
 #if defined(F_OFD_SETLK)
 
-    struct flock fl = { 0 };
+    struct flock fl = {};
 
     switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
     {
