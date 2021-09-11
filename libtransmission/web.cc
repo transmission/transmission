@@ -108,7 +108,7 @@ struct tr_web
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 {
     size_t const byteCount = size * nmemb;
-    struct tr_web_task* task = vtask;
+    auto* task = static_cast<struct tr_web_task*>(vtask);
 
     /* webseed downloads should be speed limited */
     if (task->torrentId != -1)
@@ -133,7 +133,7 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 {
     TR_UNUSED(purpose);
 
-    struct tr_web_task const* const task = vtask;
+    auto* task = static_cast<struct tr_web_task*>(vtask);
     bool const isScrape = strstr(task->url, "scrape") != NULL;
     bool const isAnnounce = strstr(task->url, "announce") != NULL;
 
@@ -319,7 +319,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 
 static void task_finish_func(void* vtask)
 {
-    struct tr_web_task* task = vtask;
+    auto* task = static_cast<struct tr_web_task*>(vtask);
     dbgmsg("finished web task %p; got %ld", (void*)task, task->code);
 
     if (task->done_func != NULL)
@@ -419,8 +419,8 @@ static void tr_webThreadFunc(void* vsession)
     CURLM* multi;
     struct tr_web* web;
     int taskCount = 0;
-    tr_session* session = vsession;
     uint32_t repeats = 0;
+    auto* session = static_cast<tr_session*>(vsession);
 
     /* try to enable ssl for https support; but if that fails,
      * try a plain vanilla init */
