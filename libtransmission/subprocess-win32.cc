@@ -107,8 +107,8 @@ static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t c
 static int compare_env_part_names(void const* vlhs, void const* vrhs)
 {
     int ret = 0;
-    auto const** const lhs = static_cast<wchar_t const**>(vlhs);
-    auto const** const rhs = static_cast<wchar_t const**>(vrhs);
+    auto const** const lhs = reinterpret_cast<wchar_t const**>(vlhs);
+    auto const** const rhs = reinterpret_cast<wchar_t const**>(vrhs);
 
     size_t lhs_part_len;
     size_t lhs_name_len;
