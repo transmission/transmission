@@ -486,14 +486,13 @@ static void tau_tracker_free(struct tau_tracker* t)
 
 static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, char const* errmsg)
 {
-    tr_ptrArray* reqs;
-
     /* fail all the scrapes */
-    reqs = &tracker->scrapes;
+    tr_ptrArray* reqs = &tracker->scrapes;
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        tau_scrape_request_fail(tr_ptrArrayNth(reqs, i), did_connect, did_timeout, errmsg);
+        auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
+        tau_scrape_request_fail(req, did_connect, did_timeout, errmsg);
     }
 
     tr_ptrArrayDestruct(reqs, (PtrArrayForeachFunc)tau_scrape_request_free);
@@ -504,7 +503,8 @@ static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, 
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        tau_announce_request_fail(tr_ptrArrayNth(reqs, i), did_connect, did_timeout, errmsg);
+        auto* req = static_cast<struct tau_announce_request*>(tr_ptrArrayNth(reqs, i));
+        tau_announce_request_fail(req, did_connect, did_timeout, errmsg);
     }
 
     tr_ptrArrayDestruct(reqs, (PtrArrayForeachFunc)tau_announce_request_free);
@@ -513,7 +513,7 @@ static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, 
 
 static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* vtracker)
 {
-    struct tau_tracker* tracker = vtracker;
+    auto* tracker = static_cast<struct tau_tracker*>(vtracker);
 
     tracker->dns_request = NULL;
 
@@ -557,7 +557,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
+        auto* req = static_cast<struct tau_announce_request*>(tr_ptrArrayNth(reqs, i));
 
         if (req->sent_at == 0)
         {
@@ -579,7 +579,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
+        auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
 
         if (req->sent_at == 0)
         {
@@ -648,7 +648,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
+        auto* req = static_cast<struct tau_announce_request*>(tr_ptrArrayNth(reqs, i));
 
         if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
         {
@@ -665,7 +665,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
+        auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
 
         if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
         {
@@ -807,7 +807,7 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
 
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); tracker == NULL && i < n; ++i)
     {
-        struct tau_tracker* tmp = tr_ptrArrayNth(&tau->trackers, i);
+        auto* tmp = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
 
         if (tr_strcmp0(tmp->key, key) == 0)
         {
@@ -861,7 +861,8 @@ bool tr_tracker_udp_is_idle(tr_session const* session)
     {
         for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
         {
-            if (!tau_tracker_is_idle(tr_ptrArrayNth(&tau->trackers, i)))
+            auto const* tracker = static_cast<struct tau_tracker const*>(tr_ptrArrayNth(&tau->trackers, i));
+            if (!tau_tracker_is_idle(tracker))
             {
                 return false;
             }
@@ -896,7 +897,7 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
     {
         for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
         {
-            struct tau_tracker* tracker = tr_ptrArrayNth(&tau->trackers, i);
+            auto* tracker = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
 
             if (tracker->dns_request != NULL)
             {
@@ -914,7 +915,6 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
 bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 {
     struct tr_announcer_udp* tau;
-    tau_action_t action_id;
     tau_transaction_t transaction_id;
     struct evbuffer* buf;
 
@@ -931,7 +931,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     /* extract the action_id and see if it makes sense */
     buf = evbuffer_new();
     evbuffer_add_reference(buf, msg, msglen, NULL, NULL);
-    action_id = evbuffer_read_ntoh_32(buf);
+    auto const action_id = tau_action_t(evbuffer_read_ntoh_32(buf));
 
     if (!is_tau_response_message(action_id, msglen))
     {
@@ -946,7 +946,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         tr_ptrArray* reqs;
-        struct tau_tracker* tracker = tr_ptrArrayNth(&tau->trackers, i);
+        auto* tracker = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
 
         /* is it a connection response? */
         if (tracker->connecting_at != 0 && transaction_id == tracker->connection_transaction_id)
@@ -962,7 +962,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 
         for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
-            struct tau_announce_request* req = tr_ptrArrayNth(reqs, j);
+            auto* req = static_cast<struct tau_announce_request*>(tr_ptrArrayNth(reqs, j));
 
             if (req->sent_at != 0 && transaction_id == req->transaction_id)
             {
@@ -980,7 +980,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 
         for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
-            struct tau_scrape_request* req = tr_ptrArrayNth(reqs, j);
+            auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, j));
 
             if (req->sent_at != 0 && transaction_id == req->transaction_id)
             {
