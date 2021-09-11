@@ -221,7 +221,7 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
     }
 
     tr_free(*myfiles);
-    *myfiles = tr_memdup(files, sizeof(tr_file_index_t) * fileCount);
+    *myfiles = static_cast<tr_file_index_t*>(tr_memdup(files, sizeof(tr_file_index_t) * fileCount));
     *mycount = fileCount;
 }
 
@@ -249,7 +249,7 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
     tr_file_index_t* mycount = wanted ? &ctor->wantSize : &ctor->notWantSize;
 
     tr_free(*myfiles);
-    *myfiles = tr_memdup(files, sizeof(tr_file_index_t) * fileCount);
+    *myfiles = static_cast<tr_file_index_t*>(tr_memdup(files, sizeof(tr_file_index_t) * fileCount));
     *mycount = fileCount;
 }
 
