@@ -158,7 +158,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
 static void dht_bootstrap(void* closure)
 {
-    struct bootstrap_closure* cl = closure;
+    auto* cl = static_cast<struct bootstrap_closure*>(closure);
     int num = cl->len / 6;
     int num6 = cl->len6 / 18;
 
@@ -242,15 +242,13 @@ static void dht_bootstrap(void* closure)
             for (;;)
             {
                 char buf[201];
-                char* p;
-                int port = 0;
-
                 if (!tr_sys_file_read_line(f, buf, 200, NULL))
                 {
                     break;
                 }
 
-                p = memchr(buf, ' ', strlen(buf));
+                auto* p = static_cast<char*>(memchr(buf, ' ', strlen(buf)));
+                int port = 0;
 
                 if (p != NULL)
                 {
@@ -357,12 +355,12 @@ int tr_dhtInit(tr_session* ss)
 
         if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
         {
-            nodes = tr_memdup(raw, len);
+            nodes = static_cast<uint8_t*>(tr_memdup(raw, len));
         }
 
         if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && len6 % 18 == 0)
         {
-            nodes6 = tr_memdup(raw, len6);
+            nodes6 = static_cast<uint8_t*>(tr_memdup(raw, len6));
         }
 
         tr_variantFree(&benc);
@@ -523,7 +521,7 @@ struct getstatus_closure
 
 static void getstatus(void* cl)
 {
-    struct getstatus_closure* closure = cl;
+    auto* closure = static_cast<struct getstatus_closure*>(cl);
     int good;
     int dubious;
     int incoming;
