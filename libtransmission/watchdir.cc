@@ -117,13 +117,13 @@ typedef struct tr_watchdir_retry
 {
     tr_watchdir_t handle;
     char* name;
-    unsigned int counter;
+    size_t counter;
     struct event* timer;
     struct timeval interval;
 } tr_watchdir_retry;
 
 /* Non-static and mutable for unit tests */
-auto tr_watchdir_retry_limit = int{ 3 };
+auto tr_watchdir_retry_limit = size_t{ 3 };
 auto tr_watchdir_retry_start_interval = timeval{ 1, 0 };
 auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 
