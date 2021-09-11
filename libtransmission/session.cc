@@ -1321,11 +1321,11 @@ bool tr_sessionIsLocked(tr_session const* session)
 
 static void peerPortChanged(void* vsession)
 {
-    TR_ASSERT(tr_isSession(vsession));
+    auto* session = static_cast<tr_session*>(vsession);
+    TR_ASSERT(tr_isSession(session));
 
     tr_torrent* tor = NULL;
 
-    auto* session = static_cast<tr_session*>(vsession);
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
     tr_sharedPortChanged(session);

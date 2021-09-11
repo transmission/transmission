@@ -1167,7 +1167,7 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
 
 #ifdef TR_ENABLE_ASSERTS
 
-static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
+static void checkBestScoresComeFirst(char const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     size_t worstFirstPos = 0;
 
@@ -1199,7 +1199,7 @@ void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compar
         quickfindFirstK(static_cast<char*>(base), 0, nmemb - 1, size, compar, k);
 
 #ifdef TR_ENABLE_ASSERTS
-        checkBestScoresComeFirst(base, nmemb, size, compar, k);
+        checkBestScoresComeFirst(static_cast<char const*>(base), nmemb, size, compar, k);
 #endif
     }
 }

@@ -243,7 +243,7 @@ static void event_callback(evutil_socket_t s, short type, void* vsession)
 {
     TR_UNUSED(type);
 
-    TR_ASSERT(tr_isSession(sv));
+    TR_ASSERT(tr_isSession(static_cast<tr_session*>(vsession)));
     TR_ASSERT(type == EV_READ);
 
     int rc;
