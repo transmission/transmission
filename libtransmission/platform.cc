@@ -563,13 +563,16 @@ char const* tr_getWebClientDir(tr_session const* session)
 
                 if (dir != NULL)
                 {
-                    s = tr_buildPath(dir, "Web", NULL);
+                    char* path = tr_buildPath(dir, "Web", NULL);
                     tr_free(dir);
 
-                    if (!isWebClientDir(s))
+                    if (isWebClientDir(path))
                     {
-                        tr_free(s);
-                        s = NULL;
+                        s = path;
+                    }
+                    else
+                    {
+                        tr_free(path);
                     }
                 }
             }
