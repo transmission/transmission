@@ -150,8 +150,9 @@ tr_sha1_ctx_t tr_sha1_init(void)
     return handle;
 }
 
-bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
+bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
+    auto* handle = static_cast<api_sha1_context*>(raw_handle);
     TR_ASSERT(handle != NULL);
 
     if (data_length == 0)
@@ -165,8 +166,10 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
     return true;
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
+bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
 {
+    auto* handle = static_cast<api_sha1_context*>(raw_handle);
+
     if (hash != NULL)
     {
         TR_ASSERT(handle != NULL);
@@ -260,8 +263,10 @@ tr_dh_ctx_t tr_dh_new(
     return handle;
 }
 
-void tr_dh_free(tr_dh_ctx_t handle)
+void tr_dh_free(tr_dh_ctx_t raw_handle)
 {
+    auto* handle = static_cast<api_dhm_context*>(raw_handle);
+
     if (handle == NULL)
     {
         return;
@@ -275,7 +280,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
 
-    api_dhm_context* handle = raw_handle;
+    auto* handle = static_cast<api_dhm_context*>(raw_handle);
 
     if (public_key_length != NULL)
     {
@@ -290,7 +295,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(other_public_key != NULL);
 
-    api_dhm_context* handle = raw_handle;
+    auto* handle = static_cast<api_dhm_context*>(raw_handle);
     struct tr_dh_secret* ret;
     size_t secret_key_length;
 
@@ -335,7 +340,7 @@ bool tr_rand_buffer(void* buffer, size_t length)
     tr_lock* rng_lock = get_rng_lock();
 
     tr_lockLock(rng_lock);
-    ret = check_result(API(ctr_drbg_random)(get_rng(), buffer, length));
+    ret = check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
     tr_lockUnlock(rng_lock);
 
     return ret;
