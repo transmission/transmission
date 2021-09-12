@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm> // std::partial_sort
 #include <errno.h> /* error codes ERANGE, ... */
 #include <limits.h> /* INT_MAX */
 #include <string.h> /* memcpy, memcmp, strstr */
@@ -4163,35 +4164,6 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
     return score;
 }
 
-static int comparePeerCandidates(void const* va, void const* vb)
-{
-    int ret;
-    auto const* const a = static_cast<struct peer_candidate const*>(va);
-    auto const* const b = static_cast<struct peer_candidate const*>(vb);
-
-    if (a->score < b->score)
-    {
-        ret = -1;
-    }
-    else if (a->score > b->score)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
-/* Partial sorting -- selecting the k best candidates
-   Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
-static void selectPeerCandidates(struct peer_candidate* candidates, int candidate_count, int select_count)
-{
-    tr_quickfindFirstK(candidates, candidate_count, sizeof(struct peer_candidate), comparePeerCandidates, select_count);
-}
-
 #ifdef TR_ENABLE_ASSERTS
 
 static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, int n, int k)
@@ -4333,11 +4305,15 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
         }
     }
 
-    *candidateCount = walk - candidates;
-
-    if (walk != candidates)
+    auto const n_candidates = walk - candidates;
+    *candidateCount = n_candidates;
+    if (n_candidates > max)
     {
-        selectPeerCandidates(candidates, walk - candidates, max);
+        std::partial_sort(
+            candidates,
+            candidates + max,
+            candidates + n_candidates,
+            [](peer_candidate const& a, peer_candidate const& b) { return a.score < b.score; });
     }
 
     TR_ASSERT(checkBestScoresComeFirst(candidates, *candidateCount, max));

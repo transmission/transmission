@@ -6,10 +6,12 @@
  *
  */
 
+#include <algorithm> // std::partial_sort
 #include <errno.h> /* ENOENT */
 #include <limits.h> /* INT_MAX */
 #include <stdlib.h>
 #include <string.h> /* memcpy */
+#include <vector>
 
 #include <signal.h>
 
@@ -3016,85 +3018,34 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
     return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
 }
 
-struct TorrentAndPosition
-{
-    tr_torrent* tor;
-    int position;
-};
-
-static int compareTorrentAndPositions(void const* va, void const* vb)
-{
-    int ret;
-    auto const* a = static_cast<struct TorrentAndPosition const*>(va);
-    auto const* b = static_cast<struct TorrentAndPosition const*>(vb);
-
-    if (a->position > b->position)
-    {
-        ret = 1;
-    }
-    else if (a->position < b->position)
-    {
-        ret = -1;
-    }
-    else
-    {
-        ret = 0;
-    }
-
-    return ret;
-}
-
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted, tr_ptrArray* setme)
 {
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(direction));
 
-    /* build an array of the candidates */
-    size_t n = tr_sessionCountTorrents(session);
-    struct TorrentAndPosition* candidates = tr_new(struct TorrentAndPosition, n);
-    size_t num_candidates = 0;
+    // build an array of the candidates
+    auto candidates = std::vector<tr_torrent*>{};
+    candidates.reserve(tr_sessionCountTorrents(session));
     tr_torrent* tor = NULL;
-
     while ((tor = tr_torrentNext(session, tor)) != NULL)
+        if (tr_torrentIsQueued(tor) && (direction == tr_torrentGetQueueDirection(tor)))
+            candidates.push_back(tor);
+
+    // find the best n candidates
+    num_wanted = std::min(num_wanted, std::size(candidates));
+    if (num_wanted < std::size(candidates))
     {
-        if (!tr_torrentIsQueued(tor))
-        {
-            continue;
-        }
-
-        if (direction != tr_torrentGetQueueDirection(tor))
-        {
-            continue;
-        }
-
-        candidates[num_candidates].tor = tor;
-        candidates[num_candidates].position = tr_torrentGetQueuePosition(tor);
-        ++num_candidates;
+        std::partial_sort(
+            std::begin(candidates),
+            std::begin(candidates) + num_wanted,
+            std::end(candidates),
+            [](tr_torrent* a, tr_torrent* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
+        candidates.resize(num_wanted);
     }
 
-    /* find the best n candidates */
-    if (num_wanted > num_candidates)
-    {
-        num_wanted = num_candidates;
-    }
-    else if (num_wanted < num_candidates)
-    {
-        tr_quickfindFirstK(
-            candidates,
-            num_candidates,
-            sizeof(struct TorrentAndPosition),
-            compareTorrentAndPositions,
-            num_wanted);
-    }
-
-    /* add them to the return array */
-    for (size_t i = 0; i < num_wanted; ++i)
-    {
-        tr_ptrArrayAppend(setme, candidates[i].tor);
-    }
-
-    /* cleanup */
-    tr_free(candidates);
+    // add them to the return array
+    for (auto const& candidate : candidates)
+        tr_ptrArrayAppend(setme, candidate);
 }
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
