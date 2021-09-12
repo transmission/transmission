@@ -53,8 +53,6 @@ void tr_bitfieldRemRange(tr_bitfield*, size_t begin, size_t end);
 ****  life cycle
 ***/
 
-extern tr_bitfield const TR_BITFIELD_INIT;
-
 void tr_bitfieldConstruct(tr_bitfield*, size_t bit_count);
 
 static inline void tr_bitfieldDestruct(tr_bitfield* b)
