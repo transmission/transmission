@@ -144,8 +144,8 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
         int const rcvbuf = isScrape ? 4096 : 3072;
         /* ignore the sockopt() return values -- these are suggestions
            rather than hard requirements & it's OK for them to fail */
-        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&sndbuf, sizeof(sndbuf));
-        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&rcvbuf, sizeof(rcvbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&rcvbuf), sizeof(rcvbuf));
     }
 
     /* return nonzero if this function encountered an error */

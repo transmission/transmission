@@ -297,6 +297,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 if(WIN32)
     tr_add_external_auto_library(EVENT2 libevent event
         CMAKE_ARGS
+            "-DEVENT__DISABLE_OPENSSL:BOOL=ON"
             "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
             "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
 else()

@@ -62,7 +62,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     char err_buf[512];
 
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&size, sizeof(size));
+    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
     {
@@ -70,7 +70,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&size, sizeof(size));
+    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
     {
@@ -79,14 +79,14 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (large)
     {
-        rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void*)&rbuf, &rbuf_len);
+        rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len);
 
         if (rc < 0)
         {
             rbuf = 0;
         }
 
-        rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void*)&sbuf, &sbuf_len);
+        rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len);
 
         if (rc < 0)
         {
@@ -167,7 +167,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 #ifdef IPV6_V6ONLY
     /* Since we always open an IPv4 socket on the same port, this
        shouldn't matter.  But I'm superstitious. */
-    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
+    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
 #endif
 
     memset(&sin6, 0, sizeof(sin6));
@@ -253,7 +253,7 @@ static void event_callback(evutil_socket_t s, short type, void* vsession)
     auto* session = static_cast<tr_session*>(vsession);
 
     fromlen = sizeof(from);
-    rc = recvfrom(s, (void*)buf, 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
+    rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:

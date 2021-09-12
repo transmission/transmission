@@ -69,7 +69,7 @@ static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_
     }
 
     tau_sockaddr_setport(ai->ai_addr, port);
-    return sendto(sockfd, buf, buflen, 0, ai->ai_addr, ai->ai_addrlen);
+    return sendto(sockfd, static_cast<char const*>(buf), buflen, 0, ai->ai_addr, ai->ai_addrlen);
 }
 
 /****

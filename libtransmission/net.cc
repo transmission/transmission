@@ -301,7 +301,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         int n = 8192;
 
-        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)) == -1)
+        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&n), sizeof(n)) == -1)
         {
             tr_logAddInfo(
                 "Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s",
@@ -417,13 +417,13 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     }
 
     optval = 1;
-    (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
-    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
 #ifdef IPV6_V6ONLY
 
     if ((addr->type == TR_AF_INET6) &&
-        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&optval, sizeof(optval)) == -1) &&
+        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
         *errOut = sockerrno;
@@ -483,7 +483,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 #endif
 
     optval = 5;
-    (void)setsockopt(fd, SOL_TCP, TCP_FASTOPEN, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_TCP, TCP_FASTOPEN, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
 #endif
 

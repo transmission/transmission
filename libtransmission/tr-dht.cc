@@ -870,12 +870,12 @@ int dht_random_bytes(void* buf, size_t size)
 
 int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr const* to, int tolen)
 {
-    return sendto(sockfd, buf, len, flags, to, tolen);
+    return sendto(sockfd, static_cast<char const*>(buf), len, flags, to, tolen);
 }
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
-int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
+extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
     TR_ASSERT(tz == NULL);
 

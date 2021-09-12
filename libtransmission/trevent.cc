@@ -104,7 +104,7 @@ static int pgpipe(tr_pipe_end_t handles[2])
 
 static int piperead(tr_pipe_end_t s, void* buf, int len)
 {
-    int ret = recv(s, buf, len, 0);
+    int ret = recv(s, static_cast<char*>(buf), len, 0);
 
     if (ret == -1)
     {

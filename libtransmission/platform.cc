@@ -263,7 +263,7 @@ static char const* getHomeDir(void)
         {
 #ifdef _WIN32
 
-            home = win32_get_known_folder(&FOLDERID_Profile);
+            home = win32_get_known_folder(FOLDERID_Profile);
 
 #else
 
@@ -347,7 +347,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
 #elif defined(_WIN32)
 
-            char* appdata = win32_get_known_folder(&FOLDERID_LocalAppData);
+            char* appdata = win32_get_known_folder(FOLDERID_LocalAppData);
             s = tr_buildPath(appdata, appname, NULL);
             tr_free(appdata);
 
@@ -440,7 +440,7 @@ char const* tr_getDefaultDownloadDir(void)
 
         if (user_dir == NULL)
         {
-            user_dir = win32_get_known_folder(&FOLDERID_Downloads);
+            user_dir = win32_get_known_folder(FOLDERID_Downloads);
         }
 
 #endif
@@ -529,7 +529,7 @@ char const* tr_getWebClientDir(tr_session const* session)
             /* Generally, Web interface should be stored in a Web subdir of
              * calling executable dir. */
 
-            static REFKNOWNFOLDERID known_folder_ids[] = {
+            static KNOWNFOLDERID const* const known_folder_ids[] = {
                 &FOLDERID_LocalAppData,
                 &FOLDERID_RoamingAppData,
                 &FOLDERID_ProgramData,
@@ -537,7 +537,7 @@ char const* tr_getWebClientDir(tr_session const* session)
 
             for (size_t i = 0; s == NULL && i < TR_N_ELEMENTS(known_folder_ids); ++i)
             {
-                char* dir = win32_get_known_folder(known_folder_ids[i]);
+                char* dir = win32_get_known_folder(*known_folder_ids[i]);
                 char* path = tr_buildPath(dir, "Transmission", "Web", NULL);
                 tr_free(dir);
 
@@ -662,7 +662,7 @@ char* tr_getSessionIdDir(void)
 
 #else
 
-    char* program_data_dir = win32_get_known_folder_ex(&FOLDERID_ProgramData, KF_FLAG_CREATE);
+    char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
     char* result = tr_buildPath(program_data_dir, "Transmission", NULL);
     tr_free(program_data_dir);
     tr_sys_dir_create(result, 0, 0, NULL);
