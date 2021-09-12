@@ -1742,7 +1742,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     /* Second, announce what we can. If there aren't enough slots
      * available, use compareAnnounceTiers to prioritize. */
-    if (std::size(announce_me) > MAX_ANNOUNCES_PER_UPKEEP)
+    if (announce_me.size() > MAX_ANNOUNCES_PER_UPKEEP)
     {
         std::partial_sort(
             std::begin(announce_me),

@@ -3032,8 +3032,8 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
             candidates.push_back(tor);
 
     // find the best n candidates
-    num_wanted = std::min(num_wanted, std::size(candidates));
-    if (num_wanted < std::size(candidates))
+    num_wanted = std::min(num_wanted, candidates.size());
+    if (num_wanted < candidates.size())
     {
         std::partial_sort(
             std::begin(candidates),
