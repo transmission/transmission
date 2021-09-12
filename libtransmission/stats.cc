@@ -18,8 +18,6 @@
 ****
 ***/
 
-struct tr_session_stats const TR_SESSION_STATS_INIT = {};
-
 /** @brief Opaque, per-session data structure for bandwidth use statistics */
 struct tr_stats_handle
 {
