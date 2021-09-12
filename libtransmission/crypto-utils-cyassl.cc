@@ -144,7 +144,7 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != NULL);
 
-    return check_result(API(ShaUpdate)(handle, data, data_length));
+    return check_result(API(ShaUpdate)(handle, static_cast<const byte*>(data), data_length));
 }
 
 bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
@@ -177,7 +177,7 @@ void tr_rc4_free(tr_rc4_ctx_t handle)
     tr_free(handle);
 }
 
-void tr_rc4_set_key(tr_rc4_ctx_t rarw_handle, uint8_t const* key, size_t key_length)
+void tr_rc4_set_key(tr_rc4_ctx_t raw_handle, uint8_t const* key, size_t key_length)
 {
     auto* handle = static_cast<Arc4*>(raw_handle);
 
@@ -187,7 +187,7 @@ void tr_rc4_set_key(tr_rc4_ctx_t rarw_handle, uint8_t const* key, size_t key_len
     API(Arc4SetKey)(handle, key, key_length);
 }
 
-void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
+void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, size_t length)
 {
     auto* handle = static_cast<Arc4*>(raw_handle);
 
@@ -234,7 +234,7 @@ tr_dh_ctx_t tr_dh_new(
 
 void tr_dh_free(tr_dh_ctx_t raw_handle)
 {
-    auto* handle = static_cast < struct tr_dh_ctx* handle = raw_handle;
+    auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
 
     if (handle == NULL)
     {
@@ -253,7 +253,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
 
-    auto* handle = static_cast < struct tr_dh_ctx* handle = raw_handle;
+    auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
     word32 my_private_key_length;
     word32 my_public_key_length;
     tr_lock* rng_lock = get_rng_lock();
@@ -296,7 +296,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(other_public_key != NULL);
 
-    auto* handle = static_cast < struct tr_dh_ctx* handle = raw_handle;
+    auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
     struct tr_dh_secret* ret;
     word32 my_secret_key_length;
 
