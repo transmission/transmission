@@ -201,7 +201,7 @@ void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, si
     TR_ASSERT(input != NULL);
     TR_ASSERT(output != NULL);
 
-    API(Arc4Process)(handle, output, input, length);
+    API(Arc4Process)(handle, static_cast<byte*>(output), static_cast<byte const*>(input), length);
 }
 
 /***
@@ -260,7 +260,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
     if (handle->private_key == NULL)
     {
-        handle->private_key = tr_malloc(handle->key_length);
+        handle->private_key = static_cast<uint8_t*>(tr_malloc(handle->key_length));
     }
 
     tr_lockLock(rng_lock);
