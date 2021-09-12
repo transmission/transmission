@@ -18,7 +18,6 @@
 #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
 #endif
 
-#include API_HEADER_CRYPT(arc4.h)
 #include API_HEADER_CRYPT(dh.h)
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)
@@ -159,43 +158,6 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
 
     tr_free(handle);
     return ret;
-}
-
-/***
-****
-***/
-
-tr_rc4_ctx_t tr_rc4_new(void)
-{
-    return tr_new0(Arc4, 1);
-}
-
-void tr_rc4_free(tr_rc4_ctx_t handle)
-{
-    tr_free(handle);
-}
-
-void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
-{
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(key != NULL);
-
-    API(Arc4SetKey)(handle, key, key_length);
-}
-
-void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
-{
-    TR_ASSERT(handle != NULL);
-
-    if (length == 0)
-    {
-        return;
-    }
-
-    TR_ASSERT(input != NULL);
-    TR_ASSERT(output != NULL);
-
-    API(Arc4Process)(handle, output, input, length);
 }
 
 /***
