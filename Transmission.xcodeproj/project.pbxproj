@@ -358,6 +358,9 @@
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
 		C1639A7C1A55F57200E42033 /* cdecode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7A1A55F57200E42033 /* cdecode.h */; };
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
+		C1A7517526ED048C0038B90A /* libarc4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1A7516426ED03140038B90A /* libarc4.a */; };
+		C1A751E526ED09A30038B90A /* arc4.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A751E326ED09A30038B90A /* arc4.c */; };
+		C1A751E626ED09A30038B90A /* arc4.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A751E426ED09A30038B90A /* arc4.h */; };
 		C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */; };
 		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; };
 		C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.c */; };
@@ -459,6 +462,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C1639A6E1A55F4D600E42033;
 			remoteInfo = b64;
+		};
+		C1A751C726ED06390038B90A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1A7516326ED03140038B90A;
+			remoteInfo = arc4;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1010,6 +1020,9 @@
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = src/cencode.c; sourceTree = "<group>"; };
 		C1639A7A1A55F57200E42033 /* cdecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cdecode.h; path = include/b64/cdecode.h; sourceTree = "<group>"; };
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = include/b64/cencode.h; sourceTree = "<group>"; };
+		C1A7516426ED03140038B90A /* libarc4.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libarc4.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A751E326ED09A30038B90A /* arc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arc4.c; path = "third-party/arc4/src/arc4.c"; sourceTree = SOURCE_ROOT; };
+		C1A751E426ED09A30038B90A /* arc4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arc4.h; path = "third-party/arc4/src/arc4.h"; sourceTree = SOURCE_ROOT; };
 		C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = upnpdev.c; sourceTree = "<group>"; };
 		C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = upnpdev.h; sourceTree = "<group>"; };
 		C1F690FC1AD0627500D95CF0 /* daemon-posix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "daemon-posix.c"; sourceTree = "<group>"; };
@@ -1119,6 +1132,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A7517526ED048C0038B90A /* libarc4.a in Frameworks */,
 				C1639A741A55F4E000E42033 /* libb64.a in Frameworks */,
 				A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */,
 				A267927C130DFF2700CB7464 /* libutp.a in Frameworks */,
@@ -1157,6 +1171,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C1639A6C1A55F4D600E42033 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1A7516226ED03140038B90A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1272,6 +1293,7 @@
 				A2E38544130DFEE3001F501B /* libutp.a */,
 				A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */,
 				C1639A6F1A55F4D600E42033 /* libb64.a */,
+				C1A7516426ED03140038B90A /* libarc4.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1286,6 +1308,7 @@
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				C15E58AC219A37C600AB292F /* utils */,
+				C1A7518626ED04EC0038B90A /* arc4 */,
 				A22CFCB50FC24F630009BD3E /* dht */,
 				A2E384BF130DFA49001F501B /* libutp */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
@@ -1738,6 +1761,15 @@
 			path = "third-party/libb64";
 			sourceTree = "<group>";
 		};
+		C1A7518626ED04EC0038B90A /* arc4 */ = {
+			isa = PBXGroup;
+			children = (
+				C1A751E326ED09A30038B90A /* arc4.c */,
+				C1A751E426ED09A30038B90A /* arc4.h */,
+			);
+			path = arc4;
+			sourceTree = "<group>";
+		};
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
 			children = (
@@ -1949,6 +1981,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1A7516026ED03140038B90A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1A751E626ED09A30038B90A /* arc4.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1981,6 +2021,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C1A751C826ED06390038B90A /* PBXTargetDependency */,
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
@@ -2174,6 +2215,23 @@
 			productReference = C1639A6F1A55F4D600E42033 /* libb64.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		C1A7516326ED03140038B90A /* arc4 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1A7516826ED03140038B90A /* Build configuration list for PBXNativeTarget "arc4" */;
+			buildPhases = (
+				C1A7516026ED03140038B90A /* Headers */,
+				C1A7516126ED03140038B90A /* Sources */,
+				C1A7516226ED03140038B90A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = arc4;
+			productName = arc4;
+			productReference = C1A7516426ED03140038B90A /* libarc4.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2229,6 +2287,7 @@
 				BE1183470CE160960002D0F3 /* miniupnp */,
 				3C7A118C0D0B2EB800B5701F /* natpmp */,
 				C1639A6E1A55F4D600E42033 /* b64 */,
+				C1A7516326ED03140038B90A /* arc4 */,
 			);
 		};
 /* End PBXProject section */
@@ -2646,6 +2705,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1A7516126ED03140038B90A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1A751E526ED09A30038B90A /* arc4.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2708,6 +2775,11 @@
 			isa = PBXTargetDependency;
 			target = C1639A6E1A55F4D600E42033 /* b64 */;
 			targetProxy = C165AB8C1A55FAA900D37711 /* PBXContainerItemProxy */;
+		};
+		C1A751C826ED06390038B90A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1A7516326ED03140038B90A /* arc4 */;
+			targetProxy = C1A751C726ED06390038B90A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2965,6 +3037,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
@@ -3155,6 +3228,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
@@ -3410,6 +3484,7 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
@@ -3650,6 +3725,30 @@
 			};
 			name = Release;
 		};
+		C1A7516526ED03140038B90A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C1A7516626ED03140038B90A /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Release - Debug";
+		};
+		C1A7516726ED03140038B90A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3779,6 +3878,16 @@
 				C1639A701A55F4D600E42033 /* Debug */,
 				C1639A711A55F4D600E42033 /* Release - Debug */,
 				C1639A721A55F4D600E42033 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C1A7516826ED03140038B90A /* Build configuration list for PBXNativeTarget "arc4" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1A7516526ED03140038B90A /* Debug */,
+				C1A7516626ED03140038B90A /* Release - Debug */,
+				C1A7516726ED03140038B90A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

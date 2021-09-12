@@ -10,6 +10,8 @@
 #include <stdlib.h> /* abs(), srand(), rand() */
 #include <string.h> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 
+#include <arc4.h>
+
 extern "C"
 {
 #include <b64/cdecode.h>
