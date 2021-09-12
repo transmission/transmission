@@ -66,7 +66,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t fd, short type, void* co
     TR_UNUSED(fd);
     TR_UNUSED(type);
 
-    auto const handle = static_cast<tr_watchdir_t const>(context);
+    auto const handle = static_cast<tr_watchdir_t>(context);
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct kevent ke;
     auto ts = timespec{};

@@ -60,7 +60,7 @@ static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd, short type, vo
     TR_UNUSED(fd);
     TR_UNUSED(type);
 
-    auto const handle = static_cast<tr_watchdir_t const>(context);
+    auto const handle = static_cast<tr_watchdir_t>(context);
 
     tr_watchdir_scan(handle, NULL);
 }
@@ -69,7 +69,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 {
     TR_ASSERT(context != NULL);
 
-    auto const handle = static_cast<tr_watchdir_t const>(context);
+    auto const handle = static_cast<tr_watchdir_t>(context);
 #ifdef TR_ENABLE_ASSERTS
     tr_watchdir_inotify const* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 #endif
