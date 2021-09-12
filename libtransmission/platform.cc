@@ -497,13 +497,13 @@ char const* tr_getWebClientDir(tr_session const* session)
 
             if (!isWebClientDir(s))
             {
-                tr_free(s);
+                tr_free(const_cast<char*>(s));
 
                 CFURLRef appURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
                 CFStringRef appRef = CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle);
                 CFIndex const appStringLength = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
 
-                char* appString = tr_malloc(appStringLength);
+                char* appString = static_cast<char*>(tr_malloc(appStringLength));
                 bool const success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
                 TR_ASSERT(success);
 
@@ -515,7 +515,7 @@ char const* tr_getWebClientDir(tr_session const* session)
 
                 if (!isWebClientDir(s))
                 {
-                    tr_free(s);
+                    tr_free(const_cast<char*>(s));
                     s = NULL;
                 }
 
