@@ -616,7 +616,7 @@ else()
 endif()
 
 if(RUN_CLANG_TIDY STREQUAL "AUTO")
-    if (DEFINED ENV{LGTM_SRC}) # skip clang-tidy on LGTM
+    if (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
         set(RUN_CLANG_TIDY OFF)
     elseif(CMAKE_VERSION VERSION_LESS "3.7.2")
         set(RUN_CLANG_TIDY OFF)
