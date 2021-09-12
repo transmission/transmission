@@ -1,17 +1,15 @@
 # Notes on the C-to-C++ Conversion
 
 - libtransmission was written in C for fifteen years, so eliminating all
-  Cisms is nearly impossible. Modernization patches are welcomed but one
-  should accept seeing `tr_strdup()` and `constexpr` side-by-side in the
-  codebase.
+  Cisms is nearly impossible. **Modernization patches are welcomed** but
+  it won't all happen overnight. `tr_strdup()` and `constexpr` wil exist
+  side-by-side in the codebase for the forseeable future.
 
-- C++ MUST NOT be leaked into public headers, e.g. transmission.h. If in
-  doubt check `#error only libtransmission should #include this header.`
+- It's so tempting to refactor all the things! Please keep modernization
+  patches reasonably focused so that they will be easy to review.
 
-- C++ tools are preferred everywhere else, including in private headers.
-  For example, use std::vector instead of tr_ptrArray. Any private tools
-  such as tr_ptrArray should eventually be removed.
+- Prefer `std::` tools over bespoke ones. For example, use `std::vector`
+  instead of tr_ptrArray. Redundant bespoke code should be removed.
 
-- Please keep modernization patches reasonably focused so that they will
-  be easy to review.
-
+- Consider ripple effects before adding C++ into public headers. Will it
+  break C code that #includes that header?
