@@ -18,7 +18,6 @@
 #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
 #endif
 
-#include API_HEADER_CRYPT(arc4.h)
 #include API_HEADER_CRYPT(dh.h)
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)
@@ -144,7 +143,7 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != NULL);
 
-    return check_result(API(ShaUpdate)(handle, static_cast<const byte*>(data), data_length));
+    return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
 
 bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
@@ -161,47 +160,6 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
 
     tr_free(handle);
     return ret;
-}
-
-/***
-****
-***/
-
-tr_rc4_ctx_t tr_rc4_new(void)
-{
-    return tr_new0(Arc4, 1);
-}
-
-void tr_rc4_free(tr_rc4_ctx_t handle)
-{
-    tr_free(handle);
-}
-
-void tr_rc4_set_key(tr_rc4_ctx_t raw_handle, uint8_t const* key, size_t key_length)
-{
-    auto* handle = static_cast<Arc4*>(raw_handle);
-
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(key != NULL);
-
-    API(Arc4SetKey)(handle, key, key_length);
-}
-
-void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, size_t length)
-{
-    auto* handle = static_cast<Arc4*>(raw_handle);
-
-    TR_ASSERT(handle != NULL);
-
-    if (length == 0)
-    {
-        return;
-    }
-
-    TR_ASSERT(input != NULL);
-    TR_ASSERT(output != NULL);
-
-    API(Arc4Process)(handle, static_cast<byte*>(output), static_cast<byte const*>(input), length);
 }
 
 /***

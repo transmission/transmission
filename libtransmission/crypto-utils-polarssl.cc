@@ -16,7 +16,6 @@
 #define API_VERSION_NUMBER POLARSSL_VERSION_NUMBER
 #endif
 
-#include API_HEADER(arc4.h)
 #include API_HEADER(base64.h)
 #include API_HEADER(ctr_drbg.h)
 #include API_HEADER(dhm.h)
@@ -43,7 +42,6 @@
 
 typedef API(ctr_drbg_context) api_ctr_drbg_context;
 typedef API(sha1_context) api_sha1_context;
-typedef API(arc4_context) api_arc4_context;
 typedef API(dhm_context) api_dhm_context;
 
 static void log_polarssl_error(int error_code, char const* file, int line)
@@ -183,58 +181,6 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
 
     tr_free(handle);
     return true;
-}
-
-/***
-****
-***/
-
-tr_rc4_ctx_t tr_rc4_new(void)
-{
-    api_arc4_context* handle = tr_new0(api_arc4_context, 1);
-
-#if API_VERSION_NUMBER >= 0x01030800
-    API(arc4_init)(handle);
-#endif
-
-    return handle;
-}
-
-void tr_rc4_free(tr_rc4_ctx_t raw_handle)
-{
-#if API_VERSION_NUMBER >= 0x01030800
-    auto* handle = static_cast<api_arc4_context*>(raw_handle);
-    API(arc4_free)(handle);
-#endif
-
-    tr_free(raw_handle);
-}
-
-void tr_rc4_set_key(tr_rc4_ctx_t raw_handle, uint8_t const* key, size_t key_length)
-{
-    auto* handle = static_cast<api_arc4_context*>(raw_handle);
-
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(key != NULL);
-
-    API(arc4_setup)(handle, key, key_length);
-}
-
-void tr_rc4_process(tr_rc4_ctx_t raw_handle, void const* input, void* output, size_t length)
-{
-    auto* handle = static_cast<api_arc4_context*>(raw_handle);
-
-    TR_ASSERT(handle != NULL);
-
-    if (length == 0)
-    {
-        return;
-    }
-
-    TR_ASSERT(input != NULL);
-    TR_ASSERT(output != NULL);
-
-    API(arc4_crypt)(handle, length, static_cast<unsigned char const*>(input), static_cast<unsigned char*>(output));
 }
 
 /***
