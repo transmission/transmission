@@ -55,7 +55,7 @@ static char* favicon_get_cache_filename(char const* host)
 static void favicon_save_to_cache(char const* host, void const* data, size_t len)
 {
     char* filename = favicon_get_cache_filename(host);
-    g_file_set_contents(filename, data, len, NULL);
+    g_file_set_contents(filename, static_cast<gchar const*>(data), len, NULL);
     g_free(filename);
 }
 
@@ -79,7 +79,7 @@ static gboolean favicon_web_done_idle_cb(gpointer vfav)
 {
     GdkPixbuf* pixbuf = NULL;
     gboolean finished = FALSE;
-    struct favicon_data* fav = vfav;
+    auto* fav = static_cast<favicon_data*>(vfav);
 
     if (fav->len > 0) /* we got something... try to make a pixbuf from it */
     {
@@ -132,8 +132,8 @@ static void favicon_web_done_cb(
     TR_UNUSED(did_timeout);
     TR_UNUSED(code);
 
-    struct favicon_data* fav = vfav;
-    fav->contents = g_memdup(data, len);
+    auto* fav = static_cast<favicon_data*>(vfav);
+    fav->contents = static_cast<char*>(g_memdup(data, len));
     fav->len = len;
 
     gdk_threads_add_idle(favicon_web_done_idle_cb, fav);

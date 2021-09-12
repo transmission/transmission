@@ -92,7 +92,7 @@ static void tracker_model_update_count(GtkTreeStore* store, GtkTreeIter* iter, i
 static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 {
     GtkTreeIter iter;
-    GtkTreeRowReference* reference = vreference;
+    auto* reference = static_cast<GtkTreeRowReference*>(vreference);
 
     if (pixbuf != NULL)
     {
@@ -143,7 +143,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
                 gtr_get_host_from_url(name, sizeof(name), inf->trackers[i].announce);
                 char* const key = g_string_chunk_insert_const(strings, name);
 
-                int* count = g_hash_table_lookup(hosts_hash, key);
+                auto* count = static_cast<int*>(g_hash_table_lookup(hosts_hash, key));
                 if (count == NULL)
                 {
                     count = tr_new0(int, 1);
@@ -166,7 +166,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
             for (int i = 0; i < keyCount; ++i)
             {
-                int* incrementme = g_hash_table_lookup(hosts_hash, keys[i]);
+                auto* incrementme = static_cast<int*>(g_hash_table_lookup(hosts_hash, keys[i]));
                 ++*incrementme;
             }
 
@@ -213,7 +213,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         {
             char* host;
             gtk_tree_model_get(model, &iter, TRACKER_FILTER_COL_HOST, &host, -1);
-            int const cmp = g_strcmp0(host, hosts->pdata[i]);
+            int const cmp = g_strcmp0(host, static_cast<char const*>(hosts->pdata[i]));
 
             if (cmp < 0)
             {
@@ -237,8 +237,8 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             GtkTreeIter add;
             GtkTreePath* path;
             GtkTreeRowReference* reference;
-            tr_session* session = g_object_get_qdata(G_OBJECT(store), SESSION_KEY);
-            char const* host = hosts->pdata[i];
+            auto* session = static_cast<tr_session*>(g_object_get_qdata(G_OBJECT(store), SESSION_KEY));
+            auto const* host = static_cast<char const*>(hosts->pdata[i]);
             char* name = get_name_from_host(host);
             int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             gtk_tree_store_insert_with_values(
@@ -261,7 +261,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         }
         else // update row
         {
-            char const* const host = hosts->pdata[i];
+            auto const* const host = static_cast<char const*>(hosts->pdata[i]);
             int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             tracker_model_update_count(store, &iter, count);
             ++store_pos;
@@ -408,8 +408,8 @@ static GtkCellRenderer* number_renderer_new(void)
 
 static void disconnect_cat_model_callbacks(gpointer tmodel, GObject* cat_model)
 {
-    g_signal_handlers_disconnect_by_func(tmodel, torrent_model_row_changed, cat_model);
-    g_signal_handlers_disconnect_by_func(tmodel, torrent_model_row_deleted_cb, cat_model);
+    g_signal_handlers_disconnect_by_func(tmodel, reinterpret_cast<gpointer>(torrent_model_row_changed), cat_model);
+    g_signal_handlers_disconnect_by_func(tmodel, reinterpret_cast<gpointer>(torrent_model_row_deleted_cb), cat_model);
 }
 
 static GtkWidget* tracker_combo_box_new(GtkTreeModel* tmodel)
@@ -692,8 +692,8 @@ static void activity_torrent_model_row_deleted_cb(GtkTreeModel const* tmodel, Gt
 
 static void disconnect_activity_model_callbacks(gpointer tmodel, GObject* cat_model)
 {
-    g_signal_handlers_disconnect_by_func(tmodel, activity_torrent_model_row_changed, cat_model);
-    g_signal_handlers_disconnect_by_func(tmodel, activity_torrent_model_row_deleted_cb, cat_model);
+    g_signal_handlers_disconnect_by_func(tmodel, reinterpret_cast<gpointer>(activity_torrent_model_row_changed), cat_model);
+    g_signal_handlers_disconnect_by_func(tmodel, reinterpret_cast<gpointer>(activity_torrent_model_row_deleted_cb), cat_model);
 }
 
 static GtkWidget* activity_combo_box_new(GtkTreeModel* tmodel)
@@ -780,7 +780,7 @@ static void filter_entry_changed(GtkEditable* e, gpointer filter_model)
     pch = gtk_editable_get_chars(e, 0, -1);
     folded = g_utf8_casefold(pch, -1);
     g_strstrip(folded);
-    g_object_set_qdata_full(filter_model, TEXT_KEY, folded, g_free);
+    g_object_set_qdata_full(static_cast<GObject*>(filter_model), TEXT_KEY, folded, g_free);
     g_free(pch);
 
     gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(filter_model));
@@ -808,7 +808,7 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
 {
     char const* text;
     tr_torrent* tor;
-    struct filter_data* data = vdata;
+    auto* data = static_cast<filter_data*>(vdata);
     GObject* o = G_OBJECT(data->filter_model);
 
     gtk_tree_model_get(model, iter, MC_TORRENT, &tor, -1);
@@ -825,7 +825,7 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
     char* host;
     GtkTreeIter iter;
     GtkTreeModel* model;
-    struct filter_data* data = vdata;
+    auto* data = static_cast<filter_data*>(vdata);
 
     /* set data->active_activity_type from the activity combobox */
     combo = GTK_COMBO_BOX(data->activity);
@@ -882,7 +882,7 @@ static gboolean update_count_label(gpointer gdata)
     GtkTreeModel* model;
     GtkComboBox* combo;
     GtkTreeIter iter;
-    struct filter_data* data = gdata;
+    auto* data = static_cast<filter_data*>(gdata);
 
     /* get the visible count */
     visibleCount = gtk_tree_model_iter_n_children(data->filter_model, NULL);
@@ -951,7 +951,7 @@ static void on_filter_model_row_inserted(
     TR_UNUSED(path);
     TR_UNUSED(iter);
 
-    update_count_label_idle(data);
+    update_count_label_idle(static_cast<filter_data*>(data));
 }
 
 static void on_filter_model_row_deleted(GtkTreeModel const* tree_model, GtkTreePath const* path, gpointer data)
@@ -959,7 +959,7 @@ static void on_filter_model_row_deleted(GtkTreeModel const* tree_model, GtkTreeP
     TR_UNUSED(tree_model);
     TR_UNUSED(path);
 
-    update_count_label_idle(data);
+    update_count_label_idle(static_cast<filter_data*>(data));
 }
 
 /***

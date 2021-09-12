@@ -87,7 +87,7 @@ struct spin_idle_data
 
 static void spin_idle_data_free(gpointer gdata)
 {
-    struct spin_idle_data* data = gdata;
+    auto* data = static_cast<spin_idle_data*>(gdata);
 
     g_timer_destroy(data->last_change);
     g_free(data);
@@ -97,7 +97,7 @@ static gboolean spun_cb_idle(gpointer spin)
 {
     gboolean keep_waiting = TRUE;
     GObject* o = G_OBJECT(spin);
-    struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
+    auto* data = static_cast<spin_idle_data*>(g_object_get_data(o, IDLE_DATA));
 
     /* has the user stopped making changes? */
     if (g_timer_elapsed(data->last_change, NULL) > 0.33)
@@ -130,7 +130,7 @@ static void spun_cb(GtkSpinButton* w, gpointer core, gboolean isDouble)
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
     GObject* o = G_OBJECT(w);
-    struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
+    auto* data = static_cast<spin_idle_data*>(g_object_get_data(o, IDLE_DATA));
 
     if (data == NULL)
     {
@@ -421,7 +421,7 @@ static void privacyPageDestroyed(gpointer gdata, GObject* dead)
 {
     TR_UNUSED(dead);
 
-    struct blocklist_data* data = gdata;
+    auto* data = static_cast<blocklist_data*>(gdata);
 
     if (data->updateBlocklistTag > 0)
     {
@@ -436,7 +436,7 @@ static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response, gpointer
 {
     TR_UNUSED(response);
 
-    struct blocklist_data* data = gdata;
+    auto* data = static_cast<blocklist_data*>(gdata);
     gtk_widget_destroy(GTK_WIDGET(dialog));
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
     data->updateBlocklistDialog = NULL;
@@ -449,7 +449,7 @@ static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
-    struct blocklist_data* data = gdata;
+    auto* data = static_cast<blocklist_data*>(gdata);
     GtkMessageDialog* d = GTK_MESSAGE_DIALOG(data->updateBlocklistDialog);
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
     gtk_message_dialog_set_markup(d, success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"));
@@ -462,7 +462,7 @@ static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
 static void onBlocklistUpdate(GtkButton* w, gpointer gdata)
 {
     GtkWidget* d;
-    struct blocklist_data* data = gdata;
+    auto* data = static_cast<blocklist_data*>(gdata);
     d = gtk_message_dialog_new(
         GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))),
         GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -646,7 +646,7 @@ static void onAddressEdited(GtkCellRendererText const* r, gchar const* path_stri
     TR_UNUSED(r);
 
     GtkTreeIter iter;
-    struct remote_page* page = gpage;
+    auto* page = static_cast<remote_page*>(gpage);
     GtkTreeModel* model = GTK_TREE_MODEL(page->store);
     GtkTreePath* path = gtk_tree_path_new_from_string(path_string);
 
@@ -665,7 +665,7 @@ static void onAddWhitelistClicked(GtkButton const* b, gpointer gpage)
 
     GtkTreeIter iter;
     GtkTreePath* path;
-    struct remote_page* page = gpage;
+    auto* page = static_cast<remote_page*>(gpage);
 
     gtk_list_store_append(page->store, &iter);
     gtk_list_store_set(page->store, &iter, COL_ADDRESS, "0.0.0.0", -1);
@@ -679,7 +679,7 @@ static void onRemoveWhitelistClicked(GtkButton const* b, gpointer gpage)
 {
     TR_UNUSED(b);
 
-    struct remote_page* page = gpage;
+    auto* page = static_cast<remote_page*>(gpage);
     GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
     GtkTreeIter iter;
 
@@ -721,14 +721,14 @@ static void onRPCToggled(GtkToggleButton* tb, gpointer page)
 {
     TR_UNUSED(tb);
 
-    refreshRPCSensitivity(page);
+    refreshRPCSensitivity(static_cast<remote_page*>(page));
 }
 
 static void onWhitelistSelectionChanged(GtkTreeSelection* sel, gpointer page)
 {
     TR_UNUSED(sel);
 
-    refreshRPCSensitivity(page);
+    refreshRPCSensitivity(static_cast<remote_page*>(page));
 }
 
 static void onLaunchClutchCB(GtkButton* w, gpointer data)
@@ -746,7 +746,7 @@ static void onLaunchClutchCB(GtkButton* w, gpointer data)
 
 static void remotePageFree(gpointer gpage)
 {
-    struct remote_page* page = gpage;
+    auto* page = static_cast<remote_page*>(gpage);
 
     g_slist_free(page->widgets);
     g_slist_free(page->auth_widgets);
@@ -906,7 +906,7 @@ static void onSchedToggled(GtkToggleButton* tb, gpointer user_data)
 {
     TR_UNUSED(tb);
 
-    refreshSchedSensitivity(user_data);
+    refreshSchedSensitivity(static_cast<BandwidthPage*>(user_data));
 }
 
 static void onTimeComboChanged(GtkComboBox* w, gpointer core)
@@ -979,7 +979,7 @@ static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
 
 static void speedPageFree(gpointer gpage)
 {
-    struct BandwidthPage* page = gpage;
+    auto* page = static_cast<BandwidthPage*>(gpage);
 
     g_slist_free(page->sched_widgets);
     g_free(page);
@@ -1090,7 +1090,7 @@ static void onCorePrefsChanged(TrCore* core, tr_quark const key, gpointer gdata)
 
     if (key == TR_KEY_peer_port)
     {
-        struct network_page_data* data = gdata;
+        auto* data = static_cast<network_page_data*>(gdata);
         gtr_label_set_text(GTK_LABEL(data->portLabel), _("Status unknown"));
         gtk_widget_set_sensitive(data->portButton, TRUE);
         gtk_widget_set_sensitive(data->portSpin, TRUE);
@@ -1101,7 +1101,7 @@ static void networkPageDestroyed(gpointer gdata, GObject* dead)
 {
     TR_UNUSED(dead);
 
-    struct network_page_data* data = gdata;
+    auto* data = static_cast<network_page_data*>(gdata);
 
     if (data->prefsTag > 0)
     {
@@ -1120,7 +1120,7 @@ static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
 {
     TR_UNUSED(core);
 
-    struct network_page_data* data = vdata;
+    auto* data = static_cast<network_page_data*>(vdata);
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
     gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
@@ -1132,7 +1132,7 @@ static void onPortTest(GtkButton* button, gpointer vdata)
 {
     TR_UNUSED(button);
 
-    struct network_page_data* data = vdata;
+    auto* data = static_cast<network_page_data*>(vdata);
     gtk_widget_set_sensitive(data->portButton, FALSE);
     gtk_widget_set_sensitive(data->portSpin, FALSE);
     gtk_label_set_markup(GTK_LABEL(data->portLabel), _("<i>Testing TCP port…</i>"));
@@ -1232,7 +1232,7 @@ static GtkWidget* networkPage(GObject* core)
 
 static void on_prefs_dialog_destroyed(gpointer gdata, GObject* dead_dialog G_GNUC_UNUSED)
 {
-    struct prefs_dialog_data* data = gdata;
+    auto* data = static_cast<prefs_dialog_data*>(gdata);
 
     if (data->core_prefs_tag > 0)
     {
@@ -1244,7 +1244,7 @@ static void on_prefs_dialog_destroyed(gpointer gdata, GObject* dead_dialog G_GNU
 
 static void on_core_prefs_changed(TrCore* core, tr_quark const key, gpointer gdata)
 {
-    struct prefs_dialog_data* data = gdata;
+    auto* data = static_cast<prefs_dialog_data*>(gdata);
 
 #if 0
 

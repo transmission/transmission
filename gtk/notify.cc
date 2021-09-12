@@ -30,7 +30,7 @@ typedef struct TrNotification
 
 static void tr_notification_free(gpointer data)
 {
-    TrNotification* n = data;
+    auto* n = static_cast<TrNotification*>(data);
 
     if (n->core != NULL)
     {
@@ -85,13 +85,11 @@ static void g_signal_callback(
     TR_UNUSED(sender_name);
     TR_UNUSED(user_data);
 
-    guint id;
-    TrNotification* n;
-
     g_return_if_fail(g_variant_is_of_type(params, G_VARIANT_TYPE("(u*)")));
 
+    guint id;
     g_variant_get(params, "(u*)", &id, NULL);
-    n = g_hash_table_lookup(active_notifications, GUINT_TO_POINTER(id));
+    auto* n = static_cast<TrNotification*>(g_hash_table_lookup(active_notifications, GUINT_TO_POINTER(id)));
 
     if (n == NULL)
     {
@@ -171,7 +169,7 @@ void gtr_notify_init(void)
 static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_data)
 {
     GVariant* result;
-    TrNotification* n = user_data;
+    auto* n = static_cast<TrNotification*>(user_data);
 
     result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, NULL);
 

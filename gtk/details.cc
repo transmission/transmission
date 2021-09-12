@@ -412,17 +412,17 @@ static void torrent_set_real(struct DetailsImpl* di, tr_quark const key, double 
     tr_variantFree(&top);
 }
 
-static void up_speed_toggled_cb(GtkToggleButton* tb, gpointer d)
+static void up_speed_toggled_cb(GtkToggleButton* tb, DetailsImpl* d)
 {
     torrent_set_bool(d, TR_KEY_uploadLimited, gtk_toggle_button_get_active(tb));
 }
 
-static void down_speed_toggled_cb(GtkToggleButton* tb, gpointer d)
+static void down_speed_toggled_cb(GtkToggleButton* tb, DetailsImpl* d)
 {
     torrent_set_bool(d, TR_KEY_downloadLimited, gtk_toggle_button_get_active(tb));
 }
 
-static void global_speed_toggled_cb(GtkToggleButton* tb, gpointer d)
+static void global_speed_toggled_cb(GtkToggleButton* tb, DetailsImpl* d)
 {
     torrent_set_bool(d, TR_KEY_honorsSessionLimits, gtk_toggle_button_get_active(tb));
 }
@@ -1188,7 +1188,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     hig_workarea_add_row(t, &row, _("Last activity:"), l, NULL);
 
     /* error */
-    l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+    l = static_cast<GtkWidget*>(g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL));
     hig_workarea_add_row(t, &row, _("Error:"), l, NULL);
     di->error_lb = l;
 
@@ -1196,12 +1196,12 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     hig_workarea_add_section_title(t, &row, _("Details"));
 
     /* destination */
-    l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+    l = static_cast<GtkWidget*>(g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL));
     hig_workarea_add_row(t, &row, _("Location:"), l, NULL);
     di->destination_lb = l;
 
     /* hash */
-    l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+    l = static_cast<GtkWidget*>(g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL));
     hig_workarea_add_row(t, &row, _("Hash:"), l, NULL);
     di->hash_lb = l;
 
@@ -1212,7 +1212,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     di->privacy_lb = l;
 
     /* origins */
-    l = g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+    l = static_cast<GtkWidget*>(g_object_new(GTK_TYPE_LABEL, "selectable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL));
     hig_workarea_add_row(t, &row, _("Origin:"), l, NULL);
     di->origin_lb = l;
 
@@ -1567,11 +1567,10 @@ static void refreshPeerList(struct DetailsImpl* di, tr_torrent** torrents, int n
         {
             char key[128];
             GtkTreePath* p;
-            GtkTreeRowReference* ref;
             tr_peer_stat const* s = &peers[i][j];
 
             g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), s->addr);
-            ref = g_hash_table_lookup(hash, key);
+            auto* ref = static_cast<GtkTreeRowReference*>(g_hash_table_lookup(hash, key));
             p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
             refreshPeerRow(store, &iter, s);
@@ -1670,7 +1669,7 @@ static void refreshWebseedList(struct DetailsImpl* di, tr_torrent** torrents, in
 
             char key[256];
             g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
-            GtkTreeRowReference* const ref = g_hash_table_lookup(hash, key);
+            auto* const ref = static_cast<GtkTreeRowReference*>(g_hash_table_lookup(hash, key));
             GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
@@ -1752,7 +1751,7 @@ static gboolean onPeerViewQueryTooltip(
         char* name = NULL;
         char* addr = NULL;
         char* flagstr = NULL;
-        struct DetailsImpl* di = gdi;
+        auto* di = static_cast<DetailsImpl*>(gdi);
         GString* gstr = di->gstr;
 
         gtk_tree_model_get(
@@ -2288,7 +2287,7 @@ enum
 static gboolean trackerVisibleFunc(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
 {
     gboolean isBackup;
-    struct DetailsImpl* di = data;
+    auto* di = static_cast<DetailsImpl*>(data);
 
     /* show all */
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(di->all_check)))
@@ -2336,7 +2335,7 @@ static tr_torrent* tracker_list_get_current_torrent(struct DetailsImpl* di)
 static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 {
     GtkTreeIter iter;
-    GtkTreeRowReference* reference = vreference;
+    auto* reference = static_cast<GtkTreeRowReference*>(vreference);
 
     if (pixbuf != NULL)
     {
@@ -2433,7 +2432,7 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
             /* build the key to find the row */
             g_string_truncate(gstr, 0);
             g_string_append_printf(gstr, "%d\t%d\t%s", tr_torrentId(tor), st->tier, st->announce);
-            GtkTreeRowReference* const ref = g_hash_table_lookup(hash, gstr->str);
+            auto* const ref = static_cast<GtkTreeRowReference*>(g_hash_table_lookup(hash, gstr->str));
             GtkTreePath* const p = gtk_tree_row_reference_get_path(ref);
             gtk_tree_model_get_iter(model, &iter, p);
 
@@ -2510,12 +2509,12 @@ static void onBackupToggled(GtkToggleButton* button, struct DetailsImpl* di)
 static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer data)
 {
     gboolean do_destroy = TRUE;
-    struct DetailsImpl* di = data;
+    auto* di = static_cast<DetailsImpl*>(data);
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
         int const torrent_id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(dialog), TORRENT_ID_KEY));
-        GtkTextBuffer* const text_buffer = g_object_get_qdata(G_OBJECT(dialog), TEXT_BUFFER_KEY);
+        auto* const text_buffer = static_cast<GtkTextBuffer*>(g_object_get_qdata(G_OBJECT(dialog), TEXT_BUFFER_KEY));
         tr_torrent* const tor = gtr_core_find_torrent(di->core, torrent_id);
 
         if (tor != NULL)
@@ -2610,7 +2609,7 @@ static void get_editable_tracker_list(GString* gstr, tr_torrent const* tor)
 
 static void on_edit_trackers(GtkButton* button, gpointer data)
 {
-    struct DetailsImpl* di = data;
+    auto* di = static_cast<DetailsImpl*>(data);
     tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
     if (tor != NULL)
@@ -2631,7 +2630,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         d = gtk_dialog_new_with_buttons(
             gstr->str,
             win,
-            GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+            GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
             TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
             TR_ARG_TUPLE(_("_Save"), GTK_RESPONSE_ACCEPT),
             NULL);
@@ -2673,7 +2672,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
 
 static void on_tracker_list_selection_changed(GtkTreeSelection* sel, gpointer gdi)
 {
-    struct DetailsImpl* di = gdi;
+    auto* di = static_cast<DetailsImpl*>(gdi);
     int const n = gtk_tree_selection_count_selected_rows(sel);
     tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
@@ -2688,7 +2687,7 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        struct DetailsImpl* di = gdi;
+        auto* di = static_cast<DetailsImpl*>(gdi);
         GtkWidget* e = GTK_WIDGET(g_object_get_qdata(G_OBJECT(dialog), URL_ENTRY_KEY));
         int const torrent_id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(dialog), TORRENT_ID_KEY));
         char* url = g_strdup(gtk_entry_get_text(GTK_ENTRY(e)));
@@ -2734,7 +2733,7 @@ static void on_tracker_list_add_button_clicked(GtkButton const* button, gpointer
 {
     TR_UNUSED(button);
 
-    struct DetailsImpl* di = gdi;
+    auto* di = static_cast<DetailsImpl*>(gdi);
     tr_torrent const* tor = tracker_list_get_current_torrent(di);
 
     if (tor != NULL)
@@ -2776,7 +2775,7 @@ static void on_tracker_list_remove_button_clicked(GtkButton const* button, gpoin
 
     GtkTreeIter iter;
     GtkTreeModel* model;
-    struct DetailsImpl* di = gdi;
+    auto* di = static_cast<DetailsImpl*>(gdi);
     GtkTreeView* v = GTK_TREE_VIEW(di->tracker_view);
     GtkTreeSelection* sel = gtk_tree_view_get_selection(v);
 
@@ -2940,7 +2939,7 @@ static void refresh(struct DetailsImpl* di)
 
 static gboolean periodic_refresh(gpointer data)
 {
-    refresh(data);
+    refresh(static_cast<DetailsImpl*>(data));
 
     return G_SOURCE_CONTINUE;
 }
@@ -2959,7 +2958,7 @@ static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocatio
 
 static void details_free(gpointer gdata)
 {
-    struct DetailsImpl* data = gdata;
+    auto* data = static_cast<DetailsImpl*>(gdata);
     g_source_remove(data->periodic_refresh_tag);
     g_hash_table_destroy(data->tracker_hash);
     g_hash_table_destroy(data->webseed_hash);
@@ -2991,7 +2990,7 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     /* create the dialog */
     di->core = core;
     di->gstr = g_string_new(NULL);
-    d = gtk_dialog_new_with_buttons(NULL, parent, 0, TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE), NULL);
+    d = gtk_dialog_new_with_buttons(NULL, parent, {}, TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE), NULL);
     di->dialog = d;
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
 
@@ -3043,7 +3042,7 @@ void gtr_torrent_details_dialog_set_torrents(GtkWidget* w, GSList* ids)
 {
     char title[256];
     int const len = g_slist_length(ids);
-    struct DetailsImpl* di = g_object_get_qdata(G_OBJECT(w), DETAILS_KEY);
+    auto* di = static_cast<DetailsImpl*>(g_object_get_qdata(G_OBJECT(w), DETAILS_KEY));
 
     g_slist_free(di->ids);
     di->ids = g_slist_copy(ids);

@@ -221,7 +221,7 @@ static void tr_core_init(TrCore* core)
     };
 
 #if GLIB_CHECK_VERSION(2, 58, 0)
-    p = core->priv = tr_core_get_instance_private(core);
+    p = core->priv = static_cast<TrCorePrivate*>(tr_core_get_instance_private(core));
 #else
     p = core->priv = G_TYPE_INSTANCE_GET_PRIVATE(core, TR_CORE_TYPE, struct TrCorePrivate);
 #endif
@@ -724,7 +724,7 @@ static time_t get_file_mtime(GFile* file)
     GFileInfo* info;
     time_t mtime = 0;
 
-    info = g_file_query_info(file, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL);
+    info = g_file_query_info(file, G_FILE_ATTRIBUTE_TIME_MODIFIED, {}, NULL, NULL);
 
     if (info != NULL)
     {
@@ -739,7 +739,7 @@ static void rename_torrent_and_unref_file(GFile* file)
 {
     GFileInfo* info;
 
-    info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, 0, NULL, NULL);
+    info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, {}, NULL, NULL);
 
     if (info != NULL)
     {
@@ -781,7 +781,7 @@ static gboolean core_watchdir_idle(gpointer gcore)
     /* separate the files into two lists: changing and unchanging */
     for (GSList* l = p->monitor_files; l != NULL; l = l->next)
     {
-        GFile* file = l->data;
+        auto* file = static_cast<GFile*>(l->data);
         time_t const mtime = get_file_mtime(file);
 
         if (mtime + 2 >= now)
@@ -835,7 +835,7 @@ static void core_watchdir_monitor_file(TrCore* core, GFile* file)
         /* if we're not already watching this file, start watching it now */
         for (GSList* l = p->monitor_files; !found && l != NULL; l = l->next)
         {
-            found = g_file_equal(file, l->data);
+            found = g_file_equal(file, static_cast<GFile*>(l->data));
         }
 
         if (!found)
@@ -866,7 +866,7 @@ static void on_file_changed_in_watchdir(
 
     if (event_type == G_FILE_MONITOR_EVENT_CREATED)
     {
-        core_watchdir_monitor_file(core, file);
+        core_watchdir_monitor_file(static_cast<TrCore*>(core), file);
     }
 }
 
@@ -913,7 +913,7 @@ static void core_watchdir_update(TrCore* core)
 
     if (is_enabled && p->monitor == NULL)
     {
-        GFileMonitor* m = g_file_monitor_directory(dir, 0, NULL, NULL);
+        GFileMonitor* m = g_file_monitor_directory(dir, {}, NULL, NULL);
         core_watchdir_scan(core);
 
         g_object_ref(dir);
@@ -1012,7 +1012,7 @@ struct notify_callback_data
 
 static gboolean on_torrent_completeness_changed_idle(gpointer gdata)
 {
-    struct notify_callback_data* data = gdata;
+    auto* data = static_cast<notify_callback_data*>(gdata);
     gtr_notify_torrent_completed(data->core, data->torrent_id);
     g_object_unref(G_OBJECT(data->core));
     g_free(data);
@@ -1026,7 +1026,7 @@ static void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness com
     if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
     {
         struct notify_callback_data* data = g_new(struct notify_callback_data, 1);
-        data->core = gcore;
+        data->core = static_cast<TrCore*>(gcore);
         data->torrent_id = tr_torrentId(tor);
         g_object_ref(G_OBJECT(data->core));
         gdk_threads_add_idle(on_torrent_completeness_changed_idle, data);
@@ -1079,7 +1079,7 @@ static gboolean find_row_from_torrent_id(GtkTreeModel* model, int id, GtkTreeIte
 
 static gboolean on_torrent_metadata_changed_idle(gpointer gdata)
 {
-    struct notify_callback_data* const data = gdata;
+    auto* const data = static_cast<notify_callback_data*>(gdata);
     tr_session* const session = gtr_core_session(data->core);
     tr_torrent const* const tor = tr_torrentFindFromId(session, data->torrent_id);
 
@@ -1108,7 +1108,7 @@ static gboolean on_torrent_metadata_changed_idle(gpointer gdata)
 static void on_torrent_metadata_changed(tr_torrent* tor, void* gcore)
 {
     struct notify_callback_data* data = g_new(struct notify_callback_data, 1);
-    data->core = gcore;
+    data->core = static_cast<TrCore*>(gcore);
     data->torrent_id = tr_torrentId(tor);
     g_object_ref(G_OBJECT(data->core));
     gdk_threads_add_idle(on_torrent_metadata_changed_idle, data);
@@ -1215,7 +1215,7 @@ static tr_torrent* core_create_new_torrent(TrCore* core, tr_ctor* ctor)
 static int core_add_ctor(TrCore* core, tr_ctor* ctor, gboolean do_prompt, gboolean do_notify)
 {
     tr_info inf;
-    int err = tr_torrentParse(ctor, &inf);
+    auto err = tr_torrentParse(ctor, &inf);
 
     switch (err)
     {
@@ -1228,7 +1228,7 @@ static int core_add_ctor(TrCore* core, tr_ctor* ctor, gboolean do_prompt, gboole
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == NULL || !core->priv->adding_from_watch_dir)
         {
-            core_emit_err(core, err, inf.name);
+            core_emit_err(core, static_cast<tr_core_err>(err), inf.name);
         }
 
         tr_metainfoFree(&inf);
@@ -1301,7 +1301,7 @@ static void add_file_async_callback(GObject* file, GAsyncResult* result, gpointe
     gsize length;
     char* contents;
     GError* error = NULL;
-    struct add_from_url_data* data = gdata;
+    auto* data = static_cast<add_from_url_data*>(gdata);
 
     if (!g_file_load_contents_finish(G_FILE(file), result, &contents, &length, NULL, &error))
     {
@@ -1427,7 +1427,7 @@ void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean
 {
     for (GSList* l = files; l != NULL; l = l->next)
     {
-        add_file(core, l->data, do_start, do_prompt, do_notify);
+        add_file(core, static_cast<GFile*>(l->data), do_start, do_prompt, do_notify);
     }
 
     gtr_core_torrents_added(core);
@@ -1853,12 +1853,12 @@ static GHashTable* pendingRequests = NULL;
 static gboolean core_read_rpc_response_idle(void* vresponse)
 {
     int64_t intVal;
-    tr_variant* response = vresponse;
+    auto* response = static_cast<tr_variant*>(vresponse);
 
     if (tr_variantDictFindInt(response, TR_KEY_tag, &intVal))
     {
         int const tag = (int)intVal;
-        struct pending_request_data* data = g_hash_table_lookup(pendingRequests, &tag);
+        auto* data = static_cast<pending_request_data*>(g_hash_table_lookup(pendingRequests, &tag));
 
         if (data != NULL)
         {
