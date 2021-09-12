@@ -68,28 +68,28 @@ if(ENABLE_NLS)
 endif()
 
 set(${PROJECT_NAME}_SOURCES
-    actions.c
-    conf.c
-    details.c
-    dialogs.c
-    favicon.c
-    file-list.c
-    filter.c
-    hig.c
-    icons.c
-    main.c
-    makemeta-ui.c
-    msgwin.c
-    notify.c
-    open-dialog.c
-    relocate.c
-    stats.c
-    torrent-cell-renderer.c
-    tr-core.c
-    tr-icon.c
-    tr-prefs.c
-    tr-window.c
-    util.c
+    actions.cc
+    conf.cc
+    details.cc
+    dialogs.cc
+    favicon.cc
+    file-list.cc
+    filter.cc
+    hig.cc
+    icons.cc
+    main.cc
+    makemeta-ui.cc
+    msgwin.cc
+    notify.cc
+    open-dialog.cc
+    relocate.cc
+    stats.cc
+    torrent-cell-renderer.cc
+    tr-core.cc
+    tr-icon.cc
+    tr-prefs.cc
+    tr-window.cc
+    util.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
 )
 
