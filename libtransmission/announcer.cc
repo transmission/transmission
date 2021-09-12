@@ -6,10 +6,12 @@
  *
  */
 
+#include <algorithm> // std::partial_sort
 #include <limits.h> /* INT_MAX */
 #include <stdio.h>
 #include <stdlib.h> /* qsort() */
 #include <string.h> /* strcmp(), memcpy(), strncmp() */
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
@@ -1567,17 +1569,15 @@ static void scrape_request_delegate(
     }
 }
 
-static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
+static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& tiers)
 {
     size_t request_count = 0;
     time_t const now = tr_time();
-    size_t const tier_count = tr_ptrArraySize(tiers);
     tr_scrape_request requests[MAX_SCRAPES_PER_UPKEEP] = {};
 
     /* batch as many info_hashes into a request as we can */
-    for (size_t i = 0; i < tier_count; ++i)
+    for (auto& tier : tiers)
     {
-        auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(tiers, i));
         struct tr_scrape_info* const scrape_info = tier->currentTracker->scrape_info;
         uint8_t const* hash = tier->tor->info.hash;
         bool found = false;
@@ -1658,11 +1658,8 @@ static inline int countDownloaders(tr_tier const* tier)
     return tracker == NULL ? 0 : tracker->downloaderCount + tracker->leecherCount;
 }
 
-static int compareAnnounceTiers(void const* va, void const* vb)
+static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
-    tr_tier const* a = (tr_tier const*)va;
-    tr_tier const* b = (tr_tier const*)vb;
-
     /* prefer higher-priority events */
     int const priority_a = a->announce_event_priority;
     int const priority_b = b->announce_event_priority;
@@ -1714,8 +1711,8 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     time_t const now = tr_time();
 
     /* build a list of tiers that need to be announced */
-    auto announceMe = tr_ptrArray{};
-    auto scrapeMe = tr_ptrArray{};
+    auto announce_me = std::vector<tr_tier*>{};
+    auto scrape_me = std::vector<tr_tier*>{};
     tr_torrent* tor = NULL;
     while ((tor = tr_torrentNext(announcer->session, tor)) != NULL)
     {
@@ -1727,12 +1724,12 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
             if (tierNeedsToAnnounce(tier, now))
             {
-                tr_ptrArrayInsertSorted(&announceMe, tier, compareAnnounceTiers);
+                announce_me.push_back(tier);
             }
 
             if (tierNeedsToScrape(tier, now))
             {
-                tr_ptrArrayAppend(&scrapeMe, tier);
+                scrape_me.push_back(tier);
             }
         }
     }
@@ -1741,22 +1738,25 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
      * we can work through that queue much faster than announces
      * (thanks to multiscrape) _and_ the scrape responses will tell
      * us which swarms are interesting and should be announced next. */
-    multiscrape(announcer, &scrapeMe);
+    multiscrape(announcer, scrape_me);
 
     /* Second, announce what we can. If there aren't enough slots
      * available, use compareAnnounceTiers to prioritize. */
-    int n = MIN(tr_ptrArraySize(&announceMe), MAX_ANNOUNCES_PER_UPKEEP);
-    for (int i = 0; i < n; ++i)
+    if (std::size(announce_me) > MAX_ANNOUNCES_PER_UPKEEP)
     {
-        auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(&announceMe, i));
-        tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
-        dbgmsg(tier, "announcing tier %d of %d", i, n);
-        tierAnnounce(announcer, tier);
+        std::partial_sort(
+            std::begin(announce_me),
+            std::begin(announce_me) + MAX_ANNOUNCES_PER_UPKEEP,
+            std::end(announce_me),
+            [](tr_tier const* a, tr_tier const* b) { return compareAnnounceTiers(a, b) < 0; });
+        announce_me.resize(MAX_ANNOUNCES_PER_UPKEEP);
     }
 
-    /* cleanup */
-    tr_ptrArrayDestruct(&scrapeMe, NULL);
-    tr_ptrArrayDestruct(&announceMe, NULL);
+    for (auto& tier : announce_me)
+    {
+        tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
+        tierAnnounce(announcer, tier);
+    }
 }
 
 static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
