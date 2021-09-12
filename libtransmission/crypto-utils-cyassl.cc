@@ -143,7 +143,7 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
 
     TR_ASSERT(data != NULL);
 
-    return check_result(API(ShaUpdate)(handle, static_cast<const byte*>(data), data_length));
+    return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
 
 bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
