@@ -12,8 +12,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-extern struct tr_session_stats const TR_SESSION_STATS_INIT;
-
 void tr_statsInit(tr_session* session);
 void tr_statsClose(tr_session* session);
 void tr_statsSaveDirty(tr_session* session);
