@@ -35,6 +35,10 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
             return 0;
         }"
         ICONV_SECOND_ARGUMENT_IS_CONST
+        FAIL_REGEX "discards qualifiers in nested pointer types"
+        FAIL_REGEX "incompatible pointer type"
+        FAIL_REGEX "invalid conversion"
+        FAIL_REGEX "no matching function"
     )
 
     set(CMAKE_REQUIRED_INCLUDES)
