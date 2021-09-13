@@ -336,8 +336,13 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     }
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_win32_on_first_scan, handle, nullptr) ==
-        -1)
+    if (event_base_once(
+            tr_watchdir_get_event_base(handle),
+            -1,
+            EV_TIMEOUT,
+            &tr_watchdir_win32_on_first_scan,
+            handle,
+            nullptr) == -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
     }
