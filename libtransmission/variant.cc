@@ -15,9 +15,11 @@
 #define _GNU_SOURCE
 #endif
 
+#include <algorithm> // std::sort
 #include <errno.h>
-#include <stdlib.h> /* strtod(), realloc(), qsort() */
+#include <stdlib.h> /* strtod() */
 #include <string.h>
+#include <vector>
 
 #ifdef _WIN32
 #include <share.h>
@@ -737,80 +739,62 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 ****  BENC WALKING
 ***/
 
-struct KeyIndex
+class WalkNode
 {
-    char const* keystr;
-    tr_variant* val;
-};
+private:
+    // for walking `v`'s children
+    size_t child_index = 0;
 
-static int compareKeyIndex(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct KeyIndex const*>(va);
-    auto const* const b = static_cast<struct KeyIndex const*>(vb);
+    // for walking `v`'s children sorted by key when it is a dictionary.
+    // Useful when writing benc, because benc dictionaries must be sorted
+    std::vector<size_t> sorted;
 
-    return strcmp(a->keystr, b->keystr);
-}
+public:
+    bool is_visited = false;
 
-struct SaveNode
-{
-    tr_variant const* v;
-    tr_variant* sorted;
-    size_t childIndex;
-    bool isVisited;
-};
+    // shallow bitwise copy of the variant passed to the constructor
+    tr_variant v = {};
 
-static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_dicts)
-{
-    node->isVisited = false;
-    node->childIndex = 0;
-
-    if (sort_dicts && tr_variantIsDict(v))
+    WalkNode(tr_variant const* v_in, bool sort_dicts)
+        : v{ *v_in }
     {
-        /* make node->sorted a sorted version of this dictionary */
+        if (!sort_dicts || !tr_variantIsDict(v_in))
+            return;
 
-        size_t const n = v->val.l.count;
-        struct KeyIndex* tmp = tr_new(struct KeyIndex, n);
+        auto const n = v_in->val.l.count;
 
-        for (size_t i = 0; i < n; i++)
+        // sort the children by key
+
+        struct ByKey
         {
-            tmp[i].val = v->val.l.vals + i;
-            tmp[i].keystr = tr_quark_get_string(tmp[i].val->key, NULL);
-        }
+            char const* key;
+            size_t idx;
+        };
 
-        qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
-
-        node->sorted = tr_new(tr_variant, 1);
-        tr_variantInitDict(node->sorted, n);
-
+        auto const* children = v_in->val.l.vals;
+        auto tmp = std::vector<ByKey>(n);
         for (size_t i = 0; i < n; ++i)
-        {
-            node->sorted->val.l.vals[i] = *tmp[i].val;
-        }
+            tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
+        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
 
-        node->sorted->val.l.count = n;
+        //  keep the sorted indices
 
-        tr_free(tmp);
-
-        v = node->sorted;
+        sorted.resize(n);
+        for (size_t i = 0; i < n; ++i)
+            sorted[i] = tmp[i].idx;
     }
-    else
+
+    tr_variant const* nextChild()
     {
-        node->sorted = NULL;
+        if (child_index >= v.val.l.count)
+            return nullptr;
+
+        auto idx = child_index++;
+        if (!sorted.empty())
+            idx = sorted[idx];
+        return v.val.l.vals + idx;
     }
-
-    node->v = v;
-}
-
-static void nodeDestruct(struct SaveNode* node)
-{
-    TR_ASSERT(node != NULL);
-
-    if (node->sorted != NULL)
-    {
-        tr_free(node->sorted->val.l.vals);
-        tr_free(node->sorted);
-    }
-}
+};
 
 /**
  * This function's previous recursive implementation was
@@ -819,45 +803,36 @@ static void nodeDestruct(struct SaveNode* node)
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    int stackSize = 0;
-    int stackAlloc = 64;
-    struct SaveNode* stack = tr_new(struct SaveNode, stackAlloc);
+    auto stack = std::vector<WalkNode>{};
+    stack.emplace_back(v_in, sort_dicts);
 
-    nodeConstruct(&stack[stackSize++], v_in, sort_dicts);
-
-    while (stackSize > 0)
+    while (!stack.empty())
     {
-        struct SaveNode* node = &stack[stackSize - 1];
+        auto& node = stack.back();
         tr_variant const* v;
 
-        if (!node->isVisited)
+        if (!node.is_visited)
         {
-            v = node->v;
-            node->isVisited = true;
+            v = &node.v;
+            node.is_visited = true;
         }
-        else if (tr_variantIsContainer(node->v) && node->childIndex < node->v->val.l.count)
+        else if (tr_variantIsContainer(&node.v) && ((v = node.nextChild())))
         {
-            size_t const index = node->childIndex;
-            ++node->childIndex;
-
-            v = node->v->val.l.vals + index;
-
-            if (tr_variantIsDict(node->v))
+            if (tr_variantIsDict(&node.v))
             {
-                tr_variant tmp;
+                auto tmp = tr_variant{};
                 tr_variantInitQuark(&tmp, v->key);
                 walkFuncs->stringFunc(&tmp, user_data);
             }
         }
-        else /* done with this node */
+        else // finished with this node
         {
-            if (tr_variantIsContainer(node->v))
+            if (tr_variantIsContainer(&node.v))
             {
-                walkFuncs->containerEndFunc(node->v, user_data);
+                walkFuncs->containerEndFunc(&node.v, user_data);
             }
 
-            --stackSize;
-            nodeDestruct(node);
+            stack.pop_back();
             continue;
         }
 
@@ -882,39 +857,17 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 break;
 
             case TR_VARIANT_TYPE_LIST:
-                if (v == node->v)
-                {
+                if (v == &node.v)
                     walkFuncs->listBeginFunc(v, user_data);
-                }
                 else
-                {
-                    if (stackAlloc == stackSize)
-                    {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
-                    }
-
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
-                }
-
+                    stack.emplace_back(v, sort_dicts);
                 break;
 
             case TR_VARIANT_TYPE_DICT:
-                if (v == node->v)
-                {
+                if (v == &node.v)
                     walkFuncs->dictBeginFunc(v, user_data);
-                }
                 else
-                {
-                    if (stackAlloc == stackSize)
-                    {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
-                    }
-
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
-                }
-
+                    stack.emplace_back(v, sort_dicts);
                 break;
 
             default:
@@ -924,8 +877,6 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
             }
         }
     }
-
-    tr_free(stack);
 }
 
 /****
