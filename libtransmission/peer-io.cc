@@ -92,13 +92,13 @@ struct tr_datatype
     bool isPieceData;
 };
 
-static struct tr_datatype* datatype_pool = NULL;
+static struct tr_datatype* datatype_pool = nullptr;
 
 static struct tr_datatype* datatype_new(void)
 {
     struct tr_datatype* ret;
 
-    if (datatype_pool == NULL)
+    if (datatype_pool == nullptr)
     {
         ret = tr_new(struct tr_datatype, 1);
     }
@@ -122,7 +122,7 @@ static void peer_io_pull_datatype(tr_peerIo* io)
 {
     struct tr_datatype* tmp;
 
-    if ((tmp = io->outbuf_datatypes) != NULL)
+    if ((tmp = io->outbuf_datatypes) != nullptr)
     {
         io->outbuf_datatypes = tmp->next;
         datatype_free(tmp);
@@ -133,9 +133,9 @@ static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
 {
     struct tr_datatype* tmp;
 
-    if ((tmp = io->outbuf_datatypes) != NULL)
+    if ((tmp = io->outbuf_datatypes) != nullptr)
     {
-        while (tmp->next != NULL)
+        while (tmp->next != nullptr)
         {
             tmp = tmp->next;
         }
@@ -170,7 +170,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
             tr_bandwidthUsed(&io->bandwidth, TR_UP, overhead, false, now);
         }
 
-        if (io->didWrite != NULL)
+        if (io->didWrite != nullptr)
         {
             io->didWrite(io, payload, next->isPieceData, io->userData);
         }
@@ -201,7 +201,7 @@ static void canReadWrapper(tr_peerIo* io)
     session = io->session;
 
     /* try to consume the input buffer */
-    if (io->canRead != NULL)
+    if (io->canRead != nullptr)
     {
         uint64_t const now = tr_time_msec();
 
@@ -334,7 +334,7 @@ static void event_read_cb(evutil_socket_t fd, short event, void* vio)
             e,
             tr_net_strerror(errstr, sizeof(errstr), e));
 
-        if (io->gotError != NULL)
+        if (io->gotError != nullptr)
         {
             io->gotError(io, what, io->userData);
         }
@@ -431,7 +431,7 @@ FAIL:
     tr_net_strerror(errstr, sizeof(errstr), e);
     dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
 
-    if (io->gotError != NULL)
+    if (io->gotError != nullptr)
     {
         io->gotError(io, what, io->userData);
     }
@@ -535,7 +535,7 @@ static void utp_on_state_change(void* vio, int state)
     }
     else if (state == UTP_STATE_EOF)
     {
-        if (io->gotError != NULL)
+        if (io->gotError != nullptr)
         {
             io->gotError(io, BEV_EVENT_EOF, io->userData);
         }
@@ -559,7 +559,7 @@ static void utp_on_error(void* vio, int errcode)
 
     dbgmsg(io, "utp_on_error -- errcode is %d", errcode);
 
-    if (io->gotError != NULL)
+    if (io->gotError != nullptr)
     {
         errno = errcode;
         io->gotError(io, BEV_EVENT_ERROR, io->userData);
@@ -650,8 +650,8 @@ static tr_peerIo* tr_peerIoNew(
     bool isSeed,
     struct tr_peer_socket const socket)
 {
-    TR_ASSERT(session != NULL);
-    TR_ASSERT(session->events != NULL);
+    TR_ASSERT(session != nullptr);
+    TR_ASSERT(session->events != nullptr);
     TR_ASSERT(tr_amInEventThread(session));
 
 #ifdef WITH_UTP
@@ -723,10 +723,10 @@ tr_peerIo* tr_peerIoNewIncoming(
     tr_port port,
     struct tr_peer_socket const socket)
 {
-    TR_ASSERT(session != NULL);
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIoNew(session, parent, addr, port, NULL, true, false, socket);
+    return tr_peerIoNew(session, parent, addr, port, nullptr, true, false, socket);
 }
 
 tr_peerIo* tr_peerIoNewOutgoing(
@@ -738,9 +738,9 @@ tr_peerIo* tr_peerIoNewOutgoing(
     bool isSeed,
     bool utp)
 {
-    TR_ASSERT(session != NULL);
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
-    TR_ASSERT(torrentHash != NULL);
+    TR_ASSERT(torrentHash != nullptr);
 
     auto socket = tr_peer_socket{};
 
@@ -753,14 +753,14 @@ tr_peerIo* tr_peerIoNewOutgoing(
     {
         socket = tr_netOpenPeerSocket(session, addr, port, isSeed);
         dbgmsg(
-            NULL,
+            nullptr,
             "tr_netOpenPeerSocket returned fd %" PRIdMAX,
             (intmax_t)(socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
     }
 
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
     {
-        return NULL;
+        return nullptr;
     }
 
     return tr_peerIoNew(session, parent, addr, port, torrentHash, false, isSeed, socket);
@@ -773,8 +773,8 @@ tr_peerIo* tr_peerIoNewOutgoing(
 static void event_enable(tr_peerIo* io, short event)
 {
     TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session != NULL);
-    TR_ASSERT(io->session->events != NULL);
+    TR_ASSERT(io->session != nullptr);
+    TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
 
@@ -790,7 +790,7 @@ static void event_enable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_add(io->event_read, NULL);
+            event_add(io->event_read, nullptr);
         }
 
         io->pendingEvents |= EV_READ;
@@ -802,7 +802,7 @@ static void event_enable(tr_peerIo* io, short event)
 
         if (need_events)
         {
-            event_add(io->event_write, NULL);
+            event_add(io->event_write, nullptr);
         }
 
         io->pendingEvents |= EV_WRITE;
@@ -812,8 +812,8 @@ static void event_enable(tr_peerIo* io, short event)
 static void event_disable(struct tr_peerIo* io, short event)
 {
     TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session != NULL);
-    TR_ASSERT(io->session->events != NULL);
+    TR_ASSERT(io->session != nullptr);
+    TR_ASSERT(io->session->events != nullptr);
 
     bool const need_events = io->socket.type == TR_PEER_SOCKET_TYPE_TCP;
 
@@ -853,7 +853,7 @@ void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled)
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
     TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session->events != NULL);
+    TR_ASSERT(io->session->events != nullptr);
 
     short const event = dir == TR_UP ? EV_WRITE : EV_READ;
 
@@ -885,7 +885,7 @@ static void io_close_socket(tr_peerIo* io)
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_SetCallbacks(io->socket.handle.utp, &dummy_utp_function_table, NULL);
+        UTP_SetCallbacks(io->socket.handle.utp, &dummy_utp_function_table, nullptr);
         UTP_Close(io->socket.handle.utp);
         break;
 
@@ -897,16 +897,16 @@ static void io_close_socket(tr_peerIo* io)
 
     io->socket = {};
 
-    if (io->event_read != NULL)
+    if (io->event_read != nullptr)
     {
         event_free(io->event_read);
-        io->event_read = NULL;
+        io->event_read = nullptr;
     }
 
-    if (io->event_write != NULL)
+    if (io->event_write != nullptr)
     {
         event_free(io->event_write);
-        io->event_write = NULL;
+        io->event_write = nullptr;
     }
 }
 
@@ -916,7 +916,7 @@ static void io_dtor(void* vio)
 
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_amInEventThread(io->session));
-    TR_ASSERT(io->session->events != NULL);
+    TR_ASSERT(io->session->events != nullptr);
 
     dbgmsg(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
@@ -926,7 +926,7 @@ static void io_dtor(void* vio)
     io_close_socket(io);
     tr_cryptoDestruct(&io->crypto);
 
-    while (io->outbuf_datatypes != NULL)
+    while (io->outbuf_datatypes != nullptr)
     {
         peer_io_pull_datatype(io);
     }
@@ -937,12 +937,12 @@ static void io_dtor(void* vio)
 
 static void tr_peerIoFree(tr_peerIo* io)
 {
-    if (io != NULL)
+    if (io != nullptr)
     {
         dbgmsg(io, "in tr_peerIoFree");
-        io->canRead = NULL;
-        io->didWrite = NULL;
-        io->gotError = NULL;
+        io->canRead = nullptr;
+        io->didWrite = nullptr;
+        io->gotError = nullptr;
         tr_runInEventThread(io->session, io_dtor, io);
     }
 }
@@ -972,7 +972,7 @@ tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    if (port != NULL)
+    if (port != nullptr)
     {
         *port = io->port;
     }
@@ -1004,7 +1004,7 @@ void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb w
 
 void tr_peerIoClear(tr_peerIo* io)
 {
-    tr_peerIoSetIOFuncs(io, NULL, NULL, NULL, NULL);
+    tr_peerIoSetIOFuncs(io, nullptr, nullptr, nullptr, nullptr);
     tr_peerIoSetEnabled(io, TR_UP, false);
     tr_peerIoSetEnabled(io, TR_DOWN, false);
 }
@@ -1071,7 +1071,7 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    if (peer_id == NULL)
+    if (peer_id == nullptr)
     {
         memset(io->peerId, '\0', sizeof(io->peerId));
         io->peerIdIsSet = false;
@@ -1346,7 +1346,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
                     canReadWrapper(io);
                 }
 
-                if (res <= 0 && io->gotError != NULL && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+                if (res <= 0 && io->gotError != nullptr && e != EAGAIN && e != EINTR && e != EINPROGRESS)
                 {
                     short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
 
@@ -1410,7 +1410,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
                     didWriteWrapper(io, n);
                 }
 
-                if (n < 0 && io->gotError != NULL && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+                if (n < 0 && io->gotError != nullptr && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
                 {
                     char errstr[512];
                     short const what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
@@ -1463,7 +1463,7 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
-    for (struct tr_datatype const* it = io->outbuf_datatypes; it != NULL; it = it->next)
+    for (struct tr_datatype const* it = io->outbuf_datatypes; it != nullptr; it = it->next)
     {
         if (it->isPieceData)
         {

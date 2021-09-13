@@ -44,7 +44,7 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
     @return the nth item in a tr_ptrArray */
 static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 {
-    TR_ASSERT(array != NULL);
+    TR_ASSERT(array != nullptr);
     TR_ASSERT(i >= 0);
     TR_ASSERT(i < array->n_items);
 
@@ -61,7 +61,7 @@ void* tr_ptrArrayPop(tr_ptrArray* array);
     @see tr_ptrArrayPop() */
 static inline void* tr_ptrArrayBack(tr_ptrArray* array)
 {
-    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : NULL;
+    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : nullptr;
 }
 
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end);

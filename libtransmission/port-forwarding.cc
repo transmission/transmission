@@ -78,12 +78,12 @@ static void natPulse(tr_shared* s, bool do_check)
     tr_port const private_peer_port = s->session->private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
-    if (s->natpmp == NULL)
+    if (s->natpmp == nullptr)
     {
         s->natpmp = tr_natpmpInit();
     }
 
-    if (s->upnp == NULL)
+    if (s->upnp == nullptr)
     {
         s->upnp = tr_upnpInit();
     }
@@ -137,7 +137,7 @@ static void set_evtimer_from_status(tr_shared* s)
         break;
     }
 
-    if (s->timer != NULL)
+    if (s->timer != nullptr)
     {
         tr_timerAdd(s->timer, sec, msec);
     }
@@ -150,8 +150,8 @@ static void onTimer(evutil_socket_t fd, short what, void* vshared)
 
     auto* s = static_cast<tr_shared*>(vshared);
 
-    TR_ASSERT(s != NULL);
-    TR_ASSERT(s->timer != NULL);
+    TR_ASSERT(s != nullptr);
+    TR_ASSERT(s->timer != nullptr);
 
     /* do something */
     natPulse(s, s->doPortCheck);
@@ -190,10 +190,10 @@ tr_shared* tr_sharedInit(tr_session* session)
 
 static void stop_timer(tr_shared* s)
 {
-    if (s->timer != NULL)
+    if (s->timer != nullptr)
     {
         event_free(s->timer);
-        s->timer = NULL;
+        s->timer = nullptr;
     }
 }
 
@@ -203,11 +203,11 @@ static void stop_forwarding(tr_shared* s)
     natPulse(s, false);
 
     tr_natpmpClose(s->natpmp);
-    s->natpmp = NULL;
+    s->natpmp = nullptr;
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
     tr_upnpClose(s->upnp);
-    s->upnp = NULL;
+    s->upnp = nullptr;
     s->upnpStatus = TR_PORT_UNMAPPED;
 
     stop_timer(s);
@@ -219,7 +219,7 @@ void tr_sharedClose(tr_session* session)
 
     s->isShuttingDown = true;
     stop_forwarding(s);
-    s->session->shared = NULL;
+    s->session->shared = nullptr;
     tr_free(s);
 }
 
