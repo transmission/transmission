@@ -26,7 +26,7 @@ static char const* getArgName(tr_option const* opt)
     {
         arg = "";
     }
-    else if (opt->argName != NULL)
+    else if (opt->argName != nullptr)
     {
         arg = opt->argName;
     }
@@ -61,8 +61,8 @@ static int get_next_line_len(char const* description, int maxlen)
 static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWidth, int argWidth)
 {
     int len;
-    char const* longName = opt->longName != NULL ? opt->longName : "";
-    char const* shortName = opt->shortName != NULL ? opt->shortName : "";
+    char const* longName = opt->longName != nullptr ? opt->longName : "";
+    char const* shortName = opt->shortName != nullptr ? opt->shortName : "";
     char const* arg = getArgName(opt);
 
     int const d_indent = shortWidth + longWidth + argWidth + 7;
@@ -102,17 +102,17 @@ static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth,
 {
     char const* arg;
 
-    if (o->longName != NULL)
+    if (o->longName != nullptr)
     {
         *longWidth = MAX(*longWidth, (int)strlen(o->longName));
     }
 
-    if (o->shortName != NULL)
+    if (o->shortName != nullptr)
     {
         *shortWidth = MAX(*shortWidth, (int)strlen(o->shortName));
     }
 
-    if ((arg = getArgName(o)) != NULL)
+    if ((arg = getArgName(o)) != nullptr)
     {
         *argWidth = MAX(*argWidth, (int)strlen(arg));
     }
@@ -137,7 +137,7 @@ void tr_getopt_usage(char const* progName, char const* description, struct tr_op
     help.has_arg = false;
     maxWidth(&help, &longWidth, &shortWidth, &argWidth);
 
-    if (description == NULL)
+    if (description == nullptr)
     {
         description = "Usage: %s [options]";
     }
@@ -155,23 +155,23 @@ void tr_getopt_usage(char const* progName, char const* description, struct tr_op
 static tr_option const* findOption(tr_option const* opts, char const* str, char const** setme_arg)
 {
     size_t matchlen = 0;
-    char const* arg = NULL;
-    tr_option const* match = NULL;
+    char const* arg = nullptr;
+    tr_option const* match = nullptr;
 
     /* find the longest matching option */
     for (tr_option const* o = opts; o->val != 0; ++o)
     {
-        size_t len = o->longName != NULL ? strlen(o->longName) : 0;
+        size_t len = o->longName != nullptr ? strlen(o->longName) : 0;
 
         if (matchlen < len && str[0] == '-' && str[1] == '-' && strncmp(str + 2, o->longName, len) == 0 &&
             (str[len + 2] == '\0' || (o->has_arg && str[len + 2] == '=')))
         {
             matchlen = len;
             match = o;
-            arg = str[len + 2] == '=' ? str + len + 3 : NULL;
+            arg = str[len + 2] == '=' ? str + len + 3 : nullptr;
         }
 
-        len = o->shortName != NULL ? strlen(o->shortName) : 0;
+        len = o->shortName != nullptr ? strlen(o->shortName) : 0;
 
         if (matchlen < len && str[0] == '-' && strncmp(str + 1, o->shortName, len) == 0 && (str[len + 1] == '\0' || o->has_arg))
         {
@@ -181,7 +181,7 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
             switch (str[len + 1])
             {
             case '\0':
-                arg = NULL;
+                arg = nullptr;
                 break;
 
             case '=':
@@ -195,7 +195,7 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
         }
     }
 
-    if (setme_arg != NULL)
+    if (setme_arg != nullptr)
     {
         *setme_arg = arg;
     }
@@ -205,10 +205,10 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
 
 int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg)
 {
-    char const* arg = NULL;
-    tr_option const* o = NULL;
+    char const* arg = nullptr;
+    tr_option const* o = nullptr;
 
-    *setme_optarg = NULL;
+    *setme_optarg = nullptr;
 
     /* handle the builtin 'help' option */
     for (int i = 1; i < argc; ++i)
@@ -228,7 +228,7 @@ int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option co
 
     o = findOption(opts, argv[tr_optind], &arg);
 
-    if (o == NULL)
+    if (o == nullptr)
     {
         /* let the user know we got an unknown option... */
         *setme_optarg = argv[tr_optind++];
@@ -238,18 +238,18 @@ int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option co
     if (!o->has_arg)
     {
         /* no argument needed for this option, so we're done */
-        if (arg != NULL)
+        if (arg != nullptr)
         {
             return TR_OPT_ERR;
         }
 
-        *setme_optarg = NULL;
+        *setme_optarg = nullptr;
         ++tr_optind;
         return o->val;
     }
 
     /* option needed an argument, and it was embedded in this string */
-    if (arg != NULL)
+    if (arg != nullptr)
     {
         *setme_optarg = arg;
         ++tr_optind;
@@ -262,7 +262,7 @@ int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option co
         return TR_OPT_ERR;
     }
 
-    if (findOption(opts, argv[tr_optind], NULL) != NULL)
+    if (findOption(opts, argv[tr_optind], nullptr) != nullptr)
     {
         return TR_OPT_ERR;
     }

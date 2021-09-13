@@ -54,13 +54,13 @@ struct tr_watchdir
 
 static bool is_regular_file(char const* dir, char const* name)
 {
-    char* const path = tr_buildPath(dir, name, NULL);
+    char* const path = tr_buildPath(dir, name, nullptr);
     auto path_info = tr_sys_path_info{};
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
     bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
-    if (error != NULL)
+    if (error != nullptr)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
@@ -145,7 +145,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t fd, short type, void* con
     TR_UNUSED(fd);
     TR_UNUSED(type);
 
-    TR_ASSERT(context != NULL);
+    TR_ASSERT(context != nullptr);
 
     auto* const retry = static_cast<tr_watchdir_retry*>(context);
     tr_watchdir_t const handle = retry->handle;
@@ -190,12 +190,12 @@ static tr_watchdir_retry* tr_watchdir_retry_new(tr_watchdir_t handle, char const
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
 {
-    if (retry == NULL)
+    if (retry == nullptr)
     {
         return;
     }
 
-    if (retry->timer != NULL)
+    if (retry->timer != nullptr)
     {
         evtimer_del(retry->timer);
         event_free(retry->timer);
@@ -207,7 +207,7 @@ static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
 
 static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 {
-    TR_ASSERT(retry != NULL);
+    TR_ASSERT(retry != nullptr);
 
     evtimer_del(retry->timer);
 
@@ -237,7 +237,7 @@ tr_watchdir_t tr_watchdir_new(
     handle->event_base = event_base;
     tr_watchdir_retries_init(&handle->active_retries);
 
-    if (!force_generic && (handle->backend == NULL))
+    if (!force_generic && (handle->backend == nullptr))
     {
 #if defined(WITH_INOTIFY)
         handle->backend = tr_watchdir_inotify_new(handle);
@@ -248,19 +248,19 @@ tr_watchdir_t tr_watchdir_new(
 #endif
     }
 
-    if (handle->backend == NULL)
+    if (handle->backend == nullptr)
     {
         handle->backend = tr_watchdir_generic_new(handle);
     }
 
-    if (handle->backend == NULL)
+    if (handle->backend == nullptr)
     {
         tr_watchdir_free(handle);
-        handle = NULL;
+        handle = nullptr;
     }
     else
     {
-        TR_ASSERT(handle->backend->free_func != NULL);
+        TR_ASSERT(handle->backend->free_func != nullptr);
     }
 
     return handle;
@@ -268,14 +268,14 @@ tr_watchdir_t tr_watchdir_new(
 
 void tr_watchdir_free(tr_watchdir_t handle)
 {
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
 
     tr_watchdir_retries_destroy(&handle->active_retries);
 
-    if (handle->backend != NULL)
+    if (handle->backend != nullptr)
     {
         handle->backend->free_func(handle->backend);
     }
@@ -286,21 +286,21 @@ void tr_watchdir_free(tr_watchdir_t handle)
 
 char const* tr_watchdir_get_path(tr_watchdir_t handle)
 {
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     return handle->path;
 }
 
 tr_watchdir_backend* tr_watchdir_get_backend(tr_watchdir_t handle)
 {
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     return handle->backend;
 }
 
 struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
 {
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     return handle->event_base;
 }
@@ -311,7 +311,7 @@ struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
 
 void tr_watchdir_process(tr_watchdir_t handle, char const* name)
 {
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     auto const search_key = tr_watchdir_retry{ {}, const_cast<char*>(name), {}, {}, {} };
     auto* existing_retry = static_cast<tr_watchdir_retry*>(tr_watchdir_retries_find(&handle->active_retries, &search_key));
@@ -333,8 +333,8 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
     tr_sys_dir_t dir;
     char const* name;
     auto new_dir_entries = tr_ptrArray{};
-    PtrArrayCompareFunc const name_compare_func = (PtrArrayCompareFunc)&strcmp;
-    tr_error* error = NULL;
+    auto const name_compare_func = (PtrArrayCompareFunc)&strcmp;
+    tr_error* error = nullptr;
 
     if ((dir = tr_sys_dir_open(handle->path, &error)) == TR_BAD_SYS_DIR)
     {
@@ -343,18 +343,18 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
         return;
     }
 
-    while ((name = tr_sys_dir_read_name(dir, &error)) != NULL)
+    while ((name = tr_sys_dir_read_name(dir, &error)) != nullptr)
     {
         if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
         {
             continue;
         }
 
-        if (dir_entries != NULL)
+        if (dir_entries != nullptr)
         {
             tr_ptrArrayInsertSorted(&new_dir_entries, tr_strdup(name), name_compare_func);
 
-            if (tr_ptrArrayFindSorted(dir_entries, name, name_compare_func) != NULL)
+            if (tr_ptrArrayFindSorted(dir_entries, name, name_compare_func) != nullptr)
             {
                 continue;
             }
@@ -363,15 +363,15 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
         tr_watchdir_process(handle, name);
     }
 
-    if (error != NULL)
+    if (error != nullptr)
     {
         log_error("Failed to read directory \"%s\" (%d): %s", handle->path, error->code, error->message);
         tr_error_free(error);
     }
 
-    tr_sys_dir_close(dir, NULL);
+    tr_sys_dir_close(dir, nullptr);
 
-    if (dir_entries != NULL)
+    if (dir_entries != nullptr)
     {
         tr_ptrArrayDestruct(dir_entries, &tr_free);
         *dir_entries = new_dir_entries;

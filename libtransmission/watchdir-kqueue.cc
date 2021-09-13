@@ -71,7 +71,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t fd, short type, void* co
     struct kevent ke;
     auto ts = timespec{};
 
-    if (kevent(backend->kq, NULL, 0, &ke, 1, &ts) == -1)
+    if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
         log_error("Failed to fetch kevent: %s", tr_strerror(errno));
         return;
@@ -85,14 +85,14 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
 
     TR_ASSERT(backend->base.free_func == &tr_watchdir_kqueue_free);
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         event_del(backend->event);
         event_free(backend->event);
@@ -138,9 +138,9 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     }
 
     /* Register kevent filter with kqueue descriptor */
-    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
+    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, nullptr);
 
-    if (kevent(backend->kq, &ke, 1, NULL, 0, NULL) == -1)
+    if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {
         log_error("Failed to set directory event filter with fd %d: %s", backend->kq, tr_strerror(errno));
         goto fail;
@@ -152,13 +152,13 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
              backend->kq,
              EV_READ | EV_ET | EV_PERSIST,
              &tr_watchdir_kqueue_on_event,
-             handle)) == NULL)
+             handle)) == nullptr)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto fail;
     }
 
-    if (event_add(backend->event, NULL) == -1)
+    if (event_add(backend->event, nullptr) == -1)
     {
         log_error("Failed to add event: %s", tr_strerror(errno));
         goto fail;
@@ -171,5 +171,5 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
 fail:
     tr_watchdir_kqueue_free(BACKEND_DOWNCAST(backend));
-    return NULL;
+    return nullptr;
 }

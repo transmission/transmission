@@ -67,8 +67,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
             char* filename = tr_torrentFindFile(tor, fileIndex);
-            fd = filename == NULL ? TR_BAD_SYS_FILE :
-                                    tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+            fd = filename == nullptr ? TR_BAD_SYS_FILE :
+                                    tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
             tr_free(filename);
             prevFileIndex = fileIndex;
         }
@@ -84,11 +84,11 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         {
             uint64_t numRead;
 
-            if (tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, NULL) && numRead > 0)
+            if (tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
             {
                 bytesThisPass = numRead;
                 tr_sha1_update(sha, buffer, bytesThisPass);
-                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, NULL);
+                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, nullptr);
             }
         }
 
@@ -136,7 +136,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         {
             if (fd != TR_BAD_SYS_FILE)
             {
-                tr_sys_file_close(fd, NULL);
+                tr_sys_file_close(fd, nullptr);
                 fd = TR_BAD_SYS_FILE;
             }
 
@@ -148,10 +148,10 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     /* cleanup */
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
     }
 
-    tr_sha1_final(sha, NULL);
+    tr_sha1_final(sha, nullptr);
     free(buffer);
 
     /* stopwatch */
@@ -179,15 +179,15 @@ struct verify_node
 };
 
 static struct verify_node currentNode;
-static tr_list* verifyList = NULL;
-static tr_thread* verifyThread = NULL;
+static tr_list* verifyList = nullptr;
+static tr_thread* verifyThread = nullptr;
 static bool stopCurrent = false;
 
 static tr_lock* getVerifyLock(void)
 {
-    static tr_lock* lock = NULL;
+    static tr_lock* lock = nullptr;
 
-    if (lock == NULL)
+    if (lock == nullptr)
     {
         lock = tr_lockNew();
     }
@@ -206,11 +206,11 @@ static void verifyThreadFunc(void* user_data)
 
         tr_lockLock(getVerifyLock());
         stopCurrent = false;
-        auto* node = static_cast<struct verify_node*>(verifyList != NULL ? verifyList->data : NULL);
+        auto* node = static_cast<struct verify_node*>(verifyList != nullptr ? verifyList->data : nullptr);
 
-        if (node == NULL)
+        if (node == nullptr)
         {
-            currentNode.torrent = NULL;
+            currentNode.torrent = nullptr;
             break;
         }
 
@@ -231,13 +231,13 @@ static void verifyThreadFunc(void* user_data)
             tr_torrentSetDirty(tor);
         }
 
-        if (currentNode.callback_func != NULL)
+        if (currentNode.callback_func != nullptr)
         {
             (*currentNode.callback_func)(tor, stopCurrent, currentNode.callback_data);
         }
     }
 
-    verifyThread = NULL;
+    verifyThread = nullptr;
     tr_lockUnlock(getVerifyLock());
 }
 
@@ -284,9 +284,9 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
     tr_list_insert_sorted(&verifyList, node, compareVerifyByPriorityAndSize);
 
-    if (verifyThread == NULL)
+    if (verifyThread == nullptr)
     {
-        verifyThread = tr_threadNew(verifyThreadFunc, NULL);
+        verifyThread = tr_threadNew(verifyThreadFunc, nullptr);
     }
 
     tr_lockUnlock(getVerifyLock());
@@ -323,9 +323,9 @@ void tr_verifyRemove(tr_torrent* tor)
 
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
 
-        if (node != NULL)
+        if (node != nullptr)
         {
-            if (node->callback_func != NULL)
+            if (node->callback_func != nullptr)
             {
                 (*node->callback_func)(tor, true, node->callback_data);
             }

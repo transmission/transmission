@@ -141,18 +141,18 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     /* We currently have no way to enable or disable IPv6 after initialisation.
        No way to fix that without some surgery to the DHT code itself. */
-    if (ipv6 == NULL || (!force && ss->udp6_socket == TR_BAD_SOCKET))
+    if (ipv6 == nullptr || (!force && ss->udp6_socket == TR_BAD_SOCKET))
     {
-        if (ss->udp6_bound != NULL)
+        if (ss->udp6_bound != nullptr)
         {
             free(ss->udp6_bound);
-            ss->udp6_bound = NULL;
+            ss->udp6_bound = nullptr;
         }
 
         return;
     }
 
-    if (ss->udp6_bound != NULL && memcmp(ipv6, ss->udp6_bound, 16) == 0)
+    if (ss->udp6_bound != nullptr && memcmp(ipv6, ss->udp6_bound, 16) == 0)
     {
         return;
     }
@@ -173,7 +173,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
     memset(&sin6, 0, sizeof(sin6));
     sin6.sin6_family = AF_INET6;
 
-    if (ipv6 != NULL)
+    if (ipv6 != nullptr)
     {
         memcpy(&sin6.sin6_addr, ipv6, 16);
     }
@@ -181,7 +181,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
     sin6.sin6_port = htons(ss->udp_port);
     public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
 
-    if (public_addr != NULL && !is_default)
+    if (public_addr != nullptr && !is_default)
     {
         sin6.sin6_addr = public_addr->addr.addr6;
     }
@@ -210,12 +210,12 @@ static void rebind_ipv6(tr_session* ss, bool force)
         tr_netCloseSocket(s);
     }
 
-    if (ss->udp6_bound == NULL)
+    if (ss->udp6_bound == nullptr)
     {
         ss->udp6_bound = static_cast<unsigned char*>(malloc(16));
     }
 
-    if (ss->udp6_bound != NULL)
+    if (ss->udp6_bound != nullptr)
     {
         memcpy(ss->udp6_bound, ipv6, 16);
     }
@@ -232,10 +232,10 @@ FAIL:
         tr_netCloseSocket(s);
     }
 
-    if (ss->udp6_bound != NULL)
+    if (ss->udp6_bound != nullptr)
     {
         free(ss->udp6_bound);
-        ss->udp6_bound = NULL;
+        ss->udp6_bound = nullptr;
     }
 }
 
@@ -325,7 +325,7 @@ void tr_udpInit(tr_session* ss)
     sin.sin_family = AF_INET;
     public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
 
-    if (public_addr != NULL && !is_default)
+    if (public_addr != nullptr && !is_default)
     {
         memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
     }
@@ -343,13 +343,13 @@ void tr_udpInit(tr_session* ss)
 
     ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
-    if (ss->udp_event == NULL)
+    if (ss->udp_event == nullptr)
     {
         tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
     }
 
 IPV6:
-    if (tr_globalIPv6() != NULL)
+    if (tr_globalIPv6() != nullptr)
     {
         rebind_ipv6(ss, true);
     }
@@ -358,7 +358,7 @@ IPV6:
     {
         ss->udp6_event = event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
-        if (ss->udp6_event == NULL)
+        if (ss->udp6_event == nullptr)
         {
             tr_logAddNamedError("UDP", "Couldn't allocate IPv6 event");
         }
@@ -371,14 +371,14 @@ IPV6:
         tr_dhtInit(ss);
     }
 
-    if (ss->udp_event != NULL)
+    if (ss->udp_event != nullptr)
     {
-        event_add(ss->udp_event, NULL);
+        event_add(ss->udp_event, nullptr);
     }
 
-    if (ss->udp6_event != NULL)
+    if (ss->udp6_event != nullptr)
     {
-        event_add(ss->udp6_event, NULL);
+        event_add(ss->udp6_event, nullptr);
     }
 }
 
@@ -392,10 +392,10 @@ void tr_udpUninit(tr_session* ss)
         ss->udp_socket = TR_BAD_SOCKET;
     }
 
-    if (ss->udp_event != NULL)
+    if (ss->udp_event != nullptr)
     {
         event_free(ss->udp_event);
-        ss->udp_event = NULL;
+        ss->udp_event = nullptr;
     }
 
     if (ss->udp6_socket != TR_BAD_SOCKET)
@@ -404,15 +404,15 @@ void tr_udpUninit(tr_session* ss)
         ss->udp6_socket = TR_BAD_SOCKET;
     }
 
-    if (ss->udp6_event != NULL)
+    if (ss->udp6_event != nullptr)
     {
         event_free(ss->udp6_event);
-        ss->udp6_event = NULL;
+        ss->udp6_event = nullptr;
     }
 
-    if (ss->udp6_bound != NULL)
+    if (ss->udp6_bound != nullptr)
     {
         free(ss->udp6_bound);
-        ss->udp6_bound = NULL;
+        ss->udp6_bound = nullptr;
     }
 }

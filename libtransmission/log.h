@@ -47,7 +47,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 #define tr_logAddTorInfo(tor, ...) tr_logAddTor(TR_LOG_INFO, tor, __VA_ARGS__)
 #define tr_logAddTorDbg(tor, ...) tr_logAddTor(TR_LOG_DEBUG, tor, __VA_ARGS__)
 
-#define tr_logAdd(level, ...) tr_logAddNamed(level, NULL, __VA_ARGS__)
+#define tr_logAdd(level, ...) tr_logAddNamed(level, nullptr, __VA_ARGS__)
 
 #define tr_logAddError(...) tr_logAdd(TR_LOG_ERROR, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAdd(TR_LOG_INFO, __VA_ARGS__)

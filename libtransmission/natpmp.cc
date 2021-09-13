@@ -98,7 +98,7 @@ struct tr_natpmp* tr_natpmpInit(void)
 
 void tr_natpmpClose(tr_natpmp* nat)
 {
-    if (nat != NULL)
+    if (nat != nullptr)
     {
         closenatpmp(&nat->natpmp);
         tr_free(nat);

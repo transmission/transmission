@@ -62,12 +62,12 @@ static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd, short type, vo
 
     auto const handle = static_cast<tr_watchdir_t>(context);
 
-    tr_watchdir_scan(handle, NULL);
+    tr_watchdir_scan(handle, nullptr);
 }
 
 static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* context)
 {
-    TR_ASSERT(context != NULL);
+    TR_ASSERT(context != nullptr);
 
     auto const handle = static_cast<tr_watchdir_t>(context);
 #ifdef TR_ENABLE_ASSERTS
@@ -127,14 +127,14 @@ static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_inotify* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
 
     TR_ASSERT(backend->base.free_func == &tr_watchdir_inotify_free);
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         bufferevent_disable(backend->event, EV_READ);
         bufferevent_free(backend->event);
@@ -175,7 +175,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         goto FAIL;
     }
 
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0)) == NULL)
+    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0)) == nullptr)
     {
         log_error("Failed to create event buffer: %s", tr_strerror(errno));
         goto FAIL;
@@ -184,11 +184,11 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     /* Guarantees at least the sizeof an inotify event will be available in the
        event buffer */
     bufferevent_setwatermark(backend->event, EV_READ, sizeof(struct inotify_event), 0);
-    bufferevent_setcb(backend->event, &tr_watchdir_inotify_on_event, NULL, NULL, handle);
+    bufferevent_setcb(backend->event, &tr_watchdir_inotify_on_event, nullptr, nullptr, handle);
     bufferevent_enable(backend->event, EV_READ);
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_inotify_on_first_scan, handle, NULL) ==
+    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_inotify_on_first_scan, handle, nullptr) ==
         -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
@@ -198,5 +198,5 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
 
 FAIL:
     tr_watchdir_inotify_free(BACKEND_DOWNCAST(backend));
-    return NULL;
+    return nullptr;
 }

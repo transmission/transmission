@@ -55,7 +55,7 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
     void const* begin = buf + 1;
     void const* end = memchr(begin, 'e', (bufend - buf) - 1);
 
-    if (end == NULL)
+    if (end == nullptr)
     {
         return EILSEQ;
     }
@@ -99,7 +99,7 @@ int tr_bencParseStr(
     {
         void const* end = memchr(buf, ':', bufend - buf);
 
-        if (end != NULL)
+        if (end != nullptr)
         {
             errno = 0;
             char* ulend;
@@ -121,15 +121,15 @@ int tr_bencParseStr(
         }
     }
 
-    *setme_end = NULL;
-    *setme_str = NULL;
+    *setme_end = nullptr;
+    *setme_str = nullptr;
     *setme_strlen = 0;
     return EILSEQ;
 }
 
 static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, int* err)
 {
-    tr_variant* node = NULL;
+    tr_variant* node = nullptr;
 
     if (tr_ptrArrayEmpty(stack))
     {
@@ -170,7 +170,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     auto stack = tr_ptrArray{};
     tr_quark key = 0;
 
-    if ((buf_in == NULL) || (bufend_in == NULL) || (top == NULL))
+    if ((buf_in == nullptr) || (bufend_in == nullptr) || (top == nullptr))
     {
         return EINVAL;
     }
@@ -202,7 +202,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitInt(v, val);
             }
@@ -213,7 +213,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitList(v, 0);
                 tr_ptrArrayAppend(&stack, v);
@@ -225,7 +225,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitDict(v, 0);
                 tr_ptrArrayAppend(&stack, v);
@@ -268,7 +268,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             {
                 key = tr_quark_new(str, str_len);
             }
-            else if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            else if ((v = get_node(&stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitStr(v, str, str_len);
             }
@@ -291,7 +291,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
     if (err == 0)
     {
-        if (setme_end != NULL)
+        if (setme_end != nullptr)
         {
             *setme_end = (char const*)buf;
         }
@@ -302,7 +302,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         tr_variantInit(top, 0);
     }
 
-    tr_ptrArrayDestruct(&stack, NULL);
+    tr_ptrArrayDestruct(&stack, nullptr);
     return err;
 }
 
@@ -346,7 +346,7 @@ static void saveStringFunc(tr_variant const* v, void* vevbuf)
     if (!tr_variantGetStr(v, &str, &len))
     {
         len = 0;
-        str = NULL;
+        str = nullptr;
     }
 
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);

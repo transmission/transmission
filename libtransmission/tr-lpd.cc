@@ -75,11 +75,11 @@ enum
     UPKEEP_INTERVAL_SECS = 5
 };
 
-static struct event* upkeep_timer = NULL;
+static struct event* upkeep_timer = nullptr;
 
 static tr_socket_t lpd_socket; /**<separate multicast receive socket */
 static tr_socket_t lpd_socket2; /**<and multicast send socket */
-static struct event* lpd_event = NULL;
+static struct event* lpd_event = nullptr;
 static tr_port lpd_port;
 
 static tr_session* session;
@@ -172,7 +172,7 @@ static int lpd_unsolicitedMsgCounter;
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
-    TR_ASSERT(s != NULL);
+    TR_ASSERT(s != nullptr);
 
     int major = -1;
     int minor = -1;
@@ -181,18 +181,18 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
     /* something might be rotten with this chunk of data */
     if (len == 0 || len > lpd_maxDatagramLength)
     {
-        return NULL;
+        return nullptr;
     }
 
     /* now we can attempt to look up the BT-SEARCH header */
     if (sscanf(s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
     {
-        return NULL;
+        return nullptr;
     }
 
     if (major < 0 || minor < 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     {
@@ -200,13 +200,13 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
         char const* const two_blank = CRLF CRLF CRLF;
         char const* const end = strstr(s, two_blank);
 
-        if (end == NULL || strlen(end) > strlen(two_blank))
+        if (end == nullptr || strlen(end) > strlen(two_blank))
         {
-            return NULL;
+            return nullptr;
         }
     }
 
-    if (ver != NULL)
+    if (ver != nullptr)
     {
         ver->major = major;
         ver->minor = minor;
@@ -232,9 +232,9 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 */
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
-    TR_ASSERT(str != NULL);
-    TR_ASSERT(name != NULL);
-    TR_ASSERT(val != NULL);
+    TR_ASSERT(str != nullptr);
+    TR_ASSERT(name != nullptr);
+    TR_ASSERT(val != nullptr);
 
     enum
     {
@@ -255,7 +255,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 
     pos = strstr(str, sstr);
 
-    if (pos == NULL)
+    if (pos == nullptr)
     {
         return false; /* search was not successful */
     }
@@ -306,7 +306,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
     int const opt_on = 1;
     int const opt_off = 0;
 
-    if (session != NULL) /* already initialized */
+    if (session != nullptr) /* already initialized */
     {
         return -1;
     }
@@ -408,8 +408,8 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new(ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL);
-    event_add(lpd_event, NULL);
+    lpd_event = event_new(ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, nullptr);
+    event_add(lpd_event, nullptr);
 
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
@@ -424,7 +424,7 @@ fail:
         evutil_closesocket(lpd_socket);
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
-        session = NULL;
+        session = nullptr;
         tr_logAddNamedDbg("LPD", "LPD initialisation failed (errno = %d)", save);
         errno = save;
     }
@@ -442,22 +442,22 @@ void tr_lpdUninit(tr_session* ss)
     tr_logAddNamedDbg("LPD", "Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
-    lpd_event = NULL;
+    lpd_event = nullptr;
 
     evtimer_del(upkeep_timer);
-    upkeep_timer = NULL;
+    upkeep_timer = nullptr;
 
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
     tr_logAddNamedDbg("LPD", "Done uninitialising Local Peer Discovery");
 
-    session = NULL;
+    session = nullptr;
 }
 
 bool tr_lpdEnabled(tr_session const* ss)
 {
-    return ss != NULL && ss == session;
+    return ss != nullptr && ss == session;
 }
 
 /**
@@ -491,7 +491,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     char hashString[SIZEOF_HASH_STRING];
     char query[lpd_maxDatagramLength + 1] = { 0 };
 
-    if (t == NULL)
+    if (t == nullptr)
     {
         return false;
     }
@@ -552,13 +552,13 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     int res = 0;
     int peerPort = 0;
 
-    if (peer != NULL && msg != NULL)
+    if (peer != nullptr && msg != nullptr)
     {
-        tr_torrent* tor = NULL;
+        tr_torrent* tor = nullptr;
 
         char const* params = lpd_extractHeader(msg, &ver);
 
-        if (params == NULL || ver.major != 1) /* allow messages of protocol v1 */
+        if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
         {
             return 0;
         }
@@ -620,7 +620,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 */
 static int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
-    tr_torrent* tor = NULL;
+    tr_torrent* tor = nullptr;
     int announcesSent = 0;
 
     if (!tr_isSession(session))
@@ -628,7 +628,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         return -1;
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != NULL && tr_sessionAllowsLPD(session))
+    while ((tor = tr_torrentNext(session, tor)) != nullptr && tr_sessionAllowsLPD(session))
     {
         if (tr_isTorrent(tor))
         {

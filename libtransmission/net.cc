@@ -62,7 +62,7 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
 
 #ifdef _WIN32
 
-    DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
+    DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, buf, buflen, nullptr);
 
     while (len > 0 && buf[len - 1] >= '\0' && buf[len - 1] <= ' ')
     {
@@ -319,8 +319,8 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     addrlen = setup_sockaddr(addr, port, &sock);
 
     /* set source address */
-    source_addr = tr_sessionGetPublicAddress(session, addr->type, NULL);
-    TR_ASSERT(source_addr != NULL);
+    source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
+    TR_ASSERT(source_addr != nullptr);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
@@ -364,7 +364,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         char addrstr[TR_ADDRSTRLEN];
         tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
+        tr_logAddDeep(__FILE__, __LINE__, nullptr, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
     }
 
     return ret;
@@ -382,7 +382,7 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address co
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
         struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
 
-        if (socket != NULL)
+        if (socket != nullptr)
         {
             ret = tr_peer_socket_utp_create(socket);
         }
@@ -451,10 +451,10 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
             }
             else
             {
-                hint = NULL;
+                hint = nullptr;
             }
 
-            if (hint == NULL)
+            if (hint == nullptr)
             {
                 fmt = _("Couldn't bind port %d on %s: %s");
             }
@@ -726,7 +726,7 @@ unsigned char const* tr_globalIPv6(void)
         last_time = now;
     }
 
-    return have_ipv6 ? ipv6 : NULL;
+    return have_ipv6 ? ipv6 : nullptr;
 }
 
 /***
@@ -786,7 +786,7 @@ struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
 
 struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
 {
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     auto ret = tr_peer_socket{ TR_PEER_SOCKET_TYPE_UTP, {} };
     ret.handle.utp = handle;
