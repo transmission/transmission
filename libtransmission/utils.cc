@@ -7,9 +7,12 @@
  */
 
 #ifdef HAVE_MEMMEM
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
 #endif
+#endif
 
+#include <array> // std::array
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_DIG */
@@ -203,23 +206,14 @@ void* tr_memdup(void const* src, size_t byteCount)
 
 char const* tr_strip_positional_args(char const* str)
 {
-    char* out;
-    static size_t bufsize = 0;
-    static char* buf = NULL;
+    static auto buf = std::array<char, 512>{};
+
     char const* in = str;
-    size_t const len = str != NULL ? strlen(str) : 0;
+    size_t pos = 0;
 
-    if (buf == NULL || bufsize < len)
+    for (; str && *str && pos + 1 < buf.size(); ++str)
     {
-        bufsize = len * 2 + 1;
-        buf = tr_renew(char, buf, bufsize);
-    }
-
-    out = buf;
-
-    for (; !tr_str_is_empty(str); ++str)
-    {
-        *out++ = *str;
+        buf[pos++] = *str;
 
         if (*str == '%' && isdigit(str[1]))
         {
@@ -242,8 +236,9 @@ char const* tr_strip_positional_args(char const* str)
         }
     }
 
-    *out = '\0';
-    return (in == NULL || strcmp(buf, in) != 0) ? buf : in;
+    buf[pos] = '\0';
+
+    return in && !strcmp(buf.data(), in) ? in : buf.data();
 }
 
 /**
