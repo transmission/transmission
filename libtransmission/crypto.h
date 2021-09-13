@@ -35,8 +35,8 @@ enum
 /** @brief Holds state information for encrypted peer communications */
 typedef struct
 {
-    tr_rc4_ctx_t dec_key;
-    tr_rc4_ctx_t enc_key;
+    struct arc4_context* dec_key;
+    struct arc4_context* enc_key;
     tr_dh_ctx_t dh;
     uint8_t myPublicKey[KEY_LEN];
     tr_dh_secret_t mySecret;

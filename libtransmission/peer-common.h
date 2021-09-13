@@ -66,8 +66,6 @@ typedef struct
     tr_port port; /* for GOT_PORT */
 } tr_peer_event;
 
-extern tr_peer_event const TR_PEER_EVENT_INIT;
-
 typedef void (*tr_peer_callback)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
 
 /***
@@ -149,8 +147,6 @@ typedef struct tr_swarm_stats
     int peerCount;
     int peerFromCount[TR_PEER_FROM__MAX];
 } tr_swarm_stats;
-
-extern tr_swarm_stats const TR_SWARM_STATS_INIT;
 
 void tr_swarmGetStats(struct tr_swarm const* swarm, tr_swarm_stats* setme);
 
