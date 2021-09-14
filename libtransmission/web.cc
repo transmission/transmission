@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h> /* strlen(), strstr() */
+#include <cstring> /* strlen(), strstr() */
+#include <algorithm>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -541,7 +542,7 @@ static void tr_webThreadFunc(void* vsession)
                     /* curl_multi_wait() returns immediately if there are
                      * no fds to wait for, so we need an explicit wait here
                      * to emulate select() behavior */
-                    tr_wait_msec(MIN(msec, THREADFUNC_MAX_SLEEP_MSEC / 2));
+                    tr_wait_msec(std::min(msec, THREADFUNC_MAX_SLEEP_MSEC / 2L));
                 }
             }
             else

@@ -6,8 +6,9 @@
  *
  */
 
-#include <stdlib.h> /* bsearch() */
-#include <string.h> /* memcmp() */
+#include <cstdlib> /* bsearch() */
+#include <cstring> /* memcmp() */
+#include <algorithm>
 
 #include "transmission.h"
 #include "ptrarray.h"
@@ -424,7 +425,7 @@ static int compareKeys(void const* va, void const* vb)
     auto const* a = static_cast<struct tr_key_struct const*>(va);
     auto const* b = static_cast<struct tr_key_struct const*>(vb);
 
-    int ret = memcmp(a->str, b->str, MIN(a->len, b->len));
+    int ret = memcmp(a->str, b->str, std::min(a->len, b->len));
 
     if (ret == 0 && a->len != b->len)
     {

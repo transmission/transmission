@@ -1555,8 +1555,8 @@ static bool parseNumberSection(char const* str, size_t len, struct number_range*
 
     tr_free(tmp);
 
-    setme->low = MIN(a, b);
-    setme->high = MAX(a, b);
+    setme->low = (int)std::min(a, b);
+    setme->high = (int)std::max(a, b);
 
     errno = error;
     return success;

@@ -166,6 +166,8 @@ typedef struct
 
     /* the name to use when deep logging is enabled */
     char log_name[128];
+
+    static int compareStops(void const* va, void const* vb);
 } tr_announce_request;
 
 struct tr_pex;

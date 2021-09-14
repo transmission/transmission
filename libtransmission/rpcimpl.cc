@@ -6,10 +6,11 @@
  *
  */
 
-#include <ctype.h> /* isdigit */
-#include <errno.h>
-#include <stdlib.h> /* strtol */
-#include <string.h> /* strcmp */
+#include <cctype> /* isdigit */
+#include <cerrno>
+#include <cstdlib> /* strtol */
+#include <cstring> /* strcmp */
+#include <algorithm>
 
 #ifndef ZLIB_CONST
 #define ZLIB_CONST
@@ -1246,7 +1247,7 @@ static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
     {
         tgt[i].tier = src[i].tier;
         tgt[i].announce = tr_strdup(src[i].announce);
-        maxTier = MAX(maxTier, src[i].tier);
+        maxTier = std::max(maxTier, src[i].tier);
     }
 
     return maxTier;

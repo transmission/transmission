@@ -6,9 +6,10 @@
  *
  */
 
-#include <errno.h>
-#include <stdlib.h> /* bsearch() */
-#include <string.h> /* memcmp() */
+#include <cerrno>
+#include <cstdlib> /* bsearch() */
+#include <cstring> /* memcmp() */
+#include <algorithm>
 
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock() */
@@ -217,7 +218,7 @@ static int readOrWritePiece(
     while (buflen != 0 && err == 0)
     {
         tr_file const* file = &info->files[fileIndex];
-        uint64_t const bytesThisPass = MIN(buflen, file->length - fileOffset);
+        uint64_t const bytesThisPass = std::min(buflen, file->length - fileOffset);
 
         err = readOrWriteBytes(tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass);
         buf += bytesThisPass;
@@ -278,7 +279,7 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
 
     while (bytesLeft != 0)
     {
-        size_t const len = MIN(bytesLeft, buflen);
+        size_t const len = std::min(bytesLeft, buflen);
         success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, static_cast<uint8_t*>(buffer)) == 0;
 
         if (!success)

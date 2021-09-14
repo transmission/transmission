@@ -6,12 +6,12 @@
  *
  */
 
-#include <errno.h> /* ENOENT */
-#include <limits.h> /* INT_MAX */
-#include <stdlib.h>
-#include <string.h> /* memcpy */
-
-#include <signal.h>
+#include <cerrno> /* ENOENT */
+#include <climits> /* INT_MAX */
+#include <cstdlib>
+#include <cstring> /* memcpy */
+#include <csignal>
+#include <algorithm>
 
 #ifndef _WIN32
 #include <sys/types.h> /* umask() */
@@ -21,7 +21,7 @@
 #include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 // #define TR_SHOW_DEPRECATED
@@ -3123,7 +3123,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         /* is it stalled? */
         if (stalled_enabled)
         {
-            int const idle_secs = (int)difftime(now, MAX(tor->startDate, tor->activityDate));
+            int const idle_secs = (int)difftime(now, std::max(tor->startDate, tor->activityDate));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
                 continue;
         }

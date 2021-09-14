@@ -30,20 +30,18 @@
 
 struct tr_tier;
 
-static void tier_build_log_name(struct tr_tier const* tier, char* buf, size_t buflen);
-
 #define dbgmsg(tier, ...) \
     do \
     { \
         if (tr_logGetDeepEnabled()) \
         { \
             char name[128]; \
-            tier_build_log_name(tier, name, TR_N_ELEMENTS(name)); \
+            tier->build_log_name(name, TR_N_ELEMENTS(name)); \
             tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
         } \
     } while (0)
 
-enum
+enum tr_announcer_defaults: int
 {
     /* unless the tracker says otherwise, rescrape this frequently */
     DEFAULT_SCRAPE_INTERVAL_SEC = (60 * 30),
@@ -116,7 +114,7 @@ static int compareTransfer(uint64_t a_uploaded, uint64_t a_downloaded, uint64_t 
  * tracker announcements of active torrents. The remaining keys are
  * used to satisfy the uniqueness requirement of a sorted tr_ptrArray.
  */
-static int compareStops(void const* va, void const* vb)
+int tr_announce_request::compareStops(void const* va, void const* vb)
 {
     int i;
     auto const* a = static_cast<tr_announce_request const*>(va);
@@ -144,12 +142,15 @@ static int compareStops(void const* va, void const* vb)
 
 struct tr_scrape_info
 {
-    char* url;
+    char* url; // TODO: [C++] Owned container (string or unique_ptr)
 
     int multiscrape_max;
+
+    static void scrapeInfoFree(void* va);
+    static int compareScrapeInfo(void const* va, void const* vb);
 };
 
-static void scrapeInfoFree(void* va)
+void tr_scrape_info::scrapeInfoFree(void* va) // TODO: [C++] this is a destructor
 {
     auto* a = static_cast<struct tr_scrape_info*>(va);
 
@@ -157,7 +158,7 @@ static void scrapeInfoFree(void* va)
     tr_free(a);
 }
 
-static int compareScrapeInfo(void const* va, void const* vb)
+int tr_scrape_info::compareScrapeInfo(void const* va, void const* vb)
 {
     auto const* a = static_cast<struct tr_scrape_info const*>(va);
     auto const* b = static_cast<struct tr_scrape_info const*>(vb);
@@ -176,9 +177,18 @@ typedef struct tr_announcer
     struct event* upkeepTimer;
     int key;
     time_t tauUpkeepAt;
+
+    static void tr_announcerInit(tr_session* session); // TODO: [C++] Convert to a constructor, create only with new/delete
+    static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url);
+    static void flushCloseMessages(tr_announcer* announcer);
 } tr_announcer;
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
+// TODO: session.cc is calling this. Remove when C++ constructor is invoked via operator new
+void tr_announcerInit(tr_session* session) {
+    tr_announcer::tr_announcerInit(session);
+}
+
+struct tr_scrape_info* tr_announcer::tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
 {
     struct tr_scrape_info* info = nullptr;
 
@@ -186,7 +196,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
     {
         bool found;
         auto const key = tr_scrape_info{ const_cast<char*>(url), {} };
-        int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
+        int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, tr_scrape_info::compareScrapeInfo, &found);
         if (found)
         {
             info = static_cast<struct tr_scrape_info*>(tr_ptrArrayNth(&announcer->scrape_info, pos));
@@ -205,7 +215,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 
 static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer);
 
-void tr_announcerInit(tr_session* session)
+void tr_announcer::tr_announcerInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
@@ -219,13 +229,11 @@ void tr_announcerInit(tr_session* session)
     session->announcer = a;
 }
 
-static void flushCloseMessages(tr_announcer* announcer);
-
 void tr_announcerClose(tr_session* session)
 {
     tr_announcer* announcer = session->announcer;
 
-    flushCloseMessages(announcer);
+    tr_announcer::flushCloseMessages(announcer);
 
     tr_tracker_udp_start_shutdown(session);
 
@@ -233,7 +241,7 @@ void tr_announcerClose(tr_session* session)
     announcer->upkeepTimer = nullptr;
 
     tr_ptrArrayDestruct(&announcer->stops, nullptr);
-    tr_ptrArrayDestruct(&announcer->scrape_info, scrapeInfoFree);
+    tr_ptrArrayDestruct(&announcer->scrape_info, tr_scrape_info::scrapeInfoFree);
 
     session->announcer = nullptr;
     tr_free(announcer);
@@ -244,26 +252,31 @@ void tr_announcerClose(tr_session* session)
 ***/
 
 /* a row in tr_tier's list of trackers */
-typedef struct
+struct tr_tracker
 {
-    char* key;
-    char* announce;
-    struct tr_scrape_info* scrape_info;
+    char* key = nullptr;
+    char* announce = nullptr;
+    struct tr_scrape_info* scrape_info = nullptr;
 
-    char* tracker_id_str;
+    char* tracker_id_str = nullptr;
 
-    int seederCount;
-    int leecherCount;
-    int downloadCount;
-    int downloaderCount;
+    int seederCount = 0;
+    int leecherCount = 0;
+    int downloadCount = 0;
+    int downloaderCount = 0;
 
-    int consecutiveFailures;
+    int consecutiveFailures = 0;
 
-    uint32_t id;
-} tr_tracker;
+    uint32_t id = 0;
+
+    static char* getKey(char const* url);
+
+    static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf);
+    static void trackerDestruct(tr_tracker* tracker);
+};
 
 /* format: host+':'+ port */
-static char* getKey(char const* url)
+char* tr_tracker::getKey(char const* url)
 {
     char* ret;
     char* scheme = nullptr;
@@ -278,19 +291,20 @@ static char* getKey(char const* url)
     return ret;
 }
 
-static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf)
+void tr_tracker::trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf)
 {
-    memset(tracker, 0, sizeof(tr_tracker));
-    tracker->key = getKey(inf->announce);
+    *tracker = {}; // TODO: [C++] remove when this function is promoted to constructor
+
+    tracker->key = tr_tracker::getKey(inf->announce);
     tracker->announce = tr_strdup(inf->announce);
-    tracker->scrape_info = tr_announcerGetScrapeInfo(announcer, inf->scrape);
+    tracker->scrape_info = tr_announcer::tr_announcerGetScrapeInfo(announcer, inf->scrape);
     tracker->id = inf->id;
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
     tracker->downloadCount = -1;
 }
 
-static void trackerDestruct(tr_tracker* tracker)
+void tr_tracker::trackerDestruct(tr_tracker* tracker)
 {
     tr_free(tracker->tracker_id_str);
     tr_free(tracker->announce);
@@ -310,56 +324,63 @@ typedef struct tr_tier
      * "event=stopped" message that was acknowledged by the tracker */
     uint64_t byteCounts[3];
 
-    tr_tracker* trackers;
-    size_t tracker_count;
-    tr_tracker* currentTracker;
-    size_t currentTrackerIndex;
+    tr_tracker* trackers = nullptr;
+    size_t tracker_count = 0;
+    tr_tracker* currentTracker = nullptr;
+    size_t currentTrackerIndex = 0;
 
-    tr_torrent* tor;
+    tr_torrent* tor = nullptr;
 
-    time_t scrapeAt;
-    time_t lastScrapeStartTime;
-    time_t lastScrapeTime;
-    bool lastScrapeSucceeded;
-    bool lastScrapeTimedOut;
+    time_t scrapeAt = 0;
+    time_t lastScrapeStartTime = 0;
+    time_t lastScrapeTime = 0;
+    bool lastScrapeSucceeded = false;
+    bool lastScrapeTimedOut = false;
 
-    time_t announceAt;
-    time_t manualAnnounceAllowedAt;
-    time_t lastAnnounceStartTime;
-    time_t lastAnnounceTime;
-    bool lastAnnounceSucceeded;
-    bool lastAnnounceTimedOut;
+    time_t announceAt = 0;
+    time_t manualAnnounceAllowedAt = 0;
+    time_t lastAnnounceStartTime = 0;
+    time_t lastAnnounceTime = 0;
+    bool lastAnnounceSucceeded = false;
+    bool lastAnnounceTimedOut = false;
 
-    tr_announce_event* announce_events;
-    int announce_event_priority;
-    int announce_event_count;
-    int announce_event_alloc;
+    tr_announce_event* announce_events = nullptr;
+    int announce_event_priority = 0;
+    int announce_event_count = 0;
+    int announce_event_alloc = 0;
 
     /* unique lookup key */
-    int key;
+    int key = 0;
 
-    int scrapeIntervalSec;
-    int announceIntervalSec;
-    int announceMinIntervalSec;
+    int scrapeIntervalSec = 0;
+    int announceIntervalSec = 0;
+    int announceMinIntervalSec = 0;
 
-    size_t lastAnnouncePeerCount;
+    size_t lastAnnouncePeerCount = 0;
 
-    bool isRunning;
-    bool isAnnouncing;
-    bool isScraping;
-    bool wasCopied;
+    bool isRunning = false;
+    bool isAnnouncing = false;
+    bool isScraping = false;
+    bool wasCopied = false;
 
     char lastAnnounceStr[128];
     char lastScrapeStr[128];
+
+    static void tierConstruct(tr_tier* tier, tr_torrent* tor);
+    static void tierDestruct(tr_tier* tier);
+
+    [[nodiscard]] bool needsToAnnounce(time_t now) const;
+    time_t get_next_scrape_time(tr_session const* session, int interval) const;
+    void build_log_name(char* buf, size_t buflen) const;
 } tr_tier;
 
-static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tier, int interval)
+time_t tr_tier::get_next_scrape_time(tr_session const* session, int interval) const
 {
     time_t ret;
     time_t const now = tr_time();
 
     /* Maybe don't scrape paused torrents */
-    if (!tier->isRunning && !session->scrapePausedTorrents)
+    if (!this->isRunning && !session->scrapePausedTorrents)
     {
         ret = 0;
     }
@@ -379,34 +400,35 @@ static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tie
     return ret;
 }
 
-static void tierConstruct(tr_tier* tier, tr_torrent* tor)
+void tr_tier::tierConstruct(tr_tier* tier, tr_torrent* tor)
 {
     static int nextKey = 1;
 
-    std::memset(tier, 0, sizeof(tr_tier));
+    *tier = {}; // TODO: [C++] remove when this function is promoted to constructor
 
     tier->key = nextKey++;
     tier->currentTrackerIndex = -1;
     tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    tier->scrapeAt = get_next_scrape_time(tor->session, tier, 0);
+    tier->scrapeAt = tier->get_next_scrape_time(tor->session, 0);
     tier->tor = tor;
 }
 
-static void tierDestruct(tr_tier* tier)
+void tr_tier::tierDestruct(tr_tier* tier)
 {
     tr_free(tier->announce_events);
 }
 
-static void tier_build_log_name(tr_tier const* tier, char* buf, size_t buflen)
+void tr_tier::build_log_name(char* buf, size_t buflen) const
 {
+    TR_ASSERT(this != nullptr);
     tr_snprintf(
         buf,
         buflen,
         "[%s---%s]",
-        (tier != nullptr && tier->tor != nullptr) ? tr_torrentName(tier->tor) : "?",
-        (tier != nullptr && tier->currentTracker != nullptr) ? tier->currentTracker->key : "?");
+        this->tor != nullptr ? tr_torrentName(this->tor) : "?",
+        this->currentTracker != nullptr ? this->currentTracker->key : "?");
 }
 
 static void tierIncrementTracker(tr_tier* tier)
@@ -456,14 +478,14 @@ static void tiersDestruct(tr_torrent_tiers* tt)
 {
     for (size_t i = 0; i < tt->tracker_count; ++i)
     {
-        trackerDestruct(&tt->trackers[i]);
+        tr_tracker::trackerDestruct(&tt->trackers[i]);
     }
 
     tr_free(tt->trackers);
 
     for (size_t i = 0; i < tt->tier_count; ++i)
     {
-        tierDestruct(&tt->tiers[i]);
+        tr_tier::tierDestruct(&tt->tiers[i]);
     }
 
     tr_free(tt->tiers);
@@ -700,7 +722,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
 
     for (size_t i = 0; i < n; ++i)
     {
-        trackerConstruct(tor->session->announcer, &tt->trackers[i], &infos[i]);
+        tr_tracker::trackerConstruct(tor->session->announcer, &tt->trackers[i], &infos[i]);
     }
 
     /* count how many tiers there are */
@@ -728,7 +750,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
         else
         {
             tier = &tt->tiers[tt->tier_count++];
-            tierConstruct(tier, tor);
+            tr_tier::tierConstruct(tier, tor);
             tier->trackers = &tt->trackers[i];
             tier->tracker_count = 1;
             tierIncrementTracker(tier);
@@ -810,7 +832,7 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
         char* message;
         struct evbuffer* buf = evbuffer_new();
 
-        tier_build_log_name(tier, name, sizeof(name));
+        tier->build_log_name(name, sizeof(name));
 
         for (int i = 0; i < tier->announce_event_count; ++i)
         {
@@ -989,7 +1011,7 @@ static tr_announce_request* announce_request_new(
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
     req->key = announcer->key;
     req->partial_seed = tr_torrentGetCompleteness(tor) == TR_PARTIAL_SEED;
-    tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
+    tier->build_log_name(req->log_name, sizeof(req->log_name));
     return req;
 }
 
@@ -1010,13 +1032,13 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
                 tr_announce_event const e = TR_ANNOUNCE_EVENT_STOPPED;
                 tr_announce_request* req = announce_request_new(announcer, tor, tier, e);
 
-                if (tr_ptrArrayFindSorted(&announcer->stops, req, compareStops) != nullptr)
+                if (tr_ptrArrayFindSorted(&announcer->stops, req, tr_announce_request::compareStops) != nullptr)
                 {
                     announce_request_free(req);
                 }
                 else
                 {
-                    tr_ptrArrayInsertSorted(&announcer->stops, req, compareStops);
+                    tr_ptrArrayInsertSorted(&announcer->stops, req, tr_announce_request::compareStops);
                 }
             }
         }
@@ -1240,13 +1262,13 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                     "Announce response contained scrape info; "
                     "rescheduling next scrape to %d seconds from now.",
                     tier->scrapeIntervalSec);
-                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, tier->scrapeIntervalSec);
+                tier->scrapeAt = tier->get_next_scrape_time(announcer->session, tier->scrapeIntervalSec);
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
             }
             else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
             {
-                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, 0);
+                tier->scrapeAt = tier->get_next_scrape_time(announcer->session, 0);
             }
 
             tier->lastAnnounceSucceeded = true;
@@ -1364,7 +1386,7 @@ static bool multiscrape_too_big(char const* errmsg)
     return std::any_of(
         std::begin(too_long_errors),
         std::end(too_long_errors),
-        [errmsg](>const< char* too_long_error) { return std::strstr(errmsg, too_long_error) != nullptr; });
+        [errmsg](const char* too_long_error) { return std::strstr(errmsg, too_long_error) != nullptr; });
 }
 
 static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
@@ -1390,7 +1412,7 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     dbgmsg(tier, "Retrying scrape in %zu seconds.", (size_t)interval);
     tr_logAddTorInfo(tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
     tier->lastScrapeSucceeded = false;
-    tier->scrapeAt = get_next_scrape_time(session, tier, interval);
+    tier->scrapeAt = tier->get_next_scrape_time(session, interval);
 }
 
 static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
@@ -1469,7 +1491,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 {
                     tier->lastScrapeSucceeded = true;
                     tier->scrapeIntervalSec = std::max((int)DEFAULT_SCRAPE_INTERVAL_SEC, response->min_request_interval);
-                    tier->scrapeAt = get_next_scrape_time(session, tier, tier->scrapeIntervalSec);
+                    tier->scrapeAt = tier->get_next_scrape_time(session, tier->scrapeIntervalSec);
                     tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
                     tr_tracker* const tracker = tier->currentTracker;
@@ -1507,7 +1529,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     if (multiscrape_too_big(response->errmsg))
     {
         char const* url = response->url;
-        struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+        struct tr_scrape_info* const scrape_info = tr_announcer::tr_announcerGetScrapeInfo(announcer, url);
         if (scrape_info != nullptr)
         {
             int* multiscrape_max = &scrape_info->multiscrape_max;
@@ -1605,7 +1627,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
         {
             tr_scrape_request* req = &requests[request_count++];
             req->url = scrape_info->url;
-            tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
+            tier->build_log_name(req->log_name, sizeof(req->log_name));
 
             std::memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
             tier->isScraping = true;
@@ -1620,7 +1642,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     }
 }
 
-static void flushCloseMessages(tr_announcer* announcer)
+void tr_announcer::flushCloseMessages(tr_announcer* announcer) // TODO: [C++] Convert to a non-static member
 {
     for (size_t i = 0, n = tr_ptrArraySize(&announcer->stops); i < n; ++i)
     {
@@ -1634,10 +1656,10 @@ static void flushCloseMessages(tr_announcer* announcer)
     tr_ptrArrayClear(&announcer->stops);
 }
 
-static inline bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
+inline bool tr_tier::needsToAnnounce(time_t now) const
 {
-    return !tier->isAnnouncing && !tier->isScraping && tier->announceAt != 0 && tier->announceAt <= now &&
-        tier->announce_event_count > 0;
+    return !this->isAnnouncing && !this->isScraping && this->announceAt != 0 && this->announceAt <= now &&
+        this->announce_event_count > 0;
 }
 
 static inline bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
@@ -1720,7 +1742,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
         {
             tr_tier* tier = &tt->tiers[i];
 
-            if (tierNeedsToAnnounce(tier, now))
+            if (tier->needsToAnnounce(now))
             {
                 tr_ptrArrayInsertSorted(&announceMe, tier, compareAnnounceTiers);
             }
@@ -1767,7 +1789,7 @@ static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
     tr_sessionLock(session);
 
     /* maybe send out some "stopped" messages for closed torrents */
-    flushCloseMessages(announcer);
+    tr_announcer::flushCloseMessages(announcer);
 
     /* maybe kick off some scrapes / announces whose time has come */
     if (!is_closing)

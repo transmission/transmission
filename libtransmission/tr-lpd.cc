@@ -26,15 +26,16 @@ THE SOFTWARE.
 #include <string.h> /* strlen(), strncpy(), strstr(), memset() */
 
 /* posix */
-#include <signal.h> /* sig_atomic_t */
-#include <ctype.h> /* toupper() */
+#include <csignal> /* sig_atomic_t */
+#include <cctype> /* toupper() */
+#include <algorithm>
 
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
 typedef uint16_t in_port_t; /* all missing */
 #else
-#include <sys/time.h>
+#include <ctime>
 #include <unistd.h> /* close() */
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
@@ -269,7 +270,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        n = MIN(len, n - 1);
+        n = std::min(len, n - 1);
         strncpy(val, beg, n);
         val[n] = 0;
     }

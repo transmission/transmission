@@ -6,10 +6,11 @@
  *
  */
 
-#include <errno.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cerrno>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
+#include <algorithm>
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -1165,7 +1166,7 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         }
 
         pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-        n = MIN(n, MAX_PEX_PEER_COUNT);
+        n = std::min(n, (unsigned long)MAX_PEX_PEER_COUNT);
         tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
 
         tr_free(pex);
@@ -1185,7 +1186,7 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         }
 
         pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-        n = MIN(n, MAX_PEX_PEER_COUNT);
+        n = std::min(n, (unsigned long)MAX_PEX_PEER_COUNT);
         tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
 
         tr_free(pex);
@@ -1447,7 +1448,7 @@ static ReadState readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t i
 
         /* read in another chunk of data */
         nLeft = req->length - evbuffer_get_length(block_buffer);
-        n = MIN(nLeft, inlen);
+        n = std::min(nLeft, inlen);
 
         tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
 
@@ -1883,20 +1884,20 @@ static void updateDesiredRequestCount(tr_peerMsgs* msgs)
 
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
-            rate_Bps = MIN(rate_Bps, tr_torrentGetSpeedLimit_Bps(torrent, TR_PEER_TO_CLIENT));
+            rate_Bps = std::min(rate_Bps, tr_torrentGetSpeedLimit_Bps(torrent, TR_PEER_TO_CLIENT));
         }
 
         /* honor the session limits, if enabled */
         if (tr_torrentUsesSessionLimits(torrent) &&
             tr_sessionGetActiveSpeedLimit_Bps(torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
         {
-            rate_Bps = MIN(rate_Bps, irate_Bps);
+            rate_Bps = std::min(rate_Bps, irate_Bps);
         }
 
         /* use this desired rate to figure out how
          * many requests we should send to this peer */
         estimatedBlocksInPeriod = (rate_Bps * seconds) / torrent->blockSize;
-        msgs->desiredRequestCount = MAX(floor, estimatedBlocksInPeriod);
+        msgs->desiredRequestCount = std::max(floor, estimatedBlocksInPeriod);
 
         /* honor the peer's maximum request count, if specified */
         if ((msgs->reqq > 0) && (msgs->desiredRequestCount > msgs->reqq))
