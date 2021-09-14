@@ -762,7 +762,10 @@ private:
         auto const* children = v.val.l.vals;
         auto tmp = std::vector<ByKey>(n);
         for (size_t i = 0; i < n; ++i)
+        {
             tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
+        }
+
         auto const compare = [](ByKey const& a, ByKey const& b)
         {
             return strcmp(a.key, b.key) < 0;
@@ -773,7 +776,9 @@ private:
 
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
+        {
             sorted[i] = tmp[i].idx;
+        }
     }
 
 public:
@@ -786,17 +791,24 @@ public:
         : v{ *v_in }
     {
         if (sort_dicts && tr_variantIsDict(v_in))
+        {
             sortByKey();
+        }
     }
 
     tr_variant const* nextChild()
     {
         if (child_index >= v.val.l.count)
+        {
             return nullptr;
+        }
 
         auto idx = child_index++;
         if (!sorted.empty())
+        {
             idx = sorted[idx];
+        }
+
         return v.val.l.vals + idx;
     }
 };
@@ -863,16 +875,24 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
 
             case TR_VARIANT_TYPE_LIST:
                 if (v == &node.v)
+                {
                     walkFuncs->listBeginFunc(v, user_data);
+                }
                 else
+                {
                     stack.emplace_back(v, sort_dicts);
+                }
                 break;
 
             case TR_VARIANT_TYPE_DICT:
                 if (v == &node.v)
+                {
                     walkFuncs->dictBeginFunc(v, user_data);
+                }
                 else
+                {
                     stack.emplace_back(v, sort_dicts);
+                }
                 break;
 
             default:
