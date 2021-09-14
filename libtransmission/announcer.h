@@ -92,6 +92,7 @@ void tr_announcerAddBytes(tr_torrent*, int up_down_or_corrupt, uint32_t byteCoun
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 
+// TODO: [C++] Used by torrent.cc, remove when the struct is published in a header file, and access via tr_announcer::getStats
 tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount);
 
 void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount);

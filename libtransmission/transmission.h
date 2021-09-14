@@ -1421,7 +1421,7 @@ typedef enum
     TR_TRACKER_ACTIVE = 3
 } tr_tracker_state;
 
-typedef struct
+typedef struct tr_tracker_stat
 {
     /* how many downloads this tracker knows of (-1 means it does not know) */
     int downloadCount;

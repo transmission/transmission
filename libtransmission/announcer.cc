@@ -183,9 +183,17 @@ typedef struct tr_announcer
     struct tr_scrape_info* getScrapeInfo(char const* url);
     void flushCloseMessages();
     tr_tier* getTier(uint8_t const* info_hash, int tierId);
+    static void onUpkeepTimer(int fd, short what, void* vannouncer);
+    static tr_tracker_stat* getStats(const tr_torrent* torrent, int* setmeTrackerCount);
+    static void resetTorrent(tr_torrent* tor);
 } tr_announcer;
 
-// TODO: session.cc is calling this. Remove when C++ constructor is invoked via operator new
+// TODO: [C++] Used by torrent.cc, remove when the struct is published in a header file, and access via tr_announcer::getStats
+tr_tracker_stat* tr_announcerStats(const tr_torrent* torrent, int* setmeTrackerCount) {
+    return tr_announcer::getStats(torrent, setmeTrackerCount);
+}
+
+// TODO: [C++] session.cc is calling this. Remove when C++ constructor is invoked via operator new
 void tr_announcerInit(tr_session* session) {
     tr_announcer::tr_announcerInit(session);
 }
@@ -215,8 +223,6 @@ struct tr_scrape_info* tr_announcer::getScrapeInfo(char const* url)
     return info;
 }
 
-static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer);
-
 void tr_announcer::tr_announcerInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
@@ -225,7 +231,7 @@ void tr_announcer::tr_announcerInit(tr_session* session)
     a->stops = {};
     a->key = tr_rand_int(INT_MAX);
     a->session = session;
-    a->upkeepTimer = evtimer_new(session->event_base, onUpkeepTimer, a);
+    a->upkeepTimer = evtimer_new(session->event_base, tr_announcer::onUpkeepTimer, a);
     tr_timerAddMsec(a->upkeepTimer, UPKEEP_INTERVAL_MSEC);
 
     session->announcer = a;
@@ -375,10 +381,12 @@ typedef struct tr_tier
     time_t get_next_scrape_time(tr_session const* session, int interval) const;
     void build_log_name(char* buf, size_t buflen) const;
     void incrementTracker();
-    void publishMessage(char const* msg, TrackerEventType type);
+    void publishMessage(char const* msg, TrackerEventType type) const;
     void publishErrorClear();
     void publishWarning(const char* msg);
     void publishError(const char* msg);
+    void copy_tier_attributes_impl(tr_tier* tgt, size_t trackerIndex) const;
+    void copy_tier_attributes(tr_torrent_tiers* tt) const;
 } tr_tier;
 
 time_t tr_tier::get_next_scrape_time(tr_session const* session, int interval) const
@@ -534,9 +542,9 @@ tr_tier* tr_announcer::getTier(uint8_t const* info_hash, int tierId)
 ****  PUBLISH
 ***/
 
-void tr_tier::publishMessage(char const* msg, TrackerEventType type)
+void tr_tier::publishMessage(char const* msg, TrackerEventType type) const
 {
-    if (this != nullptr && this->tor != nullptr && this->tor->tiers != nullptr && this->tor->tiers->callback != nullptr)
+    if (this->tor != nullptr && this->tor->tiers != nullptr && this->tor->tiers->callback != nullptr)
     {
         tr_torrent_tiers* tiers = this->tor->tiers;
         auto event = tr_tracker_event{};
@@ -1783,7 +1791,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     tr_ptrArrayDestruct(&announceMe, nullptr);
 }
 
-static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
+void tr_announcer::onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
 {
     TR_UNUSED(fd);
     TR_UNUSED(what);
@@ -1821,7 +1829,7 @@ static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
 ****
 ***/
 
-tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount)
+tr_tracker_stat* tr_announcer::getStats(tr_torrent const* torrent, int* setmeTrackerCount)
 {
     TR_ASSERT(tr_isTorrent(torrent));
 
@@ -1934,6 +1942,7 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     return ret;
 }
 
+// Belongs to a C-only struct
 void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount)
 {
     TR_UNUSED(trackerCount);
@@ -1945,35 +1954,35 @@ void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount)
 ****
 ***/
 
-static void copy_tier_attributes_impl(struct tr_tier* tgt, size_t trackerIndex, tr_tier const* src)
+void tr_tier::copy_tier_attributes_impl(struct tr_tier* tgt, size_t trackerIndex) const
 {
     /* sanity clause */
     TR_ASSERT(trackerIndex < tgt->tracker_count);
-    TR_ASSERT(tr_strcmp0(tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
+    TR_ASSERT(tr_strcmp0(tgt->trackers[trackerIndex].announce, this->currentTracker->announce) == 0);
 
     tr_tier const keep = *tgt;
 
     /* bitwise copy will handle most of tr_tier's fields... */
-    *tgt = *src;
+    *tgt = *this;
 
     /* ...fix the fields that can't be cleanly bitwise-copied */
     tgt->wasCopied = true;
     tgt->trackers = keep.trackers;
     tgt->tracker_count = keep.tracker_count;
     tgt->announce_events = static_cast<tr_announce_event*>(
-        tr_memdup(src->announce_events, sizeof(tr_announce_event) * src->announce_event_count));
-    tgt->announce_event_priority = src->announce_event_priority;
-    tgt->announce_event_count = src->announce_event_count;
-    tgt->announce_event_alloc = src->announce_event_count;
+        tr_memdup(this->announce_events, sizeof(tr_announce_event) * this->announce_event_count));
+    tgt->announce_event_priority = this->announce_event_priority;
+    tgt->announce_event_count = this->announce_event_count;
+    tgt->announce_event_alloc = this->announce_event_count;
     tgt->currentTrackerIndex = trackerIndex;
     tgt->currentTracker = &tgt->trackers[trackerIndex];
-    tgt->currentTracker->seederCount = src->currentTracker->seederCount;
-    tgt->currentTracker->leecherCount = src->currentTracker->leecherCount;
-    tgt->currentTracker->downloadCount = src->currentTracker->downloadCount;
-    tgt->currentTracker->downloaderCount = src->currentTracker->downloaderCount;
+    tgt->currentTracker->seederCount = this->currentTracker->seederCount;
+    tgt->currentTracker->leecherCount = this->currentTracker->leecherCount;
+    tgt->currentTracker->downloadCount = this->currentTracker->downloadCount;
+    tgt->currentTracker->downloaderCount = this->currentTracker->downloaderCount;
 }
 
-static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src)
+void tr_tier::copy_tier_attributes(struct tr_torrent_tiers* tt) const
 {
     bool found = false;
 
@@ -1982,19 +1991,24 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (size_t j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if (tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0)
+            if (tr_strcmp0(this->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0)
             {
                 found = true;
-                copy_tier_attributes_impl(&tt->tiers[i], j, src);
+                this->copy_tier_attributes_impl(&tt->tiers[i], j);
             }
         }
     }
 }
 
-void tr_announcerResetTorrent(tr_announcer* announcer, tr_torrent* tor)
-{
-    TR_UNUSED(announcer);
+// TODO: [C++] Used from torrent.cc, remove this when tr_announcer is properly exported via a header file and call directly
+void tr_announcerResetTorrent(tr_announcer* announcer __attribute__((unused)),
+                              tr_torrent* tor) {
+    // TR_UNUSED(announcer); // used GCC/Clang attribute instead of helper macro
+    tr_announcer::resetTorrent(tor);
+}
 
+void tr_announcer::resetTorrent(tr_torrent* tor)
+{
     TR_ASSERT(tor->tiers != nullptr);
 
     time_t const now = tr_time();
@@ -2016,7 +2030,7 @@ void tr_announcerResetTorrent(tr_announcer* announcer, tr_torrent* tor)
     {
         if (old.tiers[i].currentTracker != nullptr)
         {
-            copy_tier_attributes(tt, &old.tiers[i]);
+            old.tiers[i].copy_tier_attributes(tt);
         }
     }
 
