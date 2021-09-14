@@ -1835,8 +1835,12 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
             break;
 
         default:
-            ret = READ_ERR;
+#ifdef TR_ENABLE_ASSERTS
             TR_ASSERT_MSG(false, "unhandled peer messages state %d", (int)msgs->state);
+#else
+            ret = READ_ERR;
+            break;
+#endif
         }
     }
 
