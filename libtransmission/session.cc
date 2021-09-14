@@ -3028,8 +3028,12 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     candidates.reserve(tr_sessionCountTorrents(session));
     tr_torrent* tor = NULL;
     while ((tor = tr_torrentNext(session, tor)) != NULL)
+    {
         if (tr_torrentIsQueued(tor) && (direction == tr_torrentGetQueueDirection(tor)))
+        {
             candidates.push_back(tor);
+        }
+    }
 
     // find the best n candidates
     num_wanted = std::min(num_wanted, candidates.size());
@@ -3045,7 +3049,9 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
 
     // add them to the return array
     for (auto const& candidate : candidates)
+    {
         tr_ptrArrayAppend(setme, candidate);
+    }
 }
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
@@ -3068,7 +3074,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     {
         /* is it the right activity? */
         if (activity != tr_torrentGetActivity(tor))
+        {
             continue;
+        }
 
         /* is it stalled? */
         if (stalled_enabled)
@@ -3082,7 +3090,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
         /* if we've reached the limit, no need to keep counting */
         if (active_count >= max)
+        {
             return 0;
+        }
     }
 
     return max - active_count;
