@@ -2123,7 +2123,8 @@ static char const* sessionSet(
         return "download directory path is not absolute";
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, nullptr) && tr_sys_path_is_relative(incomplete_dir))
+    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, nullptr) &&
+        tr_sys_path_is_relative(incomplete_dir))
     {
         return "incomplete torrents directory path is not absolute";
     }

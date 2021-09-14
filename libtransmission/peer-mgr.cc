@@ -783,7 +783,11 @@ static int countActiveWebseeds(tr_swarm* s)
 
         for (int i = 0, n = tr_ptrArraySize(&s->webseeds); i < n; ++i)
         {
-            if (tr_peerIsTransferringPieces(static_cast<tr_peer const*>(tr_ptrArrayNth(&s->webseeds, i)), now, TR_DOWN, nullptr))
+            if (tr_peerIsTransferringPieces(
+                    static_cast<tr_peer const*>(tr_ptrArrayNth(&s->webseeds, i)),
+                    now,
+                    TR_DOWN,
+                    nullptr))
             {
                 ++activeCount;
             }

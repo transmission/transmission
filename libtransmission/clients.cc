@@ -907,7 +907,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         int b;
         int c;
 
-        if (strchr("AOQRSTU", id[0]) != nullptr && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
+        if (strchr("AOQRSTU", id[0]) != nullptr && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) &&
+            getShadowInt(id[3], &c))
         {
             char const* name = nullptr;
 

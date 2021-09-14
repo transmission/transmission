@@ -691,7 +691,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
         }
 
         if (server->isPasswordEnabled &&
-            (pass == nullptr || user == nullptr || strcmp(server->username, user) != 0 || !tr_ssha1_matches(server->password, pass)))
+            (pass == nullptr || user == nullptr || strcmp(server->username, user) != 0 ||
+             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->isAntiBruteForceEnabled)

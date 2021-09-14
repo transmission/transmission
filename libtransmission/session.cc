@@ -2091,7 +2091,8 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || session->web != nullptr || session->announcer != nullptr || session->announcer_udp != nullptr) &&
+    while ((session->shared != nullptr || session->web != nullptr || session->announcer != nullptr ||
+            session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
         dbgmsg(
