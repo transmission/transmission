@@ -151,10 +151,12 @@
    In the latter case, define those here since we will use them */
 
 #ifndef MAX
+#warning Use std::max
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #ifndef MIN
+#warning Use std::min
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #endif
 

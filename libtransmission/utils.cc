@@ -13,16 +13,16 @@
 #endif
 
 #include <array> // std::array
-#include <ctype.h> /* isdigit(), tolower() */
-#include <errno.h>
-#include <float.h> /* DBL_DIG */
-#include <locale.h> /* localeconv() */
-#include <math.h> /* fabs(), floor() */
-#include <stdint.h> /* SIZE_MAX */
-#include <stdio.h>
-#include <stdlib.h> /* getenv() */
-#include <string.h> /* strerror(), memset(), memmem() */
-#include <time.h> /* nanosleep() */
+#include <cctype> /* isdigit(), tolower() */
+#include <cerrno>
+#include <cfloat> /* DBL_DIG */
+#include <clocale> /* localeconv() */
+#include <cmath> /* fabs(), floor() */
+#include <cstdint> /* SIZE_MAX */
+#include <cstdio>
+#include <cstdlib> /* getenv() */
+#include <cstring> /* strerror(), memset(), memmem() */
+#include <ctime> /* nanosleep() */
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -30,7 +30,7 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h> /* StrStrIA() */
 #else
-#include <sys/time.h>
+#include <ctime>
 #include <unistd.h> /* getpagesize() */
 #endif
 
@@ -153,17 +153,17 @@ int tr_gettimeofday(struct timeval* tv)
 
 void* tr_malloc(size_t size)
 {
-    return size != 0 ? malloc(size) : nullptr;
+    return size != 0 ? std::malloc(size) : nullptr;
 }
 
 void* tr_malloc0(size_t size)
 {
-    return size != 0 ? calloc(1, size) : nullptr;
+    return size != 0 ? std::calloc(1, size) : nullptr;
 }
 
 void* tr_realloc(void* p, size_t size)
 {
-    void* result = size != 0 ? realloc(p, size) : nullptr;
+    void* result = size != 0 ? std::realloc(p, size) : nullptr;
 
     if (result == nullptr)
     {
@@ -175,9 +175,10 @@ void* tr_realloc(void* p, size_t size)
 
 void tr_free(void* p)
 {
+    // Deprecate this check: C free and C++ delete allow nullptr args and do nothing
     if (p != nullptr)
     {
-        free(p);
+        std::free(p);
     }
 }
 
@@ -197,7 +198,7 @@ void tr_free_ptrv(void* const* p)
 
 void* tr_memdup(void const* src, size_t byteCount)
 {
-    return memcpy(tr_malloc(byteCount), src, byteCount);
+    return std::memcpy(tr_malloc(byteCount), src, byteCount);
 }
 
 /***
@@ -215,11 +216,11 @@ char const* tr_strip_positional_args(char const* str)
     {
         buf[pos++] = *str;
 
-        if (*str == '%' && isdigit(str[1]))
+        if (*str == '%' && std::isdigit(str[1]))
         {
             char const* tmp = str + 1;
 
-            while (isdigit(*tmp))
+            while (std::isdigit(*tmp))
             {
                 ++tmp;
             }
@@ -238,7 +239,7 @@ char const* tr_strip_positional_args(char const* str)
 
     buf[pos] = '\0';
 
-    return in && !strcmp(buf.data(), in) ? in : buf.data();
+    return in && !std::strcmp(buf.data(), in) ? in : buf.data();
 }
 
 /**
@@ -247,9 +248,10 @@ char const* tr_strip_positional_args(char const* str)
 
 void tr_timerAdd(struct event* timer, int seconds, int microseconds)
 {
-    struct timeval tv;
-    tv.tv_sec = seconds;
-    tv.tv_usec = microseconds;
+    struct timeval tv
+    {
+        .tv_sec = seconds, .tv_usec = microseconds
+    };
 
     TR_ASSERT(tv.tv_sec >= 0);
     TR_ASSERT(tv.tv_usec >= 0);
@@ -437,7 +439,7 @@ char* tr_strndup(void const* in, size_t len)
 
         if (out != nullptr)
         {
-            memcpy(out, in, len);
+            std::memcpy(out, in, len);
             out[len] = '\0';
         }
     }
@@ -528,7 +530,7 @@ int tr_strcmp0(char const* str1, char const* str2)
 {
     if (str1 != nullptr && str2 != nullptr)
     {
-        return strcmp(str1, str2);
+        return std::strcmp(str1, str2);
     }
 
     if (str1 != nullptr)
