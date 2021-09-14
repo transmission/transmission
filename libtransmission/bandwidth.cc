@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h> /* memset() */
+#include <algorithm>
+#include <cstring> /* memset() */
 
 #include "transmission.h"
 #include "bandwidth.h"
@@ -159,7 +160,7 @@ static void allocateBandwidth(
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
 
-    tr_priority_t const priority = MAX(parent_priority, b->priority);
+    tr_priority_t const priority = std::max(parent_priority, b->priority);
 
     /* set the available bandwidth */
     if (b->band[dir].isLimited)
@@ -307,7 +308,7 @@ static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direc
     {
         if (b->band[dir].isLimited)
         {
-            byteCount = MIN(byteCount, b->band[dir].bytesLeft);
+            byteCount = std::min(byteCount, b->band[dir].bytesLeft);
 
             /* if we're getting close to exceeding the speed limit,
              * clamp down harder on the bytes available */
@@ -380,7 +381,7 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 
     if (band->isLimited && isPieceData)
     {
-        band->bytesLeft -= MIN(band->bytesLeft, byteCount);
+        band->bytesLeft -= std::min((unsigned long)band->bytesLeft, byteCount);
     }
 
 #ifdef DEBUG_DIRECTION

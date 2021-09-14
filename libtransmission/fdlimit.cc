@@ -6,9 +6,10 @@
  *
  */
 
-#include <errno.h>
-#include <inttypes.h>
-#include <string.h>
+#include <algorithm>
+#include <cerrno>
+#include <cinttypes>
+#include <cstring>
 
 #include "transmission.h"
 #include "error.h"
@@ -90,7 +91,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = MIN(length, sizeof(buf));
+            uint64_t const thisPass = std::min(length, sizeof(buf));
             uint64_t bytes_written;
             success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
             length -= bytes_written;

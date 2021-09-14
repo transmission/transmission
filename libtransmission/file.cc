@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h> /* strlen() */
+#include <algorithm>
+#include <cstring> /* strlen() */
 
 #include "transmission.h"
 #include "error.h"
@@ -26,7 +27,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     while (buffer_size > 0)
     {
-        size_t const bytes_needed = MIN(buffer_size, 1024u);
+        size_t const bytes_needed = std::min(buffer_size, 1024LU);
 
         ret = tr_sys_file_read(handle, buffer + offset, bytes_needed, &bytes_read, error);
 

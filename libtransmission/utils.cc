@@ -13,16 +13,16 @@
 #endif
 
 #include <array> // std::array
-#include <ctype.h> /* isdigit(), tolower() */
-#include <errno.h>
-#include <float.h> /* DBL_DIG */
-#include <locale.h> /* localeconv() */
-#include <math.h> /* fabs(), floor() */
-#include <stdint.h> /* SIZE_MAX */
-#include <stdio.h>
-#include <stdlib.h> /* getenv() */
-#include <string.h> /* strerror(), memset(), memmem() */
-#include <time.h> /* nanosleep() */
+#include <cctype> /* isdigit(), tolower() */
+#include <cerrno>
+#include <cfloat> /* DBL_DIG */
+#include <clocale> /* localeconv() */
+#include <cmath> /* fabs(), floor() */
+#include <cstdint> /* SIZE_MAX */
+#include <cstdio>
+#include <cstdlib> /* getenv() */
+#include <cstring> /* strerror(), memset(), memmem() */
+#include <ctime> /* nanosleep() */
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -30,7 +30,7 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h> /* StrStrIA() */
 #else
-#include <sys/time.h>
+#include <ctime>
 #include <unistd.h> /* getpagesize() */
 #endif
 
@@ -1423,8 +1423,8 @@ static bool parseNumberSection(char const* str, size_t len, struct number_range*
 
     tr_free(tmp);
 
-    setme->low = MIN(a, b);
-    setme->high = MAX(a, b);
+    setme->low = (int)std::min(a, b);
+    setme->high = (int)std::max(a, b);
 
     errno = error;
     return success;

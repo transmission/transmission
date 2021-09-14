@@ -6,10 +6,11 @@
  *
  */
 
-#include <ctype.h> /* isspace() */
-#include <stdio.h>
-#include <stdlib.h> /* exit() */
-#include <string.h>
+#include <algorithm>
+#include <cctype> /* isspace() */
+#include <cstdio>
+#include <cstdlib> /* exit() */
+#include <cstring>
 
 #include "transmission.h"
 #include "tr-getopt.h"
@@ -104,17 +105,17 @@ static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth,
 
     if (o->longName != nullptr)
     {
-        *longWidth = MAX(*longWidth, (int)strlen(o->longName));
+        *longWidth = std::max(*longWidth, (int)strlen(o->longName));
     }
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = MAX(*shortWidth, (int)strlen(o->shortName));
+        *shortWidth = std::max(*shortWidth, (int)strlen(o->shortName));
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = MAX(*argWidth, (int)strlen(arg));
+        *argWidth = std::max(*argWidth, (int)strlen(arg));
     }
 }
 

@@ -9,19 +9,20 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
 
+#include <algorithm>
+#include <cerrno>
+#include <climits> /* PATH_MAX */
+#include <cstdint> /* SIZE_MAX */
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
-#include <limits.h> /* PATH_MAX */
-#include <stdint.h> /* SIZE_MAX */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 #include <sys/file.h> /* flock() */
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 #include <vector>
 
@@ -487,7 +488,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0)
     {
-        size_t const chunk_size = MIN(file_size, SSIZE_MAX);
+        size_t const chunk_size = std::min(file_size, (unsigned long)SSIZE_MAX);
         ssize_t const copied =
 #ifdef USE_COPY_FILE_RANGE
             copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
