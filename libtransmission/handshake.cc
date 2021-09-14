@@ -1067,8 +1067,12 @@ static ReadState canRead(struct tr_peerIo* io, void* vhandshake, size_t* piece)
             break;
 
         default:
-            ret = READ_ERR;
+#ifdef TR_ENABLE_ASSERTS
             TR_ASSERT_MSG(false, "unhandled handshake state %d", (int)handshake->state);
+#else
+            ret = READ_ERR;
+            break;
+#endif
         }
 
         if (ret != READ_NOW)
