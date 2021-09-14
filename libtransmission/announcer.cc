@@ -185,10 +185,29 @@ typedef struct tr_announcer
     tr_tier* getTier(uint8_t const* info_hash, int tierId);
     static void onUpkeepTimer(int fd, short what, void* vannouncer);
     static tr_tracker_stat* getStats(const tr_torrent* torrent, int* setmeTrackerCount);
+
+    // TODO: [C++] Functions which belong to tr_torrent, but instead grouped with tr_announcer
     static void resetTorrent(tr_torrent* tor);
+    static bool canManualAnnounce(const tr_torrent* tor);
+    static time_t nextManualAnnounce(const tr_torrent* tor);
+    static tr_torrent_tiers* addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callbackData);
+    static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt);
+    static void torrentStarted(tr_torrent* tor);
+    static void manualAnnounce(tr_torrent* tor);
+    static void torrentStopped(tr_torrent* tor);
+    static void torrentCompleted(tr_torrent* tor);
+    static void changeMyPort(tr_torrent* tor);
+    static void addBytes(tr_torrent* tor, int type, uint32_t byteCount);
+
+    tr_announce_request* announce_request_new(tr_torrent* tor, const tr_tier* tier, tr_announce_event event);
+    void announce_request_delegate(tr_announce_request* request, tr_announce_response_func callback, void* callback_data);
+    void tierAnnounce(tr_tier* tier);
+    void scrape_request_delegate(const tr_scrape_request* request, tr_scrape_response_func callback, void* callback_data);
+    void multiscrape(tr_ptrArray* tiers);
+    void scrapeAndAnnounceMore();
 } tr_announcer;
 
-// TODO: [C++] Used by torrent.cc, remove when the struct is published in a header file, and access via tr_announcer::getStats
+// TODO: [C++] Used in torrent.cc via a C only header; Expose tr_torrent struct and call as member
 tr_tracker_stat* tr_announcerStats(const tr_torrent* torrent, int* setmeTrackerCount) {
     return tr_announcer::getStats(torrent, setmeTrackerCount);
 }
@@ -387,6 +406,17 @@ typedef struct tr_tier
     void publishError(const char* msg);
     void copy_tier_attributes_impl(tr_tier* tgt, size_t trackerIndex) const;
     void copy_tier_attributes(tr_torrent_tiers* tt) const;
+    void publishPeerCounts(int seeders, int leechers);
+    void publishPeersPex(int seeders, int leechers, const tr_pex* pex, size_t n);
+    bool canManualAnnounce() const;
+    void dbgmsg_announce_queue() const;
+    void update_announce_priority();
+    void announce_remove_trailing(tr_announce_event e);
+    void announce_event_push(tr_announce_event e, time_t announceAt_);
+    tr_announce_event announce_event_pull();
+    bool needsToScrape(const time_t now) const;
+    int countDownloaders() const;
+    static int compareAnnounceTiers(const void* va, const void* vb); // TODO: [C++] Used for sorting
 } tr_tier;
 
 time_t tr_tier::get_next_scrape_time(tr_session const* session, int interval) const
@@ -486,6 +516,7 @@ struct tr_torrent_tiers
     static tr_torrent_tiers *tiersNew(); // TODO: [C++] upgrade to operator new
     static void tiersDestruct(tr_torrent_tiers* tt);
     static void tiersFree(tr_torrent_tiers* tt);
+    void addTorrentToTier(tr_torrent* tor);
 };
 
 tr_torrent_tiers* tr_torrent_tiers::tiersNew()
@@ -575,23 +606,23 @@ void tr_tier::publishError(char const* msg)
     this->publishMessage(msg, TR_TRACKER_ERROR);
 }
 
-static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
+void tr_tier::publishPeerCounts(int seeders, int leechers)
 {
-    if (tier->tor->tiers->callback != nullptr)
+    if (this->tor->tiers->callback != nullptr)
     {
         auto e = tr_tracker_event{};
         e.messageType = TR_TRACKER_COUNTS;
         e.seeders = seeders;
         e.leechers = leechers;
-        dbgmsg(tier, "peer counts: %d seeders, %d leechers.", seeders, leechers);
+        dbgmsg(this, "peer counts: %d seeders, %d leechers.", seeders, leechers);
 
-        (*tier->tor->tiers->callback)(tier->tor, &e, nullptr);
+        (*this->tor->tiers->callback)(this->tor, &e, nullptr);
     }
 }
 
-static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex const* pex, size_t n)
+void tr_tier::publishPeersPex(int seeders, int leechers, tr_pex const* pex, size_t n)
 {
-    if (tier->tor->tiers->callback != nullptr)
+    if (this->tor->tiers->callback != nullptr)
     {
         auto e = tr_tracker_event{};
         e.messageType = TR_TRACKER_PEERS;
@@ -599,9 +630,9 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
         e.leechers = leechers;
         e.pex = pex;
         e.pexCount = n;
-        dbgmsg(tier, "tracker knows of %d seeders and %d leechers and gave a list of %zu peers.", seeders, leechers, n);
+        dbgmsg(this, "tracker knows of %d seeders and %d leechers and gave a list of %zu peers.", seeders, leechers, n);
 
-        (*tier->tor->tiers->callback)(tier->tor, &e, nullptr);
+        (*this->tor->tiers->callback)(this->tor, &e, nullptr);
     }
 }
 
@@ -617,11 +648,12 @@ struct ann_tracker_info
     char* host;
     char* path;
     int port;
+    static int filter_trackers_compare_func(const void* va, const void* vb);
 };
 
 /* primary key: tier
  * secondary key: udp comes before http */
-static int filter_trackers_compare_func(void const* va, void const* vb)
+int ann_tracker_info::filter_trackers_compare_func(void const* va, void const* vb)
 {
     auto* a = static_cast<struct ann_tracker_info const*>(va);
     auto* b = static_cast<struct ann_tracker_info const*>(vb);
@@ -637,6 +669,7 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
 /**
  * Massages the incoming list of trackers into something we can use.
  */
+// Belongs to tr_tracker_info, a C-only struct
 static tr_tracker_info* filter_trackers(tr_tracker_info const* input, size_t input_count, size_t* setme_count)
 {
     auto n = 0;
@@ -700,7 +733,7 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, size_t inp
     /* sort them, for two reasons:
      * (1) unjumble the tiers from the previous step
      * (2) move the UDP trackers to the front of each tier */
-    std::qsort(tmp, n, sizeof(struct ann_tracker_info), filter_trackers_compare_func);
+    std::qsort(tmp, n, sizeof(struct ann_tracker_info), ann_tracker_info::filter_trackers_compare_func);
 
     /* build the output */
     *setme_count = n;
@@ -724,37 +757,37 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, size_t inp
     return ret;
 }
 
-static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
+void tr_torrent_tiers::addTorrentToTier(tr_torrent* tor)
 {
     size_t n;
-    int tier_count;
+    int tier_count1;
     tr_tier* tier;
     tr_tracker_info* infos = filter_trackers(tor->info.trackers, tor->info.trackerCount, &n);
 
     /* build the array of trackers */
-    tt->trackers = tr_new0(tr_tracker, n);
-    tt->tracker_count = n;
+    this->trackers = tr_new0(tr_tracker, n);
+    this->tracker_count = n;
 
     for (size_t i = 0; i < n; ++i)
     {
-        tr_tracker::trackerConstruct(tor->session->announcer, &tt->trackers[i], &infos[i]);
+        tr_tracker::trackerConstruct(tor->session->announcer, &this->trackers[i], &infos[i]);
     }
 
     /* count how many tiers there are */
-    tier_count = 0;
+    tier_count1 = 0;
 
     for (size_t i = 0; i < n; ++i)
     {
         if (i == 0 || infos[i].tier != infos[i - 1].tier)
         {
-            ++tier_count;
+            ++tier_count1;
         }
     }
 
     /* build the array of tiers */
     tier = nullptr;
-    tt->tiers = tr_new0(tr_tier, tier_count);
-    tt->tier_count = 0;
+    this->tiers = tr_new0(tr_tier, tier_count1);
+    this->tier_count = 0;
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -764,9 +797,9 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
         }
         else
         {
-            tier = &tt->tiers[tt->tier_count++];
+            tier = &this->tiers[this->tier_count++];
             tr_tier::tierConstruct(tier, tor);
-            tier->trackers = &tt->trackers[i];
+            tier->trackers = &this->trackers[i];
             tier->tracker_count = 1;
             tier->incrementTracker();
         }
@@ -776,7 +809,12 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     tr_free(infos);
 }
 
-tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callbackData)
+// TODO: [C++] Used in torrent.cc via a C only header; Expose tr_torrent struct and call as member
+tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callbackData) {
+    return tr_announcer::addTorrent(tor, callback, callbackData);
+}
+
+tr_torrent_tiers* tr_announcer::addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callbackData)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -784,7 +822,7 @@ tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback ca
     tiers->callback = callback;
     tiers->callbackData = callbackData;
 
-    addTorrentToTier(tiers, tor);
+    tiers->addTorrentToTier(tor);
 
     return tiers;
 }
@@ -793,12 +831,17 @@ tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback ca
 ****
 ***/
 
-static bool tierCanManualAnnounce(tr_tier const* tier)
+bool tr_tier::canManualAnnounce() const
 {
-    return tier->manualAnnounceAllowedAt <= tr_time();
+    return this->manualAnnounceAllowedAt <= tr_time();
 }
 
-bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
+// TODO: [C++] Used in torrent.cc via a C only header; Expose tr_torrent struct and call as member
+bool tr_announcerCanManualAnnounce(tr_torrent const* tor) {
+    return tr_announcer::canManualAnnounce(tor);
+}
+
+bool tr_announcer::canManualAnnounce(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->tiers != nullptr);
@@ -813,7 +856,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     /* return true if any tier can manual announce */
     for (size_t i = 0; tt != nullptr && i < tt->tier_count; ++i)
     {
-        if (tierCanManualAnnounce(&tt->tiers[i]))
+        if (tt->tiers[i].canManualAnnounce())
         {
             return true;
         }
@@ -822,7 +865,12 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     return false;
 }
 
-time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
+// TODO: [C++] Used in torrent.cc via a C only header; Expose tr_torrent struct and call as member
+time_t tr_announcerNextManualAnnounce(tr_torrent const* tor) {
+    return tr_announcer::nextManualAnnounce(tor);
+}
+
+time_t tr_announcer::nextManualAnnounce(tr_torrent const* tor)
 {
     time_t ret = ~(time_t)0;
     struct tr_torrent_tiers const* tt = tor->tiers;
@@ -839,7 +887,7 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
     return ret;
 }
 
-static void dbgmsg_tier_announce_queue(tr_tier const* tier)
+void tr_tier::dbgmsg_announce_queue() const
 {
     if (tr_logGetDeepEnabled())
     {
@@ -847,11 +895,11 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
         char* message;
         struct evbuffer* buf = evbuffer_new();
 
-        tier->build_log_name(name, sizeof(name));
+        this->build_log_name(name, sizeof(name));
 
-        for (int i = 0; i < tier->announce_event_count; ++i)
+        for (int i = 0; i < this->announce_event_count; ++i)
         {
-            tr_announce_event const e = tier->announce_events[i];
+            tr_announce_event const e = this->announce_events[i];
             char const* str = tr_announce_event_get_string(e);
             evbuffer_add_printf(buf, "[%d:%s]", i, str);
         }
@@ -863,36 +911,36 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
 }
 
 // higher priorities go to the front of the announce queue
-static void tier_update_announce_priority(tr_tier* tier)
+void tr_tier::update_announce_priority()
 {
     int priority = -1;
 
-    for (int i = 0; i < tier->announce_event_count; ++i)
+    for (int i = 0; i < this->announce_event_count; ++i)
     {
-        priority = std::max(priority, (int)tier->announce_events[i]);
+        priority = std::max(priority, (int)this->announce_events[i]);
     }
 
-    tier->announce_event_priority = priority;
+    this->announce_event_priority = priority;
 }
 
-static void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
+void tr_tier::announce_remove_trailing(tr_announce_event e)
 {
-    while (tier->announce_event_count > 0 && tier->announce_events[tier->announce_event_count - 1] == e)
+    while (this->announce_event_count > 0 && this->announce_events[this->announce_event_count - 1] == e)
     {
-        --tier->announce_event_count;
+        --this->announce_event_count;
     }
 
-    tier_update_announce_priority(tier);
+    this->update_announce_priority();
 }
 
-static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announceAt)
+void tr_tier::announce_event_push(tr_announce_event e, time_t announceAt_)
 {
-    TR_ASSERT(tier != nullptr);
+    TR_ASSERT(this != nullptr);
 
-    dbgmsg_tier_announce_queue(tier);
-    dbgmsg(tier, "queued \"%s\"", tr_announce_event_get_string(e));
+    this->dbgmsg_announce_queue();
+    dbgmsg(this, "queued \"%s\"", tr_announce_event_get_string(e));
 
-    if (tier->announce_event_count > 0)
+    if (this->announce_event_count > 0)
     {
         /* special case #1: if we're adding a "stopped" event,
          * dump everything leading up to it except "completed" */
@@ -901,86 +949,111 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
             bool has_completed = false;
             tr_announce_event const c = TR_ANNOUNCE_EVENT_COMPLETED;
 
-            for (int i = 0; !has_completed && i < tier->announce_event_count; ++i)
+            for (int i = 0; !has_completed && i < this->announce_event_count; ++i)
             {
-                has_completed = c == tier->announce_events[i];
+                has_completed = c == this->announce_events[i];
             }
 
-            tier->announce_event_count = 0;
+            this->announce_event_count = 0;
 
             if (has_completed)
             {
-                tier->announce_events[tier->announce_event_count++] = c;
-                tier_update_announce_priority(tier);
+                this->announce_events[this->announce_event_count++] = c;
+                this->update_announce_priority();
             }
         }
 
         /* special case #2: dump all empty strings leading up to this event */
-        tier_announce_remove_trailing(tier, TR_ANNOUNCE_EVENT_NONE);
+        this->announce_remove_trailing(TR_ANNOUNCE_EVENT_NONE);
 
         /* special case #3: no consecutive duplicates */
-        tier_announce_remove_trailing(tier, e);
+        this->announce_remove_trailing(e);
     }
 
     /* make room in the array for another event */
-    if (tier->announce_event_alloc <= tier->announce_event_count)
+    if (this->announce_event_alloc <= this->announce_event_count)
     {
-        tier->announce_event_alloc += 4;
-        tier->announce_events = tr_renew(tr_announce_event, tier->announce_events, tier->announce_event_alloc);
+        this->announce_event_alloc += 4;
+        this->announce_events = tr_renew(tr_announce_event, this->announce_events, this->announce_event_alloc);
     }
 
     /* add it */
-    tier->announceAt = announceAt;
-    tier->announce_events[tier->announce_event_count++] = e;
-    tier_update_announce_priority(tier);
+    this->announceAt = announceAt_;
+    this->announce_events[this->announce_event_count++] = e;
+    this->update_announce_priority();
 
-    dbgmsg_tier_announce_queue(tier);
-    dbgmsg(tier, "announcing in %d seconds", (int)difftime(announceAt, tr_time()));
+    this->dbgmsg_announce_queue();
+    dbgmsg(this, "announcing in %d seconds", (int)difftime(announceAt_, tr_time()));
 }
 
-static tr_announce_event tier_announce_event_pull(tr_tier* tier)
+tr_announce_event tr_tier::announce_event_pull()
 {
-    tr_announce_event const e = tier->announce_events[0];
+    tr_announce_event const e = this->announce_events[0];
 
-    tr_removeElementFromArray(tier->announce_events, 0, sizeof(tr_announce_event), tier->announce_event_count);
-    --tier->announce_event_count;
-    tier_update_announce_priority(tier);
+    tr_removeElementFromArray(this->announce_events, 0, sizeof(tr_announce_event), this->announce_event_count);
+    --this->announce_event_count;
+    this->update_announce_priority();
 
     return e;
 }
 
-static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt)
+void tr_announcer::torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt)
 {
     struct tr_torrent_tiers* tt = tor->tiers;
 
     /* walk through each tier and tell them to announce */
     for (size_t i = 0; i < tt->tier_count; ++i)
     {
-        tier_announce_event_push(&tt->tiers[i], e, announceAt);
+        tt->tiers[i].announce_event_push(e, announceAt);
     }
 }
 
-void tr_announcerTorrentStarted(tr_torrent* tor)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerTorrentStarted(tr_torrent* tor) {
+    tr_announcer::torrentStarted(tor);
+}
+
+void tr_announcer::torrentStarted(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
 
-void tr_announcerManualAnnounce(tr_torrent* tor)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerManualAnnounce(tr_torrent* tor) {
+    tr_announcer::manualAnnounce(tor);
+}
+
+void tr_announcer::manualAnnounce(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_NONE, tr_time());
 }
 
-void tr_announcerTorrentStopped(tr_torrent* tor)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerTorrentStopped(tr_torrent* tor) {
+    tr_announcer::torrentStopped(tor);
+}
+
+void tr_announcer::torrentStopped(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STOPPED, tr_time());
 }
 
-void tr_announcerTorrentCompleted(tr_torrent* tor)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerTorrentCompleted(tr_torrent* tor) {
+    tr_announcer::torrentCompleted(tor);
+}
+
+void tr_announcer::torrentCompleted(tr_torrent* tor)
 {
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_COMPLETED, tr_time());
 }
 
-void tr_announcerChangeMyPort(tr_torrent* tor)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerChangeMyPort(tr_torrent* tor) {
+    tr_announcer::changeMyPort(tor);
+}
+
+void tr_announcer::changeMyPort(tr_torrent* tor)
 {
     tr_announcerTorrentStarted(tor);
 }
@@ -989,7 +1062,12 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
 ****
 ***/
 
-void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
+void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount) {
+    tr_announcer::addBytes(tor, type, byteCount);
+}
+
+void tr_announcer::addBytes(tr_torrent* tor, int type, uint32_t byteCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
@@ -1006,14 +1084,13 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
 ****
 ***/
 
-static tr_announce_request* announce_request_new(
-    tr_announcer const* announcer,
+tr_announce_request* tr_announcer::announce_request_new(
     tr_torrent* tor,
     tr_tier const* tier,
     tr_announce_event event)
 {
     tr_announce_request* req = tr_new0(tr_announce_request, 1);
-    req->port = tr_sessionGetPublicPeerPort(announcer->session);
+    req->port = tr_sessionGetPublicPeerPort(this->session);
     req->url = tr_strdup(tier->currentTracker->announce);
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
     std::memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
@@ -1024,13 +1101,11 @@ static tr_announce_request* announce_request_new(
     req->leftUntilComplete = tr_torrentHasMetadata(tor) ? tor->info.totalSize - tr_torrentHaveTotal(tor) : INT64_MAX;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
-    req->key = announcer->key;
+    req->key = this->key;
     req->partial_seed = tr_torrentGetCompleteness(tor) == TR_PARTIAL_SEED;
     tier->build_log_name(req->log_name, sizeof(req->log_name));
     return req;
 }
-
-static void announce_request_free(tr_announce_request* req);
 
 void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 {
@@ -1045,11 +1120,11 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
             if (tier->isRunning)
             {
                 tr_announce_event const e = TR_ANNOUNCE_EVENT_STOPPED;
-                tr_announce_request* req = announce_request_new(announcer, tor, tier, e);
+                tr_announce_request* req = announcer->announce_request_new(tor, tier, e);
 
                 if (tr_ptrArrayFindSorted(&announcer->stops, req, tr_announce_request::compareStops) != nullptr)
                 {
-                    announce_request_free(req);
+                    tr_announce_request::announce_request_free(req);
                 }
                 else
                 {
@@ -1123,7 +1198,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     interval = getRetryInterval(tier->currentTracker);
     dbgmsg(tier, "Retrying announce in %d seconds.", interval);
     tr_logAddTorInfo(tier->tor, "Retrying announce in %d seconds.", interval);
-    tier_announce_event_push(tier, e, tr_time() + interval);
+    tier->announce_event_push(e, tr_time() + interval);
 }
 
 static void on_announce_done(tr_announce_response const* response, void* vdata)
@@ -1256,15 +1331,15 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             if (response->pex_count > 0)
             {
-                publishPeersPex(tier, seeders, leechers, response->pex, response->pex_count);
+                tier->publishPeersPex(seeders, leechers, response->pex, response->pex_count);
             }
 
             if (response->pex6_count > 0)
             {
-                publishPeersPex(tier, seeders, leechers, response->pex6, response->pex6_count);
+                tier->publishPeersPex(seeders, leechers, response->pex6, response->pex6_count);
             }
 
-            publishPeerCounts(tier, seeders, leechers);
+            tier->publishPeerCounts(seeders, leechers);
 
             tier->isRunning = data->isRunningOnSuccess;
 
@@ -1304,7 +1379,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 /* the queue is empty, so enqueue a perodic update */
                 i = tier->announceIntervalSec;
                 dbgmsg(tier, "Sending periodic reannounce in %d seconds", i);
-                tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
+                tier->announce_event_push(TR_ANNOUNCE_EVENT_NONE, now + i);
             }
         }
     }
@@ -1312,21 +1387,18 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
     tr_free(data);
 }
 
-static void announce_request_free(tr_announce_request* req)
+void tr_announce_request::announce_request_free(tr_announce_request* req)
 {
     tr_free(req->tracker_id_str);
     tr_free(req->url);
     tr_free(req);
 }
 
-static void announce_request_delegate(
-    tr_announcer* announcer,
+void tr_announcer::announce_request_delegate(
     tr_announce_request* request,
     tr_announce_response_func callback,
     void* callback_data)
 {
-    tr_session* session = announcer->session;
-
 #if 0
 
     fprintf(stderr, "ANNOUNCE: event %s isPartialSeed %d port %d key %d numwant %d up %" PRIu64 " down %" PRIu64
@@ -1339,21 +1411,21 @@ static void announce_request_delegate(
 
     if (std::strncmp(request->url, "http", 4) == 0)
     {
-        tr_tracker_http_announce(session, request, callback, callback_data);
+        tr_tracker_http_announce(this->session, request, callback, callback_data);
     }
     else if (std::strncmp(request->url, "udp://", 6) == 0)
     {
-        tr_tracker_udp_announce(session, request, callback, callback_data);
+        tr_tracker_udp_announce(this->session, request, callback, callback_data);
     }
     else
     {
         tr_logAddError("Unsupported url: %s", request->url);
     }
 
-    announce_request_free(request);
+    tr_announce_request::announce_request_free(request);
 }
 
-static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
+void tr_announcer::tierAnnounce(tr_tier* tier)
 {
     TR_ASSERT(!tier->isAnnouncing);
     TR_ASSERT(tier->announce_event_count > 0);
@@ -1361,11 +1433,11 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     time_t const now = tr_time();
 
     tr_torrent* tor = tier->tor;
-    tr_announce_event announce_event = tier_announce_event_pull(tier);
-    tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
+    tr_announce_event announce_event = tier->announce_event_pull();
+    tr_announce_request* req = this->announce_request_new(tor, tier, announce_event);
 
     struct announce_data* data = tr_new0(struct announce_data, 1);
-    data->session = announcer->session;
+    data->session = this->session;
     data->tierId = tier->key;
     data->isRunningOnSuccess = tor->isRunning;
     data->timeSent = now;
@@ -1374,7 +1446,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
 
-    announce_request_delegate(announcer, req, on_announce_done, data);
+    this->announce_request_delegate(req, on_announce_done, data);
 }
 
 /***
@@ -1533,7 +1605,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
                     if (row->seeders >= 0 && row->leechers >= 0 && row->downloads >= 0)
                     {
-                        publishPeerCounts(tier, row->seeders, row->leechers);
+                        tier->publishPeerCounts(row->seeders, row->leechers);
                     }
                 }
             }
@@ -1577,21 +1649,18 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     }
 }
 
-static void scrape_request_delegate(
-    tr_announcer* announcer,
+void tr_announcer::scrape_request_delegate(
     tr_scrape_request const* request,
     tr_scrape_response_func callback,
     void* callback_data)
 {
-    tr_session* session = announcer->session;
-
     if (strncmp(request->url, "http", 4) == 0)
     {
-        tr_tracker_http_scrape(session, request, callback, callback_data);
+        tr_tracker_http_scrape(this->session, request, callback, callback_data);
     }
     else if (strncmp(request->url, "udp://", 6) == 0)
     {
-        tr_tracker_udp_scrape(session, request, callback, callback_data);
+        tr_tracker_udp_scrape(this->session, request, callback, callback_data);
     }
     else
     {
@@ -1599,7 +1668,7 @@ static void scrape_request_delegate(
     }
 }
 
-static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
+void tr_announcer::multiscrape(tr_ptrArray* tiers)
 {
     size_t request_count = 0;
     time_t const now = tr_time();
@@ -1610,23 +1679,23 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     for (size_t i = 0; i < tier_count; ++i)
     {
         auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(tiers, i));
-        struct tr_scrape_info* const scrape_info = tier->currentTracker->scrape_info;
+        struct tr_scrape_info* const scrape_info1 = tier->currentTracker->scrape_info;
         uint8_t const* hash = tier->tor->info.hash;
         bool found = false;
 
-        TR_ASSERT(scrape_info != nullptr);
+        TR_ASSERT(scrape_info1 != nullptr);
 
         /* if there's a request with this scrape URL and a free slot, use it */
         for (size_t j = 0; !found && j < request_count; ++j)
         {
             tr_scrape_request* req = &requests[j];
 
-            if (req->info_hash_count >= scrape_info->multiscrape_max)
+            if (req->info_hash_count >= scrape_info1->multiscrape_max)
             {
                 continue;
             }
 
-            if (tr_strcmp0(req->url, scrape_info->url) != 0)
+            if (tr_strcmp0(req->url, scrape_info1->url) != 0)
             {
                 continue;
             }
@@ -1641,7 +1710,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
         if (!found && request_count < MAX_SCRAPES_PER_UPKEEP)
         {
             tr_scrape_request* req = &requests[request_count++];
-            req->url = scrape_info->url;
+            req->url = scrape_info1->url;
             tier->build_log_name(req->log_name, sizeof(req->log_name));
 
             std::memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
@@ -1653,7 +1722,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     /* send the requests we just built */
     for (size_t i = 0; i < request_count; ++i)
     {
-        scrape_request_delegate(announcer, &requests[i], on_scrape_done, announcer->session);
+        this->scrape_request_delegate(&requests[i], on_scrape_done, this->session);
     }
 }
 
@@ -1661,8 +1730,7 @@ void tr_announcer::flushCloseMessages()
 {
     for (size_t i = 0, n = tr_ptrArraySize(&this->stops); i < n; ++i)
     {
-        announce_request_delegate(
-            this,
+        this->announce_request_delegate(
             static_cast<tr_announce_request*>(tr_ptrArrayNth(&this->stops, i)),
             nullptr,
             nullptr);
@@ -1677,20 +1745,19 @@ inline bool tr_tier::needsToAnnounce(time_t now) const
         this->announce_event_count > 0;
 }
 
-static inline bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
+inline bool tr_tier::needsToScrape(time_t const now) const
 {
-    return !tier->isScraping && tier->scrapeAt != 0 && tier->scrapeAt <= now && tier->currentTracker != nullptr &&
-        tier->currentTracker->scrape_info != nullptr;
+    return !this->isScraping && this->scrapeAt != 0 && this->scrapeAt <= now && this->currentTracker != nullptr &&
+        this->currentTracker->scrape_info != nullptr;
 }
 
-static inline int countDownloaders(tr_tier const* tier)
+inline int tr_tier::countDownloaders() const
 {
-    tr_tracker const* const tracker = tier->currentTracker;
-
+    auto tracker = this->currentTracker;
     return tracker == nullptr ? 0 : tracker->downloaderCount + tracker->leecherCount;
 }
 
-static int compareAnnounceTiers(void const* va, void const* vb)
+int tr_tier::compareAnnounceTiers(void const* va, void const* vb)
 {
     auto const* a = reinterpret_cast<tr_tier const*>(va);
     auto const* b = reinterpret_cast<tr_tier const*>(vb);
@@ -1704,8 +1771,8 @@ static int compareAnnounceTiers(void const* va, void const* vb)
     }
 
     /* prefer swarms where we might upload */
-    int const downloader_count_a = countDownloaders(a);
-    int const downloader_count_b = countDownloaders(b);
+    int const downloader_count_a = a->countDownloaders();
+    int const downloader_count_b = b->countDownloaders();
     if (downloader_count_a != downloader_count_b)
     {
         return downloader_count_a > downloader_count_b ? -1 : 1;
@@ -1741,7 +1808,7 @@ static int compareAnnounceTiers(void const* va, void const* vb)
     return a < b ? -1 : 1;
 }
 
-static void scrapeAndAnnounceMore(tr_announcer* announcer)
+void tr_announcer::scrapeAndAnnounceMore()
 {
     time_t const now = tr_time();
 
@@ -1749,7 +1816,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     auto announceMe = tr_ptrArray{};
     auto scrapeMe = tr_ptrArray{};
     tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(announcer->session, tor)) != nullptr)
+    while ((tor = tr_torrentNext(this->session, tor)) != nullptr)
     {
         struct tr_torrent_tiers* tt = tor->tiers;
 
@@ -1759,10 +1826,10 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
             if (tier->needsToAnnounce(now))
             {
-                tr_ptrArrayInsertSorted(&announceMe, tier, compareAnnounceTiers);
+                tr_ptrArrayInsertSorted(&announceMe, tier, tr_tier::compareAnnounceTiers);
             }
 
-            if (tierNeedsToScrape(tier, now))
+            if (tier->needsToScrape(now))
             {
                 tr_ptrArrayAppend(&scrapeMe, tier);
             }
@@ -1773,7 +1840,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
      * we can work through that queue much faster than announces
      * (thanks to multiscrape) _and_ the scrape responses will tell
      * us which swarms are interesting and should be announced next. */
-    multiscrape(announcer, &scrapeMe);
+    this->multiscrape(&scrapeMe);
 
     /* Second, announce what we can. If there aren't enough slots
      * available, use compareAnnounceTiers to prioritize. */
@@ -1783,7 +1850,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
         auto* tier = static_cast<tr_tier*>(tr_ptrArrayNth(&announceMe, i));
         tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
         dbgmsg(tier, "announcing tier %zu of %zu", i, n);
-        tierAnnounce(announcer, tier);
+        this->tierAnnounce(tier);
     }
 
     /* cleanup */
@@ -1809,7 +1876,7 @@ void tr_announcer::onUpkeepTimer(evutil_socket_t fd, short what, void* vannounce
     /* maybe kick off some scrapes / announces whose time has come */
     if (!is_closing)
     {
-        scrapeAndAnnounceMore(announcer);
+        announcer->scrapeAndAnnounceMore();
     }
 
     /* TAU upkeep */
@@ -1942,7 +2009,7 @@ tr_tracker_stat* tr_announcer::getStats(tr_torrent const* torrent, int* setmeTra
     return ret;
 }
 
-// Belongs to a C-only struct
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
 void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount)
 {
     TR_UNUSED(trackerCount);
@@ -2000,7 +2067,7 @@ void tr_tier::copy_tier_attributes(struct tr_torrent_tiers* tt) const
     }
 }
 
-// TODO: [C++] Used from torrent.cc, remove this when tr_announcer is properly exported via a header file and call directly
+// TODO: [C++] Used via a C only header; Expose tr_torrent struct and call as member
 void tr_announcerResetTorrent(tr_announcer* announcer __attribute__((unused)),
                               tr_torrent* tor) {
     // TR_UNUSED(announcer); // used GCC/Clang attribute instead of helper macro
@@ -2023,7 +2090,7 @@ void tr_announcer::resetTorrent(tr_torrent* tor)
     tt->tracker_count = 0;
 
     /* create the new tiers / trackers */
-    addTorrentToTier(tt, tor);
+    tt->addTorrentToTier(tor);
 
     /* copy the old tiers' states into their replacements */
     for (size_t i = 0; i < old.tier_count; ++i)
@@ -2041,7 +2108,7 @@ void tr_announcer::resetTorrent(tr_torrent* tor)
         {
             if (!tt->tiers[i].wasCopied)
             {
-                tier_announce_event_push(&tt->tiers[i], TR_ANNOUNCE_EVENT_STARTED, now);
+                tt->tiers[i].announce_event_push(TR_ANNOUNCE_EVENT_STARTED, now);
             }
         }
     }

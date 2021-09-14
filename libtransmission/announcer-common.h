@@ -124,7 +124,7 @@ typedef enum
 
 char const* tr_announce_event_get_string(tr_announce_event);
 
-typedef struct
+struct tr_announce_request
 {
     tr_announce_event event;
     bool partial_seed;
@@ -168,7 +168,8 @@ typedef struct
     char log_name[128];
 
     static int compareStops(void const* va, void const* vb);
-} tr_announce_request;
+    static void announce_request_free(struct tr_announce_request* req); // TODO: [C++] Destructor
+};
 
 struct tr_pex;
 
