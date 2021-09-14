@@ -742,28 +742,16 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 class WalkNode
 {
 private:
-    // for walking `v`'s children
+    // When walking `v`'s children, this is the index of the next child
     size_t child_index = 0;
 
-    // for walking `v`'s children sorted by key when it is a dictionary.
-    // Useful when writing benc, because benc dictionaries must be sorted
+    // When `v` is a dict, this is its children's indices sorted by key.
+    // Bencoded dicts must be sorted, so this is useful when writing benc.
     std::vector<size_t> sorted;
 
-public:
-    bool is_visited = false;
-
-    // shallow bitwise copy of the variant passed to the constructor
-    tr_variant v = {};
-
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
+    void sortByKey()
     {
-        if (!sort_dicts || !tr_variantIsDict(v_in))
-            return;
-
-        auto const n = v_in->val.l.count;
-
-        // sort the children by key
+        auto const n = v.val.l.count;
 
         struct ByKey
         {
@@ -771,17 +759,34 @@ public:
             size_t idx;
         };
 
-        auto const* children = v_in->val.l.vals;
+        auto const* children = v.val.l.vals;
         auto tmp = std::vector<ByKey>(n);
         for (size_t i = 0; i < n; ++i)
             tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
-        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
+        auto const compare = [](ByKey const& a, ByKey const& b)
+        {
+            return strcmp(a.key, b.key) < 0;
+        };
+        std::sort(std::begin(tmp), std::end(tmp), compare);
 
         //  keep the sorted indices
 
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
             sorted[i] = tmp[i].idx;
+    }
+
+public:
+    bool is_visited = false;
+
+    // Shallow bitwise copy of the variant passed to the constructor
+    tr_variant const v = {};
+
+    WalkNode(tr_variant const* v_in, bool sort_dicts)
+        : v{ *v_in }
+    {
+        if (sort_dicts && tr_variantIsDict(v_in))
+            sortByKey();
     }
 
     tr_variant const* nextChild()
