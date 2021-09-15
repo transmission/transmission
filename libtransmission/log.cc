@@ -21,7 +21,7 @@
 tr_log_level __tr_message_level = TR_LOG_ERROR;
 
 static bool myQueueEnabled = false;
-static tr_log_message* myQueue = NULL;
+static tr_log_message* myQueue = nullptr;
 static tr_log_message** myQueueTail = &myQueue;
 static int myQueueLength = 0;
 
@@ -50,9 +50,9 @@ tr_log_level tr_logGetLevel(void)
 
 static tr_lock* getMessageLock(void)
 {
-    static tr_lock* l = NULL;
+    static tr_lock* l = nullptr;
 
-    if (l == NULL)
+    if (l == nullptr)
     {
         l = tr_lockNew();
     }
@@ -72,11 +72,11 @@ tr_sys_file_t tr_logGetFile(void)
         switch (fd)
         {
         case 1:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, NULL);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
             break;
 
         case 2:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
             break;
         }
 
@@ -107,7 +107,7 @@ tr_log_message* tr_logGetQueue(void)
     tr_lockLock(getMessageLock());
 
     ret = myQueue;
-    myQueue = NULL;
+    myQueue = nullptr;
     myQueueTail = &myQueue;
     myQueueLength = 0;
 
@@ -119,7 +119,7 @@ void tr_logFreeQueue(tr_log_message* list)
 {
     tr_log_message* next;
 
-    while (list != NULL)
+    while (list != nullptr)
     {
         next = list->next;
         tr_free(list->message);
@@ -170,12 +170,12 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
     if (fp != TR_BAD_SYS_FILE || IsDebuggerPresent())
     {
         struct evbuffer* buf = evbuffer_new();
-        char* base = tr_sys_path_basename(file, NULL);
+        char* base = tr_sys_path_basename(file, nullptr);
 
         char timestr[64];
         evbuffer_add_printf(buf, "[%s] ", tr_logGetTimeStr(timestr, sizeof(timestr)));
 
-        if (name != NULL)
+        if (name != nullptr)
         {
             evbuffer_add_printf(buf, "%s ", name);
         }
@@ -195,7 +195,7 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 
         if (fp != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_write(fp, message, message_len, NULL, NULL);
+            tr_sys_file_write(fp, message, message_len, nullptr, nullptr);
         }
 
         tr_free(message);
@@ -264,7 +264,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
             {
                 tr_log_message* old = myQueue;
                 myQueue = old->next;
-                old->next = NULL;
+                old->next = nullptr;
                 tr_logFreeQueue(old);
                 --myQueueLength;
                 TR_ASSERT(myQueueLength == TR_LOG_MAX_QUEUE_LENGTH);
@@ -279,21 +279,21 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
             if (fp == TR_BAD_SYS_FILE)
             {
-                fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL);
+                fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
             }
 
             tr_logGetTimeStr(timestr, sizeof(timestr));
 
-            if (name != NULL)
+            if (name != nullptr)
             {
-                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, NULL, timestr, name, buf);
+                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, nullptr, timestr, name, buf);
             }
             else
             {
-                tr_sys_file_write_fmt(fp, "[%s] %s" TR_NATIVE_EOL_STR, NULL, timestr, buf);
+                tr_sys_file_write_fmt(fp, "[%s] %s" TR_NATIVE_EOL_STR, nullptr, timestr, buf);
             }
 
-            tr_sys_file_flush(fp, NULL);
+            tr_sys_file_flush(fp, nullptr);
         }
     }
 

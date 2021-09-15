@@ -11,13 +11,13 @@
 #include "platform.h"
 #include "utils.h"
 
-static tr_list* recycled_nodes = NULL;
+static tr_list* recycled_nodes = nullptr;
 
 static tr_lock* getRecycledNodesLock(void)
 {
-    static tr_lock* l = NULL;
+    static tr_lock* l = nullptr;
 
-    if (l == NULL)
+    if (l == nullptr)
     {
         l = tr_lockNew();
     }
@@ -27,12 +27,12 @@ static tr_lock* getRecycledNodesLock(void)
 
 static tr_list* node_alloc(void)
 {
-    tr_list* ret = NULL;
+    tr_list* ret = nullptr;
     tr_lock* lock = getRecycledNodesLock();
 
     tr_lockLock(lock);
 
-    if (recycled_nodes != NULL)
+    if (recycled_nodes != nullptr)
     {
         ret = recycled_nodes;
         recycled_nodes = recycled_nodes->next;
@@ -40,7 +40,7 @@ static tr_list* node_alloc(void)
 
     tr_lockUnlock(lock);
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         ret = tr_new(tr_list, 1);
     }
@@ -53,7 +53,7 @@ static void node_free(tr_list* node)
 {
     tr_lock* lock = getRecycledNodesLock();
 
-    if (node != NULL)
+    if (node != nullptr)
     {
         *node = {};
         tr_lockLock(lock);
@@ -69,12 +69,12 @@ static void node_free(tr_list* node)
 
 void tr_list_free(tr_list** list, TrListForeachFunc data_free_func)
 {
-    while (*list != NULL)
+    while (*list != nullptr)
     {
         tr_list* node = *list;
         *list = (*list)->next;
 
-        if (data_free_func != NULL)
+        if (data_free_func != nullptr)
         {
             data_free_func(node->data);
         }
@@ -90,7 +90,7 @@ void tr_list_prepend(tr_list** list, void* data)
     node->data = data;
     node->next = *list;
 
-    if (*list != NULL)
+    if (*list != nullptr)
     {
         (*list)->prev = node;
     }
@@ -104,7 +104,7 @@ void tr_list_append(tr_list** list, void* data)
 
     node->data = data;
 
-    if (*list == NULL)
+    if (*list == nullptr)
     {
         *list = node;
     }
@@ -112,7 +112,7 @@ void tr_list_append(tr_list** list, void* data)
     {
         tr_list* l = *list;
 
-        while (l->next != NULL)
+        while (l->next != nullptr)
         {
             l = l->next;
         }
@@ -124,7 +124,7 @@ void tr_list_append(tr_list** list, void* data)
 
 static tr_list* tr_list_find_data(tr_list* list, void const* data)
 {
-    for (; list != NULL; list = list->next)
+    for (; list != nullptr; list = list->next)
     {
         if (list->data == data)
         {
@@ -132,21 +132,21 @@ static tr_list* tr_list_find_data(tr_list* list, void const* data)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static void* tr_list_remove_node(tr_list** list, tr_list* node)
 {
     void* data;
-    tr_list* prev = node != NULL ? node->prev : NULL;
-    tr_list* next = node != NULL ? node->next : NULL;
+    tr_list* prev = node != nullptr ? node->prev : nullptr;
+    tr_list* next = node != nullptr ? node->next : nullptr;
 
-    if (prev != NULL)
+    if (prev != nullptr)
     {
         prev->next = next;
     }
 
-    if (next != NULL)
+    if (next != nullptr)
     {
         next->prev = prev;
     }
@@ -156,16 +156,16 @@ static void* tr_list_remove_node(tr_list** list, tr_list* node)
         *list = next;
     }
 
-    data = node != NULL ? node->data : NULL;
+    data = node != nullptr ? node->data : nullptr;
     node_free(node);
     return data;
 }
 
 void* tr_list_pop_front(tr_list** list)
 {
-    void* ret = NULL;
+    void* ret = nullptr;
 
-    if (*list != NULL)
+    if (*list != nullptr)
     {
         ret = (*list)->data;
         tr_list_remove_node(list, *list);
@@ -186,7 +186,7 @@ void* tr_list_remove(tr_list** list, void const* b, TrListCompareFunc compare_fu
 
 tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc func)
 {
-    for (; list != NULL; list = list->next)
+    for (; list != nullptr; list = list->next)
     {
         if (func(list->data, b) == 0)
         {
@@ -194,15 +194,15 @@ tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc func)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare)
 {
     /* find the node that we'll insert this data before */
-    tr_list* next_node = NULL;
+    tr_list* next_node = nullptr;
 
-    for (tr_list* l = *list; l != NULL; l = l->next)
+    for (tr_list* l = *list; l != nullptr; l = l->next)
     {
         int const c = (*compare)(data, l->data);
 
@@ -213,7 +213,7 @@ void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare
         }
     }
 
-    if (next_node == NULL)
+    if (next_node == nullptr)
     {
         tr_list_append(list, data);
     }
@@ -236,7 +236,7 @@ int tr_list_size(tr_list const* list)
 {
     int size = 0;
 
-    while (list != NULL)
+    while (list != nullptr)
     {
         ++size;
         list = list->next;

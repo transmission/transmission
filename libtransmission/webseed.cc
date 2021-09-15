@@ -76,7 +76,7 @@ enum
 
 static void publish(tr_webseed* w, tr_peer_event* e)
 {
-    if (w->callback != NULL)
+    if (w->callback != nullptr)
     {
         (*w->callback)(&w->parent, e, w->callback_data);
     }
@@ -151,7 +151,7 @@ static void write_block_func(void* vdata)
 
     tor = tr_torrentFindFromId(data->session, data->torrent_id);
 
-    if (tor != NULL)
+    if (tor != nullptr)
     {
         uint32_t const block_size = tor->blockSize;
         uint32_t len = evbuffer_get_length(buf);
@@ -199,11 +199,11 @@ static void connection_succeeded(void* vdata)
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
     }
 
-    if (data->real_url != NULL)
+    if (data->real_url != nullptr)
     {
         tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
-        if (tor != NULL)
+        if (tor != nullptr)
         {
             uint64_t file_offset;
             tr_file_index_t file_index;
@@ -211,7 +211,7 @@ static void connection_succeeded(void* vdata)
             tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
             tr_free(w->file_urls[file_index]);
             w->file_urls[file_index] = data->real_url;
-            data->real_url = NULL;
+            data->real_url = nullptr;
         }
     }
 
@@ -315,10 +315,10 @@ static void on_idle(tr_webseed* w)
         w->retry_challenge = running_tasks + w->idle_connections + 1;
     }
 
-    if (tor != NULL && tor->isRunning && !tr_torrentIsSeed(tor) && want > 0)
+    if (tor != nullptr && tor->isRunning && !tr_torrentIsSeed(tor) && want > 0)
     {
         int got = 0;
-        tr_block_index_t* blocks = NULL;
+        tr_block_index_t* blocks = nullptr;
 
         blocks = tr_new(tr_block_index_t, want * 2);
         tr_peerMgrGetNextRequests(tor, &w->parent, want, blocks, &got, true);
@@ -383,7 +383,7 @@ static void web_response_func(
     tr_webseed* w = t->webseed;
     tr_torrent* tor = tr_torrentFindFromId(session, w->torrent_id);
 
-    if (tor != NULL)
+    if (tor != nullptr)
     {
         /* active_transfers was only increased if the connection was successful */
         if (t->response_code == 206)
@@ -456,7 +456,7 @@ static struct evbuffer* make_url(tr_webseed* w, tr_file const* file)
     evbuffer_add(buf, w->base_url, w->base_url_len);
 
     /* if url ends with a '/', add the torrent name */
-    if (w->base_url[w->base_url_len - 1] == '/' && file->name != NULL)
+    if (w->base_url[w->base_url_len - 1] == '/' && file->name != nullptr)
     {
         tr_http_escape(buf, file->name, strlen(file->name), false);
     }
@@ -469,7 +469,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
     tr_webseed* w = t->webseed;
     tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
-    if (tor != NULL)
+    if (tor != nullptr)
     {
         char range[64];
         char** urls = t->webseed->file_urls;
@@ -490,9 +490,9 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         file = &inf->files[file_index];
         this_pass = MIN(remain, file->length - file_offset);
 
-        if (urls[file_index] == NULL)
+        if (urls[file_index] == nullptr)
         {
-            urls[file_index] = evbuffer_free_to_str(make_url(t->webseed, file), NULL);
+            urls[file_index] = evbuffer_free_to_str(make_url(t->webseed, file), nullptr);
         }
 
         tr_snprintf(range, sizeof(range), "%" PRIu64 "-%" PRIu64, file_offset, file_offset + this_pass - 1);
@@ -534,11 +534,11 @@ static bool webseed_is_transferring_pieces(tr_peer const* peer, uint64_t now, tr
     if (direction == TR_DOWN)
     {
         tr_webseed const* w = (tr_webseed const*)peer;
-        is_active = w->tasks != NULL;
+        is_active = w->tasks != nullptr;
         Bps = tr_bandwidthGetPieceSpeed_Bps(&w->bandwidth, now, direction);
     }
 
-    if (setme_Bps != NULL)
+    if (setme_Bps != nullptr)
     {
         *setme_Bps = Bps;
     }
@@ -551,16 +551,16 @@ static void webseed_destruct(tr_peer* peer)
     tr_webseed* w = (tr_webseed*)peer;
 
     /* flag all the pending tasks as dead */
-    for (tr_list* l = w->tasks; l != NULL; l = l->next)
+    for (tr_list* l = w->tasks; l != nullptr; l = l->next)
     {
         auto* task = static_cast<struct tr_webseed_task*>(l->data);
         task->dead = true;
     }
 
-    tr_list_free(&w->tasks, NULL);
+    tr_list_free(&w->tasks, nullptr);
 
     /* if we have an array of file URLs, free it */
-    if (w->file_urls != NULL)
+    if (w->file_urls != nullptr)
     {
         tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
         tr_info const* const inf = tr_torrentInfo(tor);

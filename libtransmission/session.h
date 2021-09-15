@@ -265,7 +265,7 @@ enum
 
 static inline bool tr_isSession(tr_session const* session)
 {
-    return session != NULL && session->magicNumber == SESSION_MAGIC_NUMBER;
+    return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
 }
 
 static inline bool tr_isPreallocationMode(tr_preallocation_mode m)

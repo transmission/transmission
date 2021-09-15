@@ -13,7 +13,7 @@
 
 tr_error* tr_error_new_literal(int code, char const* message)
 {
-    TR_ASSERT(message != NULL);
+    TR_ASSERT(message != nullptr);
 
     tr_error* error = tr_new(tr_error, 1);
     error->code = code;
@@ -24,7 +24,7 @@ tr_error* tr_error_new_literal(int code, char const* message)
 
 tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
 {
-    TR_ASSERT(message_format != NULL);
+    TR_ASSERT(message_format != nullptr);
 
     tr_error* error = tr_new(tr_error, 1);
     error->code = code;
@@ -35,7 +35,7 @@ tr_error* tr_error_new_valist(int code, char const* message_format, va_list args
 
 void tr_error_free(tr_error* error)
 {
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
@@ -46,14 +46,14 @@ void tr_error_free(tr_error* error)
 
 void tr_error_set(tr_error** error, int code, char const* message_format, ...)
 {
-    TR_ASSERT(message_format != NULL);
+    TR_ASSERT(message_format != nullptr);
 
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
 
-    TR_ASSERT(*error == NULL);
+    TR_ASSERT(*error == nullptr);
 
     va_list args;
 
@@ -64,29 +64,29 @@ void tr_error_set(tr_error** error, int code, char const* message_format, ...)
 
 void tr_error_set_literal(tr_error** error, int code, char const* message)
 {
-    TR_ASSERT(message != NULL);
+    TR_ASSERT(message != nullptr);
 
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
 
-    TR_ASSERT(*error == NULL);
+    TR_ASSERT(*error == nullptr);
 
     *error = tr_error_new_literal(code, message);
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
 {
-    TR_ASSERT(old_error != NULL);
-    TR_ASSERT(*old_error != NULL);
+    TR_ASSERT(old_error != nullptr);
+    TR_ASSERT(*old_error != nullptr);
 
-    if (new_error != NULL)
+    if (new_error != nullptr)
     {
-        TR_ASSERT(*new_error == NULL);
+        TR_ASSERT(*new_error == nullptr);
 
         *new_error = *old_error;
-        *old_error = NULL;
+        *old_error = nullptr;
     }
     else
     {
@@ -96,23 +96,23 @@ void tr_error_propagate(tr_error** new_error, tr_error** old_error)
 
 void tr_error_clear(tr_error** error)
 {
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
 
     tr_error_free(*error);
 
-    *error = NULL;
+    *error = nullptr;
 }
 
 static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
 {
-    TR_ASSERT(error != NULL);
-    TR_ASSERT(*error != NULL);
-    TR_ASSERT(prefix_format != NULL);
+    TR_ASSERT(error != nullptr);
+    TR_ASSERT(*error != nullptr);
+    TR_ASSERT(prefix_format != nullptr);
 
     char* prefix = tr_strdup_vprintf(prefix_format, args);
 
@@ -125,9 +125,9 @@ static void error_prefix_valist(tr_error** error, char const* prefix_format, va_
 
 void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
 {
-    TR_ASSERT(prefix_format != NULL);
+    TR_ASSERT(prefix_format != nullptr);
 
-    if (error == NULL || *error == NULL)
+    if (error == nullptr || *error == nullptr)
     {
         return;
     }
@@ -141,11 +141,11 @@ void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
 
 void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
 {
-    TR_ASSERT(prefix_format != NULL);
+    TR_ASSERT(prefix_format != nullptr);
 
     tr_error_propagate(new_error, old_error);
 
-    if (new_error == NULL)
+    if (new_error == nullptr)
     {
         return;
     }

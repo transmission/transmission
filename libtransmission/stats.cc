@@ -29,12 +29,12 @@ struct tr_stats_handle
 
 static char* getOldFilename(tr_session const* session)
 {
-    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.benc", NULL);
+    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.benc", nullptr);
 }
 
 static char* getFilename(tr_session const* session)
 {
-    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.json", NULL);
+    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.json", nullptr);
 }
 
 static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
@@ -44,13 +44,13 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
     bool loaded = false;
 
     filename = getFilename(session);
-    loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, NULL);
+    loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, nullptr);
     tr_free(filename);
 
     if (!loaded)
     {
         filename = getOldFilename(session);
-        loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, NULL);
+        loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, nullptr);
         tr_free(filename);
     }
 
@@ -102,7 +102,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     filename = getFilename(session);
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename);
     }
 
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
@@ -127,14 +127,14 @@ void tr_statsInit(tr_session* session)
 
 static struct tr_stats_handle* getStats(tr_session const* session)
 {
-    return session != NULL ? session->sessionStats : NULL;
+    return session != nullptr ? session->sessionStats : nullptr;
 }
 
 void tr_statsSaveDirty(tr_session* session)
 {
     struct tr_stats_handle* h = getStats(session);
 
-    if (h != NULL && h->isDirty)
+    if (h != nullptr && h->isDirty)
     {
         auto cumulative = tr_session_stats{};
         tr_sessionGetCumulativeStats(session, &cumulative);
@@ -148,7 +148,7 @@ void tr_statsClose(tr_session* session)
     tr_statsSaveDirty(session);
 
     tr_free(session->sessionStats);
-    session->sessionStats = NULL;
+    session->sessionStats = nullptr;
 }
 
 /***
@@ -174,7 +174,7 @@ void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme)
 {
     struct tr_stats_handle const* stats = getStats(session);
 
-    if (stats != NULL)
+    if (stats != nullptr)
     {
         *setme = stats->single;
         setme->secondsActive = tr_time() - stats->startTime;
@@ -187,7 +187,7 @@ void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* s
     struct tr_stats_handle const* stats = getStats(session);
     auto current = tr_session_stats{};
 
-    if (stats != NULL)
+    if (stats != nullptr)
     {
         tr_sessionGetStats(session, &current);
         addStats(setme, &stats->old, &current);
@@ -218,7 +218,7 @@ void tr_statsAddUploaded(tr_session* session, uint32_t bytes)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)) != NULL)
+    if ((s = getStats(session)) != nullptr)
     {
         s->single.uploadedBytes += bytes;
         s->isDirty = true;
@@ -229,7 +229,7 @@ void tr_statsAddDownloaded(tr_session* session, uint32_t bytes)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)) != NULL)
+    if ((s = getStats(session)) != nullptr)
     {
         s->single.downloadedBytes += bytes;
         s->isDirty = true;
@@ -240,7 +240,7 @@ void tr_statsFileCreated(tr_session* session)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)) != NULL)
+    if ((s = getStats(session)) != nullptr)
     {
         s->single.filesAdded++;
     }

@@ -66,7 +66,7 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
     }
 
     TR_ASSERT(begin < end);
-    TR_ASSERT(b->bits != NULL);
+    TR_ASSERT(b->bits != nullptr);
 
     if (first_byte == last_byte)
     {
@@ -158,9 +158,9 @@ bool tr_bitfieldHas(tr_bitfield const* b, size_t n)
 
 static bool tr_bitfieldIsValid(tr_bitfield const* b)
 {
-    TR_ASSERT(b != NULL);
-    TR_ASSERT((b->alloc_count == 0) == (b->bits == NULL));
-    TR_ASSERT(b->bits == NULL || b->true_count == countArray(b));
+    TR_ASSERT(b != nullptr);
+    TR_ASSERT((b->alloc_count == 0) == (b->bits == nullptr));
+    TR_ASSERT(b->bits == nullptr || b->true_count == countArray(b));
 
     return true;
 }
@@ -255,7 +255,7 @@ static bool tr_bitfieldEnsureNthBitAlloced(tr_bitfield* b, size_t nth)
 static void tr_bitfieldFreeArray(tr_bitfield* b)
 {
     tr_free(b->bits);
-    b->bits = NULL;
+    b->bits = nullptr;
     b->alloc_count = 0;
 }
 
@@ -302,7 +302,7 @@ void tr_bitfieldConstruct(tr_bitfield* b, size_t bit_count)
 {
     b->bit_count = bit_count;
     b->true_count = 0;
-    b->bits = NULL;
+    b->bits = nullptr;
     b->alloc_count = 0;
     b->have_all_hint = false;
     b->have_none_hint = false;
@@ -401,7 +401,7 @@ void tr_bitfieldAdd(tr_bitfield* b, size_t nth)
     {
         size_t const offset = nth >> 3U;
 
-        if ((b->bits != NULL) && (offset < b->alloc_count))
+        if ((b->bits != nullptr) && (offset < b->alloc_count))
         {
             b->bits[offset] |= 0x80 >> (nth & 7U);
             tr_bitfieldIncTrueCount(b, 1);

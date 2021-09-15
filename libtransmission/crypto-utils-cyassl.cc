@@ -93,7 +93,7 @@ static RNG* get_rng(void)
     {
         if (!check_result(API(InitRng)(&rng)))
         {
-            return NULL;
+            return nullptr;
         }
 
         rng_initialized = true;
@@ -104,9 +104,9 @@ static RNG* get_rng(void)
 
 static tr_lock* get_rng_lock(void)
 {
-    static tr_lock* lock = NULL;
+    static tr_lock* lock = nullptr;
 
-    if (lock == NULL)
+    if (lock == nullptr)
     {
         lock = tr_lockNew();
     }
@@ -128,20 +128,20 @@ tr_sha1_ctx_t tr_sha1_init(void)
     }
 
     tr_free(handle);
-    return NULL;
+    return nullptr;
 }
 
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
     auto* handle = static_cast<Sha*>(raw_handle);
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     if (data_length == 0)
     {
         return true;
     }
 
-    TR_ASSERT(data != NULL);
+    TR_ASSERT(data != nullptr);
 
     return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
@@ -151,9 +151,9 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
     auto* handle = static_cast<Sha*>(raw_handle);
     bool ret = true;
 
-    if (hash != NULL)
+    if (hash != nullptr)
     {
-        TR_ASSERT(handle != NULL);
+        TR_ASSERT(handle != nullptr);
 
         ret = check_result(API(ShaFinal)(handle, hash));
     }
@@ -172,8 +172,8 @@ tr_dh_ctx_t tr_dh_new(
     uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    TR_ASSERT(prime_num != NULL);
-    TR_ASSERT(generator_num != NULL);
+    TR_ASSERT(prime_num != nullptr);
+    TR_ASSERT(generator_num != nullptr);
 
     struct tr_dh_ctx* handle = tr_new0(struct tr_dh_ctx, 1);
 
@@ -182,7 +182,7 @@ tr_dh_ctx_t tr_dh_new(
     if (!check_result(API(DhSetKey)(&handle->dh, prime_num, prime_num_length, generator_num, generator_num_length)))
     {
         tr_free(handle);
-        return NULL;
+        return nullptr;
     }
 
     handle->key_length = prime_num_length;
@@ -194,7 +194,7 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 {
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
@@ -208,15 +208,15 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 {
     TR_UNUSED(private_key_length);
 
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(public_key != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
     word32 my_private_key_length;
     word32 my_public_key_length;
     tr_lock* rng_lock = get_rng_lock();
 
-    if (handle->private_key == NULL)
+    if (handle->private_key == nullptr)
     {
         handle->private_key = static_cast<uint8_t*>(tr_malloc(handle->key_length));
     }
@@ -241,7 +241,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
     handle->private_key_length = my_private_key_length;
 
-    if (public_key_length != NULL)
+    if (public_key_length != nullptr)
     {
         *public_key_length = handle->key_length;
     }
@@ -251,8 +251,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(other_public_key != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(other_public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
     struct tr_dh_secret* ret;
@@ -274,7 +274,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     else
     {
         tr_dh_secret_free(ret);
-        ret = NULL;
+        ret = nullptr;
     }
 
     return ret;
@@ -286,7 +286,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
-    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer != nullptr);
 
     bool ret;
     tr_lock* rng_lock = get_rng_lock();

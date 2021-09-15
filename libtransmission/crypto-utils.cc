@@ -50,7 +50,7 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
 {
     tr_sha1_ctx_t sha;
 
-    if ((sha = tr_sha1_init()) == NULL)
+    if ((sha = tr_sha1_init()) == nullptr)
     {
         return false;
     }
@@ -62,7 +62,7 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
 
         va_start(vl, data1_length);
 
-        while ((data = va_arg(vl, void const*)) != NULL)
+        while ((data = va_arg(vl, void const*)) != nullptr)
         {
             int const data_length = va_arg(vl, int);
             TR_ASSERT(data_length >= 0);
@@ -76,13 +76,13 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
         va_end(vl);
 
         /* did we reach the end of argument list? */
-        if (data == NULL)
+        if (data == nullptr)
         {
             return tr_sha1_final(sha, hash);
         }
     }
 
-    tr_sha1_final(sha, NULL);
+    tr_sha1_final(sha, nullptr);
     return false;
 }
 
@@ -126,7 +126,7 @@ int tr_rand_int_weak(int upper_bound)
 
 char* tr_ssha1(char const* plain_text)
 {
-    TR_ASSERT(plain_text != NULL);
+    TR_ASSERT(plain_text != nullptr);
 
     enum
     {
@@ -151,7 +151,7 @@ char* tr_ssha1(char const* plain_text)
         salt[i] = salter[salt[i] % salter_len];
     }
 
-    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, saltval_len, NULL);
+    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, saltval_len, nullptr);
     tr_sha1_to_hex(&buf[1], sha);
     memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, saltval_len);
     buf[1 + 2 * SHA_DIGEST_LENGTH + saltval_len] = '\0';
@@ -162,8 +162,8 @@ char* tr_ssha1(char const* plain_text)
 
 bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
 {
-    TR_ASSERT(ssha1 != NULL);
-    TR_ASSERT(plain_text != NULL);
+    TR_ASSERT(ssha1 != nullptr);
+    TR_ASSERT(plain_text != nullptr);
 
     size_t const brace_len = 1;
     size_t const brace_and_hash_len = brace_len + 2 * SHA_DIGEST_LENGTH;
@@ -182,7 +182,7 @@ bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
     uint8_t buf[SHA_DIGEST_LENGTH * 2 + 1];
 
     /* hash pass + salt */
-    tr_sha1(buf, plain_text, (int)strlen(plain_text), salt, (int)salt_len, NULL);
+    tr_sha1(buf, plain_text, (int)strlen(plain_text), salt, (int)salt_len, nullptr);
     tr_sha1_to_hex((char*)buf, buf);
 
     return strncmp(ssha1 + brace_len, (char const*)buf, SHA_DIGEST_LENGTH * 2) == 0;
@@ -196,7 +196,7 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 {
     char* ret;
 
-    if (input != NULL)
+    if (input != nullptr)
     {
         if (input_length != 0)
         {
@@ -214,7 +214,7 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
             ret_length = base64_encode_block(static_cast<char const*>(input), input_length, ret, &state);
             ret_length += base64_encode_blockend(ret + ret_length, &state);
 
-            if (output_length != NULL)
+            if (output_length != nullptr)
             {
                 *output_length = ret_length;
             }
@@ -230,10 +230,10 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
     }
     else
     {
-        ret = NULL;
+        ret = nullptr;
     }
 
-    if (output_length != NULL)
+    if (output_length != nullptr)
     {
         *output_length = 0;
     }
@@ -243,14 +243,14 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 
 void* tr_base64_encode_str(char const* input, size_t* output_length)
 {
-    return tr_base64_encode(input, input == NULL ? 0 : strlen(input), output_length);
+    return tr_base64_encode(input, input == nullptr ? 0 : strlen(input), output_length);
 }
 
 void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length)
 {
     char* ret;
 
-    if (input != NULL)
+    if (input != nullptr)
     {
         if (input_length != 0)
         {
@@ -262,7 +262,7 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
             base64_init_decodestate(&state);
             ret_length = base64_decode_block(static_cast<char const*>(input), input_length, ret, &state);
 
-            if (output_length != NULL)
+            if (output_length != nullptr)
             {
                 *output_length = ret_length;
             }
@@ -278,10 +278,10 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
     }
     else
     {
-        ret = NULL;
+        ret = nullptr;
     }
 
-    if (output_length != NULL)
+    if (output_length != nullptr)
     {
         *output_length = 0;
     }
@@ -291,5 +291,5 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
 
 void* tr_base64_decode_str(char const* input, size_t* output_length)
 {
-    return tr_base64_decode(input, input == NULL ? 0 : strlen(input), output_length);
+    return tr_base64_decode(input, input == nullptr ? 0 : strlen(input), output_length);
 }
