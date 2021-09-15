@@ -23,6 +23,7 @@
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
+#include <vector>
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -973,110 +974,127 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
     return ret;
 }
 
-bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+namespace
 {
-    TR_UNUSED(size);
-
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    bool ret = false;
-
-    errno = 0;
 
 #ifdef HAVE_FALLOCATE64
-
-    /* fallocate64 is always preferred, so try it first */
-    ret = fallocate64(handle, 0, 0, size) != -1;
-
-    if (ret || errno == ENOSPC)
-    {
-        goto OUT;
-    }
-
+bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
+{
+    return fallocate64(handle, 0, 0, size) == 0;
+}
 #endif
 
-    if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
-    {
-        int code = errno;
-
 #ifdef HAVE_XFS_XFS_H
+bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
+{
+    if (!platform_test_xfs_fd(handle)) // true if on xfs filesystem
+    {
+        return false;
+    }
 
-        if (platform_test_xfs_fd(handle))
-        {
-            xfs_flock64_t fl;
+    xfs_flock64_t fl;
+    fl.l_whence = 0;
+    fl.l_start = 0;
+    fl.l_len = size;
 
-            fl.l_whence = 0;
-            fl.l_start = 0;
-            fl.l_len = size;
+    // The blocks are allocated, but not zeroed, and the file size does not change
+    bool ok = xfsctl(nullptr, handle, XFS_IOC_RESVSP64, &fl) != -1;
 
-            ret = xfsctl(nullptr, handle, XFS_IOC_RESVSP64, &fl) != -1;
+    if (ok)
+    {
+        ok = ftruncate(handle, size) == 0;
+    }
 
-            if (ret)
-            {
-                ret = ftruncate(handle, size) != -1;
-            }
-
-            code = errno;
-
-            if (ret || code == ENOSPC)
-            {
-                goto NON_SPARSE_OUT;
-            }
-        }
-
+    return ok;
+}
 #endif
 
 #ifdef __APPLE__
+bool full_preallocate_apple(tr_sys_file_t handle, uint64_t size)
+{
+    fstore_t fst;
 
-        {
-            fstore_t fst;
+    fst.fst_flags = F_ALLOCATEALL;
+    fst.fst_posmode = F_PEOFPOSMODE;
+    fst.fst_offset = 0;
+    fst.fst_length = size;
+    fst.fst_bytesalloc = 0;
 
-            fst.fst_flags = F_ALLOCATEALL;
-            fst.fst_posmode = F_PEOFPOSMODE;
-            fst.fst_offset = 0;
-            fst.fst_length = size;
-            fst.fst_bytesalloc = 0;
+    bool ok = fcntl(handle, F_PREALLOCATE, &fst) != -1;
 
-            ret = fcntl(handle, F_PREALLOCATE, &fst) != -1;
+    if (ok)
+    {
+        ok = ftruncate(handle, size) == 0;
+    }
 
-            if (ret)
-            {
-                ret = ftruncate(handle, size) != -1;
-            }
-
-            code = errno;
-
-            if (ret || code == ENOSPC)
-            {
-                goto NON_SPARSE_OUT;
-            }
-        }
-
+    return ok;
+}
 #endif
 
 #ifdef HAVE_POSIX_FALLOCATE
-
-        code = posix_fallocate(handle, 0, size);
-        ret = code == 0;
-
+bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
+{
+    return posix_fallocate(handle, 0, size) == 0;
+}
 #endif
 
-#if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-NON_SPARSE_OUT:
-#endif
-        errno = code;
-    }
+} // unnamed namespace
 
+bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+{
+    TR_UNUSED(size);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    using prealloc_func = bool (*)(tr_sys_file_t, uint64_t);
+
+    // these approaches are fast and should be tried first
+    auto approaches = std::vector<prealloc_func>{
 #ifdef HAVE_FALLOCATE64
-OUT:
+        preallocate_fallocate64
 #endif
+    };
 
-    if (!ret)
+    // these approaches are sometimes slower in some settings (e.g.
+    // a slow zeroing of all the preallocated space) so only use them
+    // if specified by `flags`
+    if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
     {
-        set_system_error(error, errno);
+        // TODO: these functions haven't been reviewed in awhile.
+        // It's possible that some are faster now & should be promoted
+        // to 'always try' and/or replaced with fresher platform API.
+        approaches.insert(
+            std::end(approaches),
+            {
+#ifdef HAVE_XFS_XFS_H
+                full_preallocate_xfs,
+#endif
+#ifdef __APPLE__
+                full_preallocate_apple,
+#endif
+#ifdef HAVE_POSIX_FALLOCATE
+                full_preallocate_posix,
+#endif
+            });
     }
 
-    return ret;
+    for (auto& approach : approaches) // try until one of them works
+    {
+        errno = 0;
+
+        auto const success = approach(handle, size);
+        if (success)
+        {
+            return success;
+        }
+
+        if (errno == ENOSPC) // disk full, so subsequent approaches will fail too
+        {
+            break;
+        }
+    }
+
+    set_system_error(error, errno);
+    return false;
 }
 
 void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
