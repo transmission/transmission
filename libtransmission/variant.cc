@@ -70,7 +70,7 @@ static void use_numeric_locale(struct locale_context* context, char const* local
 {
 #ifdef HAVE_USELOCALE
 
-    context->new_locale = newlocale(LC_NUMERIC_MASK, locale_name, NULL);
+    context->new_locale = newlocale(LC_NUMERIC_MASK, locale_name, nullptr);
     context->old_locale = uselocale(context->new_locale);
 
 #else
@@ -80,7 +80,7 @@ static void use_numeric_locale(struct locale_context* context, char const* local
 #endif
 
     context->category = LC_NUMERIC;
-    tr_strlcpy(context->old_locale, setlocale(context->category, NULL), sizeof(context->old_locale));
+    tr_strlcpy(context->old_locale, setlocale(context->category, nullptr), sizeof(context->old_locale));
     setlocale(context->category, locale_name);
 
 #endif
@@ -166,7 +166,7 @@ static char const* tr_variant_string_get_string(struct tr_variant_string const* 
         break;
 
     default:
-        ret = NULL;
+        ret = nullptr;
     }
 
     return ret;
@@ -185,7 +185,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
 {
     tr_variant_string_clear(str);
 
-    if (bytes == NULL)
+    if (bytes == nullptr)
     {
         len = 0;
     }
@@ -247,7 +247,7 @@ tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 {
     int const i = dictIndexOf(dict, key);
 
-    return i < 0 ? NULL : dict->val.l.vals + i;
+    return i < 0 ? nullptr : dict->val.l.vals + i;
 }
 
 static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
@@ -263,7 +263,7 @@ size_t tr_variantListSize(tr_variant const* list)
 
 tr_variant* tr_variantListChild(tr_variant* v, size_t i)
 {
-    tr_variant* ret = NULL;
+    tr_variant* ret = nullptr;
 
     if (tr_variantIsList(v) && i < v->val.l.count)
     {
@@ -294,7 +294,7 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 
     if (tr_variantIsInt(v))
     {
-        if (setme != NULL)
+        if (setme != nullptr)
         {
             *setme = v->val.i;
         }
@@ -304,7 +304,7 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 
     if (!success && tr_variantIsBool(v))
     {
-        if (setme != NULL)
+        if (setme != nullptr)
         {
             *setme = v->val.b ? 1 : 0;
         }
@@ -324,7 +324,7 @@ bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
         *setme = getStr(v);
     }
 
-    if (len != NULL)
+    if (len != nullptr)
     {
         *len = success ? v->val.s.len : 0;
     }
@@ -362,7 +362,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         success = true;
     }
 
-    if ((!success) && tr_variantGetStr(v, &str, NULL) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+    if ((!success) && tr_variantGetStr(v, &str, nullptr) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
     {
         *setme = strcmp(str, "true") == 0;
         success = true;
@@ -622,12 +622,12 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
     tr_variant* child;
 
     /* see if it already exists, and if so, try to reuse it */
-    if ((child = tr_variantDictFind(dict, key)) != NULL)
+    if ((child = tr_variantDictFind(dict, key)) != nullptr)
     {
         if (!tr_variantIsType(child, type))
         {
             tr_variantDictRemove(dict, key);
-            child = NULL;
+            child = nullptr;
         }
         else if (child->type == TR_VARIANT_TYPE_STR)
         {
@@ -636,7 +636,7 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
     }
 
     /* if it doesn't exist, create it */
-    if (child == NULL)
+    if (child == nullptr)
     {
         child = tr_variantDictAdd(dict, key);
     }
@@ -774,7 +774,7 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
         for (size_t i = 0; i < n; i++)
         {
             tmp[i].val = v->val.l.vals + i;
-            tmp[i].keystr = tr_quark_get_string(tmp[i].val->key, NULL);
+            tmp[i].keystr = tr_quark_get_string(tmp[i].val->key, nullptr);
         }
 
         qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
@@ -795,7 +795,7 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
     }
     else
     {
-        node->sorted = NULL;
+        node->sorted = nullptr;
     }
 
     node->v = v;
@@ -803,9 +803,9 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
 
 static void nodeDestruct(struct SaveNode* node)
 {
-    TR_ASSERT(node != NULL);
+    TR_ASSERT(node != nullptr);
 
-    if (node->sorted != NULL)
+    if (node->sorted != nullptr)
     {
         tr_free(node->sorted->val.l.vals);
         tr_free(node->sorted);
@@ -861,7 +861,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
             continue;
         }
 
-        if (v != NULL)
+        if (v != nullptr)
         {
             switch (v->type)
             {
@@ -966,7 +966,7 @@ void tr_variantFree(tr_variant* v)
 {
     if (tr_variantIsSomething(v))
     {
-        tr_variantWalk(v, &freeWalkFuncs, NULL, false);
+        tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
     }
 }
 
@@ -979,7 +979,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i)) != NULL)
+    while ((val = tr_variantListChild((tr_variant*)src, i)) != nullptr)
     {
         if (tr_variantIsBool(val))
         {
@@ -1002,7 +1002,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         else if (tr_variantIsString(val))
         {
             size_t len = 0;
-            char const* str = NULL;
+            char const* str = nullptr;
             (void)tr_variantGetStr(val, &str, &len);
             tr_variantListAddRaw(target, str, len);
         }
@@ -1089,7 +1089,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             else if (tr_variantIsString(val))
             {
                 size_t len = 0;
-                char const* str = NULL;
+                char const* str = nullptr;
                 (void)tr_variantGetStr(val, &str, &len);
                 tr_variantDictAddRaw(target, key, str, len);
             }
@@ -1099,7 +1099,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsList(val))
             {
-                if (tr_variantDictFind(target, key) == NULL)
+                if (tr_variantDictFind(target, key) == nullptr)
                 {
                     tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
                 }
@@ -1108,7 +1108,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             {
                 tr_variant* target_dict = tr_variantDictFind(target, key);
 
-                if (target_dict == NULL)
+                if (target_dict == nullptr)
                 {
                     target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(val));
                 }
@@ -1120,7 +1120,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, NULL));
+                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, nullptr));
             }
         }
     }
@@ -1177,7 +1177,7 @@ static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file
     {
         uint64_t n = 0;
 
-        tr_error* tmperr = NULL;
+        tr_error* tmperr = nullptr;
         if (!tr_sys_file_write(fd, walk, nleft, &n, &tmperr))
         {
             err = tmperr->code;
@@ -1197,27 +1197,27 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 {
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with tr_sys_file_open_temp() is created on the right partition */
-    char* real_filename = tr_sys_path_resolve(filename, NULL);
-    if (real_filename != NULL)
+    char* real_filename = tr_sys_path_resolve(filename, nullptr);
+    if (real_filename != nullptr)
     {
         filename = real_filename;
     }
 
     /* if the file already exists, try to move it out of the way & keep it as a backup */
     char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
     tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
 
     int err = 0;
     if (fd != TR_BAD_SYS_FILE)
     {
         err = writeVariantToFd(v, fmt, fd, &error);
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
 
         if (err)
         {
             tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-            tr_sys_path_remove(tmp, NULL);
+            tr_sys_path_remove(tmp, nullptr);
             tr_error_free(error);
         }
         else
@@ -1232,7 +1232,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
             {
                 err = error->code;
                 tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_sys_path_remove(tmp, NULL);
+                tr_sys_path_remove(tmp, nullptr);
                 tr_error_free(error);
             }
         }
@@ -1261,9 +1261,9 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filen
 
     buf = tr_loadFile(filename, &buflen, error);
 
-    if (buf != NULL)
+    if (buf != nullptr)
     {
-        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, NULL) == 0)
+        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
         {
             ret = true;
         }

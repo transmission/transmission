@@ -94,7 +94,7 @@ static void send_simple_response(struct evhttp_request* req, int code, char cons
 
     evbuffer_add_printf(body, "<h1>%d: %s</h1>", code, code_text);
 
-    if (text != NULL)
+    if (text != nullptr)
     {
         evbuffer_add_printf(body, "%s", text);
     }
@@ -126,14 +126,14 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
     size_t inlen = evbuffer_get_length(body);
 
     char const* boundary_key = "boundary=";
-    char const* boundary_key_begin = content_type != NULL ? strstr(content_type, boundary_key) : NULL;
-    char const* boundary_val = boundary_key_begin != NULL ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
+    char const* boundary_key_begin = content_type != nullptr ? strstr(content_type, boundary_key) : nullptr;
+    char const* boundary_val = boundary_key_begin != nullptr ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
     char* boundary = tr_strdup_printf("--%s", boundary_val);
     size_t const boundary_len = strlen(boundary);
 
     char const* delim = tr_memmem(in, inlen, boundary, boundary_len);
 
-    while (delim != NULL)
+    while (delim != nullptr)
     {
         size_t part_len;
         char const* part = delim + boundary_len;
@@ -142,13 +142,13 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
         in = part;
 
         delim = tr_memmem(in, inlen, boundary, boundary_len);
-        part_len = delim != NULL ? (size_t)(delim - part) : inlen;
+        part_len = delim != nullptr ? (size_t)(delim - part) : inlen;
 
         if (part_len != 0)
         {
             char const* rnrn = tr_memmem(part, part_len, "\r\n\r\n", 4);
 
-            if (rnrn != NULL)
+            if (rnrn != nullptr)
             {
                 struct tr_mimepart* p = tr_new(struct tr_mimepart, 1);
                 p->headers_len = (size_t)(rnrn - part);
@@ -167,7 +167,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 {
     if (req->type != EVHTTP_REQ_POST)
     {
-        send_simple_response(req, 405, NULL);
+        send_simple_response(req, 405, nullptr);
     }
     else
     {
@@ -176,7 +176,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         auto parts = tr_ptrArray{};
 
         char const* query = strchr(req->uri, '?');
-        bool const paused = query != NULL && strstr(query + 1, "paused=true") != NULL;
+        bool const paused = query != nullptr && strstr(query + 1, "paused=true") != nullptr;
 
         extract_parts_from_multipart(req->input_headers, req->input_buffer, &parts);
         n = tr_ptrArraySize(&parts);
@@ -186,7 +186,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             auto const* const p = static_cast<struct tr_mimepart const*>(tr_ptrArrayNth(&parts, i));
 
-            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
+            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != nullptr)
             {
                 char const* ours = get_current_session_id(server);
                 size_t const ourlen = strlen(ours);
@@ -233,7 +233,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                 }
                 else if (tr_variantFromBenc(&test, body, body_len) == 0)
                 {
-                    auto* b64 = static_cast<char*>(tr_base64_encode(body, body_len, NULL));
+                    auto* b64 = static_cast<char*>(tr_base64_encode(body, body_len, nullptr));
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
                     tr_free(b64);
                     have_source = true;
@@ -241,7 +241,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 
                 if (have_source)
                 {
-                    tr_rpc_request_exec_json(server->session, &top, NULL, NULL);
+                    tr_rpc_request_exec_json(server->session, &top, nullptr, nullptr);
                 }
 
                 tr_variantFree(&top);
@@ -284,7 +284,7 @@ static char const* mimetype_guess(char const* path)
     };
     char const* dot = strrchr(path, '.');
 
-    for (unsigned int i = 0; dot != NULL && i < TR_N_ELEMENTS(types); ++i)
+    for (unsigned int i = 0; dot != nullptr && i < TR_N_ELEMENTS(types); ++i)
     {
         if (strcmp(dot + 1, types[i].suffix) == 0)
         {
@@ -303,7 +303,7 @@ static void add_response(
 {
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    bool const do_compress = encoding != NULL && strstr(encoding, "gzip") != NULL;
+    bool const do_compress = encoding != nullptr && strstr(encoding, "gzip") != nullptr;
 
     if (!do_compress)
     {
@@ -394,18 +394,18 @@ static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server,
     if (req->type != EVHTTP_REQ_GET)
     {
         evhttp_add_header(req->output_headers, "Allow", "GET");
-        send_simple_response(req, 405, NULL);
+        send_simple_response(req, 405, nullptr);
     }
     else
     {
         void* file;
         size_t file_len;
-        tr_error* error = NULL;
+        tr_error* error = nullptr;
 
         file_len = 0;
         file = tr_loadFile(filename, &file_len, &error);
 
-        if (file == NULL)
+        if (file == nullptr)
         {
             char* tmp = tr_strdup_printf("%s (%s)", filename, error->message);
             send_simple_response(req, HTTP_NOTFOUND, tmp);
@@ -459,12 +459,12 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
 
         subpath = tr_strdup(req->uri + strlen(server->url) + 4);
 
-        if ((pch = strchr(subpath, '?')) != NULL)
+        if ((pch = strchr(subpath, '?')) != nullptr)
         {
             *pch = '\0';
         }
 
-        if (strstr(subpath, "..") != NULL)
+        if (strstr(subpath, "..") != nullptr)
         {
             send_simple_response(req, HTTP_NOTFOUND, "<p>Tsk, tsk.</p>");
         }
@@ -516,7 +516,7 @@ static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_serve
     data->req = req;
     data->server = server;
 
-    tr_rpc_request_exec_json(server->session, have_content ? &top : NULL, rpc_response_func, data);
+    tr_rpc_request_exec_json(server->session, have_content ? &top : nullptr, rpc_response_func, data);
 
     if (have_content)
     {
@@ -540,7 +540,7 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
     {
         char const* q = strchr(req->uri, '?');
 
-        if (q != NULL)
+        if (q != nullptr)
         {
             struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
             data->req = req;
@@ -550,7 +550,7 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
         }
     }
 
-    send_simple_response(req, 405, NULL);
+    send_simple_response(req, 405, nullptr);
 }
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
@@ -560,7 +560,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
         return true;
     }
 
-    for (tr_list* l = server->whitelist; l != NULL; l = l->next)
+    for (tr_list* l = server->whitelist; l != nullptr; l = l->next)
     {
         if (tr_wildmat(address, static_cast<char const*>(l->data)))
         {
@@ -597,7 +597,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
     char const* const host = evhttp_find_header(req->input_headers, "Host");
 
     /* No host header, invalid request. */
-    if (host == NULL)
+    if (host == nullptr)
     {
         return false;
     }
@@ -619,7 +619,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
     }
 
     /* Otherwise, hostname must be whitelisted. */
-    for (tr_list* l = server->hostWhitelist; l != NULL; l = l->next)
+    for (tr_list* l = server->hostWhitelist; l != nullptr; l = l->next)
     {
         if (tr_wildmat(hostname, static_cast<char const*>(l->data)))
         {
@@ -636,7 +636,7 @@ static bool test_session_id(struct tr_rpc_server* server, struct evhttp_request*
 {
     char const* ours = get_current_session_id(server);
     char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    bool const success = theirs != NULL && strcmp(theirs, ours) == 0;
+    bool const success = theirs != nullptr && strcmp(theirs, ours) == 0;
     return success;
 }
 
@@ -644,11 +644,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
 {
     auto* server = static_cast<struct tr_rpc_server*>(arg);
 
-    if (req != NULL && req->evcon != NULL)
+    if (req != nullptr && req->evcon != nullptr)
     {
         char const* auth;
-        char* user = NULL;
-        char* pass = NULL;
+        char* user = nullptr;
+        char* pass = nullptr;
 
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
@@ -672,13 +672,13 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         auth = evhttp_find_header(req->input_headers, "Authorization");
 
-        if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
+        if (auth != nullptr && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
-            auto* p = static_cast<char*>(tr_base64_decode_str(auth + 6, NULL));
+            auto* p = static_cast<char*>(tr_base64_decode_str(auth + 6, nullptr));
 
-            if (p != NULL)
+            if (p != nullptr)
             {
-                if ((pass = strchr(p, ':')) != NULL)
+                if ((pass = strchr(p, ':')) != nullptr)
                 {
                     user = p;
                     *pass++ = '\0';
@@ -691,7 +691,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
         }
 
         if (server->isPasswordEnabled &&
-            (pass == NULL || user == NULL || strcmp(server->username, user) != 0 || !tr_ssha1_matches(server->password, pass)))
+            (pass == nullptr || user == nullptr || strcmp(server->username, user) != 0 ||
+             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->isAntiBruteForceEnabled)
@@ -714,7 +715,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             char* location = tr_strdup_printf("%sweb/", server->url);
             evhttp_add_header(req->output_headers, "Location", location);
-            send_simple_response(req, HTTP_MOVEPERM, NULL);
+            send_simple_response(req, HTTP_MOVEPERM, nullptr);
             tr_free(location);
         }
         else if (strncmp(req->uri + strlen(server->url), "web/", 4) == 0)
@@ -803,7 +804,7 @@ static int rpc_server_start_retry(tr_rpc_server* server)
     int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1) * SERVER_START_RETRY_DELAY_INCREMENT;
     retry_delay = MIN(retry_delay, SERVER_START_RETRY_MAX_DELAY);
 
-    if (server->start_retry_timer == NULL)
+    if (server->start_retry_timer == nullptr)
     {
         server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
     }
@@ -816,10 +817,10 @@ static int rpc_server_start_retry(tr_rpc_server* server)
 
 static void rpc_server_start_retry_cancel(tr_rpc_server* server)
 {
-    if (server->start_retry_timer != NULL)
+    if (server->start_retry_timer != nullptr)
     {
         event_free(server->start_retry_timer);
-        server->start_retry_timer = NULL;
+        server->start_retry_timer = nullptr;
     }
 
     server->start_retry_counter = 0;
@@ -829,7 +830,7 @@ static void startServer(void* vserver)
 {
     auto* server = static_cast<tr_rpc_server*>(vserver);
 
-    if (server->httpd != NULL)
+    if (server->httpd != nullptr)
     {
         return;
     }
@@ -876,7 +877,7 @@ static void stopServer(tr_rpc_server* server)
 
     struct evhttp* httpd = server->httpd;
 
-    if (httpd == NULL)
+    if (httpd == nullptr)
     {
         return;
     }
@@ -884,7 +885,7 @@ static void stopServer(tr_rpc_server* server)
     char const* address = tr_rpcGetBindAddress(server);
     int const port = server->port;
 
-    server->httpd = NULL;
+    server->httpd = nullptr;
     evhttp_free(httpd);
 
     tr_logAddNamedDbg(MY_NAME, "Stopped listening on %s:%d", address, port);
@@ -929,7 +930,7 @@ static void restartServer(void* vserver)
 
 void tr_rpcSetPort(tr_rpc_server* server, tr_port port)
 {
-    TR_ASSERT(server != NULL);
+    TR_ASSERT(server != nullptr);
 
     if (server->port != port)
     {
@@ -957,7 +958,7 @@ void tr_rpcSetUrl(tr_rpc_server* server, char const* url)
 
 char const* tr_rpcGetUrl(tr_rpc_server const* server)
 {
-    return server->url != NULL ? server->url : "";
+    return server->url != nullptr ? server->url : "";
 }
 
 static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
@@ -965,7 +966,7 @@ static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
     void* tmp;
 
     /* clear out the old whitelist entries */
-    while ((tmp = tr_list_pop_front(list)) != NULL)
+    while ((tmp = tr_list_pop_front(list)) != nullptr)
     {
         tr_free(tmp);
     }
@@ -1019,7 +1020,7 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
 
 char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
 {
-    return server->whitelistStr != NULL ? server->whitelistStr : "";
+    return server->whitelistStr != nullptr ? server->whitelistStr : "";
 }
 
 void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1051,7 +1052,7 @@ void tr_rpcSetUsername(tr_rpc_server* server, char const* username)
 
 char const* tr_rpcGetUsername(tr_rpc_server const* server)
 {
-    return server->username != NULL ? server->username : "";
+    return server->username != nullptr ? server->username : "";
 }
 
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
@@ -1072,7 +1073,7 @@ void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
 
 char const* tr_rpcGetPassword(tr_rpc_server const* server)
 {
-    return server->password != NULL ? server->password : "";
+    return server->password != nullptr ? server->password : "";
 }
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1126,7 +1127,7 @@ static void closeServer(void* vserver)
 
     stopServer(server);
 
-    while ((tmp = tr_list_pop_front(&server->whitelist)) != NULL)
+    while ((tmp = tr_list_pop_front(&server->whitelist)) != nullptr)
     {
         tr_free(tmp);
     }
@@ -1146,12 +1147,12 @@ static void closeServer(void* vserver)
 void tr_rpcClose(tr_rpc_server** ps)
 {
     tr_runInEventThread((*ps)->session, closeServer, *ps);
-    *ps = NULL;
+    *ps = nullptr;
 }
 
 static void missing_settings_key(tr_quark const q)
 {
-    char const* str = tr_quark_get_string(q, NULL);
+    char const* str = tr_quark_get_string(q, nullptr);
     tr_logAddNamedError(MY_NAME, _("Couldn't find settings key \"%s\""), str);
 }
 
@@ -1190,7 +1191,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_url;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL))
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
     {
         missing_settings_key(key);
     }
@@ -1223,7 +1224,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_host_whitelist;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL) && str != NULL)
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr) && str != nullptr)
     {
         missing_settings_key(key);
     }
@@ -1245,7 +1246,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_whitelist;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL) && str != NULL)
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr) && str != nullptr)
     {
         missing_settings_key(key);
     }
@@ -1256,7 +1257,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_username;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL))
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
     {
         missing_settings_key(key);
     }
@@ -1267,7 +1268,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_password;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL))
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
     {
         missing_settings_key(key);
     }
@@ -1300,7 +1301,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_bind_address;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL))
+    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
     {
         missing_settings_key(key);
         address = tr_inaddr_any;

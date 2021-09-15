@@ -16,7 +16,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-#define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
 /***
 ****
@@ -111,8 +111,8 @@ void tr_bandwidthDestruct(tr_bandwidth* b)
 {
     TR_ASSERT(tr_isBandwidth(b));
 
-    tr_bandwidthSetParent(b, NULL);
-    tr_ptrArrayDestruct(&b->children, NULL);
+    tr_bandwidthSetParent(b, nullptr);
+    tr_ptrArrayDestruct(&b->children, nullptr);
 
     memset(b, ~0, sizeof(tr_bandwidth));
 }
@@ -126,19 +126,19 @@ void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(b != parent);
 
-    if (b->parent != NULL)
+    if (b->parent != nullptr)
     {
         TR_ASSERT(tr_isBandwidth(b->parent));
         tr_ptrArrayRemoveSortedPointer(&b->parent->children, b, compareBandwidth);
-        b->parent = NULL;
+        b->parent = nullptr;
     }
 
-    if (parent != NULL)
+    if (parent != nullptr)
     {
         TR_ASSERT(tr_isBandwidth(parent));
         TR_ASSERT(parent->parent != b);
 
-        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == NULL);
+        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == nullptr);
         tr_ptrArrayInsertSorted(&parent->children, b, compareBandwidth);
         TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == b);
         b->parent = parent;
@@ -169,7 +169,7 @@ static void allocateBandwidth(
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
-    if (b->peer != NULL)
+    if (b->peer != nullptr)
     {
         b->peer->priority = priority;
         tr_ptrArrayAppend(peer_pool, b->peer);
@@ -280,16 +280,16 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
     }
 
     /* cleanup */
-    tr_ptrArrayDestruct(&normal, NULL);
-    tr_ptrArrayDestruct(&high, NULL);
-    tr_ptrArrayDestruct(&low, NULL);
-    tr_ptrArrayDestruct(&tmp, NULL);
+    tr_ptrArrayDestruct(&normal, nullptr);
+    tr_ptrArrayDestruct(&high, nullptr);
+    tr_ptrArrayDestruct(&low, nullptr);
+    tr_ptrArrayDestruct(&tmp, nullptr);
 }
 
 void tr_bandwidthSetPeer(tr_bandwidth* b, tr_peerIo* peer)
 {
     TR_ASSERT(tr_isBandwidth(b));
-    TR_ASSERT(peer == NULL || tr_isPeerIo(peer));
+    TR_ASSERT(peer == nullptr || tr_isPeerIo(peer));
 
     b->peer = peer;
 }
@@ -303,7 +303,7 @@ static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direc
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (b != NULL)
+    if (b != nullptr)
     {
         if (b->band[dir].isLimited)
         {
@@ -341,7 +341,7 @@ static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direc
             }
         }
 
-        if (b->parent != NULL && b->band[dir].honorParentLimits && byteCount > 0)
+        if (b->parent != nullptr && b->band[dir].honorParentLimits && byteCount > 0)
         {
             byteCount = bandwidthClamp(b->parent, now, dir, byteCount);
         }
@@ -406,7 +406,7 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
         bytesUsed(now, &band->piece, byteCount);
     }
 
-    if (b->parent != NULL)
+    if (b->parent != nullptr)
     {
         tr_bandwidthUsed(b->parent, dir, byteCount, isPieceData, now);
     }

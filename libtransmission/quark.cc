@@ -450,7 +450,7 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
         bsearch(&tmp, my_static, n_static, sizeof(struct tr_key_struct), compareKeys));
 
     bool success = false;
-    if (match != NULL)
+    if (match != nullptr)
     {
         *setme = match - my_static;
         success = true;
@@ -492,7 +492,7 @@ tr_quark tr_quark_new(void const* str, size_t len)
 {
     tr_quark ret = TR_KEY_NONE;
 
-    if (str != NULL)
+    if (str != nullptr)
     {
         if (len == TR_BAD_SIZE)
         {
@@ -521,7 +521,7 @@ char const* tr_quark_get_string(tr_quark q, size_t* len)
         tmp = static_cast<struct tr_key_struct const*>(tr_ptrArrayNth(&my_runtime, q - TR_N_KEYS));
     }
 
-    if (len != NULL)
+    if (len != nullptr)
     {
         *len = tmp->len;
     }
