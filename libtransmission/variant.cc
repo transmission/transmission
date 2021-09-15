@@ -753,7 +753,7 @@ public:
 
     tr_variant const* nextChild()
     {
-        if (child_index >= v.val.l.count)
+        if (!tr_variantIsContainer(&v) || (child_index >= v.val.l.count))
         {
             return nullptr;
         }
