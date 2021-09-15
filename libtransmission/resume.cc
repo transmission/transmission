@@ -23,10 +23,12 @@
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
 
-enum
+namespace
 {
-    MAX_REMEMBERED_PEERS = 200
-};
+
+constexpr int MAX_REMEMBERED_PEERS = 200;
+
+} // unnamed namespace
 
 static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
