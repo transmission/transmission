@@ -1094,6 +1094,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
         }
     }
 
+    set_system_error(error, errno);
     return false;
 }
 
