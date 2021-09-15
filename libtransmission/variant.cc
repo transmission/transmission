@@ -17,6 +17,7 @@
 
 #include <algorithm> // std::sort
 #include <errno.h>
+#include <stack>
 #include <stdlib.h> /* strtod() */
 #include <string.h>
 #include <vector>
@@ -741,14 +742,38 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 
 class WalkNode
 {
+public:
+    WalkNode(tr_variant const* v_in, bool sort_dicts)
+        : v{ *v_in }
+    {
+        if (sort_dicts && tr_variantIsDict(v_in))
+        {
+            sortByKey();
+        }
+    }
+
+    tr_variant const* nextChild()
+    {
+        if (!tr_variantIsContainer(&v) || (child_index >= v.val.l.count))
+        {
+            return nullptr;
+        }
+
+        auto idx = child_index++;
+        if (!sorted.empty())
+        {
+            idx = sorted[idx];
+        }
+
+        return v.val.l.vals + idx;
+    }
+
+    bool is_visited = false;
+
+    // Shallow bitwise copy of the variant passed to the constructor
+    tr_variant const v = {};
+
 private:
-    // When walking `v`'s children, this is the index of the next child
-    size_t child_index = 0;
-
-    // When `v` is a dict, this is its children's indices sorted by key.
-    // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
-
     void sortByKey()
     {
         auto const n = v.val.l.count;
@@ -766,11 +791,7 @@ private:
             tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
         }
 
-        auto const compare = [](ByKey const& a, ByKey const& b)
-        {
-            return strcmp(a.key, b.key) < 0;
-        };
-        std::sort(std::begin(tmp), std::end(tmp), compare);
+        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
 
         //  keep the sorted indices
 
@@ -781,36 +802,12 @@ private:
         }
     }
 
-public:
-    bool is_visited = false;
+    // When walking `v`'s children, this is the index of the next child
+    size_t child_index = 0;
 
-    // Shallow bitwise copy of the variant passed to the constructor
-    tr_variant const v = {};
-
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
-    {
-        if (sort_dicts && tr_variantIsDict(v_in))
-        {
-            sortByKey();
-        }
-    }
-
-    tr_variant const* nextChild()
-    {
-        if (child_index >= v.val.l.count)
-        {
-            return nullptr;
-        }
-
-        auto idx = child_index++;
-        if (!sorted.empty())
-        {
-            idx = sorted[idx];
-        }
-
-        return v.val.l.vals + idx;
-    }
+    // When `v` is a dict, this is its children's indices sorted by key.
+    // Bencoded dicts must be sorted, so this is useful when writing benc.
+    std::vector<size_t> sorted;
 };
 
 /**
@@ -820,12 +817,12 @@ public:
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    auto stack = std::vector<WalkNode>{};
-    stack.emplace_back(v_in, sort_dicts);
+    auto stack = std::stack<WalkNode>{};
+    stack.emplace(v_in, sort_dicts);
 
     while (!stack.empty())
     {
-        auto& node = stack.back();
+        auto& node = stack.top();
         tr_variant const* v;
 
         if (!node.is_visited)
@@ -833,7 +830,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
             v = &node.v;
             node.is_visited = true;
         }
-        else if (tr_variantIsContainer(&node.v) && ((v = node.nextChild())))
+        else if ((v = node.nextChild()) != nullptr)
         {
             if (tr_variantIsDict(&node.v))
             {
@@ -849,7 +846,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 walkFuncs->containerEndFunc(&node.v, user_data);
             }
 
-            stack.pop_back();
+            stack.pop();
             continue;
         }
 
@@ -880,7 +877,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 }
                 else
                 {
-                    stack.emplace_back(v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
                 break;
 
@@ -891,7 +888,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 }
                 else
                 {
-                    stack.emplace_back(v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
                 break;
 
