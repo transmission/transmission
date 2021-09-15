@@ -81,7 +81,7 @@ struct UTPSocket* UTP_Create(SendToProc* send_to_proc, void* send_to_userdata, s
     TR_UNUSED(addrlen);
 
     errno = ENOSYS;
-    return NULL;
+    return nullptr;
 }
 
 void tr_utpClose(tr_session* ss)
@@ -181,11 +181,11 @@ static void timer_callback(evutil_socket_t s, short type, void* vsession)
 
 int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && ss->utp_timer == NULL)
+    if (!ss->isClosed && ss->utp_timer == nullptr)
     {
         ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
 
-        if (ss->utp_timer == NULL)
+        if (ss->utp_timer == nullptr)
         {
             return -1;
         }
@@ -198,10 +198,10 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
 
 void tr_utpClose(tr_session* session)
 {
-    if (session->utp_timer != NULL)
+    if (session->utp_timer != nullptr)
     {
         evtimer_del(session->utp_timer);
-        session->utp_timer = NULL;
+        session->utp_timer = nullptr;
     }
 }
 

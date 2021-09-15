@@ -38,14 +38,14 @@ int main(int argc, char** argv)
 
     if (test_action == "--dump-args")
     {
-        for (size_t i = 3; i < argc; ++i)
+        for (int i = 3; i < argc; ++i)
         {
             tr_sys_file_write_line(fd, argv[i], nullptr);
         }
     }
     else if (test_action == "--dump-env")
     {
-        for (size_t i = 3; i < argc; ++i)
+        for (int i = 3; i < argc; ++i)
         {
             char* const value = tr_env_get_string(argv[i], "<null>");
             tr_sys_file_write_line(fd, value, nullptr);

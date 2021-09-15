@@ -41,7 +41,7 @@ static bool getShadowInt(uint8_t ch, int* setme)
     char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
     char const* pch = strchr(str, ch);
 
-    if (pch == NULL)
+    if (pch == nullptr)
     {
         return false;
     }
@@ -55,7 +55,7 @@ static bool getFDMInt(uint8_t ch, int* setme)
     char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()";
     char const* pch = strchr(str, ch);
 
-    if (pch == NULL)
+    if (pch == nullptr)
     {
         return false;
     }
@@ -69,7 +69,7 @@ static int strint(void const* pch, int span)
     char tmp[64];
     memcpy(tmp, pch, span);
     tmp[span] = '\0';
-    return strtol(tmp, NULL, 0);
+    return strtol(tmp, nullptr, 0);
 }
 
 static char const* getMnemonicEnd(uint8_t ch)
@@ -150,7 +150,7 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
     int major;
     int minor;
     char const* name;
-    char const* mod = NULL;
+    char const* mod = nullptr;
 
     if (strncmp(chid, "exbc", 4) == 0)
     {
@@ -197,7 +197,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 
     *buf = '\0';
 
-    if (id == NULL)
+    if (id == nullptr)
     {
         return buf;
     }
@@ -907,9 +907,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         int b;
         int c;
 
-        if (strchr("AOQRSTU", id[0]) != NULL && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
+        if (strchr("AOQRSTU", id[0]) != nullptr && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) &&
+            getShadowInt(id[3], &c))
         {
-            char const* name = NULL;
+            char const* name = nullptr;
 
             switch (id[0])
             {
@@ -942,7 +943,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 break;
             }
 
-            if (name != NULL)
+            if (name != nullptr)
             {
                 tr_snprintf(buf, buflen, "%s %d.%d.%d", name, a, b, c);
                 return buf;

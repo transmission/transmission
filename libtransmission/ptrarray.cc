@@ -17,10 +17,10 @@
 
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
-    TR_ASSERT(p != NULL);
-    TR_ASSERT(p->items != NULL || p->n_items == 0);
+    TR_ASSERT(p != nullptr);
+    TR_ASSERT(p->items != nullptr || p->n_items == 0);
 
-    if (func != NULL)
+    if (func != nullptr)
     {
         tr_ptrArrayForeach(p, func);
     }
@@ -30,9 +30,9 @@ void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 
 void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
-    TR_ASSERT(t != NULL);
-    TR_ASSERT(t->items != NULL || t->n_items == 0);
-    TR_ASSERT(func != NULL);
+    TR_ASSERT(t != nullptr);
+    TR_ASSERT(t->items != nullptr || t->n_items == 0);
+    TR_ASSERT(func != nullptr);
 
     for (int i = 0; i < t->n_items; ++i)
     {
@@ -70,7 +70,7 @@ int tr_ptrArrayInsert(tr_ptrArray* t, void* ptr, int pos)
 
 void* tr_ptrArrayPop(tr_ptrArray* t)
 {
-    void* ret = NULL;
+    void* ret = nullptr;
 
     if (t->n_items != 0)
     {
@@ -152,7 +152,7 @@ int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, tr_voidptr_comp
         }
     }
 
-    if (exact_match != NULL)
+    if (exact_match != nullptr)
     {
         *exact_match = match;
     }
@@ -169,7 +169,7 @@ int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, tr_voidptr_comp
 
 static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, tr_voidptr_compare_func compare)
 {
-    if (t->items == NULL)
+    if (t->items == nullptr)
     {
         TR_ASSERT(t->n_items == 0);
     }
@@ -203,7 +203,7 @@ int tr_ptrArrayInsertSorted(tr_ptrArray* t, void* ptr, tr_voidptr_compare_func c
     int ret;
     assertArrayIsSortedAndUnique(t, compare);
 
-    pos = tr_ptrArrayLowerBound(t, ptr, compare, NULL);
+    pos = tr_ptrArrayLowerBound(t, ptr, compare, nullptr);
     ret = tr_ptrArrayInsert(t, ptr, pos);
 
     assertIndexIsSortedAndUnique(t, ret, compare);
@@ -214,14 +214,14 @@ void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_
 {
     bool match = false;
     int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
-    return match ? t->items[pos] : NULL;
+    return match ? t->items[pos] : nullptr;
 }
 
 static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
 {
     int pos;
     bool match;
-    void* ret = NULL;
+    void* ret = nullptr;
 
     assertArrayIsSortedAndUnique(t, compare);
 
@@ -234,7 +234,7 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_vo
         tr_ptrArrayErase(t, pos, pos + 1);
     }
 
-    TR_ASSERT(ret == NULL || compare(ret, ptr) == 0);
+    TR_ASSERT(ret == nullptr || compare(ret, ptr) == 0);
     return ret;
 }
 
@@ -248,9 +248,9 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
 
 #else
 
-    TR_ASSERT(removed != NULL);
+    TR_ASSERT(removed != nullptr);
     TR_ASSERT(removed == ptr);
-    TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == NULL);
+    TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == nullptr);
 
 #endif
 }
