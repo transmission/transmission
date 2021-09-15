@@ -1576,7 +1576,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
     tr_scrape_request requests[MAX_SCRAPES_PER_UPKEEP] = {};
 
     /* batch as many info_hashes into a request as we can */
-    for (auto& tier : tiers)
+    for (auto* tier : tiers)
     {
         struct tr_scrape_info* const scrape_info = tier->currentTracker->scrape_info;
         uint8_t const* hash = tier->tor->info.hash;
@@ -1748,11 +1748,11 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
             std::begin(announce_me),
             std::begin(announce_me) + MAX_ANNOUNCES_PER_UPKEEP,
             std::end(announce_me),
-            [](tr_tier const* a, tr_tier const* b) { return compareAnnounceTiers(a, b) < 0; });
+            [](auto const* a, auto const* b) { return compareAnnounceTiers(a, b) < 0; });
         announce_me.resize(MAX_ANNOUNCES_PER_UPKEEP);
     }
 
-    for (auto& tier : announce_me)
+    for (auto*& tier : announce_me)
     {
         tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
         tierAnnounce(announcer, tier);

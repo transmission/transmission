@@ -3044,12 +3044,12 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
             std::begin(candidates),
             std::begin(candidates) + num_wanted,
             std::end(candidates),
-            [](tr_torrent* a, tr_torrent* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
+            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
         candidates.resize(num_wanted);
     }
 
     // add them to the return array
-    for (auto const& candidate : candidates)
+    for (auto* candidate : candidates)
     {
         tr_ptrArrayAppend(setme, candidate);
     }

@@ -4317,7 +4317,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
             candidates,
             candidates + max,
             candidates + n_candidates,
-            [](peer_candidate const& a, peer_candidate const& b) { return a.score < b.score; });
+            [](auto const& a, auto const& b) { return a.score < b.score; });
     }
 
     TR_ASSERT(checkBestScoresComeFirst(candidates, *candidateCount, max));
