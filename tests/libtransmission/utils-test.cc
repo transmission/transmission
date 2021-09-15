@@ -197,31 +197,6 @@ TEST_F(UtilsTest, lowerbound)
     }
 }
 
-TEST_F(UtilsTest, trQuickfindfirstk)
-{
-    auto const run_test = [](size_t const k, size_t const n, int* buf, int range)
-    {
-        // populate buf with random ints
-        std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
-
-        // find the best k
-        tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
-
-        // confirm that the smallest K ints are in the first slots K slots in buf
-        auto const* highest_low = std::max_element(buf, buf + k);
-        auto const* lowest_high = std::min_element(buf + k, buf + n);
-        EXPECT_LE(highest_low, lowest_high);
-    };
-
-    auto constexpr K = size_t{ 10 };
-    auto constexpr NumTrials = size_t{ 1000 };
-    auto buf = std::array<int, 100>{};
-    for (auto i = 0; i != NumTrials; ++i)
-    {
-        run_test(K, buf.size(), buf.data(), 100);
-    }
-}
-
 TEST_F(UtilsTest, trMemmem)
 {
     auto const haystack = std::string{ "abcabcabcabc" };

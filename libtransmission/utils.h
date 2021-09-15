@@ -218,9 +218,6 @@ int tr_lowerBound(
     tr_voidptr_compare_func compar,
     bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
-/** @brief moves the best k items to the first slots in the array. O(n) */
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k);
-
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
  * @return a newly-allocated string that can be freed with tr_free()
