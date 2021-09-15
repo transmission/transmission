@@ -741,14 +741,38 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 
 class WalkNode
 {
+public:
+    WalkNode(tr_variant const* v_in, bool sort_dicts)
+        : v{ *v_in }
+    {
+        if (sort_dicts && tr_variantIsDict(v_in))
+        {
+            sortByKey();
+        }
+    }
+
+    tr_variant const* nextChild()
+    {
+        if (child_index >= v.val.l.count)
+        {
+            return nullptr;
+        }
+
+        auto idx = child_index++;
+        if (!sorted.empty())
+        {
+            idx = sorted[idx];
+        }
+
+        return v.val.l.vals + idx;
+    }
+
+    bool is_visited = false;
+
+    // Shallow bitwise copy of the variant passed to the constructor
+    tr_variant const v = {};
+
 private:
-    // When walking `v`'s children, this is the index of the next child
-    size_t child_index = 0;
-
-    // When `v` is a dict, this is its children's indices sorted by key.
-    // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
-
     void sortByKey()
     {
         auto const n = v.val.l.count;
@@ -781,36 +805,12 @@ private:
         }
     }
 
-public:
-    bool is_visited = false;
+    // When walking `v`'s children, this is the index of the next child
+    size_t child_index = 0;
 
-    // Shallow bitwise copy of the variant passed to the constructor
-    tr_variant const v = {};
-
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
-    {
-        if (sort_dicts && tr_variantIsDict(v_in))
-        {
-            sortByKey();
-        }
-    }
-
-    tr_variant const* nextChild()
-    {
-        if (child_index >= v.val.l.count)
-        {
-            return nullptr;
-        }
-
-        auto idx = child_index++;
-        if (!sorted.empty())
-        {
-            idx = sorted[idx];
-        }
-
-        return v.val.l.vals + idx;
-    }
+    // When `v` is a dict, this is its children's indices sorted by key.
+    // Bencoded dicts must be sorted, so this is useful when writing benc.
+    std::vector<size_t> sorted;
 };
 
 /**
