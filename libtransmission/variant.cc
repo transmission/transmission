@@ -790,11 +790,7 @@ private:
             tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
         }
 
-        auto const compare = [](ByKey const& a, ByKey const& b)
-        {
-            return strcmp(a.key, b.key) < 0;
-        };
-        std::sort(std::begin(tmp), std::end(tmp), compare);
+        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
 
         //  keep the sorted indices
 
