@@ -17,6 +17,7 @@
 
 #include <algorithm> // std::sort
 #include <errno.h>
+#include <stack>
 #include <stdlib.h> /* strtod() */
 #include <string.h>
 #include <vector>
@@ -816,12 +817,12 @@ private:
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    auto stack = std::vector<WalkNode>{};
-    stack.emplace_back(v_in, sort_dicts);
+    auto stack = std::stack<WalkNode>{};
+    stack.emplace(v_in, sort_dicts);
 
     while (!stack.empty())
     {
-        auto& node = stack.back();
+        auto& node = stack.top();
         tr_variant const* v;
 
         if (!node.is_visited)
@@ -845,7 +846,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 walkFuncs->containerEndFunc(&node.v, user_data);
             }
 
-            stack.pop_back();
+            stack.pop();
             continue;
         }
 
@@ -876,7 +877,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 }
                 else
                 {
-                    stack.emplace_back(v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
                 break;
 
@@ -887,7 +888,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 }
                 else
                 {
-                    stack.emplace_back(v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
                 break;
 
