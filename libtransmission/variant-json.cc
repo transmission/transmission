@@ -54,10 +54,10 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    auto* parent = static_cast<tr_variant*>(tr_ptrArrayEmpty(&data->stack) ? NULL : tr_ptrArrayBack(&data->stack));
+    auto* parent = static_cast<tr_variant*>(tr_ptrArrayEmpty(&data->stack) ? nullptr : tr_ptrArrayBack(&data->stack));
 
-    tr_variant* node = NULL;
-    if (parent == NULL)
+    tr_variant* node = nullptr;
+    if (parent == nullptr)
     {
         node = data->top;
     }
@@ -65,11 +65,11 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     {
         node = tr_variantListAdd(parent);
     }
-    else if (tr_variantIsDict(parent) && data->key != NULL)
+    else if (tr_variantIsDict(parent) && data->key != nullptr)
     {
         node = tr_variantDictAdd(parent, tr_quark_new(data->key, data->keylen));
 
-        data->key = NULL;
+        data->key = nullptr;
         data->keylen = 0;
     }
 
@@ -82,7 +82,7 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    if (data->source != NULL)
+    if (data->source != nullptr)
     {
         tr_logAddError(
             "JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
@@ -135,7 +135,7 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct js
 /* like sscanf(in+2, "%4x", &val) but less slow */
 static bool decode_hex_string(char const* in, unsigned int* setme)
 {
-    TR_ASSERT(in != NULL);
+    TR_ASSERT(in != nullptr);
 
     unsigned int val = 0;
     char const* const end = in + 6;
@@ -290,7 +290,7 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
     in_end = jsn->base + state->pos_cur;
     in_len = in_end - in_begin;
 
-    if (memchr(in_begin, '\\', in_len) == NULL)
+    if (memchr(in_begin, '\\', in_len) == nullptr)
     {
         /* it's not escaped */
         ret = in_begin;
@@ -338,13 +338,13 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitReal(get_node(jsn), strtod(begin, NULL));
+            tr_variantInitReal(get_node(jsn), strtod(begin, nullptr));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, NULL, 10));
+            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, nullptr, 10));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
         {
@@ -375,7 +375,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
 
     data.error = 0;
     data.has_content = false;
-    data.key = NULL;
+    data.key = nullptr;
     data.top = setme_variant;
     data.stack = {};
     data.source = source;
@@ -396,7 +396,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     }
 
     /* maybe set the end ptr */
-    if (setme_end != NULL)
+    if (setme_end != nullptr)
     {
         *setme_end = ((char const*)vbuf) + jsn->pos;
     }
@@ -405,7 +405,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     error = data.error;
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
-    tr_ptrArrayDestruct(&data.stack, NULL);
+    tr_ptrArrayDestruct(&data.stack, nullptr);
     jsonsl_destroy(jsn);
     return error;
 }
@@ -446,7 +446,7 @@ static void jsonIndent(struct jsonWalk* data)
 
 static void jsonChildFunc(struct jsonWalk* data)
 {
-    if (data->parents != NULL && data->parents->data != NULL)
+    if (data->parents != nullptr && data->parents->data != nullptr)
     {
         auto* pstate = static_cast<struct ParentState*>(data->parents->data);
 
@@ -560,7 +560,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     struct evbuffer_iovec vec[1];
     auto* data = static_cast<struct jsonWalk*>(vdata);
 
-    char const* str = NULL;
+    char const* str = nullptr;
     size_t len = 0;
     (void)tr_variantGetStr(val, &str, &len);
     auto const* it = reinterpret_cast<unsigned char const*>(str);
@@ -709,7 +709,7 @@ void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
 
     data.doIndent = !lean;
     data.out = buf;
-    data.parents = NULL;
+    data.parents = nullptr;
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 

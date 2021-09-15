@@ -115,26 +115,26 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     int wsCount = 0;
     char* tr[MAX_TRACKERS];
     char* ws[MAX_WEBSEEDS];
-    char* displayName = NULL;
+    char* displayName = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
-    tr_magnet_info* info = NULL;
+    tr_magnet_info* info = nullptr;
 
-    if (uri != NULL && strncmp(uri, "magnet:?", 8) == 0)
+    if (uri != nullptr && strncmp(uri, "magnet:?", 8) == 0)
     {
         for (char const* walk = uri + 8; !tr_str_is_empty(walk);)
         {
             char const* key = walk;
             char const* delim = strchr(key, '=');
-            char const* val = delim == NULL ? NULL : delim + 1;
-            char const* next = strchr(delim == NULL ? key : val, '&');
+            char const* val = delim == nullptr ? nullptr : delim + 1;
+            char const* next = strchr(delim == nullptr ? key : val, '&');
             size_t keylen;
             size_t vallen;
 
-            if (delim != NULL)
+            if (delim != nullptr)
             {
                 keylen = (size_t)(delim - key);
             }
-            else if (next != NULL)
+            else if (next != nullptr)
             {
                 keylen = (size_t)(next - key);
             }
@@ -143,11 +143,11 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 keylen = strlen(key);
             }
 
-            if (val == NULL)
+            if (val == nullptr)
             {
                 vallen = 0;
             }
-            else if (next != NULL)
+            else if (next != nullptr)
             {
                 vallen = (size_t)(next - val);
             }
@@ -156,7 +156,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 vallen = strlen(val);
             }
 
-            if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != NULL && strncmp(val, "urn:btih:", 9) == 0)
+            if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != nullptr && strncmp(val, "urn:btih:", 9) == 0)
             {
                 char const* hash = val + 9;
                 size_t const hashlen = vallen - 9;
@@ -173,7 +173,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 }
             }
 
-            if (displayName == NULL && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
+            if (displayName == nullptr && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
             {
                 displayName = tr_http_unescape(val, vallen);
             }
@@ -197,7 +197,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 ws[wsCount++] = tr_http_unescape(val, vallen);
             }
 
-            walk = next != NULL ? next + 1 : NULL;
+            walk = next != nullptr ? next + 1 : nullptr;
         }
     }
 
@@ -231,7 +231,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
 
 void tr_magnetFree(tr_magnet_info* info)
 {
-    if (info != NULL)
+    if (info != nullptr)
     {
         for (int i = 0; i < info->trackerCount; ++i)
         {
@@ -287,7 +287,7 @@ void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
     d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
     tr_variantDictAddRaw(d, TR_KEY_info_hash, info->hash, 20);
 
-    if (info->displayName != NULL)
+    if (info->displayName != nullptr)
     {
         tr_variantDictAddStr(d, TR_KEY_display_name, info->displayName);
     }

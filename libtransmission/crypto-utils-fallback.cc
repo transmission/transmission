@@ -51,20 +51,20 @@ bool tr_dh_secret_derive(
     size_t append_data_size,
     uint8_t* hash)
 {
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(hash != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(hash != nullptr);
 
     auto* handle = static_cast<struct tr_dh_secret*>(raw_handle);
 
     return tr_sha1(
         hash,
-        prepend_data == NULL ? "" : prepend_data,
-        prepend_data == NULL ? 0 : (int)prepend_data_size,
+        prepend_data == nullptr ? "" : prepend_data,
+        prepend_data == nullptr ? 0 : (int)prepend_data_size,
         handle->key,
         (int)handle->key_length,
         append_data,
-        append_data == NULL ? 0 : (int)append_data_size,
-        NULL);
+        append_data == nullptr ? 0 : (int)append_data_size,
+        nullptr);
 }
 
 void tr_dh_secret_free(tr_dh_secret_t handle)
@@ -80,7 +80,7 @@ tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 {
     TR_UNUSED(handle);
 
-    return NULL;
+    return nullptr;
 }
 
 bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
@@ -96,7 +96,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
     TR_UNUSED(der);
     TR_UNUSED(der_length);
 
-    return NULL;
+    return nullptr;
 }
 
 void tr_x509_cert_free(tr_x509_cert_t handle)

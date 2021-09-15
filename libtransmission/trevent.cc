@@ -206,7 +206,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
             dbgmsg("pipe eof reached... removing event listener");
             event_free(eh->pipeEvent);
             tr_netCloseSocket(eh->fds[0]);
-            event_base_loopexit(eh->base, NULL);
+            event_base_loopexit(eh->base, nullptr);
             break;
         }
 
@@ -250,7 +250,7 @@ static void libeventThreadFunc(void* veh)
 
     /* listen to the pipe's read fd */
     eh->pipeEvent = event_new(base, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh);
-    event_add(eh->pipeEvent, NULL);
+    event_add(eh->pipeEvent, nullptr);
     event_set_log_callback(logFunc);
 
     /* loop until all the events are done */
@@ -262,7 +262,7 @@ static void libeventThreadFunc(void* veh)
     /* shut down the thread */
     tr_lockFree(eh->lock);
     event_base_free(base);
-    eh->session->events = NULL;
+    eh->session->events = nullptr;
     tr_free(eh);
     tr_logAddDebug("Closing libevent thread");
 }
@@ -271,7 +271,7 @@ void tr_eventInit(tr_session* session)
 {
     tr_event_handle* eh;
 
-    session->events = NULL;
+    session->events = nullptr;
 
     eh = tr_new0(tr_event_handle, 1);
     eh->lock = tr_lockNew();
@@ -285,7 +285,7 @@ void tr_eventInit(tr_session* session)
     eh->thread = tr_threadNew(libeventThreadFunc, eh);
 
     /* wait until the libevent thread is running */
-    while (session->events == NULL)
+    while (session->events == nullptr)
     {
         tr_wait_msec(100);
     }
@@ -295,7 +295,7 @@ void tr_eventClose(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->events == NULL)
+    if (session->events == nullptr)
     {
         return;
     }
@@ -303,7 +303,7 @@ void tr_eventClose(tr_session* session)
     session->events->die = true;
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "closing trevent pipe");
+        tr_logAddDeep(__FILE__, __LINE__, nullptr, "closing trevent pipe");
     }
 
     tr_netCloseSocket(session->events->fds[1]);
@@ -316,7 +316,7 @@ void tr_eventClose(tr_session* session)
 bool tr_amInEventThread(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(session->events != NULL);
+    TR_ASSERT(session->events != nullptr);
 
     return tr_amInThread(session->events->thread);
 }
@@ -328,7 +328,7 @@ bool tr_amInEventThread(tr_session const* session)
 void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_data)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(session->events != NULL);
+    TR_ASSERT(session->events != nullptr);
 
     if (tr_amInThread(session->events->thread))
     {

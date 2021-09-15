@@ -31,7 +31,7 @@ static void handle_sigchld(int i)
     do
     {
         /* FIXME: Only check for our own PIDs */
-        rc = waitpid(-1, NULL, WNOHANG);
+        rc = waitpid(-1, nullptr, WNOHANG);
     } while (rc > 0 || (rc == -1 && errno == EINTR));
 
     /* FIXME: Call old handler, if any */
@@ -39,12 +39,12 @@ static void handle_sigchld(int i)
 
 static void set_system_error(tr_error** error, int code, char const* what)
 {
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
 
-    if (what == NULL)
+    if (what == nullptr)
     {
         tr_error_set_literal(error, code, tr_strerror(code));
     }
@@ -56,9 +56,9 @@ static void set_system_error(tr_error** error, int code, char const* what)
 
 static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char const* work_dir, int pipe_fd)
 {
-    if (env != NULL)
+    if (env != nullptr)
     {
-        for (size_t i = 0; env[i] != NULL; ++i)
+        for (size_t i = 0; env[i] != nullptr; ++i)
         {
             if (putenv(env[i]) != 0)
             {
@@ -67,7 +67,7 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
         }
     }
 
-    if (work_dir != NULL && chdir(work_dir) == -1)
+    if (work_dir != nullptr && chdir(work_dir) == -1)
     {
         goto FAIL;
     }

@@ -126,7 +126,7 @@ void tr_bandwidthDestruct(tr_bandwidth* bandwidth);
 /** @brief test to see if the pointer refers to a live bandwidth object */
 static inline bool tr_isBandwidth(tr_bandwidth const* b)
 {
-    return b != NULL && b->magicNumber == BANDWIDTH_MAGIC_NUMBER;
+    return b != nullptr && b->magicNumber == BANDWIDTH_MAGIC_NUMBER;
 }
 
 /******

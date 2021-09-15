@@ -38,16 +38,16 @@ struct FileList
 
 static struct FileList* getFiles(char const* dir, char const* base, struct FileList* list)
 {
-    if (dir == NULL || base == NULL)
+    if (dir == nullptr || base == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    char* buf = tr_buildPath(dir, base, NULL);
+    char* buf = tr_buildPath(dir, base, nullptr);
     (void)tr_sys_path_native_separators(buf);
 
     tr_sys_path_info info;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
     if (!tr_sys_path_get_info(buf, 0, &info, &error))
     {
         tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
@@ -56,13 +56,13 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, NULL) : TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, nullptr) : TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
 
-        while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
+        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (name[0] != '.') /* skip dotfiles */
             {
@@ -70,7 +70,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
             }
         }
 
-        tr_sys_dir_close(odir, NULL);
+        tr_sys_dir_close(odir, nullptr);
     }
     else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
     {
@@ -134,12 +134,12 @@ static int builderFileCompare(void const* va, void const* vb)
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
-    char* const real_top = tr_sys_path_resolve(topFileArg, NULL);
+    char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
 
-    if (real_top == NULL)
+    if (real_top == nullptr)
     {
         /* TODO: Better error reporting */
-        return NULL;
+        return nullptr;
     }
 
     struct FileList* files;
@@ -149,20 +149,20 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     {
         tr_sys_path_info info;
-        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY;
+        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY;
     }
 
     /* build a list of files containing top file and,
        if it's a directory, all of its children */
     {
-        char* dir = tr_sys_path_dirname(ret->top, NULL);
-        char* base = tr_sys_path_basename(ret->top, NULL);
-        files = getFiles(dir, base, NULL);
+        char* dir = tr_sys_path_dirname(ret->top, nullptr);
+        char* base = tr_sys_path_basename(ret->top, nullptr);
+        files = getFiles(dir, base, nullptr);
         tr_free(base);
         tr_free(dir);
     }
 
-    for (struct FileList* walk = files; walk != NULL; walk = walk->next)
+    for (struct FileList* walk = files; walk != nullptr; walk = walk->next)
     {
         ++ret->fileCount;
     }
@@ -170,7 +170,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
     int i = 0;
-    while (files != NULL)
+    while (files != nullptr)
     {
         struct FileList* const tmp = files;
         files = files->next;
@@ -223,7 +223,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 
 void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 {
-    if (builder != NULL)
+    if (builder != nullptr)
     {
         for (uint32_t i = 0; i < builder->fileCount; ++i)
         {
@@ -255,7 +255,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     uint8_t* ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
     uint8_t* walk = ret;
     uint64_t off = 0;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
     if (b->totalSize == 0)
     {
@@ -275,7 +275,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         tr_free(buf);
         tr_free(ret);
         tr_error_free(error);
-        return NULL;
+        return nullptr;
     }
 
     while (totalRemain != 0)
@@ -290,7 +290,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         {
             uint64_t const n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
-            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, nullptr);
             bufptr += n_read;
             off += n_read;
             leftInPiece -= n_read;
@@ -298,7 +298,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
             if (off == b->files[fileIndex].size)
             {
                 off = 0;
-                tr_sys_file_close(fd, NULL);
+                tr_sys_file_close(fd, nullptr);
                 fd = TR_BAD_SYS_FILE;
 
                 if (++fileIndex < b->fileCount)
@@ -313,7 +313,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
                         tr_free(buf);
                         tr_free(ret);
                         tr_error_free(error);
-                        return NULL;
+                        return nullptr;
                     }
                 }
             }
@@ -321,7 +321,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
         TR_ASSERT(bufptr - buf == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
-        tr_sha1(walk, buf, (int)thisPieceSize, NULL);
+        tr_sha1(walk, buf, (int)thisPieceSize, nullptr);
         walk += SHA_DIGEST_LENGTH;
 
         if (b->abortFlag)
@@ -339,7 +339,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
     }
 
     tr_free(buf);
@@ -374,7 +374,7 @@ static void getFileInfo(
         char* walk = filename;
         char const* token;
 
-        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != NULL)
+        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != nullptr)
         {
             if (!tr_str_is_empty(token))
             {
@@ -410,9 +410,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    base = tr_sys_path_basename(builder->top, NULL);
+    base = tr_sys_path_basename(builder->top, nullptr);
 
-    if (base != NULL)
+    if (base != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
         tr_free(base);
@@ -420,7 +420,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    if ((pch = getHashInfo(builder)) != NULL)
+    if ((pch = getHashInfo(builder)) != nullptr)
     {
         tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
         tr_free(pch);
@@ -456,7 +456,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     if (builder->result == TR_MAKEMETA_OK && builder->trackerCount != 0)
     {
         int prevTier = -1;
-        tr_variant* tier = NULL;
+        tr_variant* tier = nullptr;
 
         if (builder->trackerCount > 1)
         {
@@ -485,7 +485,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         }
 
         tr_variantDictAddStr(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
-        tr_variantDictAddInt(&top, TR_KEY_creation_date, time(NULL));
+        tr_variantDictAddInt(&top, TR_KEY_creation_date, time(nullptr));
         tr_variantDictAddStr(&top, TR_KEY_encoding, "UTF-8");
         makeInfoDict(tr_variantDictAddDict(&top, TR_KEY_info, 666), builder);
     }
@@ -516,15 +516,15 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 ****
 ***/
 
-static tr_metainfo_builder* queue = NULL;
+static tr_metainfo_builder* queue = nullptr;
 
-static tr_thread* workerThread = NULL;
+static tr_thread* workerThread = nullptr;
 
 static tr_lock* getQueueLock(void)
 {
-    static tr_lock* lock = NULL;
+    static tr_lock* lock = nullptr;
 
-    if (lock == NULL)
+    if (lock == nullptr)
     {
         lock = tr_lockNew();
     }
@@ -538,13 +538,13 @@ static void makeMetaWorkerFunc(void* user_data)
 
     for (;;)
     {
-        tr_metainfo_builder* builder = NULL;
+        tr_metainfo_builder* builder = nullptr;
 
         /* find the next builder to process */
         tr_lock* lock = getQueueLock();
         tr_lockLock(lock);
 
-        if (queue != NULL)
+        if (queue != nullptr)
         {
             builder = queue;
             queue = queue->nextBuilder;
@@ -553,7 +553,7 @@ static void makeMetaWorkerFunc(void* user_data)
         tr_lockUnlock(lock);
 
         /* if no builders, this worker thread is done */
-        if (builder == NULL)
+        if (builder == nullptr)
         {
             break;
         }
@@ -561,7 +561,7 @@ static void makeMetaWorkerFunc(void* user_data)
         tr_realMakeMetaInfo(builder);
     }
 
-    workerThread = NULL;
+    workerThread = nullptr;
 }
 
 void tr_makeMetaInfo(
@@ -616,9 +616,9 @@ void tr_makeMetaInfo(
     builder->nextBuilder = queue;
     queue = builder;
 
-    if (workerThread == NULL)
+    if (workerThread == nullptr)
     {
-        workerThread = tr_threadNew(makeMetaWorkerFunc, NULL);
+        workerThread = tr_threadNew(makeMetaWorkerFunc, nullptr);
     }
 
     tr_lockUnlock(lock);

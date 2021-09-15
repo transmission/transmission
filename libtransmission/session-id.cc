@@ -64,14 +64,14 @@ static char* get_session_id_lock_file_path(char const* session_id)
 
 static tr_sys_file_t create_session_id_lock_file(char const* session_id)
 {
-    if (session_id == NULL)
+    if (session_id == nullptr)
     {
         return TR_BAD_SYS_FILE;
     }
 
     char* lock_file_path = get_session_id_lock_file_path(session_id);
     tr_sys_file_t lock_file;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
     lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
 
@@ -86,12 +86,12 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
         }
         else
         {
-            tr_sys_file_close(lock_file, NULL);
+            tr_sys_file_close(lock_file, nullptr);
             lock_file = TR_BAD_SYS_FILE;
         }
     }
 
-    if (error != NULL)
+    if (error != nullptr)
     {
         tr_logAddError("Unable to create session lock file (%d): %s", error->code, error->message);
         tr_error_free(error);
@@ -105,13 +105,13 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
 {
     if (lock_file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(lock_file, NULL);
+        tr_sys_file_close(lock_file, nullptr);
     }
 
-    if (session_id != NULL)
+    if (session_id != nullptr)
     {
         char* lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_path_remove(lock_file_path, NULL);
+        tr_sys_path_remove(lock_file_path, nullptr);
         tr_free(lock_file_path);
     }
 }
@@ -128,7 +128,7 @@ tr_session_id_t tr_session_id_new(void)
 
 void tr_session_id_free(tr_session_id_t session_id)
 {
-    if (session_id == NULL)
+    if (session_id == nullptr)
     {
         return;
     }
@@ -146,7 +146,7 @@ char const* tr_session_id_get_current(tr_session_id_t session_id)
 {
     time_t const now = tr_time();
 
-    if (session_id->current_value == NULL || now >= session_id->expires_at)
+    if (session_id->current_value == nullptr || now >= session_id->expires_at)
     {
         destroy_session_id_lock_file(session_id->previous_lock_file, session_id->previous_value);
         tr_free(session_id->previous_value);
@@ -167,11 +167,11 @@ bool tr_session_id_is_local(char const* session_id)
 {
     bool ret = false;
 
-    if (session_id != NULL)
+    if (session_id != nullptr)
     {
         char* lock_file_path = get_session_id_lock_file_path(session_id);
         tr_sys_file_t lock_file;
-        tr_error* error = NULL;
+        tr_error* error = nullptr;
 
         lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ, 0, &error);
 
@@ -195,10 +195,10 @@ bool tr_session_id_is_local(char const* session_id)
                 tr_error_clear(&error);
             }
 
-            tr_sys_file_close(lock_file, NULL);
+            tr_sys_file_close(lock_file, nullptr);
         }
 
-        if (error != NULL)
+        if (error != nullptr)
         {
             tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
             tr_error_free(error);
