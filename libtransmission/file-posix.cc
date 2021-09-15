@@ -1059,7 +1059,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     // if specified by `flags`
     if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
     {
-        // FIXME: these functions haven't been reviewed in awhile.
+        // TODO: these functions haven't been reviewed in awhile.
         // It's possible that some are faster now & should be promoted
         // to 'always try' and/or replaced with fresher platform API.
         approaches.insert(
