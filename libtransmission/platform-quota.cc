@@ -87,9 +87,9 @@ static char const* getdev(char const* path)
     struct mnttab mnt;
     fp = fopen(_PATH_MOUNTED, "r");
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     while (getmntent(fp, &mnt) != -1)
@@ -109,12 +109,12 @@ static char const* getdev(char const* path)
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    while ((mnt = getmntent(fp)) != NULL)
+    while ((mnt = getmntent(fp)) != nullptr)
     {
         if (tr_strcmp0(path, mnt->mnt_dir) == 0)
         {
@@ -123,7 +123,7 @@ static char const* getdev(char const* path)
     }
 
     endmntent(fp);
-    return mnt != NULL ? mnt->mnt_fsname : NULL;
+    return mnt != nullptr ? mnt->mnt_fsname : nullptr;
 
 #endif
 
@@ -136,7 +136,7 @@ static char const* getdev(char const* path)
 
     if (n == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     for (int i = 0; i < n; i++)
@@ -147,7 +147,7 @@ static char const* getdev(char const* path)
         }
     }
 
-    return NULL;
+    return nullptr;
 
 #endif
 }
@@ -163,9 +163,9 @@ static char const* getfstype(char const* device)
     struct mnttab mnt;
     fp = fopen(_PATH_MOUNTED, "r");
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     while (getmntent(fp, &mnt) != -1)
@@ -185,12 +185,12 @@ static char const* getfstype(char const* device)
 
     fp = setmntent(_PATH_MOUNTED, "r");
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    while ((mnt = getmntent(fp)) != NULL)
+    while ((mnt = getmntent(fp)) != nullptr)
     {
         if (tr_strcmp0(device, mnt->mnt_fsname) == 0)
         {
@@ -199,7 +199,7 @@ static char const* getfstype(char const* device)
     }
 
     endmntent(fp);
-    return mnt != NULL ? mnt->mnt_type : NULL;
+    return mnt != nullptr ? mnt->mnt_type : nullptr;
 
 #endif
 
@@ -212,7 +212,7 @@ static char const* getfstype(char const* device)
 
     if (n == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     for (int i = 0; i < n; i++)
@@ -223,7 +223,7 @@ static char const* getfstype(char const* device)
         }
     }
 
-    return NULL;
+    return nullptr;
 
 #endif
 }
@@ -240,14 +240,14 @@ static char const* getblkdev(char const* path)
     {
         device = getdev(dir);
 
-        if (device != NULL)
+        if (device != nullptr)
         {
             break;
         }
 
         c = strrchr(dir, '/');
 
-        if (c != NULL)
+        if (c != nullptr)
         {
             *c = '\0';
         }
@@ -279,7 +279,7 @@ static int64_t getquota(char const* device)
 
     qh = quota_open(device);
 
-    if (qh == NULL)
+    if (qh == nullptr)
     {
         return -1;
     }
@@ -441,7 +441,7 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 
 #ifndef _WIN32
 
-    if (info->fstype != NULL && evutil_ascii_strcasecmp(info->fstype, "xfs") == 0)
+    if (info->fstype != nullptr && evutil_ascii_strcasecmp(info->fstype, "xfs") == 0)
     {
 #ifdef HAVE_XQM
         ret = getxfsquota(info->device);
@@ -470,11 +470,11 @@ static int64_t tr_getDiskFreeSpace(char const* path)
 
     wide_path = tr_win32_utf8_to_native(path, -1);
 
-    if (wide_path != NULL)
+    if (wide_path != nullptr)
     {
         ULARGE_INTEGER freeBytesAvailable;
 
-        if (GetDiskFreeSpaceExW(wide_path, &freeBytesAvailable, NULL, NULL))
+        if (GetDiskFreeSpaceExW(wide_path, &freeBytesAvailable, nullptr, nullptr))
         {
             ret = freeBytesAvailable.QuadPart;
         }
@@ -515,7 +515,7 @@ struct tr_device_info* tr_device_info_create(char const* path)
 
 void tr_device_info_free(struct tr_device_info* info)
 {
-    if (info != NULL)
+    if (info != nullptr)
     {
         tr_free(info->fstype);
         tr_free(info->device);
@@ -528,7 +528,7 @@ int64_t tr_device_info_get_free_space(struct tr_device_info const* info)
 {
     int64_t free_space;
 
-    if (info == NULL || info->path == NULL)
+    if (info == nullptr || info->path == nullptr)
     {
         errno = EINVAL;
         free_space = -1;

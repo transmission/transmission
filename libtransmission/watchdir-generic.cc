@@ -64,14 +64,14 @@ static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_generic* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
 
     TR_ASSERT(backend->base.free_func == &tr_watchdir_generic_free);
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         event_del(backend->event);
         event_free(backend->event);
@@ -91,7 +91,7 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 
     if ((backend
              ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
-        NULL)
+        nullptr)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto FAIL;
@@ -110,5 +110,5 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 
 FAIL:
     tr_watchdir_generic_free(BACKEND_DOWNCAST(backend));
-    return NULL;
+    return nullptr;
 }

@@ -7,9 +7,12 @@
  */
 
 #ifdef HAVE_MEMMEM
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
 #endif
+#endif
 
+#include <array> // std::array
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_DIG */
@@ -68,18 +71,18 @@ struct tm* tr_gmtime_r(time_t const* timep, struct tm* result)
 
 #elif defined(HAVE_GMTIME_S)
 
-    return gmtime_s(result, timep) == 0 ? result : NULL;
+    return gmtime_s(result, timep) == 0 ? result : nullptr;
 
 #else
 
     struct tm* p = gmtime(timep);
-    if (p != NULL)
+    if (p != nullptr)
     {
         *result = *p;
         return result;
     }
 
-    return NULL;
+    return nullptr;
 
 #endif
 }
@@ -92,18 +95,18 @@ struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
 
 #elif defined(HAVE_LOCALTIME_S)
 
-    return localtime_s(result, timep) == 0 ? result : NULL;
+    return localtime_s(result, timep) == 0 ? result : nullptr;
 
 #else
 
     struct tm* p = localtime(timep);
-    if (p != NULL)
+    if (p != nullptr)
     {
         *result = *p;
         return result;
     }
 
-    return NULL;
+    return nullptr;
 
 #endif
 }
@@ -117,7 +120,7 @@ int tr_gettimeofday(struct timeval* tv)
     FILETIME ft;
     uint64_t tmp = 0;
 
-    if (tv == NULL)
+    if (tv == nullptr)
     {
         errno = EINVAL;
         return -1;
@@ -139,7 +142,7 @@ int tr_gettimeofday(struct timeval* tv)
 
 #else
 
-    return gettimeofday(tv, NULL);
+    return gettimeofday(tv, nullptr);
 
 #endif
 }
@@ -150,19 +153,19 @@ int tr_gettimeofday(struct timeval* tv)
 
 void* tr_malloc(size_t size)
 {
-    return size != 0 ? malloc(size) : NULL;
+    return size != 0 ? malloc(size) : nullptr;
 }
 
 void* tr_malloc0(size_t size)
 {
-    return size != 0 ? calloc(1, size) : NULL;
+    return size != 0 ? calloc(1, size) : nullptr;
 }
 
 void* tr_realloc(void* p, size_t size)
 {
-    void* result = size != 0 ? realloc(p, size) : NULL;
+    void* result = size != 0 ? realloc(p, size) : nullptr;
 
-    if (result == NULL)
+    if (result == nullptr)
     {
         tr_free(p);
     }
@@ -172,7 +175,7 @@ void* tr_realloc(void* p, size_t size)
 
 void tr_free(void* p)
 {
-    if (p != NULL)
+    if (p != nullptr)
     {
         free(p);
     }
@@ -180,12 +183,12 @@ void tr_free(void* p)
 
 void tr_free_ptrv(void* const* p)
 {
-    if (p == NULL)
+    if (p == nullptr)
     {
         return;
     }
 
-    while (*p != NULL)
+    while (*p != nullptr)
     {
         tr_free(*p);
         ++p;
@@ -203,23 +206,14 @@ void* tr_memdup(void const* src, size_t byteCount)
 
 char const* tr_strip_positional_args(char const* str)
 {
-    char* out;
-    static size_t bufsize = 0;
-    static char* buf = NULL;
+    static auto buf = std::array<char, 512>{};
+
     char const* in = str;
-    size_t const len = str != NULL ? strlen(str) : 0;
+    size_t pos = 0;
 
-    if (buf == NULL || bufsize < len)
+    for (; str && *str && pos + 1 < buf.size(); ++str)
     {
-        bufsize = len * 2 + 1;
-        buf = tr_renew(char, buf, bufsize);
-    }
-
-    out = buf;
-
-    for (; !tr_str_is_empty(str); ++str)
-    {
-        *out++ = *str;
+        buf[pos++] = *str;
 
         if (*str == '%' && isdigit(str[1]))
         {
@@ -242,8 +236,9 @@ char const* tr_strip_positional_args(char const* str)
         }
     }
 
-    *out = '\0';
-    return (in == NULL || strcmp(buf, in) != 0) ? buf : in;
+    buf[pos] = '\0';
+
+    return in && !strcmp(buf.data(), in) ? in : buf.data();
 }
 
 /**
@@ -278,7 +273,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
     tr_sys_path_info info;
     tr_sys_file_t fd;
-    tr_error* my_error = NULL;
+    tr_error* my_error = nullptr;
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     /* try to stat the file */
@@ -286,14 +281,14 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     {
         tr_logAddDebug(err_fmt, path, my_error->message);
         tr_error_propagate(error, &my_error);
-        return NULL;
+        return nullptr;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
         tr_logAddError(err_fmt, path, _("Not a regular file"));
         tr_error_set_literal(error, TR_ERROR_EISDIR, _("Not a regular file"));
-        return NULL;
+        return nullptr;
     }
 
     /* file size should be able to fit into size_t */
@@ -309,21 +304,21 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     {
         tr_logAddError(err_fmt, path, my_error->message);
         tr_error_propagate(error, &my_error);
-        return NULL;
+        return nullptr;
     }
 
     auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
 
-    if (!tr_sys_file_read(fd, buf, info.size, NULL, &my_error))
+    if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
     {
         tr_logAddError(err_fmt, path, my_error->message);
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
         free(buf);
         tr_error_propagate(error, &my_error);
-        return NULL;
+        return nullptr;
     }
 
-    tr_sys_file_close(fd, NULL);
+    tr_sys_file_close(fd, nullptr);
     buf[info.size] = '\0';
     *size = info.size;
     return buf;
@@ -341,7 +336,7 @@ char* tr_buildPath(char const* first_element, ...)
     va_start(vl, first_element);
     element = first_element;
 
-    while (element != NULL)
+    while (element != nullptr)
     {
         bufLen += strlen(element) + 1;
         element = va_arg(vl, char const*);
@@ -350,16 +345,16 @@ char* tr_buildPath(char const* first_element, ...)
     pch = buf = tr_new(char, bufLen);
     va_end(vl);
 
-    if (buf == NULL)
+    if (buf == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     /* pass 2: build the string piece by piece */
     va_start(vl, first_element);
     element = first_element;
 
-    while (element != NULL)
+    while (element != nullptr)
     {
         size_t const elementLen = strlen(element);
         memcpy(pch, element, elementLen);
@@ -415,7 +410,7 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
     evbuffer_free(buf);
     ret[n] = '\0';
 
-    if (result_len != NULL)
+    if (result_len != nullptr)
     {
         *result_len = n;
     }
@@ -425,22 +420,22 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
 
 char* tr_strdup(void const* in)
 {
-    return tr_strndup(in, in != NULL ? strlen(static_cast<char const*>(in)) : 0);
+    return tr_strndup(in, in != nullptr ? strlen(static_cast<char const*>(in)) : 0);
 }
 
 char* tr_strndup(void const* in, size_t len)
 {
-    char* out = NULL;
+    char* out = nullptr;
 
     if (len == TR_BAD_SIZE)
     {
         out = tr_strdup(in);
     }
-    else if (in != NULL)
+    else if (in != nullptr)
     {
         out = static_cast<char*>(tr_malloc(len + 1));
 
-        if (out != NULL)
+        if (out != nullptr)
         {
             memcpy(out, in, len);
             out[len] = '\0';
@@ -463,9 +458,9 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
         return haystack;
     }
 
-    if (needlelen > haystacklen || haystack == NULL || needle == NULL)
+    if (needlelen > haystacklen || haystack == nullptr || needle == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     for (size_t i = 0; i <= haystacklen - needlelen; ++i)
@@ -476,7 +471,7 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
         }
     }
 
-    return NULL;
+    return nullptr;
 
 #endif
 }
@@ -514,14 +509,14 @@ char* tr_strdup_vprintf(char const* fmt, va_list args)
 {
     struct evbuffer* buf = evbuffer_new();
     evbuffer_add_vprintf(buf, fmt, args);
-    return evbuffer_free_to_str(buf, NULL);
+    return evbuffer_free_to_str(buf, nullptr);
 }
 
 char const* tr_strerror(int i)
 {
     char const* ret = strerror(i);
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         ret = "Unknown Error";
     }
@@ -531,17 +526,17 @@ char const* tr_strerror(int i)
 
 int tr_strcmp0(char const* str1, char const* str2)
 {
-    if (str1 != NULL && str2 != NULL)
+    if (str1 != nullptr && str2 != nullptr)
     {
         return strcmp(str1, str2);
     }
 
-    if (str1 != NULL)
+    if (str1 != nullptr)
     {
         return 1;
     }
 
-    if (str2 != NULL)
+    if (str2 != nullptr)
     {
         return -1;
     }
@@ -564,16 +559,16 @@ char* tr_strsep(char** str, char const* delims)
 
     char* token;
 
-    if (*str == NULL) /* no more tokens */
+    if (*str == nullptr) /* no more tokens */
     {
-        return NULL;
+        return nullptr;
     }
 
     token = *str;
 
     while (**str != '\0')
     {
-        if (strchr(delims, **str) != NULL)
+        if (strchr(delims, **str) != nullptr)
         {
             **str = '\0';
             (*str)++;
@@ -584,7 +579,7 @@ char* tr_strsep(char** str, char const* delims)
     }
 
     /* there is not another token */
-    *str = NULL;
+    *str = nullptr;
 
     return token;
 
@@ -624,7 +619,7 @@ char* tr_strjoin(char const* const* arr, size_t len, char const* delim)
 
 char* tr_strstrip(char* str)
 {
-    if (str != NULL)
+    if (str != nullptr)
     {
         size_t len = strlen(str);
 
@@ -653,12 +648,12 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
     size_t str_len;
     size_t suffix_len;
 
-    if (str == NULL)
+    if (str == nullptr)
     {
         return false;
     }
 
-    if (suffix == NULL)
+    if (suffix == nullptr)
     {
         return true;
     }
@@ -697,7 +692,7 @@ void tr_wait_msec(long int msec)
     struct timespec ts;
     ts.tv_sec = msec / 1000;
     ts.tv_nsec = (msec % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, nullptr);
 
 #endif
 }
@@ -726,8 +721,8 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     auto* dst = static_cast<char*>(vdst);
     auto const* const src = static_cast<char const*>(vsrc);
 
-    TR_ASSERT(dst != NULL);
-    TR_ASSERT(src != NULL);
+    TR_ASSERT(dst != nullptr);
+    TR_ASSERT(src != nullptr);
 
 #ifdef HAVE_STRLCPY
 
@@ -844,14 +839,14 @@ static bool isValidURLChars(char const* url, size_t url_len)
              "<>#%<\"" /* delims */
              "{}|\\^[]`"; /* unwise */
 
-    if (url == NULL)
+    if (url == nullptr)
     {
         return false;
     }
 
     for (char const *c = url, *end = url + url_len; c < end && *c != '\0'; ++c)
     {
-        if (memchr(rfc2396_valid_chars, *c, sizeof(rfc2396_valid_chars) - 1) == NULL)
+        if (memchr(rfc2396_valid_chars, *c, sizeof(rfc2396_valid_chars) - 1) == nullptr)
         {
             return false;
         }
@@ -862,20 +857,20 @@ static bool isValidURLChars(char const* url, size_t url_len)
 
 bool tr_urlIsValidTracker(char const* url)
 {
-    if (url == NULL)
+    if (url == nullptr)
     {
         return false;
     }
 
     size_t const url_len = strlen(url);
 
-    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, nullptr, nullptr, nullptr, nullptr) &&
         (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
 }
 
 bool tr_urlIsValid(char const* url, size_t url_len)
 {
-    if (url == NULL)
+    if (url == nullptr)
     {
         return false;
     }
@@ -885,7 +880,7 @@ bool tr_urlIsValid(char const* url, size_t url_len)
         url_len = strlen(url);
     }
 
-    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, nullptr, nullptr, nullptr, nullptr) &&
         (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
          memcmp(url, "sftp://", 7) == 0);
 }
@@ -927,10 +922,10 @@ static int get_port_for_scheme(char const* scheme, size_t scheme_len)
         { "sftp", 22 }, //
         { "http", 80 }, //
         { "https", 443 }, //
-        { NULL, 0 }, //
+        { nullptr, 0 }, //
     };
 
-    for (struct known_scheme const* s = known_schemes; s->name != NULL; ++s)
+    for (struct known_scheme const* s = known_schemes; s->name != nullptr; ++s)
     {
         if (scheme_len == strlen(s->name) && memcmp(scheme, s->name, scheme_len) == 0)
         {
@@ -951,7 +946,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
     char const* scheme = url;
     char const* scheme_end = tr_memmem(scheme, url_len, "://", 3);
 
-    if (scheme_end == NULL)
+    if (scheme_end == nullptr)
     {
         return false;
     }
@@ -969,7 +964,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
     char const* authority = url;
     auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
 
-    if (authority_end == NULL)
+    if (authority_end == nullptr)
     {
         authority_end = authority + url_len;
     }
@@ -986,31 +981,31 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 
     auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
 
-    size_t const host_len = host_end != NULL ? (size_t)(host_end - authority) : authority_len;
+    size_t const host_len = host_end != nullptr ? (size_t)(host_end - authority) : authority_len;
 
     if (host_len == 0)
     {
         return false;
     }
 
-    size_t const port_len = host_end != NULL ? authority_end - host_end - 1 : 0;
+    size_t const port_len = host_end != nullptr ? authority_end - host_end - 1 : 0;
 
-    if (setme_scheme != NULL)
+    if (setme_scheme != nullptr)
     {
         *setme_scheme = tr_strndup(scheme, scheme_len);
     }
 
-    if (setme_host != NULL)
+    if (setme_host != nullptr)
     {
         *setme_host = tr_strndup(authority, host_len);
     }
 
-    if (setme_port != NULL)
+    if (setme_port != nullptr)
     {
         *setme_port = port_len > 0 ? parse_port(host_end + 1, port_len) : get_port_for_scheme(scheme, scheme_len);
     }
 
-    if (setme_path != NULL)
+    if (setme_path != nullptr)
     {
         if (url[0] == '\0')
         {
@@ -1079,136 +1074,6 @@ int tr_lowerBound(
 
 /***
 ****
-****
-***/
-
-/* Byte-wise swap two items of size SIZE.
-   From glibc, written by Douglas C. Schmidt, LGPL 2.1 or higher */
-#define SWAP(a, b, size) \
-    do \
-    { \
-        size_t __size = (size); \
-        char* __a = (a); \
-        char* __b = (b); \
-        if (__a != __b) \
-        { \
-            do \
-            { \
-                char __tmp = *__a; \
-                *__a++ = *__b; \
-                *__b++ = __tmp; \
-            } while (--__size > 0); \
-        } \
-    } while (0)
-
-static size_t quickfindPartition(
-    char* base,
-    size_t left,
-    size_t right,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    size_t pivotIndex)
-{
-    size_t storeIndex;
-
-    /* move pivot to the end */
-    SWAP(base + (size * pivotIndex), base + (size * right), size);
-
-    storeIndex = left;
-
-    for (size_t i = left; i < right; ++i)
-    {
-        if ((*compar)(base + (size * i), base + (size * right)) <= 0)
-        {
-            SWAP(base + (size * storeIndex), base + (size * i), size);
-            ++storeIndex;
-        }
-    }
-
-    /* move pivot to its final place */
-    SWAP(base + (size * right), base + (size * storeIndex), size);
-
-    /* sanity check the partition */
-#ifdef TR_ENABLE_ASSERTS
-
-    TR_ASSERT(storeIndex >= left);
-    TR_ASSERT(storeIndex <= right);
-
-    for (size_t i = left; i < storeIndex; ++i)
-    {
-        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
-    }
-
-    for (size_t i = storeIndex + 1; i <= right; ++i)
-    {
-        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
-    }
-
-#endif
-
-    return storeIndex;
-}
-
-static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar, size_t k)
-{
-    if (right > left)
-    {
-        size_t const pivotIndex = left + (right - left) / 2U;
-
-        size_t const pivotNewIndex = quickfindPartition(base, left, right, size, compar, pivotIndex);
-
-        if (pivotNewIndex > left + k) /* new condition */
-        {
-            quickfindFirstK(base, left, pivotNewIndex - 1, size, compar, k);
-        }
-        else if (pivotNewIndex < left + k)
-        {
-            quickfindFirstK(base, pivotNewIndex + 1, right, size, compar, k + left - pivotNewIndex - 1);
-        }
-    }
-}
-
-#ifdef TR_ENABLE_ASSERTS
-
-static void checkBestScoresComeFirst(char const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
-{
-    size_t worstFirstPos = 0;
-
-    for (size_t i = 1; i < k; ++i)
-    {
-        if ((*compar)(base + (size * worstFirstPos), base + (size * i)) < 0)
-        {
-            worstFirstPos = i;
-        }
-    }
-
-    for (size_t i = 0; i < k; ++i)
-    {
-        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
-    }
-
-    for (size_t i = k; i < nmemb; ++i)
-    {
-        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
-    }
-}
-
-#endif
-
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
-{
-    if (k < nmemb)
-    {
-        quickfindFirstK(static_cast<char*>(base), 0, nmemb - 1, size, compar, k);
-
-#ifdef TR_ENABLE_ASSERTS
-        checkBestScoresComeFirst(static_cast<char const*>(base), nmemb, size, compar, k);
-#endif
-    }
-}
-
-/***
-****
 ***/
 
 static char* strip_non_utf8(char const* in, size_t inlen)
@@ -1227,12 +1092,12 @@ static char* strip_non_utf8(char const* in, size_t inlen)
     }
 
     evbuffer_add(buf, in, inlen);
-    return evbuffer_free_to_str(buf, NULL);
+    return evbuffer_free_to_str(buf, nullptr);
 }
 
 static char* to_utf8(char const* in, size_t inlen)
 {
-    char* ret = NULL;
+    char* ret = nullptr;
 
 #ifdef HAVE_ICONV
 
@@ -1240,7 +1105,7 @@ static char* to_utf8(char const* in, size_t inlen)
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (size_t i = 0; ret == NULL && i < TR_N_ELEMENTS(encodings); ++i)
+    for (size_t i = 0; ret == nullptr && i < TR_N_ELEMENTS(encodings); ++i)
     {
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         auto const* inbuf = in;
@@ -1269,7 +1134,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #endif
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         ret = strip_non_utf8(in, inlen);
     }
@@ -1296,7 +1161,7 @@ char* tr_utf8clean(char const* str, size_t max_len)
         ret = to_utf8(str, max_len);
     }
 
-    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, NULL));
+    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, nullptr));
     return ret;
 }
 
@@ -1304,7 +1169,7 @@ char* tr_utf8clean(char const* str, size_t max_len)
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
-    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, NULL);
+    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);
 }
 
 char* tr_win32_native_to_utf8_ex(
@@ -1314,7 +1179,7 @@ char* tr_win32_native_to_utf8_ex(
     int extra_chars_after,
     int* real_result_size)
 {
-    char* ret = NULL;
+    char* ret = nullptr;
     int size;
 
     if (text_size == -1)
@@ -1322,7 +1187,7 @@ char* tr_win32_native_to_utf8_ex(
         text_size = wcslen(text);
     }
 
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, NULL, 0, NULL, NULL);
+    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, nullptr, 0, nullptr, nullptr);
 
     if (size == 0)
     {
@@ -1330,7 +1195,7 @@ char* tr_win32_native_to_utf8_ex(
     }
 
     ret = tr_new(char, size + extra_chars_before + extra_chars_after + 1);
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, NULL, NULL);
+    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, nullptr, nullptr);
 
     if (size == 0)
     {
@@ -1339,7 +1204,7 @@ char* tr_win32_native_to_utf8_ex(
 
     ret[size + extra_chars_before + extra_chars_after] = '\0';
 
-    if (real_result_size != NULL)
+    if (real_result_size != nullptr)
     {
         *real_result_size = size;
     }
@@ -1349,12 +1214,12 @@ char* tr_win32_native_to_utf8_ex(
 fail:
     tr_free(ret);
 
-    return NULL;
+    return nullptr;
 }
 
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
 {
-    return tr_win32_utf8_to_native_ex(text, text_size, 0, 0, NULL);
+    return tr_win32_utf8_to_native_ex(text, text_size, 0, 0, nullptr);
 }
 
 wchar_t* tr_win32_utf8_to_native_ex(
@@ -1364,7 +1229,7 @@ wchar_t* tr_win32_utf8_to_native_ex(
     int extra_chars_after,
     int* real_result_size)
 {
-    wchar_t* ret = NULL;
+    wchar_t* ret = nullptr;
     int size;
 
     if (text_size == -1)
@@ -1372,7 +1237,7 @@ wchar_t* tr_win32_utf8_to_native_ex(
         text_size = strlen(text);
     }
 
-    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, NULL, 0);
+    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, nullptr, 0);
 
     if (size == 0)
     {
@@ -1389,7 +1254,7 @@ wchar_t* tr_win32_utf8_to_native_ex(
 
     ret[size + extra_chars_before + extra_chars_after] = L'\0';
 
-    if (real_result_size != NULL)
+    if (real_result_size != nullptr)
     {
         *real_result_size = size;
     }
@@ -1399,38 +1264,38 @@ wchar_t* tr_win32_utf8_to_native_ex(
 fail:
     tr_free(ret);
 
-    return NULL;
+    return nullptr;
 }
 
 char* tr_win32_format_message(uint32_t code)
 {
-    wchar_t* wide_text = NULL;
+    wchar_t* wide_text = nullptr;
     DWORD wide_size;
-    char* text = NULL;
+    char* text = nullptr;
     size_t text_size;
 
     wide_size = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
+        nullptr,
         code,
         0,
         (LPWSTR)&wide_text,
         0,
-        NULL);
+        nullptr);
 
     if (wide_size == 0)
     {
         return tr_strdup_printf("Unknown error (0x%08x)", code);
     }
 
-    if (wide_size != 0 && wide_text != NULL)
+    if (wide_size != 0 && wide_text != nullptr)
     {
         text = tr_win32_native_to_utf8(wide_text, wide_size);
     }
 
     LocalFree(wide_text);
 
-    if (text != NULL)
+    if (text != nullptr)
     {
         /* Most (all?) messages contain "\r\n" in the end, chop it */
         text_size = strlen(text);
@@ -1451,7 +1316,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
 
     my_wide_argv = CommandLineToArgvW(GetCommandLineW(), &my_argc);
 
-    if (my_wide_argv == NULL)
+    if (my_wide_argv == nullptr)
     {
         return;
     }
@@ -1465,7 +1330,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
     {
         my_argv[i] = tr_win32_native_to_utf8(my_wide_argv[i], -1);
 
-        if (my_argv[i] == NULL)
+        if (my_argv[i] == nullptr)
         {
             break;
         }
@@ -1482,7 +1347,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
     }
     else
     {
-        my_argv[my_argc] = NULL;
+        my_argv[my_argc] = nullptr;
 
         *argc = my_argc;
         *argv = my_argv;
@@ -1582,10 +1447,10 @@ int compareInt(void const* va, void const* vb)
 int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 {
     int n = 0;
-    int* uniq = NULL;
+    int* uniq = nullptr;
     char* str = tr_strndup(str_in, len);
     char const* walk;
-    tr_list* ranges = NULL;
+    tr_list* ranges = nullptr;
     bool success = true;
 
     walk = str;
@@ -1595,7 +1460,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
         struct number_range range;
         char const* pch = strchr(walk, ',');
 
-        if (pch != NULL)
+        if (pch != nullptr)
         {
             success = parseNumberSection(walk, (size_t)(pch - walk), &range);
             walk = pch + 1;
@@ -1615,17 +1480,17 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
     if (!success)
     {
         *setmeCount = 0;
-        uniq = NULL;
+        uniq = nullptr;
     }
     else
     {
         int n2;
-        int* sorted = NULL;
+        int* sorted = nullptr;
 
         /* build a sorted number array */
         n = n2 = 0;
 
-        for (tr_list* l = ranges; l != NULL; l = l->next)
+        for (tr_list* l = ranges; l != nullptr; l = l->next)
         {
             auto const* r = static_cast<struct number_range const*>(l->data);
             n += r->high + 1 - r->low;
@@ -1633,14 +1498,14 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
         sorted = tr_new(int, n);
 
-        if (sorted == NULL)
+        if (sorted == nullptr)
         {
             n = 0;
-            uniq = NULL;
+            uniq = nullptr;
         }
         else
         {
-            for (tr_list* l = ranges; l != NULL; l = l->next)
+            for (tr_list* l = ranges; l != nullptr; l = l->next)
             {
                 auto const* r = static_cast<struct number_range const*>(l->data);
 
@@ -1657,7 +1522,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
             uniq = tr_new(int, n);
             n = 0;
 
-            if (uniq != NULL)
+            if (uniq != nullptr)
             {
                 for (int i = 0; i < n2; ++i)
                 {
@@ -1691,7 +1556,7 @@ double tr_truncd(double x, int precision)
     char buf[128];
     tr_snprintf(buf, sizeof(buf), "%.*f", TR_ARG_TUPLE(DBL_DIG, x));
 
-    if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
+    if ((pt = strstr(buf, localeconv()->decimal_point)) != nullptr)
     {
         pt[precision != 0 ? precision + 1 : 0] = '\0';
     }
@@ -1762,7 +1627,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     /* make sure the target directory exists */
     {
         char* newdir = tr_sys_path_dirname(newpath, error);
-        bool const i = newdir != NULL && tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
+        bool const i = newdir != nullptr && tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
         tr_free(newdir);
 
         if (!i)
@@ -1773,7 +1638,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath, NULL))
+    if (tr_sys_path_rename(oldpath, newpath, nullptr))
     {
         return true;
     }
@@ -1786,7 +1651,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     {
-        tr_error* my_error = NULL;
+        tr_error* my_error = nullptr;
 
         if (!tr_sys_path_remove(oldpath, &my_error))
         {
@@ -2044,18 +1909,18 @@ void tr_formatter_get_units(void* vdict)
 
 bool tr_env_key_exists(char const* key)
 {
-    TR_ASSERT(key != NULL);
+    TR_ASSERT(key != nullptr);
 
 #ifdef _WIN32
-    return GetEnvironmentVariableA(key, NULL, 0) != 0;
+    return GetEnvironmentVariableA(key, nullptr, 0) != 0;
 #else
-    return getenv(key) != NULL;
+    return getenv(key) != nullptr;
 #endif
 }
 
 int tr_env_get_int(char const* key, int default_value)
 {
-    TR_ASSERT(key != NULL);
+    TR_ASSERT(key != nullptr);
 
 #ifdef _WIN32
 
@@ -2082,16 +1947,16 @@ int tr_env_get_int(char const* key, int default_value)
 
 char* tr_env_get_string(char const* key, char const* default_value)
 {
-    TR_ASSERT(key != NULL);
+    TR_ASSERT(key != nullptr);
 
 #ifdef _WIN32
 
     wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
-    char* value = NULL;
+    char* value = nullptr;
 
-    if (wide_key != NULL)
+    if (wide_key != nullptr)
     {
-        DWORD const size = GetEnvironmentVariableW(wide_key, NULL, 0);
+        DWORD const size = GetEnvironmentVariableW(wide_key, nullptr, 0);
 
         if (size != 0)
         {
@@ -2108,7 +1973,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
         tr_free(wide_key);
     }
 
-    if (value == NULL && default_value != NULL)
+    if (value == nullptr && default_value != nullptr)
     {
         value = tr_strdup(default_value);
     }
@@ -2119,12 +1984,12 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
     char const* value = getenv(key);
 
-    if (value == NULL)
+    if (value == nullptr)
     {
         value = default_value;
     }
 
-    return value != NULL ? tr_strdup(value) : NULL;
+    return value != nullptr ? tr_strdup(value) : nullptr;
 
 #endif
 }
@@ -2159,10 +2024,10 @@ static int compareSuffix(void const* va, void const* vb)
 
 char const* tr_get_mime_type_for_filename(char const* filename)
 {
-    struct mime_type_suffix const* info = NULL;
+    struct mime_type_suffix const* info = nullptr;
 
     char const* in = strrchr(filename, '.');
-    if (in != NULL)
+    if (in != nullptr)
     {
         ++in; // walk past '.'
         if (strlen(in) <= MIME_TYPE_SUFFIX_MAXLEN)
@@ -2185,5 +2050,5 @@ char const* tr_get_mime_type_for_filename(char const* filename)
         }
     }
 
-    return info != NULL ? info->mime_type : NULL;
+    return info != nullptr ? info->mime_type : nullptr;
 }

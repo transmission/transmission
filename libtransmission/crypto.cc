@@ -42,7 +42,7 @@ static uint8_t const dh_G[] = { 2 };
 
 static void ensureKeyExists(tr_crypto* crypto)
 {
-    if (crypto->dh == NULL)
+    if (crypto->dh == nullptr)
     {
         size_t public_key_length;
 
@@ -77,7 +77,7 @@ bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey)
 {
     ensureKeyExists(crypto);
     crypto->mySecret = tr_dh_agree(crypto->dh, peerPublicKey, KEY_LEN);
-    return crypto->mySecret != NULL;
+    return crypto->mySecret != nullptr;
 }
 
 uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
@@ -95,7 +95,7 @@ static void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, char 
 {
     TR_ASSERT(crypto->torrentHashIsSet);
 
-    if (*setme == NULL)
+    if (*setme == nullptr)
     {
         *setme = tr_new0(struct arc4_context, 1);
     }
@@ -111,7 +111,7 @@ static void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, char 
 
 static void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_in, void* buf_out)
 {
-    if (key == NULL)
+    if (key == nullptr)
     {
         if (buf_in != buf_out)
         {
@@ -152,8 +152,8 @@ bool tr_cryptoSecretKeySha1(
     size_t append_data_size,
     uint8_t* hash)
 {
-    TR_ASSERT(crypto != NULL);
-    TR_ASSERT(crypto->mySecret != NULL);
+    TR_ASSERT(crypto != nullptr);
+    TR_ASSERT(crypto->mySecret != nullptr);
 
     return tr_dh_secret_derive(crypto->mySecret, prepend_data, prepend_data_size, append_data, append_data_size, hash);
 }
@@ -164,9 +164,9 @@ bool tr_cryptoSecretKeySha1(
 
 void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
 {
-    crypto->torrentHashIsSet = hash != NULL;
+    crypto->torrentHashIsSet = hash != nullptr;
 
-    if (hash != NULL)
+    if (hash != nullptr)
     {
         memcpy(crypto->torrentHash, hash, SHA_DIGEST_LENGTH);
     }
@@ -178,14 +178,14 @@ void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
 
 uint8_t const* tr_cryptoGetTorrentHash(tr_crypto const* crypto)
 {
-    TR_ASSERT(crypto != NULL);
+    TR_ASSERT(crypto != nullptr);
 
-    return crypto->torrentHashIsSet ? crypto->torrentHash : NULL;
+    return crypto->torrentHashIsSet ? crypto->torrentHash : nullptr;
 }
 
 bool tr_cryptoHasTorrentHash(tr_crypto const* crypto)
 {
-    TR_ASSERT(crypto != NULL);
+    TR_ASSERT(crypto != nullptr);
 
     return crypto->torrentHashIsSet;
 }

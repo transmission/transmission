@@ -65,7 +65,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&compact=1"
         "&supportcrypto=1",
         req->url,
-        strchr(req->url, '?') != NULL ? '&' : '?',
+        strchr(req->url, '?') != nullptr ? '&' : '?',
         escaped_info_hash,
         TR_ARG_TUPLE(PEER_ID_LEN, PEER_ID_LEN, req->peer_id),
         req->port,
@@ -110,7 +110,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
 
     ipv6 = tr_globalIPv6();
 
-    if (ipv6 != NULL)
+    if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
         evutil_inet_ntop(AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN);
@@ -118,7 +118,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         tr_http_escape(buf, ipv6_readable, TR_BAD_SIZE, true);
     }
 
-    return evbuffer_free_to_str(buf, NULL);
+    return evbuffer_free_to_str(buf, nullptr);
 }
 
 static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
@@ -134,12 +134,12 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
         tr_address addr;
         tr_variant* peer = tr_variantListChild(peerList, i);
 
-        if (peer == NULL)
+        if (peer == nullptr)
         {
             continue;
         }
 
-        if (!tr_variantDictFindStr(peer, TR_KEY_ip, &ip, NULL))
+        if (!tr_variantDictFindStr(peer, TR_KEY_ip, &ip, nullptr))
         {
             continue;
         }
@@ -185,7 +185,7 @@ static void on_announce_done_eventthread(void* vdata)
 {
     auto* data = static_cast<struct announce_data*>(vdata);
 
-    if (data->response_func != NULL)
+    if (data->response_func != nullptr)
     {
         data->response_func(&data->response, data->response_func_user_data);
     }
@@ -299,13 +299,13 @@ static void on_announce_done(
             if (tr_variantDictFindRaw(&benc, TR_KEY_peers6, &raw, &len))
             {
                 dbgmsg(data->log_name, "got a peers6 length of %zu", len);
-                response->pex6 = tr_peerMgrCompact6ToPex(raw, len, NULL, 0, &response->pex6_count);
+                response->pex6 = tr_peerMgrCompact6ToPex(raw, len, nullptr, 0, &response->pex6_count);
             }
 
             if (tr_variantDictFindRaw(&benc, TR_KEY_peers, &raw, &len))
             {
                 dbgmsg(data->log_name, "got a compact peers length of %zu", len);
-                response->pex = tr_peerMgrCompactToPex(raw, len, NULL, 0, &response->pex_count);
+                response->pex = tr_peerMgrCompactToPex(raw, len, nullptr, 0, &response->pex_count);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
@@ -365,7 +365,7 @@ static void on_scrape_done_eventthread(void* vdata)
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
 
-    if (data->response_func != NULL)
+    if (data->response_func != nullptr)
     {
         data->response_func(&data->response, data->response_func_user_data);
     }
@@ -454,7 +454,7 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
-                        if (memcmp(tr_quark_get_string(key, NULL), row->info_hash, SHA_DIGEST_LENGTH) == 0)
+                        if (memcmp(tr_quark_get_string(key, nullptr), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {
@@ -495,7 +495,7 @@ static char* scrape_url_new(tr_scrape_request const* req)
     struct evbuffer* buf = evbuffer_new();
 
     evbuffer_add_printf(buf, "%s", req->url);
-    delimiter = strchr(req->url, '?') != NULL ? '&' : '?';
+    delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
 
     for (int i = 0; i < req->info_hash_count; ++i)
     {
@@ -505,7 +505,7 @@ static char* scrape_url_new(tr_scrape_request const* req)
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str(buf, NULL);
+    return evbuffer_free_to_str(buf, nullptr);
 }
 
 void tr_tracker_http_scrape(

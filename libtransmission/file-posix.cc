@@ -23,6 +23,7 @@
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
+#include <vector>
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -95,7 +96,7 @@
 
 static void set_system_error(tr_error** error, int code)
 {
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
@@ -201,10 +202,10 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
 
     char* pp;
     bool ret = false;
-    tr_error* my_error = NULL;
+    tr_error* my_error = nullptr;
 
     /* Go one level up on each iteration and attempt to create */
-    for (pp = path_end; pp != NULL; pp = strrchr(p, TR_PATH_DELIMITER))
+    for (pp = path_end; pp != nullptr; pp = strrchr(p, TR_PATH_DELIMITER))
     {
         *pp = '\0';
 
@@ -240,7 +241,7 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
     }
 
     /* Go one level down on each iteration and attempt to create */
-    for (pp = pp == NULL ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
+    for (pp = pp == nullptr ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
     {
         *pp = TR_PATH_DELIMITER;
 
@@ -260,14 +261,14 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
 FAILURE:
 
     TR_ASSERT(!ret);
-    TR_ASSERT(my_error != NULL);
+    TR_ASSERT(my_error != nullptr);
 
     tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
     tr_error_propagate(error, &my_error);
 
 CLEANUP:
 
-    TR_ASSERT(my_error == NULL);
+    TR_ASSERT(my_error == nullptr);
 
     tr_free(path);
     return ret;
@@ -277,7 +278,7 @@ CLEANUP:
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     bool ret = access(path, F_OK) != -1;
 
@@ -291,8 +292,8 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
-    TR_ASSERT(info != NULL);
+    TR_ASSERT(path != nullptr);
+    TR_ASSERT(info != nullptr);
 
     bool ret;
     struct stat sb;
@@ -320,15 +321,15 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
 
 bool tr_sys_path_is_relative(char const* path)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     return path[0] != '/';
 }
 
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 {
-    TR_ASSERT(path1 != NULL);
-    TR_ASSERT(path2 != NULL);
+    TR_ASSERT(path1 != nullptr);
+    TR_ASSERT(path2 != nullptr);
 
     bool ret = false;
     struct stat sb1;
@@ -348,9 +349,9 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 
 char* tr_sys_path_resolve(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
-    char* ret = NULL;
+    char* ret = nullptr;
 
 #if defined(HAVE_CANONICALIZE_FILE_NAME)
 
@@ -358,18 +359,18 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 #endif
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         char tmp[PATH_MAX];
         ret = realpath(path, tmp);
 
-        if (ret != NULL)
+        if (ret != nullptr)
         {
             ret = tr_strdup(ret);
         }
     }
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         set_system_error(error, errno);
     }
@@ -379,15 +380,15 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 char* tr_sys_path_basename(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
-    char* ret = NULL;
+    char* ret = nullptr;
     char* tmp;
 
     tmp = tr_strdup(path);
     ret = basename(tmp);
 
-    if (ret != NULL)
+    if (ret != nullptr)
     {
         ret = tr_strdup(ret);
     }
@@ -403,12 +404,12 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
 
 char* tr_sys_path_dirname(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     char* tmp = tr_strdup(path);
     char* ret = dirname(tmp);
 
-    if (ret != NULL)
+    if (ret != nullptr)
     {
         ret = tr_strdup(ret);
     }
@@ -424,8 +425,8 @@ char* tr_sys_path_dirname(char const* path, tr_error** error)
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
 {
-    TR_ASSERT(src_path != NULL);
-    TR_ASSERT(dst_path != NULL);
+    TR_ASSERT(src_path != nullptr);
+    TR_ASSERT(dst_path != nullptr);
 
     bool ret = rename(src_path, dst_path) != -1;
 
@@ -442,11 +443,11 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
  * use a user-space fallback instead. */
 bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
 {
-    TR_ASSERT(src_path != NULL);
-    TR_ASSERT(dst_path != NULL);
+    TR_ASSERT(src_path != nullptr);
+    TR_ASSERT(dst_path != nullptr);
 
 #if defined(USE_COPYFILE)
-    if (copyfile(src_path, dst_path, NULL, COPYFILE_CLONE | COPYFILE_ALL) < 0)
+    if (copyfile(src_path, dst_path, nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
         set_system_error(error, errno);
         return false;
@@ -468,7 +469,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (!tr_sys_file_get_info(in, &info, error))
     {
         tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in, NULL);
+        tr_sys_file_close(in, nullptr);
         return false;
     }
 
@@ -476,7 +477,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
-        tr_sys_file_close(in, NULL);
+        tr_sys_file_close(in, nullptr);
         return false;
     }
 
@@ -489,9 +490,9 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         size_t const chunk_size = MIN(file_size, SSIZE_MAX);
         ssize_t const copied =
 #ifdef USE_COPY_FILE_RANGE
-            copy_file_range(in, NULL, out, NULL, chunk_size, 0);
+            copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
 #elif defined(USE_SENDFILE64)
-            sendfile64(out, in, NULL, chunk_size);
+            sendfile64(out, in, nullptr, chunk_size);
 #else
 #error File copy mechanism not implemented.
 #endif
@@ -542,8 +543,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* cleanup */
-    tr_sys_file_close(out, NULL);
-    tr_sys_file_close(in, NULL);
+    tr_sys_file_close(out, nullptr);
+    tr_sys_file_close(in, nullptr);
 
     if (file_size != 0)
     {
@@ -558,7 +559,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
 bool tr_sys_path_remove(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     bool ret = remove(path) != -1;
 
@@ -603,7 +604,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
     tr_sys_file_t ret;
@@ -649,7 +650,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
 tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 {
-    TR_ASSERT(path_template != NULL);
+    TR_ASSERT(path_template != nullptr);
 
     tr_sys_file_t ret = mkstemp(path_template);
 
@@ -680,7 +681,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
 bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(info != NULL);
+    TR_ASSERT(info != nullptr);
 
     struct stat sb;
     bool ret = fstat(handle, &sb) != -1;
@@ -715,7 +716,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
 
     if (my_new_offset != -1)
     {
-        if (new_offset != NULL)
+        if (new_offset != nullptr)
         {
             *new_offset = my_new_offset;
         }
@@ -733,7 +734,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL || size == 0);
+    TR_ASSERT(buffer != nullptr || size == 0);
 
     bool ret = false;
     ssize_t my_bytes_read;
@@ -744,7 +745,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
 
     if (my_bytes_read != -1)
     {
-        if (bytes_read != NULL)
+        if (bytes_read != nullptr)
         {
             *bytes_read = my_bytes_read;
         }
@@ -768,7 +769,7 @@ bool tr_sys_file_read_at(
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL || size == 0);
+    TR_ASSERT(buffer != nullptr || size == 0);
     /* seek requires signed offset, so it should be in mod range */
     TR_ASSERT(offset < UINT64_MAX / 2);
 
@@ -796,7 +797,7 @@ bool tr_sys_file_read_at(
 
     if (my_bytes_read != -1)
     {
-        if (bytes_read != NULL)
+        if (bytes_read != nullptr)
         {
             *bytes_read = my_bytes_read;
         }
@@ -814,7 +815,7 @@ bool tr_sys_file_read_at(
 bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL || size == 0);
+    TR_ASSERT(buffer != nullptr || size == 0);
 
     bool ret = false;
     ssize_t my_bytes_written;
@@ -825,7 +826,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
 
     if (my_bytes_written != -1)
     {
-        if (bytes_written != NULL)
+        if (bytes_written != nullptr)
         {
             *bytes_written = my_bytes_written;
         }
@@ -849,7 +850,7 @@ bool tr_sys_file_write_at(
     tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL || size == 0);
+    TR_ASSERT(buffer != nullptr || size == 0);
     /* seek requires signed offset, so it should be in mod range */
     TR_ASSERT(offset < UINT64_MAX / 2);
 
@@ -877,7 +878,7 @@ bool tr_sys_file_write_at(
 
     if (my_bytes_written != -1)
     {
-        if (bytes_written != NULL)
+        if (bytes_written != nullptr)
         {
             *bytes_written = my_bytes_written;
         }
@@ -973,110 +974,127 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
     return ret;
 }
 
-bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+namespace
 {
-    TR_UNUSED(size);
-
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    bool ret = false;
-
-    errno = 0;
 
 #ifdef HAVE_FALLOCATE64
-
-    /* fallocate64 is always preferred, so try it first */
-    ret = fallocate64(handle, 0, 0, size) != -1;
-
-    if (ret || errno == ENOSPC)
-    {
-        goto OUT;
-    }
-
+bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
+{
+    return fallocate64(handle, 0, 0, size) == 0;
+}
 #endif
 
-    if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
-    {
-        int code = errno;
-
 #ifdef HAVE_XFS_XFS_H
+bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
+{
+    if (!platform_test_xfs_fd(handle)) // true if on xfs filesystem
+    {
+        return false;
+    }
 
-        if (platform_test_xfs_fd(handle))
-        {
-            xfs_flock64_t fl;
+    xfs_flock64_t fl;
+    fl.l_whence = 0;
+    fl.l_start = 0;
+    fl.l_len = size;
 
-            fl.l_whence = 0;
-            fl.l_start = 0;
-            fl.l_len = size;
+    // The blocks are allocated, but not zeroed, and the file size does not change
+    bool ok = xfsctl(nullptr, handle, XFS_IOC_RESVSP64, &fl) != -1;
 
-            ret = xfsctl(NULL, handle, XFS_IOC_RESVSP64, &fl) != -1;
+    if (ok)
+    {
+        ok = ftruncate(handle, size) == 0;
+    }
 
-            if (ret)
-            {
-                ret = ftruncate(handle, size) != -1;
-            }
-
-            code = errno;
-
-            if (ret || code == ENOSPC)
-            {
-                goto NON_SPARSE_OUT;
-            }
-        }
-
+    return ok;
+}
 #endif
 
 #ifdef __APPLE__
+bool full_preallocate_apple(tr_sys_file_t handle, uint64_t size)
+{
+    fstore_t fst;
 
-        {
-            fstore_t fst;
+    fst.fst_flags = F_ALLOCATEALL;
+    fst.fst_posmode = F_PEOFPOSMODE;
+    fst.fst_offset = 0;
+    fst.fst_length = size;
+    fst.fst_bytesalloc = 0;
 
-            fst.fst_flags = F_ALLOCATEALL;
-            fst.fst_posmode = F_PEOFPOSMODE;
-            fst.fst_offset = 0;
-            fst.fst_length = size;
-            fst.fst_bytesalloc = 0;
+    bool ok = fcntl(handle, F_PREALLOCATE, &fst) != -1;
 
-            ret = fcntl(handle, F_PREALLOCATE, &fst) != -1;
+    if (ok)
+    {
+        ok = ftruncate(handle, size) == 0;
+    }
 
-            if (ret)
-            {
-                ret = ftruncate(handle, size) != -1;
-            }
-
-            code = errno;
-
-            if (ret || code == ENOSPC)
-            {
-                goto NON_SPARSE_OUT;
-            }
-        }
-
+    return ok;
+}
 #endif
 
 #ifdef HAVE_POSIX_FALLOCATE
-
-        code = posix_fallocate(handle, 0, size);
-        ret = code == 0;
-
+bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
+{
+    return posix_fallocate(handle, 0, size) == 0;
+}
 #endif
 
-#if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-NON_SPARSE_OUT:
-#endif
-        errno = code;
-    }
+} // unnamed namespace
 
+bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+{
+    TR_UNUSED(size);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    using prealloc_func = bool (*)(tr_sys_file_t, uint64_t);
+
+    // these approaches are fast and should be tried first
+    auto approaches = std::vector<prealloc_func>{
 #ifdef HAVE_FALLOCATE64
-OUT:
+        preallocate_fallocate64
 #endif
+    };
 
-    if (!ret)
+    // these approaches are sometimes slower in some settings (e.g.
+    // a slow zeroing of all the preallocated space) so only use them
+    // if specified by `flags`
+    if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
     {
-        set_system_error(error, errno);
+        // TODO: these functions haven't been reviewed in awhile.
+        // It's possible that some are faster now & should be promoted
+        // to 'always try' and/or replaced with fresher platform API.
+        approaches.insert(
+            std::end(approaches),
+            {
+#ifdef HAVE_XFS_XFS_H
+                full_preallocate_xfs,
+#endif
+#ifdef __APPLE__
+                full_preallocate_apple,
+#endif
+#ifdef HAVE_POSIX_FALLOCATE
+                full_preallocate_posix,
+#endif
+            });
     }
 
-    return ret;
+    for (auto& approach : approaches) // try until one of them works
+    {
+        errno = 0;
+
+        auto const success = approach(handle, size);
+        if (success)
+        {
+            return success;
+        }
+
+        if (errno == ENOSPC) // disk full, so subsequent approaches will fail too
+        {
+            break;
+        }
+    }
+
+    set_system_error(error, errno);
+    return false;
 }
 
 void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
@@ -1084,12 +1102,12 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
 
-    void* ret = mmap(NULL, size, PROT_READ, MAP_SHARED, handle, offset);
+    void* ret = mmap(nullptr, size, PROT_READ, MAP_SHARED, handle, offset);
 
     if (ret == MAP_FAILED)
     {
         set_system_error(error, errno);
-        ret = NULL;
+        ret = nullptr;
     }
 
     return ret;
@@ -1097,7 +1115,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 
 bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 {
-    TR_ASSERT(address != NULL);
+    TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
     bool ret = munmap((void*)address, size) != -1;
@@ -1201,27 +1219,27 @@ char* tr_sys_dir_get_current(tr_error** error)
 {
     char* ret;
 
-    ret = getcwd(NULL, 0);
+    ret = getcwd(nullptr, 0);
 
-    if (ret == NULL && (errno == EINVAL || errno == ERANGE))
+    if (ret == nullptr && (errno == EINVAL || errno == ERANGE))
     {
         size_t size = PATH_MAX;
-        char* tmp = NULL;
+        char* tmp = nullptr;
 
         do
         {
             tmp = tr_renew(char, tmp, size);
 
-            if (tmp == NULL)
+            if (tmp == nullptr)
             {
                 break;
             }
 
             ret = getcwd(tmp, size);
             size += 2048;
-        } while (ret == NULL && errno == ERANGE);
+        } while (ret == nullptr && errno == ERANGE);
 
-        if (ret == NULL)
+        if (ret == nullptr)
         {
             int const err = errno;
             tr_free(tmp);
@@ -1229,7 +1247,7 @@ char* tr_sys_dir_get_current(tr_error** error)
         }
     }
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         set_system_error(error, errno);
     }
@@ -1239,10 +1257,10 @@ char* tr_sys_dir_get_current(tr_error** error)
 
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     bool ret;
-    tr_error* my_error = NULL;
+    tr_error* my_error = nullptr;
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
@@ -1274,7 +1292,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 
     if (!ret)
     {
-        if (my_error != NULL)
+        if (my_error != nullptr)
         {
             tr_error_propagate(error, &my_error);
         }
@@ -1289,17 +1307,17 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 
 bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 {
-    TR_ASSERT(path_template != NULL);
+    TR_ASSERT(path_template != nullptr);
 
     bool ret;
 
 #ifdef HAVE_MKDTEMP
 
-    ret = mkdtemp(path_template) != NULL;
+    ret = mkdtemp(path_template) != nullptr;
 
 #else
 
-    ret = mktemp(path_template) != NULL && mkdir(path_template, 0700) != -1;
+    ret = mktemp(path_template) != nullptr && mkdir(path_template, 0700) != -1;
 
 #endif
 
@@ -1313,11 +1331,11 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-    TR_ASSERT(path != NULL);
+    TR_ASSERT(path != nullptr);
 
     DIR* ret = opendir(path);
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         set_system_error(error, errno);
         return TR_BAD_SYS_DIR;
@@ -1330,12 +1348,12 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    char const* ret = NULL;
+    char const* ret = nullptr;
 
     errno = 0;
     struct dirent const* const entry = readdir((DIR*)handle);
 
-    if (entry != NULL)
+    if (entry != nullptr)
     {
         ret = entry->d_name;
     }

@@ -77,7 +77,7 @@ static void clearMetainfo(tr_ctor* ctor)
         tr_variantFree(&ctor->metainfo);
     }
 
-    setSourceFile(ctor, NULL);
+    setSourceFile(ctor, nullptr);
 }
 
 int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
@@ -100,7 +100,7 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
     int err;
     tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
 
-    if (magnet_info == NULL)
+    if (magnet_info == nullptr)
     {
         err = -1;
     }
@@ -128,9 +128,9 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     size_t len;
     int err;
 
-    metainfo = tr_loadFile(filename, &len, NULL);
+    metainfo = tr_loadFile(filename, &len, nullptr);
 
-    if (metainfo != NULL && len != 0)
+    if (metainfo != nullptr && len != 0)
     {
         err = tr_ctorSetMetainfo(ctor, metainfo, len);
     }
@@ -151,17 +151,17 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         {
             char const* name;
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL) &&
-                !tr_variantDictFindStr(info, TR_KEY_name, &name, NULL))
+            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, nullptr) &&
+                !tr_variantDictFindStr(info, TR_KEY_name, &name, nullptr))
             {
-                name = NULL;
+                name = nullptr;
             }
 
             if (tr_str_is_empty(name))
             {
-                char* base = tr_sys_path_basename(filename, NULL);
+                char* base = tr_sys_path_basename(filename, nullptr);
 
-                if (base != NULL)
+                if (base != nullptr)
                 {
                     tr_variantDictAddStr(info, TR_KEY_name, base);
                     tr_free(base);
@@ -181,7 +181,7 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 
     filename = tr_sessionFindTorrentFile(ctor->session, hashString);
 
-    if (filename == NULL)
+    if (filename == nullptr)
     {
         err = EINVAL;
     }
@@ -284,7 +284,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
     {
         ret = false;
     }
-    else if (setme != NULL)
+    else if (setme != nullptr)
     {
         *setme = ctor->doDelete;
     }
@@ -303,12 +303,12 @@ void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
 
 bool tr_ctorGetSave(tr_ctor const* ctor)
 {
-    return ctor != NULL && ctor->saveInOurTorrentsDir;
+    return ctor != nullptr && ctor->saveInOurTorrentsDir;
 }
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 {
-    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     struct optional_args* args = &ctor->optionalArgs[mode];
@@ -318,7 +318,7 @@ void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
 {
-    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     struct optional_args* args = &ctor->optionalArgs[mode];
@@ -328,12 +328,12 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
 
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
 {
-    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     struct optional_args* args = &ctor->optionalArgs[mode];
     tr_free(args->downloadDir);
-    args->downloadDir = NULL;
+    args->downloadDir = nullptr;
     args->isSet_downloadDir = false;
 
     if (!tr_str_is_empty(directory))
@@ -358,7 +358,7 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeC
     {
         ret = false;
     }
-    else if (setmeCount != NULL)
+    else if (setmeCount != nullptr)
     {
         *setmeCount = args->peerLimit;
     }
@@ -375,7 +375,7 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused
     {
         ret = false;
     }
-    else if (setmeIsPaused != NULL)
+    else if (setmeIsPaused != nullptr)
     {
         *setmeIsPaused = args->isPaused;
     }
@@ -392,7 +392,7 @@ bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** s
     {
         ret = false;
     }
-    else if (setmeDownloadDir != NULL)
+    else if (setmeDownloadDir != nullptr)
     {
         *setmeDownloadDir = args->downloadDir;
     }
@@ -404,7 +404,7 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDi
 {
     bool ret = true;
 
-    if (ctor->incompleteDir == NULL)
+    if (ctor->incompleteDir == nullptr)
     {
         ret = false;
     }
@@ -424,7 +424,7 @@ bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
     {
         ret = false;
     }
-    else if (setme != NULL)
+    else if (setme != nullptr)
     {
         *setme = &ctor->metainfo;
     }
@@ -470,7 +470,7 @@ tr_ctor* tr_ctorNew(tr_session const* session)
     ctor->session = session;
     ctor->bandwidthPriority = TR_PRI_NORMAL;
 
-    if (session != NULL)
+    if (session != nullptr)
     {
         tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
         tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
