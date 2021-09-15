@@ -830,7 +830,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
             v = &node.v;
             node.is_visited = true;
         }
-        else if (((v = node.nextChild())) != nullptr)
+        else if ((v = node.nextChild()) != nullptr)
         {
             if (tr_variantIsDict(&node.v))
             {
