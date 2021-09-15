@@ -1515,7 +1515,7 @@
 				A25BFD68167BED3B0039D1AA /* variant.h */,
 				A2EA522F1686AC0D00180493 /* quark.cc */,
 				A2EA52301686AC0D00180493 /* quark.h */,
-				A2AF23C616B44FA0003BC59E /* log.c */,
+				A2AF23C616B44FA0003BC59E /* log.cc */,
 				A2AF23C716B44FA0003BC59E /* log.h */,
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
@@ -3076,6 +3076,7 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3090,6 +3091,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Debug;
@@ -3107,6 +3109,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Debug;
@@ -3120,6 +3123,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Debug;
@@ -3263,6 +3267,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Release;
@@ -3280,6 +3285,7 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3458,6 +3464,7 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3472,6 +3479,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = "Release - Debug";
@@ -3523,6 +3531,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = "Release - Debug";
@@ -3536,6 +3545,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -3594,7 +3604,7 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -3611,7 +3621,7 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -3628,7 +3638,7 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -3684,6 +3694,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Release;
@@ -3697,6 +3708,7 @@
 					.,
 					"third-party/libevent/include",
 				);
+				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
