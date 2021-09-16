@@ -27,7 +27,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     while (buffer_size > 0)
     {
-        size_t const bytes_needed = std::min(buffer_size, 1024LU);
+        size_t const bytes_needed = std::min(buffer_size, size_t{ 1024 });
 
         ret = tr_sys_file_read(handle, buffer + offset, bytes_needed, &bytes_read, error);
 

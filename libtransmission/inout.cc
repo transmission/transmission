@@ -218,7 +218,7 @@ static int readOrWritePiece(
     while (buflen != 0 && err == 0)
     {
         tr_file const* file = &info->files[fileIndex];
-        uint64_t const bytesThisPass = std::min(buflen, file->length - fileOffset);
+        uint64_t const bytesThisPass = std::min(uint64_t{ buflen }, uint64_t{ file->length - fileOffset });
 
         err = readOrWriteBytes(tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass);
         buf += bytesThisPass;
