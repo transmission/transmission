@@ -803,7 +803,7 @@ static void rpc_server_on_start_retry(evutil_socket_t fd, short type, void* cont
 static int rpc_server_start_retry(tr_rpc_server* server)
 {
     int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1) * SERVER_START_RETRY_DELAY_INCREMENT;
-    retry_delay = std::min(retry_delay, (int)SERVER_START_RETRY_MAX_DELAY);
+    retry_delay = std::min<int>(retry_delay, SERVER_START_RETRY_MAX_DELAY);
 
     if (server->start_retry_timer == nullptr)
     {

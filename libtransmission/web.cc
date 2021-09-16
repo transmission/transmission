@@ -542,7 +542,7 @@ static void tr_webThreadFunc(void* vsession)
                     /* curl_multi_wait() returns immediately if there are
                      * no fds to wait for, so we need an explicit wait here
                      * to emulate select() behavior */
-                    tr_wait_msec(std::min(msec, THREADFUNC_MAX_SLEEP_MSEC / 2L));
+                    tr_wait_msec(std::min<long>(msec, THREADFUNC_MAX_SLEEP_MSEC / 2L));
                 }
             }
             else

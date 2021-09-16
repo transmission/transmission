@@ -164,7 +164,7 @@ static void write_block_func(void* vdata)
         {
             while (len > 0)
             {
-                uint32_t const bytes_this_pass = std::min(len, block_size);
+                uint32_t const bytes_this_pass = std::min<uint32_t>(len, block_size);
                 tr_cacheWriteBlock(cache, tor, piece, offset_end - len, bytes_this_pass, buf);
                 len -= bytes_this_pass;
             }
@@ -324,7 +324,7 @@ static void on_idle(tr_webseed* w)
         blocks = tr_new(tr_block_index_t, want * 2);
         tr_peerMgrGetNextRequests(tor, &w->parent, want, blocks, &got, true);
 
-        w->idle_connections -= std::min(w->idle_connections, got);
+        w->idle_connections -= std::min<int>(w->idle_connections, got);
 
         if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL && got == want)
         {
@@ -489,7 +489,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 
         tr_ioFindFileLocation(tor, step_piece, step_piece_offset, &file_index, &file_offset);
         file = &inf->files[file_index];
-        this_pass = std::min(remain, file->length - file_offset);
+        this_pass = std::min<uint64_t>(remain, file->length - file_offset);
 
         if (urls[file_index] == nullptr)
         {

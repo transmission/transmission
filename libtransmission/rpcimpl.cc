@@ -1247,7 +1247,7 @@ static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
     {
         tgt[i].tier = src[i].tier;
         tgt[i].announce = tr_strdup(src[i].announce);
-        maxTier = std::max(maxTier, src[i].tier);
+        maxTier = std::max<int>(maxTier, src[i].tier);
     }
 
     return maxTier;

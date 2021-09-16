@@ -267,7 +267,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        n = std::min(len, n - 1);
+        n = std::min<int>(len, n - 1);
         strncpy(val, beg, n);
         val[n] = 0;
     }
