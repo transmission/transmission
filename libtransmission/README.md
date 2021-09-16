@@ -14,13 +14,18 @@
 
 ## Checklist for modernization of a module
 
+> **_NOTE:_**   
+> The version in `libtransmission/CMakeLists.txt` is C++17.   
+> See https://github.com/AnthonyCalandra/modern-cpp-features
+
 This can be done in multiple smaller passes:
 
 1. Satisfy clang-tidy
-3. Group member functions and their parent structs
+2. Group member functions and their parent structs
     - Use `namespace libtransmission`
     - Split large modules into smaller groups of files in a `libtransmission/<name>` subdirectories, with own
       sub-namespace.
+3. Enums replaced with new `enum class` syntax. Numeric `#define` constants replaced with C++ `const`/`constexpr`.
 4. Memory - promote init and free functions to C++ ctors and dtors, and ensure it is only managed with new/delete
 5. Owned memory - promote simple pointer fields owning their data to smart pointers (unique_ptr, shared_ptr, vector,
    string)
@@ -46,9 +51,7 @@ This can be done in multiple smaller passes:
            return f->field;
        }
        ```
-
       becomes:
-
        ```c++
        struct foo {
            int field;
@@ -64,13 +67,29 @@ This can be done in multiple smaller passes:
       under `libtransmission/`.
     - Some externally invoked functions must either not move OR have `extern "C"` adapter functions.
 
-3. Memory management:
+3. Enums promoted to `enum class` and given a type:
+   ```c++
+   enum { A, B, C };
+   ```
+   becomes
+   ```c++
+   enum: int { A, B, C };        // unscoped, use A, B, C
+   enum MyEnum: int { A, B, C }; // unscoped, use A, B, C
+   // OR wrap into a scope -
+   enum struct MyEnum: int { A, B, C }; // scoped, use MyEnum::A
+   enum class MyEnum: int { A, B, C };  // scoped, use MyEnum::A
+   ```
+   this will make all values of enum to have that numeric type.
+
+4. Numeric/bool `#define` constants should be replaced with C++ `const`/`constexpr`.
+
+6. Memory management:
     - Prefer constructors and destructors vs manual construction and destruction. But when doing so must ensure that the
       struct is never constructed using C `malloc`/`free`, but must use C++ `new`/`delete`.
     - Avoid using std::memset on a new struct. It is allowed in C, and C++ struct but will destroy virtual table on a
       C++ class. Use field initializers in C++.
 
-4. Owned memory:
+7. Owned memory:
     - If destructor deletes something, it means it was owned. Promote that field to owning type (vector, unique_ptr,
       shared_ptr or string).
     
