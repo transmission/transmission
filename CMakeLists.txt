@@ -30,6 +30,7 @@ tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_NLS           "Enable native language support" ON)
         option(INSTALL_DOC          "Build/install documentation" ON)
         option(INSTALL_LIB          "Install the library" OFF)
+tr_auto_option(RUN_CLANG_TIDY       "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT       "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
@@ -297,6 +298,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 if(WIN32)
     tr_add_external_auto_library(EVENT2 libevent event
         CMAKE_ARGS
+            "-DEVENT__DISABLE_OPENSSL:BOOL=ON"
             "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
             "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
 else()
@@ -347,6 +349,8 @@ if(ENABLE_UTP)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64)
+
+add_subdirectory(third-party/arc4)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
@@ -438,7 +442,6 @@ else()
         -Wint-in-bool-context
         -Wlogical-op
         -Wmissing-format-attribute
-        -Wnested-externs
         -Wnull-dereference
         -Wpointer-arith
         -Wredundant-decls
@@ -453,7 +456,6 @@ else()
         -Wshadow
         -Wsign-compare
         -Wsometimes-uninitialized
-        -Wstrict-prototypes
         -Wstring-conversion
         -Wsuggest-destructor-override
         -Wsuggest-override
@@ -612,7 +614,17 @@ else()
     endif()
 endif()
 
-if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
+if(RUN_CLANG_TIDY STREQUAL "AUTO")
+    if (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
+        set(RUN_CLANG_TIDY OFF)
+    elseif(CMAKE_VERSION VERSION_LESS "3.7.2")
+        set(RUN_CLANG_TIDY OFF)
+    else()
+        set(RUN_CLANG_TIDY ON)
+    endif()
+endif()
+
+if(RUN_CLANG_TIDY)
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
     if (CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
