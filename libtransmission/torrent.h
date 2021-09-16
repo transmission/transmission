@@ -309,11 +309,6 @@ static inline void tr_torrentUnlock(tr_torrent const* tor)
     tr_sessionUnlock(tor->session);
 }
 
-static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
-{
-    return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;
-}
-
 static inline tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
 {
     return tor->completeness;

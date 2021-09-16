@@ -119,6 +119,30 @@ struct CompareShaDigest
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+public:
+    tr_torrent* getTorrentById(int key) const
+    {
+        auto const it = torrentsById.find(key);
+        return it == std::end(torrentsById) ? nullptr : it->second;
+    }
+
+    tr_torrent* getTorrentByHash(uint8_t const* key) const
+    {
+        auto const it = torrentsByHash.find(key);
+        return it == std::end(torrentsByHash) ? nullptr : it->second;
+    }
+
+    tr_torrent* getTorrentByHashString(char const* key) const
+    {
+        auto const it = torrentsByHashString.find(key);
+        return it == std::end(torrentsByHashString) ? nullptr : it->second;
+    }
+
+    bool torrentExists(uint8_t const* hash) const
+    {
+        return getTorrentByHash(hash) != nullptr;
+    }
+
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;

@@ -75,23 +75,17 @@ int tr_torrentId(tr_torrent const* tor)
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int key)
 {
-    auto& map = session->torrentsById;
-    auto const it = map.find(key);
-    return it == std::end(map) ? nullptr : it->second;
+    return session->getTorrentById(key);
 }
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* key)
 {
-    auto& map = session->torrentsByHash;
-    auto const it = map.find(key);
-    return it == std::end(map) ? nullptr : it->second;
+    return session->getTorrentByHash(key);
 }
 
 tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* key)
 {
-    auto& map = session->torrentsByHashString;
-    auto const it = map.find(key);
-    return it == std::end(map) ? nullptr : it->second;
+    return session->getTorrentByHashString(key);
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)

@@ -249,7 +249,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     tr_peerIoReadBytes(handshake->io, inbuf, hash, sizeof(hash));
     TR_ASSERT(tr_peerIoHasTorrentHash(handshake->io));
 
-    if (!tr_torrentExists(handshake->session, hash) ||
+    if (!handshake->session->torrentExists(hash) ||
         memcmp(hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH) != 0)
     {
         dbgmsg(handshake, "peer returned the wrong hash. wtf?");
@@ -655,7 +655,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (tr_peerIoIsIncoming(handshake->io))
     {
-        if (!tr_torrentExists(handshake->session, hash))
+        if (!handshake->session->torrentExists(hash))
         {
             dbgmsg(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
