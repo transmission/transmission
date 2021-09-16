@@ -147,9 +147,8 @@ static void write_block_func(void* vdata)
     auto* data = static_cast<struct write_block_data*>(vdata);
     struct tr_webseed* w = data->webseed;
     struct evbuffer* buf = data->content;
-    struct tr_torrent* tor;
 
-    tor = tr_torrentFindFromId(data->session, data->torrent_id);
+    struct tr_torrent* const tor = data->session->getTorrentById(data->torrent_id);
 
     if (tor != nullptr)
     {
@@ -201,7 +200,7 @@ static void connection_succeeded(void* vdata)
 
     if (data->real_url != nullptr)
     {
-        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_torrent const* const tor = w->session->getTorrentById(w->torrent_id);
 
         if (tor != nullptr)
         {
@@ -295,7 +294,7 @@ static void on_idle(tr_webseed* w)
 {
     int want;
     int running_tasks = tr_list_size(w->tasks);
-    tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
+    tr_torrent* const tor = w->session->getTorrentById(w->torrent_id);
 
     if (w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES)
     {
@@ -381,7 +380,7 @@ static void web_response_func(
     }
 
     tr_webseed* w = t->webseed;
-    tr_torrent* tor = tr_torrentFindFromId(session, w->torrent_id);
+    tr_torrent* const tor = session->getTorrentById(w->torrent_id);
 
     if (tor != nullptr)
     {
@@ -467,7 +466,7 @@ static struct evbuffer* make_url(tr_webseed* w, tr_file const* file)
 static void task_request_next_chunk(struct tr_webseed_task* t)
 {
     tr_webseed* w = t->webseed;
-    tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
+    tr_torrent* const tor = w->session->getTorrentById(w->torrent_id);
 
     if (tor != nullptr)
     {
@@ -562,7 +561,7 @@ static void webseed_destruct(tr_peer* peer)
     /* if we have an array of file URLs, free it */
     if (w->file_urls != nullptr)
     {
-        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+        tr_torrent const* const tor = w->session->getTorrentById(w->torrent_id);
         tr_info const* const inf = tr_torrentInfo(tor);
 
         for (tr_file_index_t i = 0; i < inf->fileCount; ++i)

@@ -128,7 +128,7 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
 
             if (tr_variantGetInt(node, &id))
             {
-                tor = tr_torrentFindFromId(session, id);
+                tor = session->getTorrentById(id);
             }
             else if (tr_variantGetStr(node, &str, nullptr))
             {
@@ -147,10 +147,10 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
     }
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
-        tr_torrent* tor;
         torrents = tr_new0(tr_torrent*, 1);
 
-        if ((tor = tr_torrentFindFromId(session, id)) != nullptr)
+        tr_torrent* tor = session->getTorrentById(id);
+        if (tor != nullptr)
         {
             torrents[torrentCount++] = tor;
         }
@@ -1857,7 +1857,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
-        tor = tr_torrentFindFromId(data->session, duplicate_id);
+        tor = data->session->getTorrentById(duplicate_id);
         key = TR_KEY_torrent_duplicate;
         result = "duplicate torrent";
     }

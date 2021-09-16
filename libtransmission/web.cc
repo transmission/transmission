@@ -113,7 +113,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     /* webseed downloads should be speed limited */
     if (task->torrentId != -1)
     {
-        tr_torrent const* const tor = tr_torrentFindFromId(task->session, task->torrentId);
+        tr_torrent const* const tor = task->session->getTorrentById(task->torrentId);
 
         if (tor != nullptr && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
         {
