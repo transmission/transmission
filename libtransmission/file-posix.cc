@@ -488,7 +488,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0)
     {
-        size_t const chunk_size = std::min<unsigned long>(file_size, SSIZE_MAX);
+        size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
         ssize_t const copied =
 #ifdef USE_COPY_FILE_RANGE
             copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
@@ -519,7 +519,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0)
     {
-        uint64_t const chunk_size = std::min<uint64_t>(file_size, buflen);
+        uint64_t const chunk_size = std::min(uint64_t{ file_size }, uint64_t{ buflen });
         uint64_t bytes_read;
         uint64_t bytes_written;
 

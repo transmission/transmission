@@ -478,7 +478,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
     uint16_t idleMinutes;
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-        difftime(tr_time(), std::max<time_t>(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
+        difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
 /***
@@ -641,7 +641,7 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
 {
     // safeguard against a bad arg
     tr_info const* const inf = tr_torrentInfo(tor);
-    file_hint = std::min<tr_file_index_t>(file_hint, inf->fileCount - 1);
+    file_hint = std::min(file_hint, inf->fileCount - 1);
 
     // find the first file with data in this piece
     tr_file_index_t first = file_hint;
@@ -661,7 +661,7 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
             break;
         }
 
-        priority = std::max<int8_t>(priority, file->priority);
+        priority = std::max(priority, file->priority);
 
         /* When dealing with multimedia files, getting the first and
            last pieces can sometimes allow you to preview it a bit
@@ -1245,7 +1245,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
 static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
     return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (int)difftime(tr_time(), std::max<time_t>(tor->startDate, tor->activityDate)) :
+        (int)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
         -1;
 }
 
@@ -2851,7 +2851,7 @@ void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->addedDate = t;
-    tor->anyDate = std::max<time_t>(tor->anyDate, tor->addedDate);
+    tor->anyDate = std::max(tor->anyDate, tor->addedDate);
 }
 
 void tr_torrentSetDateActive(tr_torrent* tor, time_t t)
@@ -2859,7 +2859,7 @@ void tr_torrentSetDateActive(tr_torrent* tor, time_t t)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->activityDate = t;
-    tor->anyDate = std::max<time_t>(tor->anyDate, tor->activityDate);
+    tor->anyDate = std::max(tor->anyDate, tor->activityDate);
 }
 
 void tr_torrentSetDateDone(tr_torrent* tor, time_t t)
@@ -2867,7 +2867,7 @@ void tr_torrentSetDateDone(tr_torrent* tor, time_t t)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->doneDate = t;
-    tor->anyDate = std::max<time_t>(tor->anyDate, tor->doneDate);
+    tor->anyDate = std::max(tor->anyDate, tor->doneDate);
 }
 
 /**
@@ -3441,7 +3441,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
                 uint32_t const n = tr_torPieceCountBytes(tor, p);
                 tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
                 tor->corruptCur += n;
-                tor->downloadedCur -= std::min<unsigned long>(tor->downloadedCur, n);
+                tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
                 tr_peerMgrGotBadPiece(tor, p);
             }
         }
@@ -3449,7 +3449,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     else
     {
         uint32_t const n = tr_torBlockCountBytes(tor, block);
-        tor->downloadedCur -= std::min<unsigned long>(tor->downloadedCur, n);
+        tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
         tr_logAddTorDbg(tor, "we have this block already...");
     }
 }
@@ -3675,7 +3675,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
         }
     }
 
-    tor->queuePosition = std::min<int>(pos, back + 1);
+    tor->queuePosition = std::min(pos, back + 1);
     tor->anyDate = now;
 
     TR_ASSERT(queueIsSequenced(tor->session));

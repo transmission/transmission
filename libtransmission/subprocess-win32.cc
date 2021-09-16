@@ -94,7 +94,7 @@ static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* 
 
 static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t const* rhs, size_t rhs_len)
 {
-    int diff = wcsnicmp(lhs, rhs, std::min<size_t>(lhs_len, rhs_len));
+    int diff = wcsnicmp(lhs, rhs, std::min(lhs_len, rhs_len));
 
     if (diff == 0)
     {

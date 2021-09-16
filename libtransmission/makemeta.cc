@@ -284,12 +284,12 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
         uint8_t* bufptr = buf;
-        uint32_t const thisPieceSize = std::min<uint32_t>(b->pieceSize, totalRemain); // FIXME: Shrinking 64 bit value into 32
+        uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
         while (leftInPiece != 0)
         {
-            uint64_t const n_this_pass = std::min<uint64_t>(b->files[fileIndex].size - off, leftInPiece);
+            uint64_t const n_this_pass = std::min(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
             (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, nullptr);
             bufptr += n_read;

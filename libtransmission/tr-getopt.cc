@@ -101,21 +101,23 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
 static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth, int* argWidth)
 {
+    // FIXME: in this function sign bits from int* are lost, then 64-bit result is truncated to 32-bit int
+    // Convert arguments to size_t*
     char const* arg;
 
     if (o->longName != nullptr)
     {
-        *longWidth = std::max<int>(*longWidth, strlen(o->longName));
+        *longWidth = std::max((size_t)*longWidth, size_t{ strlen(o->longName) });
     }
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = std::max<int>(*shortWidth, strlen(o->shortName));
+        *shortWidth = std::max((size_t)*shortWidth, size_t{ strlen(o->shortName) });
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = std::max<int>(*argWidth, strlen(arg));
+        *argWidth = std::max((size_t)*argWidth, size_t{ strlen(arg) });
     }
 }
 

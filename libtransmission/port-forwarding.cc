@@ -262,5 +262,5 @@ bool tr_sharedTraversalIsEnabled(tr_shared const* s)
 
 int tr_sharedTraversalStatus(tr_shared const* s)
 {
-    return std::max<int>(s->natpmpStatus, s->upnpStatus);
+    return std::max(s->natpmpStatus, s->upnpStatus);
 }

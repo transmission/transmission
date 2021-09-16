@@ -1423,8 +1423,8 @@ static bool parseNumberSection(char const* str, size_t len, struct number_range*
 
     tr_free(tmp);
 
-    setme->low = (int)std::min<long>(a, b); // FIXME: narrowing long to int
-    setme->high = (int)std::max<long>(a, b);
+    setme->low = (int)std::min(a, b); // FIXME: narrowing long to int
+    setme->high = (int)std::max(a, b);
 
     errno = error;
     return success;

@@ -175,7 +175,7 @@ static void dht_bootstrap(void* closure)
         tr_logAddNamedInfo("DHT", "Bootstrapping from %d IPv6 nodes", num6);
     }
 
-    for (int i = 0; i < std::max<int>(num, num6); ++i)
+    for (int i = 0; i < std::max(num, num6); ++i)
     {
         if (i < num && !bootstrap_done(cl->session, AF_INET))
         {
@@ -857,7 +857,7 @@ void dht_hash(void* hash_return, int hash_size, void const* v1, int len1, void c
     unsigned char sha1[SHA_DIGEST_LENGTH];
     tr_sha1(sha1, v1, len1, v2, len2, v3, len3, nullptr);
     memset(hash_return, 0, hash_size);
-    memcpy(hash_return, sha1, std::min<int>(hash_size, SHA_DIGEST_LENGTH));
+    memcpy(hash_return, sha1, std::min(hash_size, SHA_DIGEST_LENGTH));
 }
 
 int dht_random_bytes(void* buf, size_t size)

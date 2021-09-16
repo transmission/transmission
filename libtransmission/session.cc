@@ -3036,7 +3036,7 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     }
 
     // find the best n candidates
-    num_wanted = std::min<size_t>(num_wanted, candidates.size());
+    num_wanted = std::min(num_wanted, candidates.size());
     if (num_wanted < candidates.size())
     {
         std::partial_sort(
@@ -3081,7 +3081,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         /* is it stalled? */
         if (stalled_enabled)
         {
-            int const idle_secs = (int)difftime(now, std::max<time_t>(tor->startDate, tor->activityDate));
+            int const idle_secs = (int)difftime(now, std::max(tor->startDate, tor->activityDate));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
                 continue;
         }

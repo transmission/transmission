@@ -159,7 +159,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
     {
         struct tr_datatype* next = io->outbuf_datatypes;
 
-        unsigned int const payload = std::min<unsigned long>(next->length, bytes_transferred);
+        unsigned int const payload = std::min(uint64_t { next->length }, uint64_t { bytes_transferred });
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
@@ -1098,7 +1098,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);
-    return std::max<unsigned int>(ceiling, currentSpeed_Bps * period);
+    return std::max(ceiling, currentSpeed_Bps * period);
 }
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now)
@@ -1302,7 +1302,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount)
 
     while (byteCount > 0)
     {
-        size_t const thisPass = std::min<size_t>(byteCount, buflen);
+        size_t const thisPass = std::min(byteCount, buflen);
         tr_peerIoReadBytes(io, inbuf, buf, thisPass);
         byteCount -= thisPass;
     }

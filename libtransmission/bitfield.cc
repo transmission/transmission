@@ -86,7 +86,7 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
     else
     {
         uint8_t val;
-        size_t const walk_end = std::min<size_t>(b->alloc_count, last_byte);
+        size_t const walk_end = std::min(b->alloc_count, last_byte);
 
         /* first byte */
         size_t const first_shift = begin - (first_byte * 8);
@@ -221,7 +221,7 @@ static void tr_bitfieldEnsureBitsAlloced(tr_bitfield* b, size_t n)
 
     if (has_all)
     {
-        bytes_needed = get_bytes_needed(std::max<size_t>(n, b->true_count));
+        bytes_needed = get_bytes_needed(std::max(n, b->true_count));
     }
     else
     {
@@ -354,7 +354,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
 
     if (bounded)
     {
-        byte_count = std::min<size_t>(byte_count, get_bytes_needed(b->bit_count));
+        byte_count = std::min(byte_count, get_bytes_needed(b->bit_count));
     }
 
     b->bits = static_cast<uint8_t*>(tr_memdup(bits, byte_count));

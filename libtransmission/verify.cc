@@ -77,8 +77,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* figure out how much we can read this pass */
         leftInPiece = tr_torPieceCountBytes(tor, pieceIndex) - piecePos;
         leftInFile = file->length - filePos;
-        bytesThisPass = std::min<uint64_t>(leftInFile, leftInPiece);
-        bytesThisPass = std::min<uint64_t>(bytesThisPass, buflen);
+        bytesThisPass = std::min(leftInFile, leftInPiece);
+        bytesThisPass = std::min(bytesThisPass, buflen);
 
         /* read a bit */
         if (fd != TR_BAD_SYS_FILE)
