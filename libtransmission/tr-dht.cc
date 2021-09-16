@@ -57,7 +57,7 @@
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "platform.h" /* tr_threadNew() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -654,9 +654,8 @@ static void callback(void* ignore, int event, unsigned char const* info_hash, vo
 
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
-        tr_torrent* tor;
         tr_sessionLock(session_);
-        tor = tr_torrentFindFromHash(session_, info_hash);
+        tr_torrent* const tor = session_->getTorrentByHash(info_hash);
 
         if (tor != nullptr && tr_torrentAllowsDHT(tor))
         {
@@ -682,7 +681,7 @@ static void callback(void* ignore, int event, unsigned char const* info_hash, vo
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = tr_torrentFindFromHash(session_, info_hash);
+        tr_torrent* const tor = session_->getTorrentByHash(info_hash);
 
         if (tor != nullptr)
         {

@@ -484,7 +484,7 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
     if (announcer != nullptr)
     {
         tr_session* session = announcer->session;
-        tr_torrent* tor = tr_torrentFindFromHash(session, info_hash);
+        tr_torrent* const tor = session->getTorrentByHash(info_hash);
 
         if (tor != nullptr && tor->tiers != nullptr)
         {
@@ -1426,7 +1426,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     for (int i = 0; i < response->row_count; ++i)
     {
         struct tr_scrape_response_row const* row = &response->rows[i];
-        tr_torrent* tor = tr_torrentFindFromHash(session, row->info_hash);
+        tr_torrent* const tor = session->getTorrentByHash(row->info_hash);
 
         if (tor != nullptr)
         {

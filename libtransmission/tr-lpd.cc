@@ -51,7 +51,7 @@ typedef uint16_t in_port_t; /* all missing */
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"

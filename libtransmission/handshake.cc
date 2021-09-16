@@ -175,7 +175,7 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
     uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
-    tr_torrent* const tor = torrent_hash == nullptr ? nullptr : tr_torrentFindFromHash(handshake->session, torrent_hash);
+    tr_torrent* const tor = torrent_hash == nullptr ? nullptr : handshake->session->getTorrentByHash(torrent_hash);
     unsigned char const* const peer_id = tor == nullptr ? nullptr : tr_torrentGetPeerId(tor);
     bool const success = peer_id != nullptr;
 
@@ -224,7 +224,6 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     uint8_t name[HANDSHAKE_NAME_LEN];
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
-    tr_torrent* tor;
     uint8_t peer_id[PEER_ID_LEN];
 
     dbgmsg(handshake, "payload: need %d, got %zu", HANDSHAKE_SIZE, evbuffer_get_length(inbuf));
@@ -264,7 +263,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     handshake->havePeerID = true;
     dbgmsg(handshake, "peer-id is [%*.*s]", TR_ARG_TUPLE(PEER_ID_LEN, PEER_ID_LEN, peer_id));
 
-    tor = tr_torrentFindFromHash(handshake->session, hash);
+    tr_torrent* tor = handshake->session->getTorrentByHash(hash);
 
     if (memcmp(peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0)
     {
@@ -703,7 +702,6 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     bool connected_to_self;
     char client[128];
     uint8_t peer_id[PEER_ID_LEN];
-    tr_torrent* tor;
 
     if (evbuffer_get_length(inbuf) < PEER_ID_LEN)
     {
@@ -718,7 +716,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     dbgmsg(handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming(handshake->io));
 
     /* if we've somehow connected to ourselves, don't keep the connection */
-    tor = tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(handshake->io));
+    tr_torrent* tor = handshake->session->getTorrentByHash(tr_peerIoGetTorrentHash(handshake->io));
     connected_to_self = tor != nullptr && memcmp(peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0;
 
     return tr_handshakeDone(handshake, !connected_to_self);
@@ -1156,7 +1154,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 
         if (tr_peerIoHasTorrentHash(io))
         {
-            tor = tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(io));
+            tor = handshake->session->getTorrentByHash(tr_peerIoGetTorrentHash(io));
         }
         else
         {
