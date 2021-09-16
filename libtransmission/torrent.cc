@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm> /* EINVAL */
 #include <cerrno> /* EINVAL */
 #include <climits> /* INT_MAX */
 #include <cmath>
