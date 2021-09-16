@@ -632,7 +632,7 @@ static void updateFastSet(tr_peerMsgs* msgs)
     {
         struct tr_address const* addr = tr_peerIoGetAddress(msgs->io, nullptr);
         tr_info const* inf = &msgs->torrent->info;
-        size_t const numwant = MIN(MAX_FAST_SET_SIZE, inf->pieceCount);
+        size_t const numwant = std::min(MAX_FAST_SET_SIZE, inf->pieceCount);
 
         /* build the fast set */
         msgs->fastsetSize = tr_generateAllowedSet(msgs->fastset, numwant, inf->pieceCount, inf->hash, addr);
