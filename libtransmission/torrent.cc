@@ -73,42 +73,25 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-static int compareKeyToTorrentId(void const* va, void const* vb)
+tr_torrent* tr_torrentFindFromId(tr_session* session, int key)
 {
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a->uniqueId - b;
+    auto& map = session->torrentsById;
+    auto const it = map.find(key);
+    return it == std::end(map) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
+tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* key)
 {
-    return static_cast<tr_torrent*>(tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId));
+    auto& map = session->torrentsByHash;
+    auto const it = map.find(key);
+    return it == std::end(map) ? nullptr : it->second;
 }
 
-static int compareKeyToTorrentHashString(void const* va, void const* vb)
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* key)
 {
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<char const*>(vb);
-    return evutil_ascii_strcasecmp(a->info.hashString, b);
-}
-
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
-{
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString));
-}
-
-static int compareKeyToTorrentHash(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<uint8_t const*>(vb);
-    return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
-}
-
-tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHash)
-{
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash));
+    auto& map = session->torrentsByHashString;
+    auto const it = map.find(key);
+    return it == std::end(map) ? nullptr : it->second;
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
