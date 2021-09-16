@@ -554,8 +554,6 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 
     if (peer != nullptr && msg != nullptr)
     {
-        tr_torrent* tor = nullptr;
-
         char const* params = lpd_extractHeader(msg, &ver);
 
         if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
@@ -584,9 +582,8 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = tr_torrentFindFromHashString(session, hashString);
-
-        if (tr_isTorrent(tor) && tr_torrentAllowsLPD(tor))
+        tr_torrent* tor = session->getTorrentByHashString(hashString);
+        if ((tor != nullptr) && tr_torrentAllowsLPD(tor))
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);

@@ -132,7 +132,7 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
             }
             else if (tr_variantGetStr(node, &str, nullptr))
             {
-                tor = tr_torrentFindFromHashString(session, str);
+                tor = session->getTorrentByHashString(str);
             }
             else
             {
@@ -175,10 +175,10 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
         }
         else
         {
-            tr_torrent* tor;
             torrents = tr_new0(tr_torrent*, 1);
 
-            if ((tor = tr_torrentFindFromHashString(session, str)) != nullptr)
+            tr_torrent* tor = session->getTorrentByHashString(str);
+            if (tor != nullptr)
             {
                 torrents[torrentCount++] = tor;
             }
