@@ -15,11 +15,8 @@
 #include <inttypes.h>
 #include <time.h>
 
-enum
-{
-    /* defined by BEP #9 */
-    METADATA_PIECE_SIZE = (1024 * 16)
-};
+// defined by BEP #9
+inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
 void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len);
 
