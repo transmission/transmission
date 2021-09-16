@@ -159,7 +159,7 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
     {
         struct tr_datatype* next = io->outbuf_datatypes;
 
-        unsigned int const payload = std::min(uint64_t { next->length }, uint64_t { bytes_transferred });
+        unsigned int const payload = std::min(uint64_t{ next->length }, uint64_t{ bytes_transferred });
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
