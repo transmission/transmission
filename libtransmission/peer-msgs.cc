@@ -66,8 +66,6 @@ enum
     UT_PEX_ID = 1,
     UT_METADATA_ID = 3,
     /* */
-    MAX_PEX_PEER_COUNT = 50,
-    /* */
     MIN_CHOKE_PERIOD_SEC = 10,
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 100,
@@ -96,6 +94,13 @@ enum
     METADATA_MSG_TYPE_DATA = 1,
     METADATA_MSG_TYPE_REJECT = 2
 };
+
+namespace
+{
+
+constexpr int MAX_PEX_PEER_COUNT = 50;
+
+} // unnamed namespace
 
 enum
 {
