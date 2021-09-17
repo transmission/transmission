@@ -829,7 +829,7 @@ static void sessionSetImpl(void* vdata)
     int64_t i;
     double d;
     bool boolVal;
-    char const* str;
+    char const* strVal;
     struct tr_bindinfo b;
     struct tr_turtle_info* turtle = &session->turtle;
 
@@ -884,14 +884,14 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_socket_tos, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_peer_socket_tos, &strVal, nullptr))
     {
-        session->peerSocketTOS = parse_tos(str);
+        session->peerSocketTOS = parse_tos(strVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_congestion_algorithm, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_peer_congestion_algorithm, &strVal, nullptr))
     {
-        session->peer_congestion_algorithm = tr_strdup(str);
+        session->peer_congestion_algorithm = tr_strdup(strVal);
     }
     else
     {
@@ -903,9 +903,9 @@ static void sessionSetImpl(void* vdata)
         tr_blocklistSetEnabled(session, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_blocklist_url, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_blocklist_url, &strVal, nullptr))
     {
-        tr_blocklistSetURL(session, str);
+        tr_blocklistSetURL(session, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
@@ -965,14 +965,14 @@ static void sessionSetImpl(void* vdata)
         session->preallocationMode = tr_preallocation_mode(i);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &strVal, nullptr))
     {
-        tr_sessionSetDownloadDir(session, str);
+        tr_sessionSetDownloadDir(session, strVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &strVal, nullptr))
     {
-        tr_sessionSetIncompleteDir(session, str);
+        tr_sessionSetIncompleteDir(session, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
@@ -997,8 +997,8 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, nullptr) || !tr_address_from_string(&b.addr, str) ||
-        b.addr.type != TR_AF_INET)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &strVal, nullptr) ||
+        !tr_address_from_string(&b.addr, strVal) || b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
@@ -1006,8 +1006,8 @@ static void sessionSetImpl(void* vdata)
     b.socket = TR_BAD_SOCKET;
     session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, nullptr) || !tr_address_from_string(&b.addr, str) ||
-        b.addr.type != TR_AF_INET6)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &strVal, nullptr) ||
+        !tr_address_from_string(&b.addr, strVal) || b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
@@ -1147,9 +1147,9 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetTorrentDoneScriptEnabled(session, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &str, nullptr))
+    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &strVal, nullptr))
     {
-        tr_sessionSetTorrentDoneScript(session, str);
+        tr_sessionSetTorrentDoneScript(session, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
