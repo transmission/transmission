@@ -24,7 +24,7 @@
 
 @interface TrackerCell : NSActionCell
 {
-    NSMutableDictionary * fNameAttributes, * fStatusAttributes;
+    NSMutableDictionary *fNameAttributes, *fStatusAttributes;
 }
 
 @end

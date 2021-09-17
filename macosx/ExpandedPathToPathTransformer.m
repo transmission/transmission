@@ -24,19 +24,19 @@
 
 @implementation ExpandedPathToPathTransformer
 
-+ (Class) transformedValueClass
++ (Class)transformedValueClass
 {
     return [NSString class];
 }
 
-+ (BOOL) allowsReverseTransformation
++ (BOOL)allowsReverseTransformation
 {
     return NO;
 }
 
-- (id) transformedValue: (id) value
+- (id)transformedValue:(id)value
 {
-    return value == nil ? nil : [[NSFileManager defaultManager] displayNameAtPath: value];
+    return value == nil ? nil : [NSFileManager.defaultManager displayNameAtPath:value];
 }
 
 @end

@@ -24,18 +24,18 @@
 
 @implementation InfoTextField
 
-- (void) setStringValue: (NSString *) string
+- (void)setStringValue:(NSString*)string
 {
-    [super setStringValue: string];
+    super.stringValue = string;
 
-    [self setSelectable: ![[self stringValue] isEqualToString: @""]];
+    self.selectable = ![self.stringValue isEqualToString:@""];
 }
 
-- (void) setObjectValue: (id <NSCopying>) object
+- (void)setObjectValue:(id<NSCopying>)object
 {
-    [super setObjectValue: object];
+    super.objectValue = object;
 
-    [self setSelectable: ![[self stringValue] isEqualToString: @""]];
+    self.selectable = ![self.stringValue isEqualToString:@""];
 }
 
 @end

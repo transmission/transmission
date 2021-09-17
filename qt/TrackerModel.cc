@@ -59,7 +59,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 
 struct CompareTrackers
 {
-    bool operator ()(TrackerInfo const& a, TrackerInfo const& b) const
+    bool operator()(TrackerInfo const& a, TrackerInfo const& b) const
     {
         if (a.torrent_id != b.torrent_id)
         {

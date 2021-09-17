@@ -29,8 +29,8 @@
     NSInteger fMouseRow;
 }
 
-- (NSRect) iconRectForRow: (int) row;
+- (NSRect)iconRectForRow:(int)row;
 
-- (NSInteger) hoveredRow;
+@property(nonatomic, readonly) NSInteger hoveredRow;
 
 @end

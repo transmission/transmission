@@ -28,8 +28,7 @@ static char const* add = NULL;
 static char const* deleteme = NULL;
 static char const* replace[2] = { NULL, NULL };
 
-static tr_option options[] =
-{
+static tr_option options[] = {
     { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
     { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
     { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },

@@ -20,8 +20,8 @@
 ****
 ***/
 
-FaviconCache::FaviconCache() :
-    nam_(new QNetworkAccessManager(this))
+FaviconCache::FaviconCache()
+    : nam_(new QNetworkAccessManager(this))
 {
     connect(nam_, &QNetworkAccessManager::finished, this, &FaviconCache::onRequestFinished);
 }
@@ -60,7 +60,7 @@ void markUrlAsScraped(QString const& url_str)
     }
 }
 
-} // unnamed namespace
+} // namespace
 
 void FaviconCache::ensureCacheDirHasBeenScanned()
 {
@@ -152,7 +152,7 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
         return k_it->second;
     }
 
-    auto const url = QUrl { url_str };
+    auto const url = QUrl{ url_str };
     auto const key = getKey(url);
     keys_.insert({ url_str, key });
 
@@ -163,27 +163,27 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
         markUrlAsScraped(url_str);
 
         auto const scrape = [this](auto const host)
-            {
-                auto const schemes = std::array<QString, 2>{
-                    QStringLiteral("http"),
-                    QStringLiteral("https")
-                };
-                auto const suffixes = std::array<QString, 5>{
-                    QStringLiteral("gif"),
-                    QStringLiteral("ico"),
-                    QStringLiteral("jpg"),
-                    QStringLiteral("png"),
-                    QStringLiteral("svg")
-                };
-                for (auto const& scheme : schemes)
-                {
-                    for (auto const& suffix : suffixes)
-                    {
-                        auto const path = QStringLiteral("%1://%2/favicon.%3").arg(scheme).arg(host).arg(suffix);
-                        nam_->get(QNetworkRequest(path));
-                    }
-                }
+        {
+            auto const schemes = std::array<QString, 2>{
+                QStringLiteral("http"),
+                QStringLiteral("https"),
             };
+            auto const suffixes = std::array<QString, 5>{
+                QStringLiteral("gif"), //
+                QStringLiteral("ico"), //
+                QStringLiteral("jpg"), //
+                QStringLiteral("png"), //
+                QStringLiteral("svg"), //
+            };
+            for (auto const& scheme : schemes)
+            {
+                for (auto const& suffix : suffixes)
+                {
+                    auto const path = QStringLiteral("%1://%2/favicon.%3").arg(scheme).arg(host).arg(suffix);
+                    nam_->get(QNetworkRequest(path));
+                }
+            }
+        };
 
         // tracker.domain.com
         auto host = url.host();

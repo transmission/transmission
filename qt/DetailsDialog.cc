@@ -91,8 +91,7 @@ QString collateAddress(QString const& address)
         if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
         {
             quint32 const ipv4_address = ip_address.toIPv4Address();
-            collated = QStringLiteral("1-") +
-                QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
+            collated = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
         }
         else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
         {
@@ -129,8 +128,8 @@ class PeerItem : public QTreeWidgetItem
     QString status_;
 
 public:
-    explicit PeerItem(Peer p) :
-        peer_(std::move(p))
+    explicit PeerItem(Peer p)
+        : peer_(std::move(p))
     {
     }
 
@@ -149,7 +148,7 @@ public:
         status_ = s;
     }
 
-    bool operator <(QTreeWidgetItem const& other) const override
+    bool operator<(QTreeWidgetItem const& other) const override
     {
         auto const* i = dynamic_cast<PeerItem const*>(&other);
         auto const* tw = treeWidget();
@@ -210,11 +209,11 @@ QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback)
     return icon;
 }
 
-DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    prefs_(prefs),
-    model_(model)
+DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , prefs_(prefs)
+    , model_(model)
 {
     ui_.setupUi(this);
 
@@ -227,10 +226,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     adjustSize();
     ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
 
-    static std::array<int, 2> constexpr InitKeys =
-    {
+    static std::array<int, 2> constexpr InitKeys = {
         Prefs::SHOW_TRACKER_SCRAPES,
-        Prefs::SHOW_BACKUP_TRACKERS
+        Prefs::SHOW_BACKUP_TRACKERS,
     };
 
     for (int const key : InitKeys)
@@ -308,8 +306,11 @@ void DetailsDialog::onTorrentsEdited(torrent_ids_t const& ids)
 
     // are any of the edited torrents on display here?
     torrent_ids_t interesting_ids;
-    std::set_intersection(std::begin(a), std::end(a),
-        std::begin(b), std::end(b),
+    std::set_intersection(
+        std::begin(a),
+        std::end(a),
+        std::begin(b),
+        std::end(b),
         std::inserter(interesting_ids, std::begin(interesting_ids)));
 
     if (!interesting_ids.empty())
@@ -517,10 +518,7 @@ void DetailsDialog::refreshUI()
             //: %1 is amount of downloaded and verified data,
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
-            string = tr("%1 of %2 (%3%)")
-                .arg(fmt.sizeToString(have_verified))
-                .arg(size_when_done_str)
-                .arg(pct);
+            string = tr("%1 of %2 (%3%)").arg(fmt.sizeToString(have_verified)).arg(size_when_done_str).arg(pct);
         }
         else
         {
@@ -530,10 +528,10 @@ void DetailsDialog::refreshUI()
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
             string = tr("%1 of %2 (%3%), %4 Unverified")
-                .arg(fmt.sizeToString(have_verified + have_unverified))
-                .arg(size_when_done_str)
-                .arg(pct)
-                .arg(fmt.sizeToString(have_unverified));
+                         .arg(fmt.sizeToString(have_verified + have_unverified))
+                         .arg(size_when_done_str)
+                         .arg(pct)
+                         .arg(fmt.sizeToString(have_unverified));
         }
     }
 
@@ -599,9 +597,7 @@ void DetailsDialog::refreshUI()
             d += t->downloadedEver();
         }
 
-        string = tr("%1 (Ratio: %2)")
-            .arg(fmt.sizeToString(u))
-            .arg(fmt.ratioToString(tr_getRatio(u, d)));
+        string = tr("%1 (Ratio: %2)").arg(fmt.sizeToString(u)).arg(fmt.ratioToString(tr_getRatio(u, d)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -775,14 +771,11 @@ void DetailsDialog::refreshUI()
         }
         else if (piece_size > 0)
         {
-            string = tr("%1 (%Ln pieces @ %2)", "", pieces)
-                .arg(fmt.sizeToString(size))
-                .arg(fmt.memToString(piece_size));
+            string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(fmt.sizeToString(size)).arg(fmt.memToString(piece_size));
         }
         else
         {
-            string = tr("%1 (%Ln pieces)", "", pieces)
-                .arg(fmt.sizeToString(size));
+            string = tr("%1 (%Ln pieces)", "", pieces).arg(fmt.sizeToString(size));
         }
     }
 
@@ -1154,10 +1147,8 @@ void DetailsDialog::refreshUI()
             }
 
             item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString() : fmt.speedToString(peer.rate_to_peer));
-            item->setText(COL_DOWN,
-                peer.rate_to_client.isZero() ? QString() : fmt.speedToString(peer.rate_to_client));
-            item->setText(COL_PERCENT, peer.progress > 0 ? QStringLiteral("%1%").arg(int(peer.progress * 100.0)) :
-                QString());
+            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString() : fmt.speedToString(peer.rate_to_client));
+            item->setText(COL_PERCENT, peer.progress > 0 ? QStringLiteral("%1%").arg(int(peer.progress * 100.0)) : QString());
             item->setText(COL_STATUS, code);
             item->setToolTip(COL_STATUS, code_tip);
 
@@ -1298,8 +1289,8 @@ void DetailsDialog::onTrackerSelectionChanged()
 void DetailsDialog::onAddTrackerClicked()
 {
     bool ok = false;
-    QString const url = QInputDialog::getText(this, tr("Add URL "), tr("Add tracker announce URL:"), QLineEdit::Normal,
-        QString(), &ok);
+    QString const
+        url = QInputDialog::getText(this, tr("Add URL "), tr("Add tracker announce URL:"), QLineEdit::Normal, QString(), &ok);
 
     if (!ok)
     {
@@ -1342,8 +1333,13 @@ void DetailsDialog::onEditTrackerClicked()
     auto const tracker_info = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
 
     bool ok = false;
-    QString const newval = QInputDialog::getText(this, tr("Edit URL "), tr("Edit tracker announce URL:"), QLineEdit::Normal,
-        tracker_info.st.announce, &ok);
+    QString const newval = QInputDialog::getText(
+        this,
+        tr("Edit URL "),
+        tr("Edit tracker announce URL:"),
+        QLineEdit::Normal,
+        tracker_info.st.announce,
+        &ok);
 
     if (!ok)
     {
@@ -1418,8 +1414,8 @@ void DetailsDialog::initOptionsTab()
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 
-    void (QComboBox::* combo_index_changed)(int) = &QComboBox::currentIndexChanged;
-    void (QSpinBox::* spin_value_changed)(int) = &QSpinBox::valueChanged;
+    void (QComboBox::*combo_index_changed)(int) = &QComboBox::currentIndexChanged;
+    void (QSpinBox::*spin_value_changed)(int) = &QSpinBox::valueChanged;
     connect(ui_.bandwidthPriorityCombo, combo_index_changed, this, &DetailsDialog::onBandwidthPriorityChanged);
     connect(ui_.idleCombo, combo_index_changed, this, &DetailsDialog::onIdleModeChanged);
     connect(ui_.idleSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
@@ -1440,7 +1436,10 @@ void DetailsDialog::initOptionsTab()
 
 void DetailsDialog::initTrackerTab()
 {
-    auto deleter = [](QObject* o) { o->deleteLater(); };
+    auto deleter = [](QObject* o)
+    {
+        o->deleteLater();
+    };
 
     // NOLINTNEXTLINE(modernize-make-shared) no custom deleters in make_shared
     tracker_model_.reset(new TrackerModel, deleter);
@@ -1466,7 +1465,9 @@ void DetailsDialog::initTrackerTab()
     connect(ui_.showBackupTrackersCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowBackupTrackersToggled);
     connect(ui_.showTrackerScrapesCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowTrackerScrapesToggled);
     connect(
-        ui_.trackersView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+        ui_.trackersView->selectionModel(),
+        &QItemSelectionModel::selectionChanged,
+        this,
         &DetailsDialog::onTrackerSelectionChanged);
 
     onTrackerSelectionChanged();

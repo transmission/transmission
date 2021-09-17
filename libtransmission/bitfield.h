@@ -31,8 +31,7 @@ typedef struct tr_bitfield
        This occurs when a magnet link's peers send have all / have none */
     bool have_all_hint;
     bool have_none_hint;
-}
-tr_bitfield;
+} tr_bitfield;
 
 /***
 ****
@@ -53,8 +52,6 @@ void tr_bitfieldRemRange(tr_bitfield*, size_t begin, size_t end);
 /***
 ****  life cycle
 ***/
-
-extern tr_bitfield const TR_BITFIELD_INIT;
 
 void tr_bitfieldConstruct(tr_bitfield*, size_t bit_count);
 

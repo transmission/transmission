@@ -27,30 +27,30 @@
 
 @interface FileOutlineController : NSObject
 {
-    Torrent * fTorrent;
-    NSMutableArray * fFileList;
+    Torrent* fTorrent;
+    NSMutableArray* fFileList;
 
-    IBOutlet FileOutlineView * fOutline;
+    IBOutlet FileOutlineView* fOutline;
 
-    NSString * fFilterText;
+    NSString* fFilterText;
 }
 
-- (FileOutlineView *) outlineView;
+@property(nonatomic, readonly) FileOutlineView* outlineView;
 
-- (void) setTorrent: (Torrent *) torrent;
+- (void)setTorrent:(Torrent*)torrent;
 
-- (void) setFilterText: (NSString *) text;
+- (void)setFilterText:(NSString*)text;
 
-- (void) refresh;
+- (void)refresh;
 
-- (void) setCheck: (id) sender;
-- (void) setOnlySelectedCheck: (id) sender;
-- (void) checkAll;
-- (void) uncheckAll;
-- (void) setPriority: (id) sender;
+- (void)setCheck:(id)sender;
+- (void)setOnlySelectedCheck:(id)sender;
+- (void)checkAll;
+- (void)uncheckAll;
+- (void)setPriority:(id)sender;
 
-- (void) revealFile: (id) sender;
+- (void)revealFile:(id)sender;
 
-- (void) renameSelected: (id) sender;
+- (void)renameSelected:(id)sender;
 
 @end

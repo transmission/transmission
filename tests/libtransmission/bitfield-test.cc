@@ -35,8 +35,7 @@ TEST(Bitfield, countRange)
         do
         {
             end = tr_rand_int_weak(bit_count);
-        }
-        while (end == begin);
+        } while (end == begin);
 
         // ensure end <= begin
         if (end < begin)

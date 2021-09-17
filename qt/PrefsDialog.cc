@@ -56,8 +56,8 @@ class PreferenceWidget
     static char const* const PrefKey;
 
 public:
-    explicit PreferenceWidget(QObject* object) :
-        object_(object)
+    explicit PreferenceWidget(QObject* object)
+        : object_(object)
     {
     }
 
@@ -361,8 +361,8 @@ void PrefsDialog::initSpeedTab()
         ui_.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
     }
 
-    ui_.altSpeedLimitDaysCombo->setCurrentIndex(ui_.altSpeedLimitDaysCombo->findData(prefs_.getInt(
-        Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
+    ui_.altSpeedLimitDaysCombo->setCurrentIndex(
+        ui_.altSpeedLimitDaysCombo->findData(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
 
     linkWidgetToPref(ui_.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
     linkWidgetToPref(ui_.uploadSpeedLimitSpin, Prefs::USPEED);
@@ -374,8 +374,8 @@ void PrefsDialog::initSpeedTab()
     linkWidgetToPref(ui_.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
     linkWidgetToPref(ui_.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
 
-    sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit <<
-        ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
+    sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
+                   << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.speedLimitsSectionLayout);
@@ -466,8 +466,12 @@ void PrefsDialog::onBlocklistUpdated(int n)
 
 void PrefsDialog::onUpdateBlocklistClicked()
 {
-    blocklist_dialog_ = new QMessageBox(QMessageBox::Information, QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist..."), QMessageBox::Close, this);
+    blocklist_dialog_ = new QMessageBox(
+        QMessageBox::Information,
+        QString(),
+        tr("<b>Update Blocklist</b><p>Getting new blocklist..."),
+        QMessageBox::Close,
+        this);
     connect(blocklist_dialog_, &QDialog::rejected, this, &PrefsDialog::onUpdateBlocklistCancelled);
     connect(&session_, &Session::blocklistUpdated, this, &PrefsDialog::onBlocklistUpdated);
     blocklist_dialog_->show();
@@ -491,8 +495,8 @@ void PrefsDialog::initPrivacyTab()
     linkWidgetToPref(ui_.blocklistEdit, Prefs::BLOCKLIST_URL);
     linkWidgetToPref(ui_.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
 
-    block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton <<
-        ui_.autoUpdateBlocklistCheck;
+    block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
+                   << ui_.autoUpdateBlocklistCheck;
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.encryptionSectionLayout);
@@ -585,8 +589,11 @@ void PrefsDialog::initDownloadingTab()
     cr->addLayout(ui_.incompleteSectionLayout);
     cr->update();
 
-    connect(ui_.queueStalledMinutesSpin, qOverload<int>(
-        &QSpinBox::valueChanged), this, &PrefsDialog::onQueueStalledMinutesChanged);
+    connect(
+        ui_.queueStalledMinutesSpin,
+        qOverload<int>(&QSpinBox::valueChanged),
+        this,
+        &PrefsDialog::onQueueStalledMinutesChanged);
 
     updateDownloadingWidgetsLocality();
     onQueueStalledMinutesChanged();
@@ -596,9 +603,10 @@ void PrefsDialog::updateDownloadingWidgetsLocality()
 {
     ui_.watchDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.watchDirButton) : ui_.watchDirEdit);
     ui_.downloadDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.downloadDirButton) : ui_.downloadDirEdit);
-    ui_.incompleteDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.incompleteDirButton) : ui_.incompleteDirEdit);
-    ui_.completionScriptStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.completionScriptButton) :
-        ui_.completionScriptEdit);
+    ui_.incompleteDirStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.incompleteDirButton) : ui_.incompleteDirEdit);
+    ui_.completionScriptStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.completionScriptButton) : ui_.completionScriptEdit);
 
     ui_.watchDirStack->setFixedHeight(ui_.watchDirStack->currentWidget()->sizeHint().height());
     ui_.downloadDirStack->setFixedHeight(ui_.downloadDirStack->currentWidget()->sizeHint().height());
@@ -612,12 +620,12 @@ void PrefsDialog::updateDownloadingWidgetsLocality()
 ****
 ***/
 
-PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    prefs_(prefs),
-    is_server_(session.isServer()),
-    is_local_(session_.isLocal())
+PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , prefs_(prefs)
+    , is_server_(session.isServer())
+    , is_local_(session_.isLocal())
 {
     ui_.setupUi(this);
 
@@ -631,8 +639,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     connect(&session_, &Session::sessionUpdated, this, &PrefsDialog::sessionUpdated);
 
-    static std::array<int, 10> constexpr InitKeys =
-    {
+    static std::array<int, 10> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED,
         Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
         Prefs::BLOCKLIST_ENABLED,
@@ -642,7 +649,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
         Prefs::INCOMPLETE_DIR,
         Prefs::INCOMPLETE_DIR_ENABLED,
         Prefs::RPC_ENABLED,
-        Prefs::SCRIPT_TORRENT_DONE_FILENAME
+        Prefs::SCRIPT_TORRENT_DONE_FILENAME,
     };
 
     for (auto const key : InitKeys)

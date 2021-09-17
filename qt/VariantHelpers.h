@@ -30,12 +30,11 @@ namespace trqt
 namespace variant_helpers
 {
 
-template<typename T,
-    typename std::enable_if<std::is_same_v<T, bool>>::type* = nullptr>
+template<typename T, typename std::enable_if<std::is_same_v<T, bool>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T {};
+    auto value = T{};
     if (tr_variantGetBool(variant, &value))
     {
         ret = value;
@@ -44,15 +43,15 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T,
-    typename std::enable_if<std::is_same_v<T, int64_t>||
-    std::is_same_v<T, uint64_t>||
-    std::is_same_v<T, int>||
-    std::is_same_v<T, time_t>>::type* = nullptr>
+template<
+    typename T,
+    typename std::enable_if<
+        std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> ||
+        std::is_same_v<T, time_t>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = int64_t {};
+    auto value = int64_t{};
     if (tr_variantGetInt(variant, &value))
     {
         ret = value;
@@ -61,12 +60,11 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T,
-    typename std::enable_if<std::is_same_v<T, double>>::type* = nullptr>
+template<typename T, typename std::enable_if<std::is_same_v<T, double>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T {};
+    auto value = T{};
     if (tr_variantGetReal(variant, &value))
     {
         ret = value;
@@ -103,20 +101,18 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename C, typename T = typename C::value_type,
+template<
+    typename C,
+    typename T = typename C::value_type,
     typename std::enable_if<
-    std::is_same_v<C, QStringList>||
-    std::is_same_v<C, QList<T>>||
-    std::is_same_v<C, std::vector<T>>
-    >::type* = nullptr
-    >
+        std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<C> ret;
 
     if (tr_variantIsList(variant))
     {
-        auto list = C {};
+        auto list = C{};
 
         for (size_t i = 0, n = tr_variantListSize(variant); i < n; ++i)
         {
@@ -232,4 +228,4 @@ void dictAdd(tr_variant* dict, tr_quark key, T const& value)
 
 } // namespace variant_helpers
 
-} // trqt
+} // namespace trqt

@@ -30,17 +30,17 @@ namespace
 
 struct TorrentIdLessThan
 {
-    bool operator ()(Torrent const* left, Torrent const* right) const
+    bool operator()(Torrent const* left, Torrent const* right) const
     {
         return left->id() < right->id();
     }
 
-    bool operator ()(int left_id, Torrent const* right) const
+    bool operator()(int left_id, Torrent const* right) const
     {
         return left_id < right->id();
     }
 
-    bool operator ()(Torrent const* left, int right_id) const
+    bool operator()(Torrent const* left, int right_id) const
     {
         return left->id() < right_id;
     }
@@ -51,7 +51,7 @@ auto getIds(Iter it, Iter end)
 {
     torrent_ids_t ids;
 
-    for ( ; it != end; ++it)
+    for (; it != end; ++it)
     {
         ids.insert((*it)->id());
     }
@@ -65,8 +65,8 @@ auto getIds(Iter it, Iter end)
 ****
 ***/
 
-TorrentModel::TorrentModel(Prefs const& prefs) :
-    prefs_(prefs)
+TorrentModel::TorrentModel(Prefs const& prefs)
+    : prefs_(prefs)
 {
 }
 
@@ -162,11 +162,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
 
     auto const now = time(nullptr);
     auto const recently_added = [&now](auto const& tor)
-        {
-            static auto constexpr MaxAge = 60;
-            auto const date = tor->dateAdded();
-            return (date != 0) && (difftime(now, date) < MaxAge);
-        };
+    {
+        static auto constexpr MaxAge = 60;
+        auto const date = tor->dateAdded();
+        return (date != 0) && (difftime(now, date) < MaxAge);
+    };
 
     // build a list of the property keys
     tr_variant* const first_child = tr_variantListChild(torrents, 0);
@@ -482,6 +482,9 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
 
 bool TorrentModel::hasTorrent(TorrentHash const& hash) const
 {
-    auto test = [hash](auto const& tor) { return tor->hash() == hash; };
+    auto test = [hash](auto const& tor)
+    {
+        return tor->hash() == hash;
+    };
     return std::any_of(torrents_.cbegin(), torrents_.cend(), test);
 }

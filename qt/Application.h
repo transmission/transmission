@@ -39,7 +39,11 @@ public:
     void raise() const;
     bool notifyApp(QString const& title, QString const& body) const;
 
-    QString const& intern(QString const& in) { return *interned_strings_.insert(in).first; }
+    QString const& intern(QString const& in)
+    {
+        return *interned_strings_.insert(in).first;
+    }
+
     FaviconCache& faviconCache();
 
 public slots:

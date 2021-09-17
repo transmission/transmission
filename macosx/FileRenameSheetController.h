@@ -13,15 +13,19 @@
 
 @interface FileRenameSheetController : NSWindowController
 
-+ (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
-+ (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
++ (void)presentSheetForTorrent:(Torrent*)torrent
+                modalForWindow:(NSWindow*)window
+             completionHandler:(void (^)(BOOL didRename))completionHandler;
++ (void)presentSheetForFileListNode:(FileListNode*)node
+                     modalForWindow:(NSWindow*)window
+                  completionHandler:(void (^)(BOOL didRename))completionHandler;
 
-@property (weak) IBOutlet NSTextField * labelField;
-@property (weak) IBOutlet NSTextField * inputField;
-@property (weak) IBOutlet NSButton * renameButton;
-@property (weak) IBOutlet NSButton * cancelButton;
+@property(weak) IBOutlet NSTextField* labelField;
+@property(weak) IBOutlet NSTextField* inputField;
+@property(weak) IBOutlet NSButton* renameButton;
+@property(weak) IBOutlet NSButton* cancelButton;
 
-- (IBAction) rename: (id) sender;
-- (IBAction) cancelRename: (id) sender;
+- (IBAction)rename:(id)sender;
+- (IBAction)cancelRename:(id)sender;
 
 @end

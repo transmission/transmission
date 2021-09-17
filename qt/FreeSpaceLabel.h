@@ -18,7 +18,7 @@ class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class FreeSpaceLabel : public QLabel
