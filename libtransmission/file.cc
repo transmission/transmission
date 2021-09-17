@@ -125,6 +125,8 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     return ret;
 }
 
+#include <iostream>
+
 bool tr_sys_dir_create(char const* path_in, int flags, int permissions, tr_error** error)
 {
     TR_ASSERT(path_in != nullptr);
@@ -134,22 +136,27 @@ bool tr_sys_dir_create(char const* path_in, int flags, int permissions, tr_error
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
-        fs::create_directories(path, ec);
+        auto const ok = fs::create_directories(path, ec);
+        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << std::endl;
     }
     else
     {
-        fs::create_directory(path, ec);
+        auto const ok = fs::create_directory(path, ec);
+        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << std::endl;
     }
 
     if (!ec)
     {
         fs::permissions(path, fs::perms(permissions), fs::perm_options::replace, ec);
+        std::cerr << __FILE__ << ':' << __LINE__ << " ec " << ec << std::endl;
     }
 
     if (ec)
     {
         tr_error_set_literal(error, ec.value(), ec.message().c_str());
+        std::cerr << __FILE__ << ':' << __LINE__ << " error is " << ec.value() << ' ' << ec.message() << std::endl;
+        return false;
     }
 
-    return !ec;
+    return true;
 }

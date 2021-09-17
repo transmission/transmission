@@ -15,6 +15,7 @@
 
 #include <array>
 #include <cstring>
+#include <iostream>
 #include <string>
 
 #ifndef _WIN32
@@ -1417,6 +1418,7 @@ TEST_F(FileTest, dirCreate)
     createFileWithContents(path1, "test");
 
     // Can't create directory where file already exists
+    std::cerr << "this is the one that fails on other platforms, created a file named " << path1 << std::endl;
     EXPECT_FALSE(tr_sys_dir_create(path1, 0, 0700, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
