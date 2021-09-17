@@ -2444,12 +2444,12 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static bool tr_stringEndsWith(char const* str, char const* end)
+static bool tr_stringEndsWith(char const* strval, char const* end)
 {
-    size_t const slen = strlen(str);
+    size_t const slen = strlen(strval);
     size_t const elen = strlen(end);
 
-    return slen >= elen && memcmp(&str[slen - elen], end, elen) == 0;
+    return slen >= elen && memcmp(&strval[slen - elen], end, elen) == 0;
 }
 
 static void loadBlocklists(tr_session* session)
