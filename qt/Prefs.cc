@@ -44,17 +44,19 @@ void ensureSoundCommandIsAList(tr_variant* dict)
     }
 
     tr_variantDictRemove(dict, key);
-    dictAdd(dict, key, std::array<std::string_view, 5>{
+    dictAdd(
+        dict,
+        key,
+        std::array<std::string_view, 5>{
             "canberra-gtk-play",
-            "-i", "complete-download",
-            "-d", "transmission torrent downloaded"
+            TR_ARG_TUPLE("-i", "complete-download"),
+            TR_ARG_TUPLE("-d", "transmission torrent downloaded"),
         });
 }
 
-} // anonymous namespace
+} // namespace
 
-std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
-{
+std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     /* gui settings */
     PrefItem{ OPTIONS_PROMPT, TR_KEY_show_options_window, QVariant::Bool },
     { OPEN_DIALOG_FOLDER, TR_KEY_open_dialog_dir, QVariant::String },
@@ -146,14 +148,13 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { RPC_WHITELIST, TR_KEY_rpc_whitelist, QVariant::String },
     { USPEED_ENABLED, TR_KEY_speed_limit_up_enabled, QVariant::Bool },
     { USPEED, TR_KEY_speed_limit_up, QVariant::Int },
-    { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int }
+    { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int },
 };
 
 namespace
 {
 
-auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>
-{{
+auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
     { FilterMode::SHOW_ALL, "show-all" },
     { FilterMode::SHOW_ACTIVE, "show-active" },
     { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
@@ -161,11 +162,10 @@ auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode
     { FilterMode::SHOW_PAUSED, "show-paused" },
     { FilterMode::SHOW_FINISHED, "show-finished" },
     { FilterMode::SHOW_VERIFYING, "show-verifying" },
-    { FilterMode::SHOW_ERROR, "show-error" }
-}};
+    { FilterMode::SHOW_ERROR, "show-error" },
+} };
 
-auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>
-{{
+auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
     { SortMode::SORT_BY_NAME, "sort-by-name" },
     { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
     { SortMode::SORT_BY_AGE, "sort-by-age" },
@@ -175,13 +175,13 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
     { SortMode::SORT_BY_RATIO, "sort-by-ratio" },
     { SortMode::SORT_BY_SIZE, "sort-by-size" },
     { SortMode::SORT_BY_STATE, "sort-by-state" },
-    { SortMode::SORT_BY_ID, "sort-by-id" }
-}};
+    { SortMode::SORT_BY_ID, "sort-by-id" },
+} };
 
 bool isValidUtf8(QByteArray const& byteArray)
 {
     auto const* const codec = QTextCodec::codecForName("UTF-8");
-    auto state = QTextCodec::ConverterState {};
+    auto state = QTextCodec::ConverterState{};
     auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
 }
@@ -192,8 +192,8 @@ bool isValidUtf8(QByteArray const& byteArray)
 ****
 ***/
 
-Prefs::Prefs(QString config_dir) :
-    config_dir_(std::move(config_dir))
+Prefs::Prefs(QString config_dir)
+    : config_dir_(std::move(config_dir))
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -236,7 +236,10 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    auto const test = [&value](auto const& item)
+                    {
+                        return item.second == *value;
+                    };
                     // NOLINTNEXTLINE(readability-qualified-auto)
                     auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                     auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
@@ -250,7 +253,10 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    auto const test = [&value](auto const& item)
+                    {
+                        return item.second == *value;
+                    };
                     // NOLINTNEXTLINE(readability-qualified-auto)
                     auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                     auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
@@ -343,7 +349,10 @@ Prefs::~Prefs()
         case CustomVariantType::SortModeType:
             {
                 auto const mode = val.value<SortMode>().mode();
-                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                auto const test = [&mode](auto const& item)
+                {
+                    return item.first == mode;
+                };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                 auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
@@ -354,7 +363,10 @@ Prefs::~Prefs()
         case CustomVariantType::FilterModeType:
             {
                 auto const mode = val.value<FilterMode>().mode();
-                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                auto const test = [&mode](auto const& item)
+                {
+                    return item.first == mode;
+                };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                 auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
@@ -411,15 +423,15 @@ Prefs::~Prefs()
  */
 void Prefs::initDefaults(tr_variant* d) const
 {
-    auto constexpr FilterMode = std::string_view { "all" };
-    auto constexpr SessionHost = std::string_view { "localhost" };
-    auto constexpr SessionPassword = std::string_view {};
-    auto constexpr SessionUsername = std::string_view {};
-    auto constexpr SortMode = std::string_view { "sort-by-name" };
-    auto constexpr StatsMode = std::string_view { "total-ratio" };
-    auto constexpr WindowLayout = std::string_view { "menu,toolbar,filter,list,statusbar" };
+    auto constexpr FilterMode = std::string_view{ "all" };
+    auto constexpr SessionHost = std::string_view{ "localhost" };
+    auto constexpr SessionPassword = std::string_view{};
+    auto constexpr SessionUsername = std::string_view{};
+    auto constexpr SortMode = std::string_view{ "sort-by-name" };
+    auto constexpr StatsMode = std::string_view{ "total-ratio" };
+    auto constexpr WindowLayout = std::string_view{ "menu,toolbar,filter,list,statusbar" };
 
-    auto const download_dir = std::string_view { tr_getDefaultDownloadDir() };
+    auto const download_dir = std::string_view{ tr_getDefaultDownloadDir() };
 
     tr_variantDictReserve(d, 38);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);

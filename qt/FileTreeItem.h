@@ -25,19 +25,17 @@ class FileTreeItem
     TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
-/* *INDENT-OFF* */
     enum
     {
         LOW = (1 << 0),
         NORMAL = (1 << 1),
         HIGH = (1 << 2)
     };
-/* *INDENT-ON* */
 
-    FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0) :
-        name_(name),
-        total_size_(size),
-        file_index_(file_index)
+    FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0)
+        : name_(name)
+        , total_size_(size)
+        , file_index_(file_index)
     {
     }
 

@@ -72,9 +72,21 @@ private:
 private slots:
     void recount();
     void recountSoon(Pending const& fields);
-    void recountActivitySoon() { recountSoon(Pending().set(ACTIVITY)); }
-    void recountTrackersSoon() { recountSoon(Pending().set(TRACKERS)); }
-    void recountAllSoon() { recountSoon(Pending().set(ACTIVITY).set(TRACKERS)); }
+
+    void recountActivitySoon()
+    {
+        recountSoon(Pending().set(ACTIVITY));
+    }
+
+    void recountTrackersSoon()
+    {
+        recountSoon(Pending().set(TRACKERS));
+    }
+
+    void recountAllSoon()
+    {
+        recountSoon(Pending().set(ACTIVITY).set(TRACKERS));
+    }
 
     void refreshPref(int key);
     void onActivityIndexChanged(int index);

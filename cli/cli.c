@@ -45,14 +45,14 @@
 #define MEM_T_STR "TiB"
 
 #define DISK_K 1000
-#define DISK_B_STR   "B"
+#define DISK_B_STR "B"
 #define DISK_K_STR "kB"
 #define DISK_M_STR "MB"
 #define DISK_G_STR "GB"
 #define DISK_T_STR "TB"
 
 #define SPEED_K 1000
-#define SPEED_B_STR  "B/s"
+#define SPEED_B_STR "B/s"
 #define SPEED_K_STR "kB/s"
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"
@@ -73,11 +73,10 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = NULL;
 
-static struct tr_option const options[] =
-{
+static struct tr_option const options[] = {
     { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
-    { 'd', "downlimit", "Set max download speed in "SPEED_K_STR, "d", true, "<speed>" },
+    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
     { 'D', "no-downlimit", "Don't limit the download speed", "D", false, NULL },
     { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
@@ -88,7 +87,7 @@ static struct tr_option const options[] =
     { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
     { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
     { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
-    { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", true, "<speed>" },
+    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
     { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, NULL },
     { 'v', "verify", "Verify the specified torrent", "v", false, NULL },
     { 'V', "version", "Show version number and exit", "V", false, NULL },
@@ -98,9 +97,12 @@ static struct tr_option const options[] =
 
 static char const* getUsage(void)
 {
-    return "A fast and easy BitTorrent client\n"
+    // clang-format off
+    return
+        "A fast and easy BitTorrent client\n"
         "\n"
         "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
+    // clang-format on
 }
 
 static int parseCommandLine(tr_variant*, int argc, char const** argv);
@@ -135,8 +137,14 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 
 static bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_session* session, bool did_connect, bool did_timeout, long response_code,
-    void const* response, size_t response_byte_count, void* ctor)
+static void onTorrentFileDownloaded(
+    tr_session* session,
+    bool did_connect,
+    bool did_timeout,
+    long response_code,
+    void const* response,
+    size_t response_byte_count,
+    void* ctor)
 {
     TR_UNUSED(session);
     TR_UNUSED(did_connect);
@@ -155,7 +163,11 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
     }
     else if (st->activity == TR_STATUS_CHECK)
     {
-        tr_snprintf(buf, buflen, "Verifying local files (%.2f%%, %.2f%% valid)", tr_truncd(100 * st->recheckProgress, 2),
+        tr_snprintf(
+            buf,
+            buflen,
+            "Verifying local files (%.2f%%, %.2f%% valid)",
+            tr_truncd(100 * st->recheckProgress, 2),
             tr_truncd(100 * st->percentDone, 2));
     }
     else if (st->activity == TR_STATUS_DOWNLOAD)
@@ -168,8 +180,16 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
         tr_formatter_speed_KBps(dnStr, st->pieceDownloadSpeed_KBps, sizeof(dnStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
-        tr_snprintf(buf, buflen, "Progress: %.1f%%, dl from %d of %d peers (%s), ul to %d (%s) [%s]",
-            tr_truncd(100 * st->percentDone, 1), st->peersSendingToUs, st->peersConnected, dnStr, st->peersGettingFromUs, upStr,
+        tr_snprintf(
+            buf,
+            buflen,
+            "Progress: %.1f%%, dl from %d of %d peers (%s), ul to %d (%s) [%s]",
+            tr_truncd(100 * st->percentDone, 1),
+            st->peersSendingToUs,
+            st->peersConnected,
+            dnStr,
+            st->peersGettingFromUs,
+            upStr,
             ratioStr);
     }
     else if (st->activity == TR_STATUS_SEED)
@@ -180,8 +200,14 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
         tr_formatter_speed_KBps(upStr, st->pieceUploadSpeed_KBps, sizeof(upStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
-        tr_snprintf(buf, buflen, "Seeding, uploading to %d of %d peer(s), %s [%s]", st->peersGettingFromUs, st->peersConnected,
-            upStr, ratioStr);
+        tr_snprintf(
+            buf,
+            buflen,
+            "Seeding, uploading to %d of %d peer(s), %s [%s]",
+            st->peersGettingFromUs,
+            st->peersConnected,
+            upStr,
+            ratioStr);
     }
     else
     {
@@ -262,8 +288,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL) &&
-        !tr_sys_path_exists(str, NULL))
+    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, NULL) && !tr_sys_path_exists(str, NULL))
     {
         tr_error* error = NULL;
 
@@ -337,12 +362,11 @@ int tr_main(int argc, char* argv[])
     {
         char line[LINEWIDTH];
         tr_stat const* st;
-        char const* messageName[] =
-        {
+        char const* messageName[] = {
             NULL,
             "Tracker gave a warning:",
             "Tracker gave an error:",
-            "Error:"
+            "Error:",
         };
 
         tr_wait_msec(200);
@@ -377,7 +401,7 @@ int tr_main(int argc, char* argv[])
         }
 
         getStatusStr(st, line, sizeof(line));
-        printf("\r%-*s", LINEWIDTH, line);
+        printf("\r%-*s", TR_ARG_TUPLE(LINEWIDTH, line));
 
         if (messageName[st->error])
         {

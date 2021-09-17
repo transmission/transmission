@@ -1,7 +1,7 @@
-## [Transmission 3.10](https://github.com/transmission/transmission/releases/tag/3.10) (2020-mm-dd)
+## [Transmission 3.10](https://github.com/transmission/transmission/releases/tag/3.10) (2021-mm-dd)
 
 ### All Platforms
--
+- Fetch metadata of stopped magnets ([#1080](https://github.com/transmission/transmission/pull/1080)
 
 ### Mac Client
 - Updates for macOS 11 Big Sur ([#1535](https://github.com/transmission/transmission/pull/1535)

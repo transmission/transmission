@@ -24,6 +24,6 @@
 
 @interface NSImage (NSImageAdditions)
 
-- (NSImage *) imageWithColor: (NSColor *) color;
+- (NSImage*)imageWithColor:(NSColor*)color;
 
 @end

@@ -81,6 +81,19 @@
    For more information on configuration, see settings.json documentation for
    "rpc-host-whitelist-enabled" and "rpc-host-whitelist" keys.
 
+2.3.3.  Authentication
+
+   Enabling authentication is an optional security feature that can be enabled
+   on Transmission RPC servers. Authentication occurs by method of HTTP Basic
+   Access Authentication.
+
+   If authentication is enabled, Transmission inspects the "Authorization:"
+   HTTP header value to validate the credentials of the request. The value
+   of this HTTP header is expected to be "Basic <b64 credentials>", where
+   <b64 credentials> is equal to a base64 encoded string of the username
+   and password (respectively), separated by a colon.
+
+
 3.  Torrent Requests
 
 3.1.  Torrent Action Requests
@@ -237,7 +250,7 @@
    seedRatioMode               | number                      | tr_ratiolimit
    sizeWhenDone                | number                      | tr_stat
    startDate                   | number                      | tr_stat
-   status                      | number                      | tr_stat
+   status                      | number (see below)          | tr_stat
    trackers                    | array (see below)           | n/a
    trackerStats                | array (see below)           | n/a
    totalSize                   | number                      | tr_info
@@ -308,6 +321,15 @@
    priorities         | an array of tr_info.filecount        | tr_info
                       | numbers. each is the tr_priority_t   |
                       | mode for the corresponding file.     |
+   -------------------+--------------------------------------+
+   status             | a number between 0 and 6, where:     | tr_stat
+                      | 0: Torrent is stopped                |
+                      | 1: Queued to check files             |
+                      | 2: Checking files                    |
+                      | 3: Queued to download                |
+                      | 4: Downloading                       |
+                      | 5: Queued to seed                    |
+                      | 6: Seeding                           |
    -------------------+--------------------------------------+
    trackers           | array of objects, each containing:   |
                       +-------------------------+------------+
