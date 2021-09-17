@@ -140,6 +140,7 @@ endif()
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
+find_package(Filesystem REQUIRED)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 if(TARGET CURL::libcurl)

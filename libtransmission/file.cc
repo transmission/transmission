@@ -6,8 +6,8 @@
  *
  */
 
-#include <filesystem>
 #include <string.h> /* strlen() */
+#include CXX_FILESYSTEM_HEADER
 
 #include "transmission.h"
 #include "error.h"
@@ -15,7 +15,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-namespace fs = std::filesystem;
+namespace fs = CXX_FILESYSTEM_NAMESPACE;
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
