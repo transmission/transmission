@@ -1208,9 +1208,9 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 ****
 ***/
 
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte)
+void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme)
 {
-    evbuffer_add(outbuf, &byte, 1);
+    evbuffer_add(outbuf, &addme, 1);
 }
 
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t addme_hs)
