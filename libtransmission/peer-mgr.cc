@@ -1337,6 +1337,15 @@ void tr_peerMgrGetNextRequests(
 
     updateEndgame(s);
 
+    // TODO(ckerr) this safeguard is here to silence a false nullptr dereference
+    // warning. The better fix is to refactor the `pieces` array to be a std
+    // container but that's out-of-scope for a "fix all the warnings" PR
+    if (s->pieces == nullptr)
+    {
+        *numgot = 0;
+        return;
+    }
+
     struct weighted_piece* pieces = s->pieces;
     int got = 0;
     int checkedPieceCount = 0;

@@ -155,7 +155,7 @@ static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
 
 static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 {
-    while (bytes_transferred != 0 && tr_isPeerIo(io))
+    while (bytes_transferred != 0 && tr_isPeerIo(io) && io->outbuf_datatypes != nullptr)
     {
         struct tr_datatype* next = io->outbuf_datatypes;
 
@@ -1209,9 +1209,9 @@ void tr_peerIoWriteBytes(tr_peerIo* io, void const* bytes, size_t byteCount, boo
 ****
 ***/
 
-void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte)
+void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t addme)
 {
-    evbuffer_add(outbuf, &byte, 1);
+    evbuffer_add(outbuf, &addme, 1);
 }
 
 void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t addme_hs)
