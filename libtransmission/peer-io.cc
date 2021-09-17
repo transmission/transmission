@@ -154,7 +154,7 @@ static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
 
 static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
 {
-    while (bytes_transferred != 0 && tr_isPeerIo(io))
+    while (bytes_transferred != 0 && tr_isPeerIo(io) && io->outbuf_datatypes != nullptr)
     {
         struct tr_datatype* next = io->outbuf_datatypes;
 
