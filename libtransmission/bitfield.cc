@@ -385,7 +385,7 @@ void tr_bitfieldSetFromFlags(tr_bitfield* b, bool const* flags, size_t n)
 
     for (size_t i = 0; i < n; ++i)
     {
-        if (flags[i])
+        if (flags[i] && b->bits != nullptr)
         {
             ++trueCount;
             b->bits[i >> 3U] |= (0x80 >> (i & 7U));
