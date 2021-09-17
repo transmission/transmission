@@ -1365,11 +1365,6 @@ char* tr_sys_dir_get_current(tr_error** error)
     return ret;
 }
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
-{
-    return create_dir(path, flags, permissions, true, error);
-}
-
 static void dir_create_temp_callback(char const* path, void* param, tr_error** error)
 {
     bool* result = (bool*)param;

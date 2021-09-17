@@ -6,6 +6,7 @@
  *
  */
 
+#include <filesystem>
 #include <string.h> /* strlen() */
 
 #include "transmission.h"
@@ -13,6 +14,8 @@
 #include "file.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+namespace fs = std::filesystem;
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
@@ -120,4 +123,33 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     }
 
     return ret;
+}
+
+bool tr_sys_dir_create(char const* path_in, int flags, int permissions, tr_error** error)
+{
+    TR_ASSERT(path_in != nullptr);
+    auto const path = fs::path{ path_in };
+
+    auto ec = std::error_code{};
+
+    if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
+    {
+        fs::create_directories(path, ec);
+    }
+    else
+    {
+        fs::create_directory(path, ec);
+    }
+
+    if (!ec)
+    {
+        fs::permissions(path, fs::perms(permissions), fs::perm_options::replace, ec);
+    }
+
+    if (ec)
+    {
+        tr_error_set_literal(error, ec.value(), ec.message().c_str());
+    }
+
+    return !ec;
 }

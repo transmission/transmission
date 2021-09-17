@@ -138,20 +138,20 @@ protected:
         return true;
     }
 
-    bool validatePermissions(char const* path, unsigned int permissions)
+    void validatePermissions(char const* path, unsigned int permissions)
     {
 #ifndef _WIN32
 
         struct stat sb = {};
-        return stat(path, &sb) != -1 && (sb.st_mode & 0777) == permissions;
+        EXPECT_EQ(0, stat(path, &sb));
+        EXPECT_EQ(permissions, (sb.st_mode & 0777))
+            << "expected " << std::oct << permissions << ", got " << (sb.st_mode & 0777);
 
 #else
 
+        /* No UNIX permissions on Windows */
         TR_UNUSED(path);
         TR_UNUSED(permissions);
-
-        /* No UNIX permissions on Windows */
-        return true;
 
 #endif
     }
@@ -1028,7 +1028,7 @@ TEST_F(FileTest, fileOpen)
     EXPECT_EQ(nullptr, err);
     tr_sys_file_close(fd, nullptr);
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
-    EXPECT_TRUE(validatePermissions(path1, 0640));
+    validatePermissions(path1, 0640);
 
     // can open existing file
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
@@ -1411,7 +1411,7 @@ TEST_F(FileTest, dirCreate)
     EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
-    EXPECT_TRUE(validatePermissions(path1, 0700));
+    validatePermissions(path1, 0700);
 
     tr_sys_path_remove(path1, nullptr);
     createFileWithContents(path1, "test");
@@ -1433,12 +1433,12 @@ TEST_F(FileTest, dirCreate)
     tr_error_clear(&err);
 
     // Can create directory with parent directories
-    EXPECT_TRUE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
+    EXPECT_TRUE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0755, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
     EXPECT_TRUE(tr_sys_path_exists(path2, nullptr));
-    EXPECT_TRUE(validatePermissions(path1, 0751));
-    EXPECT_TRUE(validatePermissions(path2, 0751));
+    validatePermissions(path1, 0755);
+    validatePermissions(path2, 0755);
 
     // Can create existing directory (no-op)
     EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &err));
