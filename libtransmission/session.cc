@@ -265,49 +265,49 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 #define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
 #endif
 
-static int parse_tos(char const* str)
+static int parse_tos(char const* tos)
 {
     char* p;
     int value;
 
-    if (evutil_ascii_strcasecmp(str, "") == 0)
+    if (evutil_ascii_strcasecmp(tos, "") == 0)
     {
         return 0;
     }
 
-    if (evutil_ascii_strcasecmp(str, "default") == 0)
+    if (evutil_ascii_strcasecmp(tos, "default") == 0)
     {
         return 0;
     }
 
-    if (evutil_ascii_strcasecmp(str, "lowcost") == 0)
+    if (evutil_ascii_strcasecmp(tos, "lowcost") == 0)
     {
         return TR_IPTOS_LOWCOST;
     }
 
-    if (evutil_ascii_strcasecmp(str, "mincost") == 0)
+    if (evutil_ascii_strcasecmp(tos, "mincost") == 0)
     {
         return TR_IPTOS_LOWCOST;
     }
 
-    if (evutil_ascii_strcasecmp(str, "throughput") == 0)
+    if (evutil_ascii_strcasecmp(tos, "throughput") == 0)
     {
         return TR_IPTOS_THRUPUT;
     }
 
-    if (evutil_ascii_strcasecmp(str, "reliability") == 0)
+    if (evutil_ascii_strcasecmp(tos, "reliability") == 0)
     {
         return TR_IPTOS_RELIABLE;
     }
 
-    if (evutil_ascii_strcasecmp(str, "lowdelay") == 0)
+    if (evutil_ascii_strcasecmp(tos, "lowdelay") == 0)
     {
         return TR_IPTOS_LOWDELAY;
     }
 
-    value = strtol(str, &p, 0);
+    value = strtol(tos, &p, 0);
 
-    if (p == nullptr || p == str)
+    if (p == nullptr || p == tos)
     {
         return 0;
     }
