@@ -134,15 +134,24 @@ bool tr_sys_dir_create(char const* path_in, int flags, int permissions, tr_error
 
     auto ec = std::error_code{};
 
+    auto const status = fs::status(path, ec);
+    std::cerr << "path " << path_in << " status type " << int(status.type()) << " permissions " << std::oct
+              << int(status.permissions()) << std::dec << " ec " << ec << " code " << ec.value() << " message " << ec.message()
+              << std::endl;
+
+    ec.clear();
+
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
         auto const ok = fs::create_directories(path, ec);
-        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << " code " << ec.value()
+                  << " message " << ec.message() << std::endl;
     }
     else
     {
         auto const ok = fs::create_directory(path, ec);
-        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " ok " << ok << " path " << path << " ec " << ec << " code " << ec.value()
+                  << " message " << ec.message() << std::endl;
     }
 
     if (!ec)
