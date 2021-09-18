@@ -1518,7 +1518,7 @@
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Чтобы добавить резервный URL, добавьте его после основного URL в той же строке.
-Чтобы добавить ещё один основной URL, добавьте его в новой строке.</translation>
+Чтобы добавить ещё один основной URL, добавьте пустую строку, а затем его в новой строке.</translation>
     </message>
     <message>
         <location line="+8"/>
