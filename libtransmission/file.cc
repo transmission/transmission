@@ -30,8 +30,6 @@ namespace fs = ghc::filesystem;
 #include "tr-assert.h"
 #include "utils.h"
 
-namespace fs = ghc::filesystem;
-
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
