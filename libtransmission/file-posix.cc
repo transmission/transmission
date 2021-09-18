@@ -519,7 +519,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0)
     {
-        uint64_t const chunk_size = std::min(uint64_t{ file_size }, uint64_t{ buflen });
+        uint64_t const chunk_size = std::min(file_size, uint64_t{ buflen });
         uint64_t bytes_read;
         uint64_t bytes_written;
 
