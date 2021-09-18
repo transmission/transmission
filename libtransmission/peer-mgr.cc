@@ -2754,7 +2754,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     uint64_t desiredAvailable = 0;
 
-    for (size_t i = 0, n = std::min(size_t{ tor->info.pieceCount }, size_t{ s->pieceReplicationSize }); i < n; ++i)
+    for (size_t i = 0, n = std::min(size_t{ tor->info.pieceCount }, s->pieceReplicationSize); i < n; ++i)
     {
         if (!tor->info.pieces[i].dnd && s->pieceReplication[i] > 0)
         {
