@@ -29,3 +29,6 @@
 [submodule "third-party/googletest"]
 	path = third-party/googletest
 	url = https://github.com/google/googletest.git
+[submodule "third-party/filesystem"]
+	path = third-party/filesystem
+	url = https://github.com/gulrak/filesystem.git
