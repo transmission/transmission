@@ -7,7 +7,7 @@
  */
 
 #include <string.h> /* strlen() */
-#include CXX_FILESYSTEM_HEADER
+#include <ghc/filesystem.hpp>
 
 #include "transmission.h"
 #include "error.h"
@@ -15,7 +15,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-namespace fs = CXX_FILESYSTEM_NAMESPACE;
+namespace fs = ghc::filesystem;
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {

@@ -140,7 +140,6 @@ endif()
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
-find_package(Filesystem REQUIRED)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 if(TARGET CURL::libcurl)
@@ -352,6 +351,7 @@ endif()
 tr_add_external_auto_library(B64 libb64 b64)
 
 add_subdirectory(third-party/arc4)
+add_subdirectory(third-party/filesystem)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)

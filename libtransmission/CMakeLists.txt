@@ -274,7 +274,6 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
 endforeach()
 
 target_link_libraries(${TR_NAME}
-    std::filesystem
     ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
     ${CRYPTO_LIBRARIES}
@@ -289,6 +288,7 @@ target_link_libraries(${TR_NAME}
     ${LIBM_LIBRARY}
     ${TR_NETWORK_LIBRARIES}
     arc4::arc4
+    ghc_filesystem
 )
 
 if(ICONV_FOUND)
