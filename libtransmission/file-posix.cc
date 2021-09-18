@@ -9,7 +9,6 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
 
-#include <filesystem>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
@@ -25,6 +24,8 @@
 #include <sys/stat.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 #include <vector>
+
+#include <ghc/filesystem>
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
