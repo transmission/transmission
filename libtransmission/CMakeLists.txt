@@ -291,6 +291,10 @@ target_link_libraries(${TR_NAME}
     ghc_filesystem
 )
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0.0")
+  target_link_libraries(${TR_NAME} -lstdc++fs)
+endif()
+
 if(ICONV_FOUND)
     target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
 endif()

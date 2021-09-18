@@ -110,8 +110,6 @@ namespace fs = ghc::filesystem;
 #endif
 #endif
 
-namespace fs = std::filesystem;
-
 static void set_system_error(tr_error** error, int code)
 {
     if (error == nullptr)
