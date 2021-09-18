@@ -112,12 +112,12 @@ static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth,
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = std::max((size_t)*shortWidth, size_t{ strlen(o->shortName) });
+        *shortWidth = std::max((size_t)*shortWidth, strlen(o->shortName));
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = std::max((size_t)*argWidth, size_t{ strlen(arg) });
+        *argWidth = std::max((size_t)*argWidth, strlen(arg));
     }
 }
 
