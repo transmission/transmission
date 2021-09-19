@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
@@ -57,7 +59,7 @@ private:
         size_t buf_pos = 0;
         while (buf_pos < buf_len && bytes_remaining > 0)
         {
-            uint64_t const chunk_size = MIN(buf_len - buf_pos, bytes_remaining);
+            uint64_t const chunk_size = std::min(uint64_t{ buf_len - buf_pos }, bytes_remaining);
             uint64_t bytes_read = 0;
 
             tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read, nullptr);

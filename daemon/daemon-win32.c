@@ -108,6 +108,8 @@ static void update_service_status(
     }
 }
 
+#define TR_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 static unsigned int __stdcall service_stop_thread_main(void* param)
 {
     callbacks->on_stop(callback_arg);
@@ -118,7 +120,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
     for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT; ++checkpoint)
     {
         wait_time = wait_time >= sleep_time ? wait_time - sleep_time : 0;
-        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, MAX(wait_time, sleep_time * 2));
+        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, TR_MAX(wait_time, sleep_time * 2));
     }
 
     return 0;

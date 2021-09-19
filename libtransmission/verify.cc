@@ -6,8 +6,9 @@
  *
  */
 
-#include <string.h> /* memcmp() */
-#include <stdlib.h> /* free() */
+#include <algorithm>
+#include <cstdlib> /* free() */
+#include <cstring> /* memcmp() */
 
 #include "transmission.h"
 #include "completion.h"
@@ -76,8 +77,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* figure out how much we can read this pass */
         leftInPiece = tr_torPieceCountBytes(tor, pieceIndex) - piecePos;
         leftInFile = file->length - filePos;
-        bytesThisPass = MIN(leftInFile, leftInPiece);
-        bytesThisPass = MIN(bytesThisPass, buflen);
+        bytesThisPass = std::min(leftInFile, leftInPiece);
+        bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
 
         /* read a bit */
         if (fd != TR_BAD_SYS_FILE)

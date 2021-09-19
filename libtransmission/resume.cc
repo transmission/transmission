@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h>
+#include <algorithm>
+#include <cstring>
 
 #include "transmission.h"
 #include "completion.h"
@@ -69,7 +70,7 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
 static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
     size_t const n_in = buflen / sizeof(tr_pex);
-    size_t const n_pex = MIN(n_in, MAX_REMEMBERED_PEERS);
+    size_t const n_pex = std::min(n_in, size_t{ MAX_REMEMBERED_PEERS });
 
     tr_pex pex[MAX_REMEMBERED_PEERS];
     memcpy(pex, buf, sizeof(tr_pex) * n_pex);

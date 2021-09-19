@@ -6,15 +6,15 @@
  *
  */
 
-#include <algorithm> // std::partial_sort
-#include <errno.h> /* error codes ERANGE, ... */
-#include <limits.h> /* INT_MAX */
-#include <string.h> /* memcpy, memcmp, strstr */
-#include <stdlib.h> /* qsort */
+#include <algorithm>
+#include <cerrno> /* error codes ERANGE, ... */
+#include <climits> /* INT_MAX */
+#include <cstdlib> /* qsort */
+#include <cstring> /* memcpy, memcmp, strstr */
 
 #include <event2/event.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -833,7 +833,7 @@ static void updateEndgame(tr_swarm* s)
         numDownloading += countActiveWebseeds(s);
 
         /* average number of pending requests per downloading peer */
-        s->endgame = s->requestCount / MAX(numDownloading, 1);
+        s->endgame = s->requestCount / std::max(numDownloading, 1);
     }
 }
 
@@ -1504,7 +1504,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
 
     while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
     {
-        cancel_buflen = MAX(cancel_buflen, tor->swarm->requestCount);
+        cancel_buflen = std::max(cancel_buflen, tor->swarm->requestCount);
     }
 
     if (cancel_buflen > 0)
@@ -2432,7 +2432,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     ***  add the first N of them into our return list
     **/
 
-    n = MIN(atomCount, maxCount);
+    n = std::min(atomCount, maxCount);
     pex = walk = tr_new0(tr_pex, n);
 
     for (int i = 0; i < atomCount && count < n; ++i)
@@ -2754,7 +2754,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     uint64_t desiredAvailable = 0;
 
-    for (size_t i = 0, n = MIN(tor->info.pieceCount, s->pieceReplicationSize); i < n; ++i)
+    for (size_t i = 0, n = std::min(size_t{ tor->info.pieceCount }, s->pieceReplicationSize); i < n; ++i)
     {
         if (!tor->info.pieces[i].dnd && s->pieceReplication[i] > 0)
         {
@@ -3041,7 +3041,7 @@ static void rechokeDownloads(tr_swarm* s)
             /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
              * higher values indicate more congestion. */
             double const cancelRate = cancels / (double)(cancels + blocks);
-            double const mult = 1 - MIN(cancelRate, 0.5);
+            double const mult = 1 - std::min(cancelRate, 0.5);
             maxPeers = s->interestedCount * mult;
             tordbg(
                 s,
@@ -3057,7 +3057,7 @@ static void rechokeDownloads(tr_swarm* s)
         {
             int const maxIncrease = 15;
             time_t const maxHistory = 2 * CANCEL_HISTORY_SEC;
-            double const mult = MIN(timeSinceCancel, maxHistory) / (double)maxHistory;
+            double const mult = std::min(timeSinceCancel, maxHistory) / (double)maxHistory;
             int const inc = maxIncrease * mult;
             maxPeers = s->maxPeers + inc;
             tordbg(
@@ -3153,7 +3153,7 @@ static void rechokeDownloads(tr_swarm* s)
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
 
-    s->interestedCount = MIN(maxPeers, rechoke_count);
+    s->interestedCount = std::min(maxPeers, rechoke_count);
 
     for (int i = 0; i < rechoke_count; ++i)
     {
@@ -3437,7 +3437,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
         int const lo = MIN_UPLOAD_IDLE_SECS;
         int const hi = MAX_UPLOAD_IDLE_SECS;
         int const limit = hi - (hi - lo) * strictness;
-        int const idleTime = now - MAX(atom->time, atom->piece_data_time);
+        int const idleTime = now - std::max(atom->time, atom->piece_data_time);
 
         if (idleTime > limit)
         {
@@ -3975,7 +3975,7 @@ static int compareAtomPtrsByShelfDate(void const* va, void const* vb)
 
 static int getMaxAtomCount(tr_torrent const* tor)
 {
-    return MIN(50, tor->maxConnectedPeers * 3);
+    return std::min(50, tor->maxConnectedPeers * 3);
 }
 
 static void atomPulse(evutil_socket_t fd, short what, void* vmgr)
@@ -4182,7 +4182,7 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
 static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, int n, int k)
 {
     uint64_t worstFirstScore = 0;
-    int const x = MIN(n, k) - 1;
+    int const x = std::min(n, k) - 1;
 
     for (int i = 0; i < x; i++)
     {

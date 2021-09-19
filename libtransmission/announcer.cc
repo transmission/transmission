@@ -6,11 +6,11 @@
  *
  */
 
-#include <algorithm> // std::partial_sort
-#include <limits.h> /* INT_MAX */
-#include <stdio.h>
-#include <stdlib.h> /* qsort() */
-#include <string.h> /* strcmp(), memcpy(), strncmp() */
+#include <algorithm>
+#include <climits> /* INT_MAX */
+#include <cstdio>
+#include <cstdlib> /* qsort() */
+#include <cstring> /* strcmp(), memcpy(), strncmp() */
 #include <vector>
 
 #include <event2/buffer.h>
@@ -797,7 +797,7 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
     {
         if (tt->tiers[i].isRunning)
         {
-            ret = MIN(ret, tt->tiers[i].manualAnnounceAllowedAt);
+            ret = std::min(ret, tt->tiers[i].manualAnnounceAllowedAt);
         }
     }
 
@@ -834,7 +834,7 @@ static void tier_update_announce_priority(tr_tier* tier)
 
     for (int i = 0; i < tier->announce_event_count; ++i)
     {
-        priority = MAX(priority, (int)tier->announce_events[i]);
+        priority = std::max(priority, int{ tier->announce_events[i] });
     }
 
     tier->announce_event_priority = priority;
@@ -1475,7 +1475,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 else
                 {
                     tier->lastScrapeSucceeded = true;
-                    tier->scrapeIntervalSec = MAX(DEFAULT_SCRAPE_INTERVAL_SEC, response->min_request_interval);
+                    tier->scrapeIntervalSec = std::max(int{ DEFAULT_SCRAPE_INTERVAL_SEC }, response->min_request_interval);
                     tier->scrapeAt = get_next_scrape_time(session, tier, tier->scrapeIntervalSec);
                     tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
@@ -1524,7 +1524,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                error out, lower the value once for that batch, not N times. */
             if (*multiscrape_max >= response->row_count)
             {
-                int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
+                int const n = std::max(1, int{ *multiscrape_max - TR_MULTISCRAPE_STEP });
                 if (*multiscrape_max != n)
                 {
                     char* scheme = nullptr;

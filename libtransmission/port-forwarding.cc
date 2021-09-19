@@ -6,8 +6,8 @@
  *
  */
 
-#include <stdio.h>
-
+#include <algorithm>
+#include <cstdio>
 #include <sys/types.h>
 
 #include <event2/event.h>
@@ -262,5 +262,5 @@ bool tr_sharedTraversalIsEnabled(tr_shared const* s)
 
 int tr_sharedTraversalStatus(tr_shared const* s)
 {
-    return MAX(s->natpmpStatus, s->upnpStatus);
+    return std::max(s->natpmpStatus, s->upnpStatus);
 }
