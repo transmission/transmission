@@ -6,10 +6,11 @@
  *
  */
 
-#include <ctype.h> /* isspace() */
-#include <stdio.h>
-#include <stdlib.h> /* exit() */
-#include <string.h>
+#include <algorithm>
+#include <cctype> /* isspace() */
+#include <cstdio>
+#include <cstdlib> /* exit() */
+#include <cstring>
 
 #include "transmission.h"
 #include "tr-getopt.h"
@@ -100,21 +101,23 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
 static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth, int* argWidth)
 {
+    // FIXME: in this function sign bits from int* are lost, then 64-bit result is truncated to 32-bit int
+    // Convert arguments to size_t*
     char const* arg;
 
     if (o->longName != nullptr)
     {
-        *longWidth = MAX(*longWidth, (int)strlen(o->longName));
+        *longWidth = std::max((size_t)*longWidth, strlen(o->longName));
     }
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = MAX(*shortWidth, (int)strlen(o->shortName));
+        *shortWidth = std::max((size_t)*shortWidth, strlen(o->shortName));
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = MAX(*argWidth, (int)strlen(arg));
+        *argWidth = std::max((size_t)*argWidth, strlen(arg));
     }
 }
 

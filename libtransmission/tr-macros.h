@@ -147,17 +147,6 @@
     } while (0)
 #endif
 
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
-
 /***
 ****
 ***/
