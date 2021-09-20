@@ -10,8 +10,8 @@
 #include "Application.h"
 #include "InteropObject.h"
 
-InteropObject::InteropObject(QObject* parent) :
-    QObject(parent)
+InteropObject::InteropObject(QObject* parent)
+    : QObject(parent)
 {
 }
 

@@ -36,7 +36,7 @@ class Prefs;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 struct Peer
@@ -111,7 +111,9 @@ private:
     std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
 
 public:
-    TorrentHash() {}
+    TorrentHash()
+    {
+    }
 
     explicit TorrentHash(char const* str)
     {
@@ -123,17 +125,17 @@ public:
         tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }
 
-    bool operator ==(TorrentHash const& that) const
+    bool operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    bool operator !=(TorrentHash const& that) const
+    bool operator!=(TorrentHash const& that) const
     {
         return data_ != that.data_;
     }
 
-    bool operator <(TorrentHash const& that) const
+    bool operator<(TorrentHash const& that) const
     {
         return data_ < that.data_;
     }

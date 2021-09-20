@@ -40,8 +40,7 @@ typedef struct _TrCore
 
     /*< private >*/
     struct TrCorePrivate* priv;
-}
-TrCore;
+} TrCore;
 
 enum tr_core_err
 {
@@ -54,15 +53,14 @@ typedef struct _TrCoreClass
 {
     GObjectClass parent_class;
 
-    void (* add_error)(TrCore*, enum tr_core_err, char const* name);
-    void (* add_prompt)(TrCore*, gpointer ctor);
-    void (* blocklist_updated)(TrCore*, int ruleCount);
-    void (* busy)(TrCore*, gboolean is_busy);
-    void (* prefs_changed)(TrCore*, tr_quark const key);
-    void (* port_tested)(TrCore*, gboolean is_open);
-    void (* quit)(TrCore*);
-}
-TrCoreClass;
+    void (*add_error)(TrCore*, enum tr_core_err, char const* name);
+    void (*add_prompt)(TrCore*, gpointer ctor);
+    void (*blocklist_updated)(TrCore*, int ruleCount);
+    void (*busy)(TrCore*, gboolean is_busy);
+    void (*prefs_changed)(TrCore*, tr_quark const key);
+    void (*port_tested)(TrCore*, gboolean is_open);
+    void (*quit)(TrCore*);
+} TrCoreClass;
 
 GType tr_core_get_type(void) G_GNUC_CONST;
 

@@ -12,9 +12,9 @@
 
 @implementation ShareTorrentFileHelper
 
-+ (ShareTorrentFileHelper *) sharedHelper
++ (ShareTorrentFileHelper*)sharedHelper
 {
-    static ShareTorrentFileHelper *helper;
+    static ShareTorrentFileHelper* helper;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         helper = [[ShareTorrentFileHelper alloc] init];
@@ -22,43 +22,44 @@
     return helper;
 }
 
-- (NSArray *) shareTorrentURLs
+- (NSArray*)shareTorrentURLs
 {
-    NSArray * torrents = [(Controller *)[NSApp delegate] selectedTorrents];
-    NSMutableArray * fileURLs = [NSMutableArray arrayWithCapacity: [torrents count]];
-    for (Torrent * torrent in torrents)
+    NSArray* torrents = ((Controller*)NSApp.delegate).selectedTorrents;
+    NSMutableArray* fileURLs = [NSMutableArray arrayWithCapacity:torrents.count];
+    for (Torrent* torrent in torrents)
     {
-        NSString * location = [torrent torrentLocation];
-        if ([location length] > 0) {
-            [fileURLs addObject: [NSURL fileURLWithPath: location]];
+        NSString* location = torrent.torrentLocation;
+        if (location.length > 0)
+        {
+            [fileURLs addObject:[NSURL fileURLWithPath:location]];
         }
     }
     return fileURLs;
 }
 
-- (NSArray *) menuItems
+- (NSArray*)menuItems
 {
-    NSArray * services = [NSSharingService sharingServicesForItems: [self shareTorrentURLs]];
-    NSMutableArray * items = [NSMutableArray arrayWithCapacity: [services count]];
-    for (NSSharingService * service in services)
+    NSArray* services = [NSSharingService sharingServicesForItems:self.shareTorrentURLs];
+    NSMutableArray* items = [NSMutableArray arrayWithCapacity:services.count];
+    for (NSSharingService* service in services)
     {
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: service.title // 10.9: change to menuItemTitle
-                                                      action: @selector(performShareAction:)
-                                               keyEquivalent: @""];
+        NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:service.title // 10.9: change to menuItemTitle
+                                                      action:@selector(performShareAction:)
+                                               keyEquivalent:@""];
         item.image = service.image;
         item.representedObject = service;
-        service.delegate = (Controller *)[NSApp delegate];
+        service.delegate = (Controller*)NSApp.delegate;
         item.target = self;
-        [items addObject: item];
+        [items addObject:item];
     }
 
     return items;
 }
 
-- (void) performShareAction: (NSMenuItem *) item
+- (void)performShareAction:(NSMenuItem*)item
 {
-    NSSharingService * service = item.representedObject;
-    [service performWithItems: [self shareTorrentURLs]]; // on 10.9, use attachmentFileURLs?
+    NSSharingService* service = item.representedObject;
+    [service performWithItems:self.shareTorrentURLs]; // on 10.9, use attachmentFileURLs?
 }
 
 @end

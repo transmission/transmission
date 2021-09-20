@@ -24,24 +24,35 @@
 
 @interface TorrentCell : NSActionCell
 {
-    NSUserDefaults * fDefaults;
+    NSUserDefaults* fDefaults;
 
-    NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
+    NSMutableDictionary* fTitleAttributes;
+    NSMutableDictionary* fStatusAttributes;
 
-    BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
-            fHover, fHoverControl, fHoverReveal, fHoverAction;
+    BOOL fTracking;
+    BOOL fMouseDownControlButton;
+    BOOL fMouseDownRevealButton;
+    BOOL fMouseDownActionButton;
+    BOOL fHover;
+    BOOL fHoverControl;
+    BOOL fHoverReveal;
+    BOOL fHoverAction;
 
-    NSColor * fBarBorderColor, * fBluePieceColor, * fBarMinimalBorderColor;
+    NSColor* fBarBorderColor;
+    NSColor* fBluePieceColor;
+    NSColor* fBarMinimalBorderColor;
 }
 
-- (NSRect) iconRectForBounds: (NSRect) bounds;
+- (NSRect)iconRectForBounds:(NSRect)bounds;
 
-- (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
-            mouseLocation: (NSPoint) mouseLocation;
-- (void) setHover: (BOOL) hover;
-- (void) setControlHover: (BOOL) hover;
-- (void) setRevealHover: (BOOL) hover;
-- (void) setActionHover: (BOOL) hover;
-- (void) setActionPushed: (BOOL) pushed;
+- (void)addTrackingAreasForView:(NSView*)controlView
+                         inRect:(NSRect)cellFrame
+                   withUserInfo:(NSDictionary*)userInfo
+                  mouseLocation:(NSPoint)mouseLocation;
+- (void)setHover:(BOOL)hover;
+- (void)setControlHover:(BOOL)hover;
+- (void)setRevealHover:(BOOL)hover;
+- (void)setActionHover:(BOOL)hover;
+- (void)setActionPushed:(BOOL)pushed;
 
 @end

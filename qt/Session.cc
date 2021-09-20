@@ -83,12 +83,10 @@ void Session::portTest()
 {
     auto* q = new RpcQueue();
 
-    q->add([this]()
-        {
-            return exec("port-test", nullptr);
-        });
+    q->add([this]() { return exec("port-test", nullptr); });
 
-    q->add([this](RpcResponse const& r)
+    q->add(
+        [this](RpcResponse const& r)
         {
             bool is_open = false;
 
@@ -109,7 +107,7 @@ void Session::portTest()
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
-    auto constexpr MagnetLinkKey = std::string_view { "magnetLink" };
+    auto constexpr MagnetLinkKey = std::string_view{ "magnetLink" };
     auto constexpr Fields = std::array<std::string_view, 1>{ MagnetLinkKey };
 
     tr_variant args;
@@ -119,12 +117,10 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
 
     auto* q = new RpcQueue();
 
-    q->add([this, &args]()
-        {
-            return exec(TR_KEY_torrent_get, &args);
-        });
+    q->add([this, &args]() { return exec(TR_KEY_torrent_get, &args); });
 
-    q->add([](RpcResponse const& r)
+    q->add(
+        [](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -293,9 +289,9 @@ void Session::updatePref(int key)
 ****
 ***/
 
-Session::Session(QString config_dir, Prefs& prefs) :
-    config_dir_(std::move(config_dir)),
-    prefs_(prefs)
+Session::Session(QString config_dir, Prefs& prefs)
+    : config_dir_(std::move(config_dir))
+    , prefs_(prefs)
 {
     stats_ = {};
     stats_.ratio = TR_RATIO_NA;
@@ -396,7 +392,7 @@ bool Session::isLocal() const
 
 void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const
 {
-    auto constexpr RecentlyActiveKey = std::string_view { "recently-active" };
+    auto constexpr RecentlyActiveKey = std::string_view{ "recently-active" };
 
     if (&ids == &RecentlyActiveIDs)
     {
@@ -413,14 +409,8 @@ Session::Tag Session::torrentSetImpl(tr_variant* args)
     auto* const q = new RpcQueue();
     auto const tag = q->tag();
 
-    q->add([this, args]()
-        {
-            return rpc_.exec(TR_KEY_torrent_set, args);
-        });
-    q->add([this, tag]()
-        {
-            emit sessionCalled(tag);
-        });
+    q->add([this, args]() { return rpc_.exec(TR_KEY_torrent_set, args); });
+    q->add([this, tag]() { emit sessionCalled(tag); });
     q->setTolerateErrors();
     q->run();
 
@@ -504,10 +494,8 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
 
     auto* q = new RpcQueue();
 
-    q->add([this, &args]()
-        {
-            return exec("torrent-rename-path", &args);
-        },
+    q->add(
+        [this, &args]() { return exec("torrent-rename-path", &args); },
         [](RpcResponse const& r)
         {
             auto str = dictFind<QString>(r.args.get(), TR_KEY_path);
@@ -515,18 +503,20 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
             str = dictFind<QString>(r.args.get(), TR_KEY_name);
             auto const name = str ? *str : QStringLiteral("(unknown)");
 
-            auto* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
-                tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)").
-                    arg(path).arg(name).arg(r.result), QMessageBox::Close,
+            auto* d = new QMessageBox(
+                QMessageBox::Information,
+                tr("Error Renaming Path"),
+                tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)")
+                    .arg(path)
+                    .arg(name)
+                    .arg(r.result),
+                QMessageBox::Close,
                 QApplication::activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([this, ids](RpcResponse const& /*r*/)
-        {
-            refreshTorrents(ids, TorrentProperties::Rename);
-        });
+    q->add([this, ids](RpcResponse const& /*r*/) { refreshTorrents(ids, TorrentProperties::Rename); });
 
     q->run();
 }
@@ -539,14 +529,14 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
     {
         // unchanging fields needed by the main window
         static auto constexpr MainInfoKeys = std::array<tr_quark, 8>{
-            TR_KEY_addedDate,
-            TR_KEY_downloadDir,
-            TR_KEY_file_count,
-            TR_KEY_hashString,
-            TR_KEY_name,
-            TR_KEY_primary_mime_type,
-            TR_KEY_totalSize,
-            TR_KEY_trackers,
+            TR_KEY_addedDate, //
+            TR_KEY_downloadDir, //
+            TR_KEY_file_count, //
+            TR_KEY_hashString, //
+            TR_KEY_name, //
+            TR_KEY_primary_mime_type, //
+            TR_KEY_totalSize, //
+            TR_KEY_trackers, //
         };
 
         // changing fields needed by the main window
@@ -575,55 +565,55 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_sizeWhenDone,
             TR_KEY_status,
             TR_KEY_uploadedEver,
-            TR_KEY_webseedsSendingToUs
+            TR_KEY_webseedsSendingToUs,
         };
 
         // unchanging fields needed by the details dialog
         static auto constexpr DetailInfoKeys = std::array<tr_quark, 8>{
-            TR_KEY_comment,
-            TR_KEY_creator,
-            TR_KEY_dateCreated,
-            TR_KEY_files,
-            TR_KEY_isPrivate,
-            TR_KEY_pieceCount,
-            TR_KEY_pieceSize,
-            TR_KEY_trackers
+            TR_KEY_comment, //
+            TR_KEY_creator, //
+            TR_KEY_dateCreated, //
+            TR_KEY_files, //
+            TR_KEY_isPrivate, //
+            TR_KEY_pieceCount, //
+            TR_KEY_pieceSize, //
+            TR_KEY_trackers, //
         };
 
         // changing fields needed by the details dialog
         static auto constexpr DetailStatKeys = std::array<tr_quark, 17>{
-            TR_KEY_activityDate,
-            TR_KEY_bandwidthPriority,
-            TR_KEY_corruptEver,
-            TR_KEY_desiredAvailable,
-            TR_KEY_downloadedEver,
-            TR_KEY_downloadLimit,
-            TR_KEY_downloadLimited,
-            TR_KEY_fileStats,
-            TR_KEY_honorsSessionLimits,
-            TR_KEY_peer_limit,
-            TR_KEY_peers,
-            TR_KEY_seedIdleLimit,
-            TR_KEY_seedIdleMode,
-            TR_KEY_startDate,
-            TR_KEY_trackerStats,
-            TR_KEY_uploadLimit,
-            TR_KEY_uploadLimited
+            TR_KEY_activityDate, //
+            TR_KEY_bandwidthPriority, //
+            TR_KEY_corruptEver, //
+            TR_KEY_desiredAvailable, //
+            TR_KEY_downloadedEver, //
+            TR_KEY_downloadLimit, //
+            TR_KEY_downloadLimited, //
+            TR_KEY_fileStats, //
+            TR_KEY_honorsSessionLimits, //
+            TR_KEY_peer_limit, //
+            TR_KEY_peers, //
+            TR_KEY_seedIdleLimit, //
+            TR_KEY_seedIdleMode, //
+            TR_KEY_startDate, //
+            TR_KEY_trackerStats, //
+            TR_KEY_uploadLimit, //
+            TR_KEY_uploadLimited, //
         };
 
         // keys needed after renaming a torrent
         static auto constexpr RenameKeys = std::array<tr_quark, 3>{
             TR_KEY_fileStats,
             TR_KEY_files,
-            TR_KEY_name
+            TR_KEY_name,
         };
 
         auto const append = [&names](tr_quark key)
-            {
-                size_t len = {};
-                char const* str = tr_quark_get_string(key, &len);
-                names.emplace_back(str, len);
-            };
+        {
+            size_t len = {};
+            char const* str = tr_quark_get_string(key, &len);
+            names.emplace_back(str, len);
+        };
 
         switch (props)
         {
@@ -676,14 +666,12 @@ void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
 
     auto* q = new RpcQueue();
 
-    q->add([this, &args]()
-        {
-            return exec(TR_KEY_torrent_get, &args);
-        });
+    q->add([this, &args]() { return exec(TR_KEY_torrent_get, &args); });
 
     bool const all_torrents = ids.empty();
 
-    q->add([this, all_torrents](RpcResponse const& r)
+    q->add(
+        [this, all_torrents](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -719,15 +707,9 @@ void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& 
 
     auto* q = new RpcQueue();
 
-    q->add([this, request, &args]()
-        {
-            return exec(request, &args);
-        });
+    q->add([this, request, &args]() { return exec(request, &args); });
 
-    q->add([this, ids]()
-        {
-            refreshTorrents(ids, TorrentProperties::MainStats);
-        });
+    q->add([this, ids]() { refreshTorrents(ids, TorrentProperties::MainStats); });
 
     q->run();
 }
@@ -789,15 +771,9 @@ void Session::refreshSessionStats()
 {
     auto* q = new RpcQueue();
 
-    q->add([this]()
-        {
-            return exec("session-stats", nullptr);
-        });
+    q->add([this]() { return exec("session-stats", nullptr); });
 
-    q->add([this](RpcResponse const& r)
-        {
-            updateStats(r.args.get());
-        });
+    q->add([this](RpcResponse const& r) { updateStats(r.args.get()); });
 
     q->run();
 }
@@ -806,15 +782,9 @@ void Session::refreshSessionInfo()
 {
     auto* q = new RpcQueue();
 
-    q->add([this]()
-        {
-            return exec("session-get", nullptr);
-        });
+    q->add([this]() { return exec("session-get", nullptr); });
 
-    q->add([this](RpcResponse const& r)
-        {
-            updateInfo(r.args.get());
-        });
+    q->add([this](RpcResponse const& r) { updateInfo(r.args.get()); });
 
     q->run();
 }
@@ -823,12 +793,10 @@ void Session::updateBlocklist()
 {
     auto* q = new RpcQueue();
 
-    q->add([this]()
-        {
-            return exec("blocklist-update", nullptr);
-        });
+    q->add([this]() { return exec("blocklist-update", nullptr); });
 
-    q->add([this](RpcResponse const& r)
+    q->add(
+        [this](RpcResponse const& r)
         {
             auto const size = dictFind<int>(r.args.get(), TR_KEY_blocklist_size);
             if (size)
@@ -1086,20 +1054,22 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
 
     auto* q = new RpcQueue();
 
-    q->add([this, args]()
-        {
-            return exec("torrent-add", args);
-        },
+    q->add(
+        [this, args]() { return exec("torrent-add", args); },
         [add_me](RpcResponse const& r)
         {
-            auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
-                QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
+            auto* d = new QMessageBox(
+                QMessageBox::Warning,
+                tr("Error Adding Torrent"),
+                QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()),
+                QMessageBox::Close,
                 QApplication::activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([this, add_me](RpcResponse const& r)
+    q->add(
+        [this, add_me](RpcResponse const& r)
         {
             tr_variant* dup;
             bool session_has_torrent = false;
@@ -1128,7 +1098,8 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
 
     if (trash_original && add_me.type == AddData::FILENAME)
     {
-        q->add([add_me]()
+        q->add(
+            [add_me]()
             {
                 QFile original(add_me.filename);
                 original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
@@ -1147,9 +1118,7 @@ void Session::onDuplicatesTimer()
     QStringList lines;
     for (auto it : duplicates)
     {
-        lines.push_back(tr("%1 (copy of %2)")
-            .arg(it.first)
-            .arg(it.second.left(7)));
+        lines.push_back(tr("%1 (copy of %2)").arg(it.first).arg(it.second.left(7)));
     }
 
     if (!lines.empty())

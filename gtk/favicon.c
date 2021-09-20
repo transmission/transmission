@@ -118,8 +118,14 @@ static gboolean favicon_web_done_idle_cb(gpointer vfav)
     return G_SOURCE_REMOVE;
 }
 
-static void favicon_web_done_cb(tr_session* session, bool did_connect, bool did_timeout, long code, void const* data,
-    size_t len, void* vfav)
+static void favicon_web_done_cb(
+    tr_session* session,
+    bool did_connect,
+    bool did_timeout,
+    long code,
+    void const* data,
+    size_t len,
+    void* vfav)
 {
     TR_UNUSED(session);
     TR_UNUSED(did_connect);

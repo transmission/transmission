@@ -26,18 +26,19 @@
 
 @interface DragOverlayWindow : NSWindow
 {
-    tr_session * fLib;
+    tr_session* fLib;
 
-    NSViewAnimation * fFadeInAnimation, * fFadeOutAnimation;
+    NSViewAnimation* fFadeInAnimation;
+    NSViewAnimation* fFadeOutAnimation;
 }
 
-- (id) initWithLib: (tr_session *) lib forWindow: (NSWindow *) window;
+- (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window;
 
-- (void) setTorrents: (NSArray *) files;
-- (void) setFile: (NSString *) file;
-- (void) setURL: (NSString *) url;
+- (void)setTorrents:(NSArray*)files;
+- (void)setFile:(NSString*)file;
+- (void)setURL:(NSString*)url;
 
-- (void) fadeIn;
-- (void) fadeOut;
+- (void)fadeIn;
+- (void)fadeOut;
 
 @end
