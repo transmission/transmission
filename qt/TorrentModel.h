@@ -23,7 +23,7 @@ class Speed;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class TorrentModel : public QAbstractListModel
@@ -47,7 +47,11 @@ public:
     Torrent const* getTorrentFromId(int id) const;
 
     using torrents_t = QVector<Torrent*>;
-    torrents_t const& torrents() const { return torrents_; }
+
+    torrents_t const& torrents() const
+    {
+        return torrents_;
+    }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;

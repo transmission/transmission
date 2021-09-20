@@ -61,13 +61,12 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
     do \
     { \
         DWORD const local_code = (code); \
-        \
+\
         if (tr_logLevelIsActive((level))) \
         { \
             do_log_system_error(__FILE__, __LINE__, (level), local_code, (message)); \
         } \
-    } \
-    while (0)
+    } while (0)
 
 /***
 ****
@@ -81,14 +80,19 @@ static BOOL WINAPI handle_console_ctrl(DWORD control_type)
     return TRUE;
 }
 
-static void update_service_status(DWORD new_state, DWORD win32_exit_code, DWORD service_specific_exit_code, DWORD check_point,
+static void update_service_status(
+    DWORD new_state,
+    DWORD win32_exit_code,
+    DWORD service_specific_exit_code,
+    DWORD check_point,
     DWORD wait_hint)
 {
     SERVICE_STATUS status;
     status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     status.dwCurrentState = new_state;
-    status.dwControlsAccepted = new_state != SERVICE_RUNNING ? 0 : SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN |
-        SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
+    status.dwControlsAccepted = new_state != SERVICE_RUNNING ?
+        0 :
+        SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
     status.dwWin32ExitCode = service_specific_exit_code == 0 ? win32_exit_code : ERROR_SERVICE_SPECIFIC_ERROR;
     status.dwServiceSpecificExitCode = service_specific_exit_code;
     status.dwCheckPoint = check_point;
@@ -104,6 +108,8 @@ static void update_service_status(DWORD new_state, DWORD win32_exit_code, DWORD 
     }
 }
 
+#define TR_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 static unsigned int __stdcall service_stop_thread_main(void* param)
 {
     callbacks->on_stop(callback_arg);
@@ -114,7 +120,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
     for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT; ++checkpoint)
     {
         wait_time = wait_time >= sleep_time ? wait_time - sleep_time : 0;
-        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, MAX(wait_time, sleep_time * 2));
+        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, TR_MAX(wait_time, sleep_time * 2));
     }
 
     return 0;
@@ -244,10 +250,9 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
     }
     else
     {
-        SERVICE_TABLE_ENTRY const service_table[] =
-        {
+        SERVICE_TABLE_ENTRY const service_table[] = {
             { (LPWSTR)service_name, &service_main },
-            { NULL, NULL }
+            { NULL, NULL },
         };
 
         if (!StartServiceCtrlDispatcherW(service_table))

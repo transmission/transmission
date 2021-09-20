@@ -27,8 +27,7 @@
 #define MY_NAME "transmission-show"
 #define TIMEOUT_SECS 30
 
-static tr_option options[] =
-{
+static tr_option options[] = {
     { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
     { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
     { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },

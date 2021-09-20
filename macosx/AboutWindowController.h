@@ -24,15 +24,18 @@
 
 @interface AboutWindowController : NSWindowController
 {
-    IBOutlet NSTextView * fTextView, * fLicenseView;
-    IBOutlet NSTextField * fVersionField, * fCopyrightField;
-    IBOutlet NSButton * fLicenseButton, * fLicenseCloseButton;
-    IBOutlet NSPanel * fLicenseSheet;
+    IBOutlet NSTextView* fTextView;
+    IBOutlet NSTextView* fLicenseView;
+    IBOutlet NSTextField* fVersionField;
+    IBOutlet NSTextField* fCopyrightField;
+    IBOutlet NSButton* fLicenseButton;
+    IBOutlet NSButton* fLicenseCloseButton;
+    IBOutlet NSPanel* fLicenseSheet;
 }
 
-+ (AboutWindowController *) aboutController;
+@property(nonatomic, class, readonly) AboutWindowController* aboutController;
 
-- (IBAction) showLicense: (id) sender;
-- (IBAction) hideLicense: (id) sender;
+- (IBAction)showLicense:(id)sender;
+- (IBAction)hideLicense:(id)sender;
 
 @end

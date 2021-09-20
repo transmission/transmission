@@ -43,91 +43,95 @@ enum
 
 @implementation PiecesView
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
     //store box colors
-    fGreenAvailabilityColor = [NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0];
-    fBluePieceColor = [NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0];
+    fGreenAvailabilityColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:0.4 alpha:1.0];
+    fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
 
     //actually draw the box
-    [self setTorrent: nil];
+    [self setTorrent:nil];
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     tr_free(fPieces);
 }
 
-- (void) setTorrent: (Torrent *) torrent
+- (void)setTorrent:(Torrent*)torrent
 {
     [self clearView];
 
-    fTorrent = (torrent && ![torrent isMagnet]) ? torrent : nil;
+    fTorrent = (torrent && !torrent.magnet) ? torrent : nil;
     if (fTorrent)
     {
         //determine relevant values
-        fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
+        fNumPieces = MIN(fTorrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
 
-        const CGFloat width = [self bounds].size.width;
+        CGFloat const width = self.bounds.size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
 
-    NSImage * back = [[NSImage alloc] initWithSize: [self bounds].size];
+    NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
     [back lockFocus];
 
-    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
-                                endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
-    [gradient drawInRect: [self bounds] angle: 90.0];
+    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4]
+                                                         endingColor:[NSColor colorWithCalibratedWhite:0.2 alpha:0.4]];
+    [gradient drawInRect:self.bounds angle:90.0];
     [back unlockFocus];
 
-    [self setImage: back];
+    self.image = back;
 
     [self setNeedsDisplay];
 }
 
-- (void) clearView
+- (void)clearView
 {
     tr_free(fPieces);
     fPieces = NULL;
 }
 
-- (void) updateView
+- (void)updateView
 {
     if (!fTorrent)
+    {
         return;
+    }
 
     //determine if first time
-    const BOOL first = fPieces == NULL;
+    BOOL const first = fPieces == NULL;
     if (first)
-        fPieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
+    {
+        fPieces = (int8_t*)tr_malloc(fNumPieces * sizeof(int8_t));
+    }
 
-    int8_t * pieces = NULL;
-    float * piecesPercent = NULL;
+    int8_t* pieces = NULL;
+    float* piecesPercent = NULL;
 
-    const BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    BOOL const showAvailablity = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (showAvailablity)
     {
-        pieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
-        [fTorrent getAvailability: pieces size: fNumPieces];
+        pieces = (int8_t*)tr_malloc(fNumPieces * sizeof(int8_t));
+        [fTorrent getAvailability:pieces size:fNumPieces];
     }
     else
     {
-        piecesPercent = (float *)tr_malloc(fNumPieces * sizeof(float));
-        [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
+        piecesPercent = (float*)tr_malloc(fNumPieces * sizeof(float));
+        [fTorrent getAmountFinished:piecesPercent size:fNumPieces];
     }
 
-    NSImage * image = [self image];
+    NSImage* image = self.image;
 
     NSRect fillRects[fNumPieces];
-    NSColor * fillColors[fNumPieces];
+    NSColor* fillColors[fNumPieces];
 
     NSInteger usedCount = 0;
 
     for (NSInteger index = 0; index < fNumPieces; index++)
     {
-        NSColor * pieceColor = nil;
+        NSColor* pieceColor = nil;
 
         if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
         {
@@ -135,7 +139,7 @@ enum
             {
                 if (!first && fPieces[index] != PIECE_FLASHING)
                 {
-                    pieceColor = [NSColor orangeColor];
+                    pieceColor = NSColor.orangeColor;
                     fPieces[index] = PIECE_FLASHING;
                 }
                 else
@@ -149,7 +153,7 @@ enum
         {
             if (first || fPieces[index] != PIECE_NONE)
             {
-                pieceColor = [NSColor whiteColor];
+                pieceColor = NSColor.whiteColor;
                 fPieces[index] = PIECE_NONE;
             }
         }
@@ -164,19 +168,21 @@ enum
         else
         {
             //always redraw "mixed"
-            CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
-            NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
-            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
+            CGFloat percent = showAvailablity ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
+            NSColor* fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
+            pieceColor = [NSColor.whiteColor blendedColorWithFraction:percent ofColor:fullColor];
             fPieces[index] = PIECE_SOME;
         }
 
         if (pieceColor)
         {
-            const NSInteger across = index % fAcross,
-                            down = index / fAcross;
-            fillRects[usedCount] = NSMakeRect(across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                                [image size].width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
-                                                fWidth, fWidth);
+            NSInteger const across = index % fAcross;
+            NSInteger const down = index / fAcross;
+            fillRects[usedCount] = NSMakeRect(
+                across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                image.size.width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
+                fWidth,
+                fWidth);
             fillColors[usedCount] = pieceColor;
 
             usedCount++;
@@ -195,22 +201,22 @@ enum
     tr_free(piecesPercent);
 }
 
-- (BOOL) acceptsFirstMouse: (NSEvent *) event
+- (BOOL)acceptsFirstMouse:(NSEvent*)event
 {
     return YES;
 }
 
-- (void) mouseDown: (NSEvent *) event
+- (void)mouseDown:(NSEvent*)event
 {
     if (fTorrent)
     {
-        const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
-        [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+        BOOL const availability = ![NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
+        [NSUserDefaults.standardUserDefaults setBool:availability forKey:@"PiecesViewShowAvailability"];
 
-        [self sendAction:[self action] to:[self target]];
+        [self sendAction:self.action to:self.target];
     }
 
-    [super mouseDown: event];
+    [super mouseDown:event];
 }
 
 @end

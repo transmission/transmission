@@ -28,23 +28,23 @@
 
 @interface BlocklistDownloaderViewController : NSObject
 {
-    PrefsController * fPrefsController;
+    PrefsController* fPrefsController;
 
-    IBOutlet NSWindow * fStatusWindow;
-    IBOutlet NSProgressIndicator * fProgressBar;
-    IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fButton;
+    IBOutlet NSWindow* fStatusWindow;
+    IBOutlet NSProgressIndicator* fProgressBar;
+    IBOutlet NSTextField* fTextField;
+    IBOutlet NSButton* fButton;
 }
 
-+ (void) downloadWithPrefsController: (PrefsController *) prefsController;
++ (void)downloadWithPrefsController:(PrefsController*)prefsController;
 
-- (void) cancelDownload: (id) sender;
+- (void)cancelDownload:(id)sender;
 
-- (void) setStatusStarting;
-- (void) setStatusProgressForCurrentSize: (NSUInteger) currentSize expectedSize: (long long) expectedSize;
-- (void) setStatusProcessing;
+- (void)setStatusStarting;
+- (void)setStatusProgressForCurrentSize:(NSUInteger)currentSize expectedSize:(long long)expectedSize;
+- (void)setStatusProcessing;
 
-- (void) setFinished;
-- (void) setFailed: (NSString *) error;
+- (void)setFinished;
+- (void)setFailed:(NSString*)error;
 
 @end

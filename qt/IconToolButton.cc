@@ -13,8 +13,8 @@
 
 #include "IconToolButton.h"
 
-IconToolButton::IconToolButton(QWidget* parent) :
-    QToolButton(parent)
+IconToolButton::IconToolButton(QWidget* parent)
+    : QToolButton(parent)
 {
 }
 

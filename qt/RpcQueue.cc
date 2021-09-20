@@ -13,9 +13,9 @@
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 RpcQueue::Tag RpcQueue::next_tag = {};
 
-RpcQueue::RpcQueue(QObject* parent) :
-    QObject(parent),
-    tag_(next_tag++)
+RpcQueue::RpcQueue(QObject* parent)
+    : QObject(parent)
+    , tag_(next_tag++)
 {
     connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }

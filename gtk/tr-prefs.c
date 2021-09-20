@@ -463,8 +463,13 @@ static void onBlocklistUpdate(GtkButton* w, gpointer gdata)
 {
     GtkWidget* d;
     struct blocklist_data* data = gdata;
-    d = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))), GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", _("Update Blocklist"));
+    d = gtk_message_dialog_new(
+        GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))),
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_INFO,
+        GTK_BUTTONS_CLOSE,
+        "%s",
+        _("Update Blocklist"));
     gtk_widget_set_sensitive(data->updateBlocklistButton, FALSE);
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(d), "%s", _("Getting new blocklist…"));
     data->updateBlocklistDialog = d;
@@ -491,8 +496,11 @@ static void onIntComboChanged(GtkComboBox* combo_box, gpointer core)
 
 static GtkWidget* new_encryption_combo(GObject* core, tr_quark const key)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(_("Allow encryption"), TR_CLEAR_PREFERRED, _("Prefer encryption"),
-        TR_ENCRYPTION_PREFERRED, _("Require encryption"), TR_ENCRYPTION_REQUIRED, NULL);
+    GtkWidget* w = gtr_combo_box_new_enum(
+        TR_ARG_TUPLE(_("Allow encryption"), TR_CLEAR_PREFERRED),
+        TR_ARG_TUPLE(_("Prefer encryption"), TR_ENCRYPTION_PREFERRED),
+        TR_ARG_TUPLE(_("Require encryption"), TR_ENCRYPTION_REQUIRED),
+        NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
     g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
@@ -572,9 +580,7 @@ enum
 static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
 {
     char** rules;
-    GtkListStore* store = gtk_list_store_new(N_COLS,
-        G_TYPE_STRING,
-        G_TYPE_STRING);
+    GtkListStore* store = gtk_list_store_new(N_COLS, G_TYPE_STRING, G_TYPE_STRING);
 
     rules = g_strsplit(whitelist, ",", 0);
 
@@ -625,8 +631,7 @@ static void refreshWhitelist(struct remote_page* page)
             g_string_append(gstr, address);
             g_string_append(gstr, ",");
             g_free(address);
-        }
-        while (gtk_tree_model_iter_next(model, &iter));
+        } while (gtk_tree_model_iter_next(model, &iter));
     }
 
     g_string_truncate(gstr, gstr->len - 1); /* remove the trailing comma */
@@ -832,8 +837,7 @@ static GtkWidget* remotePage(GObject* core)
         v = page->view = GTK_TREE_VIEW(w);
         gtk_widget_set_tooltip_text(w, _("IP addresses may use wildcards, such as 192.168.*.*"));
         sel = gtk_tree_view_get_selection(v);
-        g_signal_connect(sel, "changed",
-            G_CALLBACK(onWhitelistSelectionChanged), page);
+        g_signal_connect(sel, "changed", G_CALLBACK(onWhitelistSelectionChanged), page);
         g_object_unref(G_OBJECT(m));
         gtk_tree_view_set_headers_visible(v, TRUE);
         w = gtk_frame_new(NULL);
@@ -851,7 +855,12 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, "margin-top", GUI_PAD, "margin-bottom", GUI_PAD,
+        g_object_set(
+            w,
+            TR_ARG_TUPLE("halign", GTK_ALIGN_START),
+            TR_ARG_TUPLE("valign", GTK_ALIGN_START),
+            TR_ARG_TUPLE("margin-top", GUI_PAD),
+            TR_ARG_TUPLE("margin-bottom", GUI_PAD),
             NULL);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
@@ -951,16 +960,16 @@ static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
 static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
 {
     GtkWidget* w = gtr_combo_box_new_enum(
-        _("Every Day"), TR_SCHED_ALL,
-        _("Weekdays"), TR_SCHED_WEEKDAY,
-        _("Weekends"), TR_SCHED_WEEKEND,
-        _("Sunday"), TR_SCHED_SUN,
-        _("Monday"), TR_SCHED_MON,
-        _("Tuesday"), TR_SCHED_TUES,
-        _("Wednesday"), TR_SCHED_WED,
-        _("Thursday"), TR_SCHED_THURS,
-        _("Friday"), TR_SCHED_FRI,
-        _("Saturday"), TR_SCHED_SAT,
+        TR_ARG_TUPLE(_("Every Day"), TR_SCHED_ALL),
+        TR_ARG_TUPLE(_("Weekdays"), TR_SCHED_WEEKDAY),
+        TR_ARG_TUPLE(_("Weekends"), TR_SCHED_WEEKEND),
+        TR_ARG_TUPLE(_("Sunday"), TR_SCHED_SUN),
+        TR_ARG_TUPLE(_("Monday"), TR_SCHED_MON),
+        TR_ARG_TUPLE(_("Tuesday"), TR_SCHED_TUES),
+        TR_ARG_TUPLE(_("Wednesday"), TR_SCHED_WED),
+        TR_ARG_TUPLE(_("Thursday"), TR_SCHED_THURS),
+        TR_ARG_TUPLE(_("Friday"), TR_SCHED_FRI),
+        TR_ARG_TUPLE(_("Saturday"), TR_SCHED_SAT),
         NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
@@ -1266,9 +1275,12 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core = TR_CORE(core);
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
-    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-        _("_Help"), GTK_RESPONSE_HELP,
-        _("_Close"), GTK_RESPONSE_CLOSE,
+    d = gtk_dialog_new_with_buttons(
+        _("Transmission Preferences"),
+        parent,
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        TR_ARG_TUPLE(_("_Help"), GTK_RESPONSE_HELP),
+        TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
         NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");

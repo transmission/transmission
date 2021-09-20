@@ -27,8 +27,7 @@ QVariant DBusInteropHelper::addMetainfo(QString const& metainfo) const
         QStringLiteral("com.transmissionbt.Transmission"),
         QStringLiteral("/com/transmissionbt/Transmission"),
         QStringLiteral("com.transmissionbt.Transmission"),
-        QStringLiteral("AddMetainfo")
-        );
+        QStringLiteral("AddMetainfo"));
     request.setArguments(QVariantList() << metainfo);
 
     QDBusReply<bool> const response = QDBusConnection::sessionBus().call(request);

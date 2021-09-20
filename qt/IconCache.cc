@@ -140,8 +140,12 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int i
 
         SHFILEINFO shell_file_info;
 
-        if (::SHGetFileInfoW(filename.data(), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
-            sizeof(shell_file_info), SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
+        if (::SHGetFileInfoW(
+                filename.data(),
+                FILE_ATTRIBUTE_NORMAL,
+                &shell_file_info,
+                sizeof(shell_file_info),
+                SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
         {
             if (shell_file_info.hIcon != nullptr)
             {

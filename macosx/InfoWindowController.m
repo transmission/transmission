@@ -44,253 +44,276 @@
 
 #define INVALID -99
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, tabTag) {
     TAB_GENERAL_TAG = 0,
     TAB_ACTIVITY_TAG = 1,
     TAB_TRACKERS_TAG = 2,
     TAB_PEERS_TAG = 3,
     TAB_FILE_TAG = 4,
     TAB_OPTIONS_TAG = 5
-} tabTag;
+};
 
 @interface InfoWindowController (Private)
 
-- (void) resetInfo;
-- (void) resetInfoForTorrent: (NSNotification *) notification;
+- (void)resetInfo;
+- (void)resetInfoForTorrent:(NSNotification*)notification;
 
 @end
 
 @implementation InfoWindowController
 
-- (id) init
+- (instancetype)init
 {
-    self = [super initWithWindowNibName: @"InfoWindow"];
+    self = [super initWithWindowNibName:@"InfoWindow"];
     return self;
 }
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
-    [fNoneSelectedField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents")];
+    fNoneSelectedField.stringValue = NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents");
 
     //window location and size
-    NSPanel * window = (NSPanel *)[self window];
+    NSPanel* window = (NSPanel*)self.window;
 
-    [window setFloatingPanel: NO];
+    window.floatingPanel = NO;
 
-    const CGFloat windowHeight = NSHeight([window frame]);
-    fMinWindowWidth = [window minSize].width;
+    CGFloat const windowHeight = NSHeight(window.frame);
+    fMinWindowWidth = window.minSize.width;
 
-    [window setFrameAutosaveName: @"InspectorWindow"];
-    [window setFrameUsingName: @"InspectorWindow"];
+    [window setFrameAutosaveName:@"InspectorWindow"];
+    [window setFrameUsingName:@"InspectorWindow"];
 
-    NSRect windowRect = [window frame];
+    NSRect windowRect = window.frame;
     windowRect.origin.y -= windowHeight - NSHeight(windowRect);
     windowRect.size.height = windowHeight;
-    [window setFrame: windowRect display: NO];
+    [window setFrame:windowRect display:NO];
 
-    [window setBecomesKeyOnlyIfNeeded: YES];
+    window.becomesKeyOnlyIfNeeded = YES;
 
     //set tab tooltips
-    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_GENERAL_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Trackers", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_TRACKERS_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_PEERS_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_FILE_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"General Info", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_GENERAL_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"Activity", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_ACTIVITY_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"Trackers", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_TRACKERS_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"Peers", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_PEERS_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_FILE_TAG]];
+    [fTabMatrix setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_OPTIONS_TAG]];
 
     //set selected tab
     fCurrentTabTag = INVALID;
-    NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
+    NSString* identifier = [NSUserDefaults.standardUserDefaults stringForKey:@"InspectorSelected"];
     NSInteger tag;
-    if ([identifier isEqualToString: TAB_INFO_IDENT])
-        tag = TAB_GENERAL_TAG;
-    else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
-        tag = TAB_ACTIVITY_TAG;
-    else if ([identifier isEqualToString: TAB_TRACKER_IDENT])
-        tag = TAB_TRACKERS_TAG;
-    else if ([identifier isEqualToString: TAB_PEERS_IDENT])
-        tag = TAB_PEERS_TAG;
-    else if ([identifier isEqualToString: TAB_FILES_IDENT])
-        tag = TAB_FILE_TAG;
-    else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
-        tag = TAB_OPTIONS_TAG;
-    else //safety
+    if ([identifier isEqualToString:TAB_INFO_IDENT])
     {
-        [[NSUserDefaults standardUserDefaults] setObject: TAB_INFO_IDENT forKey: @"InspectorSelected"];
         tag = TAB_GENERAL_TAG;
     }
-    [fTabMatrix selectCellWithTag: tag];
-    [self setTab: nil];
+    else if ([identifier isEqualToString:TAB_ACTIVITY_IDENT])
+    {
+        tag = TAB_ACTIVITY_TAG;
+    }
+    else if ([identifier isEqualToString:TAB_TRACKER_IDENT])
+    {
+        tag = TAB_TRACKERS_TAG;
+    }
+    else if ([identifier isEqualToString:TAB_PEERS_IDENT])
+    {
+        tag = TAB_PEERS_TAG;
+    }
+    else if ([identifier isEqualToString:TAB_FILES_IDENT])
+    {
+        tag = TAB_FILE_TAG;
+    }
+    else if ([identifier isEqualToString:TAB_OPTIONS_IDENT])
+    {
+        tag = TAB_OPTIONS_TAG;
+    }
+    else //safety
+    {
+        [NSUserDefaults.standardUserDefaults setObject:TAB_INFO_IDENT forKey:@"InspectorSelected"];
+        tag = TAB_GENERAL_TAG;
+    }
+    [fTabMatrix selectCellWithTag:tag];
+    [self setTab:nil];
 
     //set blank inspector
-    [self setInfoForTorrents: [NSArray array]];
+    [self setInfoForTorrents:@[]];
 
     //allow for update notifications
-    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(resetInfoForTorrent:) name: @"ResetInspector" object: nil];
-    [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
-    [nc addObserver: self selector: @selector(updateOptions) name: @"UpdateOptions" object: nil];
+    NSNotificationCenter* nc = NSNotificationCenter.defaultCenter;
+    [nc addObserver:self selector:@selector(resetInfoForTorrent:) name:@"ResetInspector" object:nil];
+    [nc addObserver:self selector:@selector(updateInfoStats) name:@"UpdateStats" object:nil];
+    [nc addObserver:self selector:@selector(updateOptions) name:@"UpdateOptions" object:nil];
 }
 
-- (void) dealloc
+- (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 
-    if ([fViewController respondsToSelector: @selector(saveViewSize)])
+    if ([fViewController respondsToSelector:@selector(saveViewSize)])
+    {
         [fViewController saveViewSize];
+    }
 }
 
-- (void) setInfoForTorrents: (NSArray *) torrents
+- (void)setInfoForTorrents:(NSArray*)torrents
 {
-    if (fTorrents && [fTorrents isEqualToArray: torrents])
+    if (fTorrents && [fTorrents isEqualToArray:torrents])
+    {
         return;
+    }
 
     fTorrents = torrents;
 
     [self resetInfo];
 }
 
-- (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
+- (NSRect)windowWillUseStandardFrame:(NSWindow*)window defaultFrame:(NSRect)defaultFrame
 {
-    NSRect windowRect = [window frame];
-    windowRect.size.width = [window minSize].width;
+    NSRect windowRect = window.frame;
+    windowRect.size.width = window.minSize.width;
     return windowRect;
 }
 
-- (void) windowWillClose: (NSNotification *) notification
+- (void)windowWillClose:(NSNotification*)notification
 {
-    if (fCurrentTabTag == TAB_FILE_TAG && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
+    if (fCurrentTabTag == TAB_FILE_TAG && ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
+    {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
+    }
 }
 
-- (void) setTab: (id) sender
+- (void)setTab:(id)sender
 {
-    const NSInteger oldTabTag = fCurrentTabTag;
+    NSInteger const oldTabTag = fCurrentTabTag;
     fCurrentTabTag = [fTabMatrix selectedTag];
     if (fCurrentTabTag == oldTabTag)
+    {
         return;
+    }
 
     //take care of old view
     CGFloat oldHeight = 0;
     if (oldTabTag != INVALID)
     {
         //deselect old tab item
-        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
+        [(InfoTabButtonCell*)[fTabMatrix cellWithTag:oldTabTag] setSelectedTab:NO];
 
-        if ([fViewController respondsToSelector: @selector(saveViewSize)])
+        if ([fViewController respondsToSelector:@selector(saveViewSize)])
+        {
             [fViewController saveViewSize];
+        }
 
-        if ([fViewController respondsToSelector: @selector(clearView)])
+        if ([fViewController respondsToSelector:@selector(clearView)])
+        {
             [fViewController clearView];
+        }
 
-        NSView * oldView = [fViewController view];
-        oldHeight = NSHeight([oldView frame]);
+        NSView* oldView = fViewController.view;
+        oldHeight = NSHeight(oldView.frame);
 
         //remove old view
         [oldView removeFromSuperview];
     }
 
     //set new tab item
-    NSString * identifier;
+    NSString* identifier;
     switch (fCurrentTabTag)
     {
-        case TAB_GENERAL_TAG:
-            if (!fGeneralViewController)
-            {
-                fGeneralViewController = [[InfoGeneralViewController alloc] init];
-                [fGeneralViewController setInfoForTorrents: fTorrents];
-            }
+    case TAB_GENERAL_TAG:
+        if (!fGeneralViewController)
+        {
+            fGeneralViewController = [[InfoGeneralViewController alloc] init];
+            [fGeneralViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fGeneralViewController;
-            identifier = TAB_INFO_IDENT;
-            break;
-        case TAB_ACTIVITY_TAG:
-            if (!fActivityViewController)
-            {
-                fActivityViewController = [[InfoActivityViewController alloc] init];
-                [fActivityViewController setInfoForTorrents: fTorrents];
-            }
+        fViewController = fGeneralViewController;
+        identifier = TAB_INFO_IDENT;
+        break;
+    case TAB_ACTIVITY_TAG:
+        if (!fActivityViewController)
+        {
+            fActivityViewController = [[InfoActivityViewController alloc] init];
+            [fActivityViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fActivityViewController;
-            identifier = TAB_ACTIVITY_IDENT;
-            break;
-        case TAB_TRACKERS_TAG:
-            if (!fTrackersViewController)
-            {
-                fTrackersViewController = [[InfoTrackersViewController alloc] init];
-                [fTrackersViewController setInfoForTorrents: fTorrents];
-            }
+        fViewController = fActivityViewController;
+        identifier = TAB_ACTIVITY_IDENT;
+        break;
+    case TAB_TRACKERS_TAG:
+        if (!fTrackersViewController)
+        {
+            fTrackersViewController = [[InfoTrackersViewController alloc] init];
+            [fTrackersViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fTrackersViewController;
-            identifier = TAB_TRACKER_IDENT;
-            break;
-        case TAB_PEERS_TAG:
-            if (!fPeersViewController)
-            {
-                fPeersViewController = [[InfoPeersViewController alloc] init];
-                [fPeersViewController setInfoForTorrents: fTorrents];
-            }
+        fViewController = fTrackersViewController;
+        identifier = TAB_TRACKER_IDENT;
+        break;
+    case TAB_PEERS_TAG:
+        if (!fPeersViewController)
+        {
+            fPeersViewController = [[InfoPeersViewController alloc] init];
+            [fPeersViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fPeersViewController;
-            identifier = TAB_PEERS_IDENT;
-            break;
-        case TAB_FILE_TAG:
-            if (!fFileViewController)
-            {
-                fFileViewController = [[InfoFileViewController alloc] init];
-                [fFileViewController setInfoForTorrents: fTorrents];
-            }
+        fViewController = fPeersViewController;
+        identifier = TAB_PEERS_IDENT;
+        break;
+    case TAB_FILE_TAG:
+        if (!fFileViewController)
+        {
+            fFileViewController = [[InfoFileViewController alloc] init];
+            [fFileViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fFileViewController;
-            identifier = TAB_FILES_IDENT;
-            break;
-        case TAB_OPTIONS_TAG:
-            if (!fOptionsViewController)
-            {
-                fOptionsViewController = [[InfoOptionsViewController alloc] init];
-                [fOptionsViewController setInfoForTorrents: fTorrents];
-            }
+        fViewController = fFileViewController;
+        identifier = TAB_FILES_IDENT;
+        break;
+    case TAB_OPTIONS_TAG:
+        if (!fOptionsViewController)
+        {
+            fOptionsViewController = [[InfoOptionsViewController alloc] init];
+            [fOptionsViewController setInfoForTorrents:fTorrents];
+        }
 
-            fViewController = fOptionsViewController;
-            identifier = TAB_OPTIONS_IDENT;
-            break;
-        default:
-            NSAssert1(NO, @"Unknown info tab selected: %ld", fCurrentTabTag);
-            return;
+        fViewController = fOptionsViewController;
+        identifier = TAB_OPTIONS_IDENT;
+        break;
+    default:
+        NSAssert1(NO, @"Unknown info tab selected: %ld", fCurrentTabTag);
+        return;
     }
 
-    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
+    [NSUserDefaults.standardUserDefaults setObject:identifier forKey:@"InspectorSelected"];
 
-    NSWindow * window = [self window];
+    NSWindow* window = self.window;
 
-    [window setTitle: [NSString stringWithFormat: @"%@ - %@", [fViewController title],
-                        NSLocalizedString(@"Torrent Inspector", "Inspector -> title")]];
+    window.title = [NSString
+        stringWithFormat:@"%@ - %@", fViewController.title, NSLocalizedString(@"Torrent Inspector", "Inspector -> title")];
 
     //selected tab item
-    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
+    [(InfoTabButtonCell*)fTabMatrix.selectedCell setSelectedTab:YES];
 
-    NSView * view = [fViewController view];
+    NSView* view = fViewController.view;
 
     [fViewController updateInfo];
 
-    NSRect windowRect = [window frame], viewRect = [view frame];
+    NSRect windowRect = window.frame, viewRect = view.frame;
 
-    const CGFloat difference = NSHeight(viewRect) - oldHeight;
+    CGFloat const difference = NSHeight(viewRect) - oldHeight;
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
 
-    const CGFloat minWindowWidth = MAX(fMinWindowWidth, [view fittingSize].width);
+    CGFloat const minWindowWidth = MAX(fMinWindowWidth, view.fittingSize.width);
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
-    if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
+    if ([fViewController respondsToSelector:@selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
     {
-        if ([window screen])
+        if (window.screen)
         {
-            const CGFloat screenHeight = NSHeight([[window screen] visibleFrame]);
+            CGFloat const screenHeight = NSHeight(window.screen.visibleFrame);
             if (NSHeight(windowRect) > screenHeight)
             {
-                const CGFloat difference = screenHeight - NSHeight(windowRect);
+                CGFloat const difference = screenHeight - NSHeight(windowRect);
                 windowRect.origin.y -= difference;
                 windowRect.size.height += difference;
 
@@ -298,229 +321,255 @@ typedef enum
             }
         }
 
-        [window setMinSize: NSMakeSize(minWindowWidth, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT)];
-        [window setMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
+        window.minSize = NSMakeSize(minWindowWidth, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT);
+        window.maxSize = NSMakeSize(FLT_MAX, FLT_MAX);
     }
     else
     {
-        [window setMinSize: NSMakeSize(minWindowWidth, NSHeight(windowRect))];
-        [window setMaxSize: NSMakeSize(FLT_MAX, NSHeight(windowRect))];
+        window.minSize = NSMakeSize(minWindowWidth, NSHeight(windowRect));
+        window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
     }
 
     viewRect.size.width = NSWidth(windowRect);
-    [view setFrame: viewRect];
+    view.frame = viewRect;
 
-    [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
-    [[window contentView] addSubview: view];
+    [window setFrame:windowRect display:YES animate:oldTabTag != INVALID];
+    [window.contentView addSubview:view];
 
-    [[window contentView] addConstraints: [NSLayoutConstraint constraintsWithVisualFormat: @"H:|-0-[view]-0-|"
-                                                                                  options: 0
-                                                                                  metrics: nil
-                                                                                    views: @{ @"view": view }]];
-    [[window contentView] addConstraints: [NSLayoutConstraint constraintsWithVisualFormat: @"V:[tabs]-0-[view]-0-|"
-                                                                                  options: 0
-                                                                                  metrics: nil
-                                                                                    views: @{ @"tabs": fTabMatrix, @"view": view }]];
+    [window.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[view]-0-|" options:0 metrics:nil
+                                                                                 views:@{ @"view" : view }]];
+    [window.contentView
+        addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[tabs]-0-[view]-0-|" options:0 metrics:nil
+                                                                 views:@{ @"tabs" : fTabMatrix, @"view" : view }]];
 
-    if ((fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG)
-        && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
+    if ((fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG) &&
+        ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
+    {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
+    }
 }
 
-- (void) setNextTab
+- (void)setNextTab
 {
-    NSInteger tag = [fTabMatrix selectedTag]+1;
-    if (tag >= [fTabMatrix numberOfColumns])
+    NSInteger tag = [fTabMatrix selectedTag] + 1;
+    if (tag >= fTabMatrix.numberOfColumns)
+    {
         tag = 0;
+    }
 
-    [fTabMatrix selectCellWithTag: tag];
-    [self setTab: nil];
+    [fTabMatrix selectCellWithTag:tag];
+    [self setTab:nil];
 }
 
-- (void) setPreviousTab
+- (void)setPreviousTab
 {
-    NSInteger tag = [fTabMatrix selectedTag]-1;
+    NSInteger tag = [fTabMatrix selectedTag] - 1;
     if (tag < 0)
-        tag = [fTabMatrix numberOfColumns]-1;
+    {
+        tag = fTabMatrix.numberOfColumns - 1;
+    }
 
-    [fTabMatrix selectCellWithTag: tag];
-    [self setTab: nil];
+    [fTabMatrix selectCellWithTag:tag];
+    [self setTab:nil];
 }
 
-- (void) swipeWithEvent: (NSEvent *) event
+- (void)swipeWithEvent:(NSEvent*)event
 {
-    if ([event deltaX] < 0.0)
+    if (event.deltaX < 0.0)
+    {
         [self setNextTab];
-    else if ([event deltaX] > 0.0)
+    }
+    else if (event.deltaX > 0.0)
+    {
         [self setPreviousTab];
+    }
 }
 
-- (void) updateInfoStats
+- (void)updateInfoStats
 {
     [fViewController updateInfo];
 }
 
-- (void) updateOptions
+- (void)updateOptions
 {
     [fOptionsViewController updateOptions];
 }
 
-- (NSArray *) quickLookURLs
+- (NSArray*)quickLookURLs
 {
-    return [fFileViewController quickLookURLs];
+    return fFileViewController.quickLookURLs;
 }
 
-- (BOOL) canQuickLook
+- (BOOL)canQuickLook
 {
-    if (fCurrentTabTag != TAB_FILE_TAG || ![[self window] isVisible])
+    if (fCurrentTabTag != TAB_FILE_TAG || !self.window.visible)
+    {
         return NO;
+    }
 
-    return [fFileViewController canQuickLook];
+    return fFileViewController.canQuickLook;
 }
 
-- (NSRect) quickLookSourceFrameForPreviewItem: (id <QLPreviewItem>) item
+- (NSRect)quickLookSourceFrameForPreviewItem:(id<QLPreviewItem>)item
 {
-    return [fFileViewController quickLookSourceFrameForPreviewItem: item];
+    return [fFileViewController quickLookSourceFrameForPreviewItem:item];
 }
 
 @end
 
 @implementation InfoWindowController (Private)
 
-- (void) resetInfo
+- (void)resetInfo
 {
-    const NSUInteger numberSelected = [fTorrents count];
+    NSUInteger const numberSelected = fTorrents.count;
     if (numberSelected != 1)
     {
         if (numberSelected > 0)
         {
-            [fImageView setImage: [NSImage imageNamed: NSImageNameMultipleDocuments]];
+            fImageView.image = [NSImage imageNamed:NSImageNameMultipleDocuments];
 
-            [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ Torrents Selected",
-                                            "Inspector -> selected torrents"),
-                                            [NSString formattedUInteger: numberSelected]]];
-            [fNameField setHidden: NO];
+            fNameField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ Torrents Selected", "Inspector -> selected torrents"),
+                                                                [NSString formattedUInteger:numberSelected]];
+            fNameField.hidden = NO;
 
             uint64_t size = 0;
             NSUInteger fileCount = 0, magnetCount = 0;
-            for (Torrent * torrent in fTorrents)
+            for (Torrent* torrent in fTorrents)
             {
-                size += [torrent size];
-                fileCount += [torrent fileCount];
-                if ([torrent isMagnet])
+                size += torrent.size;
+                fileCount += torrent.fileCount;
+                if (torrent.magnet)
+                {
                     ++magnetCount;
+                }
             }
 
-            NSMutableArray * fileStrings = [NSMutableArray arrayWithCapacity: 2];
+            NSMutableArray* fileStrings = [NSMutableArray arrayWithCapacity:2];
             if (fileCount > 0)
             {
-                NSString * fileString;
+                NSString* fileString;
                 if (fileCount == 1)
+                {
                     fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
+                }
                 else
-                    fileString = [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                    [NSString formattedUInteger: fileCount]];
-                [fileStrings addObject: fileString];
+                {
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
+                                                            [NSString formattedUInteger:fileCount]];
+                }
+                [fileStrings addObject:fileString];
             }
             if (magnetCount > 0)
             {
-                NSString * magnetString;
+                NSString* magnetString;
                 if (magnetCount == 1)
+                {
                     magnetString = NSLocalizedString(@"1 magnetized transfer", "Inspector -> selected torrents");
+                }
                 else
-                    magnetString = [NSString stringWithFormat: NSLocalizedString(@"%@ magnetized transfers",
-                                    "Inspector -> selected torrents"), [NSString formattedUInteger: magnetCount]];
-                [fileStrings addObject: magnetString];
+                {
+                    magnetString = [NSString stringWithFormat:NSLocalizedString(@"%@ magnetized transfers", "Inspector -> selected torrents"),
+                                                              [NSString formattedUInteger:magnetCount]];
+                }
+                [fileStrings addObject:magnetString];
             }
 
-            NSString * fileString = [fileStrings componentsJoinedByString: @" + "];
+            NSString* fileString = [fileStrings componentsJoinedByString:@" + "];
 
             if (magnetCount < numberSelected)
             {
-                [fBasicInfoField setStringValue: [NSString stringWithFormat: @"%@, %@", fileString,
-                    [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
-                        [NSString stringForFileSize: size]]]];
+                fBasicInfoField.stringValue = [NSString
+                    stringWithFormat:@"%@, %@",
+                                     fileString,
+                                     [NSString stringWithFormat:NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
+                                                                [NSString stringForFileSize:size]]];
 
-                NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
-                [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
-                [fBasicInfoField setToolTip: [formatter stringFromByteCount: size]];
+                NSByteCountFormatter* formatter = [[NSByteCountFormatter alloc] init];
+                formatter.allowedUnits = NSByteCountFormatterUseBytes;
+                fBasicInfoField.toolTip = [formatter stringFromByteCount:size];
             }
             else
             {
-                [fBasicInfoField setStringValue: fileString];
-                [fBasicInfoField setToolTip: nil];
+                fBasicInfoField.stringValue = fileString;
+                fBasicInfoField.toolTip = nil;
             }
-            [fBasicInfoField setHidden: NO];
+            fBasicInfoField.hidden = NO;
 
-            [fNoneSelectedField setHidden: YES];
+            fNoneSelectedField.hidden = YES;
         }
         else
         {
-            [fImageView setImage: [NSImage imageNamed: NSImageNameApplicationIcon]];
-            [fNoneSelectedField setHidden: NO];
+            fImageView.image = [NSImage imageNamed:NSImageNameApplicationIcon];
+            fNoneSelectedField.hidden = NO;
 
-            [fNameField setHidden: YES];
-            [fBasicInfoField setHidden: YES];
+            fNameField.hidden = YES;
+            fBasicInfoField.hidden = YES;
         }
 
-        [fNameField setToolTip: nil];
+        fNameField.toolTip = nil;
     }
     else
     {
-        Torrent * torrent = fTorrents[0];
+        Torrent* torrent = fTorrents[0];
 
-        [fImageView setImage: [torrent icon]];
+        fImageView.image = torrent.icon;
 
-        NSString * name = [torrent name];
-        [fNameField setStringValue: name];
-        [fNameField setToolTip: name];
-        [fNameField setHidden: NO];
+        NSString* name = torrent.name;
+        fNameField.stringValue = name;
+        fNameField.toolTip = name;
+        fNameField.hidden = NO;
 
-        if (![torrent isMagnet])
+        if (!torrent.magnet)
         {
-            NSString * basicString = [NSString stringForFileSize: [torrent size]];
-            if ([torrent isFolder])
+            NSString* basicString = [NSString stringForFileSize:torrent.size];
+            if (torrent.folder)
             {
-                NSString * fileString;
-                const NSUInteger fileCount = [torrent fileCount];
+                NSString* fileString;
+                NSUInteger const fileCount = torrent.fileCount;
                 if (fileCount == 1)
+                {
                     fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
+                }
                 else
-                    fileString= [NSString stringWithFormat: NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                    [NSString formattedUInteger: fileCount]];
-                basicString = [NSString stringWithFormat: @"%@, %@", fileString, basicString];
+                {
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
+                                                            [NSString formattedUInteger:fileCount]];
+                }
+                basicString = [NSString stringWithFormat:@"%@, %@", fileString, basicString];
             }
-            [fBasicInfoField setStringValue: basicString];
+            fBasicInfoField.stringValue = basicString;
 
-            NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
-            [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
-            [fBasicInfoField setToolTip: [formatter stringFromByteCount: [torrent size]]];
+            NSByteCountFormatter* formatter = [[NSByteCountFormatter alloc] init];
+            formatter.allowedUnits = NSByteCountFormatterUseBytes;
+            fBasicInfoField.toolTip = [formatter stringFromByteCount:torrent.size];
         }
         else
         {
-            [fBasicInfoField setStringValue: NSLocalizedString(@"Magnetized transfer", "Inspector -> selected torrents")];
-            [fBasicInfoField setToolTip: nil];
+            fBasicInfoField.stringValue = NSLocalizedString(@"Magnetized transfer", "Inspector -> selected torrents");
+            fBasicInfoField.toolTip = nil;
         }
-        [fBasicInfoField setHidden: NO];
+        fBasicInfoField.hidden = NO;
 
-        [fNoneSelectedField setHidden: YES];
+        fNoneSelectedField.hidden = YES;
     }
 
-    [fGeneralViewController setInfoForTorrents: fTorrents];
-    [fActivityViewController setInfoForTorrents: fTorrents];
-    [fTrackersViewController setInfoForTorrents: fTorrents];
-    [fPeersViewController setInfoForTorrents: fTorrents];
-    [fFileViewController setInfoForTorrents: fTorrents];
-    [fOptionsViewController setInfoForTorrents: fTorrents];
+    [fGeneralViewController setInfoForTorrents:fTorrents];
+    [fActivityViewController setInfoForTorrents:fTorrents];
+    [fTrackersViewController setInfoForTorrents:fTorrents];
+    [fPeersViewController setInfoForTorrents:fTorrents];
+    [fFileViewController setInfoForTorrents:fTorrents];
+    [fOptionsViewController setInfoForTorrents:fTorrents];
 
     [fViewController updateInfo];
 }
 
-- (void) resetInfoForTorrent: (NSNotification *) notification
+- (void)resetInfoForTorrent:(NSNotification*)notification
 {
-    Torrent * torrent = [notification userInfo][@"Torrent"];
-    if (fTorrents && (!torrent || [fTorrents containsObject: torrent]))
+    Torrent* torrent = notification.userInfo[@"Torrent"];
+    if (fTorrents && (!torrent || [fTorrents containsObject:torrent]))
+    {
         [self resetInfo];
+    }
 }
 
 @end

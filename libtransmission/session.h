@@ -17,6 +17,7 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
+#include "ptrarray.h"
 #include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
@@ -28,16 +29,14 @@ typedef enum
     TR_NET_OK,
     TR_NET_ERROR,
     TR_NET_WAIT
-}
-tr_tristate_t;
+} tr_tristate_t;
 
 typedef enum
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-}
-tr_auto_switch_state_t;
+} tr_auto_switch_state_t;
 
 enum
 {
@@ -179,6 +178,9 @@ struct tr_session
 
     int torrentCount;
     tr_torrent* torrentList;
+    tr_ptrArray torrentsSortedByHash;
+    tr_ptrArray torrentsSortedByHashString;
+    tr_ptrArray torrentsSortedById;
 
     char* torrentDoneScript;
 
@@ -263,7 +265,7 @@ enum
 
 static inline bool tr_isSession(tr_session const* session)
 {
-    return session != NULL && session->magicNumber == SESSION_MAGIC_NUMBER;
+    return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
 }
 
 static inline bool tr_isPreallocationMode(tr_preallocation_mode m)
@@ -323,5 +325,8 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
+
+void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
+void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);
 
 TR_END_DECLS

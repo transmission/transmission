@@ -92,8 +92,9 @@ int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
     option.textElideMode = Qt::ElideNone;
     option.font = view->font();
 
-    return view->style()->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).
-        width();
+    return view->style()
+        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
+        .width();
 }
 
 int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
