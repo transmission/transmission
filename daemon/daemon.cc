@@ -779,7 +779,7 @@ static int daemon_start(void* varg, bool foreground)
 
     /* Create new timer event to report daemon status */
     {
-        struct timeval one_sec = { .tv_sec = 1, .tv_usec = 0 };
+        constexpr auto one_sec = timeval{ 1, 0 }; // 1 second
         status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, NULL);
 
         if (status_ev == NULL)
@@ -905,10 +905,10 @@ int tr_main(int argc, char* argv[])
         return ret;
     }
 
-    dtr_callbacks const cb = {
-        .on_start = &daemon_start,
-        .on_stop = &daemon_stop,
-        .on_reconfigure = &daemon_reconfigure,
+    auto constexpr cb = dtr_callbacks{
+        &daemon_start,
+        &daemon_stop,
+        &daemon_reconfigure,
     };
 
     tr_error* error = NULL;
