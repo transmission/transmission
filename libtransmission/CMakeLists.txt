@@ -78,9 +78,9 @@ set(PROJECT_FILES
   webseed.cc
 )
 
-string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
+string(REPLACE ";" " " CXX_WARNING_FLAGS_STR "${CXX_WARNING_FLAGS}")
 foreach(FILE ${PROJECT_FILES})
-  set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${C_WARNING_FLAGS_STR}")
+  set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${CXX_WARNING_FLAGS_STR}")
 endforeach()
 
 set(THIRD_PARTY_FILES
