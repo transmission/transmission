@@ -193,8 +193,9 @@ static void showInfo(tr_info const* inf)
     tr_free(files);
 }
 
-static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* buf)
+static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
+    auto* buf = static_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
     evbuffer_add(buf, ptr, byteCount);
     return byteCount;

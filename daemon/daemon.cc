@@ -201,14 +201,14 @@ static char const* getConfigDir(int argc, char const* const* argv)
 {
     int c;
     char const* configDir = NULL;
-    char const* optarg;
+    char const* optstr;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optstr)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
-            configDir = optarg;
+            configDir = optstr;
             break;
         }
     }
@@ -223,9 +223,9 @@ static char const* getConfigDir(int argc, char const* const* argv)
     return configDir;
 }
 
-static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* context)
+static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
-    tr_session const* session = context;
+    auto const* session = static_cast<tr_session const*>(vsession);
 
     if (!tr_str_has_suffix(name, ".torrent"))
     {
@@ -408,7 +408,7 @@ static bool parse_args(
     int* exit_code)
 {
     int c;
-    char const* optarg;
+    char const* optstr;
 
     *paused = false;
     *dump_settings = false;
@@ -416,12 +416,12 @@ static bool parse_args(
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optstr)) != TR_OPT_DONE)
     {
         switch (c)
         {
         case 'a':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_whitelist, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_rpc_whitelist, optstr);
             tr_variantDictAddBool(settings, TR_KEY_rpc_whitelist_enabled, true);
             break;
 
@@ -434,7 +434,7 @@ static bool parse_args(
             break;
 
         case 'c':
-            tr_variantDictAddStr(settings, TR_KEY_watch_dir, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_watch_dir, optstr);
             tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, true);
             break;
 
@@ -443,7 +443,7 @@ static bool parse_args(
             break;
 
         case 941:
-            tr_variantDictAddStr(settings, TR_KEY_incomplete_dir, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_incomplete_dir, optstr);
             tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, true);
             break;
 
@@ -456,9 +456,9 @@ static bool parse_args(
             break;
 
         case 'e':
-            if (reopen_log_file(optarg))
+            if (reopen_log_file(optstr))
             {
-                logfileName = optarg;
+                logfileName = optstr;
             }
 
             break;
@@ -484,7 +484,7 @@ static bool parse_args(
             break;
 
         case 'p':
-            tr_variantDictAddInt(settings, TR_KEY_rpc_port, atoi(optarg));
+            tr_variantDictAddInt(settings, TR_KEY_rpc_port, atoi(optstr));
             break;
 
         case 't':
@@ -496,19 +496,19 @@ static bool parse_args(
             break;
 
         case 'u':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_username, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_rpc_username, optstr);
             break;
 
         case 'v':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_password, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_rpc_password, optstr);
             break;
 
         case 'w':
-            tr_variantDictAddStr(settings, TR_KEY_download_dir, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_download_dir, optstr);
             break;
 
         case 'P':
-            tr_variantDictAddInt(settings, TR_KEY_peer_port, atoi(optarg));
+            tr_variantDictAddInt(settings, TR_KEY_peer_port, atoi(optstr));
             break;
 
         case 'm':
@@ -520,11 +520,11 @@ static bool parse_args(
             break;
 
         case 'L':
-            tr_variantDictAddInt(settings, TR_KEY_peer_limit_global, atoi(optarg));
+            tr_variantDictAddInt(settings, TR_KEY_peer_limit_global, atoi(optstr));
             break;
 
         case 'l':
-            tr_variantDictAddInt(settings, TR_KEY_peer_limit_per_torrent, atoi(optarg));
+            tr_variantDictAddInt(settings, TR_KEY_peer_limit_per_torrent, atoi(optstr));
             break;
 
         case 800:
@@ -544,19 +544,19 @@ static bool parse_args(
             break;
 
         case 'i':
-            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv4, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv4, optstr);
             break;
 
         case 'I':
-            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv6, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv6, optstr);
             break;
 
         case 'r':
-            tr_variantDictAddStr(settings, TR_KEY_rpc_bind_address, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_rpc_bind_address, optstr);
             break;
 
         case 953:
-            tr_variantDictAddReal(settings, TR_KEY_ratio_limit, atof(optarg));
+            tr_variantDictAddReal(settings, TR_KEY_ratio_limit, atof(optstr));
             tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, true);
             break;
 
@@ -565,7 +565,7 @@ static bool parse_args(
             break;
 
         case 'x':
-            tr_variantDictAddStr(settings, key_pidfile, optarg);
+            tr_variantDictAddStr(settings, key_pidfile, optstr);
             break;
 
         case 'y':
@@ -651,7 +651,7 @@ static void daemon_stop(void* arg)
     event_base_loopexit(ev_base, NULL);
 }
 
-static int daemon_start(void* raw_arg, bool foreground)
+static int daemon_start(void* varg, bool foreground)
 {
 #ifndef HAVE_SYSLOG
     TR_UNUSED(foreground);
@@ -664,7 +664,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     struct event* status_ev = NULL;
     tr_watchdir_t watchdir = NULL;
 
-    struct daemon_data* const arg = raw_arg;
+    auto* arg = static_cast<daemon_data*>(varg);
     tr_variant* const settings = &arg->settings;
     char const* const configDir = arg->configDir;
 

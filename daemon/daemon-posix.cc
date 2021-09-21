@@ -56,7 +56,7 @@ static void handle_signal(int sig)
         break;
 
     default:
-        assert(!"Unexpected signal");
+        assert("Unexpected signal");
     }
 }
 
