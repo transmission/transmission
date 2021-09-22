@@ -24,10 +24,10 @@
 
 @interface PeerProgressIndicatorCell : NSLevelIndicatorCell
 {
-    NSDictionary * fAttributes;
+    NSDictionary* fAttributes;
     BOOL fSeed;
 }
 
-- (void) setSeed: (BOOL) seed;
+- (void)setSeed:(BOOL)seed;
 
 @end

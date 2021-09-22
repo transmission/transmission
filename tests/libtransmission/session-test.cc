@@ -23,7 +23,7 @@
 
 TEST(Session, peerId)
 {
-    auto const peer_id_prefix = std::string { PEERID_PREFIX };
+    auto const peer_id_prefix = std::string{ PEERID_PREFIX };
 
     for (int i = 0; i < 100000; ++i)
     {
@@ -53,6 +53,11 @@ TEST(Session, peerId)
 
 TEST(Session, sessionId)
 {
+#ifdef __sun
+    // FIXME: File locking doesn't work as expected
+    GTEST_SKIP();
+#endif
+
     EXPECT_FALSE(tr_session_id_is_local(nullptr));
     EXPECT_FALSE(tr_session_id_is_local(""));
     EXPECT_FALSE(tr_session_id_is_local("test"));

@@ -26,30 +26,32 @@
 
 @interface GlobalOptionsPopoverViewController : NSViewController
 {
-    tr_session * fHandle;
-    NSUserDefaults * fDefaults;
+    tr_session* fHandle;
+    NSUserDefaults* fDefaults;
 
-    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField;
+    IBOutlet NSTextField* fUploadLimitField;
+    IBOutlet NSTextField* fDownloadLimitField;
 
-    IBOutlet NSTextField * fRatioStopField, * fIdleStopField;
+    IBOutlet NSTextField* fRatioStopField;
+    IBOutlet NSTextField* fIdleStopField;
 
-    NSString * fInitialString;
+    NSString* fInitialString;
 }
 
-- (id) initWithHandle: (tr_session *) handle;
+- (instancetype)initWithHandle:(tr_session*)handle;
 
-- (IBAction) updatedDisplayString: (id) sender;
+- (IBAction)updatedDisplayString:(id)sender;
 
-- (IBAction) setDownSpeedSetting: (id) sender;
-- (IBAction) setDownSpeedLimit: (id) sender;
+- (IBAction)setDownSpeedSetting:(id)sender;
+- (IBAction)setDownSpeedLimit:(id)sender;
 
-- (IBAction) setUpSpeedSetting: (id) sender;
-- (IBAction) setUpSpeedLimit: (id) sender;
+- (IBAction)setUpSpeedSetting:(id)sender;
+- (IBAction)setUpSpeedLimit:(id)sender;
 
-- (IBAction) setRatioStopSetting: (id) sender;
-- (IBAction) setRatioStopLimit: (id) sender;
+- (IBAction)setRatioStopSetting:(id)sender;
+- (IBAction)setRatioStopLimit:(id)sender;
 
-- (IBAction) setIdleStopSetting: (id) sender;
-- (IBAction) setIdleStopLimit: (id) sender;
+- (IBAction)setIdleStopSetting:(id)sender;
+- (IBAction)setIdleStopLimit:(id)sender;
 
 @end

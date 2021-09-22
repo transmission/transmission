@@ -34,7 +34,7 @@ protected:
 
 TEST_P(JSONTest, testElements)
 {
-    auto const in = std::string {
+    auto const in = std::string{
         "{ \"string\": \"hello world\","
         "  \"escaped\": \"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
         "  \"int\": 5, "
@@ -57,7 +57,7 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("escaped", 7), &str, nullptr));
     EXPECT_STREQ("bell \b formfeed \f linefeed \n carriage return \r tab \t", str);
 
-    auto i = int64_t {};
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
     EXPECT_EQ(5, i);
 
@@ -83,7 +83,7 @@ TEST_P(JSONTest, testElements)
 
 TEST_P(JSONTest, testUtf8)
 {
-    auto in = std::string { "{ \"key\": \"Letöltések\" }" };
+    auto in = std::string{ "{ \"key\": \"Letöltések\" }" };
     tr_variant top;
     char const* str;
     char* json;
@@ -101,7 +101,7 @@ TEST_P(JSONTest, testUtf8)
         tr_variantFree(&top);
     }
 
-    in = std::string { R"({ "key": "\u005C" })" };
+    in = std::string{ R"({ "key": "\u005C" })" };
     err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
@@ -121,7 +121,7 @@ TEST_P(JSONTest, testUtf8)
      * 5. Dogfood that result back into the parser.
      * 6. Confirm that the result is UTF-8.
      */
-    in = std::string { R"({ "key": "Let\u00f6lt\u00e9sek" })" };
+    in = std::string{ R"({ "key": "Let\u00f6lt\u00e9sek" })" };
     err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
@@ -153,7 +153,7 @@ TEST_P(JSONTest, testUtf8)
 
 TEST_P(JSONTest, test1)
 {
-    auto const in = std::string {
+    auto const in = std::string{
         "{\n"
         "    \"headers\": {\n"
         "        \"type\": \"request\",\n"
@@ -204,7 +204,7 @@ TEST_P(JSONTest, test1)
 TEST_P(JSONTest, test2)
 {
     tr_variant top;
-    auto const in = std::string { " " };
+    auto const in = std::string{ " " };
 
     top.type = 0;
     int err = tr_variantFromJson(&top, in.data(), in.size());
@@ -215,7 +215,7 @@ TEST_P(JSONTest, test2)
 
 TEST_P(JSONTest, test3)
 {
-    auto const in = std::string {
+    auto const in = std::string{
         "{ \"error\": 2,"
         "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
         "  \"eta\": 262792,"
@@ -237,7 +237,7 @@ TEST_P(JSONTest, test3)
 TEST_P(JSONTest, unescape)
 {
     tr_variant top;
-    auto const in = std::string { R"({ "string-1": "\/usr\/lib" })" };
+    auto const in = std::string{ R"({ "string-1": "\/usr\/lib" })" };
     int const err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
 
@@ -248,8 +248,11 @@ TEST_P(JSONTest, unescape)
     tr_variantFree(&top);
 }
 
-INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_SUITE_P( //
     JSON,
     JSONTest,
-    ::testing::Values("C", "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8")
-    );
+    ::testing::Values( //
+        "C",
+        "da_DK.UTF-8",
+        "fr_FR.UTF-8",
+        "ru_RU.UTF-8"));

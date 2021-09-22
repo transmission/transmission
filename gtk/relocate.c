@@ -72,8 +72,13 @@ static gboolean onTimer(gpointer gdata)
     if (done == TR_LOC_ERROR)
     {
         int const flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
-        GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(data->message_dialog), flags, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-            "%s", _("Couldn't move torrent"));
+        GtkWidget* w = gtk_message_dialog_new(
+            GTK_WINDOW(data->message_dialog),
+            flags,
+            GTK_MESSAGE_ERROR,
+            GTK_BUTTONS_CLOSE,
+            "%s",
+            _("Couldn't move torrent"));
         gtk_dialog_run(GTK_DIALOG(w));
         gtk_widget_destroy(GTK_WIDGET(data->message_dialog));
     }
@@ -108,8 +113,12 @@ static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
         data->do_move = gtk_toggle_button_get_active(move_tb);
 
         /* pop up a dialog saying that the work is in progress */
-        w = gtk_message_dialog_new(GTK_WINDOW(dialog), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
-            GTK_BUTTONS_CLOSE, NULL);
+        w = gtk_message_dialog_new(
+            GTK_WINDOW(dialog),
+            GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+            GTK_MESSAGE_INFO,
+            GTK_BUTTONS_CLOSE,
+            NULL);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("This may take a moment…"));
         gtk_dialog_set_response_sensitive(GTK_DIALOG(w), GTK_RESPONSE_CLOSE, FALSE);
         gtk_widget_show(w);
@@ -138,9 +147,12 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
     GtkWidget* t;
     struct relocate_dialog_data* data;
 
-    d = gtk_dialog_new_with_buttons(_("Set Torrent Location"), parent, GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-        _("_Cancel"), GTK_RESPONSE_CANCEL,
-        _("_Apply"), GTK_RESPONSE_APPLY,
+    d = gtk_dialog_new_with_buttons(
+        _("Set Torrent Location"),
+        parent,
+        GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+        TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
+        TR_ARG_TUPLE(_("_Apply"), GTK_RESPONSE_APPLY),
         NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
     g_signal_connect(d, "response", G_CALLBACK(onResponse), NULL);

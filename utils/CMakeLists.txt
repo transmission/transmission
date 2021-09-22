@@ -1,6 +1,6 @@
 project(trutils)
 
-add_compile_options(${C_WARNING_FLAGS})
+add_compile_options(${CXX_WARNING_FLAGS})
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
@@ -17,7 +17,7 @@ foreach(P create edit remote show)
         "${TR_NAME}-${P}"
         "${TR_NAME}-${P}.exe")
 
-    add_executable(${TR_NAME}-${P} ${P}.c ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
+    add_executable(${TR_NAME}-${P} ${P}.cc ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
     target_link_libraries(${TR_NAME}-${P} ${TR_NAME})
 
     install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -23,8 +23,8 @@ class TrackerDelegate : public QItemDelegate
     TR_DISABLE_COPY_MOVE(TrackerDelegate)
 
 public:
-    explicit TrackerDelegate(QObject* parent = nullptr) :
-        QItemDelegate(parent)
+    explicit TrackerDelegate(QObject* parent = nullptr)
+        : QItemDelegate(parent)
     {
     }
 
