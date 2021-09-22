@@ -560,7 +560,7 @@ static char* getEncodedMetainfo(char const* filename)
 
     if (buf != NULL)
     {
-        b64 = tr_base64_encode(buf, len, NULL);
+        b64 = static_cast<char*>(tr_base64_encode(buf, len, NULL));
         tr_free(buf);
     }
 
@@ -796,8 +796,9 @@ static tr_quark const list_keys[] = {
     TR_KEY_uploadRatio, //
 };
 
-static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* buf)
+static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
+    auto* const buf = static_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
     evbuffer_add(buf, ptr, byteCount);
     return byteCount;
@@ -808,7 +809,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* st
 {
     TR_UNUSED(stream);
 
-    char const* line = ptr;
+    auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
     size_t const key_len = strlen(key);
@@ -1401,7 +1402,7 @@ static void printPeers(tr_variant* top)
 static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
 {
     size_t len = 0;
-    char* const str = tr_base64_decode(raw, raw_len, &len);
+    auto* const str = static_cast<char*>(tr_base64_decode(raw, raw_len, &len));
     printf("  ");
 
     size_t piece = 0;
