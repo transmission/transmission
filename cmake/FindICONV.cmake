@@ -17,12 +17,12 @@ find_package_handle_standard_args(ICONV
 )
 
 if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
-    include(CheckCSourceCompiles)
+    include(CheckCXXSourceCompiles)
 
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIRS})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
 
-    check_c_source_compiles("
+    check_cxx_source_compiles("
         #include <iconv.h>
         int main()
         {
@@ -35,8 +35,11 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
             return 0;
         }"
         ICONV_SECOND_ARGUMENT_IS_CONST
+        FAIL_REGEX "discards qualifiers in nested pointer types"
         FAIL_REGEX "incompatible pointer type"
-        FAIL_REGEX "discards qualifiers in nested pointer types")
+        FAIL_REGEX "invalid conversion"
+        FAIL_REGEX "no matching function"
+    )
 
     set(CMAKE_REQUIRED_INCLUDES)
     set(CMAKE_REQUIRED_LIBRARIES)

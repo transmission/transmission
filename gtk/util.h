@@ -13,6 +13,7 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 
 extern int const mem_K;
 extern char const* mem_K_str;
@@ -39,15 +40,15 @@ extern char const* speed_T_str;
 #else
 
 #define TR_DEFINE_QUARK(QN, q_n) \
-    GQuark q_n ## _quark(void) \
+    GQuark q_n##_quark(void) \
     { \
         static GQuark q; \
-        \
+\
         if (G_UNLIKELY(q == 0)) \
         { \
             q = g_quark_from_static_string(#QN); \
         } \
-        \
+\
         return q; \
     }
 

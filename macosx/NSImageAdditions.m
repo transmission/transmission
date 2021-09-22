@@ -24,15 +24,15 @@
 
 @implementation NSImage (NSImageAdditions)
 
-- (NSImage *) imageWithColor: (NSColor *) color
+- (NSImage*)imageWithColor:(NSColor*)color
 {
-    NSImage * coloredImage = [self copy];
+    NSImage* coloredImage = [self copy];
 
     [coloredImage lockFocus];
 
     [color set];
 
-    const NSSize size = [coloredImage size];
+    NSSize const size = coloredImage.size;
     NSRectFillUsingOperation(NSMakeRect(0.0, 0.0, size.width, size.height), NSCompositeSourceAtop);
 
     [coloredImage unlockFocus];

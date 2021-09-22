@@ -25,31 +25,31 @@
 
 @interface StatusBarView (Private)
 
-- (void) reload;
+- (void)reload;
 
 @end
 
 @implementation StatusBarView
 
-- (BOOL) mouseDownCanMoveWindow
+- (BOOL)mouseDownCanMoveWindow
 {
     return YES;
 }
 
-- (BOOL) isOpaque
+- (BOOL)isOpaque
 {
     return YES;
 }
 
-- (void) drawRect: (NSRect) rect
+- (void)drawRect:(NSRect)rect
 {
-    [[NSColor windowBackgroundColor] setFill];
+    [NSColor.windowBackgroundColor setFill];
     NSRectFill(rect);
-    
-    const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+
+    NSRect const lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
-        [[NSColor gridColor] setFill];
+        [NSColor.gridColor setFill];
         NSRectFill(lineBorderRect);
     }
 }
@@ -58,9 +58,9 @@
 
 @implementation StatusBarView (Private)
 
-- (void) reload
+- (void)reload
 {
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 }
 
 @end

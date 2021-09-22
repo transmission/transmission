@@ -44,8 +44,7 @@ struct bratecontrol
     {
         uint64_t date;
         uint64_t size;
-    }
-    transfers[HISTORY_SIZE];
+    } transfers[HISTORY_SIZE];
     uint64_t cache_time;
     unsigned int cache_val;
 };
@@ -114,8 +113,7 @@ typedef struct tr_bandwidth
     tr_session* session;
     tr_ptrArray children; /* struct tr_bandwidth */
     struct tr_peerIo* peer;
-}
-tr_bandwidth;
+} tr_bandwidth;
 
 /**
 ***
@@ -128,7 +126,7 @@ void tr_bandwidthDestruct(tr_bandwidth* bandwidth);
 /** @brief test to see if the pointer refers to a live bandwidth object */
 static inline bool tr_isBandwidth(tr_bandwidth const* b)
 {
-    return b != NULL && b->magicNumber == BANDWIDTH_MAGIC_NUMBER;
+    return b != nullptr && b->magicNumber == BANDWIDTH_MAGIC_NUMBER;
 }
 
 /******

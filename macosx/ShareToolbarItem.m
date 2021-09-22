@@ -12,19 +12,20 @@
 
 @implementation ShareToolbarItem
 
-- (NSMenuItem *) menuFormRepresentation
+- (NSMenuItem*)menuFormRepresentation
 {
-    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: nil keyEquivalent: @""];
-    [menuItem setEnabled: [[self target] validateToolbarItem: self]];
+    NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:self.label action:nil keyEquivalent:@""];
+    menuItem.enabled = [self.target validateToolbarItem:self];
 
-    if ([menuItem isEnabled]) {
-        NSMenu *servicesMenu = [[NSMenu alloc] initWithTitle: @""];
-        for (NSMenuItem * item in [[ShareTorrentFileHelper sharedHelper] menuItems])
+    if (menuItem.enabled)
+    {
+        NSMenu* servicesMenu = [[NSMenu alloc] initWithTitle:@""];
+        for (NSMenuItem* item in ShareTorrentFileHelper.sharedHelper.menuItems)
         {
             [servicesMenu addItem:item];
         }
 
-        [menuItem setSubmenu:servicesMenu];
+        menuItem.submenu = servicesMenu;
     }
 
     return menuItem;

@@ -36,7 +36,7 @@ QString getNameFromMetainfo(QByteArray const& metainfo)
     return name;
 }
 
-} // anonymous namespace
+} // namespace
 
 int AddData::set(QString const& key)
 {

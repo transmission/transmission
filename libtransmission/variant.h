@@ -36,8 +36,7 @@ typedef enum
     TR_STRING_TYPE_QUARK,
     TR_STRING_TYPE_HEAP,
     TR_STRING_TYPE_BUF
-}
-tr_string_type;
+} tr_string_type;
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
@@ -51,8 +50,7 @@ struct tr_variant_string
     {
         char buf[16];
         char const* str;
-    }
-    str;
+    } str;
 };
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
@@ -93,10 +91,8 @@ typedef struct tr_variant
             size_t count;
             struct tr_variant* vals;
         } l;
-    }
-    val;
-}
-tr_variant;
+    } val;
+} tr_variant;
 
 void tr_variantFree(tr_variant*);
 
@@ -109,8 +105,7 @@ typedef enum
     TR_VARIANT_FMT_BENC,
     TR_VARIANT_FMT_JSON,
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
-}
-tr_variant_fmt;
+} tr_variant_fmt;
 
 int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
 
@@ -122,7 +117,12 @@ struct evbuffer* tr_variantToBuf(tr_variant const* variant, tr_variant_fmt fmt);
 bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, struct tr_error** error);
 
 /* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, size_t buflen, char const* optional_source,
+int tr_variantFromBuf(
+    tr_variant* setme,
+    tr_variant_fmt fmt,
+    void const* buf,
+    size_t buflen,
+    char const* optional_source,
     char const** setme_end);
 
 static inline int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t buflen)
@@ -130,13 +130,21 @@ static inline int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t 
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, NULL, NULL);
 }
 
-static inline int tr_variantFromBencFull(tr_variant* setme, void const* buf, size_t buflen, char const* source,
+static inline int tr_variantFromBencFull(
+    tr_variant* setme,
+    void const* buf,
+    size_t buflen,
+    char const* source,
     char const** setme_end)
 {
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, source, setme_end);
 }
 
-static inline int tr_variantFromJsonFull(tr_variant* setme, void const* buf, size_t buflen, char const* source,
+static inline int tr_variantFromJsonFull(
+    tr_variant* setme,
+    void const* buf,
+    size_t buflen,
+    char const* source,
     char const** setme_end)
 {
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, source, setme_end);

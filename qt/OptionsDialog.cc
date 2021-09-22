@@ -29,12 +29,12 @@ using ::trqt::variant_helpers::listAdd;
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
-    BaseDialog(parent),
-    add_(std::move(addme)),
-    verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
-    session_(session),
-    is_local_(session_.isLocal())
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
+    : BaseDialog(parent)
+    , add_(std::move(addme))
+    , verify_button_(new QPushButton(tr("&Verify Local Data"), this))
+    , session_(session)
+    , is_local_(session_.isLocal())
 {
     ui_.setupUi(this);
 
