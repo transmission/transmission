@@ -105,7 +105,7 @@ QuickLookGeneratorPluginType* AllocQuickLookGeneratorPluginType(CFUUIDRef inFact
     memcpy(theNewInstance->conduitInterface, &myInterfaceFtbl, sizeof(QLGeneratorInterfaceStruct));
 
     /*  Retain and keep an open instance refcount for each factory. */
-    theNewInstance->factoryID = CFRetain(inFactoryID);
+    theNewInstance->factoryID = static_cast<CFUUIDRef>(CFRetain(inFactoryID));
     CFPlugInAddInstanceForFactory(inFactoryID);
 
     /* This function returns the IUnknown interface so set the refCount to one. */

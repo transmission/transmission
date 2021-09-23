@@ -63,7 +63,7 @@
         return NO;
     }
 
-    typeof(self) other = (typeof(self))object;
+    auto other = static_cast<decltype(self)>(object);
     if (self.torrent != other.torrent)
     {
         return NO;

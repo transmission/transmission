@@ -1309,7 +1309,7 @@ static void removeKeRangerRansomware()
 
 - (void)openFilesWithDict:(NSDictionary*)dictionary
 {
-    [self openFiles:dictionary[@"Filenames"] addType:[dictionary[@"AddType"] intValue] forcePath:nil];
+    [self openFiles:dictionary[@"Filenames"] addType:static_cast<addType>([dictionary[@"AddType"] intValue]) forcePath:nil];
 }
 
 //called on by applescript
@@ -4204,9 +4204,9 @@ static void removeKeRangerRansomware()
     return [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ButtonToolbarItem class]];
 }
 
-- (id)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)class
+- (id)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
 {
-    ButtonToolbarItem* item = [[class alloc] initWithItemIdentifier:ident];
+    ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
 
     NSButton* button = [[NSButton alloc] init];
     button.bezelStyle = NSTexturedRoundedBezelStyle;

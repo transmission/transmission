@@ -420,7 +420,7 @@
 
     for (Torrent* torrent in fTorrents)
     {
-        torrent.ratioSetting = setting;
+        torrent.ratioSetting = static_cast<tr_ratiolimit>(setting);
     }
 
     fRatioLimitField.hidden = !single;
@@ -470,7 +470,7 @@
 
     for (Torrent* torrent in fTorrents)
     {
-        torrent.idleSetting = setting;
+        torrent.idleSetting = static_cast<tr_idlelimit>(setting);
     }
 
     fIdleLimitField.hidden = !single;
