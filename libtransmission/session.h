@@ -14,6 +14,7 @@
 
 #define TR_NAME "Transmission"
 
+#include <stdio.h>
 #include <cstring> // memcmp()
 #include <map>
 #include <unordered_set>
