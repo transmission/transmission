@@ -869,7 +869,7 @@
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileOutlineView.mm; sourceTree = "<group>"; };
 		A2AF23C616B44FA0003BC59E /* log.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cc; sourceTree = "<group>"; };
 		A2AF23C716B44FA0003BC59E /* log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
-		A2B3FB450E5901E700FF78FB /* cli.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cli.cc; sourceTree = "<group>"; };
+		A2B3FB450E5901E700FF78FB /* cli.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cli.cc; sourceTree = "<group>"; };
 		A2B5B4E71880665E0071A66A /* ShareTorrentFileHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareTorrentFileHelper.h; sourceTree = "<group>"; };
 		A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ShareTorrentFileHelper.mm; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/AddWindow.xib; sourceTree = "<group>"; };
