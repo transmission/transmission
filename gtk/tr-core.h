@@ -27,8 +27,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
-G_BEGIN_DECLS
-
 #define TR_CORE_TYPE (tr_core_get_type())
 #define TR_CORE(o) (G_TYPE_CHECK_INSTANCE_CAST((o), TR_CORE_TYPE, TrCore))
 
@@ -182,5 +180,3 @@ enum
     /* */
     MC_ROW_COUNT
 };
-
-G_END_DECLS
