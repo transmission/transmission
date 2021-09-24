@@ -14,6 +14,13 @@
 
 #define TR_NAME "Transmission"
 
+#include <cstring> // memcmp()
+#include <map>
+#include <unordered_set>
+#include <vector>
+
+#include <event2/util.h> // evutil_ascii_strcasecmp()
+
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
@@ -21,8 +28,6 @@
 #include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
-
-TR_BEGIN_DECLS
 
 typedef enum
 {
@@ -93,6 +98,22 @@ struct tr_turtle_info
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
+};
+
+struct CompareHash
+{
+    bool operator()(uint8_t const* const a, uint8_t const* const b) const
+    {
+        return std::memcmp(a, b, SHA_DIGEST_LENGTH) < 0;
+    }
+};
+
+struct CompareHashString
+{
+    bool operator()(char const* const a, char const* const b) const
+    {
+        return evutil_ascii_strcasecmp(a, b) < 0;
+    }
 };
 
 /** @brief handle to an active libtransmission session */
@@ -176,11 +197,10 @@ struct tr_session
     int peerSocketTOS;
     char* peer_congestion_algorithm;
 
-    int torrentCount;
-    tr_torrent* torrentList;
-    tr_ptrArray torrentsSortedByHash;
-    tr_ptrArray torrentsSortedByHashString;
-    tr_ptrArray torrentsSortedById;
+    std::unordered_set<tr_torrent*> torrents;
+    std::map<int, tr_torrent*> torrentsById;
+    std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
+    std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
     char* torrentDoneScript;
 
@@ -256,7 +276,7 @@ struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
 int tr_sessionCountTorrents(tr_session const* session);
 
-tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n);
+std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
 
 enum
 {
@@ -328,5 +348,3 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 
 void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);
-
-TR_END_DECLS

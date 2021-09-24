@@ -768,10 +768,9 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
 void tr_dhtUpkeep(tr_session* session)
 {
-    tr_torrent* tor = nullptr;
     time_t const now = tr_time();
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         if (!tor->isRunning || !tr_torrentAllowsDHT(tor))
         {
