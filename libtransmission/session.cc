@@ -586,7 +586,6 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_torrent* tor = nullptr;
     auto* session = static_cast<tr_session*>(vsession);
 
     if (tr_cacheFlushDone(session->cache) != 0)
@@ -594,7 +593,7 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
         tr_logAddError("Error while flushing completed pieces from cache");
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         tr_torrentSave(tor);
     }
@@ -624,22 +623,18 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     int64_t i;
-    tr_session* session;
     struct init_data data;
 
     tr_timeUpdate(time(nullptr));
 
     /* initialize the bare skeleton of the session object */
-    session = tr_new0(tr_session, 1);
+    auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
     session->lock = tr_lockNew();
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
-    session->torrentsSortedByHash = {};
-    session->torrentsSortedByHashString = {};
-    session->torrentsSortedById = {};
     tr_bandwidthConstruct(&session->bandwidth, session, nullptr);
     tr_variantInitList(&session->removedTorrents, 0);
 
@@ -686,7 +681,6 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     int const min = 100;
     int const max = 999999;
     struct timeval tv;
-    tr_torrent* tor = nullptr;
     time_t const now = time(nullptr);
 
     /**
@@ -702,7 +696,10 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
         turtleCheckClock(session, &session->turtle);
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    // TODO: this seems a little silly. Why do we increment this
+    // every second instead of computing the value as needed by
+    // subtracting the current time from a start time?
+    for (auto* tor : session->torrents)
     {
         if (tor->isRunning)
         {
@@ -1325,13 +1322,11 @@ static void peerPortChanged(void* vsession)
     auto* session = static_cast<tr_session*>(vsession);
     TR_ASSERT(tr_isSession(session));
 
-    tr_torrent* tor = nullptr;
-
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
     tr_sharedPortChanged(session);
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         tr_torrentChangeMyPort(tor);
     }
@@ -1908,41 +1903,18 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 
 int tr_sessionCountTorrents(tr_session const* session)
 {
-    return tr_isSession(session) ? session->torrentCount : 0;
+    return tr_isSession(session) ? std::size(session->torrents) : 0;
 }
 
-tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
+std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(setme_n != nullptr);
 
-    int n = tr_sessionCountTorrents(session);
-    *setme_n = n;
-
-    tr_torrent** torrents = tr_new(tr_torrent*, n);
-    tr_torrent* tor = nullptr;
-
-    for (int i = 0; i < n; ++i)
-    {
-        torrents[i] = tor = tr_torrentNext(session, tor);
-    }
-
+    auto const& src = session->torrents;
+    auto const n = std::size(src);
+    auto torrents = std::vector<tr_torrent*>{ n };
+    std::copy(std::begin(src), std::end(src), std::begin(torrents));
     return torrents;
-}
-
-static int compareTorrentByCur(void const* va, void const* vb)
-{
-    tr_torrent const* a = *(tr_torrent const* const*)va;
-    tr_torrent const* b = *(tr_torrent const* const*)vb;
-    uint64_t const aCur = a->downloadedCur + a->uploadedCur;
-    uint64_t const bCur = b->downloadedCur + b->uploadedCur;
-
-    if (aCur != bCur)
-    {
-        return aCur > bCur ? -1 : 1; /* close the biggest torrents first */
-    }
-
-    return 0;
 }
 
 static void closeBlocklists(tr_session*);
@@ -1951,9 +1923,6 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void*
 
 static void sessionCloseImplStart(tr_session* session)
 {
-    int n;
-    tr_torrent** torrents;
-
     session->isClosing = true;
 
     free_incoming_peer_port(session);
@@ -1979,15 +1948,23 @@ static void sessionCloseImplStart(tr_session* session)
     /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
-    torrents = tr_sessionGetTorrents(session, &n);
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByCur);
+    auto torrents = tr_sessionGetTorrents(session);
+    std::sort(
+        std::begin(torrents),
+        std::end(torrents),
+        [](auto const* a, auto const* b)
+        {
+            auto const aCur = a->downloadedCur + a->uploadedCur;
+            auto const bCur = b->downloadedCur + b->uploadedCur;
+            return aCur > bCur; // larger xfers go first
+        });
 
-    for (int i = 0; i < n; ++i)
+    for (auto* tor : torrents)
     {
-        tr_torrentFree(torrents[i]);
+        tr_torrentFree(tor);
     }
 
-    tr_free(torrents);
+    torrents.clear();
 
     /* Close the announcer *after* closing the torrents
        so that all the &event=stopped messages will be
@@ -2144,9 +2121,6 @@ void tr_sessionClose(tr_session* session)
     }
 
     tr_device_info_free(session->downloadDir);
-    tr_ptrArrayDestruct(&session->torrentsSortedByHash, nullptr);
-    tr_ptrArrayDestruct(&session->torrentsSortedByHashString, nullptr);
-    tr_ptrArrayDestruct(&session->torrentsSortedById, nullptr);
     tr_free(session->torrentDoneScript);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
@@ -2154,7 +2128,7 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->incompleteDir);
     tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
-    tr_free(session);
+    delete session;
 }
 
 struct sessionLoadTorrentsData
@@ -3026,8 +3000,7 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     // build an array of the candidates
     auto candidates = std::vector<tr_torrent*>{};
     candidates.reserve(tr_sessionCountTorrents(session));
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         if (tr_torrentIsQueued(tor) && (direction == tr_torrentGetQueueDirection(tor)))
         {
@@ -3069,8 +3042,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     bool const stalled_enabled = tr_sessionGetQueueStalledEnabled(session);
     int const stalled_if_idle_for_n_seconds = tr_sessionGetQueueStalledMinutes(session) * 60;
     time_t const now = tr_time();
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto const* tor : session->torrents)
     {
         /* is it the right activity? */
         if (activity != tr_torrentGetActivity(tor))
@@ -3098,67 +3070,18 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     return max - active_count;
 }
 
-static int compareTorrentsById(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<tr_torrent const*>(vb);
-    return a->uniqueId - b->uniqueId;
-}
-
-static int compareTorrentsByHashString(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<tr_torrent const*>(vb);
-    return evutil_ascii_strcasecmp(a->info.hashString, b->info.hashString);
-}
-
-static int compareTorrentsByHash(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<tr_torrent const*>(vb);
-    return memcmp(a->info.hash, b->info.hash, SHA_DIGEST_LENGTH);
-}
-
 void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
 {
-    /* add tor to tr_session.torrentList */
-    tor->next = session->torrentList;
-    session->torrentList = tor;
-
-    /* add tor to tr_session.torrentsSortedByFoo */
-    tr_ptrArrayInsertSorted(&session->torrentsSortedById, tor, compareTorrentsById);
-    tr_ptrArrayInsertSorted(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
-    tr_ptrArrayInsertSorted(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
-
-    /* increment the torrent count */
-    ++session->torrentCount;
+    session->torrents.insert(tor);
+    session->torrentsById.insert_or_assign(tor->uniqueId, tor);
+    session->torrentsByHash.insert_or_assign(tor->info.hash, tor);
+    session->torrentsByHashString.insert_or_assign(tor->info.hashString, tor);
 }
 
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 {
-    /* remove tor from tr_session.torrentList */
-    if (tor == session->torrentList)
-    {
-        session->torrentList = tor->next;
-    }
-    else
-    {
-        for (tr_torrent* t = session->torrentList; t != nullptr; t = t->next)
-        {
-            if (t->next == tor)
-            {
-                t->next = tor->next;
-                break;
-            }
-        }
-    }
-
-    /* remove tor from tr_session.torrentsSortedByFoo */
-    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedById, tor, compareTorrentsById);
-    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
-    tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
-
-    /* decrement the torrent count */
-    TR_ASSERT(session->torrentCount >= 1);
-    session->torrentCount--;
+    session->torrents.erase(tor);
+    session->torrentsById.erase(tor->uniqueId);
+    session->torrentsByHash.erase(tor->info.hash);
+    session->torrentsByHashString.erase(tor->info.hashString);
 }

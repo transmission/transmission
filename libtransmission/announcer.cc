@@ -1713,8 +1713,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     /* build a list of tiers that need to be announced */
     auto announce_me = std::vector<tr_tier*>{};
     auto scrape_me = std::vector<tr_tier*>{};
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(announcer->session, tor)) != nullptr)
+    for (auto* tor : announcer->session->torrents)
     {
         struct tr_torrent_tiers* tt = tor->tiers;
 

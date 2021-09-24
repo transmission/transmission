@@ -160,13 +160,12 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
     {
         if (strcmp(str, "recently-active") == 0)
         {
-            tr_torrent* tor = nullptr;
             time_t const now = tr_time();
             time_t const window = RECENTLY_ACTIVE_SECONDS;
             int const n = tr_sessionCountTorrents(session);
             torrents = tr_new0(tr_torrent*, n);
 
-            while ((tor = tr_torrentNext(session, tor)) != nullptr)
+            for (auto* tor : session->torrents)
             {
                 if (tor->anyDate >= now - window)
                 {
@@ -187,7 +186,11 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
     }
     else /* all of them */
     {
-        torrents = tr_sessionGetTorrents(session, &torrentCount);
+        // TODO: getTorrents() should return a std::vector<tr_torrent*>
+        auto tmp = tr_sessionGetTorrents(session);
+        torrentCount = std::size(tmp);
+        torrents = tr_new(tr_torrent*, torrentCount);
+        std::copy_n(std::begin(tmp), torrentCount, torrents);
     }
 
     *setmeCount = torrentCount;
@@ -2382,21 +2385,14 @@ static char const* sessionStats(
 
     TR_ASSERT(idle_data == nullptr);
 
-    int running = 0;
-    int total = 0;
     auto currentStats = tr_session_stats{};
     auto cumulativeStats = tr_session_stats{};
-    tr_torrent* tor = nullptr;
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
-    {
-        ++total;
-
-        if (tor->isRunning)
-        {
-            ++running;
-        }
-    }
+    int const total = std::size(session->torrents);
+    int const running = std::count_if(
+        std::begin(session->torrents),
+        std::end(session->torrents),
+        [](auto const* tor) { return tor->isRunning; });
 
     tr_sessionGetStats(session, &currentStats);
     tr_sessionGetCumulativeStats(session, &cumulativeStats);

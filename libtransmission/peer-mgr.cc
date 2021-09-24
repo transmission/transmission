@@ -553,12 +553,9 @@ void tr_peerMgrFree(tr_peerMgr* manager)
 
 void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 {
-    tr_torrent* tor = nullptr;
-    tr_session* session = mgr->session;
-
     /* we cache whether or not a peer is blocklisted...
        since the blocklist has changed, erase that cached value */
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         tr_swarm* s = tor->swarm;
 
@@ -1490,7 +1487,6 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
 
     time_t now;
     time_t too_old;
-    tr_torrent* tor;
     int cancel_buflen = 0;
     struct block_request* cancel = nullptr;
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
@@ -1500,9 +1496,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
     too_old = now - REQUEST_TTL_SECS;
 
     /* alloc the temporary "cancel" buffer */
-    tor = nullptr;
-
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto const* tor : mgr->session->torrents)
     {
         cancel_buflen = std::max(cancel_buflen, tor->swarm->requestCount);
     }
@@ -1513,9 +1507,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
     }
 
     /* prune requests that are too old */
-    tor = nullptr;
-
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         tr_swarm* s = tor->swarm;
         int const n = s->requestCount;
@@ -3378,13 +3370,12 @@ static void rechokePulse(evutil_socket_t fd, short what, void* vmgr)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_torrent* tor = nullptr;
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     uint64_t const now = tr_time_msec();
 
     managerLock(mgr);
 
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         if (tor->isRunning)
         {
@@ -3720,17 +3711,15 @@ static void enforceTorrentPeerLimit(tr_swarm* s, uint64_t now)
 
 static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
 {
-    int n = 0;
-    tr_torrent* tor = nullptr;
-    int const max = tr_sessionGetPeerLimit(session);
-
     /* count the total number of peers */
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    int n = 0;
+    for (auto const* tor : session->torrents)
     {
         n += tr_ptrArraySize(&tor->swarm->peers);
     }
 
     /* if there are too many, prune out the worst */
+    int const max = tr_sessionGetPeerLimit(session);
     if (n > max)
     {
         tr_peer** peers = tr_new(tr_peer*, n);
@@ -3738,9 +3727,7 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
 
         /* populate the peer array */
         n = 0;
-        tor = nullptr;
-
-        while ((tor = tr_torrentNext(session, tor)) != nullptr)
+        for (auto* tor : session->torrents)
         {
             tr_swarm* s = tor->swarm;
 
@@ -3774,7 +3761,6 @@ static void reconnectPulse(evutil_socket_t fd, short what, void* vmgr)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_torrent* tor;
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     time_t const now_sec = tr_time();
     uint64_t const now_msec = tr_time_msec();
@@ -3784,9 +3770,7 @@ static void reconnectPulse(evutil_socket_t fd, short what, void* vmgr)
     **/
 
     /* if we're over the per-torrent peer limits, cull some peers */
-    tor = nullptr;
-
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         if (tor->isRunning)
         {
@@ -3798,9 +3782,7 @@ static void reconnectPulse(evutil_socket_t fd, short what, void* vmgr)
     enforceSessionPeerLimit(mgr->session, now_msec);
 
     /* remove crappy peers */
-    tor = nullptr;
-
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         if (!tor->swarm->isRunning)
         {
@@ -3825,9 +3807,7 @@ static void reconnectPulse(evutil_socket_t fd, short what, void* vmgr)
 
 static void pumpAllPeers(tr_peerMgr* mgr)
 {
-    tr_torrent* tor = nullptr;
-
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         tr_swarm* s = tor->swarm;
 
@@ -3883,8 +3863,7 @@ static void bandwidthPulse(evutil_socket_t fd, short what, void* vmgr)
     tr_bandwidthAllocate(&session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC);
 
     /* torrent upkeep */
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         /* possibly stop torrents that have seeded enough */
         tr_torrentCheckSeedLimit(tor);
@@ -3986,8 +3965,7 @@ static void atomPulse(evutil_socket_t fd, short what, void* vmgr)
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     managerLock(mgr);
 
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(mgr->session, tor)) != nullptr)
+    for (auto* tor : mgr->session->torrents)
     {
         int atomCount;
         tr_swarm* s = tor->swarm;
@@ -4237,9 +4215,6 @@ static bool swarmIsAllSeeds(struct tr_swarm* swarm)
 /** @return an array of all the atoms we might want to connect to */
 static struct peer_candidate* getPeerCandidates(tr_session* session, int* candidateCount, int max)
 {
-    int atomCount;
-    int peerCount;
-    tr_torrent* tor;
     struct peer_candidate* candidates;
     struct peer_candidate* walk;
     time_t const now = tr_time();
@@ -4248,11 +4223,9 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     int const maxCandidates = tr_sessionGetPeerLimit(session) * 0.95;
 
     /* count how many peers and atoms we've got */
-    tor = nullptr;
-    atomCount = 0;
-    peerCount = 0;
-
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    int atomCount = 0;
+    int peerCount = 0;
+    for (auto const* tor : session->torrents)
     {
         atomCount += tr_ptrArraySize(&tor->swarm->pool);
         peerCount += tr_ptrArraySize(&tor->swarm->peers);
@@ -4269,9 +4242,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     walk = candidates = tr_new(struct peer_candidate, atomCount);
 
     /* populate the candidate array */
-    tor = nullptr;
-
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         int nAtoms;
         struct peer_atom** atoms;

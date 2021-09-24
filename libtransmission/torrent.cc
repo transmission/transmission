@@ -73,42 +73,25 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-static int compareKeyToTorrentId(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a->uniqueId - b;
-}
-
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
-    return static_cast<tr_torrent*>(tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId));
+    auto& src = session->torrentsById;
+    auto it = src.find(id);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
-static int compareKeyToTorrentHashString(void const* va, void const* vb)
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashstr)
 {
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<char const*>(vb);
-    return evutil_ascii_strcasecmp(a->info.hashString, b);
+    auto& src = session->torrentsByHashString;
+    auto it = src.find(hashstr);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
+tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
 {
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString));
-}
-
-static int compareKeyToTorrentHash(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<uint8_t const*>(vb);
-    return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
-}
-
-tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHash)
-{
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash));
+    auto& src = session->torrentsByHash;
+    auto it = src.find(hash);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
@@ -127,9 +110,7 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
 {
-    tr_torrent* tor = nullptr;
-
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         if (memcmp(tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH) == 0)
         {
@@ -883,7 +864,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->session = session;
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
-    tor->queuePosition = session->torrentCount;
+    tor->queuePosition = tr_sessionCountTorrents(session);
     tor->labels = {};
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
@@ -1644,9 +1625,7 @@ static void freeTorrent(tr_torrent* tor)
     tr_sessionRemoveTorrent(session, tor);
 
     /* resequence the queue positions */
-    tr_torrent* t = nullptr;
-
-    while ((t = tr_torrentNext(session, t)) != nullptr)
+    for (auto* t : session->torrents)
     {
         if (t->queuePosition > tor->queuePosition)
         {
@@ -3599,13 +3578,11 @@ static int compareTorrentByQueuePosition(void const* va, void const* vb)
 
 static bool queueIsSequenced(tr_session* session)
 {
-    int n;
-    bool is_sequenced;
-    tr_torrent** torrents;
-
-    n = 0;
-    torrents = tr_sessionGetTorrents(session, &n);
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
+    auto torrents = tr_sessionGetTorrents(session);
+    std::sort(
+        std::begin(torrents),
+        std::end(torrents),
+        [](auto const* a, auto const* b) { return a->queuePosition < b->queuePosition; });
 
 #if 0
 
@@ -3621,14 +3598,13 @@ static bool queueIsSequenced(tr_session* session)
 #endif
 
     /* test them */
-    is_sequenced = true;
+    bool is_sequenced = true;
 
-    for (int i = 0; is_sequenced && i < n; ++i)
+    for (int i = 0, n = std::size(torrents); is_sequenced && i < n; ++i)
     {
         is_sequenced = torrents[i]->queuePosition == i;
     }
 
-    tr_free(torrents);
     return is_sequenced;
 }
 
@@ -3642,7 +3618,6 @@ int tr_torrentGetQueuePosition(tr_torrent const* tor)
 void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 {
     int back = -1;
-    tr_torrent* walk;
     int const old_pos = tor->queuePosition;
     time_t const now = tr_time();
 
@@ -3653,9 +3628,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
     tor->queuePosition = -1;
 
-    walk = nullptr;
-
-    while ((walk = tr_torrentNext(tor->session, walk)) != nullptr)
+    for (auto* walk : tor->session->torrents)
     {
         if ((old_pos < pos) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= pos))
         {
