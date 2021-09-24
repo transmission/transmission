@@ -1257,8 +1257,7 @@ bool trashDataFile(char const* filename, tr_error** error)
                                                     self.peersSendingToUs];
             }
 
-            NSInteger const webSeedCount = fStat->webseedsSendingToUs;
-            if (webSeedCount > 0)
+            if (NSInteger const webSeedCount = fStat->webseedsSendingToUs; webSeedCount > 0)
             {
                 NSString* webSeedString;
                 if (webSeedCount == 1)
@@ -1661,7 +1660,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (void)setFileCheckState:(NSInteger)state forIndexes:(NSIndexSet*)indexSet
 {
     NSUInteger count = indexSet.count;
-    tr_file_index_t* files = malloc(count * sizeof(tr_file_index_t));
+    tr_file_index_t* files = static_cast<tr_file_index_t*>(malloc(count * sizeof(tr_file_index_t)));
     for (NSUInteger index = indexSet.firstIndex, i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index], i++)
     {
         files[i] = index;
@@ -1677,7 +1676,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (void)setFilePriority:(tr_priority_t)priority forIndexes:(NSIndexSet*)indexSet
 {
     NSUInteger const count = indexSet.count;
-    tr_file_index_t* files = tr_malloc(count * sizeof(tr_file_index_t));
+    tr_file_index_t* files = static_cast<tr_file_index_t*>(tr_malloc(count * sizeof(tr_file_index_t)));
     for (NSUInteger index = indexSet.firstIndex, i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index], i++)
     {
         files[i] = index;
@@ -1899,18 +1898,18 @@ bool trashDataFile(char const* filename, tr_error** error)
         tr_parse_result result = TR_PARSE_ERR;
         if (path)
         {
-            result = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String);
+            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromFile(ctor, path.UTF8String));
         }
 
         if (result != TR_PARSE_OK && magnetAddress)
         {
-            result = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String);
+            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String));
         }
 
         //backup - shouldn't be needed after upgrade to 1.70
         if (result != TR_PARSE_OK && hashString)
         {
-            result = tr_ctorSetMetainfoFromHash(ctor, hashString.UTF8String);
+            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromHash(ctor, hashString.UTF8String));
         }
 
         if (result == TR_PARSE_OK)
@@ -2173,9 +2172,12 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     if (success)
     {
+        using WeakUpdateNodeAndChildrenForRename = void (^__block __weak)(FileListNode*);
+        using UpdateNodeAndChildrenForRename = void (^)(FileListNode*);
+
         NSString* oldName = oldPath.lastPathComponent;
-        void (^__block __weak weakUpdateNodeAndChildrenForRename)(FileListNode*);
-        void (^updateNodeAndChildrenForRename)(FileListNode*);
+        WeakUpdateNodeAndChildrenForRename weakUpdateNodeAndChildrenForRename;
+        UpdateNodeAndChildrenForRename updateNodeAndChildrenForRename;
         weakUpdateNodeAndChildrenForRename = updateNodeAndChildrenForRename = ^(FileListNode* node) {
             [node updateFromOldName:oldName toNewName:newName inPath:path];
 

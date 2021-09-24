@@ -765,7 +765,7 @@
 
 - (void)setAutoSpeedLimitDay:(id)sender
 {
-    tr_sessionSetAltSpeedDay(fHandle, [sender selectedItem].tag);
+    tr_sessionSetAltSpeedDay(fHandle, static_cast<tr_sched_day>([sender selectedItem].tag));
 }
 
 + (NSInteger)dateToTimeSum:(NSDate*)date

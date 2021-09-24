@@ -702,7 +702,7 @@
     }
 
     NSInteger pieceCount = MIN(torrent.pieceCount, MAX_PIECES);
-    float* piecesPercent = malloc(pieceCount * sizeof(float));
+    float* piecesPercent = static_cast<float*>(malloc(pieceCount * sizeof(float)));
     [torrent getAmountFinished:piecesPercent size:pieceCount];
 
     NSBitmapImageRep* bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:nil pixelsWide:pieceCount pixelsHigh:1

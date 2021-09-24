@@ -23,6 +23,8 @@
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
 
+#import <Sparkle/SUUpdaterDelegate.h>
+
 #include <libtransmission/transmission.h>
 
 #import "VDKQueue.h"
@@ -49,7 +51,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
+    : NSObject<NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 {
     IBOutlet NSWindow* fWindow;
     IBOutlet TorrentTableView* fTableView;
