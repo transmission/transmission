@@ -11,8 +11,8 @@
 #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
 #endif
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */
