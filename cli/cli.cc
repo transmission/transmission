@@ -144,13 +144,14 @@ static void onTorrentFileDownloaded(
     long response_code,
     void const* response,
     size_t response_byte_count,
-    void* ctor)
+    void* vctor)
 {
     TR_UNUSED(session);
     TR_UNUSED(did_connect);
     TR_UNUSED(did_timeout);
     TR_UNUSED(response_code);
 
+    auto* ctor = static_cast<tr_ctor*>(vctor);
     tr_ctorSetMetainfo(ctor, response, response_byte_count);
     waitingOnWeb = false;
 }
