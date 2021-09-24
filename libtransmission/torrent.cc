@@ -73,42 +73,25 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-static int compareKeyToTorrentId(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a->uniqueId - b;
-}
-
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
-    return static_cast<tr_torrent*>(tr_ptrArrayFindSorted(&session->torrentsSortedById, &id, compareKeyToTorrentId));
+    auto& src = session->torrentsById;
+    auto it = src.find(id);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
-static int compareKeyToTorrentHashString(void const* va, void const* vb)
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashstr)
 {
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<char const*>(vb);
-    return evutil_ascii_strcasecmp(a->info.hashString, b);
+    auto& src = session->torrentsByHashString;
+    auto it = src.find(hashstr);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
+tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
 {
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHashString, str, compareKeyToTorrentHashString));
-}
-
-static int compareKeyToTorrentHash(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_torrent const*>(va);
-    auto const* const b = static_cast<uint8_t const*>(vb);
-    return memcmp(a->info.hash, b, SHA_DIGEST_LENGTH);
-}
-
-tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* torrentHash)
-{
-    return static_cast<tr_torrent*>(
-        tr_ptrArrayFindSorted(&session->torrentsSortedByHash, torrentHash, compareKeyToTorrentHash));
+    auto& src = session->torrentsByHash;
+    auto it = src.find(hash);
+    return it == std::end(src) ? nullptr : it->second;
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)

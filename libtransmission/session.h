@@ -14,8 +14,12 @@
 
 #define TR_NAME "Transmission"
 
+#include <cstring> // memcmp()
+#include <map>
 #include <unordered_set>
 #include <vector>
+
+#include <event2/util.h> // evutil_ascii_strcasecmp()
 
 #include "bandwidth.h"
 #include "bitfield.h"
@@ -94,6 +98,22 @@ struct tr_turtle_info
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
+};
+
+struct CompareHash
+{
+    bool operator()(uint8_t const* const a, uint8_t const* const b) const
+    {
+        return std::memcmp(a, b, SHA_DIGEST_LENGTH) < 0;
+    }
+};
+
+struct CompareHashString
+{
+    bool operator()(char const* const a, char const* const b) const
+    {
+        return evutil_ascii_strcasecmp(a, b) < 0;
+    }
 };
 
 /** @brief handle to an active libtransmission session */
@@ -178,9 +198,9 @@ struct tr_session
     char* peer_congestion_algorithm;
 
     std::unordered_set<tr_torrent*> torrents;
-    tr_ptrArray torrentsSortedByHash;
-    tr_ptrArray torrentsSortedByHashString;
-    tr_ptrArray torrentsSortedById;
+    std::map<int, tr_torrent*> torrentsById;
+    std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
+    std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
     char* torrentDoneScript;
 
