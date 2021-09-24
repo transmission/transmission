@@ -3595,9 +3595,11 @@ static int compareTorrentByQueuePosition(void const* va, void const* vb)
 
 static bool queueIsSequenced(tr_session* session)
 {
-    int n = 0;
-    tr_torrent** torrents = tr_sessionGetTorrents(session, &n);
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
+    auto torrents = tr_sessionGetTorrents(session);
+    std::sort(
+        std::begin(torrents),
+        std::end(torrents),
+        [](auto const* a, auto const* b) { return a->queuePosition < b->queuePosition; });
 
 #if 0
 
@@ -3615,12 +3617,11 @@ static bool queueIsSequenced(tr_session* session)
     /* test them */
     bool is_sequenced = true;
 
-    for (int i = 0; is_sequenced && i < n; ++i)
+    for (int i = 0, n = std::size(torrents); is_sequenced && i < n; ++i)
     {
         is_sequenced = torrents[i]->queuePosition == i;
     }
 
-    tr_free(torrents);
     return is_sequenced;
 }
 

@@ -186,7 +186,11 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
     }
     else /* all of them */
     {
-        torrents = tr_sessionGetTorrents(session, &torrentCount);
+        // TODO: getTorrents() should return a std::vector<tr_torrent*>
+        auto tmp = tr_sessionGetTorrents(session);
+        torrentCount = std::size(tmp);
+        torrents = tr_new(tr_torrent*, torrentCount);
+        std::copy_n(std::begin(tmp), torrentCount, torrents);
     }
 
     *setmeCount = torrentCount;

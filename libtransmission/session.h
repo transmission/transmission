@@ -15,6 +15,7 @@
 #define TR_NAME "Transmission"
 
 #include <unordered_set>
+#include <vector>
 
 #include "bandwidth.h"
 #include "bitfield.h"
@@ -23,8 +24,6 @@
 #include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
-
-TR_BEGIN_DECLS
 
 typedef enum
 {
@@ -257,7 +256,7 @@ struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
 int tr_sessionCountTorrents(tr_session const* session);
 
-tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n);
+std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
 
 enum
 {
@@ -329,5 +328,3 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 
 void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);
-
-TR_END_DECLS

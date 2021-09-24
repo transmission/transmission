@@ -1909,32 +1909,15 @@ int tr_sessionCountTorrents(tr_session const* session)
     return tr_isSession(session) ? std::size(session->torrents) : 0;
 }
 
-tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
+std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(setme_n != nullptr);
 
-    auto const n = std::size(session->torrents);
-    tr_torrent** torrents = tr_new(tr_torrent*, n);
-    std::copy(std::begin(session->torrents), std::end(session->torrents), torrents);
-
-    *setme_n = n;
+    auto const& src = session->torrents;
+    auto const n = std::size(src);
+    auto torrents = std::vector<tr_torrent*>{ n };
+    std::copy(std::begin(src), std::end(src), std::begin(torrents));
     return torrents;
-}
-
-static int compareTorrentByCur(void const* va, void const* vb)
-{
-    tr_torrent const* a = *(tr_torrent const* const*)va;
-    tr_torrent const* b = *(tr_torrent const* const*)vb;
-    uint64_t const aCur = a->downloadedCur + a->uploadedCur;
-    uint64_t const bCur = b->downloadedCur + b->uploadedCur;
-
-    if (aCur != bCur)
-    {
-        return aCur > bCur ? -1 : 1; /* close the biggest torrents first */
-    }
-
-    return 0;
 }
 
 static void closeBlocklists(tr_session*);
@@ -1943,9 +1926,6 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void*
 
 static void sessionCloseImplStart(tr_session* session)
 {
-    int n;
-    tr_torrent** torrents;
-
     session->isClosing = true;
 
     free_incoming_peer_port(session);
@@ -1971,15 +1951,23 @@ static void sessionCloseImplStart(tr_session* session)
     /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
-    torrents = tr_sessionGetTorrents(session, &n);
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByCur);
+    auto torrents = tr_sessionGetTorrents(session);
+    std::sort(
+        std::begin(torrents),
+        std::end(torrents),
+        [](auto const* a, auto const* b)
+        {
+            auto const aCur = a->downloadedCur + a->uploadedCur;
+            auto const bCur = b->downloadedCur + b->uploadedCur;
+            return aCur > bCur; // larger xfers go first
+        });
 
-    for (int i = 0; i < n; ++i)
+    for (auto* tor : torrents)
     {
-        tr_torrentFree(torrents[i]);
+        tr_torrentFree(tor);
     }
 
-    tr_free(torrents);
+    torrents.clear();
 
     /* Close the announcer *after* closing the torrents
        so that all the &event=stopped messages will be
