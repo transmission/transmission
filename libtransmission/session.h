@@ -14,6 +14,8 @@
 
 #define TR_NAME "Transmission"
 
+#include <unordered_set>
+
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
@@ -176,8 +178,7 @@ struct tr_session
     int peerSocketTOS;
     char* peer_congestion_algorithm;
 
-    int torrentCount;
-    tr_torrent* torrentList;
+    std::unordered_set<tr_torrent*> torrents;
     tr_ptrArray torrentsSortedByHash;
     tr_ptrArray torrentsSortedByHashString;
     tr_ptrArray torrentsSortedById;

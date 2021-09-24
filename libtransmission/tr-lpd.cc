@@ -618,7 +618,6 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 */
 static int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
-    tr_torrent* tor = nullptr;
     int announcesSent = 0;
 
     if (!tr_isSession(session))
@@ -626,9 +625,9 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         return -1;
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr && tr_sessionAllowsLPD(session))
+    if (tr_sessionAllowsLPD(session))
     {
-        if (tr_isTorrent(tor))
+        for (auto* tor : session->torrents)
         {
             int announcePrio = 0;
 

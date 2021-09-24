@@ -127,9 +127,7 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
 {
-    tr_torrent* tor = nullptr;
-
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         if (memcmp(tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH) == 0)
         {
@@ -883,7 +881,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->session = session;
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
-    tor->queuePosition = session->torrentCount;
+    tor->queuePosition = tr_sessionCountTorrents(session);
     tor->labels = {};
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
@@ -1644,9 +1642,7 @@ static void freeTorrent(tr_torrent* tor)
     tr_sessionRemoveTorrent(session, tor);
 
     /* resequence the queue positions */
-    tr_torrent* t = nullptr;
-
-    while ((t = tr_torrentNext(session, t)) != nullptr)
+    for (auto* t : session->torrents)
     {
         if (t->queuePosition > tor->queuePosition)
         {
@@ -3599,12 +3595,8 @@ static int compareTorrentByQueuePosition(void const* va, void const* vb)
 
 static bool queueIsSequenced(tr_session* session)
 {
-    int n;
-    bool is_sequenced;
-    tr_torrent** torrents;
-
-    n = 0;
-    torrents = tr_sessionGetTorrents(session, &n);
+    int n = 0;
+    tr_torrent** torrents = tr_sessionGetTorrents(session, &n);
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
 #if 0
@@ -3621,7 +3613,7 @@ static bool queueIsSequenced(tr_session* session)
 #endif
 
     /* test them */
-    is_sequenced = true;
+    bool is_sequenced = true;
 
     for (int i = 0; is_sequenced && i < n; ++i)
     {
@@ -3642,7 +3634,6 @@ int tr_torrentGetQueuePosition(tr_torrent const* tor)
 void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 {
     int back = -1;
-    tr_torrent* walk;
     int const old_pos = tor->queuePosition;
     time_t const now = tr_time();
 
@@ -3653,9 +3644,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
     tor->queuePosition = -1;
 
-    walk = nullptr;
-
-    while ((walk = tr_torrentNext(tor->session, walk)) != nullptr)
+    for (auto* walk : tor->session->torrents)
     {
         if ((old_pos < pos) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= pos))
         {

@@ -586,7 +586,6 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    tr_torrent* tor = nullptr;
     auto* session = static_cast<tr_session*>(vsession);
 
     if (tr_cacheFlushDone(session->cache) != 0)
@@ -594,7 +593,7 @@ static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
         tr_logAddError("Error while flushing completed pieces from cache");
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         tr_torrentSave(tor);
     }
@@ -624,13 +623,12 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     int64_t i;
-    tr_session* session;
     struct init_data data;
 
     tr_timeUpdate(time(nullptr));
 
     /* initialize the bare skeleton of the session object */
-    session = tr_new0(tr_session, 1);
+    auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
     session->lock = tr_lockNew();
@@ -686,7 +684,6 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
     int const min = 100;
     int const max = 999999;
     struct timeval tv;
-    tr_torrent* tor = nullptr;
     time_t const now = time(nullptr);
 
     /**
@@ -702,7 +699,10 @@ static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
         turtleCheckClock(session, &session->turtle);
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    // TODO: this seems a little silly. Why do we increment this
+    // every second instead of computing the value as needed by
+    // subtracting the current time from a start time?
+    for (auto* tor : session->torrents)
     {
         if (tor->isRunning)
         {
@@ -1325,13 +1325,11 @@ static void peerPortChanged(void* vsession)
     auto* session = static_cast<tr_session*>(vsession);
     TR_ASSERT(tr_isSession(session));
 
-    tr_torrent* tor = nullptr;
-
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
     tr_sharedPortChanged(session);
 
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         tr_torrentChangeMyPort(tor);
     }
@@ -1908,7 +1906,7 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 
 int tr_sessionCountTorrents(tr_session const* session)
 {
-    return tr_isSession(session) ? session->torrentCount : 0;
+    return tr_isSession(session) ? std::size(session->torrents) : 0;
 }
 
 tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
@@ -1916,17 +1914,11 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(setme_n != nullptr);
 
-    int n = tr_sessionCountTorrents(session);
-    *setme_n = n;
-
+    auto const n = std::size(session->torrents);
     tr_torrent** torrents = tr_new(tr_torrent*, n);
-    tr_torrent* tor = nullptr;
+    std::copy(std::begin(session->torrents), std::end(session->torrents), torrents);
 
-    for (int i = 0; i < n; ++i)
-    {
-        torrents[i] = tor = tr_torrentNext(session, tor);
-    }
-
+    *setme_n = n;
     return torrents;
 }
 
@@ -2154,7 +2146,7 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->incompleteDir);
     tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
-    tr_free(session);
+    delete session;
 }
 
 struct sessionLoadTorrentsData
@@ -3026,8 +3018,7 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     // build an array of the candidates
     auto candidates = std::vector<tr_torrent*>{};
     candidates.reserve(tr_sessionCountTorrents(session));
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto* tor : session->torrents)
     {
         if (tr_torrentIsQueued(tor) && (direction == tr_torrentGetQueueDirection(tor)))
         {
@@ -3069,8 +3060,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     bool const stalled_enabled = tr_sessionGetQueueStalledEnabled(session);
     int const stalled_if_idle_for_n_seconds = tr_sessionGetQueueStalledMinutes(session) * 60;
     time_t const now = tr_time();
-    tr_torrent* tor = nullptr;
-    while ((tor = tr_torrentNext(session, tor)) != nullptr)
+    for (auto const* tor : session->torrents)
     {
         /* is it the right activity? */
         if (activity != tr_torrentGetActivity(tor))
@@ -3121,44 +3111,20 @@ static int compareTorrentsByHash(void const* va, void const* vb)
 
 void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
 {
-    /* add tor to tr_session.torrentList */
-    tor->next = session->torrentList;
-    session->torrentList = tor;
+    session->torrents.insert(tor);
 
     /* add tor to tr_session.torrentsSortedByFoo */
     tr_ptrArrayInsertSorted(&session->torrentsSortedById, tor, compareTorrentsById);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
     tr_ptrArrayInsertSorted(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
-
-    /* increment the torrent count */
-    ++session->torrentCount;
 }
 
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 {
-    /* remove tor from tr_session.torrentList */
-    if (tor == session->torrentList)
-    {
-        session->torrentList = tor->next;
-    }
-    else
-    {
-        for (tr_torrent* t = session->torrentList; t != nullptr; t = t->next)
-        {
-            if (t->next == tor)
-            {
-                t->next = tor->next;
-                break;
-            }
-        }
-    }
+    session->torrents.erase(tor);
 
     /* remove tor from tr_session.torrentsSortedByFoo */
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedById, tor, compareTorrentsById);
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHashString, tor, compareTorrentsByHashString);
     tr_ptrArrayRemoveSortedPointer(&session->torrentsSortedByHash, tor, compareTorrentsByHash);
-
-    /* decrement the torrent count */
-    TR_ASSERT(session->torrentCount >= 1);
-    session->torrentCount--;
 }

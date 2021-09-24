@@ -253,8 +253,6 @@ struct tr_torrent
     time_t lastStatTime;
     tr_stat stats;
 
-    tr_torrent* next;
-
     int uniqueId;
 
     struct tr_bandwidth bandwidth;
@@ -270,11 +268,6 @@ struct tr_torrent
 
     tr_ptrArray labels;
 };
-
-static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)
-{
-    return current != nullptr ? current->next : session->torrentList;
-}
 
 /* what piece index is this block in? */
 static inline tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_index_t const block)
