@@ -6,13 +6,16 @@
  *
  */
 
+#include <cstdlib>
+#include <cstring>
+#include <map>
+
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600 /* needed for recursive locks. */
+#endif
 #ifndef __USE_UNIX98
 #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
 #endif
-
-#include <cstdlib>
-#include <cstring>
 
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */
