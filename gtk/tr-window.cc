@@ -67,7 +67,7 @@ static TR_DEFINE_QUARK(private_data, private_data)
 
 static PrivateData* get_private_data(GtkWindow* w)
 {
-    return g_object_get_qdata(G_OBJECT(w), private_data_quark());
+    return static_cast<PrivateData*>(g_object_get_qdata(G_OBJECT(w), private_data_quark()));
 }
 
 /***
@@ -201,7 +201,7 @@ static void prefsChanged(TrCore* core, tr_quark const key, gpointer wind)
         break;
 
     case TR_KEY_statusbar_stats:
-        gtr_window_refresh(wind);
+        gtr_window_refresh(static_cast<GtkWindow*>(wind));
         break;
 
     case TR_KEY_alt_speed_enabled:
@@ -217,7 +217,7 @@ static void prefsChanged(TrCore* core, tr_quark const key, gpointer wind)
 
 static void privateFree(gpointer vprivate)
 {
-    PrivateData* p = vprivate;
+    auto* p = static_cast<PrivateData*>(vprivate);
     g_signal_handler_disconnect(p->core, p->pref_handler_id);
     g_free(p);
 }
@@ -226,7 +226,7 @@ static void onYinYangClicked(GtkWidget* w, gpointer vprivate)
 {
     TR_UNUSED(w);
 
-    PrivateData* p = vprivate;
+    auto* p = static_cast<PrivateData*>(vprivate);
 
 #if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_widget(GTK_MENU(p->status_menu), GTK_WIDGET(w), GDK_GRAVITY_NORTH_EAST, GDK_GRAVITY_SOUTH_EAST, NULL);
@@ -252,8 +252,8 @@ static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivat
 {
     if (gtk_check_menu_item_get_active(menu_item))
     {
-        PrivateData* p = vprivate;
-        char const* val = g_object_get_data(G_OBJECT(menu_item), STATS_MODE);
+        auto* p = static_cast<PrivateData*>(vprivate);
+        auto const* val = static_cast<char const*>(g_object_get_data(G_OBJECT(menu_item), STATS_MODE));
         gtr_core_set_pref(p->core, TR_KEY_statusbar_stats, val);
     }
 }
@@ -273,7 +273,7 @@ static void syncAltSpeedButton(PrivateData* p)
                           g_strdup_printf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
-    gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
+    gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, GtkIconSize(-1));
     g_object_set(w, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_widget_set_tooltip_text(w, str);
 
@@ -282,7 +282,7 @@ static void syncAltSpeedButton(PrivateData* p)
 
 static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 {
-    PrivateData* p = vprivate;
+    auto* p = static_cast<PrivateData*>(vprivate);
     gboolean const b = gtk_toggle_button_get_active(button);
     gtr_core_set_pref_bool(p->core, TR_KEY_alt_speed_enabled, b);
 }
@@ -297,7 +297,7 @@ static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path, GtkTreeI
 
     tr_torrent* tor;
     tr_stat const* torStat;
-    time_t* maxTime = gmaxTime;
+    auto* maxTime = static_cast<time_t*>(gmaxTime);
 
     gtk_tree_model_get(model, iter, MC_TORRENT, &tor, -1);
     torStat = tr_torrentStatCached(tor);
@@ -319,7 +319,7 @@ static gboolean onAskTrackerQueryTooltip(
 
     gboolean handled;
     time_t maxTime = 0;
-    PrivateData* p = gdata;
+    auto* p = static_cast<PrivateData*>(gdata);
     time_t const now = time(NULL);
 
     gtk_tree_selection_selected_foreach(p->selection, findMaxAnnounceTime, &maxTime);
@@ -345,7 +345,7 @@ static gboolean onAskTrackerQueryTooltip(
 
 static gboolean onAltSpeedToggledIdle(gpointer vp)
 {
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
     gboolean b = tr_sessionUsesAltSpeed(gtr_core_session(p->core));
     gtr_core_set_pref_bool(p->core, TR_KEY_alt_speed_enabled, b);
 
@@ -371,10 +371,10 @@ static void onAltSpeedToggled(tr_session* s, bool isEnabled, bool byUser, void* 
 
 static void onSpeedToggled(GtkCheckMenuItem* check, gpointer vp)
 {
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
     GObject* o = G_OBJECT(check);
     gboolean isEnabled = g_object_get_data(o, ENABLED_KEY) != 0;
-    tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
+    auto dir = static_cast<tr_direction>(GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY)));
     tr_quark const key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
 
     if (gtk_check_menu_item_get_active(check))
@@ -386,10 +386,10 @@ static void onSpeedToggled(GtkCheckMenuItem* check, gpointer vp)
 static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
 {
     tr_quark key;
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
     GObject* o = G_OBJECT(check);
     int const KBps = GPOINTER_TO_INT(g_object_get_data(o, SPEED_KEY));
-    tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
+    auto dir = static_cast<tr_direction>(GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY)));
 
     key = dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down;
     gtr_core_set_pref_int(p->core, key, KBps);
@@ -453,7 +453,7 @@ static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
 
 static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
 {
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
 
     if (gtk_check_menu_item_get_active(check))
     {
@@ -464,7 +464,7 @@ static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
 
 static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 {
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
     int i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(check), RATIO_KEY));
     double const ratio = stockRatios[i];
     gtr_core_set_pref_double(p->core, TR_KEY_ratio_limit, ratio);
@@ -543,7 +543,7 @@ static void onOptionsClicked(GtkButton* button, gpointer vp)
     char buf2[512];
     gboolean b;
     GtkWidget* w;
-    PrivateData* p = vp;
+    auto* p = static_cast<PrivateData*>(vp);
 
     w = p->speedlimit_on_item[TR_DOWN];
     tr_formatter_speed_KBps(buf1, gtr_pref_int_get(TR_KEY_speed_limit_down), sizeof(buf1));

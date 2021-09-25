@@ -71,7 +71,7 @@ static void clearData(FileData* data)
 
 static void freeData(gpointer data)
 {
-    clearData(data);
+    clearData(static_cast<FileData*>(data));
     g_free(data);
 }
 
@@ -94,7 +94,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkT
 {
     TR_UNUSED(path);
 
-    struct RefreshData* refresh_data = gdata;
+    auto* refresh_data = static_cast<RefreshData*>(gdata);
     FileData* data = refresh_data->file_data;
     unsigned int index;
     uint64_t size;
@@ -301,7 +301,7 @@ static void refresh(FileData* data)
 
 static gboolean refreshModel(gpointer file_data)
 {
-    refresh(file_data);
+    refresh(static_cast<FileData*>(file_data));
 
     return G_SOURCE_CONTINUE;
 }
@@ -325,7 +325,7 @@ static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path, 
 
     if (is_file)
     {
-        struct ActiveData* data = gdata;
+        auto* data = static_cast<ActiveData*>(gdata);
 
         /* active means: if it's selected or any ancestor is selected */
         gboolean is_active = gtk_tree_selection_iter_is_selected(data->sel, iter);
@@ -377,7 +377,7 @@ static gboolean getSubtreeForeach(GtkTreeModel* model, GtkTreePath* path, GtkTre
 
     if (is_file)
     {
-        struct SubtreeForeachData* data = gdata;
+        auto* data = static_cast<SubtreeForeachData*>(gdata);
 
         if (gtk_tree_path_compare(path, data->path) == 0 || gtk_tree_path_is_descendant(path, data->path))
         {
@@ -453,8 +453,8 @@ static void buildTree(GNode* node, gpointer gdata)
 {
     char size_str[64];
     GtkTreeIter child_iter;
-    struct build_data* build = gdata;
-    struct row_struct* child_data = node->data;
+    auto* build = static_cast<build_data*>(gdata);
+    auto* child_data = static_cast<row_struct*>(node->data);
     gboolean const isLeaf = node->children == NULL;
 
     char const* mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data->name) : DIRECTORY_MIME_TYPE;
@@ -502,7 +502,7 @@ static GNode* find_child(GNode* parent, char const* name)
 
     while (child != NULL)
     {
-        struct row_struct const* child_data = child->data;
+        auto const* child_data = static_cast<row_struct const*>(child->data);
 
         if (*child_data->name == *name && g_strcmp0(child_data->name, name) == 0)
         {
@@ -518,7 +518,7 @@ static GNode* find_child(GNode* parent, char const* name)
 void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 {
     /* unset the old fields */
-    FileData* const data = g_object_get_data(G_OBJECT(w), "file-data");
+    auto* const data = static_cast<FileData*>(g_object_get_data(G_OBJECT(w), "file-data"));
     clearData(data);
 
     /* instantiate the model */
@@ -689,7 +689,7 @@ static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeView
     TR_UNUSED(col);
 
     gboolean handled = FALSE;
-    FileData* data = gdata;
+    auto* data = static_cast<FileData*>(gdata);
     tr_torrent const* tor = gtr_core_find_torrent(data->core, data->torrentId);
 
     if (tor != NULL)
@@ -820,7 +820,7 @@ static gboolean onViewButtonPressed(GtkWidget* w, GdkEventButton const* event, g
     GtkTreePath* path = NULL;
     gboolean handled = FALSE;
     GtkTreeView* treeview = GTK_TREE_VIEW(w);
-    FileData* data = gdata;
+    auto* data = static_cast<FileData*>(gdata);
 
     if (event->type == GDK_BUTTON_PRESS && event->button == 1 && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == 0 &&
         getAndSelectEventPath(treeview, event, &col, &path))

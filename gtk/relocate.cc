@@ -33,7 +33,7 @@ struct relocate_dialog_data
 
 static void data_free(gpointer gdata)
 {
-    struct relocate_dialog_data* data = gdata;
+    auto* data = static_cast<relocate_dialog_data*>(gdata);
     g_source_remove(data->timer);
     g_slist_free(data->torrent_ids);
     g_free(data);
@@ -66,12 +66,12 @@ static void startMovingNextTorrent(struct relocate_dialog_data* data)
  * if so, delete the dialog */
 static gboolean onTimer(gpointer gdata)
 {
-    struct relocate_dialog_data* data = gdata;
+    auto* data = static_cast<relocate_dialog_data*>(gdata);
     int const done = data->done;
 
     if (done == TR_LOC_ERROR)
     {
-        int const flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+        auto const flags = GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT);
         GtkWidget* w = gtk_message_dialog_new(
             GTK_WINDOW(data->message_dialog),
             flags,
@@ -105,9 +105,9 @@ static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
     {
         GtkWidget* w;
         GObject* d = G_OBJECT(dialog);
-        struct relocate_dialog_data* data = g_object_get_data(d, DATA_KEY);
-        GtkFileChooser* chooser = g_object_get_data(d, "chooser");
-        GtkToggleButton* move_tb = g_object_get_data(d, "move_rb");
+        auto* data = static_cast<relocate_dialog_data*>(g_object_get_data(d, DATA_KEY));
+        auto* chooser = static_cast<GtkFileChooser*>(g_object_get_data(d, "chooser"));
+        auto* move_tb = static_cast<GtkToggleButton*>(g_object_get_data(d, "move_rb"));
         char* location = gtk_file_chooser_get_filename(chooser);
 
         data->do_move = gtk_toggle_button_get_active(move_tb);
@@ -115,7 +115,7 @@ static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
         /* pop up a dialog saying that the work is in progress */
         w = gtk_message_dialog_new(
             GTK_WINDOW(dialog),
-            GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+            GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
             GTK_MESSAGE_INFO,
             GTK_BUTTONS_CLOSE,
             NULL);
@@ -150,7 +150,7 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
     d = gtk_dialog_new_with_buttons(
         _("Set Torrent Location"),
         parent,
-        GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+        GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
         TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
         TR_ARG_TUPLE(_("_Apply"), GTK_RESPONSE_APPLY),
         NULL);

@@ -41,7 +41,7 @@ struct delete_data
 
 static void on_remove_dialog_response(GtkDialog* dialog, gint response, gpointer gdd)
 {
-    struct delete_data* dd = gdd;
+    auto* dd = static_cast<delete_data*>(gdd);
 
     if (response == GTK_RESPONSE_ACCEPT)
     {

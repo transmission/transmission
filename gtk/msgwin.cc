@@ -105,8 +105,8 @@ static void scroll_to_bottom(struct MsgData* data)
 
 static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 {
-    struct MsgData* data = gdata;
-    int const level = gtr_combo_box_get_active_enum(combo_box);
+    auto* data = static_cast<MsgData*>(gdata);
+    auto const level = static_cast<tr_log_level>(gtr_combo_box_get_active_enum(combo_box));
     gboolean const pinned_to_new = is_pinned_to_new(data);
 
     tr_logSetLevel(level);
@@ -136,7 +136,7 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
     if (fp == NULL)
     {
         GtkWidget*
-            w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""), filename);
+            w = gtk_message_dialog_new(parent, {}, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""), filename);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", g_strerror(errno));
         g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
         gtk_widget_show(w);
@@ -191,7 +191,7 @@ static void onSaveDialogResponse(GtkWidget* d, int response, gpointer data)
     if (response == GTK_RESPONSE_ACCEPT)
     {
         char* file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(d));
-        doSave(GTK_WINDOW(d), data, file);
+        doSave(GTK_WINDOW(d), static_cast<MsgData*>(data), file);
         g_free(file);
     }
 
@@ -217,7 +217,7 @@ static void onClearRequest(GtkWidget* w, gpointer gdata)
 {
     TR_UNUSED(w);
 
-    struct MsgData* data = gdata;
+    auto* data = static_cast<MsgData*>(gdata);
 
     gtk_list_store_clear(data->store);
     tr_logFreeQueue(myHead);
@@ -226,7 +226,7 @@ static void onClearRequest(GtkWidget* w, gpointer gdata)
 
 static void onPauseToggled(GtkToggleToolButton* w, gpointer gdata)
 {
-    struct MsgData* data = gdata;
+    auto* data = static_cast<MsgData*>(gdata);
 
     data->isPaused = gtk_toggle_tool_button_get_active(w);
 }
@@ -350,7 +350,7 @@ static void appendColumn(GtkTreeView* view, int col)
 static gboolean isRowVisible(GtkTreeModel* model, GtkTreeIter* iter, gpointer gdata)
 {
     struct tr_log_message const* node;
-    struct MsgData const* data = gdata;
+    auto const* data = static_cast<MsgData const*>(gdata);
 
     gtk_tree_model_get(model, iter, COL_TR_MSG, &node, -1);
 
@@ -361,7 +361,7 @@ static void onWindowDestroyed(gpointer gdata, GObject* deadWindow)
 {
     TR_UNUSED(deadWindow);
 
-    struct MsgData* data = gdata;
+    auto* data = static_cast<MsgData*>(gdata);
 
     g_source_remove(data->refresh_tag);
 
@@ -409,7 +409,7 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
 
 static gboolean onRefresh(gpointer gdata)
 {
-    struct MsgData* data = gdata;
+    auto* data = static_cast<MsgData*>(gdata);
     gboolean const pinned_to_new = is_pinned_to_new(data);
 
     if (!data->isPaused)
@@ -557,7 +557,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     data->sort = gtk_tree_model_sort_new_with_model(data->filter);
     g_object_unref(data->filter);
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->sort), COL_SEQUENCE, GTK_SORT_ASCENDING);
-    data->maxLevel = gtr_pref_int_get(TR_KEY_message_level);
+    data->maxLevel = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data, NULL);
 
     view = gtk_tree_view_new_with_model(data->sort);

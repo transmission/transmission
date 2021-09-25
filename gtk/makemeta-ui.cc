@@ -45,7 +45,7 @@ typedef struct
 
 static void freeMetaUI(gpointer p)
 {
-    MakeMetaUI* ui = p;
+    auto* ui = static_cast<MakeMetaUI*>(p);
 
     tr_metaInfoBuilderFree(ui->builder);
     g_free(ui->target);
@@ -56,7 +56,7 @@ static void freeMetaUI(gpointer p)
 static gboolean onProgressDialogRefresh(gpointer data)
 {
     char* str = NULL;
-    MakeMetaUI* ui = data;
+    auto* ui = static_cast<MakeMetaUI*>(data);
     tr_metainfo_builder const* b = ui->builder;
     GtkDialog* d = GTK_DIALOG(ui->progress_dialog);
     GtkProgressBar* p = GTK_PROGRESS_BAR(ui->progress_bar);
@@ -129,7 +129,7 @@ static void onProgressDialogDestroyed(gpointer data, GObject* dead)
 {
     TR_UNUSED(dead);
 
-    MakeMetaUI const* ui = data;
+    auto const* ui = static_cast<MakeMetaUI*>(data);
     g_source_remove(ui->progress_tag);
 }
 
@@ -150,7 +150,7 @@ static void addTorrent(MakeMetaUI* ui)
 
 static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 {
-    MakeMetaUI* ui = data;
+    auto* ui = static_cast<MakeMetaUI*>(data);
 
     switch (response)
     {
@@ -184,7 +184,7 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     d = gtk_dialog_new_with_buttons(
         _("New Torrent"),
         GTK_WINDOW(parent),
-        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+        GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
         TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
         TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
         TR_ARG_TUPLE(_("_Add"), GTK_RESPONSE_ACCEPT),
@@ -218,7 +218,7 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
 
 static void onResponse(GtkDialog* d, int response, gpointer user_data)
 {
-    MakeMetaUI* ui = user_data;
+    auto* ui = static_cast<MakeMetaUI*>(user_data);
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
@@ -353,7 +353,7 @@ static void setFilename(MakeMetaUI* ui, char const* filename)
 static void onChooserChosen(GtkFileChooser* chooser, gpointer user_data)
 {
     char* filename;
-    MakeMetaUI* ui = user_data;
+    auto* ui = static_cast<MakeMetaUI*>(user_data);
 
     g_object_set_data(G_OBJECT(chooser), FILE_CHOSEN_KEY, GINT_TO_POINTER(TRUE));
 
@@ -379,13 +379,13 @@ static void onSourceToggled2(GtkToggleButton* tb, GtkWidget* chooser, MakeMetaUI
 
 static void onFolderToggled(GtkToggleButton* tb, gpointer data)
 {
-    MakeMetaUI* ui = data;
+    auto* ui = static_cast<MakeMetaUI*>(data);
     onSourceToggled2(tb, ui->folder_chooser, ui);
 }
 
 static void onFileToggled(GtkToggleButton* tb, gpointer data)
 {
-    MakeMetaUI* ui = data;
+    auto* ui = static_cast<MakeMetaUI*>(data);
     onSourceToggled2(tb, ui->file_chooser, ui);
 }
 
@@ -410,7 +410,7 @@ static void on_drag_data_received(
     TR_UNUSED(info);
 
     gboolean success = FALSE;
-    MakeMetaUI* ui = user_data;
+    auto* ui = static_cast<MakeMetaUI*>(user_data);
     char** uris = gtk_selection_data_get_uris(selection_data);
 
     if (uris != NULL && uris[0] != NULL)

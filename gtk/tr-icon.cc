@@ -66,7 +66,7 @@ void gtr_icon_refresh(gpointer vicon)
     char tip[1024];
     char const* idle = _("Idle");
     GtkStatusIcon* icon = GTK_STATUS_ICON(vicon);
-    tr_session* session = gtr_core_session(g_object_get_qdata(G_OBJECT(icon), core_quark()));
+    tr_session* session = gtr_core_session(static_cast<TrCore*>(g_object_get_qdata(G_OBJECT(icon), core_quark())));
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);

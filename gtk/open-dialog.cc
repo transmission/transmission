@@ -70,7 +70,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
      * invalidated by gtr_pref_string_set() */
     for (l = list; l != NULL; l = l->next)
     {
-        l->data = g_strdup(l->data);
+        l->data = g_strdup(static_cast<char const*>(l->data));
     }
 
     /* save the first N_RECENT directories */
@@ -78,7 +78,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
     {
         char key[64];
         g_snprintf(key, sizeof(key), "recent-download-dir-%d", i + 1);
-        gtr_pref_string_set(tr_quark_new(key, TR_BAD_SIZE), l->data);
+        gtr_pref_string_set(tr_quark_new(key, TR_BAD_SIZE), static_cast<char const*>(l->data));
     }
 
     gtr_pref_save(gtr_core_session(core));
@@ -118,7 +118,7 @@ static void removeOldTorrent(struct OpenData* o)
 
 static void addResponseCB(GtkDialog* dialog, gint response, gpointer gdata)
 {
-    struct OpenData* o = gdata;
+    auto* o = static_cast<OpenData*>(gdata);
 
     if (o->tor != NULL)
     {
@@ -181,7 +181,7 @@ static void updateTorrent(struct OpenData* o)
  */
 static void sourceChanged(GtkFileChooserButton* b, gpointer gdata)
 {
-    struct OpenData* o = gdata;
+    auto* o = static_cast<OpenData*>(gdata);
     char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(b));
 
     /* maybe instantiate a torrent */
@@ -233,7 +233,7 @@ static void sourceChanged(GtkFileChooserButton* b, gpointer gdata)
 
 static void downloadDirChanged(GtkFileChooserButton* b, gpointer gdata)
 {
-    struct OpenData* data = gdata;
+    auto* data = static_cast<OpenData*>(gdata);
     char* fname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(b));
 
     if (fname != NULL && (data->downloadDir == NULL || !tr_sys_path_is_same(fname, data->downloadDir, NULL)))
@@ -347,7 +347,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
 
     for (GSList* walk = list; walk != NULL; walk = walk->next)
     {
-        gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(w), walk->data, NULL);
+        gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(w), static_cast<char const*>(walk->data), NULL);
     }
 
     g_slist_free(list);
@@ -443,7 +443,7 @@ static void onOpenDialogResponse(GtkDialog* dialog, int response, gpointer core)
         gboolean const do_notify = FALSE;
         GSList* files = gtk_file_chooser_get_files(chooser);
 
-        gtr_core_add_files(core, files, do_start, do_prompt, do_notify);
+        gtr_core_add_files(static_cast<TrCore*>(core), files, do_start, do_prompt, do_notify);
         g_slist_foreach(files, (GFunc)(GCallback)g_object_unref, NULL);
         g_slist_free(files);
     }
@@ -497,7 +497,7 @@ static void onOpenURLResponse(GtkDialog* dialog, int response, gpointer user_dat
 
         if (url != NULL)
         {
-            handled = gtr_core_add_from_url(user_data, url);
+            handled = gtr_core_add_from_url(static_cast<TrCore*>(user_data), url);
 
             if (!handled)
             {

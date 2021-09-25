@@ -55,7 +55,7 @@ static gboolean updateStats(gpointer gdata)
     tr_session_stats one;
     tr_session_stats all;
     size_t const buflen = sizeof(buf);
-    struct stat_ui* ui = gdata;
+    auto* ui = static_cast<stat_ui*>(gdata);
 
     tr_sessionGetStats(gtr_core_session(ui->core), &one);
     tr_sessionGetCumulativeStats(gtr_core_session(ui->core), &all);
@@ -85,7 +85,7 @@ static void dialogDestroyed(gpointer p, GObject* dialog)
 
 static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
 {
-    struct stat_ui* ui = gdata;
+    auto* ui = static_cast<stat_ui*>(gdata);
 
     if (response == TR_RESPONSE_RESET)
     {
@@ -93,7 +93,7 @@ static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
         char const* secondary = _(
             "These statistics are for your information only. "
             "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
-        int const flags = GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL;
+        auto const flags = GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL);
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(dialog), flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", primary);
         gtk_dialog_add_buttons(
             GTK_DIALOG(w),

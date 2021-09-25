@@ -130,7 +130,7 @@ static void get_selected_torrent_ids_foreach(GtkTreeModel* model, GtkTreePath* p
     TR_UNUSED(path);
 
     int id;
-    GSList** ids = gdata;
+    auto** ids = static_cast<GSList**>(gdata);
     gtk_tree_model_get(model, iter, MC_TORRENT_ID, &id, -1);
     *ids = g_slist_append(*ids, GINT_TO_POINTER(id));
 }
@@ -144,7 +144,7 @@ static GSList* get_selected_torrent_ids(struct cbdata* data)
 
 static void on_details_dialog_closed(gpointer gdata, GObject* dead)
 {
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     data->details = g_slist_remove(data->details, dead);
 }
@@ -157,9 +157,9 @@ static void show_details_dialog_for_selected_torrents(struct cbdata* data)
 
     for (GSList* l = data->details; dialog == NULL && l != NULL; l = l->next)
     {
-        if (g_strcmp0(key, g_object_get_data(l->data, "key")) == 0)
+        if (g_strcmp0(key, static_cast<char const*>(g_object_get_data(static_cast<GObject*>(l->data), "key"))) == 0)
         {
-            dialog = l->data;
+            dialog = static_cast<GtkWidget*>(l->data);
         }
     }
 
@@ -196,7 +196,7 @@ static void get_selected_torrent_counts_foreach(GtkTreeModel* model, GtkTreePath
     TR_UNUSED(path);
 
     int activity = 0;
-    struct counts_data* counts = user_data;
+    auto* counts = static_cast<counts_data*>(user_data);
 
     ++counts->total_count;
 
@@ -233,7 +233,7 @@ static void count_updatable_foreach(GtkTreeModel* model, GtkTreePath* path, GtkT
 
 static gboolean refresh_actions(gpointer gdata)
 {
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     if (!data->is_closing)
     {
@@ -278,7 +278,7 @@ static gboolean refresh_actions(gpointer gdata)
 
 static void refresh_actions_soon(gpointer gdata)
 {
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     if (!data->is_closing && data->refresh_actions_tag == 0)
     {
@@ -371,7 +371,7 @@ struct on_rpc_changed_struct
 static gboolean on_rpc_changed_idle(gpointer gdata)
 {
     tr_torrent* tor;
-    struct on_rpc_changed_struct* data = gdata;
+    auto* data = static_cast<on_rpc_changed_struct*>(gdata);
 
     switch (data->type)
     {
@@ -461,7 +461,7 @@ static tr_rpc_callback_status on_rpc_changed(
     struct tr_torrent* tor,
     void* gdata)
 {
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
     struct on_rpc_changed_struct* data;
 
     data = g_new(struct on_rpc_changed_struct, 1);
@@ -478,7 +478,7 @@ static tr_rpc_callback_status on_rpc_changed(
 ***/
 
 static sig_atomic_t global_sigcount = 0;
-static struct cbdata* sighandler_cbdata = NULL;
+static auto* sighandler_cbdata = static_cast<cbdata*>(nullptr);
 
 static void signal_handler(int sig)
 {
@@ -508,7 +508,7 @@ static void on_startup(GApplication* application, gpointer user_data)
     GtkWindow* win;
     GtkUIManager* ui_manager;
     tr_session* session;
-    struct cbdata* cbdata = user_data;
+    auto* cbdata = static_cast<struct cbdata*>(user_data);
 
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
@@ -585,7 +585,7 @@ static void on_activate(GApplication* app, struct cbdata* cbdata)
 
 static void open_files(GSList* files, gpointer gdata)
 {
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
     gboolean const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents) && !cbdata->start_paused;
     gboolean const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     gboolean const do_notify = TRUE;
@@ -630,7 +630,7 @@ int main(int argc, char** argv)
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &cbdata.start_paused, _("Start with all torrents paused"), NULL },
         { "minimized", 'm', 0, G_OPTION_ARG_NONE, &cbdata.is_iconified, _("Start minimized in notification area"), NULL },
         { "version", 'v', 0, G_OPTION_ARG_NONE, &show_version, _("Show version number and exit"), NULL },
-        { NULL, 0, 0, 0, NULL, NULL, NULL }
+        { NULL, 0, 0, {}, NULL, NULL, NULL }
     };
 
     /* default settings */
@@ -842,7 +842,7 @@ static gboolean winclose(GtkWidget const* w, GdkEvent const* event, gpointer gda
     TR_UNUSED(w);
     TR_UNUSED(event);
 
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
 
     if (cbdata->icon != NULL)
     {
@@ -861,7 +861,7 @@ static void rowChangedCB(GtkTreeModel const* model, GtkTreePath* path, GtkTreeIt
     TR_UNUSED(model);
     TR_UNUSED(iter);
 
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     if (gtk_tree_selection_path_is_selected(data->sel, path))
     {
@@ -930,7 +930,7 @@ static void main_window_setup(struct cbdata* cbdata, GtkWindow* wind)
 static gboolean on_session_closed(gpointer gdata)
 {
     GSList* tmp;
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
 
     tmp = g_slist_copy(cbdata->details);
     g_slist_foreach(tmp, (GFunc)(GCallback)gtk_widget_destroy, NULL);
@@ -972,7 +972,7 @@ struct session_close_struct
  * punt the GUI teardown back to the GTK+ thread */
 static gpointer session_close_threadfunc(gpointer gdata)
 {
-    struct session_close_struct* data = gdata;
+    auto* data = static_cast<session_close_struct*>(gdata);
     tr_sessionClose(data->session);
     gdk_threads_add_idle(on_session_closed, data->cbdata);
     g_free(data);
@@ -989,7 +989,7 @@ static void on_app_exit(gpointer vdata)
     GtkWidget* p;
     GtkWidget* w;
     GtkWidget* c;
-    struct cbdata* cbdata = vdata;
+    auto* cbdata = static_cast<struct cbdata*>(vdata);
     struct session_close_struct* session_close_data;
 
     if (cbdata->is_closing)
@@ -1016,12 +1016,12 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    p = g_object_new(
+    p = static_cast<GtkWidget*>(g_object_new(
         GTK_TYPE_GRID,
         TR_ARG_TUPLE("column-spacing", GUI_PAD_BIG),
         TR_ARG_TUPLE("halign", GTK_ALIGN_CENTER),
         TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER),
-        NULL);
+        NULL));
     gtk_container_add(GTK_CONTAINER(c), p);
 
     w = gtk_image_new_from_icon_name("network-workgroup", GTK_ICON_SIZE_DIALOG);
@@ -1132,7 +1132,7 @@ static gboolean on_main_window_focus_in(GtkWidget const* widget, GdkEventFocus c
     TR_UNUSED(widget);
     TR_UNUSED(event);
 
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
 
     if (cbdata->wind != NULL)
     {
@@ -1144,7 +1144,7 @@ static gboolean on_main_window_focus_in(GtkWidget const* widget, GdkEventFocus c
 
 static void on_add_torrent(TrCore* core, tr_ctor* ctor, gpointer gdata)
 {
-    struct cbdata* cbdata = gdata;
+    auto* cbdata = static_cast<struct cbdata*>(gdata);
     GtkWidget* w = gtr_torrent_options_dialog_new(cbdata->wind, core, ctor);
 
     g_signal_connect(w, "focus-in-event", G_CALLBACK(on_main_window_focus_in), cbdata);
@@ -1161,13 +1161,13 @@ static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer da
 {
     TR_UNUSED(core);
 
-    struct cbdata* cbdata = data;
+    auto* cbdata = static_cast<struct cbdata*>(data);
     tr_session* tr = gtr_core_session(cbdata->core);
 
     switch (key)
     {
     case TR_KEY_encryption:
-        tr_sessionSetEncryption(tr, gtr_pref_int_get(key));
+        tr_sessionSetEncryption(tr, static_cast<tr_encryption_mode>(gtr_pref_int_get(key)));
         break;
 
     case TR_KEY_download_dir:
@@ -1175,7 +1175,7 @@ static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer da
         break;
 
     case TR_KEY_message_level:
-        tr_logSetLevel(gtr_pref_int_get(key));
+        tr_logSetLevel(static_cast<tr_log_level>(gtr_pref_int_get(key)));
         break;
 
     case TR_KEY_peer_port:
@@ -1327,7 +1327,7 @@ static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer da
         break;
 
     case TR_KEY_alt_speed_time_day:
-        tr_sessionSetAltSpeedDay(tr, gtr_pref_int_get(key));
+        tr_sessionSetAltSpeedDay(tr, static_cast<tr_sched_day>(gtr_pref_int_get(key)));
         break;
 
     case TR_KEY_peer_port_random_on_start:
@@ -1365,7 +1365,7 @@ static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer da
 
 static gboolean update_model_once(gpointer gdata)
 {
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     /* update the torrent data in the model */
     gtr_core_update(data->core);
@@ -1391,7 +1391,7 @@ static gboolean update_model_once(gpointer gdata)
 
 static void update_model_soon(gpointer gdata)
 {
-    struct cbdata* data = gdata;
+    auto* data = static_cast<cbdata*>(gdata);
 
     if (data->update_model_soon_tag == 0)
     {
@@ -1448,7 +1448,7 @@ static void append_id_to_benc_list(GtkTreeModel* m, GtkTreePath* path, GtkTreeIt
 
     tr_torrent* tor = NULL;
     gtk_tree_model_get(m, iter, MC_TORRENT, &tor, -1);
-    tr_variantListAddInt(list, tr_torrentId(tor));
+    tr_variantListAddInt(static_cast<tr_variant*>(list), tr_torrentId(tor));
 }
 
 static gboolean call_rpc_for_selected_torrents(struct cbdata* data, char const* method)
@@ -1482,7 +1482,7 @@ static void open_folder_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeI
 
     int id;
     gtk_tree_model_get(model, iter, MC_TORRENT_ID, &id, -1);
-    gtr_core_open_folder(core, id);
+    gtr_core_open_folder(static_cast<TrCore*>(core), id);
 }
 
 static gboolean on_message_window_closed(void)
@@ -1496,7 +1496,7 @@ static void accumulate_selected_torrents(GtkTreeModel* model, GtkTreePath* path,
     TR_UNUSED(path);
 
     int id;
-    GSList** data = gdata;
+    auto** data = static_cast<GSList**>(gdata);
 
     gtk_tree_model_get(model, iter, MC_TORRENT_ID, &id, -1);
     *data = g_slist_append(*data, GINT_TO_POINTER(id));
@@ -1544,7 +1544,7 @@ static tr_torrent* get_first_selected_torrent(struct cbdata* data)
 
     if (l != NULL)
     {
-        GtkTreePath* p = l->data;
+        auto* p = static_cast<GtkTreePath*>(l->data);
         GtkTreeIter i;
 
         if (gtk_tree_model_get_iter(m, &i, p))
@@ -1582,7 +1582,7 @@ static void copy_magnet_link_to_clipboard(GtkWidget* w, tr_torrent* tor)
 void gtr_actions_handler(char const* action_name, gpointer user_data)
 {
     gboolean changed = FALSE;
-    struct cbdata* data = user_data;
+    auto* data = static_cast<cbdata*>(user_data);
 
     if (g_strcmp0(action_name, "open-torrent-from-url") == 0)
     {

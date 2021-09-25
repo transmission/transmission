@@ -595,7 +595,7 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
     GString* gstr = g_string_new(NULL);
 
-    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _("Unrecognized URL"));
+    GtkWidget* w = gtk_message_dialog_new(window, {}, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _("Unrecognized URL"));
 
     g_string_append_printf(gstr, _("Transmission doesn't know how to use \"%s\""), url);
 
@@ -674,7 +674,7 @@ static void on_freespace_label_destroyed(gpointer gdata, GObject* dead_label);
 
 static void freespace_label_data_free(gpointer gdata)
 {
-    struct freespace_label_data* data = gdata;
+    auto* data = static_cast<freespace_label_data*>(gdata);
 
     if (data->core != NULL)
     {
@@ -695,14 +695,14 @@ static TR_DEFINE_QUARK(freespace_label_data, freespace_label_data)
 
 static void on_freespace_label_core_destroyed(gpointer gdata, GObject* dead_core G_GNUC_UNUSED)
 {
-    struct freespace_label_data* data = gdata;
+    auto* data = static_cast<freespace_label_data*>(gdata);
     data->core = NULL;
     freespace_label_data_free(data);
 }
 
 static void on_freespace_label_destroyed(gpointer gdata, GObject* dead_label G_GNUC_UNUSED)
 {
-    struct freespace_label_data* data = gdata;
+    auto* data = static_cast<freespace_label_data*>(gdata);
     data->label = NULL;
     freespace_label_data_free(data);
 }
@@ -713,7 +713,7 @@ static gboolean on_freespace_timer(gpointer gdata)
     char markup[128];
     int64_t bytes;
     tr_session* session;
-    struct freespace_label_data* data = gdata;
+    auto* data = static_cast<freespace_label_data*>(gdata);
 
     session = gtr_core_session(data->core);
     bytes = tr_sessionGetDirFreeSpace(session, data->dir);
@@ -756,9 +756,7 @@ GtkWidget* gtr_freespace_label_new(struct _TrCore* core, char const* dir)
 
 void gtr_freespace_label_set_dir(GtkWidget* label, char const* dir)
 {
-    struct freespace_label_data* data;
-
-    data = g_object_get_qdata(G_OBJECT(label), freespace_label_data_quark());
+    auto* data = static_cast<freespace_label_data*>(g_object_get_qdata(G_OBJECT(label), freespace_label_data_quark()));
 
     tr_free(data->dir);
     data->dir = g_strdup(dir);
