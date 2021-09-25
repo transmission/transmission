@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
+#include <vector>
 
 #include "tr-macros.h"
 
@@ -256,8 +257,6 @@ char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
 ****
 ***/
 
-int compareInt(void const* va, void const* vb);
-
 void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
@@ -287,7 +286,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-int* tr_parseNumberRange(char const* str, size_t str_len, int* setmeCount) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NONNULL(1);
 
 /**
  * @brief truncate a double value at a given number of decimal places.

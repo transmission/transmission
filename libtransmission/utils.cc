@@ -12,6 +12,7 @@
 #endif
 #endif
 
+#include <algorithm> // std::sort
 #include <array> // std::array
 #include <cctype> /* isdigit(), tolower() */
 #include <cerrno>
@@ -23,6 +24,17 @@
 #include <cstdlib> /* getenv() */
 #include <cstring> /* strerror(), memset(), memmem() */
 #include <ctime> /* nanosleep() */
+#include <exception>
+#include <set>
+#include <string>
+#include <vector>
+
+#if defined(__GNUC__) && !__has_include(<charconv>)
+#undef HAVE_CHARCONV
+#else
+#define HAVE_CHARCONV 1
+#include <charconv> // std::from_chars()
+#endif
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -1393,59 +1405,44 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(char const* str, size_t len, struct number_range* setme)
+static bool parseNumberSection(char const* str, char const* const end, number_range& range)
 {
-    long a;
-    long b;
     bool success;
-    char* end;
-    int const error = errno;
-    char* tmp = tr_strndup(str, len);
+    auto const error = errno;
 
-    errno = 0;
-    a = b = strtol(tmp, &end, 10);
-
-    if (errno != 0 || end == tmp)
+#if defined(HAVE_CHARCONV)
+    auto result = std::from_chars(str, end, range.low);
+    success = result.ec == std::errc{};
+    if (success)
+    {
+        range.high = range.low;
+        if (result.ptr != end && *result.ptr == '-')
+        {
+            result = std::from_chars(result.ptr + 1, end, range.high);
+            success = result.ec == std::errc{};
+        }
+    }
+#else
+    try
+    {
+        auto tmp = std::string(str, end);
+        auto pos = size_t{};
+        range.low = range.high = std::stoi(tmp, &pos);
+        if (pos != std::size(tmp) && tmp[pos] == '-')
+        {
+            tmp.erase(0, pos + 1);
+            range.high = std::stoi(tmp, &pos);
+        }
+        success = true;
+    }
+    catch (std::exception&)
     {
         success = false;
     }
-    else if (*end != '-')
-    {
-        success = true;
-    }
-    else
-    {
-        char const* pch = end + 1;
-        b = strtol(pch, &end, 10);
-
-        if (errno != 0 || pch == end)
-        {
-            success = false;
-        }
-        else if (*end != '\0') /* trailing data */
-        {
-            success = false;
-        }
-        else
-        {
-            success = true;
-        }
-    }
-
-    tr_free(tmp);
-
-    setme->low = (int)std::min(a, b); // FIXME: narrowing long to int
-    setme->high = (int)std::max(a, b);
+#endif
 
     errno = error;
     return success;
-}
-
-int compareInt(void const* va, void const* vb)
-{
-    int const a = *(int const*)va;
-    int const b = *(int const*)vb;
-    return a - b;
 }
 
 /**
@@ -1455,106 +1452,29 @@ int compareInt(void const* va, void const* vb)
  * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, NULL is returned.
  */
-int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
+std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
 {
-    int n = 0;
-    int* uniq = nullptr;
-    char* str = tr_strndup(str_in, len);
-    char const* walk;
-    tr_list* ranges = nullptr;
-    bool success = true;
+    auto values = std::set<int>{};
 
-    walk = str;
-
-    while (!tr_str_is_empty(walk) && success)
+    auto const* const end = str + (len != TR_BAD_SIZE ? len : strlen(str));
+    for (auto const* walk = str; walk < end;)
     {
-        struct number_range range;
-        char const* pch = strchr(walk, ',');
-
-        if (pch != nullptr)
+        auto delim = std::find(walk, end, ',');
+        auto range = number_range{};
+        if (!parseNumberSection(walk, delim, range))
         {
-            success = parseNumberSection(walk, (size_t)(pch - walk), &range);
-            walk = pch + 1;
-        }
-        else
-        {
-            success = parseNumberSection(walk, strlen(walk), &range);
-            walk += strlen(walk);
+            break;
         }
 
-        if (success)
+        for (auto i = range.low; i <= range.high; ++i)
         {
-            tr_list_append(&ranges, tr_memdup(&range, sizeof(struct number_range)));
+            values.insert(i);
         }
+
+        walk = delim + 1;
     }
 
-    if (!success)
-    {
-        *setmeCount = 0;
-        uniq = nullptr;
-    }
-    else
-    {
-        int n2;
-        int* sorted = nullptr;
-
-        /* build a sorted number array */
-        n = n2 = 0;
-
-        for (tr_list* l = ranges; l != nullptr; l = l->next)
-        {
-            auto const* r = static_cast<struct number_range const*>(l->data);
-            n += r->high + 1 - r->low;
-        }
-
-        sorted = tr_new(int, n);
-
-        if (sorted == nullptr)
-        {
-            n = 0;
-            uniq = nullptr;
-        }
-        else
-        {
-            for (tr_list* l = ranges; l != nullptr; l = l->next)
-            {
-                auto const* r = static_cast<struct number_range const*>(l->data);
-
-                for (int i = r->low; i <= r->high; ++i)
-                {
-                    sorted[n2++] = i;
-                }
-            }
-
-            qsort(sorted, n, sizeof(int), compareInt);
-            TR_ASSERT(n == n2);
-
-            /* remove duplicates */
-            uniq = tr_new(int, n);
-            n = 0;
-
-            if (uniq != nullptr)
-            {
-                for (int i = 0; i < n2; ++i)
-                {
-                    if (n == 0 || uniq[n - 1] != sorted[i])
-                    {
-                        uniq[n++] = sorted[i];
-                    }
-                }
-            }
-
-            tr_free(sorted);
-        }
-    }
-
-    /* cleanup */
-    tr_list_free(&ranges, tr_free);
-    tr_free(str);
-
-    /* return the result */
-    *setmeCount = n;
-    return uniq;
+    return { std::begin(values), std::end(values) };
 }
 
 /***
