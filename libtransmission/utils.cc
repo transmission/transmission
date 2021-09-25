@@ -1424,7 +1424,7 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
  * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, NULL is returned.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t len) // FIXME: string_view
+std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
 {
     auto values = std::set<int>{};
 
