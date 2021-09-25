@@ -39,16 +39,6 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
     }
 }
 
-TEST_F(QuarkTest, allPredefinedKeysAreSorted)
-{
-    for (int i = 0; i + 1 < TR_N_KEYS; i++)
-    {
-        auto const str1 = quarkGetString(i);
-        auto const str2 = quarkGetString(i + 1);
-        EXPECT_LT(str1, str2);
-    }
-}
-
 TEST_F(QuarkTest, newEmptyQuarkReturnsNone)
 {
     auto const q = tr_quark_new(nullptr, TR_BAD_SIZE);
