@@ -17,7 +17,6 @@
 #include <cctype> /* isdigit(), tolower() */
 #include <cerrno>
 #include <cfloat> /* DBL_DIG */
-#include <charconv> // std::from_chars()
 #include <clocale> /* localeconv() */
 #include <cmath> /* fabs(), floor() */
 #include <cstdint> /* SIZE_MAX */
@@ -25,8 +24,17 @@
 #include <cstdlib> /* getenv() */
 #include <cstring> /* strerror(), memset(), memmem() */
 #include <ctime> /* nanosleep() */
+#include <exception>
 #include <set>
+#include <string>
 #include <vector>
+
+#if defined(__GNUC__) && !__has_include(<charconv>)
+#undef HAVE_CHARCONV
+#else
+#define HAVE_CHARCONV 1
+#include <charconv> // std::from_chars()
+#endif
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -1399,10 +1407,12 @@ struct number_range
  */
 static bool parseNumberSection(char const* str, char const* const end, number_range& range)
 {
+    bool success;
     auto const error = errno;
 
+#if defined(HAVE_CHARCONV)
     auto result = std::from_chars(str, end, range.low);
-    bool success = result.ec == std::errc{};
+    success = result.ec == std::errc{};
     if (success)
     {
         range.high = range.low;
@@ -1412,6 +1422,24 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
             success = result.ec == std::errc{};
         }
     }
+#else
+    try
+    {
+        auto tmp = std::string(str, end);
+        auto pos = size_t{};
+        range.low = range.high = std::stoi(tmp, &pos);
+        if (pos != std::size(tmp) && tmp[pos] == '-')
+        {
+            tmp.erase(0, pos + 1);
+            range.high = std::stoi(tmp, &pos);
+        }
+        success = true;
+    }
+    catch (std::exception&)
+    {
+        success = false;
+    }
+#endif
 
     errno = error;
     return success;
