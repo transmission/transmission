@@ -16,8 +16,6 @@
 #include "variant.h"
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 enum tr_metainfo_basename_format
 {
     TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH,
@@ -43,5 +41,3 @@ void tr_metainfoMigrateFile(
 
 /** @brief Private function that's exposed here only for unit tests */
 char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted);
-
-TR_END_DECLS

@@ -12,8 +12,6 @@
 #include "tr-macros.h"
 #include "variant.h"
 
-TR_BEGIN_DECLS
-
 /***
 ****  RPC processing
 ***/
@@ -36,5 +34,3 @@ void tr_rpc_request_exec_uri(
     void* callback_user_data);
 
 void tr_rpc_parse_list_str(tr_variant* setme, char const* list_str, size_t list_str_len);
-
-TR_END_DECLS

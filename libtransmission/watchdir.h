@@ -10,8 +10,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 struct event_base;
 
 typedef struct tr_watchdir* tr_watchdir_t;
@@ -37,5 +35,3 @@ tr_watchdir_t tr_watchdir_new(
 void tr_watchdir_free(tr_watchdir_t handle);
 
 char const* tr_watchdir_get_path(tr_watchdir_t handle);
-
-TR_END_DECLS

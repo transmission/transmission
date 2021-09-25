@@ -11,8 +11,6 @@
 #include "tr-macros.h"
 #include "transmission.h"
 
-TR_BEGIN_DECLS
-
 typedef struct tr_metainfo_builder_file
 {
     char* filename;
@@ -118,5 +116,3 @@ void tr_makeMetaInfo(
     int trackerCount,
     char const* comment,
     bool isPrivate);
-
-TR_END_DECLS

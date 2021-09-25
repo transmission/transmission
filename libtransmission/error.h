@@ -12,8 +12,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /**
  * @addtogroup error Error reporting
  * @{
@@ -129,5 +127,3 @@ void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, cha
     TR_GNUC_PRINTF(3, 4);
 
 /** @} */
-
-TR_END_DECLS

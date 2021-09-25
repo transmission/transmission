@@ -20,8 +20,6 @@
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
-TR_BEGIN_DECLS
-
 /**
 *** @addtogroup peers
 *** @{
@@ -78,7 +76,5 @@ bool tr_cryptoSecretKeySha1(
     uint8_t* hash);
 
 /* @} */
-
-TR_END_DECLS
 
 #endif // TR_ENCRYPTION_H

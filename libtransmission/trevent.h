@@ -14,8 +14,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 void tr_eventInit(tr_session*);
 
 void tr_eventClose(tr_session*);
@@ -23,5 +21,3 @@ void tr_eventClose(tr_session*);
 bool tr_amInEventThread(tr_session const*);
 
 void tr_runInEventThread(tr_session*, void (*func)(void*), void* user_data);
-
-TR_END_DECLS

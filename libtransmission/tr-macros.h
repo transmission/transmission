@@ -162,16 +162,5 @@
 
 #define TR_BAD_SIZE ((size_t)-1)
 
-/* Guard C code in headers, while including them from C++ */
-#ifdef __cplusplus
-#define TR_BEGIN_DECLS \
-    extern "C" \
-    {
-#define TR_END_DECLS }
-#else
-#define TR_BEGIN_DECLS
-#define TR_END_DECLS
-#endif
-
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__

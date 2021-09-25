@@ -15,8 +15,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /***
 ****
 ***/
@@ -421,7 +419,3 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ***/
 
 void tr_net_init(void);
-
-/** @} */
-
-TR_END_DECLS

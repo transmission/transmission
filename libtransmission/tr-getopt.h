@@ -10,8 +10,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /**
  * @addtogroup utils Utilities
  * @{
@@ -51,5 +49,3 @@ int tr_getopt(char const* summary, int argc, char const* const* argv, tr_option 
 void tr_getopt_usage(char const* appName, char const* description, tr_option const* opts);
 
 /** @} */
-
-TR_END_DECLS
