@@ -25,6 +25,8 @@
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
 #include <string>
 
 using ::libtransmission::test::makeString;
@@ -136,35 +138,30 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
+    auto const tostring = [](std::vector<int> const& v)
+    {
+        std::stringstream ss;
+        for (auto const& i : v)
+        {
+            ss << i << ' ';
+        }
+        return ss.str();
+    };
+
     auto numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE);
-    auto count = std::size(numbers);
-    EXPECT_EQ(15, count);
-    EXPECT_EQ(1, numbers[0]);
-    EXPECT_EQ(6, numbers[5]);
-    EXPECT_EQ(10, numbers[9]);
-    EXPECT_EQ(13, numbers[10]);
-    EXPECT_EQ(16, numbers[11]);
-    EXPECT_EQ(19, numbers[14]);
+    EXPECT_EQ("1 2 3 4 5 6 7 8 9 10 13 16 17 18 19 ", tostring(numbers));
 
     numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE);
-    count = std::size(numbers);
-    EXPECT_EQ(7, count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        EXPECT_EQ(i + 1, numbers[i]);
-    }
+    EXPECT_EQ("1 2 3 4 5 6 7 ", tostring(numbers));
 
     numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE);
-    count = std::size(numbers);
-    EXPECT_EQ(0, count);
+    EXPECT_EQ("", tostring(numbers));
 
     numbers = tr_parseNumberRange("1-", TR_BAD_SIZE);
-    count = std::size(numbers);
-    EXPECT_EQ(0, count);
+    EXPECT_EQ("", tostring(numbers));
 
     numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE);
-    count = std::size(numbers);
-    EXPECT_EQ(0, count);
+    EXPECT_EQ("", tostring(numbers));
 }
 
 namespace
