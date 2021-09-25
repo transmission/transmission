@@ -61,6 +61,12 @@ char const* tr_strip_positional_args(char const* fmt);
 char const* tr_get_mime_type_for_filename(char const* filename);
 
 /**
+ * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
+ */
+bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
+
+/**
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
@@ -413,15 +419,3 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ***/
 
 void tr_net_init(void);
-
-/** @} */
-
-TR_BEGIN_DECLS
-
-/**
- * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
- */
-bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
-
-TR_END_DECLS

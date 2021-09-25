@@ -476,6 +476,17 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
 #endif
 }
 
+extern "C"
+{
+    int DoMatch(char const* text, char const* p);
+}
+
+/* User-level routine. returns whether or not 'text' and 'p' matched */
+bool tr_wildmat(char const* text, char const* p)
+{
+    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) == true);
+}
+
 char const* tr_strcasestr(char const* haystack, char const* needle)
 {
 #ifdef HAVE_STRCASESTR
