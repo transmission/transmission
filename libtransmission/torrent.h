@@ -20,8 +20,6 @@
 #include "utils.h" /* TR_GNUC_PRINTF */
 #include "ptrarray.h"
 
-TR_BEGIN_DECLS
-
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 
@@ -474,5 +472,3 @@ static inline tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
 {
     return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
-
-TR_END_DECLS

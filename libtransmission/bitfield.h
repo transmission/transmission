@@ -15,8 +15,6 @@
 #include "transmission.h"
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
 typedef struct tr_bitfield
 {
@@ -91,5 +89,3 @@ static inline bool tr_bitfieldHasNone(tr_bitfield const* b)
 }
 
 bool tr_bitfieldHas(tr_bitfield const* b, size_t n);
-
-TR_END_DECLS

@@ -14,8 +14,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 typedef void (*VariantWalkFunc)(tr_variant const* val, void* user_data);
 
 struct VariantWalkFuncs
@@ -52,5 +50,3 @@ int tr_bencParseStr(
     size_t* setme_strlen);
 
 int tr_variantParseBenc(void const* buf, void const* end, tr_variant* top, char const** setme_end);
-
-TR_END_DECLS

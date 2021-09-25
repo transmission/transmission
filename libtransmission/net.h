@@ -37,8 +37,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 #ifdef _WIN32
 typedef SOCKET tr_socket_t;
 #define TR_BAD_SOCKET INVALID_SOCKET
@@ -153,5 +151,3 @@ bool tr_net_hasIPv6(tr_port);
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
-
-TR_END_DECLS

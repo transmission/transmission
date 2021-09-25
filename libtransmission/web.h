@@ -10,8 +10,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 struct tr_address;
 struct tr_web_task;
 
@@ -62,5 +60,3 @@ void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool esca
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
 char* tr_http_unescape(char const* str, size_t len);
-
-TR_END_DECLS

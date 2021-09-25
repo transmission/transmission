@@ -17,8 +17,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 struct tr_error;
 
 /**
@@ -687,5 +685,3 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error);
 
 /** @} */
 /** @} */
-
-TR_END_DECLS

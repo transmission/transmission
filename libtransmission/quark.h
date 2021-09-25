@@ -10,8 +10,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 typedef size_t tr_quark;
 
@@ -433,9 +431,3 @@ char const* tr_quark_get_string(tr_quark quark, size_t* len);
  * created.
  */
 tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-TR_END_DECLS

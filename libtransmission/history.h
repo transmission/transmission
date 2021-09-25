@@ -16,8 +16,6 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /**
  * A generic short-term memory object that remembers how many times
  * something happened over the last N seconds.
@@ -58,5 +56,3 @@ void tr_historyAdd(tr_recentHistory*, time_t when, unsigned int n);
  * @param seconds how many seconds to count back through.
  */
 unsigned int tr_historyGet(tr_recentHistory const*, time_t when, unsigned int seconds);
-
-TR_END_DECLS

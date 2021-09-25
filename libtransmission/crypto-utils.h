@@ -16,8 +16,6 @@
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
-TR_BEGIN_DECLS
-
 /**
 *** @addtogroup utils Utilities
 *** @{
@@ -191,7 +189,5 @@ static inline void tr_hex_to_sha1(void* sha1, void const* hex)
 }
 
 /** @} */
-
-TR_END_DECLS
 
 #endif /* TR_CRYPTO_UTILS_H */

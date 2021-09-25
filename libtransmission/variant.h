@@ -13,8 +13,6 @@
 #include "tr-macros.h"
 #include "quark.h"
 
-TR_BEGIN_DECLS
-
 struct evbuffer;
 
 struct tr_error;
@@ -276,15 +274,4 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const**
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
 
-/***
-****
-****
-***/
-
-/**
-***
-**/
-
 /* @} */
-
-TR_END_DECLS
