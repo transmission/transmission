@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdlib> /* bsearch() */
 #include <cstring> /* memcmp() */
+#include <iterator>
 
 #include "transmission.h"
 #include "ptrarray.h"
@@ -27,7 +28,7 @@ struct tr_key_struct
         "" name "", sizeof("" name "") - 1, \
     }
 
-static struct tr_key_struct const my_static[] = {
+static struct tr_key_struct constexpr my_static[] = {
     Q(""),
     Q("activeTorrentCount"),
     Q("activity-date"),
@@ -417,6 +418,36 @@ static struct tr_key_struct const my_static[] = {
     Q("webseeds"),
     Q("webseedsSendingToUs"),
 };
+
+static size_t constexpr quarks_are_sorted = ( //
+    []() constexpr
+    {
+        for (size_t i = 1; i < std::size(my_static); ++i)
+        {
+            char const* lhs = my_static[i - 1].str;
+            char const* rhs = my_static[i].str;
+
+            while (true)
+            {
+                if (*lhs > *rhs)
+                {
+                    return false;
+                }
+
+                if (*lhs < *rhs || *lhs == '\0' || *rhs == '\0')
+                {
+                    break;
+                }
+
+                ++lhs;
+                ++rhs;
+            }
+        }
+
+        return true;
+    })();
+
+static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their string value");
 
 #undef Q
 
