@@ -37,8 +37,7 @@
 **  on.
 */
 
-#include "transmission.h"
-#include "utils.h"
+#include <stdbool.h>
 
 #define ABORT -1
 

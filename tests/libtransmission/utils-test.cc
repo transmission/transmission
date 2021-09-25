@@ -136,8 +136,8 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
-    auto count = int{};
-    auto* numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
+    auto numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE);
+    auto count = std::size(numbers);
     EXPECT_EQ(15, count);
     EXPECT_EQ(1, numbers[0]);
     EXPECT_EQ(6, numbers[5]);
@@ -145,29 +145,26 @@ TEST_F(UtilsTest, numbers)
     EXPECT_EQ(13, numbers[10]);
     EXPECT_EQ(16, numbers[11]);
     EXPECT_EQ(19, numbers[14]);
-    tr_free(numbers);
 
-    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
+    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE);
+    count = std::size(numbers);
     EXPECT_EQ(7, count);
-    EXPECT_NE(nullptr, numbers);
-    for (int i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
     {
         EXPECT_EQ(i + 1, numbers[i]);
     }
 
-    tr_free(numbers);
-
-    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
+    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE);
+    count = std::size(numbers);
     EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
 
-    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
+    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE);
+    count = std::size(numbers);
     EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
 
-    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
+    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE);
+    count = std::size(numbers);
     EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
 }
 
 namespace

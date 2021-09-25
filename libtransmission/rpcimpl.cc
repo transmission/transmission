@@ -1382,7 +1382,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     }
 
     /* sort trackerIds and remove from largest to smallest so there is no need to recalculate array indicies */
-    qsort(tids, t, sizeof(int), compareInt);
+    std::sort(tids, tids + t);
 
     bool changed = false;
     int dup = -1;
@@ -2917,8 +2917,8 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
 {
-    int valueCount;
-    int* values = tr_parseNumberRange(str, len, &valueCount);
+    auto const values = tr_parseNumberRange(str, len);
+    auto const valueCount = std::size(values);
 
     if (valueCount == 0)
     {
@@ -2932,13 +2932,11 @@ void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
     {
         tr_variantInitList(setme, valueCount);
 
-        for (int i = 0; i < valueCount; ++i)
+        for (auto const& value : values)
         {
-            tr_variantListAddInt(setme, values[i]);
+            tr_variantListAddInt(setme, value);
         }
     }
-
-    tr_free(values);
 }
 
 void tr_rpc_request_exec_uri(

@@ -640,27 +640,20 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
     if (arg != NULL)
     {
-        int valueCount;
-        int* values;
-
-        values = tr_parseNumberRange(arg, TR_BAD_SIZE, &valueCount);
-
-        for (int i = 0; i < valueCount; ++i)
+        for (int& day : tr_parseNumberRange(arg, TR_BAD_SIZE))
         {
-            if (values[i] < 0 || values[i] > 7)
+            if (day < 0 || day > 7)
             {
                 continue;
             }
 
-            if (values[i] == 7)
+            if (day == 7)
             {
-                values[i] = 0;
+                day = 0;
             }
 
-            days |= 1 << values[i];
+            days |= 1 << day;
         }
-
-        tr_free(values);
     }
 
     if (days != 0)
@@ -708,15 +701,10 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 
     if (strcmp(arg, "all") != 0)
     {
-        int valueCount;
-        int* values = tr_parseNumberRange(arg, TR_BAD_SIZE, &valueCount);
-
-        for (int i = 0; i < valueCount; ++i)
+        for (auto const& idx : tr_parseNumberRange(arg, TR_BAD_SIZE))
         {
-            tr_variantListAddInt(files, values[i]);
+            tr_variantListAddInt(files, idx);
         }
-
-        tr_free(values);
     }
 }
 
