@@ -1457,21 +1457,21 @@ std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: strin
     auto values = std::set<int>{};
 
     auto const* const end = str + (len != TR_BAD_SIZE ? len : strlen(str));
-    bool success = true;
-    char const* walk = str;
-    while (!tr_str_is_empty(walk) && success)
+    for (auto const* walk = str; walk < end;)
     {
         auto delim = std::find(walk, end, ',');
         auto range = number_range{};
-        success = parseNumberSection(walk, delim, range);
-        walk = delim + 1;
-        if (success)
+        if (!parseNumberSection(walk, delim, range))
         {
-            for (auto i = range.low; i <= range.high; ++i)
-            {
-                values.insert(i);
-            }
+            break;
         }
+
+        for (auto i = range.low; i <= range.high; ++i)
+        {
+            values.insert(i);
+        }
+
+        walk = delim + 1;
     }
 
     return { std::begin(values), std::end(values) };
