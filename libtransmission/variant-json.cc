@@ -7,10 +7,11 @@
  */
 
 #include <ctype.h>
+#include <errno.h> /* EILSEQ, EINVAL */
+#include <deque>
 #include <math.h> /* fabs() */
 #include <stdio.h>
 #include <string.h>
-#include <errno.h> /* EILSEQ, EINVAL */
 
 #include <event2/buffer.h> /* evbuffer_add() */
 #include <event2/util.h> /* evutil_strtoll() */
@@ -20,7 +21,6 @@
 #include "transmission.h"
 #include "ConvertUTF.h"
 #include "jsonsl.h"
-#include "list.h"
 #include "log.h"
 #include "ptrarray.h"
 #include "tr-assert.h"
@@ -424,7 +424,7 @@ struct ParentState
 struct jsonWalk
 {
     bool doIndent;
-    tr_list* parents;
+    std::deque<ParentState> parents;
     struct evbuffer* out;
 };
 
@@ -440,22 +440,22 @@ static void jsonIndent(struct jsonWalk* data)
 
     if (data->doIndent)
     {
-        evbuffer_add(data->out, buf, tr_list_size(data->parents) * 4 + 1);
+        evbuffer_add(data->out, buf, std::size(data->parents) * 4 + 1);
     }
 }
 
 static void jsonChildFunc(struct jsonWalk* data)
 {
-    if (data->parents != nullptr && data->parents->data != nullptr)
+    if (!std::empty(data->parents))
     {
-        auto* pstate = static_cast<struct ParentState*>(data->parents->data);
+        auto& pstate = data->parents.back();
 
-        switch (pstate->variantType)
+        switch (pstate.variantType)
         {
         case TR_VARIANT_TYPE_DICT:
             {
-                int const i = pstate->childIndex;
-                ++pstate->childIndex;
+                int const i = pstate.childIndex;
+                ++pstate.childIndex;
 
                 if (i % 2 == 0)
                 {
@@ -463,9 +463,8 @@ static void jsonChildFunc(struct jsonWalk* data)
                 }
                 else
                 {
-                    bool const isLast = pstate->childIndex == pstate->childCount;
-
-                    if (!isLast)
+                    bool const is_last = pstate.childIndex == pstate.childCount;
+                    if (!is_last)
                     {
                         evbuffer_add(data->out, ",", 1);
                         jsonIndent(data);
@@ -477,10 +476,9 @@ static void jsonChildFunc(struct jsonWalk* data)
 
         case TR_VARIANT_TYPE_LIST:
             {
-                ++pstate->childIndex;
-                bool const isLast = pstate->childIndex == pstate->childCount;
-
-                if (!isLast)
+                ++pstate.childIndex;
+                bool const is_last = pstate.childIndex == pstate.childCount;
+                if (!is_last)
                 {
                     evbuffer_add(data->out, ",", 1);
                     jsonIndent(data);
@@ -497,23 +495,13 @@ static void jsonChildFunc(struct jsonWalk* data)
 
 static void jsonPushParent(struct jsonWalk* data, tr_variant const* v)
 {
-    struct ParentState* pstate = tr_new(struct ParentState, 1);
-
-    pstate->variantType = v->type;
-    pstate->childIndex = 0;
-    pstate->childCount = v->val.l.count;
-
-    if (tr_variantIsDict(v))
-    {
-        pstate->childCount *= 2;
-    }
-
-    tr_list_prepend(&data->parents, pstate);
+    int const n_children = tr_variantIsDict(v) ? v->val.l.count * 2 : v->val.l.count;
+    data->parents.push_back({ v->type, 0, n_children });
 }
 
 static void jsonPopParent(struct jsonWalk* data)
 {
-    tr_free(tr_list_pop_front(&data->parents));
+    data->parents.pop_back();
 }
 
 static void jsonIntFunc(tr_variant const* val, void* vdata)
@@ -709,7 +697,6 @@ void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
 
     data.doIndent = !lean;
     data.out = buf;
-    data.parents = nullptr;
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 
