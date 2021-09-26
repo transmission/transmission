@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring> /* memcpy */
+#include <list>
 #include <vector>
 
 #ifndef _WIN32
@@ -2145,10 +2146,6 @@ static void sessionLoadTorrents(void* vdata)
     auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
     TR_ASSERT(tr_isSession(data->session));
 
-    int i;
-    int n = 0;
-    tr_list* list = nullptr;
-
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
     tr_sys_path_info info;
@@ -2157,6 +2154,7 @@ static void sessionLoadTorrents(void* vdata)
         tr_sys_dir_open(dirname, nullptr) :
         TR_BAD_SYS_DIR;
 
+    auto torrents = std::list<tr_torrent*>{};
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
@@ -2171,8 +2169,7 @@ static void sessionLoadTorrents(void* vdata)
 
                 if ((tor = tr_torrentNew(data->ctor, nullptr, nullptr)) != nullptr)
                 {
-                    tr_list_prepend(&list, tor);
-                    ++n;
+                    torrents.push_back(tor);
                 }
 
                 tr_free(path);
@@ -2182,17 +2179,9 @@ static void sessionLoadTorrents(void* vdata)
         tr_sys_dir_close(odir, nullptr);
     }
 
+    int const n = std::size(torrents);
     data->torrents = tr_new(tr_torrent*, n);
-    i = 0;
-
-    for (tr_list* l = list; l != nullptr; l = l->next)
-    {
-        data->torrents[i++] = (tr_torrent*)l->data;
-    }
-
-    TR_ASSERT(i == n);
-
-    tr_list_free(&list, nullptr);
+    std::copy(std::begin(torrents), std::end(torrents), data->torrents);
 
     if (n != 0)
     {
