@@ -22,10 +22,12 @@
 
 #pragma once
 
+#include <vector>
+
 #include "tr-core.h"
 #include "util.h"
 
 /**
  * Prompt the user to confirm removing a torrent.
  */
-void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* gtorrents, gboolean doDelete);
+void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const& gtorrents, gboolean doDelete);

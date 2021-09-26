@@ -6,10 +6,12 @@
  *
  */
 
+#include <algorithm>
 #include <limits.h> /* INT_MAX */
 #include <stddef.h>
 #include <stdio.h> /* sscanf() */
 #include <stdlib.h> /* abort() */
+
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
@@ -3039,18 +3041,19 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     return d;
 }
 
-void gtr_torrent_details_dialog_set_torrents(GtkWidget* w, GSList* ids)
+void gtr_torrent_details_dialog_set_torrents(GtkWidget* w, std::vector<int> const& ids)
 {
     char title[256];
-    int const len = g_slist_length(ids);
+    int const len = ids.size();
     auto* di = static_cast<DetailsImpl*>(g_object_get_qdata(G_OBJECT(w), DETAILS_KEY));
 
     g_slist_free(di->ids);
-    di->ids = g_slist_copy(ids);
+    di->ids = g_slist_alloc();
+    std::for_each(ids.rbegin(), ids.rend(), [di](auto const id) { di->ids = g_slist_prepend(di->ids, GINT_TO_POINTER(id)); });
 
     if (len == 1)
     {
-        int const id = GPOINTER_TO_INT(ids->data);
+        int const id = ids.front();
         tr_torrent const* tor = gtr_core_find_torrent(di->core, id);
         tr_info const* inf = tr_torrentInfo(tor);
         g_snprintf(title, sizeof(title), _("%s Properties"), inf->name);

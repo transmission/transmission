@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <algorithm>
+
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
@@ -56,7 +58,7 @@ static void on_remove_dialog_response(GtkDialog* dialog, gint response, gpointer
     g_free(dd);
 }
 
-void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gboolean delete_files)
+void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const& torrent_ids, gboolean delete_files)
 {
     GtkWidget* d;
     GString* primary_text;
@@ -64,7 +66,7 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     struct delete_data* dd;
     int connected = 0;
     int incomplete = 0;
-    int const count = g_slist_length(torrent_ids);
+    int const count = torrent_ids.size();
 
     if (count == 0)
     {
@@ -73,12 +75,16 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
 
     dd = g_new0(struct delete_data, 1);
     dd->core = core;
-    dd->torrent_ids = torrent_ids;
+    dd->torrent_ids = g_slist_alloc();
     dd->delete_files = delete_files;
 
-    for (GSList* l = torrent_ids; l != nullptr; l = l->next)
+    std::for_each(
+        torrent_ids.rbegin(),
+        torrent_ids.rend(),
+        [dd](auto const id) { dd->torrent_ids = g_slist_prepend(dd->torrent_ids, GINT_TO_POINTER(id)); });
+
+    for (auto const id : torrent_ids)
     {
-        int const id = GPOINTER_TO_INT(l->data);
         tr_torrent* tor = gtr_core_find_torrent(core, id);
         tr_stat const* stat = tr_torrentStat(tor);
 

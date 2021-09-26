@@ -193,11 +193,9 @@ if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
     pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtk+-3.0>=${GTK_MINIMUM}
-        glib-2.0>=${GLIB_MINIMUM}
-        gio-2.0>=${GIO_MINIMUM}
-        gmodule-2.0>=${GLIB_MINIMUM}
-        gthread-2.0>=${GLIB_MINIMUM})
+        gtkmm-3.0>=${GTK_MINIMUM}
+        glibmm-2.4>=${GLIB_MINIMUM}
+        giomm-2.4>=${GIO_MINIMUM})
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 

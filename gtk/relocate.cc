@@ -6,10 +6,12 @@
  *
  */
 
-#include <libtransmission/transmission.h>
+#include <algorithm>
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+
+#include <libtransmission/transmission.h>
 
 #include "conf.h" /* gtr_pref_string_get */
 #include "hig.h"
@@ -139,7 +141,7 @@ static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
     }
 }
 
-GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torrent_ids)
+GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, std::vector<int> const& torrent_ids)
 {
     guint row;
     GtkWidget* w;
@@ -179,8 +181,14 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
 
     data = g_new0(struct relocate_dialog_data, 1);
     data->core = core;
-    data->torrent_ids = torrent_ids;
+    data->torrent_ids = g_slist_alloc();
     data->chooser_dialog = d;
+
+    std::for_each(
+        torrent_ids.rbegin(),
+        torrent_ids.rend(),
+        [data](auto const id) { data->torrent_ids = g_slist_prepend(data->torrent_ids, GINT_TO_POINTER(id)); });
+
     g_object_set_data_full(G_OBJECT(d), DATA_KEY, data, data_free);
 
     return d;

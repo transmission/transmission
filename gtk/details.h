@@ -8,9 +8,12 @@
 
 #pragma once
 
+#include <vector>
+
 #include <gtk/gtk.h>
+
 #include "tr-core.h"
 
 GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core);
 
-void gtr_torrent_details_dialog_set_torrents(GtkWidget* details_dialog, GSList* torrent_ids);
+void gtr_torrent_details_dialog_set_torrents(GtkWidget* details_dialog, std::vector<int> const& torrent_ids);

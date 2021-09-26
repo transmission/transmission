@@ -32,6 +32,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/tr-assert.h>
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/variant.h>
 
@@ -193,6 +194,47 @@ static void tr_core_class_init(TrCoreClass* core_class)
         1,
         G_TYPE_INT);
 }
+
+TorrentModelColumns::TorrentModelColumns()
+{
+    add(name_collated);
+    add(torrent);
+    add(torrent_id);
+    add(speed_up);
+    add(speed_down);
+    add(active_peers_up);
+    add(active_peers_down);
+    add(recheck_progress);
+    add(active);
+    add(activity);
+    add(finished);
+    add(priority);
+    add(queue_position);
+    add(trackers);
+    add(error);
+    add(active_peer_count);
+
+    // TODO: Remove
+    TR_ASSERT(name_collated.index() == MC_NAME_COLLATED);
+    TR_ASSERT(torrent.index() == MC_TORRENT);
+    TR_ASSERT(torrent_id.index() == MC_TORRENT_ID);
+    TR_ASSERT(speed_up.index() == MC_SPEED_UP);
+    TR_ASSERT(speed_down.index() == MC_SPEED_DOWN);
+    TR_ASSERT(active_peers_up.index() == MC_ACTIVE_PEERS_UP);
+    TR_ASSERT(active_peers_down.index() == MC_ACTIVE_PEERS_DOWN);
+    TR_ASSERT(recheck_progress.index() == MC_RECHECK_PROGRESS);
+    TR_ASSERT(active.index() == MC_ACTIVE);
+    TR_ASSERT(activity.index() == MC_ACTIVITY);
+    TR_ASSERT(finished.index() == MC_FINISHED);
+    TR_ASSERT(priority.index() == MC_PRIORITY);
+    TR_ASSERT(queue_position.index() == MC_QUEUE_POSITION);
+    TR_ASSERT(trackers.index() == MC_TRACKERS);
+    TR_ASSERT(error.index() == MC_ERROR);
+    TR_ASSERT(active_peer_count.index() == MC_ACTIVE_PEER_COUNT);
+    static_assert(MC_ROW_COUNT == 16, "");
+};
+
+TorrentModelColumns const torrent_cols;
 
 static void tr_core_init(TrCore* core)
 {
@@ -1428,6 +1470,21 @@ void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean
     for (GSList* l = files; l != nullptr; l = l->next)
     {
         add_file(core, static_cast<GFile*>(l->data), do_start, do_prompt, do_notify);
+    }
+
+    gtr_core_torrents_added(core);
+}
+
+void gtr_core_add_files(
+    TrCore* core,
+    std::vector<Glib::RefPtr<Gio::File>> const& files,
+    bool do_start,
+    bool do_prompt,
+    bool do_notify)
+{
+    for (auto const& file : files)
+    {
+        add_file(core, Glib::unwrap(file), do_start, do_prompt, do_notify);
     }
 
     gtr_core_torrents_added(core);

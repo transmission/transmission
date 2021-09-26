@@ -22,7 +22,11 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <vector>
+
+#include <giomm.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
@@ -99,6 +103,12 @@ void gtr_core_load(TrCore* self, gboolean forcepaused);
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
 void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean do_prompt, gboolean do_notify);
+void gtr_core_add_files(
+    TrCore* core,
+    std::vector<Glib::RefPtr<Gio::File>> const& files,
+    bool do_start,
+    bool do_prompt,
+    bool do_notify);
 
 /** @brief Add a torrent from a URL */
 bool gtr_core_add_from_url(TrCore* core, char const* url);
@@ -180,3 +190,32 @@ enum
     /* */
     MC_ROW_COUNT
 };
+
+class TorrentModelColumns : public Gtk::TreeModelColumnRecord
+{
+public:
+    TorrentModelColumns();
+
+    Gtk::TreeModelColumn<Glib::ustring> name_collated;
+    Gtk::TreeModelColumn<void*> torrent;
+    Gtk::TreeModelColumn<int> torrent_id;
+    Gtk::TreeModelColumn<double> speed_up;
+    Gtk::TreeModelColumn<double> speed_down;
+    Gtk::TreeModelColumn<int> active_peers_up;
+    Gtk::TreeModelColumn<int> active_peers_down;
+    Gtk::TreeModelColumn<double> recheck_progress;
+    Gtk::TreeModelColumn<bool> active;
+    Gtk::TreeModelColumn<tr_torrent_activity> activity;
+    Gtk::TreeModelColumn<bool> finished;
+    Gtk::TreeModelColumn<tr_priority_t> priority;
+    Gtk::TreeModelColumn<int> queue_position;
+    Gtk::TreeModelColumn<unsigned int> trackers;
+    /* tr_stat.error
+     * Tracked because ACTIVITY_FILTER_ERROR needs the row-changed events */
+    Gtk::TreeModelColumn<int> error;
+    /* tr_stat.{ peersSendingToUs + peersGettingFromUs + webseedsSendingToUs }
+     * Tracked because ACTIVITY_FILTER_ACTIVE needs the row-changed events */
+    Gtk::TreeModelColumn<int> active_peer_count;
+};
+
+extern TorrentModelColumns const torrent_cols;

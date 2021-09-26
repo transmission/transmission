@@ -10,6 +10,7 @@
 
 #include <sys/types.h>
 #include <glib.h>
+#include <glibmm.h>
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
@@ -159,3 +160,30 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* entry);
  * This prevents the label from having to recalculate its size
  * and prevents selected text in the label from being deselected */
 void gtr_label_set_text(GtkLabel* lb, char const* text);
+
+namespace Glib
+{
+
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 68)
+
+template<typename T>
+inline bool operator==(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
+{
+    return !lhs;
+}
+
+template<typename T>
+inline bool operator!=(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
+{
+    return !(lhs == nullptr);
+}
+
+template<typename T>
+inline RefPtr<T> make_refptr_for_instance(T* object)
+{
+    return RefPtr<T>(object);
+}
+
+#endif
+
+} // namespace Glib
