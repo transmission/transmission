@@ -15,6 +15,7 @@
 #define TR_NAME "Transmission"
 
 #include <cstring> // memcmp()
+#include <list>
 #include <map>
 #include <unordered_set>
 #include <vector>
@@ -57,6 +58,7 @@ struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
+struct tr_blocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 struct tr_device_info;
@@ -213,7 +215,7 @@ struct tr_session
 
     struct tr_device_info* downloadDir;
 
-    struct tr_list* blocklists;
+    std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 

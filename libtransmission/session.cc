@@ -6,7 +6,7 @@
  *
  */
 
-#include <algorithm> // std::partial_sort, min, max
+#include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <cerrno> /* ENOENT */
 #include <climits> /* INT_MAX */
 #include <csignal>
@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstring> /* memcpy */
 #include <list>
+#include <numeric> // std::acumulate()
 #include <vector>
 
 #ifndef _WIN32
@@ -37,7 +38,6 @@
 #include "error-types.h"
 #include "fdlimit.h"
 #include "file.h"
-#include "list.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
@@ -2419,7 +2419,7 @@ static void loadBlocklists(tr_session* session)
     tr_sys_dir_t odir;
     char* dirname;
     char const* name;
-    tr_list* blocklists = nullptr;
+    auto blocklists = std::list<tr_blocklistFile*>{};
     auto loadme = tr_ptrArray{};
     bool const isEnabled = session->isBlocklistEnabled;
 
@@ -2520,7 +2520,7 @@ static void loadBlocklists(tr_session* session)
 
         for (int i = 0; i < n; ++i)
         {
-            tr_list_append(&blocklists, tr_blocklistFileNew(paths[i], isEnabled));
+            blocklists.push_back(tr_blocklistFileNew(paths[i], isEnabled));
         }
     }
 
@@ -2533,7 +2533,9 @@ static void loadBlocklists(tr_session* session)
 
 static void closeBlocklists(tr_session* session)
 {
-    tr_list_free(&session->blocklists, (TrListForeachFunc)tr_blocklistFileFree);
+    auto& src = session->blocklists;
+    std::for_each(std::begin(src), std::end(src), [](auto* b) { tr_blocklistFileFree(b); });
+    src.clear();
 }
 
 void tr_sessionReloadBlocklists(tr_session* session)
@@ -2548,15 +2550,12 @@ int tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    int n = 0;
-
-    for (tr_list* l = session->blocklists; l != nullptr; l = l->next)
-    {
-        auto const* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
-        n += tr_blocklistFileGetRuleCount(blocklistFile);
-    }
-
-    return n;
+    auto const& src = session->blocklists;
+    return std::accumulate(
+        std::begin(src),
+        std::end(src),
+        0,
+        [](int sum, auto const* cur) { return sum + tr_blocklistFileGetRuleCount(cur); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
@@ -2566,68 +2565,63 @@ bool tr_blocklistIsEnabled(tr_session const* session)
     return session->isBlocklistEnabled;
 }
 
-void tr_blocklistSetEnabled(tr_session* session, bool isEnabled)
+void tr_blocklistSetEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isBlocklistEnabled = isEnabled;
+    session->isBlocklistEnabled = enabled;
 
-    for (tr_list* l = session->blocklists; l != nullptr; l = l->next)
-    {
-        auto* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
-        tr_blocklistFileSetEnabled(blocklistFile, isEnabled);
-    }
+    auto& src = session->blocklists;
+    std::for_each(
+        std::begin(src),
+        std::end(src),
+        [enabled](auto* blocklist) { tr_blocklistFileSetEnabled(blocklist, enabled); });
 }
 
 bool tr_blocklistExists(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->blocklists != nullptr;
+    return !std::empty(session->blocklists);
 }
 
 int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 {
-    int ruleCount;
-    tr_blocklistFile* b = nullptr;
-    char const* defaultName = DEFAULT_BLOCKLIST_FILENAME;
     tr_sessionLock(session);
 
-    for (tr_list* l = session->blocklists; b == nullptr && l != nullptr; l = l->next)
+    // find (or add) the default blocklist
+    tr_blocklistFile* b = nullptr;
+    auto& src = session->blocklists;
+    char const* const name = DEFAULT_BLOCKLIST_FILENAME;
+    auto const it = std::find_if(
+        std::begin(src),
+        std::end(src),
+        [&name](auto const* blocklist) { return tr_stringEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
+    if (it == std::end(src))
     {
-        auto const* blocklistFile = static_cast<tr_blocklistFile*>(l->data);
-        if (tr_stringEndsWith(tr_blocklistFileGetFilename(blocklistFile), defaultName))
-        {
-            b = static_cast<tr_blocklistFile*>(l->data);
-        }
-    }
-
-    if (b == nullptr)
-    {
-        char* path = tr_buildPath(session->configDir, "blocklists", defaultName, nullptr);
+        char* path = tr_buildPath(session->configDir, "blocklists", name, nullptr);
         b = tr_blocklistFileNew(path, session->isBlocklistEnabled);
-        tr_list_append(&session->blocklists, b);
+        src.push_back(b);
         tr_free(path);
     }
+    else
+    {
+        b = *it;
+    }
 
-    ruleCount = tr_blocklistFileSetContent(b, contentFilename);
+    // set the default blocklist's content
+    int const ruleCount = tr_blocklistFileSetContent(b, contentFilename);
     tr_sessionUnlock(session);
     return ruleCount;
 }
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
-    TR_ASSERT(tr_isSession(session));
-
-    for (tr_list* l = session->blocklists; l != nullptr; l = l->next)
-    {
-        if (tr_blocklistFileHasAddress(static_cast<tr_blocklistFile*>(l->data), addr))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    auto& src = session->blocklists;
+    return std::any_of(
+        std::begin(src),
+        std::end(src),
+        [&addr](auto* blocklist) { return tr_blocklistFileHasAddress(blocklist, addr); });
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
