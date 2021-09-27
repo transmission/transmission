@@ -29,7 +29,6 @@ set(PROJECT_FILES
   handshake.cc
   history.cc
   inout.cc
-  list.cc
   log.cc
   magnet.cc
   makemeta.cc
@@ -155,7 +154,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     handshake.h
     history.h
     inout.h
-    list.h
     magnet.h
     metainfo.h
     mime-types.h

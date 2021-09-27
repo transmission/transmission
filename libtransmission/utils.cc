@@ -58,7 +58,6 @@
 #include "error-types.h"
 #include "file.h"
 #include "ConvertUTF.h"
-#include "list.h"
 #include "log.h"
 #include "mime-types.h"
 #include "net.h"
