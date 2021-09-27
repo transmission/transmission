@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cstring> /* strlen() */
+#include <set>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -16,7 +17,6 @@
 #include "bandwidth.h"
 #include "cache.h"
 #include "inout.h" /* tr_ioFindFileLocation() */
-#include "list.h"
 #include "peer-mgr.h"
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -47,7 +47,7 @@ struct tr_webseed
     tr_session* session;
     tr_peer_callback callback;
     void* callback_data;
-    tr_list* tasks;
+    std::set<tr_webseed_task*> tasks;
     struct event* timer;
     char* base_url;
     size_t base_url_len;
@@ -295,7 +295,7 @@ static void task_request_next_chunk(struct tr_webseed_task* task);
 static void on_idle(tr_webseed* w)
 {
     int want;
-    int running_tasks = tr_list_size(w->tasks);
+    int const running_tasks = std::size(w->tasks);
     tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
     if (w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES)
@@ -349,7 +349,7 @@ static void on_idle(tr_webseed* w)
             task->block_size = tor->blockSize;
             task->content = evbuffer_new();
             evbuffer_add_cb(task->content, on_content_changed, task);
-            tr_list_append(&w->tasks, task);
+            w->tasks.insert(task);
             task_request_next_chunk(task);
         }
 
@@ -411,7 +411,7 @@ static void web_response_func(
                 ++w->retry_tickcount;
             }
 
-            tr_list_remove_data(&w->tasks, t);
+            w->tasks.erase(t);
             evbuffer_free(t->content);
             tr_free(t);
         }
@@ -440,7 +440,7 @@ static void web_response_func(
 
                 ++w->idle_connections;
 
-                tr_list_remove_data(&w->tasks, t);
+                w->tasks.erase(t);
                 evbuffer_free(t->content);
                 tr_free(t);
 
@@ -535,7 +535,7 @@ static bool webseed_is_transferring_pieces(tr_peer const* peer, uint64_t now, tr
     if (direction == TR_DOWN)
     {
         tr_webseed const* w = (tr_webseed const*)peer;
-        is_active = w->tasks != nullptr;
+        is_active = !std::empty(w->tasks);
         Bps = tr_bandwidthGetPieceSpeed_Bps(&w->bandwidth, now, direction);
     }
 
@@ -552,13 +552,13 @@ static void webseed_destruct(tr_peer* peer)
     tr_webseed* w = (tr_webseed*)peer;
 
     /* flag all the pending tasks as dead */
-    for (tr_list* l = w->tasks; l != nullptr; l = l->next)
-    {
-        auto* task = static_cast<struct tr_webseed_task*>(l->data);
-        task->dead = true;
-    }
-
-    tr_list_free(&w->tasks, nullptr);
+    auto& src = w->tasks;
+    std::for_each(std::begin(src), std::end(src), [](auto* task) { task->dead = true; });
+    // Manually destructing is unfortunately necessary until we C++ify
+    // the tr_peer / tr_peerMsgs / tr_webseed inheritance. Peers are
+    // curently tr_free()d in tr_peerFree() so we can't new/delete them.
+    using type = decltype(w->tasks);
+    w->tasks.~type();
 
     /* if we have an array of file URLs, free it */
     if (w->file_urls != nullptr)
