@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstring> /* memcpy */
+#include <list>
+#include <string>
 
 #include <zlib.h>
 
@@ -22,7 +24,6 @@
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "error.h"
 #include "fdlimit.h"
-#include "list.h"
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
@@ -62,9 +63,9 @@ struct tr_rpc_server
     tr_session* session;
     char* username;
     char* password;
-    char* whitelistStr;
-    tr_list* whitelist;
-    tr_list* hostWhitelist;
+    std::string whitelistStr;
+    std::list<std::string> whitelist;
+    std::list<std::string> hostWhitelist;
     int loginattempts;
     bool isAntiBruteForceEnabled;
     int antiBruteForceThreshold;
@@ -556,20 +557,10 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 {
-    if (!server->isWhitelistEnabled)
-    {
-        return true;
-    }
+    auto const& src = server->whitelist;
 
-    for (tr_list* l = server->whitelist; l != nullptr; l = l->next)
-    {
-        if (tr_wildmat(address, static_cast<char const*>(l->data)))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return !server->isWhitelistEnabled ||
+        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s.c_str()); });
 }
 
 static bool isIPAddressWithOptionalPort(char const* host)
@@ -610,27 +601,19 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
     }
 
     /* Host header might include the port. */
-    char* const hostname = tr_strndup(host, strcspn(host, ":"));
+    auto const hostname = std::string(host, strcspn(host, ":"));
 
     /* localhost is always acceptable. */
-    if (strcmp(hostname, "localhost") == 0 || strcmp(hostname, "localhost.") == 0)
+    if (hostname == "localhost" || hostname == "localhost.")
     {
-        tr_free(hostname);
         return true;
     }
 
-    /* Otherwise, hostname must be whitelisted. */
-    for (tr_list* l = server->hostWhitelist; l != nullptr; l = l->next)
-    {
-        if (tr_wildmat(hostname, static_cast<char const*>(l->data)))
-        {
-            tr_free(hostname);
-            return true;
-        }
-    }
-
-    tr_free(hostname);
-    return false;
+    auto const& src = server->hostWhitelist;
+    return std::any_of(
+        std::begin(src),
+        std::end(src),
+        [&hostname](auto const& str) { return tr_wildmat(hostname.c_str(), str.c_str()); });
 }
 
 static bool test_session_id(struct tr_rpc_server* server, struct evhttp_request* req)
@@ -962,24 +945,17 @@ char const* tr_rpcGetUrl(tr_rpc_server const* server)
     return server->url != nullptr ? server->url : "";
 }
 
-static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
+static auto parseWhitelist(char const* whitelistStr)
 {
-    void* tmp;
-
-    /* clear out the old whitelist entries */
-    while ((tmp = tr_list_pop_front(list)) != nullptr)
-    {
-        tr_free(tmp);
-    }
+    auto list = std::list<std::string>{};
 
     /* build the new whitelist entries */
     for (char const* walk = whitelistStr; !tr_str_is_empty(walk);)
     {
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);
-        char* token = tr_strndup(walk, len);
-
-        tr_list_append(list, token);
+        list.emplace_back(walk, len);
+        auto const token = list.back().c_str();
 
         if (strcspn(token, "+-") < len)
         {
@@ -1002,26 +978,24 @@ static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
 
         ++walk;
     }
+
+    return list;
 }
 
-void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* whitelistStr)
+void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* str)
 {
-    tr_rpcSetList(whitelistStr, &server->hostWhitelist);
+    server->hostWhitelist = parseWhitelist(str);
 }
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
+void tr_rpcSetWhitelist(tr_rpc_server* server, char const* str)
 {
-    /* keep the string */
-    char* const tmp = server->whitelistStr;
-    server->whitelistStr = tr_strdup(whitelistStr);
-    tr_free(tmp);
-
-    tr_rpcSetList(whitelistStr, &server->whitelist);
+    server->whitelistStr = str ? str : "";
+    server->whitelist = parseWhitelist(str);
 }
 
 char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
 {
-    return server->whitelistStr != nullptr ? server->whitelistStr : "";
+    return server->whitelistStr.c_str();
 }
 
 void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1123,15 +1097,9 @@ void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
 
 static void closeServer(void* vserver)
 {
-    void* tmp;
     auto* server = static_cast<tr_rpc_server*>(vserver);
 
     stopServer(server);
-
-    while ((tmp = tr_list_pop_front(&server->whitelist)) != nullptr)
-    {
-        tr_free(tmp);
-    }
 
     if (server->isStreamInitialized)
     {
@@ -1139,10 +1107,9 @@ static void closeServer(void* vserver)
     }
 
     tr_free(server->url);
-    tr_free(server->whitelistStr);
     tr_free(server->username);
     tr_free(server->password);
-    tr_free(server);
+    delete server;
 }
 
 void tr_rpcClose(tr_rpc_server** ps)
@@ -1162,13 +1129,12 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     bool boolVal;
     int64_t i;
     char const* str;
-    tr_quark key;
     tr_address address;
 
-    tr_rpc_server* s = tr_new0(tr_rpc_server, 1);
+    tr_rpc_server* s = new tr_rpc_server{};
     s->session = session;
 
-    key = TR_KEY_rpc_enabled;
+    tr_quark key = TR_KEY_rpc_enabled;
 
     if (!tr_variantDictFindBool(settings, key, &boolVal))
     {
