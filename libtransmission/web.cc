@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cstring> /* strlen(), strstr() */
+#include <set>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -21,7 +22,6 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "file.h"
-#include "list.h"
 #include "log.h"
 #include "net.h" /* tr_address */
 #include "torrent.h"
@@ -89,8 +89,6 @@ static void task_free(struct tr_web_task* task)
 ****
 ***/
 
-static tr_list* paused_easy_handles = nullptr;
-
 struct tr_web
 {
     bool curl_verbose;
@@ -100,6 +98,7 @@ struct tr_web
     struct tr_web_task* tasks;
     tr_lock* taskLock;
     char* cookie_filename;
+    std::set<CURL*> paused_easy_handles;
 };
 
 /***
@@ -118,7 +117,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
         if (tor != nullptr && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
         {
-            tr_list_append(&paused_easy_handles, task->curl_easy);
+            task->session->web->paused_easy_handles.insert(task->curl_easy);
             return CURL_WRITEFUNC_PAUSE;
         }
     }
@@ -418,7 +417,6 @@ static void tr_webThreadFunc(void* vsession)
 {
     char* str;
     CURLM* multi;
-    struct tr_web* web;
     int taskCount = 0;
     uint32_t repeats = 0;
     auto* session = static_cast<tr_session*>(vsession);
@@ -430,7 +428,7 @@ static void tr_webThreadFunc(void* vsession)
         curl_global_init(0);
     }
 
-    web = tr_new0(struct tr_web, 1);
+    auto* web = new tr_web{};
     web->close_mode = ~0;
     web->taskLock = tr_lockNew();
     web->tasks = nullptr;
@@ -495,22 +493,12 @@ static void tr_webThreadFunc(void* vsession)
 
         tr_lockUnlock(web->taskLock);
 
-        /* unpause any paused curl handles */
-        if (paused_easy_handles != nullptr)
-        {
-            CURL* handle;
-            tr_list* tmp;
-
-            /* swap paused_easy_handles to prevent oscillation
-               between writeFunc this while loop */
-            tmp = paused_easy_handles;
-            paused_easy_handles = nullptr;
-
-            while ((handle = tr_list_pop_front(&tmp)) != nullptr)
-            {
-                curl_easy_pause(handle, CURLPAUSE_CONT);
-            }
-        }
+        /* resume any paused curl handles.
+           swap paused_easy_handles to prevent oscillation
+           between writeFunc this while loop */
+        auto paused = decltype(web->paused_easy_handles){};
+        std::swap(paused, web->paused_easy_handles);
+        std::for_each(std::begin(paused), std::end(paused), [](auto* curl) { curl_easy_pause(curl, CURLPAUSE_CONT); });
 
         /* maybe wait a little while before calling curl_multi_perform() */
         msec = 0;
@@ -576,7 +564,7 @@ static void tr_webThreadFunc(void* vsession)
                 task->did_connect = task->code > 0 || req_bytes_sent > 0;
                 task->did_timeout = task->code == 0 && total_time >= task->timeout_secs;
                 curl_multi_remove_handle(multi, e);
-                tr_list_remove_data(&paused_easy_handles, e);
+                web->paused_easy_handles.erase(e);
                 curl_easy_cleanup(e);
                 tr_runInEventThread(task->session, task_finish_func, task);
                 --taskCount;
@@ -595,12 +583,11 @@ static void tr_webThreadFunc(void* vsession)
     }
 
     /* cleanup */
-    tr_list_free(&paused_easy_handles, nullptr);
     curl_multi_cleanup(multi);
     tr_lockFree(web->taskLock);
     tr_free(web->curl_ca_bundle);
     tr_free(web->cookie_filename);
-    tr_free(web);
+    delete web;
     session->web = nullptr;
 }
 
