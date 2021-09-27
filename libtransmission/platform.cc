@@ -8,7 +8,9 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <list>
 #include <map>
+#include <string>
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600 /* needed for recursive locks. */
@@ -38,7 +40,6 @@
 
 #include "transmission.h"
 #include "file.h"
-#include "list.h"
 #include "log.h"
 #include "platform.h"
 #include "session.h"
@@ -584,22 +585,21 @@ char const* tr_getWebClientDir(tr_session const* session)
 
             TR_UNUSED(session);
 
-            tr_list* candidates = nullptr;
-            char* tmp;
+            auto candidates = std::list<std::string>{};
 
             /* XDG_DATA_HOME should be the first in the list of candidates */
-            tmp = tr_env_get_string("XDG_DATA_HOME", nullptr);
-
+            char* tmp = tr_env_get_string("XDG_DATA_HOME", nullptr);
             if (!tr_str_is_empty(tmp))
             {
-                tr_list_append(&candidates, tmp);
+                candidates.emplace_back(tmp);
             }
             else
             {
                 char* dhome = tr_buildPath(getHomeDir(), ".local", "share", nullptr);
-                tr_list_append(&candidates, dhome);
-                tr_free(tmp);
+                candidates.emplace_back(dhome);
+                tr_free(dhome);
             }
+            tr_free(tmp);
 
             /* XDG_DATA_DIRS are the backup directories */
             {
@@ -618,14 +618,14 @@ char const* tr_getWebClientDir(tr_session const* session)
                     {
                         if (end - tmp > 1)
                         {
-                            tr_list_append(&candidates, tr_strndup(tmp, (size_t)(end - tmp)));
+                            candidates.emplace_back(tmp, (size_t)(end - tmp));
                         }
 
                         tmp = (char*)end + 1;
                     }
                     else if (!tr_str_is_empty(tmp))
                     {
-                        tr_list_append(&candidates, tr_strdup(tmp));
+                        candidates.emplace_back(tmp);
                         break;
                     }
                 }
@@ -634,9 +634,9 @@ char const* tr_getWebClientDir(tr_session const* session)
             }
 
             /* walk through the candidates & look for a match */
-            for (tr_list* l = candidates; l != nullptr; l = l->next)
+            for (auto const& dir : candidates)
             {
-                char* path = tr_buildPath(static_cast<char const*>(l->data), "transmission", "public_html", nullptr);
+                char* path = tr_buildPath(dir.c_str(), "transmission", "public_html", nullptr);
                 bool const found = isWebClientDir(path);
 
                 if (found)
@@ -647,8 +647,6 @@ char const* tr_getWebClientDir(tr_session const* session)
 
                 tr_free(path);
             }
-
-            tr_list_free(&candidates, tr_free);
 
 #endif
         }
