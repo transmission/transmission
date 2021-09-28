@@ -22,7 +22,6 @@
 #include "ConvertUTF.h"
 #include "jsonsl.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -41,7 +40,7 @@ struct json_wrapper_data
     struct evbuffer* keybuf;
     struct evbuffer* strbuf;
     char const* source;
-    tr_ptrArray stack;
+    std::deque<tr_variant*> stack;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -54,7 +53,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    auto* parent = static_cast<tr_variant*>(tr_ptrArrayEmpty(&data->stack) ? nullptr : tr_ptrArrayBack(&data->stack));
+    auto* parent = std::empty(data->stack) ? nullptr : data->stack.back();
 
     tr_variant* node = nullptr;
     if (parent == nullptr)
@@ -110,16 +109,15 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct js
     TR_UNUSED(action);
     TR_UNUSED(buf);
 
-    tr_variant* node;
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
         data->has_content = true;
-        node = get_node(jsn);
-        tr_ptrArrayAppend(&data->stack, node);
+        tr_variant* node = get_node(jsn);
+        data->stack.push_back(node);
 
-        int const depth = tr_ptrArraySize(&data->stack);
+        int const depth = std::size(data->stack);
         size_t const n = depth < MAX_DEPTH ? data->preallocGuess[depth] : 0;
         if (state->type == JSONSL_T_LIST)
         {
@@ -325,8 +323,9 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
-        int const depth = tr_ptrArraySize(&data->stack);
-        auto* v = static_cast<tr_variant const*>(tr_ptrArrayPop(&data->stack));
+        int const depth = std::size(data->stack);
+        auto* v = data->stack.back();
+        data->stack.pop_back();
         if (depth < MAX_DEPTH)
         {
             data->preallocGuess[depth] = v->val.l.count;
@@ -405,7 +404,6 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     error = data.error;
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
-    tr_ptrArrayDestruct(&data.stack, nullptr);
     jsonsl_destroy(jsn);
     return error;
 }
