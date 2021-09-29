@@ -328,12 +328,11 @@ void tr_watchdir_process(tr_watchdir_t handle, char const* name)
     }
 }
 
-void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
+void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir_entries)
 {
     tr_sys_dir_t dir;
     char const* name;
-    auto new_dir_entries = tr_ptrArray{};
-    auto const name_compare_func = (PtrArrayCompareFunc)&strcmp;
+    auto new_dir_entries = std::unordered_set<std::string>{};
     tr_error* error = nullptr;
 
     if ((dir = tr_sys_dir_open(handle->path, &error)) == TR_BAD_SYS_DIR)
@@ -352,9 +351,10 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
 
         if (dir_entries != nullptr)
         {
-            tr_ptrArrayInsertSorted(&new_dir_entries, tr_strdup(name), name_compare_func);
+            auto const namestr = std::string(name);
+            new_dir_entries.insert(namestr);
 
-            if (tr_ptrArrayFindSorted(dir_entries, name, name_compare_func) != nullptr)
+            if (dir_entries->count(namestr) != 0)
             {
                 continue;
             }
@@ -373,7 +373,6 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
 
     if (dir_entries != nullptr)
     {
-        tr_ptrArrayDestruct(dir_entries, &tr_free);
         *dir_entries = new_dir_entries;
     }
 }

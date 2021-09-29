@@ -7,6 +7,8 @@
  */
 
 #include <errno.h>
+#include <string>
+#include <unordered_set>
 
 #include <event2/event.h>
 
@@ -14,7 +16,6 @@
 
 #include "transmission.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
@@ -37,10 +38,10 @@ typedef struct tr_watchdir_generic
     tr_watchdir_backend base;
 
     struct event* event;
-    tr_ptrArray dir_entries;
+    std::unordered_set<std::string> dir_entries;
 } tr_watchdir_generic;
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_generic*)(b))
+#define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_generic*>(b))
 
 /* Non-static and mutable for unit tests. default to 10 sec. */
 auto tr_watchdir_generic_interval = timeval{ 10, 0 };
@@ -77,16 +78,12 @@ static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
         event_free(backend->event);
     }
 
-    tr_ptrArrayDestruct(&backend->dir_entries, &tr_free);
-
-    tr_free(backend);
+    delete backend;
 }
 
 tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 {
-    tr_watchdir_generic* backend;
-
-    backend = tr_new0(tr_watchdir_generic, 1);
+    auto* backend = new tr_watchdir_generic{};
     backend->base.free_func = &tr_watchdir_generic_free;
 
     if ((backend
