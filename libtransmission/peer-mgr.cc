@@ -3818,18 +3818,6 @@ static void pumpAllPeers(tr_peerMgr* mgr)
     }
 }
 
-static void queuePulseForeach(void* vtor)
-{
-    auto* tor = static_cast<tr_torrent*>(vtor);
-
-    tr_torrentStartNow(tor);
-
-    if (tor->queue_started_callback != nullptr)
-    {
-        (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
-    }
-}
-
 static void queuePulse(tr_session* session, tr_direction dir)
 {
     TR_ASSERT(tr_isSession(session));
@@ -3837,13 +3825,17 @@ static void queuePulse(tr_session* session, tr_direction dir)
 
     if (tr_sessionGetQueueEnabled(session, dir))
     {
-        auto torrents = tr_ptrArray{};
+        auto const n = tr_sessionCountQueueFreeSlots(session, dir);
 
-        tr_sessionGetNextQueuedTorrents(session, dir, tr_sessionCountQueueFreeSlots(session, dir), &torrents);
+        for (auto* tor : tr_sessionGetNextQueuedTorrents(session, dir, n))
+        {
+            tr_torrentStartNow(tor);
 
-        tr_ptrArrayForeach(&torrents, queuePulseForeach);
-
-        tr_ptrArrayDestruct(&torrents, nullptr);
+            if (tor->queue_started_callback != nullptr)
+            {
+                (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
+            }
+        }
     }
 }
 

@@ -344,7 +344,7 @@ void tr_sessionSetAltSpeed_Bps(tr_session*, tr_direction, unsigned int Bps);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
-void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
+std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 
