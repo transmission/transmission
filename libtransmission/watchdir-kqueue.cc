@@ -117,7 +117,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     char const* const path = tr_watchdir_get_path(handle);
     struct kevent ke;
 
-    auto* backend = tr_watchdir_kqueue{};
+    auto* backend = new tr_watchdir_kqueue{};
     backend->base.free_func = &tr_watchdir_kqueue_free;
     backend->kq = -1;
     backend->dirfd = -1;
