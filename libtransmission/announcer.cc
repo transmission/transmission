@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
-#include <vector>
+#include <set>
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
@@ -24,7 +24,6 @@
 #include "crypto-utils.h" /* tr_rand_int(), tr_rand_int_weak() */
 #include "log.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
-#include "ptrarray.h"
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -90,55 +89,39 @@ char const* tr_announce_event_get_string(tr_announce_event e)
     }
 }
 
-/***
-****
-***/
-
-static int compareTransfer(uint64_t a_uploaded, uint64_t a_downloaded, uint64_t b_uploaded, uint64_t b_downloaded)
+namespace
 {
-    /* higher upload count goes first */
-    if (a_uploaded != b_uploaded)
-    {
-        return a_uploaded > b_uploaded ? -1 : 1;
-    }
 
-    /* then higher download count goes first */
-    if (a_downloaded != b_downloaded)
-    {
-        return a_downloaded > b_downloaded ? -1 : 1;
-    }
-
-    return 0;
-}
-
-/**
- * Comparison function for tr_announce_requests.
- *
- * The primary key (amount of data transferred) is used to prioritize
- * tracker announcements of active torrents. The remaining keys are
- * used to satisfy the uniqueness requirement of a sorted tr_ptrArray.
- */
-static int compareStops(void const* va, void const* vb)
+struct StopsCompare
 {
-    int i;
-    auto const* a = static_cast<tr_announce_request const*>(va);
-    auto const* b = static_cast<tr_announce_request const*>(vb);
-
-    /* primary key: volume of data transferred. */
-    if ((i = compareTransfer(a->up, a->down, b->up, b->down)) != 0)
+    int compare(tr_announce_request const* a, tr_announce_request const* b) const
     {
-        return i;
+        // primary key: volume of data transferred
+        auto ax = a->up + a->down;
+        auto bx = b->up + b->down;
+        if (ax != bx)
+        {
+            return ax > bx ? -1 : 1;
+        }
+
+        // secondary key: the torrent's info_hash
+        auto const i = memcmp(a->info_hash, b->info_hash, SHA_DIGEST_LENGTH);
+        if (i != 0)
+        {
+            return i;
+        }
+
+        // tertiary key: the tracker's announce url
+        return tr_strcmp0(a->url, b->url);
     }
 
-    /* secondary key: the torrent's info_hash */
-    if ((i = memcmp(a->info_hash, b->info_hash, SHA_DIGEST_LENGTH)) != 0)
+    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const
     {
-        return i;
+        return compare(a, b) < 0;
     }
+};
 
-    /* tertiary key: the tracker's announce url */
-    return tr_strcmp0(a->url, b->url);
-}
+} // namespace
 
 /***
 ****
@@ -171,7 +154,7 @@ static int compareScrapeInfo(void const* va, void const* vb)
  */
 typedef struct tr_announcer
 {
-    tr_ptrArray stops; /* tr_announce_request */
+    std::set<tr_announce_request*, StopsCompare> stops;
     tr_ptrArray scrape_info; /* struct tr_scrape_info */
 
     tr_session* session;
@@ -211,8 +194,7 @@ void tr_announcerInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_announcer* a = tr_new0(tr_announcer, 1);
-    a->stops = {};
+    auto* a = new tr_announcer{};
     a->key = tr_rand_int(INT_MAX);
     a->session = session;
     a->upkeepTimer = evtimer_new(session->event_base, onUpkeepTimer, a);
@@ -234,11 +216,10 @@ void tr_announcerClose(tr_session* session)
     event_free(announcer->upkeepTimer);
     announcer->upkeepTimer = nullptr;
 
-    tr_ptrArrayDestruct(&announcer->stops, nullptr);
     tr_ptrArrayDestruct(&announcer->scrape_info, scrapeInfoFree);
 
     session->announcer = nullptr;
-    tr_free(announcer);
+    delete announcer;
 }
 
 /***
@@ -1012,13 +993,13 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
                 tr_announce_event const e = TR_ANNOUNCE_EVENT_STOPPED;
                 tr_announce_request* req = announce_request_new(announcer, tor, tier, e);
 
-                if (tr_ptrArrayFindSorted(&announcer->stops, req, compareStops) != nullptr)
+                if (announcer->stops.count(req))
                 {
                     announce_request_free(req);
                 }
                 else
                 {
-                    tr_ptrArrayInsertSorted(&announcer->stops, req, compareStops);
+                    announcer->stops.insert(req);
                 }
             }
         }
@@ -1627,16 +1608,12 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
 
 static void flushCloseMessages(tr_announcer* announcer)
 {
-    for (int i = 0, n = tr_ptrArraySize(&announcer->stops); i < n; ++i)
-    {
-        announce_request_delegate(
-            announcer,
-            static_cast<tr_announce_request*>(tr_ptrArrayNth(&announcer->stops, i)),
-            nullptr,
-            nullptr);
-    }
-
-    tr_ptrArrayClear(&announcer->stops);
+    auto& stops = announcer->stops;
+    std::for_each(
+        std::begin(stops),
+        std::end(stops),
+        [&announcer](auto* stop) { announce_request_delegate(announcer, stop, nullptr, nullptr); });
+    stops.clear();
 }
 
 static inline bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
@@ -1685,14 +1662,11 @@ static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */
-    int const xfer = compareTransfer(
-        a->byteCounts[TR_ANN_UP],
-        a->byteCounts[TR_ANN_DOWN],
-        b->byteCounts[TR_ANN_UP],
-        b->byteCounts[TR_ANN_DOWN]);
-    if (xfer)
+    auto const xa = a->byteCounts[TR_ANN_UP] + a->byteCounts[TR_ANN_DOWN];
+    auto const xb = b->byteCounts[TR_ANN_UP] + b->byteCounts[TR_ANN_DOWN];
+    if (xa != xb)
     {
-        return xfer;
+        return xa > xb ? -1 : 1;
     }
 
     // announcements that have been waiting longer go first
