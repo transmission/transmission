@@ -27,7 +27,6 @@
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
-#include "ptrarray.h"
 #include "rpcimpl.h"
 #include "rpc-server.h"
 #include "session.h"
@@ -108,21 +107,14 @@ static void send_simple_response(struct evhttp_request* req, int code, char cons
 
 struct tr_mimepart
 {
-    char* headers;
-    size_t headers_len;
-    char* body;
-    size_t body_len;
+    std::string headers;
+    std::string body;
 };
 
-static void tr_mimepart_free(struct tr_mimepart* p)
+static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct evbuffer* body)
 {
-    tr_free(p->body);
-    tr_free(p->headers);
-    tr_free(p);
-}
+    auto ret = std::vector<tr_mimepart>{};
 
-static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct evbuffer* body, tr_ptrArray* setme_parts)
-{
     char const* content_type = evhttp_find_header(headers, "Content-Type");
     char const* in = (char const*)evbuffer_pullup(body, -1);
     size_t inlen = evbuffer_get_length(body);
@@ -152,17 +144,17 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
 
             if (rnrn != nullptr)
             {
-                struct tr_mimepart* p = tr_new(struct tr_mimepart, 1);
-                p->headers_len = (size_t)(rnrn - part);
-                p->headers = tr_strndup(part, p->headers_len);
-                p->body_len = (size_t)((part + part_len) - (rnrn + 4));
-                p->body = tr_strndup(rnrn + 4, p->body_len);
-                tr_ptrArrayAppend(setme_parts, p);
+                auto tmp = tr_mimepart{};
+                tmp.headers.assign(part, rnrn - part);
+                tmp.body.assign(rnrn + 4, (part + part_len) - (rnrn + 4));
+                ret.push_back(tmp);
             }
         }
     }
 
     tr_free(boundary);
+
+    return ret;
 }
 
 static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* server)
@@ -173,26 +165,21 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
     }
     else
     {
-        int n;
         bool hasSessionId = false;
-        auto parts = tr_ptrArray{};
 
         char const* query = strchr(req->uri, '?');
         bool const paused = query != nullptr && strstr(query + 1, "paused=true") != nullptr;
 
-        extract_parts_from_multipart(req->input_headers, req->input_buffer, &parts);
-        n = tr_ptrArraySize(&parts);
+        auto const parts = extract_parts_from_multipart(req->input_headers, req->input_buffer);
 
         /* first look for the session id */
-        for (int i = 0; i < n; ++i)
+        for (auto const& p : parts)
         {
-            auto const* const p = static_cast<struct tr_mimepart const*>(tr_ptrArrayNth(&parts, i));
-
-            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != nullptr)
+            if (tr_strcasestr(p.headers.c_str(), TR_RPC_SESSION_ID_HEADER) != nullptr)
             {
                 char const* ours = get_current_session_id(server);
                 size_t const ourlen = strlen(ours);
-                hasSessionId = ourlen <= p->body_len && memcmp(p->body, ours, ourlen) == 0;
+                hasSessionId = ourlen <= std::size(p.body) && memcmp(p.body.c_str(), ours, ourlen) == 0;
                 break;
             }
         }
@@ -208,15 +195,14 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         }
         else
         {
-            for (int i = 0; i < n; ++i)
+            for (auto const& p : parts)
             {
-                auto const* const p = static_cast<struct tr_mimepart const*>(tr_ptrArrayNth(&parts, i));
-                size_t body_len = p->body_len;
+                auto const& body = p.body;
+                size_t body_len = std::size(body);
                 tr_variant top;
                 tr_variant* args;
                 tr_variant test;
                 bool have_source = false;
-                char const* body = p->body;
 
                 if (body_len >= 2 && memcmp(&body[body_len - 2], "\r\n", 2) == 0)
                 {
@@ -228,14 +214,14 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                 args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddBool(args, TR_KEY_paused, paused);
 
-                if (tr_urlIsValid(body, body_len))
+                if (tr_urlIsValid(body.c_str(), body_len))
                 {
-                    tr_variantDictAddRaw(args, TR_KEY_filename, body, body_len);
+                    tr_variantDictAddRaw(args, TR_KEY_filename, body.c_str(), body_len);
                     have_source = true;
                 }
-                else if (tr_variantFromBenc(&test, body, body_len) == 0)
+                else if (tr_variantFromBenc(&test, body.c_str(), body_len) == 0)
                 {
-                    auto* b64 = static_cast<char*>(tr_base64_encode(body, body_len, nullptr));
+                    auto* b64 = static_cast<char*>(tr_base64_encode(body.c_str(), body_len, nullptr));
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
                     tr_free(b64);
                     have_source = true;
@@ -249,8 +235,6 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                 tr_variantFree(&top);
             }
         }
-
-        tr_ptrArrayDestruct(&parts, (PtrArrayForeachFunc)tr_mimepart_free);
 
         /* send "success" response */
         {
