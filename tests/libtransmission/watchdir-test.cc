@@ -360,6 +360,8 @@ TEST_P(WatchDirTest, retry)
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
     EXPECT_EQ(test_file, wd_data.name);
+
+    tr_watchdir_free(wd);
 }
 
 INSTANTIATE_TEST_SUITE_P( //

@@ -12,14 +12,15 @@
 #error only the libtransmission watchdir module should #include this header.
 #endif
 
-struct tr_ptrArray;
+#include <string>
+#include <unordered_set>
 
 typedef struct tr_watchdir_backend
 {
     void (*free_func)(struct tr_watchdir_backend*);
 } tr_watchdir_backend;
 
-#define BACKEND_DOWNCAST(b) ((tr_watchdir_backend*)(b))
+#define BACKEND_DOWNCAST(b) (reinterpret_cast<tr_watchdir_backend*>(b))
 
 /* ... */
 
@@ -31,7 +32,7 @@ struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle);
 
 void tr_watchdir_process(tr_watchdir_t handle, char const* name);
 
-void tr_watchdir_scan(tr_watchdir_t handle, struct tr_ptrArray* dir_entries);
+void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir_entries);
 
 /* ... */
 

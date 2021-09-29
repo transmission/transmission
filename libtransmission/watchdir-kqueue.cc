@@ -8,6 +8,8 @@
 
 #include <errno.h>
 #include <string.h> /* strcmp() */
+#include <string>
+#include <unordered_set>
 
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* close() */
@@ -25,7 +27,6 @@
 
 #include "transmission.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
@@ -50,10 +51,10 @@ typedef struct tr_watchdir_kqueue
     int kq;
     int dirfd;
     struct event* event;
-    tr_ptrArray dir_entries;
+    std::unordered_set<std::string> dir_entries;
 } tr_watchdir_kqueue;
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_kqueue*)(b))
+#define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_kqueue*>(b))
 
 #define KQUEUE_WATCH_MASK (NOTE_WRITE | NOTE_EXTEND)
 
@@ -108,18 +109,15 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
         close(backend->dirfd);
     }
 
-    tr_ptrArrayDestruct(&backend->dir_entries, &tr_free);
-
-    tr_free(backend);
+    delete backend;
 }
 
 tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 {
     char const* const path = tr_watchdir_get_path(handle);
     struct kevent ke;
-    tr_watchdir_kqueue* backend;
 
-    backend = tr_new0(tr_watchdir_kqueue, 1);
+    auto* backend = tr_watchdir_kqueue{};
     backend->base.free_func = &tr_watchdir_kqueue_free;
     backend->kq = -1;
     backend->dirfd = -1;
