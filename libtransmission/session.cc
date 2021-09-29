@@ -46,7 +46,6 @@
 #include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
-#include "ptrarray.h"
 #include "rpc-server.h"
 #include "session.h"
 #include "session-id.h"
