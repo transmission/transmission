@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring> /* memcpy */
+#include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
 #include <vector>
@@ -2419,8 +2420,7 @@ static void loadBlocklists(tr_session* session)
     tr_sys_dir_t odir;
     char* dirname;
     char const* name;
-    auto blocklists = std::list<tr_blocklistFile*>{};
-    auto loadme = tr_ptrArray{};
+    auto loadme = std::unordered_set<std::string>{};
     bool const isEnabled = session->isBlocklistEnabled;
 
     /* walk the blocklist directory... */
@@ -2500,35 +2500,23 @@ static void loadBlocklists(tr_session* session)
 
         if (load != nullptr)
         {
-            if (tr_ptrArrayFindSorted(&loadme, load, (PtrArrayCompareFunc)strcmp) == nullptr)
-            {
-                tr_ptrArrayInsertSorted(&loadme, load, (PtrArrayCompareFunc)strcmp);
-            }
-            else
-            {
-                tr_free(load);
-            }
+            loadme.emplace(load);
+            tr_free(load);
         }
 
         tr_free(path);
     }
 
-    if (!tr_ptrArrayEmpty(&loadme))
-    {
-        int const n = tr_ptrArraySize(&loadme);
-        char const* const* paths = (char const* const*)tr_ptrArrayBase(&loadme);
-
-        for (int i = 0; i < n; ++i)
-        {
-            blocklists.push_back(tr_blocklistFileNew(paths[i], isEnabled));
-        }
-    }
+    session->blocklists.clear();
+    std::transform(
+        std::begin(loadme),
+        std::end(loadme),
+        std::back_inserter(session->blocklists),
+        [&isEnabled](auto const& path) { return tr_blocklistFileNew(path.c_str(), isEnabled); });
 
     /* cleanup */
     tr_sys_dir_close(odir, nullptr);
     tr_free(dirname);
-    tr_ptrArrayDestruct(&loadme, (PtrArrayForeachFunc)tr_free);
-    session->blocklists = blocklists;
 }
 
 static void closeBlocklists(tr_session* session)
