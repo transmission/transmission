@@ -14,6 +14,8 @@
 #include <cstdarg>
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcmp */
+#include <set>
+#include <string>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -2959,9 +2961,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
  */
 static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 {
-    auto files = tr_ptrArray{};
-    auto folders = tr_ptrArray{};
-    PtrArrayCompareFunc vstrcmp = (PtrArrayCompareFunc)strcmp;
+    auto files = std::vector<std::string>{};
+    auto folders = std::set<std::string>{};
     char const* const top = tor->currentDir;
 
     /* don't try to delete local data if the directory's gone missing */
@@ -3011,8 +3012,9 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
         {
             char* target = tr_buildPath(tmpdir, tor->info.files[f].name, nullptr);
             tr_moveFile(filename, target, nullptr);
-            tr_ptrArrayAppend(&files, target);
+            files.emplace_back(target);
             tr_free(filename);
+            tr_free(target);
         }
     }
 
@@ -3045,9 +3047,9 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     }
 
     /* go from the bottom up */
-    for (int i = 0, n = tr_ptrArraySize(&files); i < n; ++i)
+    for (auto const& file : files)
     {
-        char* walk = tr_strdup(tr_ptrArrayNth(&files, i));
+        char* walk = tr_strdup(file.c_str());
 
         while (tr_sys_path_exists(walk, nullptr) && !tr_sys_path_is_same(tmpdir, walk, nullptr))
         {
@@ -3091,11 +3093,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 
                 if (tr_sys_path_is_same(top, parent, nullptr) || strcmp(top, parent) == 0)
                 {
-                    if (tr_ptrArrayFindSorted(&folders, dir, vstrcmp) == nullptr)
-                    {
-                        tr_ptrArrayInsertSorted(&folders, tr_strdup(dir), vstrcmp);
-                    }
-
+                    folders.emplace(dir);
                     tr_free(parent);
                     break;
                 }
@@ -3109,16 +3107,14 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
         tr_free(dir);
     }
 
-    for (int i = 0, n = tr_ptrArraySize(&folders); i < n; ++i)
+    for (auto const& folder : folders)
     {
-        removeEmptyFoldersAndJunkFiles(static_cast<char const*>(tr_ptrArrayNth(&folders, i)));
+        removeEmptyFoldersAndJunkFiles(folder.c_str());
     }
 
     /* cleanup */
     tr_sys_path_remove(tmpdir, nullptr);
     tr_free(tmpdir);
-    tr_ptrArrayDestruct(&folders, tr_free);
-    tr_ptrArrayDestruct(&files, tr_free);
 }
 
 static void tr_torrentDeleteLocalData(tr_torrent* tor, tr_fileFunc func)
