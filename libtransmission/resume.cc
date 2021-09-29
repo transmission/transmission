@@ -106,12 +106,11 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 
 static void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
-    size_t const n = tr_ptrArraySize(&tor->labels);
-    tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, n);
-    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
-    for (size_t i = 0; i < n; ++i)
+    auto const& labels = tor->labels;
+    tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
+    for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, labels[i]);
+        tr_variantListAddStr(list, label.c_str());
     }
 }
 
@@ -128,7 +127,7 @@ static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
         {
             if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr && str_len != 0)
             {
-                tr_ptrArrayAppend(&tor->labels, tr_strndup(str, str_len));
+                tor->labels.emplace(str, str_len);
             }
         }
 

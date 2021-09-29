@@ -68,29 +68,6 @@ TEST_F(UtilsTest, trStrstrip)
     tr_free(in);
 }
 
-TEST_F(UtilsTest, trStrjoin)
-{
-    auto const in1 = std::array<char const*, 2>{ "one", "two" };
-    auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
-    EXPECT_EQ("one, two", out);
-
-    auto const in2 = std::array<char const*, 1>{ "hello" };
-    out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
-    EXPECT_EQ("hello", out);
-
-    auto const in3 = std::array<char const*, 5>{ "a", "b", "ccc", "d", "eeeee" };
-    out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
-    EXPECT_EQ("a b ccc d eeeee", out);
-
-    auto const in4 = std::array<char const*, 3>{ "7", "ate", "9" };
-    out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
-    EXPECT_EQ("7ate9", out);
-
-    char const** in5 = nullptr;
-    out = makeString(tr_strjoin(in5, 0, "a"));
-    EXPECT_EQ("", out);
-}
-
 TEST_F(UtilsTest, trBuildpath)
 {
     auto out = makeString(tr_buildPath("foo", "bar", nullptr));

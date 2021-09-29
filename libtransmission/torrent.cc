@@ -15,6 +15,7 @@
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcmp */
 #include <set>
+#include <sstream>
 #include <string>
 
 #ifndef _WIN32
@@ -42,7 +43,6 @@
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
 #include "platform.h" /* TR_PATH_DELIMITER_STR */
-#include "ptrarray.h"
 #include "resume.h"
 #include "session.h"
 #include "subprocess.h"
@@ -867,7 +867,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = tr_sessionCountTorrents(session);
-    tor->labels = {};
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
 
@@ -1077,7 +1076,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
 
     if (r == TR_PARSE_OK)
     {
-        tor = tr_new0(tr_torrent, 1);
+        tor = new tr_torrent{};
         tor->info = tmpInfo;
 
         if (hasInfo)
@@ -1639,11 +1638,9 @@ static void freeTorrent(tr_torrent* tor)
     TR_ASSERT(queueIsSequenced(session));
 
     tr_bandwidthDestruct(&tor->bandwidth);
-    tr_ptrArrayDestruct(&tor->labels, tr_free);
 
     tr_metainfoFree(inf);
-    memset(tor, ~0, sizeof(tr_torrent));
-    tr_free(tor);
+    delete tor;
 
     tr_sessionUnlock(session);
 }
@@ -2109,6 +2106,23 @@ void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
     tr_torrentSetIdleLimitHitCallback(torrent, nullptr, nullptr);
 }
 
+static std::string buildLabelsString(tr_torrent const* tor)
+{
+    auto buf = std::stringstream{};
+
+    for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
+    {
+        buf << *it;
+
+        if (++it != end)
+        {
+            buf << ',';
+        }
+    }
+
+    return buf.str();
+}
+
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
     if (tr_str_is_empty(script))
@@ -2129,8 +2143,6 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         nullptr,
     };
 
-    char* labels = tr_strjoin((char const* const*)tr_ptrArrayBase(&tor->labels), tr_ptrArraySize(&tor->labels), ",");
-
     char* const env[] = {
         tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
         tr_strdup_printf("TR_TIME_LOCALTIME=%s", ctime_str),
@@ -2138,7 +2150,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
         tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
-        tr_strdup_printf("TR_TORRENT_LABELS=%s", labels),
+        tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
         nullptr,
     };
 
@@ -2154,7 +2166,6 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     tr_free_ptrv((void* const*)env);
     tr_free_ptrv((void* const*)cmd);
-    tr_free(labels);
     tr_free(torrent_dir);
 }
 
@@ -2412,21 +2423,13 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
+void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tr_torrentLock(tor);
 
-    tr_ptrArrayDestruct(&tor->labels, tr_free);
-    tor->labels = {};
-    char** l = (char**)tr_ptrArrayBase(labels);
-    int const n = tr_ptrArraySize(labels);
-    for (int i = 0; i < n; i++)
-    {
-        tr_ptrArrayAppend(&tor->labels, tr_strdup(l[i]));
-    }
-
+    tor->labels = std::move(labels);
     tr_torrentSetDirty(tor);
 
     tr_torrentUnlock(tor);
