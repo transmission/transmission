@@ -472,12 +472,10 @@ static char const* torrentVerify(
 
 static void addLabels(tr_torrent const* tor, tr_variant* list)
 {
-    int const labelsCount = tr_ptrArraySize(&tor->labels);
-    tr_variantInitList(list, labelsCount);
-    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
-    for (int i = 0; i < labelsCount; ++i)
+    tr_variantInitList(list, std::size(tor->labels));
+    for (auto const& label : tor->labels)
     {
-        tr_variantListAddStr(list, labels[i]);
+        tr_variantListAddStr(list, label.c_str());
     }
 }
 
@@ -1079,8 +1077,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
     size_t const n = tr_variantListSize(list);
     char const* errmsg = nullptr;
-    auto labels = tr_ptrArray{};
-    int labelcount = 0;
+    auto labels = tr_labels_t{};
     for (size_t i = 0; i < n; ++i)
     {
         char const* str;
@@ -1099,26 +1096,13 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
                 errmsg = "labels cannot contain comma (,) character";
             }
 
-            if (errmsg == nullptr)
+            if (errmsg == nullptr && labels.count(label) != 0)
             {
-                bool dup = false;
-                for (int j = 0; j < labelcount; j++)
-                {
-                    if (tr_strcmp0(label, (char*)tr_ptrArrayNth(&labels, j)) == 0)
-                    {
-                        dup = true;
-                        break;
-                    }
-                }
-
-                if (dup)
-                {
-                    errmsg = "labels cannot contain duplicates";
-                }
+                errmsg = "labels cannot contain duplicates";
             }
 
-            tr_ptrArrayAppend(&labels, label);
-            labelcount++;
+            labels.emplace(label);
+            tr_free(label);
 
             if (errmsg != nullptr)
             {
@@ -1129,10 +1113,9 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 
     if (errmsg == nullptr)
     {
-        tr_torrentSetLabels(tor, &labels);
+        tr_torrentSetLabels(tor, std::move(labels));
     }
 
-    tr_ptrArrayDestruct(&labels, tr_free);
     return errmsg;
 }
 
