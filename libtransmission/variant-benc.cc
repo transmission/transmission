@@ -7,6 +7,7 @@
  */
 
 #include <ctype.h> /* isdigit() */
+#include <deque>
 #include <errno.h>
 #include <stdlib.h> /* strtoul() */
 #include <string.h> /* strlen(), memchr() */
@@ -16,7 +17,6 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "ptrarray.h"
 #include "utils.h" /* tr_snprintf() */
 #include "variant.h"
 #include "variant-common.h"
@@ -127,17 +127,17 @@ int tr_bencParseStr(
     return EILSEQ;
 }
 
-static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, int* err)
+static tr_variant* get_node(std::deque<tr_variant*>& stack, tr_quark* key, tr_variant* top, int* err)
 {
     tr_variant* node = nullptr;
 
-    if (tr_ptrArrayEmpty(stack))
+    if (std::empty(stack))
     {
         node = top;
     }
     else
     {
-        auto* parent = static_cast<tr_variant*>(tr_ptrArrayBack(stack));
+        auto* parent = stack.back();
 
         if (tr_variantIsList(parent))
         {
@@ -167,7 +167,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     int err = 0;
     auto const* buf = static_cast<uint8_t const*>(buf_in);
     auto const* const bufend = static_cast<uint8_t const*>(bufend_in);
-    auto stack = tr_ptrArray{};
+    auto stack = std::deque<tr_variant*>{};
     tr_quark key = 0;
 
     if ((buf_in == nullptr) || (bufend_in == nullptr) || (top == nullptr))
@@ -202,7 +202,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
+            if ((v = get_node(stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitInt(v, val);
             }
@@ -213,10 +213,10 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
+            if ((v = get_node(stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitList(v, 0);
-                tr_ptrArrayAppend(&stack, v);
+                stack.push_back(v);
             }
         }
         else if (*buf == 'd') /* dict */
@@ -225,26 +225,26 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)) != nullptr)
+            if ((v = get_node(stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitDict(v, 0);
-                tr_ptrArrayAppend(&stack, v);
+                stack.push_back(v);
             }
         }
         else if (*buf == 'e') /* end of list or dict */
         {
             ++buf;
 
-            if (tr_ptrArrayEmpty(&stack) || key != 0)
+            if (std::empty(stack) || key != 0)
             {
                 err = EILSEQ;
                 break;
             }
             else
             {
-                tr_ptrArrayPop(&stack);
+                stack.pop_back();
 
-                if (tr_ptrArrayEmpty(&stack))
+                if (std::empty(stack))
                 {
                     break;
                 }
@@ -264,11 +264,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if (key == 0 && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(static_cast<tr_variant*>(tr_ptrArrayBack(&stack))))
+            if (key == 0 && !std::empty(stack) && tr_variantIsDict(stack.back()))
             {
                 key = tr_quark_new(str, str_len);
             }
-            else if ((v = get_node(&stack, &key, top, &err)) != nullptr)
+            else if ((v = get_node(stack, &key, top, &err)) != nullptr)
             {
                 tr_variantInitStr(v, str, str_len);
             }
@@ -278,13 +278,13 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             ++buf;
         }
 
-        if (tr_ptrArrayEmpty(&stack))
+        if (std::empty(stack))
         {
             break;
         }
     }
 
-    if (err == 0 && (top->type == 0 || !tr_ptrArrayEmpty(&stack)))
+    if (err == 0 && (top->type == 0 || !std::empty(stack)))
     {
         err = EILSEQ;
     }
@@ -302,7 +302,6 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         tr_variantInit(top, 0);
     }
 
-    tr_ptrArrayDestruct(&stack, nullptr);
     return err;
 }
 
