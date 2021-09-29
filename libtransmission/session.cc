@@ -2963,7 +2963,7 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
     return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
 }
 
-void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted, tr_ptrArray* setme)
+std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted)
 {
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(direction));
@@ -2991,11 +2991,7 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
         candidates.resize(num_wanted);
     }
 
-    // add them to the return array
-    for (auto* candidate : candidates)
-    {
-        tr_ptrArrayAppend(setme, candidate);
-    }
+    return candidates;
 }
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
