@@ -8,6 +8,7 @@
 
 #include <errno.h> /* errno, EAFNOSUPPORT */
 #include <string.h> /* memcpy(), memset() */
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/dns.h>
@@ -157,8 +158,7 @@ enum
 
 struct tau_scrape_request
 {
-    void* payload;
-    size_t payload_len;
+    std::vector<uint8_t> payload;
 
     time_t sent_at;
     time_t created_at;
@@ -174,30 +174,29 @@ static struct tau_scrape_request* tau_scrape_request_new(
     tr_scrape_response_func callback,
     void* user_data)
 {
-    struct evbuffer* buf;
-    struct tau_scrape_request* req;
     tau_transaction_t const transaction_id = tau_transaction_new();
 
     /* build the payload */
-    buf = evbuffer_new();
+    auto* buf = evbuffer_new();
     evbuffer_add_hton_32(buf, TAU_ACTION_SCRAPE);
     evbuffer_add_hton_32(buf, transaction_id);
-
     for (int i = 0; i < in->info_hash_count; ++i)
     {
         evbuffer_add(buf, in->info_hash[i], SHA_DIGEST_LENGTH);
     }
+    auto const& payload = evbuffer_pullup(buf, -1);
 
     /* build the tau_scrape_request */
-    req = tr_new0(struct tau_scrape_request, 1);
+
+    auto* req = new tau_scrape_request{};
+    req->callback = callback;
     req->created_at = tr_time();
     req->transaction_id = transaction_id;
     req->callback = callback;
     req->user_data = user_data;
     req->response.url = tr_strdup(in->url);
     req->response.row_count = in->info_hash_count;
-    req->payload_len = evbuffer_get_length(buf);
-    req->payload = tr_memdup(evbuffer_pullup(buf, -1), req->payload_len);
+    req->payload.assign(payload, payload + evbuffer_get_length(buf));
 
     for (int i = 0; i < req->response.row_count; ++i)
     {
@@ -216,8 +215,7 @@ static void tau_scrape_request_free(struct tau_scrape_request* req)
 {
     tr_free(req->response.errmsg);
     tr_free(req->response.url);
-    tr_free(req->payload);
-    tr_free(req);
+    delete req;
 }
 
 static void tau_scrape_request_finished(struct tau_scrape_request const* request)
@@ -585,7 +583,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
         {
             dbgmsg(tracker->key, "sending scrape req %p", (void*)req);
             req->sent_at = now;
-            tau_tracker_send_request(tracker, req->payload, req->payload_len);
+            tau_tracker_send_request(tracker, std::data(req->payload), std::size(req->payload));
 
             if (req->callback == nullptr)
             {
