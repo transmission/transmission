@@ -28,7 +28,7 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
+#define dbgmsg(name, ...) tr_logAddDeepNamed((name).c_str(), __VA_ARGS__)
 
 /****
 *****
@@ -441,25 +441,33 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
 
 struct tau_tracker
 {
-    tr_session* session;
+    tr_session* const session;
 
-    char* key;
-    char* host;
-    int port;
+    std::string const key;
+    std::string const host;
+    int const port;
 
-    struct evdns_getaddrinfo_request* dns_request;
-    struct evutil_addrinfo* addr;
-    time_t addr_expiration_time;
+    struct evdns_getaddrinfo_request* dns_request = nullptr;
+    struct evutil_addrinfo* addr = nullptr;
+    time_t addr_expiration_time = 0;
 
-    time_t connecting_at;
-    time_t connection_expiration_time;
-    tau_connection_t connection_id;
-    tau_transaction_t connection_transaction_id;
+    time_t connecting_at = 0;
+    time_t connection_expiration_time = 0;
+    tau_connection_t connection_id = 0;
+    tau_transaction_t connection_transaction_id = 0;
 
-    time_t close_at;
+    time_t close_at = 0;
 
-    tr_ptrArray announces;
-    tr_ptrArray scrapes;
+    tr_ptrArray announces = {};
+    tr_ptrArray scrapes = {};
+
+    tau_tracker(tr_session* session_in, std::string const& key_in, std::string const& host_in, int port_in)
+        : session{ session_in }
+        , key{ key_in }
+        , host{ host_in }
+        , port{ port_in }
+    {
+    }
 };
 
 static void tau_tracker_upkeep(struct tau_tracker*);
@@ -475,9 +483,7 @@ static void tau_tracker_free(struct tau_tracker* t)
 
     tr_ptrArrayDestruct(&t->announces, (PtrArrayForeachFunc)tau_announce_request_free);
     tr_ptrArrayDestruct(&t->scrapes, (PtrArrayForeachFunc)tau_scrape_request_free);
-    tr_free(t->host);
-    tr_free(t->key);
-    tr_free(t);
+    delete t;
 }
 
 static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, char const* errmsg)
@@ -710,7 +716,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tracker->host,
+            tracker->host.c_str(),
             nullptr,
             &hints,
             tau_tracker_on_dns,
@@ -805,7 +811,7 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
     {
         auto* tmp = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
 
-        if (tr_strcmp0(tmp->key, key) == 0)
+        if (tmp->key == key)
         {
             tracker = tmp;
         }
@@ -814,13 +820,7 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
     /* if we don't have a match, build a new tracker */
     if (tracker == nullptr)
     {
-        tracker = tr_new0(struct tau_tracker, 1);
-        tracker->session = tau->session;
-        tracker->key = key;
-        tracker->host = host;
-        tracker->port = port;
-        tracker->scrapes = {};
-        tracker->announces = {};
+        tracker = new tau_tracker{ tau->session, key, host, port };
         tr_ptrArrayAppend(&tau->trackers, tracker);
         dbgmsg(tracker->key, "New tau_tracker created");
     }
