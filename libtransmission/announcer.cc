@@ -12,6 +12,7 @@
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
 #include <set>
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
@@ -129,25 +130,16 @@ struct StopsCompare
 
 struct tr_scrape_info
 {
-    char* url;
+    std::string const url;
 
     int multiscrape_max;
+
+    tr_scrape_info(std::string const& url_in, int const multiscrape_max_in)
+        : url{ url_in }
+        , multiscrape_max{ multiscrape_max_in }
+    {
+    }
 };
-
-static void scrapeInfoFree(void* va)
-{
-    auto* a = static_cast<struct tr_scrape_info*>(va);
-
-    tr_free(a->url);
-    tr_free(a);
-}
-
-static int compareScrapeInfo(void const* va, void const* vb)
-{
-    auto const* a = static_cast<struct tr_scrape_info const*>(va);
-    auto const* b = static_cast<struct tr_scrape_info const*>(vb);
-    return tr_strcmp0(a->url, b->url);
-}
 
 /**
  * "global" (per-tr_session) fields
@@ -155,7 +147,7 @@ static int compareScrapeInfo(void const* va, void const* vb)
 typedef struct tr_announcer
 {
     std::set<tr_announce_request*, StopsCompare> stops;
-    tr_ptrArray scrape_info; /* struct tr_scrape_info */
+    std::map<std::string, tr_scrape_info> scrape_info;
 
     tr_session* session;
     struct event* upkeepTimer;
@@ -169,20 +161,10 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 
     if (!tr_str_is_empty(url))
     {
-        bool found;
-        auto const key = tr_scrape_info{ const_cast<char*>(url), {} };
-        int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
-        if (found)
-        {
-            info = static_cast<struct tr_scrape_info*>(tr_ptrArrayNth(&announcer->scrape_info, pos));
-        }
-        else
-        {
-            info = tr_new0(struct tr_scrape_info, 1);
-            info->url = tr_strdup(url);
-            info->multiscrape_max = TR_MULTISCRAPE_MAX;
-            tr_ptrArrayInsert(&announcer->scrape_info, info, pos);
-        }
+        auto const urlstr = std::string{ url };
+        auto& scrapes = announcer->scrape_info;
+        auto const it = scrapes.try_emplace(urlstr, urlstr, TR_MULTISCRAPE_MAX);
+        info = &it.first->second;
     }
 
     return info;
@@ -215,8 +197,6 @@ void tr_announcerClose(tr_session* session)
 
     event_free(announcer->upkeepTimer);
     announcer->upkeepTimer = nullptr;
-
-    tr_ptrArrayDestruct(&announcer->scrape_info, scrapeInfoFree);
 
     session->announcer = nullptr;
     delete announcer;
@@ -1389,7 +1369,7 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
-        if (tracker != nullptr && tracker->scrape_info != nullptr && tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
+        if (tracker != nullptr && tracker->scrape_info != nullptr && tracker->scrape_info->url == scrape)
         {
             return &tt->tiers[i];
         }
@@ -1575,7 +1555,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            if (tr_strcmp0(req->url, scrape_info->url) != 0)
+            if (scrape_info->url != req->url)
             {
                 continue;
             }
@@ -1590,7 +1570,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         if (!found && request_count < MAX_SCRAPES_PER_UPKEEP)
         {
             tr_scrape_request* req = &requests[request_count++];
-            req->url = scrape_info->url;
+            req->url = scrape_info->url.c_str();
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
             memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
@@ -1802,7 +1782,7 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
 
             if (tracker->scrape_info != nullptr)
             {
-                tr_strlcpy(st->scrape, tracker->scrape_info->url, sizeof(st->scrape));
+                tr_strlcpy(st->scrape, tracker->scrape_info->url.c_str(), sizeof(st->scrape));
             }
             else
             {
