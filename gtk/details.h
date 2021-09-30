@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,12 +8,27 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
-#include <gtk/gtk.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
-#include "tr-core.h"
+typedef struct _TrCore TrCore;
 
-GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core);
+class DetailsDialog : public Gtk::Dialog
+{
+public:
+    ~DetailsDialog() override;
 
-void gtr_torrent_details_dialog_set_torrents(GtkWidget* details_dialog, std::vector<int> const& torrent_ids);
+    static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, TrCore* core);
+
+    void set_torrents(std::vector<int> const& torrent_ids);
+
+protected:
+    DetailsDialog(Gtk::Window& parent, TrCore* core);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};

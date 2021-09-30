@@ -975,7 +975,7 @@ GtkWidget* gtr_file_list_new(TrCore* core, int torrentId)
     gtk_container_set_border_width(GTK_CONTAINER(view), GUI_PAD_BIG);
     g_signal_connect(view, "button-press-event", G_CALLBACK(onViewButtonPressed), data);
     g_signal_connect(view, "row_activated", G_CALLBACK(onRowActivated), data);
-    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), nullptr);
+    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released_old), NULL);
 
     pango_context = gtk_widget_create_pango_context(view);
     pango_font_description = pango_font_description_copy(pango_context_get_font_description(pango_context));

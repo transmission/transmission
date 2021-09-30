@@ -831,7 +831,7 @@ static GtkWidget* remotePage(GObject* core)
 
         page->store = GTK_LIST_STORE(m);
         w = gtk_tree_view_new_with_model(m);
-        g_signal_connect(w, "button-release-event", G_CALLBACK(on_tree_view_button_released), nullptr);
+        g_signal_connect(w, "button-release-event", G_CALLBACK(on_tree_view_button_released_old), NULL);
 
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         v = page->view = GTK_TREE_VIEW(w);

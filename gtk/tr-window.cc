@@ -74,10 +74,8 @@ static PrivateData* get_private_data(GtkWindow* w)
 ****
 ***/
 
-static void on_popup_menu(GtkWidget* self, GdkEventButton* event)
+static void on_popup_menu(GdkEventButton* event)
 {
-    TR_UNUSED(self);
-
     GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
 
 #if GTK_CHECK_VERSION(3, 22, 0)
@@ -162,10 +160,10 @@ static GtkWidget* makeview(PrivateData* p)
     sel = gtk_tree_view_get_selection(tree_view);
     gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
 
-    g_signal_connect(view, "popup-menu", G_CALLBACK(on_popup_menu), nullptr);
-    g_signal_connect(view, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), (void*)on_popup_menu);
-    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), nullptr);
-    g_signal_connect(view, "row-activated", G_CALLBACK(view_row_activated), nullptr);
+    g_signal_connect_swapped(view, "popup-menu", G_CALLBACK(on_popup_menu), NULL);
+    g_signal_connect(view, "button-press-event", G_CALLBACK(on_tree_view_button_pressed_old), (void*)on_popup_menu);
+    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released_old), NULL);
+    g_signal_connect(view, "row-activated", G_CALLBACK(view_row_activated), NULL);
 
     gtk_tree_view_set_model(tree_view, p->filter_model);
     g_object_unref(p->filter_model);

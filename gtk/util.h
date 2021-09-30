@@ -8,10 +8,12 @@
 
 #pragma once
 
+#include <functional>
 #include <sys/types.h>
 #include <glib.h>
 #include <glibmm.h>
 #include <gtk/gtk.h>
+#include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
@@ -146,10 +148,15 @@ void gtr_add_torrent_error_dialog(GtkWidget* window_or_child, int err, tr_torren
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpointer unused);
+gboolean on_tree_view_button_pressed_old(GtkWidget* view, GdkEventButton* event, gpointer unused);
+bool on_tree_view_button_pressed(
+    Gtk::TreeView* view,
+    GdkEventButton* event,
+    std::function<void(GdkEventButton*)> const& callback = {});
 
 /* if the click didn't specify a row, clear the selection */
-gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer unused);
+gboolean on_tree_view_button_released_old(GtkWidget* view, GdkEventButton* event, gpointer unused);
+bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
 bool gtr_file_trash_or_remove(char const* filename, struct tr_error** error);
@@ -185,5 +192,13 @@ inline RefPtr<T> make_refptr_for_instance(T* object)
 }
 
 #endif
+
+template<typename T>
+T str_strip(T const& text)
+{
+    auto const new_begin = text.find_first_not_of("\t\n\v\f\r ");
+    auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
+    return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin);
+}
 
 } // namespace Glib

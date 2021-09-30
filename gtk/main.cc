@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <locale.h>
 #include <map>
+#include <memory>
 #include <signal.h>
 #include <sstream>
 #include <stdio.h>
@@ -184,11 +185,12 @@ private:
     Glib::RefPtr<Gtk::Window> prefs_;
     std::vector<std::string> error_list_;
     std::vector<std::string> duplicates_list_;
-    std::map<std::string, Glib::RefPtr<Gtk::Window>> details_;
+    std::map<std::string, std::unique_ptr<DetailsDialog>> details_;
     Glib::RefPtr<Gtk::TreeSelection> sel_;
 };
 
-void gtr_window_present(Glib::RefPtr<Gtk::Window> const& window)
+template<typename T>
+void gtr_window_present(T const& window)
 {
     window->present(gtk_get_current_event_time());
 }
@@ -226,26 +228,21 @@ std::vector<int> Application::get_selected_torrent_ids() const
 
 void Application::show_details_dialog_for_selected_torrents()
 {
-    Glib::RefPtr<Gtk::Window> dialog;
     auto const ids = get_selected_torrent_ids();
     auto const key = get_details_dialog_key(ids);
 
-    if (auto const l = details_.find(key); l != details_.end())
+    auto dialog_it = details_.find(key);
+
+    if (dialog_it == details_.end())
     {
-        dialog = l->second;
+        auto dialog = DetailsDialog::create(*wind_.get(), core_);
+        dialog->set_torrents(ids);
+        dialog->signal_hide().connect([this, key]() { details_.erase(key); });
+        dialog_it = details_.emplace(key, std::move(dialog)).first;
+        dialog_it->second->show();
     }
 
-    if (dialog == nullptr)
-    {
-        dialog = Glib::make_refptr_for_instance(
-            Glib::wrap(GTK_WINDOW(gtr_torrent_details_dialog_new(Glib::unwrap(wind_), core_))));
-        gtr_torrent_details_dialog_set_torrents(Glib::unwrap(static_cast<Gtk::Widget*>(dialog.get())), ids);
-        dialog->signal_unrealize().connect([this, key]() { details_.erase(key); });
-        details_.emplace(key, dialog);
-        dialog->show();
-    }
-
-    gtr_window_present(dialog);
+    gtr_window_present(dialog_it->second);
 }
 
 /****

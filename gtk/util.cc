@@ -284,52 +284,61 @@ typedef void (*PopupFunc)(GtkWidget*, GdkEventButton*);
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
 
-gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpointer func)
+gboolean on_tree_view_button_pressed_old(GtkWidget* view, GdkEventButton* event, gpointer func)
 {
-    GtkTreeView* tv = GTK_TREE_VIEW(view);
+    return on_tree_view_button_pressed(
+        Glib::wrap(GTK_TREE_VIEW(view)),
+        event,
+        func == nullptr ? std::function<void(GdkEventButton*)>() : reinterpret_cast<void (*)(GdkEventButton*)>(func));
+}
 
+bool on_tree_view_button_pressed(
+    Gtk::TreeView* view,
+    GdkEventButton* event,
+    std::function<void(GdkEventButton*)> const& callback)
+{
     if (event->type == GDK_BUTTON_PRESS && event->button == 3)
     {
-        GtkTreePath* path;
-        GtkTreeSelection* selection = gtk_tree_view_get_selection(tv);
+        Gtk::TreeModel::Path path;
+        auto const selection = view->get_selection();
 
-        if (gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, &path, nullptr, nullptr, nullptr))
+        if (view->get_path_at_pos((int)event->x, (int)event->y, path))
         {
-            if (!gtk_tree_selection_path_is_selected(selection, path))
+            if (!selection->is_selected(path))
             {
-                gtk_tree_selection_unselect_all(selection);
-                gtk_tree_selection_select_path(selection, path);
+                selection->unselect_all();
+                selection->select(path);
             }
-
-            gtk_tree_path_free(path);
         }
 
-        if (func != nullptr)
+        if (callback)
         {
-            (*(PopupFunc)func)(view, event);
+            callback(event);
         }
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer user_data)
+gboolean on_tree_view_button_released_old(GtkWidget* view, GdkEventButton* event, gpointer /*user_data*/)
 {
-    TR_UNUSED(user_data);
+    return on_tree_view_button_released(Glib::wrap(GTK_TREE_VIEW(view)), event);
+}
 
-    GtkTreeView* tv = GTK_TREE_VIEW(view);
+bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event)
+{
+    Gtk::TreeModel::Path path;
 
-    if (!gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, nullptr, nullptr, nullptr, nullptr))
+    if (!view->get_path_at_pos((int)event->x, (int)event->y, path))
     {
-        GtkTreeSelection* selection = gtk_tree_view_get_selection(tv);
-        gtk_tree_selection_unselect_all(selection);
+        view->get_selection()->unselect_all();
     }
 
-    return FALSE;
+    return false;
 }
 
 bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
