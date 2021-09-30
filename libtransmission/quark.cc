@@ -428,13 +428,6 @@ static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their stri
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
 
-tr_quark append_new_quark(void const* str, size_t len)
-{
-    tr_quark const ret = TR_N_KEYS + std::size(my_runtime);
-    my_runtime.emplace_back(tr_strndup(str, len), len);
-    return ret;
-}
-
 } // namespace
 
 bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
@@ -477,7 +470,8 @@ tr_quark tr_quark_new(void const* str, size_t len)
 
         if (!tr_quark_lookup(str, len, &ret))
         {
-            ret = append_new_quark(str, len);
+            ret = TR_N_KEYS + std::size(my_runtime);
+            my_runtime.emplace_back(tr_strndup(str, len), len);
         }
     }
 
