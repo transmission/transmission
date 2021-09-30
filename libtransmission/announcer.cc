@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
+#include <map>
 #include <set>
 #include <vector>
 
