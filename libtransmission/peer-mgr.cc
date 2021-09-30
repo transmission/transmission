@@ -11,6 +11,7 @@
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcpy, memcmp, strstr */
+#include <vector>
 
 #include <event2/event.h>
 
@@ -724,15 +725,13 @@ static struct block_request* requestListLookup(tr_swarm* s, tr_block_index_t blo
  * Find the peers are we currently requesting the block
  * with index @a block from and append them to @a peerArr.
  */
-static void getBlockRequestPeers(tr_swarm* s, tr_block_index_t block, tr_ptrArray* peerArr)
+static auto getBlockRequestPeers(tr_swarm* s, tr_block_index_t block)
 {
-    bool exact;
-    int pos;
-    struct block_request key;
+    auto peers = std::vector<tr_peer*>{};
 
-    key.block = block;
-    key.peer = nullptr;
-    pos = tr_lowerBound(&key, s->requests, s->requestCount, sizeof(struct block_request), compareReqByBlock, &exact);
+    auto const key = block_request{ block, nullptr, 0 };
+    bool exact;
+    int const pos = tr_lowerBound(&key, s->requests, s->requestCount, sizeof(struct block_request), compareReqByBlock, &exact);
 
     TR_ASSERT(!exact); /* shouldn't have a request with .peer == NULL */
 
@@ -743,8 +742,10 @@ static void getBlockRequestPeers(tr_swarm* s, tr_block_index_t block, tr_ptrArra
             break;
         }
 
-        tr_ptrArrayAppend(peerArr, s->requests[i].peer);
+        peers.push_back(s->requests[i].peer);
     }
+
+    return peers;
 }
 
 static void decrementPendingReqCount(struct block_request const* b)
@@ -1356,16 +1357,12 @@ void tr_peerMgrGetNextRequests(
         {
             tr_block_index_t first;
             tr_block_index_t last;
-            tr_ptrArray peerArr = {};
 
             tr_torGetPieceBlockRange(tor, p->index, &first, &last);
 
             for (tr_block_index_t b = first; b <= last && (got < numwant || (get_intervals && setme[2 * got - 1] == b - 1));
                  ++b)
             {
-                int peerCount;
-                tr_peer** peers;
-
                 /* don't request blocks we've already got */
                 if (tr_torrentBlockIsComplete(tor, b))
                 {
@@ -1373,10 +1370,8 @@ void tr_peerMgrGetNextRequests(
                 }
 
                 /* always add peer if this block has no peers yet */
-                tr_ptrArrayClear(&peerArr);
-                getBlockRequestPeers(s, b, &peerArr);
-                peers = (tr_peer**)tr_ptrArrayPeek(&peerArr, &peerCount);
-
+                auto const peers = getBlockRequestPeers(s, b);
+                auto const peerCount = std::size(peers);
                 if (peerCount != 0)
                 {
                     /* don't make a second block request until the endgame */
@@ -1430,8 +1425,6 @@ void tr_peerMgrGetNextRequests(
                 requestListAdd(s, b, peer);
                 ++p->requestCount;
             }
-
-            tr_ptrArrayDestruct(&peerArr, nullptr);
         }
     }
 
@@ -1679,16 +1672,8 @@ static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 
 static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_peer* no_notify)
 {
-    auto peerArr = tr_ptrArray{};
-    getBlockRequestPeers(s, block, &peerArr);
-
-    int peerCount;
-    tr_peer** peers = (tr_peer**)tr_ptrArrayPeek(&peerArr, &peerCount);
-
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* p : getBlockRequestPeers(s, block))
     {
-        tr_peer* p = peers[i];
-
         if (p != no_notify && tr_isPeerMsgs(p))
         {
             tr_historyAdd(&p->cancelsSentToPeer, tr_time(), 1);
@@ -1697,8 +1682,6 @@ static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_pe
 
         removeRequestFromTables(s, block, p);
     }
-
-    tr_ptrArrayDestruct(&peerArr, nullptr);
 }
 
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
