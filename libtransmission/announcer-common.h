@@ -12,6 +12,8 @@
 #error only the libtransmission announcer module should #include this header.
 #endif
 
+#include <string>
+
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "session.h" /* PEER_ID_LEN */
 
@@ -68,7 +70,7 @@ struct tr_scrape_response_row
     int downloaders;
 };
 
-typedef struct
+struct tr_scrape_response
 {
     /* whether or not we managed to connect to the tracker */
     bool did_connect;
@@ -83,15 +85,15 @@ typedef struct
     struct tr_scrape_response_row rows[TR_MULTISCRAPE_MAX];
 
     /* the raw scrape url */
-    char* url;
+    std::string url;
 
     /* human-readable error string on failure, or NULL */
-    char* errmsg;
+    std::string errmsg;
 
     /* minimum interval (in seconds) allowed between scrapes.
      * this is an unofficial extension that some trackers won't support. */
     int min_request_interval;
-} tr_scrape_response;
+};
 
 typedef void (*tr_scrape_response_func)(tr_scrape_response const* response, void* user_data);
 

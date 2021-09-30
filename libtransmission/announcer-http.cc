@@ -370,9 +370,7 @@ static void on_scrape_done_eventthread(void* vdata)
         data->response_func(&data->response, data->response_func_user_data);
     }
 
-    tr_free(data->response.errmsg);
-    tr_free(data->response.url);
-    tr_free(data);
+    delete data;
 }
 
 static void on_scrape_done(
@@ -389,7 +387,7 @@ static void on_scrape_done(
     tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url);
+    dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url.c_str());
 
     if (response_code != HTTP_OK)
     {
@@ -514,11 +512,10 @@ void tr_tracker_http_scrape(
     tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
-    struct scrape_data* d;
     char* url = scrape_url_new(request);
 
-    d = tr_new0(struct scrape_data, 1);
-    d->response.url = tr_strdup(request->url);
+    auto* d = new scrape_data{};
+    d->response.url = request->url;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;
