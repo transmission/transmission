@@ -156,15 +156,14 @@ typedef struct tr_announcer
     time_t tauUpkeepAt;
 } tr_announcer;
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
+static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, std::string const& url)
 {
     struct tr_scrape_info* info = nullptr;
 
-    if (!tr_str_is_empty(url))
+    if (!std::empty(url))
     {
-        auto const urlstr = std::string{ url };
         auto& scrapes = announcer->scrape_info;
-        auto const it = scrapes.try_emplace(urlstr, urlstr, TR_MULTISCRAPE_MAX);
+        auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
         info = &it.first->second;
     }
 
@@ -1362,7 +1361,7 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     tier->scrapeAt = get_next_scrape_time(session, tier, interval);
 }
 
-static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
+static tr_tier* find_tier(tr_torrent* tor, std::string const& scrape)
 {
     struct tr_torrent_tiers* tt = tor->tiers;
 
@@ -1407,7 +1406,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     "downloaders:%d "
                     "min_request_interval:%d "
                     "err:%s ",
-                    response->url,
+                    response->url.c_str(),
                     (int)response->did_connect,
                     (int)response->did_timeout,
                     row->seeders,
@@ -1415,7 +1414,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     row->downloads,
                     row->downloaders,
                     response->min_request_interval,
-                    response->errmsg != nullptr ? response->errmsg : "none");
+                    std::empty(response->errmsg) ? "none" : response->errmsg.c_str());
 
                 tier->isScraping = false;
                 tier->lastScrapeTime = now;
@@ -1430,9 +1429,9 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 {
                     on_scrape_error(session, tier, _("Tracker did not respond"));
                 }
-                else if (response->errmsg != nullptr)
+                else if (!std::empty(response->errmsg))
                 {
-                    on_scrape_error(session, tier, response->errmsg);
+                    on_scrape_error(session, tier, response->errmsg.c_str());
                 }
                 else
                 {
@@ -1473,9 +1472,9 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     }
 
     /* Maybe reduce the number of torrents in a multiscrape req */
-    if (multiscrape_too_big(response->errmsg))
+    if (multiscrape_too_big(response->errmsg.c_str()))
     {
-        char const* url = response->url;
+        auto const& url = response->url;
         struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
         if (scrape_info != nullptr)
         {
@@ -1492,7 +1491,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     char* scheme = nullptr;
                     char* host = nullptr;
                     int port;
-                    if (tr_urlParse(url, strlen(url), &scheme, &host, &port, nullptr))
+                    if (tr_urlParse(std::data(url), std::size(url), &scheme, &host, &port, nullptr))
                     {
                         /* don't log the full URL, since that might have a personal announce id */
                         char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);

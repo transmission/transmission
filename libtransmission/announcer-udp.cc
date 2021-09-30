@@ -213,8 +213,6 @@ static struct tau_scrape_request* tau_scrape_request_new(
 
 static void tau_scrape_request_free(struct tau_scrape_request* req)
 {
-    tr_free(req->response.errmsg);
-    tr_free(req->response.url);
     delete req;
 }
 
