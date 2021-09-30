@@ -3328,8 +3328,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* optimistic unchoke */
     if (s->optimistic == nullptr && !isMaxedOut && checkedChokeCount < size)
     {
-        int n;
-        auto randPool = tr_ptrArray{};
+        auto randPool = std::vector<ChokeData*>{};
 
         for (int i = checkedChokeCount; i < size; ++i)
         {
@@ -3340,20 +3339,19 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
 
                 for (int y = 0; y < x; ++y)
                 {
-                    tr_ptrArrayAppend(&randPool, &choke[i]);
+                    randPool.push_back(&choke[i]);
                 }
             }
         }
 
-        if ((n = tr_ptrArraySize(&randPool)) != 0)
+        auto const n = std::size(randPool);
+        if (n != 0)
         {
-            auto* c = static_cast<struct ChokeData*>(tr_ptrArrayNth(&randPool, tr_rand_int_weak(n)));
+            auto* c = randPool[tr_rand_int_weak(n)];
             c->isChoked = false;
             s->optimistic = c->msgs;
             s->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
         }
-
-        tr_ptrArrayDestruct(&randPool, nullptr);
     }
 
     for (int i = 0; i < size; ++i)
