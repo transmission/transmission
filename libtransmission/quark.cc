@@ -480,16 +480,7 @@ tr_quark tr_quark_new(void const* str, size_t len)
 
 char const* tr_quark_get_string(tr_quark q, size_t* len)
 {
-    std::string_view tmp;
-
-    if (q < TR_N_KEYS)
-    {
-        tmp = my_static[q];
-    }
-    else
-    {
-        tmp = my_runtime[q - TR_N_KEYS];
-    }
+    auto const& tmp = q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
 
     if (len != nullptr)
     {
