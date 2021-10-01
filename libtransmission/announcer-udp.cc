@@ -229,7 +229,7 @@ static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
-    request->response.errmsg = errmsg;
+    request->response.errmsg = errmsg == nullptr ? "" : errmsg;
     tau_scrape_request_finished(request);
 }
 
