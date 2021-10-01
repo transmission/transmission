@@ -93,46 +93,39 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
     }
 }
 
-static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth, int* argWidth)
+static void maxWidth(struct tr_option const* o, size_t& longWidth, size_t& shortWidth, size_t& argWidth)
 {
-    // FIXME: in this function sign bits from int* are lost, then 64-bit result is truncated to 32-bit int
-    // Convert arguments to size_t*
     char const* arg;
 
     if (o->longName != nullptr)
     {
-        *longWidth = std::max((size_t)*longWidth, strlen(o->longName));
+        longWidth = std::max(longWidth, strlen(o->longName));
     }
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = std::max((size_t)*shortWidth, strlen(o->shortName));
+        shortWidth = std::max(shortWidth, strlen(o->shortName));
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = std::max((size_t)*argWidth, strlen(arg));
+        argWidth = std::max(argWidth, strlen(arg));
     }
 }
 
 void tr_getopt_usage(char const* progName, char const* description, struct tr_option const opts[])
 {
-    int longWidth = 0;
-    int shortWidth = 0;
-    int argWidth = 0;
-    struct tr_option help;
+    auto longWidth = size_t{ 0 };
+    auto shortWidth = size_t{ 0 };
+    auto argWidth = size_t{ 0 };
 
     for (tr_option const* o = opts; o->val != 0; ++o)
     {
-        maxWidth(o, &longWidth, &shortWidth, &argWidth);
+        maxWidth(o, longWidth, shortWidth, argWidth);
     }
 
-    help.val = -1;
-    help.longName = "help";
-    help.description = "Display this help page and exit";
-    help.shortName = "h";
-    help.has_arg = false;
-    maxWidth(&help, &longWidth, &shortWidth, &argWidth);
+    auto const help = tr_option{ -1, "help", "Display this help page and exit", "h", false, nullptr };
+    maxWidth(&help, longWidth, shortWidth, argWidth);
 
     if (description == nullptr)
     {
