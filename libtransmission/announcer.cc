@@ -246,7 +246,7 @@ static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tr
     memset(tracker, 0, sizeof(tr_tracker));
     tracker->key = getKey(inf->announce);
     tracker->announce = tr_strdup(inf->announce);
-    tracker->scrape_info = tr_announcerGetScrapeInfo(announcer, inf->scrape);
+    tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, inf->scrape);
     tracker->id = inf->id;
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
