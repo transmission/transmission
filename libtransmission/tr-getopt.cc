@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib> /* exit() */
 #include <cstring>
+#include <string_view>
 
 #include "transmission.h"
 #include "tr-getopt.h"
@@ -39,24 +40,16 @@ static char const* getArgName(tr_option const* opt)
     return arg;
 }
 
-static int get_next_line_len(char const* description, int maxlen)
+static size_t get_next_line_len(std::string_view description, size_t maxlen)
 {
-    int end;
-    int len = strlen(description);
-
-    if (len < maxlen)
+    auto len = std::size(description);
+    if (len > maxlen)
     {
-        return len;
+        description.remove_suffix(len - maxlen);
+        auto const pos = description.rfind(' ');
+        len = pos != std::string_view::npos ? pos : maxlen;
     }
-
-    end = maxlen < len ? maxlen : len;
-
-    while (end > 0 && !isspace(description[end]))
-    {
-        --end;
-    }
-
-    return end != 0 ? end : len;
+    return len;
 }
 
 static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWidth, int argWidth)
