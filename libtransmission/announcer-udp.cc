@@ -184,7 +184,8 @@ static struct tau_scrape_request* tau_scrape_request_new(
     {
         evbuffer_add(buf, in->info_hash[i], SHA_DIGEST_LENGTH);
     }
-    auto const& payload = evbuffer_pullup(buf, -1);
+    auto const* const payload_begin = evbuffer_pullup(buf, -1);
+    auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
 
     /* build the tau_scrape_request */
 
@@ -196,7 +197,7 @@ static struct tau_scrape_request* tau_scrape_request_new(
     req->user_data = user_data;
     req->response.url = tr_strdup(in->url);
     req->response.row_count = in->info_hash_count;
-    req->payload.assign(payload, payload + evbuffer_get_length(buf));
+    req->payload.assign(payload_begin, payload_end);
 
     for (int i = 0; i < req->response.row_count; ++i)
     {
@@ -283,8 +284,7 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
 
 struct tau_announce_request
 {
-    void* payload;
-    size_t payload_len;
+    std::vector<uint8_t> payload;
 
     time_t created_at;
     time_t sent_at;
@@ -327,12 +327,10 @@ static struct tau_announce_request* tau_announce_request_new(
     tr_announce_response_func callback,
     void* user_data)
 {
-    struct evbuffer* buf;
-    struct tau_announce_request* req;
     tau_transaction_t const transaction_id = tau_transaction_new();
 
     /* build the payload */
-    buf = evbuffer_new();
+    auto* buf = evbuffer_new();
     evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
     evbuffer_add_hton_32(buf, transaction_id);
     evbuffer_add(buf, in->info_hash, SHA_DIGEST_LENGTH);
@@ -345,15 +343,16 @@ static struct tau_announce_request* tau_announce_request_new(
     evbuffer_add_hton_32(buf, in->key);
     evbuffer_add_hton_32(buf, in->numwant);
     evbuffer_add_hton_16(buf, in->port);
+    auto const* const payload_begin = evbuffer_pullup(buf, -1);
+    auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
 
     /* build the tau_announce_request */
-    req = tr_new0(struct tau_announce_request, 1);
+    auto* req = new tau_announce_request{};
     req->created_at = tr_time();
     req->transaction_id = transaction_id;
     req->callback = callback;
     req->user_data = user_data;
-    req->payload_len = evbuffer_get_length(buf);
-    req->payload = tr_memdup(evbuffer_pullup(buf, -1), req->payload_len);
+    req->payload.assign(payload_begin, payload_end);
     req->response.seeders = -1;
     req->response.leechers = -1;
     req->response.downloads = -1;
@@ -370,8 +369,7 @@ static void tau_announce_request_free(struct tau_announce_request* req)
     tr_free(req->response.errmsg);
     tr_free(req->response.pex6);
     tr_free(req->response.pex);
-    tr_free(req->payload);
-    tr_free(req);
+    delete req;
 }
 
 static void tau_announce_request_finished(struct tau_announce_request const* request)
@@ -565,7 +563,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
         {
             dbgmsg(tracker->key, "sending announce req %p", (void*)req);
             req->sent_at = now;
-            tau_tracker_send_request(tracker, req->payload, req->payload_len);
+            tau_tracker_send_request(tracker, std::data(req->payload), std::size(req->payload));
 
             if (req->callback == nullptr)
             {
