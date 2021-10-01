@@ -25,6 +25,7 @@
 #include <cstring> /* strerror(), memset(), memmem() */
 #include <ctime> /* nanosleep() */
 #include <exception>
+#include <iterator> // std::back_inserter
 #include <set>
 #include <string>
 #include <vector>
