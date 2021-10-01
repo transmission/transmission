@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string_view>
 #include <time.h> /* time_t */
 #include <vector>
 
@@ -59,7 +60,7 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
-char const* tr_get_mime_type_for_filename(char const* filename);
+char const* tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.

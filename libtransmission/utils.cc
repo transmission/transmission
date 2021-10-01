@@ -1914,40 +1914,32 @@ void tr_net_init(void)
 
 /// mime-type
 
-static int compareSuffix(void const* va, void const* vb)
+char const* tr_get_mime_type_for_filename(std::string_view filename)
 {
-    auto const* suffix = static_cast<char const*>(va);
-    auto const* entry = static_cast<struct mime_type_suffix const*>(vb);
-    return tr_strcmp0(suffix, entry->suffix);
-}
-
-char const* tr_get_mime_type_for_filename(char const* filename)
-{
-    struct mime_type_suffix const* info = nullptr;
-
-    char const* in = strrchr(filename, '.');
-    if (in != nullptr)
+    auto constexpr compare = [](mime_type_suffix const& entry, auto const& suffix)
     {
-        ++in; // walk past '.'
-        if (strlen(in) <= MIME_TYPE_SUFFIX_MAXLEN)
+        return entry.suffix < suffix;
+    };
+
+    auto const pos = filename.rfind('.');
+    if (pos != filename.npos)
+    {
+        // make a lowercase copy of the file suffix
+        filename.remove_prefix(pos + 1);
+        auto suffix_lc = std::string{};
+        std::transform(
+            std::begin(filename),
+            std::end(filename),
+            std::back_inserter(suffix_lc),
+            [](auto c) { return std::tolower(c); });
+
+        // find it
+        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
+        if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
-            char lowercase_suffix[MIME_TYPE_SUFFIX_MAXLEN + 1];
-            char* out = lowercase_suffix;
-            while (*in != '\0')
-            {
-                *out++ = (char)tolower((unsigned char)*in++);
-            }
-
-            *out = '\0';
-
-            info = static_cast<struct mime_type_suffix const*>(bsearch(
-                lowercase_suffix,
-                mime_type_suffixes,
-                TR_N_ELEMENTS(mime_type_suffixes),
-                sizeof(*mime_type_suffixes),
-                compareSuffix));
+            return std::data(it->mime_type);
         }
     }
 
-    return info != nullptr ? info->mime_type : nullptr;
+    return nullptr;
 }
