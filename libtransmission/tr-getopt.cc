@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib> /* exit() */
 #include <cstring>
+#include <string_view>
 
 #include "transmission.h"
 #include "tr-getopt.h"
@@ -39,36 +40,27 @@ static char const* getArgName(tr_option const* opt)
     return arg;
 }
 
-static int get_next_line_len(char const* description, int maxlen)
+static size_t get_next_line_len(std::string_view description, size_t maxlen)
 {
-    int end;
-    int len = strlen(description);
-
-    if (len < maxlen)
+    auto len = std::size(description);
+    if (len > maxlen)
     {
-        return len;
+        description.remove_suffix(len - maxlen);
+        auto const pos = description.rfind(' ');
+        len = pos != std::string_view::npos ? pos : maxlen;
     }
-
-    end = maxlen < len ? maxlen : len;
-
-    while (end > 0 && !isspace(description[end]))
-    {
-        --end;
-    }
-
-    return end != 0 ? end : len;
+    return len;
 }
 
 static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWidth, int argWidth)
 {
-    int len;
     char const* longName = opt->longName != nullptr ? opt->longName : "";
     char const* shortName = opt->shortName != nullptr ? opt->shortName : "";
     char const* arg = getArgName(opt);
 
     int const d_indent = shortWidth + longWidth + argWidth + 7;
     int const d_width = 80 - d_indent;
-    char const* d = opt->description;
+    auto d = std::string_view{ opt->description };
 
     printf(
         " %s%-*s %s%-*s %-*s ",
@@ -77,68 +69,63 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
         tr_str_is_empty(longName) ? "  " : "--",
         TR_ARG_TUPLE(longWidth, longName),
         TR_ARG_TUPLE(argWidth, arg));
-    len = get_next_line_len(d, d_width);
-    printf("%*.*s\n", TR_ARG_TUPLE(len, len, d));
 
-    d += len;
-
-    while (isspace(*d))
+    auto const strip_leading_whitespace = [](std::string_view text)
     {
-        ++d;
-    }
+        auto pos = text.find_first_not_of(' ');
+        if (pos != std::string_view::npos)
+        {
+            text.remove_prefix(pos);
+        }
+        return text;
+    };
+
+    int len = get_next_line_len(d, d_width);
+    printf("%*.*s\n", TR_ARG_TUPLE(len, len, std::data(d)));
+    d.remove_prefix(len);
+    d = strip_leading_whitespace(d);
 
     while ((len = get_next_line_len(d, d_width)) != 0)
     {
-        printf("%*.*s%*.*s\n", TR_ARG_TUPLE(d_indent, d_indent, ""), TR_ARG_TUPLE(len, len, d));
-        d += len;
-
-        while (isspace(*d))
-        {
-            ++d;
-        }
+        printf("%*.*s%*.*s\n", TR_ARG_TUPLE(d_indent, d_indent, ""), TR_ARG_TUPLE(len, len, std::data(d)));
+        d.remove_prefix(len);
+        d = strip_leading_whitespace(d);
     }
 }
 
-static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth, int* argWidth)
+static void maxWidth(struct tr_option const* o, size_t& longWidth, size_t& shortWidth, size_t& argWidth)
 {
-    // FIXME: in this function sign bits from int* are lost, then 64-bit result is truncated to 32-bit int
-    // Convert arguments to size_t*
     char const* arg;
 
     if (o->longName != nullptr)
     {
-        *longWidth = std::max((size_t)*longWidth, strlen(o->longName));
+        longWidth = std::max(longWidth, strlen(o->longName));
     }
 
     if (o->shortName != nullptr)
     {
-        *shortWidth = std::max((size_t)*shortWidth, strlen(o->shortName));
+        shortWidth = std::max(shortWidth, strlen(o->shortName));
     }
 
     if ((arg = getArgName(o)) != nullptr)
     {
-        *argWidth = std::max((size_t)*argWidth, strlen(arg));
+        argWidth = std::max(argWidth, strlen(arg));
     }
 }
 
 void tr_getopt_usage(char const* progName, char const* description, struct tr_option const opts[])
 {
-    int longWidth = 0;
-    int shortWidth = 0;
-    int argWidth = 0;
-    struct tr_option help;
+    auto longWidth = size_t{ 0 };
+    auto shortWidth = size_t{ 0 };
+    auto argWidth = size_t{ 0 };
 
     for (tr_option const* o = opts; o->val != 0; ++o)
     {
-        maxWidth(o, &longWidth, &shortWidth, &argWidth);
+        maxWidth(o, longWidth, shortWidth, argWidth);
     }
 
-    help.val = -1;
-    help.longName = "help";
-    help.description = "Display this help page and exit";
-    help.shortName = "h";
-    help.has_arg = false;
-    maxWidth(&help, &longWidth, &shortWidth, &argWidth);
+    auto const help = tr_option{ -1, "help", "Display this help page and exit", "h", false, nullptr };
+    maxWidth(&help, longWidth, shortWidth, argWidth);
 
     if (description == nullptr)
     {
