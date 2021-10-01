@@ -999,11 +999,11 @@ TEST_F(FileTest, fileOpen)
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error* err = nullptr;
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error_clear(&err);
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error_clear(&err);
@@ -1012,11 +1012,11 @@ TEST_F(FileTest, fileOpen)
     tr_sys_dir_create(path1, 0, 0777, nullptr);
 #ifdef _WIN32
     // this works on *NIX
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 #endif
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 

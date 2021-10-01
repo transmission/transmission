@@ -225,9 +225,9 @@ TEST_F(UtilsTest, url)
 {
     auto const* url = "http://1";
     int port;
-    char* scheme;
-    char* host;
-    char* path;
+    char* scheme = nullptr;
+    char* host = nullptr;
+    char* path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("1", host);
@@ -238,6 +238,9 @@ TEST_F(UtilsTest, url)
     tr_free(host);
 
     url = "http://www.some-tracker.org/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);
@@ -248,6 +251,9 @@ TEST_F(UtilsTest, url)
     tr_free(host);
 
     url = "http://www.some-tracker.org:8080/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);

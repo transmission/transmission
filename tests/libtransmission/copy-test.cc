@@ -75,6 +75,8 @@ private:
 
     bool filesAreIdentical(char const* fn1, char const* fn2)
     {
+        bool identical = true;
+
         tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
         tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
         EXPECT_NE(fd1, TR_BAD_SYS_FILE);
@@ -100,12 +102,14 @@ private:
 
             if (bytes_left1 != bytes_left2)
             {
-                return false;
+                identical = false;
+                break;
             }
 
             if (memcmp(readbuf1, readbuf2, buflen) != 0)
             {
-                return false;
+                identical = false;
+                break;
             }
         }
 
@@ -114,7 +118,7 @@ private:
         tr_sys_file_close(fd1, nullptr);
         tr_sys_file_close(fd2, nullptr);
 
-        return true;
+        return identical;
     }
 };
 
