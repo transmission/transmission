@@ -605,6 +605,8 @@ tr_webseed* tr_webseedNew(struct tr_torrent* tor, char const* url, tr_peer_callb
     tr_bitfieldSetHasAll(&peer->have);
     tr_peerUpdateProgress(tor, peer);
 
+    using type = decltype(w->tasks);
+    new (&w->tasks) type;
     w->torrent_id = tr_torrentId(tor);
     w->session = tor->session;
     w->base_url_len = strlen(url);
