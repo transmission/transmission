@@ -54,14 +54,13 @@ static size_t get_next_line_len(std::string_view description, size_t maxlen)
 
 static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWidth, int argWidth)
 {
-    int len;
     char const* longName = opt->longName != nullptr ? opt->longName : "";
     char const* shortName = opt->shortName != nullptr ? opt->shortName : "";
     char const* arg = getArgName(opt);
 
     int const d_indent = shortWidth + longWidth + argWidth + 7;
     int const d_width = 80 - d_indent;
-    char const* d = opt->description;
+    auto d = std::string_view{ opt->description };
 
     printf(
         " %s%-*s %s%-*s %-*s ",
@@ -70,25 +69,27 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
         tr_str_is_empty(longName) ? "  " : "--",
         TR_ARG_TUPLE(longWidth, longName),
         TR_ARG_TUPLE(argWidth, arg));
-    len = get_next_line_len(d, d_width);
-    printf("%*.*s\n", TR_ARG_TUPLE(len, len, d));
 
-    d += len;
-
-    while (isspace(*d))
+    auto const strip_leading_whitespace = [](std::string_view text)
     {
-        ++d;
-    }
+        auto pos = text.find_first_not_of(' ');
+        if (pos != std::string_view::npos)
+        {
+            text.remove_prefix(pos);
+        }
+        return text;
+    };
+
+    int len = get_next_line_len(d, d_width);
+    printf("%*.*s\n", TR_ARG_TUPLE(len, len, std::data(d)));
+    d.remove_prefix(len);
+    d = strip_leading_whitespace(d);
 
     while ((len = get_next_line_len(d, d_width)) != 0)
     {
-        printf("%*.*s%*.*s\n", TR_ARG_TUPLE(d_indent, d_indent, ""), TR_ARG_TUPLE(len, len, d));
-        d += len;
-
-        while (isspace(*d))
-        {
-            ++d;
-        }
+        printf("%*.*s%*.*s\n", TR_ARG_TUPLE(d_indent, d_indent, ""), TR_ARG_TUPLE(len, len, std::data(d)));
+        d.remove_prefix(len);
+        d = strip_leading_whitespace(d);
     }
 }
 
