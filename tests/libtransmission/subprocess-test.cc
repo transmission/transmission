@@ -212,21 +212,27 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
     auto buffer = std::array<char, 1024>{};
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(test_env_value1, buffer.data());
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(test_env_value2, buffer.data());
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(test_env_value3, buffer.data());
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(test_env_value4, buffer.data());
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(test_env_value5, buffer.data());
 
+    buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_STREQ("<null>", buffer.data());
 
