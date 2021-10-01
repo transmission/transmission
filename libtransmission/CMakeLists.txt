@@ -33,7 +33,6 @@ set(PROJECT_FILES
   magnet.cc
   makemeta.cc
   metainfo.cc
-  mime-types.cc
   natpmp.cc
   net.cc
   peer-io.cc

@@ -370,7 +370,6 @@
 		C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5751C3223CC00D62832 /* watchdir.cc */; };
 		C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5761C3223CC00D62832 /* watchdir.h */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
-		CAB35C65252F6F5E00552A55 /* mime-types.cc in Sources */ = {isa = PBXBuildFile; fileRef = CAB35C63252F6F5E00552A55 /* mime-types.cc */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
@@ -1031,7 +1030,6 @@
 		C1FEE5751C3223CC00D62832 /* watchdir.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = watchdir.cc; sourceTree = "<group>"; };
 		C1FEE5761C3223CC00D62832 /* watchdir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = watchdir.h; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
-		CAB35C63252F6F5E00552A55 /* mime-types.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "mime-types.cc"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
@@ -1390,7 +1388,6 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
-				CAB35C63252F6F5E00552A55 /* mime-types.cc */,
 				CAB35C62252F6F5E00552A55 /* mime-types.h */,
 				C1077A4A183EB29600634C22 /* error.cc */,
 				C1077A4B183EB29600634C22 /* error.h */,
@@ -2472,7 +2469,6 @@
 				A201527E0D1C270F0081714F /* torrent-ctor.cc in Sources */,
 				A2D22A130D65EEE700007D5F /* verify.cc in Sources */,
 				4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */,
-				CAB35C65252F6F5E00552A55 /* mime-types.cc in Sources */,
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
