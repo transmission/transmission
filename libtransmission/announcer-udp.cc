@@ -194,7 +194,7 @@ static struct tau_scrape_request* tau_scrape_request_new(
     req->transaction_id = transaction_id;
     req->callback = callback;
     req->user_data = user_data;
-    req->response.url = tr_strdup(in->url);
+    req->response.url = in->url;
     req->response.row_count = in->info_hash_count;
     req->payload.assign(payload, payload + evbuffer_get_length(buf));
 
@@ -228,7 +228,7 @@ static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
-    request->response.errmsg = tr_strdup(errmsg);
+    request->response.errmsg = errmsg;
     tau_scrape_request_finished(request);
 }
 
