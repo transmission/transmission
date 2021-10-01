@@ -34,9 +34,6 @@ https.get(url, (res) => {
         }
       }
 
-      const max_suffix_len = suffixes
-        .reduce((acc, [suffix]) => Math.max(acc, suffix.length), 0);
-
       const mime_type_lines = suffixes
         .map(([suffix, mime_type]) => `      { "${suffix}", "${mime_type}" }`)
         .sort()
