@@ -22,10 +22,29 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include "tr-core.h"
+#include <memory>
 
-GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* uim, TrCore* core);
-GtkTreeSelection* gtr_window_get_selection(GtkWindow*);
-void gtr_window_set_busy(GtkWindow*, gboolean isBusy);
-void gtr_window_refresh(GtkWindow*);
+#include <glibmm.h>
+#include <gtkmm.h>
+
+typedef struct _TrCore TrCore;
+
+class MainWindow : public Gtk::ApplicationWindow
+{
+public:
+    ~MainWindow() override;
+
+    static std::unique_ptr<MainWindow> create(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, TrCore* core);
+
+    Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
+
+    void set_busy(bool isBusy);
+    void refresh();
+
+protected:
+    MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, TrCore* core);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};

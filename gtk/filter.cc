@@ -967,7 +967,7 @@ static void on_filter_model_row_deleted(GtkTreeModel const* tree_model, GtkTreeP
 ****
 ***/
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTreeModel** filter_model)
+GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, Glib::RefPtr<Gtk::TreeModel>& filter_model)
 {
     GtkWidget* l;
     GtkWidget* w;
@@ -1033,7 +1033,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     g_signal_connect(s, "changed", G_CALLBACK(filter_entry_changed), data->filter_model);
     selection_changed_cb(nullptr, data);
 
-    *filter_model = data->filter_model;
+    filter_model = Glib::wrap(data->filter_model, true);
     update_count_label(data);
     return h;
 }

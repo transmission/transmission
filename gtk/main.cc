@@ -179,7 +179,7 @@ private:
     sigc::connection update_model_soon_tag_;
     sigc::connection refresh_actions_tag_;
     void* icon_ = nullptr;
-    Glib::RefPtr<Gtk::Window> wind_;
+    std::unique_ptr<MainWindow> wind_;
     TrCore* core_ = nullptr;
     Glib::RefPtr<Gtk::Window> msgwin_;
     Glib::RefPtr<Gtk::Window> prefs_;
@@ -235,7 +235,7 @@ void Application::show_details_dialog_for_selected_torrents()
 
     if (dialog_it == details_.end())
     {
-        auto dialog = DetailsDialog::create(*wind_.get(), core_);
+        auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
         dialog->signal_hide().connect([this, key]() { details_.erase(key); });
         dialog_it = details_.emplace(key, std::move(dialog)).first;
@@ -559,8 +559,7 @@ void Application::on_startup()
     ui_manager_->ensure_update();
 
     /* create main window now to be a parent to any error dialogs */
-    wind_ = Glib::make_refptr_for_instance(
-        Glib::wrap(GTK_WINDOW(gtr_window_new(Glib::unwrap(this), Glib::unwrap(ui_manager_), core_))));
+    wind_ = MainWindow::create(*this, ui_manager_, core_);
     wind_->signal_size_allocate().connect(sigc::mem_fun(this, &Application::on_main_window_size_allocated));
     hold();
     app_setup();
@@ -720,7 +719,7 @@ std::string Application::get_application_id(std::string const& config_dir)
 
 void Application::on_core_busy(TrCore const* /*core*/, bool busy)
 {
-    gtr_window_set_busy(Glib::unwrap(wind_), busy);
+    wind_->set_busy(busy);
 }
 
 void Application::app_setup()
@@ -789,7 +788,7 @@ void Application::app_setup()
     if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
     {
         Gtk::MessageDialog w(
-            *wind_.get(),
+            *wind_,
             _("Transmission is a file sharing program. When you run a torrent, its data will be "
               "made available to others by means of upload. Any content you share is your sole responsibility."),
             false,
@@ -905,7 +904,7 @@ void Application::main_window_setup()
 
     // g_assert(nullptr == cbdata->wind);
     // cbdata->wind = wind;
-    sel_ = sel = Glib::wrap(gtr_window_get_selection(Glib::unwrap(wind_)));
+    sel_ = sel = wind_->get_selection();
 
     sel->signal_changed().connect(sigc::mem_fun(this, &Application::refresh_actions_soon));
     refresh_actions_soon();
@@ -1019,7 +1018,7 @@ void Application::show_torrent_errors(Glib::ustring const& primary, std::vector<
         s << leader << ' ' << f << '\n';
     }
 
-    Gtk::MessageDialog w(*wind_.get(), primary, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    Gtk::MessageDialog w(*wind_, primary, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
     w.set_secondary_text(s.str());
     w.run();
 
@@ -1077,7 +1076,8 @@ bool Application::on_main_window_focus_in(GdkEventFocus* /*event*/)
 
 void Application::on_add_torrent(TrCore* core, tr_ctor* ctor)
 {
-    Gtk::Widget* w = Glib::wrap(gtr_torrent_options_dialog_new(Glib::unwrap(wind_), core, ctor));
+    Gtk::Widget* w = Glib::wrap(
+        gtr_torrent_options_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core, ctor));
 
     w->signal_focus_in_event().connect(sigc::mem_fun(this, &Application::on_main_window_focus_in));
 
@@ -1300,7 +1300,7 @@ bool Application::update_model_once()
     /* refresh the main window's statusbar and toolbar buttons */
     if (wind_ != nullptr)
     {
-        gtr_window_refresh(Glib::unwrap(wind_));
+        wind_->refresh();
     }
 
     /* update the actions */
@@ -1362,7 +1362,7 @@ void Application::show_about_dialog()
     d.set_license(LICENSE);
     d.set_wrap_license(true);
 #endif
-    d.set_transient_for(*wind_.get());
+    d.set_transient_for(*wind_);
     d.run();
 }
 
@@ -1409,7 +1409,7 @@ void Application::remove_selected(bool delete_files)
 
     if (!l.empty())
     {
-        gtr_confirm_remove(Glib::unwrap(wind_), core_, l, delete_files);
+        gtr_confirm_remove(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_, l, delete_files);
     }
 }
 
@@ -1484,17 +1484,19 @@ void Application::actions_handler(std::string const& action_name)
 
     if (action_name == "open-torrent-from-url")
     {
-        Gtk::Widget* w = Glib::wrap(gtr_torrent_open_from_url_dialog_new(Glib::unwrap(wind_), core_));
+        Gtk::Widget* w = Glib::wrap(
+            gtr_torrent_open_from_url_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
         w->show();
     }
     else if (action_name == "open-torrent-menu" || action_name == "open-torrent-toolbar")
     {
-        Gtk::Widget* w = Glib::wrap(gtr_torrent_open_from_file_dialog_new(Glib::unwrap(wind_), core_));
+        Gtk::Widget* w = Glib::wrap(
+            gtr_torrent_open_from_file_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
         w->show();
     }
     else if (action_name == "show-stats")
     {
-        Gtk::Widget* dialog = Glib::wrap(gtr_stats_dialog_new(Glib::unwrap(wind_), core_));
+        Gtk::Widget* dialog = Glib::wrap(gtr_stats_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
         dialog->show();
     }
     else if (action_name == "donate")
@@ -1524,7 +1526,8 @@ void Application::actions_handler(std::string const& action_name)
 
         if (!ids.empty())
         {
-            Gtk::Widget* w = Glib::wrap(gtr_relocate_dialog_new(Glib::unwrap(wind_), core_, ids));
+            Gtk::Widget* w = Glib::wrap(
+                gtr_relocate_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_, ids));
             w->show();
         }
     }
@@ -1546,7 +1549,8 @@ void Application::actions_handler(std::string const& action_name)
     }
     else if (action_name == "new-torrent")
     {
-        Gtk::Widget* w = Glib::wrap(gtr_torrent_creation_dialog_new(Glib::unwrap(wind_), core_));
+        Gtk::Widget* w = Glib::wrap(
+            gtr_torrent_creation_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
         w->show();
     }
     else if (action_name == "remove-torrent")
@@ -1573,8 +1577,8 @@ void Application::actions_handler(std::string const& action_name)
     {
         if (prefs_ == nullptr)
         {
-            prefs_ = Glib::make_refptr_for_instance(
-                Glib::wrap(GTK_WINDOW(gtr_prefs_dialog_new(Glib::unwrap(wind_), G_OBJECT(core_)))));
+            prefs_ = Glib::make_refptr_for_instance(Glib::wrap(
+                GTK_WINDOW(gtr_prefs_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), G_OBJECT(core_)))));
             prefs_->signal_unrealize().connect([this]() { prefs_.reset(); });
         }
 
@@ -1584,8 +1588,8 @@ void Application::actions_handler(std::string const& action_name)
     {
         if (msgwin_ == nullptr)
         {
-            msgwin_ = Glib::make_refptr_for_instance(
-                Glib::wrap(GTK_WINDOW(gtr_message_log_window_new(Glib::unwrap(wind_), core_))));
+            msgwin_ = Glib::make_refptr_for_instance(Glib::wrap(
+                GTK_WINDOW(gtr_message_log_window_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_))));
             msgwin_->signal_unrealize().connect(sigc::mem_fun(this, &Application::on_message_window_closed));
         }
         else
