@@ -227,42 +227,18 @@ struct tr_peerMgr
 *** tr_peer virtual functions
 **/
 
-static bool tr_peerIsTransferringPieces(tr_peer const* peer, uint64_t now, tr_direction direction, unsigned int* Bps)
-{
-    TR_ASSERT(peer != nullptr);
-    TR_ASSERT(peer->funcs != nullptr);
-
-    return (*peer->funcs->is_transferring_pieces)(peer, now, direction, Bps);
-}
-
 unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_direction direction)
 {
     unsigned int Bps = 0;
-    tr_peerIsTransferringPieces(peer, now, direction, &Bps);
+    peer->is_transferring_pieces(now, direction, &Bps);
     return Bps;
 }
 
-static void tr_peerFree(tr_peer* peer)
+tr_peer::tr_peer(tr_torrent const* tor)
 {
-    TR_ASSERT(peer != nullptr);
-    TR_ASSERT(peer->funcs != nullptr);
-
-    (*peer->funcs->destruct)(peer);
-
-    tr_free(peer);
-}
-
-void tr_peerConstruct(tr_peer* peer, tr_torrent const* tor)
-{
-    TR_ASSERT(peer != nullptr);
-    TR_ASSERT(tr_isTorrent(tor));
-
-    memset(peer, 0, sizeof(tr_peer));
-
-    peer->client = TR_KEY_NONE;
-    peer->swarm = tor->swarm;
-    tr_bitfieldConstruct(&peer->have, tor->info.pieceCount);
-    tr_bitfieldConstruct(&peer->blame, tor->blockCount);
+    swarm = tor->swarm;
+    tr_bitfieldConstruct(&have, tor->info.pieceCount);
+    tr_bitfieldConstruct(&blame, tor->blockCount);
 }
 
 static void peerDeclinedAllRequests(tr_swarm*, tr_peer const*);
@@ -452,7 +428,7 @@ static void swarmFree(void* vs)
     TR_ASSERT(tr_ptrArrayEmpty(&s->outgoingHandshakes));
     TR_ASSERT(tr_ptrArrayEmpty(&s->peers));
 
-    tr_ptrArrayDestruct(&s->webseeds, (PtrArrayForeachFunc)tr_peerFree);
+    tr_ptrArrayDestruct(&s->webseeds, [](void* peer) { delete static_cast<tr_peer*>(peer); });
     tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)tr_free);
     tr_ptrArrayDestruct(&s->outgoingHandshakes, nullptr);
     tr_ptrArrayDestruct(&s->peers, nullptr);
@@ -472,14 +448,14 @@ static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
     tr_info const* inf = &tor->info;
 
     /* clear the array */
-    tr_ptrArrayDestruct(&s->webseeds, (PtrArrayForeachFunc)tr_peerFree);
+    tr_ptrArrayDestruct(&s->webseeds, [](void* peer) { delete static_cast<tr_peer*>(peer); });
     s->webseeds = {};
     s->stats.activeWebseedCount = 0;
 
     /* repopulate it */
     for (unsigned int i = 0; i < inf->webseedCount; ++i)
     {
-        tr_webseed* w = tr_webseedNew(tor, inf->webseeds[i], peerCallbackFunc, s);
+        tr_peer* w = tr_webseedNew(tor, inf->webseeds[i], peerCallbackFunc, s);
         tr_ptrArrayAppend(&s->webseeds, w);
     }
 }
@@ -782,11 +758,7 @@ static int countActiveWebseeds(tr_swarm* s)
 
         for (int i = 0, n = tr_ptrArraySize(&s->webseeds); i < n; ++i)
         {
-            if (tr_peerIsTransferringPieces(
-                    static_cast<tr_peer const*>(tr_ptrArrayNth(&s->webseeds, i)),
-                    now,
-                    TR_DOWN,
-                    nullptr))
+            if (static_cast<tr_peer const*>(tr_ptrArrayNth(&s->webseeds, i))->is_transferring_pieces(now, TR_DOWN, nullptr))
             {
                 ++activeCount;
             }
@@ -1958,7 +1930,7 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
 
     tr_swarm* swarm = tor->swarm;
 
-    tr_peer* peer = (tr_peer*)tr_peerMsgsNew(tor, io, peerCallbackFunc, swarm);
+    tr_peer* peer = tr_peerMsgsNew(tor, io, peerCallbackFunc, swarm);
     peer->atom = atom;
     peer->client = client;
     atom->peer = peer;
@@ -2760,7 +2732,7 @@ double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
         unsigned int Bps = 0;
         auto const* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->webseeds, i));
 
-        if (tr_peerIsTransferringPieces(peer, now, TR_DOWN, &Bps))
+        if (peer->is_transferring_pieces(now, TR_DOWN, &Bps))
         {
             ret[i] = Bps / (double)tr_speed_K;
         }
@@ -3427,7 +3399,7 @@ static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSi
 
     int peerCount;
     int outsize = 0;
-    struct tr_peer** ret = nullptr;
+    tr_peer** ret = nullptr;
     tr_peer** peers = (tr_peer**)tr_ptrArrayPeek(&s->peers, &peerCount);
 
     for (int i = 0; i < peerCount; ++i)
@@ -3528,7 +3500,7 @@ static void removePeer(tr_swarm* s, tr_peer* peer)
     TR_ASSERT(s->stats.peerCount == tr_ptrArraySize(&s->peers));
     TR_ASSERT(s->stats.peerFromCount[atom->fromFirst] >= 0);
 
-    tr_peerFree(peer);
+    delete peer;
 }
 
 static void closePeer(tr_swarm* s, tr_peer* peer)
@@ -3571,7 +3543,7 @@ static void closeBadPeers(tr_swarm* s, time_t const now_sec)
     if (!tr_ptrArrayEmpty(&s->peers))
     {
         int peerCount;
-        struct tr_peer** peers;
+        tr_peer** peers;
 
         peers = getPeersToClose(s, now_sec, &peerCount);
 

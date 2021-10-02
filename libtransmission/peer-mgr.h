@@ -58,7 +58,7 @@ typedef struct tr_pex
 
 struct peer_atom;
 struct tr_peerIo;
-struct tr_peerMsgs;
+class tr_peerMsgs;
 struct tr_swarm;
 
 static inline bool tr_isPex(tr_pex const* pex)
