@@ -82,7 +82,7 @@ class tr_peer
 {
 public:
     tr_peer(tr_torrent const* tor);
-    virtual ~tr_peer() = default;
+    virtual ~tr_peer();
 
     virtual bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
 

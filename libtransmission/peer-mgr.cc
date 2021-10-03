@@ -244,21 +244,19 @@ tr_peer::tr_peer(tr_torrent const* tor)
 
 static void peerDeclinedAllRequests(tr_swarm*, tr_peer const*);
 
-void tr_peerDestruct(tr_peer* peer)
+tr_peer::~tr_peer()
 {
-    TR_ASSERT(peer != nullptr);
-
-    if (peer->swarm != nullptr)
+    if (swarm != nullptr)
     {
-        peerDeclinedAllRequests(peer->swarm, peer);
+        peerDeclinedAllRequests(swarm, this);
     }
 
-    tr_bitfieldDestruct(&peer->have);
-    tr_bitfieldDestruct(&peer->blame);
+    tr_bitfieldDestruct(&have);
+    tr_bitfieldDestruct(&blame);
 
-    if (peer->atom != nullptr)
+    if (atom != nullptr)
     {
-        peer->atom->peer = nullptr;
+        atom->peer = nullptr;
     }
 }
 
