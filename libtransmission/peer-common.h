@@ -99,10 +99,12 @@ public:
     /* how many requests we've made and are currently awaiting a response for */
     int pendingReqsToPeer = 0;
 
+    tr_session* const session;
+
     /* Hook to private peer-mgr information */
     struct peer_atom* atom = nullptr;
 
-    struct tr_swarm* swarm = nullptr;
+    struct tr_swarm* const swarm;
 
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float progress = 0.0f;

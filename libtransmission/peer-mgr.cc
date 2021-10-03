@@ -235,8 +235,9 @@ unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_dire
 }
 
 tr_peer::tr_peer(tr_torrent const* tor)
+    : session{ tor->session }
+    , swarm{ tor->swarm }
 {
-    swarm = tor->swarm;
     tr_bitfieldConstruct(&have, tor->info.pieceCount);
     tr_bitfieldConstruct(&blame, tor->blockCount);
 }

@@ -60,7 +60,6 @@ struct tr_webseed : public tr_peer
 public:
     tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
         : tr_peer{ tor }
-        , session{ tor->session }
         , torrent_id{ tr_torrentId(tor) }
         , base_url{ url }
         , callback{ callback_in }
@@ -106,7 +105,6 @@ public:
         return is_active;
     }
 
-    tr_session* const session;
     int const torrent_id;
     std::string const base_url;
     tr_peer_callback const callback;
@@ -279,7 +277,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 {
     size_t const n_added = info->n_added;
     auto* task = static_cast<struct tr_webseed_task*>(vtask);
-    tr_session* session = task->session;
+    auto* session = task->session;
 
     tr_sessionLock(session);
 
@@ -307,7 +305,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
                 /* processing this uses a tr_torrent pointer,
                    so push the work to the libevent thread... */
-                tr_runInEventThread(w->session, connection_succeeded, data);
+                tr_runInEventThread(session, connection_succeeded, data);
             }
         }
 
@@ -315,10 +313,10 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
         {
             /* once we've got at least one full block, save it */
 
-            struct write_block_data* data;
             uint32_t const block_size = task->block_size;
             tr_block_index_t const completed = len / block_size;
 
+            struct write_block_data* data;
             data = tr_new(struct write_block_data, 1);
             data->webseed = task->webseed;
             data->piece_index = task->piece_index;

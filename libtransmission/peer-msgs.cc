@@ -349,15 +349,6 @@ tr_peer* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr_pee
 ***
 **/
 
-static inline tr_session* getSession(tr_peerMsgs* msgs)
-{
-    return msgs->torrent->session;
-}
-
-/**
-***
-**/
-
 static void myDebug(char const* file, int line, tr_peerMsgs const* msgs, char const* fmt, ...) TR_GNUC_PRINTF(4, 5);
 
 static void myDebug(char const* file, int line, tr_peerMsgs const* msgs, char const* fmt, ...)
@@ -1001,7 +992,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     }
 
     tr_variantInitDict(&val, 8);
-    tr_variantDictAddBool(&val, TR_KEY_e, getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED);
+    tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode != TR_CLEAR_PREFERRED);
 
     if (ipv6 != nullptr)
     {
@@ -1013,7 +1004,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, msgs->torrent->infoDictLength);
     }
 
-    tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(getSession(msgs)));
+    tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(msgs->session));
     tr_variantDictAddInt(&val, TR_KEY_reqq, REQQ);
     tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
     tr_variantDictAddQuark(&val, TR_KEY_v, version_quark);
@@ -1404,7 +1395,7 @@ static void updatePeerProgress(tr_peerMsgs* msgs)
 
 static void prefetchPieces(tr_peerMsgs* msgs)
 {
-    if (!getSession(msgs)->isPrefetchEnabled)
+    if (!msgs->session->isPrefetchEnabled)
     {
         return;
     }
@@ -1415,7 +1406,7 @@ static void prefetchPieces(tr_peerMsgs* msgs)
 
         if (requestIsValid(msgs, req))
         {
-            tr_cachePrefetchBlock(getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length);
+            tr_cachePrefetchBlock(msgs->session->cache, msgs->torrent, req->index, req->offset, req->length);
             ++msgs->prefetchCount;
         }
     }
@@ -1722,7 +1713,7 @@ static ReadState readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t
 
         if (msgs->dht_port > 0)
         {
-            tr_dhtAddNode(getSession(msgs), tr_peerAddress(msgs), msgs->dht_port, false);
+            tr_dhtAddNode(msgs->session, tr_peerAddress(msgs), msgs->dht_port, false);
         }
 
         break;
@@ -1873,7 +1864,7 @@ static int clientGotBlock(tr_peerMsgs* msgs, struct evbuffer* data, struct peer_
     ***  Save the block
     **/
 
-    if ((err = tr_cacheWriteBlock(getSession(msgs)->cache, tor, req->index, req->offset, req->length, data)) != 0)
+    if ((err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data)) != 0)
     {
         return err;
     }
@@ -2186,7 +2177,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
             evbuffer_reserve_space(out, req.length, iovec, 1);
             err = tr_cacheReadBlock(
-                      getSession(msgs)->cache,
+                      msgs->session->cache,
                       msgs->torrent,
                       req.index,
                       req.offset,
