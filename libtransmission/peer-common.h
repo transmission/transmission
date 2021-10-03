@@ -105,7 +105,7 @@ public:
     /* Hook to private peer-mgr information */
     peer_atom* const atom;
 
-    struct tr_swarm* const swarm;
+    tr_swarm* const swarm;
 
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float progress = 0.0f;

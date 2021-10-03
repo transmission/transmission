@@ -1516,7 +1516,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
 
                 if (msgs != nullptr)
                 {
-                    tr_historyAdd(&request->peer->cancelsSentToPeer, now, 1);
+                    request->peer->cancelsSentToPeer.add(now, 1);
                     tr_peerMsgsCancel(msgs, request->block);
                     decrementPendingReqCount(request);
                 }
@@ -1644,11 +1644,13 @@ static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 
 static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_peer* no_notify)
 {
+    auto const now = tr_time();
+
     for (auto* p : getBlockRequestPeers(s, block))
     {
         if (p != no_notify && tr_isPeerMsgs(p))
         {
-            tr_historyAdd(&p->cancelsSentToPeer, tr_time(), 1);
+            p->cancelsSentToPeer.add(now, 1);
             tr_peerMsgsCancel(PEER_MSGS(p), block);
         }
 
@@ -1808,7 +1810,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_piece_index_t const p = e->pieceIndex;
             tr_block_index_t const block = _tr_block(tor, p, e->offset);
             cancelAllRequestsForBlock(s, block, peer);
-            tr_historyAdd(&peer->blocksSentToClient, tr_time(), 1);
+            peer->blocksSentToClient.add(tr_time(), 1);
             pieceListResortPiece(s, pieceListLookup(s, p));
             tr_torrentGotBlock(tor, block);
             break;
@@ -2783,10 +2785,10 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->isUploadingTo = tr_peerMsgsIsActive(msgs, TR_CLIENT_TO_PEER);
         stat->isSeed = tr_peerIsSeed(peer);
 
-        stat->blocksToPeer = tr_historyGet(&peer->blocksSentToPeer, now, CANCEL_HISTORY_SEC);
-        stat->blocksToClient = tr_historyGet(&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
-        stat->cancelsToPeer = tr_historyGet(&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
-        stat->cancelsToClient = tr_historyGet(&peer->cancelsSentToClient, now, CANCEL_HISTORY_SEC);
+        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CANCEL_HISTORY_SEC);
+        stat->blocksToClient = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
+        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
+        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CANCEL_HISTORY_SEC);
 
         stat->pendingReqsToPeer = peer->pendingReqsToPeer;
         stat->pendingReqsToClient = peer->pendingReqsToClient;
@@ -2970,8 +2972,8 @@ static void rechokeDownloads(tr_swarm* s)
         for (int i = 0; i < peerCount; ++i)
         {
             auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, i));
-            int const b = tr_historyGet(&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
-            int const c = tr_historyGet(&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
+            auto const b = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
+            auto const c = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
 
             if (b == 0) /* ignore unresponsive peers, as described above */
             {
@@ -3053,8 +3055,8 @@ static void rechokeDownloads(tr_swarm* s)
             else
             {
                 tr_rechoke_state rechoke_state;
-                int const blocks = tr_historyGet(&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
-                int const cancels = tr_historyGet(&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
+                auto const blocks = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
+                auto const cancels = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
 
                 if (blocks == 0 && cancels == 0)
                 {
