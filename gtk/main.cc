@@ -1076,9 +1076,10 @@ bool Application::on_main_window_focus_in(GdkEventFocus* /*event*/)
 
 void Application::on_add_torrent(TrCore* core, tr_ctor* ctor)
 {
-    Gtk::Widget* w = Glib::wrap(
-        gtr_torrent_options_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core, ctor));
+    auto w = std::shared_ptr<OptionsDialog>(
+        OptionsDialog::create(*wind_, core, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
+    w->signal_hide().connect([w]() mutable { w.reset(); });
     w->signal_focus_in_event().connect(sigc::mem_fun(this, &Application::on_main_window_focus_in));
 
     if (wind_ != nullptr)
@@ -1484,14 +1485,14 @@ void Application::actions_handler(std::string const& action_name)
 
     if (action_name == "open-torrent-from-url")
     {
-        Gtk::Widget* w = Glib::wrap(
-            gtr_torrent_open_from_url_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
+        auto w = std::shared_ptr<TorrentUrlChooserDialog>(TorrentUrlChooserDialog::create(*wind_, core_));
+        w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "open-torrent-menu" || action_name == "open-torrent-toolbar")
     {
-        Gtk::Widget* w = Glib::wrap(
-            gtr_torrent_open_from_file_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
+        auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
+        w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")
