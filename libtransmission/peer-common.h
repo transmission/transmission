@@ -117,11 +117,11 @@ public:
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
     tr_quark client = TR_KEY_NONE;
 
-    tr_recentHistory blocksSentToClient = {};
-    tr_recentHistory blocksSentToPeer = {};
+    tr_recentHistory blocksSentToClient;
+    tr_recentHistory blocksSentToPeer;
 
-    tr_recentHistory cancelsSentToClient = {};
-    tr_recentHistory cancelsSentToPeer = {};
+    tr_recentHistory cancelsSentToClient;
+    tr_recentHistory cancelsSentToPeer;
 };
 
 /** Update the tr_peer.progress field based on the 'have' bitset. */

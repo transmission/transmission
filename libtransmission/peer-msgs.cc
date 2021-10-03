@@ -11,6 +11,7 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <cstring>
+#include <memory> // std::unique_ptr
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -142,10 +143,10 @@ static void blockToReq(tr_torrent const* tor, tr_block_index_t block, struct pee
  * the current message that it's sending us. */
 struct tr_incoming
 {
-    uint8_t id;
-    uint32_t length; /* includes the +1 for id length */
-    struct peer_request blockReq; /* metadata for incoming blocks */
-    struct evbuffer* block; /* piece data for incoming blocks */
+    uint8_t id = 0;
+    uint32_t length = 0; /* includes the +1 for id length */
+    struct peer_request blockReq = {}; /* metadata for incoming blocks */
+    struct evbuffer* block = nullptr; /* piece data for incoming blocks */
 };
 
 // TODO: make these to be member functions
@@ -159,6 +160,16 @@ static void updateDesiredRequestCount(tr_peerMsgs* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void tr_peerMsgsSetActive(tr_peerMsgs* msgs, tr_direction direction, bool is_active);
 //zzz
+
+struct EventDeleter
+{
+    void operator()(struct event* ev) const
+    {
+        event_free(ev);
+    }
+};
+
+using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
 /**
  * Low-level communication state information about a connected peer.
@@ -190,8 +201,8 @@ public:
     {
         if (tr_torrentAllowsPex(torrent))
         {
-            pexTimer = evtimer_new(torrent->session->event_base, pexPulse, this);
-            tr_timerAdd(pexTimer, PEX_INTERVAL_SECS, 0);
+            pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
+            tr_timerAdd(pex_timer.get(), PEX_INTERVAL_SECS, 0);
         }
 
         if (tr_peerIoSupportsUTP(io))
@@ -227,11 +238,6 @@ public:
     {
         tr_peerMsgsSetActive(this, TR_UP, false);
         tr_peerMsgsSetActive(this, TR_DOWN, false);
-
-        if (this->pexTimer != nullptr)
-        {
-            event_free(this->pexTimer);
-        }
 
         if (this->incoming.block != nullptr)
         {
@@ -274,14 +280,14 @@ public:
     /* whether or not we've indicated to the peer that we would download from them if unchoked. */
     bool client_is_interested = false;
 
-    bool peerSupportsPex;
-    bool peerSupportsMetadataXfer;
-    bool clientSentLtepHandshake;
-    bool peerSentLtepHandshake;
+    bool peerSupportsPex = false;
+    bool peerSupportsMetadataXfer = false;
+    bool clientSentLtepHandshake = false;
+    bool peerSentLtepHandshake = false;
 
-    int desiredRequestCount;
+    int desiredRequestCount = 0;
 
-    int prefetchCount;
+    int prefetchCount = 0;
 
     bool is_active[2] = { false, false };
 
@@ -291,16 +297,16 @@ public:
     int8_t outMessagesBatchPeriod;
 
     uint8_t state = AWAITING_BT_LENGTH;
-    uint8_t ut_pex_id;
-    uint8_t ut_metadata_id;
-    uint16_t pexCount;
-    uint16_t pexCount6;
+    uint8_t ut_pex_id = 0;
+    uint8_t ut_metadata_id = 0;
+    uint16_t pexCount = 0;
+    uint16_t pexCount6 = 0;
 
-    tr_port dht_port;
+    tr_port dht_port = 0;
 
-    encryption_preference_t encryption_preference;
+    encryption_preference_t encryption_preference = ENCRYPTION_PREFERENCE_UNKNOWN;
 
-    size_t metadata_size_hint;
+    size_t metadata_size_hint = 0;
 #if 0
     size_t fastsetSize;
     tr_piece_index_t fastset[MAX_FAST_SET_SIZE];
@@ -313,31 +319,31 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
-    struct peer_request peerAskedFor[REQQ];
+    struct peer_request peerAskedFor[REQQ] = {};
 
-    int peerAskedForMetadata[METADATA_REQQ];
-    int peerAskedForMetadataCount;
+    int peerAskedForMetadata[METADATA_REQQ] = {};
+    int peerAskedForMetadataCount = 0;
 
-    tr_pex* pex;
-    tr_pex* pex6;
+    tr_pex* pex = nullptr;
+    tr_pex* pex6 = nullptr;
 
-    time_t clientSentAnythingAt;
+    time_t clientSentAnythingAt = 0;
 
-    time_t chokeChangedAt;
+    time_t chokeChangedAt = 0;
 
     /* when we started batching the outMessages */
-    time_t outMessagesBatchedAt;
+    time_t outMessagesBatchedAt = 0;
 
-    struct tr_incoming incoming;
+    struct tr_incoming incoming = {};
 
     /* if the peer supports the Extension Protocol in BEP 10 and
        supplied a reqq argument, it's stored here. Otherwise, the
        value is zero and should be ignored. */
-    int64_t reqq;
+    int64_t reqq = 0;
 
-    struct event* pexTimer;
+    UniqueTimer pex_timer;
 
-    struct tr_peerIo* io;
+    struct tr_peerIo* io = nullptr;
 };
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
@@ -2667,8 +2673,8 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
 
     sendPex(msgs);
 
-    TR_ASSERT(msgs->pexTimer != nullptr);
-    tr_timerAdd(msgs->pexTimer, PEX_INTERVAL_SECS, 0);
+    TR_ASSERT(msgs->pex_timer);
+    tr_timerAdd(msgs->pex_timer.get(), PEX_INTERVAL_SECS, 0);
 }
 
 /***
