@@ -177,8 +177,8 @@ static void tr_peerMsgsSetActive(tr_peerMsgs* msgs, tr_direction direction, bool
 class tr_peerMsgs : public tr_peer
 {
 public:
-    tr_peerMsgs(struct tr_torrent* torrent_in, struct tr_peerIo* io_in, tr_peer_callback callback_in, void* callbackData_in)
-        : tr_peer{ torrent_in }
+    tr_peerMsgs(tr_torrent* torrent_in, peer_atom* atom, tr_peerIo* io_in, tr_peer_callback callback_in, void* callbackData_in)
+        : tr_peer{ torrent_in, atom }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
         , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
@@ -340,9 +340,9 @@ public:
     struct tr_peerIo* io;
 };
 
-tr_peer* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr_peer_callback callback, void* callbackData)
+tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
 {
-    return new tr_peerMsgs(torrent, io, callback, callbackData);
+    return new tr_peerMsgs(torrent, atom, io, callback, callbackData);
 }
 
 /**

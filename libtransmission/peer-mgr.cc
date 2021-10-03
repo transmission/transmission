@@ -234,8 +234,9 @@ unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_dire
     return Bps;
 }
 
-tr_peer::tr_peer(tr_torrent const* tor)
+tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
+    , atom{ atom_in }
     , swarm{ tor->swarm }
 {
     tr_bitfieldConstruct(&have, tor->info.pieceCount);
@@ -1929,8 +1930,7 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
 
     tr_swarm* swarm = tor->swarm;
 
-    tr_peer* peer = tr_peerMsgsNew(tor, io, peerCallbackFunc, swarm);
-    peer->atom = atom;
+    tr_peer* peer = tr_peerMsgsNew(tor, atom, io, peerCallbackFunc, swarm);
     peer->client = client;
     atom->peer = peer;
 

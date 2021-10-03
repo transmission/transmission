@@ -24,6 +24,7 @@
 
 class tr_peer;
 struct tr_swarm;
+struct peer_atom;
 
 enum
 {
@@ -81,7 +82,7 @@ typedef void (*tr_peer_callback)(tr_peer* peer, tr_peer_event const* event, void
 class tr_peer
 {
 public:
-    tr_peer(tr_torrent const* tor);
+    tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
     virtual ~tr_peer();
 
     virtual bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
@@ -102,7 +103,7 @@ public:
     tr_session* const session;
 
     /* Hook to private peer-mgr information */
-    struct peer_atom* atom = nullptr;
+    peer_atom* const atom;
 
     struct tr_swarm* const swarm;
 
