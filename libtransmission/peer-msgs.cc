@@ -306,12 +306,12 @@ public:
     tr_piece_index_t fastset[MAX_FAST_SET_SIZE];
 #endif
 
-    tr_torrent* torrent;
+    tr_torrent* const torrent;
 
-    tr_peer_callback callback;
-    void* callbackData;
+    tr_peer_callback const callback;
+    void* const callbackData;
 
-    struct evbuffer* outMessages; /* all the non-piece messages */
+    evbuffer* const outMessages; /* all the non-piece messages */
 
     struct peer_request peerAskedFor[REQQ];
 
