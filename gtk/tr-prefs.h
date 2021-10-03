@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,9 +8,26 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <memory>
 
-GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core);
+#include <gtkmm.h>
+
+typedef struct _TrCore TrCore;
+
+class PrefsDialog : public Gtk::Dialog
+{
+public:
+    ~PrefsDialog() override;
+
+    static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, TrCore* core);
+
+protected:
+    PrefsDialog(Gtk::Window& parent, TrCore* core);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};
 
 enum
 {

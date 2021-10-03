@@ -182,7 +182,7 @@ private:
     std::unique_ptr<MainWindow> wind_;
     TrCore* core_ = nullptr;
     Glib::RefPtr<Gtk::Window> msgwin_;
-    Glib::RefPtr<Gtk::Window> prefs_;
+    std::unique_ptr<PrefsDialog> prefs_;
     std::vector<std::string> error_list_;
     std::vector<std::string> duplicates_list_;
     std::map<std::string, std::unique_ptr<DetailsDialog>> details_;
@@ -1577,9 +1577,8 @@ void Application::actions_handler(std::string const& action_name)
     {
         if (prefs_ == nullptr)
         {
-            prefs_ = Glib::make_refptr_for_instance(Glib::wrap(
-                GTK_WINDOW(gtr_prefs_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), G_OBJECT(core_)))));
-            prefs_->signal_unrealize().connect([this]() { prefs_.reset(); });
+            prefs_ = PrefsDialog::create(*wind_, core_);
+            prefs_->signal_hide().connect([this]() { prefs_.reset(); });
         }
 
         gtr_window_present(prefs_);

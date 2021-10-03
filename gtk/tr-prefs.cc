@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,12 +8,16 @@
 
 #include <ctype.h> /* isspace */
 #include <limits.h> /* USHRT_MAX, INT_MAX */
+#include <sstream>
 #include <unistd.h>
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
+
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"
@@ -24,298 +28,291 @@
 ***
 **/
 
-struct prefs_dialog_data
+class PrefsDialog::Impl
 {
-    TrCore* core;
-    gulong core_prefs_tag;
+public:
+    Impl(PrefsDialog& dialog, TrCore* core);
+    ~Impl();
 
-    GtkWidget* freespace_label;
+private:
+    Gtk::Widget* speedPage();
+    Gtk::Widget* downloadingPage();
+    Gtk::Widget* seedingPage();
+    Gtk::Widget* privacyPage();
+    Gtk::Widget* networkPage();
+    Gtk::Widget* desktopPage();
+    Gtk::Widget* remotePage();
 
-    GtkWidget* port_label;
-    GtkWidget* port_button;
-    GtkWidget* port_spin;
+    void on_core_prefs_changed(tr_quark const key);
+
+    void response_cb(int response);
+
+private:
+    PrefsDialog& dialog_;
+
+    TrCore* core_ = nullptr;
+    gulong core_prefs_tag_ = 0;
+
+    Gtk::Label* freespace_label_ = nullptr;
+
+    Gtk::Label* port_label_ = nullptr;
+    Gtk::Button* port_button_ = nullptr;
+    Gtk::SpinButton* port_spin_ = nullptr;
 };
 
 /**
 ***
 **/
 
-#define PREF_KEY "pref-key"
-
-static void response_cb(GtkDialog* dialog, int response, gpointer user_data)
+void PrefsDialog::Impl::response_cb(int response)
 {
-    TR_UNUSED(user_data);
-
-    if (response == GTK_RESPONSE_HELP)
+    if (response == Gtk::RESPONSE_HELP)
     {
-        char* uri = g_strconcat(gtr_get_help_uri(), "/html/preferences.html", nullptr);
-        gtr_open_uri(uri);
-        g_free(uri);
+        gtr_open_uri((Glib::ustring(gtr_get_help_uri()) + "/html/preferences.html").c_str());
     }
 
-    if (response == GTK_RESPONSE_CLOSE)
+    if (response == Gtk::RESPONSE_CLOSE)
     {
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        dialog_.hide();
     }
 }
 
-static void toggled_cb(GtkToggleButton* w, gpointer core)
+namespace
 {
-    tr_quark const key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), PREF_KEY));
-    gboolean const flag = gtk_toggle_button_get_active(w);
 
-    gtr_core_set_pref_bool(TR_CORE(core), key, flag);
-}
-
-static GtkWidget* new_check_button(char const* mnemonic, tr_quark const key, gpointer core)
+Gtk::CheckButton* new_check_button(Glib::ustring const& mnemonic, tr_quark const key, TrCore* core)
 {
-    GtkWidget* w = gtk_check_button_new_with_mnemonic(mnemonic);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), gtr_pref_flag_get(key));
-    g_signal_connect(w, "toggled", G_CALLBACK(toggled_cb), core);
+    auto* w = Gtk::make_managed<Gtk::CheckButton>(mnemonic, true);
+    w->set_active(gtr_pref_flag_get(key));
+    w->signal_toggled().connect([w, key, core]() { gtr_core_set_pref_bool(core, key, w->get_active()); });
     return w;
 }
 
 #define IDLE_DATA "idle-data"
 
-struct spin_idle_data
+bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, TrCore* core, bool isDouble)
 {
-    gpointer core;
-    GTimer* last_change;
-    gboolean isDouble;
-};
-
-static void spin_idle_data_free(gpointer gdata)
-{
-    auto* data = static_cast<spin_idle_data*>(gdata);
-
-    g_timer_destroy(data->last_change);
-    g_free(data);
-}
-
-static gboolean spun_cb_idle(gpointer spin)
-{
-    gboolean keep_waiting = TRUE;
-    GObject* o = G_OBJECT(spin);
-    auto* data = static_cast<spin_idle_data*>(g_object_get_data(o, IDLE_DATA));
+    bool keep_waiting = true;
+    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IDLE_DATA));
 
     /* has the user stopped making changes? */
-    if (g_timer_elapsed(data->last_change, nullptr) > 0.33)
+    if (last_change->elapsed() > 0.33)
     {
         /* update the core */
-        tr_quark const key = GPOINTER_TO_INT(g_object_get_data(o, PREF_KEY));
-
-        if (data->isDouble)
+        if (isDouble)
         {
-            double const value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(spin));
-            gtr_core_set_pref_double(TR_CORE(data->core), key, value);
+            double const value = spin->get_value();
+            gtr_core_set_pref_double(core, key, value);
         }
         else
         {
-            int const value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin));
-            gtr_core_set_pref_int(TR_CORE(data->core), key, value);
+            int const value = spin->get_value_as_int();
+            gtr_core_set_pref_int(core, key, value);
         }
 
         /* cleanup */
-        g_object_set_data(o, IDLE_DATA, nullptr);
-        keep_waiting = FALSE;
-        g_object_unref(G_OBJECT(o));
+        spin->set_data(IDLE_DATA, nullptr);
+        keep_waiting = false;
+        spin->unreference();
     }
 
     return keep_waiting;
 }
 
-static void spun_cb(GtkSpinButton* w, gpointer core, gboolean isDouble)
+void spun_cb(Gtk::SpinButton* w, tr_quark const key, TrCore* core, bool isDouble)
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
-    GObject* o = G_OBJECT(w);
-    auto* data = static_cast<spin_idle_data*>(g_object_get_data(o, IDLE_DATA));
+    auto* last_change = static_cast<Glib::Timer*>(w->get_data(IDLE_DATA));
 
-    if (data == nullptr)
+    if (last_change == nullptr)
     {
-        data = g_new(struct spin_idle_data, 1);
-        data->core = core;
-        data->last_change = g_timer_new();
-        data->isDouble = isDouble;
-        g_object_set_data_full(o, IDLE_DATA, data, spin_idle_data_free);
-        g_object_ref(G_OBJECT(o));
-        gdk_threads_add_timeout_seconds(1, spun_cb_idle, w);
+        last_change = new Glib::Timer();
+        w->set_data(IDLE_DATA, last_change, [](void* p) { delete static_cast<Glib::Timer*>(p); });
+        w->reference();
+        Glib::signal_timeout().connect_seconds([w, key, core, isDouble]() { return spun_cb_idle(w, key, core, isDouble); }, 1);
     }
 
-    g_timer_start(data->last_change);
+    last_change->start();
 }
 
-static void spun_cb_int(GtkSpinButton* w, gpointer core)
+Gtk::SpinButton* new_spin_button(tr_quark const key, TrCore* core, int low, int high, int step)
 {
-    spun_cb(w, core, FALSE);
-}
-
-static void spun_cb_double(GtkSpinButton* w, gpointer core)
-{
-    spun_cb(w, core, TRUE);
-}
-
-static GtkWidget* new_spin_button(tr_quark const key, gpointer core, int low, int high, int step)
-{
-    GtkWidget* w = gtk_spin_button_new_with_range(low, high, step);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    gtk_spin_button_set_digits(GTK_SPIN_BUTTON(w), 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(w), gtr_pref_int_get(key));
-    g_signal_connect(w, "value-changed", G_CALLBACK(spun_cb_int), core);
+    auto* w = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(gtr_pref_int_get(key), low, high, step));
+    w->set_digits(0);
+    w->signal_value_changed().connect([w, key, core]() { spun_cb(w, key, core, false); });
     return w;
 }
 
-static GtkWidget* new_spin_button_double(tr_quark const key, gpointer core, double low, double high, double step)
+Gtk::SpinButton* new_spin_button_double(tr_quark const key, TrCore* core, double low, double high, double step)
 {
-    GtkWidget* w = gtk_spin_button_new_with_range(low, high, step);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    gtk_spin_button_set_digits(GTK_SPIN_BUTTON(w), 2);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(w), gtr_pref_double_get(key));
-    g_signal_connect(w, "value-changed", G_CALLBACK(spun_cb_double), core);
+    auto* w = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(gtr_pref_double_get(key), low, high, step));
+    w->set_digits(2);
+    w->signal_value_changed().connect([w, key, core]() { spun_cb(w, key, core, true); });
     return w;
 }
 
-static void entry_changed_cb(GtkEntry* w, gpointer core)
+void entry_changed_cb(Gtk::Entry* w, tr_quark const key, TrCore* core)
 {
-    tr_quark const key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), PREF_KEY));
-    char const* value = gtk_entry_get_text(w);
-
-    gtr_core_set_pref(TR_CORE(core), key, value);
+    gtr_core_set_pref(core, key, w->get_text().c_str());
 }
 
-static GtkWidget* new_entry(tr_quark const key, gpointer core)
+Gtk::Entry* new_entry(tr_quark const key, TrCore* core)
 {
-    GtkWidget* w = gtk_entry_new();
-    char const* value = gtr_pref_string_get(key);
+    auto* w = Gtk::make_managed<Gtk::Entry>();
 
-    if (value != nullptr)
+    if (char const* value = gtr_pref_string_get(key); value != nullptr)
     {
-        gtk_entry_set_text(GTK_ENTRY(w), value);
+        w->set_text(value);
     }
 
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    g_signal_connect(w, "changed", G_CALLBACK(entry_changed_cb), core);
+    w->signal_changed().connect([w, key, core]() { entry_changed_cb(w, key, core); });
     return w;
 }
 
-static void chosen_cb(GtkFileChooser* w, gpointer core)
+void chosen_cb(Gtk::FileChooser* w, tr_quark const key, TrCore* core)
 {
-    tr_quark const key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), PREF_KEY));
-    char* value = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(w));
-    gtr_core_set_pref(TR_CORE(core), key, value);
-    g_free(value);
+    gtr_core_set_pref(core, key, w->get_filename().c_str());
 }
 
-static GtkWidget* new_path_chooser_button(tr_quark const key, gpointer core)
+Gtk::FileChooserButton* new_path_chooser_button(tr_quark const key, TrCore* core)
 {
-    GtkWidget* w = gtk_file_chooser_button_new(nullptr, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    char const* path = gtr_pref_string_get(key);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
+    auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
-    if (path != nullptr)
+    if (char const* path = gtr_pref_string_get(key); path != nullptr)
     {
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w), path);
+        w->set_filename(path);
     }
 
-    g_signal_connect(w, "selection-changed", G_CALLBACK(chosen_cb), core);
+    w->signal_selection_changed().connect([w, key, core]() { chosen_cb(w, key, core); });
     return w;
 }
 
-static GtkWidget* new_file_chooser_button(tr_quark const key, gpointer core)
+Gtk::FileChooserButton* new_file_chooser_button(tr_quark const key, TrCore* core)
 {
-    GtkWidget* w = gtk_file_chooser_button_new(nullptr, GTK_FILE_CHOOSER_ACTION_OPEN);
-    char const* path = gtr_pref_string_get(key);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
+    auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_OPEN);
 
-    if (path != nullptr)
+    if (char const* path = gtr_pref_string_get(key); path != nullptr)
     {
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w), path);
+        w->set_filename(path);
     }
 
-    g_signal_connect(w, "selection-changed", G_CALLBACK(chosen_cb), core);
+    w->signal_selection_changed().connect([w, key, core]() { chosen_cb(w, key, core); });
     return w;
 }
 
-static void target_cb(GtkWidget* tb, gpointer target)
+void target_cb(Gtk::ToggleButton* tb, Gtk::Widget* target)
 {
-    gboolean const b = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(tb));
-
-    gtk_widget_set_sensitive(GTK_WIDGET(target), b);
+    target->set_sensitive(tb->get_active());
 }
+
+} // namespace
 
 /****
 *****  Download Tab
 ****/
 
-static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
+Gtk::Widget* PrefsDialog::Impl::downloadingPage()
 {
-    GtkWidget* t;
-    GtkWidget* w;
-    GtkWidget* l;
-    char const* s;
     guint row = 0;
 
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, C_("Gerund", "Adding"));
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, C_("Gerund", "Adding"));
 
-    s = _("Automatically add .torrent files _from:");
-    l = new_check_button(s, TR_KEY_watch_dir_enabled, core);
-    w = new_path_chooser_button(TR_KEY_watch_dir, core);
-    gtk_widget_set_sensitive(GTK_WIDGET(w), gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
-    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
-    hig_workarea_add_row_w(t, &row, l, w, nullptr);
+    {
+        auto* l = new_check_button(_("Automatically add .torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
+        auto* w = new_path_chooser_button(TR_KEY_watch_dir, core_);
+        w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
+        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            nullptr);
+    }
 
-    s = _("Show the Torrent Options _dialog");
-    w = new_check_button(s, TR_KEY_show_options_window, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(
+            new_check_button(_("Show the Torrent Options _dialog"), TR_KEY_show_options_window, core_))));
 
-    s = _("_Start added torrents");
-    w = new_check_button(s, TR_KEY_start_added_torrents, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(
+            static_cast<Gtk::Widget*>(new_check_button(_("_Start added torrents"), TR_KEY_start_added_torrents, core_))));
 
-    s = _("Mo_ve .torrent file to the trash");
-    w = new_check_button(s, TR_KEY_trash_original_torrent_files, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(
+            new_check_button(_("Mo_ve .torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_))));
 
-    w = new_path_chooser_button(TR_KEY_download_dir, core);
-    hig_workarea_add_row(t, &row, _("Save to _Location:"), w, nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Save to _Location:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_path_chooser_button(TR_KEY_download_dir, core_))),
+        nullptr);
 
-    l = data->freespace_label = gtr_freespace_label_new(TR_CORE(core), nullptr);
-    g_object_set(l, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, nullptr);
-    hig_workarea_add_wide_control(t, &row, l);
+    freespace_label_ = Glib::wrap(GTK_LABEL(gtr_freespace_label_new(core_, nullptr)));
+    freespace_label_->set_halign(Gtk::ALIGN_END);
+    freespace_label_->set_valign(Gtk::ALIGN_CENTER);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(freespace_label_)));
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Download Queue"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Download Queue"));
 
-    s = _("Ma_ximum active downloads:");
-    w = new_spin_button(TR_KEY_download_queue_size, core, 0, INT_MAX, 1);
-    hig_workarea_add_row(t, &row, s, w, nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Ma_ximum active downloads:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_download_queue_size, core_, 0, INT_MAX, 1))),
+        nullptr);
 
-    s = _("Downloads sharing data in the last _N minutes are active:");
-    w = new_spin_button(TR_KEY_queue_stalled_minutes, core, 1, INT_MAX, 15);
-    hig_workarea_add_row(t, &row, s, w, nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Downloads sharing data in the last _N minutes are active:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_queue_stalled_minutes, core_, 1, INT_MAX, 15))),
+        nullptr);
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Incomplete"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Incomplete"));
 
-    s = _("Append \"._part\" to incomplete files' names");
-    w = new_check_button(s, TR_KEY_rename_partial_files, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(
+            new_check_button(_("Append \"._part\" to incomplete files' names"), TR_KEY_rename_partial_files, core_))));
 
-    s = _("Keep _incomplete torrents in:");
-    l = new_check_button(s, TR_KEY_incomplete_dir_enabled, core);
-    w = new_path_chooser_button(TR_KEY_incomplete_dir, core);
-    gtk_widget_set_sensitive(GTK_WIDGET(w), gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
-    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
-    hig_workarea_add_row_w(t, &row, l, w, nullptr);
+    {
+        auto* l = new_check_button(_("Keep _incomplete torrents in:"), TR_KEY_incomplete_dir_enabled, core_);
+        auto* w = new_path_chooser_button(TR_KEY_incomplete_dir, core_);
+        w->set_sensitive(gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
+        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            nullptr);
+    }
 
-    s = _("Call scrip_t when torrent is completed:");
-    l = new_check_button(s, TR_KEY_script_torrent_done_enabled, core);
-    w = new_file_chooser_button(TR_KEY_script_torrent_done_filename, core);
-    gtk_widget_set_sensitive(GTK_WIDGET(w), gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
-    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
-    hig_workarea_add_row_w(t, &row, l, w, nullptr);
+    {
+        auto* l = new_check_button(_("Call scrip_t when torrent is completed:"), TR_KEY_script_torrent_done_enabled, core_);
+        auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_filename, core_);
+        w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
+        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            nullptr);
+    }
 
     return t;
 }
@@ -324,30 +321,38 @@ static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
 *****  Torrent Tab
 ****/
 
-static GtkWidget* seedingPage(GObject* core)
+Gtk::Widget* PrefsDialog::Impl::seedingPage()
 {
-    GtkWidget* t;
-    GtkWidget* w;
-    GtkWidget* w2;
-    char const* s;
     guint row = 0;
 
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Limits"));
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Limits"));
 
-    s = _("Stop seeding at _ratio:");
-    w = new_check_button(s, TR_KEY_ratio_limit_enabled, core);
-    w2 = new_spin_button_double(TR_KEY_ratio_limit, core, 0, 1000, .05);
-    gtk_widget_set_sensitive(GTK_WIDGET(w2), gtr_pref_flag_get(TR_KEY_ratio_limit_enabled));
-    g_signal_connect(w, "toggled", G_CALLBACK(target_cb), w2);
-    hig_workarea_add_row_w(t, &row, w, w2, nullptr);
+    {
+        auto* w = new_check_button(_("Stop seeding at _ratio:"), TR_KEY_ratio_limit_enabled, core_);
+        auto* w2 = new_spin_button_double(TR_KEY_ratio_limit, core_, 0, 1000, .05);
+        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_ratio_limit_enabled));
+        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
+            nullptr);
+    }
 
-    s = _("Stop seeding if idle for _N minutes:");
-    w = new_check_button(s, TR_KEY_idle_seeding_limit_enabled, core);
-    w2 = new_spin_button(TR_KEY_idle_seeding_limit, core, 1, 40320, 5);
-    gtk_widget_set_sensitive(GTK_WIDGET(w2), gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
-    g_signal_connect(w, "toggled", G_CALLBACK(target_cb), w2);
-    hig_workarea_add_row_w(t, &row, w, w2, nullptr);
+    {
+        auto* w = new_check_button(_("Stop seeding if idle for _N minutes:"), TR_KEY_idle_seeding_limit_enabled, core_);
+        auto* w2 = new_spin_button(TR_KEY_idle_seeding_limit, core_, 1, 40320, 5);
+        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
+        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
+            nullptr);
+    }
 
     return t;
 }
@@ -356,38 +361,51 @@ static GtkWidget* seedingPage(GObject* core)
 *****  Desktop Tab
 ****/
 
-static GtkWidget* desktopPage(GObject* core)
+Gtk::Widget* PrefsDialog::Impl::desktopPage()
 {
-    GtkWidget* t;
-    GtkWidget* w;
-    char const* s;
     guint row = 0;
 
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Desktop"));
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Desktop"));
 
-    s = _("_Inhibit hibernation when torrents are active");
-    w = new_check_button(s, TR_KEY_inhibit_desktop_hibernation, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(
+            new_check_button(_("_Inhibit hibernation when torrents are active"), TR_KEY_inhibit_desktop_hibernation, core_))));
 
-    s = _("Show Transmission icon in the _notification area");
-    w = new_check_button(s, TR_KEY_show_notification_area_icon, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+            _("Show Transmission icon in the _notification area"),
+            TR_KEY_show_notification_area_icon,
+            core_))));
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Notification"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Notification"));
 
-    s = _("Show a notification when torrents are a_dded");
-    w = new_check_button(s, TR_KEY_torrent_added_notification_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+            _("Show a notification when torrents are a_dded"),
+            TR_KEY_torrent_added_notification_enabled,
+            core_))));
 
-    s = _("Show a notification when torrents _finish");
-    w = new_check_button(s, TR_KEY_torrent_complete_notification_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+            _("Show a notification when torrents _finish"),
+            TR_KEY_torrent_complete_notification_enabled,
+            core_))));
 
-    s = _("Play a _sound when torrents finish");
-    w = new_check_button(s, TR_KEY_torrent_complete_sound_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(
+            new_check_button(_("Play a _sound when torrents finish"), TR_KEY_torrent_complete_sound_enabled, core_))));
 
     return t;
 }
@@ -396,174 +414,156 @@ static GtkWidget* desktopPage(GObject* core)
 *****  Peer Tab
 ****/
 
+namespace
+{
+
 struct blocklist_data
 {
-    gulong updateBlocklistTag;
-    GtkWidget* updateBlocklistButton;
-    GtkWidget* updateBlocklistDialog;
-    GtkWidget* label;
-    GtkWidget* check;
-    TrCore* core;
+    ~blocklist_data();
+
+    gulong updateBlocklistTag = 0;
+    Gtk::Button* updateBlocklistButton = nullptr;
+    std::unique_ptr<Gtk::MessageDialog> updateBlocklistDialog;
+    Gtk::Label* label = nullptr;
+    Gtk::CheckButton* check = nullptr;
+    TrCore* core = nullptr;
 };
 
-static void updateBlocklistText(GtkWidget* w, TrCore* core)
+void updateBlocklistText(Gtk::Label* w, TrCore* core)
 {
-    char buf1[512];
-    char buf2[512];
     int const n = tr_blocklistGetRuleCount(gtr_core_session(core));
-    g_snprintf(buf1, sizeof(buf1), ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n);
-    g_snprintf(buf2, sizeof(buf2), "<i>%s</i>", buf1);
-    gtk_label_set_markup(GTK_LABEL(w), buf2);
+    w->set_markup(Glib::ustring::sprintf(
+        "<i>%s</i>",
+        Glib::ustring::sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
-static void privacyPageDestroyed(gpointer gdata, GObject* dead)
+blocklist_data::~blocklist_data()
 {
-    TR_UNUSED(dead);
-
-    auto* data = static_cast<blocklist_data*>(gdata);
-
-    if (data->updateBlocklistTag > 0)
+    if (updateBlocklistTag > 0)
     {
-        g_signal_handler_disconnect(data->core, data->updateBlocklistTag);
+        g_signal_handler_disconnect(core, updateBlocklistTag);
     }
-
-    g_free(data);
 }
 
 /* user hit "close" in the blocklist-update dialog */
-static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response, gpointer gdata)
+void onBlocklistUpdateResponse(std::shared_ptr<blocklist_data> const& data)
 {
-    TR_UNUSED(response);
-
-    auto* data = static_cast<blocklist_data*>(gdata);
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-    gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
-    data->updateBlocklistDialog = nullptr;
+    data->updateBlocklistButton->set_sensitive(true);
+    data->updateBlocklistDialog.reset();
     g_signal_handler_disconnect(data->core, data->updateBlocklistTag);
     data->updateBlocklistTag = 0;
 }
 
 /* core says the blocklist was updated */
-static void onBlocklistUpdated(TrCore* core, int n, gpointer gdata)
+void onBlocklistUpdated(TrCore* core, int n, blocklist_data* data)
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
-    auto* data = static_cast<blocklist_data*>(gdata);
-    GtkMessageDialog* d = GTK_MESSAGE_DIALOG(data->updateBlocklistDialog);
-    gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
-    gtk_message_dialog_set_markup(d, success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"));
-    char const* const fmt = ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count);
-    gtk_message_dialog_format_secondary_text(d, fmt, count);
+    data->updateBlocklistButton->set_sensitive(true);
+    data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
+    data->updateBlocklistDialog->set_secondary_text(
+        Glib::ustring::sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
     updateBlocklistText(data->label, core);
 }
 
 /* user pushed a button to update the blocklist */
-static void onBlocklistUpdate(GtkButton* w, gpointer gdata)
+void onBlocklistUpdate(Gtk::Button* w, std::shared_ptr<blocklist_data> const& data)
 {
-    GtkWidget* d;
-    auto* data = static_cast<blocklist_data*>(gdata);
-    d = gtk_message_dialog_new(
-        GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))),
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_INFO,
-        GTK_BUTTONS_CLOSE,
-        "%s",
-        _("Update Blocklist"));
-    gtk_widget_set_sensitive(data->updateBlocklistButton, FALSE);
-    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(d), "%s", _("Getting new blocklist…"));
-    data->updateBlocklistDialog = d;
-    g_signal_connect(d, "response", G_CALLBACK(onBlocklistUpdateResponse), data);
-    gtk_widget_show(d);
+    data->updateBlocklistDialog = std::make_unique<Gtk::MessageDialog>(
+        *static_cast<Gtk::Window*>(w->get_toplevel()),
+        _("Update Blocklist"),
+        false,
+        Gtk::MESSAGE_INFO,
+        Gtk::BUTTONS_CLOSE);
+    data->updateBlocklistButton->set_sensitive(false);
+    data->updateBlocklistDialog->set_secondary_text(_("Getting new blocklist…"));
+    data->updateBlocklistDialog->signal_response().connect([data](int /*response*/) { onBlocklistUpdateResponse(data); });
+    data->updateBlocklistDialog->show();
     gtr_core_blocklist_update(data->core);
-    data->updateBlocklistTag = g_signal_connect(data->core, "blocklist-updated", G_CALLBACK(onBlocklistUpdated), data);
+    data->updateBlocklistTag = g_signal_connect(data->core, "blocklist-updated", G_CALLBACK(onBlocklistUpdated), data.get());
 }
 
-static void on_blocklist_url_changed(GtkEditable* e, gpointer gbutton)
+void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
 {
-    gchar* url = gtk_editable_get_chars(e, 0, -1);
-    gboolean const is_url_valid = tr_urlParse(url, TR_BAD_SIZE, nullptr, nullptr, nullptr, nullptr);
-    gtk_widget_set_sensitive(GTK_WIDGET(gbutton), is_url_valid);
-    g_free(url);
+    auto const url = e->get_chars(0, -1);
+    bool const is_url_valid = tr_urlParse(url.c_str(), TR_BAD_SIZE, nullptr, nullptr, nullptr, nullptr);
+    button->set_sensitive(is_url_valid);
 }
 
-static void onIntComboChanged(GtkComboBox* combo_box, gpointer core)
+void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, TrCore* core)
 {
-    int const val = gtr_combo_box_get_active_enum(combo_box);
-    tr_quark const key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(combo_box), PREF_KEY));
-    gtr_core_set_pref_int(TR_CORE(core), key, val);
+    gtr_core_set_pref_int(core, key, gtr_combo_box_get_active_enum(Glib::unwrap(combo_box)));
 }
 
-static GtkWidget* new_encryption_combo(GObject* core, tr_quark const key)
+Gtk::ComboBox* new_encryption_combo(TrCore* core, tr_quark const key)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(
+    auto* w = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
         TR_ARG_TUPLE(_("Allow encryption"), TR_CLEAR_PREFERRED),
         TR_ARG_TUPLE(_("Prefer encryption"), TR_ENCRYPTION_PREFERRED),
         TR_ARG_TUPLE(_("Require encryption"), TR_ENCRYPTION_REQUIRED),
-        nullptr);
-    gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
+        nullptr)));
+    gtr_combo_box_set_active_enum(Glib::unwrap(w), gtr_pref_int_get(key));
+    w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
     return w;
 }
 
-static GtkWidget* privacyPage(GObject* core)
+} // namespace
+
+Gtk::Widget* PrefsDialog::Impl::privacyPage()
 {
-    char const* s;
-    GtkWidget* t;
-    GtkWidget* w;
-    GtkWidget* b;
-    GtkWidget* h;
-    GtkWidget* e;
-    struct blocklist_data* data;
     guint row = 0;
 
-    data = g_new0(struct blocklist_data, 1);
-    data->core = TR_CORE(core);
+    auto const data = std::make_shared<blocklist_data>();
+    data->core = core_;
 
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Privacy"));
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Privacy"));
 
-    s = _("_Encryption mode:");
-    w = new_encryption_combo(core, TR_KEY_encryption);
-    hig_workarea_add_row(t, &row, s, w, nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("_Encryption mode:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_encryption_combo(core_, TR_KEY_encryption))),
+        nullptr);
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Blocklist"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Blocklist"));
 
-    b = new_check_button(_("Enable _blocklist:"), TR_KEY_blocklist_enabled, core);
-    e = new_entry(TR_KEY_blocklist_url, core);
-    gtk_widget_set_size_request(e, 300, -1);
-    hig_workarea_add_row_w(t, &row, b, e, nullptr);
-    data->check = b;
-    g_signal_connect(b, "toggled", G_CALLBACK(target_cb), e);
-    target_cb(b, e);
+    data->check = new_check_button(_("Enable _blocklist:"), TR_KEY_blocklist_enabled, core_);
+    auto* e = new_entry(TR_KEY_blocklist_url, core_);
+    e->set_size_request(300, -1);
+    hig_workarea_add_row_w(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(data->check)),
+        Glib::unwrap(static_cast<Gtk::Widget*>(e)),
+        nullptr);
+    data->check->signal_toggled().connect([data, e]() { target_cb(data->check, e); });
+    target_cb(data->check, e);
 
-    w = gtk_label_new("");
-    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
-    updateBlocklistText(w, TR_CORE(core));
-    data->label = w;
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
-    gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-    b = data->updateBlocklistButton = gtk_button_new_with_mnemonic(_("_Update"));
-    g_object_set_data(G_OBJECT(b), "session", gtr_core_session(TR_CORE(core)));
-    g_signal_connect(b, "clicked", G_CALLBACK(onBlocklistUpdate), data);
-    g_signal_connect(data->check, "toggled", G_CALLBACK(target_cb), b);
-    target_cb(data->check, b);
-    gtk_box_pack_start(GTK_BOX(h), b, FALSE, FALSE, 0);
-    g_signal_connect(data->check, "toggled", G_CALLBACK(target_cb), w);
-    target_cb(data->check, w);
-    hig_workarea_add_wide_control(t, &row, h);
-    g_signal_connect(e, "changed", G_CALLBACK(on_blocklist_url_changed), data->updateBlocklistButton);
-    on_blocklist_url_changed(GTK_EDITABLE(e), data->updateBlocklistButton);
+    data->label = Gtk::make_managed<Gtk::Label>();
+    data->label->set_halign(Gtk::ALIGN_START);
+    data->label->set_valign(Gtk::ALIGN_CENTER);
+    updateBlocklistText(data->label, core_);
+    auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
+    h->pack_start(*data->label, true, true, 0);
+    data->updateBlocklistButton = Gtk::make_managed<Gtk::Button>(_("_Update"), true);
+    data->updateBlocklistButton->set_data("session", gtr_core_session(core_));
+    data->updateBlocklistButton->signal_clicked().connect([data]() { onBlocklistUpdate(data->updateBlocklistButton, data); });
+    target_cb(data->check, data->updateBlocklistButton);
+    h->pack_start(*data->updateBlocklistButton, false, false, 0);
+    data->check->signal_toggled().connect([data]() { target_cb(data->check, data->label); });
+    target_cb(data->check, data->label);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h)));
+    e->signal_changed().connect([data, e]() { on_blocklist_url_changed(e, data->updateBlocklistButton); });
+    on_blocklist_url_changed(e, data->updateBlocklistButton);
 
-    s = _("Enable _automatic updates");
-    w = new_check_button(s, TR_KEY_blocklist_updates_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
-    g_signal_connect(data->check, "toggled", G_CALLBACK(target_cb), w);
-    target_cb(data->check, w);
+    auto* update_check = new_check_button(_("Enable _automatic updates"), TR_KEY_blocklist_updates_enabled, core_);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(update_check)));
+    data->check->signal_toggled().connect([data, update_check]() { target_cb(data->check, update_check); });
+    target_cb(data->check, update_check);
 
-    g_object_weak_ref(G_OBJECT(t), privacyPageDestroyed, data);
     return t;
 }
 
@@ -571,311 +571,256 @@ static GtkWidget* privacyPage(GObject* core)
 *****  Remote Tab
 ****/
 
-enum
+namespace
 {
-    COL_ADDRESS,
-    N_COLS
-};
 
-static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
+class WhitelistModelColumns : public Gtk::TreeModelColumnRecord
 {
-    char** rules;
-    GtkListStore* store = gtk_list_store_new(N_COLS, G_TYPE_STRING, G_TYPE_STRING);
-
-    rules = g_strsplit(whitelist, ",", 0);
-
-    for (int i = 0; rules != nullptr && rules[i] != nullptr; ++i)
+public:
+    WhitelistModelColumns()
     {
-        GtkTreeIter iter;
-        char const* s = rules[i];
-
-        while (isspace(*s))
-        {
-            ++s;
-        }
-
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, COL_ADDRESS, s, -1);
+        add(address);
     }
 
-    g_strfreev(rules);
-    return GTK_TREE_MODEL(store);
+    Gtk::TreeModelColumn<Glib::ustring> address;
+};
+
+WhitelistModelColumns const whitelist_cols;
+
+Glib::RefPtr<Gtk::ListStore> whitelist_tree_model_new(char const* whitelist)
+{
+    auto const store = Gtk::ListStore::create(whitelist_cols);
+
+    std::istringstream stream(whitelist != nullptr ? whitelist : "");
+    std::string s;
+
+    while (std::getline(stream, s, ','))
+    {
+        s = Glib::str_strip(s);
+
+        if (s.empty())
+        {
+            continue;
+        }
+
+        auto const iter = store->append();
+        (*iter)[whitelist_cols.address] = s;
+    }
+
+    return store;
 }
 
 struct remote_page
 {
     TrCore* core;
-    GtkTreeView* view;
-    GtkListStore* store;
-    GtkWidget* remove_button;
-    GSList* widgets;
-    GSList* auth_widgets;
-    GSList* whitelist_widgets;
-    GtkToggleButton* rpc_tb;
-    GtkToggleButton* auth_tb;
-    GtkToggleButton* whitelist_tb;
+    Gtk::TreeView* view;
+    Glib::RefPtr<Gtk::ListStore> store;
+    Gtk::Button* remove_button;
+    std::vector<Gtk::Widget*> widgets;
+    std::vector<Gtk::Widget*> auth_widgets;
+    std::vector<Gtk::Widget*> whitelist_widgets;
+    Gtk::ToggleButton* rpc_tb;
+    Gtk::ToggleButton* auth_tb;
+    Gtk::ToggleButton* whitelist_tb;
 };
 
-static void refreshWhitelist(struct remote_page* page)
+void refreshWhitelist(std::shared_ptr<remote_page> const& page)
 {
-    GtkTreeIter iter;
-    GString* gstr = g_string_new(nullptr);
-    GtkTreeModel* model = GTK_TREE_MODEL(page->store);
+    std::ostringstream gstr;
 
-    if (gtk_tree_model_iter_nth_child(model, &iter, nullptr, 0))
+    for (auto const& row : page->store->children())
     {
-        do
-        {
-            char* address;
-            gtk_tree_model_get(model, &iter, COL_ADDRESS, &address, -1);
-            g_string_append(gstr, address);
-            g_string_append(gstr, ",");
-            g_free(address);
-        } while (gtk_tree_model_iter_next(model, &iter));
+        gstr << row.get_value(whitelist_cols.address) << ",";
     }
 
-    g_string_truncate(gstr, gstr->len - 1); /* remove the trailing comma */
+    auto str = gstr.str();
+    if (!str.empty())
+    {
+        str.resize(str.size() - 1); /* remove the trailing comma */
+    }
 
-    gtr_core_set_pref(page->core, TR_KEY_rpc_whitelist, gstr->str);
-
-    g_string_free(gstr, TRUE);
+    gtr_core_set_pref(page->core, TR_KEY_rpc_whitelist, str.c_str());
 }
 
-static void onAddressEdited(GtkCellRendererText const* r, gchar const* path_string, gchar* address, gpointer gpage)
+void onAddressEdited(Glib::ustring const& path, Glib::ustring const& address, std::shared_ptr<remote_page> const& page)
 {
-    TR_UNUSED(r);
-
-    GtkTreeIter iter;
-    auto* page = static_cast<remote_page*>(gpage);
-    GtkTreeModel* model = GTK_TREE_MODEL(page->store);
-    GtkTreePath* path = gtk_tree_path_new_from_string(path_string);
-
-    if (gtk_tree_model_get_iter(model, &iter, path))
+    if (auto const iter = page->store->get_iter(path); iter)
     {
-        gtk_list_store_set(page->store, &iter, COL_ADDRESS, address, -1);
+        (*iter)[whitelist_cols.address] = address;
     }
 
-    gtk_tree_path_free(path);
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton const* b, gpointer gpage)
+void onAddWhitelistClicked(std::shared_ptr<remote_page> const& page)
 {
-    TR_UNUSED(b);
+    auto const iter = page->store->append();
+    (*iter)[whitelist_cols.address] = "0.0.0.0";
 
-    GtkTreeIter iter;
-    GtkTreePath* path;
-    auto* page = static_cast<remote_page*>(gpage);
-
-    gtk_list_store_append(page->store, &iter);
-    gtk_list_store_set(page->store, &iter, COL_ADDRESS, "0.0.0.0", -1);
-
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(page->store), &iter);
-    gtk_tree_view_set_cursor(page->view, path, gtk_tree_view_get_column(page->view, COL_ADDRESS), TRUE);
-    gtk_tree_path_free(path);
+    page->view->set_cursor(page->store->get_path(iter), *page->view->get_column(0), true);
 }
 
-static void onRemoveWhitelistClicked(GtkButton const* b, gpointer gpage)
+void onRemoveWhitelistClicked(std::shared_ptr<remote_page> const& page)
 {
-    TR_UNUSED(b);
+    auto const sel = page->view->get_selection();
 
-    auto* page = static_cast<remote_page*>(gpage);
-    GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
-    GtkTreeIter iter;
-
-    if (gtk_tree_selection_get_selected(sel, nullptr, &iter))
+    if (auto const iter = sel->get_selected(); iter)
     {
-        gtk_list_store_remove(page->store, &iter);
+        page->store->erase(iter);
         refreshWhitelist(page);
     }
 }
 
-static void refreshRPCSensitivity(struct remote_page* page)
+void refreshRPCSensitivity(std::shared_ptr<remote_page> const& page)
 {
-    int const rpc_active = gtk_toggle_button_get_active(page->rpc_tb);
-    int const auth_active = gtk_toggle_button_get_active(page->auth_tb);
-    int const whitelist_active = gtk_toggle_button_get_active(page->whitelist_tb);
-    GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
-    int const have_addr = gtk_tree_selection_get_selected(sel, nullptr, nullptr);
-    int const n_rules = gtk_tree_model_iter_n_children(GTK_TREE_MODEL(page->store), nullptr);
+    bool const rpc_active = page->rpc_tb->get_active();
+    bool const auth_active = page->auth_tb->get_active();
+    bool const whitelist_active = page->whitelist_tb->get_active();
+    auto const sel = page->view->get_selection();
+    auto const have_addr = sel->get_selected();
+    auto const n_rules = page->store->children().size();
 
-    for (GSList* l = page->widgets; l != nullptr; l = l->next)
+    for (auto* const widget : page->widgets)
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active);
+        widget->set_sensitive(rpc_active);
     }
 
-    for (GSList* l = page->auth_widgets; l != nullptr; l = l->next)
+    for (auto* const widget : page->auth_widgets)
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active && auth_active);
+        widget->set_sensitive(rpc_active && auth_active);
     }
 
-    for (GSList* l = page->whitelist_widgets; l != nullptr; l = l->next)
+    for (auto* const widget : page->whitelist_widgets)
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active && whitelist_active);
+        widget->set_sensitive(rpc_active && whitelist_active);
     }
 
-    gtk_widget_set_sensitive(page->remove_button, rpc_active && have_addr && n_rules > 1);
+    page->remove_button->set_sensitive(rpc_active && whitelist_active && have_addr && n_rules > 1);
 }
 
-static void onRPCToggled(GtkToggleButton* tb, gpointer page)
+void onLaunchClutchCB()
 {
-    TR_UNUSED(tb);
-
-    refreshRPCSensitivity(static_cast<remote_page*>(page));
+    gtr_open_uri(Glib::ustring::sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)).c_str());
 }
 
-static void onWhitelistSelectionChanged(GtkTreeSelection* sel, gpointer page)
+} // namespace
+
+Gtk::Widget* PrefsDialog::Impl::remotePage()
 {
-    TR_UNUSED(sel);
-
-    refreshRPCSensitivity(static_cast<remote_page*>(page));
-}
-
-static void onLaunchClutchCB(GtkButton* w, gpointer data)
-{
-    TR_UNUSED(w);
-    TR_UNUSED(data);
-
-    char* uri;
-    int const port = gtr_pref_int_get(TR_KEY_rpc_port);
-
-    uri = g_strdup_printf("http://localhost:%d/", port);
-    gtr_open_uri(uri);
-    g_free(uri);
-}
-
-static void remotePageFree(gpointer gpage)
-{
-    auto* page = static_cast<remote_page*>(gpage);
-
-    g_slist_free(page->widgets);
-    g_slist_free(page->auth_widgets);
-    g_slist_free(page->whitelist_widgets);
-    g_free(page);
-}
-
-static GtkWidget* remotePage(GObject* core)
-{
-    GtkWidget* t;
-    GtkWidget* w;
-    GtkWidget* h;
-    char const* s;
     guint row = 0;
-    struct remote_page* page = g_new0(struct remote_page, 1);
+    auto const page = std::make_shared<remote_page>();
 
-    page->core = TR_CORE(core);
+    page->core = core_;
 
-    t = hig_workarea_create();
-    g_object_set_data_full(G_OBJECT(t), "page", page, remotePageFree);
+    auto* t = Glib::wrap(hig_workarea_create());
 
-    hig_workarea_add_section_title(t, &row, _("Remote Control"));
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Remote Control"));
 
     /* "enabled" checkbutton */
-    s = _("Allow _remote access");
-    w = new_check_button(s, TR_KEY_rpc_enabled, core);
-    page->rpc_tb = GTK_TOGGLE_BUTTON(w);
-    g_signal_connect(w, "clicked", G_CALLBACK(onRPCToggled), page);
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
-    gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-    w = gtk_button_new_with_mnemonic(_("_Open web client"));
-    page->widgets = g_slist_prepend(page->widgets, w);
-    g_signal_connect(w, "clicked", G_CALLBACK(onLaunchClutchCB), nullptr);
-    gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    hig_workarea_add_wide_control(t, &row, h);
+    page->rpc_tb = new_check_button(_("Allow _remote access"), TR_KEY_rpc_enabled, core_);
+    page->rpc_tb->signal_clicked().connect([page]() { refreshRPCSensitivity(page); });
+    auto* h1 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
+    h1->pack_start(*page->rpc_tb, true, true, 0);
+    auto* open_button = Gtk::make_managed<Gtk::Button>(_("_Open web client"), true);
+    page->widgets.push_back(open_button);
+    open_button->signal_clicked().connect(&onLaunchClutchCB);
+    h1->pack_start(*open_button, false, false, 0);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h1)));
 
     /* port */
-    w = new_spin_button(TR_KEY_rpc_port, core, 0, USHRT_MAX, 1);
-    page->widgets = g_slist_prepend(page->widgets, w);
-    w = hig_workarea_add_row(t, &row, _("HTTP _port:"), w, nullptr);
-    page->widgets = g_slist_prepend(page->widgets, w);
+    auto* port_spin = new_spin_button(TR_KEY_rpc_port, core_, 0, USHRT_MAX, 1);
+    page->widgets.push_back(port_spin);
+    page->widgets.push_back(Glib::wrap(hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("HTTP _port:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(port_spin)),
+        nullptr)));
 
     /* require authentication */
-    s = _("Use _authentication");
-    w = new_check_button(s, TR_KEY_rpc_authentication_required, core);
-    hig_workarea_add_wide_control(t, &row, w);
-    page->auth_tb = GTK_TOGGLE_BUTTON(w);
-    page->widgets = g_slist_prepend(page->widgets, w);
-    g_signal_connect(w, "clicked", G_CALLBACK(onRPCToggled), page);
+    page->auth_tb = new_check_button(_("Use _authentication"), TR_KEY_rpc_authentication_required, core_);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(page->auth_tb)));
+    page->widgets.push_back(page->auth_tb);
+    page->auth_tb->signal_clicked().connect([page]() { refreshRPCSensitivity(page); });
 
     /* username */
-    s = _("_Username:");
-    w = new_entry(TR_KEY_rpc_username, core);
-    page->auth_widgets = g_slist_prepend(page->auth_widgets, w);
-    w = hig_workarea_add_row(t, &row, s, w, nullptr);
-    page->auth_widgets = g_slist_prepend(page->auth_widgets, w);
+    auto* username_entry = new_entry(TR_KEY_rpc_username, core_);
+    page->auth_widgets.push_back(username_entry);
+    page->auth_widgets.push_back(Glib::wrap(hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("_Username:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(username_entry)),
+        nullptr)));
 
     /* password */
-    s = _("Pass_word:");
-    w = new_entry(TR_KEY_rpc_password, core);
-    gtk_entry_set_visibility(GTK_ENTRY(w), FALSE);
-    page->auth_widgets = g_slist_prepend(page->auth_widgets, w);
-    w = hig_workarea_add_row(t, &row, s, w, nullptr);
-    page->auth_widgets = g_slist_prepend(page->auth_widgets, w);
+    auto* password_entry = new_entry(TR_KEY_rpc_password, core_);
+    password_entry->set_visibility(false);
+    page->auth_widgets.push_back(password_entry);
+    page->auth_widgets.push_back(Glib::wrap(hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Pass_word:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(password_entry)),
+        nullptr)));
 
     /* require authentication */
-    s = _("Only allow these IP a_ddresses:");
-    w = new_check_button(s, TR_KEY_rpc_whitelist_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
-    page->whitelist_tb = GTK_TOGGLE_BUTTON(w);
-    page->widgets = g_slist_prepend(page->widgets, w);
-    g_signal_connect(w, "clicked", G_CALLBACK(onRPCToggled), page);
+    page->whitelist_tb = new_check_button(_("Only allow these IP a_ddresses:"), TR_KEY_rpc_whitelist_enabled, core_);
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(page->whitelist_tb)));
+    page->widgets.push_back(page->whitelist_tb);
+    page->whitelist_tb->signal_clicked().connect([page]() { refreshRPCSensitivity(page); });
 
     /* access control list */
     {
-        char const* val = gtr_pref_string_get(TR_KEY_rpc_whitelist);
-        GtkTreeModel* m = whitelist_tree_model_new(val);
-        GtkTreeViewColumn* c;
-        GtkCellRenderer* r;
-        GtkTreeSelection* sel;
-        GtkTreeView* v;
+        page->store = whitelist_tree_model_new(gtr_pref_string_get(TR_KEY_rpc_whitelist));
 
-        page->store = GTK_LIST_STORE(m);
-        w = gtk_tree_view_new_with_model(m);
-        g_signal_connect(w, "button-release-event", G_CALLBACK(on_tree_view_button_released_old), NULL);
+        page->view = Gtk::make_managed<Gtk::TreeView>(page->store);
+        page->view->signal_button_release_event().connect([page](GdkEventButton* event)
+                                                          { return on_tree_view_button_released(page->view, event); });
 
-        page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
-        v = page->view = GTK_TREE_VIEW(w);
-        gtk_widget_set_tooltip_text(w, _("IP addresses may use wildcards, such as 192.168.*.*"));
-        sel = gtk_tree_view_get_selection(v);
-        g_signal_connect(sel, "changed", G_CALLBACK(onWhitelistSelectionChanged), page);
-        g_object_unref(G_OBJECT(m));
-        gtk_tree_view_set_headers_visible(v, TRUE);
-        w = gtk_frame_new(nullptr);
-        gtk_frame_set_shadow_type(GTK_FRAME(w), GTK_SHADOW_IN);
-        gtk_container_add(GTK_CONTAINER(w), GTK_WIDGET(v));
+        page->whitelist_widgets.push_back(page->view);
+        page->view->set_tooltip_text(_("IP addresses may use wildcards, such as 192.168.*.*"));
+        auto const sel = page->view->get_selection();
+        sel->signal_changed().connect([page]() { refreshRPCSensitivity(page); });
+        page->view->set_headers_visible(true);
+        auto* view_frame = Gtk::make_managed<Gtk::Frame>();
+        view_frame->set_shadow_type(Gtk::SHADOW_IN);
+        view_frame->add(*page->view);
 
         /* ip address column */
-        r = gtk_cell_renderer_text_new();
-        g_signal_connect(r, "edited", G_CALLBACK(onAddressEdited), page);
-        g_object_set(G_OBJECT(r), "editable", TRUE, nullptr);
-        c = gtk_tree_view_column_new_with_attributes(nullptr, r, "text", COL_ADDRESS, nullptr);
-        gtk_tree_view_column_set_expand(c, TRUE);
-        gtk_tree_view_append_column(v, c);
-        gtk_tree_view_set_headers_visible(v, FALSE);
+        auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+        r->signal_edited().connect([page](auto const& path, auto const& new_text) { onAddressEdited(path, new_text, page); });
+        r->property_editable() = true;
+        auto* c = Gtk::make_managed<Gtk::TreeViewColumn>("", *r);
+        c->add_attribute(r->property_text(), whitelist_cols.address);
+        c->set_expand(true);
+        page->view->append_column(*c);
+        page->view->set_headers_visible(false);
 
-        s = _("Addresses:");
-        w = hig_workarea_add_row(t, &row, s, w, nullptr);
-        g_object_set(
-            w,
-            TR_ARG_TUPLE("halign", GTK_ALIGN_START),
-            TR_ARG_TUPLE("valign", GTK_ALIGN_START),
-            TR_ARG_TUPLE("margin-top", GUI_PAD),
-            TR_ARG_TUPLE("margin-bottom", GUI_PAD),
-            nullptr);
-        page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
+        auto* w = Glib::wrap(hig_workarea_add_row(
+            Glib::unwrap(t),
+            &row,
+            _("Addresses:"),
+            Glib::unwrap(static_cast<Gtk::Widget*>(view_frame)),
+            nullptr));
+        w->set_halign(Gtk::ALIGN_START);
+        w->set_valign(Gtk::ALIGN_START);
+        w->set_margin_top(GUI_PAD);
+        w->set_margin_bottom(GUI_PAD);
+        page->whitelist_widgets.push_back(w);
 
-        h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-        w = gtk_button_new_with_mnemonic(_("_Remove"));
-        g_signal_connect(w, "clicked", G_CALLBACK(onRemoveWhitelistClicked), page);
-        page->remove_button = w;
-        onWhitelistSelectionChanged(sel, page);
-        gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_button_new_with_mnemonic(_("_Add"));
-        page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
-        g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
-        g_object_set(h, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, nullptr);
-        gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        hig_workarea_add_wide_control(t, &row, h);
+        auto* h2 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
+        page->remove_button = Gtk::make_managed<Gtk::Button>(_("_Remove"), true);
+        page->remove_button->signal_clicked().connect([page]() { onRemoveWhitelistClicked(page); });
+        refreshRPCSensitivity(page);
+        h2->pack_start(*page->remove_button, true, true, 0);
+        auto* add_button = Gtk::make_managed<Gtk::Button>(_("_Add"), true);
+        page->whitelist_widgets.push_back(add_button);
+        add_button->signal_clicked().connect([page]() { onAddWhitelistClicked(page); });
+        h2->set_halign(Gtk::ALIGN_END);
+        h2->set_valign(Gtk::ALIGN_CENTER);
+        h2->pack_start(*add_button, true, true, 0);
+        hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h2)));
     }
 
     refreshRPCSensitivity(page);
@@ -886,80 +831,73 @@ static GtkWidget* remotePage(GObject* core)
 *****  Bandwidth Tab
 ****/
 
+namespace
+{
+
 struct BandwidthPage
 {
-    TrCore* core;
-    GSList* sched_widgets;
+    std::vector<Gtk::Widget*> sched_widgets;
 };
 
-static void refreshSchedSensitivity(struct BandwidthPage* p)
+void refreshSchedSensitivity(std::shared_ptr<BandwidthPage> const& p)
 {
-    gboolean const sched_enabled = gtr_pref_flag_get(TR_KEY_alt_speed_time_enabled);
+    bool const sched_enabled = gtr_pref_flag_get(TR_KEY_alt_speed_time_enabled);
 
-    for (GSList* l = p->sched_widgets; l != nullptr; l = l->next)
+    for (auto* const w : p->sched_widgets)
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(l->data), sched_enabled);
+        w->set_sensitive(sched_enabled);
     }
 }
 
-static void onSchedToggled(GtkToggleButton* tb, gpointer user_data)
+Gtk::ComboBox* new_time_combo(TrCore* core, tr_quark const key)
 {
-    TR_UNUSED(tb);
-
-    refreshSchedSensitivity(static_cast<BandwidthPage*>(user_data));
-}
-
-static void onTimeComboChanged(GtkComboBox* w, gpointer core)
-{
-    GtkTreeIter iter;
-
-    if (gtk_combo_box_get_active_iter(w, &iter))
+    class TimeModelColumns : public Gtk::TreeModelColumnRecord
     {
-        int val = 0;
-        tr_quark const key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), PREF_KEY));
-        gtk_tree_model_get(gtk_combo_box_get_model(w), &iter, 0, &val, -1);
-        gtr_core_set_pref_int(TR_CORE(core), key, val);
-    }
-}
+    public:
+        TimeModelColumns()
+        {
+            add(offset);
+            add(title);
+        }
 
-static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
-{
-    int val;
-    GtkWidget* w;
-    GtkCellRenderer* r;
-    GtkListStore* store;
+        Gtk::TreeModelColumn<int> offset;
+        Gtk::TreeModelColumn<Glib::ustring> title;
+    };
+
+    static TimeModelColumns const time_cols;
 
     /* build a store at 15 minute intervals */
-    store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
+    auto store = Gtk::ListStore::create(time_cols);
 
     for (int i = 0; i < 60 * 24; i += 15)
     {
-        char buf[128];
-        GtkTreeIter iter;
-        g_snprintf(buf, sizeof(buf), "%02d:%02d", i / 60, i % 60);
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, i, 1, buf, -1);
+        auto const iter = store->append();
+        (*iter)[time_cols.offset] = i;
+        (*iter)[time_cols.title] = Glib::ustring::sprintf("%02d:%02d", i / 60, i % 60);
     }
 
     /* build the widget */
-    w = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
-    gtk_combo_box_set_wrap_width(GTK_COMBO_BOX(w), 4);
-    r = gtk_cell_renderer_text_new();
-    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(w), r, TRUE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(w), r, "text", 1, nullptr);
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    val = gtr_pref_int_get(key);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(w), val / (15));
-    g_signal_connect(w, "changed", G_CALLBACK(onTimeComboChanged), core);
+    auto* w = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(store));
+    w->set_wrap_width(4);
+    auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+    w->pack_start(*r, true);
+    w->add_attribute(r->property_text(), time_cols.title);
+    w->set_active(gtr_pref_int_get(key) / 15);
+    w->signal_changed().connect(
+        [w, key, core]()
+        {
+            if (auto const iter = w->get_active(); iter)
+            {
+                gtr_core_set_pref_int(core, key, iter->get_value(time_cols.offset));
+            }
+        });
 
-    /* cleanup */
-    g_object_unref(G_OBJECT(store));
     return w;
 }
 
-static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
+Gtk::ComboBox* new_week_combo(TrCore* core, tr_quark const key)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(
+    auto* w = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
         TR_ARG_TUPLE(_("Every Day"), TR_SCHED_ALL),
         TR_ARG_TUPLE(_("Weekdays"), TR_SCHED_WEEKDAY),
         TR_ARG_TUPLE(_("Weekends"), TR_SCHED_WEEKEND),
@@ -970,101 +908,127 @@ static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
         TR_ARG_TUPLE(_("Thursday"), TR_SCHED_THURS),
         TR_ARG_TUPLE(_("Friday"), TR_SCHED_FRI),
         TR_ARG_TUPLE(_("Saturday"), TR_SCHED_SAT),
-        nullptr);
-    gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
-    g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
-    g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
+        nullptr)));
+    gtr_combo_box_set_active_enum(Glib::unwrap(w), gtr_pref_int_get(key));
+    w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
     return w;
 }
 
-static void speedPageFree(gpointer gpage)
-{
-    auto* page = static_cast<BandwidthPage*>(gpage);
+} // namespace
 
-    g_slist_free(page->sched_widgets);
-    g_free(page);
-}
-
-static GtkWidget* speedPage(GObject* core)
+Gtk::Widget* PrefsDialog::Impl::speedPage()
 {
-    char const* s;
-    GtkWidget* t;
-    GtkWidget* l;
-    GtkWidget* w;
-    GtkWidget* w2;
-    GtkWidget* h;
-    char buf[512];
     guint row = 0;
-    struct BandwidthPage* page = tr_new0(struct BandwidthPage, 1);
+    auto page = std::make_shared<BandwidthPage>();
 
-    page->core = TR_CORE(core);
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Speed Limits"));
 
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Speed Limits"));
+    {
+        auto* w = new_check_button(
+            Glib::ustring::sprintf(_("_Upload (%s):"), _(speed_K_str)),
+            TR_KEY_speed_limit_up_enabled,
+            core_);
+        auto* w2 = new_spin_button(TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
+        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
+        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
+            nullptr);
+    }
 
-    g_snprintf(buf, sizeof(buf), _("_Upload (%s):"), _(speed_K_str));
-    w = new_check_button(buf, TR_KEY_speed_limit_up_enabled, core);
-    w2 = new_spin_button(TR_KEY_speed_limit_up, core, 0, INT_MAX, 5);
-    gtk_widget_set_sensitive(GTK_WIDGET(w2), gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
-    g_signal_connect(w, "toggled", G_CALLBACK(target_cb), w2);
-    hig_workarea_add_row_w(t, &row, w, w2, nullptr);
+    {
+        auto* w = new_check_button(
+            Glib::ustring::sprintf(_("_Download (%s):"), _(speed_K_str)),
+            TR_KEY_speed_limit_down_enabled,
+            core_);
+        auto* w2 = new_spin_button(TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
+        w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
+        w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
+            nullptr);
+    }
 
-    g_snprintf(buf, sizeof(buf), _("_Download (%s):"), _(speed_K_str));
-    w = new_check_button(buf, TR_KEY_speed_limit_down_enabled, core);
-    w2 = new_spin_button(TR_KEY_speed_limit_down, core, 0, INT_MAX, 5);
-    gtk_widget_set_sensitive(GTK_WIDGET(w2), gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
-    g_signal_connect(w, "toggled", G_CALLBACK(target_cb), w2);
-    hig_workarea_add_row_w(t, &row, w, w2, nullptr);
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
 
-    hig_workarea_add_section_divider(t, &row);
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-    g_snprintf(buf, sizeof(buf), "<b>%s</b>", _("Alternative Speed Limits"));
-    w = gtk_label_new(buf);
-    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
-    gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
-    gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_icon_name("alt-speed-on", GTK_ICON_SIZE_MENU);
-    gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    hig_workarea_add_section_title_widget(t, &row, h);
+    {
+        auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
+        auto* w = Gtk::make_managed<Gtk::Label>(Glib::ustring::sprintf("<b>%s</b>", _("Alternative Speed Limits")));
+        w->set_halign(Gtk::ALIGN_START);
+        w->set_valign(Gtk::ALIGN_CENTER);
+        w->set_use_markup(true);
+        h->pack_start(*w, false, false, 0);
+        h->pack_start(*Gtk::make_managed<Gtk::Image>("alt-speed-on", Gtk::ICON_SIZE_MENU), false, false, 0);
+        hig_workarea_add_section_title_widget(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h)));
+    }
 
-    s = _("Override normal speed limits manually or at scheduled times");
-    g_snprintf(buf, sizeof(buf), "<small>%s</small>", s);
-    w = gtk_label_new(buf);
-    gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
-    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
-    hig_workarea_add_wide_control(t, &row, w);
+    {
+        auto* w = Gtk::make_managed<Gtk::Label>(
+            Glib::ustring::sprintf("<small>%s</small>", _("Override normal speed limits manually or at scheduled times")));
+        w->set_use_markup(true);
+        w->set_halign(Gtk::ALIGN_START);
+        w->set_valign(Gtk::ALIGN_CENTER);
+        hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+    }
 
-    g_snprintf(buf, sizeof(buf), _("U_pload (%s):"), _(speed_K_str));
-    w = new_spin_button(TR_KEY_alt_speed_up, core, 0, INT_MAX, 5);
-    hig_workarea_add_row(t, &row, buf, w, nullptr);
+    {
+        auto* w = new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5);
+        hig_workarea_add_row(
+            Glib::unwrap(t),
+            &row,
+            Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)).c_str(),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            nullptr);
+    }
 
-    g_snprintf(buf, sizeof(buf), _("Do_wnload (%s):"), _(speed_K_str));
-    w = new_spin_button(TR_KEY_alt_speed_down, core, 0, INT_MAX, 5);
-    hig_workarea_add_row(t, &row, buf, w, nullptr);
+    {
+        auto* w = new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5);
+        hig_workarea_add_row(
+            Glib::unwrap(t),
+            &row,
+            Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)).c_str(),
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            nullptr);
+    }
 
-    s = _("_Scheduled times:");
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    w2 = new_time_combo(core, TR_KEY_alt_speed_time_begin);
-    page->sched_widgets = g_slist_prepend(page->sched_widgets, w2);
-    gtk_box_pack_start(GTK_BOX(h), w2, TRUE, TRUE, 0);
-    w2 = l = gtk_label_new_with_mnemonic(_(" _to "));
-    page->sched_widgets = g_slist_prepend(page->sched_widgets, w2);
-    gtk_box_pack_start(GTK_BOX(h), w2, FALSE, FALSE, 0);
-    w2 = new_time_combo(core, TR_KEY_alt_speed_time_end);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(l), w2);
-    page->sched_widgets = g_slist_prepend(page->sched_widgets, w2);
-    gtk_box_pack_start(GTK_BOX(h), w2, TRUE, TRUE, 0);
-    w = new_check_button(s, TR_KEY_alt_speed_time_enabled, core);
-    g_signal_connect(w, "toggled", G_CALLBACK(onSchedToggled), page);
-    hig_workarea_add_row_w(t, &row, w, h, nullptr);
+    {
+        auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, 0);
+        auto* start_combo = new_time_combo(core_, TR_KEY_alt_speed_time_begin);
+        page->sched_widgets.push_back(start_combo);
+        h->pack_start(*start_combo, true, true, 0);
+        auto* to_label = Gtk::make_managed<Gtk::Label>(_(" _to "), true);
+        page->sched_widgets.push_back(to_label);
+        h->pack_start(*to_label, false, false, 0);
+        auto* end_combo = new_time_combo(core_, TR_KEY_alt_speed_time_end);
+        to_label->set_mnemonic_widget(*end_combo);
+        page->sched_widgets.push_back(end_combo);
+        h->pack_start(*end_combo, true, true, 0);
+        auto* w = new_check_button(_("_Scheduled times:"), TR_KEY_alt_speed_time_enabled, core_);
+        w->signal_toggled().connect([page]() { refreshSchedSensitivity(page); });
+        hig_workarea_add_row_w(
+            Glib::unwrap(t),
+            &row,
+            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
+            Glib::unwrap(static_cast<Gtk::Widget*>(h)),
+            nullptr);
+    }
 
-    s = _("_On days:");
-    w = new_week_combo(core, TR_KEY_alt_speed_time_day);
-    page->sched_widgets = g_slist_prepend(page->sched_widgets, w);
-    w = hig_workarea_add_row(t, &row, s, w, nullptr);
-    page->sched_widgets = g_slist_prepend(page->sched_widgets, w);
-
-    g_object_set_data_full(G_OBJECT(t), "page", page, speedPageFree);
+    auto* week_combo = new_week_combo(core_, TR_KEY_alt_speed_time_day);
+    page->sched_widgets.push_back(week_combo);
+    auto* week_row = Glib::wrap(hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("_On days:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(week_combo)),
+        nullptr));
+    page->sched_widgets.push_back(week_row);
 
     refreshSchedSensitivity(page);
     return t;
@@ -1074,154 +1038,152 @@ static GtkWidget* speedPage(GObject* core)
 *****  Network Tab
 ****/
 
+namespace
+{
+
 struct network_page_data
 {
-    TrCore* core;
-    GtkWidget* portLabel;
-    GtkWidget* portButton;
-    GtkWidget* portSpin;
-    gulong portTag;
-    gulong prefsTag;
+    ~network_page_data();
+
+    TrCore* core = nullptr;
+    Gtk::Label* portLabel = nullptr;
+    Gtk::Button* portButton = nullptr;
+    Gtk::SpinButton* portSpin = nullptr;
+    gulong portTag = 0;
+    gulong prefsTag = 0;
 };
 
-static void onCorePrefsChanged(TrCore* core, tr_quark const key, gpointer gdata)
+void onCorePrefsChanged(TrCore* /*core*/, tr_quark const key, network_page_data* data)
 {
-    TR_UNUSED(core);
-
     if (key == TR_KEY_peer_port)
     {
-        auto* data = static_cast<network_page_data*>(gdata);
-        gtr_label_set_text(GTK_LABEL(data->portLabel), _("Status unknown"));
-        gtk_widget_set_sensitive(data->portButton, TRUE);
-        gtk_widget_set_sensitive(data->portSpin, TRUE);
+        gtr_label_set_text(Glib::unwrap(data->portLabel), _("Status unknown"));
+        data->portButton->set_sensitive(true);
+        data->portSpin->set_sensitive(true);
     }
 }
 
-static void networkPageDestroyed(gpointer gdata, GObject* dead)
+network_page_data::~network_page_data()
 {
-    TR_UNUSED(dead);
-
-    auto* data = static_cast<network_page_data*>(gdata);
-
-    if (data->prefsTag > 0)
+    if (prefsTag > 0)
     {
-        g_signal_handler_disconnect(data->core, data->prefsTag);
+        g_signal_handler_disconnect(core, prefsTag);
     }
 
-    if (data->portTag > 0)
+    if (portTag > 0)
     {
-        g_signal_handler_disconnect(data->core, data->portTag);
+        g_signal_handler_disconnect(core, portTag);
     }
-
-    g_free(data);
 }
 
-static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
+void onPortTested(TrCore* /*core*/, bool isOpen, network_page_data* data)
 {
-    TR_UNUSED(core);
-
-    auto* data = static_cast<network_page_data*>(vdata);
-    char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
-
-    gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
-    gtk_widget_set_sensitive(data->portButton, TRUE);
-    gtk_widget_set_sensitive(data->portSpin, TRUE);
+    data->portLabel->set_markup(isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>"));
+    data->portButton->set_sensitive(true);
+    data->portSpin->set_sensitive(true);
 }
 
-static void onPortTest(GtkButton* button, gpointer vdata)
+void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
-    TR_UNUSED(button);
-
-    auto* data = static_cast<network_page_data*>(vdata);
-    gtk_widget_set_sensitive(data->portButton, FALSE);
-    gtk_widget_set_sensitive(data->portSpin, FALSE);
-    gtk_label_set_markup(GTK_LABEL(data->portLabel), _("<i>Testing TCP port…</i>"));
+    data->portButton->set_sensitive(false);
+    data->portSpin->set_sensitive(false);
+    data->portLabel->set_markup(_("<i>Testing TCP port…</i>"));
 
     if (data->portTag == 0)
     {
-        data->portTag = g_signal_connect(data->core, "port-tested", G_CALLBACK(onPortTested), data);
+        data->portTag = g_signal_connect(data->core, "port-tested", G_CALLBACK(onPortTested), data.get());
     }
 
     gtr_core_port_test(data->core);
 }
 
-static GtkWidget* networkPage(GObject* core)
+} // namespace
+
+Gtk::Widget* PrefsDialog::Impl::networkPage()
 {
-    GtkWidget* t;
-    GtkWidget* w;
-    GtkWidget* h;
-    GtkWidget* l;
-    char const* s;
-    struct network_page_data* data;
     guint row = 0;
 
     /* register to stop listening to core prefs changes when the page is destroyed */
-    data = g_new0(struct network_page_data, 1);
-    data->core = TR_CORE(core);
+    auto const data = std::make_shared<network_page_data>();
+    data->core = core_;
 
     /* build the page */
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Listening Port"));
+    auto* t = Glib::wrap(hig_workarea_create());
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Listening Port"));
 
-    s = _("_Port used for incoming connections:");
-    w = data->portSpin = new_spin_button(TR_KEY_peer_port, core, 1, USHRT_MAX, 1);
-    hig_workarea_add_row(t, &row, s, w, nullptr);
+    data->portSpin = new_spin_button(TR_KEY_peer_port, core_, 1, USHRT_MAX, 1);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("_Port used for incoming connections:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(data->portSpin)),
+        nullptr);
 
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
-    l = data->portLabel = gtk_label_new(_("Status unknown"));
-    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
-    gtk_box_pack_start(GTK_BOX(h), l, TRUE, TRUE, 0);
-    w = data->portButton = gtk_button_new_with_mnemonic(_("Te_st Port"));
-    gtk_box_pack_end(GTK_BOX(h), w, FALSE, FALSE, 0);
-    g_signal_connect(w, "clicked", G_CALLBACK(onPortTest), data);
-    hig_workarea_add_row(t, &row, nullptr, h, nullptr);
-    data->prefsTag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(onCorePrefsChanged), data);
-    g_object_weak_ref(G_OBJECT(t), networkPageDestroyed, data);
+    auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
+    data->portLabel = Gtk::make_managed<Gtk::Label>(_("Status unknown"));
+    data->portLabel->set_halign(Gtk::ALIGN_START);
+    data->portLabel->set_valign(Gtk::ALIGN_CENTER);
+    h->pack_start(*data->portLabel, true, true, 0);
+    data->portButton = Gtk::make_managed<Gtk::Button>(_("Te_st Port"), true);
+    h->pack_end(*data->portButton, false, false, 0);
+    data->portButton->signal_clicked().connect([data]() { onPortTest(data); });
+    hig_workarea_add_row(Glib::unwrap(t), &row, nullptr, Glib::unwrap(static_cast<Gtk::Widget*>(h)), nullptr);
+    data->prefsTag = g_signal_connect(core_, "prefs-changed", G_CALLBACK(onCorePrefsChanged), data.get());
 
-    s = _("Pick a _random port every time Transmission is started");
-    w = new_check_button(s, TR_KEY_peer_port_random_on_start, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+            _("Pick a _random port every time Transmission is started"),
+            TR_KEY_peer_port_random_on_start,
+            core_))));
 
-    s = _("Use UPnP or NAT-PMP port _forwarding from my router");
-    w = new_check_button(s, TR_KEY_port_forwarding_enabled, core);
-    hig_workarea_add_wide_control(t, &row, w);
+    hig_workarea_add_wide_control(
+        Glib::unwrap(t),
+        &row,
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+            _("Use UPnP or NAT-PMP port _forwarding from my router"),
+            TR_KEY_port_forwarding_enabled,
+            core_))));
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Peer Limits"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Peer Limits"));
 
-    w = new_spin_button(TR_KEY_peer_limit_per_torrent, core, 1, FD_SETSIZE, 5);
-    hig_workarea_add_row(t, &row, _("Maximum peers per _torrent:"), w, nullptr);
-    w = new_spin_button(TR_KEY_peer_limit_global, core, 1, FD_SETSIZE, 5);
-    hig_workarea_add_row(t, &row, _("Maximum peers _overall:"), w, nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Maximum peers per _torrent:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_peer_limit_per_torrent, core_, 1, FD_SETSIZE, 5))),
+        nullptr);
+    hig_workarea_add_row(
+        Glib::unwrap(t),
+        &row,
+        _("Maximum peers _overall:"),
+        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_peer_limit_global, core_, 1, FD_SETSIZE, 5))),
+        nullptr);
 
-    hig_workarea_add_section_divider(t, &row);
-    hig_workarea_add_section_title(t, &row, _("Options"));
+    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Options"));
+
+    Gtk::CheckButton* w;
 
 #ifdef WITH_UTP
-    s = _("Enable _uTP for peer communication");
-    w = new_check_button(s, TR_KEY_utp_enabled, core);
-    s = _("uTP is a tool for reducing network congestion.");
-    gtk_widget_set_tooltip_text(w, s);
-    hig_workarea_add_wide_control(t, &row, w);
+    w = new_check_button(_("Enable _uTP for peer communication"), TR_KEY_utp_enabled, core_);
+    w->set_tooltip_text(_("uTP is a tool for reducing network congestion."));
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
 #endif
 
-    s = _("Use PE_X to find more peers");
-    w = new_check_button(s, TR_KEY_pex_enabled, core);
-    s = _("PEX is a tool for exchanging peer lists with the peers you're connected to.");
-    gtk_widget_set_tooltip_text(w, s);
-    hig_workarea_add_wide_control(t, &row, w);
+    w = new_check_button(_("Use PE_X to find more peers"), TR_KEY_pex_enabled, core_);
+    w->set_tooltip_text(_("PEX is a tool for exchanging peer lists with the peers you're connected to."));
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
 
-    s = _("Use _DHT to find more peers");
-    w = new_check_button(s, TR_KEY_dht_enabled, core);
-    s = _("DHT is a tool for finding peers without a tracker.");
-    gtk_widget_set_tooltip_text(w, s);
-    hig_workarea_add_wide_control(t, &row, w);
+    w = new_check_button(_("Use _DHT to find more peers"), TR_KEY_dht_enabled, core_);
+    w->set_tooltip_text(_("DHT is a tool for finding peers without a tracker."));
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
 
-    s = _("Use _Local Peer Discovery to find more peers");
-    w = new_check_button(s, TR_KEY_lpd_enabled, core);
-    s = _("LPD is a tool for finding peers on your local network.");
-    gtk_widget_set_tooltip_text(w, s);
-    hig_workarea_add_wide_control(t, &row, w);
+    w = new_check_button(_("Use _Local Peer Discovery to find more peers"), TR_KEY_lpd_enabled, core_);
+    w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
+    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
 
     return t;
 }
@@ -1230,80 +1192,82 @@ static GtkWidget* networkPage(GObject* core)
 *****
 ****/
 
-static void on_prefs_dialog_destroyed(gpointer gdata, GObject* dead_dialog G_GNUC_UNUSED)
+PrefsDialog::Impl::~Impl()
 {
-    auto* data = static_cast<prefs_dialog_data*>(gdata);
-
-    if (data->core_prefs_tag > 0)
+    if (core_prefs_tag_ > 0)
     {
-        g_signal_handler_disconnect(data->core, data->core_prefs_tag);
+        g_signal_handler_disconnect(core_, core_prefs_tag_);
     }
-
-    g_free(data);
 }
 
-static void on_core_prefs_changed(TrCore* core, tr_quark const key, gpointer gdata)
+void PrefsDialog::Impl::on_core_prefs_changed(tr_quark const key)
 {
-    auto* data = static_cast<prefs_dialog_data*>(gdata);
-
 #if 0
 
     if (key == TR_KEY_peer_port)
     {
-        gtr_label_set_text(GTK_LABEL(data->port_label), _("Status unknown"));
-        gtk_widget_set_sensitive(data->port_button, TRUE);
-        gtk_widget_set_sensitive(data->port_spin, TRUE);
+        port_label_->set_text(_("Status unknown"));
+        port_button_->set_sensitive(true);
+        port_spin_->set_sensitive(true);
     }
 
 #endif
 
     if (key == TR_KEY_download_dir)
     {
-        char const* downloadDir = tr_sessionGetDownloadDir(gtr_core_session(core));
-        gtr_freespace_label_set_dir(data->freespace_label, downloadDir);
+        char const* downloadDir = tr_sessionGetDownloadDir(gtr_core_session(core_));
+        gtr_freespace_label_set_dir(Glib::unwrap(static_cast<Gtk::Widget*>(freespace_label_)), downloadDir);
     }
 }
 
-GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
+std::unique_ptr<PrefsDialog> PrefsDialog::create(Gtk::Window& parent, TrCore* core)
 {
-    GtkWidget* d;
-    GtkWidget* n;
-    struct prefs_dialog_data* data;
-    tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
+    return std::unique_ptr<PrefsDialog>(new PrefsDialog(parent, core));
+}
 
-    data = g_new0(struct prefs_dialog_data, 1);
-    data->core = TR_CORE(core);
-    data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
+PrefsDialog::PrefsDialog(Gtk::Window& parent, TrCore* core)
+    : Gtk::Dialog(_("Transmission Preferences"), parent)
+    , impl_(std::make_unique<Impl>(*this, core))
+{
+}
 
-    d = gtk_dialog_new_with_buttons(
-        _("Transmission Preferences"),
-        parent,
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        TR_ARG_TUPLE(_("_Help"), GTK_RESPONSE_HELP),
-        TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
-        nullptr);
-    g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
-    gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
-    gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);
+PrefsDialog::~PrefsDialog() = default;
 
-    n = gtk_notebook_new();
-    gtk_container_set_border_width(GTK_CONTAINER(n), GUI_PAD);
+PrefsDialog::Impl::Impl(PrefsDialog& dialog, TrCore* core)
+    : dialog_(dialog)
+    , core_(core)
+{
+    static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
 
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), speedPage(core), gtk_label_new(_("Speed")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), downloadingPage(core, data), gtk_label_new(C_("Gerund", "Downloading")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), seedingPage(core), gtk_label_new(C_("Gerund", "Seeding")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), privacyPage(core), gtk_label_new(_("Privacy")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), networkPage(core), gtk_label_new(_("Network")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), desktopPage(core), gtk_label_new(_("Desktop")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), remotePage(core), gtk_label_new(_("Remote")));
+    core_prefs_tag_ = g_signal_connect(
+        core_,
+        "prefs-changed",
+        G_CALLBACK(static_cast<void (*)(TrCore*, tr_quark, Impl*)>([](TrCore* /*core*/, tr_quark key, Impl* impl)
+                                                                   { impl->on_core_prefs_changed(key); })),
+        this);
+
+    dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
+    dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
+    dialog_.set_role("transmission-preferences-dialog");
+    dialog_.set_border_width(GUI_PAD);
+
+    auto* n = Gtk::make_managed<Gtk::Notebook>();
+    n->set_border_width(GUI_PAD);
+
+    n->append_page(*speedPage(), _("Speed"));
+    n->append_page(*downloadingPage(), C_("Gerund", "Downloading"));
+    n->append_page(*seedingPage(), C_("Gerund", "Seeding"));
+    n->append_page(*privacyPage(), _("Privacy"));
+    n->append_page(*networkPage(), _("Network"));
+    n->append_page(*desktopPage(), _("Desktop"));
+    n->append_page(*remotePage(), _("Remote"));
 
     /* init from prefs keys */
-    for (size_t i = 0; i < G_N_ELEMENTS(prefs_quarks); ++i)
+    for (auto const key : prefs_quarks)
     {
-        on_core_prefs_changed(TR_CORE(core), prefs_quarks[i], data);
+        on_core_prefs_changed(key);
     }
 
-    g_signal_connect(d, "response", G_CALLBACK(response_cb), core);
-    gtr_dialog_set_content(GTK_DIALOG(d), n);
-    return d;
+    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::response_cb));
+    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(n)));
 }
