@@ -149,16 +149,17 @@ struct tr_incoming
     struct evbuffer* block = nullptr; /* piece data for incoming blocks */
 };
 
+class tr_peerMsgsImpl;
 // TODO: make these to be member functions
-static void sendLtepHandshake(tr_peerMsgs* msgs);
+static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
 static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
-static void tellPeerWhatWeHave(tr_peerMsgs* msgs);
-static void protocolSendPort(tr_peerMsgs* msgs, uint16_t port);
+static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
+static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port);
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
-static void updateDesiredRequestCount(tr_peerMsgs* msgs);
+static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
-static void tr_peerMsgsSetActive(tr_peerMsgs* msgs, tr_direction direction, bool is_active);
+static void tr_peerMsgsSetActive(tr_peerMsgsImpl* msgs, tr_direction direction, bool is_active);
 //zzz
 
 struct EventDeleter
@@ -185,11 +186,16 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
  * @see struct peer_atom
  * @see tr_peer
  */
-class tr_peerMsgs : public tr_peer
+class tr_peerMsgsImpl : public tr_peerMsgs
 {
 public:
-    tr_peerMsgs(tr_torrent* torrent_in, peer_atom* atom, tr_peerIo* io_in, tr_peer_callback callback_in, void* callbackData_in)
-        : tr_peer{ torrent_in, atom }
+    tr_peerMsgsImpl(
+        tr_torrent* torrent_in,
+        peer_atom* atom,
+        tr_peerIo* io_in,
+        tr_peer_callback callback_in,
+        void* callbackData_in)
+        : tr_peerMsgs{ torrent_in, atom }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
         , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
@@ -234,7 +240,7 @@ public:
         updateDesiredRequestCount(this);
     }
 
-    ~tr_peerMsgs() override
+    ~tr_peerMsgsImpl() override
     {
         tr_peerMsgsSetActive(this, TR_UP, false);
         tr_peerMsgsSetActive(this, TR_DOWN, false);
@@ -348,16 +354,16 @@ public:
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
 {
-    return new tr_peerMsgs(torrent, atom, io, callback, callbackData);
+    return new tr_peerMsgsImpl(torrent, atom, io, callback, callbackData);
 }
 
 /**
 ***
 **/
 
-static void myDebug(char const* file, int line, tr_peerMsgs const* msgs, char const* fmt, ...) TR_GNUC_PRINTF(4, 5);
+static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, char const* fmt, ...) TR_GNUC_PRINTF(4, 5);
 
-static void myDebug(char const* file, int line, tr_peerMsgs const* msgs, char const* fmt, ...)
+static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, char const* fmt, ...)
 {
     tr_sys_file_t const fp = tr_logGetFile();
 
@@ -403,7 +409,7 @@ static void myDebug(char const* file, int line, tr_peerMsgs const* msgs, char co
 ***
 **/
 
-static void pokeBatchPeriod(tr_peerMsgs* msgs, int interval)
+static void pokeBatchPeriod(tr_peerMsgsImpl* msgs, int interval)
 {
     if (msgs->outMessagesBatchPeriod > interval)
     {
@@ -412,12 +418,12 @@ static void pokeBatchPeriod(tr_peerMsgs* msgs, int interval)
     }
 }
 
-static void dbgOutMessageLen(tr_peerMsgs* msgs)
+static void dbgOutMessageLen(tr_peerMsgsImpl* msgs)
 {
     dbgmsg(msgs, "outMessage size is now %zu", evbuffer_get_length(msgs->outMessages));
 }
 
-static void protocolSendReject(tr_peerMsgs* msgs, struct peer_request const* req)
+static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
 
@@ -433,7 +439,7 @@ static void protocolSendReject(tr_peerMsgs* msgs, struct peer_request const* req
     dbgOutMessageLen(msgs);
 }
 
-static void protocolSendRequest(tr_peerMsgs* msgs, struct peer_request const* req)
+static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -448,7 +454,7 @@ static void protocolSendRequest(tr_peerMsgs* msgs, struct peer_request const* re
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
 
-static void protocolSendCancel(tr_peerMsgs* msgs, struct peer_request const* req)
+static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -463,7 +469,7 @@ static void protocolSendCancel(tr_peerMsgs* msgs, struct peer_request const* req
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
 
-static void protocolSendPort(tr_peerMsgs* msgs, uint16_t port)
+static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -473,7 +479,7 @@ static void protocolSendPort(tr_peerMsgs* msgs, uint16_t port)
     evbuffer_add_uint16(out, port);
 }
 
-static void protocolSendHave(tr_peerMsgs* msgs, uint32_t index)
+static void protocolSendHave(tr_peerMsgsImpl* msgs, uint32_t index)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -505,7 +511,7 @@ static void protocolSendAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
 
 #endif
 
-static void protocolSendChoke(tr_peerMsgs* msgs, bool choke)
+static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -517,7 +523,7 @@ static void protocolSendChoke(tr_peerMsgs* msgs, bool choke)
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
 
-static void protocolSendHaveAll(tr_peerMsgs* msgs)
+static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
 
@@ -531,7 +537,7 @@ static void protocolSendHaveAll(tr_peerMsgs* msgs)
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
 
-static void protocolSendHaveNone(tr_peerMsgs* msgs)
+static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
 
@@ -549,7 +555,7 @@ static void protocolSendHaveNone(tr_peerMsgs* msgs)
 ***  EVENTS
 **/
 
-static void publish(tr_peerMsgs* msgs, tr_peer_event* e)
+static void publish(tr_peerMsgsImpl* msgs, tr_peer_event* e)
 {
     if (msgs->callback != nullptr)
     {
@@ -557,7 +563,7 @@ static void publish(tr_peerMsgs* msgs, tr_peer_event* e)
     }
 }
 
-static void fireError(tr_peerMsgs* msgs, int err)
+static void fireError(tr_peerMsgsImpl* msgs, int err)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_ERROR;
@@ -565,7 +571,7 @@ static void fireError(tr_peerMsgs* msgs, int err)
     publish(msgs, &e);
 }
 
-static void fireGotBlock(tr_peerMsgs* msgs, struct peer_request const* req)
+static void fireGotBlock(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
@@ -575,7 +581,7 @@ static void fireGotBlock(tr_peerMsgs* msgs, struct peer_request const* req)
     publish(msgs, &e);
 }
 
-static void fireGotRej(tr_peerMsgs* msgs, struct peer_request const* req)
+static void fireGotRej(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_REJ;
@@ -585,28 +591,28 @@ static void fireGotRej(tr_peerMsgs* msgs, struct peer_request const* req)
     publish(msgs, &e);
 }
 
-static void fireGotChoke(tr_peerMsgs* msgs)
+static void fireGotChoke(tr_peerMsgsImpl* msgs)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
     publish(msgs, &e);
 }
 
-static void fireClientGotHaveAll(tr_peerMsgs* msgs)
+static void fireClientGotHaveAll(tr_peerMsgsImpl* msgs)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
     publish(msgs, &e);
 }
 
-static void fireClientGotHaveNone(tr_peerMsgs* msgs)
+static void fireClientGotHaveNone(tr_peerMsgsImpl* msgs)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
     publish(msgs, &e);
 }
 
-static void fireClientGotPieceData(tr_peerMsgs* msgs, uint32_t length)
+static void fireClientGotPieceData(tr_peerMsgsImpl* msgs, uint32_t length)
 {
     auto e = tr_peer_event{};
     e.length = length;
@@ -614,7 +620,7 @@ static void fireClientGotPieceData(tr_peerMsgs* msgs, uint32_t length)
     publish(msgs, &e);
 }
 
-static void firePeerGotPieceData(tr_peerMsgs* msgs, uint32_t length)
+static void firePeerGotPieceData(tr_peerMsgsImpl* msgs, uint32_t length)
 {
     auto e = tr_peer_event{};
     e.length = length;
@@ -622,7 +628,7 @@ static void firePeerGotPieceData(tr_peerMsgs* msgs, uint32_t length)
     publish(msgs, &e);
 }
 
-static void fireClientGotSuggest(tr_peerMsgs* msgs, uint32_t pieceIndex)
+static void fireClientGotSuggest(tr_peerMsgsImpl* msgs, uint32_t pieceIndex)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
@@ -630,7 +636,7 @@ static void fireClientGotSuggest(tr_peerMsgs* msgs, uint32_t pieceIndex)
     publish(msgs, &e);
 }
 
-static void fireClientGotPort(tr_peerMsgs* msgs, tr_port port)
+static void fireClientGotPort(tr_peerMsgsImpl* msgs, tr_port port)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_PORT;
@@ -638,7 +644,7 @@ static void fireClientGotPort(tr_peerMsgs* msgs, tr_port port)
     publish(msgs, &e);
 }
 
-static void fireClientGotAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
+static void fireClientGotAllowedFast(tr_peerMsgsImpl* msgs, uint32_t pieceIndex)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
@@ -646,7 +652,7 @@ static void fireClientGotAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
     publish(msgs, &e);
 }
 
-static void fireClientGotBitfield(tr_peerMsgs* msgs, tr_bitfield* bitfield)
+static void fireClientGotBitfield(tr_peerMsgsImpl* msgs, tr_bitfield* bitfield)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -654,7 +660,7 @@ static void fireClientGotBitfield(tr_peerMsgs* msgs, tr_bitfield* bitfield)
     publish(msgs, &e);
 }
 
-static void fireClientGotHave(tr_peerMsgs* msgs, tr_piece_index_t index)
+static void fireClientGotHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 {
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_HAVE;
@@ -753,9 +759,8 @@ static void updateFastSet(tr_peerMsgs* msgs)
 ****  ACTIVE
 ***/
 
-static bool tr_peerMsgsCalculateActive(tr_peerMsgs const* msgs, tr_direction direction)
+static bool tr_peerMsgsCalculateActive(tr_peerMsgsImpl const* msgs, tr_direction direction)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
     TR_ASSERT(tr_isDirection(direction));
 
     bool is_active;
@@ -784,9 +789,10 @@ static bool tr_peerMsgsCalculateActive(tr_peerMsgs const* msgs, tr_direction dir
     return is_active;
 }
 
-bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction)
+bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs_in, tr_direction direction)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
     TR_ASSERT(tr_isDirection(direction));
 
     bool is_active = msgs->is_active[direction];
@@ -796,7 +802,7 @@ bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction)
     return is_active;
 }
 
-static void tr_peerMsgsSetActive(tr_peerMsgs* msgs, tr_direction direction, bool is_active)
+static void tr_peerMsgsSetActive(tr_peerMsgsImpl* msgs, tr_direction direction, bool is_active)
 {
     dbgmsg(msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
 
@@ -808,10 +814,10 @@ static void tr_peerMsgsSetActive(tr_peerMsgs* msgs, tr_direction direction, bool
     }
 }
 
-void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs, tr_direction direction)
+void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs_in, tr_direction direction)
 {
+    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
     bool const is_active = tr_peerMsgsCalculateActive(msgs, direction);
-
     tr_peerMsgsSetActive(msgs, direction, is_active);
 }
 
@@ -819,7 +825,7 @@ void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs, tr_direction direction)
 ***  INTEREST
 **/
 
-static void sendInterest(tr_peerMsgs* msgs, bool b)
+static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 {
     TR_ASSERT(msgs != nullptr);
 
@@ -834,15 +840,17 @@ static void sendInterest(tr_peerMsgs* msgs, bool b)
     dbgOutMessageLen(msgs);
 }
 
-static void updateInterest(tr_peerMsgs* msgs)
+static void updateInterest(tr_peerMsgsImpl* msgs)
 {
     TR_UNUSED(msgs);
 
     /* FIXME -- might need to poke the mgr on startup */
 }
 
-void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool b)
+void tr_peerMsgsSetInterested(tr_peerMsgs* msgs_in, bool b)
 {
+    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
+
     if (msgs->client_is_interested != b)
     {
         sendInterest(msgs, b);
@@ -851,7 +859,7 @@ void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool b)
     }
 }
 
-static bool popNextMetadataRequest(tr_peerMsgs* msgs, int* piece)
+static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
 {
     if (msgs->peerAskedForMetadataCount == 0)
     {
@@ -866,7 +874,7 @@ static bool popNextMetadataRequest(tr_peerMsgs* msgs, int* piece)
     return true;
 }
 
-static bool popNextRequest(tr_peerMsgs* msgs, struct peer_request* setme)
+static bool popNextRequest(tr_peerMsgsImpl* msgs, struct peer_request* setme)
 {
     if (msgs->pendingReqsToClient == 0)
     {
@@ -881,7 +889,7 @@ static bool popNextRequest(tr_peerMsgs* msgs, struct peer_request* setme)
     return true;
 }
 
-static void cancelAllRequestsToClient(tr_peerMsgs* msgs)
+static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
     struct peer_request req;
     bool const mustSendCancel = tr_peerIoSupportsFEXT(msgs->io);
@@ -895,8 +903,9 @@ static void cancelAllRequestsToClient(tr_peerMsgs* msgs)
     }
 }
 
-void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peer_is_choked)
+void tr_peerMsgsSetChoke(tr_peerMsgs* msgs_in, bool peer_is_choked)
 {
+    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
     TR_ASSERT(msgs != nullptr);
 
     time_t const now = tr_time();
@@ -925,8 +934,9 @@ void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peer_is_choked)
 ***
 **/
 
-void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t index)
+void tr_peerMsgsHave(tr_peerMsgs* msgs_in, uint32_t index)
 {
+    auto* const msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
     protocolSendHave(msgs, index);
 
     /* since we have more pieces now, we might not be interested in this peer */
@@ -937,18 +947,19 @@ void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t index)
 ***
 **/
 
-static bool reqIsValid(tr_peerMsgs const* peer, uint32_t index, uint32_t offset, uint32_t length)
+static bool reqIsValid(tr_peerMsgsImpl const* peer, uint32_t index, uint32_t offset, uint32_t length)
 {
     return tr_torrentReqIsValid(peer->torrent, index, offset, length);
 }
 
-static bool requestIsValid(tr_peerMsgs const* msgs, struct peer_request const* req)
+static bool requestIsValid(tr_peerMsgsImpl const* msgs, struct peer_request const* req)
 {
     return reqIsValid(msgs, req->index, req->offset, req->length);
 }
 
-void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block)
+void tr_peerMsgsCancel(tr_peerMsgs* msgs_in, tr_block_index_t block)
 {
+    auto* const msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
     struct peer_request req;
     blockToReq(msgs->torrent, block, &req);
     protocolSendCancel(msgs, &req);
@@ -958,7 +969,7 @@ void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block)
 ***
 **/
 
-static void sendLtepHandshake(tr_peerMsgs* msgs)
+static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     tr_variant val;
     bool allow_pex;
@@ -1044,7 +1055,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     tr_variantFree(&val);
 }
 
-static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer* inbuf)
+static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
 {
     int64_t i;
     tr_variant val;
@@ -1159,7 +1170,7 @@ static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer*
     tr_free(tmp);
 }
 
-static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     int64_t msg_type = -1;
     int64_t piece = -1;
@@ -1229,7 +1240,7 @@ static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer*
     tr_free(tmp);
 }
 
-static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     tr_torrent* tor = msgs->torrent;
     if (!tr_torrentAllowsPex(tor))
@@ -1296,9 +1307,9 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
     tr_variantFree(&val);
 }
 
-static void sendPex(tr_peerMsgs* msgs);
+static void sendPex(tr_peerMsgsImpl* msgs);
 
-static void parseLtep(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
+static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     TR_ASSERT(msglen > 0);
 
@@ -1337,7 +1348,7 @@ static void parseLtep(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf
     }
 }
 
-static ReadState readBtLength(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint32_t len;
 
@@ -1361,9 +1372,9 @@ static ReadState readBtLength(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t 
     return READ_NOW;
 }
 
-static ReadState readBtMessage(tr_peerMsgs*, struct evbuffer*, size_t);
+static ReadState readBtMessage(tr_peerMsgsImpl*, struct evbuffer*, size_t);
 
-static ReadState readBtId(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint8_t id;
 
@@ -1392,14 +1403,14 @@ static ReadState readBtId(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inle
     }
 }
 
-static void updatePeerProgress(tr_peerMsgs* msgs)
+static void updatePeerProgress(tr_peerMsgsImpl* msgs)
 {
     tr_peerUpdateProgress(msgs->torrent, msgs);
 
     updateInterest(msgs);
 }
 
-static void prefetchPieces(tr_peerMsgs* msgs)
+static void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
     if (!msgs->session->isPrefetchEnabled)
     {
@@ -1418,7 +1429,7 @@ static void prefetchPieces(tr_peerMsgs* msgs)
     }
 }
 
-static void peerMadeRequest(tr_peerMsgs* msgs, struct peer_request const* req)
+static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const reqIsValid = requestIsValid(msgs, req);
@@ -1459,7 +1470,7 @@ static void peerMadeRequest(tr_peerMsgs* msgs, struct peer_request const* req)
     }
 }
 
-static bool messageLengthIsCorrect(tr_peerMsgs const* msg, uint8_t id, uint32_t len)
+static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint32_t len)
 {
     switch (id)
     {
@@ -1510,9 +1521,9 @@ static bool messageLengthIsCorrect(tr_peerMsgs const* msg, uint8_t id, uint32_t 
     }
 }
 
-static int clientGotBlock(tr_peerMsgs* msgs, struct evbuffer* block, struct peer_request const* req);
+static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* block, struct peer_request const* req);
 
-static ReadState readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
+static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
 {
     TR_ASSERT(evbuffer_get_length(inbuf) >= inlen);
 
@@ -1580,7 +1591,7 @@ static ReadState readBtPiece(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t i
     }
 }
 
-static ReadState readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen)
+static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
 {
     uint8_t const id = msgs->incoming.id;
 #ifdef TR_ENABLE_ASSERTS
@@ -1831,7 +1842,7 @@ static ReadState readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t
 }
 
 /* returns 0 on success, or an errno on failure */
-static int clientGotBlock(tr_peerMsgs* msgs, struct evbuffer* data, struct peer_request const* req)
+static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct peer_request const* req)
 {
     TR_ASSERT(msgs != nullptr);
     TR_ASSERT(req != nullptr);
@@ -1884,7 +1895,7 @@ static void peerPulse(void* vmsgs);
 
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
 {
-    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     if (wasPieceData)
     {
@@ -1900,7 +1911,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     ReadState ret;
-    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     struct evbuffer* in = tr_peerIoGetReadBuffer(io);
     size_t const inlen = evbuffer_get_length(in);
 
@@ -1945,8 +1956,10 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     return ret;
 }
 
-bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
+bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs_in, tr_block_index_t block)
 {
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+
     if (msgs->state != AWAITING_BT_PIECE)
     {
         return false;
@@ -1959,7 +1972,7 @@ bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
 ***
 **/
 
-static void updateDesiredRequestCount(tr_peerMsgs* msgs)
+static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {
     tr_torrent const* const torrent = msgs->torrent;
 
@@ -2006,7 +2019,7 @@ static void updateDesiredRequestCount(tr_peerMsgs* msgs)
     }
 }
 
-static void updateMetadataRequests(tr_peerMsgs* msgs, time_t now)
+static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 {
     int piece;
 
@@ -2038,7 +2051,7 @@ static void updateMetadataRequests(tr_peerMsgs* msgs, time_t now)
     }
 }
 
-static void updateBlockRequests(tr_peerMsgs* msgs)
+static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
     if (tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT) && msgs->desiredRequestCount > 0 &&
         msgs->pendingReqsToPeer <= msgs->desiredRequestCount * 0.66)
@@ -2064,7 +2077,7 @@ static void updateBlockRequests(tr_peerMsgs* msgs)
     }
 }
 
-static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
+static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
     int piece;
     size_t bytesWritten = 0;
@@ -2259,7 +2272,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
 static void peerPulse(void* vmsgs)
 {
-    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     time_t const now = tr_time();
 
     if (tr_isPeerIo(msgs->io))
@@ -2288,7 +2301,7 @@ void tr_peerMsgsPulse(tr_peerMsgs* msgs)
 
 static void gotError(tr_peerIo* io, short what, void* vmsgs)
 {
-    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     TR_UNUSED(io);
 
@@ -2305,7 +2318,7 @@ static void gotError(tr_peerIo* io, short what, void* vmsgs)
     fireError(msgs, ENOTCONN);
 }
 
-static void sendBitfield(tr_peerMsgs* msgs)
+static void sendBitfield(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(tr_torrentHasMetadata(msgs->torrent));
 
@@ -2323,7 +2336,7 @@ static void sendBitfield(tr_peerMsgs* msgs)
     tr_free(bytes);
 }
 
-static void tellPeerWhatWeHave(tr_peerMsgs* msgs)
+static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
@@ -2460,7 +2473,7 @@ static void tr_set_compare(
     }
 }
 
-static void sendPex(tr_peerMsgs* msgs)
+static void sendPex(tr_peerMsgsImpl* msgs)
 {
     if (msgs->peerSupportsPex && tr_torrentAllowsPex(msgs->torrent))
     {
@@ -2669,7 +2682,7 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
     TR_UNUSED(fd);
     TR_UNUSED(what);
 
-    auto* msgs = static_cast<tr_peerMsgs*>(vmsgs);
+    auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     sendPex(msgs);
 
@@ -2681,58 +2694,66 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
 ****
 ***/
 
-time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs)
+time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return tr_peerIoGetAge(msgs->io);
 }
 
-bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return msgs->peer_is_choked;
 }
 
-bool tr_peerMsgsIsPeerInterested(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsPeerInterested(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return msgs->peer_is_interested;
 }
 
-bool tr_peerMsgsIsClientChoked(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsClientChoked(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return msgs->client_is_choked;
 }
 
-bool tr_peerMsgsIsClientInterested(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsClientInterested(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return msgs->client_is_interested;
 }
 
-bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return msgs->io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
 }
 
-bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return tr_peerIoIsEncrypted(msgs->io);
 }
 
-bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs)
+bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs_in)
 {
-    TR_ASSERT(tr_isPeerMsgs(msgs));
+    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
+    TR_ASSERT(msgs != nullptr);
 
     return tr_peerIoIsIncoming(msgs->io);
 }

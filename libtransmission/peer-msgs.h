@@ -26,7 +26,16 @@ struct tr_torrent;
  * @{
  */
 
-class tr_peerMsgs;
+class tr_peerMsgs : public tr_peer
+{
+public:
+    tr_peerMsgs(tr_torrent* torrent, peer_atom* atom)
+        : tr_peer(torrent, atom)
+    {
+    }
+
+    virtual ~tr_peerMsgs() override = default;
+};
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
 
