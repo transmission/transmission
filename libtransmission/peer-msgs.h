@@ -47,6 +47,9 @@ public:
 
     virtual bool is_active(tr_direction direction) const = 0;
     virtual void update_active(tr_direction direction) = 0;
+
+    virtual time_t get_connection_age() const = 0;
+    virtual bool is_reading_block(tr_block_index_t block) const = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -57,11 +60,7 @@ tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
 
-time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs);
-
 void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peerIsChoked);
-
-bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block);
 
 void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool clientIsInterested);
 

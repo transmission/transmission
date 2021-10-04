@@ -1487,7 +1487,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
                 struct block_request const* const request = &s->requests[i];
                 tr_peerMsgs const* const msgs = PEER_MSGS(request->peer);
 
-                if (msgs != nullptr && request->sentAt <= too_old && !tr_peerMsgsIsReadingBlock(msgs, request->block))
+                if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
                 {
                     TR_ASSERT(cancel != nullptr);
                     TR_ASSERT(cancelCount < cancel_buflen);
@@ -3153,7 +3153,7 @@ static int compareChoke(void const* va, void const* vb)
 /* is this a new connection? */
 static bool isNew(tr_peerMsgs const* msgs)
 {
-    return msgs != nullptr && tr_peerMsgsGetConnectionAge(msgs) < 45;
+    return msgs != nullptr && msgs->get_connection_age() < 45;
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */

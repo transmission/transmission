@@ -322,6 +322,16 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
+    time_t get_connection_age() const override
+    {
+        return tr_peerIoGetAge(io);
+    }
+
+    bool is_reading_block(tr_block_index_t block) const override
+    {
+        return state == AWAITING_BT_PIECE && block == _tr_block(torrent, incoming.blockReq.index, incoming.blockReq.offset);
+    }
+
 private:
     bool calculate_active(tr_direction direction) const
     {
@@ -1971,18 +1981,6 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     return ret;
 }
 
-bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs_in, tr_block_index_t block)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-
-    if (msgs->state != AWAITING_BT_PIECE)
-    {
-        return false;
-    }
-
-    return block == _tr_block(msgs->torrent, msgs->incoming.blockReq.index, msgs->incoming.blockReq.offset);
-}
-
 /**
 ***
 **/
@@ -2703,18 +2701,6 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
 
     TR_ASSERT(msgs->pex_timer);
     tr_timerAdd(msgs->pex_timer.get(), PEX_INTERVAL_SECS, 0);
-}
-
-/***
-****
-***/
-
-time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return tr_peerIoGetAge(msgs->io);
 }
 
 /***
