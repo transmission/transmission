@@ -2776,10 +2776,10 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->isEncrypted = tr_peerMsgsIsEncrypted(msgs);
         stat->rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
         stat->rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
-        stat->peerIsChoked = tr_peerMsgsIsPeerChoked(msgs);
-        stat->peerIsInterested = tr_peerMsgsIsPeerInterested(msgs);
-        stat->clientIsChoked = tr_peerMsgsIsClientChoked(msgs);
-        stat->clientIsInterested = tr_peerMsgsIsClientInterested(msgs);
+        stat->peerIsChoked = msgs->is_peer_choked();
+        stat->peerIsInterested = msgs->is_peer_interested();
+        stat->clientIsChoked = msgs->is_client_choked();
+        stat->clientIsInterested = msgs->is_client_interested();
         stat->isIncoming = tr_peerMsgsIsIncomingConnection(msgs);
         stat->isDownloadingFrom = tr_peerMsgsIsActive(msgs, TR_PEER_TO_CLIENT);
         stat->isUploadingTo = tr_peerMsgsIsActive(msgs, TR_CLIENT_TO_PEER);
@@ -3241,8 +3241,8 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
         {
             struct ChokeData* n = &choke[size++];
             n->msgs = msgs;
-            n->isInterested = tr_peerMsgsIsPeerInterested(msgs);
-            n->wasChoked = tr_peerMsgsIsPeerChoked(msgs);
+            n->isInterested = msgs->is_peer_interested();
+            n->wasChoked = msgs->is_peer_choked();
             n->rate = getRate(s->tor, atom, now);
             n->salt = tr_rand_int_weak(INT_MAX);
             n->isChoked = true;

@@ -273,6 +273,26 @@ public:
         return Bps > 0;
     }
 
+    bool is_peer_choked() const override
+    {
+        return peer_is_choked;
+    }
+
+    bool is_peer_interested() const override
+    {
+        return peer_is_interested;
+    }
+
+    bool is_client_choked() const override
+    {
+        return client_is_choked;
+    }
+
+    bool is_client_interested() const override
+    {
+        return client_is_interested;
+    }
+
 public:
     /* Whether or not we've choked this peer. */
     bool peer_is_choked = true;
@@ -767,7 +787,7 @@ static bool tr_peerMsgsCalculateActive(tr_peerMsgsImpl const* msgs, tr_direction
 
     if (direction == TR_CLIENT_TO_PEER)
     {
-        is_active = tr_peerMsgsIsPeerInterested(msgs) && !tr_peerMsgsIsPeerChoked(msgs);
+        is_active = msgs->is_peer_interested() && !msgs->is_peer_choked();
     }
     else /* TR_PEER_TO_CLIENT */
     {
@@ -777,7 +797,7 @@ static bool tr_peerMsgsCalculateActive(tr_peerMsgsImpl const* msgs, tr_direction
         }
         else
         {
-            is_active = tr_peerMsgsIsClientInterested(msgs) && !tr_peerMsgsIsClientChoked(msgs);
+            is_active = msgs->is_client_interested() && !msgs->is_client_choked();
 
             if (is_active)
             {
@@ -2056,8 +2076,8 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
     if (tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT) && msgs->desiredRequestCount > 0 &&
         msgs->pendingReqsToPeer <= msgs->desiredRequestCount * 0.66)
     {
-        TR_ASSERT(tr_peerMsgsIsClientInterested(msgs));
-        TR_ASSERT(!tr_peerMsgsIsClientChoked(msgs));
+        TR_ASSERT(msgs->is_client_interested());
+        TR_ASSERT(!msgs->is_client_choked());
 
         int n;
         tr_block_index_t* blocks;
@@ -2700,38 +2720,6 @@ time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs_in)
     TR_ASSERT(msgs != nullptr);
 
     return tr_peerIoGetAge(msgs->io);
-}
-
-bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return msgs->peer_is_choked;
-}
-
-bool tr_peerMsgsIsPeerInterested(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return msgs->peer_is_interested;
-}
-
-bool tr_peerMsgsIsClientChoked(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return msgs->client_is_choked;
-}
-
-bool tr_peerMsgsIsClientInterested(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return msgs->client_is_interested;
 }
 
 bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs_in)

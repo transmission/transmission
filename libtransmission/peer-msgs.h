@@ -35,6 +35,11 @@ public:
     }
 
     virtual ~tr_peerMsgs() override = default;
+
+    virtual bool is_peer_choked() const = 0;
+    virtual bool is_peer_interested() const = 0;
+    virtual bool is_client_choked() const = 0;
+    virtual bool is_client_interested() const = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -44,14 +49,6 @@ bool tr_isPeerMsgs(void const* msgs);
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
-
-bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsPeerInterested(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsClientChoked(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsClientInterested(tr_peerMsgs const* msgs);
 
 bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction);
 
