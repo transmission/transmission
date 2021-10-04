@@ -27,6 +27,8 @@
 namespace
 {
 
+struct tr_webseed;
+
 struct tr_webseed_task
 {
     bool dead;
@@ -51,9 +53,7 @@ auto constexpr MAX_CONSECUTIVE_FAILURES = 5;
 
 auto constexpr MAX_WEBSEED_CONNECTIONS = 4;
 
-} // namespace
-
-static void webseed_timer_func(evutil_socket_t fd, short what, void* vw);
+void webseed_timer_func(evutil_socket_t fd, short what, void* vw);
 
 struct tr_webseed : public tr_peer
 {
@@ -120,6 +120,8 @@ public:
     int active_transfers = 0;
     std::vector<std::string> file_urls;
 };
+
+} // namespace
 
 /***
 ****
@@ -557,7 +559,10 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 ****
 ***/
 
-static void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
+namespace
+{
+
+void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
 {
     TR_UNUSED(fd);
     TR_UNUSED(what);
@@ -573,6 +578,8 @@ static void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
 
     tr_timerAddMsec(w->timer, TR_IDLE_TIMER_MSEC);
 }
+
+} // unnamed namespace
 
 tr_peer* tr_webseedNew(struct tr_torrent* torrent, std::string_view url, tr_peer_callback callback, void* callback_data)
 {

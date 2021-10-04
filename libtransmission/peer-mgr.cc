@@ -163,7 +163,7 @@ enum piece_sort_state
 };
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
-typedef struct tr_swarm
+struct tr_swarm
 {
     tr_swarm_stats stats;
 
@@ -207,7 +207,7 @@ typedef struct tr_swarm
      * requests are considered 'fast' are allowed to request a block that's
      * already been requested from another (slower?) peer. */
     int endgame;
-} tr_swarm;
+};
 
 struct tr_peerMgr
 {
@@ -2903,12 +2903,12 @@ static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_
     return false;
 }
 
-typedef enum
+enum tr_rechoke_state
 {
     RECHOKE_STATE_GOOD,
     RECHOKE_STATE_UNTESTED,
     RECHOKE_STATE_BAD
-} tr_rechoke_state;
+};
 
 struct tr_rechoke_info
 {

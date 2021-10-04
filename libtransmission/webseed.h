@@ -12,8 +12,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-typedef struct tr_webseed tr_webseed;
-
 #include <string_view>
 
 #include "peer-common.h"
