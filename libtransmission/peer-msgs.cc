@@ -509,7 +509,7 @@ private:
     bool is_active_[2] = { false, false };
 };
 
-tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
+tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
 {
     return new tr_peerMsgsImpl(torrent, atom, io, callback, callbackData);
 }

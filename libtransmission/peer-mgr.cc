@@ -1485,7 +1485,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
             for (int i = 0; i < n; ++i)
             {
                 struct block_request const* const request = &s->requests[i];
-                tr_peerMsgs const* const msgs = PEER_MSGS(request->peer);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(request->peer);
 
                 if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
                 {
@@ -1501,7 +1501,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
                         s->requests[keepCount] = *request;
                     }
 
-                    keepCount++;
+                    ++keepCount;
                 }
             }
 
@@ -1512,8 +1512,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
             for (int i = 0; i < cancelCount; ++i)
             {
                 struct block_request const* const request = &cancel[i];
-                tr_peerMsgs* msgs = PEER_MSGS(request->peer);
-
+                auto* msgs = dynamic_cast<tr_peerMsgs*>(request->peer);
                 if (msgs != nullptr)
                 {
                     request->peer->cancelsSentToPeer.add(now, 1);
@@ -1667,10 +1666,10 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     /* walk through our peers */
     for (int i = 0, n = tr_ptrArraySize(&s->peers); i < n; ++i)
     {
-        auto* peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
+        auto* peer = static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i));
 
         // notify the peer that we now have this piece
-        PEER_MSGS(peer)->on_piece_completed(p);
+        peer->on_piece_completed(p);
 
         if (!pieceCameFromPeers)
         {
@@ -1933,7 +1932,7 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
 
     tr_swarm* swarm = tor->swarm;
 
-    tr_peer* peer = tr_peerMsgsNew(tor, atom, io, peerCallbackFunc, swarm);
+    auto* peer = tr_peerMsgsNew(tor, atom, io, peerCallbackFunc, swarm);
     peer->client = client;
     atom->peer = peer;
 
@@ -1944,9 +1943,10 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
     TR_ASSERT(swarm->stats.peerCount == tr_ptrArraySize(&swarm->peers));
     TR_ASSERT(swarm->stats.peerFromCount[atom->fromFirst] <= swarm->stats.peerCount);
 
-    tr_peerMsgs* msgs = PEER_MSGS(peer);
-    msgs->update_active(TR_UP);
-    msgs->update_active(TR_DOWN);
+    // TODO is this needed?
+    // isn't it already initialized in tr_peerMsgsImpl's ctor?
+    peer->update_active(TR_UP);
+    peer->update_active(TR_DOWN);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -2572,7 +2572,7 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
     /* update the bittorrent peers' willingnes... */
     for (int i = 0; i < peerCount; ++i)
     {
-        auto* msgs = PEER_MSGS(peers[i]);
+        auto* msgs = static_cast<tr_peerMsgs*>(peers[i]);
         msgs->update_active(TR_UP);
         msgs->update_active(TR_DOWN);
     }
@@ -2765,7 +2765,7 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
     {
         char* pch;
         tr_peer* peer = peers[i];
-        tr_peerMsgs const* const msgs = PEER_MSGS(peer);
+        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peer);
         struct peer_atom const* atom = peer->atom;
         tr_peer_stat* stat = ret + i;
 
@@ -2912,7 +2912,7 @@ typedef enum
 
 struct tr_rechoke_info
 {
-    tr_peer* peer;
+    tr_peerMsgs* peer;
     int salt;
     int rechoke_state;
 };
@@ -3048,11 +3048,11 @@ static void rechokeDownloads(tr_swarm* s)
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
         for (int i = 0; i < peerCount; ++i)
         {
-            auto* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
+            auto* const peer = static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i));
 
             if (!isPeerInteresting(s->tor, piece_is_interesting, peer))
             {
-                PEER_MSGS(peer)->set_interested(false);
+                peer->set_interested(false);
             }
             else
             {
@@ -3107,7 +3107,7 @@ static void rechokeDownloads(tr_swarm* s)
 
     for (int i = 0; i < rechoke_count; ++i)
     {
-        PEER_MSGS(rechoke[i].peer)->set_interested(i < s->interestedCount);
+        rechoke[i].peer->set_interested(i < s->interestedCount);
     }
 
     /* cleanup */
@@ -3224,27 +3224,25 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (int i = 0; i < peerCount; ++i)
     {
-        tr_peer* peer = peers[i];
-        tr_peerMsgs* msgs = PEER_MSGS(peer);
-
-        struct peer_atom* atom = peer->atom;
+        auto* const peer = dynamic_cast<tr_peerMsgs*>(peers[i]);
+        struct peer_atom* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
         {
             /* choke seeds and partial seeds */
-            msgs->set_choke(true);
+            peer->set_choke(true);
         }
         else if (chokeAll)
         {
             /* choke everyone if we're not uploading */
-            msgs->set_choke(true);
+            peer->set_choke(true);
         }
-        else if (msgs != s->optimistic)
+        else if (peer != s->optimistic)
         {
             struct ChokeData* n = &choke[size++];
-            n->msgs = msgs;
-            n->isInterested = msgs->is_peer_interested();
-            n->wasChoked = msgs->is_peer_choked();
+            n->msgs = peer;
+            n->isInterested = peer->is_peer_interested();
+            n->wasChoked = peer->is_peer_choked();
             n->rate = getRate(s->tor, atom, now);
             n->salt = tr_rand_int_weak(INT_MAX);
             n->isChoked = true;

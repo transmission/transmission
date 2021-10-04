@@ -61,11 +61,12 @@ public:
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 };
 
-#define PEER_MSGS(o) (tr_peerMsgsCast(o))
-
-tr_peerMsgs* tr_peerMsgsCast(void* msgs);
-
-tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
+tr_peerMsgs* tr_peerMsgsNew(
+    tr_torrent* torrent,
+    peer_atom* atom,
+    tr_peerIo* io,
+    tr_peer_callback callback,
+    void* callback_data);
 
 size_t tr_generateAllowedSet(
     tr_piece_index_t* setmePieces,
