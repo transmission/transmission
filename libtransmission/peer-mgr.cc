@@ -2876,7 +2876,7 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 
     for (int i = 0; i < peerCount; ++i)
     {
-        tr_peerMsgsSetInterested(static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i)), false);
+        static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i))->set_interested(false);
     }
 }
 
@@ -3052,7 +3052,7 @@ static void rechokeDownloads(tr_swarm* s)
 
             if (!isPeerInteresting(s->tor, piece_is_interesting, peer))
             {
-                tr_peerMsgsSetInterested(PEER_MSGS(peer), false);
+                PEER_MSGS(peer)->set_interested(false);
             }
             else
             {
@@ -3107,7 +3107,7 @@ static void rechokeDownloads(tr_swarm* s)
 
     for (int i = 0; i < rechoke_count; ++i)
     {
-        tr_peerMsgsSetInterested(PEER_MSGS(rechoke[i].peer), i < s->interestedCount);
+        PEER_MSGS(rechoke[i].peer)->set_interested(i < s->interestedCount);
     }
 
     /* cleanup */
@@ -3232,12 +3232,12 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
         if (tr_peerIsSeed(peer))
         {
             /* choke seeds and partial seeds */
-            tr_peerMsgsSetChoke(PEER_MSGS(peer), true);
+            msgs->set_choke(true);
         }
         else if (chokeAll)
         {
             /* choke everyone if we're not uploading */
-            tr_peerMsgsSetChoke(PEER_MSGS(peer), true);
+            msgs->set_choke(true);
         }
         else if (msgs != s->optimistic)
         {
@@ -3314,7 +3314,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
 
     for (int i = 0; i < size; ++i)
     {
-        tr_peerMsgsSetChoke(choke[i].msgs, choke[i].isChoked);
+        choke[i].msgs->set_choke(choke[i].isChoked);
     }
 
     /* cleanup */

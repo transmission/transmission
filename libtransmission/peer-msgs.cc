@@ -162,6 +162,9 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
+static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
+static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
+static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
 //zzz
 
 struct EventDeleter
@@ -277,22 +280,22 @@ public:
 
     bool is_peer_choked() const override
     {
-        return peer_is_choked;
+        return peer_is_choked_;
     }
 
     bool is_peer_interested() const override
     {
-        return peer_is_interested;
+        return peer_is_interested_;
     }
 
     bool is_client_choked() const override
     {
-        return client_is_choked;
+        return client_is_choked_;
     }
 
     bool is_client_interested() const override
     {
-        return client_is_interested;
+        return client_is_interested_;
     }
 
     bool is_utp_connection() const override
@@ -340,6 +343,40 @@ public:
         protocolSendCancel(this, blockToReq(torrent, block));
     }
 
+    void set_choke(bool peer_is_choked) override
+    {
+        time_t const now = tr_time();
+        time_t const fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
+
+        if (chokeChangedAt > fibrillationTime)
+        {
+            // TODO dbgmsg(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
+        }
+        else if (peer_is_choked_ != peer_is_choked)
+        {
+            peer_is_choked_ = peer_is_choked;
+
+            if (peer_is_choked_)
+            {
+                cancelAllRequestsToClient(this);
+            }
+
+            protocolSendChoke(this, peer_is_choked_);
+            chokeChangedAt = now;
+            update_active(TR_CLIENT_TO_PEER);
+        }
+    }
+
+    void set_interested(bool interested) override
+    {
+        if (client_is_interested_ != interested)
+        {
+            client_is_interested_ = interested;
+            sendInterest(this, interested);
+            update_active(TR_PEER_TO_CLIENT);
+        }
+    }
+
 private:
     bool calculate_active(tr_direction direction) const
     {
@@ -374,16 +411,16 @@ private:
 
 public:
     /* Whether or not we've choked this peer. */
-    bool peer_is_choked = true;
+    bool peer_is_choked_ = true;
 
     /* whether or not the peer has indicated it will download from us. */
-    bool peer_is_interested = false;
+    bool peer_is_interested_ = false;
 
     /* whether or not the peer is choking us. */
-    bool client_is_choked = true;
+    bool client_is_choked_ = true;
 
     /* whether or not we've indicated to the peer that we would download from them if unchoked. */
-    bool client_is_interested = false;
+    bool client_is_interested_ = false;
 
     bool peerSupportsPex = false;
     bool peerSupportsMetadataXfer = false;
@@ -864,7 +901,6 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 
     struct evbuffer* out = msgs->outMessages;
 
-    msgs->client_is_interested = b;
     dbgmsg(msgs, "Sending %s", b ? "Interested" : "Not Interested");
     evbuffer_add_uint32(out, sizeof(uint8_t));
     evbuffer_add_uint8(out, b ? BT_INTERESTED : BT_NOT_INTERESTED);
@@ -878,18 +914,6 @@ static void updateInterest(tr_peerMsgsImpl* msgs)
     TR_UNUSED(msgs);
 
     /* FIXME -- might need to poke the mgr on startup */
-}
-
-void tr_peerMsgsSetInterested(tr_peerMsgs* msgs_in, bool b)
-{
-    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
-
-    if (msgs->client_is_interested != b)
-    {
-        sendInterest(msgs, b);
-
-        msgs->update_active(TR_PEER_TO_CLIENT);
-    }
 }
 
 static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
@@ -933,33 +957,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
         {
             protocolSendReject(msgs, &req);
         }
-    }
-}
-
-void tr_peerMsgsSetChoke(tr_peerMsgs* msgs_in, bool peer_is_choked)
-{
-    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    time_t const now = tr_time();
-    time_t const fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
-
-    if (msgs->chokeChangedAt > fibrillationTime)
-    {
-        dbgmsg(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
-    }
-    else if (msgs->peer_is_choked != peer_is_choked)
-    {
-        msgs->peer_is_choked = peer_is_choked;
-
-        if (peer_is_choked)
-        {
-            cancelAllRequestsToClient(msgs);
-        }
-
-        protocolSendChoke(msgs, peer_is_choked);
-        msgs->chokeChangedAt = now;
-        msgs->update_active(TR_CLIENT_TO_PEER);
     }
 }
 
@@ -1459,7 +1456,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const reqIsValid = requestIsValid(msgs, req);
     bool const clientHasPiece = reqIsValid && tr_torrentPieceIsComplete(msgs->torrent, req->index);
-    bool const peerIsChoked = msgs->peer_is_choked;
+    bool const peerIsChoked = msgs->peer_is_choked_;
 
     bool allow = false;
 
@@ -1649,7 +1646,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     {
     case BT_CHOKE:
         dbgmsg(msgs, "got Choke");
-        msgs->client_is_choked = true;
+        msgs->client_is_choked_ = true;
 
         if (!fext)
         {
@@ -1661,20 +1658,20 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BT_UNCHOKE:
         dbgmsg(msgs, "got Unchoke");
-        msgs->client_is_choked = false;
+        msgs->client_is_choked_ = false;
         msgs->update_active(TR_PEER_TO_CLIENT);
         updateDesiredRequestCount(msgs);
         break;
 
     case BT_INTERESTED:
         dbgmsg(msgs, "got Interested");
-        msgs->peer_is_interested = true;
+        msgs->peer_is_interested_ = true;
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
     case BT_NOT_INTERESTED:
         dbgmsg(msgs, "got Not Interested");
-        msgs->peer_is_interested = false;
+        msgs->peer_is_interested_ = false;
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
@@ -1990,7 +1987,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
     tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
-    if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked || !msgs->client_is_interested)
+    if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked_ || !msgs->client_is_interested_)
     {
         msgs->desiredRequestCount = 0;
     }

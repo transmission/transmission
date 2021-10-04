@@ -52,6 +52,9 @@ public:
     virtual bool is_reading_block(tr_block_index_t block) const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
+
+    virtual void set_choke(bool peer_is_choked) = 0;
+    virtual void set_interested(bool client_is_interested) = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -61,10 +64,6 @@ bool tr_isPeerMsgs(void const* msgs);
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
-
-void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peerIsChoked);
-
-void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool clientIsInterested);
 
 void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t pieceIndex);
 
