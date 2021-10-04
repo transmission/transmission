@@ -153,18 +153,20 @@ struct tr_incoming
 
 class tr_peerMsgsImpl;
 // TODO: make these to be member functions
-static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
-static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
-static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
-static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port);
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
+static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
-static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
+static void peerPulse(void* vmsgs);
+static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
-static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
+static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
+static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port);
 static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
+static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
+static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
+static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 //zzz
 
 struct EventDeleter
@@ -375,6 +377,24 @@ public:
             sendInterest(this, interested);
             update_active(TR_PEER_TO_CLIENT);
         }
+    }
+
+    void pulse() override
+    {
+        peerPulse(this);
+    }
+
+    void on_piece_completed(tr_piece_index_t piece) override
+    {
+        protocolSendHave(this, piece);
+
+        // since we have more pieces now, we might not be interested in this peer
+        update_interest();
+    }
+
+    void update_interest()
+    {
+        // FIXME -- might need to poke the mgr on startup
     }
 
 private:
@@ -616,7 +636,7 @@ static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
     evbuffer_add_uint16(out, port);
 }
 
-static void protocolSendHave(tr_peerMsgsImpl* msgs, uint32_t index)
+static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -909,13 +929,6 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
     dbgOutMessageLen(msgs);
 }
 
-static void updateInterest(tr_peerMsgsImpl* msgs)
-{
-    TR_UNUSED(msgs);
-
-    /* FIXME -- might need to poke the mgr on startup */
-}
-
 static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
 {
     if (msgs->peerAskedForMetadataCount == 0)
@@ -958,19 +971,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
             protocolSendReject(msgs, &req);
         }
     }
-}
-
-/**
-***
-**/
-
-void tr_peerMsgsHave(tr_peerMsgs* msgs_in, uint32_t index)
-{
-    auto* const msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
-    protocolSendHave(msgs, index);
-
-    /* since we have more pieces now, we might not be interested in this peer */
-    updateInterest(msgs);
 }
 
 /**
@@ -1429,7 +1429,7 @@ static void updatePeerProgress(tr_peerMsgsImpl* msgs)
 {
     tr_peerUpdateProgress(msgs->torrent, msgs);
 
-    updateInterest(msgs);
+    msgs->update_interest();
 }
 
 static void prefetchPieces(tr_peerMsgsImpl* msgs)
@@ -1913,8 +1913,6 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     return 0;
 }
 
-static void peerPulse(void* vmsgs);
-
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
@@ -2296,14 +2294,6 @@ static void peerPulse(void* vmsgs)
         {
             break;
         }
-    }
-}
-
-void tr_peerMsgsPulse(tr_peerMsgs* msgs)
-{
-    if (msgs != nullptr)
-    {
-        peerPulse(msgs);
     }
 }
 

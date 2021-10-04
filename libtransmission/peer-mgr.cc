@@ -1669,8 +1669,8 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     {
         auto* peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
 
-        /* notify the peer that we now have this piece */
-        tr_peerMsgsHave(PEER_MSGS(peer), p);
+        // notify the peer that we now have this piece
+        PEER_MSGS(peer)->on_piece_completed(p);
 
         if (!pieceCameFromPeers)
         {
@@ -3769,7 +3769,7 @@ static void pumpAllPeers(tr_peerMgr* mgr)
 
         for (int j = 0, n = tr_ptrArraySize(&s->peers); j < n; ++j)
         {
-            tr_peerMsgsPulse(static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, j)));
+            static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, j))->pulse();
         }
     }
 }

@@ -55,6 +55,10 @@ public:
 
     virtual void set_choke(bool peer_is_choked) = 0;
     virtual void set_interested(bool client_is_interested) = 0;
+
+    virtual void pulse() = 0;
+
+    virtual void on_piece_completed(tr_piece_index_t) = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -64,10 +68,6 @@ bool tr_isPeerMsgs(void const* msgs);
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
-
-void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t pieceIndex);
-
-void tr_peerMsgsPulse(tr_peerMsgs* msgs);
 
 size_t tr_generateAllowedSet(
     tr_piece_index_t* setmePieces,
