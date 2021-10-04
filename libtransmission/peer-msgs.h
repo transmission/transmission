@@ -63,8 +63,6 @@ public:
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
 
-bool tr_isPeerMsgs(void const* msgs);
-
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);

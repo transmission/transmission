@@ -2687,22 +2687,3 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
     TR_ASSERT(msgs->pex_timer);
     tr_timerAdd(msgs->pex_timer.get(), PEX_INTERVAL_SECS, 0);
 }
-
-/***
-****
-***/
-
-bool tr_isPeerMsgs(void const* msgs)
-{
-    return msgs != nullptr;
-}
-
-tr_peerMsgs* tr_peerMsgsCast(void* vm)
-{
-    auto* m = static_cast<tr_peerMsgs*>(vm);
-    return tr_isPeerMsgs(m) ? m : nullptr;
-}
-
-/***
-****  tr_peer member functions
-***/
