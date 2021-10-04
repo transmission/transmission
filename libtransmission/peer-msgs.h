@@ -44,6 +44,9 @@ public:
     virtual bool is_utp_connection() const = 0;
     virtual bool is_encrypted() const = 0;
     virtual bool is_incoming_connection() const = 0;
+
+    virtual bool is_active(tr_direction direction) const = 0;
+    virtual void update_active(tr_direction direction) = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -53,10 +56,6 @@ bool tr_isPeerMsgs(void const* msgs);
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callback_data);
-
-bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction);
-
-void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs, tr_direction direction);
 
 time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs);
 

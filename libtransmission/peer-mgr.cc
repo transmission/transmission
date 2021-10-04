@@ -1944,8 +1944,8 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
     TR_ASSERT(swarm->stats.peerFromCount[atom->fromFirst] <= swarm->stats.peerCount);
 
     tr_peerMsgs* msgs = PEER_MSGS(peer);
-    tr_peerMsgsUpdateActive(msgs, TR_UP);
-    tr_peerMsgsUpdateActive(msgs, TR_DOWN);
+    msgs->update_active(TR_UP);
+    msgs->update_active(TR_DOWN);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -2571,8 +2571,9 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
     /* update the bittorrent peers' willingnes... */
     for (int i = 0; i < peerCount; ++i)
     {
-        tr_peerMsgsUpdateActive(tr_peerMsgsCast(peers[i]), TR_UP);
-        tr_peerMsgsUpdateActive(tr_peerMsgsCast(peers[i]), TR_DOWN);
+        auto* msgs = PEER_MSGS(peers[i]);
+        msgs->update_active(TR_UP);
+        msgs->update_active(TR_DOWN);
     }
 }
 
@@ -2781,8 +2782,8 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->clientIsChoked = msgs->is_client_choked();
         stat->clientIsInterested = msgs->is_client_interested();
         stat->isIncoming = msgs->is_incoming_connection();
-        stat->isDownloadingFrom = tr_peerMsgsIsActive(msgs, TR_PEER_TO_CLIENT);
-        stat->isUploadingTo = tr_peerMsgsIsActive(msgs, TR_CLIENT_TO_PEER);
+        stat->isDownloadingFrom = msgs->is_active(TR_PEER_TO_CLIENT);
+        stat->isUploadingTo = msgs->is_active(TR_CLIENT_TO_PEER);
         stat->isSeed = tr_peerIsSeed(peer);
 
         stat->blocksToPeer = peer->blocksSentToPeer.count(now, CANCEL_HISTORY_SEC);

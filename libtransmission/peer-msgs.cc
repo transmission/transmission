@@ -159,7 +159,6 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
-static void tr_peerMsgsSetActive(tr_peerMsgsImpl* msgs, tr_direction direction, bool is_active);
 //zzz
 
 struct EventDeleter
@@ -242,8 +241,8 @@ public:
 
     ~tr_peerMsgsImpl() override
     {
-        tr_peerMsgsSetActive(this, TR_UP, false);
-        tr_peerMsgsSetActive(this, TR_DOWN, false);
+        set_active(TR_UP, false);
+        set_active(TR_DOWN, false);
 
         if (this->incoming.block != nullptr)
         {
@@ -308,6 +307,53 @@ public:
         return tr_peerIoIsIncoming(io);
     }
 
+    bool is_active(tr_direction direction) const override
+    {
+        TR_ASSERT(tr_isDirection(direction));
+        auto const active = is_active_[direction];
+        TR_ASSERT(active == calculate_active(direction));
+        return active;
+    }
+
+    void update_active(tr_direction direction) override
+    {
+        TR_ASSERT(tr_isDirection(direction));
+
+        set_active(direction, calculate_active(direction));
+    }
+
+private:
+    bool calculate_active(tr_direction direction) const
+    {
+        if (direction == TR_CLIENT_TO_PEER)
+        {
+            return is_peer_interested() && !is_peer_choked();
+        }
+
+        // TR_PEER_TO_CLIENT
+
+        if (!tr_torrentHasMetadata(torrent))
+        {
+            return true;
+        }
+
+        auto const active = is_client_interested() && !is_client_choked();
+        TR_ASSERT(!active || !tr_torrentIsSeed(torrent));
+        return active;
+    }
+
+    void set_active(tr_direction direction, bool active)
+    {
+        // TODO dbgmsg(msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
+        auto& val = is_active_[direction];
+        if (val != active)
+        {
+            val = active;
+
+            tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
+        }
+    }
+
 public:
     /* Whether or not we've choked this peer. */
     bool peer_is_choked = true;
@@ -329,8 +375,6 @@ public:
     int desiredRequestCount = 0;
 
     int prefetchCount = 0;
-
-    bool is_active[2] = { false, false };
 
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
@@ -385,6 +429,9 @@ public:
     UniqueTimer pex_timer;
 
     struct tr_peerIo* io = nullptr;
+
+private:
+    bool is_active_[2] = { false, false };
 };
 
 tr_peer* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
@@ -789,73 +836,6 @@ static void updateFastSet(tr_peerMsgs* msgs)
 }
 
 #endif
-
-/***
-****  ACTIVE
-***/
-
-static bool tr_peerMsgsCalculateActive(tr_peerMsgsImpl const* msgs, tr_direction direction)
-{
-    TR_ASSERT(tr_isDirection(direction));
-
-    bool is_active;
-
-    if (direction == TR_CLIENT_TO_PEER)
-    {
-        is_active = msgs->is_peer_interested() && !msgs->is_peer_choked();
-    }
-    else /* TR_PEER_TO_CLIENT */
-    {
-        if (!tr_torrentHasMetadata(msgs->torrent))
-        {
-            is_active = true;
-        }
-        else
-        {
-            is_active = msgs->is_client_interested() && !msgs->is_client_choked();
-
-            if (is_active)
-            {
-                TR_ASSERT(!tr_torrentIsSeed(msgs->torrent));
-            }
-        }
-    }
-
-    return is_active;
-}
-
-bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs_in, tr_direction direction)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-    TR_ASSERT(tr_isDirection(direction));
-
-    bool is_active = msgs->is_active[direction];
-
-    TR_ASSERT(is_active == tr_peerMsgsCalculateActive(msgs, direction));
-
-    return is_active;
-}
-
-static void tr_peerMsgsSetActive(tr_peerMsgsImpl* msgs, tr_direction direction, bool is_active)
-{
-    dbgmsg(msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
-
-    if (msgs->is_active[direction] != is_active)
-    {
-        msgs->is_active[direction] = is_active;
-
-        tr_swarmIncrementActivePeers(msgs->torrent->swarm, direction, is_active);
-    }
-}
-
-void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs_in, tr_direction direction)
-{
-    auto* msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
-    bool const is_active = tr_peerMsgsCalculateActive(msgs, direction);
-    tr_peerMsgsSetActive(msgs, direction, is_active);
-}
-
 /**
 ***  INTEREST
 **/
@@ -890,7 +870,7 @@ void tr_peerMsgsSetInterested(tr_peerMsgs* msgs_in, bool b)
     {
         sendInterest(msgs, b);
 
-        tr_peerMsgsUpdateActive(msgs, TR_PEER_TO_CLIENT);
+        msgs->update_active(TR_PEER_TO_CLIENT);
     }
 }
 
@@ -961,7 +941,7 @@ void tr_peerMsgsSetChoke(tr_peerMsgs* msgs_in, bool peer_is_choked)
 
         protocolSendChoke(msgs, peer_is_choked);
         msgs->chokeChangedAt = now;
-        tr_peerMsgsUpdateActive(msgs, TR_CLIENT_TO_PEER);
+        msgs->update_active(TR_CLIENT_TO_PEER);
     }
 }
 
@@ -1666,26 +1646,26 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             fireGotChoke(msgs);
         }
 
-        tr_peerMsgsUpdateActive(msgs, TR_PEER_TO_CLIENT);
+        msgs->update_active(TR_PEER_TO_CLIENT);
         break;
 
     case BT_UNCHOKE:
         dbgmsg(msgs, "got Unchoke");
         msgs->client_is_choked = false;
-        tr_peerMsgsUpdateActive(msgs, TR_PEER_TO_CLIENT);
+        msgs->update_active(TR_PEER_TO_CLIENT);
         updateDesiredRequestCount(msgs);
         break;
 
     case BT_INTERESTED:
         dbgmsg(msgs, "got Interested");
         msgs->peer_is_interested = true;
-        tr_peerMsgsUpdateActive(msgs, TR_CLIENT_TO_PEER);
+        msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
     case BT_NOT_INTERESTED:
         dbgmsg(msgs, "got Not Interested");
         msgs->peer_is_interested = false;
-        tr_peerMsgsUpdateActive(msgs, TR_CLIENT_TO_PEER);
+        msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
     case BT_HAVE:
