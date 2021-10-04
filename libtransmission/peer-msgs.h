@@ -50,6 +50,8 @@ public:
 
     virtual time_t get_connection_age() const = 0;
     virtual bool is_reading_block(tr_block_index_t block) const = 0;
+
+    virtual void cancel_block_request(tr_block_index_t block) = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -67,8 +69,6 @@ void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool clientIsInterested);
 void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t pieceIndex);
 
 void tr_peerMsgsPulse(tr_peerMsgs* msgs);
-
-void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block);
 
 size_t tr_generateAllowedSet(
     tr_piece_index_t* setmePieces,

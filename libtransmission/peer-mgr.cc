@@ -1517,7 +1517,7 @@ static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
                 if (msgs != nullptr)
                 {
                     request->peer->cancelsSentToPeer.add(now, 1);
-                    tr_peerMsgsCancel(msgs, request->block);
+                    msgs->cancel_block_request(request->block);
                     decrementPendingReqCount(request);
                 }
             }
@@ -1648,10 +1648,11 @@ static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_pe
 
     for (auto* p : getBlockRequestPeers(s, block))
     {
-        if (p != no_notify && tr_isPeerMsgs(p))
+        auto* msgs = dynamic_cast<tr_peerMsgs*>(p);
+        if ((msgs != nullptr) && (msgs != no_notify))
         {
-            p->cancelsSentToPeer.add(now, 1);
-            tr_peerMsgsCancel(PEER_MSGS(p), block);
+            msgs->cancelsSentToPeer.add(now, 1);
+            msgs->cancel_block_request(block);
         }
 
         removeRequestFromTables(s, block, p);

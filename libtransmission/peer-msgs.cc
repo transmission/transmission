@@ -130,9 +130,11 @@ struct peer_request
     uint32_t length;
 };
 
-static void blockToReq(tr_torrent const* tor, tr_block_index_t block, struct peer_request* setme)
+static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
 {
-    tr_torrentGetBlockLocation(tor, block, &setme->index, &setme->offset, &setme->length);
+    auto ret = peer_request{};
+    tr_torrentGetBlockLocation(tor, block, &ret.index, &ret.offset, &ret.length);
+    return ret;
 }
 
 /**
@@ -159,6 +161,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs);
 static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 static void gotError(tr_peerIo* io, short what, void* vmsgs);
+static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 //zzz
 
 struct EventDeleter
@@ -330,6 +333,11 @@ public:
     bool is_reading_block(tr_block_index_t block) const override
     {
         return state == AWAITING_BT_PIECE && block == _tr_block(torrent, incoming.blockReq.index, incoming.blockReq.offset);
+    }
+
+    void cancel_block_request(tr_block_index_t block) override
+    {
+        protocolSendCancel(this, blockToReq(torrent, block));
     }
 
 private:
@@ -531,32 +539,32 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
     dbgOutMessageLen(msgs);
 }
 
-static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const& req)
 {
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
     evbuffer_add_uint8(out, BT_REQUEST);
-    evbuffer_add_uint32(out, req->index);
-    evbuffer_add_uint32(out, req->offset);
-    evbuffer_add_uint32(out, req->length);
+    evbuffer_add_uint32(out, req.index);
+    evbuffer_add_uint32(out, req.offset);
+    evbuffer_add_uint32(out, req.length);
 
-    dbgmsg(msgs, "requesting %u:%u->%u...", req->index, req->offset, req->length);
+    dbgmsg(msgs, "requesting %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
 
-static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
 {
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
     evbuffer_add_uint8(out, BT_CANCEL);
-    evbuffer_add_uint32(out, req->index);
-    evbuffer_add_uint32(out, req->offset);
-    evbuffer_add_uint32(out, req->length);
+    evbuffer_add_uint32(out, req.index);
+    evbuffer_add_uint32(out, req.offset);
+    evbuffer_add_uint32(out, req.length);
 
-    dbgmsg(msgs, "cancelling %u:%u->%u...", req->index, req->offset, req->length);
+    dbgmsg(msgs, "cancelling %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }
@@ -980,14 +988,6 @@ static bool reqIsValid(tr_peerMsgsImpl const* peer, uint32_t index, uint32_t off
 static bool requestIsValid(tr_peerMsgsImpl const* msgs, struct peer_request const* req)
 {
     return reqIsValid(msgs, req->index, req->offset, req->length);
-}
-
-void tr_peerMsgsCancel(tr_peerMsgs* msgs_in, tr_block_index_t block)
-{
-    auto* const msgs = dynamic_cast<tr_peerMsgsImpl*>(msgs_in);
-    struct peer_request req;
-    blockToReq(msgs->torrent, block, &req);
-    protocolSendCancel(msgs, &req);
 }
 
 /**
@@ -2081,9 +2081,7 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 
         for (int i = 0; i < n; ++i)
         {
-            struct peer_request req;
-            blockToReq(msgs->torrent, blocks[i], &req);
-            protocolSendRequest(msgs, &req);
+            protocolSendRequest(msgs, blockToReq(msgs->torrent, blocks[i]));
         }
 
         tr_free(blocks);
