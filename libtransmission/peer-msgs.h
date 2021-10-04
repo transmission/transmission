@@ -40,6 +40,10 @@ public:
     virtual bool is_peer_interested() const = 0;
     virtual bool is_client_choked() const = 0;
     virtual bool is_client_interested() const = 0;
+
+    virtual bool is_utp_connection() const = 0;
+    virtual bool is_encrypted() const = 0;
+    virtual bool is_incoming_connection() const = 0;
 };
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
@@ -55,12 +59,6 @@ bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction);
 void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs, tr_direction direction);
 
 time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs);
 
 void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peerIsChoked);
 

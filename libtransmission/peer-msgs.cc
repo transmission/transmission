@@ -293,6 +293,21 @@ public:
         return client_is_interested;
     }
 
+    bool is_utp_connection() const override
+    {
+        return io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
+    }
+
+    bool is_encrypted() const override
+    {
+        return tr_peerIoIsEncrypted(io);
+    }
+
+    bool is_incoming_connection() const override
+    {
+        return tr_peerIoIsIncoming(io);
+    }
+
 public:
     /* Whether or not we've choked this peer. */
     bool peer_is_choked = true;
@@ -2720,30 +2735,6 @@ time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs_in)
     TR_ASSERT(msgs != nullptr);
 
     return tr_peerIoGetAge(msgs->io);
-}
-
-bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return msgs->io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
-}
-
-bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return tr_peerIoIsEncrypted(msgs->io);
-}
-
-bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs_in)
-{
-    auto const* msgs = dynamic_cast<tr_peerMsgsImpl const*>(msgs_in);
-    TR_ASSERT(msgs != nullptr);
-
-    return tr_peerIoIsIncoming(msgs->io);
 }
 
 /***
