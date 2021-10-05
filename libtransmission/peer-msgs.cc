@@ -196,21 +196,16 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 class tr_peerMsgsImpl : public tr_peerMsgs
 {
 public:
-    tr_peerMsgsImpl(
-        tr_torrent* torrent_in,
-        peer_atom* atom,
-        tr_peerIo* io_in,
-        tr_peer_callback callback_in,
-        void* callbackData_in)
+    tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
         , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
-        , callback{ callback_in }
-        , callbackData{ callbackData_in }
         , outMessages{ evbuffer_new() }
         , outMessagesBatchedAt{ 0 }
         , io{ io_in }
+        , callback_{ callback }
+        , callbackData_{ callbackData }
     {
         if (tr_torrentAllowsPex(torrent))
         {
@@ -369,16 +364,6 @@ public:
         }
     }
 
-    void set_interested(bool interested) override
-    {
-        if (client_is_interested_ != interested)
-        {
-            client_is_interested_ = interested;
-            sendInterest(this, interested);
-            update_active(TR_PEER_TO_CLIENT);
-        }
-    }
-
     void pulse() override
     {
         peerPulse(this);
@@ -392,9 +377,126 @@ public:
         update_interest();
     }
 
+    void set_interested(bool interested) override
+    {
+        if (client_is_interested_ != interested)
+        {
+            client_is_interested_ = interested;
+            sendInterest(this, interested);
+            update_active(TR_PEER_TO_CLIENT);
+        }
+    }
+
     void update_interest()
     {
         // FIXME -- might need to poke the mgr on startup
+    }
+
+    // publishing events
+
+    void publishError(int err)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_ERROR;
+        e.err = err;
+        publish(e);
+    }
+
+    void publishGotBlock(struct peer_request const* req)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
+        e.pieceIndex = req->index;
+        e.offset = req->offset;
+        e.length = req->length;
+        publish(e);
+    }
+
+    void publishGotRej(struct peer_request const* req)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_REJ;
+        e.pieceIndex = req->index;
+        e.offset = req->offset;
+        e.length = req->length;
+        publish(e);
+    }
+
+    void publishGotChoke()
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
+        publish(e);
+    }
+
+    void publishClientGotHaveAll()
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
+        publish(e);
+    }
+
+    void publishClientGotHaveNone()
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
+        publish(e);
+    }
+
+    void publishClientGotPieceData(uint32_t length)
+    {
+        auto e = tr_peer_event{};
+        e.length = length;
+        e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
+        publish(e);
+    }
+
+    void publishPeerGotPieceData(uint32_t length)
+    {
+        auto e = tr_peer_event{};
+        e.length = length;
+        e.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
+        publish(e);
+    }
+
+    void publishClientGotSuggest(tr_piece_index_t pieceIndex)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
+        e.pieceIndex = pieceIndex;
+        publish(e);
+    }
+
+    void publishClientGotPort(tr_port port)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_PORT;
+        e.port = port;
+        publish(e);
+    }
+
+    void publishClientGotAllowedFast(tr_piece_index_t pieceIndex)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
+        e.pieceIndex = pieceIndex;
+        publish(e);
+    }
+
+    void publishClientGotBitfield(tr_bitfield* bitfield)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
+        e.bitfield = bitfield;
+        publish(e);
+    }
+
+    void publishClientGotHave(tr_piece_index_t index)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_HAVE;
+        e.pieceIndex = index;
+        publish(e);
     }
 
 private:
@@ -426,6 +528,14 @@ private:
             val = active;
 
             tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
+        }
+    }
+
+    void publish(tr_peer_event const& e)
+    {
+        if (callback_ != nullptr)
+        {
+            (*callback_)(this, &e, callbackData_);
         }
     }
 
@@ -474,9 +584,6 @@ public:
 
     tr_torrent* const torrent;
 
-    tr_peer_callback const callback;
-    void* const callbackData;
-
     evbuffer* const outMessages; /* all the non-piece messages */
 
     struct peer_request peerAskedFor[REQQ] = {};
@@ -507,6 +614,9 @@ public:
 
 private:
     bool is_active_[2] = { false, false };
+
+    tr_peer_callback const callback_;
+    void* const callbackData_;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
@@ -706,123 +816,6 @@ static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
     dbgmsg(msgs, "sending HAVE_NONE...");
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
-}
-
-/**
-***  EVENTS
-**/
-
-static void publish(tr_peerMsgsImpl* msgs, tr_peer_event* e)
-{
-    if (msgs->callback != nullptr)
-    {
-        (*msgs->callback)(msgs, e, msgs->callbackData);
-    }
-}
-
-static void fireError(tr_peerMsgsImpl* msgs, int err)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_ERROR;
-    e.err = err;
-    publish(msgs, &e);
-}
-
-static void fireGotBlock(tr_peerMsgsImpl* msgs, struct peer_request const* req)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-    e.pieceIndex = req->index;
-    e.offset = req->offset;
-    e.length = req->length;
-    publish(msgs, &e);
-}
-
-static void fireGotRej(tr_peerMsgsImpl* msgs, struct peer_request const* req)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_REJ;
-    e.pieceIndex = req->index;
-    e.offset = req->offset;
-    e.length = req->length;
-    publish(msgs, &e);
-}
-
-static void fireGotChoke(tr_peerMsgsImpl* msgs)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_CHOKE;
-    publish(msgs, &e);
-}
-
-static void fireClientGotHaveAll(tr_peerMsgsImpl* msgs)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_HAVE_ALL;
-    publish(msgs, &e);
-}
-
-static void fireClientGotHaveNone(tr_peerMsgsImpl* msgs)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_HAVE_NONE;
-    publish(msgs, &e);
-}
-
-static void fireClientGotPieceData(tr_peerMsgsImpl* msgs, uint32_t length)
-{
-    auto e = tr_peer_event{};
-    e.length = length;
-    e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
-    publish(msgs, &e);
-}
-
-static void firePeerGotPieceData(tr_peerMsgsImpl* msgs, uint32_t length)
-{
-    auto e = tr_peer_event{};
-    e.length = length;
-    e.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
-    publish(msgs, &e);
-}
-
-static void fireClientGotSuggest(tr_peerMsgsImpl* msgs, uint32_t pieceIndex)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_SUGGEST;
-    e.pieceIndex = pieceIndex;
-    publish(msgs, &e);
-}
-
-static void fireClientGotPort(tr_peerMsgsImpl* msgs, tr_port port)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_PORT;
-    e.port = port;
-    publish(msgs, &e);
-}
-
-static void fireClientGotAllowedFast(tr_peerMsgsImpl* msgs, uint32_t pieceIndex)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_ALLOWED_FAST;
-    e.pieceIndex = pieceIndex;
-    publish(msgs, &e);
-}
-
-static void fireClientGotBitfield(tr_peerMsgsImpl* msgs, tr_bitfield* bitfield)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
-    e.bitfield = bitfield;
-    publish(msgs, &e);
-}
-
-static void fireClientGotHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_HAVE;
-    e.pieceIndex = index;
-    publish(msgs, &e);
 }
 
 /**
@@ -1164,7 +1157,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
     {
         pex.port = htons((uint16_t)i);
-        fireClientGotPort(msgs, pex.port);
+        msgs->publishClientGotPort(pex.port);
         dbgmsg(msgs, "peer's port is now %d", (int)i);
     }
 
@@ -1586,7 +1579,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
 
         tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
 
-        fireClientGotPieceData(msgs, n);
+        msgs->publishClientGotPieceData(n);
         *setme_piece_bytes_read += n;
         dbgmsg(
             msgs,
@@ -1638,7 +1631,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     if (!messageLengthIsCorrect(msgs, id, msglen + 1))
     {
         dbgmsg(msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen);
-        fireError(msgs, EMSGSIZE);
+        msgs->publishError(EMSGSIZE);
         return READ_ERR;
     }
 
@@ -1650,7 +1643,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (!fext)
         {
-            fireGotChoke(msgs);
+            msgs->publishGotChoke();
         }
 
         msgs->update_active(TR_PEER_TO_CLIENT);
@@ -1681,7 +1674,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (tr_torrentHasMetadata(msgs->torrent) && ui32 >= msgs->torrent->info.pieceCount)
         {
-            fireError(msgs, ERANGE);
+            msgs->publishError(ERANGE);
             return READ_ERR;
         }
 
@@ -1689,7 +1682,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         if (!tr_bitfieldHas(&msgs->have, ui32))
         {
             tr_bitfieldAdd(&msgs->have, ui32);
-            fireClientGotHave(msgs, ui32);
+            msgs->publishClientGotHave(ui32);
         }
 
         updatePeerProgress(msgs);
@@ -1701,7 +1694,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
             tr_bitfieldSetRaw(&msgs->have, tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
-            fireClientGotBitfield(msgs, &msgs->have);
+            msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
             break;
@@ -1763,11 +1756,11 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            fireClientGotSuggest(msgs, ui32);
+            msgs->publishClientGotSuggest(ui32);
         }
         else
         {
-            fireError(msgs, EMSGSIZE);
+            msgs->publishError(EMSGSIZE);
             return READ_ERR;
         }
 
@@ -1779,11 +1772,11 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            fireClientGotAllowedFast(msgs, ui32);
+            msgs->publishClientGotAllowedFast(ui32);
         }
         else
         {
-            fireError(msgs, EMSGSIZE);
+            msgs->publishError(EMSGSIZE);
             return READ_ERR;
         }
 
@@ -1796,12 +1789,12 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         {
             tr_bitfieldSetHasAll(&msgs->have);
             TR_ASSERT(tr_bitfieldHasAll(&msgs->have));
-            fireClientGotHaveAll(msgs);
+            msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
         }
         else
         {
-            fireError(msgs, EMSGSIZE);
+            msgs->publishError(EMSGSIZE);
             return READ_ERR;
         }
 
@@ -1813,12 +1806,12 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         if (fext)
         {
             tr_bitfieldSetHasNone(&msgs->have);
-            fireClientGotHaveNone(msgs);
+            msgs->publishClientGotHaveNone();
             updatePeerProgress(msgs);
         }
         else
         {
-            fireError(msgs, EMSGSIZE);
+            msgs->publishError(EMSGSIZE);
             return READ_ERR;
         }
 
@@ -1834,11 +1827,11 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
             if (fext)
             {
-                fireGotRej(msgs, &r);
+                msgs->publishGotRej(&r);
             }
             else
             {
-                fireError(msgs, EMSGSIZE);
+                msgs->publishError(EMSGSIZE);
                 return READ_ERR;
             }
 
@@ -1909,7 +1902,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     }
 
     tr_bitfieldAdd(&msgs->blame, req->index);
-    fireGotBlock(msgs, req);
+    msgs->publishGotBlock(req);
     return 0;
 }
 
@@ -1919,7 +1912,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 
     if (wasPieceData)
     {
-        firePeerGotPieceData(msgs, bytesWritten);
+        msgs->publishPeerGotPieceData(bytesWritten);
     }
 
     if (tr_isPeerIo(io) && io->userData != nullptr)
@@ -2313,7 +2306,7 @@ static void gotError(tr_peerIo* io, short what, void* vmsgs)
         dbgmsg(msgs, "libevent got an error! what=%hd, errno=%d (%s)", what, errno, tr_strerror(errno));
     }
 
-    fireError(msgs, ENOTCONN);
+    msgs->publishError(ENOTCONN);
 }
 
 static void sendBitfield(tr_peerMsgsImpl* msgs)
