@@ -150,7 +150,7 @@ private:
     Gtk::CheckButton* scrape_check_ = nullptr;
     Gtk::CheckButton* all_check_ = nullptr;
 
-    Gtk::Widget* file_list_ = nullptr;
+    FileList* file_list_ = nullptr;
     Gtk::Label* file_label_ = nullptr;
 
     std::vector<int> ids_;
@@ -2716,7 +2716,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, TrCore* core)
     n->append_page(*tracker_page_new(), _("Trackers"));
 
     auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
-    file_list_ = Glib::wrap(gtr_file_list_new(core, 0));
+    file_list_ = Gtk::make_managed<FileList>(core, 0);
     file_label_ = Gtk::make_managed<Gtk::Label>(_("File listing not available for combined torrent properties"));
     v->pack_start(*file_list_, true, true, 0);
     v->pack_start(*file_label_, true, true, 0);
@@ -2750,13 +2750,13 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
         auto const* inf = tr_torrentInfo(tor);
         g_snprintf(title, sizeof(title), _("%s Properties"), inf->name);
 
-        gtr_file_list_set_torrent(Glib::unwrap(file_list_), id);
+        file_list_->set_torrent(id);
         file_list_->show();
         file_label_->hide();
     }
     else
     {
-        gtr_file_list_clear(Glib::unwrap(file_list_));
+        file_list_->clear();
         file_list_->hide();
         file_label_->show();
         g_snprintf(title, sizeof(title), _("%'d Torrent Properties"), len);

@@ -100,7 +100,7 @@ private:
     OptionsDialog& dialog_;
 
     TrCore* core_ = nullptr;
-    Gtk::Widget* file_list_ = nullptr;
+    FileList* file_list_ = nullptr;
     Gtk::CheckButton* run_check_ = nullptr;
     Gtk::CheckButton* trash_check_ = nullptr;
     Gtk::ComboBox* priority_combo_ = nullptr;
@@ -115,7 +115,7 @@ void OptionsDialog::Impl::removeOldTorrent()
 {
     if (tor_ != nullptr)
     {
-        gtr_file_list_clear(Glib::unwrap(file_list_));
+        file_list_->clear();
         tr_torrentRemove(tor_, false, nullptr);
         tor_ = nullptr;
     }
@@ -159,14 +159,14 @@ void OptionsDialog::Impl::updateTorrent()
 
     if (tor_ == nullptr)
     {
-        gtr_file_list_clear(Glib::unwrap(file_list_));
+        file_list_->clear();
         file_list_->set_sensitive(false);
     }
     else
     {
         tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
-        gtr_file_list_set_torrent(Glib::unwrap(file_list_), tr_torrentId(tor_));
+        file_list_->set_torrent(tr_torrentId(tor_));
         tr_torrentVerify(tor_, nullptr, nullptr);
     }
 }
@@ -289,7 +289,7 @@ OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<t
 
     filename_ = tr_ctorGetSourceFile(ctor_.get()) != nullptr ? tr_ctorGetSourceFile(ctor_.get()) : "";
     downloadDir_ = str;
-    file_list_ = Glib::wrap(gtr_file_list_new(core_, 0));
+    file_list_ = Gtk::make_managed<FileList>(core_, 0);
     trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve .torrent file to the trash"), true);
     run_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Start when added"), true);
 
