@@ -134,7 +134,6 @@ void tr_variantInit(tr_variant* v, char type)
 
 static auto constexpr STRING_INIT = tr_variant_string{
     TR_STRING_TYPE_QUARK,
-    TR_KEY_NONE,
     0,
     {},
 };
@@ -180,7 +179,6 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     tr_variant_string_clear(str);
 
     str->type = TR_STRING_TYPE_QUARK;
-    str->quark = quark;
     str->str.str = tr_quark_get_string(quark, &str->len);
 }
 

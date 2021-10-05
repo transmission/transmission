@@ -42,7 +42,6 @@ typedef enum
 struct tr_variant_string
 {
     tr_string_type type;
-    tr_quark quark;
     size_t len;
     union
     {
