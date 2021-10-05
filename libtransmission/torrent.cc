@@ -1287,7 +1287,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->queuePosition = tor->queuePosition;
     s->idleSecs = torrentGetIdleSecs(tor, s->activity);
     s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
-    tr_strlcpy(s->errorString, tor->errorString, sizeof(s->errorString));
+    s->errorString = tor->errorString;
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
     s->peersConnected = swarm_stats.peerCount;
