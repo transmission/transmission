@@ -334,12 +334,7 @@ static inline int toMemMB(uint64_t B)
 **/
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
-unsigned int tr_sessionGetAltSpeed_Bps(tr_session const*, tr_direction);
-unsigned int tr_sessionGetRawSpeed_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
-
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
-void tr_sessionSetAltSpeed_Bps(tr_session*, tr_direction, unsigned int Bps);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
