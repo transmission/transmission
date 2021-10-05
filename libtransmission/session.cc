@@ -636,7 +636,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
-    tr_bandwidthConstruct(&session->bandwidth, session, nullptr);
+    tr_bandwidthConstruct(&session->bandwidth, nullptr);
     tr_variantInitList(&session->removedTorrents, 0);
 
     /* nice to start logging at the very beginning */

@@ -614,7 +614,7 @@ tr_webseed* tr_webseedNew(struct tr_torrent* tor, char const* url, tr_peer_callb
     w->callback = callback;
     w->callback_data = callback_data;
     w->file_urls = tr_new0(char*, inf->fileCount);
-    tr_bandwidthConstruct(&w->bandwidth, tor->session, &tor->bandwidth);
+    tr_bandwidthConstruct(&w->bandwidth, &tor->bandwidth);
     w->timer = evtimer_new(w->session->event_base, webseed_timer_func, w);
     tr_timerAddMsec(w->timer, TR_IDLE_TIMER_MSEC);
     return w;
