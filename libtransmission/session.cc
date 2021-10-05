@@ -1453,6 +1453,8 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 ****
 ***/
 
+static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d);
+
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme_Bps)
 {
     bool isLimited = true;
@@ -1627,7 +1629,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
 {
     TR_ASSERT(tr_isSession(s));
     TR_ASSERT(tr_isDirection(d));
@@ -1677,7 +1679,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int Bps)
+static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int Bps)
 {
     TR_ASSERT(tr_isSession(s));
     TR_ASSERT(tr_isDirection(d));
@@ -1692,7 +1694,7 @@ void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps
     tr_sessionSetAltSpeed_Bps(s, d, toSpeedBytes(KBps));
 }
 
-unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
+static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
 {
     TR_ASSERT(tr_isSession(s));
     TR_ASSERT(tr_isDirection(d));
@@ -1892,7 +1894,7 @@ unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction
     return tr_isSession(session) ? tr_bandwidthGetPieceSpeed_Bps(&session->bandwidth, 0, dir) : 0;
 }
 
-unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
+static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
     return tr_isSession(session) ? tr_bandwidthGetRawSpeed_Bps(&session->bandwidth, 0, dir) : 0;
 }
