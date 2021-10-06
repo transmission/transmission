@@ -29,8 +29,8 @@ struct tr_torrent;
 class tr_peerMsgs : public tr_peer
 {
 public:
-    tr_peerMsgs(tr_torrent* torrent, peer_atom* atom)
-        : tr_peer(torrent, atom)
+    tr_peerMsgs(tr_torrent* torrent, peer_atom* atom_in)
+        : tr_peer{ torrent, atom_in }
     {
     }
 

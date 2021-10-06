@@ -196,8 +196,8 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 class tr_peerMsgsImpl : public tr_peerMsgs
 {
 public:
-    tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
-        : tr_peerMsgs{ torrent_in, atom }
+    tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
+        : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
         , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
@@ -389,7 +389,7 @@ public:
 
     void update_interest()
     {
-        // FIXME -- might need to poke the mgr on startup
+        // TODO -- might need to poke the mgr on startup
     }
 
     // publishing events
