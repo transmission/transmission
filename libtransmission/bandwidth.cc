@@ -95,11 +95,10 @@ static int compareBandwidth(void const* va, void const* vb)
 ****
 ***/
 
-void tr_bandwidthConstruct(tr_bandwidth* b, tr_session* session, tr_bandwidth* parent)
+void tr_bandwidthConstruct(tr_bandwidth* b, tr_bandwidth* parent)
 {
     static unsigned int uniqueKey = 0;
 
-    b->session = session;
     b->children = {};
     b->magicNumber = BANDWIDTH_MAGIC_NUMBER;
     b->uniqueKey = uniqueKey++;

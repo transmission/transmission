@@ -680,7 +680,7 @@ static tr_peerIo* tr_peerIoNew(
     io->timeCreated = tr_time();
     io->inbuf = evbuffer_new();
     io->outbuf = evbuffer_new();
-    tr_bandwidthConstruct(&io->bandwidth, session, parent);
+    tr_bandwidthConstruct(&io->bandwidth, parent);
     tr_bandwidthSetPeer(&io->bandwidth, io);
     dbgmsg(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
 

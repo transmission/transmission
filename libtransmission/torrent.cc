@@ -885,7 +885,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tor->incompleteDir = tr_strdup(dir);
     }
 
-    tr_bandwidthConstruct(&tor->bandwidth, session, &session->bandwidth);
+    tr_bandwidthConstruct(&tor->bandwidth, &session->bandwidth);
 
     tor->bandwidth.priority = tr_ctorGetBandwidthPriority(ctor);
     tor->error = TR_STAT_OK;
