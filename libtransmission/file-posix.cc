@@ -10,6 +10,7 @@
 #define _GNU_SOURCE
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
@@ -608,31 +609,35 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
     TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
-    tr_sys_file_t ret;
-    int native_flags = 0;
-
-    if ((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) == (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE))
+    struct native_map_item
     {
-        native_flags |= O_RDWR;
-    }
-    else if ((flags & TR_SYS_FILE_READ) != 0)
+        int symbolic_mask;
+        int symbolic_value;
+        int native_value;
+    };
+
+    auto constexpr native_map = std::array<native_map_item, 8>{
+        { { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, O_RDWR },
+          { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ, O_RDONLY },
+          { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_WRITE, O_WRONLY },
+          { TR_SYS_FILE_CREATE, TR_SYS_FILE_CREATE, O_CREAT },
+          { TR_SYS_FILE_CREATE_NEW, TR_SYS_FILE_CREATE_NEW, O_CREAT | O_EXCL },
+          { TR_SYS_FILE_APPEND, TR_SYS_FILE_APPEND, O_APPEND },
+          { TR_SYS_FILE_TRUNCATE, TR_SYS_FILE_TRUNCATE, O_TRUNC },
+          { TR_SYS_FILE_SEQUENTIAL, TR_SYS_FILE_SEQUENTIAL, O_SEQUENTIAL } }
+    };
+
+    int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC;
+
+    for (auto const& item : native_map)
     {
-        native_flags |= O_RDONLY;
-    }
-    else if ((flags & TR_SYS_FILE_WRITE) != 0)
-    {
-        native_flags |= O_WRONLY;
+        if ((flags & item.symbolic_mask) == item.symbolic_value)
+        {
+            native_flags |= item.native_value;
+        }
     }
 
-    native_flags |= //
-        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) | //
-        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) | //
-        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) | //
-        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) | //
-        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) | //
-        O_BINARY | O_LARGEFILE | O_CLOEXEC;
-
-    ret = open(path, native_flags, permissions);
+    tr_sys_file_t ret = open(path, native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {
