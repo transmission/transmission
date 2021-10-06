@@ -43,8 +43,6 @@ static constexpr void base32_to_sha1(uint8_t* out, char const* in, size_t const 
 
     size_t const outlen = 20;
 
-    memset(out, 0, 20);
-
     size_t index = 0;
     size_t offset = 0;
     for (size_t i = 0; i < inlen; ++i)
@@ -97,6 +95,11 @@ static constexpr void base32_to_sha1(uint8_t* out, char const* in, size_t const 
 
             out[offset] |= digit << (8 - index);
         }
+    }
+
+    while (offset < 20)
+    {
+        out[offset++] = '\0';
     }
 }
 
