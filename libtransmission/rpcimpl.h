@@ -16,7 +16,7 @@
 ****  RPC processing
 ***/
 
-typedef void (*tr_rpc_response_func)(tr_session* session, tr_variant* response, void* user_data);
+using tr_rpc_response_func = void (*)(tr_session* session, tr_variant* response, void* user_data);
 
 /* http://www.json.org/ */
 void tr_rpc_request_exec_json(

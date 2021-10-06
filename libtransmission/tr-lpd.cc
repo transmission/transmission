@@ -30,7 +30,7 @@ THE SOFTWARE.
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
-typedef uint16_t in_port_t; /* all missing */
+using in_port_t = uint16_t; /* all missing */
 #else
 #include <ctime>
 #include <unistd.h> /* close() */

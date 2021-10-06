@@ -22,17 +22,17 @@
 **/
 
 /** @brief Opaque SHA1 context type. */
-typedef void* tr_sha1_ctx_t;
+using tr_sha1_ctx_t = void*;
 /** @brief Opaque DH context type. */
-typedef void* tr_dh_ctx_t;
+using tr_dh_ctx_t = void*;
 /** @brief Opaque DH secret key type. */
-typedef void* tr_dh_secret_t;
+using tr_dh_secret_t = void*;
 /** @brief Opaque SSL context type. */
-typedef void* tr_ssl_ctx_t;
+using tr_ssl_ctx_t = void*;
 /** @brief Opaque X509 certificate store type. */
-typedef void* tr_x509_store_t;
+using tr_x509_store_t = void*;
 /** @brief Opaque X509 certificate type. */
-typedef void* tr_x509_cert_t;
+using tr_x509_cert_t = void*;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.

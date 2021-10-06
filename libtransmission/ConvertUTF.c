@@ -44,8 +44,6 @@
 #endif
 #include <string.h> /* strlen () */
 
-#include "transmission.h"
-
 #include "ConvertUTF.h"
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
@@ -364,7 +362,7 @@ tr_utf8_validate (const char * str, size_t max_len, const char ** end)
     if (str == NULL)
         return false;
 
-    sourceEnd = source + (max_len == TR_BAD_SIZE ? strlen (str) : max_len);
+    sourceEnd = source + (max_len == ((size_t)-1) ? strlen (str) : max_len);
 
     if (source == sourceEnd)
     {

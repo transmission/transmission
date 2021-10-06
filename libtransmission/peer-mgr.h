@@ -29,9 +29,9 @@
  */
 
 struct UTPSocket;
+struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_torrent;
-typedef struct tr_peerMgr tr_peerMgr;
 
 /* added_f's bitwise-or'ed flags */
 enum
@@ -49,12 +49,12 @@ enum
     ADDED_F_CONNECTABLE = 16
 };
 
-typedef struct tr_pex
+struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
     uint8_t flags;
-} tr_pex;
+};
 
 struct peer_atom;
 struct tr_peerIo;

@@ -17,7 +17,7 @@
  * @{
  */
 
-typedef struct tr_natpmp tr_natpmp;
+struct tr_natpmp;
 
 tr_natpmp* tr_natpmpInit(void);
 

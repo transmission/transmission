@@ -10,7 +10,7 @@
 
 #include "tr-macros.h"
 
-typedef struct tr_session_id* tr_session_id_t;
+using tr_session_id_t = struct tr_session_id*;
 
 /**
  * Create new session identifier object.

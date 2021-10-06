@@ -12,7 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
-typedef struct tr_webseed tr_webseed;
+struct tr_webseed;
 
 #include "peer-common.h"
 

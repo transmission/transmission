@@ -15,10 +15,10 @@
 #include <string>
 #include <unordered_set>
 
-typedef struct tr_watchdir_backend
+struct tr_watchdir_backend
 {
     void (*free_func)(struct tr_watchdir_backend*);
-} tr_watchdir_backend;
+};
 
 #define BACKEND_DOWNCAST(b) (reinterpret_cast<tr_watchdir_backend*>(b))
 
