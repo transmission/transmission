@@ -638,6 +638,17 @@ static void handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
+        evhttp_add_header(req->output_headers, "Access-Control-Allow-Origin", "*");
+
+        if (req->type == EVHTTP_REQ_OPTIONS)
+        {
+            char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");
+            evhttp_add_header(req->output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            evhttp_add_header(req->output_headers, "Access-Control-Allow-Headers", headers);
+            send_simple_response(req, 200, "");
+            return;
+        }
+
         auth = evhttp_find_header(req->input_headers, "Authorization");
 
         if (auth != nullptr && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
@@ -730,6 +741,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 TR_RPC_SESSION_ID_HEADER,
                 sessionId);
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
+            evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp);
             tr_free(tmp);
         }
@@ -804,6 +816,7 @@ static void startServer(void* vserver)
     }
 
     struct evhttp* httpd = evhttp_new(server->session->event_base);
+    evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
     char const* address = tr_rpcGetBindAddress(server);
 
