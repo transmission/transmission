@@ -14,14 +14,14 @@
 
 static char const* get_static_string(char const* s)
 {
-    static GStringChunk* static_strings = NULL;
+    static GStringChunk* static_strings = nullptr;
 
-    if (s == NULL)
+    if (s == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (static_strings == NULL)
+    if (static_strings == nullptr)
     {
         static_strings = g_string_chunk_new(1024);
     }
@@ -36,7 +36,7 @@ typedef struct
     GHashTable* cache;
 } IconCache;
 
-static IconCache* icon_cache[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static IconCache* icon_cache[7] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 static GdkPixbuf* create_void_pixbuf(int width, int height)
 {
@@ -58,12 +58,12 @@ static int get_size_in_pixels(GtkIconSize icon_size)
 
 static IconCache* icon_cache_new(GtkWidget* for_widget, GtkIconSize icon_size)
 {
-    g_return_val_if_fail(for_widget != NULL, NULL);
+    g_return_val_if_fail(for_widget != nullptr, nullptr);
 
     IconCache* icons = g_new0(IconCache, 1);
     icons->icon_theme = gtk_icon_theme_get_for_screen(gtk_widget_get_screen(for_widget));
     icons->icon_size = get_size_in_pixels(icon_size);
-    icons->cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_object_unref);
+    icons->cache = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, g_object_unref);
 
     g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
 
@@ -72,14 +72,14 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, GtkIconSize icon_size)
 
 static char const* _icon_cache_get_icon_key(GIcon* icon)
 {
-    char const* key = NULL;
+    char const* key = nullptr;
 
     if (G_IS_THEMED_ICON(icon))
     {
         char** icon_names;
         char* name;
 
-        g_object_get(icon, "names", &icon_names, NULL);
+        g_object_get(icon, "names", &icon_names, nullptr);
         name = g_strjoinv(",", icon_names);
 
         key = get_static_string(name);
@@ -106,25 +106,25 @@ static char const* _icon_cache_get_icon_key(GIcon* icon)
 
 static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconTheme* icon_theme)
 {
-    char** icon_names = NULL;
+    char** icon_names = nullptr;
     GtkIconInfo* icon_info;
     GdkPixbuf* pixbuf;
-    GError* error = NULL;
+    GError* error = nullptr;
 
-    g_object_get(icon, "names", &icon_names, NULL);
+    g_object_get(icon, "names", &icon_names, nullptr);
 
     icon_info = gtk_icon_theme_choose_icon(icon_theme, (char const**)icon_names, size, {});
 
-    if (icon_info == NULL)
+    if (icon_info == nullptr)
     {
         icon_info = gtk_icon_theme_lookup_icon(icon_theme, "text-x-generic", size, GTK_ICON_LOOKUP_USE_BUILTIN);
     }
 
     pixbuf = gtk_icon_info_load_icon(icon_info, &error);
 
-    if (pixbuf == NULL)
+    if (pixbuf == nullptr)
     {
-        if (error != NULL && error->message != NULL)
+        if (error != nullptr && error->message != nullptr)
         {
             g_warning("could not load icon pixbuf: %s\n", error->message);
         }
@@ -151,7 +151,7 @@ static GdkPixbuf* get_file_icon_pixbuf(GFileIcon* icon, int size)
 
     file = g_file_icon_get_file(icon);
     filename = g_file_get_path(file);
-    pixbuf = gdk_pixbuf_new_from_file_at_size(filename, size, -1, NULL);
+    pixbuf = gdk_pixbuf_new_from_file_at_size(filename, size, -1, nullptr);
     g_free(filename);
     g_object_unref(file);
 
@@ -160,9 +160,9 @@ static GdkPixbuf* get_file_icon_pixbuf(GFileIcon* icon, int size)
 
 static GdkPixbuf* _get_icon_pixbuf(GIcon* icon, int size, GtkIconTheme* theme)
 {
-    if (icon == NULL)
+    if (icon == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     if (G_IS_THEMED_ICON(icon))
@@ -175,21 +175,21 @@ static GdkPixbuf* _get_icon_pixbuf(GIcon* icon, int size, GtkIconTheme* theme)
         return get_file_icon_pixbuf(G_FILE_ICON(icon), size);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mime_type)
 {
     GIcon* icon = g_content_type_get_icon(mime_type);
     char const* key = _icon_cache_get_icon_key(icon);
-    if (key == NULL)
+    if (key == nullptr)
     {
         key = VOID_PIXBUF_KEY;
     }
 
-    g_return_val_if_fail(icons != NULL, NULL);
+    g_return_val_if_fail(icons != nullptr, nullptr);
     auto* pixbuf = static_cast<GdkPixbuf*>(g_hash_table_lookup(icons->cache, key));
-    if (pixbuf != NULL)
+    if (pixbuf != nullptr)
     {
         g_object_ref(pixbuf);
         g_object_unref(G_OBJECT(icon));
@@ -198,7 +198,7 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mi
 
     pixbuf = _get_icon_pixbuf(icon, icons->icon_size, icons->icon_theme);
 
-    if (pixbuf != NULL)
+    if (pixbuf != nullptr)
     {
         g_hash_table_insert(icons->cache, (gpointer)key, g_object_ref(pixbuf));
     }
@@ -243,7 +243,7 @@ GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, 
         break;
     }
 
-    if (icon_cache[n] == NULL)
+    if (icon_cache[n] == nullptr)
     {
         icon_cache[n] = icon_cache_new(for_widget, icon_size);
     }
@@ -253,7 +253,7 @@ GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, 
 
 char const* gtr_get_mime_type_from_filename(char const* file)
 {
-    char* tmp = g_content_type_guess(file, NULL, 0, NULL);
+    char* tmp = g_content_type_guess(file, nullptr, 0, nullptr);
     char const* ret = get_static_string(tmp);
     g_free(tmp);
     return ret;

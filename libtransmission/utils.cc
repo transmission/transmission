@@ -1419,7 +1419,7 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
  * array of setmeCount ints of all the values in the array.
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  * It's the caller's responsibility to call tr_free () on the returned array.
- * If a fragment of the string can't be parsed, NULL is returned.
+ * If a fragment of the string can't be parsed, nullptr is returned.
  */
 std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
 {

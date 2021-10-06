@@ -45,13 +45,13 @@ static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data)
     GtkWidget* w = gtr_action_get_widget("/icon-popup");
 
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_pointer(GTK_MENU(w), NULL);
+    gtk_menu_popup_at_pointer(GTK_MENU(w), nullptr);
 
     TR_UNUSED(self);
     TR_UNUSED(button);
     TR_UNUSED(when);
 #else
-    gtk_menu_popup(GTK_MENU(w), NULL, NULL, gtk_status_icon_position_menu, self, button, when);
+    gtk_menu_popup(GTK_MENU(w), nullptr, nullptr, gtk_status_icon_position_menu, self, button, when);
 #endif
 }
 
@@ -138,7 +138,7 @@ static char const* getIconName(void)
     else
     {
         GtkIconInfo* icon_info = gtk_icon_theme_lookup_icon(theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN);
-        gboolean const icon_is_builtin = gtk_icon_info_get_filename(icon_info) == NULL;
+        gboolean const icon_is_builtin = gtk_icon_info_get_filename(icon_info) == nullptr;
 
 #if GTK_CHECK_VERSION(3, 8, 0)
         g_object_unref(icon_info);
@@ -170,8 +170,8 @@ gpointer gtr_icon_new(TrCore* core)
 
     char const* icon_name = getIconName();
     GtkStatusIcon* icon = gtk_status_icon_new_from_icon_name(icon_name);
-    g_signal_connect(icon, "activate", G_CALLBACK(activated), NULL);
-    g_signal_connect(icon, "popup-menu", G_CALLBACK(popup), NULL);
+    g_signal_connect(icon, "activate", G_CALLBACK(activated), nullptr);
+    g_signal_connect(icon, "popup-menu", G_CALLBACK(popup), nullptr);
     g_object_set_qdata(G_OBJECT(icon), core_quark(), core);
     return icon;
 

@@ -742,7 +742,7 @@ typedef struct tr_log_message
 
     /* The torrent associated with this message,
      * or a module name such as "Port Forwarding" for non-torrent messages,
-     * or NULL. */
+     * or nullptr. */
     char* name;
 
     /* The message */
@@ -777,7 +777,7 @@ void tr_logFreeQueue(tr_log_message* freeme);
  * The caller only needs to invoke this when the blocklist
  * has changed.
  *
- * Passing NULL for a filename will clear the blocklist.
+ * Passing nullptr for a filename will clear the blocklist.
  */
 int tr_blocklistSetContent(tr_session* session, char const* filename);
 
@@ -834,11 +834,11 @@ typedef enum
 } tr_ctorMode;
 
 /** @brief Create a torrent constructor object used to instantiate a tr_torrent
-    @param session_or_NULL the tr_session.
-                           This is required if you're going to call tr_torrentNew(),
-                           but you can use NULL for tr_torrentParse().
+    @param session_or_nullptr the tr_session.
+                              This is required if you're going to call tr_torrentNew(),
+                              but you can use nullptr for tr_torrentParse().
     @see tr_torrentNew(), tr_torrentParse() */
-tr_ctor* tr_ctorNew(tr_session const* session_or_NULL);
+tr_ctor* tr_ctorNew(tr_session const* session_or_nullptr);
 
 /** @brief Free a torrent constructor object */
 void tr_ctorFree(tr_ctor* ctor);
@@ -914,7 +914,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setmeDoDelete);
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 /** @brief Get the .torrent file that this ctor's metainfo came from,
-           or NULL if tr_ctorSetMetainfoFromFile() wasn't used */
+           or nullptr if tr_ctorSetMetainfoFromFile() wasn't used */
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
 
 typedef enum
@@ -931,9 +931,9 @@ typedef enum
  *         TR_PARSE_OK if parsing succeeded and it's not a duplicate;
  *         TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  *
- * @param setme_info_or_NULL If parsing is successful and setme_info is non-NULL,
- *                           the parsed metainfo is stored there and sould be freed
- *                           by calling tr_metainfoFree() when no longer needed.
+ * @param setme_info_or_nullptr If parsing is successful and setme_info is non-nullptr,
+ *                              the parsed metainfo is stored there and sould be freed
+ *                              by calling tr_metainfoFree() when no longer needed.
  *
  * Notes:
  *
@@ -944,7 +944,7 @@ typedef enum
  * 2. setme_info->torrent's value can't be set unless ctor's session variable
  *    is set.
  */
-tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setme_info_or_NULL);
+tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setme_info_or_nullptr);
 
 /** @brief free a metainfo
     @see tr_torrentParse */
@@ -953,7 +953,7 @@ void tr_metainfoFree(tr_info* inf);
 /**
  * Instantiate a single torrent.
  *
- * Returns a pointer to the torrent on success, or NULL on failure.
+ * Returns a pointer to the torrent on success, or nullptr on failure.
  *
  * @param ctor               the builder struct
  * @param setme_error        TR_PARSE_ERR if the parsing failed.
@@ -998,7 +998,7 @@ typedef void (*tr_torrent_rename_done_func)( //
  * @param tor           the torrent whose path will be renamed
  * @param oldpath       the path to the file or folder that will be renamed
  * @param newname       the file or folder's new name
- * @param callback      the callback invoked when the renaming finishes, or NULL
+ * @param callback      the callback invoked when the renaming finishes, or nullptr
  * @param callback_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
@@ -1022,12 +1022,12 @@ typedef void (*tr_torrent_rename_done_func)( //
  *
  *   Changing tr_info's contents requires a session lock, so this function
  *   returns asynchronously to avoid blocking. If you don't want to be notified
- *   when the function has finished, you can pass NULL as the callback arg.
+ *   when the function has finished, you can pass nullptr as the callback arg.
  *
  *   On success, the callback's error argument will be 0.
  *
  *   If oldpath can't be found in files[*].name, or if newname is already
- *   in files[*].name, or contains a directory separator, or is NULL, "",
+ *   in files[*].name, or contains a directory separator, or is nullptr, "",
  *   ".", or "..", the error argument will be EINVAL.
  *
  *   If the path exists on disk but can't be renamed, the error argument
@@ -1089,7 +1089,7 @@ char const* tr_torrentName(tr_torrent const*);
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
  * @return a newly-allocated string (that must be tr_free()d by the caller
  *         when done) that gives the location of this file on disk,
- *         or NULL if no file exists yet.
+ *         or nullptr if no file exists yet.
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_info.fileCount)
  */
@@ -1564,11 +1564,11 @@ typedef void (*tr_verify_done_func)(tr_torrent* torrent, bool aborted, void* use
 /**
  * Queue a torrent for verification.
  *
- * If callback_func is non-NULL, it will be called from the libtransmission
+ * If callback_func is non-nullptr, it will be called from the libtransmission
  * thread after the torrent's completness state is updated after the
  * file verification pass.
  */
-void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_NULL, void* callback_data_or_NULL);
+void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_nullptr, void* callback_data_or_nullptr);
 
 /***********************************************************************
  * tr_info
@@ -1643,7 +1643,7 @@ struct tr_info
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
     tr_info const* const inf = tr_torrentInfo(tor);
-    return (inf != NULL) && (inf->fileCount > 0);
+    return (inf != nullptr) && (inf->fileCount > 0);
 }
 
 /**

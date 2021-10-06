@@ -136,7 +136,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     }
 
     /* Register kevent filter with kqueue descriptor */
-    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
+    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, nullptr);
 
     if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {

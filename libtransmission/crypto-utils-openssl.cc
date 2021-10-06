@@ -193,8 +193,8 @@ static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
 
 static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
 {
-    /* If the fields p and g in d are NULL, the corresponding input
-     * parameters MUST be non-NULL. q may remain NULL.
+    /* If the fields p and g in d are nullptr, the corresponding input
+     * parameters MUST be non-nullptr. q may remain nullptr.
      */
     if ((dh->p == nullptr && p == nullptr) || (dh->g == nullptr && g == nullptr))
     {

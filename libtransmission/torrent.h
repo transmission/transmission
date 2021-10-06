@@ -380,7 +380,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 /**
  * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath.
  *
- * If the file is found, "tr_buildPath(base, subpath, NULL)"
+ * If the file is found, "tr_buildPath(base, subpath, nullptr)"
  * will generate the complete filename.
  *
  * @return true if the file is found, false otherwise.

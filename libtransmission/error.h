@@ -32,7 +32,7 @@ typedef struct tr_error
  * @param[in] code    Error code (platform-specific).
  * @param[in] message Error message.
  *
- * @return Newly allocated error object on success, `NULL` otherwise.
+ * @return Newly allocated error object on success, `nullptr` otherwise.
  */
 tr_error* tr_error_new_literal(int code, char const* message);
 
@@ -43,7 +43,7 @@ tr_error* tr_error_new_literal(int code, char const* message);
  * @param[in] message_format Error message format string.
  * @param[in] args           Format arguments.
  *
- * @return Newly allocated error object on success, `NULL` otherwise.
+ * @return Newly allocated error object on success, `nullptr` otherwise.
  */
 tr_error* tr_error_new_valist(int code, char const* message_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
@@ -57,7 +57,7 @@ void tr_error_free(tr_error* error);
 /**
  * @brief Create and set new error object using `printf`-style formatting.
  *
- * If passed pointer to error object is `NULL`, do nothing.
+ * If passed pointer to error object is `nullptr`, do nothing.
  *
  * @param[in,out] error          Pointer to error object to be set.
  * @param[in]     code           Error code (platform-specific).
@@ -69,7 +69,7 @@ void tr_error_set(tr_error** error, int code, char const* message_format, ...) T
 /**
  * @brief Create and set new error object using literal error message.
  *
- * If passed pointer to error object is `NULL`, do nothing.
+ * If passed pointer to error object is `nullptr`, do nothing.
  *
  * @param[in,out] error   Pointer to error object to be set.
  * @param[in]     code    Error code (platform-specific).
@@ -80,8 +80,8 @@ void tr_error_set_literal(tr_error** error, int code, char const* message);
 /**
  * @brief Propagate existing error object upwards.
  *
- * If passed pointer to new error object is not `NULL`, copy old error object to
- * new error object and free old error object. Otherwise, just free old error
+ * If passed pointer to new error object is not `nullptr`, copy old error object
+ * to new error object and free old error object. Otherwise, just free old error
  * object.
  *
  * @param[in,out] new_error Pointer to error object to be set.
@@ -92,8 +92,8 @@ void tr_error_propagate(tr_error** new_error, tr_error** old_error);
 /**
  * @brief Clear error object.
  *
- * Free error object being pointed and set pointer to `NULL`. If passed pointer
- * is `NULL`, do nothing.
+ * Free error object being pointed and set pointer to `nullptr`. If passed
+ * pointer is `nullptr`, do nothing.
  *
  * @param[in,out] error Pointer to error object to be cleared.
  */
@@ -102,7 +102,7 @@ void tr_error_clear(tr_error** error);
 /**
  * @brief Prefix message of exising error object.
  *
- * If passed pointer to error object is not `NULL`, prefix its message with
+ * If passed pointer to error object is not `nullptr`, prefix its message with
  * `printf`-style formatted text. Otherwise, do nothing.
  *
  * @param[in,out] error         Pointer to error object to be set.
@@ -114,9 +114,9 @@ void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_P
 /**
  * @brief Prefix message and propagate existing error object upwards.
  *
- * If passed pointer to new error object is not `NULL`, copy old error object to
- * new error object, prefix its message with `printf`-style formatted text, and
- * free old error object. Otherwise, just free old error object.
+ * If passed pointer to new error object is not `nullptr`, copy old error object
+ * to new error object, prefix its message with `printf`-style formatted text,
+ * and free old error object. Otherwise, just free old error object.
  *
  * @param[in,out] new_error Pointer to error object to be set.
  * @param[in,out] old_error     Error object to be propagated. Cleared on return.

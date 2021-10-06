@@ -29,15 +29,15 @@
 #define SERVICE_CONTROL_PRESHUTDOWN 0x0000000F
 #endif
 
-static dtr_callbacks const* callbacks = NULL;
-static void* callback_arg = NULL;
+static dtr_callbacks const* callbacks = nullptr;
+static void* callback_arg = nullptr;
 
 static LPCWSTR const service_name = L"TransmissionDaemon";
 
-static SERVICE_STATUS_HANDLE status_handle = NULL;
+static SERVICE_STATUS_HANDLE status_handle = nullptr;
 static DWORD current_state = SERVICE_STOPPED;
-static HANDLE service_thread = NULL;
-static HANDLE service_stop_thread = NULL;
+static HANDLE service_thread = nullptr;
+static HANDLE service_stop_thread = nullptr;
 
 /***
 ****
@@ -128,7 +128,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
 
 static void stop_service(void)
 {
-    if (service_stop_thread != NULL)
+    if (service_stop_thread != nullptr)
     {
         return;
     }
@@ -137,9 +137,10 @@ static void stop_service(void)
 
     update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, 1, wait_time);
 
-    service_stop_thread = (HANDLE)_beginthreadex(NULL, 0, &service_stop_thread_main, (LPVOID)(UINT_PTR)wait_time, 0, NULL);
+    service_stop_thread = (HANDLE)
+        _beginthreadex(nullptr, 0, &service_stop_thread_main, (LPVOID)(UINT_PTR)wait_time, 0, nullptr);
 
-    if (service_stop_thread == NULL)
+    if (service_stop_thread == nullptr)
     {
         log_system_error(TR_LOG_DEBUG, GetLastError(), "_beginthreadex() failed, trying to stop synchronously");
         service_stop_thread_main((LPVOID)(UINT_PTR)wait_time);
@@ -184,9 +185,9 @@ static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
     TR_UNUSED(argc);
     TR_UNUSED(argv);
 
-    status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, NULL);
+    status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, nullptr);
 
-    if (status_handle == NULL)
+    if (status_handle == nullptr)
     {
         log_system_error(TR_LOG_ERROR, GetLastError(), "RegisterServiceCtrlHandlerEx() failed");
         return;
@@ -194,9 +195,9 @@ static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
 
     update_service_status(SERVICE_START_PENDING, NO_ERROR, 0, 1, 1000);
 
-    service_thread = (HANDLE)_beginthreadex(NULL, 0, &service_thread_main, NULL, 0, NULL);
+    service_thread = (HANDLE)_beginthreadex(nullptr, 0, &service_thread_main, nullptr, 0, nullptr);
 
-    if (service_thread == NULL)
+    if (service_thread == nullptr)
     {
         log_system_error(TR_LOG_ERROR, GetLastError(), "_beginthreadex() failed");
         return;
@@ -209,7 +210,7 @@ static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
         log_system_error(TR_LOG_ERROR, GetLastError(), "WaitForSingleObject() failed");
     }
 
-    if (service_stop_thread != NULL)
+    if (service_stop_thread != nullptr)
     {
         WaitForSingleObject(service_stop_thread, INFINITE);
         CloseHandle(service_stop_thread);
@@ -252,7 +253,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
     {
         SERVICE_TABLE_ENTRY const service_table[] = {
             { (LPWSTR)service_name, &service_main },
-            { NULL, NULL },
+            { nullptr, nullptr },
         };
 
         if (!StartServiceCtrlDispatcherW(service_table))
