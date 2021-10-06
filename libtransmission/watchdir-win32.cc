@@ -40,7 +40,7 @@
 ****
 ***/
 
-typedef struct tr_watchdir_win32
+struct tr_watchdir_win32
 {
     tr_watchdir_backend base;
 
@@ -50,7 +50,7 @@ typedef struct tr_watchdir_win32
     evutil_socket_t notify_pipe[2];
     struct bufferevent* event;
     HANDLE thread;
-} tr_watchdir_win32;
+};
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_win32*)(b))
 
@@ -67,7 +67,7 @@ static BOOL tr_get_overlapped_result_ex(
     DWORD timeout,
     BOOL alertable)
 {
-    typedef BOOL(WINAPI * impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+    using impl_t = BOOL(WINAPI*)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
 
     static impl_t real_impl = nullptr;
     static bool is_real_impl_valid = false;

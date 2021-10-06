@@ -37,7 +37,7 @@ enum
 ***  Peer Publish / Subscribe
 **/
 
-typedef enum
+enum PeerEventType
 {
     TR_PEER_CLIENT_GOT_BLOCK,
     TR_PEER_CLIENT_GOT_CHOKE,
@@ -52,9 +52,9 @@ typedef enum
     TR_PEER_CLIENT_GOT_HAVE_NONE,
     TR_PEER_PEER_GOT_PIECE_DATA,
     TR_PEER_ERROR
-} PeerEventType;
+};
 
-typedef struct
+struct tr_peer_event
 {
     PeerEventType eventType;
 
@@ -64,17 +64,18 @@ typedef struct
     uint32_t length; /* for GOT_BLOCK + GOT_PIECE_DATA */
     int err; /* errno for GOT_ERROR */
     tr_port port; /* for GOT_PORT */
-} tr_peer_event;
+};
 
-typedef void (*tr_peer_callback)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
+using tr_peer_callback = void (*)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
 
 /***
 ****
 ***/
 
-typedef void (*tr_peer_destruct_func)(struct tr_peer* peer);
-typedef bool (
-    *tr_peer_is_transferring_pieces_func)(struct tr_peer const* peer, uint64_t now, tr_direction direction, unsigned int* Bps);
+using tr_peer_destruct_func = void (*)(struct tr_peer* peer);
+
+using tr_peer_is_transferring_pieces_func =
+    bool (*)(tr_peer const* peer, uint64_t now, tr_direction direction, unsigned int* Bps);
 
 struct tr_peer_virtual_funcs
 {
@@ -88,7 +89,7 @@ struct tr_peer_virtual_funcs
  * @see struct peer_atom
  * @see tr_peerMsgs
  */
-typedef struct tr_peer
+struct tr_peer
 {
     /* whether or not we should free this peer soon.
        NOTE: private to peer-mgr.c */
@@ -125,7 +126,7 @@ typedef struct tr_peer
     tr_recentHistory cancelsSentToPeer;
 
     struct tr_peer_virtual_funcs const* funcs;
-} tr_peer;
+};
 
 void tr_peerConstruct(struct tr_peer* peer, tr_torrent const* tor);
 
@@ -140,13 +141,13 @@ bool tr_peerIsSeed(struct tr_peer const* peer);
 ****
 ***/
 
-typedef struct tr_swarm_stats
+struct tr_swarm_stats
 {
     int activePeerCount[2];
     int activeWebseedCount;
     int peerCount;
     int peerFromCount[TR_PEER_FROM__MAX];
-} tr_swarm_stats;
+};
 
 void tr_swarmGetStats(struct tr_swarm const* swarm, tr_swarm_stats* setme);
 

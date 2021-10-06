@@ -111,12 +111,12 @@ enum
     AWAITING_BT_PIECE
 };
 
-typedef enum
+enum encryption_preference_t
 {
     ENCRYPTION_PREFERENCE_UNKNOWN,
     ENCRYPTION_PREFERENCE_YES,
     ENCRYPTION_PREFERENCE_NO
-} encryption_preference_t;
+};
 
 /**
 ***
@@ -2261,7 +2261,7 @@ static void tellPeerWhatWeHave(tr_peerMsgs* msgs)
 #define MAX_PEX_ADDED 50
 #define MAX_PEX_DROPPED 50
 
-typedef struct
+struct PexDiffs
 {
     tr_pex* added;
     tr_pex* dropped;
@@ -2269,7 +2269,7 @@ typedef struct
     int addedCount;
     int droppedCount;
     int elementCount;
-} PexDiffs;
+};
 
 static void pexAddedCb(void const* vpex, void* userData)
 {
@@ -2302,7 +2302,7 @@ static inline void pexElementCb(void const* vpex, void* userData)
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
-typedef void (*tr_set_func)(void const* element, void* userData);
+using tr_set_func = void (*)(void const* element, void* userData);
 
 /**
  * @brief find the differences and commonalities in two sorted sets

@@ -23,16 +23,16 @@
 /**
  * @brief simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray
+struct tr_ptrArray
 {
     void** items;
     int n_items;
     int n_alloc;
-} tr_ptrArray;
+};
 
-typedef tr_voidptr_compare_func PtrArrayCompareFunc;
+using PtrArrayCompareFunc = tr_voidptr_compare_func;
 
-typedef void (*PtrArrayForeachFunc)(void*);
+using PtrArrayForeachFunc = void (*)(void*);
 
 /** @brief Destructor to free a tr_ptrArray's internal memory */
 void tr_ptrArrayDestruct(tr_ptrArray*, PtrArrayForeachFunc func);
@@ -57,7 +57,7 @@ static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 void* tr_ptrArrayPop(tr_ptrArray* array);
 
 /** @brief Return the last item in a tr_ptrArray
-    @return the last item in a tr_ptrArray, or NULL if the array is empty
+    @return the last item in a tr_ptrArray, or nullptr if the array is empty
     @see tr_ptrArrayPop() */
 static inline void* tr_ptrArrayBack(tr_ptrArray* array)
 {
@@ -118,7 +118,7 @@ int tr_ptrArrayInsertSorted(tr_ptrArray* array, void* value, tr_voidptr_compare_
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare);
 
 /** @brief Find a pointer from an array sorted by the specified sort function
-    @return the matching pointer, or NULL if no match was found */
+    @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
 
 /* @} */

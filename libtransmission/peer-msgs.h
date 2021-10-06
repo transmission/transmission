@@ -26,7 +26,7 @@ struct tr_torrent;
  * @{
  */
 
-typedef struct tr_peerMsgs tr_peerMsgs;
+struct tr_peerMsgs;
 
 #define PEER_MSGS(o) (tr_peerMsgsCast(o))
 

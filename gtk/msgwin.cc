@@ -44,8 +44,8 @@ struct MsgData
     guint refresh_tag;
 };
 
-static struct tr_log_message* myTail = NULL;
-static struct tr_log_message* myHead = NULL;
+static struct tr_log_message* myTail = nullptr;
+static struct tr_log_message* myHead = nullptr;
 
 /****
 *****
@@ -56,7 +56,7 @@ static gboolean is_pinned_to_new(struct MsgData* data)
 {
     gboolean pinned_to_new = FALSE;
 
-    if (data->view == NULL)
+    if (data->view == nullptr)
     {
         pinned_to_new = TRUE;
     }
@@ -64,12 +64,12 @@ static gboolean is_pinned_to_new(struct MsgData* data)
     {
         GtkTreePath* last_visible;
 
-        if (gtk_tree_view_get_visible_range(data->view, NULL, &last_visible))
+        if (gtk_tree_view_get_visible_range(data->view, nullptr, &last_visible))
         {
             GtkTreeIter iter;
-            int const row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
+            int const row_count = gtk_tree_model_iter_n_children(data->sort, nullptr);
 
-            if (gtk_tree_model_iter_nth_child(data->sort, &iter, NULL, row_count - 1))
+            if (gtk_tree_model_iter_nth_child(data->sort, &iter, nullptr, row_count - 1))
             {
                 GtkTreePath* last_row = gtk_tree_model_get_path(data->sort, &iter);
                 pinned_to_new = !gtk_tree_path_compare(last_visible, last_row);
@@ -85,15 +85,15 @@ static gboolean is_pinned_to_new(struct MsgData* data)
 
 static void scroll_to_bottom(struct MsgData* data)
 {
-    if (data->sort != NULL)
+    if (data->sort != nullptr)
     {
         GtkTreeIter iter;
-        int const row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
+        int const row_count = gtk_tree_model_iter_n_children(data->sort, nullptr);
 
-        if (gtk_tree_model_iter_nth_child(data->sort, &iter, NULL, row_count - 1))
+        if (gtk_tree_model_iter_nth_child(data->sort, &iter, nullptr, row_count - 1))
         {
             GtkTreePath* last_row = gtk_tree_model_get_path(data->sort, &iter);
-            gtk_tree_view_scroll_to_cell(data->view, last_row, NULL, TRUE, 1, 0);
+            gtk_tree_view_scroll_to_cell(data->view, last_row, nullptr, TRUE, 1, 0);
             gtk_tree_path_free(last_row);
         }
     }
@@ -133,7 +133,7 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 {
     FILE* fp = fopen(filename, "w+");
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
         GtkWidget*
             w = gtk_message_dialog_new(parent, {}, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""), filename);
@@ -146,7 +146,7 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
         GtkTreeIter iter;
         GtkTreeModel* model = GTK_TREE_MODEL(data->sort);
 
-        if (gtk_tree_model_iter_children(model, &iter, NULL))
+        if (gtk_tree_model_iter_children(model, &iter, nullptr))
         {
             do
             {
@@ -176,8 +176,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
                     "%s\t%s\t%s\t%s\n",
                     date,
                     levelStr,
-                    node->name != NULL ? node->name : "",
-                    node->message != NULL ? node->message : "");
+                    node->name != nullptr ? node->name : "",
+                    node->message != nullptr ? node->message : "");
                 g_free(date);
             } while (gtk_tree_model_iter_next(model, &iter));
         }
@@ -207,7 +207,7 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
         GTK_FILE_CHOOSER_ACTION_SAVE,
         TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
         TR_ARG_TUPLE(_("_Save"), GTK_RESPONSE_ACCEPT),
-        NULL);
+        nullptr);
 
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);
@@ -221,7 +221,7 @@ static void onClearRequest(GtkWidget* w, gpointer gdata)
 
     gtk_list_store_clear(data->store);
     tr_logFreeQueue(myHead);
-    myHead = myTail = NULL;
+    myHead = myTail = nullptr;
 }
 
 static void onPauseToggled(GtkToggleToolButton* w, gpointer gdata)
@@ -260,11 +260,19 @@ static void renderText(
     TR_UNUSED(column);
 
     int const col = GPOINTER_TO_INT(gcol);
-    char* str = NULL;
+    char* str = nullptr;
     struct tr_log_message const* node;
 
     gtk_tree_model_get(tree_model, iter, col, &str, COL_TR_MSG, &node, -1);
-    g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+    g_object_set(
+        renderer,
+        "text",
+        str,
+        "foreground",
+        getForegroundColor(node->level),
+        "ellipsize",
+        PANGO_ELLIPSIZE_END,
+        nullptr);
 }
 
 static void renderTime(
@@ -281,7 +289,7 @@ static void renderTime(
     gtk_tree_model_get(tree_model, iter, COL_TR_MSG, &node, -1);
     GDateTime* date_time = g_date_time_new_from_unix_local(node->when);
     gchar* buf = g_date_time_format(date_time, "%T");
-    g_object_set(renderer, "text", buf, "foreground", getForegroundColor(node->level), NULL);
+    g_object_set(renderer, "text", buf, "foreground", getForegroundColor(node->level), nullptr);
     g_free(buf);
     g_date_time_unref(date_time);
 }
@@ -290,7 +298,7 @@ static void appendColumn(GtkTreeView* view, int col)
 {
     GtkCellRenderer* r;
     GtkTreeViewColumn* c;
-    char const* title = NULL;
+    char const* title = nullptr;
 
     switch (col)
     {
@@ -316,8 +324,8 @@ static void appendColumn(GtkTreeView* view, int col)
     {
     case COL_NAME:
         r = gtk_cell_renderer_text_new();
-        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
+        c = gtk_tree_view_column_new_with_attributes(title, r, nullptr);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), nullptr);
         gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
         gtk_tree_view_column_set_fixed_width(c, 200);
         gtk_tree_view_column_set_resizable(c, TRUE);
@@ -325,8 +333,8 @@ static void appendColumn(GtkTreeView* view, int col)
 
     case COL_MESSAGE:
         r = gtk_cell_renderer_text_new();
-        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
+        c = gtk_tree_view_column_new_with_attributes(title, r, nullptr);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), nullptr);
         gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
         gtk_tree_view_column_set_fixed_width(c, 500);
         gtk_tree_view_column_set_resizable(c, TRUE);
@@ -334,8 +342,8 @@ static void appendColumn(GtkTreeView* view, int col)
 
     case COL_SEQUENCE:
         r = gtk_cell_renderer_text_new();
-        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-        gtk_tree_view_column_set_cell_data_func(c, r, renderTime, NULL, NULL);
+        c = gtk_tree_view_column_new_with_attributes(title, r, nullptr);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderTime, nullptr, nullptr);
         gtk_tree_view_column_set_resizable(c, TRUE);
         break;
 
@@ -374,13 +382,13 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
     static unsigned int sequence = 0;
     char const* default_name = g_get_application_name();
 
-    for (i = head; i != NULL && i->next != NULL; i = i->next)
+    for (i = head; i != nullptr && i->next != nullptr; i = i->next)
     {
-        char const* name = i->name != NULL ? i->name : default_name;
+        char const* name = i->name != nullptr ? i->name : default_name;
 
         gtk_list_store_insert_with_values(
             store,
-            NULL,
+            nullptr,
             0,
             TR_ARG_TUPLE(COL_TR_MSG, i),
             TR_ARG_TUPLE(COL_NAME, name),
@@ -394,7 +402,7 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
             GString* gstr = g_string_sized_new(512);
             g_string_append_printf(gstr, "%s:%d %s", i->file, i->line, i->message);
 
-            if (i->name != NULL)
+            if (i->name != nullptr)
             {
                 g_string_append_printf(gstr, " (%s)", i->name);
             }
@@ -416,13 +424,13 @@ static gboolean onRefresh(gpointer gdata)
     {
         tr_log_message* msgs = tr_logGetQueue();
 
-        if (msgs != NULL)
+        if (msgs != nullptr)
         {
             /* add the new messages and append them to the end of
              * our persistent list */
             tr_log_message* tail = addMessages(data->store, msgs);
 
-            if (myTail != NULL)
+            if (myTail != nullptr)
             {
                 myTail->next = msgs;
             }
@@ -449,7 +457,7 @@ static GtkWidget* debug_level_combo_new(void)
         TR_ARG_TUPLE(_("Error"), TR_LOG_ERROR),
         TR_ARG_TUPLE(_("Information"), TR_LOG_INFO),
         TR_ARG_TUPLE(_("Debug"), TR_LOG_DEBUG),
-        NULL);
+        nullptr);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(TR_KEY_message_level));
     return w;
 }
@@ -486,25 +494,25 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
     gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
-    item = gtk_tool_button_new(NULL, NULL);
+    item = gtk_tool_button_new(nullptr, nullptr);
     g_object_set(
         item,
         TR_ARG_TUPLE("icon-name", "document-save-as"),
         TR_ARG_TUPLE("is-important", TRUE),
         TR_ARG_TUPLE("label", _("Save _As")),
         TR_ARG_TUPLE("use-underline", TRUE),
-        NULL);
+        nullptr);
     g_signal_connect(item, "clicked", G_CALLBACK(onSaveRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
-    item = gtk_tool_button_new(NULL, NULL);
+    item = gtk_tool_button_new(nullptr, nullptr);
     g_object_set(
         item,
         TR_ARG_TUPLE("icon-name", "edit-clear"),
         TR_ARG_TUPLE("is-important", TRUE),
         TR_ARG_TUPLE("label", _("Clear")),
         TR_ARG_TUPLE("use-underline", TRUE),
-        NULL);
+        nullptr);
     g_signal_connect(item, "clicked", G_CALLBACK(onClearRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
@@ -518,7 +526,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
         TR_ARG_TUPLE("is-important", TRUE),
         TR_ARG_TUPLE("label", _("P_ause")),
         TR_ARG_TUPLE("use-underline", TRUE),
-        NULL);
+        nullptr);
     g_signal_connect(item, "toggled", G_CALLBACK(onPauseToggled), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
@@ -526,7 +534,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     w = gtk_label_new(_("Level"));
-    g_object_set(w, "margin", GUI_PAD, NULL);
+    g_object_set(w, "margin", GUI_PAD, nullptr);
     item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(item), w);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
@@ -553,21 +561,21 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     addMessages(data->store, myHead);
     onRefresh(data); /* much faster to populate *before* it has listeners */
 
-    data->filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(data->store), NULL);
+    data->filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(data->store), nullptr);
     data->sort = gtk_tree_model_sort_new_with_model(data->filter);
     g_object_unref(data->filter);
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->sort), COL_SEQUENCE, GTK_SORT_ASCENDING);
     data->maxLevel = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
-    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data, NULL);
+    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data, nullptr);
 
     view = gtk_tree_view_new_with_model(data->sort);
     g_object_unref(data->sort);
-    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
+    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), nullptr);
     data->view = GTK_TREE_VIEW(view);
     appendColumn(data->view, COL_SEQUENCE);
     appendColumn(data->view, COL_NAME);
     appendColumn(data->view, COL_MESSAGE);
-    w = gtk_scrolled_window_new(NULL, NULL);
+    w = gtk_scrolled_window_new(nullptr, nullptr);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(w), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(w), view);

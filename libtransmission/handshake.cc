@@ -85,7 +85,7 @@ enum
 ***
 **/
 
-typedef enum
+enum handshake_state_t
 {
     /* incoming */
     AWAITING_HANDSHAKE,
@@ -103,7 +103,7 @@ typedef enum
     AWAITING_PAD_D,
     /* */
     N_STATES
-} handshake_state_t;
+};
 
 struct tr_handshake
 {
@@ -211,13 +211,13 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool isConnected);
 
-typedef enum
+enum handshake_parse_err_t
 {
     HANDSHAKE_OK,
     HANDSHAKE_ENCRYPTION_WRONG,
     HANDSHAKE_BAD_TORRENT,
     HANDSHAKE_PEER_IS_SELF,
-} handshake_parse_err_t;
+};
 
 static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {

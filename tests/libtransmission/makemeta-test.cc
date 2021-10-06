@@ -37,7 +37,7 @@ protected:
         bool isPrivate)
     {
         // char* sandbox;
-        tr_info inf;
+        auto inf = tr_info{};
 
         // create a single input file
         auto input_file = makeString(tr_buildPath(sandboxDir().data(), "test.XXXXXX", nullptr));
@@ -151,7 +151,7 @@ protected:
         // now let's check our work: parse the  .torrent file
         auto* ctor = tr_ctorNew(nullptr);
         tr_ctorSetMetainfoFromFile(ctor, torrent_file);
-        tr_info inf;
+        auto inf = tr_info{};
         auto parse_result = tr_torrentParse(ctor, &inf);
         EXPECT_EQ(TR_PARSE_OK, parse_result);
 

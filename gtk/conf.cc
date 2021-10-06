@@ -40,7 +40,7 @@
 
 #define MY_CONFIG_NAME "transmission"
 
-static char* gl_confdir = NULL;
+static char* gl_confdir = nullptr;
 
 void gtr_pref_init(char const* config_dir)
 {
@@ -63,12 +63,12 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
     dir = g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD);
 
-    if (dir == NULL)
+    if (dir == nullptr)
     {
         dir = g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
     }
 
-    if (dir == NULL)
+    if (dir == nullptr)
     {
         dir = tr_getDefaultDownloadDir();
     }
@@ -109,7 +109,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 {
     tr_quark key = TR_KEY_torrent_complete_sound_command;
-    tr_variant* list = NULL;
+    tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, key, &list))
     {
         return;
@@ -196,9 +196,9 @@ void gtr_pref_flag_set(tr_quark const key, gboolean value)
 
 char** gtr_pref_strv_get(tr_quark const key)
 {
-    char** ret = NULL;
+    char** ret = nullptr;
 
-    tr_variant* list = NULL;
+    tr_variant* list = nullptr;
     if (tr_variantDictFindList(getPrefs(), key, &list))
     {
         size_t out = 0;
@@ -207,7 +207,7 @@ char** gtr_pref_strv_get(tr_quark const key)
 
         for (size_t i = 0; i < n; ++i)
         {
-            char const* str = NULL;
+            char const* str = nullptr;
             size_t len = 0;
             if (tr_variantGetStr(tr_variantListChild(list, i), &str, &len))
             {
@@ -223,7 +223,7 @@ char const* gtr_pref_string_get(tr_quark const key)
 {
     char const* str;
 
-    return tr_variantDictFindStr(getPrefs(), key, &str, NULL) ? str : NULL;
+    return tr_variantDictFindStr(getPrefs(), key, &str, nullptr) ? str : nullptr;
 }
 
 void gtr_pref_string_set(tr_quark const key, char const* value)

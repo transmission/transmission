@@ -36,11 +36,11 @@ static char* get_url(char const* host, int image_type)
 
 static char* favicon_get_cache_dir(void)
 {
-    static char* dir = NULL;
+    static char* dir = nullptr;
 
-    if (dir == NULL)
+    if (dir == nullptr)
     {
-        dir = g_build_filename(g_get_user_cache_dir(), "transmission", "favicons", NULL);
+        dir = g_build_filename(g_get_user_cache_dir(), "transmission", "favicons", nullptr);
         g_mkdir_with_parents(dir, 0777);
     }
 
@@ -49,22 +49,22 @@ static char* favicon_get_cache_dir(void)
 
 static char* favicon_get_cache_filename(char const* host)
 {
-    return g_build_filename(favicon_get_cache_dir(), host, NULL);
+    return g_build_filename(favicon_get_cache_dir(), host, nullptr);
 }
 
 static void favicon_save_to_cache(char const* host, void const* data, size_t len)
 {
     char* filename = favicon_get_cache_filename(host);
-    g_file_set_contents(filename, static_cast<gchar const*>(data), len, NULL);
+    g_file_set_contents(filename, static_cast<gchar const*>(data), len, nullptr);
     g_free(filename);
 }
 
 static GdkPixbuf* favicon_load_from_cache(char const* host)
 {
     char* filename = favicon_get_cache_filename(host);
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_size(filename, 16, 16, NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_size(filename, 16, 16, nullptr);
 
-    if (pixbuf == NULL) /* bad file */
+    if (pixbuf == nullptr) /* bad file */
     {
         g_remove(filename);
     }
@@ -77,7 +77,7 @@ static void favicon_web_done_cb(tr_session*, bool, bool, long, void const*, size
 
 static gboolean favicon_web_done_idle_cb(gpointer vfav)
 {
-    GdkPixbuf* pixbuf = NULL;
+    GdkPixbuf* pixbuf = nullptr;
     gboolean finished = FALSE;
     auto* fav = static_cast<favicon_data*>(vfav);
 
@@ -85,7 +85,7 @@ static gboolean favicon_web_done_idle_cb(gpointer vfav)
     {
         favicon_save_to_cache(fav->host, fav->contents, fav->len);
         pixbuf = favicon_load_from_cache(fav->host);
-        finished = pixbuf != NULL;
+        finished = pixbuf != nullptr;
     }
 
     if (!finished) /* no pixbuf yet... */
@@ -99,7 +99,7 @@ static gboolean favicon_web_done_idle_cb(gpointer vfav)
             char* url = get_url(fav->host, fav->type);
 
             g_free(fav->contents);
-            fav->contents = NULL;
+            fav->contents = nullptr;
             fav->len = 0;
 
             tr_webRun(fav->session, url, favicon_web_done_cb, fav);
@@ -143,7 +143,7 @@ void gtr_get_favicon(tr_session* session, char const* host, GFunc pixbuf_ready_f
 {
     GdkPixbuf* pixbuf = favicon_load_from_cache(host);
 
-    if (pixbuf != NULL)
+    if (pixbuf != nullptr)
     {
         pixbuf_ready_func(pixbuf, pixbuf_ready_func_data);
     }

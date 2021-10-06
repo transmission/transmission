@@ -29,14 +29,14 @@ static char const* getKey(void)
     return _("Port Forwarding (UPnP)");
 }
 
-typedef enum
+enum tr_upnp_state
 {
     TR_UPNP_IDLE,
     TR_UPNP_ERR,
     TR_UPNP_DISCOVER,
     TR_UPNP_MAP,
     TR_UPNP_UNMAP
-} tr_upnp_state;
+};
 
 struct tr_upnp
 {

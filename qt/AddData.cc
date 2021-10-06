@@ -25,7 +25,7 @@ QString getNameFromMetainfo(QByteArray const& metainfo)
     tr_ctor* ctor = tr_ctorNew(nullptr);
     tr_ctorSetMetainfo(ctor, metainfo.constData(), metainfo.size());
 
-    tr_info inf;
+    auto inf = tr_info{};
     if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
     {
         name = QString::fromUtf8(inf.name); // metainfo is required to be UTF-8

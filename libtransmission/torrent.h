@@ -112,12 +112,12 @@ void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
     torrent's content than any other mime-type. */
 char const* tr_torrentPrimaryMimeType(tr_torrent const* tor);
 
-typedef enum
+enum tr_verify_state
 {
     TR_VERIFY_NONE,
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
-} tr_verify_state;
+};
 
 void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
 
@@ -380,7 +380,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 /**
  * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath.
  *
- * If the file is found, "tr_buildPath(base, subpath, NULL)"
+ * If the file is found, "tr_buildPath(base, subpath, nullptr)"
  * will generate the complete filename.
  *
  * @return true if the file is found, false otherwise.

@@ -168,7 +168,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
     char host[1024];
     char const* pch;
 
-    if ((pch = strstr(url, "://")) != NULL)
+    if ((pch = strstr(url, "://")) != nullptr)
     {
         size_t const hostlen = strcspn(pch + 3, ":/");
         size_t const copylen = MIN(hostlen, sizeof(host) - 1);
@@ -189,7 +189,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
         char const* first_dot = strchr(host, '.');
         char const* last_dot = strrchr(host, '.');
 
-        if (first_dot != NULL && last_dot != NULL && first_dot != last_dot)
+        if (first_dot != nullptr && last_dot != nullptr && first_dot != last_dot)
         {
             g_strlcpy(buf, first_dot + 1, buflen);
         }
@@ -202,18 +202,18 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 
 static gboolean gtr_is_supported_url(char const* str)
 {
-    return str != NULL &&
+    return str != nullptr &&
         (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") || g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)
 {
-    return str != NULL && g_str_has_prefix(str, "magnet:?");
+    return str != nullptr && g_str_has_prefix(str, "magnet:?");
 }
 
 gboolean gtr_is_hex_hashcode(char const* str)
 {
-    if (str == NULL || strlen(str) != 40)
+    if (str == nullptr || strlen(str) != 40)
     {
         return FALSE;
     }
@@ -231,9 +231,9 @@ gboolean gtr_is_hex_hashcode(char const* str)
 
 static GtkWindow* getWindow(GtkWidget* w)
 {
-    if (w == NULL)
+    if (w == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     if (GTK_IS_WINDOW(w))
@@ -293,7 +293,7 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
         GtkTreePath* path;
         GtkTreeSelection* selection = gtk_tree_view_get_selection(tv);
 
-        if (gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, &path, NULL, NULL, NULL))
+        if (gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, &path, nullptr, nullptr, nullptr))
         {
             if (!gtk_tree_selection_path_is_selected(selection, path))
             {
@@ -304,7 +304,7 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
             gtk_tree_path_free(path);
         }
 
-        if (func != NULL)
+        if (func != nullptr)
         {
             (*(PopupFunc)func)(view, event);
         }
@@ -323,7 +323,7 @@ gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gp
 
     GtkTreeView* tv = GTK_TREE_VIEW(view);
 
-    if (!gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, NULL, NULL, NULL, NULL))
+    if (!gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, nullptr, nullptr, nullptr, nullptr))
     {
         GtkTreeSelection* selection = gtk_tree_view_get_selection(tv);
         gtk_tree_selection_unselect_all(selection);
@@ -344,10 +344,10 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
     if (gtr_pref_flag_get(TR_KEY_trash_can_enabled))
     {
-        GError* err = NULL;
-        trashed = g_file_trash(file, NULL, &err);
+        GError* err = nullptr;
+        trashed = g_file_trash(file, nullptr, &err);
 
-        if (err != NULL)
+        if (err != nullptr)
         {
             g_message("Unable to trash file \"%s\": %s", filename, err->message);
             tr_error_set_literal(error, err->code, err->message);
@@ -357,10 +357,10 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
     if (!trashed)
     {
-        GError* err = NULL;
-        g_file_delete(file, NULL, &err);
+        GError* err = nullptr;
+        g_file_delete(file, nullptr, &err);
 
-        if (err != NULL)
+        if (err != nullptr)
         {
             g_message("Unable to delete file \"%s\": %s", filename, err->message);
             tr_error_clear(error);
@@ -376,9 +376,9 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 
 char const* gtr_get_help_uri(void)
 {
-    static char const* uri = NULL;
+    static char const* uri = nullptr;
 
-    if (uri == NULL)
+    if (uri == nullptr)
     {
         uri = g_strdup_printf("https://transmissionbt.com/help/gtk/%d.%dx", MAJOR_VERSION, MINOR_VERSION / 10);
     }
@@ -397,28 +397,28 @@ void gtr_open_file(char const* path)
 
 void gtr_open_uri(char const* uri)
 {
-    if (uri != NULL)
+    if (uri != nullptr)
     {
         gboolean opened = FALSE;
 
         if (!opened)
         {
 #if GTK_CHECK_VERSION(3, 22, 0)
-            opened = gtk_show_uri_on_window(NULL, uri, GDK_CURRENT_TIME, NULL);
+            opened = gtk_show_uri_on_window(nullptr, uri, GDK_CURRENT_TIME, nullptr);
 #else
-            opened = gtk_show_uri(NULL, uri, GDK_CURRENT_TIME, NULL);
+            opened = gtk_show_uri(nullptr, uri, GDK_CURRENT_TIME, nullptr);
 #endif
         }
 
         if (!opened)
         {
-            opened = g_app_info_launch_default_for_uri(uri, NULL, NULL);
+            opened = g_app_info_launch_default_for_uri(uri, nullptr, nullptr);
         }
 
         if (!opened)
         {
-            char* argv[] = { (char*)"xdg-open", (char*)uri, NULL };
-            opened = g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL);
+            char* argv[] = { (char*)"xdg-open", (char*)uri, nullptr };
+            opened = g_spawn_async(nullptr, argv, nullptr, G_SPAWN_SEARCH_PATH, nullptr, nullptr, nullptr, nullptr);
         }
 
         if (!opened)
@@ -454,7 +454,7 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
     /* find the one to select */
     i = 0;
 
-    while (gtk_tree_model_iter_nth_child(model, &iter, NULL, i))
+    while (gtk_tree_model_iter_nth_child(model, &iter, nullptr, i))
     {
         gtk_tree_model_get(model, &iter, column, &currentValue, -1);
 
@@ -479,7 +479,7 @@ GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
 
     text = text_1;
 
-    if (text != NULL)
+    if (text != nullptr)
     {
         va_list vl;
 
@@ -488,9 +488,9 @@ GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
         do
         {
             int const val = va_arg(vl, int);
-            gtk_list_store_insert_with_values(store, NULL, INT_MAX, 0, val, 1, text, -1);
+            gtk_list_store_insert_with_values(store, nullptr, INT_MAX, 0, val, 1, text, -1);
             text = va_arg(vl, char const*);
-        } while (text != NULL);
+        } while (text != nullptr);
 
         va_end(vl);
     }
@@ -498,7 +498,7 @@ GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
     w = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
     r = gtk_cell_renderer_text_new();
     gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(w), r, TRUE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(w), r, "text", 1, NULL);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(w), r, "text", 1, nullptr);
 
     /* cleanup */
     g_object_unref(store);
@@ -524,7 +524,7 @@ GtkWidget* gtr_priority_combo_new(void)
         TR_ARG_TUPLE(_("High"), TR_PRI_HIGH),
         TR_ARG_TUPLE(_("Normal"), TR_PRI_NORMAL),
         TR_ARG_TUPLE(_("Low"), TR_PRI_LOW),
-        NULL);
+        nullptr);
 }
 
 /***
@@ -541,7 +541,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
         GList* windows = gtk_window_list_toplevels();
         GtkWindow const* const window = GTK_WINDOW(w);
 
-        for (GList* l = windows; l != NULL; l = l->next)
+        for (GList* l = windows; l != nullptr; l = l->next)
         {
             if (!GTK_IS_WINDOW(l->data))
             {
@@ -558,7 +558,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
                 continue;
             }
 
-            if (b && g_object_get_data(G_OBJECT(l->data), GTR_CHILD_HIDDEN) != NULL)
+            if (b && g_object_get_data(G_OBJECT(l->data), GTR_CHILD_HIDDEN) != nullptr)
             {
                 g_object_steal_data(G_OBJECT(l->data), GTR_CHILD_HIDDEN);
                 gtr_widget_set_visible(GTK_WIDGET(l->data), TRUE);
@@ -593,13 +593,13 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
     GtkWindow* window = getWindow(parent);
 
-    GString* gstr = g_string_new(NULL);
+    GString* gstr = g_string_new(nullptr);
 
     GtkWidget* w = gtk_message_dialog_new(window, {}, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _("Unrecognized URL"));
 
     g_string_append_printf(gstr, _("Transmission doesn't know how to use \"%s\""), url);
 
-    if (gtr_is_magnet_link(url) && strstr(url, xt) == NULL)
+    if (gtr_is_magnet_link(url) && strstr(url, xt) == nullptr)
     {
         g_string_append_printf(gstr, "\n \n");
         g_string_append_printf(
@@ -630,7 +630,7 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
     {
         char const* const s = text[i];
 
-        if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
+        if (s != nullptr && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {
             gtk_entry_set_text(GTK_ENTRY(e), s);
             break;
@@ -676,12 +676,12 @@ static void freespace_label_data_free(gpointer gdata)
 {
     auto* data = static_cast<freespace_label_data*>(gdata);
 
-    if (data->core != NULL)
+    if (data->core != nullptr)
     {
         g_object_weak_unref(G_OBJECT(data->core), on_freespace_label_core_destroyed, data);
     }
 
-    if (data->label != NULL)
+    if (data->label != nullptr)
     {
         g_object_weak_ref(G_OBJECT(data->label), on_freespace_label_destroyed, data);
     }
@@ -696,14 +696,14 @@ static TR_DEFINE_QUARK(freespace_label_data, freespace_label_data)
 static void on_freespace_label_core_destroyed(gpointer gdata, GObject* dead_core G_GNUC_UNUSED)
 {
     auto* data = static_cast<freespace_label_data*>(gdata);
-    data->core = NULL;
+    data->core = nullptr;
     freespace_label_data_free(data);
 }
 
 static void on_freespace_label_destroyed(gpointer gdata, GObject* dead_label G_GNUC_UNUSED)
 {
     auto* data = static_cast<freespace_label_data*>(gdata);
-    data->label = NULL;
+    data->label = nullptr;
     freespace_label_data_free(data);
 }
 
@@ -742,7 +742,7 @@ GtkWidget* gtr_freespace_label_new(struct _TrCore* core, char const* dir)
     data = g_new0(struct freespace_label_data, 1);
     data->timer_id = g_timeout_add_seconds(3, on_freespace_timer, data);
     data->core = core;
-    data->label = GTK_LABEL(gtk_label_new(NULL));
+    data->label = GTK_LABEL(gtk_label_new(nullptr));
     data->dir = g_strdup(dir);
 
     /* when either the core or the label is destroyed, stop updating */

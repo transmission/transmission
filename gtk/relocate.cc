@@ -18,7 +18,7 @@
 
 #define DATA_KEY "gtr-relocate-data"
 
-static char* previousLocation = NULL;
+static char* previousLocation = nullptr;
 
 struct relocate_dialog_data
 {
@@ -50,9 +50,9 @@ static void startMovingNextTorrent(struct relocate_dialog_data* data)
 
     tr_torrent* tor = gtr_core_find_torrent(data->core, id);
 
-    if (tor != NULL)
+    if (tor != nullptr)
     {
-        tr_torrentSetLocation(tor, previousLocation, data->do_move, NULL, &data->done);
+        tr_torrentSetLocation(tor, previousLocation, data->do_move, nullptr, &data->done);
     }
 
     data->torrent_ids = g_slist_delete_link(data->torrent_ids, data->torrent_ids);
@@ -84,7 +84,7 @@ static gboolean onTimer(gpointer gdata)
     }
     else if (done == TR_LOC_DONE)
     {
-        if (data->torrent_ids != NULL)
+        if (data->torrent_ids != nullptr)
         {
             startMovingNextTorrent(data);
         }
@@ -118,7 +118,7 @@ static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
             GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
             GTK_MESSAGE_INFO,
             GTK_BUTTONS_CLOSE,
-            NULL);
+            nullptr);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("This may take a moment…"));
         gtk_dialog_set_response_sensitive(GTK_DIALOG(w), GTK_RESPONSE_CLOSE, FALSE);
         gtk_widget_show(w);
@@ -153,15 +153,15 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
         GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
         TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
         TR_ARG_TUPLE(_("_Apply"), GTK_RESPONSE_APPLY),
-        NULL);
+        nullptr);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
-    g_signal_connect(d, "response", G_CALLBACK(onResponse), NULL);
+    g_signal_connect(d, "response", G_CALLBACK(onResponse), nullptr);
 
     row = 0;
     t = hig_workarea_create();
     hig_workarea_add_section_title(t, &row, _("Location"));
 
-    if (previousLocation == NULL)
+    if (previousLocation == nullptr)
     {
         previousLocation = g_strdup(gtr_pref_string_get(TR_KEY_download_dir));
     }
@@ -169,8 +169,8 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
     w = gtk_file_chooser_button_new(_("Set Torrent Location"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(w), previousLocation);
     g_object_set_data(G_OBJECT(d), "chooser", w);
-    hig_workarea_add_row(t, &row, _("Torrent _location:"), w, NULL);
-    w = gtk_radio_button_new_with_mnemonic(NULL, _("_Move from the current folder"));
+    hig_workarea_add_row(t, &row, _("Torrent _location:"), w, nullptr);
+    w = gtk_radio_button_new_with_mnemonic(nullptr, _("_Move from the current folder"));
     g_object_set_data(G_OBJECT(d), "move_rb", w);
     hig_workarea_add_wide_control(t, &row, w);
     w = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(w), _("Local data is _already there"));

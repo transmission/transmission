@@ -33,13 +33,13 @@
 ****
 ***/
 
-typedef struct tr_watchdir_generic
+struct tr_watchdir_generic
 {
     tr_watchdir_backend base;
 
     struct event* event;
     std::unordered_set<std::string> dir_entries;
-} tr_watchdir_generic;
+};
 
 #define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_generic*>(b))
 

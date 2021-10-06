@@ -29,19 +29,19 @@
 #include "utils.h"
 #include "variant.h"
 
-typedef enum
+enum tr_tristate_t
 {
     TR_NET_OK,
     TR_NET_ERROR,
     TR_NET_WAIT
-} tr_tristate_t;
+};
 
-typedef enum
+enum tr_auto_switch_state_t
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-} tr_auto_switch_state_t;
+};
 
 enum
 {

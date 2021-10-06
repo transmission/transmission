@@ -255,7 +255,7 @@ static void getStatusString(
     if (st->error != 0)
     {
         char const* fmt[] = {
-            NULL,
+            nullptr,
             N_("Tracker gave a warning: \"%s\""),
             N_("Tracker gave an error: \"%s\""),
             N_("Error: %s"),
@@ -393,7 +393,7 @@ static GdkPixbuf* get_icon(tr_torrent const* tor, GtkIconSize icon_size, GtkWidg
     {
         mime_type = DIRECTORY_MIME_TYPE;
     }
-    else if (strchr(info->files[0].name, '/') != NULL)
+    else if (strchr(info->files[0].name, '/') != nullptr)
     {
         mime_type = DIRECTORY_MIME_TYPE;
     }
@@ -440,12 +440,12 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
     gtk_cell_renderer_get_padding(GTK_CELL_RENDERER(cell), &xpad, &ypad);
 
     /* get the idealized cell dimensions */
-    g_object_set(p->icon_renderer, "pixbuf", icon, NULL);
-    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, NULL, &icon_size);
-    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &name_size);
-    g_object_set(p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &stat_size);
+    g_object_set(p->icon_renderer, "pixbuf", icon, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, nullptr, &icon_size);
+    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &name_size);
+    g_object_set(p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &stat_size);
 
     /**
     *** LAYOUT
@@ -453,12 +453,12 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
 
 #define BAR_WIDTH 50
 
-    if (width != NULL)
+    if (width != nullptr)
     {
         *width = xpad * 2 + icon_size.width + GUI_PAD + BAR_WIDTH + GUI_PAD + stat_size.width;
     }
 
-    if (height != NULL)
+    if (height != nullptr)
     {
         *height = ypad * 2 + MAX(name_size.height, p->bar_height);
     }
@@ -494,31 +494,31 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
     gtk_cell_renderer_get_padding(GTK_CELL_RENDERER(cell), &xpad, &ypad);
 
     /* get the idealized cell dimensions */
-    g_object_set(p->icon_renderer, "pixbuf", icon, NULL);
-    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, NULL, &icon_size);
+    g_object_set(p->icon_renderer, "pixbuf", icon, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, nullptr, &icon_size);
     g_object_set(
         p->text_renderer,
         TR_ARG_TUPLE("text", name),
         TR_ARG_TUPLE("weight", PANGO_WEIGHT_BOLD),
         TR_ARG_TUPLE("scale", 1.0),
         TR_ARG_TUPLE("ellipsize", PANGO_ELLIPSIZE_NONE),
-        NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &name_size);
-    g_object_set(p->text_renderer, "text", gstr_prog->str, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &prog_size);
-    g_object_set(p->text_renderer, "text", gstr_stat->str, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &stat_size);
+        nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &name_size);
+    g_object_set(p->text_renderer, "text", gstr_prog->str, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &prog_size);
+    g_object_set(p->text_renderer, "text", gstr_stat->str, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &stat_size);
 
     /**
     *** LAYOUT
     **/
 
-    if (width != NULL)
+    if (width != nullptr)
     {
         *width = xpad * 2 + icon_size.width + GUI_PAD + MAX(prog_size.width, stat_size.width);
     }
 
-    if (height != NULL)
+    if (height != nullptr)
     {
         *height = ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + p->bar_height + GUI_PAD_SMALL +
             stat_size.height;
@@ -539,7 +539,7 @@ static void torrent_cell_renderer_get_size(
 {
     TorrentCellRenderer const* const self = TORRENT_CELL_RENDERER(cell);
 
-    if (self != NULL && self->priv->tor != NULL)
+    if (self != nullptr && self->priv->tor != nullptr)
     {
         int w;
         int h;
@@ -554,22 +554,22 @@ static void torrent_cell_renderer_get_size(
             get_size_full(TORRENT_CELL_RENDERER(cell), widget, &w, &h);
         }
 
-        if (width != NULL)
+        if (width != nullptr)
         {
             *width = w;
         }
 
-        if (height != NULL)
+        if (height != nullptr)
         {
             *height = h;
         }
 
-        if (x_offset != NULL)
+        if (x_offset != nullptr)
         {
             *x_offset = cell_area ? cell_area->x : 0;
         }
 
-        if (y_offset != NULL)
+        if (y_offset != nullptr)
         {
             int xpad;
             int ypad;
@@ -676,14 +676,14 @@ static void render_compact(
     fill_area.height -= ypad * 2;
     icon_area = name_area = stat_area = prog_area = fill_area;
 
-    g_object_set(p->icon_renderer, "pixbuf", icon, NULL);
-    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, NULL, &size);
+    g_object_set(p->icon_renderer, "pixbuf", icon, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, nullptr, &size);
     icon_area.width = size.width;
-    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &size);
+    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &size);
     name_area.width = size.width;
-    g_object_set(p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &size);
+    g_object_set(p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &size);
     stat_area.width = size.width;
 
     icon_area.x = fill_area.x;
@@ -698,9 +698,9 @@ static void render_compact(
     *** RENDER
     **/
 
-    g_object_set(p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL);
+    g_object_set(p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, nullptr);
     gtr_cell_renderer_render(p->icon_renderer, window, widget, &icon_area, flags);
-    g_object_set(p->progress_renderer, "value", (int)(percentDone * 100.0), "text", NULL, "sensitive", sensitive, NULL);
+    g_object_set(p->progress_renderer, "value", (int)(percentDone * 100.0), "text", nullptr, "sensitive", sensitive, nullptr);
     gtr_cell_renderer_render(p->progress_renderer, window, widget, &prog_area, flags);
     g_object_set(
         p->text_renderer,
@@ -708,9 +708,9 @@ static void render_compact(
         TR_ARG_TUPLE("scale", SMALL_SCALE),
         TR_ARG_TUPLE("ellipsize", PANGO_ELLIPSIZE_END),
         TR_ARG_TUPLE(FOREGROUND_COLOR_KEY, &text_color),
-        NULL);
+        nullptr);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &stat_area, flags);
-    g_object_set(p->text_renderer, "text", name, "scale", 1.0, FOREGROUND_COLOR_KEY, &text_color, NULL);
+    g_object_set(p->text_renderer, "text", name, "scale", 1.0, FOREGROUND_COLOR_KEY, &text_color, nullptr);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &name_area, flags);
 
     /* cleanup */
@@ -762,8 +762,8 @@ static void render_full(
     get_text_color(widget, st, &text_color);
 
     /* get the idealized cell dimensions */
-    g_object_set(p->icon_renderer, "pixbuf", icon, NULL);
-    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, NULL, &size);
+    g_object_set(p->icon_renderer, "pixbuf", icon, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, nullptr, &size);
     icon_area.width = size.width;
     icon_area.height = size.height;
     g_object_set(
@@ -772,16 +772,16 @@ static void render_full(
         TR_ARG_TUPLE("weight", PANGO_WEIGHT_BOLD),
         TR_ARG_TUPLE("ellipsize", PANGO_ELLIPSIZE_NONE),
         TR_ARG_TUPLE("scale", 1.0),
-        NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &size);
+        nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &size);
     name_area.width = size.width;
     name_area.height = size.height;
-    g_object_set(p->text_renderer, "text", gstr_prog->str, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &size);
+    g_object_set(p->text_renderer, "text", gstr_prog->str, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &size);
     prog_area.width = size.width;
     prog_area.height = size.height;
-    g_object_set(p->text_renderer, "text", gstr_stat->str, NULL);
-    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &size);
+    g_object_set(p->text_renderer, "text", gstr_stat->str, nullptr);
+    gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, nullptr, &size);
     stat_area.width = size.width;
     stat_area.height = size.height;
 
@@ -824,7 +824,7 @@ static void render_full(
     *** RENDER
     **/
 
-    g_object_set(p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL);
+    g_object_set(p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, nullptr);
     gtr_cell_renderer_render(p->icon_renderer, window, widget, &icon_area, flags);
     g_object_set(
         p->text_renderer,
@@ -833,13 +833,13 @@ static void render_full(
         TR_ARG_TUPLE(FOREGROUND_COLOR_KEY, &text_color),
         TR_ARG_TUPLE("ellipsize", PANGO_ELLIPSIZE_END),
         TR_ARG_TUPLE("weight", PANGO_WEIGHT_BOLD),
-        NULL);
+        nullptr);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &name_area, flags);
-    g_object_set(p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL);
+    g_object_set(p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, nullptr);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &prog_area, flags);
-    g_object_set(p->progress_renderer, "value", (int)(percentDone * 100.0), "text", "", "sensitive", sensitive, NULL);
+    g_object_set(p->progress_renderer, "value", (int)(percentDone * 100.0), "text", "", "sensitive", sensitive, nullptr);
     gtr_cell_renderer_render(p->progress_renderer, window, widget, &prct_area, flags);
-    g_object_set(p->text_renderer, "text", gstr_stat->str, FOREGROUND_COLOR_KEY, &text_color, NULL);
+    g_object_set(p->text_renderer, "text", gstr_stat->str, FOREGROUND_COLOR_KEY, &text_color, nullptr);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &stat_area, flags);
 
     /* cleanup */
@@ -861,7 +861,7 @@ static void torrent_cell_renderer_render(
     gtk_widget_set_direction(widget, GTK_TEXT_DIR_RTL);
 #endif
 
-    if (self != NULL && self->priv->tor != NULL)
+    if (self != nullptr && self->priv->tor != nullptr)
     {
         struct TorrentCellRendererPrivate const* const p = self->priv;
 
@@ -952,14 +952,14 @@ static void torrent_cell_renderer_dispose(GObject* o)
 {
     TorrentCellRenderer* r = TORRENT_CELL_RENDERER(o);
 
-    if (r != NULL && r->priv != NULL)
+    if (r != nullptr && r->priv != nullptr)
     {
         g_string_free(r->priv->gstr1, TRUE);
         g_string_free(r->priv->gstr2, TRUE);
         g_object_unref(G_OBJECT(r->priv->text_renderer));
         g_object_unref(G_OBJECT(r->priv->progress_renderer));
         g_object_unref(G_OBJECT(r->priv->icon_renderer));
-        r->priv = NULL;
+        r->priv = nullptr;
     }
 
     G_OBJECT_CLASS(torrent_cell_renderer_parent_class)->dispose(o);
@@ -979,27 +979,34 @@ static void torrent_cell_renderer_class_init(TorrentCellRendererClass* klass)
     g_object_class_install_property(
         gobject_class,
         P_TORRENT,
-        g_param_spec_pointer("torrent", NULL, "tr_torrent*", G_PARAM_READWRITE));
+        g_param_spec_pointer("torrent", nullptr, "tr_torrent*", G_PARAM_READWRITE));
 
     g_object_class_install_property(
         gobject_class,
         P_UPLOAD_SPEED,
-        g_param_spec_double("piece-upload-speed", NULL, "tr_stat.pieceUploadSpeed_KBps", 0, INT_MAX, 0, G_PARAM_READWRITE));
+        g_param_spec_double("piece-upload-speed", nullptr, "tr_stat.pieceUploadSpeed_KBps", 0, INT_MAX, 0, G_PARAM_READWRITE));
 
     g_object_class_install_property(
         gobject_class,
         P_DOWNLOAD_SPEED,
-        g_param_spec_double("piece-download-speed", NULL, "tr_stat.pieceDownloadSpeed_KBps", 0, INT_MAX, 0, G_PARAM_READWRITE));
+        g_param_spec_double(
+            "piece-download-speed",
+            nullptr,
+            "tr_stat.pieceDownloadSpeed_KBps",
+            0,
+            INT_MAX,
+            0,
+            G_PARAM_READWRITE));
 
     g_object_class_install_property(
         gobject_class,
         P_BAR_HEIGHT,
-        g_param_spec_int("bar-height", NULL, "Bar Height", 1, INT_MAX, DEFAULT_BAR_HEIGHT, G_PARAM_READWRITE));
+        g_param_spec_int("bar-height", nullptr, "Bar Height", 1, INT_MAX, DEFAULT_BAR_HEIGHT, G_PARAM_READWRITE));
 
     g_object_class_install_property(
         gobject_class,
         P_COMPACT,
-        g_param_spec_boolean("compact", NULL, "Compact Mode", FALSE, G_PARAM_READWRITE));
+        g_param_spec_boolean("compact", nullptr, "Compact Mode", FALSE, G_PARAM_READWRITE));
 }
 
 static void torrent_cell_renderer_init(TorrentCellRenderer* self)
@@ -1012,11 +1019,11 @@ static void torrent_cell_renderer_init(TorrentCellRenderer* self)
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE(self, TORRENT_CELL_RENDERER_TYPE, struct TorrentCellRendererPrivate);
 #endif
 
-    p->tor = NULL;
-    p->gstr1 = g_string_new(NULL);
-    p->gstr2 = g_string_new(NULL);
+    p->tor = nullptr;
+    p->gstr1 = g_string_new(nullptr);
+    p->gstr2 = g_string_new(nullptr);
     p->text_renderer = gtk_cell_renderer_text_new();
-    g_object_set(p->text_renderer, "xpad", 0, "ypad", 0, NULL);
+    g_object_set(p->text_renderer, "xpad", 0, "ypad", 0, nullptr);
     p->progress_renderer = gtk_cell_renderer_progress_new();
     p->icon_renderer = gtk_cell_renderer_pixbuf_new();
     g_object_ref_sink(p->text_renderer);
@@ -1028,5 +1035,5 @@ static void torrent_cell_renderer_init(TorrentCellRenderer* self)
 
 GtkCellRenderer* torrent_cell_renderer_new(void)
 {
-    return (GtkCellRenderer*)g_object_new(TORRENT_CELL_RENDERER_TYPE, NULL);
+    return (GtkCellRenderer*)g_object_new(TORRENT_CELL_RENDERER_TYPE, nullptr);
 }
