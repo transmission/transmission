@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <inttypes.h> /* int64_t */
+#include <cstddef> // size_t
+#include <inttypes.h> // int64_t
 
 #include "tr-macros.h"
 #include "quark.h"
@@ -152,7 +153,7 @@ static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t 
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
 }
 
-static inline bool tr_variantIsType(tr_variant const* b, int type)
+constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;
 }
@@ -161,7 +162,7 @@ static inline bool tr_variantIsType(tr_variant const* b, int type)
 ****  Strings
 ***/
 
-static inline bool tr_variantIsString(tr_variant const* b)
+constexpr bool tr_variantIsString(tr_variant const* b)
 {
     return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
 }
@@ -178,7 +179,7 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** raw_setme, size
 ****  Real Numbers
 ***/
 
-static inline bool tr_variantIsReal(tr_variant const* v)
+constexpr bool tr_variantIsReal(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
@@ -190,7 +191,7 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 ****  Booleans
 ***/
 
-static inline bool tr_variantIsBool(tr_variant const* v)
+constexpr bool tr_variantIsBool(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
@@ -202,7 +203,7 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 ****  Ints
 ***/
 
-static inline bool tr_variantIsInt(tr_variant const* v)
+constexpr bool tr_variantIsInt(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
@@ -214,7 +215,7 @@ bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 ****  Lists
 ***/
 
-static inline bool tr_variantIsList(tr_variant const* v)
+constexpr bool tr_variantIsList(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
 }
@@ -240,7 +241,7 @@ size_t tr_variantListSize(tr_variant const* list);
 ****  Dictionaries
 ***/
 
-static inline bool tr_variantIsDict(tr_variant const* v)
+constexpr bool tr_variantIsDict(tr_variant const* v)
 {
     return v != nullptr && v->type == TR_VARIANT_TYPE_DICT;
 }

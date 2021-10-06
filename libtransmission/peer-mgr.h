@@ -33,6 +33,7 @@ struct UTPSocket;
 struct peer_atom;
 struct tr_peerIo;
 struct tr_peerMgr;
+struct tr_peerMsgs;
 struct tr_peer_stat;
 struct tr_swarm;
 struct tr_torrent;
@@ -60,7 +61,7 @@ struct tr_pex
     uint8_t flags;
 };
 
-static inline bool tr_isPex(tr_pex const* pex)
+constexpr bool tr_isPex(tr_pex const* pex)
 {
     return pex && tr_address_is_valid(&pex->addr);
 }

@@ -149,29 +149,20 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 }
 
 /* returns a const pointer to the variant's string */
-static char const* tr_variant_string_get_string(struct tr_variant_string const* str)
+static constexpr char const* tr_variant_string_get_string(struct tr_variant_string const* str)
 {
-    char const* ret;
-
     switch (str->type)
     {
     case TR_STRING_TYPE_BUF:
-        ret = str->str.buf;
-        break;
+        return str->str.buf;
 
     case TR_STRING_TYPE_HEAP:
-        ret = str->str.str;
-        break;
-
     case TR_STRING_TYPE_QUARK:
-        ret = str->str.str;
-        break;
+        return str->str.str;
 
     default:
-        ret = nullptr;
+        return nullptr;
     }
-
-    return ret;
 }
 
 static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark const quark)
@@ -221,7 +212,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
 ****
 ***/
 
-static inline char const* getStr(tr_variant const* v)
+static constexpr char const* getStr(tr_variant const* v)
 {
     TR_ASSERT(tr_variantIsString(v));
 
