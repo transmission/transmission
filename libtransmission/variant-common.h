@@ -14,7 +14,7 @@
 
 #include "tr-macros.h"
 
-typedef void (*VariantWalkFunc)(tr_variant const* val, void* user_data);
+using VariantWalkFunc = void (*)(tr_variant const* val, void* user_data);
 
 struct VariantWalkFuncs
 {

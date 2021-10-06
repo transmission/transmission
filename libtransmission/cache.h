@@ -15,8 +15,7 @@
 #include "tr-macros.h"
 
 struct evbuffer;
-
-typedef struct tr_cache tr_cache;
+struct tr_cache;
 
 /***
 ****

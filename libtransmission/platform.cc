@@ -51,9 +51,9 @@
 ***/
 
 #ifdef _WIN32
-typedef DWORD tr_thread_id;
+using tr_thread_id = DWORD;
 #else
-typedef pthread_t tr_thread_id;
+using tr_thread_id = pthread_t;
 #endif
 
 static tr_thread_id tr_getCurrentThread(void)

@@ -44,7 +44,7 @@
 ****
 ***/
 
-typedef struct tr_watchdir_kqueue
+struct tr_watchdir_kqueue
 {
     tr_watchdir_backend base;
 
@@ -52,7 +52,7 @@ typedef struct tr_watchdir_kqueue
     int dirfd;
     struct event* event;
     std::unordered_set<std::string> dir_entries;
-} tr_watchdir_kqueue;
+};
 
 #define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_kqueue*>(b))
 

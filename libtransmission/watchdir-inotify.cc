@@ -38,14 +38,14 @@
 ****
 ***/
 
-typedef struct tr_watchdir_inotify
+struct tr_watchdir_inotify
 {
     tr_watchdir_backend base;
 
     int infd;
     int inwd;
     struct bufferevent* event;
-} tr_watchdir_inotify;
+};
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_inotify*)(b))
 

@@ -22,10 +22,10 @@ struct tr_peerIo;
 
 /** @brief opaque struct holding hanshake state information.
            freed when the handshake is completed. */
-typedef struct tr_handshake tr_handshake;
+struct tr_handshake;
 
 /* returns true on success, false on error */
-typedef bool (*handshakeDoneCB)(
+using handshakeDoneCB = bool (*)(
     struct tr_handshake* handshake,
     struct tr_peerIo* io,
     bool readAnythingFromPeer,

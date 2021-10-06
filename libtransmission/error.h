@@ -18,13 +18,13 @@
  */
 
 /** @brief Structure holding error information. */
-typedef struct tr_error
+struct tr_error
 {
     /** @brief Error code, platform-specific */
     int code;
     /** @brief Error message */
     char* message;
-} tr_error;
+};
 
 /**
  * @brief Create new error object using literal error message.

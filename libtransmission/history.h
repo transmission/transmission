@@ -29,7 +29,7 @@ enum
     TR_RECENT_HISTORY_PERIOD_SEC = 60
 };
 
-typedef struct tr_recentHistory
+struct tr_recentHistory
 {
     /* these are PRIVATE IMPLEMENTATION details included for composition only.
      * Don't access these directly! */
@@ -41,7 +41,7 @@ typedef struct tr_recentHistory
         unsigned int n;
         time_t date;
     } slices[TR_RECENT_HISTORY_PERIOD_SEC];
-} tr_recentHistory;
+};
 
 /**
  * @brief add a counter to the recent history object.

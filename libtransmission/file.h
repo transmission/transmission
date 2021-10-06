@@ -27,11 +27,11 @@ struct tr_error;
 #ifndef _WIN32
 
 /** @brief Platform-specific file descriptor type. */
-typedef int tr_sys_file_t;
+using tr_sys_file_t = int;
 /** @brief Platform-specific invalid file descriptor constant. */
 #define TR_BAD_SYS_FILE (-1)
 /** @brief Platform-specific directory descriptor type. */
-typedef void* tr_sys_dir_t;
+using tr_sys_dir_t = void*;
 /** @brief Platform-specific end-of-line sequence. */
 #define TR_NATIVE_EOL_STR "\n"
 /** @brief Platform-specific end-of-line sequence length. */
@@ -39,9 +39,9 @@ typedef void* tr_sys_dir_t;
 
 #else
 
-typedef HANDLE tr_sys_file_t;
+using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
-typedef struct tr_sys_dir_win32* tr_sys_dir_t;
+using tr_sys_dir_t = tr_sys_dir_win32*;
 #define TR_NATIVE_EOL_STR "\r\n"
 #define TR_NATIVE_EOL_STR_SIZE 2
 
@@ -50,14 +50,14 @@ typedef struct tr_sys_dir_win32* tr_sys_dir_t;
 /** @brief Platform-specific invalid directory descriptor constant. */
 #define TR_BAD_SYS_DIR ((tr_sys_dir_t) nullptr)
 
-typedef enum
+enum tr_std_sys_file_t
 {
     TR_STD_SYS_FILE_IN,
     TR_STD_SYS_FILE_OUT,
     TR_STD_SYS_FILE_ERR
-} tr_std_sys_file_t;
+};
 
-typedef enum
+enum tr_sys_file_open_flags_t
 {
     TR_SYS_FILE_READ = (1 << 0),
     TR_SYS_FILE_WRITE = (1 << 1),
@@ -66,57 +66,57 @@ typedef enum
     TR_SYS_FILE_APPEND = (1 << 4),
     TR_SYS_FILE_TRUNCATE = (1 << 5),
     TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-} tr_sys_file_open_flags_t;
+};
 
-typedef enum
+enum tr_seek_origin_t
 {
     TR_SEEK_SET,
     TR_SEEK_CUR,
     TR_SEEK_END
-} tr_seek_origin_t;
+};
 
-typedef enum
+enum tr_sys_file_lock_flags_t
 {
     TR_SYS_FILE_LOCK_SH = (1 << 0),
     TR_SYS_FILE_LOCK_EX = (1 << 1),
     TR_SYS_FILE_LOCK_NB = (1 << 2),
     TR_SYS_FILE_LOCK_UN = (1 << 3)
-} tr_sys_file_lock_flags_t;
+};
 
-typedef enum
+enum tr_sys_path_get_info_flags_t
 {
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
-} tr_sys_path_get_info_flags_t;
+};
 
-typedef enum
+enum tr_sys_file_advice_t
 {
     TR_SYS_FILE_ADVICE_WILL_NEED,
     TR_SYS_FILE_ADVICE_DONT_NEED
-} tr_sys_file_advice_t;
+};
 
-typedef enum
+enum tr_sys_file_preallocate_flags_t
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
-} tr_sys_file_preallocate_flags_t;
+};
 
-typedef enum
+enum tr_sys_dir_create_flags_t
 {
     TR_SYS_DIR_CREATE_PARENTS = (1 << 0)
-} tr_sys_dir_create_flags_t;
+};
 
-typedef enum
+enum tr_sys_path_type_t
 {
     TR_SYS_PATH_IS_FILE,
     TR_SYS_PATH_IS_DIRECTORY,
     TR_SYS_PATH_IS_OTHER
-} tr_sys_path_type_t;
+};
 
-typedef struct tr_sys_path_info
+struct tr_sys_path_info
 {
-    tr_sys_path_type_t type;
-    uint64_t size;
-    time_t last_modified_at;
-} tr_sys_path_info;
+    tr_sys_path_type_t type = {};
+    uint64_t size = 0;
+    time_t last_modified_at = 0;
+};
 
 /**
  * @name Platform-specific wrapper functions

@@ -40,9 +40,9 @@
 
 #define MY_NAME "tr_crypto_utils"
 
-typedef API(ctr_drbg_context) api_ctr_drbg_context;
-typedef API(sha1_context) api_sha1_context;
-typedef API(dhm_context) api_dhm_context;
+using api_ctr_drbg_context = API(ctr_drbg_context);
+using api_sha1_context = API(sha1_context);
+using api_dhm_context = API(dhm_context);
 
 static void log_polarssl_error(int error_code, char const* file, int line)
 {
