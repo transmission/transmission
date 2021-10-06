@@ -1042,7 +1042,8 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         dictAdd(args, TR_KEY_filename, add_me.url.toString());
         break;
 
-    case AddData::FILENAME: /* fall-through */
+    case AddData::FILENAME:
+        [[fallthrough]];
     case AddData::METAINFO:
         dictAdd(args, TR_KEY_metainfo, add_me.toBase64());
         break;

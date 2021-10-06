@@ -647,7 +647,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
                 announcePrio = 2;
                 break;
 
-            default: /* fall through */
+            default:
                 break;
             }
 
