@@ -28,11 +28,11 @@
 #define TIMEOUT_SECS 30
 
 static tr_option options[] = {
-    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
-    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
-    { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },
-    { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 0, NULL, NULL, NULL, false, NULL }
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
+    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
+    { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
+    { 'V', "version", "Show version number and exit", "V", false, nullptr },
+    { 0, nullptr, nullptr, nullptr, false, nullptr }
 };
 
 static char const* getUsage(void)
@@ -44,7 +44,7 @@ static bool magnetFlag = false;
 static bool scrapeFlag = false;
 static bool unsorted = false;
 static bool showVersion = false;
-char const* filename = NULL;
+char const* filename = nullptr;
 
 static int parseCommandLine(int argc, char const* const* argv)
 {
@@ -224,14 +224,14 @@ static void doScrape(tr_info const* inf)
         char* url;
         char escaped[SHA_DIGEST_LENGTH * 3 + 1];
 
-        if (scrape == NULL)
+        if (scrape == nullptr)
         {
             continue;
         }
 
         tr_http_escape_sha1(escaped, inf->hash);
 
-        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') != NULL ? '&' : '?', escaped);
+        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') != nullptr ? '&' : '?', escaped);
 
         printf("%s ... ", url);
         fflush(stdout);
@@ -271,7 +271,7 @@ static void doScrape(tr_info const* inf)
 
                         while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
-                            if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
+                            if (memcmp(inf->hash, tr_quark_get_string(key, nullptr), SHA_DIGEST_LENGTH) == 0)
                             {
                                 int64_t seeders;
                                 if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
@@ -332,7 +332,7 @@ int tr_main(int argc, char* argv[])
     }
 
     /* make sure the user specified a filename */
-    if (filename == NULL)
+    if (filename == nullptr)
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -341,7 +341,7 @@ int tr_main(int argc, char* argv[])
     }
 
     /* try to parse the .torrent file */
-    ctor = tr_ctorNew(NULL);
+    ctor = tr_ctorNew(nullptr);
     tr_ctorSetMetainfoFromFile(ctor, filename);
     err = tr_torrentParse(ctor, &inf);
     tr_ctorFree(ctor);

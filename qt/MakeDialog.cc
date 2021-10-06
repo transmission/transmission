@@ -156,7 +156,7 @@ void MakeDialog::makeTorrent()
         }
         else
         {
-            tr_tracker_info tmp;
+            auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
             trackers.append(tmp);

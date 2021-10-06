@@ -18,8 +18,8 @@
 #define NOTIFICATIONS_DBUS_CORE_OBJECT "/org/freedesktop/Notifications"
 #define NOTIFICATIONS_DBUS_CORE_INTERFACE "org.freedesktop.Notifications"
 
-static GDBusProxy* proxy = NULL;
-static GHashTable* active_notifications = NULL;
+static GDBusProxy* proxy = nullptr;
+static GHashTable* active_notifications = nullptr;
 static gboolean server_supports_actions = FALSE;
 
 typedef struct TrNotification
@@ -32,7 +32,7 @@ static void tr_notification_free(gpointer data)
 {
     auto* n = static_cast<TrNotification*>(data);
 
-    if (n->core != NULL)
+    if (n->core != nullptr)
     {
         g_object_unref(G_OBJECT(n->core));
     }
@@ -47,11 +47,11 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
     char** caps;
     GVariant* result;
 
-    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, NULL);
+    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, nullptr);
 
-    if (result == NULL || !g_variant_is_of_type(result, G_VARIANT_TYPE("(as)")))
+    if (result == nullptr || !g_variant_is_of_type(result, G_VARIANT_TYPE("(as)")))
     {
-        if (result != NULL)
+        if (result != nullptr)
         {
             g_variant_unref(result);
         }
@@ -61,7 +61,7 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
 
     g_variant_get(result, "(^a&s)", &caps);
 
-    for (int i = 0; caps[i] != NULL; i++)
+    for (int i = 0; caps[i] != nullptr; i++)
     {
         if (g_strcmp0(caps[i], "actions") == 0)
         {
@@ -88,10 +88,10 @@ static void g_signal_callback(
     g_return_if_fail(g_variant_is_of_type(params, G_VARIANT_TYPE("(u*)")));
 
     guint id;
-    g_variant_get(params, "(u*)", &id, NULL);
+    g_variant_get(params, "(u*)", &id, nullptr);
     auto* n = static_cast<TrNotification*>(g_hash_table_lookup(active_notifications, GUINT_TO_POINTER(id)));
 
-    if (n == NULL)
+    if (n == nullptr)
     {
         return;
     }
@@ -103,13 +103,13 @@ static void g_signal_callback(
     else if (g_strcmp0(signal_name, "ActionInvoked") == 0 && g_variant_is_of_type(params, G_VARIANT_TYPE("(us)")))
     {
         tr_torrent const* tor = gtr_core_find_torrent(n->core, n->torrent_id);
-        if (tor == NULL)
+        if (tor == nullptr)
         {
             return;
         }
 
-        char* action = NULL;
-        g_variant_get(params, "(u&s)", NULL, &action);
+        char* action = nullptr;
+        g_variant_get(params, "(u&s)", nullptr, &action);
 
         if (g_strcmp0(action, "folder") == 0)
         {
@@ -119,7 +119,7 @@ static void g_signal_callback(
         {
             tr_info const* inf = tr_torrentInfo(tor);
             char const* dir = tr_torrentGetDownloadDir(tor);
-            char* path = g_build_filename(dir, inf->files[0].name, NULL);
+            char* path = g_build_filename(dir, inf->files[0].name, nullptr);
             gtr_open_file(path);
             g_free(path);
         }
@@ -131,39 +131,39 @@ static void dbus_proxy_ready_callback(GObject* source, GAsyncResult* res, gpoint
     TR_UNUSED(source);
     TR_UNUSED(user_data);
 
-    proxy = g_dbus_proxy_new_for_bus_finish(res, NULL);
+    proxy = g_dbus_proxy_new_for_bus_finish(res, nullptr);
 
-    if (proxy == NULL)
+    if (proxy == nullptr)
     {
         g_warning("Failed to create proxy for %s", NOTIFICATIONS_DBUS_NAME);
         return;
     }
 
-    g_signal_connect(proxy, "g-signal", G_CALLBACK(g_signal_callback), NULL);
+    g_signal_connect(proxy, "g-signal", G_CALLBACK(g_signal_callback), nullptr);
     g_dbus_proxy_call(
         proxy,
         "GetCapabilities",
         g_variant_new("()"),
         G_DBUS_CALL_FLAGS_NONE,
         -1,
-        NULL,
+        nullptr,
         get_capabilities_callback,
-        NULL);
+        nullptr);
 }
 
 void gtr_notify_init(void)
 {
-    active_notifications = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, tr_notification_free);
+    active_notifications = g_hash_table_new_full(g_direct_hash, g_direct_equal, nullptr, tr_notification_free);
     g_dbus_proxy_new_for_bus(
         G_BUS_TYPE_SESSION,
         G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-        NULL,
+        nullptr,
         NOTIFICATIONS_DBUS_NAME,
         NOTIFICATIONS_DBUS_CORE_OBJECT,
         NOTIFICATIONS_DBUS_CORE_INTERFACE,
-        NULL,
+        nullptr,
         dbus_proxy_ready_callback,
-        NULL);
+        nullptr);
 }
 
 static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_data)
@@ -171,11 +171,11 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
     GVariant* result;
     auto* n = static_cast<TrNotification*>(user_data);
 
-    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, NULL);
+    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, nullptr);
 
-    if (result == NULL || !g_variant_is_of_type(result, G_VARIANT_TYPE("(u)")))
+    if (result == nullptr || !g_variant_is_of_type(result, G_VARIANT_TYPE("(u)")))
     {
-        if (result != NULL)
+        if (result != nullptr)
         {
             g_variant_unref(result);
         }
@@ -197,14 +197,14 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
     {
         char** argv = gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command);
         g_spawn_async(
-            NULL /*cwd*/,
+            nullptr /*cwd*/,
             argv,
-            NULL /*envp*/,
+            nullptr /*envp*/,
             G_SPAWN_SEARCH_PATH,
-            NULL /*GSpawnChildSetupFunc*/,
-            NULL /*user_data*/,
-            NULL /*child_pid*/,
-            NULL);
+            nullptr /*GSpawnChildSetupFunc*/,
+            nullptr /*user_data*/,
+            nullptr /*child_pid*/,
+            nullptr);
         g_strfreev(argv);
     }
 
@@ -259,7 +259,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
             -1),
         G_DBUS_CALL_FLAGS_NONE,
         -1,
-        NULL,
+        nullptr,
         notify_callback,
         n);
 }
@@ -279,10 +279,10 @@ void gtr_notify_torrent_added(char const* name)
     g_dbus_proxy_call(
         proxy,
         "Notify",
-        g_variant_new("(susssasa{sv}i)", "Transmission", 0, "transmission", _("Torrent Added"), name, NULL, NULL, -1),
+        g_variant_new("(susssasa{sv}i)", "Transmission", 0, "transmission", _("Torrent Added"), name, nullptr, nullptr, -1),
         G_DBUS_CALL_FLAGS_NONE,
         -1,
-        NULL,
+        nullptr,
         notify_callback,
         n);
 }

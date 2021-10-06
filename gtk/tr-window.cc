@@ -83,7 +83,14 @@ static void on_popup_menu(GtkWidget* self, GdkEventButton* event)
 #if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent*)event);
 #else
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
+    gtk_menu_popup(
+        GTK_MENU(menu),
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        event != nullptr ? event->button : 0,
+        event != nullptr ? event->time : 0);
 #endif
 }
 
@@ -109,11 +116,11 @@ static gboolean tree_view_search_equal_func(
 
     gboolean match;
     char* lower;
-    char const* name = NULL;
+    char const* name = nullptr;
 
     lower = g_strstrip(g_utf8_strdown(key, -1));
     gtk_tree_model_get(model, iter, MC_NAME_COLLATED, &name, -1);
-    match = strstr(name, lower) != NULL;
+    match = strstr(name, lower) != nullptr;
     g_free(lower);
 
     return !match;
@@ -130,7 +137,7 @@ static GtkWidget* makeview(PrivateData* p)
     view = gtk_tree_view_new();
     tree_view = GTK_TREE_VIEW(view);
     gtk_tree_view_set_search_column(tree_view, MC_NAME_COLLATED);
-    gtk_tree_view_set_search_equal_func(tree_view, tree_view_search_equal_func, NULL, NULL);
+    gtk_tree_view_set_search_equal_func(tree_view, tree_view_search_equal_func, nullptr, nullptr);
     gtk_tree_view_set_headers_visible(tree_view, FALSE);
     gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
 
@@ -141,7 +148,7 @@ static GtkWidget* makeview(PrivateData* p)
         TR_ARG_TUPLE("title", _("Torrent")),
         TR_ARG_TUPLE("resizable", TRUE),
         TR_ARG_TUPLE("sizing", GTK_TREE_VIEW_COLUMN_FIXED),
-        NULL));
+        nullptr));
 
     p->renderer = r = torrent_cell_renderer_new();
     gtk_tree_view_column_pack_start(col, r, FALSE);
@@ -150,15 +157,15 @@ static GtkWidget* makeview(PrivateData* p)
     gtk_tree_view_column_add_attribute(col, r, "piece-download-speed", MC_SPEED_DOWN);
 
     gtk_tree_view_append_column(tree_view, col);
-    g_object_set(r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL);
+    g_object_set(r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, nullptr);
 
     sel = gtk_tree_view_get_selection(tree_view);
     gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
 
-    g_signal_connect(view, "popup-menu", G_CALLBACK(on_popup_menu), NULL);
+    g_signal_connect(view, "popup-menu", G_CALLBACK(on_popup_menu), nullptr);
     g_signal_connect(view, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), (void*)on_popup_menu);
-    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
-    g_signal_connect(view, "row-activated", G_CALLBACK(view_row_activated), NULL);
+    g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), nullptr);
+    g_signal_connect(view, "row-activated", G_CALLBACK(view_row_activated), nullptr);
 
     gtk_tree_view_set_model(tree_view, p->filter_model);
     g_object_unref(p->filter_model);
@@ -178,26 +185,26 @@ static void prefsChanged(TrCore* core, tr_quark const key, gpointer wind)
     switch (key)
     {
     case TR_KEY_compact_view:
-        g_object_set(p->renderer, "compact", gtr_pref_flag_get(key), NULL);
+        g_object_set(p->renderer, "compact", gtr_pref_flag_get(key), nullptr);
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values. Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
-        g_signal_emit_by_name(p->view, "style-updated", NULL, NULL);
+        g_signal_emit_by_name(p->view, "style-updated", nullptr, nullptr);
         break;
 
     case TR_KEY_show_statusbar:
         isEnabled = gtr_pref_flag_get(key);
-        g_object_set(p->status, "visible", isEnabled, NULL);
+        g_object_set(p->status, "visible", isEnabled, nullptr);
         break;
 
     case TR_KEY_show_filterbar:
         isEnabled = gtr_pref_flag_get(key);
-        g_object_set(p->filter, "visible", isEnabled, NULL);
+        g_object_set(p->filter, "visible", isEnabled, nullptr);
         break;
 
     case TR_KEY_show_toolbar:
         isEnabled = gtr_pref_flag_get(key);
-        g_object_set(p->toolbar, "visible", isEnabled, NULL);
+        g_object_set(p->toolbar, "visible", isEnabled, nullptr);
         break;
 
     case TR_KEY_statusbar_stats:
@@ -229,9 +236,9 @@ static void onYinYangClicked(GtkWidget* w, gpointer vprivate)
     auto* p = static_cast<PrivateData*>(vprivate);
 
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(p->status_menu), GTK_WIDGET(w), GDK_GRAVITY_NORTH_EAST, GDK_GRAVITY_SOUTH_EAST, NULL);
+    gtk_menu_popup_at_widget(GTK_MENU(p->status_menu), GTK_WIDGET(w), GDK_GRAVITY_NORTH_EAST, GDK_GRAVITY_SOUTH_EAST, nullptr);
 #else
-    gtk_menu_popup(GTK_MENU(p->status_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+    gtk_menu_popup(GTK_MENU(p->status_menu), nullptr, nullptr, nullptr, nullptr, 0, gtk_get_current_event_time());
 #endif
 }
 
@@ -274,7 +281,7 @@ static void syncAltSpeedButton(PrivateData* p)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, GtkIconSize(-1));
-    g_object_set(w, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
+    g_object_set(w, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, nullptr);
     gtk_widget_set_tooltip_text(w, str);
 
     g_free(str);
@@ -320,7 +327,7 @@ static gboolean onAskTrackerQueryTooltip(
     gboolean handled;
     time_t maxTime = 0;
     auto* p = static_cast<PrivateData*>(gdata);
-    time_t const now = time(NULL);
+    time_t const now = time(nullptr);
 
     gtk_tree_selection_selected_foreach(p->selection, findMaxAnnounceTime, &maxTime);
 
@@ -409,7 +416,7 @@ static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
     m = gtk_menu_new();
     menu_shell = GTK_MENU_SHELL(m);
 
-    w = gtk_radio_menu_item_new_with_label(NULL, _("Unlimited"));
+    w = gtk_radio_menu_item_new_with_label(nullptr, _("Unlimited"));
     o = G_OBJECT(w);
     p->speedlimit_off_item[dir] = w;
     g_object_set_data(o, DIRECTION_KEY, GINT_TO_POINTER(dir));
@@ -480,7 +487,7 @@ static GtkWidget* createRatioMenu(PrivateData* p)
     m = gtk_menu_new();
     menu_shell = GTK_MENU_SHELL(m);
 
-    w = gtk_radio_menu_item_new_with_label(NULL, _("Seed Forever"));
+    w = gtk_radio_menu_item_new_with_label(nullptr, _("Seed Forever"));
     p->ratio_off_item = w;
     g_object_set_data(G_OBJECT(w), ENABLED_KEY, GINT_TO_POINTER(FALSE));
     g_signal_connect(w, "toggled", G_CALLBACK(onRatioToggled), p);
@@ -574,9 +581,9 @@ static void onOptionsClicked(GtkButton* button, gpointer vp)
         GTK_WIDGET(button),
         GDK_GRAVITY_NORTH_WEST,
         GDK_GRAVITY_SOUTH_WEST,
-        NULL);
+        nullptr);
 #else
-    gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+    gtk_menu_popup(GTK_MENU(p->options_menu), nullptr, nullptr, nullptr, nullptr, 0, gtk_get_current_event_time());
 #endif
 }
 
@@ -627,7 +634,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     /* Please move it to separate .css file if you’re adding more styles here. */
     style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
+    gtk_css_provider_load_from_data(css_provider, style, strlen(style), nullptr);
     gtk_style_context_add_provider_for_screen(
         gdk_screen_get_default(),
         GTK_STYLE_PROVIDER(css_provider),
@@ -654,7 +661,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
     /* status menu */
     menu = p->status_menu = gtk_menu_new();
-    l = NULL;
+    l = nullptr;
     pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
     for (size_t i = 0; i < G_N_ELEMENTS(stats_modes); ++i)
@@ -701,21 +708,21 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* download */
-    w = dl_lb = gtk_label_new(NULL);
+    w = dl_lb = gtk_label_new(nullptr);
     p->dl_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->dl_lb, TRUE);
     gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* upload */
-    w = ul_lb = gtk_label_new(NULL);
-    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+    w = ul_lb = gtk_label_new(nullptr);
+    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, nullptr);
     p->ul_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->ul_lb, TRUE);
     gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* ratio */
-    w = gtk_label_new(NULL);
-    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
+    w = gtk_label_new(nullptr);
+    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, nullptr);
     p->stats_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->stats_lb, TRUE);
     gtk_container_add(GTK_CONTAINER(grid), w);
@@ -733,7 +740,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     **/
 
     p->view = makeview(p);
-    w = list = p->scroll = gtk_scrolled_window_new(NULL, NULL);
+    w = list = p->scroll = gtk_scrolled_window_new(nullptr, nullptr);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(w), GTK_SHADOW_OUT);
     gtk_style_context_add_class(gtk_widget_get_style_context(w), "tr-workarea");
@@ -755,8 +762,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
         pango_layout_get_pixel_size(pango_layout, &width, &height);
         gtk_widget_set_size_request(ul_lb, width, height);
         gtk_widget_set_size_request(dl_lb, width, height);
-        g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
-        g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, nullptr);
+        g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, nullptr);
         g_object_unref(G_OBJECT(pango_layout));
     }
 
@@ -831,7 +838,7 @@ static void updateSpeeds(PrivateData* p)
 {
     tr_session const* const session = gtr_core_session(p->core);
 
-    if (session != NULL)
+    if (session != nullptr)
     {
         char text_str[256];
         char speed_str[128];
@@ -842,7 +849,7 @@ static void updateSpeeds(PrivateData* p)
         GtkTreeIter iter;
         GtkTreeModel* model = gtr_core_model(p->core);
 
-        if (gtk_tree_model_iter_nth_child(model, &iter, NULL, 0))
+        if (gtk_tree_model_iter_nth_child(model, &iter, nullptr, 0))
         {
             do
             {
@@ -881,7 +888,7 @@ void gtr_window_refresh(GtkWindow* self)
 {
     PrivateData* p = get_private_data(self);
 
-    if (p != NULL && p->core != NULL && gtr_core_session(p->core) != NULL)
+    if (p != nullptr && p->core != nullptr && gtr_core_session(p->core) != nullptr)
     {
         updateSpeeds(p);
         updateStats(p);
@@ -897,10 +904,10 @@ void gtr_window_set_busy(GtkWindow* win, gboolean isBusy)
 {
     GtkWidget* w = GTK_WIDGET(win);
 
-    if (w != NULL && gtk_widget_get_realized(w))
+    if (w != nullptr && gtk_widget_get_realized(w))
     {
         GdkDisplay* display = gtk_widget_get_display(w);
-        GdkCursor* cursor = isBusy ? gdk_cursor_new_for_display(display, GDK_WATCH) : NULL;
+        GdkCursor* cursor = isBusy ? gdk_cursor_new_for_display(display, GDK_WATCH) : nullptr;
 
         gdk_window_set_cursor(gtk_widget_get_window(w), cursor);
         gdk_display_flush(display);

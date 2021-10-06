@@ -29,7 +29,7 @@ TEST(Metainfo, magnetLink)
 
     auto* ctor = tr_ctorNew(nullptr);
     tr_ctorSetMetainfoFromMagnetLink(ctor, MagnetLink);
-    tr_info inf;
+    auto inf = tr_info{};
     auto const parse_result = tr_torrentParse(ctor, &inf);
     EXPECT_EQ(TR_PARSE_OK, parse_result);
     EXPECT_EQ(0, inf.fileCount); // because it's a magnet link

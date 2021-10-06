@@ -23,17 +23,17 @@
 
 static int fileCount = 0;
 static bool showVersion = false;
-static char const** files = NULL;
-static char const* add = NULL;
-static char const* deleteme = NULL;
-static char const* replace[2] = { NULL, NULL };
+static char const** files = nullptr;
+static char const* add = nullptr;
+static char const* deleteme = nullptr;
+static char const* replace[2] = { nullptr, nullptr };
 
 static tr_option options[] = {
     { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
     { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
     { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
-    { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 0, NULL, NULL, NULL, false, NULL }
+    { 'V', "version", "Show version number and exit", "V", false, nullptr },
+    { 0, nullptr, nullptr, nullptr, false, nullptr }
 };
 
 static char const* getUsage(void)
@@ -92,7 +92,7 @@ static bool removeURL(tr_variant* metainfo, char const* url)
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL) && strcmp(str, url) == 0)
+    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr) && strcmp(str, url) == 0)
     {
         printf("\tRemoved \"%s\" from \"announce\"\n", str);
         tr_variantDictRemove(metainfo, TR_KEY_announce);
@@ -104,13 +104,13 @@ static bool removeURL(tr_variant* metainfo, char const* url)
         tr_variant* tier;
         int tierIndex = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierIndex)) != NULL)
+        while ((tier = tr_variantListChild(announce_list, tierIndex)) != nullptr)
         {
             int nodeIndex = 0;
             tr_variant const* node;
-            while ((node = tr_variantListChild(tier, nodeIndex)) != NULL)
+            while ((node = tr_variantListChild(tier, nodeIndex)) != nullptr)
             {
-                if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
+                if (tr_variantGetStr(node, &str, nullptr) && strcmp(str, url) == 0)
                 {
                     printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, tierIndex + 1);
                     tr_variantListRemove(tier, nodeIndex);
@@ -142,13 +142,13 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
     /* if we removed the "announce" field and there's still another track left,
      * use it as the "announce" field */
-    if (changed && !tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL))
+    if (changed && !tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr))
     {
         tr_variant* const tier = tr_variantListChild(announce_list, 0);
-        if (tier != NULL)
+        if (tier != nullptr)
         {
             tr_variant const* const node = tr_variantListChild(tier, 0);
-            if ((node != NULL) && tr_variantGetStr(node, &str, NULL))
+            if ((node != nullptr) && tr_variantGetStr(node, &str, nullptr))
             {
                 tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
                 printf("\tAdded \"%s\" to announce\n", str);
@@ -166,7 +166,7 @@ static char* replaceSubstr(char const* str, char const* in, char const* out)
     size_t const inlen = strlen(in);
     size_t const outlen = strlen(out);
 
-    while ((walk = strstr(str, in)) != NULL)
+    while ((walk = strstr(str, in)) != nullptr)
     {
         evbuffer_add(buf, str, walk - str);
         evbuffer_add(buf, out, outlen);
@@ -175,7 +175,7 @@ static char* replaceSubstr(char const* str, char const* in, char const* out)
 
     evbuffer_add(buf, str, strlen(str));
 
-    return evbuffer_free_to_str(buf, NULL);
+    return evbuffer_free_to_str(buf, nullptr);
 }
 
 static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
@@ -184,7 +184,7 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL) && strstr(str, in) != NULL)
+    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr) && strstr(str, in) != nullptr)
     {
         char* newstr = replaceSubstr(str, in, out);
         printf("\tReplaced in \"announce\": \"%s\" --> \"%s\"\n", str, newstr);
@@ -198,14 +198,14 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
         tr_variant* tier;
         int tierCount = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
+        while ((tier = tr_variantListChild(announce_list, tierCount)) != nullptr)
         {
             tr_variant* node;
             int nodeCount = 0;
 
-            while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
+            while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
             {
-                if (tr_variantGetStr(node, &str, NULL) && strstr(str, in) != NULL)
+                if (tr_variantGetStr(node, &str, nullptr) && strstr(str, in) != nullptr)
                 {
                     char* newstr = replaceSubstr(str, in, out);
                     printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
@@ -230,15 +230,15 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
     int tierCount = 0;
     tr_variant* tier;
 
-    while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
+    while ((tier = tr_variantListChild(announce_list, tierCount)) != nullptr)
     {
         int nodeCount = 0;
         tr_variant const* node;
 
-        while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
+        while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
         {
-            char const* str = NULL;
-            if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
+            char const* str = nullptr;
+            if (tr_variantGetStr(node, &str, nullptr) && strcmp(str, url) == 0)
             {
                 return true;
             }
@@ -254,10 +254,10 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 
 static bool addURL(tr_variant* metainfo, char const* url)
 {
-    char const* announce = NULL;
-    tr_variant* announce_list = NULL;
+    char const* announce = nullptr;
+    tr_variant* announce_list = nullptr;
     bool changed = false;
-    bool const had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, NULL);
+    bool const had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, nullptr);
     bool const had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
 
     if (!had_announce && !had_announce_list)
@@ -323,7 +323,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (add == NULL && deleteme == NULL && replace[0] == 0)
+    if (add == nullptr && deleteme == nullptr && replace[0] == 0)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -336,7 +336,7 @@ int tr_main(int argc, char* argv[])
         tr_variant top;
         bool changed = false;
         char const* filename = files[i];
-        tr_error* error = NULL;
+        tr_error* error = nullptr;
 
         printf("%s\n", filename);
 
@@ -347,17 +347,17 @@ int tr_main(int argc, char* argv[])
             continue;
         }
 
-        if (deleteme != NULL)
+        if (deleteme != nullptr)
         {
             changed |= removeURL(&top, deleteme);
         }
 
-        if (add != NULL)
+        if (add != nullptr)
         {
             changed = addURL(&top, add);
         }
 
-        if (replace[0] != NULL && replace[1] != NULL)
+        if (replace[0] != nullptr && replace[1] != nullptr)
         {
             changed |= replaceURL(&top, replace[0], replace[1]);
         }

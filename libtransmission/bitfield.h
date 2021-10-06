@@ -16,20 +16,20 @@
 #include "tr-macros.h"
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
-typedef struct tr_bitfield
+struct tr_bitfield
 {
-    uint8_t* bits;
-    size_t alloc_count;
+    uint8_t* bits = nullptr;
+    size_t alloc_count = 0;
 
-    size_t bit_count;
+    size_t bit_count = 0;
 
-    size_t true_count;
+    size_t true_count = 0;
 
     /* Special cases for when full or empty but we don't know the bitCount.
        This occurs when a magnet link's peers send have all / have none */
-    bool have_all_hint;
-    bool have_none_hint;
-} tr_bitfield;
+    bool have_all_hint = false;
+    bool have_none_hint = false;
+};
 
 /***
 ****

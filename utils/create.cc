@@ -28,19 +28,19 @@ static tr_tracker_info trackers[MAX_TRACKERS];
 static int trackerCount = 0;
 static bool isPrivate = false;
 static bool showVersion = false;
-static char const* comment = NULL;
-static char const* outfile = NULL;
-static char const* infile = NULL;
+static char const* comment = nullptr;
+static char const* outfile = nullptr;
+static char const* infile = nullptr;
 static uint32_t piecesize_kib = 0;
 
 static tr_option options[] = {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, NULL },
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
     { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
     { 'c', "comment", "Add a comment", "c", true, "<comment>" },
     { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 0, NULL, NULL, NULL, false, NULL }
+    { 'V', "version", "Show version number and exit", "V", false, nullptr },
+    { 0, nullptr, nullptr, nullptr, false, nullptr }
 };
 
 static char const* getUsage(void)
@@ -84,12 +84,12 @@ static int parseCommandLine(int argc, char const* const* argv)
             break;
 
         case 's':
-            if (optarg != NULL)
+            if (optarg != nullptr)
             {
-                char* endptr = NULL;
+                char* endptr = nullptr;
                 piecesize_kib = strtoul(optarg, &endptr, 10);
 
-                if (endptr != NULL && *endptr == 'M')
+                if (endptr != nullptr && *endptr == 'M')
                 {
                     piecesize_kib *= KiB;
                 }
@@ -112,11 +112,11 @@ static int parseCommandLine(int argc, char const* const* argv)
 static char* tr_getcwd(void)
 {
     char* result;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
     result = tr_sys_dir_get_current(&error);
 
-    if (result == NULL)
+    if (result == nullptr)
     {
         fprintf(stderr, "getcwd error: \"%s\"", error->message);
         tr_error_free(error);
@@ -128,8 +128,8 @@ static char* tr_getcwd(void)
 
 int tr_main(int argc, char* argv[])
 {
-    char* out2 = NULL;
-    tr_metainfo_builder* b = NULL;
+    char* out2 = nullptr;
+    tr_metainfo_builder* b = nullptr;
 
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
@@ -147,7 +147,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    if (infile == NULL)
+    if (infile == nullptr)
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -155,12 +155,12 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (outfile == NULL)
+    if (outfile == nullptr)
     {
-        tr_error* error = NULL;
+        tr_error* error = nullptr;
         char* base = tr_sys_path_basename(infile, &error);
 
-        if (base == NULL)
+        if (base == nullptr)
         {
             fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
             return EXIT_FAILURE;
@@ -168,7 +168,7 @@ int tr_main(int argc, char* argv[])
 
         char* end = tr_strdup_printf("%s.torrent", base);
         char* cwd = tr_getcwd();
-        outfile = out2 = tr_buildPath(cwd, end, NULL);
+        outfile = out2 = tr_buildPath(cwd, end, nullptr);
         tr_free(cwd);
         tr_free(end);
         tr_free(base);
@@ -191,7 +191,7 @@ int tr_main(int argc, char* argv[])
 
     b = tr_metaInfoBuilderCreate(infile);
 
-    if (b == NULL)
+    if (b == nullptr)
     {
         fprintf(stderr, "ERROR: Cannot find specified input file or directory.\n");
         return EXIT_FAILURE;

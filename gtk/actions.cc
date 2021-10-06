@@ -18,8 +18,8 @@
 #include "tr-core.h"
 #include "tr-prefs.h"
 
-static TrCore* myCore = NULL;
-static GtkActionGroup* myGroup = NULL;
+static TrCore* myCore = nullptr;
+static GtkActionGroup* myGroup = nullptr;
 
 static void action_cb(GtkAction* a, gpointer user_data)
 {
@@ -27,15 +27,15 @@ static void action_cb(GtkAction* a, gpointer user_data)
 }
 
 static GtkRadioActionEntry sort_radio_entries[] = {
-    { "sort-by-activity", NULL, N_("Sort by _Activity"), NULL, NULL, 0 },
-    { "sort-by-name", NULL, N_("Sort by _Name"), NULL, NULL, 1 },
-    { "sort-by-progress", NULL, N_("Sort by _Progress"), NULL, NULL, 2 },
-    { "sort-by-queue", NULL, N_("Sort by _Queue"), NULL, NULL, 3 },
-    { "sort-by-ratio", NULL, N_("Sort by Rati_o"), NULL, NULL, 4 },
-    { "sort-by-state", NULL, N_("Sort by Stat_e"), NULL, NULL, 5 },
-    { "sort-by-age", NULL, N_("Sort by A_ge"), NULL, NULL, 6 },
-    { "sort-by-time-left", NULL, N_("Sort by Time _Left"), NULL, NULL, 7 },
-    { "sort-by-size", NULL, N_("Sort by Si_ze"), NULL, NULL, 8 },
+    { "sort-by-activity", nullptr, N_("Sort by _Activity"), nullptr, nullptr, 0 },
+    { "sort-by-name", nullptr, N_("Sort by _Name"), nullptr, nullptr, 1 },
+    { "sort-by-progress", nullptr, N_("Sort by _Progress"), nullptr, nullptr, 2 },
+    { "sort-by-queue", nullptr, N_("Sort by _Queue"), nullptr, nullptr, 3 },
+    { "sort-by-ratio", nullptr, N_("Sort by Rati_o"), nullptr, nullptr, 4 },
+    { "sort-by-state", nullptr, N_("Sort by Stat_e"), nullptr, nullptr, 5 },
+    { "sort-by-age", nullptr, N_("Sort by A_ge"), nullptr, nullptr, 6 },
+    { "sort-by-time-left", nullptr, N_("Sort by Time _Left"), nullptr, nullptr, 7 },
+    { "sort-by-size", nullptr, N_("Sort by Si_ze"), nullptr, nullptr, 8 },
 };
 
 static void sort_changed_cb(GtkAction* action, GtkRadioAction* current, gpointer user_data)
@@ -51,8 +51,8 @@ static void sort_changed_cb(GtkAction* action, GtkRadioAction* current, gpointer
 }
 
 static GtkToggleActionEntry show_toggle_entries[] = {
-    { "toggle-main-window", NULL, N_("_Show Transmission"), NULL, NULL, G_CALLBACK(action_cb), TRUE },
-    { "toggle-message-log", NULL, N_("Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE },
+    { "toggle-main-window", nullptr, N_("_Show Transmission"), nullptr, nullptr, G_CALLBACK(action_cb), TRUE },
+    { "toggle-message-log", nullptr, N_("Message _Log"), nullptr, nullptr, G_CALLBACK(action_cb), FALSE },
 };
 
 static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
@@ -66,26 +66,32 @@ static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
 }
 
 static GtkToggleActionEntry pref_toggle_entries[] = {
-    { "alt-speed-enabled", NULL, N_("Enable Alternative Speed _Limits"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "compact-view", NULL, N_("_Compact View"), "<alt>C", NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "sort-reversed", NULL, N_("Re_verse Sort Order"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-filterbar", NULL, N_("_Filterbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-statusbar", NULL, N_("_Statusbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-toolbar", NULL, N_("_Toolbar"), NULL, NULL, G_CALLBACK(toggle_pref_cb), FALSE },
+    { "alt-speed-enabled",
+      nullptr,
+      N_("Enable Alternative Speed _Limits"),
+      nullptr,
+      nullptr,
+      G_CALLBACK(toggle_pref_cb),
+      FALSE },
+    { "compact-view", nullptr, N_("_Compact View"), "<alt>C", nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
+    { "sort-reversed", nullptr, N_("Re_verse Sort Order"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
+    { "show-filterbar", nullptr, N_("_Filterbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
+    { "show-statusbar", nullptr, N_("_Statusbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
+    { "show-toolbar", nullptr, N_("_Toolbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
 };
 
 static GtkActionEntry entries[] = {
-    { "file-menu", NULL, N_("_File"), NULL, NULL, NULL },
-    { "torrent-menu", NULL, N_("_Torrent"), NULL, NULL, NULL },
-    { "view-menu", NULL, N_("_View"), NULL, NULL, NULL },
-    { "sort-menu", NULL, N_("_Sort Torrents By"), NULL, NULL, NULL },
-    { "queue-menu", NULL, N_("_Queue"), NULL, NULL, NULL },
-    { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
-    { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
-    { "copy-magnet-link-to-clipboard", "edit-copy", N_("Copy _Magnet Link to Clipboard"), "", NULL, G_CALLBACK(action_cb) },
+    { "file-menu", nullptr, N_("_File"), nullptr, nullptr, nullptr },
+    { "torrent-menu", nullptr, N_("_Torrent"), nullptr, nullptr, nullptr },
+    { "view-menu", nullptr, N_("_View"), nullptr, nullptr, nullptr },
+    { "sort-menu", nullptr, N_("_Sort Torrents By"), nullptr, nullptr, nullptr },
+    { "queue-menu", nullptr, N_("_Queue"), nullptr, nullptr, nullptr },
+    { "edit-menu", nullptr, N_("_Edit"), nullptr, nullptr, nullptr },
+    { "help-menu", nullptr, N_("_Help"), nullptr, nullptr, nullptr },
+    { "copy-magnet-link-to-clipboard", "edit-copy", N_("Copy _Magnet Link to Clipboard"), "", nullptr, G_CALLBACK(action_cb) },
     { "open-torrent-from-url", "document-open", N_("Open _URL…"), "<control>U", N_("Open URL…"), G_CALLBACK(action_cb) },
-    { "open-torrent-toolbar", "document-open", N_("_Open"), NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
-    { "open-torrent-menu", "document-open", N_("_Open"), NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
+    { "open-torrent-toolbar", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), G_CALLBACK(action_cb) },
+    { "open-torrent-menu", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), G_CALLBACK(action_cb) },
     { "torrent-start", "media-playback-start", N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
     { "torrent-start-now",
       "media-playback-start",
@@ -93,35 +99,45 @@ static GtkActionEntry entries[] = {
       "<shift><control>S",
       N_("Start torrent now"),
       G_CALLBACK(action_cb) },
-    { "show-stats", NULL, N_("_Statistics"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "donate", NULL, N_("_Donate"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "torrent-verify", NULL, N_("_Verify Local Data"), "<control>V", NULL, G_CALLBACK(action_cb) },
+    { "show-stats", nullptr, N_("_Statistics"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "donate", nullptr, N_("_Donate"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "torrent-verify", nullptr, N_("_Verify Local Data"), "<control>V", nullptr, G_CALLBACK(action_cb) },
     { "torrent-stop", "media-playback-pause", N_("_Pause"), "<control>P", N_("Pause torrent"), G_CALLBACK(action_cb) },
-    { "pause-all-torrents", "media-playback-pause", N_("_Pause All"), NULL, N_("Pause all torrents"), G_CALLBACK(action_cb) },
-    { "start-all-torrents", "media-playback-start", N_("_Start All"), NULL, N_("Start all torrents"), G_CALLBACK(action_cb) },
-    { "relocate-torrent", NULL, N_("Set _Location…"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", NULL, G_CALLBACK(action_cb) },
-    { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", NULL, G_CALLBACK(action_cb) },
-    { "new-torrent", "document-new", N_("_New…"), NULL, N_("Create a torrent"), G_CALLBACK(action_cb) },
-    { "quit", "application-exit", N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "select-all", "edit-select-all", N_("Select _All"), "<control>A", NULL, G_CALLBACK(action_cb) },
-    { "deselect-all", NULL, N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
-    { "edit-preferences", "preferences-system", N_("_Preferences"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "pause-all-torrents",
+      "media-playback-pause",
+      N_("_Pause All"),
+      nullptr,
+      N_("Pause all torrents"),
+      G_CALLBACK(action_cb) },
+    { "start-all-torrents",
+      "media-playback-start",
+      N_("_Start All"),
+      nullptr,
+      N_("Start all torrents"),
+      G_CALLBACK(action_cb) },
+    { "relocate-torrent", nullptr, N_("Set _Location…"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", nullptr, G_CALLBACK(action_cb) },
+    { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", nullptr, G_CALLBACK(action_cb) },
+    { "new-torrent", "document-new", N_("_New…"), nullptr, N_("Create a torrent"), G_CALLBACK(action_cb) },
+    { "quit", "application-exit", N_("_Quit"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "select-all", "edit-select-all", N_("Select _All"), "<control>A", nullptr, G_CALLBACK(action_cb) },
+    { "deselect-all", nullptr, N_("Dese_lect All"), "<shift><control>A", nullptr, G_CALLBACK(action_cb) },
+    { "edit-preferences", "preferences-system", N_("_Preferences"), nullptr, nullptr, G_CALLBACK(action_cb) },
     { "show-torrent-properties",
       "document-properties",
       N_("_Properties"),
       "<alt>Return",
       N_("Torrent properties"),
       G_CALLBACK(action_cb) },
-    { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
-    { "show-about-dialog", "help-about", N_("_About"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "help", "help-browser", N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
-    { "torrent-reannounce", "network-workgroup", N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-top", "go-top", N_("Move to _Top"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-up", "go-up", N_("Move _Up"), "<control>Up", NULL, G_CALLBACK(action_cb) },
-    { "queue-move-down", "go-down", N_("Move _Down"), "<control>Down", NULL, G_CALLBACK(action_cb) },
-    { "queue-move-bottom", "go-bottom", N_("Move to _Bottom"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "present-main-window", NULL, N_("Present Main Window"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", nullptr, G_CALLBACK(action_cb) },
+    { "show-about-dialog", "help-about", N_("_About"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "help", "help-browser", N_("_Contents"), "F1", nullptr, G_CALLBACK(action_cb) },
+    { "torrent-reannounce", "network-workgroup", N_("Ask Tracker for _More Peers"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "queue-move-top", "go-top", N_("Move to _Top"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "queue-move-up", "go-up", N_("Move _Up"), "<control>Up", nullptr, G_CALLBACK(action_cb) },
+    { "queue-move-down", "go-down", N_("Move _Down"), "<control>Down", nullptr, G_CALLBACK(action_cb) },
+    { "queue-move-bottom", "go-bottom", N_("Move to _Bottom"), nullptr, nullptr, G_CALLBACK(action_cb) },
+    { "present-main-window", nullptr, N_("Present Main Window"), nullptr, nullptr, G_CALLBACK(action_cb) },
 };
 
 typedef struct
@@ -157,11 +173,11 @@ static void register_my_icons(void)
             GdkPixbuf* p;
             gchar* resource_path = g_strdup_printf(TR_RESOURCE_PATH "icons/%s.png", my_fallback_icons[i].filename);
 
-            p = gdk_pixbuf_new_from_resource(resource_path, NULL);
+            p = gdk_pixbuf_new_from_resource(resource_path, nullptr);
 
             g_free(resource_path);
 
-            if (p != NULL)
+            if (p != nullptr)
             {
                 int width;
                 GtkIconSet* icon_set;
@@ -181,7 +197,7 @@ static void register_my_icons(void)
     g_object_unref(G_OBJECT(factory));
 }
 
-static GtkUIManager* myUIManager = NULL;
+static GtkUIManager* myUIManager = nullptr;
 
 void gtr_actions_set_core(TrCore* core)
 {
@@ -200,7 +216,7 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
     register_my_icons();
 
     action_group = myGroup = gtk_action_group_new("Actions");
-    gtk_action_group_set_translation_domain(action_group, NULL);
+    gtk_action_group_set_translation_domain(action_group, nullptr);
 
     match = gtr_pref_string_get(TR_KEY_sort_mode);
 
@@ -218,7 +234,7 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
         G_N_ELEMENTS(sort_radio_entries),
         active,
         G_CALLBACK(sort_changed_cb),
-        NULL);
+        nullptr);
 
     gtk_action_group_add_toggle_actions(
         action_group,
@@ -247,23 +263,23 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 *****
 ****/
 
-static GHashTable* key_to_action = NULL;
+static GHashTable* key_to_action = nullptr;
 
 static void ensure_action_map_loaded(GtkUIManager* uim)
 {
-    if (key_to_action != NULL)
+    if (key_to_action != nullptr)
     {
         return;
     }
 
-    key_to_action = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    key_to_action = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, nullptr);
 
-    for (GList* l = gtk_ui_manager_get_action_groups(uim); l != NULL; l = l->next)
+    for (GList* l = gtk_ui_manager_get_action_groups(uim); l != nullptr; l = l->next)
     {
         GtkActionGroup* action_group = GTK_ACTION_GROUP(l->data);
         GList* actions = gtk_action_group_list_actions(action_group);
 
-        for (GList* ait = actions; ait != NULL; ait = ait->next)
+        for (GList* ait = actions; ait != nullptr; ait = ait->next)
         {
             GtkAction* action = GTK_ACTION(ait->data);
             char const* name = gtk_action_get_name(action);
@@ -284,7 +300,7 @@ void gtr_action_activate(char const* name)
 {
     GtkAction* action = get_action(name);
 
-    g_assert(action != NULL);
+    g_assert(action != nullptr);
     gtk_action_activate(action);
 }
 
@@ -292,16 +308,16 @@ void gtr_action_set_sensitive(char const* name, gboolean b)
 {
     GtkAction* action = get_action(name);
 
-    g_assert(action != NULL);
-    g_object_set(action, "sensitive", b, NULL);
+    g_assert(action != nullptr);
+    g_object_set(action, "sensitive", b, nullptr);
 }
 
 void gtr_action_set_important(char const* name, gboolean b)
 {
     GtkAction* action = get_action(name);
 
-    g_assert(action != NULL);
-    g_object_set(action, "is-important", b, NULL);
+    g_assert(action != nullptr);
+    g_object_set(action, "is-important", b, nullptr);
 }
 
 void gtr_action_set_toggled(char const* name, gboolean b)

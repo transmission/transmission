@@ -46,7 +46,7 @@ void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* sectio
 
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", section_title);
     l = gtk_label_new(buf);
-    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
     gtk_label_set_use_markup(GTK_LABEL(l), TRUE);
     hig_workarea_add_section_title_widget(t, row, l);
 }
@@ -94,7 +94,7 @@ void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
             TR_ARG_TUPLE("halign", GTK_ALIGN_START),
             TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER),
             TR_ARG_TUPLE("use-markup", TRUE),
-            NULL);
+            nullptr);
     }
 
     gtk_grid_attach(GTK_GRID(t), w, 0, row, 1, 1);
@@ -104,10 +104,10 @@ static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* co
 {
     if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), NULL);
+        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), nullptr);
     }
 
-    g_object_set(control, "expand", TRUE, NULL);
+    g_object_set(control, "expand", TRUE, nullptr);
     gtk_grid_attach(GTK_GRID(t), control, 1, row, 1, 1);
 }
 
@@ -115,7 +115,7 @@ static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control
 {
     if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), NULL);
+        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), nullptr);
     }
 
     gtk_widget_set_hexpand(control, TRUE);

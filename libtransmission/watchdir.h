@@ -12,16 +12,16 @@
 
 struct event_base;
 
-typedef struct tr_watchdir* tr_watchdir_t;
+using tr_watchdir_t = struct tr_watchdir*;
 
-typedef enum
+enum tr_watchdir_status
 {
     TR_WATCHDIR_ACCEPT,
     TR_WATCHDIR_IGNORE,
     TR_WATCHDIR_RETRY
-} tr_watchdir_status;
+};
 
-typedef tr_watchdir_status (*tr_watchdir_cb)(tr_watchdir_t handle, char const* name, void* user_data);
+using tr_watchdir_cb = tr_watchdir_status (*)(tr_watchdir_t handle, char const* name, void* user_data);
 
 /* ... */
 

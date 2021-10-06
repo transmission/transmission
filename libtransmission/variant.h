@@ -29,12 +29,12 @@ struct tr_error;
  * @{
  */
 
-typedef enum
+enum tr_string_type
 {
     TR_STRING_TYPE_QUARK,
     TR_STRING_TYPE_HEAP,
     TR_STRING_TYPE_BUF
-} tr_string_type;
+};
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
@@ -66,11 +66,11 @@ enum
 /* These are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
-typedef struct tr_variant
+struct tr_variant
 {
-    char type;
+    char type = '\0';
 
-    tr_quark key;
+    tr_quark key = TR_KEY_NONE;
 
     union
     {
@@ -88,8 +88,8 @@ typedef struct tr_variant
             size_t count;
             struct tr_variant* vals;
         } l;
-    } val;
-} tr_variant;
+    } val = {};
+};
 
 void tr_variantFree(tr_variant*);
 
@@ -97,12 +97,12 @@ void tr_variantFree(tr_variant*);
 ****  Serialization / Deserialization
 ***/
 
-typedef enum
+enum tr_variant_fmt
 {
     TR_VARIANT_FMT_BENC,
     TR_VARIANT_FMT_JSON,
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
-} tr_variant_fmt;
+};
 
 int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
 
@@ -124,7 +124,7 @@ int tr_variantFromBuf(
 
 static inline int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t buflen)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, NULL, NULL);
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, nullptr, nullptr);
 }
 
 static inline int tr_variantFromBencFull(
@@ -149,12 +149,12 @@ static inline int tr_variantFromJsonFull(
 
 static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, NULL, NULL);
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
 }
 
 static inline bool tr_variantIsType(tr_variant const* b, int type)
 {
-    return b != NULL && b->type == type;
+    return b != nullptr && b->type == type;
 }
 
 /***
@@ -163,7 +163,7 @@ static inline bool tr_variantIsType(tr_variant const* b, int type)
 
 static inline bool tr_variantIsString(tr_variant const* b)
 {
-    return b != NULL && b->type == TR_VARIANT_TYPE_STR;
+    return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
 }
 
 bool tr_variantGetStr(tr_variant const* variant, char const** setme_str, size_t* setme_len);
@@ -180,7 +180,7 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** raw_setme, size
 
 static inline bool tr_variantIsReal(tr_variant const* v)
 {
-    return v != NULL && v->type == TR_VARIANT_TYPE_REAL;
+    return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
 }
 
 void tr_variantInitReal(tr_variant* initme, double value);
@@ -192,7 +192,7 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 static inline bool tr_variantIsBool(tr_variant const* v)
 {
-    return v != NULL && v->type == TR_VARIANT_TYPE_BOOL;
+    return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
 void tr_variantInitBool(tr_variant* initme, bool value);
@@ -204,7 +204,7 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 static inline bool tr_variantIsInt(tr_variant const* v)
 {
-    return v != NULL && v->type == TR_VARIANT_TYPE_INT;
+    return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
 }
 
 void tr_variantInitInt(tr_variant* variant, int64_t value);
@@ -216,7 +216,7 @@ bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 static inline bool tr_variantIsList(tr_variant const* v)
 {
-    return v != NULL && v->type == TR_VARIANT_TYPE_LIST;
+    return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
 }
 
 void tr_variantInitList(tr_variant* list, size_t reserve_count);
@@ -242,7 +242,7 @@ size_t tr_variantListSize(tr_variant const* list);
 
 static inline bool tr_variantIsDict(tr_variant const* v)
 {
-    return v != NULL && v->type == TR_VARIANT_TYPE_DICT;
+    return v != nullptr && v->type == TR_VARIANT_TYPE_DICT;
 }
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);

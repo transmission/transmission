@@ -99,7 +99,7 @@ static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
             GTK_DIALOG(w),
             TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
             TR_ARG_TUPLE(_("_Reset"), TR_RESPONSE_RESET),
-            NULL);
+            nullptr);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", secondary);
 
         if (gtk_dialog_run(GTK_DIALOG(w)) == TR_RESPONSE_RESET)
@@ -132,28 +132,28 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
         GTK_DIALOG_DESTROY_WITH_PARENT,
         TR_ARG_TUPLE(_("_Reset"), TR_RESPONSE_RESET),
         TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
-        NULL);
+        nullptr);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
     t = hig_workarea_create();
     ui->core = core;
 
     hig_workarea_add_section_title(t, &row, _("Current Session"));
-    l = gtk_label_new(NULL);
+    l = gtk_label_new(nullptr);
     ui->one_up_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->one_up_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Uploaded:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Uploaded:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->one_down_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->one_down_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Downloaded:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Downloaded:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->one_ratio_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->one_ratio_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Ratio:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Ratio:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->one_time_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->one_time_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Duration:"), l, NULL);
+    hig_workarea_add_row(t, &row, _("Duration:"), l, nullptr);
 
     hig_workarea_add_section_divider(t, &row);
 
@@ -163,22 +163,22 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     gtk_label_set_single_line_mode(ui->all_sessions_lb, TRUE);
     hig_workarea_add_label_w(t, row, l);
     ++row;
-    l = gtk_label_new(NULL);
+    l = gtk_label_new(nullptr);
     ui->all_up_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_up_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Uploaded:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Uploaded:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->all_down_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_down_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Downloaded:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Downloaded:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->all_ratio_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_ratio_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Ratio:"), l, NULL);
-    l = gtk_label_new(NULL);
+    hig_workarea_add_row(t, &row, _("Ratio:"), l, nullptr);
+    l = gtk_label_new(nullptr);
     ui->all_time_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_time_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Duration:"), l, NULL);
+    hig_workarea_add_row(t, &row, _("Duration:"), l, nullptr);
 
     gtr_dialog_set_content(GTK_DIALOG(d), t);
 

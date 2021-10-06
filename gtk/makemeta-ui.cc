@@ -55,7 +55,7 @@ static void freeMetaUI(gpointer p)
 
 static gboolean onProgressDialogRefresh(gpointer data)
 {
-    char* str = NULL;
+    char* str = nullptr;
     auto* ui = static_cast<MakeMetaUI*>(data);
     tr_metainfo_builder const* b = ui->builder;
     GtkDialog* d = GTK_DIALOG(ui->progress_dialog);
@@ -93,7 +93,7 @@ static gboolean onProgressDialogRefresh(gpointer data)
         g_assert_not_reached();
     }
 
-    if (str != NULL)
+    if (str != nullptr)
     {
         gtr_label_set_text(GTK_LABEL(ui->progress_label), str);
         g_free(str);
@@ -161,8 +161,7 @@ static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 
     case GTK_RESPONSE_ACCEPT:
         addTorrent(ui);
-
-        /* fall-through */
+        [[fallthrough]];
 
     case GTK_RESPONSE_CLOSE:
         gtk_widget_destroy(ui->builder->result ? GTK_WIDGET(d) : ui->dialog);
@@ -188,18 +187,18 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
         TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
         TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
         TR_ARG_TUPLE(_("_Add"), GTK_RESPONSE_ACCEPT),
-        NULL);
+        nullptr);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
-    fr = gtk_frame_new(NULL);
+    fr = gtk_frame_new(nullptr);
     gtk_container_set_border_width(GTK_CONTAINER(fr), GUI_PAD_BIG);
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_NONE);
     v = gtk_box_new(GTK_ORIENTATION_VERTICAL, GUI_PAD);
     gtk_container_add(GTK_CONTAINER(fr), v);
 
     l = gtk_label_new(_("Creating torrent…"));
-    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
     ui->progress_label = l;
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);
@@ -222,7 +221,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        if (ui->builder != NULL)
+        if (ui->builder != nullptr)
         {
             int n;
             int tier;
@@ -255,7 +254,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             n = 0;
             tier = 0;
 
-            for (int i = 0; tracker_strings[i] != NULL; ++i)
+            for (int i = 0; tracker_strings[i] != nullptr; ++i)
             {
                 char* const str = tracker_strings[i];
 
@@ -273,7 +272,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
 
             /* build the .torrent */
             makeProgressDialog(GTK_WIDGET(d), ui);
-            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL, isPrivate);
+            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : nullptr, isPrivate);
 
             /* cleanup */
             g_free(trackers);
@@ -301,12 +300,12 @@ static void onSourceToggled(GtkToggleButton* tb, gpointer user_data)
 static void updatePiecesLabel(MakeMetaUI* ui)
 {
     tr_metainfo_builder const* builder = ui->builder;
-    char const* filename = builder != NULL ? builder->top : NULL;
-    GString* gstr = g_string_new(NULL);
+    char const* filename = builder != nullptr ? builder->top : nullptr;
+    GString* gstr = g_string_new(nullptr);
 
     g_string_append(gstr, "<i>");
 
-    if (filename == NULL)
+    if (filename == nullptr)
     {
         g_string_append(gstr, _("No source selected"));
     }
@@ -336,10 +335,10 @@ static void updatePiecesLabel(MakeMetaUI* ui)
 
 static void setFilename(MakeMetaUI* ui, char const* filename)
 {
-    if (ui->builder != NULL)
+    if (ui->builder != nullptr)
     {
         tr_metaInfoBuilderFree(ui->builder);
-        ui->builder = NULL;
+        ui->builder = nullptr;
     }
 
     if (filename)
@@ -366,13 +365,13 @@ static void onSourceToggled2(GtkToggleButton* tb, GtkWidget* chooser, MakeMetaUI
 {
     if (gtk_toggle_button_get_active(tb))
     {
-        if (g_object_get_data(G_OBJECT(chooser), FILE_CHOSEN_KEY) != NULL)
+        if (g_object_get_data(G_OBJECT(chooser), FILE_CHOSEN_KEY) != nullptr)
         {
             onChooserChosen(GTK_FILE_CHOOSER(chooser), ui);
         }
         else
         {
-            setFilename(ui, NULL);
+            setFilename(ui, nullptr);
         }
     }
 }
@@ -413,10 +412,10 @@ static void on_drag_data_received(
     auto* ui = static_cast<MakeMetaUI*>(user_data);
     char** uris = gtk_selection_data_get_uris(selection_data);
 
-    if (uris != NULL && uris[0] != NULL)
+    if (uris != nullptr && uris[0] != nullptr)
     {
         char const* uri = uris[0];
-        gchar* filename = g_filename_from_uri(uri, NULL, NULL);
+        gchar* filename = g_filename_from_uri(uri, nullptr, nullptr);
 
         if (g_file_test(filename, G_FILE_TEST_IS_DIR))
         {
@@ -462,7 +461,7 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
         GTK_DIALOG_DESTROY_WITH_PARENT,
         TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
         TR_ARG_TUPLE(_("_New"), GTK_RESPONSE_ACCEPT),
-        NULL);
+        nullptr);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);
@@ -472,62 +471,62 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     hig_workarea_add_section_title(t, &row, _("Files"));
 
     str = _("Sa_ve to:");
-    w = gtk_file_chooser_button_new(NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    w = gtk_file_chooser_button_new(nullptr, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(w), getDefaultSavePath());
     ui->destination_chooser = w;
-    hig_workarea_add_row(t, &row, str, w, NULL);
+    hig_workarea_add_row(t, &row, str, w, nullptr);
 
-    l = gtk_radio_button_new_with_mnemonic(NULL, _("Source F_older:"));
+    l = gtk_radio_button_new_with_mnemonic(nullptr, _("Source F_older:"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), FALSE);
-    w = gtk_file_chooser_button_new(NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    w = gtk_file_chooser_button_new(nullptr, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
     g_signal_connect(l, "toggled", G_CALLBACK(onFolderToggled), ui);
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
     g_signal_connect(w, "selection-changed", G_CALLBACK(onChooserChosen), ui);
     ui->folder_radio = l;
     ui->folder_chooser = w;
     gtk_widget_set_sensitive(GTK_WIDGET(w), FALSE);
-    hig_workarea_add_row_w(t, &row, l, w, NULL);
+    hig_workarea_add_row_w(t, &row, l, w, nullptr);
 
     slist = gtk_radio_button_get_group(GTK_RADIO_BUTTON(l));
     l = gtk_radio_button_new_with_mnemonic(slist, _("Source _File:"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), TRUE);
-    w = gtk_file_chooser_button_new(NULL, GTK_FILE_CHOOSER_ACTION_OPEN);
+    w = gtk_file_chooser_button_new(nullptr, GTK_FILE_CHOOSER_ACTION_OPEN);
     g_signal_connect(l, "toggled", G_CALLBACK(onFileToggled), ui);
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
     g_signal_connect(w, "selection-changed", G_CALLBACK(onChooserChosen), ui);
     ui->file_radio = l;
     ui->file_chooser = w;
-    hig_workarea_add_row_w(t, &row, l, w, NULL);
+    hig_workarea_add_row_w(t, &row, l, w, nullptr);
 
-    w = gtk_label_new(NULL);
+    w = gtk_label_new(nullptr);
     ui->pieces_lb = w;
     gtk_label_set_markup(GTK_LABEL(w), _("<i>No source selected</i>"));
-    hig_workarea_add_row(t, &row, NULL, w, NULL);
+    hig_workarea_add_row(t, &row, nullptr, w, nullptr);
 
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Properties"));
 
     str = _("_Trackers:");
     v = gtk_box_new(GTK_ORIENTATION_VERTICAL, GUI_PAD_SMALL);
-    ui->announce_text_buffer = gtk_text_buffer_new(NULL);
+    ui->announce_text_buffer = gtk_text_buffer_new(nullptr);
     w = gtk_text_view_new_with_buffer(ui->announce_text_buffer);
     gtk_widget_set_size_request(w, -1, 80);
-    sw = gtk_scrolled_window_new(NULL, NULL);
+    sw = gtk_scrolled_window_new(nullptr, nullptr);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(sw), w);
-    fr = gtk_frame_new(NULL);
+    fr = gtk_frame_new(nullptr);
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(fr), sw);
     gtk_box_pack_start(GTK_BOX(v), fr, TRUE, TRUE, 0);
-    l = gtk_label_new(NULL);
+    l = gtk_label_new(nullptr);
     gtk_label_set_markup(
         GTK_LABEL(l),
         _("To add a backup URL, add it on the line after the primary URL.\n"
           "To add another primary URL, add it after a blank line."));
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
-    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);
-    hig_workarea_add_tall_row(t, &row, str, v, NULL);
+    hig_workarea_add_tall_row(t, &row, str, v, nullptr);
 
     l = gtk_check_button_new_with_mnemonic(_("Co_mment:"));
     ui->comment_check = l;
@@ -536,14 +535,14 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     ui->comment_entry = w;
     gtk_widget_set_sensitive(GTK_WIDGET(w), FALSE);
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
-    hig_workarea_add_row_w(t, &row, l, w, NULL);
+    hig_workarea_add_row_w(t, &row, l, w, nullptr);
 
     w = hig_workarea_add_wide_checkbutton(t, &row, _("_Private torrent"), FALSE);
     ui->private_check = w;
 
     gtr_dialog_set_content(GTK_DIALOG(d), t);
 
-    gtk_drag_dest_set(d, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY);
+    gtk_drag_dest_set(d, GTK_DEST_DEFAULT_ALL, nullptr, 0, GDK_ACTION_COPY);
     gtk_drag_dest_add_uri_targets(d);
     g_signal_connect(d, "drag-data-received", G_CALLBACK(on_drag_data_received), ui);
 

@@ -145,7 +145,7 @@ struct tr_scrape_info
 /**
  * "global" (per-tr_session) fields
  */
-typedef struct tr_announcer
+struct tr_announcer
 {
     std::set<tr_announce_request*, StopsCompare> stops;
     std::map<std::string, tr_scrape_info> scrape_info;
@@ -154,7 +154,7 @@ typedef struct tr_announcer
     struct event* upkeepTimer;
     int key;
     time_t tauUpkeepAt;
-} tr_announcer;
+};
 
 static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, std::string const& url)
 {
@@ -207,7 +207,7 @@ void tr_announcerClose(tr_session* session)
 ***/
 
 /* a row in tr_tier's list of trackers */
-typedef struct
+struct tr_tracker
 {
     char* key;
     char* announce;
@@ -223,7 +223,7 @@ typedef struct
     int consecutiveFailures;
 
     uint32_t id;
-} tr_tracker;
+};
 
 /* format: host+':'+ port */
 static char* getKey(char const* url)
@@ -267,7 +267,7 @@ static void trackerDestruct(tr_tracker* tracker)
 struct tr_torrent_tiers;
 
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
-typedef struct tr_tier
+struct tr_tier
 {
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
@@ -314,7 +314,7 @@ typedef struct tr_tier
 
     char lastAnnounceStr[128];
     char lastScrapeStr[128];
-} tr_tier;
+};
 
 static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tier, int interval)
 {
@@ -398,7 +398,7 @@ static void tierIncrementTracker(tr_tier* tier)
  *
  * this opaque data structure can be found in tr_torrent.tiers
  */
-typedef struct tr_torrent_tiers
+struct tr_torrent_tiers
 {
     tr_tier* tiers;
     int tier_count;
@@ -408,7 +408,7 @@ typedef struct tr_torrent_tiers
 
     tr_tracker_callback callback;
     void* callbackData;
-} tr_torrent_tiers;
+};
 
 static tr_torrent_tiers* tiersNew(void)
 {

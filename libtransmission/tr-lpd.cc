@@ -30,7 +30,7 @@ THE SOFTWARE.
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
-typedef uint16_t in_port_t; /* all missing */
+using in_port_t = uint16_t; /* all missing */
 #else
 #include <ctime>
 #include <unistd.h> /* close() */
@@ -156,17 +156,17 @@ static int lpd_unsolicitedMsgCounter;
 /**
 * @brief Checks for BT-SEARCH method and separates the parameter section
 * @param[in] s The request string
-* @param[out] ver If non-NULL, gets filled with protocol info from the request
+* @param[out] ver If non-nullptr, gets filled with protocol info from the request
 * @return Returns a relative pointer to the beginning of the parameter section.
-*         If result is NULL, s was invalid and no information will be returned
+*         If result is nullptr, s was invalid and no information will be returned
 * @remark Note that the returned pointer is only usable as long as the given
 *         pointer s is valid; that is, return storage is temporary.
 *
 * Determines whether the given string checks out to be a valid BT-SEARCH message.
 * If so, the return value points to the beginning of the parameter section (note:
 * in this case the function returns a character sequence beginning with CRLF).
-* If parameter is not NULL, the declared protocol version is returned as part of
-* the lpd_protocolVersion structure.
+* If parameter is not nullptr, the declared protocol version is returned as part
+* of the lpd_protocolVersion structure.
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
@@ -647,7 +647,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
                 announcePrio = 2;
                 break;
 
-            default: /* fall through */
+            default:
                 break;
             }
 

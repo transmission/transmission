@@ -71,7 +71,7 @@ public:
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
 
-        tr_bandwidthConstruct(&bandwidth, tor->session, &tor->bandwidth);
+        tr_bandwidthConstruct(&bandwidth, &tor->bandwidth);
         timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
