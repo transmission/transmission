@@ -401,7 +401,7 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
 }
 
-static inline bool replicationExists(tr_swarm const* s)
+static constexpr bool replicationExists(tr_swarm const* s)
 {
     return s->pieceReplication != nullptr;
 }
@@ -581,7 +581,7 @@ static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 ****
 ***/
 
-static inline bool atomIsSeed(struct peer_atom const* atom)
+static constexpr bool atomIsSeed(struct peer_atom const* atom)
 {
     return (atom->flags & ADDED_F_SEED_FLAG) != 0;
 }
@@ -840,7 +840,7 @@ static void updateEndgame(tr_swarm* s)
 *****
 ****/
 
-static inline void invalidatePieceSorting(tr_swarm* s)
+static constexpr void invalidatePieceSorting(tr_swarm* s)
 {
     s->pieceSortState = PIECES_UNSORTED;
 }
@@ -4061,7 +4061,7 @@ static bool torrentWasRecentlyStarted(tr_torrent const* tor)
     return difftime(tr_time(), tor->startDate) < 120;
 }
 
-static inline uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
+static constexpr uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
 {
     value = value << (uint64_t)width;
     value |= addme;

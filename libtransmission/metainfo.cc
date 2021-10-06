@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm>
+#include <array>
 #include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
@@ -26,14 +28,22 @@
 ***/
 
 #ifdef _WIN32
-#define PATH_DELIMITER_CHARS "/\\"
+auto constexpr PATH_DELIMITER_CHARS = std::array<char, 2>{ '/', '\\' };
 #else
-#define PATH_DELIMITER_CHARS "/"
+auto constexpr PATH_DELIMITER_CHARS = std::array<char, 1>{ '/' };
 #endif
 
-static inline bool char_is_path_separator(char c)
+static constexpr bool char_is_path_separator(char c)
 {
-    return strchr(PATH_DELIMITER_CHARS, c) != nullptr;
+    for (auto ch : PATH_DELIMITER_CHARS)
+    {
+        if (c == ch)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static char* metainfoGetBasenameNameAndPartialHash(tr_info const* inf)
