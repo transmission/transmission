@@ -82,7 +82,7 @@ private:
     Gtk::ScrolledWindow* scroll_ = nullptr;
     Gtk::TreeView* view_ = nullptr;
     Gtk::Toolbar* toolbar_ = nullptr;
-    Gtk::Box* filter_ = nullptr;
+    FilterBar* filter_ = nullptr;
     Gtk::Grid* status_ = nullptr;
     Gtk::Menu* status_menu_;
     Gtk::Label* ul_lb_ = nullptr;
@@ -518,8 +518,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     gtr_action_set_important("show-torrent-properties", true);
 
     /* filter */
-    Glib::RefPtr<Gtk::TreeModel> filter_model;
-    filter_ = Glib::wrap(GTK_BOX(gtr_filter_bar_new(gtr_core_session(core_), gtr_core_model(core_), filter_model)));
+    filter_ = Gtk::make_managed<FilterBar>(gtr_core_session(core_), Glib::wrap(gtr_core_model(core_), true));
     filter_->set_border_width(GUI_PAD_SMALL);
 
     /* status menu */
@@ -595,7 +594,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     *** Workarea
     **/
 
-    view_ = makeview(filter_model);
+    view_ = makeview(filter_->get_filter_model());
     scroll_ = Gtk::make_managed<Gtk::ScrolledWindow>();
     scroll_->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     scroll_->set_shadow_type(Gtk::SHADOW_OUT);

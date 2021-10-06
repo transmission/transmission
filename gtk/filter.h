@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2012-2014 Mnemosyne LLC
+ * This file Copyright (C) 2012-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,8 +8,21 @@
 
 #pragma once
 
+#include <memory>
+
 #include <gtkmm.h>
 
-#include <libtransmission/transmission.h>
+typedef struct tr_session tr_session;
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* torrent_model, Glib::RefPtr<Gtk::TreeModel>& filter_model);
+class FilterBar : public Gtk::Box
+{
+public:
+    FilterBar(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
+    ~FilterBar() override;
+
+    Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};
