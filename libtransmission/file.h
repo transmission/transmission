@@ -41,6 +41,7 @@ using tr_sys_dir_t = void*;
 
 using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
+struct tr_sys_dir_win32;
 using tr_sys_dir_t = tr_sys_dir_win32*;
 #define TR_NATIVE_EOL_STR "\r\n"
 #define TR_NATIVE_EOL_STR_SIZE 2
