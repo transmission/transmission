@@ -117,7 +117,7 @@ struct peer_atom
     /* similar to a TTL field, but less rigid --
      * if the swarm is small, the atom will be kept past this date. */
     time_t shelf_date;
-    tr_peer* peer; /* will be NULL if not connected */
+    tr_peer* peer; /* will be nullptr if not connected */
     tr_address addr;
 };
 
@@ -175,7 +175,7 @@ struct tr_swarm
     tr_torrent* tor;
     struct tr_peerMgr* manager;
 
-    tr_peerMsgs* optimistic; /* the optimistic peer, or NULL if none */
+    tr_peerMsgs* optimistic; /* the optimistic peer, or nullptr if none */
     int optimisticUnchokeTimeScaler;
 
     bool poolIsAllSeeds;
@@ -193,7 +193,7 @@ struct tr_swarm
 
     /* An array of pieceCount items stating how many peers have each piece.
        This is used to help us for downloading pieces "rarest first."
-       This may be NULL if we don't have metainfo yet, or if we're not
+       This may be nullptr if we don't have metainfo yet, or if we're not
        downloading and don't care about rarity */
     uint16_t* pieceReplication;
     size_t pieceReplicationSize;
@@ -733,7 +733,7 @@ static auto getBlockRequestPeers(tr_swarm* s, tr_block_index_t block)
     bool exact;
     int const pos = tr_lowerBound(&key, s->requests, s->requestCount, sizeof(struct block_request), compareReqByBlock, &exact);
 
-    TR_ASSERT(!exact); /* shouldn't have a request with .peer == NULL */
+    TR_ASSERT(!exact); /* shouldn't have a request with .peer == nullptr */
 
     for (int i = pos; i < s->requestCount; ++i)
     {

@@ -102,7 +102,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  * from time to time!  When the worker thread sets that flag,
  * the caller must pass the builder to tr_metaInfoBuilderFree().
  *
- * @param outputFile if NULL, builder->top + ".torrent" will be used.
+ * @param outputFile if nullptr, builder->top + ".torrent" will be used.
 
  * @param trackers An array of trackers, sorted by tier from first to last.
  *                 NOTE: only the `tier' and `announce' fields are used.
