@@ -257,8 +257,7 @@ void tr_peerConstruct(tr_peer* peer, tr_torrent const* tor)
     TR_ASSERT(peer != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
 
-    memset(peer, 0, sizeof(tr_peer));
-
+    *peer = {};
     peer->client = TR_KEY_NONE;
     peer->swarm = tor->swarm;
     tr_bitfieldConstruct(&peer->have, tor->info.pieceCount);

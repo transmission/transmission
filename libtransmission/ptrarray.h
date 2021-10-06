@@ -66,7 +66,7 @@ constexpr void* tr_ptrArrayBack(tr_ptrArray* array)
 
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end);
 
-constexpr void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
+static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
 {
     tr_ptrArrayErase(t, pos, pos + 1);
 }
@@ -84,7 +84,7 @@ constexpr void tr_ptrArrayClear(tr_ptrArray* a)
 int tr_ptrArrayInsert(tr_ptrArray* array, void* insertMe, int pos);
 
 /** @brief Append a pointer into the array */
-constexpr int tr_ptrArrayAppend(tr_ptrArray* array, void* appendMe)
+static inline int tr_ptrArrayAppend(tr_ptrArray* array, void* appendMe)
 {
     return tr_ptrArrayInsert(array, appendMe, -1);
 }

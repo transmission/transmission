@@ -50,7 +50,7 @@ void tr_cpConstruct(tr_completion*, tr_torrent*);
 
 void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* blocks);
 
-constexpr void tr_cpDestruct(tr_completion* cp)
+static inline void tr_cpDestruct(tr_completion* cp)
 {
     tr_bitfieldDestruct(&cp->blockBitfield);
 }
@@ -78,12 +78,12 @@ constexpr uint64_t tr_cpHaveTotal(tr_completion const* cp)
     return cp->sizeNow;
 }
 
-constexpr bool tr_cpHasAll(tr_completion const* cp)
+static inline bool tr_cpHasAll(tr_completion const* cp)
 {
     return tr_torrentHasMetadata(cp->tor) && tr_bitfieldHasAll(&cp->blockBitfield);
 }
 
-constexpr bool tr_cpHasNone(tr_completion const* cp)
+static inline bool tr_cpHasNone(tr_completion const* cp)
 {
     return !tr_torrentHasMetadata(cp->tor) || tr_bitfieldHasNone(&cp->blockBitfield);
 }
@@ -100,7 +100,7 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const*, tr_piece_index_t);
 
 size_t tr_cpMissingBytesInPiece(tr_completion const*, tr_piece_index_t);
 
-constexpr bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
+static inline bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
 {
     return tr_cpMissingBlocksInPiece(cp, i) == 0;
 }
@@ -111,7 +111,7 @@ constexpr bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
 
 void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t i);
 
-constexpr bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
+static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
 {
     return tr_bitfieldHas(&cp->blockBitfield, i);
 }

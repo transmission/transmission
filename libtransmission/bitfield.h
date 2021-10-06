@@ -53,7 +53,7 @@ void tr_bitfieldRemRange(tr_bitfield*, size_t begin, size_t end);
 
 void tr_bitfieldConstruct(tr_bitfield*, size_t bit_count);
 
-constexpr void tr_bitfieldDestruct(tr_bitfield* b)
+static inline void tr_bitfieldDestruct(tr_bitfield* b)
 {
     tr_bitfieldSetHasNone(b);
 }

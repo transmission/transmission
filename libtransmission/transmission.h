@@ -1222,7 +1222,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf);
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
  */
-constexpr char* tr_torrentGetMagnetLink(tr_torrent const* tor)
+static inline char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
     return tr_torrentInfoGetMagnetLink(tr_torrentInfo(tor));
 }
@@ -1640,7 +1640,7 @@ struct tr_info
     bool isFolder;
 };
 
-constexpr bool tr_torrentHasMetadata(tr_torrent const* tor)
+static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
     tr_info const* const inf = tr_torrentInfo(tor);
     return (inf != nullptr) && (inf->fileCount > 0);

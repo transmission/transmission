@@ -123,12 +123,12 @@ int tr_variantFromBuf(
     char const* optional_source,
     char const** setme_end);
 
-constexpr int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t buflen)
+static inline int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t buflen)
 {
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, nullptr, nullptr);
 }
 
-constexpr int tr_variantFromBencFull(
+static inline int tr_variantFromBencFull(
     tr_variant* setme,
     void const* buf,
     size_t buflen,
@@ -138,7 +138,7 @@ constexpr int tr_variantFromBencFull(
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, source, setme_end);
 }
 
-constexpr int tr_variantFromJsonFull(
+static inline int tr_variantFromJsonFull(
     tr_variant* setme,
     void const* buf,
     size_t buflen,
@@ -148,7 +148,7 @@ constexpr int tr_variantFromJsonFull(
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, source, setme_end);
 }
 
-constexpr int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
+static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
 {
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
 }

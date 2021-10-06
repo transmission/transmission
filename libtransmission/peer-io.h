@@ -262,17 +262,17 @@ void evbuffer_add_uint16(struct evbuffer* outbuf, uint16_t hs);
 void evbuffer_add_uint32(struct evbuffer* outbuf, uint32_t hl);
 void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t hll);
 
-constexpr void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
+static inline void evbuffer_add_hton_16(struct evbuffer* buf, uint16_t val)
 {
     evbuffer_add_uint16(buf, val);
 }
 
-constexpr void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
+static inline void evbuffer_add_hton_32(struct evbuffer* buf, uint32_t val)
 {
     evbuffer_add_uint32(buf, val);
 }
 
-constexpr void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
+static inline void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
 {
     evbuffer_add_uint64(buf, val);
 }
@@ -281,7 +281,7 @@ void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuf
 
 void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount);
 
-constexpr void tr_peerIoReadUint8(tr_peerIo* io, struct evbuffer* inbuf, uint8_t* setme)
+static inline void tr_peerIoReadUint8(tr_peerIo* io, struct evbuffer* inbuf, uint8_t* setme)
 {
     tr_peerIoReadBytes(io, inbuf, setme, sizeof(uint8_t));
 }
@@ -298,7 +298,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
-constexpr void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
+static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -307,12 +307,12 @@ constexpr void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
-constexpr bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
+static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
 {
     return tr_bandwidthClamp(&io->bandwidth, dir, 1024) > 0;
 }
 
-constexpr unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
+static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
 {
     return tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, dir);
 }
