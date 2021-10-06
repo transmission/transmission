@@ -646,7 +646,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 *** struct block_request
 **/
 
-static int compareReqByBlock(void const* va, void const* vb)
+static constexpr int compareReqByBlock(void const* va, void const* vb)
 {
     auto const* const a = static_cast<struct block_request const*>(va);
     auto const* const b = static_cast<struct block_request const*>(vb);
@@ -1028,7 +1028,7 @@ static void assertReplicationCountIsExact(Torrent* t)
 
 #endif
 
-static struct weighted_piece* pieceListLookup(tr_swarm* s, tr_piece_index_t index)
+static constexpr weighted_piece* pieceListLookup(tr_swarm* s, tr_piece_index_t index)
 {
     for (int i = 0; i < s->pieceCount; ++i)
     {
@@ -2941,7 +2941,7 @@ struct tr_rechoke_info
     int rechoke_state;
 };
 
-static int compare_rechoke_info(void const* va, void const* vb)
+static constexpr int compare_rechoke_info(void const* va, void const* vb)
 {
     auto const* const a = static_cast<struct tr_rechoke_info const*>(va);
     auto const* const b = static_cast<struct tr_rechoke_info const*>(vb);
