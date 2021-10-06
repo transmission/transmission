@@ -22,7 +22,7 @@
 
 TEST(Crypto, torrentHash)
 {
-    tr_crypto a;
+    auto a = tr_crypto{};
 
     auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
     for (size_t i = 0; i < hash.size(); ++i)

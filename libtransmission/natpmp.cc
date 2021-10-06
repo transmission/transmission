@@ -30,7 +30,7 @@ static char const* getKey(void)
     return _("Port Forwarding (NAT-PMP)");
 }
 
-typedef enum
+enum tr_natpmp_state
 {
     TR_NATPMP_IDLE,
     TR_NATPMP_ERR,
@@ -40,7 +40,7 @@ typedef enum
     TR_NATPMP_RECV_MAP,
     TR_NATPMP_SEND_UNMAP,
     TR_NATPMP_RECV_UNMAP
-} tr_natpmp_state;
+};
 
 struct tr_natpmp
 {

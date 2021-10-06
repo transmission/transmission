@@ -50,11 +50,11 @@
 #define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
 #endif
 
-typedef enum
+enum tr_format
 {
     TR_FORMAT_OBJECT = 0,
     TR_FORMAT_TABLE
-} tr_format;
+};
 
 /***
 ****
@@ -2741,7 +2741,7 @@ static char const* sessionClose(
 ****
 ***/
 
-typedef char const* (*handler)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
+using handler = char const* (*)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
 
 static struct method
 {

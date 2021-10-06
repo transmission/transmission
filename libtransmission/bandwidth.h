@@ -100,7 +100,7 @@ struct tr_band
  *   and call tr_bandwidthClamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
-typedef struct tr_bandwidth
+struct tr_bandwidth
 {
     /* these are PRIVATE IMPLEMENTATION details that should not be touched.
      * it's included in the header for inlining and composition. */
@@ -112,7 +112,7 @@ typedef struct tr_bandwidth
     unsigned int uniqueKey;
     tr_ptrArray children; /* struct tr_bandwidth */
     struct tr_peerIo* peer;
-} tr_bandwidth;
+};
 
 /**
 ***

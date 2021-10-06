@@ -95,14 +95,14 @@ static uint64_t evbuffer_read_ntoh_64(struct evbuffer* buf)
 *****
 ****/
 
-typedef uint64_t tau_connection_t;
+using tau_connection_t = uint64_t;
 
 enum
 {
     TAU_CONNECTION_TTL_SECS = 60
 };
 
-typedef uint32_t tau_transaction_t;
+using tau_transaction_t = uint32_t;
 
 static tau_transaction_t tau_transaction_new(void)
 {
@@ -112,13 +112,13 @@ static tau_transaction_t tau_transaction_new(void)
 }
 
 /* used in the "action" field of a request */
-typedef enum
+enum tau_action_t
 {
     TAU_ACTION_CONNECT = 0,
     TAU_ACTION_ANNOUNCE = 1,
     TAU_ACTION_SCRAPE = 2,
     TAU_ACTION_ERROR = 3
-} tau_action_t;
+};
 
 static bool is_tau_response_message(tau_action_t action, size_t msglen)
 {
@@ -295,14 +295,14 @@ struct tau_announce_request
     void* user_data;
 };
 
-typedef enum
+enum tau_announce_event
 {
     /* used in the "event" field of an announce request */
     TAU_ANNOUNCE_EVENT_NONE = 0,
     TAU_ANNOUNCE_EVENT_COMPLETED = 1,
     TAU_ANNOUNCE_EVENT_STARTED = 2,
     TAU_ANNOUNCE_EVENT_STOPPED = 3
-} tau_announce_event;
+};
 
 static tau_announce_event get_tau_announce_event(tr_announce_event e)
 {

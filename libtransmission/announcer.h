@@ -21,19 +21,19 @@ struct tr_torrent_tiers;
  * ***  Tracker Publish / Subscribe
  * **/
 
-typedef enum
+enum TrackerEventType
 {
     TR_TRACKER_WARNING,
     TR_TRACKER_ERROR,
     TR_TRACKER_ERROR_CLEAR,
     TR_TRACKER_PEERS,
     TR_TRACKER_COUNTS,
-} TrackerEventType;
+};
 
 struct tr_pex;
 
 /** @brief Notification object to tell listeners about announce or scrape occurences */
-typedef struct
+struct tr_tracker_event
 {
     /* what type of event this is */
     TrackerEventType messageType;
@@ -49,9 +49,9 @@ typedef struct
     /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
     int leechers;
     int seeders;
-} tr_tracker_event;
+};
 
-typedef void (*tr_tracker_callback)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
+using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
 
 /**
 ***  Session ctor/dtor

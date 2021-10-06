@@ -11,22 +11,22 @@
 #include "tr-macros.h"
 #include "transmission.h"
 
-typedef struct tr_metainfo_builder_file
+struct tr_metainfo_builder_file
 {
     char* filename;
     uint64_t size;
-} tr_metainfo_builder_file;
+};
 
-typedef enum
+enum tr_metainfo_builder_err
 {
     TR_MAKEMETA_OK,
     TR_MAKEMETA_URL,
     TR_MAKEMETA_CANCELLED,
     TR_MAKEMETA_IO_READ, /* see builder.errfile, builder.my_errno */
     TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
-} tr_metainfo_builder_err;
+};
 
-typedef struct tr_metainfo_builder
+struct tr_metainfo_builder
 {
     /**
     ***  These are set by tr_makeMetaInfoBuilderCreate()
@@ -78,7 +78,7 @@ typedef struct tr_metainfo_builder
     **/
 
     struct tr_metainfo_builder* nextBuilder;
-} tr_metainfo_builder;
+};
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFile);
 

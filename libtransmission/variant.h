@@ -29,12 +29,12 @@ struct tr_error;
  * @{
  */
 
-typedef enum
+enum tr_string_type
 {
     TR_STRING_TYPE_QUARK,
     TR_STRING_TYPE_HEAP,
     TR_STRING_TYPE_BUF
-} tr_string_type;
+};
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
@@ -66,11 +66,11 @@ enum
 /* These are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
-typedef struct tr_variant
+struct tr_variant
 {
-    char type;
+    char type = '\0';
 
-    tr_quark key;
+    tr_quark key = TR_KEY_NONE;
 
     union
     {
@@ -88,8 +88,8 @@ typedef struct tr_variant
             size_t count;
             struct tr_variant* vals;
         } l;
-    } val;
-} tr_variant;
+    } val = {};
+};
 
 void tr_variantFree(tr_variant*);
 
@@ -97,12 +97,12 @@ void tr_variantFree(tr_variant*);
 ****  Serialization / Deserialization
 ***/
 
-typedef enum
+enum tr_variant_fmt
 {
     TR_VARIANT_FMT_BENC,
     TR_VARIANT_FMT_JSON,
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
-} tr_variant_fmt;
+};
 
 int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
 

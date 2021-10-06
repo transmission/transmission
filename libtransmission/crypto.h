@@ -31,7 +31,7 @@ enum
 };
 
 /** @brief Holds state information for encrypted peer communications */
-typedef struct
+struct tr_crypto
 {
     struct arc4_context* dec_key;
     struct arc4_context* enc_key;
@@ -41,7 +41,7 @@ typedef struct
     uint8_t torrentHash[SHA_DIGEST_LENGTH];
     bool isIncoming;
     bool torrentHashIsSet;
-} tr_crypto;
+};
 
 /** @brief construct a new tr_crypto object */
 void tr_cryptoConstruct(tr_crypto* crypto, uint8_t const* torrentHash, bool isIncoming);

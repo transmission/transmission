@@ -23,16 +23,16 @@
 /**
  * @brief simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray
+struct tr_ptrArray
 {
     void** items;
     int n_items;
     int n_alloc;
-} tr_ptrArray;
+};
 
-typedef tr_voidptr_compare_func PtrArrayCompareFunc;
+using PtrArrayCompareFunc = tr_voidptr_compare_func;
 
-typedef void (*PtrArrayForeachFunc)(void*);
+using PtrArrayForeachFunc = void (*)(void*);
 
 /** @brief Destructor to free a tr_ptrArray's internal memory */
 void tr_ptrArrayDestruct(tr_ptrArray*, PtrArrayForeachFunc func);

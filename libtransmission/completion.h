@@ -16,7 +16,7 @@
 #include "bitfield.h"
 #include "utils.h" /* tr_getRatio() */
 
-typedef struct tr_completion
+struct tr_completion
 {
     tr_torrent* tor;
 
@@ -40,7 +40,7 @@ typedef struct tr_completion
 
     /* number of bytes we want or have now. [0..sizeWhenDone] */
     uint64_t sizeNow;
-} tr_completion;
+};
 
 /**
 *** Life Cycle

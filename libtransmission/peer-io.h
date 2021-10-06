@@ -35,27 +35,27 @@ struct tr_peerIo;
  * @{
  */
 
-typedef enum
+enum ReadState
 {
     READ_NOW,
     READ_LATER,
     READ_ERR
-} ReadState;
+};
 
-typedef enum
+enum tr_encryption_type
 {
     /* these match the values in MSE's crypto_select */
     PEER_ENCRYPTION_NONE = (1 << 0),
     PEER_ENCRYPTION_RC4 = (1 << 1)
-} tr_encryption_type;
+};
 
-typedef ReadState (*tr_can_read_cb)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+using tr_can_read_cb = ReadState (*)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
 
-typedef void (*tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+using tr_did_write_cb = void (*)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
 
-typedef void (*tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
+using tr_net_error_cb = void (*)(struct tr_peerIo* io, short what, void* userData);
 
-typedef struct tr_peerIo
+struct tr_peerIo
 {
     bool isEncrypted;
     bool isIncoming;
@@ -100,7 +100,7 @@ typedef struct tr_peerIo
 
     struct event* event_read;
     struct event* event_write;
-} tr_peerIo;
+};
 
 /**
 ***

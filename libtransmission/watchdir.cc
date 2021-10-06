@@ -113,14 +113,14 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
 ****
 ***/
 
-typedef struct tr_watchdir_retry
+struct tr_watchdir_retry
 {
     tr_watchdir_t handle;
     char* name;
     size_t counter;
     struct event* timer;
     struct timeval interval;
-} tr_watchdir_retry;
+};
 
 /* Non-static and mutable for unit tests */
 auto tr_watchdir_retry_limit = size_t{ 3 };
