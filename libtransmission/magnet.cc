@@ -37,11 +37,13 @@ static int constexpr base32Lookup[] = {
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static constexpr void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
+static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     TR_ASSERT(inlen == 32);
 
     size_t const outlen = 20;
+
+    memset(out, 0, 20);
 
     size_t index = 0;
     size_t offset = 0;
@@ -56,7 +58,7 @@ static constexpr void base32_to_sha1(uint8_t* out, char const* in, size_t const 
         }
 
         /* If this digit is not in the table, ignore it */
-        int digit = base32Lookup[lookup];
+        int const digit = base32Lookup[lookup];
 
         if (digit == 0xFF)
         {
@@ -95,11 +97,6 @@ static constexpr void base32_to_sha1(uint8_t* out, char const* in, size_t const 
 
             out[offset] |= digit << (8 - index);
         }
-    }
-
-    while (offset < 20)
-    {
-        out[offset++] = '\0';
     }
 }
 
