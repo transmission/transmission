@@ -50,7 +50,7 @@ void tr_cpConstruct(tr_completion*, tr_torrent*);
 
 void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* blocks);
 
-static inline void tr_cpDestruct(tr_completion* cp)
+constexpr void tr_cpDestruct(tr_completion* cp)
 {
     tr_bitfieldDestruct(&cp->blockBitfield);
 }
@@ -73,17 +73,17 @@ uint64_t tr_cpLeftUntilDone(tr_completion const*);
 
 void tr_cpGetAmountDone(tr_completion const* completion, float* tab, int tabCount);
 
-static inline uint64_t tr_cpHaveTotal(tr_completion const* cp)
+constexpr uint64_t tr_cpHaveTotal(tr_completion const* cp)
 {
     return cp->sizeNow;
 }
 
-static inline bool tr_cpHasAll(tr_completion const* cp)
+constexpr bool tr_cpHasAll(tr_completion const* cp)
 {
     return tr_torrentHasMetadata(cp->tor) && tr_bitfieldHasAll(&cp->blockBitfield);
 }
 
-static inline bool tr_cpHasNone(tr_completion const* cp)
+constexpr bool tr_cpHasNone(tr_completion const* cp)
 {
     return !tr_torrentHasMetadata(cp->tor) || tr_bitfieldHasNone(&cp->blockBitfield);
 }
@@ -100,7 +100,7 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const*, tr_piece_index_t);
 
 size_t tr_cpMissingBytesInPiece(tr_completion const*, tr_piece_index_t);
 
-static inline bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
+constexpr bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
 {
     return tr_cpMissingBlocksInPiece(cp, i) == 0;
 }
@@ -111,7 +111,7 @@ static inline bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_
 
 void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t i);
 
-static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
+constexpr bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
 {
     return tr_bitfieldHas(&cp->blockBitfield, i);
 }
@@ -124,7 +124,7 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t);
 
 void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count);
 
-static inline void tr_cpInvalidateDND(tr_completion* cp)
+constexpr void tr_cpInvalidateDND(tr_completion* cp)
 {
     cp->sizeWhenDoneIsDirty = true;
 }

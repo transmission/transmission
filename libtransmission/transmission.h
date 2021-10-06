@@ -1222,7 +1222,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf);
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
  */
-static inline char* tr_torrentGetMagnetLink(tr_torrent const* tor)
+constexpr char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
     return tr_torrentInfoGetMagnetLink(tr_torrentInfo(tor));
 }
@@ -1640,7 +1640,7 @@ struct tr_info
     bool isFolder;
 };
 
-static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
+constexpr bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
     tr_info const* const inf = tr_torrentInfo(tor);
     return (inf != nullptr) && (inf->fileCount > 0);
@@ -1885,7 +1885,7 @@ TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 /** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
-static inline bool tr_isDirection(tr_direction d)
+constexpr bool tr_isDirection(tr_direction d)
 {
     return d == TR_UP || d == TR_DOWN;
 }

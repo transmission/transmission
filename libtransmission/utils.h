@@ -202,7 +202,7 @@ char* tr_strdup(void const* in);
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
-static inline bool tr_str_is_empty(char const* value)
+constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
 }
@@ -354,7 +354,7 @@ static inline time_t tr_time(void)
 }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
-static inline void tr_timeUpdate(time_t now)
+constexpr void tr_timeUpdate(time_t now)
 {
     __tr_current_time = now;
 }
