@@ -208,7 +208,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
     }
     else
     {
-        char* tmp = tr_new(char, len + 1);
+        auto* tmp = tr_new(char, len + 1);
         memcpy(tmp, bytes, len);
         tmp[len] = '\0';
         str->type = TR_STRING_TYPE_HEAP;
