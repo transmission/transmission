@@ -247,10 +247,12 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
         switch (io->priority)
         {
         case TR_PRI_HIGH:
-            tr_ptrArrayAppend(&high, io); /* fall through */
+            tr_ptrArrayAppend(&high, io);
+            [[fallthrough]];
 
         case TR_PRI_NORMAL:
-            tr_ptrArrayAppend(&normal, io); /* fall through */
+            tr_ptrArrayAppend(&normal, io);
+            [[fallthrough]];
 
         default:
             tr_ptrArrayAppend(&low, io);

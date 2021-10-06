@@ -161,8 +161,7 @@ static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 
     case GTK_RESPONSE_ACCEPT:
         addTorrent(ui);
-
-        /* fall-through */
+        [[fallthrough]];
 
     case GTK_RESPONSE_CLOSE:
         gtk_widget_destroy(ui->builder->result ? GTK_WIDGET(d) : ui->dialog);

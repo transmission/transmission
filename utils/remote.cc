@@ -2112,9 +2112,7 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
                         {
                             tr_snprintf(id, sizeof(id), "%" PRId64, i);
                         }
-
-                        /* fall-through to default: to give success or failure msg */
-                        TR_GNUC_FALLTHROUGH;
+                        [[fallthrough]];
                     }
 
                 default:

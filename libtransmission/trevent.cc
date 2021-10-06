@@ -120,8 +120,8 @@ static int piperead(tr_pipe_end_t s, void* buf, int len)
         case WSAECONNRESET:
             /* EOF on the pipe! (win32 socket based implementation) */
             ret = 0;
+            [[fallthrough]];
 
-        /* fall through */
         default:
             errno = werror;
             break;
