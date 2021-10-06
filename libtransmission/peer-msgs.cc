@@ -250,7 +250,7 @@ struct tr_peerMsgs
 ***
 **/
 
-static inline tr_session* getSession(struct tr_peerMsgs* msgs)
+static constexpr tr_session* getSession(struct tr_peerMsgs* msgs)
 {
     return msgs->torrent->session;
 }
@@ -2283,7 +2283,7 @@ static void pexAddedCb(void const* vpex, void* userData)
     }
 }
 
-static inline void pexDroppedCb(void const* vpex, void* userData)
+static constexpr void pexDroppedCb(void const* vpex, void* userData)
 {
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
@@ -2294,7 +2294,7 @@ static inline void pexDroppedCb(void const* vpex, void* userData)
     }
 }
 
-static inline void pexElementCb(void const* vpex, void* userData)
+static constexpr void pexElementCb(void const* vpex, void* userData)
 {
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);

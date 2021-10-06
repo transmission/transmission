@@ -257,8 +257,7 @@ void tr_peerConstruct(tr_peer* peer, tr_torrent const* tor)
     TR_ASSERT(peer != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
 
-    memset(peer, 0, sizeof(tr_peer));
-
+    *peer = {};
     peer->client = TR_KEY_NONE;
     peer->swarm = tor->swarm;
     tr_bitfieldConstruct(&peer->have, tor->info.pieceCount);
@@ -402,7 +401,7 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
 }
 
-static inline bool replicationExists(tr_swarm const* s)
+static constexpr bool replicationExists(tr_swarm const* s)
 {
     return s->pieceReplication != nullptr;
 }
@@ -582,7 +581,7 @@ static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 ****
 ***/
 
-static inline bool atomIsSeed(struct peer_atom const* atom)
+static constexpr bool atomIsSeed(struct peer_atom const* atom)
 {
     return (atom->flags & ADDED_F_SEED_FLAG) != 0;
 }
@@ -647,7 +646,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 *** struct block_request
 **/
 
-static int compareReqByBlock(void const* va, void const* vb)
+static constexpr int compareReqByBlock(void const* va, void const* vb)
 {
     auto const* const a = static_cast<struct block_request const*>(va);
     auto const* const b = static_cast<struct block_request const*>(vb);
@@ -841,7 +840,7 @@ static void updateEndgame(tr_swarm* s)
 *****
 ****/
 
-static inline void invalidatePieceSorting(tr_swarm* s)
+static constexpr void invalidatePieceSorting(tr_swarm* s)
 {
     s->pieceSortState = PIECES_UNSORTED;
 }
@@ -1029,7 +1028,7 @@ static void assertReplicationCountIsExact(Torrent* t)
 
 #endif
 
-static struct weighted_piece* pieceListLookup(tr_swarm* s, tr_piece_index_t index)
+static constexpr weighted_piece* pieceListLookup(tr_swarm* s, tr_piece_index_t index)
 {
     for (int i = 0; i < s->pieceCount; ++i)
     {
@@ -2942,7 +2941,7 @@ struct tr_rechoke_info
     int rechoke_state;
 };
 
-static int compare_rechoke_info(void const* va, void const* vb)
+static constexpr int compare_rechoke_info(void const* va, void const* vb)
 {
     auto const* const a = static_cast<struct tr_rechoke_info const*>(va);
     auto const* const b = static_cast<struct tr_rechoke_info const*>(vb);
@@ -4062,7 +4061,7 @@ static bool torrentWasRecentlyStarted(tr_torrent const* tor)
     return difftime(tr_time(), tor->startDate) < 120;
 }
 
-static inline uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
+static constexpr uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
 {
     value = value << (uint64_t)width;
     value |= addme;

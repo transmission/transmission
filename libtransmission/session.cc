@@ -1583,7 +1583,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
     return tr_bitfieldHas(&t->minutes, minute_of_the_week);
 }
 
-static inline tr_auto_switch_state_t autoSwitchState(bool enabled)
+static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
 {
     return enabled ? TR_AUTO_SWITCH_ON : TR_AUTO_SWITCH_OFF;
 }
