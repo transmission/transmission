@@ -20,7 +20,7 @@
 
 This can be done in multiple smaller passes:
 
-1. Satisfy clang-tidy
+1. Satisfy clang-tidy. `libtransmission/.clang-tidy`'s list of rules should eventually be expanded to a list similar to the one in `qt/.clang-tidy`.
 2. Group member functions and their parent structs
     - Use `namespace libtransmission`
     - Split large modules into smaller groups of files in a `libtransmission/<name>` subdirectories, with own
