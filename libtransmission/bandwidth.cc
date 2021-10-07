@@ -58,7 +58,7 @@ unsigned int tr_bandwidth::getSpeed_Bps(struct bratecontrol const* r, unsigned i
     return r->cache_val;
 }
 
-void tr_bandwidth::bytesUsed(uint64_t const now, struct bratecontrol* r, size_t size)
+void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, struct bratecontrol* r, size_t size)
 {
     if (r->transfers[r->newest].date + GRANULARITY_MSEC >= now)
     {
@@ -96,6 +96,10 @@ int tr_bandwidth::compareBandwidth(void const* va, void const* vb)
 ***/
 
 tr_bandwidth::tr_bandwidth(tr_bandwidth* newParent)
+    : band{}
+    , parent{ nullptr }
+    , children{}
+    , peer{ nullptr }
 {
     static unsigned int uniqueKey = 0;
 
@@ -325,7 +329,7 @@ unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int by
     return byteCount;
 }
 
-void tr_bandwidth::used(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
+void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -352,15 +356,15 @@ void tr_bandwidth::used(tr_direction dir, size_t byteCount, bool isPieceData, ui
 
 #endif
 
-    bytesUsed(now, &band_->raw, byteCount);
+    notifyBandwidthConsumedBytes(now, &band_->raw, byteCount);
 
     if (isPieceData)
     {
-        bytesUsed(now, &band_->piece, byteCount);
+        notifyBandwidthConsumedBytes(now, &band_->piece, byteCount);
     }
 
     if (this->parent != nullptr)
     {
-        this->parent->used(dir, byteCount, isPieceData, now);
+        this->parent->notifyBandwidthConsumed(dir, byteCount, isPieceData, now);
     }
 }

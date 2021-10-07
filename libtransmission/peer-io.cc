@@ -164,11 +164,11 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
-        io->bandwidth->used(TR_UP, payload, next->isPieceData, now);
+        io->bandwidth->notifyBandwidthConsumed(TR_UP, payload, next->isPieceData, now);
 
         if (overhead > 0)
         {
-            io->bandwidth->used(TR_UP, overhead, false, now);
+            io->bandwidth->notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
         if (io->didWrite != nullptr)
@@ -220,18 +220,18 @@ static void canReadWrapper(tr_peerIo* io)
             {
                 if (piece != 0)
                 {
-                    io->bandwidth->used(TR_DOWN, piece, true, now);
+                    io->bandwidth->notifyBandwidthConsumed(TR_DOWN, piece, true, now);
                 }
 
                 if (used != piece)
                 {
-                    io->bandwidth->used(TR_DOWN, used - piece, false, now);
+                    io->bandwidth->notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
                 }
             }
 
             if (overhead > 0)
             {
-                io->bandwidth->used(TR_UP, overhead, false, now);
+                io->bandwidth->notifyBandwidthConsumed(TR_UP, overhead, false, now);
             }
 
             switch (ret)
@@ -577,7 +577,7 @@ static void utp_on_overhead(void* vio, bool send, size_t count, int type)
 
     dbgmsg(io, "utp_on_overhead -- count is %zu", count);
 
-    io->bandwidth->used(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
+    io->bandwidth->notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
 static auto utp_function_table = UTPFunctionTable{
@@ -1454,7 +1454,7 @@ int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
         bytesUsed = tr_peerIoTryWrite(io, limit);
     }
 
-    dbgmsg(io, "flushing peer-io, direction %d, limit %zu, bytesUsed %d", (int)dir, limit, bytesUsed);
+    dbgmsg(io, "flushing peer-io, direction %d, limit %zu, notifyBandwidthConsumedBytes %d", (int)dir, limit, bytesUsed);
     return bytesUsed;
 }
 

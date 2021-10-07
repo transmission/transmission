@@ -287,7 +287,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
         uint32_t len;
         struct tr_webseed* w = task->webseed;
 
-        w->bandwidth.used(TR_DOWN, n_added, true, tr_time_msec());
+        w->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
         fire_client_got_piece_data(w, n_added);
         len = evbuffer_get_length(buf);
 

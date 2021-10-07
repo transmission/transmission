@@ -137,7 +137,7 @@ public:
      * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
      * This is is usually invoked by the peer-io after a read or write.
      */
-    void used(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now);
+    void notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now);
 
     /**
      * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
@@ -244,7 +244,7 @@ public:
 
 private:
     static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
-    static void bytesUsed(uint64_t now, struct bratecontrol* r, size_t size);
+    static void notifyBandwidthConsumedBytes(uint64_t now, struct bratecontrol* r, size_t size);
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
     static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir);
     void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec, tr_ptrArray* peer_pool);
