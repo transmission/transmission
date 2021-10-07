@@ -885,7 +885,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tor->incompleteDir = tr_strdup(dir);
     }
 
-    tr_bandwidthConstruct(&tor->bandwidth, &session->bandwidth);
+    tor->bandwidth.construct(&session->bandwidth);
 
     tor->bandwidth.priority = tr_ctorGetBandwidthPriority(ctor);
     tor->error = TR_STAT_OK;
@@ -1300,10 +1300,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peerFromCount[i];
     }
 
-    s->rawUploadSpeed_KBps = toSpeedKBps(tr_bandwidthGetRawSpeed_Bps(&tor->bandwidth, now, TR_UP));
-    s->rawDownloadSpeed_KBps = toSpeedKBps(tr_bandwidthGetRawSpeed_Bps(&tor->bandwidth, now, TR_DOWN));
-    pieceUploadSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&tor->bandwidth, now, TR_UP);
-    pieceDownloadSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&tor->bandwidth, now, TR_DOWN);
+    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth.getRawSpeed_Bps(now, TR_UP));
+    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth.getRawSpeed_Bps(now, TR_DOWN));
+    pieceUploadSpeed_Bps = tor->bandwidth.getPieceSpeed_Bps(now, TR_UP);
+    pieceDownloadSpeed_Bps = tor->bandwidth.getPieceSpeed_Bps(now, TR_DOWN);
     s->pieceUploadSpeed_KBps = toSpeedKBps(pieceUploadSpeed_Bps);
     s->pieceDownloadSpeed_KBps = toSpeedKBps(pieceDownloadSpeed_Bps);
 
@@ -1637,7 +1637,7 @@ static void freeTorrent(tr_torrent* tor)
 
     TR_ASSERT(queueIsSequenced(session));
 
-    tr_bandwidthDestruct(&tor->bandwidth);
+    tor->bandwidth.destruct();
 
     tr_metainfoFree(inf);
     delete tor;

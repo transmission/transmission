@@ -3191,7 +3191,7 @@ static inline bool isBandwidthMaxedOut(tr_bandwidth const* b, uint64_t const now
     }
     else
     {
-        unsigned int const got = tr_bandwidthGetPieceSpeed_Bps(b, now_msec, dir);
+        unsigned int const got = b->getPieceSpeed_Bps(now_msec, dir);
         unsigned int const want = tr_bandwidthGetDesiredSpeed_Bps(b, dir);
         return got >= want;
     }
@@ -3805,8 +3805,8 @@ static void bandwidthPulse(evutil_socket_t fd, short what, void* vmgr)
     pumpAllPeers(mgr);
 
     /* allocate bandwidth to the peers */
-    tr_bandwidthAllocate(&session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC);
-    tr_bandwidthAllocate(&session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC);
+    session->bandwidth.allocate(TR_UP, BANDWIDTH_PERIOD_MSEC);
+    session->bandwidth.allocate(TR_DOWN, BANDWIDTH_PERIOD_MSEC);
 
     /* torrent upkeep */
     for (auto* tor : session->torrents)

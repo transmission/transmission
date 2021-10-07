@@ -164,11 +164,11 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
-        tr_bandwidthUsed(&io->bandwidth, TR_UP, payload, next->isPieceData, now);
+        io->bandwidth.used(TR_UP, payload, next->isPieceData, now);
 
         if (overhead > 0)
         {
-            tr_bandwidthUsed(&io->bandwidth, TR_UP, overhead, false, now);
+            io->bandwidth.used(TR_UP, overhead, false, now);
         }
 
         if (io->didWrite != nullptr)
@@ -220,18 +220,18 @@ static void canReadWrapper(tr_peerIo* io)
             {
                 if (piece != 0)
                 {
-                    tr_bandwidthUsed(&io->bandwidth, TR_DOWN, piece, true, now);
+                    io->bandwidth.used(TR_DOWN, piece, true, now);
                 }
 
                 if (used != piece)
                 {
-                    tr_bandwidthUsed(&io->bandwidth, TR_DOWN, used - piece, false, now);
+                    io->bandwidth.used(TR_DOWN, used - piece, false, now);
                 }
             }
 
             if (overhead > 0)
             {
-                tr_bandwidthUsed(&io->bandwidth, TR_UP, overhead, false, now);
+                io->bandwidth.used(TR_UP, overhead, false, now);
             }
 
             switch (ret)
@@ -285,7 +285,7 @@ static void event_read_cb(evutil_socket_t fd, short event, void* vio)
 
     curlen = evbuffer_get_length(io->inbuf);
     howmuch = curlen >= max ? 0 : max - curlen;
-    howmuch = tr_bandwidthClamp(&io->bandwidth, TR_DOWN, howmuch);
+    howmuch = io->bandwidth.clamp(TR_DOWN, howmuch);
 
     dbgmsg(io, "libevent says this peer is ready to read");
 
@@ -378,7 +378,7 @@ static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 
     /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
-    howmuch = tr_bandwidthClamp(&io->bandwidth, dir, evbuffer_get_length(io->outbuf));
+    howmuch = io->bandwidth.clamp(dir, evbuffer_get_length(io->outbuf));
 
     /* if we don't have any bandwidth left, stop writing */
     if (howmuch < 1)
@@ -496,7 +496,7 @@ static size_t utp_get_rb_size(void* vio)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    size_t bytes = tr_bandwidthClamp(&io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE);
+    size_t bytes = io->bandwidth.clamp(TR_DOWN, UTP_READ_BUFFER_SIZE);
 
     dbgmsg(io, "utp_get_rb_size is saying it's ready to read %zu bytes", bytes);
     return UTP_READ_BUFFER_SIZE - bytes;
@@ -577,7 +577,7 @@ static void utp_on_overhead(void* vio, bool send, size_t count, int type)
 
     dbgmsg(io, "utp_on_overhead -- count is %zu", count);
 
-    tr_bandwidthUsed(&io->bandwidth, send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
+    io->bandwidth.used(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
 static auto utp_function_table = UTPFunctionTable{
@@ -680,8 +680,8 @@ static tr_peerIo* tr_peerIoNew(
     io->timeCreated = tr_time();
     io->inbuf = evbuffer_new();
     io->outbuf = evbuffer_new();
-    tr_bandwidthConstruct(&io->bandwidth, parent);
-    tr_bandwidthSetPeer(&io->bandwidth, io);
+    io->bandwidth.construct(parent);
+    io->bandwidth.setPeer(io);
     dbgmsg(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
 
     switch (socket.type)
@@ -921,7 +921,7 @@ static void io_dtor(void* vio)
 
     dbgmsg(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
-    tr_bandwidthDestruct(&io->bandwidth);
+    io->bandwidth.destruct();
     evbuffer_free(io->outbuf);
     evbuffer_free(io->inbuf);
     io_close_socket(io);
@@ -1094,7 +1094,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, TR_UP);
+    unsigned int const currentSpeed_Bps = io->bandwidth.getPieceSpeed_Bps(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);
@@ -1316,7 +1316,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 {
     int res = 0;
 
-    if ((howmuch = tr_bandwidthClamp(&io->bandwidth, TR_DOWN, howmuch)) != 0)
+    if ((howmuch = io->bandwidth.clamp(TR_DOWN, howmuch)) != 0)
     {
         switch (io->socket.type)
         {
@@ -1389,7 +1389,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
         howmuch = old_len;
     }
 
-    if ((howmuch = tr_bandwidthClamp(&io->bandwidth, TR_UP, howmuch)) != 0)
+    if ((howmuch = io->bandwidth.clamp(TR_UP, howmuch)) != 0)
     {
         switch (io->socket.type)
         {

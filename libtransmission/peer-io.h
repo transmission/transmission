@@ -302,19 +302,19 @@ static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_bandwidthSetParent(&io->bandwidth, parent);
+    io->bandwidth.setParent(parent);
 }
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
 static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
 {
-    return tr_bandwidthClamp(&io->bandwidth, dir, 1024) > 0;
+    return io->bandwidth.clamp(dir, 1024) > 0;
 }
 
 static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
 {
-    return tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, dir);
+    return io->bandwidth.getPieceSpeed_Bps(now, dir);
 }
 
 /**

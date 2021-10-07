@@ -636,7 +636,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
-    tr_bandwidthConstruct(&session->bandwidth, nullptr);
+    session->bandwidth.construct(nullptr);
     tr_variantInitList(&session->removedTorrents, 0);
 
     /* nice to start logging at the very beginning */
@@ -1891,12 +1891,12 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? tr_bandwidthGetPieceSpeed_Bps(&session->bandwidth, 0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth.getPieceSpeed_Bps(0, dir) : 0;
 }
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? tr_bandwidthGetRawSpeed_Bps(&session->bandwidth, 0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth.getRawSpeed_Bps(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -2112,7 +2112,7 @@ void tr_sessionClose(tr_session* session)
 
     /* free the session memory */
     tr_variantFree(&session->removedTorrents);
-    tr_bandwidthDestruct(&session->bandwidth);
+    session->bandwidth.destruct();
     tr_bitfieldDestruct(&session->turtle.minutes);
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);

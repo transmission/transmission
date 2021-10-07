@@ -97,7 +97,7 @@ struct tr_band
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidthClamp() before performing I/O to see how much
+ *   and call tr_bandwidth::clamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
 struct tr_bandwidth
@@ -110,8 +110,45 @@ struct tr_bandwidth
     tr_priority_t priority;
     int magicNumber;
     unsigned int uniqueKey;
-    tr_ptrArray children; /* struct tr_bandwidth */
+    tr_ptrArray children; /* struct tr_bandwidth, TODO: replace with std::vector<tr_bandwidth> */
     struct tr_peerIo* peer;
+
+    /**
+     * @brief clamps byteCount down to a number that this bandwidth will allow to be consumed
+    */
+    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byteCount) const;
+
+    void setPeer(tr_peerIo* peer);
+
+    /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
+    unsigned int getRawSpeed_Bps(uint64_t const now, tr_direction const dir) const;
+
+    /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
+    unsigned int getPieceSpeed_Bps(uint64_t const now, tr_direction const dir) const;
+
+    /**
+     * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
+     * This is is usually invoked by the peer-io after a read or write.
+     */
+    void used(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now);
+
+    /**
+     * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
+     */
+    void allocate(tr_direction dir, unsigned int period_msec);
+
+    void setParent(tr_bandwidth* parent);
+
+    void construct(tr_bandwidth* parent);
+    void destruct();
+
+private:
+    static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
+    static void bytesUsed(uint64_t const now, struct bratecontrol* r, size_t size);
+    [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
+    static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir);
+    void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec, tr_ptrArray* peer_pool);
+    static int compareBandwidth(void const* va, void const* vb);
 };
 
 /**
@@ -173,32 +210,6 @@ constexpr bool tr_bandwidthIsLimited(tr_bandwidth const* bandwidth, tr_direction
     return bandwidth->band[dir].isLimited;
 }
 
-/**
- * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
- */
-void tr_bandwidthAllocate(tr_bandwidth* bandwidth, tr_direction direction, unsigned int period_msec);
-
-/**
- * @brief clamps byteCount down to a number that this bandwidth will allow to be consumed
- */
-unsigned int tr_bandwidthClamp(tr_bandwidth const* bandwidth, tr_direction direction, unsigned int byteCount);
-
-/******
-*******
-******/
-
-/** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* bandwidth, uint64_t const now, tr_direction const direction);
-
-/** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* bandwidth, uint64_t const now, tr_direction const direction);
-
-/**
- * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
- * This is is usually invoked by the peer-io after a read or write.
- */
-void tr_bandwidthUsed(tr_bandwidth* bandwidth, tr_direction direction, size_t byteCount, bool isPieceData, uint64_t now);
-
 /******
 *******
 ******/
@@ -226,11 +237,5 @@ constexpr bool tr_bandwidthAreParentLimitsHonored(tr_bandwidth const* bandwidth,
 
     return bandwidth->band[direction].honorParentLimits;
 }
-
-/******
-*******
-******/
-
-void tr_bandwidthSetPeer(tr_bandwidth* bandwidth, struct tr_peerIo* peerIo);
 
 /* @} */
