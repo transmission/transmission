@@ -67,7 +67,7 @@ export class Prefs extends EventTarget {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
     // eslint-disable-next-line unicorn/no-document-cookie
-    document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
+    document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}`;
   }
 
   static _getCookie(key, fallback) {
