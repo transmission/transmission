@@ -13,7 +13,7 @@
 #endif
 
 #include <array>
-#include <vector>
+#include <unordered_set>
 
 #include "transmission.h"
 #include "ptrarray.h"
@@ -110,8 +110,7 @@ private:
     tr_priority_t priority = 0;
     std::array<struct tr_band, 2> band;
     struct tr_bandwidth* parent;
-    unsigned int uniqueKey;
-    tr_ptrArray children; // of tr_bandwidth
+    std::unordered_set<tr_bandwidth *> children;
     struct tr_peerIo* peer;
 
 public:
@@ -122,7 +121,6 @@ public:
     ~tr_bandwidth()
     {
         this->setParent(nullptr);
-        tr_ptrArrayDestruct(&this->children, nullptr);
     }
 
     /**
@@ -248,7 +246,6 @@ private:
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
     static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir);
     void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec, tr_ptrArray* peer_pool);
-    static int compareBandwidth(void const* va, void const* vb);
 };
 
 /* @} */

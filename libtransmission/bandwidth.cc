@@ -79,18 +79,6 @@ void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, struct brate
     r->cache_time = 0;
 }
 
-/******
-*******
-*******
-******/
-
-int tr_bandwidth::compareBandwidth(void const* va, void const* vb)
-{
-    auto const* a = static_cast<tr_bandwidth const*>(va);
-    auto const* b = static_cast<tr_bandwidth const*>(vb);
-    return a->uniqueKey - b->uniqueKey;
-}
-
 /***
 ****
 ***/
@@ -101,10 +89,7 @@ tr_bandwidth::tr_bandwidth(tr_bandwidth* newParent)
     , children{}
     , peer{ nullptr }
 {
-    static unsigned int uniqueKey = 0;
-
     this->children = {};
-    this->uniqueKey = uniqueKey++;
     this->band[TR_UP].honorParentLimits = true;
     this->band[TR_DOWN].honorParentLimits = true;
     this->setParent(newParent);
@@ -120,17 +105,16 @@ void tr_bandwidth::setParent(tr_bandwidth* newParent)
 
     if (this->parent != nullptr)
     {
-        tr_ptrArrayRemoveSortedPointer(&this->parent->children, this, tr_bandwidth::compareBandwidth);
+        this->parent->children.erase(this);
         this->parent = nullptr;
     }
 
     if (newParent != nullptr)
     {
         TR_ASSERT(newParent->parent != this);
+        TR_ASSERT(newParent->children.find(this) == newParent->children.end()); // does not exist
 
-        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, tr_bandwidth::compareBandwidth) == nullptr);
-        tr_ptrArrayInsertSorted(&newParent->children, this, tr_bandwidth::compareBandwidth);
-        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, tr_bandwidth::compareBandwidth) == this);
+        newParent->children.insert(this);
         this->parent = newParent;
     }
 }
@@ -163,13 +147,10 @@ void tr_bandwidth::allocateBandwidth(
         tr_ptrArrayAppend(peer_pool, this->peer);
     }
 
-    /* traverse & repeat for the subtree
-     * TODO: Replace with std::for_each over std::vector */
-    auto** children_ = (struct tr_bandwidth**)tr_ptrArrayBase(&this->children);
-    struct tr_bandwidth** const end = children_ + tr_ptrArraySize(&this->children);
-    for (; children_ != end; ++children_)
+    // traverse & repeat for the subtree
+    for (auto child: this->children)
     {
-        (*children_)->allocateBandwidth(priority_, dir, period_msec, peer_pool);
+        child->allocateBandwidth(priority_, dir, period_msec, peer_pool);
     }
 }
 
