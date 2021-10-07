@@ -177,6 +177,8 @@ struct verify_node
     tr_verify_done_func callback_func;
     void* callback_data;
     uint64_t current_size;
+    bool* completion_signal; // if != nullptr, set to true once work is done
+    bool request_abort;
 
     int compare(verify_node const& that) const
     {
@@ -207,7 +209,6 @@ static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
 static auto& verifyList{ *new std::set<verify_node>{} };
 static tr_thread* verifyThread = nullptr;
-static bool stopCurrent = false;
 
 static tr_lock* getVerifyLock(void)
 {
@@ -230,7 +231,6 @@ static void verifyThreadFunc(void* user_data)
         bool changed = false;
 
         tr_lockLock(getVerifyLock());
-        stopCurrent = false;
         if (std::empty(verifyList))
         {
             currentNode.torrent = nullptr;
@@ -245,18 +245,23 @@ static void verifyThreadFunc(void* user_data)
         tr_torrent* tor = currentNode.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
         tr_torrentSetVerifyState(tor, TR_VERIFY_NOW);
-        changed = verifyTorrent(tor, &stopCurrent);
+        changed = verifyTorrent(tor, &currentNode.request_abort);
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
-        if (!stopCurrent && changed)
+        if (!currentNode.request_abort && changed)
         {
             tr_torrentSetDirty(tor);
         }
 
         if (currentNode.callback_func != nullptr)
         {
-            (*currentNode.callback_func)(tor, stopCurrent, currentNode.callback_data);
+            (*currentNode.callback_func)(tor, currentNode.request_abort, currentNode.callback_data);
+        }
+
+        if (currentNode.completion_signal != nullptr)
+        {
+            *currentNode.completion_signal = true;
         }
     }
 
@@ -274,6 +279,8 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.callback_func = callback_func;
     node.callback_data = callback_data;
     node.current_size = tr_torrentGetCurrentSizeOnDisk(tor);
+    node.request_abort = false;
+    node.completion_signal = nullptr;
 
     tr_lockLock(getVerifyLock());
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
@@ -296,9 +303,11 @@ void tr_verifyRemove(tr_torrent* tor)
 
     if (tor == currentNode.torrent)
     {
-        stopCurrent = true;
+        bool completed = false;
+        currentNode.completion_signal = &completed;
+        currentNode.request_abort = true;
 
-        while (stopCurrent)
+        while (!completed)
         {
             tr_lockUnlock(lock);
             tr_wait_msec(100);
@@ -334,7 +343,7 @@ void tr_verifyClose(tr_session* session)
 
     tr_lockLock(getVerifyLock());
 
-    stopCurrent = true;
+    currentNode.request_abort = true;
     verifyList.clear();
 
     tr_lockUnlock(getVerifyLock());
