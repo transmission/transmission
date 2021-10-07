@@ -21,7 +21,7 @@
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 388>{ "",
+auto constexpr my_static = std::array<std::string_view, 389>{ "",
                                                               "activeTorrentCount",
                                                               "activity-date",
                                                               "activityDate",
@@ -402,6 +402,7 @@ auto constexpr my_static = std::array<std::string_view, 388>{ "",
                                                               "ut_recommend",
                                                               "utp-enabled",
                                                               "v",
+                                                              "verify-threads",
                                                               "version",
                                                               "wanted",
                                                               "warning message",

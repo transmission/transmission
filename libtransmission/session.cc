@@ -414,6 +414,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
+    tr_variantDictAddInt(d, TR_KEY_verify_threads, 1);
 }
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
@@ -487,6 +488,7 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
+    tr_variantDictAddInt(d, TR_KEY_verify_threads, tr_verifyGetParallelism(s->verifier));
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
@@ -1168,6 +1170,15 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
     {
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
+    }
+
+    /**
+    ***  Verifier
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_verify_threads, &i))
+    {
+        tr_verifySetParallelism(session->verifier, i);
     }
 
     data->done = true;

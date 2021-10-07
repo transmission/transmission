@@ -403,6 +403,7 @@ enum
     TR_KEY_ut_recommend,
     TR_KEY_utp_enabled,
     TR_KEY_v,
+    TR_KEY_verify_threads,
     TR_KEY_version,
     TR_KEY_wanted,
     TR_KEY_warning_message,
