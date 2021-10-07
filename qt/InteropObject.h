@@ -10,9 +10,12 @@
 
 #include <QObject>
 
+#include "Macros.h"
+
 class InteropObject : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(InteropObject)
 
 #ifdef ENABLE_DBUS_INTEROP
     Q_CLASSINFO("D-Bus Interface", "com.transmissionbt.Transmission")
@@ -27,9 +30,9 @@ class InteropObject : public QObject
 #endif
 
 public:
-    InteropObject(QObject* parent = nullptr);
+    explicit InteropObject(QObject* parent = nullptr);
 
 public slots:
-    bool PresentWindow();
-    bool AddMetainfo(QString const& metainfo);
+    bool PresentWindow() const;
+    bool AddMetainfo(QString const& metainfo) const;
 };

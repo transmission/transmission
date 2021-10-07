@@ -16,7 +16,7 @@ public:
     enum
     {
         TrackerStatsList = QVariant::UserType,
-        PeerList = QVariant::UserType,
+        PeerList,
         FileList,
         FilterModeType,
         SortModeType

@@ -26,18 +26,19 @@
 
 @interface URLSheetWindowController : NSWindowController
 {
-    IBOutlet NSTextField * fLabelField;
-    IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fOpenButton, * fCancelButton;
+    IBOutlet NSTextField* fLabelField;
+    IBOutlet NSTextField* fTextField;
+    IBOutlet NSButton* fOpenButton;
+    IBOutlet NSButton* fCancelButton;
 
-    Controller * fController;
+    Controller* fController;
 }
 
-- (id) initWithController: (Controller *) controller;
+- (instancetype)initWithController:(Controller*)controller;
 
-- (void) openURLEndSheet: (id) sender;
-- (void) openURLCancelEndSheet: (id) sender;
+- (void)openURLEndSheet:(id)sender;
+- (void)openURLCancelEndSheet:(id)sender;
 
-- (NSString *) urlString;
+@property(nonatomic, readonly) NSString* urlString;
 
 @end

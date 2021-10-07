@@ -1,11 +1,11 @@
 project(trmacql)
 
 set(${PROJECT_NAME}_SOURCES
-    ../NSApplicationAdditions.m
-    ../NSStringAdditions.m
-    GeneratePreviewForURL.m
-    GenerateThumbnailForURL.m
-    main.c
+    ../NSApplicationAdditions.mm
+    ../NSStringAdditions.mm
+    GeneratePreviewForURL.mm
+    GenerateThumbnailForURL.mm
+    main.cc
 )
 
 set(${PROJECT_NAME}_HEADERS

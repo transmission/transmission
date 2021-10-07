@@ -29,9 +29,11 @@
     BOOL fHoverRow;
 }
 
-- (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
-            mouseLocation: (NSPoint) mouseLocation;
+- (void)addTrackingAreasForView:(NSView*)controlView
+                         inRect:(NSRect)cellFrame
+                   withUserInfo:(NSDictionary*)userInfo
+                  mouseLocation:(NSPoint)mouseLocation;
 
-- (void) setHovered: (BOOL) hovered;
+- (void)setHovered:(BOOL)hovered;
 
 @end

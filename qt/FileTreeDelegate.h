@@ -10,17 +10,19 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class FileTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeDelegate)
 
 public:
-    FileTreeDelegate(QObject* parent = nullptr) :
-        QItemDelegate(parent)
+    explicit FileTreeDelegate(QObject* parent = nullptr)
+        : QItemDelegate(parent)
     {
     }
 
-public:
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
     void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;

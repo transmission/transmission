@@ -15,9 +15,9 @@
 #include <inttypes.h>
 #include "peer-common.h"
 
+class tr_peer;
 struct tr_address;
 struct tr_bitfield;
-struct tr_peer;
 struct tr_peerIo;
 struct tr_torrent;
 
@@ -26,49 +26,53 @@ struct tr_torrent;
  * @{
  */
 
-typedef struct tr_peerMsgs tr_peerMsgs;
+class tr_peerMsgs : public tr_peer
+{
+public:
+    tr_peerMsgs(tr_torrent* torrent, peer_atom* atom_in)
+        : tr_peer{ torrent, atom_in }
+    {
+    }
 
-#define PEER_MSGS(o) (tr_peerMsgsCast(o))
+    virtual ~tr_peerMsgs() override = default;
 
-bool tr_isPeerMsgs(void const* msgs);
+    virtual bool is_peer_choked() const = 0;
+    virtual bool is_peer_interested() const = 0;
+    virtual bool is_client_choked() const = 0;
+    virtual bool is_client_interested() const = 0;
 
-tr_peerMsgs* tr_peerMsgsCast(void* msgs);
+    virtual bool is_utp_connection() const = 0;
+    virtual bool is_encrypted() const = 0;
+    virtual bool is_incoming_connection() const = 0;
 
-tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr_peer_callback callback, void* callback_data);
+    virtual bool is_active(tr_direction direction) const = 0;
+    virtual void update_active(tr_direction direction) = 0;
 
-bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs);
+    virtual time_t get_connection_age() const = 0;
+    virtual bool is_reading_block(tr_block_index_t block) const = 0;
 
-bool tr_peerMsgsIsPeerInterested(tr_peerMsgs const* msgs);
+    virtual void cancel_block_request(tr_block_index_t block) = 0;
 
-bool tr_peerMsgsIsClientChoked(tr_peerMsgs const* msgs);
+    virtual void set_choke(bool peer_is_choked) = 0;
+    virtual void set_interested(bool client_is_interested) = 0;
 
-bool tr_peerMsgsIsClientInterested(tr_peerMsgs const* msgs);
+    virtual void pulse() = 0;
 
-bool tr_peerMsgsIsActive(tr_peerMsgs const* msgs, tr_direction direction);
+    virtual void on_piece_completed(tr_piece_index_t) = 0;
+};
 
-void tr_peerMsgsUpdateActive(tr_peerMsgs* msgs, tr_direction direction);
+tr_peerMsgs* tr_peerMsgsNew(
+    tr_torrent* torrent,
+    peer_atom* atom,
+    tr_peerIo* io,
+    tr_peer_callback callback,
+    void* callback_data);
 
-time_t tr_peerMsgsGetConnectionAge(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs);
-
-bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs);
-
-void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peerIsChoked);
-
-bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block);
-
-void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool clientIsInterested);
-
-void tr_peerMsgsHave(tr_peerMsgs* msgs, uint32_t pieceIndex);
-
-void tr_peerMsgsPulse(tr_peerMsgs* msgs);
-
-void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block);
-
-size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSize, size_t pieceCount, uint8_t const* infohash,
+size_t tr_generateAllowedSet(
+    tr_piece_index_t* setmePieces,
+    size_t desiredSetSize,
+    size_t pieceCount,
+    uint8_t const* infohash,
     struct tr_address const* addr);
 
 /* @} */

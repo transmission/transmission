@@ -10,7 +10,8 @@
 
 #include <memory>
 
-class QAxObject;
+#include <QAxObject>
+
 class QObject;
 class QString;
 class QVariant;
@@ -19,15 +20,14 @@ class ComInteropHelper
 {
 public:
     ComInteropHelper();
-    ~ComInteropHelper();
 
     bool isConnected() const;
 
-    QVariant addMetainfo(QString const& metainfo);
+    QVariant addMetainfo(QString const& metainfo) const;
 
     static void initialize();
     static void registerObject(QObject* parent);
 
 private:
-    std::unique_ptr<QAxObject> m_client;
+    std::unique_ptr<QAxObject> client_;
 };

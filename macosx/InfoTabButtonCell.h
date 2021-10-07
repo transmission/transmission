@@ -24,13 +24,13 @@
 
 @interface InfoTabButtonCell : NSButtonCell
 {
-    NSImage * fIcon;
+    NSImage* fIcon;
 
     BOOL fSelected;
 }
 
-- (void) setSelectedTab: (BOOL) selected;
+- (void)setSelectedTab:(BOOL)selected;
 
-- (void) reloadAppearance;
+- (void)reloadAppearance;
 
 @end

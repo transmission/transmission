@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -8,7 +9,6 @@
 	<body>
 		<div id="mainbox">
 			<div id="banner">
-				<a name="menus"></a>
 				<div id="machelp">
 				<a class="bread" href="../index.html">Transmission Help</a>
 				</div>
@@ -16,13 +16,13 @@
 				<a class="leftborder" href="../html/Index2.html">Index</a></div>
 				</div>
 			</div>
-			<div id="pagetitle">
+			<div class="pagetitle">
 				<h1>I cannot get Transmission's port to open! </h1>
 			</div>
-			
+
 			<p>If your port is still not open, even after you have enabled automatic port forwarding, here are some tips you can use which may get it working.
 
-				<div summary="To do this" id="taskbox">
+				<div class="taskbox">
 				<p>If you are still having problems, open the Message Log (in the Window menu) and post the debug output on the <a href="https://forum.transmissionbt.com/viewforum.php?f=4">support forums</a>.
 				<ol>
 					<li>Pause your torrents</li>
@@ -31,8 +31,8 @@
 					<li>Post the resultant output</li>
 				</ol>
 				</div>
-				
-			<div id="pagetitle">
+
+			<div class="pagetitle">
 				<h1>UPnP</h1>
 			</div>
 			<p>For UPnP compatible routers, make sure:
@@ -41,13 +41,13 @@
 				<li>DMZ mode is disabled.</li>
 				<li>The port has not already been forwarded manually.
 			</ul>
-			
-			<div id="pagetitle">
+
+			<div class="pagetitle">
 				<h1>AirPort</h1>
 			</div>
 			<p>If you have an Apple AirPort, make sure NAT-PMP is enabled.
-				
-					<div summary="To do this" id="taskbox">
+
+					<div class="taskbox">
 					<ol>
 						<li>Open AirPort Utility (located in /Applications/Utilities)</li>
 						<li>Select your base station, and then choose Manual Setup from the Base Station menu. Enter the base station password if necessary.</li>
@@ -55,22 +55,22 @@
 						<li>Click "Update".</li>
 					</ol>
 					</div>
-					
+
 			</div>
 
 		</div>
-					<div id="pagetitle">
+					<div class="pagetitle">
 						<h1>Double NAT</h1>
 					</div>
 					<p>Another possible reason your port remains closed could be because your router is not the only device on the network which needs to be configured.
 
-					<p>For example, your network might resemble the following: <b>ADSL modem/router --> AirPort extreme --> MacBook.</b>
+					<p>For example, your network might resemble the following: <em>ADSL modem/router --> AirPort extreme --> MacBook.</em>
 
 					<p>If you have multiple routers in your home network (such as in the example above), you have two options. The easiest way is to turn one of the routers into 'Bridge mode' which means you then only have to configure one device rather than all of them. So, in our above example, we would set the AirPort extreme to 'Bridge'. See your router's help documentation for instructions.
-												
+
 					<p>The second way is to map Transmission's port on all of the devices on your network.
 					Transmission can only automatically port map the router the computer is directly connected to. Any others in between this router and your modem will have to be <a href="pfrouter.html">forwarded manually</a>. For detailed instructions, <a href="http://www.portforward.com/help/doublerouterportforwarding.htm">click here</a>.
-					
+
 					<p>Finally make sure the OS X firewall is either disabled, or you have <a href="pffirewall.html">allowed Transmission's port</a>.
 					The firewall can cause the port to remain closed, even if it has been successfully mapped by the router(s).
 					</div>
