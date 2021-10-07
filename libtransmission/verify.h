@@ -21,6 +21,10 @@ struct tr_verifier;
 
 tr_verifier* tr_verifyInit();
 
+int tr_verifyGetParallelism(tr_verifier const* v);
+
+void tr_verifySetParallelism(tr_verifier* v, int parallelism);
+
 void tr_verifyAdd(tr_verifier* v, tr_torrent* tor, tr_verify_done_func callback_func, void* callback_user_data);
 
 void tr_verifyRemove(tr_verifier* v, tr_torrent* tor);

@@ -281,6 +281,38 @@ tr_verifier* tr_verifyInit()
     return new tr_verifier;
 }
 
+int tr_verifyGetParallelism(tr_verifier const* v)
+{
+    return v->maxVerificationThreads;
+}
+
+void tr_verifySetParallelism(tr_verifier* v, int parallelism)
+{
+    parallelism = std::clamp(parallelism, 1, 128);
+
+    tr_lockLock(v->lock);
+
+    v->maxVerificationThreads = parallelism;
+
+    // If any work is currently pending and we can start more threads, do so
+    // now to pick up the queue. We spawn at most as many threads as there are
+    // items currently pending.
+    for (auto const& item : v->pendingSet)
+    {
+        TR_UNUSED(item);
+
+        if (v->activeVerificationThreads >= v->maxVerificationThreads)
+        {
+            break;
+        }
+
+        ++v->activeVerificationThreads;
+        tr_threadNew(verifyThreadFunc, v);
+    }
+
+    tr_lockUnlock(v->lock);
+}
+
 void tr_verifyAdd(tr_verifier* v, tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
