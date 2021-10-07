@@ -10,7 +10,7 @@
 - Prefer `std::` tools over bespoke ones. For example, use `std::vector`
   instead of tr_ptrArray. Redundant bespoke code should be removed.
 
-- Consider ripple effects before adding C++ into public headers. Will it break C code that #includes that header?
+- Consider ripple effects before adding C++ into public headers. Will it break C code that #includes that header? If you think it might, [consult with downstream projects](https://github.com/transmission/transmission/issues/1826) to see if this is a problem for them.
 
 ## Checklist for modernization of a module
 
