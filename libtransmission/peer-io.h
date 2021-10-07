@@ -91,7 +91,9 @@ struct tr_peerIo
     tr_net_error_cb gotError;
     void* userData;
 
-    struct tr_bandwidth bandwidth;
+    // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    struct tr_bandwidth *bandwidth;
     tr_crypto crypto;
 
     struct evbuffer* inbuf;
@@ -301,19 +303,19 @@ static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    io->bandwidth.setParent(parent);
+    io->bandwidth->setParent(parent);
 }
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
 static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
 {
-    return io->bandwidth.clamp(dir, 1024) > 0;
+    return io->bandwidth->clamp(dir, 1024) > 0;
 }
 
 static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
 {
-    return io->bandwidth.getPieceSpeed_Bps(now, dir);
+    return io->bandwidth->getPieceSpeed_Bps(now, dir);
 }
 
 /**

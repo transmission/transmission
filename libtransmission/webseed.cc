@@ -64,6 +64,7 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
+        , bandwidth(tor->bandwidth)
     {
         // init parent bits
         tr_bitfieldSetHasAll(&have);
@@ -71,7 +72,6 @@ public:
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
 
-        bandwidth.construct(&tor->bandwidth);
         timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
@@ -83,7 +83,6 @@ public:
         tasks.clear();
 
         event_free(timer);
-        bandwidth.destruct();
     }
 
     bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
@@ -110,7 +109,7 @@ public:
     tr_peer_callback const callback;
     void* const callback_data;
 
-    tr_bandwidth bandwidth = {};
+    tr_bandwidth bandwidth;
     std::set<tr_webseed_task*> tasks;
     struct event* timer = nullptr;
     int consecutive_failures = 0;

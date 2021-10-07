@@ -12,6 +12,9 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
+#include <vector>
+
 #include "transmission.h"
 #include "ptrarray.h"
 #include "tr-assert.h"
@@ -104,20 +107,29 @@ struct tr_bandwidth
     /* these are PRIVATE IMPLEMENTATION details that should not be touched.
      * it's included in the header for inlining and composition. */
 private:
-    tr_priority_t priority;
-
-private:
-    struct tr_band band[2];
+    tr_priority_t priority = 0;
+    std::array<struct tr_band, 2> band;
     struct tr_bandwidth* parent;
     unsigned int uniqueKey;
-    tr_ptrArray children; /* struct tr_bandwidth, TODO: replace with std::vector<tr_bandwidth> */
+    tr_ptrArray children; // of tr_bandwidth
     struct tr_peerIo* peer;
 
 public:
+    explicit tr_bandwidth(tr_bandwidth* newParent);
+
+    tr_bandwidth(): tr_bandwidth(nullptr) {}
+
+    ~tr_bandwidth()
+    {
+        this->setParent(nullptr);
+        tr_ptrArrayDestruct(&this->children, nullptr);
+    }
+
+    /**
+     * * @brief Sets new peer, nullptr is allowed.
+     */
     void setPeer(tr_peerIo* newPeer)
     {
-        TR_ASSERT(newPeer == nullptr);
-
         this->peer = newPeer;
     }
 
@@ -133,9 +145,6 @@ public:
     void allocate(tr_direction dir, unsigned int period_msec);
 
     void setParent(tr_bandwidth* newParent);
-
-    void construct(tr_bandwidth* parent_);
-    void destruct();
 
     [[nodiscard]] tr_priority_t getPriority() const
     {

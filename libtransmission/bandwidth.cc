@@ -95,7 +95,7 @@ int tr_bandwidth::compareBandwidth(void const* va, void const* vb)
 ****
 ***/
 
-void tr_bandwidth::construct(tr_bandwidth* parent_)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* newParent)
 {
     static unsigned int uniqueKey = 0;
 
@@ -103,15 +103,7 @@ void tr_bandwidth::construct(tr_bandwidth* parent_)
     this->uniqueKey = uniqueKey++;
     this->band[TR_UP].honorParentLimits = true;
     this->band[TR_DOWN].honorParentLimits = true;
-    this->setParent(parent_);
-}
-
-void tr_bandwidth::destruct()
-{
-    this->setParent(nullptr);
-    tr_ptrArrayDestruct(&this->children, nullptr);
-
-    memset(this, ~0, sizeof(tr_bandwidth));
+    this->setParent(newParent);
 }
 
 /***
@@ -124,7 +116,7 @@ void tr_bandwidth::setParent(tr_bandwidth* newParent)
 
     if (this->parent != nullptr)
     {
-        tr_ptrArrayRemoveSortedPointer(&this->parent->children, this, compareBandwidth);
+        tr_ptrArrayRemoveSortedPointer(&this->parent->children, this, tr_bandwidth::compareBandwidth);
         this->parent = nullptr;
     }
 
@@ -132,9 +124,9 @@ void tr_bandwidth::setParent(tr_bandwidth* newParent)
     {
         TR_ASSERT(newParent->parent != this);
 
-        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, compareBandwidth) == nullptr);
-        tr_ptrArrayInsertSorted(&newParent->children, this, compareBandwidth);
-        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, compareBandwidth) == this);
+        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, tr_bandwidth::compareBandwidth) == nullptr);
+        tr_ptrArrayInsertSorted(&newParent->children, this, tr_bandwidth::compareBandwidth);
+        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, tr_bandwidth::compareBandwidth) == this);
         this->parent = newParent;
     }
 }

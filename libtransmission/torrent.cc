@@ -196,7 +196,7 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth.setDesiredSpeed_Bps(dir, Bps))
+    if (tor->bandwidth->setDesiredSpeed_Bps(dir, Bps))
     {
         tr_torrentSetDirty(tor);
     }
@@ -212,7 +212,7 @@ unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tor->bandwidth.getDesiredSpeed_Bps(dir);
+    return tor->bandwidth->getDesiredSpeed_Bps(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -228,7 +228,7 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth.setLimited(dir, do_use))
+    if (tor->bandwidth->setLimited(dir, do_use))
     {
         tr_torrentSetDirty(tor);
     }
@@ -238,14 +238,14 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth.isLimited(dir);
+    return tor->bandwidth->isLimited(dir);
 }
 
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool doUse)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth.honorParentLimits(TR_UP, doUse) || tor->bandwidth.honorParentLimits(TR_DOWN, doUse))
+    if (tor->bandwidth->honorParentLimits(TR_UP, doUse) || tor->bandwidth->honorParentLimits(TR_DOWN, doUse))
     {
         tr_torrentSetDirty(tor);
     }
@@ -255,7 +255,7 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth.areParentLimitsHonored(TR_UP);
+    return tor->bandwidth->areParentLimitsHonored(TR_UP);
 }
 
 /***
@@ -880,9 +880,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tor->incompleteDir = tr_strdup(dir);
     }
 
-    tor->bandwidth.construct(&session->bandwidth);
+    tor->bandwidth = new tr_bandwidth(session->bandwidth);
 
-    tor->bandwidth.setPriority(tr_ctorGetBandwidthPriority(ctor));
+    tor->bandwidth->setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
@@ -1295,10 +1295,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peerFromCount[i];
     }
 
-    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth.getRawSpeed_Bps(now, TR_UP));
-    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth.getRawSpeed_Bps(now, TR_DOWN));
-    pieceUploadSpeed_Bps = tor->bandwidth.getPieceSpeed_Bps(now, TR_UP);
-    pieceDownloadSpeed_Bps = tor->bandwidth.getPieceSpeed_Bps(now, TR_DOWN);
+    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeed_Bps(now, TR_UP));
+    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeed_Bps(now, TR_DOWN));
+    pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeed_Bps(now, TR_UP);
+    pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeed_Bps(now, TR_DOWN);
     s->pieceUploadSpeed_KBps = toSpeedKBps(pieceUploadSpeed_Bps);
     s->pieceDownloadSpeed_KBps = toSpeedKBps(pieceDownloadSpeed_Bps);
 
@@ -1632,7 +1632,7 @@ static void freeTorrent(tr_torrent* tor)
 
     TR_ASSERT(queueIsSequenced(session));
 
-    tor->bandwidth.destruct();
+    delete tor->bandwidth;
 
     tr_metainfoFree(inf);
     delete tor;
@@ -2438,7 +2438,7 @@ tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth.getPriority();
+    return tor->bandwidth->getPriority();
 }
 
 void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
@@ -2446,9 +2446,9 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));
 
-    if (tor->bandwidth.getPriority() != priority)
+    if (tor->bandwidth->getPriority() != priority)
     {
-        tor->bandwidth.setPriority(priority);
+        tor->bandwidth->setPriority(priority);
 
         tr_torrentSetDirty(tor);
     }

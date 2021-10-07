@@ -2054,7 +2054,7 @@ static bool myHandshakeDoneCB(
 
                 /* this steals its refcount too, which is balanced by our unref in peerDelete() */
                 tr_peerIo* stolen = tr_handshakeStealIO(handshake);
-                tr_peerIoSetParent(stolen, &s->tor->bandwidth);
+                tr_peerIoSetParent(stolen, s->tor->bandwidth);
                 createBitTorrentPeer(s->tor, stolen, atom, client);
 
                 success = true;
@@ -2116,7 +2116,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
         tr_peerIo* io;
         tr_handshake* handshake;
 
-        io = tr_peerIoNewIncoming(session, &session->bandwidth, addr, port, socket);
+        io = tr_peerIoNewIncoming(session, session->bandwidth, addr, port, socket);
 
         handshake = tr_handshakeNew(io, session->encryptionMode, myHandshakeDoneCB, manager);
 
@@ -3206,7 +3206,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
     bool const chokeAll = !tr_torrentIsPieceTransferAllowed(s->tor, TR_CLIENT_TO_PEER);
-    bool const isMaxedOut = isBandwidthMaxedOut(&s->tor->bandwidth, now, TR_UP);
+    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -3805,8 +3805,8 @@ static void bandwidthPulse(evutil_socket_t fd, short what, void* vmgr)
     pumpAllPeers(mgr);
 
     /* allocate bandwidth to the peers */
-    session->bandwidth.allocate(TR_UP, BANDWIDTH_PERIOD_MSEC);
-    session->bandwidth.allocate(TR_DOWN, BANDWIDTH_PERIOD_MSEC);
+    session->bandwidth->allocate(TR_UP, BANDWIDTH_PERIOD_MSEC);
+    session->bandwidth->allocate(TR_DOWN, BANDWIDTH_PERIOD_MSEC);
 
     /* torrent upkeep */
     for (auto* tor : session->torrents)
@@ -4213,7 +4213,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && isBandwidthMaxedOut(&tor->bandwidth, now_msec, TR_UP))
+        if (seeding && isBandwidthMaxedOut(tor->bandwidth, now_msec, TR_UP))
         {
             continue;
         }
@@ -4268,7 +4268,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
     io = tr_peerIoNewOutgoing(
         mgr->session,
-        &mgr->session->bandwidth,
+        mgr->session->bandwidth,
         &atom->addr,
         atom->port,
         s->tor->info.hash,
