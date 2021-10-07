@@ -6,10 +6,11 @@
  *
  */
 
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
+#include <algorithm>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 
 #include <windows.h>
 
@@ -27,19 +28,19 @@ enum tr_app_type
 
 static void set_system_error(tr_error** error, DWORD code, char const* what)
 {
-    if (error == NULL)
+    if (error == nullptr)
     {
         return;
     }
 
     char* message = tr_win32_format_message(code);
 
-    if (message == NULL)
+    if (message == nullptr)
     {
         message = tr_strdup_printf("Unknown error: 0x%08lx", code);
     }
 
-    if (what == NULL)
+    if (what == nullptr)
     {
         tr_error_set_literal(error, code, message);
     }
@@ -60,11 +61,11 @@ static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wcha
 
 static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* name_len)
 {
-    TR_ASSERT(part != NULL);
+    TR_ASSERT(part != nullptr);
 
     auto const* const equals_pos = wcschr(part, L'=');
 
-    if (equals_pos == NULL)
+    if (equals_pos == nullptr)
     {
         /* Invalid part */
         return false;
@@ -78,13 +79,13 @@ static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* 
         return false;
     }
 
-    if (full_len != NULL)
+    if (full_len != nullptr)
     {
         /* Includes terminating '\0' */
         *full_len = wcslen(part) + 1;
     }
 
-    if (name_len != NULL)
+    if (name_len != nullptr)
     {
         *name_len = (size_t)my_name_len;
     }
@@ -94,7 +95,7 @@ static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* 
 
 static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t const* rhs, size_t rhs_len)
 {
-    int diff = wcsnicmp(lhs, rhs, MIN(lhs_len, rhs_len));
+    int diff = wcsnicmp(lhs, rhs, std::min(lhs_len, rhs_len));
 
     if (diff == 0)
     {
@@ -129,14 +130,14 @@ static int compare_env_part_names(void const* vlhs, void const* vrhs)
 
 static wchar_t** to_wide_env(char const* const* env)
 {
-    if (env == NULL || env[0] == NULL)
+    if (env == nullptr || env[0] == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     size_t part_count = 0;
 
-    while (env[part_count] != NULL)
+    while (env[part_count] != nullptr)
     {
         ++part_count;
     }
@@ -148,7 +149,7 @@ static wchar_t** to_wide_env(char const* const* env)
         wide_env[i] = tr_win32_utf8_to_native(env[i], -1);
     }
 
-    wide_env[part_count] = NULL;
+    wide_env[part_count] = nullptr;
 
     /* "The sort is case-insensitive, Unicode order, without regard to locale" (c) MSDN */
     qsort(wide_env, part_count, sizeof(wchar_t*), &compare_env_part_names);
@@ -160,26 +161,26 @@ static bool create_env_block(char const* const* env, wchar_t** env_block, tr_err
 {
     wchar_t** wide_env = to_wide_env(env);
 
-    if (wide_env == NULL)
+    if (wide_env == nullptr)
     {
-        *env_block = NULL;
+        *env_block = nullptr;
         return true;
     }
 
     wchar_t* const old_env_block = GetEnvironmentStringsW();
 
-    if (old_env_block == NULL)
+    if (old_env_block == nullptr)
     {
         set_system_error(error, GetLastError(), "Call to GetEnvironmentStrings()");
         return false;
     }
 
-    *env_block = NULL;
+    *env_block = nullptr;
 
     wchar_t const* old_part = old_env_block;
     size_t env_block_len = 0;
 
-    for (size_t i = 0; wide_env[i] != NULL; ++i)
+    for (size_t i = 0; wide_env[i] != nullptr; ++i)
     {
         wchar_t const* const part = wide_env[i];
 
@@ -226,7 +227,7 @@ static bool create_env_block(char const* const* env, wchar_t** env_block, tr_err
     {
         size_t old_part_len;
 
-        if (!parse_env_block_part(old_part, &old_part_len, NULL))
+        if (!parse_env_block_part(old_part, &old_part_len, nullptr))
         {
             continue;
         }
@@ -247,7 +248,7 @@ static bool create_env_block(char const* const* env, wchar_t** env_block, tr_err
 
 static void append_argument(char** arguments, char const* argument)
 {
-    size_t arguments_len = *arguments != NULL ? strlen(*arguments) : 0u;
+    size_t arguments_len = *arguments != nullptr ? strlen(*arguments) : 0u;
     size_t const argument_len = strlen(argument);
 
     if (arguments_len > 0)
@@ -255,7 +256,7 @@ static void append_argument(char** arguments, char const* argument)
         (*arguments)[arguments_len++] = ' ';
     }
 
-    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == NULL)
+    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
     {
         *arguments = tr_renew(char, *arguments, arguments_len + argument_len + 2);
         strcpy(*arguments + arguments_len, argument);
@@ -310,7 +311,7 @@ static bool contains_batch_metachars(char const* text)
     return strpbrk(
                text,
                "&<>()@^|"
-               "%!^\"") != NULL;
+               "%!^\"") != nullptr;
 }
 
 static enum tr_app_type get_app_type(char const* app)
@@ -351,13 +352,13 @@ static bool construct_cmd_line(char const* const* cmd, wchar_t** cmd_line)
 {
     enum tr_app_type const app_type = get_app_type(cmd[0]);
 
-    char* args = NULL;
+    char* args = nullptr;
     size_t arg_count = 0;
     bool ret = false;
 
     append_app_launcher_arguments(app_type, &args);
 
-    for (size_t i = 0; cmd[i] != NULL; ++i)
+    for (size_t i = 0; cmd[i] != nullptr; ++i)
     {
         if (app_type == TR_APP_TYPE_BATCH && i > 0 && contains_batch_metachars(cmd[i]))
         {
@@ -369,7 +370,7 @@ static bool construct_cmd_line(char const* const* cmd, wchar_t** cmd_line)
         ++arg_count;
     }
 
-    *cmd_line = args != NULL ? tr_win32_utf8_to_native(args, -1) : NULL;
+    *cmd_line = args != nullptr ? tr_win32_utf8_to_native(args, -1) : nullptr;
 
     ret = true;
 
@@ -380,7 +381,7 @@ cleanup:
 
 bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
 {
-    wchar_t* env_block = NULL;
+    wchar_t* env_block = nullptr;
 
     if (!create_env_block(env, &env_block, error))
     {
@@ -395,7 +396,7 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
         return false;
     }
 
-    wchar_t* current_dir = work_dir != NULL ? tr_win32_utf8_to_native(work_dir, -1) : NULL;
+    wchar_t* current_dir = work_dir != nullptr ? tr_win32_utf8_to_native(work_dir, -1) : nullptr;
 
     auto si = STARTUPINFOW{};
     si.cb = sizeof(si);
@@ -405,10 +406,10 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
     PROCESS_INFORMATION pi;
 
     bool const ret = CreateProcessW(
-        NULL,
+        nullptr,
         cmd_line,
-        NULL,
-        NULL,
+        nullptr,
+        nullptr,
         FALSE,
         NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE,
         env_block,

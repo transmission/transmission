@@ -53,7 +53,7 @@ static void log_openssl_error(char const* file, int line)
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
 #else
-            OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
+            OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
 #endif
 
             strings_loaded = true;
@@ -85,7 +85,7 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 
 static bool check_openssl_pointer(void const* pointer, char const* file, int line)
 {
-    bool const ret = pointer != NULL;
+    bool const ret = pointer != nullptr;
 
     if (!ret)
     {
@@ -105,27 +105,27 @@ tr_sha1_ctx_t tr_sha1_init(void)
 {
     EVP_MD_CTX* handle = EVP_MD_CTX_create();
 
-    if (check_result(EVP_DigestInit_ex(handle, EVP_sha1(), NULL)))
+    if (check_result(EVP_DigestInit_ex(handle, EVP_sha1(), nullptr)))
     {
         return handle;
     }
 
     EVP_MD_CTX_destroy(handle);
-    return NULL;
+    return nullptr;
 }
 
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
     auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
 
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     if (data_length == 0)
     {
         return true;
     }
 
-    TR_ASSERT(data != NULL);
+    TR_ASSERT(data != nullptr);
 
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
@@ -136,9 +136,9 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
 
     bool ret = true;
 
-    if (hash != NULL)
+    if (hash != nullptr)
     {
-        TR_ASSERT(handle != NULL);
+        TR_ASSERT(handle != nullptr);
 
         unsigned int hash_length;
 
@@ -161,7 +161,7 @@ static EVP_CIPHER_CTX* openssl_evp_cipher_context_new(void)
 {
     EVP_CIPHER_CTX* handle = tr_new(EVP_CIPHER_CTX, 1);
 
-    if (handle != NULL)
+    if (handle != nullptr)
     {
         EVP_CIPHER_CTX_init(handle);
     }
@@ -171,7 +171,7 @@ static EVP_CIPHER_CTX* openssl_evp_cipher_context_new(void)
 
 static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
 {
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
@@ -193,33 +193,33 @@ static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
 
 static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
 {
-    /* If the fields p and g in d are NULL, the corresponding input
-     * parameters MUST be non-NULL. q may remain NULL.
+    /* If the fields p and g in d are nullptr, the corresponding input
+     * parameters MUST be non-nullptr. q may remain nullptr.
      */
-    if ((dh->p == NULL && p == NULL) || (dh->g == NULL && g == NULL))
+    if ((dh->p == nullptr && p == nullptr) || (dh->g == nullptr && g == nullptr))
     {
         return 0;
     }
 
-    if (p != NULL)
+    if (p != nullptr)
     {
         BN_free(dh->p);
         dh->p = p;
     }
 
-    if (q != NULL)
+    if (q != nullptr)
     {
         BN_free(dh->q);
         dh->q = q;
     }
 
-    if (g != NULL)
+    if (g != nullptr)
     {
         BN_free(dh->g);
         dh->g = g;
     }
 
-    if (q != NULL)
+    if (q != nullptr)
     {
         dh->length = BN_num_bits(q);
     }
@@ -227,20 +227,20 @@ static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
     return 1;
 }
 
-static inline int DH_set_length(DH* dh, long length)
+static constexpr int DH_set_length(DH* dh, long length)
 {
     dh->length = length;
     return 1;
 }
 
-static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
+static constexpr void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
 {
-    if (pub_key != NULL)
+    if (pub_key != nullptr)
     {
         *pub_key = dh->pub_key;
     }
 
-    if (priv_key != NULL)
+    if (priv_key != nullptr)
     {
         *priv_key = dh->priv_key;
     }
@@ -254,22 +254,22 @@ tr_dh_ctx_t tr_dh_new(
     uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    TR_ASSERT(prime_num != NULL);
-    TR_ASSERT(generator_num != NULL);
+    TR_ASSERT(prime_num != nullptr);
+    TR_ASSERT(generator_num != nullptr);
 
     DH* handle = DH_new();
     BIGNUM* p;
     BIGNUM* g;
 
-    p = BN_bin2bn(prime_num, prime_num_length, NULL);
-    g = BN_bin2bn(generator_num, generator_num_length, NULL);
+    p = BN_bin2bn(prime_num, prime_num_length, nullptr);
+    g = BN_bin2bn(generator_num, generator_num_length, nullptr);
 
-    if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, NULL, g) == 0)
+    if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, nullptr, g) == 0)
     {
         BN_free(p);
         BN_free(g);
         DH_free(handle);
-        handle = NULL;
+        handle = nullptr;
     }
 
     return handle;
@@ -279,7 +279,7 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 {
     auto* handle = static_cast<DH*>(raw_handle);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
@@ -289,8 +289,8 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(public_key != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<DH*>(raw_handle);
     int dh_size;
@@ -304,14 +304,14 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
         return false;
     }
 
-    DH_get0_key(handle, &my_public_key, NULL);
+    DH_get0_key(handle, &my_public_key, nullptr);
 
     my_public_key_length = BN_bn2bin(my_public_key, public_key);
     dh_size = DH_size(handle);
 
     tr_dh_align_key(public_key, my_public_key_length, dh_size);
 
-    if (public_key_length != NULL)
+    if (public_key_length != nullptr)
     {
         *public_key_length = dh_size;
     }
@@ -323,17 +323,17 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 {
     auto* handle = static_cast<DH*>(raw_handle);
 
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(other_public_key != NULL);
+    TR_ASSERT(handle != nullptr);
+    TR_ASSERT(other_public_key != nullptr);
 
     struct tr_dh_secret* ret;
     int dh_size;
     int secret_key_length;
     BIGNUM* other_key;
 
-    if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, NULL)))
+    if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr)))
     {
-        return NULL;
+        return nullptr;
     }
 
     dh_size = DH_size(handle);
@@ -348,7 +348,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     else
     {
         tr_dh_secret_free(ret);
-        ret = NULL;
+        ret = nullptr;
     }
 
     BN_free(other_key);
@@ -361,9 +361,9 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 {
-    if (handle == NULL)
+    if (handle == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     return SSL_CTX_get_cert_store(static_cast<SSL_CTX const*>(handle));
@@ -371,19 +371,19 @@ tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 
 bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
 {
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(cert != NULL);
+    TR_ASSERT(handle != nullptr);
+    TR_ASSERT(cert != nullptr);
 
     return check_result(X509_STORE_add_cert(static_cast<X509_STORE*>(handle), static_cast<X509*>(cert)));
 }
 
 tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 {
-    TR_ASSERT(der != NULL);
+    TR_ASSERT(der != nullptr);
 
-    X509* const ret = d2i_X509(NULL, (unsigned char const**)&der, der_length);
+    X509* const ret = d2i_X509(nullptr, (unsigned char const**)&der, der_length);
 
-    if (ret == NULL)
+    if (ret == nullptr)
     {
         log_error();
     }
@@ -393,7 +393,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 
 void tr_x509_cert_free(tr_x509_cert_t handle)
 {
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
@@ -407,7 +407,7 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
-    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer != nullptr);
 
     return check_result(RAND_bytes(static_cast<unsigned char*>(buffer), (int)length));
 }

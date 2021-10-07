@@ -25,6 +25,8 @@
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
 #include <string>
 
 using ::libtransmission::test::makeString;
@@ -64,29 +66,6 @@ TEST_F(UtilsTest, trStrstrip)
     EXPECT_EQ(in, out);
     EXPECT_STREQ("test", out);
     tr_free(in);
-}
-
-TEST_F(UtilsTest, trStrjoin)
-{
-    auto const in1 = std::array<char const*, 2>{ "one", "two" };
-    auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
-    EXPECT_EQ("one, two", out);
-
-    auto const in2 = std::array<char const*, 1>{ "hello" };
-    out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
-    EXPECT_EQ("hello", out);
-
-    auto const in3 = std::array<char const*, 5>{ "a", "b", "ccc", "d", "eeeee" };
-    out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
-    EXPECT_EQ("a b ccc d eeeee", out);
-
-    auto const in4 = std::array<char const*, 3>{ "7", "ate", "9" };
-    out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
-    EXPECT_EQ("7ate9", out);
-
-    char const** in5 = nullptr;
-    out = makeString(tr_strjoin(in5, 0, "a"));
-    EXPECT_EQ("", out);
 }
 
 TEST_F(UtilsTest, trBuildpath)
@@ -136,38 +115,31 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
-    auto count = int{};
-    auto* numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
-    EXPECT_EQ(15, count);
-    EXPECT_EQ(1, numbers[0]);
-    EXPECT_EQ(6, numbers[5]);
-    EXPECT_EQ(10, numbers[9]);
-    EXPECT_EQ(13, numbers[10]);
-    EXPECT_EQ(16, numbers[11]);
-    EXPECT_EQ(19, numbers[14]);
-    tr_free(numbers);
-
-    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
-    EXPECT_EQ(7, count);
-    EXPECT_NE(nullptr, numbers);
-    for (int i = 0; i < count; ++i)
+    auto const tostring = [](std::vector<int> const& v)
     {
-        EXPECT_EQ(i + 1, numbers[i]);
-    }
+        std::stringstream ss;
+        for (auto const& i : v)
+        {
+            ss << i << ' ';
+        }
+        return ss.str();
+    };
 
-    tr_free(numbers);
+    auto numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE);
+    EXPECT_EQ(std::string("1 2 3 4 5 6 7 8 9 10 13 16 17 18 19 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE);
+    EXPECT_EQ(std::string("1 2 3 4 5 6 7 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE);
+    auto const empty_string = std::string{};
+    EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE);
+    EXPECT_EQ(empty_string, tostring(numbers));
+
+    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE);
+    EXPECT_EQ(empty_string, tostring(numbers));
 }
 
 namespace
@@ -194,31 +166,6 @@ TEST_F(UtilsTest, lowerbound)
         auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
         EXPECT_EQ(expected_pos[i - 1], pos);
         EXPECT_EQ(expected_exact[i - 1], exact);
-    }
-}
-
-TEST_F(UtilsTest, trQuickfindfirstk)
-{
-    auto const run_test = [](size_t const k, size_t const n, int* buf, int range)
-    {
-        // populate buf with random ints
-        std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
-
-        // find the best k
-        tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
-
-        // confirm that the smallest K ints are in the first slots K slots in buf
-        auto const* highest_low = std::max_element(buf, buf + k);
-        auto const* lowest_high = std::min_element(buf + k, buf + n);
-        EXPECT_LE(highest_low, lowest_high);
-    };
-
-    auto constexpr K = size_t{ 10 };
-    auto constexpr NumTrials = size_t{ 1000 };
-    auto buf = std::array<int, 100>{};
-    for (auto i = 0; i != NumTrials; ++i)
-    {
-        run_test(K, buf.size(), buf.data(), 100);
     }
 }
 
@@ -278,9 +225,9 @@ TEST_F(UtilsTest, url)
 {
     auto const* url = "http://1";
     int port;
-    char* scheme;
-    char* host;
-    char* path;
+    char* scheme = nullptr;
+    char* host = nullptr;
+    char* path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("1", host);
@@ -291,6 +238,9 @@ TEST_F(UtilsTest, url)
     tr_free(host);
 
     url = "http://www.some-tracker.org/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);
@@ -301,6 +251,9 @@ TEST_F(UtilsTest, url)
     tr_free(host);
 
     url = "http://www.some-tracker.org:8080/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);

@@ -6,9 +6,10 @@
  *
  */
 
-#include <errno.h>
-#include <inttypes.h>
-#include <string.h>
+#include <algorithm>
+#include <cerrno>
+#include <cinttypes>
+#include <cstring>
 
 #include "transmission.h"
 #include "error.h"
@@ -20,7 +21,7 @@
 #include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
 
-#define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
 /***
 ****
@@ -30,7 +31,7 @@
 
 static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error** error)
 {
-    tr_error* my_error = NULL;
+    tr_error* my_error = nullptr;
 
     if (length == 0)
     {
@@ -51,7 +52,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         tr_error_clear(&my_error);
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, NULL, &my_error) && tr_sys_file_truncate(fd, length, &my_error))
+        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, nullptr, &my_error) && tr_sys_file_truncate(fd, length, &my_error))
         {
             return true;
         }
@@ -65,7 +66,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
 
 static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
 {
-    tr_error* my_error = NULL;
+    tr_error* my_error = nullptr;
 
     if (length == 0)
     {
@@ -90,7 +91,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = MIN(length, sizeof(buf));
+            uint64_t const thisPass = std::min(length, uint64_t{ sizeof(buf) });
             uint64_t bytes_written;
             success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
             length -= bytes_written;
@@ -123,20 +124,20 @@ struct tr_cached_file
     time_t used_at;
 };
 
-static inline bool cached_file_is_open(struct tr_cached_file const* o)
+static constexpr bool cached_file_is_open(struct tr_cached_file const* o)
 {
-    TR_ASSERT(o != NULL);
+    TR_ASSERT(o != nullptr);
 
-    return (o != NULL) && (o->fd != TR_BAD_SYS_FILE);
+    return (o != nullptr) && (o->fd != TR_BAD_SYS_FILE);
 }
 
 static void cached_file_close(struct tr_cached_file* o)
 {
     TR_ASSERT(cached_file_is_open(o));
 
-    if (o != NULL)
+    if (o != nullptr)
     {
-        tr_sys_file_close(o->fd, NULL);
+        tr_sys_file_close(o->fd, nullptr);
         o->fd = TR_BAD_SYS_FILE;
     }
 }
@@ -158,14 +159,14 @@ static int cached_file_open(
     bool already_existed;
     bool resize_needed;
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
     /* create subfolders, if any */
     if (writable)
     {
         char* dir = tr_sys_path_dirname(filename, &error);
 
-        if (dir == NULL)
+        if (dir == nullptr)
         {
             tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
             goto FAIL;
@@ -181,7 +182,7 @@ static int cached_file_open(
         tr_free(dir);
     }
 
-    already_existed = tr_sys_path_get_info(filename, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_FILE;
+    already_existed = tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_FILE;
 
     /* we can't resize the file w/o write permissions */
     resize_needed = already_existed && (file_size < info.size);
@@ -201,7 +202,7 @@ static int cached_file_open(
     if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
     {
         bool success = false;
-        char const* type = NULL;
+        char const* type = nullptr;
 
         if (allocation == TR_PREALLOCATE_FULL)
         {
@@ -214,7 +215,7 @@ static int cached_file_open(
             type = _("sparse");
         }
 
-        TR_ASSERT(type != NULL);
+        TR_ASSERT(type != nullptr);
 
         if (!success)
         {
@@ -252,7 +253,7 @@ FAIL:
 
         if (fd != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_close(fd, NULL);
+            tr_sys_file_close(fd, nullptr);
         }
 
         return err;
@@ -282,7 +283,7 @@ static void fileset_construct(struct tr_fileset* set, int n)
 
 static void fileset_close_all(struct tr_fileset* set)
 {
-    if (set != NULL)
+    if (set != nullptr)
     {
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
@@ -298,12 +299,12 @@ static void fileset_destruct(struct tr_fileset* set)
 {
     fileset_close_all(set);
     tr_free(set->begin);
-    set->end = set->begin = NULL;
+    set->end = set->begin = nullptr;
 }
 
 static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 {
-    if (set != NULL)
+    if (set != nullptr)
     {
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
@@ -317,7 +318,7 @@ static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 
 static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent_id, tr_file_index_t i)
 {
-    if (set != NULL)
+    if (set != nullptr)
     {
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
@@ -328,14 +329,14 @@ static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
 {
-    struct tr_cached_file* cull = NULL;
+    struct tr_cached_file* cull = nullptr;
 
-    if (set != NULL && set->begin != NULL)
+    if (set != nullptr && set->begin != nullptr)
     {
         /* try to find an unused slot */
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
@@ -349,7 +350,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
         /* all slots are full... recycle the least recently used */
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
-            if (cull == NULL || o->used_at < cull->used_at)
+            if (cull == nullptr || o->used_at < cull->used_at)
             {
                 cull = o;
             }
@@ -377,7 +378,7 @@ static void ensureSessionFdInfoExists(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->fdInfo == NULL)
+    if (session->fdInfo == nullptr)
     {
         struct tr_fdInfo* i;
         int const FILE_CACHE_SIZE = 32;
@@ -391,12 +392,12 @@ static void ensureSessionFdInfoExists(tr_session* session)
 
 void tr_fdClose(tr_session* session)
 {
-    if (session != NULL && session->fdInfo != NULL)
+    if (session != nullptr && session->fdInfo != nullptr)
     {
         struct tr_fdInfo* i = session->fdInfo;
         fileset_destruct(&i->fileset);
         tr_free(i);
-        session->fdInfo = NULL;
+        session->fdInfo = nullptr;
     }
 }
 
@@ -406,9 +407,9 @@ void tr_fdClose(tr_session* session)
 
 static struct tr_fileset* get_fileset(tr_session* session)
 {
-    if (session == NULL)
+    if (session == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     ensureSessionFdInfoExists(session);
@@ -419,13 +420,13 @@ void tr_fdFileClose(tr_session* s, tr_torrent const* tor, tr_file_index_t i)
 {
     struct tr_cached_file* o;
 
-    if ((o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i)) != NULL)
+    if ((o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i)) != nullptr)
     {
         /* flush writable files so that their mtimes will be
          * up-to-date when this function returns to the caller... */
         if (o->is_writable)
         {
-            tr_sys_file_flush(o->fd, NULL);
+            tr_sys_file_flush(o->fd, nullptr);
         }
 
         cached_file_close(o);
@@ -436,7 +437,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 {
     struct tr_cached_file* o = fileset_lookup(get_fileset(s), torrent_id, i);
 
-    if (o == NULL || (writable && !o->is_writable))
+    if (o == nullptr || (writable && !o->is_writable))
     {
         return TR_BAD_SYS_FILE;
     }
@@ -449,7 +450,7 @@ bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, t
 {
     struct tr_cached_file const* o = fileset_lookup(get_fileset(s), torrent_id, i);
     auto info = tr_sys_path_info{};
-    bool const success = o != NULL && tr_sys_file_get_info(o->fd, &info, NULL);
+    bool const success = o != nullptr && tr_sys_file_get_info(o->fd, &info, nullptr);
 
     if (success)
     {
@@ -479,11 +480,11 @@ tr_sys_file_t tr_fdFileCheckout(
     struct tr_fileset* set = get_fileset(session);
     struct tr_cached_file* o = fileset_lookup(set, torrent_id, i);
 
-    if (o != NULL && writable && !o->is_writable)
+    if (o != nullptr && writable && !o->is_writable)
     {
         cached_file_close(o); /* close it so we can reopen in rw mode */
     }
-    else if (o == NULL)
+    else if (o == nullptr)
     {
         o = fileset_get_empty_slot(set);
     }
@@ -575,8 +576,8 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* addr, tr_port* port)
 {
     TR_ASSERT(tr_isSession(s));
-    TR_ASSERT(addr != NULL);
-    TR_ASSERT(port != NULL);
+    TR_ASSERT(addr != nullptr);
+    TR_ASSERT(port != nullptr);
 
     tr_socket_t fd;
     socklen_t len;
@@ -609,7 +610,7 @@ void tr_fdSocketClose(tr_session* session, tr_socket_t fd)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->fdInfo != NULL)
+    if (session->fdInfo != nullptr)
     {
         struct tr_fdInfo* gFd = session->fdInfo;
 

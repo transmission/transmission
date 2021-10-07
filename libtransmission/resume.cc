@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h>
+#include <algorithm>
+#include <cstring>
 
 #include "transmission.h"
 #include "completion.h"
@@ -23,10 +24,12 @@
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
 
-enum
+namespace
 {
-    MAX_REMEMBERED_PEERS = 200
-};
+
+constexpr int MAX_REMEMBERED_PEERS = 200;
+
+} // unnamed namespace
 
 static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
@@ -67,7 +70,7 @@ static void savePeers(tr_variant* dict, tr_torrent const* tor)
 static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
     size_t const n_in = buflen / sizeof(tr_pex);
-    size_t const n_pex = MIN(n_in, MAX_REMEMBERED_PEERS);
+    size_t const n_pex = std::min(n_in, size_t{ MAX_REMEMBERED_PEERS });
 
     tr_pex pex[MAX_REMEMBERED_PEERS];
     memcpy(pex, buf, sizeof(tr_pex) * n_pex);
@@ -103,12 +106,11 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 
 static void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
-    size_t const n = tr_ptrArraySize(&tor->labels);
-    tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, n);
-    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
-    for (size_t i = 0; i < n; ++i)
+    auto const& labels = tor->labels;
+    tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
+    for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, labels[i]);
+        tr_variantListAddStr(list, label.c_str());
     }
 }
 
@@ -123,9 +125,9 @@ static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
         size_t str_len;
         for (int i = 0; i < n; ++i)
         {
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL && str_len != 0)
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr && str_len != 0)
             {
-                tr_ptrArrayAppend(&tor->labels, tr_strndup(str, str_len));
+                tor->labels.emplace(str, str_len);
             }
         }
 
@@ -156,7 +158,7 @@ static void saveDND(tr_variant* dict, tr_torrent const* tor)
 static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 {
     uint64_t ret = 0;
-    tr_variant* list = NULL;
+    tr_variant* list = nullptr;
     tr_file_index_t const n = tor->info.fileCount;
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
@@ -394,7 +396,7 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
     uint64_t ret = 0;
     char const* name;
 
-    if (tr_variantDictFindStr(dict, TR_KEY_name, &name, NULL))
+    if (tr_variantDictFindStr(dict, TR_KEY_name, &name, nullptr))
     {
         ret = TR_FR_NAME;
 
@@ -451,7 +453,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
             char const* str;
             size_t str_len;
 
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL && str_len != 0)
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr && str_len != 0)
             {
                 tr_free(files[i].name);
                 files[i].name = tr_strndup(str, str_len);
@@ -658,11 +660,11 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        err = NULL;
+        err = nullptr;
         tr_bitfieldConstruct(&blocks, tor->blockCount);
 
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
-        if (b != NULL)
+        if (b != nullptr)
         {
             size_t buflen;
             uint8_t const* buf;
@@ -684,7 +686,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                 tr_bitfieldSetRaw(&blocks, buf, buflen, true);
             }
         }
-        else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, NULL))
+        else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
         {
             if (strcmp(str, "all") == 0)
             {
@@ -704,7 +706,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
         }
 
-        if (err != NULL)
+        if (err != nullptr)
         {
             tr_logAddTorDbg(tor, "Torrent needs to be verified - %s", err);
         }
@@ -744,7 +746,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
     tr_variantDictAddStr(&top, TR_KEY_destination, tor->downloadDir);
 
-    if (tor->incompleteDir != NULL)
+    if (tor->incompleteDir != nullptr)
     {
         tr_variantDictAddStr(&top, TR_KEY_incomplete_dir, tor->incompleteDir);
     }
@@ -794,9 +796,9 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     bool boolVal;
     uint64_t fieldsLoaded = 0;
     bool const wasDirty = tor->isDirty;
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
 
-    if (didRenameToHashOnlyName != NULL)
+    if (didRenameToHashOnlyName != nullptr)
     {
         *didRenameToHashOnlyName = false;
     }
@@ -820,11 +822,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
             return fieldsLoaded;
         }
 
-        if (tr_sys_path_rename(old_filename, filename, NULL))
+        if (tr_sys_path_rename(old_filename, filename, nullptr))
         {
             tr_logAddTorDbg(tor, "Migrated resume file from \"%s\" to \"%s\"", old_filename, filename);
 
-            if (didRenameToHashOnlyName != NULL)
+            if (didRenameToHashOnlyName != nullptr)
             {
                 *didRenameToHashOnlyName = true;
             }
@@ -1057,10 +1059,10 @@ void tr_torrentRemoveResume(tr_torrent const* tor)
     char* filename;
 
     filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    tr_sys_path_remove(filename, NULL);
+    tr_sys_path_remove(filename, nullptr);
     tr_free(filename);
 
     filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-    tr_sys_path_remove(filename, NULL);
+    tr_sys_path_remove(filename, nullptr);
     tr_free(filename);
 }

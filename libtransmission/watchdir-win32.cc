@@ -40,7 +40,7 @@
 ****
 ***/
 
-typedef struct tr_watchdir_win32
+struct tr_watchdir_win32
 {
     tr_watchdir_backend base;
 
@@ -50,7 +50,7 @@ typedef struct tr_watchdir_win32
     evutil_socket_t notify_pipe[2];
     struct bufferevent* event;
     HANDLE thread;
-} tr_watchdir_win32;
+};
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_win32*)(b))
 
@@ -67,9 +67,9 @@ static BOOL tr_get_overlapped_result_ex(
     DWORD timeout,
     BOOL alertable)
 {
-    typedef BOOL(WINAPI * impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+    using impl_t = BOOL(WINAPI*)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
 
-    static impl_t real_impl = NULL;
+    static impl_t real_impl = nullptr;
     static bool is_real_impl_valid = false;
 
     if (!is_real_impl_valid)
@@ -78,7 +78,7 @@ static BOOL tr_get_overlapped_result_ex(
         is_real_impl_valid = true;
     }
 
-    if (real_impl != NULL)
+    if (real_impl != nullptr)
     {
         return (*real_impl)(handle, overlapped, bytes_transferred, timeout, alertable);
     }
@@ -126,9 +126,9 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
                 sizeof(backend->buffer),
                 FALSE,
                 WIN32_WATCH_MASK,
-                NULL,
+                nullptr,
                 &backend->overlapped,
-                NULL))
+                nullptr))
         {
             log_error("Failed to read directory changes");
             return 0;
@@ -150,7 +150,7 @@ static void tr_watchdir_win32_on_first_scan(evutil_socket_t fd, short type, void
 
     auto const handle = static_cast<tr_watchdir_t>(context);
 
-    tr_watchdir_scan(handle, NULL);
+    tr_watchdir_scan(handle, nullptr);
 }
 
 static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
@@ -208,7 +208,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         {
             char* name = tr_win32_native_to_utf8(ev->FileName, ev->FileNameLength / sizeof(WCHAR));
 
-            if (name != NULL)
+            if (name != nullptr)
             {
                 tr_watchdir_process(handle, name);
                 tr_free(name);
@@ -223,7 +223,7 @@ static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_win32* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
@@ -235,13 +235,13 @@ static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
         CancelIoEx(backend->fd, &backend->overlapped);
     }
 
-    if (backend->thread != NULL)
+    if (backend->thread != nullptr)
     {
         WaitForSingleObject(backend->thread, INFINITE);
         CloseHandle(backend->thread);
     }
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         bufferevent_free(backend->event);
     }
@@ -275,7 +275,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     backend->fd = INVALID_HANDLE_VALUE;
     backend->notify_pipe[0] = backend->notify_pipe[1] = TR_BAD_SOCKET;
 
-    if ((wide_path = tr_win32_utf8_to_native(path, -1)) == NULL)
+    if ((wide_path = tr_win32_utf8_to_native(path, -1)) == nullptr)
     {
         log_error("Failed to convert \"%s\" to native path", path);
         goto fail;
@@ -285,17 +285,17 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
              wide_path,
              FILE_LIST_DIRECTORY,
              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-             NULL,
+             nullptr,
              OPEN_EXISTING,
              FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-             NULL)) == INVALID_HANDLE_VALUE)
+             nullptr)) == INVALID_HANDLE_VALUE)
     {
         log_error("Failed to open directory \"%s\"", path);
         goto fail;
     }
 
     tr_free(wide_path);
-    wide_path = NULL;
+    wide_path = nullptr;
 
     backend->overlapped.Pointer = handle;
 
@@ -305,9 +305,9 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
             sizeof(backend->buffer),
             FALSE,
             WIN32_WATCH_MASK,
-            NULL,
+            nullptr,
             &backend->overlapped,
-            NULL))
+            nullptr))
     {
         log_error("Failed to read directory changes");
         goto fail;
@@ -319,25 +319,30 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
         goto fail;
     }
 
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == NULL)
+    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == nullptr)
     {
         log_error("Failed to create event buffer: %s", tr_strerror(errno));
         goto fail;
     }
 
     bufferevent_setwatermark(backend->event, EV_READ, sizeof(FILE_NOTIFY_INFORMATION), 0);
-    bufferevent_setcb(backend->event, &tr_watchdir_win32_on_event, NULL, NULL, handle);
+    bufferevent_setcb(backend->event, &tr_watchdir_win32_on_event, nullptr, nullptr, handle);
     bufferevent_enable(backend->event, EV_READ);
 
-    if ((backend->thread = (HANDLE)_beginthreadex(NULL, 0, &tr_watchdir_win32_thread, handle, 0, NULL)) == NULL)
+    if ((backend->thread = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr)) == nullptr)
     {
         log_error("Failed to create thread");
         goto fail;
     }
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_win32_on_first_scan, handle, NULL) ==
-        -1)
+    if (event_base_once(
+            tr_watchdir_get_event_base(handle),
+            -1,
+            EV_TIMEOUT,
+            &tr_watchdir_win32_on_first_scan,
+            handle,
+            nullptr) == -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
     }
@@ -347,5 +352,5 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 fail:
     tr_watchdir_win32_free(BACKEND_DOWNCAST(backend));
     tr_free(wide_path);
-    return NULL;
+    return nullptr;
 }

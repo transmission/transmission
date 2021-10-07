@@ -20,21 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/* ansi */
-#include <errno.h>
-#include <stdio.h>
-#include <string.h> /* strlen(), strncpy(), strstr(), memset() */
-
-/* posix */
-#include <signal.h> /* sig_atomic_t */
-#include <ctype.h> /* toupper() */
+#include <algorithm>
+#include <cctype> /* toupper() */
+#include <cerrno>
+#include <csignal> /* sig_atomic_t */
+#include <cstdio>
+#include <cstring> /* strlen(), strncpy(), strstr(), memset() */
 
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
-typedef uint16_t in_port_t; /* all missing */
+using in_port_t = uint16_t; /* all missing */
 #else
-#include <sys/time.h>
+#include <ctime>
 #include <unistd.h> /* close() */
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
@@ -75,11 +73,11 @@ enum
     UPKEEP_INTERVAL_SECS = 5
 };
 
-static struct event* upkeep_timer = NULL;
+static struct event* upkeep_timer = nullptr;
 
 static tr_socket_t lpd_socket; /**<separate multicast receive socket */
 static tr_socket_t lpd_socket2; /**<and multicast send socket */
-static struct event* lpd_event = NULL;
+static struct event* lpd_event = nullptr;
 static tr_port lpd_port;
 
 static tr_session* session;
@@ -158,21 +156,21 @@ static int lpd_unsolicitedMsgCounter;
 /**
 * @brief Checks for BT-SEARCH method and separates the parameter section
 * @param[in] s The request string
-* @param[out] ver If non-NULL, gets filled with protocol info from the request
+* @param[out] ver If non-nullptr, gets filled with protocol info from the request
 * @return Returns a relative pointer to the beginning of the parameter section.
-*         If result is NULL, s was invalid and no information will be returned
+*         If result is nullptr, s was invalid and no information will be returned
 * @remark Note that the returned pointer is only usable as long as the given
 *         pointer s is valid; that is, return storage is temporary.
 *
 * Determines whether the given string checks out to be a valid BT-SEARCH message.
 * If so, the return value points to the beginning of the parameter section (note:
 * in this case the function returns a character sequence beginning with CRLF).
-* If parameter is not NULL, the declared protocol version is returned as part of
-* the lpd_protocolVersion structure.
+* If parameter is not nullptr, the declared protocol version is returned as part
+* of the lpd_protocolVersion structure.
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
-    TR_ASSERT(s != NULL);
+    TR_ASSERT(s != nullptr);
 
     int major = -1;
     int minor = -1;
@@ -181,18 +179,18 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
     /* something might be rotten with this chunk of data */
     if (len == 0 || len > lpd_maxDatagramLength)
     {
-        return NULL;
+        return nullptr;
     }
 
     /* now we can attempt to look up the BT-SEARCH header */
     if (sscanf(s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
     {
-        return NULL;
+        return nullptr;
     }
 
     if (major < 0 || minor < 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     {
@@ -200,13 +198,13 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
         char const* const two_blank = CRLF CRLF CRLF;
         char const* const end = strstr(s, two_blank);
 
-        if (end == NULL || strlen(end) > strlen(two_blank))
+        if (end == nullptr || strlen(end) > strlen(two_blank))
         {
-            return NULL;
+            return nullptr;
         }
     }
 
-    if (ver != NULL)
+    if (ver != nullptr)
     {
         ver->major = major;
         ver->minor = minor;
@@ -232,9 +230,9 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 */
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
-    TR_ASSERT(str != NULL);
-    TR_ASSERT(name != NULL);
-    TR_ASSERT(val != NULL);
+    TR_ASSERT(str != nullptr);
+    TR_ASSERT(name != nullptr);
+    TR_ASSERT(val != nullptr);
 
     enum
     {
@@ -255,7 +253,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 
     pos = strstr(str, sstr);
 
-    if (pos == NULL)
+    if (pos == nullptr)
     {
         return false; /* search was not successful */
     }
@@ -269,7 +267,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        n = MIN(len, n - 1);
+        n = std::min(len, n - 1);
         strncpy(val, beg, n);
         val[n] = 0;
     }
@@ -306,7 +304,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
     int const opt_on = 1;
     int const opt_off = 0;
 
-    if (session != NULL) /* already initialized */
+    if (session != nullptr) /* already initialized */
     {
         return -1;
     }
@@ -408,8 +406,8 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new(ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL);
-    event_add(lpd_event, NULL);
+    lpd_event = event_new(ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, nullptr);
+    event_add(lpd_event, nullptr);
 
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
@@ -424,7 +422,7 @@ fail:
         evutil_closesocket(lpd_socket);
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
-        session = NULL;
+        session = nullptr;
         tr_logAddNamedDbg("LPD", "LPD initialisation failed (errno = %d)", save);
         errno = save;
     }
@@ -442,22 +440,22 @@ void tr_lpdUninit(tr_session* ss)
     tr_logAddNamedDbg("LPD", "Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
-    lpd_event = NULL;
+    lpd_event = nullptr;
 
     evtimer_del(upkeep_timer);
-    upkeep_timer = NULL;
+    upkeep_timer = nullptr;
 
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
     tr_logAddNamedDbg("LPD", "Done uninitialising Local Peer Discovery");
 
-    session = NULL;
+    session = nullptr;
 }
 
 bool tr_lpdEnabled(tr_session const* ss)
 {
-    return ss != NULL && ss == session;
+    return ss != nullptr && ss == session;
 }
 
 /**
@@ -491,7 +489,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     char hashString[SIZEOF_HASH_STRING];
     char query[lpd_maxDatagramLength + 1] = { 0 };
 
-    if (t == NULL)
+    if (t == nullptr)
     {
         return false;
     }
@@ -552,13 +550,13 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     int res = 0;
     int peerPort = 0;
 
-    if (peer != NULL && msg != NULL)
+    if (peer != nullptr && msg != nullptr)
     {
-        tr_torrent* tor = NULL;
+        tr_torrent* tor = nullptr;
 
         char const* params = lpd_extractHeader(msg, &ver);
 
-        if (params == NULL || ver.major != 1) /* allow messages of protocol v1 */
+        if (params == nullptr || ver.major != 1) /* allow messages of protocol v1 */
         {
             return 0;
         }
@@ -620,7 +618,6 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 */
 static int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
-    tr_torrent* tor = NULL;
     int announcesSent = 0;
 
     if (!tr_isSession(session))
@@ -628,9 +625,9 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         return -1;
     }
 
-    while ((tor = tr_torrentNext(session, tor)) != NULL && tr_sessionAllowsLPD(session))
+    if (tr_sessionAllowsLPD(session))
     {
-        if (tr_isTorrent(tor))
+        for (auto* tor : session->torrents)
         {
             int announcePrio = 0;
 
@@ -650,7 +647,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
                 announcePrio = 2;
                 break;
 
-            default: /* fall through */
+            default:
                 break;
             }
 

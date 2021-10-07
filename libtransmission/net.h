@@ -37,10 +37,8 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 #ifdef _WIN32
-typedef SOCKET tr_socket_t;
+using tr_socket_t = SOCKET;
 #define TR_BAD_SOCKET INVALID_SOCKET
 
 #undef EADDRINUSE
@@ -65,7 +63,7 @@ typedef SOCKET tr_socket_t;
 #define sockerrno WSAGetLastError()
 #else
 /** @brief Platform-specific socket descriptor type. */
-typedef int tr_socket_t;
+using tr_socket_t = int;
 /** @brief Platform-specific invalid socket descriptor constant. */
 #define TR_BAD_SOCKET (-1)
 
@@ -78,14 +76,14 @@ typedef int tr_socket_t;
 *****
 ****/
 
-typedef enum tr_address_type
+enum tr_address_type
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
-} tr_address_type;
+};
 
-typedef struct tr_address
+struct tr_address
 {
     tr_address_type type;
     union
@@ -93,7 +91,7 @@ typedef struct tr_address
         struct in6_addr addr6;
         struct in_addr addr4;
     } addr;
-} tr_address;
+};
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
@@ -112,9 +110,9 @@ int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
-static inline bool tr_address_is_valid(tr_address const* a)
+constexpr bool tr_address_is_valid(tr_address const* a)
 {
-    return a != NULL && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
+    return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }
 
 /***********************************************************************
@@ -153,5 +151,3 @@ bool tr_net_hasIPv6(tr_port);
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
-
-TR_END_DECLS

@@ -83,7 +83,7 @@ for:
 
   artifacts:
   - path: '*.msi'
-  - path: '*-pdb.zip'
+  - path: '*-pdb.7z'
 
   deploy:
   - provider: Webhook

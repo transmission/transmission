@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm>
+#include <array>
 #include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
@@ -26,14 +28,22 @@
 ***/
 
 #ifdef _WIN32
-#define PATH_DELIMITER_CHARS "/\\"
+auto constexpr PATH_DELIMITER_CHARS = std::array<char, 2>{ '/', '\\' };
 #else
-#define PATH_DELIMITER_CHARS "/"
+auto constexpr PATH_DELIMITER_CHARS = std::array<char, 1>{ '/' };
 #endif
 
-static inline bool char_is_path_separator(char c)
+static constexpr bool char_is_path_separator(char c)
 {
-    return strchr(PATH_DELIMITER_CHARS, c) != NULL;
+    for (auto ch : PATH_DELIMITER_CHARS)
+    {
+        if (c == ch)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static char* metainfoGetBasenameNameAndPartialHash(tr_info const* inf)
@@ -70,7 +80,7 @@ char* tr_metainfoGetBasename(tr_info const* inf, enum tr_metainfo_basename_forma
 
     default:
         TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -90,7 +100,7 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
 {
     if (len == 0 || (len == 1 && str[0] == '.'))
     {
-        return NULL;
+        return nullptr;
     }
 
     *is_adjusted = false;
@@ -109,7 +119,7 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
 
     for (size_t i = 0; i < len; ++i)
     {
-        if (strchr(reserved_chars, ret[i]) != NULL || (unsigned char)ret[i] < 0x20)
+        if (strchr(reserved_chars, ret[i]) != nullptr || (unsigned char)ret[i] < 0x20)
         {
             ret[i] = '_';
             *is_adjusted = true;
@@ -148,7 +158,7 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
     if (start_pos == end_pos)
     {
         tr_free(ret);
-        return NULL;
+        return nullptr;
     }
 
     if (start_pos != 0 || end_pos != len)
@@ -167,7 +177,7 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
     bool success = false;
     size_t root_len = 0;
 
-    *setme = NULL;
+    *setme = nullptr;
     *is_adjusted = false;
 
     if (tr_variantIsList(path))
@@ -190,7 +200,7 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
 
             bool is_component_adjusted;
             char* final_str = tr_metainfo_sanitize_path_component(str, len, &is_component_adjusted);
-            if (final_str == NULL)
+            if (final_str == nullptr)
             {
                 continue;
             }
@@ -233,19 +243,19 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
     bool is_root_adjusted;
     char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
-    if (root_name == NULL)
+    if (root_name == nullptr)
     {
         return "path";
     }
 
-    char const* result = NULL;
+    char const* result = nullptr;
 
     if (tr_variantIsList(files)) /* multi-file mode */
     {
         struct evbuffer* buf;
 
         buf = evbuffer_new();
-        result = NULL;
+        result = nullptr;
 
         inf->isFolder = true;
         inf->fileCount = tr_variantListSize(files);
@@ -311,7 +321,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
 static char* tr_convertAnnounceToScrape(char const* announce)
 {
-    char* scrape = NULL;
+    char* scrape = nullptr;
 
     /* To derive the scrape URL use the following steps:
      * Begin with the announce URL. Find the last '/' in it.
@@ -322,7 +332,7 @@ static char* tr_convertAnnounceToScrape(char const* announce)
 
     char const* s = strrchr(announce, '/');
 
-    if (s != NULL && strncmp(s + 1, "announce", 8) == 0)
+    if (s != nullptr && strncmp(s + 1, "announce", 8) == 0)
     {
         char const* prefix = announce;
         size_t const prefix_len = s + 1 - announce;
@@ -356,7 +366,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
 {
     size_t len;
     char const* str;
-    tr_tracker_info* trackers = NULL;
+    tr_tracker_info* trackers = nullptr;
     int trackerCount = 0;
     tr_variant* tiers;
 
@@ -416,7 +426,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
         if (trackerCount == 0)
         {
             tr_free(trackers);
-            trackers = NULL;
+            trackers = nullptr;
         }
     }
 
@@ -443,7 +453,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     inf->trackers = trackers;
     inf->trackerCount = trackerCount;
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -461,7 +471,7 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
 {
     size_t len;
     char* url;
-    char* ret = NULL;
+    char* ret = nullptr;
 
     url = tr_strdup(url_in);
     tr_strstrip(url);
@@ -497,22 +507,22 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
         for (int i = 0; i < n; i++)
         {
-            if (tr_variantGetStr(tr_variantListChild(urls, i), &url, NULL))
+            if (tr_variantGetStr(tr_variantListChild(urls, i), &url, nullptr))
             {
                 char* fixed_url = fix_webseed_url(inf, url);
 
-                if (fixed_url != NULL)
+                if (fixed_url != nullptr)
                 {
                     inf->webseeds[inf->webseedCount++] = fixed_url;
                 }
             }
         }
     }
-    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url, NULL)) /* handle single items in webseeds */
+    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url, nullptr)) /* handle single items in webseeds */
     {
         char* fixed_url = fix_webseed_url(inf, url);
 
-        if (fixed_url != NULL)
+        if (fixed_url != nullptr)
         {
             inf->webseedCount = 1;
             inf->webseeds = tr_new0(char*, 1);
@@ -533,7 +543,7 @@ static char const* tr_metainfoParseImpl(
     char const* str;
     uint8_t const* raw;
     tr_variant* d;
-    tr_variant* infoDict = NULL;
+    tr_variant* infoDict = nullptr;
     tr_variant* meta = (tr_variant*)meta_in;
     bool b;
     bool isMagnet = false;
@@ -543,7 +553,7 @@ static char const* tr_metainfoParseImpl(
      * dictionary, given the definition of the info key above. */
     b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
 
-    if (hasInfoDict != NULL)
+    if (hasInfoDict != nullptr)
     {
         *hasInfoDict = b;
     }
@@ -578,12 +588,12 @@ static char const* tr_metainfoParseImpl(
                 inf->originalName = tr_strndup(str, len);
             }
 
-            if (inf->name == NULL)
+            if (inf->name == nullptr)
             {
                 inf->name = tr_strdup(inf->hashString);
             }
 
-            if (inf->originalName == NULL)
+            if (inf->originalName == nullptr)
             {
                 inf->originalName = tr_strdup(inf->hashString);
             }
@@ -597,10 +607,10 @@ static char const* tr_metainfoParseImpl(
     {
         size_t blen;
         char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
-        tr_sha1(inf->hash, bstr, (int)blen, NULL);
+        tr_sha1(inf->hash, bstr, (int)blen, nullptr);
         tr_sha1_to_hex(inf->hashString, inf->hash);
 
-        if (infoDictLength != NULL)
+        if (infoDictLength != nullptr)
         {
             *infoDictLength = blen;
         }
@@ -707,7 +717,7 @@ static char const* tr_metainfoParseImpl(
     if (!isMagnet)
     {
         if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) !=
-            NULL)
+            nullptr)
         {
             return str;
         }
@@ -724,7 +734,7 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* get announce or announce-list */
-    if ((str = getannounce(inf, meta)) != NULL)
+    if ((str = getannounce(inf, meta)) != nullptr)
     {
         return str;
     }
@@ -734,9 +744,9 @@ static char const* tr_metainfoParseImpl(
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session != NULL ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : NULL;
+    inf->torrent = session != nullptr ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : nullptr;
 
-    return NULL;
+    return nullptr;
 }
 
 bool tr_metainfoParse(
@@ -747,9 +757,9 @@ bool tr_metainfoParse(
     size_t* infoDictLength)
 {
     char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
-    bool const success = badTag == NULL;
+    bool const success = badTag == nullptr;
 
-    if (badTag != NULL)
+    if (badTag != nullptr)
     {
         tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
         tr_metainfoFree(inf);
@@ -795,11 +805,11 @@ void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
     char* filename;
 
     filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
-    tr_sys_path_remove(filename, NULL);
+    tr_sys_path_remove(filename, nullptr);
     tr_free(filename);
 
     filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-    tr_sys_path_remove(filename, NULL);
+    tr_sys_path_remove(filename, nullptr);
     tr_free(filename);
 }
 
@@ -812,7 +822,7 @@ void tr_metainfoMigrateFile(
     char* old_filename = getTorrentFilename(session, info, old_format);
     char* new_filename = getTorrentFilename(session, info, new_format);
 
-    if (tr_sys_path_rename(old_filename, new_filename, NULL))
+    if (tr_sys_path_rename(old_filename, new_filename, nullptr))
     {
         tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename, new_filename);
     }

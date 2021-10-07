@@ -47,7 +47,7 @@ char* tr_getSessionIdDir(void);
  * @{
  */
 
-typedef struct tr_thread tr_thread;
+struct tr_thread;
 
 /** @brief Instantiate a new process thread */
 tr_thread* tr_threadNew(void (*func)(void*), void* arg);
@@ -60,7 +60,7 @@ bool tr_amInThread(tr_thread const* thread);
 ****
 ***/
 
-typedef struct tr_lock tr_lock;
+struct tr_lock;
 
 /** @brief Create a new thread mutex object */
 tr_lock* tr_lockNew(void);

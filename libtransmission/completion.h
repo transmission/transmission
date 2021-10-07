@@ -16,7 +16,7 @@
 #include "bitfield.h"
 #include "utils.h" /* tr_getRatio() */
 
-typedef struct tr_completion
+struct tr_completion
 {
     tr_torrent* tor;
 
@@ -40,7 +40,7 @@ typedef struct tr_completion
 
     /* number of bytes we want or have now. [0..sizeWhenDone] */
     uint64_t sizeNow;
-} tr_completion;
+};
 
 /**
 *** Life Cycle
@@ -73,7 +73,7 @@ uint64_t tr_cpLeftUntilDone(tr_completion const*);
 
 void tr_cpGetAmountDone(tr_completion const* completion, float* tab, int tabCount);
 
-static inline uint64_t tr_cpHaveTotal(tr_completion const* cp)
+constexpr uint64_t tr_cpHaveTotal(tr_completion const* cp)
 {
     return cp->sizeNow;
 }
@@ -124,7 +124,7 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t);
 
 void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count);
 
-static inline void tr_cpInvalidateDND(tr_completion* cp)
+constexpr void tr_cpInvalidateDND(tr_completion* cp)
 {
     cp->sizeWhenDoneIsDirty = true;
 }

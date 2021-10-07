@@ -121,12 +121,6 @@
 #define TR_GNUC_MALLOC
 #endif
 
-#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
-#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
-#else
-#define TR_GNUC_FALLTHROUGH
-#endif
-
 /***
 ****
 ***/
@@ -147,17 +141,6 @@
     } while (0)
 #endif
 
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
-
 /***
 ****
 ***/
@@ -172,17 +155,6 @@
 #define TR_ADDRSTRLEN 64
 
 #define TR_BAD_SIZE ((size_t)-1)
-
-/* Guard C code in headers, while including them from C++ */
-#ifdef __cplusplus
-#define TR_BEGIN_DECLS \
-    extern "C" \
-    {
-#define TR_END_DECLS }
-#else
-#define TR_BEGIN_DECLS
-#define TR_END_DECLS
-#endif
 
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__

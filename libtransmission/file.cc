@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h> /* strlen() */
+#include <algorithm>
+#include <cstring> /* strlen() */
 
 #include "transmission.h"
 #include "error.h"
@@ -17,7 +18,7 @@
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer != nullptr);
     TR_ASSERT(buffer_size > 0);
 
     bool ret = false;
@@ -26,7 +27,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     while (buffer_size > 0)
     {
-        size_t const bytes_needed = MIN(buffer_size, 1024u);
+        size_t const bytes_needed = std::min(buffer_size, size_t{ 1024 });
 
         ret = tr_sys_file_read(handle, buffer + offset, bytes_needed, &bytes_read, error);
 
@@ -57,7 +58,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
         {
             if (delta != 0)
             {
-                ret = tr_sys_file_seek(handle, delta, TR_SEEK_CUR, NULL, error);
+                ret = tr_sys_file_seek(handle, delta, TR_SEEK_CUR, nullptr, error);
 
                 if (!ret)
                 {
@@ -84,13 +85,13 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer != nullptr);
 
-    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
+    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
 
     if (ret)
     {
-        ret = tr_sys_file_write(handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE, NULL, error);
+        ret = tr_sys_file_write(handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE, nullptr, error);
     }
 
     return ret;
@@ -99,7 +100,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error**
 bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(format != NULL);
+    TR_ASSERT(format != nullptr);
 
     bool ret = false;
     char* buffer;
@@ -109,9 +110,9 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     buffer = tr_strdup_vprintf(format, args);
     va_end(args);
 
-    if (buffer != NULL)
+    if (buffer != nullptr)
     {
-        ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
+        ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
         tr_free(buffer);
     }
     else

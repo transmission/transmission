@@ -29,14 +29,14 @@ static char const* getKey(void)
     return _("Port Forwarding (UPnP)");
 }
 
-typedef enum
+enum tr_upnp_state
 {
     TR_UPNP_IDLE,
     TR_UPNP_ERR,
     TR_UPNP_DISCOVER,
     TR_UPNP_MAP,
     TR_UPNP_UNMAP
-} tr_upnp_state;
+};
 
 struct tr_upnp
 {
@@ -88,15 +88,15 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
     int err = UPNPDISCOVER_SUCCESS;
 
 #if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
-    ret = upnpDiscover(msec, NULL, NULL, 0, 0, 2, &err);
+    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, 2, &err);
 #else
-    ret = upnpDiscover(msec, NULL, NULL, 0, 0, &err);
+    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, &err);
 #endif
 
     have_err = err != UPNPDISCOVER_SUCCESS;
 #else
-    ret = upnpDiscover(msec, NULL, NULL, 0);
-    have_err = ret == NULL;
+    ret = upnpDiscover(msec, nullptr, nullptr, 0);
+    have_err = ret == nullptr;
 #endif
 
     if (have_err)
@@ -125,12 +125,12 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         handle->data.first.servicetype,
         portStr,
         proto,
-        NULL /*remoteHost*/,
+        nullptr /*remoteHost*/,
         intClient,
         intPort,
-        NULL /*desc*/,
-        NULL /*enabled*/,
-        NULL /*duration*/);
+        nullptr /*desc*/,
+        nullptr /*enabled*/,
+        nullptr /*duration*/);
 #elif (MINIUPNPC_API_VERSION >= 8) /* adds desc, enabled and leaseDuration args */
     err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
@@ -139,9 +139,9 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         proto,
         intClient,
         intPort,
-        NULL /*desc*/,
-        NULL /*enabled*/,
-        NULL /*duration*/);
+        nullptr /*desc*/,
+        nullptr /*enabled*/,
+        nullptr /*duration*/);
 #else
     err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
@@ -173,8 +173,8 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         handle->lanaddr,
         desc,
         proto,
-        NULL,
-        NULL);
+        nullptr,
+        nullptr);
 #else
     err = UPNP_AddPortMapping(
         handle->urls.controlURL,
@@ -184,7 +184,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         handle->lanaddr,
         desc,
         proto,
-        NULL);
+        nullptr);
 #endif
 
     if (err != 0)
@@ -208,7 +208,7 @@ static void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, t
 
     tr_snprintf(portStr, sizeof(portStr), "%d", (int)port);
 
-    UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto, NULL);
+    UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto, nullptr);
 }
 
 /**
@@ -291,7 +291,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
     {
         errno = 0;
 
-        if (handle->urls.controlURL == NULL)
+        if (handle->urls.controlURL == nullptr)
         {
             handle->isMapped = false;
         }

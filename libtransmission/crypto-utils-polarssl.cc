@@ -40,9 +40,9 @@
 
 #define MY_NAME "tr_crypto_utils"
 
-typedef API(ctr_drbg_context) api_ctr_drbg_context;
-typedef API(sha1_context) api_sha1_context;
-typedef API(dhm_context) api_dhm_context;
+using api_ctr_drbg_context = API(ctr_drbg_context);
+using api_sha1_context = API(sha1_context);
+using api_dhm_context = API(dhm_context);
 
 static void log_polarssl_error(int error_code, char const* file, int line)
 {
@@ -105,13 +105,13 @@ static api_ctr_drbg_context* get_rng(void)
 #if API_VERSION_NUMBER >= 0x02000000
         API(ctr_drbg_init)(&rng);
 
-        if (!check_result(API(ctr_drbg_seed)(&rng, &my_rand, NULL, NULL, 0)))
+        if (!check_result(API(ctr_drbg_seed)(&rng, &my_rand, nullptr, nullptr, 0)))
 #else
 
-        if (!check_result(API(ctr_drbg_init)(&rng, &my_rand, NULL, NULL, 0)))
+        if (!check_result(API(ctr_drbg_init)(&rng, &my_rand, nullptr, nullptr, 0)))
 #endif
         {
-            return NULL;
+            return nullptr;
         }
 
         rng_initialized = true;
@@ -122,9 +122,9 @@ static api_ctr_drbg_context* get_rng(void)
 
 static tr_lock* get_rng_lock(void)
 {
-    static tr_lock* lock = NULL;
+    static tr_lock* lock = nullptr;
 
-    if (lock == NULL)
+    if (lock == nullptr)
     {
         lock = tr_lockNew();
     }
@@ -151,14 +151,14 @@ tr_sha1_ctx_t tr_sha1_init(void)
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
     auto* handle = static_cast<api_sha1_context*>(raw_handle);
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(handle != nullptr);
 
     if (data_length == 0)
     {
         return true;
     }
 
-    TR_ASSERT(data != NULL);
+    TR_ASSERT(data != nullptr);
 
     API(sha1_update)(handle, static_cast<unsigned char const*>(data), data_length);
     return true;
@@ -168,9 +168,9 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
 {
     auto* handle = static_cast<api_sha1_context*>(raw_handle);
 
-    if (hash != NULL)
+    if (hash != nullptr)
     {
-        TR_ASSERT(handle != NULL);
+        TR_ASSERT(handle != nullptr);
 
         API(sha1_finish)(handle, hash);
     }
@@ -193,8 +193,8 @@ tr_dh_ctx_t tr_dh_new(
     uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    TR_ASSERT(prime_num != NULL);
-    TR_ASSERT(generator_num != NULL);
+    TR_ASSERT(prime_num != nullptr);
+    TR_ASSERT(generator_num != nullptr);
 
     api_dhm_context* handle = tr_new0(api_dhm_context, 1);
 
@@ -206,7 +206,7 @@ tr_dh_ctx_t tr_dh_new(
         !check_result(API(mpi_read_binary)(&handle->G, generator_num, generator_num_length)))
     {
         API(dhm_free)(handle);
-        return NULL;
+        return nullptr;
     }
 
     handle->len = prime_num_length;
@@ -218,7 +218,7 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 {
     auto* handle = static_cast<api_dhm_context*>(raw_handle);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return;
     }
@@ -228,23 +228,23 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(public_key != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<api_dhm_context*>(raw_handle);
 
-    if (public_key_length != NULL)
+    if (public_key_length != nullptr)
     {
         *public_key_length = handle->len;
     }
 
-    return check_result(API(dhm_make_public)(handle, private_key_length, public_key, handle->len, my_rand, NULL));
+    return check_result(API(dhm_make_public)(handle, private_key_length, public_key, handle->len, my_rand, nullptr));
 }
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
-    TR_ASSERT(raw_handle != NULL);
-    TR_ASSERT(other_public_key != NULL);
+    TR_ASSERT(raw_handle != nullptr);
+    TR_ASSERT(other_public_key != nullptr);
 
     auto* handle = static_cast<api_dhm_context*>(raw_handle);
     struct tr_dh_secret* ret;
@@ -252,7 +252,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
     if (!check_result(API(dhm_read_public)(handle, other_public_key, other_public_key_length)))
     {
-        return NULL;
+        return nullptr;
     }
 
     ret = tr_dh_secret_new(handle->len);
@@ -261,17 +261,17 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 #if API_VERSION_NUMBER >= 0x02000000
 
-    if (!check_result(API(dhm_calc_secret)(handle, ret->key, secret_key_length, &secret_key_length, my_rand, NULL)))
+    if (!check_result(API(dhm_calc_secret)(handle, ret->key, secret_key_length, &secret_key_length, my_rand, nullptr)))
 #elif API_VERSION_NUMBER >= 0x01030000
 
-    if (!check_result(API(dhm_calc_secret)(handle, ret->key, &secret_key_length, my_rand, NULL)))
+    if (!check_result(API(dhm_calc_secret)(handle, ret->key, &secret_key_length, my_rand, nullptr)))
 #else
 
     if (!check_result(API(dhm_calc_secret)(handle, ret->key, &secret_key_length)))
 #endif
     {
         tr_dh_secret_free(ret);
-        return NULL;
+        return nullptr;
     }
 
     tr_dh_secret_align(ret, secret_key_length);
@@ -285,7 +285,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
-    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer != nullptr);
 
     bool ret;
     tr_lock* rng_lock = get_rng_lock();

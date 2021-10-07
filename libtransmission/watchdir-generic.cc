@@ -7,6 +7,8 @@
  */
 
 #include <errno.h>
+#include <string>
+#include <unordered_set>
 
 #include <event2/event.h>
 
@@ -14,7 +16,6 @@
 
 #include "transmission.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
@@ -32,15 +33,15 @@
 ****
 ***/
 
-typedef struct tr_watchdir_generic
+struct tr_watchdir_generic
 {
     tr_watchdir_backend base;
 
     struct event* event;
-    tr_ptrArray dir_entries;
-} tr_watchdir_generic;
+    std::unordered_set<std::string> dir_entries;
+};
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_generic*)(b))
+#define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_generic*>(b))
 
 /* Non-static and mutable for unit tests. default to 10 sec. */
 auto tr_watchdir_generic_interval = timeval{ 10, 0 };
@@ -64,34 +65,30 @@ static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_generic* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
 
     TR_ASSERT(backend->base.free_func == &tr_watchdir_generic_free);
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         event_del(backend->event);
         event_free(backend->event);
     }
 
-    tr_ptrArrayDestruct(&backend->dir_entries, &tr_free);
-
-    tr_free(backend);
+    delete backend;
 }
 
 tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 {
-    tr_watchdir_generic* backend;
-
-    backend = tr_new0(tr_watchdir_generic, 1);
+    auto* backend = new tr_watchdir_generic{};
     backend->base.free_func = &tr_watchdir_generic_free;
 
     if ((backend
              ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
-        NULL)
+        nullptr)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto FAIL;
@@ -110,5 +107,5 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
 
 FAIL:
     tr_watchdir_generic_free(BACKEND_DOWNCAST(backend));
-    return NULL;
+    return nullptr;
 }

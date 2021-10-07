@@ -10,20 +10,18 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 struct tr_address;
 struct tr_web_task;
 
-typedef enum
+enum tr_web_close_mode
 {
     TR_WEB_CLOSE_WHEN_IDLE,
     TR_WEB_CLOSE_NOW
-} tr_web_close_mode;
+};
 
 void tr_webClose(tr_session* session, tr_web_close_mode close_mode);
 
-typedef void (*tr_web_done_func)(
+using tr_web_done_func = void (*)(
     tr_session* session,
     bool did_connect_flag,
     bool timeout_flag,
@@ -62,5 +60,3 @@ void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool esca
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
 char* tr_http_unescape(char const* str, size_t len);
-
-TR_END_DECLS

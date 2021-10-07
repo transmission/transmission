@@ -16,8 +16,6 @@
 #include "tr-assert.h"
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 enum tr_peer_socket_type
 {
     TR_PEER_SOCKET_TYPE_NONE,
@@ -47,5 +45,3 @@ struct tr_address;
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
-TR_END_DECLS

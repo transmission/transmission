@@ -27,14 +27,11 @@ set(PROJECT_FILES
   file-posix.cc
   file-win32.cc
   handshake.cc
-  history.cc
   inout.cc
-  list.cc
   log.cc
   magnet.cc
   makemeta.cc
   metainfo.cc
-  mime-types.cc
   natpmp.cc
   net.cc
   peer-io.cc
@@ -78,9 +75,9 @@ set(PROJECT_FILES
   webseed.cc
 )
 
-string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
+string(REPLACE ";" " " CXX_WARNING_FLAGS_STR "${CXX_WARNING_FLAGS}")
 foreach(FILE ${PROJECT_FILES})
-  set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${C_WARNING_FLAGS_STR}")
+  set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${CXX_WARNING_FLAGS_STR}")
 endforeach()
 
 set(THIRD_PARTY_FILES
@@ -155,7 +152,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     handshake.h
     history.h
     inout.h
-    list.h
     magnet.h
     metainfo.h
     mime-types.h

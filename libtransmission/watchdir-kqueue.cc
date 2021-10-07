@@ -8,6 +8,8 @@
 
 #include <errno.h>
 #include <string.h> /* strcmp() */
+#include <string>
+#include <unordered_set>
 
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* close() */
@@ -25,7 +27,6 @@
 
 #include "transmission.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
@@ -43,17 +44,17 @@
 ****
 ***/
 
-typedef struct tr_watchdir_kqueue
+struct tr_watchdir_kqueue
 {
     tr_watchdir_backend base;
 
     int kq;
     int dirfd;
     struct event* event;
-    tr_ptrArray dir_entries;
-} tr_watchdir_kqueue;
+    std::unordered_set<std::string> dir_entries;
+};
 
-#define BACKEND_UPCAST(b) ((tr_watchdir_kqueue*)(b))
+#define BACKEND_UPCAST(b) (reinterpret_cast<tr_watchdir_kqueue*>(b))
 
 #define KQUEUE_WATCH_MASK (NOTE_WRITE | NOTE_EXTEND)
 
@@ -71,7 +72,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t fd, short type, void* co
     struct kevent ke;
     auto ts = timespec{};
 
-    if (kevent(backend->kq, NULL, 0, &ke, 1, &ts) == -1)
+    if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
         log_error("Failed to fetch kevent: %s", tr_strerror(errno));
         return;
@@ -85,14 +86,14 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
 {
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(backend_base);
 
-    if (backend == NULL)
+    if (backend == nullptr)
     {
         return;
     }
 
     TR_ASSERT(backend->base.free_func == &tr_watchdir_kqueue_free);
 
-    if (backend->event != NULL)
+    if (backend->event != nullptr)
     {
         event_del(backend->event);
         event_free(backend->event);
@@ -108,18 +109,15 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
         close(backend->dirfd);
     }
 
-    tr_ptrArrayDestruct(&backend->dir_entries, &tr_free);
-
-    tr_free(backend);
+    delete backend;
 }
 
 tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 {
     char const* const path = tr_watchdir_get_path(handle);
     struct kevent ke;
-    tr_watchdir_kqueue* backend;
 
-    backend = tr_new0(tr_watchdir_kqueue, 1);
+    auto* backend = new tr_watchdir_kqueue{};
     backend->base.free_func = &tr_watchdir_kqueue_free;
     backend->kq = -1;
     backend->dirfd = -1;
@@ -140,7 +138,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     /* Register kevent filter with kqueue descriptor */
     EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
 
-    if (kevent(backend->kq, &ke, 1, NULL, 0, NULL) == -1)
+    if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {
         log_error("Failed to set directory event filter with fd %d: %s", backend->kq, tr_strerror(errno));
         goto fail;
@@ -152,13 +150,13 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
              backend->kq,
              EV_READ | EV_ET | EV_PERSIST,
              &tr_watchdir_kqueue_on_event,
-             handle)) == NULL)
+             handle)) == nullptr)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto fail;
     }
 
-    if (event_add(backend->event, NULL) == -1)
+    if (event_add(backend->event, nullptr) == -1)
     {
         log_error("Failed to add event: %s", tr_strerror(errno));
         goto fail;
@@ -171,5 +169,5 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
 fail:
     tr_watchdir_kqueue_free(BACKEND_DOWNCAST(backend));
-    return NULL;
+    return nullptr;
 }

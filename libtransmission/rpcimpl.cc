@@ -6,10 +6,11 @@
  *
  */
 
-#include <ctype.h> /* isdigit */
-#include <errno.h>
-#include <stdlib.h> /* strtol */
-#include <string.h> /* strcmp */
+#include <algorithm>
+#include <cctype> /* isdigit */
+#include <cerrno>
+#include <cstdlib> /* strtol */
+#include <cstring> /* strcmp */
 
 #ifndef ZLIB_CONST
 #define ZLIB_CONST
@@ -49,11 +50,11 @@
 #define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
 #endif
 
-typedef enum
+enum tr_format
 {
     TR_FORMAT_OBJECT = 0,
     TR_FORMAT_TABLE
-} tr_format;
+};
 
 /***
 ****
@@ -63,7 +64,7 @@ static tr_rpc_callback_status notify(tr_session* session, tr_rpc_callback_type t
 {
     tr_rpc_callback_status status = TR_RPC_OK;
 
-    if (session->rpc_func != NULL)
+    if (session->rpc_func != nullptr)
     {
         status = (*session->rpc_func)(session, type, tor, session->rpc_func_user_data);
     }
@@ -89,7 +90,7 @@ struct tr_rpc_idle_data
 
 static void tr_idle_function_done(struct tr_rpc_idle_data* data, char const* result)
 {
-    if (result == NULL)
+    if (result == nullptr)
     {
         result = "success";
     }
@@ -111,7 +112,7 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
 {
     int torrentCount = 0;
     int64_t id;
-    tr_torrent** torrents = NULL;
+    tr_torrent** torrents = nullptr;
     tr_variant* ids;
     char const* str;
 
@@ -130,16 +131,16 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
             {
                 tor = tr_torrentFindFromId(session, id);
             }
-            else if (tr_variantGetStr(node, &str, NULL))
+            else if (tr_variantGetStr(node, &str, nullptr))
             {
                 tor = tr_torrentFindFromHashString(session, str);
             }
             else
             {
-                tor = NULL;
+                tor = nullptr;
             }
 
-            if (tor != NULL)
+            if (tor != nullptr)
             {
                 torrents[torrentCount++] = tor;
             }
@@ -150,22 +151,21 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
         tr_torrent* tor;
         torrents = tr_new0(tr_torrent*, 1);
 
-        if ((tor = tr_torrentFindFromId(session, id)) != NULL)
+        if ((tor = tr_torrentFindFromId(session, id)) != nullptr)
         {
             torrents[torrentCount++] = tor;
         }
     }
-    else if (tr_variantDictFindStr(args, TR_KEY_ids, &str, NULL))
+    else if (tr_variantDictFindStr(args, TR_KEY_ids, &str, nullptr))
     {
         if (strcmp(str, "recently-active") == 0)
         {
-            tr_torrent* tor = NULL;
             time_t const now = tr_time();
             time_t const window = RECENTLY_ACTIVE_SECONDS;
             int const n = tr_sessionCountTorrents(session);
             torrents = tr_new0(tr_torrent*, n);
 
-            while ((tor = tr_torrentNext(session, tor)) != NULL)
+            for (auto* tor : session->torrents)
             {
                 if (tor->anyDate >= now - window)
                 {
@@ -178,7 +178,7 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
             tr_torrent* tor;
             torrents = tr_new0(tr_torrent*, 1);
 
-            if ((tor = tr_torrentFindFromHashString(session, str)) != NULL)
+            if ((tor = tr_torrentFindFromHashString(session, str)) != nullptr)
             {
                 torrents[torrentCount++] = tor;
             }
@@ -186,7 +186,11 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
     }
     else /* all of them */
     {
-        torrents = tr_sessionGetTorrents(session, &torrentCount);
+        // TODO: getTorrents() should return a std::vector<tr_torrent*>
+        auto tmp = tr_sessionGetTorrents(session);
+        torrentCount = std::size(tmp);
+        torrents = tr_new(tr_torrent*, torrentCount);
+        std::copy_n(std::begin(tmp), torrentCount, torrents);
     }
 
     *setmeCount = torrentCount;
@@ -200,7 +204,7 @@ static void notifyBatchQueueChange(tr_session* session, tr_torrent** torrents, i
         notify(session, TR_RPC_TORRENT_CHANGED, torrents[i]);
     }
 
-    notify(session, TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, NULL);
+    notify(session, TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, nullptr);
 }
 
 static char const* queueMoveTop(
@@ -217,7 +221,7 @@ static char const* queueMoveTop(
     tr_torrentsQueueMoveTop(torrents, n);
     notifyBatchQueueChange(session, torrents, n);
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* queueMoveUp(
@@ -234,7 +238,7 @@ static char const* queueMoveUp(
     tr_torrentsQueueMoveUp(torrents, n);
     notifyBatchQueueChange(session, torrents, n);
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* queueMoveDown(
@@ -251,7 +255,7 @@ static char const* queueMoveDown(
     tr_torrentsQueueMoveDown(torrents, n);
     notifyBatchQueueChange(session, torrents, n);
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* queueMoveBottom(
@@ -268,7 +272,7 @@ static char const* queueMoveBottom(
     tr_torrentsQueueMoveBottom(torrents, n);
     notifyBatchQueueChange(session, torrents, n);
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
@@ -288,7 +292,7 @@ static char const* torrentStart(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -307,7 +311,7 @@ static char const* torrentStart(
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* torrentStartNow(
@@ -319,7 +323,7 @@ static char const* torrentStartNow(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -338,7 +342,7 @@ static char const* torrentStartNow(
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* torrentStop(
@@ -350,7 +354,7 @@ static char const* torrentStop(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -367,7 +371,7 @@ static char const* torrentStop(
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* torrentRemove(
@@ -379,7 +383,7 @@ static char const* torrentRemove(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     bool deleteFlag;
 
@@ -400,12 +404,12 @@ static char const* torrentRemove(
 
         if ((status & TR_RPC_NOREMOVE) == 0)
         {
-            tr_torrentRemove(tor, deleteFlag, NULL);
+            tr_torrentRemove(tor, deleteFlag, nullptr);
         }
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* torrentReannounce(
@@ -417,7 +421,7 @@ static char const* torrentReannounce(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -434,7 +438,7 @@ static char const* torrentReannounce(
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 static char const* torrentVerify(
@@ -446,7 +450,7 @@ static char const* torrentVerify(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -454,12 +458,12 @@ static char const* torrentVerify(
     for (int i = 0; i < torrentCount; ++i)
     {
         tr_torrent* tor = torrents[i];
-        tr_torrentVerify(tor, NULL, NULL);
+        tr_torrentVerify(tor, nullptr, nullptr);
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 
     tr_free(torrents);
-    return NULL;
+    return nullptr;
 }
 
 /***
@@ -468,12 +472,10 @@ static char const* torrentVerify(
 
 static void addLabels(tr_torrent const* tor, tr_variant* list)
 {
-    int const labelsCount = tr_ptrArraySize(&tor->labels);
-    tr_variantInitList(list, labelsCount);
-    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
-    for (int i = 0; i < labelsCount; ++i)
+    tr_variantInitList(list, std::size(tor->labels));
+    for (auto const& label : tor->labels)
     {
-        tr_variantListAddStr(list, labels[i]);
+        tr_variantListAddStr(list, label.c_str());
     }
 }
 
@@ -625,7 +627,7 @@ static void initField(
         break;
 
     case TR_KEY_comment:
-        tr_variantInitStr(initme, inf->comment != NULL ? inf->comment : "", TR_BAD_SIZE);
+        tr_variantInitStr(initme, inf->comment != nullptr ? inf->comment : "", TR_BAD_SIZE);
         break;
 
     case TR_KEY_corruptEver:
@@ -633,7 +635,7 @@ static void initField(
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStr(initme, inf->creator != NULL ? inf->creator : "", TR_BAD_SIZE);
+        tr_variantInitStr(initme, inf->creator != nullptr ? inf->creator : "", TR_BAD_SIZE);
         break;
 
     case TR_KEY_dateCreated:
@@ -799,8 +801,8 @@ static void initField(
         {
             size_t byte_count = 0;
             void* bytes = tr_torrentCreatePieceBitfield(tor, &byte_count);
-            auto* enc = static_cast<char*>(tr_base64_encode(bytes, byte_count, NULL));
-            tr_variantInitStr(initme, enc != NULL ? enc : "", TR_BAD_SIZE);
+            auto* enc = static_cast<char*>(tr_base64_encode(bytes, byte_count, nullptr));
+            tr_variantInitStr(initme, enc != nullptr ? enc : "", TR_BAD_SIZE);
             tr_free(enc);
             tr_free(bytes);
         }
@@ -984,17 +986,17 @@ static char const* torrentGet(
 {
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
     tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_torrents, torrentCount + 1);
     tr_variant* fields;
     char const* strVal;
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
     tr_format format;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, NULL) && strcmp(strVal, "table") == 0)
+    if (tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") == 0)
     {
         format = TR_FORMAT_TABLE;
     }
@@ -1003,7 +1005,7 @@ static char const* torrentGet(
         format = TR_FORMAT_OBJECT;
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_ids, &strVal, NULL) && strcmp(strVal, "recently-active") == 0)
+    if (tr_variantDictFindStr(args_in, TR_KEY_ids, &strVal, nullptr) && strcmp(strVal, "recently-active") == 0)
     {
         int n = 0;
         tr_variant* d;
@@ -1011,7 +1013,7 @@ static char const* torrentGet(
         int const interval = RECENTLY_ACTIVE_SECONDS;
         tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, 0);
 
-        while ((d = tr_variantListChild(&session->removedTorrents, n)) != NULL)
+        while ((d = tr_variantListChild(&session->removedTorrents, n)) != nullptr)
         {
             int64_t date;
             int64_t id;
@@ -1074,14 +1076,13 @@ static char const* torrentGet(
 static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
     size_t const n = tr_variantListSize(list);
-    char const* errmsg = NULL;
-    auto labels = tr_ptrArray{};
-    int labelcount = 0;
+    char const* errmsg = nullptr;
+    auto labels = tr_labels_t{};
     for (size_t i = 0; i < n; ++i)
     {
         char const* str;
         size_t str_len;
-        if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL)
+        if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr)
         {
             char* label = tr_strndup(str, str_len);
             tr_strstrip(label);
@@ -1090,45 +1091,31 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
                 errmsg = "labels cannot be empty";
             }
 
-            if (errmsg == NULL && strchr(str, ',') != NULL)
+            if (errmsg == nullptr && strchr(str, ',') != nullptr)
             {
                 errmsg = "labels cannot contain comma (,) character";
             }
 
-            if (errmsg == NULL)
+            if (errmsg == nullptr && labels.count(label) != 0)
             {
-                bool dup = false;
-                for (int j = 0; j < labelcount; j++)
-                {
-                    if (tr_strcmp0(label, (char*)tr_ptrArrayNth(&labels, j)) == 0)
-                    {
-                        dup = true;
-                        break;
-                    }
-                }
-
-                if (dup)
-                {
-                    errmsg = "labels cannot contain duplicates";
-                }
+                errmsg = "labels cannot contain duplicates";
             }
 
-            tr_ptrArrayAppend(&labels, label);
-            labelcount++;
+            labels.emplace(label);
+            tr_free(label);
 
-            if (errmsg != NULL)
+            if (errmsg != nullptr)
             {
                 break;
             }
         }
     }
 
-    if (errmsg == NULL)
+    if (errmsg == nullptr)
     {
-        tr_torrentSetLabels(tor, &labels);
+        tr_torrentSetLabels(tor, std::move(labels));
     }
 
-    tr_ptrArrayDestruct(&labels, tr_free);
     return errmsg;
 }
 
@@ -1137,7 +1124,7 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
     int64_t tmp;
     int fileCount = 0;
     size_t const n = tr_variantListSize(list);
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
     tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
 
     if (n != 0)
@@ -1179,7 +1166,7 @@ static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* lis
     int64_t tmp;
     int fileCount = 0;
     size_t const n = tr_variantListSize(list);
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
     tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
 
     if (n != 0) /* if argument list, process them */
@@ -1226,7 +1213,7 @@ static bool findAnnounceUrl(tr_tracker_info const* t, int n, char const* url, in
         {
             found = true;
 
-            if (pos != NULL)
+            if (pos != nullptr)
             {
                 *pos = i;
             }
@@ -1246,7 +1233,7 @@ static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
     {
         tgt[i].tier = src[i].tier;
         tgt[i].announce = tr_strdup(src[i].announce);
-        maxTier = MAX(maxTier, src[i].tier);
+        maxTier = std::max(maxTier, src[i].tier);
     }
 
     return maxTier;
@@ -1270,7 +1257,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     tr_tracker_info* trackers;
     bool changed = false;
     tr_info const* inf = tr_torrentInfo(tor);
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
 
     /* make a working copy of the existing announce list */
     n = inf->trackerCount;
@@ -1281,12 +1268,12 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     i = 0;
 
     tr_variant const* val;
-    while ((val = tr_variantListChild(urls, i)) != NULL)
+    while ((val = tr_variantListChild(urls, i)) != nullptr)
     {
-        char const* announce = NULL;
+        char const* announce = nullptr;
 
-        if (tr_variantGetStr(val, &announce, NULL) && tr_urlIsValidTracker(announce) &&
-            !findAnnounceUrl(trackers, n, announce, NULL))
+        if (tr_variantGetStr(val, &announce, nullptr) && tr_urlIsValidTracker(announce) &&
+            !findAnnounceUrl(trackers, n, announce, nullptr))
         {
             trackers[n].tier = ++tier; /* add a new tier */
             trackers[n].announce = tr_strdup(announce);
@@ -1316,7 +1303,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     bool changed = false;
     tr_info const* inf = tr_torrentInfo(tor);
     int const n = inf->trackerCount;
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
 
     /* make a working copy of the existing announce list */
     trackers = tr_new0(tr_tracker_info, n);
@@ -1365,7 +1352,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     int i = 0;
     int t = 0;
     tr_variant const* val;
-    while ((val = tr_variantListChild(ids, i)) != NULL)
+    while ((val = tr_variantListChild(ids, i)) != nullptr)
     {
         int64_t pos;
 
@@ -1378,7 +1365,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     }
 
     /* sort trackerIds and remove from largest to smallest so there is no need to recalculate array indicies */
-    qsort(tids, t, sizeof(int), compareInt);
+    std::sort(tids, tids + t);
 
     bool changed = false;
     int dup = -1;
@@ -1397,7 +1384,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         changed = true;
     }
 
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
     if (!changed)
     {
         errmsg = "invalid argument";
@@ -1421,12 +1408,12 @@ static char const* torrentSet(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
 
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
 
     for (int i = 0; i < torrentCount; ++i)
     {
@@ -1448,17 +1435,17 @@ static char const* torrentSet(
             }
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
         {
             errmsg = setLabels(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &tmp_variant))
         {
             errmsg = setFileDLs(tor, false, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_wanted, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_files_wanted, &tmp_variant))
         {
             errmsg = setFileDLs(tor, true, tmp_variant);
         }
@@ -1468,17 +1455,17 @@ static char const* torrentSet(
             tr_torrentSetPeerLimit(tor, tmp);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_high, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_high, &tmp_variant))
         {
             errmsg = setFilePriorities(tor, TR_PRI_HIGH, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_low, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_low, &tmp_variant))
         {
             errmsg = setFilePriorities(tor, TR_PRI_LOW, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_normal, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_normal, &tmp_variant))
         {
             errmsg = setFilePriorities(tor, TR_PRI_NORMAL, tmp_variant);
         }
@@ -1533,17 +1520,17 @@ static char const* torrentSet(
             tr_torrentSetQueuePosition(tor, (int)tmp);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
         {
             errmsg = addTrackerUrls(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerRemove, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerRemove, &tmp_variant))
         {
             errmsg = removeTrackers(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerReplace, &tmp_variant))
+        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerReplace, &tmp_variant))
         {
             errmsg = replaceTrackers(tor, tmp_variant);
         }
@@ -1564,11 +1551,11 @@ static char const* torrentSetLocation(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
-    char const* location = NULL;
+    char const* location = nullptr;
 
-    if (!tr_variantDictFindStr(args_in, TR_KEY_location, &location, NULL))
+    if (!tr_variantDictFindStr(args_in, TR_KEY_location, &location, nullptr))
     {
         return "no location";
     }
@@ -1590,13 +1577,13 @@ static char const* torrentSetLocation(
     for (int i = 0; i < torrentCount; ++i)
     {
         tr_torrent* tor = torrents[i];
-        tr_torrentSetLocation(tor, location, move, NULL, NULL);
+        tr_torrentSetLocation(tor, location, move, nullptr, nullptr);
         notify(session, TR_RPC_TORRENT_MOVED, tor);
     }
 
     tr_free(torrents);
 
-    return NULL;
+    return nullptr;
 }
 
 /***
@@ -1614,7 +1601,7 @@ static void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char con
 
     if (error == 0)
     {
-        result = NULL;
+        result = nullptr;
     }
     else
     {
@@ -1632,12 +1619,12 @@ static char const* torrentRenamePath(
 {
     TR_UNUSED(args_out);
 
-    char const* errmsg = NULL;
+    char const* errmsg = nullptr;
 
-    char const* oldpath = NULL;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, NULL);
-    char const* newname = NULL;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_name, &newname, NULL);
+    char const* oldpath = nullptr;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, nullptr);
+    char const* newname = nullptr;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_name, &newname, nullptr);
 
     int torrentCount = 0;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
@@ -1703,7 +1690,7 @@ static char const* portTest(tr_session* session, tr_variant* args_in, tr_variant
     char* url = tr_strdup_printf("https://portcheck.transmissionbt.com/%d", port);
     tr_webRun(session, url, portTested, idle_data);
     tr_free(url);
-    return NULL;
+    return nullptr;
 }
 
 /***
@@ -1743,7 +1730,7 @@ static void gotNewBlocklist(
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
         auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
-        tr_error* error = NULL;
+        tr_error* error = nullptr;
 
         /* this is an odd Magic Number required by zlib to enable gz support.
            See zlib's inflateInit2() documentation for a full description */
@@ -1756,7 +1743,7 @@ static void gotNewBlocklist(
         stream.avail_in = response_byte_count;
         inflateInit2(&stream, windowBits);
 
-        char* const filename = tr_buildPath(configDir, "blocklist.tmp.XXXXXX", NULL);
+        char* const filename = tr_buildPath(configDir, "blocklist.tmp.XXXXXX", nullptr);
         tr_sys_file_t const fd = tr_sys_file_open_temp(filename, &error);
 
         if (fd == TR_BAD_SYS_FILE)
@@ -1771,7 +1758,7 @@ static void gotNewBlocklist(
             stream.avail_out = buflen;
             err = inflate(&stream, Z_NO_FLUSH);
 
-            if ((stream.avail_out < buflen) && (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, NULL, &error)))
+            if ((stream.avail_out < buflen) && (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, nullptr, &error)))
             {
                 tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
                 tr_error_clear(&error);
@@ -1792,13 +1779,13 @@ static void gotNewBlocklist(
         inflateEnd(&stream);
 
         if ((err == Z_DATA_ERROR) && // couldn't inflate it... it's probably already uncompressed
-            !tr_sys_file_write(fd, response, response_byte_count, NULL, &error))
+            !tr_sys_file_write(fd, response, response_byte_count, nullptr, &error))
         {
             tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
             tr_error_clear(&error);
         }
 
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
 
         if (!tr_str_is_empty(result))
         {
@@ -1812,7 +1799,7 @@ static void gotNewBlocklist(
             tr_snprintf(result, sizeof(result), "success");
         }
 
-        tr_sys_path_remove(filename, NULL);
+        tr_sys_path_remove(filename, nullptr);
         tr_free(filename);
         tr_free(buf);
     }
@@ -1830,7 +1817,7 @@ static char const* blocklistUpdate(
     TR_UNUSED(args_out);
 
     tr_webRun(session, session->blocklist_url, gotNewBlocklist, idle_data);
-    return NULL;
+    return nullptr;
 }
 
 /***
@@ -1853,7 +1840,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
     if (err == 0)
     {
         key = TR_KEY_torrent_added;
-        result = NULL;
+        result = nullptr;
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
@@ -1867,7 +1854,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
         result = "invalid or corrupt torrent file";
     }
 
-    if (tor != NULL && key != 0)
+    if (tor != nullptr && key != 0)
     {
         tr_quark const fields[] = {
             TR_KEY_id,
@@ -1877,12 +1864,12 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 
         addTorrentInfo(tor, TR_FORMAT_OBJECT, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
 
-        if (result == NULL)
+        if (result == nullptr)
         {
             notify(data->session, TR_RPC_TORRENT_ADDED, tor);
         }
 
-        result = NULL;
+        result = nullptr;
     }
 
     tr_idle_function_done(data, result);
@@ -1937,7 +1924,7 @@ static void gotMetadataFromURL(
 
 static bool isCurlURL(char const* filename)
 {
-    if (filename == NULL)
+    if (filename == nullptr)
     {
         return false;
     }
@@ -1973,22 +1960,22 @@ static char const* torrentAdd(
 {
     TR_UNUSED(args_out);
 
-    TR_ASSERT(idle_data != NULL);
+    TR_ASSERT(idle_data != nullptr);
 
-    char const* filename = NULL;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, NULL);
+    char const* filename = nullptr;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, nullptr);
 
-    char const* metainfo_base64 = NULL;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, NULL);
+    char const* metainfo_base64 = nullptr;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, nullptr);
 
-    if (filename == NULL && metainfo_base64 == NULL)
+    if (filename == nullptr && metainfo_base64 == nullptr)
     {
         return "no filename or metainfo specified";
     }
 
-    char const* download_dir = NULL;
+    char const* download_dir = nullptr;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL) && tr_sys_path_is_relative(download_dir))
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, nullptr) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
@@ -2000,10 +1987,10 @@ static char const* torrentAdd(
 
     /* set the optional arguments */
 
-    char const* cookies = NULL;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_cookies, &cookies, NULL);
+    char const* cookies = nullptr;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_cookies, &cookies, nullptr);
 
-    if (download_dir != NULL)
+    if (download_dir != nullptr)
     {
         tr_ctorSetDownloadDir(ctor, TR_FORCE, download_dir);
     }
@@ -2076,7 +2063,7 @@ static char const* torrentAdd(
     {
         char* fname = tr_strstrip(tr_strdup(filename));
 
-        if (fname == NULL)
+        if (fname == nullptr)
         {
             size_t len;
             auto* metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &len));
@@ -2097,7 +2084,7 @@ static char const* torrentAdd(
         tr_free(fname);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /***
@@ -2113,17 +2100,18 @@ static char const* sessionSet(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
-    char const* download_dir = NULL;
-    char const* incomplete_dir = NULL;
+    char const* download_dir = nullptr;
+    char const* incomplete_dir = nullptr;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, NULL) && tr_sys_path_is_relative(download_dir))
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, nullptr) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, NULL) && tr_sys_path_is_relative(incomplete_dir))
+    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, nullptr) &&
+        tr_sys_path_is_relative(incomplete_dir))
     {
         return "incomplete torrents directory path is not absolute";
     }
@@ -2178,12 +2166,12 @@ static char const* sessionSet(
         tr_blocklistSetEnabled(session, boolVal);
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_blocklist_url, &str, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_blocklist_url, &str, nullptr))
     {
         tr_blocklistSetURL(session, str);
     }
 
-    if (download_dir != NULL)
+    if (download_dir != nullptr)
     {
         tr_sessionSetDownloadDir(session, download_dir);
     }
@@ -2208,7 +2196,7 @@ static char const* sessionSet(
         tr_sessionSetQueueEnabled(session, TR_DOWN, boolVal);
     }
 
-    if (incomplete_dir != NULL)
+    if (incomplete_dir != nullptr)
     {
         tr_sessionSetIncompleteDir(session, incomplete_dir);
     }
@@ -2303,7 +2291,7 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, nullptr))
     {
         tr_sessionSetTorrentDoneScript(session, str);
     }
@@ -2338,7 +2326,7 @@ static char const* sessionSet(
         tr_sessionLimitSpeed(session, TR_UP, boolVal);
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_encryption, &str, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_encryption, &str, nullptr))
     {
         if (tr_strcmp0(str, "required") == 0)
         {
@@ -2364,9 +2352,9 @@ static char const* sessionSet(
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
-    notify(session, TR_RPC_SESSION_CHANGED, NULL);
+    notify(session, TR_RPC_SESSION_CHANGED, nullptr);
 
-    return NULL;
+    return nullptr;
 }
 
 static char const* sessionStats(
@@ -2378,23 +2366,16 @@ static char const* sessionStats(
     TR_UNUSED(args_in);
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
-    int running = 0;
-    int total = 0;
     auto currentStats = tr_session_stats{};
     auto cumulativeStats = tr_session_stats{};
-    tr_torrent* tor = NULL;
 
-    while ((tor = tr_torrentNext(session, tor)) != NULL)
-    {
-        ++total;
-
-        if (tor->isRunning)
-        {
-            ++running;
-        }
-    }
+    int const total = std::size(session->torrents);
+    int const running = std::count_if(
+        std::begin(session->torrents),
+        std::end(session->torrents),
+        [](auto const* tor) { return tor->isRunning; });
 
     tr_sessionGetStats(session, &currentStats);
     tr_sessionGetCumulativeStats(session, &cumulativeStats);
@@ -2419,7 +2400,7 @@ static char const* sessionStats(
     tr_variantDictAddInt(d, TR_KEY_sessionCount, currentStats.sessionCount);
     tr_variantDictAddInt(d, TR_KEY_uploadedBytes, currentStats.uploadedBytes);
 
-    return NULL;
+    return nullptr;
 }
 
 static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
@@ -2659,7 +2640,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
 {
     TR_UNUSED(idle_data);
 
-    TR_ASSERT(idle_data == NULL);
+    TR_ASSERT(idle_data == nullptr);
 
     tr_variant* fields;
 
@@ -2694,7 +2675,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
@@ -2702,11 +2683,11 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     TR_UNUSED(idle_data);
 
     int tmperr;
-    char const* path = NULL;
-    char const* err = NULL;
+    char const* path = nullptr;
+    char const* err = nullptr;
     int64_t free_space = -1;
 
-    if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, NULL))
+    if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, nullptr))
     {
         return "directory path argument is missing";
     }
@@ -2729,7 +2710,7 @@ static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_varian
     errno = tmperr;
 
     /* response */
-    if (path != NULL)
+    if (path != nullptr)
     {
         tr_variantDictAddStr(args_out, TR_KEY_path, path);
     }
@@ -2752,15 +2733,15 @@ static char const* sessionClose(
     TR_UNUSED(args_out);
     TR_UNUSED(idle_data);
 
-    notify(session, TR_RPC_SESSION_CLOSE, NULL);
-    return NULL;
+    notify(session, TR_RPC_SESSION_CLOSE, nullptr);
+    return nullptr;
 }
 
 /***
 ****
 ***/
 
-typedef char const* (*handler)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
+using handler = char const* (*)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
 
 static struct method
 {
@@ -2808,22 +2789,22 @@ void tr_rpc_request_exec_json(
     char const* str;
     tr_variant* const mutable_request = (tr_variant*)request;
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
-    char const* result = NULL;
-    struct method const* method = NULL;
+    char const* result = nullptr;
+    struct method const* method = nullptr;
 
-    if (callback == NULL)
+    if (callback == nullptr)
     {
         callback = noop_response_callback;
     }
 
     /* parse the request */
-    if (!tr_variantDictFindStr(mutable_request, TR_KEY_method, &str, NULL))
+    if (!tr_variantDictFindStr(mutable_request, TR_KEY_method, &str, nullptr))
     {
         result = "no method name";
     }
     else
     {
-        for (size_t i = 0; method == NULL && i < TR_N_ELEMENTS(methods); ++i)
+        for (size_t i = 0; method == nullptr && i < TR_N_ELEMENTS(methods); ++i)
         {
             if (strcmp(str, methods[i].name) == 0)
             {
@@ -2831,14 +2812,14 @@ void tr_rpc_request_exec_json(
             }
         }
 
-        if (method == NULL)
+        if (method == nullptr)
         {
             result = "method name not recognized";
         }
     }
 
     /* if we couldn't figure out which method to use, return an error */
-    if (result != NULL)
+    if (result != nullptr)
     {
         int64_t tag;
         tr_variant response;
@@ -2864,9 +2845,9 @@ void tr_rpc_request_exec_json(
 
         tr_variantInitDict(&response, 3);
         args_out = tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
-        result = (*method->func)(session, args_in, args_out, NULL);
+        result = (*method->func)(session, args_in, args_out, nullptr);
 
-        if (result == NULL)
+        if (result == nullptr)
         {
             result = "success";
         }
@@ -2901,7 +2882,7 @@ void tr_rpc_request_exec_json(
         result = (*method->func)(session, args_in, data->args_out, data);
 
         /* Async operation failed prematurely? Invoke callback or else client will not get a reply */
-        if (result != NULL)
+        if (result != nullptr)
         {
             tr_idle_function_done(data, result);
         }
@@ -2919,8 +2900,8 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
 {
-    int valueCount;
-    int* values = tr_parseNumberRange(str, len, &valueCount);
+    auto const values = tr_parseNumberRange(str, len);
+    auto const valueCount = std::size(values);
 
     if (valueCount == 0)
     {
@@ -2934,13 +2915,11 @@ void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
     {
         tr_variantInitList(setme, valueCount);
 
-        for (int i = 0; i < valueCount; ++i)
+        for (auto const& value : values)
         {
-            tr_variantListAddInt(setme, values[i]);
+            tr_variantListAddInt(setme, value);
         }
     }
-
-    tr_free(values);
 }
 
 void tr_rpc_request_exec_uri(
@@ -2960,17 +2939,17 @@ void tr_rpc_request_exec_uri(
 
     pch = strchr(request, '?');
 
-    if (pch == NULL)
+    if (pch == nullptr)
     {
         pch = request;
     }
 
-    while (pch != NULL)
+    while (pch != nullptr)
     {
         char const* delim = strchr(pch, '=');
         char const* next = strchr(pch, '&');
 
-        if (delim != NULL)
+        if (delim != nullptr)
         {
             char* key = tr_strndup(pch, (size_t)(delim - pch));
             bool isArg = strcmp(key, "method") != 0 && strcmp(key, "tag") != 0;
@@ -2979,11 +2958,11 @@ void tr_rpc_request_exec_uri(
             tr_rpc_parse_list_str(
                 tr_variantDictAdd(parent, tr_quark_new(key, (size_t)(delim - pch))),
                 delim + 1,
-                next != NULL ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
+                next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
             tr_free(key);
         }
 
-        pch = next != NULL ? next + 1 : NULL;
+        pch = next != nullptr ? next + 1 : nullptr;
     }
 
     tr_rpc_request_exec_json(session, &top, callback, callback_user_data);

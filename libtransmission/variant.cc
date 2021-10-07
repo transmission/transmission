@@ -15,9 +15,12 @@
 #define _GNU_SOURCE
 #endif
 
+#include <algorithm> // std::sort
 #include <errno.h>
-#include <stdlib.h> /* strtod(), realloc(), qsort() */
+#include <stack>
+#include <stdlib.h> /* strtod() */
 #include <string.h>
+#include <vector>
 
 #ifdef _WIN32
 #include <share.h>
@@ -70,7 +73,7 @@ static void use_numeric_locale(struct locale_context* context, char const* local
 {
 #ifdef HAVE_USELOCALE
 
-    context->new_locale = newlocale(LC_NUMERIC_MASK, locale_name, NULL);
+    context->new_locale = newlocale(LC_NUMERIC_MASK, locale_name, nullptr);
     context->old_locale = uselocale(context->new_locale);
 
 #else
@@ -80,7 +83,7 @@ static void use_numeric_locale(struct locale_context* context, char const* local
 #endif
 
     context->category = LC_NUMERIC;
-    tr_strlcpy(context->old_locale, setlocale(context->category, NULL), sizeof(context->old_locale));
+    tr_strlcpy(context->old_locale, setlocale(context->category, nullptr), sizeof(context->old_locale));
     setlocale(context->category, locale_name);
 
 #endif
@@ -131,7 +134,6 @@ void tr_variantInit(tr_variant* v, char type)
 
 static auto constexpr STRING_INIT = tr_variant_string{
     TR_STRING_TYPE_QUARK,
-    TR_KEY_NONE,
     0,
     {},
 };
@@ -147,29 +149,20 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 }
 
 /* returns a const pointer to the variant's string */
-static char const* tr_variant_string_get_string(struct tr_variant_string const* str)
+static constexpr char const* tr_variant_string_get_string(struct tr_variant_string const* str)
 {
-    char const* ret;
-
     switch (str->type)
     {
     case TR_STRING_TYPE_BUF:
-        ret = str->str.buf;
-        break;
+        return str->str.buf;
 
     case TR_STRING_TYPE_HEAP:
-        ret = str->str.str;
-        break;
-
     case TR_STRING_TYPE_QUARK:
-        ret = str->str.str;
-        break;
+        return str->str.str;
 
     default:
-        ret = NULL;
+        return nullptr;
     }
-
-    return ret;
 }
 
 static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark const quark)
@@ -177,7 +170,6 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     tr_variant_string_clear(str);
 
     str->type = TR_STRING_TYPE_QUARK;
-    str->quark = quark;
     str->str.str = tr_quark_get_string(quark, &str->len);
 }
 
@@ -185,7 +177,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
 {
     tr_variant_string_clear(str);
 
-    if (bytes == NULL)
+    if (bytes == nullptr)
     {
         len = 0;
     }
@@ -207,7 +199,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
     }
     else
     {
-        char* tmp = tr_new(char, len + 1);
+        auto* tmp = tr_new(char, len + 1);
         memcpy(tmp, bytes, len);
         tmp[len] = '\0';
         str->type = TR_STRING_TYPE_HEAP;
@@ -220,7 +212,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
 ****
 ***/
 
-static inline char const* getStr(tr_variant const* v)
+static constexpr char const* getStr(tr_variant const* v)
 {
     TR_ASSERT(tr_variantIsString(v));
 
@@ -247,7 +239,7 @@ tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 {
     int const i = dictIndexOf(dict, key);
 
-    return i < 0 ? NULL : dict->val.l.vals + i;
+    return i < 0 ? nullptr : dict->val.l.vals + i;
 }
 
 static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
@@ -263,7 +255,7 @@ size_t tr_variantListSize(tr_variant const* list)
 
 tr_variant* tr_variantListChild(tr_variant* v, size_t i)
 {
-    tr_variant* ret = NULL;
+    tr_variant* ret = nullptr;
 
     if (tr_variantIsList(v) && i < v->val.l.count)
     {
@@ -294,7 +286,7 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 
     if (tr_variantIsInt(v))
     {
-        if (setme != NULL)
+        if (setme != nullptr)
         {
             *setme = v->val.i;
         }
@@ -304,7 +296,7 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 
     if (!success && tr_variantIsBool(v))
     {
-        if (setme != NULL)
+        if (setme != nullptr)
         {
             *setme = v->val.b ? 1 : 0;
         }
@@ -324,7 +316,7 @@ bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
         *setme = getStr(v);
     }
 
-    if (len != NULL)
+    if (len != nullptr)
     {
         *len = success ? v->val.s.len : 0;
     }
@@ -362,7 +354,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         success = true;
     }
 
-    if ((!success) && tr_variantGetStr(v, &str, NULL) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+    if ((!success) && tr_variantGetStr(v, &str, nullptr) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
     {
         *setme = strcmp(str, "true") == 0;
         success = true;
@@ -622,12 +614,12 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
     tr_variant* child;
 
     /* see if it already exists, and if so, try to reuse it */
-    if ((child = tr_variantDictFind(dict, key)) != NULL)
+    if ((child = tr_variantDictFind(dict, key)) != nullptr)
     {
         if (!tr_variantIsType(child, type))
         {
             tr_variantDictRemove(dict, key);
-            child = NULL;
+            child = nullptr;
         }
         else if (child->type == TR_VARIANT_TYPE_STR)
         {
@@ -636,7 +628,7 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
     }
 
     /* if it doesn't exist, create it */
-    if (child == NULL)
+    if (child == nullptr)
     {
         child = tr_variantDictAdd(dict, key);
     }
@@ -737,80 +729,75 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 ****  BENC WALKING
 ***/
 
-struct KeyIndex
+class WalkNode
 {
-    char const* keystr;
-    tr_variant* val;
-};
-
-static int compareKeyIndex(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct KeyIndex const*>(va);
-    auto const* const b = static_cast<struct KeyIndex const*>(vb);
-
-    return strcmp(a->keystr, b->keystr);
-}
-
-struct SaveNode
-{
-    tr_variant const* v;
-    tr_variant* sorted;
-    size_t childIndex;
-    bool isVisited;
-};
-
-static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_dicts)
-{
-    node->isVisited = false;
-    node->childIndex = 0;
-
-    if (sort_dicts && tr_variantIsDict(v))
+public:
+    WalkNode(tr_variant const* v_in, bool sort_dicts)
+        : v{ *v_in }
     {
-        /* make node->sorted a sorted version of this dictionary */
-
-        size_t const n = v->val.l.count;
-        struct KeyIndex* tmp = tr_new(struct KeyIndex, n);
-
-        for (size_t i = 0; i < n; i++)
+        if (sort_dicts && tr_variantIsDict(v_in))
         {
-            tmp[i].val = v->val.l.vals + i;
-            tmp[i].keystr = tr_quark_get_string(tmp[i].val->key, NULL);
+            sortByKey();
+        }
+    }
+
+    tr_variant const* nextChild()
+    {
+        if (!tr_variantIsContainer(&v) || (child_index >= v.val.l.count))
+        {
+            return nullptr;
         }
 
-        qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
+        auto idx = child_index++;
+        if (!sorted.empty())
+        {
+            idx = sorted[idx];
+        }
 
-        node->sorted = tr_new(tr_variant, 1);
-        tr_variantInitDict(node->sorted, n);
+        return v.val.l.vals + idx;
+    }
 
+    bool is_visited = false;
+
+    // Shallow bitwise copy of the variant passed to the constructor
+    tr_variant const v = {};
+
+private:
+    void sortByKey()
+    {
+        auto const n = v.val.l.count;
+
+        struct ByKey
+        {
+            char const* key;
+            size_t idx;
+        };
+
+        auto const* children = v.val.l.vals;
+        auto tmp = std::vector<ByKey>(n);
         for (size_t i = 0; i < n; ++i)
         {
-            node->sorted->val.l.vals[i] = *tmp[i].val;
+            tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
         }
 
-        node->sorted->val.l.count = n;
+        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
 
-        tr_free(tmp);
+        //  keep the sorted indices
 
-        v = node->sorted;
+        sorted.resize(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            sorted[i] = tmp[i].idx;
+        }
     }
-    else
-    {
-        node->sorted = NULL;
-    }
 
-    node->v = v;
-}
+    // When walking `v`'s children, this is the index of the next child
+    size_t child_index = 0;
 
-static void nodeDestruct(struct SaveNode* node)
-{
-    TR_ASSERT(node != NULL);
-
-    if (node->sorted != NULL)
-    {
-        tr_free(node->sorted->val.l.vals);
-        tr_free(node->sorted);
-    }
-}
+    // When `v` is a dict, this is its children's indices sorted by key.
+    // Bencoded dicts must be sorted, so this is useful when writing benc.
+    std::vector<size_t> sorted;
+};
 
 /**
  * This function's previous recursive implementation was
@@ -819,49 +806,40 @@ static void nodeDestruct(struct SaveNode* node)
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    int stackSize = 0;
-    int stackAlloc = 64;
-    struct SaveNode* stack = tr_new(struct SaveNode, stackAlloc);
+    auto stack = std::stack<WalkNode>{};
+    stack.emplace(v_in, sort_dicts);
 
-    nodeConstruct(&stack[stackSize++], v_in, sort_dicts);
-
-    while (stackSize > 0)
+    while (!stack.empty())
     {
-        struct SaveNode* node = &stack[stackSize - 1];
+        auto& node = stack.top();
         tr_variant const* v;
 
-        if (!node->isVisited)
+        if (!node.is_visited)
         {
-            v = node->v;
-            node->isVisited = true;
+            v = &node.v;
+            node.is_visited = true;
         }
-        else if (tr_variantIsContainer(node->v) && node->childIndex < node->v->val.l.count)
+        else if ((v = node.nextChild()) != nullptr)
         {
-            size_t const index = node->childIndex;
-            ++node->childIndex;
-
-            v = node->v->val.l.vals + index;
-
-            if (tr_variantIsDict(node->v))
+            if (tr_variantIsDict(&node.v))
             {
-                tr_variant tmp;
+                auto tmp = tr_variant{};
                 tr_variantInitQuark(&tmp, v->key);
                 walkFuncs->stringFunc(&tmp, user_data);
             }
         }
-        else /* done with this node */
+        else // finished with this node
         {
-            if (tr_variantIsContainer(node->v))
+            if (tr_variantIsContainer(&node.v))
             {
-                walkFuncs->containerEndFunc(node->v, user_data);
+                walkFuncs->containerEndFunc(&node.v, user_data);
             }
 
-            --stackSize;
-            nodeDestruct(node);
+            stack.pop();
             continue;
         }
 
-        if (v != NULL)
+        if (v != nullptr)
         {
             switch (v->type)
             {
@@ -882,39 +860,25 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
                 break;
 
             case TR_VARIANT_TYPE_LIST:
-                if (v == node->v)
+                if (v == &node.v)
                 {
                     walkFuncs->listBeginFunc(v, user_data);
                 }
                 else
                 {
-                    if (stackAlloc == stackSize)
-                    {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
-                    }
-
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
-
                 break;
 
             case TR_VARIANT_TYPE_DICT:
-                if (v == node->v)
+                if (v == &node.v)
                 {
                     walkFuncs->dictBeginFunc(v, user_data);
                 }
                 else
                 {
-                    if (stackAlloc == stackSize)
-                    {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
-                    }
-
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
+                    stack.emplace(v, sort_dicts);
                 }
-
                 break;
 
             default:
@@ -924,8 +888,6 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
             }
         }
     }
-
-    tr_free(stack);
 }
 
 /****
@@ -966,7 +928,7 @@ void tr_variantFree(tr_variant* v)
 {
     if (tr_variantIsSomething(v))
     {
-        tr_variantWalk(v, &freeWalkFuncs, NULL, false);
+        tr_variantWalk(v, &freeWalkFuncs, nullptr, false);
     }
 }
 
@@ -979,7 +941,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i)) != NULL)
+    while ((val = tr_variantListChild((tr_variant*)src, i)) != nullptr)
     {
         if (tr_variantIsBool(val))
         {
@@ -1002,7 +964,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         else if (tr_variantIsString(val))
         {
             size_t len = 0;
-            char const* str = NULL;
+            char const* str = nullptr;
             (void)tr_variantGetStr(val, &str, &len);
             tr_variantListAddRaw(target, str, len);
         }
@@ -1089,7 +1051,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             else if (tr_variantIsString(val))
             {
                 size_t len = 0;
-                char const* str = NULL;
+                char const* str = nullptr;
                 (void)tr_variantGetStr(val, &str, &len);
                 tr_variantDictAddRaw(target, key, str, len);
             }
@@ -1099,7 +1061,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsList(val))
             {
-                if (tr_variantDictFind(target, key) == NULL)
+                if (tr_variantDictFind(target, key) == nullptr)
                 {
                     tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
                 }
@@ -1108,7 +1070,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             {
                 tr_variant* target_dict = tr_variantDictFind(target, key);
 
-                if (target_dict == NULL)
+                if (target_dict == nullptr)
                 {
                     target_dict = tr_variantDictAddDict(target, key, tr_variantDictSize(val));
                 }
@@ -1120,7 +1082,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, NULL));
+                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, nullptr));
             }
         }
     }
@@ -1177,7 +1139,7 @@ static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file
     {
         uint64_t n = 0;
 
-        tr_error* tmperr = NULL;
+        tr_error* tmperr = nullptr;
         if (!tr_sys_file_write(fd, walk, nleft, &n, &tmperr))
         {
             err = tmperr->code;
@@ -1197,27 +1159,27 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 {
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with tr_sys_file_open_temp() is created on the right partition */
-    char* real_filename = tr_sys_path_resolve(filename, NULL);
-    if (real_filename != NULL)
+    char* real_filename = tr_sys_path_resolve(filename, nullptr);
+    if (real_filename != nullptr)
     {
         filename = real_filename;
     }
 
     /* if the file already exists, try to move it out of the way & keep it as a backup */
     char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
-    tr_error* error = NULL;
+    tr_error* error = nullptr;
     tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
 
     int err = 0;
     if (fd != TR_BAD_SYS_FILE)
     {
         err = writeVariantToFd(v, fmt, fd, &error);
-        tr_sys_file_close(fd, NULL);
+        tr_sys_file_close(fd, nullptr);
 
         if (err)
         {
             tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-            tr_sys_path_remove(tmp, NULL);
+            tr_sys_path_remove(tmp, nullptr);
             tr_error_free(error);
         }
         else
@@ -1232,7 +1194,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
             {
                 err = error->code;
                 tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_sys_path_remove(tmp, NULL);
+                tr_sys_path_remove(tmp, nullptr);
                 tr_error_free(error);
             }
         }
@@ -1261,9 +1223,9 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filen
 
     buf = tr_loadFile(filename, &buflen, error);
 
-    if (buf != NULL)
+    if (buf != nullptr)
     {
-        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, NULL) == 0)
+        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
         {
             ret = true;
         }

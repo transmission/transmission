@@ -96,7 +96,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
         ++len;
     }
 
-    if (info != NULL)
+    if (info != nullptr)
     {
         struct cache_block const* b = blocks[pos + len - 1];
         info->last_block_time = b->time;
@@ -275,7 +275,7 @@ void tr_cacheFree(tr_cache* cache)
 {
     TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
 
-    tr_ptrArrayDestruct(&cache->blocks, NULL);
+    tr_ptrArrayDestruct(&cache->blocks, nullptr);
     tr_free(cache);
 }
 
@@ -324,7 +324,7 @@ int tr_cacheWriteBlock(
 
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb == NULL)
+    if (cb == nullptr)
     {
         cb = tr_new(struct cache_block, 1);
         cb->tor = torrent;
@@ -360,7 +360,7 @@ int tr_cacheReadBlock(
     int err = 0;
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb != NULL)
+    if (cb != nullptr)
     {
         evbuffer_copyout(cb->evbuf, setme, len);
     }
@@ -377,7 +377,7 @@ int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t
     int err = 0;
     struct cache_block const* const cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb == NULL)
+    if (cb == nullptr)
     {
         err = tr_ioPrefetch(torrent, piece, offset, len);
     }
@@ -394,7 +394,7 @@ static int findBlockPos(tr_cache const* cache, tr_torrent* torrent, tr_piece_ind
     struct cache_block key;
     key.tor = torrent;
     key.block = block;
-    return tr_ptrArrayLowerBound(&cache->blocks, &key, cache_block_compare, NULL);
+    return tr_ptrArrayLowerBound(&cache->blocks, &key, cache_block_compare, nullptr);
 }
 
 int tr_cacheFlushDone(tr_cache* cache)
@@ -449,7 +449,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
             break;
         }
 
-        err = flushContiguous(cache, pos, getBlockRun(cache, pos, NULL));
+        err = flushContiguous(cache, pos, getBlockRun(cache, pos, nullptr));
     }
 
     return err;
@@ -470,7 +470,7 @@ int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
             break;
         }
 
-        err = flushContiguous(cache, pos, getBlockRun(cache, pos, NULL));
+        err = flushContiguous(cache, pos, getBlockRun(cache, pos, nullptr));
     }
 
     return err;

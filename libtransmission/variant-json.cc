@@ -7,10 +7,11 @@
  */
 
 #include <ctype.h>
+#include <errno.h> /* EILSEQ, EINVAL */
+#include <deque>
 #include <math.h> /* fabs() */
 #include <stdio.h>
 #include <string.h>
-#include <errno.h> /* EILSEQ, EINVAL */
 
 #include <event2/buffer.h> /* evbuffer_add() */
 #include <event2/util.h> /* evutil_strtoll() */
@@ -20,9 +21,7 @@
 #include "transmission.h"
 #include "ConvertUTF.h"
 #include "jsonsl.h"
-#include "list.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -41,7 +40,7 @@ struct json_wrapper_data
     struct evbuffer* keybuf;
     struct evbuffer* strbuf;
     char const* source;
-    tr_ptrArray stack;
+    std::deque<tr_variant*> stack;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -54,10 +53,10 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    auto* parent = static_cast<tr_variant*>(tr_ptrArrayEmpty(&data->stack) ? NULL : tr_ptrArrayBack(&data->stack));
+    auto* parent = std::empty(data->stack) ? nullptr : data->stack.back();
 
-    tr_variant* node = NULL;
-    if (parent == NULL)
+    tr_variant* node = nullptr;
+    if (parent == nullptr)
     {
         node = data->top;
     }
@@ -65,11 +64,11 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     {
         node = tr_variantListAdd(parent);
     }
-    else if (tr_variantIsDict(parent) && data->key != NULL)
+    else if (tr_variantIsDict(parent) && data->key != nullptr)
     {
         node = tr_variantDictAdd(parent, tr_quark_new(data->key, data->keylen));
 
-        data->key = NULL;
+        data->key = nullptr;
         data->keylen = 0;
     }
 
@@ -82,7 +81,7 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    if (data->source != NULL)
+    if (data->source != nullptr)
     {
         tr_logAddError(
             "JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
@@ -110,16 +109,15 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct js
     TR_UNUSED(action);
     TR_UNUSED(buf);
 
-    tr_variant* node;
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
         data->has_content = true;
-        node = get_node(jsn);
-        tr_ptrArrayAppend(&data->stack, node);
+        tr_variant* node = get_node(jsn);
+        data->stack.push_back(node);
 
-        int const depth = tr_ptrArraySize(&data->stack);
+        int const depth = std::size(data->stack);
         size_t const n = depth < MAX_DEPTH ? data->preallocGuess[depth] : 0;
         if (state->type == JSONSL_T_LIST)
         {
@@ -135,7 +133,7 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct js
 /* like sscanf(in+2, "%4x", &val) but less slow */
 static bool decode_hex_string(char const* in, unsigned int* setme)
 {
-    TR_ASSERT(in != NULL);
+    TR_ASSERT(in != nullptr);
 
     unsigned int val = 0;
     char const* const end = in + 6;
@@ -290,7 +288,7 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
     in_end = jsn->base + state->pos_cur;
     in_len = in_end - in_begin;
 
-    if (memchr(in_begin, '\\', in_len) == NULL)
+    if (memchr(in_begin, '\\', in_len) == nullptr)
     {
         /* it's not escaped */
         ret = in_begin;
@@ -325,8 +323,9 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
-        int const depth = tr_ptrArraySize(&data->stack);
-        auto* v = static_cast<tr_variant const*>(tr_ptrArrayPop(&data->stack));
+        int const depth = std::size(data->stack);
+        auto* v = data->stack.back();
+        data->stack.pop_back();
         if (depth < MAX_DEPTH)
         {
             data->preallocGuess[depth] = v->val.l.count;
@@ -338,13 +337,13 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitReal(get_node(jsn), strtod(begin, NULL));
+            tr_variantInitReal(get_node(jsn), strtod(begin, nullptr));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, NULL, 10));
+            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, nullptr, 10));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
         {
@@ -375,7 +374,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
 
     data.error = 0;
     data.has_content = false;
-    data.key = NULL;
+    data.key = nullptr;
     data.top = setme_variant;
     data.stack = {};
     data.source = source;
@@ -396,7 +395,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     }
 
     /* maybe set the end ptr */
-    if (setme_end != NULL)
+    if (setme_end != nullptr)
     {
         *setme_end = ((char const*)vbuf) + jsn->pos;
     }
@@ -405,7 +404,6 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     error = data.error;
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
-    tr_ptrArrayDestruct(&data.stack, NULL);
     jsonsl_destroy(jsn);
     return error;
 }
@@ -424,7 +422,7 @@ struct ParentState
 struct jsonWalk
 {
     bool doIndent;
-    tr_list* parents;
+    std::deque<ParentState> parents;
     struct evbuffer* out;
 };
 
@@ -440,22 +438,22 @@ static void jsonIndent(struct jsonWalk* data)
 
     if (data->doIndent)
     {
-        evbuffer_add(data->out, buf, tr_list_size(data->parents) * 4 + 1);
+        evbuffer_add(data->out, buf, std::size(data->parents) * 4 + 1);
     }
 }
 
 static void jsonChildFunc(struct jsonWalk* data)
 {
-    if (data->parents != NULL && data->parents->data != NULL)
+    if (!std::empty(data->parents))
     {
-        auto* pstate = static_cast<struct ParentState*>(data->parents->data);
+        auto& pstate = data->parents.back();
 
-        switch (pstate->variantType)
+        switch (pstate.variantType)
         {
         case TR_VARIANT_TYPE_DICT:
             {
-                int const i = pstate->childIndex;
-                ++pstate->childIndex;
+                int const i = pstate.childIndex;
+                ++pstate.childIndex;
 
                 if (i % 2 == 0)
                 {
@@ -463,9 +461,8 @@ static void jsonChildFunc(struct jsonWalk* data)
                 }
                 else
                 {
-                    bool const isLast = pstate->childIndex == pstate->childCount;
-
-                    if (!isLast)
+                    bool const is_last = pstate.childIndex == pstate.childCount;
+                    if (!is_last)
                     {
                         evbuffer_add(data->out, ",", 1);
                         jsonIndent(data);
@@ -477,10 +474,9 @@ static void jsonChildFunc(struct jsonWalk* data)
 
         case TR_VARIANT_TYPE_LIST:
             {
-                ++pstate->childIndex;
-                bool const isLast = pstate->childIndex == pstate->childCount;
-
-                if (!isLast)
+                ++pstate.childIndex;
+                bool const is_last = pstate.childIndex == pstate.childCount;
+                if (!is_last)
                 {
                     evbuffer_add(data->out, ",", 1);
                     jsonIndent(data);
@@ -497,23 +493,13 @@ static void jsonChildFunc(struct jsonWalk* data)
 
 static void jsonPushParent(struct jsonWalk* data, tr_variant const* v)
 {
-    struct ParentState* pstate = tr_new(struct ParentState, 1);
-
-    pstate->variantType = v->type;
-    pstate->childIndex = 0;
-    pstate->childCount = v->val.l.count;
-
-    if (tr_variantIsDict(v))
-    {
-        pstate->childCount *= 2;
-    }
-
-    tr_list_prepend(&data->parents, pstate);
+    int const n_children = tr_variantIsDict(v) ? v->val.l.count * 2 : v->val.l.count;
+    data->parents.push_back({ v->type, 0, n_children });
 }
 
 static void jsonPopParent(struct jsonWalk* data)
 {
-    tr_free(tr_list_pop_front(&data->parents));
+    data->parents.pop_back();
 }
 
 static void jsonIntFunc(tr_variant const* val, void* vdata)
@@ -560,7 +546,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     struct evbuffer_iovec vec[1];
     auto* data = static_cast<struct jsonWalk*>(vdata);
 
-    char const* str = NULL;
+    char const* str = nullptr;
     size_t len = 0;
     (void)tr_variantGetStr(val, &str, &len);
     auto const* it = reinterpret_cast<unsigned char const*>(str);
@@ -709,7 +695,6 @@ void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
 
     data.doIndent = !lean;
     data.out = buf;
-    data.parents = NULL;
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 
