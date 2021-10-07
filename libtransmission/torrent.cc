@@ -1853,7 +1853,7 @@ static void verifyTorrent(void* vdata)
     }
 
     /* if the torrent's already being verified, stop it */
-    tr_verifyRemove(tor);
+    tr_verifyRemove(tor->session->verifier, tor);
 
     startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
 
@@ -1870,7 +1870,7 @@ static void verifyTorrent(void* vdata)
     }
     else
     {
-        tr_verifyAdd(tor, onVerifyDone, data);
+        tr_verifyAdd(tor->session->verifier, tor, onVerifyDone, data);
     }
 
 unlock:
@@ -1908,7 +1908,7 @@ static void stopTorrent(void* vtor)
 
     tr_torrentLock(tor);
 
-    tr_verifyRemove(tor);
+    tr_verifyRemove(tor->session->verifier, tor);
     tr_peerMgrStopTorrent(tor);
     tr_announcerTorrentStopped(tor);
     tr_cacheFlushTorrent(tor->session->cache, tor);
@@ -3170,7 +3170,7 @@ static void setLocation(void* vdata)
     if (!tr_sys_path_is_same(location, tor->currentDir, nullptr))
     {
         /* bad idea to move files while they're being verified... */
-        tr_verifyRemove(tor);
+        tr_verifyRemove(tor->session->verifier, tor);
 
         /* try to move the files.
          * FIXME: there are still all kinds of nasty cases, like what

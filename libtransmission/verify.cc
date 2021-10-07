@@ -29,7 +29,6 @@
 enum
 {
     MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100,
-    DEFAULT_THREAD_POOL_SIZE = 1,
 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
@@ -206,54 +205,45 @@ struct verify_node
     }
 };
 
-// TODO: refactor s.t. this doesn't leak
-static auto& pendingSet{ *new std::set<verify_node>{} };
-static auto& activeSet{ *new std::set<verify_node*>{} };
-static int activeVerificationThreads = 0;
-static int maxVerificationThreads = DEFAULT_THREAD_POOL_SIZE;
-
-static tr_lock* getVerifyLock(void)
+struct tr_verifier
 {
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+    tr_lock* lock = tr_lockNew();
+    std::set<verify_node> pendingSet;
+    std::set<verify_node*> activeSet;
+    int activeVerificationThreads = 0;
+    int maxVerificationThreads = 1;
+};
 
 static void verifyThreadFunc(void* user_data)
 {
-    TR_UNUSED(user_data);
+    tr_verifier* v = static_cast<tr_verifier*>(user_data);
 
     for (;;)
     {
         bool changed = false;
         verify_node node;
 
-        tr_lockLock(getVerifyLock());
-        if (activeVerificationThreads > maxVerificationThreads)
+        tr_lockLock(v->lock);
+        if (v->activeVerificationThreads > v->maxVerificationThreads)
         {
             // Attempt to downsize the thread pool.
             break;
         }
 
-        if (std::empty(pendingSet))
+        if (std::empty(v->pendingSet))
         {
             break;
         }
 
-        auto const it = std::begin(pendingSet);
+        auto const it = std::begin(v->pendingSet);
         node = *it;
-        pendingSet.erase(it);
+        v->pendingSet.erase(it);
 
         // This stores a reference to a local variable, but we ensure that the
         // set element is removed before the local goes out of scope.
-        activeSet.insert(&node);
+        v->activeSet.insert(&node);
 
-        tr_lockUnlock(getVerifyLock());
+        tr_lockUnlock(v->lock);
 
         tr_torrent* tor = node.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
@@ -262,7 +252,7 @@ static void verifyThreadFunc(void* user_data)
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
-        tr_lockLock(getVerifyLock());
+        tr_lockLock(v->lock);
         if (!node.request_abort && changed)
         {
             tr_torrentSetDirty(tor);
@@ -278,15 +268,20 @@ static void verifyThreadFunc(void* user_data)
             *node.completion_signal = true;
         }
 
-        activeSet.erase(&node);
-        tr_lockUnlock(getVerifyLock());
+        v->activeSet.erase(&node);
+        tr_lockUnlock(v->lock);
     }
 
-    --activeVerificationThreads;
-    tr_lockUnlock(getVerifyLock());
+    --v->activeVerificationThreads;
+    tr_lockUnlock(v->lock);
 }
 
-void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
+tr_verifier* tr_verifyInit()
+{
+    return new tr_verifier;
+}
+
+void tr_verifyAdd(tr_verifier* v, tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
     tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
@@ -299,32 +294,31 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.request_abort = false;
     node.completion_signal = nullptr;
 
-    tr_lockLock(getVerifyLock());
+    tr_lockLock(v->lock);
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
-    pendingSet.insert(node);
+    v->pendingSet.insert(node);
 
-    if (activeVerificationThreads < maxVerificationThreads)
+    if (v->activeVerificationThreads < v->maxVerificationThreads)
     {
-        ++activeVerificationThreads;
-        tr_threadNew(verifyThreadFunc, nullptr);
+        ++v->activeVerificationThreads;
+        tr_threadNew(verifyThreadFunc, v);
     }
 
-    tr_lockUnlock(getVerifyLock());
+    tr_lockUnlock(v->lock);
 }
 
-void tr_verifyRemove(tr_torrent* tor)
+void tr_verifyRemove(tr_verifier* v, tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_lock* lock = getVerifyLock();
-    tr_lockLock(lock);
+    tr_lockLock(v->lock);
 
     auto const active_it = std::find_if(
-        std::begin(activeSet),
-        std::end(activeSet),
+        std::begin(v->activeSet),
+        std::end(v->activeSet),
         [tor](auto const& task) { return tor == task->torrent; });
 
-    if (active_it != std::end(activeSet))
+    if (active_it != std::end(v->activeSet))
     {
         bool completed = false;
         (*active_it)->completion_signal = &completed;
@@ -332,54 +326,51 @@ void tr_verifyRemove(tr_torrent* tor)
 
         while (!completed)
         {
-            tr_lockUnlock(lock);
+            tr_lockUnlock(v->lock);
             tr_wait_msec(100);
-            tr_lockLock(lock);
+            tr_lockLock(v->lock);
         }
     }
     else
     {
         auto const pending_it = std::find_if(
-            std::begin(pendingSet),
-            std::end(pendingSet),
+            std::begin(v->pendingSet),
+            std::end(v->pendingSet),
             [tor](auto const& task) { return tor == task.torrent; });
 
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
 
-        if (pending_it != std::end(pendingSet))
+        if (pending_it != std::end(v->pendingSet))
         {
             if (pending_it->callback_func != nullptr)
             {
                 (*pending_it->callback_func)(tor, true, pending_it->callback_data);
             }
 
-            pendingSet.erase(pending_it);
+            v->pendingSet.erase(pending_it);
         }
     }
 
-    tr_lockUnlock(lock);
+    tr_lockUnlock(v->lock);
 }
 
-void tr_verifyClose(tr_session* session)
+void tr_verifyClose(tr_verifier* v)
 {
-    TR_UNUSED(session);
+    tr_lockLock(v->lock);
 
-    tr_lock* lock = getVerifyLock();
-    tr_lockLock(lock);
-
-    pendingSet.clear();
+    v->pendingSet.clear();
 
     // Request all active threads to abort and wait for completion.
-    for (verify_node* active : activeSet)
+    for (verify_node* active : v->activeSet)
     {
         active->request_abort = true;
     }
-    while (activeVerificationThreads > 0)
+    while (v->activeVerificationThreads > 0)
     {
-        tr_lockUnlock(lock);
+        tr_lockUnlock(v->lock);
         tr_wait_msec(100);
-        tr_lockLock(lock);
+        tr_lockLock(v->lock);
     }
 
-    tr_lockUnlock(lock);
+    tr_lockUnlock(v->lock);
 }

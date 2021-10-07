@@ -218,6 +218,8 @@ struct tr_session
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
+    struct tr_verifier* verifier;
+
     struct tr_cache* cache;
 
     struct tr_lock* lock;

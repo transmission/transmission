@@ -17,10 +17,14 @@
  * @{
  */
 
-void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_user_data);
+struct tr_verifier;
 
-void tr_verifyRemove(tr_torrent* tor);
+tr_verifier* tr_verifyInit();
 
-void tr_verifyClose(tr_session*);
+void tr_verifyAdd(tr_verifier* v, tr_torrent* tor, tr_verify_done_func callback_func, void* callback_user_data);
+
+void tr_verifyRemove(tr_verifier* v, tr_torrent* tor);
+
+void tr_verifyClose(tr_verifier* v);
 
 /* @} */
