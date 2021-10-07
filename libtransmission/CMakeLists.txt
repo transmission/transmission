@@ -27,7 +27,6 @@ set(PROJECT_FILES
   file-posix.cc
   file-win32.cc
   handshake.cc
-  history.cc
   inout.cc
   log.cc
   magnet.cc

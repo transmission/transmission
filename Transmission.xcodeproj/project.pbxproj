@@ -86,7 +86,6 @@
 		A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.mm */; };
 		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
 		A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209ECA1114319C3002B02D1 /* InfoWindow.xib */; };
-		A209EE5C1144B51E002B02D1 /* history.cc in Sources */ = {isa = PBXBuildFile; fileRef = A209EE5A1144B51E002B02D1 /* history.cc */; };
 		A209EE5D1144B51E002B02D1 /* history.h in Headers */ = {isa = PBXBuildFile; fileRef = A209EE5B1144B51E002B02D1 /* history.h */; };
 		A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */; };
 		A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A21282A60CA6C66800EAEE0F /* StatusBarView.mm */; };
@@ -599,7 +598,6 @@
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoOptionsViewController.mm; sourceTree = "<group>"; };
 		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InfoWindow.xib; sourceTree = "<group>"; };
-		A209EE5A1144B51E002B02D1 /* history.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = history.cc; sourceTree = "<group>"; };
 		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = history.h; sourceTree = "<group>"; };
 		A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolbarSegmentedCell.h; sourceTree = "<group>"; };
 		A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolbarSegmentedCell.mm; sourceTree = "<group>"; };
@@ -1466,7 +1464,6 @@
 				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
 				A21FBBAA0EDA78C300BC3C51 /* bandwidth.cc */,
 				A209EE5B1144B51E002B02D1 /* history.h */,
-				A209EE5A1144B51E002B02D1 /* history.cc */,
 				A23547E011CD0B090046EAE6 /* cache.cc */,
 				A23547E111CD0B090046EAE6 /* cache.h */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
@@ -2483,7 +2480,6 @@
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.cc in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet.cc in Sources */,
-				A209EE5C1144B51E002B02D1 /* history.cc in Sources */,
 				A220EC5B118C8A060022B4BE /* tr-lpd.cc in Sources */,
 				C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.cc in Sources */,

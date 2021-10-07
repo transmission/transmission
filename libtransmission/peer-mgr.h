@@ -28,6 +28,7 @@
  * @{
  */
 
+class tr_peerMsgs;
 struct UTPSocket;
 struct peer_atom;
 struct tr_peerIo;
