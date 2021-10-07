@@ -9,17 +9,20 @@
 #pragma once
 
 #include <ctime>
+#include <memory>
 
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Macros.h"
+#include "Speed.h"
 #include "TorrentFilter.h"
+#include "Typedefs.h"
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -30,6 +33,7 @@ class QStringList;
 class AboutDialog;
 class AddData;
 class DetailsDialog;
+class ListViewProxyStyle;
 class Prefs;
 class PrefsDialog;
 class Session;
@@ -41,20 +45,20 @@ class TorrentModel;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minized);
-    virtual ~MainWindow();
 
     QSystemTrayIcon& trayIcon()
     {
-        return myTrayIcon;
+        return tray_icon_;
     }
 
 public slots:
@@ -77,23 +81,52 @@ public slots:
     void setFilterbarVisible(bool);
     void setStatusbarVisible(bool);
     void setCompactView(bool);
-    void refreshActionSensitivity();
-    void refreshActionSensitivitySoon();
     void wrongAuthentication();
 
     void openSession();
 
 protected:
     // QWidget
-    virtual void contextMenuEvent(QContextMenuEvent*);
-    virtual void dragEnterEvent(QDragEnterEvent*);
-    virtual void dropEvent(QDropEvent*);
+    void contextMenuEvent(QContextMenuEvent*) override;
+    void dragEnterEvent(QDragEnterEvent*) override;
+    void dropEvent(QDropEvent*) override;
+
+private slots:
+    void addTorrents(QStringList const& filenames);
+    void copyMagnetLinkToClipboard();
+    void dataReadProgress();
+    void dataSendProgress();
+    void newTorrent();
+    void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
+    void onRefreshTimer();
+    void onSessionSourceChanged();
+    void onSetPrefs();
+    void onSetPrefs(bool);
+    void onSortModeChanged(QAction const* action);
+    void onStatsModeChanged(QAction const* action);
+    void openAbout();
+    void openDonate() const;
+    void openFolder();
+    void openHelp() const;
+    void openPreferences();
+    void openProperties();
+    void openStats();
+    void openTorrent();
+    void openURL();
+    void refreshPref(int key);
+    void refreshSoon(int fields = ~0);
+    void removeTorrents(bool const delete_files);
+    void setLocation();
+    void setSortAscendingPref(bool);
+    void toggleSpeedMode();
+    void toggleWindows(bool do_show);
+    void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon getStockIcon(QString const&, int fallback, QStringList const& emblemNames);
+    QIcon getStockIcon(QString const&, int fallback = -1) const;
+    QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
-    QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
@@ -101,80 +134,80 @@ private:
     void initStatusBar();
 
     void clearSelection();
-    void addTorrent(AddData const& addMe, bool showOptions);
+    void addTorrent(AddData const& add_me, bool show_options);
 
     // QWidget
-    virtual void hideEvent(QHideEvent* event);
-    virtual void showEvent(QShowEvent* event);
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
-private slots:
-    void openPreferences();
+    Session& session_;
+    Prefs& prefs_;
+    TorrentModel& model_;
+
+    std::shared_ptr<ListViewProxyStyle> lvp_style_;
+
+    QPixmap pixmap_network_error_;
+    QPixmap pixmap_network_idle_;
+    QPixmap pixmap_network_receive_;
+    QPixmap pixmap_network_transmit_;
+    QPixmap pixmap_network_transmit_receive_;
+
+    Ui_MainWindow ui_ = {};
+
+    time_t last_full_update_time_ = {};
+    QPointer<SessionDialog> session_dialog_;
+    QPointer<PrefsDialog> prefs_dialog_;
+    QPointer<AboutDialog> about_dialog_;
+    QPointer<StatsDialog> stats_dialog_;
+    QPointer<DetailsDialog> details_dialog_;
+    QSystemTrayIcon tray_icon_;
+    TorrentFilter filter_model_;
+    TorrentDelegate* torrent_delegate_ = {};
+    TorrentDelegateMin* torrent_delegate_min_ = {};
+    time_t last_send_time_ = {};
+    time_t last_read_time_ = {};
+    QTimer network_timer_;
+    bool network_error_ = {};
+    QAction* dlimit_off_action_ = {};
+    QAction* dlimit_on_action_ = {};
+    QAction* ulimit_off_action_ = {};
+    QAction* ulimit_on_action_ = {};
+    QAction* ratio_off_action_ = {};
+    QAction* ratio_on_action_ = {};
+    QWidgetList hidden_;
+    QWidget* filter_bar_ = {};
+    QAction* alt_speed_action_ = {};
+    QString error_message_;
+
+    QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
+    QString const total_transfer_stats_mode_name_ = QStringLiteral("total-transfer");
+    QString const session_ratio_stats_mode_name_ = QStringLiteral("session-ratio");
+    QString const session_transfer_stats_mode_name_ = QStringLiteral("session-transfer");
+    QString const show_options_checkbox_name_ = QStringLiteral("show-options-checkbox");
+
+    struct TransferStats
+    {
+        Speed speed_up;
+        Speed speed_down;
+        size_t peers_sending = 0;
+        size_t peers_receiving = 0;
+    };
+    TransferStats getTransferStats() const;
+
+    enum
+    {
+        REFRESH_TITLE = (1 << 0),
+        REFRESH_STATUS_BAR = (1 << 1),
+        REFRESH_TRAY_ICON = (1 << 2),
+        REFRESH_TORRENT_VIEW_HEADER = (1 << 3),
+        REFRESH_ACTION_SENSITIVITY = (1 << 4)
+    };
+    int refresh_fields_ = {};
+    QTimer refresh_timer_;
+
+    void refreshActionSensitivity();
+    void refreshStatusBar(TransferStats const&);
     void refreshTitle();
-    void refreshStatusBar();
-    void refreshTrayIcon();
-    void refreshTrayIconSoon();
     void refreshTorrentViewHeader();
-    void openTorrent();
-    void openURL();
-    void newTorrent();
-    void trayActivated(QSystemTrayIcon::ActivationReason);
-    void refreshPref(int key);
-    void addTorrents(QStringList const& filenames);
-    void removeTorrents(bool const deleteFiles);
-    void openStats();
-    void openDonate();
-    void openAbout();
-    void openHelp();
-    void openFolder();
-    void copyMagnetLinkToClipboard();
-    void setLocation();
-    void openProperties();
-    void toggleSpeedMode();
-    void dataReadProgress();
-    void dataSendProgress();
-    void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void toggleWindows(bool doShow);
-    void onSetPrefs();
-    void onSetPrefs(bool);
-    void onSessionSourceChanged();
-    void onModelReset();
-
-    void setSortAscendingPref(bool);
-
-    void onStatsModeChanged(QAction* action);
-    void onSortModeChanged(QAction* action);
-
-private:
-    Session& mySession;
-    Prefs& myPrefs;
-    TorrentModel& myModel;
-
-    Ui_MainWindow ui;
-
-    time_t myLastFullUpdateTime;
-    QPointer<SessionDialog> mySessionDialog;
-    QPointer<PrefsDialog> myPrefsDialog;
-    QPointer<AboutDialog> myAboutDialog;
-    QPointer<StatsDialog> myStatsDialog;
-    QPointer<DetailsDialog> myDetailsDialog;
-    QSystemTrayIcon myTrayIcon;
-    TorrentFilter myFilterModel;
-    TorrentDelegate* myTorrentDelegate;
-    TorrentDelegateMin* myTorrentDelegateMin;
-    time_t myLastSendTime;
-    time_t myLastReadTime;
-    QTimer myNetworkTimer;
-    bool myNetworkError;
-    QTimer myRefreshTrayIconTimer;
-    QTimer myRefreshActionSensitivityTimer;
-    QAction* myDlimitOffAction;
-    QAction* myDlimitOnAction;
-    QAction* myUlimitOffAction;
-    QAction* myUlimitOnAction;
-    QAction* myRatioOffAction;
-    QAction* myRatioOnAction;
-    QWidgetList myHidden;
-    QWidget* myFilterBar;
-    QAction* myAltSpeedAction;
-    QString myErrorMessage;
+    void refreshTrayIcon(TransferStats const&);
 };

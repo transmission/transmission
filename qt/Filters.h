@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <QMetaType>
-#include <QString>
-#include <QVariant>
+#include <array>
+
+#include "Torrent.h"
 
 class FilterMode
 {
@@ -28,38 +28,34 @@ public:
         NUM_MODES
     };
 
-public:
-    FilterMode(int mode = SHOW_ALL) :
-        myMode(mode)
-    {
-    }
-
-    FilterMode(QString const& name) :
-        myMode(modeFromName(name))
+    explicit FilterMode(int mode = SHOW_ALL)
+        : mode_(mode)
     {
     }
 
     int mode() const
     {
-        return myMode;
+        return mode_;
     }
 
-    QString const& name() const
-    {
-        return names[myMode];
-    }
+    /* The Torrent properties that can affect this filter.
+       When one of these changes, it's time to refilter. */
+    static Torrent::fields_t constexpr TorrentFields = //
+        (uint64_t(1) << Torrent::ERROR) | //
+        (uint64_t(1) << Torrent::IS_FINISHED) | //
+        (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) | //
+        (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) | //
+        (uint64_t(1) << Torrent::STATUS);
 
-    static int modeFromName(QString const& name);
+    static bool test(Torrent const& tor, int mode);
 
-    static QString const& nameFromMode(int mode)
+    bool test(Torrent const& tor) const
     {
-        return names[mode];
+        return test(tor, mode());
     }
 
 private:
-    int myMode;
-
-    static QString const names[];
+    int mode_;
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -82,34 +78,18 @@ public:
         NUM_MODES
     };
 
-public:
-    SortMode(int mode = SORT_BY_ID) :
-        myMode(mode)
-    {
-    }
-
-    SortMode(QString const& name) :
-        myMode(modeFromName(name))
+    explicit SortMode(int mode = SORT_BY_ID)
+        : mode_(mode)
     {
     }
 
     int mode() const
     {
-        return myMode;
+        return mode_;
     }
-
-    QString const& name() const
-    {
-        return names[myMode];
-    }
-
-    static int modeFromName(QString const& name);
-    static QString const& nameFromMode(int mode);
 
 private:
-    int myMode;
-
-    static QString const names[];
+    int mode_ = SORT_BY_ID;
 };
 
 Q_DECLARE_METATYPE(SortMode)

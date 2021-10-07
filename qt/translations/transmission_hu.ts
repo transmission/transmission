@@ -9,7 +9,7 @@
         <translation>A Transmission-ről</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+28"/>
+        <location filename="../AboutDialog.cc" line="+27"/>
         <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
@@ -24,7 +24,7 @@
         <translation>Copyright (c) The Transmission Project</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+4"/>
+        <location filename="../AboutDialog.cc" line="+2"/>
         <source>C&amp;redits</source>
         <translation>K&amp;észítették</translation>
     </message>
@@ -42,35 +42,39 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+355"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;A Transmission egy fájlmegosztó program.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Mikor futtatsz egy torrentet, az adatot feltöltés révén elérhetővé teszed mások számára. Minden megosztott adat a saját felelősséged.</translation>
+        <translation>Egy torrent futtatása során a hozzá tartozó adatok elérhetővé válnak más felhasználók számára is. Minden megosztott tartalomért Ön tartozik felelősséggel.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation>&amp;Elfogadom</translation>
     </message>
-    <message>
-        <location line="+92"/>
-        <source>Torrent Completed</source>
-        <translation>Torrent befejezve</translation>
+    <message numerus="yes">
+        <location line="+77"/>
+        <source>Torrent(s) Added</source>
+        <translation>
+            <numerusform>Torrent(ek) hozzáadva</numerusform>
+        </translation>
     </message>
-    <message>
-        <location line="+26"/>
-        <source>Torrent Added</source>
-        <translation>Torrent hozzáadva</translation>
+    <message numerus="yes">
+        <location line="+10"/>
+        <source>Torrent Completed</source>
+        <translation>
+            <numerusform>Torrent kész</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+408"/>
+        <location filename="../DetailsDialog.cc" line="+410"/>
         <source>None</source>
         <translation>Nincs</translation>
     </message>
@@ -81,7 +85,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+271"/>
+        <location line="+272"/>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
     </message>
@@ -93,7 +97,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Szünetelteve</translation>
+        <translation>Megállítva</translation>
     </message>
     <message>
         <location line="+250"/>
@@ -120,14 +124,14 @@
         </translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privát ezen tracker számára --DHT és PEX letiltva </translation>
+        <translation>Privát ezen követő számára --DHT és PEX letiltva </translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>Publikus torrent</translation>
+        <translation>Nyilvános torrent</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -135,17 +139,17 @@
         <translation>Készítette: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created on %1</source>
         <translation>Készült: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created by %1 on %2</source>
         <translation>Készítette: %1 ekkor: %2</translation>
     </message>
     <message>
-        <location line="+185"/>
+        <location line="+183"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Titkosított kapcsolat</translation>
@@ -153,7 +157,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>Optimista unchoke</translation>
+        <translation>Optimista engedélyezés</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -163,7 +167,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Töltenénk ettől a partnertől ha az megengedné</translation>
+        <translation>Letöltés a partnertől, ha hagyná</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -173,27 +177,27 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Feltöltenénk ennek apartnernek ha az kérné </translation>
+        <translation>Feltöltés a partnernek, ha kérné</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>A partner unchoke-olt minket, de nem vagyunk ebben érdekeltek</translation>
+        <translation>A partner hajlandó küldeni, de nem érdeklődünk</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Unchoke-oltuk a partnert, de ő nem érdeklődik</translation>
+        <translation>A partner engedélyezve, de nem érdeklődik</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>A partner DHT-n keresztül lett felderítva</translation>
+        <translation>Partner megtalálva a DHT segítségével</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>A partner PEX-en keresztül lett felfedezve</translation>
+        <translation>Partner megtalálva a Peer Exchange (PEX) segítségével</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -201,7 +205,7 @@
         <translation>Bejövő kapcsolatú partner</translation>
     </message>
     <message numerus="yes">
-        <location line="+136"/>
+        <location line="+134"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -209,19 +213,19 @@
         </translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+42"/>
         <location line="+16"/>
-        <location line="+30"/>
+        <location line="+28"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-28"/>
         <source>Tracker already exists.</source>
-        <translation>A tracker már létezik.</translation>
+        <translation>A követő már létezik.</translation>
     </message>
     <message>
-        <location line="-815"/>
+        <location line="-807"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -233,13 +237,13 @@
         <translation>%1 of %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
-        <translation>%1 of %2 (%3%), %4 Ellenőrízetlen</translation>
+        <translation>%1 ebből: %2 (%3%), %4 nem ellenőrzött</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+41"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 hibás)</translation>
     </message>
@@ -249,7 +253,7 @@
         <translation>%1 (Arány: %2)</translation>
     </message>
     <message>
-        <location line="+276"/>
+        <location line="+273"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
@@ -259,7 +263,7 @@
         <translation>A partner uTP-n keresztül kapcsolódik</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+163"/>
         <source>Add URL </source>
         <translation>URL hozzáadása</translation>
     </message>
@@ -270,7 +274,7 @@
     </message>
     <message>
         <location line="+9"/>
-        <location line="+46"/>
+        <location line="+44"/>
         <source>Invalid URL &quot;%1&quot;</source>
         <translation>Érvénytelen URL: &quot;%1&quot;</translation>
     </message>
@@ -282,17 +286,17 @@
     <message>
         <location line="+0"/>
         <source>Edit tracker announce URL:</source>
-        <translation>Tracker bejelentési URL szerkesztése:</translation>
+        <translation>Követő bejelentési URL szerkesztése:</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+57"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>Normál</translation>
+        <translation>Közepes</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -308,25 +312,25 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>Aránytól függetlenül seedeljen</translation>
+        <translation>Megosztás aránytól függetlenül</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Seedelés befejezése ha elérte az arányt:</translation>
+        <translation>Megosztás eddig az arányig:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation>Aktivitástól független seedelés</translation>
+        <translation>Megosztás aktivitástól függetlenül</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Seedelés befejezése ha inaktív a torrent:</translation>
+        <translation>Megosztás befejezése ha inaktív a torrent:</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+64"/>
         <source>Up</source>
         <translation>Fel</translation>
     </message>
@@ -483,7 +487,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Mutassa a &amp;backup trackereket</translation>
+        <translation>Tartalék kö&amp;vetők megjelenítése</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -549,8 +553,8 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+290"/>
-        <location filename="../FileTreeView.cc" line="+108"/>
+        <location filename="../FileTreeItem.cc" line="+292"/>
+        <location filename="../FileTreeView.cc" line="+111"/>
         <location line="+285"/>
         <source>Low</source>
         <translation>Alacsony</translation>
@@ -579,7 +583,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+205"/>
+        <location filename="../FileTreeModel.cc" line="+199"/>
         <source>File</source>
         <translation>Fájl</translation>
     </message>
@@ -640,13 +644,13 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+67"/>
-        <location line="+167"/>
+        <location filename="../FilterBar.cc" line="+49"/>
+        <location line="+142"/>
         <source>All</source>
         <translation>Mind</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-135"/>
         <source>Active</source>
         <translation>Aktív</translation>
     </message>
@@ -681,7 +685,7 @@
         <translation>Hiba</translation>
     </message>
     <message>
-        <location line="+165"/>
+        <location line="+139"/>
         <source>Show:</source>
         <translation>Mutat:</translation>
     </message>
@@ -694,78 +698,78 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+33"/>
+        <location filename="../Formatter.cc" line="+27"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>kB/s</source>
         <translation>kB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MB/s</source>
         <translation>MB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GB/s</source>
         <translation>GB/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TB/s</source>
         <translation>TB/s</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+9"/>
+        <location line="+1"/>
+        <location line="+1"/>
         <source>B</source>
         <translation>B</translation>
     </message>
     <message>
-        <location line="-8"/>
+        <location line="-1"/>
         <source>kB</source>
         <translation>kB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MB</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GB</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TB</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
         <source>KiB</source>
         <translation>KiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>MiB</source>
         <translation>MiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>GiB</source>
         <translation>GiB</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>TiB</source>
         <translation>TiB</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+34"/>
         <location line="+17"/>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
@@ -783,7 +787,7 @@
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+36"/>
+        <location line="+23"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln nap</numerusform>
@@ -811,7 +815,7 @@
         </translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <location line="+11"/>
         <location line="+11"/>
         <source>%1, %2</source>
@@ -821,12 +825,12 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+52"/>
+        <location filename="../FreeSpaceLabel.cc" line="+55"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation>&lt;i&gt;Szabad terület kiszámítása...&lt;/i&gt;</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+32"/>
         <source>%1 free</source>
         <translation>%1 szabad</translation>
     </message>
@@ -934,12 +938,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Több &amp;partner igénylése a trackertől</translation>
+        <translation>Több &amp;partner igénylése a követőtől</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Több partner igénylése a trackertől</translation>
+        <translation>Több partner igénylése a követőtől</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1060,7 +1064,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Rendezés &amp;elkészültség szerint</translation>
+        <translation>Rendezés &amp;haladás szerint</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1120,7 +1124,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Tracker</source>
-        <translation>&amp;Tracker</translation>
+        <translation>&amp;Követő</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1171,7 +1175,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>Magnet Link másolása a &amp;vágólapra</translation>
+        <translation>Mágnes link másolása a &amp;vágólapra</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1219,75 +1223,75 @@
         <translation>&amp;Sorrend szerint rendezés</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+467"/>
         <source>Limit Download Speed</source>
         <translation>Letöltési sebességkorlát</translation>
     </message>
     <message>
-        <location line="-53"/>
+        <location line="-55"/>
         <source>Unlimited</source>
         <translation>Korlátlan</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location line="+702"/>
-        <location line="+8"/>
+        <location line="+7"/>
+        <location line="+730"/>
+        <location line="+9"/>
         <source>Limited at %1</source>
         <translation>Korlátozva: %1</translation>
     </message>
     <message>
-        <location line="-661"/>
+        <location line="-689"/>
         <source>Limit Upload Speed</source>
         <translation>Feltöltési sebességkorlát</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Seedelés befejezése ha elérte az arányt</translation>
+        <translation>Megosztás befejezése ha elérte az arányt</translation>
     </message>
     <message>
         <location line="-31"/>
         <source>Seed Forever</source>
-        <translation>Seedelés örökké</translation>
+        <translation>Megosztás folyamatosan</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location line="+689"/>
+        <location line="+718"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Seedelés befejezése ha elérte a %1 arányt</translation>
     </message>
     <message>
-        <location line="-441"/>
+        <location line="-402"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+16"/>
         <source>Idle</source>
         <translation>Inaktív</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <location line="+17"/>
+        <location line="+30"/>
+        <location line="+20"/>
         <source>Ratio: %1</source>
         <translation>Arány: %1</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+6"/>
+        <location line="-14"/>
+        <location line="+7"/>
         <source>Down: %1, Up: %2</source>
         <translation>Le: %1, Fel: %2</translation>
     </message>
     <message>
-        <location line="+470"/>
+        <location line="+441"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Show &amp;options dialog</source>
-        <translation>&amp;Opciók ablak megjelenítése</translation>
+        <translation>&amp;Beállítások ablak megjelenítése</translation>
     </message>
     <message>
         <location line="-9"/>
@@ -1295,17 +1299,17 @@
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location line="-972"/>
+        <location line="-990"/>
         <source>Speed Limits</source>
         <translation>Ideiglenes sebesség korlátok</translation>
     </message>
     <message>
-        <location line="+454"/>
+        <location line="+503"/>
         <source>Network Error</source>
         <translation>Hálózati hiba</translation>
     </message>
     <message>
-        <location line="+484"/>
+        <location line="+460"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Kattintson az ideiglenes sebességkorlátok kikapcsolásához
@@ -1319,14 +1323,14 @@
  (%1 le, %2 fel)</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+135"/>
         <source>Remove torrent?</source>
-        <translation>Valóban törölni kívánod a torrentet?</translation>
+        <translation>Valóban törölni kívánja a torrentet?</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>Valóban le kívánod törölni a torrent letöltött fájljait?</translation>
+        <translation>Valóban törölni kívánja a torrent letöltött fájljait?</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
@@ -1336,14 +1340,14 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-555"/>
+        <location line="-524"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>%L1 /%Ln torrent mutatása</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+560"/>
+        <location line="+529"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Valóban törölni akarod a(z) %Ln torrent letöltött fájlait?</numerusform>
@@ -1352,12 +1356,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Ha egyszer eltávolítod, akkor a folytatáshoz szükséged lesz a torrent fájlra, vagy egy mágnes hivatkozásra.</translation>
+        <translation>Ha egyszer eltávolítja, akkor a folytatáshoz szüksége lesz a torrent fájlra, vagy egy mágnes linkre.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Ha egyszer eltávolítod, akkor a folytatáshoz szükséged lesz a torrent fájlokra, vagy a mágnes hivatkozásokra.</translation>
+        <translation>Ha egyszer eltávolítja, akkor a folytatáshoz szüksége lesz a torrent fájlokra, vagy a mágnes linkekre.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1400,7 +1404,7 @@
         <translation>Ezen torrentek némelyike még nincs letöltve.</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+69"/>
         <source>%1 has not responded yet</source>
         <translation>%1 még nem válaszolt</translation>
     </message>
@@ -1428,7 +1432,7 @@
         <translation>Új Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+217"/>
+        <location filename="../MakeDialog.cc" line="+218"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Nincs forrás kiválasztva&lt;/i&gt;</translation>
     </message>
@@ -1479,7 +1483,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>&amp;Trackerek:</translation>
+        <translation>&amp;Követők:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1504,12 +1508,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>Új Torrent</translation>
+        <translation>Új torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-124"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>„%1” létrehozás alatt</translation>
+        <translation>„%1” létrehozása</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1519,7 +1523,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+4"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Hibás bejelentési URL: „%1”</translation>
+        <translation>Hiba: érvénytelen bejelentési URL: „%1”</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1552,7 +1556,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+4"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Torrent URL vagy mágnes hivatkozás megnyitása</translation>
+        <translation>Torrent URL vagy mágnes link megnyitása</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1590,17 +1594,17 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>I&amp;ndítás hozzáadás után</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="-70"/>
+        <location filename="../OptionsDialog.cc" line="-69"/>
         <source>&amp;Verify Local Data</source>
-        <translation>Hely adat &amp;ellenőrzése</translation>
+        <translation>Hely adatok &amp;ellenőrzése</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>Torrent fájl &amp;lomtárba helyezése</translation>
+        <translation>Torrent fájl &amp;kukába helyezése</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+29"/>
+        <location filename="../OptionsDialog.cc" line="+28"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
@@ -1613,8 +1617,8 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>PathButton</name>
     <message>
-        <location filename="../PathButton.cc" line="+30"/>
-        <location line="+71"/>
+        <location filename="../PathButton.cc" line="+26"/>
+        <location line="+72"/>
         <source>(None)</source>
         <translation>(Nincs)</translation>
     </message>
@@ -1634,7 +1638,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location filename="../PrefsDialog.ui" line="+1139"/>
         <source>Use &amp;authentication</source>
-        <translation>&amp;Authentikáció használata</translation>
+        <translation>&amp;Hitelesítés szükséges</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1659,12 +1663,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="-1150"/>
         <source>Speed Limits</source>
-        <translation>Sebesség korlátok</translation>
+        <translation>Sebességkorlátok</translation>
     </message>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;Normál sebességlimitek felülbírálása kézzel vagy ütemezve a következő időszakokban&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;Általános sebességkorlátok figyelmen kívül hagyása kézileg, vagy ütemezett időben&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
@@ -1677,7 +1681,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Megadott &amp;napokon:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+335"/>
+        <location filename="../PrefsDialog.cc" line="+349"/>
         <source>Every Day</source>
         <translation>Minden nap</translation>
     </message>
@@ -1692,7 +1696,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Hétvégén</translation>
     </message>
     <message>
-        <location line="-183"/>
+        <location line="-197"/>
         <source>Sunday</source>
         <translation>Vasárnap</translation>
     </message>
@@ -1727,7 +1731,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Szombat</translation>
     </message>
     <message>
-        <location line="+244"/>
+        <location line="+258"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>A port &lt;b&gt;nyitva&lt;/b&gt;</translation>
     </message>
@@ -1743,9 +1747,9 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+335"/>
+        <location filename="../PrefsDialog.cc" line="+342"/>
         <source>Status unknown</source>
-        <translation>Státusz nem ismert</translation>
+        <translation>Állapot ismeretlen</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -1773,7 +1777,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>A uTP egy eszköz ami a hálózat túlterhelése ellen véd. </translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-230"/>
+        <location filename="../PrefsDialog.cc" line="-236"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1796,7 +1800,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Torrentbeállítások &amp;ablak megnyitása</translation>
+        <translation>Torrentbeállítások &amp;ablak megjelenítése</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1806,7 +1810,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>Torrent fájl &amp;lomtárba helyezése</translation>
+        <translation>Torrent fájl &amp;kukába helyezése</translation>
     </message>
     <message>
         <location line="+57"/>
@@ -1826,7 +1830,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation>Seedelés</translation>
+        <translation>Megosztás</translation>
     </message>
     <message>
         <location line="+548"/>
@@ -1834,7 +1838,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Távoli</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+149"/>
+        <location filename="../PrefsDialog.cc" line="+155"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;A blokkolási lista %Ln szabályt tartalmaz&lt;/i&gt;</numerusform>
@@ -1861,7 +1865,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>&amp;Partnerek maximális száma:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-223"/>
+        <location filename="../PrefsDialog.cc" line="-230"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;Frissítés sikeres!&lt;/b&gt;&lt;p&gt;A tiltólistában most %Ln elemet tartalmaz.</numerusform>
@@ -1921,7 +1925,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="-213"/>
         <source>Te&amp;st Port</source>
-        <translation>Tesz&amp;t port</translation>
+        <translation>P&amp;ort tesztelése</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -1936,7 +1940,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="-66"/>
         <source>&amp;Encryption mode:</source>
-        <translation>&amp;Titkosítási mód:</translation>
+        <translation>&amp;Titkosítás módja:</translation>
     </message>
     <message>
         <location line="+453"/>
@@ -1986,7 +1990,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+836"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation>Indítás a tálcán, kis méretben</translation>
+        <translation>&amp;Indítás az értesítési területen, kis méretben</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -2001,12 +2005,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Értesítés megjelenítése a letöltések &amp;befejeztével</translation>
+        <translation>Értesítés megjelenítése torrentek be&amp;fejeződésekor</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>&amp;Hang lejátszása mikor végeznek a torrentek</translation>
+        <translation>Hang leját&amp;szása torrentek befejeződésekor</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-73"/>
@@ -2036,7 +2040,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>A DHT segítségével tracker nélkül találhatod meg a partnereket.</translation>
+        <translation>A DHT segítségével követő nélkül találhatod meg a partnereket.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2054,29 +2058,29 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Titkosítás</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+141"/>
+        <location filename="../PrefsDialog.cc" line="+142"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>Válaszd ki a torrent befejezésekor lefuttatni kívánt szkriptet</translation>
+        <translation>Válassza ki a torrent befejezésekor lefuttatni kívánt szkriptet</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Select Incomplete Directory</source>
-        <translation>Válaszd ki az átmeneti könyvtárat</translation>
+        <translation>Válassza ki az átmeneti könyvtárat</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>Válaszd ki a megfigyelni kívánt könyvtárat</translation>
+        <translation>Válassza ki a megfigyelni kívánt könyvtárat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Destination</source>
-        <translation>Válaszd ki a cél könyvtárat</translation>
+        <translation>Válassza ki a célkönyvtárat</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-355"/>
         <source>Adding</source>
-        <translation>Hozzáadá</translation>
+        <translation>Hozzáadás</translation>
     </message>
     <message>
         <location line="+137"/>
@@ -2092,7 +2096,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+205"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>Félkész fájlok nevéhez &quot;.&amp;part&quot; hozzáfűzése</translation>
+        <translation>Félkész fájlok nevéhez „.&amp;part” hozzáfűzése</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2112,12 +2116,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+59"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>Seedelés befejezése ha elérte az &amp;arányt:</translation>
+        <translation>Megosztás eddig az &amp;arányig:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation>Seedelés befejezése ha i&amp;naktív a torrent:</translation>
+        <translation>Megosztás &amp;befejezése ha inaktív a torrent:</translation>
     </message>
     <message>
         <location line="-557"/>
@@ -2135,7 +2139,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Hálózat</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+95"/>
+        <location filename="../PrefsDialog.cc" line="+105"/>
         <source>Not supported by remote sessions</source>
         <translation>Távoli munkamenet esetén nem támogatott</translation>
     </message>
@@ -2143,7 +2147,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-301"/>
+        <location filename="../Application.cc" line="-255"/>
         <source>Invalid option</source>
         <translation>érvénytelen opció</translation>
     </message>
@@ -2151,19 +2155,19 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+65"/>
+        <location filename="../RelocateDialog.cc" line="+66"/>
         <source>Select Location</source>
-        <translation>Válaszd ki a mappát</translation>
+        <translation>Válassza ki a mappát</translation>
     </message>
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>Válaszd ki a torrentet</translation>
+        <translation>Válassza ki a torrentet</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Set Location</source>
-        <translation>Válaszd ki a mappát</translation>
+        <translation>Válassza ki a mappát</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2178,35 +2182,44 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>A letöltött adat &amp;már itt van</translation>
+        <translation>A letöltött adatok &amp;már itt vannak</translation>
     </message>
 </context>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+546"/>
+        <location filename="../Session.cc" line="+518"/>
         <source>Error Renaming Path</source>
-        <translation>Hiba az elérési út átnevezésekor</translation>
+        <translation>Hiba az útvonal átnevezésekor</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Nem sikerült átnevezni a(z) „%1” elemet erre: „%2”, mert: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Kérem javítsa ki a hibákat, és próbálkozzon újra.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Nem sikerült átnevezni a(z) „%1” elemet erre: „%2”, mert: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Javítsa ki a hibákat, és próbálkozzon újra.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+449"/>
+        <location line="+576"/>
         <source>Error Adding Torrent</source>
         <translation>Hiba a torrent hozzáadásakor</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Add Torrent</source>
-        <translation>Torrent hozzáadása</translation>
+        <location line="+55"/>
+        <source>%1 (copy of %2)</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location line="+1"/>
-        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;„%1” hozzáadása sikertelen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Megegyezik a(z) „%2” torrenttel, ami pedig már hozzá lett adva.&lt;/p&gt;</translation>
+    <message numerus="yes">
+        <location line="+8"/>
+        <source>Duplicate Torrent(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+2"/>
+        <source>Unable to add %n duplicate torrent(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2299,7 +2312,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Összesen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../StatsDialog.cc" line="+72"/>
+        <location filename="../StatsDialog.cc" line="+66"/>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>%Ln alkalommal lett elindítva</numerusform>
@@ -2309,9 +2322,9 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1014"/>
+        <location filename="../Torrent.cc" line="+322"/>
         <source>Verifying local data</source>
-        <translation>Helyi adat ellenőrzése</translation>
+        <translation>Helyi adatok ellenőrzése</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2321,7 +2334,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+8"/>
         <source>Seeding</source>
-        <translation>Feltöltés</translation>
+        <translation>Megosztás</translation>
     </message>
     <message>
         <location line="-24"/>
@@ -2346,17 +2359,17 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+8"/>
         <source>Queued for seeding</source>
-        <translation>Sorbaállítva feltöltésre</translation>
+        <translation>Sorba állítva megosztáshoz</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Tracker gave a warning: %1</source>
-        <translation>A tracker figyelmeztetést dobott: %1</translation>
+        <translation>A követő figyelmeztetést küldött: „%1”</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Tracker gave an error: %1</source>
-        <translation>A tracker hibát dobott: %1</translation>
+        <translation>A követő hibát jelzett: „%1”</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2367,19 +2380,19 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+177"/>
+        <location filename="../TorrentDelegate.cc" line="+154"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Mágneses átvitel - metaadatok letöltése (%1 %)</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
         <translation>%1 / %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
         <translation>%1 / %2 (%3%), feltöltve: %4 (Arány: %5 Cél: %6)</translation>
@@ -2420,7 +2433,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Arány: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+44"/>
+        <location line="+45"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2435,12 +2448,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         </translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+18"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-54"/>
+        <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Metaadat letöltése %Ln partnertől (%1 % kész)</numerusform>
@@ -2470,12 +2483,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         </translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Error</source>
-        <translation>Hiba</translation>
-    </message>
-    <message>
-        <location line="-82"/>
+        <location line="-76"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Helyi adatok ellenőrzése (%1 %1)</translation>
     </message>
@@ -2483,7 +2491,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2508,24 +2516,24 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Nincs frissítés beütemezve</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Több partner kérése %1 múlva</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>Queued to ask for more peers</source>
         <translation>További partnerek kérése beütemezve</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Új partnerek kérése... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+18"/>
+        <location line="+24"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2547,24 +2555,24 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>A követőnek %1nem volt információja%2 a partnerszámáról ennyivel ezelőtt: %3</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-18"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>Scrape hiba történt ennyi ideje: %1&quot;%2&quot;%3 %4</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+31"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Partnerszám lekérése %1 múlva</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>Partnerszám lekérése beütemezve</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation>Partnerszám lekérése most... &lt;small&gt;%1&lt;/small&gt;</translation>

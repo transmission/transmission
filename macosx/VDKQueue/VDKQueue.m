@@ -1,23 +1,23 @@
-//	VDKQueue.m
-//	Created by Bryan D K Jones on 28 March 2012
-//	Copyright 2013 Bryan D K Jones
+//    VDKQueue.m
+//    Created by Bryan D K Jones on 28 March 2012
+//    Copyright 2013 Bryan D K Jones
 //
 //  Based heavily on UKKQueue, which was created and copyrighted by Uli Kusterer on 21 Dec 2003.
 //
-//	This software is provided 'as-is', without any express or implied
-//	warranty. In no event will the authors be held liable for any damages
-//	arising from the use of this software.
-//	Permission is granted to anyone to use this software for any purpose,
-//	including commercial applications, and to alter it and redistribute it
-//	freely, subject to the following restrictions:
-//	   1. The origin of this software must not be misrepresented; you must not
-//	   claim that you wrote the original software. If you use this software
-//	   in a product, an acknowledgment in the product documentation would be
-//	   appreciated but is not required.
-//	   2. Altered source versions must be plainly marked as such, and must not be
-//	   misrepresented as being the original software.
-//	   3. This notice may not be removed or altered from any source
-//	   distribution.
+//    This software is provided 'as-is', without any express or implied
+//    warranty. In no event will the authors be held liable for any damages
+//    arising from the use of this software.
+//    Permission is granted to anyone to use this software for any purpose,
+//    including commercial applications, and to alter it and redistribute it
+//    freely, subject to the following restrictions:
+//       1. The origin of this software must not be misrepresented; you must not
+//       claim that you wrote the original software. If you use this software
+//       in a product, an acknowledgment in the product documentation would be
+//       appreciated but is not required.
+//       2. Altered source versions must be plainly marked as such, and must not be
+//       misrepresented as being the original software.
+//       3. This notice may not be removed or altered from any source
+//       distribution.
 
 #import <AppKit/AppKit.h>
 
@@ -47,12 +47,12 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 //  This is a simple model class used to hold info about each path we watch.
 @interface VDKQueuePathEntry : NSObject
 {
-	NSString*		_path;
-	int				_watchedFD;
-	u_int			_subscriptionFlags;
+    NSString*        _path;
+    int                _watchedFD;
+    u_int            _subscriptionFlags;
 }
 
-- (id) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags;
+- (instancetype) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags NS_DESIGNATED_INITIALIZER;
 
 @property (atomic, copy) NSString *path;
 @property (atomic, assign) int watchedFD;
@@ -64,28 +64,28 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 @synthesize path = _path, watchedFD = _watchedFD, subscriptionFlags = _subscriptionFlags;
 
 
-- (id) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags;
+- (instancetype) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags;
 {
     self = [super init];
-	if (self)
-	{
-		_path = [inPath copy];
-		_watchedFD = open([_path fileSystemRepresentation], O_EVTONLY, 0);
-		if (_watchedFD < 0)
-		{
-			return nil;
-		}
-		_subscriptionFlags = flags;
-	}
-	return self;
+    if (self)
+    {
+        _path = [inPath copy];
+        _watchedFD = open(_path.fileSystemRepresentation, O_EVTONLY, 0);
+        if (_watchedFD < 0)
+        {
+            return nil;
+        }
+        _subscriptionFlags = flags;
+    }
+    return self;
 }
 
--(void)	dealloc
+-(void)    dealloc
 {
     
-	if (_watchedFD >= 0) close(_watchedFD);
-	_watchedFD = -1;
-	
+    if (_watchedFD >= 0) close(_watchedFD);
+    _watchedFD = -1;
+    
 }
 
 @end
@@ -119,21 +119,21 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 #pragma mark -
 #pragma mark INIT/DEALLOC
 
-- (id) init
+- (instancetype) init
 {
-	self = [super init];
-	if (self)
-	{
-		_coreQueueFD = kqueue();
-		if (_coreQueueFD == -1)
-		{
-			return nil;
-		}
-		
+    self = [super init];
+    if (self)
+    {
+        _coreQueueFD = kqueue();
+        if (_coreQueueFD == -1)
+        {
+            return nil;
+        }
+        
         _alwaysPostNotifications = NO;
-		_watchedPathEntries = [[NSMutableDictionary alloc] init];
-	}
-	return self;
+        _watchedPathEntries = [[NSMutableDictionary alloc] init];
+    }
+    return self;
 }
 
 
@@ -155,47 +155,47 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 #pragma mark -
 #pragma mark PRIVATE METHODS
 
-- (VDKQueuePathEntry *)	addPathToQueue:(NSString *)path notifyingAbout:(u_int)flags
+- (VDKQueuePathEntry *)    addPathToQueue:(NSString *)path notifyingAbout:(u_int)flags
 {
-	@synchronized(self)
-	{
+    @synchronized(self)
+    {
         // Are we already watching this path?
-		VDKQueuePathEntry *pathEntry = _watchedPathEntries[path];
-		
+        VDKQueuePathEntry *pathEntry = _watchedPathEntries[path];
+        
         if (pathEntry)
-		{
+        {
             // All flags already set?
-			if(([pathEntry subscriptionFlags] & flags) == flags) 
+            if((pathEntry.subscriptionFlags & flags) == flags) 
             {
-				return pathEntry; 
+                return pathEntry; 
             }
-			
-			flags |= [pathEntry subscriptionFlags];
-		}
-		
-		struct timespec		nullts = { 0, 0 };
-		struct kevent		ev;
-		
-		if (!pathEntry)
+            
+            flags |= pathEntry.subscriptionFlags;
+        }
+        
+        struct timespec        nullts = { 0, 0 };
+        struct kevent        ev;
+        
+        if (!pathEntry)
         {
             pathEntry = [[VDKQueuePathEntry alloc] initWithPath:path andSubscriptionFlags:flags];
         }
         
-		if (pathEntry)
-		{
-			EV_SET(&ev, [pathEntry watchedFD], EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
-			
-			[pathEntry setSubscriptionFlags:flags];
+        if (pathEntry)
+        {
+            EV_SET(&ev, [pathEntry watchedFD], EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
+            
+            pathEntry.subscriptionFlags = flags;
             
             _watchedPathEntries[path] = pathEntry;
             kevent(_coreQueueFD, &ev, 1, NULL, 0, &nullts);
             
-			// Start the thread that fetches and processes our events if it's not already running.
-			if(!_keepWatcherThreadRunning)
-			{
-				_keepWatcherThreadRunning = YES;
-				[NSThread detachNewThreadSelector:@selector(watcherThread:) toTarget:self withObject:nil];
-			}
+            // Start the thread that fetches and processes our events if it's not already running.
+            if(!_keepWatcherThreadRunning)
+            {
+                _keepWatcherThreadRunning = YES;
+                [NSThread detachNewThreadSelector:@selector(watcherThread:) toTarget:self withObject:nil];
+            }
         }
         
         return pathEntry;
@@ -207,17 +207,17 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 
 - (void) watcherThread:(id)sender
 {
-    int					n;
-    struct kevent		ev;
+    int                    n;
+    struct kevent        ev;
     struct timespec     timeout = { 1, 0 };     // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
-	int					theFD = _coreQueueFD;	// So we don't have to risk accessing iVars when the thread is terminated.
+    int                    theFD = _coreQueueFD;    // So we don't have to risk accessing iVars when the thread is terminated.
     
     NSMutableArray      *notesToPost = [[NSMutableArray alloc] initWithCapacity:5];
     
 #if DEBUG_LOG_THREAD_LIFETIME
-	NSLog(@"watcherThread started.");
+    NSLog(@"watcherThread started.");
 #endif
-	
+    
     while(_keepWatcherThreadRunning)
     {
         @try 
@@ -295,8 +295,8 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                                                    
                                                    if (!_delegate || _alwaysPostNotifications)
                                                    {
-                                                       NSDictionary * userInfoDict = [[NSDictionary alloc] initWithObjects: @[fpath] forKeys: @[@"path"]];
-                                                       [[[NSWorkspace sharedWorkspace] notificationCenter] postNotificationName:note object:self userInfo:userInfoDict];
+                                                       NSDictionary * userInfoDict = @{@"path": fpath};
+                                                       [[NSWorkspace sharedWorkspace].notificationCenter postNotificationName:note object:self userInfo:userInfoDict];
                                                    }
                                                }
                                                
@@ -313,14 +313,14 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
         }
     }
     
-	// Close our kqueue's file descriptor
-	if(close(theFD) == -1) {
+    // Close our kqueue's file descriptor
+    if(close(theFD) == -1) {
        NSLog(@"VDKQueue watcherThread: Couldn't close main kqueue (%d)", errno); 
     }
     
     
 #if DEBUG_LOG_THREAD_LIFETIME
-	NSLog(@"watcherThread finished.");
+    NSLog(@"watcherThread finished.");
 #endif
 
 }
@@ -382,14 +382,14 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
     if (!aPath) return;
     
     @synchronized(self)
-	{
-		VDKQueuePathEntry *entry = _watchedPathEntries[aPath];
+    {
+        VDKQueuePathEntry *entry = _watchedPathEntries[aPath];
         
         // Remove it only if we're watching it.
         if (entry) {
             [_watchedPathEntries removeObjectForKey:aPath];
         }
-	}
+    }
     
 }
 
@@ -409,7 +409,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
     
     @synchronized(self)
     {
-        count = [_watchedPathEntries count];
+        count = _watchedPathEntries.count;
     }
     
     return count;

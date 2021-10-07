@@ -13,12 +13,8 @@
 #include <stddef.h>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /**
 *** @addtogroup utils Utilities
@@ -26,13 +22,17 @@ extern "C"
 **/
 
 /** @brief Opaque SHA1 context type. */
-typedef void* tr_sha1_ctx_t;
-/** @brief Opaque RC4 context type. */
-typedef void* tr_rc4_ctx_t;
+using tr_sha1_ctx_t = void*;
 /** @brief Opaque DH context type. */
-typedef void* tr_dh_ctx_t;
+using tr_dh_ctx_t = void*;
 /** @brief Opaque DH secret key type. */
-typedef void* tr_dh_secret_t;
+using tr_dh_secret_t = void*;
+/** @brief Opaque SSL context type. */
+using tr_ssl_ctx_t = void*;
+/** @brief Opaque X509 certificate store type. */
+using tr_x509_store_t = void*;
+/** @brief Opaque X509 certificate type. */
+using tr_x509_cert_t = void*;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.
@@ -55,29 +55,12 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length);
 bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash);
 
 /**
- * @brief Allocate and initialize new RC4 cipher context.
- */
-tr_rc4_ctx_t tr_rc4_new(void);
-
-/**
- * @brief Free RC4 cipher context.
- */
-void tr_rc4_free(tr_rc4_ctx_t handle);
-
-/**
- * @brief Set RC4 cipher key.
- */
-void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length);
-
-/**
- * @brief Process memory block with RC4 cipher.
- */
-void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length);
-
-/**
  * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
  */
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+tr_dh_ctx_t tr_dh_new(
+    uint8_t const* prime_num,
+    size_t prime_num_length,
+    uint8_t const* generator_num,
     size_t generator_num_length);
 
 /**
@@ -99,8 +82,13 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
  * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
  *        given data to the key during calculation.
  */
-bool tr_dh_secret_derive(tr_dh_secret_t handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
-    size_t append_data_size, uint8_t* hash);
+bool tr_dh_secret_derive(
+    tr_dh_secret_t handle,
+    void const* prepend_data,
+    size_t prepend_data_size,
+    void const* append_data,
+    size_t append_data_size,
+    uint8_t* hash);
 
 /**
  * @brief Free DH secret key returned by @ref tr_dh_agree.
@@ -111,6 +99,26 @@ void tr_dh_secret_free(tr_dh_secret_t handle);
  * @brief Align DH key (big-endian number) to required length (internal, do not use).
  */
 void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size);
+
+/**
+ * @brief Get X509 certificate store from SSL context.
+ */
+tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle);
+
+/**
+ * @brief Add certificate to X509 certificate store.
+ */
+bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
+
+/**
+ * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
+ */
+tr_x509_cert_t tr_x509_cert_new(void const* der_data, size_t der_data_size);
+
+/**
+ * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
+ */
+void tr_x509_cert_free(tr_x509_cert_t handle);
 
 /**
  * @brief Returns a random number in the range of [0...upper_bound).
@@ -167,7 +175,7 @@ void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 /**
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
+static inline void tr_sha1_to_hex(void* hex, void const* sha1)
 {
     tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);
 }
@@ -175,15 +183,11 @@ static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_hex_to_sha1(uint8_t* sha1, char const* hex)
+static inline void tr_hex_to_sha1(void* sha1, void const* hex)
 {
     tr_hex_to_binary(hex, sha1, SHA_DIGEST_LENGTH);
 }
 
 /** @} */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* TR_CRYPTO_UTILS_H */

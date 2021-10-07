@@ -13,23 +13,23 @@
 #endif
 
 #include "transmission.h"
+#include "tr-macros.h"
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
-typedef struct tr_bitfield
+struct tr_bitfield
 {
-    uint8_t* bits;
-    size_t alloc_count;
+    uint8_t* bits = nullptr;
+    size_t alloc_count = 0;
 
-    size_t bit_count;
+    size_t bit_count = 0;
 
-    size_t true_count;
+    size_t true_count = 0;
 
     /* Special cases for when full or empty but we don't know the bitCount.
        This occurs when a magnet link's peers send have all / have none */
-    bool have_all_hint;
-    bool have_none_hint;
-}
-tr_bitfield;
+    bool have_all_hint = false;
+    bool have_none_hint = false;
+};
 
 /***
 ****
@@ -50,8 +50,6 @@ void tr_bitfieldRemRange(tr_bitfield*, size_t begin, size_t end);
 /***
 ****  life cycle
 ***/
-
-extern tr_bitfield const TR_BITFIELD_INIT;
 
 void tr_bitfieldConstruct(tr_bitfield*, size_t bit_count);
 
@@ -80,12 +78,12 @@ size_t tr_bitfieldCountRange(tr_bitfield const*, size_t begin, size_t end);
 
 size_t tr_bitfieldCountTrueBits(tr_bitfield const* b);
 
-static inline bool tr_bitfieldHasAll(tr_bitfield const* b)
+constexpr bool tr_bitfieldHasAll(tr_bitfield const* b)
 {
     return b->bit_count != 0 ? (b->true_count == b->bit_count) : b->have_all_hint;
 }
 
-static inline bool tr_bitfieldHasNone(tr_bitfield const* b)
+constexpr bool tr_bitfieldHasNone(tr_bitfield const* b)
 {
     return b->bit_count != 0 ? (b->true_count == 0) : b->have_none_hint;
 }

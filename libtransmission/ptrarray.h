@@ -23,21 +23,16 @@
 /**
  * @brief simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray
+struct tr_ptrArray
 {
     void** items;
     int n_items;
     int n_alloc;
-}
-tr_ptrArray;
+};
 
-typedef tr_voidptr_compare_func PtrArrayCompareFunc;
+using PtrArrayCompareFunc = tr_voidptr_compare_func;
 
-typedef void (* PtrArrayForeachFunc)(void*);
-
-#define TR_PTR_ARRAY_INIT_STATIC { NULL, 0, 0 }
-
-extern tr_ptrArray const TR_PTR_ARRAY_INIT;
+using PtrArrayForeachFunc = void (*)(void*);
 
 /** @brief Destructor to free a tr_ptrArray's internal memory */
 void tr_ptrArrayDestruct(tr_ptrArray*, PtrArrayForeachFunc func);
@@ -47,9 +42,9 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
 
 /** @brief Return the nth item in a tr_ptrArray
     @return the nth item in a tr_ptrArray */
-static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
+constexpr void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 {
-    TR_ASSERT(array != NULL);
+    TR_ASSERT(array != nullptr);
     TR_ASSERT(i >= 0);
     TR_ASSERT(i < array->n_items);
 
@@ -62,11 +57,11 @@ static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 void* tr_ptrArrayPop(tr_ptrArray* array);
 
 /** @brief Return the last item in a tr_ptrArray
-    @return the last item in a tr_ptrArray, or NULL if the array is empty
+    @return the last item in a tr_ptrArray, or nullptr if the array is empty
     @see tr_ptrArrayPop() */
-static inline void* tr_ptrArrayBack(tr_ptrArray* array)
+constexpr void* tr_ptrArrayBack(tr_ptrArray* array)
 {
-    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : NULL;
+    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : nullptr;
 }
 
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end);
@@ -79,7 +74,7 @@ static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek(tr_ptrArray* array, int* size);
 
-static inline void tr_ptrArrayClear(tr_ptrArray* a)
+constexpr void tr_ptrArrayClear(tr_ptrArray* a)
 {
     a->n_items = 0;
 }
@@ -94,21 +89,21 @@ static inline int tr_ptrArrayAppend(tr_ptrArray* array, void* appendMe)
     return tr_ptrArrayInsert(array, appendMe, -1);
 }
 
-static inline void** tr_ptrArrayBase(tr_ptrArray const* a)
+constexpr void** tr_ptrArrayBase(tr_ptrArray const* a)
 {
     return a->items;
 }
 
 /** @brief Return the number of items in the array
     @return the number of items in the array */
-static inline int tr_ptrArraySize(tr_ptrArray const* a)
+constexpr int tr_ptrArraySize(tr_ptrArray const* a)
 {
     return a->n_items;
 }
 
 /** @brief Return True if the array has no pointers
     @return True if the array has no pointers */
-static inline bool tr_ptrArrayEmpty(tr_ptrArray const* a)
+constexpr bool tr_ptrArrayEmpty(tr_ptrArray const* a)
 {
     return tr_ptrArraySize(a) == 0;
 }
@@ -123,7 +118,7 @@ int tr_ptrArrayInsertSorted(tr_ptrArray* array, void* value, tr_voidptr_compare_
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare);
 
 /** @brief Find a pointer from an array sorted by the specified sort function
-    @return the matching pointer, or NULL if no match was found */
+    @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
 
 /* @} */

@@ -8,13 +8,10 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
-typedef size_t tr_quark;
+using tr_quark = size_t;
 
 /*
  * Predefined Quarks.
@@ -46,6 +43,8 @@ enum
     TR_KEY_announce, /* metainfo */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
+    TR_KEY_anti_brute_force_enabled, /* rpc */
+    TR_KEY_anti_brute_force_threshold, /* rpc */
     TR_KEY_arguments, /* rpc */
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
@@ -82,6 +81,8 @@ enum
     TR_KEY_delete_local_data,
     TR_KEY_desiredAvailable,
     TR_KEY_destination,
+    TR_KEY_details_window_height,
+    TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
     TR_KEY_display_name,
     TR_KEY_dnd,
@@ -105,6 +106,7 @@ enum
     TR_KEY_dropped,
     TR_KEY_dropped6,
     TR_KEY_e,
+    TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
     TR_KEY_error,
@@ -113,6 +115,7 @@ enum
     TR_KEY_etaIdle,
     TR_KEY_failure_reason,
     TR_KEY_fields,
+    TR_KEY_file_count,
     TR_KEY_fileStats,
     TR_KEY_filename,
     TR_KEY_files,
@@ -125,6 +128,7 @@ enum
     TR_KEY_filter_trackers,
     TR_KEY_flagStr,
     TR_KEY_flags,
+    TR_KEY_format,
     TR_KEY_fromCache,
     TR_KEY_fromDht,
     TR_KEY_fromIncoming,
@@ -251,6 +255,7 @@ enum
     TR_KEY_port_is_open,
     TR_KEY_preallocation,
     TR_KEY_prefetch_enabled,
+    TR_KEY_primary_mime_type,
     TR_KEY_priorities,
     TR_KEY_priority,
     TR_KEY_priority_high,
@@ -426,11 +431,3 @@ char const* tr_quark_get_string(tr_quark quark, size_t* len);
  * created.
  */
 tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-#ifdef __cplusplus
-}
-#endif

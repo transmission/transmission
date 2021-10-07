@@ -12,6 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "tr-macros.h"
+
 /**
  * @brief parse a peer-id into a human-readable client name and version number
  * @ingroup utils
