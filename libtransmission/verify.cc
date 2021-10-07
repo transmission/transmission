@@ -364,13 +364,22 @@ void tr_verifyClose(tr_session* session)
 {
     TR_UNUSED(session);
 
-    tr_lockLock(getVerifyLock());
+    tr_lock* lock = getVerifyLock();
+    tr_lockLock(lock);
 
+    pendingSet.clear();
+
+    // Request all active threads to abort and wait for completion.
     for (verify_node* active : activeSet)
     {
         active->request_abort = true;
     }
-    pendingSet.clear();
+    while (activeVerificationThreads > 0)
+    {
+        tr_lockUnlock(lock);
+        tr_wait_msec(100);
+        tr_lockLock(lock);
+    }
 
-    tr_lockUnlock(getVerifyLock());
+    tr_lockUnlock(lock);
 }
