@@ -751,7 +751,6 @@ static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInitFromInfo(tr_torrent* tor)
 {
-    uint64_t t;
     tr_info const* const info = &tor->info;
 
     tor->blockSize = tr_getBlockSize(info->pieceSize);
@@ -780,13 +779,14 @@ static void torrentInitFromInfo(tr_torrent* tor)
     tor->blockCountInPiece = tor->blockSize != 0 ? info->pieceSize / tor->blockSize : 0;
     tor->blockCountInLastPiece = tor->blockSize != 0 ? (tor->lastPieceSize + tor->blockSize - 1) / tor->blockSize : 0;
 
+#ifdef TR_ENABLE_ASSERTS
     /* check our work */
     if (tor->blockSize != 0)
     {
         TR_ASSERT(info->pieceSize % tor->blockSize == 0);
     }
 
-    t = info->pieceCount - 1;
+    uint64_t t = info->pieceCount - 1;
     t *= info->pieceSize;
     t += tor->lastPieceSize;
     TR_ASSERT(t == info->totalSize);
@@ -800,6 +800,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
     t *= tor->blockCountInPiece;
     t += tor->blockCountInLastPiece;
     TR_ASSERT(t == (uint64_t)tor->blockCount);
+#endif
 
     tr_cpConstruct(&tor->completion, tor);
 
