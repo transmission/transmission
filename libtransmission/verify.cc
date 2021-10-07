@@ -205,9 +205,9 @@ struct verify_node
     }
 };
 
-static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
-static auto& verifyList{ *new std::set<verify_node>{} };
+static auto& pendingSet{ *new std::set<verify_node>{} };
+static auto& activeSet{ *new std::set<verify_node*>{} };
 static tr_thread* verifyThread = nullptr;
 
 static tr_lock* getVerifyLock(void)
@@ -229,40 +229,49 @@ static void verifyThreadFunc(void* user_data)
     for (;;)
     {
         bool changed = false;
+        verify_node node;
 
         tr_lockLock(getVerifyLock());
-        if (std::empty(verifyList))
+        if (std::empty(pendingSet))
         {
-            currentNode.torrent = nullptr;
             break; // FIXME: unbalanced lock?
         }
 
-        auto const it = std::begin(verifyList);
-        currentNode = *it;
-        verifyList.erase(it);
+        auto const it = std::begin(pendingSet);
+        node = *it;
+        pendingSet.erase(it);
+
+        // This stores a reference to a local variable, but we ensure that the
+        // set element is removed before the local goes out of scope.
+        activeSet.insert(&node);
+
         tr_lockUnlock(getVerifyLock());
 
-        tr_torrent* tor = currentNode.torrent;
+        tr_torrent* tor = node.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
         tr_torrentSetVerifyState(tor, TR_VERIFY_NOW);
-        changed = verifyTorrent(tor, &currentNode.request_abort);
+        changed = verifyTorrent(tor, &node.request_abort);
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
-        if (!currentNode.request_abort && changed)
+        tr_lockLock(getVerifyLock());
+        if (!node.request_abort && changed)
         {
             tr_torrentSetDirty(tor);
         }
 
-        if (currentNode.callback_func != nullptr)
+        if (node.callback_func != nullptr)
         {
-            (*currentNode.callback_func)(tor, currentNode.request_abort, currentNode.callback_data);
+            (*node.callback_func)(tor, node.request_abort, node.callback_data);
         }
 
-        if (currentNode.completion_signal != nullptr)
+        if (node.completion_signal != nullptr)
         {
-            *currentNode.completion_signal = true;
+            *node.completion_signal = true;
         }
+
+        activeSet.erase(&node);
+        tr_lockUnlock(getVerifyLock());
     }
 
     verifyThread = nullptr;
@@ -284,7 +293,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
 
     tr_lockLock(getVerifyLock());
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
-    verifyList.insert(node);
+    pendingSet.insert(node);
 
     if (verifyThread == nullptr)
     {
@@ -301,11 +310,16 @@ void tr_verifyRemove(tr_torrent* tor)
     tr_lock* lock = getVerifyLock();
     tr_lockLock(lock);
 
-    if (tor == currentNode.torrent)
+    auto const active_it = std::find_if(
+        std::begin(activeSet),
+        std::end(activeSet),
+        [tor](auto const& task) { return tor == task->torrent; });
+
+    if (active_it != std::end(activeSet))
     {
         bool completed = false;
-        currentNode.completion_signal = &completed;
-        currentNode.request_abort = true;
+        (*active_it)->completion_signal = &completed;
+        (*active_it)->request_abort = true;
 
         while (!completed)
         {
@@ -316,21 +330,21 @@ void tr_verifyRemove(tr_torrent* tor)
     }
     else
     {
-        auto const it = std::find_if(
-            std::begin(verifyList),
-            std::end(verifyList),
+        auto const pending_it = std::find_if(
+            std::begin(pendingSet),
+            std::end(pendingSet),
             [tor](auto const& task) { return tor == task.torrent; });
 
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
 
-        if (it != std::end(verifyList))
+        if (pending_it != std::end(pendingSet))
         {
-            if (it->callback_func != nullptr)
+            if (pending_it->callback_func != nullptr)
             {
-                (*it->callback_func)(tor, true, it->callback_data);
+                (*pending_it->callback_func)(tor, true, pending_it->callback_data);
             }
 
-            verifyList.erase(it);
+            pendingSet.erase(pending_it);
         }
     }
 
@@ -343,8 +357,11 @@ void tr_verifyClose(tr_session* session)
 
     tr_lockLock(getVerifyLock());
 
-    currentNode.request_abort = true;
-    verifyList.clear();
+    for (verify_node* active : activeSet)
+    {
+        active->request_abort = true;
+    }
+    pendingSet.clear();
 
     tr_lockUnlock(getVerifyLock());
 }
