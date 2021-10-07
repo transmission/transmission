@@ -28,7 +28,8 @@
 
 enum
 {
-    MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
+    MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100,
+    DEFAULT_THREAD_POOL_SIZE = 1,
 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
@@ -208,7 +209,8 @@ struct verify_node
 // TODO: refactor s.t. this doesn't leak
 static auto& pendingSet{ *new std::set<verify_node>{} };
 static auto& activeSet{ *new std::set<verify_node*>{} };
-static tr_thread* verifyThread = nullptr;
+static int activeVerificationThreads = 0;
+static int maxVerificationThreads = DEFAULT_THREAD_POOL_SIZE;
 
 static tr_lock* getVerifyLock(void)
 {
@@ -232,9 +234,15 @@ static void verifyThreadFunc(void* user_data)
         verify_node node;
 
         tr_lockLock(getVerifyLock());
+        if (activeVerificationThreads > maxVerificationThreads)
+        {
+            // Attempt to downsize the thread pool.
+            break;
+        }
+
         if (std::empty(pendingSet))
         {
-            break; // FIXME: unbalanced lock?
+            break;
         }
 
         auto const it = std::begin(pendingSet);
@@ -274,7 +282,7 @@ static void verifyThreadFunc(void* user_data)
         tr_lockUnlock(getVerifyLock());
     }
 
-    verifyThread = nullptr;
+    --activeVerificationThreads;
     tr_lockUnlock(getVerifyLock());
 }
 
@@ -295,9 +303,10 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
     pendingSet.insert(node);
 
-    if (verifyThread == nullptr)
+    if (activeVerificationThreads < maxVerificationThreads)
     {
-        verifyThread = tr_threadNew(verifyThreadFunc, nullptr);
+        ++activeVerificationThreads;
+        tr_threadNew(verifyThreadFunc, nullptr);
     }
 
     tr_lockUnlock(getVerifyLock());
