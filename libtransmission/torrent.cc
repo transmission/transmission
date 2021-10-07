@@ -196,7 +196,7 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tr_bandwidthSetDesiredSpeed_Bps(&tor->bandwidth, dir, Bps))
+    if (tor->bandwidth.setDesiredSpeed_Bps(dir, Bps))
     {
         tr_torrentSetDirty(tor);
     }
@@ -212,7 +212,7 @@ unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tr_bandwidthGetDesiredSpeed_Bps(&tor->bandwidth, dir);
+    return tor->bandwidth.getDesiredSpeed_Bps(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -228,7 +228,7 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tr_bandwidthSetLimited(&tor->bandwidth, dir, do_use))
+    if (tor->bandwidth.setLimited(dir, do_use))
     {
         tr_torrentSetDirty(tor);
     }
@@ -238,19 +238,14 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_bandwidthIsLimited(&tor->bandwidth, dir);
+    return tor->bandwidth.isLimited(dir);
 }
 
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool doUse)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    bool changed;
-
-    changed = tr_bandwidthHonorParentLimits(&tor->bandwidth, TR_UP, doUse);
-    changed |= tr_bandwidthHonorParentLimits(&tor->bandwidth, TR_DOWN, doUse);
-
-    if (changed)
+    if (tor->bandwidth.honorParentLimits(TR_UP, doUse) || tor->bandwidth.honorParentLimits(TR_DOWN, doUse))
     {
         tr_torrentSetDirty(tor);
     }
@@ -260,7 +255,7 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_bandwidthAreParentLimitsHonored(&tor->bandwidth, TR_UP);
+    return tor->bandwidth.areParentLimitsHonored(TR_UP);
 }
 
 /***
@@ -887,7 +882,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->bandwidth.construct(&session->bandwidth);
 
-    tor->bandwidth.priority = tr_ctorGetBandwidthPriority(ctor);
+    tor->bandwidth.setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
@@ -2443,7 +2438,7 @@ tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth.priority;
+    return tor->bandwidth.getPriority();
 }
 
 void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
@@ -2451,9 +2446,9 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));
 
-    if (tor->bandwidth.priority != priority)
+    if (tor->bandwidth.getPriority() != priority)
     {
-        tor->bandwidth.priority = priority;
+        tor->bandwidth.setPriority(priority);
 
         tr_torrentSetDirty(tor);
     }

@@ -95,22 +95,19 @@ int tr_bandwidth::compareBandwidth(void const* va, void const* vb)
 ****
 ***/
 
-void tr_bandwidth::construct(tr_bandwidth* parent)
+void tr_bandwidth::construct(tr_bandwidth* parent_)
 {
     static unsigned int uniqueKey = 0;
 
     this->children = {};
-    this->magicNumber = BANDWIDTH_MAGIC_NUMBER;
     this->uniqueKey = uniqueKey++;
     this->band[TR_UP].honorParentLimits = true;
     this->band[TR_DOWN].honorParentLimits = true;
-    this->setParent(parent);
+    this->setParent(parent_);
 }
 
 void tr_bandwidth::destruct()
 {
-    TR_ASSERT(tr_isBandwidth(this));
-
     this->setParent(nullptr);
     tr_ptrArrayDestruct(&this->children, nullptr);
 
@@ -121,27 +118,24 @@ void tr_bandwidth::destruct()
 ****
 ***/
 
-void tr_bandwidth::setParent(tr_bandwidth* parent)
+void tr_bandwidth::setParent(tr_bandwidth* newParent)
 {
-    TR_ASSERT(tr_isBandwidth(this));
-    TR_ASSERT(this != parent);
+    TR_ASSERT(this != newParent);
 
     if (this->parent != nullptr)
     {
-        TR_ASSERT(tr_isBandwidth(this->parent));
         tr_ptrArrayRemoveSortedPointer(&this->parent->children, this, compareBandwidth);
         this->parent = nullptr;
     }
 
-    if (parent != nullptr)
+    if (newParent != nullptr)
     {
-        TR_ASSERT(tr_isBandwidth(parent));
-        TR_ASSERT(parent->parent != this);
+        TR_ASSERT(newParent->parent != this);
 
-        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, this, compareBandwidth) == nullptr);
-        tr_ptrArrayInsertSorted(&parent->children, this, compareBandwidth);
-        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, this, compareBandwidth) == this);
-        this->parent = parent;
+        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, compareBandwidth) == nullptr);
+        tr_ptrArrayInsertSorted(&newParent->children, this, compareBandwidth);
+        TR_ASSERT(tr_ptrArrayFindSorted(&newParent->children, this, compareBandwidth) == this);
+        this->parent = newParent;
     }
 }
 
@@ -155,10 +149,9 @@ void tr_bandwidth::allocateBandwidth(
     unsigned int period_msec,
     tr_ptrArray* peer_pool)
 {
-    TR_ASSERT(tr_isBandwidth(this));
     TR_ASSERT(tr_isDirection(dir));
 
-    tr_priority_t const priority = std::max(parent_priority, this->priority);
+    tr_priority_t const priority_ = std::max(parent_priority, this->priority);
 
     /* set the available bandwidth */
     if (this->band[dir].isLimited)
@@ -170,17 +163,17 @@ void tr_bandwidth::allocateBandwidth(
     /* add this bandwidth's peer, if any, to the peer pool */
     if (this->peer != nullptr)
     {
-        this->peer->priority = priority;
+        this->peer->priority = priority_;
         tr_ptrArrayAppend(peer_pool, this->peer);
     }
 
     /* traverse & repeat for the subtree
      * TODO: Replace with std::for_each over std::vector */
-    auto** children = (struct tr_bandwidth**)tr_ptrArrayBase(&this->children);
-    struct tr_bandwidth** const end = children + tr_ptrArraySize(&this->children);
-    for (; children != end; ++children)
+    auto** children_ = (struct tr_bandwidth**)tr_ptrArrayBase(&this->children);
+    struct tr_bandwidth** const end = children_ + tr_ptrArraySize(&this->children);
+    for (; children_ != end; ++children_)
     {
-        (*children)->allocateBandwidth(priority, dir, period_msec, peer_pool);
+        (*children_)->allocateBandwidth(priority_, dir, period_msec, peer_pool);
     }
 }
 
@@ -288,21 +281,12 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     tr_ptrArrayDestruct(&tmp, nullptr);
 }
 
-void tr_bandwidth::setPeer(tr_peerIo* peer)
-{
-    TR_ASSERT(tr_isBandwidth(this));
-    TR_ASSERT(peer == nullptr || tr_isPeerIo(peer));
-
-    this->peer = peer;
-}
-
 /***
 ****
 ***/
 
 unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const
 {
-    TR_ASSERT(tr_isBandwidth(this));
     TR_ASSERT(tr_isDirection(dir));
 
     if (this->band[dir].isLimited)
@@ -323,7 +307,7 @@ unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int by
             }
 
             current = this->getRawSpeed_Bps(now, TR_DOWN);
-            desired = tr_bandwidthGetDesiredSpeed_Bps(this, TR_DOWN);
+            desired = this->getDesiredSpeed_Bps(TR_DOWN);
             r = desired >= 1 ? current / desired : 0;
 
             if (r > 1.0)
@@ -349,42 +333,20 @@ unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int by
     return byteCount;
 }
 
-unsigned int tr_bandwidth::clamp(tr_direction dir, unsigned int byteCount) const
-{
-    return this->clamp(0, dir, byteCount);
-}
-
-unsigned int tr_bandwidth::getRawSpeed_Bps(uint64_t const now, tr_direction const dir) const
-{
-    TR_ASSERT(tr_isBandwidth(this));
-    TR_ASSERT(tr_isDirection(dir));
-
-    return getSpeed_Bps(&this->band[dir].raw, HISTORY_MSEC, now);
-}
-
-unsigned int tr_bandwidth::getPieceSpeed_Bps(uint64_t const now, tr_direction const dir) const
-{
-    TR_ASSERT(tr_isBandwidth(this));
-    TR_ASSERT(tr_isDirection(dir));
-
-    return getSpeed_Bps(&this->band[dir].piece, HISTORY_MSEC, now);
-}
-
 void tr_bandwidth::used(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
 {
-    TR_ASSERT(tr_isBandwidth(this));
     TR_ASSERT(tr_isDirection(dir));
 
-    struct tr_band* band = &this->band[dir];
+    struct tr_band* band_ = &this->band[dir];
 
-    if (band->isLimited && isPieceData)
+    if (band_->isLimited && isPieceData)
     {
-        band->bytesLeft -= std::min(size_t{ band->bytesLeft }, byteCount);
+        band_->bytesLeft -= std::min(size_t{ band_->bytesLeft }, byteCount);
     }
 
 #ifdef DEBUG_DIRECTION
 
-    if (dir == DEBUG_DIRECTION && band->isLimited)
+    if (dir == DEBUG_DIRECTION && band_->isLimited)
     {
         fprintf(
             stderr,
@@ -393,16 +355,16 @@ void tr_bandwidth::used(tr_direction dir, size_t byteCount, bool isPieceData, ui
             byteCount,
             isPieceData ? "piece" : "raw",
             oldBytesLeft,
-            band->bytesLeft);
+            band_->bytesLeft);
     }
 
 #endif
 
-    bytesUsed(now, &band->raw, byteCount);
+    bytesUsed(now, &band_->raw, byteCount);
 
     if (isPieceData)
     {
-        bytesUsed(now, &band->piece, byteCount);
+        bytesUsed(now, &band_->piece, byteCount);
     }
 
     if (this->parent != nullptr)

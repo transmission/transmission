@@ -134,8 +134,7 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_isBandwidth(&io->bandwidth) &&
-        tr_address_is_valid(&io->addr);
+    return io != nullptr && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
 }
 
 /**

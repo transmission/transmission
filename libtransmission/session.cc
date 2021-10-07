@@ -1494,9 +1494,9 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
     bool const isLimited = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &limit_Bps);
     bool const zeroCase = isLimited && limit_Bps == 0;
 
-    tr_bandwidthSetLimited(&session->bandwidth, dir, isLimited && !zeroCase);
+    session->bandwidth.setLimited(dir, isLimited && !zeroCase);
 
-    tr_bandwidthSetDesiredSpeed_Bps(&session->bandwidth, dir, limit_Bps);
+    session->bandwidth.setDesiredSpeed_Bps(dir, limit_Bps);
 }
 
 enum
