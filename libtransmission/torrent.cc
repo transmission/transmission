@@ -849,6 +849,8 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+static void torrentCallScript(tr_torrent const* tor, char const* script);
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -969,6 +971,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
+        if (tr_torrentHasMetadata(tor) && tr_sessionIsTorrentAddedScriptEnabled(session))
+        {
+            torrentCallScript(tor, tr_sessionGetTorrentAddedScript(session));
+        }
+
         if (!tr_torrentHasMetadata(tor) && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
@@ -1930,6 +1937,11 @@ static void stopTorrent(void* vtor)
         tr_logAddTorInfo(tor, "%s", "Magnet Verify");
         refreshCurrentDir(tor);
         tr_torrentVerify(tor, nullptr, nullptr);
+
+        if (tr_sessionIsTorrentAddedScriptEnabled(tor->session))
+        {
+            torrentCallScript(tor, tr_sessionGetTorrentAddedScript(tor->session));
+        }
     }
 }
 

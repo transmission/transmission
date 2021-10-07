@@ -2291,6 +2291,16 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
+    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_added_filename, &str, nullptr))
+    {
+        tr_sessionSetTorrentAddedScript(session, str);
+    }
+
+    if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_added_enabled, &boolVal))
+    {
+        tr_sessionSetTorrentAddedScriptEnabled(session, boolVal);
+    }
+
     if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, nullptr))
     {
         tr_sessionSetTorrentDoneScript(session, str);
@@ -2573,6 +2583,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_speed_limit_down_enabled:
         tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_DOWN));
+        break;
+
+    case TR_KEY_script_torrent_added_filename:
+        tr_variantDictAddStr(d, key, tr_sessionGetTorrentAddedScript(s));
+        break;
+
+    case TR_KEY_script_torrent_added_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionIsTorrentAddedScriptEnabled(s));
         break;
 
     case TR_KEY_script_torrent_done_filename:

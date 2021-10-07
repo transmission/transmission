@@ -127,6 +127,7 @@ struct tr_session
     bool isLPDEnabled;
     bool isBlocklistEnabled;
     bool isPrefetchEnabled;
+    bool isTorrentAddedScriptEnabled;
     bool isTorrentDoneScriptEnabled;
     bool isClosing;
     bool isClosed;
@@ -203,6 +204,7 @@ struct tr_session
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
     std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
+    char* torrentAddedScript;
     char* torrentDoneScript;
 
     char* configDir;
