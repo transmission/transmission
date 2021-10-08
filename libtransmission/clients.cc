@@ -370,6 +370,11 @@ constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]));
 }
 
+constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', id[4], id[5], '.', charint(id[6]));
+}
+
 void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " ("sv);
@@ -383,7 +388,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 93>
+auto constexpr Clients = std::array<Client, 94>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -441,6 +446,7 @@ auto constexpr Clients = std::array<Client, 93>
     { "-OS", "OneSwarm", four_digit_formatter },
     { "-OT", "OmegaTorrent", four_digit_formatter },
     { "-PD", "Pando", four_digit_formatter },
+    { "-PI", "PicoTorrent", picotorrent_formatter },
     { "-QD", "QQDownload", four_digit_formatter },
     { "-RS", "Rufus", four_digit_formatter },
     { "-RT", "Retriever", four_digit_formatter },
@@ -530,20 +536,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         std::cerr << "got a match [" << key << "] -> [" << buf << ']' << std::endl;
         return buf;
     }
-
-    /* Azureus-style */
-    if (id[0] == '-' && id[7] == '-')
-    {
-        if (strncmp(chid + 1, "PI", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
-        }
-        if (!tr_str_is_empty(buf))
-        {
-            return buf;
-        }
-    }
-
 
     /* Mainline */
     if (isMainlineStyle(id))
