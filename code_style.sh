@@ -30,6 +30,7 @@ cfile_excludes=(
   'macosx/VDKQueue/*'
   'third-party/*'
   'web/*'
+  '.git/*'
 )
 
 get_find_path_args() {

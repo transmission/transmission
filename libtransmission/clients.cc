@@ -62,7 +62,7 @@ int strint(void const* pch, int span)
     return strtol(tmp, nullptr, 0);
 }
 
-char const* getMnemonicEnd(uint8_t ch)
+constexpr char const* getMnemonicEnd(uint8_t ch)
 {
     switch (ch)
     {
@@ -123,7 +123,7 @@ void mainline_style(char* buf, size_t buflen, char const* name, uint8_t const* i
     }
 }
 
-bool isMainlineStyle(uint8_t const* peer_id)
+constexpr bool isMainlineStyle(uint8_t const* peer_id)
 {
     /**
      * One of the following styles will be used:
@@ -136,10 +136,6 @@ bool isMainlineStyle(uint8_t const* peer_id)
 bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
     char const* chid = (char const*)id;
-    bool is_bitlord;
-    int major;
-    int minor;
-    char const* name;
     char const* mod = nullptr;
 
     if (strncmp(chid, "exbc", 4) == 0)
@@ -159,10 +155,10 @@ bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
         return false;
     }
 
-    is_bitlord = strncmp(chid + 6, "LORD", 4) == 0;
-    name = (is_bitlord) ? "BitLord " : "BitComet ";
-    major = id[4];
-    minor = id[5];
+    bool const is_bitlord = strncmp(chid + 6, "LORD", 4) == 0;
+    char const* const name = (is_bitlord) ? "BitLord " : "BitComet ";
+    int const major = id[4];
+    int const minor = id[5];
 
     /**
      * Bitcomet, and older versions of BitLord, are of the form x.yy.
