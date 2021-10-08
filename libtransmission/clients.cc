@@ -38,23 +38,6 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
     return { buf, buflen - 1 };
 }
 
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
-{
-    while (n >= 10)
-    {
-        auto mod = n;
-        auto multiplier = 1;
-        while (mod > 10)
-        {
-            mod /= 10;
-            multiplier *= 10;
-        }
-        std::tie(buf, buflen) = buf_append(buf, buflen, char('0' + mod));
-        n -= mod * multiplier;
-    }
-    return buf_append(buf, buflen, char('0' + n));
-}
-
 constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::string_view name)
 {
     auto const len = std::min(buflen - 1, std::size(name));
@@ -64,6 +47,23 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::str
     }
     *buf = '\0';
     return { buf, buflen - len };
+}
+
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
+{
+    auto mybuf = std::array<char, 32>{};
+    auto const end = std::end(mybuf);
+    auto constexpr base = 10;
+    auto* ptr = end;
+
+    while ((n / base) > 0)
+    {
+        *--ptr = char('0' + (n % base));
+        n /= base;
+    }
+    *--ptr = char('0' + (n % base));
+
+    return buf_append(buf, buflen, std::string_view(ptr, end-ptr));
 }
 
 template<typename T, typename... ArgTypes>
