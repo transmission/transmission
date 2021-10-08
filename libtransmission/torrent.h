@@ -257,7 +257,7 @@ struct tr_torrent
 
     int uniqueId;
 
-    // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
+    // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     struct tr_bandwidth* bandwidth;
 

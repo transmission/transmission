@@ -16,7 +16,6 @@
 #include <unordered_set>
 
 #include "transmission.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
@@ -104,15 +103,6 @@ struct tr_band
  */
 struct tr_bandwidth
 {
-    /* these are PRIVATE IMPLEMENTATION details that should not be touched.
-     * it's included in the header for inlining and composition. */
-private:
-    tr_priority_t priority = 0;
-    std::array<struct tr_band, 2> band;
-    struct tr_bandwidth* parent;
-    std::unordered_set<tr_bandwidth*> children;
-    struct tr_peerIo* peer;
-
 public:
     explicit tr_bandwidth(tr_bandwidth* newParent);
 
@@ -127,7 +117,7 @@ public:
     }
 
     /**
-     * * @brief Sets new peer, nullptr is allowed.
+     * @brief Sets new peer, nullptr is allowed.
      */
     void setPeer(tr_peerIo* newPeer)
     {
@@ -245,14 +235,24 @@ public:
 
 private:
     static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
+
     static void notifyBandwidthConsumedBytes(uint64_t now, struct bratecontrol* r, size_t size);
+
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
+
     static void phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir);
+
     void allocateBandwidth(
         tr_priority_t parent_priority,
         tr_direction dir,
         unsigned int period_msec,
         std::vector<tr_peerIo*>& peer_pool);
+
+    tr_priority_t priority = 0;
+    std::array<struct tr_band, 2> band;
+    struct tr_bandwidth* parent;
+    std::unordered_set<tr_bandwidth*> children;
+    struct tr_peerIo* peer;
 };
 
 /* @} */
