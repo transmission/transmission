@@ -91,11 +91,6 @@ constexpr std::string_view getMnemonicEnd(uint8_t ch)
     }
 }
 
-void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
-{
-    tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
-}
-
 void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
 {
     tr_snprintf(
@@ -419,7 +414,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 116>
+auto constexpr Clients = std::array<Client, 117>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -487,6 +482,7 @@ auto constexpr Clients = std::array<Client, 116>
     { "-RZ", "RezTorrent", four_digit_formatter },
     { "-SD", "Thunder", four_digit_formatter },
     { "-SM", "SoMud", four_digit_formatter },
+    { "-SP", "BitSpirit", three_digit_formatter },
     { "-SS", "SwarmScope", four_digit_formatter },
     { "-ST", "SymTorrent", four_digit_formatter },
     { "-SZ", "Shareaza", four_digit_formatter },
@@ -603,10 +599,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "btpd", 4) == 0)
     {
         tr_snprintf(buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7]);
-    }
-    else if (strncmp(chid, "-SP", 3) == 0)
-    {
-        three_digits(buf, buflen, "BitSpirit", id + 3);
     }
     else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
     {
