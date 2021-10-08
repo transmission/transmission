@@ -92,13 +92,6 @@ auto constexpr charints = std::array<std::string_view, 256>{
       "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "" }
 };
 
-constexpr std::optional<int> getFDMInt(uint8_t ch)
-{
-    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
-    auto const pos = str.find(ch);
-    return pos != std::string_view::npos ? pos : std::optional<int>{};
-}
-
 int strint(void const* pch, int span)
 {
     char tmp[64];
@@ -210,15 +203,22 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
 
 bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
 {
+    // BitComet produces peer ids that consists of four ASCII characters exbc,
+    // followed by two bytes x and y, followed by random characters. The version
+    // number is x in decimal before the decimal point and y as two decimal
+    // digits after the decimal point. BitLord uses the same scheme, but adds
+    // LORD after the version bytes. An unofficial patch for BitComet once
+    // replaced exbc with FUTB. The encoding for BitComet Peer IDs changed
+    // to Azureus-style as of BitComet version 0.59.
     auto mod = std::string_view{};
 
     if (peer_id.find("exbc"sv) == 0)
     {
-        mod = ""sv;
+        mod = "";
     }
     else if (peer_id.find("FUTB"sv) == 0)
     {
-        mod = "(Solidox Mod) "sv;
+        mod = "(Solidox Mod) ";
     }
     else if (peer_id.find("xUTB"sv) == 0)
     {
@@ -234,18 +234,8 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     int const major = peer_id[4];
     int const minor = peer_id[5];
 
-    // Bitcomet, and older versions of BitLord, are of the form x.yy.
-    // Bitcoment 1.0 and onwards are of the form x.y.
-    if (is_bitlord && major > 0)
-    {
-        buf_append(buf, buflen, name, ' ', mod, major, '.', minor);
-    }
-    else
-    {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
-        tr_snprintf(buf, buflen, "%02d", minor);
-    }
-
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
+    tr_snprintf(buf, buflen, "%02d", minor);
     return true;
 }
 
@@ -269,6 +259,11 @@ constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view n
 
 // specific clients
 
+constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
+}
+
 constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[4] == '-' && id[6] == '-' && id[8] == '-')
@@ -283,11 +278,6 @@ constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, 
     {
         buf_append(buf, buflen, name);
     }
-}
-
-constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
 }
 
 constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -313,6 +303,10 @@ void bittorrent_dna_formatter(char* buf, size_t buflen, std::string_view name, c
 
 void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
+    // Bits on Wheels uses the pattern -BOWxxx-yyyyyyyyyyyy, where y is random
+    // (uppercase letters) and x depends on the version.
+    // Version 1.0.6 has xxx = A0C.
+
     if (strncmp(&id[4], "A0B", 3) == 0)
     {
         buf_append(buf, buflen, name, " 1.0.5"sv);
@@ -349,10 +343,11 @@ constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    auto const c = getFDMInt(id[5]);
-    if (c)
+    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
+    auto const pos = str.find(id[5]);
+    if (pos != std::string_view::npos)
     {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', *c);
+        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', int(pos));
     }
     else
     {
@@ -383,6 +378,9 @@ constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
+    // Queen Bee uses Bram`s new style:
+    // Q1-0-0-- or Q1-10-0- followed by random bytes.
+
     if (id[4] == '-' && id[6] == '-') // Mx-y-z--
     {
         buf_append(buf, buflen, name, ' ', id[1], '.', id[3], '.', id[5]);
@@ -404,11 +402,18 @@ constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
+    // MLdonkey use the following peer_id scheme: the first characters are
+    // -ML followed by a dotted version then a - followed by randomness.
+    // e.g. -ML2.7.2-kgjjfkd
     buf_append(buf, buflen, name, ' ', std::string_view(id + 3, 5));
 }
 
 constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
+    // Opera 8 previews and Opera 9.x releases use the following peer_id
+    // scheme: The first two characters are OP and the next four digits equal
+    // the build number. All following characters are random lowercase
+    // hexdecimal digits.
     buf_append(buf, buflen, name, ' ', std::string_view(id + 2, 4));
 }
 
@@ -493,7 +498,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 124>{ {
+auto constexpr Clients = std::array<Client, 127>{ {
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
     { "-AT", "Artemis", four_digit_formatter },
@@ -530,6 +535,7 @@ auto constexpr Clients = std::array<Client, 124>{ {
     { "-FL", "Folx", folx_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
     { "-FW", "FrostWire", three_digit_formatter },
+    { "-FX", "Freebox", four_digit_formatter },
     { "-G3", "G3 Torrent", no_version_formatter },
     { "-GR", "GetRight", four_digit_formatter },
     { "-GS", "GSTorrent", four_digit_formatter },
@@ -557,9 +563,11 @@ auto constexpr Clients = std::array<Client, 124>{ {
     { "-PD", "Pando", four_digit_formatter },
     { "-PI", "PicoTorrent", picotorrent_formatter },
     { "-QD", "QQDownload", four_digit_formatter },
+    { "-QT", "QT 4 Torrent example", four_digit_formatter },
     { "-RS", "Rufus", four_digit_formatter },
     { "-RT", "Retriever", four_digit_formatter },
     { "-RZ", "RezTorrent", four_digit_formatter },
+    { "-SB", "~Swiftbit", four_digit_formatter },
     { "-SD", "Thunder", four_digit_formatter },
     { "-SM", "SoMud", four_digit_formatter },
     { "-SP", "BitSpirit", three_digit_formatter },
@@ -569,7 +577,7 @@ auto constexpr Clients = std::array<Client, 124>{ {
     { "-S~", "Shareaza", four_digit_formatter },
     { "-TN", "Torrent .NET", four_digit_formatter },
     { "-TR", "Transmission", transmission_formatter },
-    { "-TS", "TorrentStorm", four_digit_formatter },
+    { "-TS", "Torrentstorm", four_digit_formatter },
     { "-TT", "TuoTu", four_digit_formatter },
     { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
     { "-UL", "uLeecher!", four_digit_formatter },
