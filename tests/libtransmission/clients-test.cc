@@ -21,9 +21,10 @@ TEST(Client, clientForId)
         char const* expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 33>{
+    auto constexpr Tests = std::array<LocalTest, 34>{
         { { "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
           { "-BT791\0-", "BitTorrent 7.9.1" },
+          { "-AZ8421-", "Azureus / Vuze 8.4.2.1" },
           { "-FC1013-", "FileCroc 1.0.1.3" },
           { "-FC1013-", "FileCroc 1.0.1.3" },
           { "-MR1100-", "Miro 1.1.0.0" },

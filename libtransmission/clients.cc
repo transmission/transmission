@@ -91,7 +91,22 @@ void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* dig
     tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
 }
 
-void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    tr_snprintf(
+        buf,
+        buflen,
+        "%*.*s %d.%d.%d.%d",
+        int(std::size(name)),
+        int(std::size(name)),
+        std::data(name),
+        charint(digits[3]),
+        charint(digits[4]),
+        charint(digits[5]),
+        charint(digits[6]));
+}
+
+void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
 {
     tr_snprintf(
         buf,
@@ -179,40 +194,44 @@ bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
     return true;
 }
 
-using format_func = void (*)(char* buf, size_t buflen, std::string_view szname, char const* id);
+using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
 
-void transmission_formatter(char* buf, size_t buflen, std::string_view szname, char const* chid)
+void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
 {
     if (strncmp(chid + 3, "000", 3) == 0) // very old client style: -TR0006- is 0.6
     {
-        tr_snprintf(buf, buflen, "%s 0.%c", std::data(szname), chid[6]);
+        tr_snprintf(buf, buflen, "%*.*s 0.%c", int(std::size(name)), int(std::size(name)), std::data(name), chid[6]);
     }
     else if (strncmp(chid + 3, "00", 2) == 0) // previous client style: -TR0072- is 0.72
     {
-        tr_snprintf(buf, buflen, "%s 0.%02d", std::data(szname), strint(chid + 5, 2));
+        tr_snprintf(buf, buflen, "%*.*s 0.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(chid + 5, 2));
     }
     else // current client style: -TR111Z- is 1.11+ */
     {
         tr_snprintf(
             buf,
             buflen,
-            "%s %d.%02d%s",
-            std::data(szname),
+            "%*.*s %d.%02d%s",
+            int(std::size(name)),
+            int(std::size(name)),
+            std::data(name),
             strint(chid + 3, 1),
             strint(chid + 4, 2),
             (chid[6] == 'Z' || chid[6] == 'X') ? "+" : "");
     }
 }
 
-void utorrent_formatter(char* buf, size_t buflen, std::string_view szname, char const* id)
+void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[7] == '-')
     {
         tr_snprintf(
             buf,
             buflen,
-            "%s %d.%d.%d%s",
-            std::data(szname),
+            "%*.*s %d.%d.%d%s",
+            int(std::size(name)),
+            int(std::size(name)),
+            std::data(name),
             strint(id + 3, 1),
             strint(id + 4, 1),
             strint(id + 5, 1),
@@ -223,8 +242,10 @@ void utorrent_formatter(char* buf, size_t buflen, std::string_view szname, char 
         tr_snprintf(
             buf,
             buflen,
-            "%s %d.%d.%d%s",
-            std::data(szname),
+            "%*.*s %d.%d.%d%s",
+            int(std::size(name)),
+            int(std::size(name)),
+            std::data(name),
             strint(id + 3, 1),
             strint(id + 4, 1),
             strint(id + 5, 2),
@@ -239,12 +260,16 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 6>{ { { "-BT", "BitTorrent", utorrent_formatter },
-                                                  { "-TR", "Transmission", transmission_formatter },
-                                                  { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
-                                                  { "-UM", "\xc2\xb5Torrent Mac", utorrent_formatter },
-                                                  { "-UT", "\xc2\xb5Torrent", utorrent_formatter },
-                                                  { "-UW", "\xc2\xb5Torrent Web", utorrent_formatter } } };
+auto constexpr Clients = std::array<Client, 7>
+{{
+    { "-AZ", "Azureus / Vuze", four_digit_formatter },
+    { "-BT", "BitTorrent", utorrent_formatter },
+    { "-TR", "Transmission", transmission_formatter },
+    { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
+    { "-UM", "\xc2\xb5Torrent Mac", utorrent_formatter },
+    { "-UT", "\xc2\xb5Torrent", utorrent_formatter },
+    { "-UW", "\xc2\xb5Torrent Web", utorrent_formatter }
+}};
 
 } // namespace
 
@@ -380,9 +405,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 getMnemonicEnd(id[6]));
         }
         /* */
-        else
-#endif
-        if (strncmp(chid + 1, "AZ", 2) == 0)
+        else if (strncmp(chid + 1, "AZ", 2) == 0)
         {
             if (id[3] > '3' || (id[3] == '3' && id[4] >= '1')) /* Vuze starts at version 3.1.0.0 */
             {
@@ -393,8 +416,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 four_digits(buf, buflen, "Azureus", id + 3);
             }
         }
+        else
+#endif
         /* */
-        else if (strncmp(chid + 1, "KT", 2) == 0)
+        if (strncmp(chid + 1, "KT", 2) == 0)
         {
             if (id[5] == 'D')
             {
