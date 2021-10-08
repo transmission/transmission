@@ -63,7 +63,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
     }
     *--ptr = char('0' + (n % base));
 
-    return buf_append(buf, buflen, std::string_view(ptr, end-ptr));
+    return buf_append(buf, buflen, std::string_view(ptr, end - ptr));
 }
 
 template<typename T, typename... ArgTypes>
@@ -131,7 +131,15 @@ constexpr std::string_view getMnemonicEnd(uint8_t ch)
 
 void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
-    tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
+    tr_snprintf(
+        buf,
+        buflen,
+        "%*.*s %d.%02d",
+        int(std::size(name)),
+        int(std::size(name)),
+        std::data(name),
+        strint(digits + 3, 2),
+        strint(digits + 5, 2));
 }
 
 constexpr std::optional<int> getShadowInt(uint8_t ch)
@@ -160,7 +168,7 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
         peer_id.remove_suffix(1);
     }
     auto vals = std::vector<int>{};
-    while(std::size(peer_id) > 1)
+    while (std::size(peer_id) > 1)
     {
         auto const num = getShadowInt(peer_id.back());
         if (!num)
@@ -172,20 +180,38 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
     }
 
     auto name = std::string_view{};
-    switch(peer_id.front())
+    switch (peer_id.front())
     {
-        case 'A': name = "ABC"sv; break;
-        case 'O': name = "Osprey"; break;
-        case 'Q': name = "BTQueue"; break;
-        case 'R': name = "Tribler"; break;
-        case 'S': name = "Shad0w"; break;
-        case 'T': name = "BitTornado"; break;
-        case 'U': name = "UPnP NAT Bit Torrent"; break;
-        default: return false;
+    case 'A':
+        name = "ABC"sv;
+        break;
+    case 'O':
+        name = "Osprey";
+        break;
+    case 'Q':
+        name = "BTQueue";
+        break;
+    case 'R':
+        name = "Tribler";
+        break;
+    case 'S':
+        name = "Shad0w";
+        break;
+    case 'T':
+        name = "BitTornado";
+        break;
+    case 'U':
+        name = "UPnP NAT Bit Torrent";
+        break;
+    default:
+        return false;
     }
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
-    std::for_each(std::rbegin(vals), std::rend(vals), [&buf, &buflen](int num){ std::tie(buf, buflen) = buf_append(buf, buflen, num, '.');});
+    std::for_each(
+        std::rbegin(vals),
+        std::rend(vals),
+        [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
     buf[-1] = '\0'; // remove trailing '.'
     return true;
 }
@@ -211,7 +237,7 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
         return false;
     }
 
-    bool const is_bitlord = std::string_view(std::begin(peer_id)+6, 4) == "LORD"sv;
+    bool const is_bitlord = std::string_view(std::begin(peer_id) + 6, 4) == "LORD"sv;
     auto const name = is_bitlord ? "BitLord"sv : "BitComet"sv;
     int const major = peer_id[4];
     int const minor = peer_id[5];
@@ -240,7 +266,18 @@ constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view 
 
 constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
-    buf_append(buf, buflen, name, ' ', charint(digits[3]), '.', charint(digits[4]), '.', charint(digits[5]), '.', charint(digits[6]));
+    buf_append(
+        buf,
+        buflen,
+        name,
+        ' ',
+        charint(digits[3]),
+        '.',
+        charint(digits[4]),
+        '.',
+        charint(digits[5]),
+        '.',
+        charint(digits[6]));
 }
 
 constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -279,7 +316,7 @@ constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void bitlord_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], '-', std::string_view(id+6, 3));
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], '-', std::string_view(id + 6, 3));
 }
 
 constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -316,7 +353,7 @@ constexpr void blizzard_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void btpd_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', std::string_view(id+5, 3));
+    buf_append(buf, buflen, name, ' ', std::string_view(id + 5, 3));
 }
 
 constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -386,12 +423,12 @@ constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', std::string_view(id+3, 5));
+    buf_append(buf, buflen, name, ' ', std::string_view(id + 3, 5));
 }
 
 constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', std::string_view(id+2, 4));
+    buf_append(buf, buflen, name, ' ', std::string_view(id + 2, 4));
 }
 
 constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -475,8 +512,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 124>
-{{
+auto constexpr Clients = std::array<Client, 124>{ {
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
     { "-AT", "Artemis", four_digit_formatter },
@@ -601,7 +637,7 @@ auto constexpr Clients = std::array<Client, 124>
     { "btpd", "BT Protocol Daemon", btpd_formatter },
     { "eX", "eXeem", no_version_formatter },
     { "martini", "Martini Man", no_version_formatter },
-}};
+} };
 
 } // namespace
 
