@@ -206,6 +206,23 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
     return { buf, buflen - 1 };
 }
 
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
+{
+    while (n >= 10)
+    {
+        auto mod = n;
+        auto multiplier = 1;
+        while (mod > 10)
+        {
+            mod /= 10;
+            multiplier *= 10;
+        }
+        std::tie(buf, buflen) = buf_append(buf, buflen, char('0' + mod));
+        n -= mod * multiplier;
+    }
+    return buf_append(buf, buflen, char('0' + n));
+}
+
 constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::string_view name)
 {
     auto const len = std::min(buflen - 1, std::size(name));
@@ -294,16 +311,14 @@ constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view nam
 
 void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.');
-
     auto const c = getFDMInt(id[5]);
     if (c)
     {
-        tr_snprintf(buf, buflen, "%d", *c);
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', *c);
     }
     else
     {
-        buf_append(buf, buflen, 'x');
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', 'x');
     }
 }
 
@@ -331,7 +346,7 @@ constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], " ("sv, id[5], id[6], ')');
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
 }
 
 void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
