@@ -127,7 +127,7 @@ void tr_bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
     tr_direction dir,
     unsigned int period_msec,
-    tr_ptrArray* peer_pool)
+    std::vector<tr_peerIo*>& peer_pool)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -144,7 +144,7 @@ void tr_bandwidth::allocateBandwidth(
     if (this->peer != nullptr)
     {
         this->peer->priority = priority_;
-        tr_ptrArrayAppend(peer_pool, this->peer);
+        peer_pool.push_back(this->peer);
     }
 
     // traverse & repeat for the subtree
@@ -154,19 +154,15 @@ void tr_bandwidth::allocateBandwidth(
     }
 }
 
-void tr_bandwidth::phaseOne(tr_ptrArray const* peerArray, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo *> &peerArray, tr_direction dir)
 {
-    int n;
-    int peerCount = tr_ptrArraySize(peerArray);
-    auto** peers = (struct tr_peerIo**)tr_ptrArrayBase(peerArray);
-
     /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    n = peerCount;
-    dbgmsg("%d peers to go round-robin for %s", n, dir == TR_UP ? "upload" : "download");
+    dbgmsg("%lu peers to go round-robin for %s", peerArray.size(), dir == TR_UP ? "upload" : "download");
 
+    size_t n = peerArray.size();
     while (n > 0)
     {
         int const i = tr_rand_int_weak(n); /* pick a peer at random */
@@ -176,16 +172,14 @@ void tr_bandwidth::phaseOne(tr_ptrArray const* peerArray, tr_direction dir)
          * out in a timely manner. */
         size_t const increment = 3000;
 
-        int const bytesUsed = tr_peerIoFlush(peers[i], dir, increment);
+        int const bytesUsed = tr_peerIoFlush(peerArray[i], dir, increment);
 
-        dbgmsg("peer #%d of %d used %d bytes in this pass", i, n, bytesUsed);
+        dbgmsg("peer #%d of %zu used %d bytes in this pass", i, n, bytesUsed);
 
         if (bytesUsed != (int)increment)
         {
             /* peer is done writing for now; move it to the end of the list */
-            tr_peerIo* pio = peers[i];
-            peers[i] = peers[n - 1];
-            peers[n - 1] = pio;
+            std::swap(peerArray[i], peerArray[n - 1]);
             --n;
         }
     }
@@ -193,39 +187,33 @@ void tr_bandwidth::phaseOne(tr_ptrArray const* peerArray, tr_direction dir)
 
 void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
-    int peerCount;
-    auto tmp = tr_ptrArray{};
-    auto low = tr_ptrArray{};
-    auto high = tr_ptrArray{};
-    auto normal = tr_ptrArray{};
-    struct tr_peerIo** peers;
+    std::vector<tr_peerIo *> tmp;
+    std::vector<tr_peerIo *> low;
+    std::vector<tr_peerIo *> normal;
+    std::vector<tr_peerIo *> high;
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
-    this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, &tmp);
-    peers = (struct tr_peerIo**)tr_ptrArrayBase(&tmp);
-    peerCount = tr_ptrArraySize(&tmp);
+    this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, tmp);
 
-    for (int i = 0; i < peerCount; ++i)
+    for (auto io: tmp)
     {
-        tr_peerIo* io = peers[i];
         tr_peerIoRef(io);
-
         tr_peerIoFlushOutgoingProtocolMsgs(io);
 
         switch (io->priority)
         {
         case TR_PRI_HIGH:
-            tr_ptrArrayAppend(&high, io);
+            high.push_back(io);
             [[fallthrough]];
 
         case TR_PRI_NORMAL:
-            tr_ptrArrayAppend(&normal, io);
+            normal.push_back(io);
             [[fallthrough]];
 
         default:
-            tr_ptrArrayAppend(&low, io);
+            low.push_back(io);
         }
     }
 
@@ -233,29 +221,23 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    phaseOne(&high, dir);
-    phaseOne(&normal, dir);
-    phaseOne(&low, dir);
+    phaseOne(high, dir);
+    phaseOne(normal, dir);
+    phaseOne(low, dir);
 
     /* Second phase of IO. To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidthAllocate () call, when we start over again. */
-    for (int i = 0; i < peerCount; ++i)
+    for (auto io: tmp)
     {
-        tr_peerIoSetEnabled(peers[i], dir, tr_peerIoHasBandwidthLeft(peers[i], dir));
+        tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
     }
 
-    for (int i = 0; i < peerCount; ++i)
+    for (auto io: tmp)
     {
-        tr_peerIoUnref(peers[i]);
+        tr_peerIoUnref(io);
     }
-
-    /* cleanup */
-    tr_ptrArrayDestruct(&normal, nullptr);
-    tr_ptrArrayDestruct(&high, nullptr);
-    tr_ptrArrayDestruct(&low, nullptr);
-    tr_ptrArrayDestruct(&tmp, nullptr);
 }
 
 /***

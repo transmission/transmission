@@ -244,8 +244,9 @@ private:
     static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
     static void notifyBandwidthConsumedBytes(uint64_t now, struct bratecontrol* r, size_t size);
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
-    static void phaseOne(tr_ptrArray const* peerArray, tr_direction dir);
-    void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec, tr_ptrArray* peer_pool);
+    static void phaseOne(std::vector<tr_peerIo *> &peerArray, tr_direction dir);
+    void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec,
+        std::vector<tr_peerIo*>& peer_pool);
 };
 
 /* @} */
