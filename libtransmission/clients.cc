@@ -86,9 +86,9 @@ constexpr char const* getMnemonicEnd(uint8_t ch)
     }
 }
 
-void three_digits_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
-    tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(digits[0]), charint(digits[1]), charint(digits[2]));
+    tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(digits[3]), charint(digits[4]), charint(digits[5]));
 }
 
 void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
@@ -124,7 +124,12 @@ void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digi
         charint(digits[3]));
 }
 
-void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
+}
+
+void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
 {
     tr_snprintf(buf, buflen, "%s %d.%02d", name, strint(digits, 2), strint(digits + 2, 2));
 }
@@ -201,6 +206,15 @@ bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 
 using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
 
+void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    TR_UNUSED(id);
+
+    auto const len = std::min(buflen - 1, std::size(name));
+    std::copy_n(std::begin(name), len, buf);
+    buf[len] = '\0';
+}
+
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
 {
     if (strncmp(chid + 3, "000", 3) == 0) // very old client style: -TR0006- is 0.6
@@ -238,7 +252,7 @@ void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char co
     }
     else
     {
-        three_digits_formatter(buf, buflen, name, id);
+        three_digit_formatter(buf, buflen, name, id);
     }
 }
 
@@ -281,16 +295,92 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 8>
+auto constexpr Clients = std::array<Client, 84>
 {{
+    { "-AG", "Aress", four_digit_formatter },
+    { "-AR", "Arctic", four_digit_formatter },
+    { "-AT", "Artemis", four_digit_formatter },
+    { "-AV", "Avicora", four_digit_formatter },
+    { "-AX", "BitPump", two_major_two_minor_formatter },
     { "-AZ", "Azureus / Vuze", four_digit_formatter },
+    { "-A~", "Ares", three_digit_formatter },
+    { "-BC", "BitComet", two_major_two_minor_formatter },
+    { "-BE", "BitTorrent SDK", four_digit_formatter },
+    { "-BF", "BitFlu", no_version_formatter },
+    { "-BG", "BTGetit", four_digit_formatter },
+    { "-BH", "BitZilla", four_digit_formatter },
+    { "-BI", "BiglyBT", four_digit_formatter },
+    { "-BM", "BitMagnet", four_digit_formatter },
+    { "-BN", "Baidu Netdisk", no_version_formatter },
+    { "-BP", "BitTorrent Pro (Azureus + Spyware)", four_digit_formatter },
+    { "-BS", "BTSlave", four_digit_formatter },
     { "-BT", "BitTorrent", utorrent_formatter },
+    { "-BW", "BitWombat", four_digit_formatter },
+    { "-BX", "BittorrentX", four_digit_formatter },
+    { "-CD", "Enhanced CTorrent", two_major_two_minor_formatter },
+    { "-DE", "Deluge", four_digit_formatter },
+    { "-DP", "Propagate Data Client", four_digit_formatter },
+    { "-EB", "EBit", four_digit_formatter },
+    { "-ES", "Electric Sheep", three_digit_formatter },
+    { "-FC", "FileCroc", four_digit_formatter },
+    { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
+    { "-FW", "FrostWire", three_digit_formatter },
+    { "-GR", "GetRight", four_digit_formatter },
+    { "-GS", "GSTorrent", four_digit_formatter },
+    { "-HK", "Hekate", four_digit_formatter },
+    { "-HL", "Halite", three_digit_formatter },
+    { "-HN", "Hydranode", four_digit_formatter },
+    { "-KG", "KGet", four_digit_formatter },
     { "-KT", "KTorrent", ktorrent_formatter },
+    { "-LC", "LeechCraft", four_digit_formatter },
+    { "-LH", "LH-ABC", four_digit_formatter },
+    { "-LP", "Lphant", two_major_two_minor_formatter },
+    { "-LT", "libtorrent (Rasterbar)", three_digit_formatter },
+    { "-LW", "LimeWire", no_version_formatter },
+    { "-MK", "Meerkat", four_digit_formatter },
+    { "-MO", "MonoTorrent", four_digit_formatter },
+    { "-MP", "MooPolice", three_digit_formatter },
+    { "-MR", "Miro", four_digit_formatter },
+    { "-MT", "Moonlight", four_digit_formatter },
+    { "-NX", "Net Transport", four_digit_formatter },
+    { "-OS", "OneSwarm", four_digit_formatter },
+    { "-OT", "OmegaTorrent", four_digit_formatter },
+    { "-PD", "Pando", four_digit_formatter },
+    { "-QD", "QQDownload", four_digit_formatter },
+    { "-RS", "Rufus", four_digit_formatter },
+    { "-RT", "Retriever", four_digit_formatter },
+    { "-RZ", "RezTorrent", four_digit_formatter },
+    { "-SD", "Thunder", four_digit_formatter },
+    { "-SM", "SoMud", four_digit_formatter },
+    { "-SS", "SwarmScope", four_digit_formatter },
+    { "-ST", "SymTorrent", four_digit_formatter },
+    { "-SZ", "Shareaza", four_digit_formatter },
+    { "-S~", "Shareaza", four_digit_formatter },
+    { "-TN", "Torrent .NET", four_digit_formatter },
     { "-TR", "Transmission", transmission_formatter },
+    { "-TS", "TorrentStorm", four_digit_formatter },
+    { "-TT", "TuoTu", four_digit_formatter },
     { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
+    { "-UL", "uLeecher!", four_digit_formatter },
     { "-UM", "\xc2\xb5Torrent Mac", utorrent_formatter },
     { "-UT", "\xc2\xb5Torrent", utorrent_formatter },
-    { "-UW", "\xc2\xb5Torrent Web", utorrent_formatter }
+    { "-UW", "\xc2\xb5Torrent Web", utorrent_formatter },
+    { "-VG", "Vagaa", four_digit_formatter },
+    { "-WS", "HTTP Seed", no_version_formatter },
+    { "-WT", "BitLet", four_digit_formatter },
+    { "-WW", "WebTorrent", four_digit_formatter },
+    { "-WY", "FireTorrent", four_digit_formatter },
+    { "-XL", "Xunlei", four_digit_formatter },
+    { "-XS", "XSwifter", four_digit_formatter },
+    { "-XT", "XanTorrent", four_digit_formatter },
+    { "-XX", "Xtorrent", four_digit_formatter },
+    { "-ZO", "Zona", four_digit_formatter },
+    { "-ZT", "Zip Torrent", four_digit_formatter },
+    { "-bk", "BitKitten (libtorrent)", four_digit_formatter },
+    { "-lt", "libTorrent (Rakshasa)", three_digit_formatter },
+    { "-pb", "pbTorrent", three_digit_formatter },
+    { "-qB", "qBittorrent", three_digit_formatter },
+    { "-st", "SharkTorrent", four_digit_formatter },
 }};
 
 } // namespace
@@ -349,415 +439,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
-#if 0
-        if (strncmp(chid + 1, "TR", 2) == 0)
-        {
-            if (strncmp(chid + 3, "000", 3) == 0) /* very old client style: -TR0006- is 0.6 */
-            {
-                tr_snprintf(buf, buflen, "Transmission 0.%c", id[6]);
-            }
-            else if (strncmp(chid + 3, "00", 2) == 0) /* previous client style: -TR0072- is 0.72 */
-            {
-                tr_snprintf(buf, buflen, "Transmission 0.%02d", strint(id + 5, 2));
-            }
-            else /* current client style: -TR111Z- is 1.11+ */
-            {
-                tr_snprintf(
-                    buf,
-                    buflen,
-                    "Transmission %d.%02d%s",
-                    strint(id + 3, 1),
-                    strint(id + 4, 2),
-                    (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
-            }
-        }
-        else if (strncmp(chid + 1, "UT", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
-        }
-        else if (strncmp(chid + 1, "BT", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "BitTorrent %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
-        }
-        else if (strncmp(chid + 1, "UM", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Mac %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
-        }
-        else if (strncmp(chid + 1, "UE", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Embedded %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
-        }
-        else if (strncmp(chid + 1, "UW", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Web %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
-        }
         /* */
-        else if (strncmp(chid + 1, "AZ", 2) == 0)
-        {
-            if (id[3] > '3' || (id[3] == '3' && id[4] >= '1')) /* Vuze starts at version 3.1.0.0 */
-            {
-                four_digits(buf, buflen, "Vuze", id + 3);
-            }
-            else
-            {
-                four_digits(buf, buflen, "Azureus", id + 3);
-            }
-        }
-        /* */
-        else if (strncmp(chid + 1, "KT", 2) == 0)
-        {
-            if (id[5] == 'D')
-            {
-                tr_snprintf(buf, buflen, "KTorrent %d.%d Dev %d", charint(id[3]), charint(id[4]), charint(id[6]));
-            }
-            else if (id[5] == 'R')
-            {
-                tr_snprintf(buf, buflen, "KTorrent %d.%d RC %d", charint(id[3]), charint(id[4]), charint(id[6]));
-            }
-            else
-            {
-                three_digits(buf, buflen, "KTorrent", id + 3);
-            }
-        }
-        else
-#endif
-        /* */
-        if (strncmp(chid + 1, "AG", 2) == 0)
-        {
-            four_digits(buf, buflen, "Ares", id + 3);
-        }
-        else if (strncmp(chid + 1, "AR", 2) == 0)
-        {
-            four_digits(buf, buflen, "Arctic", id + 3);
-        }
-        else if (strncmp(chid + 1, "AT", 2) == 0)
-        {
-            four_digits(buf, buflen, "Artemis", id + 3);
-        }
-        else if (strncmp(chid + 1, "AV", 2) == 0)
-        {
-            four_digits(buf, buflen, "Avicora", id + 3);
-        }
-        else if (strncmp(chid + 1, "BE", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitTorrent SDK", id + 3);
-        }
-        else if (strncmp(chid + 1, "BG", 2) == 0)
-        {
-            four_digits(buf, buflen, "BTGetit", id + 3);
-        }
-        else if (strncmp(chid + 1, "BH", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitZilla", id + 3);
-        }
-        else if (strncmp(chid + 1, "BI", 2) == 0)
-        {
-            four_digits(buf, buflen, "BiglyBT", id + 3);
-        }
-        else if (strncmp(chid + 1, "BM", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitMagnet", id + 3);
-        }
-        else if (strncmp(chid + 1, "BP", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitTorrent Pro (Azureus + Spyware)", id + 3);
-        }
-        else if (strncmp(chid + 1, "BX", 2) == 0)
-        {
-            four_digits(buf, buflen, "BittorrentX", id + 3);
-        }
-        else if (strncmp(chid + 1, "bk", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitKitten (libtorrent)", id + 3);
-        }
-        else if (strncmp(chid + 1, "BS", 2) == 0)
-        {
-            four_digits(buf, buflen, "BTSlave", id + 3);
-        }
-        else if (strncmp(chid + 1, "BW", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitWombat", id + 3);
-        }
-        else if (strncmp(chid + 1, "EB", 2) == 0)
-        {
-            four_digits(buf, buflen, "EBit", id + 3);
-        }
-        else if (strncmp(chid + 1, "DE", 2) == 0)
-        {
-            four_digits(buf, buflen, "Deluge", id + 3);
-        }
-        else if (strncmp(chid + 1, "DP", 2) == 0)
-        {
-            four_digits(buf, buflen, "Propagate Data Client", id + 3);
-        }
-        else if (strncmp(chid + 1, "FC", 2) == 0)
-        {
-            four_digits(buf, buflen, "FileCroc", id + 3);
-        }
-        else if (strncmp(chid + 1, "FT", 2) == 0)
-        {
-            four_digits(buf, buflen, "FoxTorrent/RedSwoosh", id + 3);
-        }
-        else if (strncmp(chid + 1, "GR", 2) == 0)
-        {
-            four_digits(buf, buflen, "GetRight", id + 3);
-        }
-        else if (strncmp(chid + 1, "GS", 2) == 0)
-        {
-            four_digits(buf, buflen, "GSTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "HK", 2) == 0)
-        {
-            four_digits(buf, buflen, "Hekate", id + 3);
-        }
-        else if (strncmp(chid + 1, "HN", 2) == 0)
-        {
-            four_digits(buf, buflen, "Hydranode", id + 3);
-        }
-        else if (strncmp(chid + 1, "KG", 2) == 0)
-        {
-            four_digits(buf, buflen, "KGet", id + 3);
-        }
-        else if (strncmp(chid + 1, "LC", 2) == 0)
-        {
-            four_digits(buf, buflen, "LeechCraft", id + 3);
-        }
-        else if (strncmp(chid + 1, "LH", 2) == 0)
-        {
-            four_digits(buf, buflen, "LH-ABC", id + 3);
-        }
-        else if (strncmp(chid + 1, "NX", 2) == 0)
-        {
-            four_digits(buf, buflen, "Net Transport", id + 3);
-        }
-        else if (strncmp(chid + 1, "MK", 2) == 0)
-        {
-            four_digits(buf, buflen, "Meerkat", id + 3);
-        }
-        else if (strncmp(chid + 1, "MO", 2) == 0)
-        {
-            four_digits(buf, buflen, "MonoTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "MR", 2) == 0)
-        {
-            four_digits(buf, buflen, "Miro", id + 3);
-        }
-        else if (strncmp(chid + 1, "MT", 2) == 0)
-        {
-            four_digits(buf, buflen, "Moonlight", id + 3);
-        }
-        else if (strncmp(chid + 1, "OS", 2) == 0)
-        {
-            four_digits(buf, buflen, "OneSwarm", id + 3);
-        }
-        else if (strncmp(chid + 1, "OT", 2) == 0)
-        {
-            four_digits(buf, buflen, "OmegaTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "PD", 2) == 0)
-        {
-            four_digits(buf, buflen, "Pando", id + 3);
-        }
-        else if (strncmp(chid + 1, "QD", 2) == 0)
-        {
-            four_digits(buf, buflen, "QQDownload", id + 3);
-        }
-        else if (strncmp(chid + 1, "RS", 2) == 0)
-        {
-            four_digits(buf, buflen, "Rufus", id + 3);
-        }
-        else if (strncmp(chid + 1, "RT", 2) == 0)
-        {
-            four_digits(buf, buflen, "Retriever", id + 3);
-        }
-        else if (strncmp(chid + 1, "RZ", 2) == 0)
-        {
-            four_digits(buf, buflen, "RezTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "SD", 2) == 0)
-        {
-            four_digits(buf, buflen, "Thunder", id + 3);
-        }
-        else if (strncmp(chid + 1, "SM", 2) == 0)
-        {
-            four_digits(buf, buflen, "SoMud", id + 3);
-        }
-        else if (strncmp(chid + 1, "SS", 2) == 0)
-        {
-            four_digits(buf, buflen, "SwarmScope", id + 3);
-        }
-        else if (strncmp(chid + 1, "ST", 2) == 0)
-        {
-            four_digits(buf, buflen, "SymTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "SZ", 2) == 0)
-        {
-            four_digits(buf, buflen, "Shareaza", id + 3);
-        }
-        else if (strncmp(chid + 1, "S~", 2) == 0)
-        {
-            four_digits(buf, buflen, "Shareaza", id + 3);
-        }
-        else if (strncmp(chid + 1, "st", 2) == 0)
-        {
-            four_digits(buf, buflen, "SharkTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "TN", 2) == 0)
-        {
-            four_digits(buf, buflen, "Torrent .NET", id + 3);
-        }
-        else if (strncmp(chid + 1, "TS", 2) == 0)
-        {
-            four_digits(buf, buflen, "TorrentStorm", id + 3);
-        }
-        else if (strncmp(chid + 1, "TT", 2) == 0)
-        {
-            four_digits(buf, buflen, "TuoTu", id + 3);
-        }
-        else if (strncmp(chid + 1, "UL", 2) == 0)
-        {
-            four_digits(buf, buflen, "uLeecher!", id + 3);
-        }
-        else if (strncmp(chid + 1, "VG", 2) == 0)
-        {
-            four_digits(buf, buflen, "Vagaa", id + 3);
-        }
-        else if (strncmp(chid + 1, "WT", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitLet", id + 3);
-        }
-        else if (strncmp(chid + 1, "WY", 2) == 0)
-        {
-            four_digits(buf, buflen, "FireTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "WW", 2) == 0)
-        {
-            four_digits(buf, buflen, "WebTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "XL", 2) == 0)
-        {
-            four_digits(buf, buflen, "Xunlei", id + 3);
-        }
-        else if (strncmp(chid + 1, "XS", 2) == 0)
-        {
-            four_digits(buf, buflen, "XSwifter", id + 3);
-        }
-        else if (strncmp(chid + 1, "XT", 2) == 0)
-        {
-            four_digits(buf, buflen, "XanTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "XX", 2) == 0)
-        {
-            four_digits(buf, buflen, "Xtorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "ZT", 2) == 0)
-        {
-            four_digits(buf, buflen, "Zip Torrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "ZO", 2) == 0)
-        {
-            four_digits(buf, buflen, "Zona", id + 3);
-        }
-        /* */
-        else if (strncmp(chid + 1, "A~", 2) == 0)
-        {
-            three_digits(buf, buflen, "Ares", id + 3);
-        }
-        else if (strncmp(chid + 1, "ES", 2) == 0)
-        {
-            three_digits(buf, buflen, "Electric Sheep", id + 3);
-        }
-        else if (strncmp(chid + 1, "FW", 2) == 0)
-        {
-            three_digits(buf, buflen, "FrostWire", id + 3);
-        }
-        else if (strncmp(chid + 1, "HL", 2) == 0)
-        {
-            three_digits(buf, buflen, "Halite", id + 3);
-        }
-        else if (strncmp(chid + 1, "LT", 2) == 0)
-        {
-            three_digits(buf, buflen, "libtorrent (Rasterbar)", id + 3);
-        }
-        else if (strncmp(chid + 1, "lt", 2) == 0)
-        {
-            three_digits(buf, buflen, "libTorrent (Rakshasa)", id + 3);
-        }
-        else if (strncmp(chid + 1, "MP", 2) == 0)
-        {
-            three_digits(buf, buflen, "MooPolice", id + 3);
-        }
-        else if (strncmp(chid + 1, "pb", 2) == 0)
-        {
-            three_digits(buf, buflen, "pbTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "qB", 2) == 0)
-        {
-            three_digits(buf, buflen, "qBittorrent", id + 3);
-        }
-        /* */
-        else if (strncmp(chid + 1, "AX", 2) == 0)
-        {
-            two_major_two_minor(buf, buflen, "BitPump", id + 3);
-        }
-        else if (strncmp(chid + 1, "BC", 2) == 0)
-        {
-            two_major_two_minor(buf, buflen, "BitComet", id + 3);
-        }
-        else if (strncmp(chid + 1, "CD", 2) == 0)
-        {
-            two_major_two_minor(buf, buflen, "Enhanced CTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "LP", 2) == 0)
-        {
-            two_major_two_minor(buf, buflen, "Lphant", id + 3);
-        }
-        /* */
-        else if (strncmp(chid + 1, "BF", 2) == 0)
-        {
-            no_version(buf, buflen, "BitFlu");
-        }
-        else if (strncmp(chid + 1, "LW", 2) == 0)
-        {
-            no_version(buf, buflen, "LimeWire");
-        }
-        /* */
-        else if (strncmp(chid + 1, "BB", 2) == 0)
+        if (strncmp(chid + 1, "BB", 2) == 0)
         {
             tr_snprintf(buf, buflen, "BitBuddy %c.%c%c%c", id[3], id[4], id[5], id[6]);
         }
@@ -822,14 +505,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "FL", 2) == 0)
         {
             tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
-        }
-        else if (strncmp(chid + 1, "BN", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "Baidu Netdisk");
-        }
-        else if (strncmp(chid + 1, "WS", 2) == 0)
-        {
-            no_version(buf, buflen, "HTTP Seed");
         }
 
         if (!tr_str_is_empty(buf))

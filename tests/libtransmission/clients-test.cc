@@ -21,8 +21,9 @@ TEST(Client, clientForId)
         char const* expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 35>{{
+    auto constexpr Tests = std::array<LocalTest, 36>{{
         { "-AZ8421-", "Azureus / Vuze 8.4.2.1" },
+        { "-BC0241-", "BitComet 2.41" }, // two major, two minor
         { "-BI2300-", "BiglyBT 2.3.0.0" },
         { "-BL246326", "BitLord 2.4.6-326" }, // Style used after BitLord 0.59
         { "-BN0001-", "Baidu Netdisk" }, // Baidu Netdisk Client v5.5.4
