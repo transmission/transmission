@@ -313,6 +313,11 @@ void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char cons
     }
 }
 
+void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    tr_snprintf(buf, buflen, "%*.*s %d.%d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), strint(id + 5, 2));
+}
+
 void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     tr_snprintf(buf, buflen, "%*.*s %c.%c%c%c", int(std::size(name)), int(std::size(name)), std::data(name), id[3], id[4], id[5], id[6]);
@@ -330,7 +335,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 88>
+auto constexpr Clients = std::array<Client, 89>
 {{
     { "-AG", "Aress", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -355,6 +360,7 @@ auto constexpr Clients = std::array<Client, 88>
     { "-BW", "BitWombat", four_digit_formatter },
     { "-BX", "BittorrentX", four_digit_formatter },
     { "-CD", "Enhanced CTorrent", two_major_two_minor_formatter },
+    { "-CT", "CTorrent", ctorrent_formatter },
     { "-DE", "Deluge", four_digit_formatter },
     { "-DP", "Propagate Data Client", four_digit_formatter },
     { "-EB", "EBit", four_digit_formatter },
@@ -478,11 +484,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
-        if (strncmp(chid + 1, "CT", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id + 5, 2));
-        }
-        else if (strncmp(chid + 1, "XC", 2) == 0 || strncmp(chid + 1, "XX", 2) == 0)
+        if (strncmp(chid + 1, "XC", 2) == 0 || strncmp(chid + 1, "XX", 2) == 0)
         {
             tr_snprintf(buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id + 5, 2));
         }
