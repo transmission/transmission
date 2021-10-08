@@ -148,13 +148,13 @@ void tr_bandwidth::allocateBandwidth(
     }
 
     // traverse & repeat for the subtree
-    for (auto child: this->children)
+    for (auto child : this->children)
     {
         child->allocateBandwidth(priority_, dir, period_msec, peer_pool);
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo *> &peerArray, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 {
     /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others. Loop through the peers, giving each a
@@ -187,17 +187,17 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo *> &peerArray, tr_direction di
 
 void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
-    std::vector<tr_peerIo *> tmp;
-    std::vector<tr_peerIo *> low;
-    std::vector<tr_peerIo *> normal;
-    std::vector<tr_peerIo *> high;
+    std::vector<tr_peerIo*> tmp;
+    std::vector<tr_peerIo*> low;
+    std::vector<tr_peerIo*> normal;
+    std::vector<tr_peerIo*> high;
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
      * 2. accumulate an array of all the peerIos from b and its subtree. */
     this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, tmp);
 
-    for (auto io: tmp)
+    for (auto io : tmp)
     {
         tr_peerIoRef(io);
         tr_peerIoFlushOutgoingProtocolMsgs(io);
@@ -229,12 +229,12 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidthAllocate () call, when we start over again. */
-    for (auto io: tmp)
+    for (auto io : tmp)
     {
         tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
     }
 
-    for (auto io: tmp)
+    for (auto io : tmp)
     {
         tr_peerIoUnref(io);
     }

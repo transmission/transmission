@@ -110,13 +110,16 @@ private:
     tr_priority_t priority = 0;
     std::array<struct tr_band, 2> band;
     struct tr_bandwidth* parent;
-    std::unordered_set<tr_bandwidth *> children;
+    std::unordered_set<tr_bandwidth*> children;
     struct tr_peerIo* peer;
 
 public:
     explicit tr_bandwidth(tr_bandwidth* newParent);
 
-    tr_bandwidth(): tr_bandwidth(nullptr) {}
+    tr_bandwidth()
+        : tr_bandwidth(nullptr)
+    {
+    }
 
     ~tr_bandwidth()
     {
@@ -244,8 +247,11 @@ private:
     static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
     static void notifyBandwidthConsumedBytes(uint64_t now, struct bratecontrol* r, size_t size);
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
-    static void phaseOne(std::vector<tr_peerIo *> &peerArray, tr_direction dir);
-    void allocateBandwidth(tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec,
+    static void phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir);
+    void allocateBandwidth(
+        tr_priority_t parent_priority,
+        tr_direction dir,
+        unsigned int period_msec,
         std::vector<tr_peerIo*>& peer_pool);
 };
 

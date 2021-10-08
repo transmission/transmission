@@ -242,7 +242,7 @@ struct tr_session
     /* monitors the "global pool" speeds */
     // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    struct tr_bandwidth *bandwidth;
+    struct tr_bandwidth* bandwidth;
 
     float desiredRatio;
 
