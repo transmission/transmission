@@ -21,7 +21,7 @@ TEST(Client, clientForId)
         char const* expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 36>{{
+    auto constexpr Tests = std::array<LocalTest, 37>{{
         { "-AZ8421-", "Azureus / Vuze 8.4.2.1" },
         { "-BC0241-", "BitComet 2.41" }, // two major, two minor
         { "-BI2300-", "BiglyBT 2.3.0.0" },
@@ -55,6 +55,7 @@ TEST(Client, clientForId)
         { "A2-1-18-8-", "aria2 1.18.8" },
         { "A2-1-2-0-", "aria2 1.2.0" },
         { "O1008132", "Osprey 1.0.0" },
+        { "Q1-23-4-", "Queen Bee 1.23.4" },
         { "TIX0193-", "Tixati 1.93" },
         { "\x65\x78\x62\x63\x00\x38\x4C\x4F\x52\x44\x32\x00\x04\x8E\xCE\xD5\x7B\xD7\x10\x28", "BitLord 0.56" },
         { "\x65\x78\x62\x63\x00\x38\x7A\x44\x63\x10\x2D\x6E\x9A\xD6\x72\x3B\x33\x9F\x35\xA9", "BitComet 0.56" }

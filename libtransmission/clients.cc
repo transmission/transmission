@@ -124,28 +124,6 @@ void no_version(char* buf, size_t buflen, char const* name)
     tr_strlcpy(buf, name, buflen);
 }
 
-void mainline_style(char* buf, size_t buflen, char const* name, uint8_t const* id)
-{
-    if (id[4] == '-' && id[6] == '-')
-    {
-        tr_snprintf(buf, buflen, "%s %c.%c.%c", name, id[1], id[3], id[5]);
-    }
-    else if (id[5] == '-')
-    {
-        tr_snprintf(buf, buflen, "%s %c.%c%c.%c", name, id[1], id[3], id[4], id[6]);
-    }
-}
-
-constexpr bool isMainlineStyle(uint8_t const* peer_id)
-{
-    /**
-     * One of the following styles will be used:
-     *   Mx-y-z--
-     *   Mx-yy-z-
-     */
-    return peer_id[2] == '-' && peer_id[7] == '-' && (peer_id[4] == '-' || peer_id[5] == '-');
-}
-
 bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
     char const* chid = (char const*)id;
@@ -381,6 +359,22 @@ void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, char co
     tr_snprintf(buf, buflen, "%d)", strint(id + 5, 2));
 }
 
+void mainline_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (id[4] == '-' && id[6] == '-') // Mx-y-z--
+    {
+        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], '.', id[5]);
+    }
+    else if (id[5] == '-') // Mx-yy-z-
+    {
+        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], id[4], '.', id[6]);
+    }
+    else
+    {
+        buf_append(buf, buflen, name);
+    }
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -388,7 +382,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 107>
+auto constexpr Clients = std::array<Client, 109>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -491,7 +485,9 @@ auto constexpr Clients = std::array<Client, 107>
     { "346-", "TorrentTopia", no_version_formatter },
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "LIME", "Limewire", no_version_formatter },
+    { "M", "BitTorrent", mainline_formatter },
     { "Pando", "Pando", no_version_formatter },
+    { "Q", "Queen Bee", mainline_formatter },
     { "a00---0", "Swarmy", no_version_formatter },
     { "a02---0", "Swarmy", no_version_formatter },
     { "aria2-", "aria2", no_version_formatter },
@@ -548,25 +544,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         eq.first->formatter(buf, buflen, eq.first->name, chid);
         std::cerr << "got a match [" << key << "] -> [" << buf << ']' << std::endl;
         return buf;
-    }
-
-    /* Mainline */
-    if (isMainlineStyle(id))
-    {
-        if (*id == 'M')
-        {
-            mainline_style(buf, buflen, "BitTorrent", id);
-        }
-
-        if (*id == 'Q')
-        {
-            mainline_style(buf, buflen, "Queen Bee", id);
-        }
-
-        if (!tr_str_is_empty(buf))
-        {
-            return buf;
-        }
     }
 
     if (decodeBitCometClient(buf, buflen, id))
