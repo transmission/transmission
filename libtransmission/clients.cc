@@ -109,16 +109,6 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
     tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
 }
 
-void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
-{
-    tr_snprintf(buf, buflen, "%s %d.%02d", name, strint(digits, 2), strint(digits + 2, 2));
-}
-
-void no_version(char* buf, size_t buflen, char const* name)
-{
-    tr_strlcpy(buf, name, buflen);
-}
-
 bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
     char const* chid = (char const*)id;
@@ -227,14 +217,20 @@ constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view n
 
 // specific clients
 
-constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
-}
-
-constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
+    if (id[4] == '-' && id[6] == '-' && id[8] == '-')
+    {
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
+    }
+    else if (id[4] == '-' && id[7] == '-' && id[9] == '-')
+    {
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[5], id[6], '.', id[8]);
+    }
+    else
+    {
+        buf_append(buf, buflen, name);
+    }
 }
 
 constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -278,6 +274,11 @@ constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, 
     buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
 }
 
+constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
+}
+
 void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     auto const c = getFDMInt(id[5]);
@@ -289,6 +290,11 @@ void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* 
     {
         std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
     }
+}
+
+constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
 }
 
 constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -414,7 +420,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 117>
+auto constexpr Clients = std::array<Client, 119>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -517,6 +523,7 @@ auto constexpr Clients = std::array<Client, 117>
     { "-st", "SharkTorrent", four_digit_formatter },
     { "10-------", "JVtorrent", no_version_formatter },
     { "346-", "TorrentTopia", no_version_formatter },
+    { "A2", "aria2", aria2_formatter },
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "BLZ", "Blizzard Downloader", blizzard_formatter },
     { "LIME", "Limewire", no_version_formatter },
@@ -527,6 +534,7 @@ auto constexpr Clients = std::array<Client, 117>
     { "Plus", "Plus!", plus_formatter },
     { "Q", "Queen Bee", mainline_formatter },
     { "S3", "Amazon S3", amazon_formatter },
+    { "TIX", "Tixati", two_major_two_minor_formatter },
     { "XBT", "XBT Client", xbt_formatter },
     { "a00---0", "Swarmy", no_version_formatter },
     { "a02---0", "Swarmy", no_version_formatter },
@@ -611,25 +619,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "-NE", 3) == 0)
     {
         four_digits(buf, buflen, "BT Next Evolution", id + 3);
-    }
-    else if (strncmp(chid, "TIX", 3) == 0)
-    {
-        two_major_two_minor(buf, buflen, "Tixati", id + 3);
-    }
-    else if (strncmp(chid, "A2", 2) == 0)
-    {
-        if (id[4] == '-' && id[6] == '-' && id[8] == '-')
-        {
-            tr_snprintf(buf, buflen, "aria2 %c.%c.%c", id[3], id[5], id[7]);
-        }
-        else if (id[4] == '-' && id[7] == '-' && id[9] == '-')
-        {
-            tr_snprintf(buf, buflen, "aria2 %c.%c%c.%c", id[3], id[5], id[6], id[8]);
-        }
-        else
-        {
-            no_version(buf, buflen, "aria2");
-        }
     }
     else if (strncmp(chid, "-BL", 3) == 0)
     {
