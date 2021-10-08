@@ -8,7 +8,10 @@
 
 /* thanks amc1! */
 
+#include <algorithm>
+#include <array>
 #include <optional>
+#include <string_view>
 #include <ctype.h> /* isprint() */
 #include <stdlib.h> /* strtol() */
 #include <string.h>
@@ -176,7 +179,76 @@ bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
     return true;
 }
 
+using format_func = void (*)(char* buf, size_t buflen, std::string_view szname, char const* id);
+
+void transmission_formatter(char* buf, size_t buflen, std::string_view szname, char const* chid)
+{
+    if (strncmp(chid + 3, "000", 3) == 0) // very old client style: -TR0006- is 0.6
+    {
+        tr_snprintf(buf, buflen, "%s 0.%c", std::data(szname), chid[6]);
+    }
+    else if (strncmp(chid + 3, "00", 2) == 0) // previous client style: -TR0072- is 0.72
+    {
+        tr_snprintf(buf, buflen, "%s 0.%02d", std::data(szname), strint(chid + 5, 2));
+    }
+    else // current client style: -TR111Z- is 1.11+ */
+    {
+        tr_snprintf(
+            buf,
+            buflen,
+            "%s %d.%02d%s",
+            std::data(szname),
+            strint(chid + 3, 1),
+            strint(chid + 4, 2),
+            (chid[6] == 'Z' || chid[6] == 'X') ? "+" : "");
+    }
+}
+
+void utorrent_formatter(char* buf, size_t buflen, std::string_view szname, char const* id)
+{
+    if (id[7] == '-')
+    {
+        tr_snprintf(
+            buf,
+            buflen,
+            "%s %d.%d.%d%s",
+            std::data(szname),
+            strint(id + 3, 1),
+            strint(id + 4, 1),
+            strint(id + 5, 1),
+            getMnemonicEnd(id[6]));
+    }
+    else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
+    {
+        tr_snprintf(
+            buf,
+            buflen,
+            "%s %d.%d.%d%s",
+            std::data(szname),
+            strint(id + 3, 1),
+            strint(id + 4, 1),
+            strint(id + 5, 2),
+            getMnemonicEnd(id[7]));
+    }
+}
+
+struct Client
+{
+    std::string_view begins_with;
+    std::string_view name;
+    format_func formatter;
+};
+
+auto constexpr Clients = std::array<Client, 6>{ { { "-BT", "BitTorrent", utorrent_formatter },
+                                                  { "-TR", "Transmission", transmission_formatter },
+                                                  { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
+                                                  { "-UM", "\xc2\xb5Torrent Mac", utorrent_formatter },
+                                                  { "-UT", "\xc2\xb5Torrent", utorrent_formatter },
+                                                  { "-UW", "\xc2\xb5Torrent Web", utorrent_formatter } } };
+
 } // namespace
+
+#include <iostream> // FIXME do not commit
 
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
@@ -190,9 +262,47 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         return buf;
     }
 
+    struct Compare
+    {
+        bool operator()(std::string_view const& key, Client const& client) const
+        {
+            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
+            auto const ret = key_lhs < client.begins_with;
+            // std::cerr << "is [" << key_lhs << " less than " << client.begins_with << ' ' << ret << std::endl;
+            return ret;
+        }
+
+        bool operator()(Client const& client, std::string_view const& key) const
+        {
+            auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
+            auto const ret = client.begins_with < key_lhs;
+            // std::cerr << "is [" << client.begins_with << " less than " << key_lhs << ' ' << ret << std::endl;
+            return ret;
+        }
+    };
+
+    auto const key = std::string_view{ chid };
+    auto const compare = Compare{};
+#if 0
+    auto constexpr compare = [](std::string_view const& key, Client const& client){
+        auto const key_lhs = std::string_view { std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
+        return client.begins_with < key_lhs;
+    };
+#endif
+    auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, compare);
+    // std::cerr << "eq.first distance from begin " << std::distance(std::begin(Clients), eq.first) << std::endl;
+    // std::cerr << "eq.second distance from begin " << std::distance(std::begin(Clients), eq.second) << std::endl;
+    if (eq.first != std::end(Clients) && eq.first != eq.second)
+    {
+        eq.first->formatter(buf, buflen, eq.first->name, chid);
+        std::cerr << "got a match [" << key << "] -> [" << buf << ']' << std::endl;
+        return buf;
+    }
+
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
+#if 0
         if (strncmp(chid + 1, "TR", 2) == 0)
         {
             if (strncmp(chid + 3, "000", 3) == 0) /* very old client style: -TR0006- is 0.6 */
@@ -270,7 +380,9 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 getMnemonicEnd(id[6]));
         }
         /* */
-        else if (strncmp(chid + 1, "AZ", 2) == 0)
+        else
+#endif
+        if (strncmp(chid + 1, "AZ", 2) == 0)
         {
             if (id[3] > '3' || (id[3] == '3' && id[4] >= '1')) /* Vuze starts at version 3.1.0.0 */
             {
@@ -679,6 +791,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         }
     }
 
+#if 0
     /* uTorrent will replace the trailing dash with an extra digit for longer version numbers */
     if (id[0] == '-')
     {
@@ -732,6 +845,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             return buf;
         }
     }
+#endif
 
     /* Mainline */
     if (isMainlineStyle(id))
