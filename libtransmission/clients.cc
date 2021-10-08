@@ -70,24 +70,24 @@ int strint(void const* pch, int span)
     return strtol(tmp, nullptr, 0);
 }
 
-constexpr char const* getMnemonicEnd(uint8_t ch)
+constexpr std::string_view getMnemonicEnd(uint8_t ch)
 {
     switch (ch)
     {
     case 'b':
     case 'B':
-        return " (Beta)";
+        return " (Beta)"sv;
 
     case 'd':
-        return " (Debug)";
+        return " (Debug)"sv;
 
     case 'x':
     case 'X':
     case 'Z':
-        return " (Dev)";
+        return " (Dev)"sv;
 
     default:
-        return "";
+        return ""sv;
     }
 }
 
@@ -381,12 +381,17 @@ constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view nam
 {
     if (id[7] == '-')
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], std::string_view(getMnemonicEnd(id[6]))); // TODO: make getMnemonicEnd return a string_view
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], getMnemonicEnd(id[6]));
     }
     else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], std::string_view(getMnemonicEnd(id[6])));
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], getMnemonicEnd(id[6]));
     }
+}
+
+constexpr void xbt_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], getMnemonicEnd(id[6]));
 }
 
 constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -414,7 +419,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 115>
+auto constexpr Clients = std::array<Client, 116>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -526,6 +531,7 @@ auto constexpr Clients = std::array<Client, 115>
     { "Plus", "Plus!", plus_formatter },
     { "Q", "Queen Bee", mainline_formatter },
     { "S3", "Amazon S3", amazon_formatter },
+    { "XBT", "XBT Client", xbt_formatter },
     { "a00---0", "Swarmy", no_version_formatter },
     { "a02---0", "Swarmy", no_version_formatter },
     { "aria2-", "aria2", no_version_formatter },
@@ -593,10 +599,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "DNA", 3) == 0)
     {
         tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
-    }
-    else if (strncmp(chid, "XBT", 3) == 0)
-    {
-        tr_snprintf(buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]));
     }
     else if (strncmp(chid, "btpd", 4) == 0)
     {
