@@ -127,13 +127,6 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
     tr_snprintf(buf, buflen, "%02d", strint(id + 5, 2));
 }
 
-constexpr std::optional<int> getShadowInt(uint8_t ch)
-{
-    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
-    auto const pos = str.find(ch);
-    return pos != std::string_view::npos ? pos : std::optional<int>{};
-}
-
 bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
 {
     // Shad0w with his experimental BitTorrent implementation and BitTornado
@@ -143,6 +136,13 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
     // characters denoting version are limited to the following characters:
     // 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-
     // For example: 'S58B-----'... for Shadow's 5.8.11
+
+    auto constexpr get_shad0w_int = [](char ch)
+    {
+        auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
+        auto const pos = str.find(ch);
+        return pos != std::string_view::npos ? pos : std::optional<int>{};
+    };
 
     if (std::size(peer_id) != 9 || peer_id[6] != '-' || peer_id[7] != '-' || peer_id[8] != '-')
     {
@@ -155,7 +155,7 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
     auto vals = std::vector<int>{};
     while (std::size(peer_id) > 1)
     {
-        auto const num = getShadowInt(peer_id.back());
+        auto const num = get_shad0w_int(peer_id.back());
         if (!num)
         {
             return false;
