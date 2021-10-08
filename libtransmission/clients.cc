@@ -8,6 +8,8 @@
 
 /* thanks amc1! */
 
+#include <iostream> // FIXME do not commit
+
 #include <algorithm>
 #include <array>
 #include <optional>
@@ -15,13 +17,21 @@
 #include <ctype.h> /* isprint() */
 #include <stdlib.h> /* strtol() */
 #include <string.h>
+#include <tuple>
 
 #include "transmission.h"
 #include "clients.h"
 #include "utils.h" /* tr_snprintf(), tr_strlcpy() */
 
+using namespace std::literals; // "foo"sv
+
 namespace
 {
+
+auto constexpr charints = std::array<std::string_view, 256>
+{{
+    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "", "", "", "", "", "", "", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "", "", "", "", "", "", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+}};
 
 constexpr int charint(uint8_t ch)
 {
@@ -86,29 +96,9 @@ constexpr char const* getMnemonicEnd(uint8_t ch)
     }
 }
 
-void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
-{
-    tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(digits[3]), charint(digits[4]), charint(digits[5]));
-}
-
 void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
 {
     tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
-}
-
-void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
-{
-    tr_snprintf(
-        buf,
-        buflen,
-        "%*.*s %d.%d.%d.%d",
-        int(std::size(name)),
-        int(std::size(name)),
-        std::data(name),
-        charint(digits[3]),
-        charint(digits[4]),
-        charint(digits[5]),
-        charint(digits[6]));
 }
 
 void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
@@ -206,49 +196,83 @@ bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 
 using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
 
-void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
+{
+    if (buflen >= 2)
+    {
+        *buf++ = ch;
+    }
+    *buf = '\0';
+    return { buf, buflen - 1 };
+}
+
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::string_view name)
+{
+    auto const len = std::min(buflen - 1, std::size(name));
+    for (size_t i = 0; i < len; ++i)
+    {
+        *buf++ = name[i];
+    }
+    *buf = '\0';
+    return { buf, buflen - len };
+}
+
+template<typename T, typename... ArgTypes>
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const t, ArgTypes... args)
+{
+    std::tie(buf, buflen) = buf_append(buf, buflen, t);
+    return buf_append(buf, buflen, args...);
+}
+
+constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    buf_append(buf, buflen, name, ' ', charints[digits[3]], '.', charints[digits[4]], '.', charints[digits[5]]);
+}
+
+constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    buf_append(buf, buflen, name, ' ', charints[digits[3]], '.', charints[digits[4]], '.', charints[digits[5]], '.', charints[digits[6]]);
+}
+
+constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     TR_UNUSED(id);
-
-    auto const len = std::min(buflen - 1, std::size(name));
-    std::copy_n(std::begin(name), len, buf);
-    buf[len] = '\0';
+    buf_append(buf, buflen, name);
 }
 
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
 {
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
+
     if (strncmp(chid + 3, "000", 3) == 0) // very old client style: -TR0006- is 0.6
     {
-        tr_snprintf(buf, buflen, "%*.*s 0.%c", int(std::size(name)), int(std::size(name)), std::data(name), chid[6]);
+        tr_snprintf(buf, buflen, "0.%c", chid[6]);
     }
     else if (strncmp(chid + 3, "00", 2) == 0) // previous client style: -TR0072- is 0.72
     {
-        tr_snprintf(buf, buflen, "%*.*s 0.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(chid + 5, 2));
+        tr_snprintf(buf, buflen, "0.%02d", strint(chid + 5, 2));
     }
     else // current client style: -TR111Z- is 1.11+ */
     {
         tr_snprintf(
             buf,
             buflen,
-            "%*.*s %d.%02d%s",
-            int(std::size(name)),
-            int(std::size(name)),
-            std::data(name),
+            "%d.%02d%s",
             strint(chid + 3, 1),
             strint(chid + 4, 2),
             (chid[6] == 'Z' || chid[6] == 'X') ? "+" : "");
     }
 }
 
-void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void constexpr ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[5] == 'D')
     {
-        tr_snprintf(buf, buflen, "%*.*s %d.%d Dev %d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), charint(id[6]));
+        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " Dev "sv, charints[id[6]]);
     }
     else if (id[5] == 'R')
     {
-        tr_snprintf(buf, buflen, "%*.*s %d.%d RC %d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), charint(id[6]));
+        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " RC "sv, charints[id[6]]);
     }
     else
     {
@@ -256,52 +280,34 @@ void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char co
     }
 }
 
-void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[7] == '-')
     {
-        tr_snprintf(
-            buf,
-            buflen,
-            "%*.*s %d.%d.%d%s",
-            int(std::size(name)),
-            int(std::size(name)),
-            std::data(name),
-            strint(id + 3, 1),
-            strint(id + 4, 1),
-            strint(id + 5, 1),
-            getMnemonicEnd(id[6]));
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], std::string_view(getMnemonicEnd(id[6]))); // TODO: make getMnemonicEnd return a string_view
     }
     else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
     {
-        tr_snprintf(
-            buf,
-            buflen,
-            "%*.*s %d.%d.%d%s",
-            int(std::size(name)),
-            int(std::size(name)),
-            std::data(name),
-            strint(id + 3, 1),
-            strint(id + 4, 1),
-            strint(id + 5, 2),
-            getMnemonicEnd(id[7]));
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], std::string_view(getMnemonicEnd(id[6])));
     }
 }
 
 void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.');
+
     auto const c = getFDMInt(id[5]);
     if (c)
     {
-        tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), *c);
+        tr_snprintf(buf, buflen, "%d", *c);
     }
     else
     {
-        tr_snprintf(buf, buflen, "%*.*s %d.%d.x", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]));
+        buf_append(buf, buflen, 'x');
     }
 }
 
-void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[6] == '0')
     {
@@ -309,23 +315,39 @@ void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char cons
     }
     else
     {
-        tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
+        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6]);
     }
 }
 
-void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    tr_snprintf(buf, buflen, "%*.*s %d.%d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), strint(id + 5, 2));
+    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
 }
 
-void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    tr_snprintf(buf, buflen, "%*.*s %c.%c%c%c", int(std::size(name)), int(std::size(name)), std::data(name), id[3], id[4], id[5], id[6]);
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], id[5], id[6]);
 }
 
-void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    tr_snprintf(buf, buflen, "%*.*s %c.%c (%c%c)", int(std::size(name)), int(std::size(name)), std::data(name), id[3], id[4], id[5], id[6]);
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], " ("sv, id[5], id[6], ')');
+}
+
+void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (strncmp(&id[4], "A0B", 3) == 0)
+    {
+        buf_append(buf, buflen, name, " 1.0.5"sv);
+    }
+    else if (strncmp(&id[4], "A0C", 3) == 0)
+    {
+        buf_append(buf, buflen, name, " 1.0.6"sv);
+    }
+    else
+    {
+        buf_append(buf, buflen, name, ' ', id[4], '.', id[5], '.', id[6]);
+    }
 }
 
 struct Client
@@ -335,9 +357,9 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 89>
+auto constexpr Clients = std::array<Client, 90>
 {{
-    { "-AG", "Aress", four_digit_formatter },
+    { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
     { "-AT", "Artemis", four_digit_formatter },
     { "-AV", "Avicora", four_digit_formatter },
@@ -353,6 +375,7 @@ auto constexpr Clients = std::array<Client, 89>
     { "-BI", "BiglyBT", four_digit_formatter },
     { "-BM", "BitMagnet", four_digit_formatter },
     { "-BN", "Baidu Netdisk", no_version_formatter },
+    { "-BOW", "Bits on Wheels", bits_on_wheels_formatter },
     { "-BP", "BitTorrent Pro (Azureus + Spyware)", four_digit_formatter },
     { "-BR", "BitRocket", bitrocket_formatter },
     { "-BS", "BTSlave", four_digit_formatter },
@@ -430,8 +453,6 @@ auto constexpr Clients = std::array<Client, 89>
 
 } // namespace
 
-#include <iostream> // FIXME do not commit
-
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
     auto const* id = static_cast<uint8_t const*>(id_in);
@@ -487,21 +508,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         if (strncmp(chid + 1, "XC", 2) == 0 || strncmp(chid + 1, "XX", 2) == 0)
         {
             tr_snprintf(buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id + 5, 2));
-        }
-        else if (strncmp(chid + 1, "BOW", 3) == 0)
-        {
-            if (strncmp(&chid[4], "A0B", 3) == 0)
-            {
-                tr_snprintf(buf, buflen, "Bits on Wheels 1.0.5");
-            }
-            else if (strncmp(&chid[4], "A0C", 3) == 0)
-            {
-                tr_snprintf(buf, buflen, "Bits on Wheels 1.0.6");
-            }
-            else
-            {
-                tr_snprintf(buf, buflen, "Bits on Wheels %c.%c.%c", id[4], id[5], id[5]);
-            }
         }
         else if (strncmp(chid + 1, "MG", 2) == 0)
         {
