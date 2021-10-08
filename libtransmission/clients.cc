@@ -364,6 +364,11 @@ constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, c
     buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
 }
 
+constexpr void qvod_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    four_digit_formatter(buf, buflen, name, id + 1);
+}
+
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
@@ -430,7 +435,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 122>
+auto constexpr Clients = std::array<Client, 123>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -545,6 +550,7 @@ auto constexpr Clients = std::array<Client, 122>
     { "Pando", "Pando", no_version_formatter },
     { "Plus", "Plus!", plus_formatter },
     { "Q", "Queen Bee", mainline_formatter },
+    { "QVOD", "QVOD", qvod_formatter },
     { "S3", "Amazon S3", amazon_formatter },
     { "TIX", "Tixati", two_major_two_minor_formatter },
     { "XBT", "XBT Client", xbt_formatter },
@@ -620,10 +626,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
     {
         tr_snprintf(buf, buflen, "BitSpirit %u", (id[1] == 0 ? 1 : id[1]));
-    }
-    else if (strncmp(chid, "QVOD", 4) == 0)
-    {
-        four_digits(buf, buflen, "QVOD", id + 4);
     }
 
     /* Shad0w-style */
