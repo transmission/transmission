@@ -28,11 +28,6 @@ using namespace std::literals; // "foo"sv
 namespace
 {
 
-auto constexpr charints = std::array<std::string_view, 256>
-{{
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "", "", "", "", "", "", "", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "", "", "", "", "", "", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
-}};
-
 constexpr int charint(uint8_t ch)
 {
     if ('0' <= ch && ch <= '9')
@@ -243,12 +238,12 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const 
 
 constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
-    buf_append(buf, buflen, name, ' ', charints[digits[3]], '.', charints[digits[4]], '.', charints[digits[5]]);
+    buf_append(buf, buflen, name, ' ', charint(digits[3]), '.', charint(digits[4]), '.', charint(digits[5]));
 }
 
 constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
-    buf_append(buf, buflen, name, ' ', charints[digits[3]], '.', charints[digits[4]], '.', charints[digits[5]], '.', charints[digits[6]]);
+    buf_append(buf, buflen, name, ' ', charint(digits[3]), '.', charint(digits[4]), '.', charint(digits[5]), '.', charint(digits[6]));
 }
 
 constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -285,11 +280,11 @@ void constexpr ktorrent_formatter(char* buf, size_t buflen, std::string_view nam
 {
     if (id[5] == 'D')
     {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " Dev "sv, charints[id[6]]);
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " Dev "sv, charint(id[6]));
     }
     else if (id[5] == 'R')
     {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " RC "sv, charints[id[6]]);
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " RC "sv, charint(id[6]));
     }
     else
     {
@@ -314,11 +309,11 @@ void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* 
     auto const c = getFDMInt(id[5]);
     if (c)
     {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', *c);
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', *c);
     }
     else
     {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', 'x');
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
     }
 }
 
@@ -336,7 +331,7 @@ constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name,
 
 constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
 }
 
 constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -347,6 +342,11 @@ constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view nam
 constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
+}
+
+constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
 }
 
 void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -365,6 +365,17 @@ void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, c
     }
 }
 
+constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]));
+}
+
+void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " ("sv);
+    tr_snprintf(buf, buflen, "%d)", strint(id + 5, 2));
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -372,7 +383,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 90>
+auto constexpr Clients = std::array<Client, 93>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -405,6 +416,7 @@ auto constexpr Clients = std::array<Client, 90>
     { "-ES", "Electric Sheep", three_digit_formatter },
     { "-FC", "FileCroc", four_digit_formatter },
     { "-FD", "Free Download Manager", fdm_formatter },
+    { "-FL", "Folx", folx_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
     { "-FW", "FrostWire", three_digit_formatter },
     { "-GR", "GetRight", four_digit_formatter },
@@ -419,6 +431,7 @@ auto constexpr Clients = std::array<Client, 90>
     { "-LP", "Lphant", two_major_two_minor_formatter },
     { "-LT", "libtorrent (Rasterbar)", three_digit_formatter },
     { "-LW", "LimeWire", no_version_formatter },
+    { "-MG", "MediaGet", mediaget_formatter },
     { "-MK", "Meerkat", four_digit_formatter },
     { "-MO", "MonoTorrent", four_digit_formatter },
     { "-MP", "MooPolice", three_digit_formatter },
@@ -452,11 +465,12 @@ auto constexpr Clients = std::array<Client, 90>
     { "-WT", "BitLet", four_digit_formatter },
     { "-WW", "WebTorrent", four_digit_formatter },
     { "-WY", "FireTorrent", four_digit_formatter },
+    { "-XC", "Xtorrent", xtorrent_formatter },
     { "-XF", "Xfplay", xfplay_formatter },
     { "-XL", "Xunlei", four_digit_formatter },
     { "-XS", "XSwifter", four_digit_formatter },
     { "-XT", "XanTorrent", four_digit_formatter },
-    { "-XX", "Xtorrent", four_digit_formatter },
+    { "-XX", "Xtorrent", xtorrent_formatter },
     { "-ZO", "Zona", four_digit_formatter },
     { "-ZT", "Zip Torrent", four_digit_formatter },
     { "-bk", "BitKitten (libtorrent)", four_digit_formatter },
@@ -520,23 +534,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
-        if (strncmp(chid + 1, "XC", 2) == 0 || strncmp(chid + 1, "XX", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id + 5, 2));
-        }
-        else if (strncmp(chid + 1, "MG", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "MediaGet %d.%02d", charint(id[3]), charint(id[4]));
-        }
-        else if (strncmp(chid + 1, "PI", 2) == 0)
+        if (strncmp(chid + 1, "PI", 2) == 0)
         {
             tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
         }
-        else if (strncmp(chid + 1, "FL", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
-        }
-
         if (!tr_str_is_empty(buf))
         {
             return buf;
