@@ -380,6 +380,11 @@ constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name,
     buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
 }
 
+constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', std::string_view(id+2, 4));
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -387,7 +392,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 110>
+auto constexpr Clients = std::array<Client, 111>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -491,6 +496,7 @@ auto constexpr Clients = std::array<Client, 110>
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "LIME", "Limewire", no_version_formatter },
     { "M", "BitTorrent", mainline_formatter },
+    { "OP", "Opera", opera_formatter },
     { "Pando", "Pando", no_version_formatter },
     { "Q", "Queen Bee", mainline_formatter },
     { "S3", "Amazon S3", amazon_formatter },
@@ -558,10 +564,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Everything else */
-    else if (strncmp(chid, "OP", 2) == 0)
-    {
-        tr_snprintf(buf, buflen, "Opera (Build %c%c%c%c)", id[2], id[3], id[4], id[5]);
-    }
     else if (strncmp(chid, "-ML", 3) == 0)
     {
         tr_snprintf(buf, buflen, "MLDonkey %c%c%c%c%c", id[3], id[4], id[5], id[6], id[7]);
