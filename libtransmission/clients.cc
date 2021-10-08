@@ -230,6 +230,129 @@ constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view n
     buf_append(buf, buflen, name);
 }
 
+// specific clients
+
+constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
+}
+
+constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
+}
+
+constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
+}
+
+constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], id[5], id[6]);
+}
+
+constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
+}
+
+void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (strncmp(&id[4], "A0B", 3) == 0)
+    {
+        buf_append(buf, buflen, name, " 1.0.5"sv);
+    }
+    else if (strncmp(&id[4], "A0C", 3) == 0)
+    {
+        buf_append(buf, buflen, name, " 1.0.6"sv);
+    }
+    else
+    {
+        buf_append(buf, buflen, name, ' ', id[4], '.', id[5], '.', id[6]);
+    }
+}
+
+constexpr void blizzard_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', int(id[3] + 1), int(id[4]));
+}
+
+constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
+}
+
+void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    auto const c = getFDMInt(id[5]);
+    if (c)
+    {
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', *c);
+    }
+    else
+    {
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
+    }
+}
+
+constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (id[5] == 'D')
+    {
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " Dev "sv, charint(id[6]));
+    }
+    else if (id[5] == 'R')
+    {
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " RC "sv, charint(id[6]));
+    }
+    else
+    {
+        three_digit_formatter(buf, buflen, name, id);
+    }
+}
+
+constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (id[4] == '-' && id[6] == '-') // Mx-y-z--
+    {
+        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], '.', id[5]);
+    }
+    else if (id[5] == '-') // Mx-yy-z-
+    {
+        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], id[4], '.', id[6]);
+    }
+    else
+    {
+        buf_append(buf, buflen, name);
+    }
+}
+
+constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]));
+}
+
+constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', std::string_view(id+3, 5));
+}
+
+constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', std::string_view(id+2, 4));
+}
+
+constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', id[4], id[5], '.', charint(id[6]));
+}
+
+constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
+}
+
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
@@ -254,22 +377,6 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, cha
     }
 }
 
-void constexpr ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    if (id[5] == 'D')
-    {
-        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " Dev "sv, charint(id[6]));
-    }
-    else if (id[5] == 'R')
-    {
-        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " RC "sv, charint(id[6]));
-    }
-    else
-    {
-        three_digit_formatter(buf, buflen, name, id);
-    }
-}
-
 constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[7] == '-')
@@ -279,19 +386,6 @@ constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view nam
     else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
     {
         buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], std::string_view(getMnemonicEnd(id[6])));
-    }
-}
-
-void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    auto const c = getFDMInt(id[5]);
-    if (c)
-    {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', *c);
-    }
-    else
-    {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
     }
 }
 
@@ -307,97 +401,10 @@ constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name,
     }
 }
 
-constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
-}
-
-constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], id[5], id[6]);
-}
-
-constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
-}
-
-constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
-}
-
-void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    if (strncmp(&id[4], "A0B", 3) == 0)
-    {
-        buf_append(buf, buflen, name, " 1.0.5"sv);
-    }
-    else if (strncmp(&id[4], "A0C", 3) == 0)
-    {
-        buf_append(buf, buflen, name, " 1.0.6"sv);
-    }
-    else
-    {
-        buf_append(buf, buflen, name, ' ', id[4], '.', id[5], '.', id[6]);
-    }
-}
-
-constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]));
-}
-
-constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', id[4], id[5], '.', charint(id[6]));
-}
-
 void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " ("sv);
     tr_snprintf(buf, buflen, "%d)", strint(id + 5, 2));
-}
-
-void mainline_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    if (id[4] == '-' && id[6] == '-') // Mx-y-z--
-    {
-        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], '.', id[5]);
-    }
-    else if (id[5] == '-') // Mx-yy-z-
-    {
-        buf_append(buf, buflen, name, ' ', id[1], '.', id[3], id[4], '.', id[6]);
-    }
-    else
-    {
-        buf_append(buf, buflen, name);
-    }
-}
-
-constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
-}
-
-constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', std::string_view(id+2, 4));
-}
-
-constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', std::string_view(id+3, 5));
-}
-
-constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
-}
-
-constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
 }
 
 struct Client
@@ -407,7 +414,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 114>
+auto constexpr Clients = std::array<Client, 115>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -510,6 +517,7 @@ auto constexpr Clients = std::array<Client, 114>
     { "10-------", "JVtorrent", no_version_formatter },
     { "346-", "TorrentTopia", no_version_formatter },
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
+    { "BLZ", "Blizzard Downloader", blizzard_formatter },
     { "LIME", "Limewire", no_version_formatter },
     { "M", "BitTorrent", mainline_formatter },
     { "Mbrst", "burst!", burst_formatter },
@@ -593,10 +601,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "btpd", 4) == 0)
     {
         tr_snprintf(buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7]);
-    }
-    else if (strncmp(chid, "BLZ", 3) == 0)
-    {
-        tr_snprintf(buf, buflen, "Blizzard Downloader %d.%d", id[3] + 1, id[4]);
     }
     else if (strncmp(chid, "-SP", 3) == 0)
     {
