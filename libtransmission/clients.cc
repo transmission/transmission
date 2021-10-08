@@ -86,7 +86,12 @@ constexpr char const* getMnemonicEnd(uint8_t ch)
     }
 }
 
-void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void three_digits_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(digits[0]), charint(digits[1]), charint(digits[2]));
+}
+
+void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
 {
     tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
 }
@@ -221,6 +226,22 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, cha
     }
 }
 
+void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (id[5] == 'D')
+    {
+        tr_snprintf(buf, buflen, "%*.*s %d.%d Dev %d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), charint(id[6]));
+    }
+    else if (id[5] == 'R')
+    {
+        tr_snprintf(buf, buflen, "%*.*s %d.%d RC %d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), charint(id[6]));
+    }
+    else
+    {
+        three_digits_formatter(buf, buflen, name, id);
+    }
+}
+
 void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     if (id[7] == '-')
@@ -260,10 +281,11 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 7>
+auto constexpr Clients = std::array<Client, 8>
 {{
     { "-AZ", "Azureus / Vuze", four_digit_formatter },
     { "-BT", "BitTorrent", utorrent_formatter },
+    { "-KT", "KTorrent", ktorrent_formatter },
     { "-TR", "Transmission", transmission_formatter },
     { "-UE", "\xc2\xb5Torrent Embedded", utorrent_formatter },
     { "-UM", "\xc2\xb5Torrent Mac", utorrent_formatter },
@@ -416,10 +438,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 four_digits(buf, buflen, "Azureus", id + 3);
             }
         }
-        else
-#endif
         /* */
-        if (strncmp(chid + 1, "KT", 2) == 0)
+        else if (strncmp(chid + 1, "KT", 2) == 0)
         {
             if (id[5] == 'D')
             {
@@ -434,8 +454,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 three_digits(buf, buflen, "KTorrent", id + 3);
             }
         }
+        else
+#endif
         /* */
-        else if (strncmp(chid + 1, "AG", 2) == 0)
+        if (strncmp(chid + 1, "AG", 2) == 0)
         {
             four_digits(buf, buflen, "Ares", id + 3);
         }
