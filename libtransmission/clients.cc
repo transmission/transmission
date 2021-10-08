@@ -395,6 +395,11 @@ constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, c
     buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
 }
 
+constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -402,7 +407,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 113>
+auto constexpr Clients = std::array<Client, 114>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -507,6 +512,7 @@ auto constexpr Clients = std::array<Client, 113>
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "LIME", "Limewire", no_version_formatter },
     { "M", "BitTorrent", mainline_formatter },
+    { "Mbrst", "burst!", burst_formatter },
     { "OP", "Opera", opera_formatter },
     { "Pando", "Pando", no_version_formatter },
     { "Plus", "Plus!", plus_formatter },
@@ -583,10 +589,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "XBT", 3) == 0)
     {
         tr_snprintf(buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]));
-    }
-    else if (strncmp(chid, "Mbrst", 5) == 0)
-    {
-        tr_snprintf(buf, buflen, "burst! %c.%c.%c", id[5], id[7], id[9]);
     }
     else if (strncmp(chid, "btpd", 4) == 0)
     {
