@@ -216,10 +216,8 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     int const major = peer_id[4];
     int const minor = peer_id[5];
 
-    /**
-     * Bitcomet, and older versions of BitLord, are of the form x.yy.
-     * Bitcoment 1.0 and onwards are of the form x.y.
-     */
+    // Bitcomet, and older versions of BitLord, are of the form x.yy.
+    // Bitcoment 1.0 and onwards are of the form x.y.
     if (is_bitlord && major > 0)
     {
         buf_append(buf, buflen, name, ' ', mod, major, '.', minor);
@@ -609,19 +607,24 @@ auto constexpr Clients = std::array<Client, 124>
 
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
-    auto const* id = static_cast<uint8_t const*>(id_in);
-    auto const* chid = static_cast<char const*>(id_in);
-    auto const key = std::string_view{ chid };
-
     *buf = '\0';
 
+    auto const* const id = static_cast<char const*>(id_in);
     if (id == nullptr)
     {
         return buf;
     }
 
+    auto const key = std::string_view{ id };
+
     if (decodeShad0wClient(buf, buflen, key) || decodeBitCometClient(buf, buflen, key))
     {
+        return buf;
+    }
+
+    if (!*id && strncmp(id + 2, "BS", 2) == 0)
+    {
+        tr_snprintf(buf, buflen, "BitSpirit %d", id[1] == '\0' ? 1 : int(id[1]));
         return buf;
     }
 
@@ -642,27 +645,19 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
     if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
-        eq.first->formatter(buf, buflen, eq.first->name, chid);
+        eq.first->formatter(buf, buflen, eq.first->name, id);
         return buf;
     }
 
-
-    /* Everything else */
-    else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
-    {
-        tr_snprintf(buf, buflen, "BitSpirit %u", (id[1] == 0 ? 1 : id[1]));
-    }
-
-
-    /* No match */
+    // no match
     if (tr_str_is_empty(buf))
     {
-        char out[32];
-        char* walk = out;
+        auto out = std::array<char, 32>{};
+        auto* walk = std::begin(out);
 
         for (size_t i = 0; i < 8; ++i)
         {
-            char const c = chid[i];
+            char const c = id[i];
 
             if (isprint((unsigned char)c))
             {
@@ -670,13 +665,12 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
             else
             {
-                tr_snprintf(walk, out + sizeof(out) - walk, "%%%02X", (unsigned int)c);
+                tr_snprintf(walk, std::end(out) - walk, "%%%02X", (unsigned int)c);
                 walk += 3;
             }
         }
 
-        *walk = '\0';
-        tr_strlcpy(buf, out, buflen);
+        buf_append(buf, buflen, std::string_view(std::begin(out), walk - std::begin(out)));
     }
 
     return buf;
