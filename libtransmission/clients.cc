@@ -288,6 +288,19 @@ void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char co
     }
 }
 
+void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    auto const c = getFDMInt(id[5]);
+    if (c)
+    {
+        tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]), *c);
+    }
+    else
+    {
+        tr_snprintf(buf, buflen, "%*.*s %d.%d.x", int(std::size(name)), int(std::size(name)), std::data(name), charint(id[3]), charint(id[4]));
+    }
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -295,7 +308,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 84>
+auto constexpr Clients = std::array<Client, 85>
 {{
     { "-AG", "Aress", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -323,6 +336,7 @@ auto constexpr Clients = std::array<Client, 84>
     { "-EB", "EBit", four_digit_formatter },
     { "-ES", "Electric Sheep", three_digit_formatter },
     { "-FC", "FileCroc", four_digit_formatter },
+    { "-FD", "Free Download Manager", fdm_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
     { "-FW", "FrostWire", three_digit_formatter },
     { "-GR", "GetRight", four_digit_formatter },
@@ -490,18 +504,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
         }
-        else if (strncmp(chid + 1, "FD", 2) == 0)
-        {
-            auto const c = getFDMInt(id[5]);
-            if (c)
-            {
-                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), *c);
-            }
-            else
-            {
-                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]), charint(id[4]));
-            }
-        }
         else if (strncmp(chid + 1, "FL", 2) == 0)
         {
             tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
@@ -513,61 +515,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         }
     }
 
-#if 0
-    /* uTorrent will replace the trailing dash with an extra digit for longer version numbers */
-    if (id[0] == '-')
-    {
-        if (strncmp(chid + 1, "UT", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
-        }
-        else if (strncmp(chid + 1, "UM", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Mac %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
-        }
-        else if (strncmp(chid + 1, "UE", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Embedded %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
-        }
-        else if (strncmp(chid + 1, "UW", 2) == 0)
-        {
-            tr_snprintf(
-                buf,
-                buflen,
-                "\xc2\xb5Torrent Web %d.%d.%d%s",
-                strint(id + 3, 1),
-                strint(id + 4, 1),
-                strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
-        }
-
-        if (!tr_str_is_empty(buf))
-        {
-            return buf;
-        }
-    }
-#endif
 
     /* Mainline */
     if (isMainlineStyle(id))
