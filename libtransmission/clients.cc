@@ -388,7 +388,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 106>
+auto constexpr Clients = std::array<Client, 107>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -421,6 +421,7 @@ auto constexpr Clients = std::array<Client, 106>
     { "-ES", "Electric Sheep", three_digit_formatter },
     { "-FC", "FileCroc", four_digit_formatter },
     { "-FD", "Free Download Manager", fdm_formatter },
+    { "-FG", "FlashGet", two_major_two_minor_formatter },
     { "-FL", "Folx", folx_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
     { "-FW", "FrostWire", three_digit_formatter },
@@ -573,11 +574,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         return buf;
     }
 
-    /* Clients with no version */
-    else if (strncmp(chid, "-FG", 3) == 0)
-    {
-        two_major_two_minor(buf, buflen, "FlashGet", id + 3);
-    }
     /* Everything else */
     else if (strncmp(chid, "S3", 2) == 0 && id[2] == '-' && id[4] == '-' && id[6] == '-')
     {
