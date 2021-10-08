@@ -388,7 +388,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 94>
+auto constexpr Clients = std::array<Client, 106>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -424,6 +424,7 @@ auto constexpr Clients = std::array<Client, 94>
     { "-FL", "Folx", folx_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
     { "-FW", "FrostWire", three_digit_formatter },
+    { "-G3", "G3 Torrent", no_version_formatter },
     { "-GR", "GetRight", four_digit_formatter },
     { "-GS", "GSTorrent", four_digit_formatter },
     { "-HK", "Hekate", four_digit_formatter },
@@ -469,6 +470,7 @@ auto constexpr Clients = std::array<Client, 94>
     { "-VG", "Vagaa", four_digit_formatter },
     { "-WS", "HTTP Seed", no_version_formatter },
     { "-WT", "BitLet", four_digit_formatter },
+    { "-WT-", "BitLet", no_version_formatter },
     { "-WW", "WebTorrent", four_digit_formatter },
     { "-WY", "FireTorrent", four_digit_formatter },
     { "-XC", "Xtorrent", xtorrent_formatter },
@@ -484,6 +486,16 @@ auto constexpr Clients = std::array<Client, 94>
     { "-pb", "pbTorrent", three_digit_formatter },
     { "-qB", "qBittorrent", three_digit_formatter },
     { "-st", "SharkTorrent", four_digit_formatter },
+    { "10-------", "JVtorrent", no_version_formatter },
+    { "346-", "TorrentTopia", no_version_formatter },
+    { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
+    { "LIME", "Limewire", no_version_formatter },
+    { "Pando", "Pando", no_version_formatter },
+    { "a00---0", "Swarmy", no_version_formatter },
+    { "a02---0", "Swarmy", no_version_formatter },
+    { "aria2-", "aria2", no_version_formatter },
+    { "eX", "eXeem", no_version_formatter },
+    { "martini", "Martini Man", no_version_formatter },
 }};
 
 } // namespace
@@ -562,54 +574,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Clients with no version */
-    if (strncmp(chid, "AZ2500BT", 8) == 0)
-    {
-        no_version(buf, buflen, "BitTyrant (Azureus Mod)");
-    }
-    else if (strncmp(chid, "LIME", 4) == 0)
-    {
-        no_version(buf, buflen, "Limewire");
-    }
-    else if (strncmp(chid, "martini", 7) == 0)
-    {
-        no_version(buf, buflen, "Martini Man");
-    }
-    else if (strncmp(chid, "Pando", 5) == 0)
-    {
-        no_version(buf, buflen, "Pando");
-    }
-    else if (strncmp(chid, "a00---0", 7) == 0)
-    {
-        no_version(buf, buflen, "Swarmy");
-    }
-    else if (strncmp(chid, "a02---0", 7) == 0)
-    {
-        no_version(buf, buflen, "Swarmy");
-    }
-    else if (strncmp(chid, "-G3", 3) == 0)
-    {
-        no_version(buf, buflen, "G3 Torrent");
-    }
-    else if (strncmp(chid, "10-------", 9) == 0)
-    {
-        no_version(buf, buflen, "JVtorrent");
-    }
-    else if (strncmp(chid, "346-", 4) == 0)
-    {
-        no_version(buf, buflen, "TorrentTopia");
-    }
-    else if (strncmp(chid, "eX", 2) == 0)
-    {
-        no_version(buf, buflen, "eXeem");
-    }
-    else if (strncmp(chid, "aria2-", 6) == 0)
-    {
-        no_version(buf, buflen, "aria2");
-    }
-    else if (strncmp(chid, "-WT-", 4) == 0)
-    {
-        no_version(buf, buflen, "BitLet");
-    }
     else if (strncmp(chid, "-FG", 3) == 0)
     {
         two_major_two_minor(buf, buflen, "FlashGet", id + 3);
