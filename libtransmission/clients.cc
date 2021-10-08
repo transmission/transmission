@@ -8,6 +8,7 @@
 
 /* thanks amc1! */
 
+#include <optional>
 #include <ctype.h> /* isprint() */
 #include <stdlib.h> /* strtol() */
 #include <string.h>
@@ -16,7 +17,10 @@
 #include "clients.h"
 #include "utils.h" /* tr_snprintf(), tr_strlcpy() */
 
-static int charint(uint8_t ch)
+namespace
+{
+
+constexpr int charint(uint8_t ch)
 {
     if ('0' <= ch && ch <= '9')
     {
@@ -36,21 +40,14 @@ static int charint(uint8_t ch)
     return 0;
 }
 
-static bool getShadowInt(uint8_t ch, int* setme)
+constexpr std::optional<int> getShadowInt(uint8_t ch)
 {
-    char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
-    char const* pch = strchr(str, ch);
-
-    if (pch == nullptr)
-    {
-        return false;
-    }
-
-    *setme = pch - str;
-    return true;
+    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
+    auto const pos = str.find(ch);
+    return pos != std::string_view::npos ? pos : std::optional<int>{};
 }
 
-static bool getFDMInt(uint8_t ch, int* setme)
+bool getFDMInt(uint8_t ch, int* setme)
 {
     char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()";
     char const* pch = strchr(str, ch);
@@ -64,7 +61,7 @@ static bool getFDMInt(uint8_t ch, int* setme)
     return true;
 }
 
-static int strint(void const* pch, int span)
+int strint(void const* pch, int span)
 {
     char tmp[64];
     memcpy(tmp, pch, span);
@@ -72,7 +69,7 @@ static int strint(void const* pch, int span)
     return strtol(tmp, nullptr, 0);
 }
 
-static char const* getMnemonicEnd(uint8_t ch)
+char const* getMnemonicEnd(uint8_t ch)
 {
     switch (ch)
     {
@@ -93,12 +90,12 @@ static char const* getMnemonicEnd(uint8_t ch)
     }
 }
 
-static void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
 }
 
-static void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(
         buf,
@@ -111,17 +108,17 @@ static void four_digits(char* buf, size_t buflen, char const* name, uint8_t cons
         charint(digits[3]));
 }
 
-static void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits)
+void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(buf, buflen, "%s %d.%02d", name, strint(digits, 2), strint(digits + 2, 2));
 }
 
-static void no_version(char* buf, size_t buflen, char const* name)
+void no_version(char* buf, size_t buflen, char const* name)
 {
     tr_strlcpy(buf, name, buflen);
 }
 
-static void mainline_style(char* buf, size_t buflen, char const* name, uint8_t const* id)
+void mainline_style(char* buf, size_t buflen, char const* name, uint8_t const* id)
 {
     if (id[4] == '-' && id[6] == '-')
     {
@@ -133,7 +130,7 @@ static void mainline_style(char* buf, size_t buflen, char const* name, uint8_t c
     }
 }
 
-static bool isMainlineStyle(uint8_t const* peer_id)
+bool isMainlineStyle(uint8_t const* peer_id)
 {
     /**
      * One of the following styles will be used:
@@ -143,7 +140,7 @@ static bool isMainlineStyle(uint8_t const* peer_id)
     return peer_id[2] == '-' && peer_id[7] == '-' && (peer_id[4] == '-' || peer_id[5] == '-');
 }
 
-static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
+bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
     char const* chid = (char const*)id;
     bool is_bitlord;
@@ -189,6 +186,8 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 
     return true;
 }
+
+} // namespace
 
 char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
@@ -903,12 +902,11 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Shad0w-style */
     if (tr_str_is_empty(buf))
     {
-        int a;
-        int b;
-        int c;
+        auto const a = getShadowInt(id[1]);
+        auto const b = getShadowInt(id[2]);
+        auto const c = getShadowInt(id[3]);
 
-        if (strchr("AOQRSTU", id[0]) != nullptr && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) &&
-            getShadowInt(id[3], &c))
+        if (strchr("AOQRSTU", id[0]) != nullptr && a && b && c)
         {
             char const* name = nullptr;
 
@@ -945,7 +943,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 
             if (name != nullptr)
             {
-                tr_snprintf(buf, buflen, "%s %d.%d.%d", name, a, b, c);
+                tr_snprintf(buf, buflen, "%s %d.%d.%d", name, *a, *b, *c);
                 return buf;
             }
         }
