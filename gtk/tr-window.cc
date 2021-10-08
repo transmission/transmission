@@ -92,7 +92,7 @@ private:
     Gtk::ToggleButton* alt_speed_button_ = nullptr;
     Gtk::Menu* options_menu_ = nullptr;
     Glib::RefPtr<Gtk::TreeSelection> selection_;
-    Gtk::CellRenderer* renderer_ = nullptr;
+    TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
     TrCore* core_ = nullptr;
     gulong pref_handler_id_ = 0;
@@ -143,11 +143,11 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
     column_->set_resizable(true);
     column_->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
 
-    renderer_ = Glib::wrap(torrent_cell_renderer_new());
+    renderer_ = Gtk::make_managed<TorrentCellRenderer>();
     column_->pack_start(*renderer_, false);
-    column_->add_attribute(*renderer_, "torrent", torrent_cols.torrent);
-    column_->add_attribute(*renderer_, "piece-upload-speed", torrent_cols.speed_up);
-    column_->add_attribute(*renderer_, "piece-download-speed", torrent_cols.speed_down);
+    column_->add_attribute(renderer_->property_torrent(), torrent_cols.torrent);
+    column_->add_attribute(renderer_->property_piece_upload_speed(), torrent_cols.speed_up);
+    column_->add_attribute(renderer_->property_piece_download_speed(), torrent_cols.speed_down);
 
     view->append_column(*column_);
     renderer_->property_xpad() = GUI_PAD_SMALL;
@@ -174,7 +174,7 @@ void MainWindow::Impl::prefsChanged(tr_quark const key)
     switch (key)
     {
     case TR_KEY_compact_view:
-        g_object_set(Glib::unwrap(renderer_), "compact", gtr_pref_flag_get(key), nullptr);
+        renderer_->property_compact() = gtr_pref_flag_get(key);
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values. Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
