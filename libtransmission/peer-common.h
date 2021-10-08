@@ -103,8 +103,8 @@ public:
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float progress = 0.0f;
 
-    struct tr_bitfield blame = {};
-    struct tr_bitfield have = {};
+    struct tr_bitfield blame;
+    struct tr_bitfield have;
 
     /* the client name.
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */

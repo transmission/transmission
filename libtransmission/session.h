@@ -95,7 +95,9 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    tr_bitfield minutes;
+    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
+    // TODO: remove * and own the value
+    tr_bitfield* minutes;
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;

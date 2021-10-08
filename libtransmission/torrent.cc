@@ -1460,7 +1460,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
             /* the middle blocks */
             if (first + 1 < last)
             {
-                uint64_t u = tr_bitfieldCountRange(&tor->completion.blockBitfield, first + 1, last);
+                uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
                 u *= tor->blockSize;
                 total += u;
             }

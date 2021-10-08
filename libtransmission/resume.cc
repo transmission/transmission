@@ -471,20 +471,21 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
+// TODO: Refactor this into a constructor for tr_variant
 static void bitfieldToBenc(tr_bitfield const* b, tr_variant* benc)
 {
-    if (tr_bitfieldHasAll(b))
+    if (b->hasAll())
     {
         tr_variantInitStr(benc, "all", 3);
     }
-    else if (tr_bitfieldHasNone(b))
+    else if (b->hasNone())
     {
         tr_variantInitStr(benc, "none", 4);
     }
     else
     {
         size_t byte_count = 0;
-        auto* raw = static_cast<uint8_t*>(tr_bitfieldGetRaw(b, &byte_count));
+        auto* raw = static_cast<uint8_t*>(b->getRaw(&byte_count));
         tr_variantInitRaw(benc, raw, byte_count);
         tr_free(raw);
     }
@@ -569,7 +570,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     }
 
     /* add the blocks bitfield */
-    bitfieldToBenc(&tor->completion.blockBitfield, tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToBenc(tor->completion.blockBitfield, tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
@@ -590,7 +591,6 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         uint8_t const* raw;
         size_t rawlen;
         tr_variant* l;
-        struct tr_bitfield blocks = {};
 
         if (tr_variantDictFindList(prog, TR_KEY_time_checked, &l))
         {
@@ -661,7 +661,8 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
 
         err = nullptr;
-        tr_bitfieldConstruct(&blocks, tor->blockCount);
+
+        tr_bitfield blocks(tor->blockCount);
 
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
         if (b != nullptr)
@@ -675,22 +676,22 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
             else if (buflen == 3 && memcmp(buf, "all", 3) == 0)
             {
-                tr_bitfieldSetHasAll(&blocks);
+                blocks.setHasAll();
             }
             else if (buflen == 4 && memcmp(buf, "none", 4) == 0)
             {
-                tr_bitfieldSetHasNone(&blocks);
+                blocks.setHasNone();
             }
             else
             {
-                tr_bitfieldSetRaw(&blocks, buf, buflen, true);
+                blocks.setRaw(buf, buflen, true);
             }
         }
         else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
         {
             if (strcmp(str, "all") == 0)
             {
-                tr_bitfieldSetHasAll(&blocks);
+                blocks.setHasAll();
             }
             else
             {
@@ -699,7 +700,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            tr_bitfieldSetRaw(&blocks, raw, rawlen, true);
+            blocks.setRaw(raw, rawlen, true);
         }
         else
         {
@@ -715,7 +716,6 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             tr_cpBlockInit(&tor->completion, &blocks);
         }
 
-        tr_bitfieldDestruct(&blocks);
         ret = TR_FR_PROGRESS;
     }
 
