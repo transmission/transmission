@@ -269,6 +269,11 @@ constexpr void blizzard_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', int(id[3] + 1), int(id[4]));
 }
 
+constexpr void btpd_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', std::string_view(id+5, 3));
+}
+
 constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
@@ -420,7 +425,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 120>
+auto constexpr Clients = std::array<Client, 121>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -540,6 +545,7 @@ auto constexpr Clients = std::array<Client, 120>
     { "a00---0", "Swarmy", no_version_formatter },
     { "a02---0", "Swarmy", no_version_formatter },
     { "aria2-", "aria2", no_version_formatter },
+    { "btpd", "BT Protocol Daemon", btpd_formatter },
     { "eX", "eXeem", no_version_formatter },
     { "martini", "Martini Man", no_version_formatter },
 }};
@@ -604,10 +610,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "DNA", 3) == 0)
     {
         tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
-    }
-    else if (strncmp(chid, "btpd", 4) == 0)
-    {
-        tr_snprintf(buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7]);
     }
     else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
     {
