@@ -313,6 +313,16 @@ void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char cons
     }
 }
 
+void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    tr_snprintf(buf, buflen, "%*.*s %c.%c%c%c", int(std::size(name)), int(std::size(name)), std::data(name), id[3], id[4], id[5], id[6]);
+}
+
+void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    tr_snprintf(buf, buflen, "%*.*s %c.%c (%c%c)", int(std::size(name)), int(std::size(name)), std::data(name), id[3], id[4], id[5], id[6]);
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -320,7 +330,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 86>
+auto constexpr Clients = std::array<Client, 88>
 {{
     { "-AG", "Aress", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -329,6 +339,7 @@ auto constexpr Clients = std::array<Client, 86>
     { "-AX", "BitPump", two_major_two_minor_formatter },
     { "-AZ", "Azureus / Vuze", four_digit_formatter },
     { "-A~", "Ares", three_digit_formatter },
+    { "-BB", "BitBuddy", bitbuddy_formatter },
     { "-BC", "BitComet", two_major_two_minor_formatter },
     { "-BE", "BitTorrent SDK", four_digit_formatter },
     { "-BF", "BitFlu", no_version_formatter },
@@ -338,6 +349,7 @@ auto constexpr Clients = std::array<Client, 86>
     { "-BM", "BitMagnet", four_digit_formatter },
     { "-BN", "Baidu Netdisk", no_version_formatter },
     { "-BP", "BitTorrent Pro (Azureus + Spyware)", four_digit_formatter },
+    { "-BR", "BitRocket", bitrocket_formatter },
     { "-BS", "BTSlave", four_digit_formatter },
     { "-BT", "BitTorrent", utorrent_formatter },
     { "-BW", "BitWombat", four_digit_formatter },
@@ -466,16 +478,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
-        /* */
-        if (strncmp(chid + 1, "BB", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "BitBuddy %c.%c%c%c", id[3], id[4], id[5], id[6]);
-        }
-        else if (strncmp(chid + 1, "BR", 2) == 0)
-        {
-            tr_snprintf(buf, buflen, "BitRocket %c.%c (%c%c)", id[3], id[4], id[5], id[6]);
-        }
-        else if (strncmp(chid + 1, "CT", 2) == 0)
+        if (strncmp(chid + 1, "CT", 2) == 0)
         {
             tr_snprintf(buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id + 5, 2));
         }
