@@ -420,7 +420,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 119>
+auto constexpr Clients = std::array<Client, 120>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -477,6 +477,7 @@ auto constexpr Clients = std::array<Client, 119>
     { "-MP", "MooPolice", three_digit_formatter },
     { "-MR", "Miro", four_digit_formatter },
     { "-MT", "Moonlight", four_digit_formatter },
+    { "-NE", "BT Next Evolution", four_digit_formatter },
     { "-NX", "Net Transport", four_digit_formatter },
     { "-OS", "OneSwarm", four_digit_formatter },
     { "-OT", "OmegaTorrent", four_digit_formatter },
@@ -615,10 +616,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "QVOD", 4) == 0)
     {
         four_digits(buf, buflen, "QVOD", id + 4);
-    }
-    else if (strncmp(chid, "-NE", 3) == 0)
-    {
-        four_digits(buf, buflen, "BT Next Evolution", id + 3);
     }
     else if (strncmp(chid, "-BL", 3) == 0)
     {
