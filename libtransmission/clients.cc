@@ -390,6 +390,11 @@ constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', std::string_view(id+3, 5));
 }
 
+constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -397,7 +402,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 112>
+auto constexpr Clients = std::array<Client, 113>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -504,6 +509,7 @@ auto constexpr Clients = std::array<Client, 112>
     { "M", "BitTorrent", mainline_formatter },
     { "OP", "Opera", opera_formatter },
     { "Pando", "Pando", no_version_formatter },
+    { "Plus", "Plus!", plus_formatter },
     { "Q", "Queen Bee", mainline_formatter },
     { "S3", "Amazon S3", amazon_formatter },
     { "a00---0", "Swarmy", no_version_formatter },
@@ -573,10 +579,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "DNA", 3) == 0)
     {
         tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
-    }
-    else if (strncmp(chid, "Plus", 4) == 0)
-    {
-        tr_snprintf(buf, buflen, "Plus! v2 %c.%c%c", id[4], id[5], id[6]);
     }
     else if (strncmp(chid, "XBT", 3) == 0)
     {
