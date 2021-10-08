@@ -47,18 +47,11 @@ constexpr std::optional<int> getShadowInt(uint8_t ch)
     return pos != std::string_view::npos ? pos : std::optional<int>{};
 }
 
-bool getFDMInt(uint8_t ch, int* setme)
+constexpr std::optional<int> getFDMInt(uint8_t ch)
 {
-    char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()";
-    char const* pch = strchr(str, ch);
-
-    if (pch == nullptr)
-    {
-        return false;
-    }
-
-    *setme = pch - str;
-    return true;
+    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
+    auto const pos = str.find(ch);
+    return pos != std::string_view::npos ? pos : std::optional<int>{};
 }
 
 int strint(void const* pch, int span)
@@ -661,11 +654,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         }
         else if (strncmp(chid + 1, "FD", 2) == 0)
         {
-            int c;
-
-            if (getFDMInt(id[5], &c))
+            auto const c = getFDMInt(id[5]);
+            if (c)
             {
-                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), c);
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), *c);
             }
             else
             {
