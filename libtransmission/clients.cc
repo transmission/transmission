@@ -91,19 +91,6 @@ constexpr std::string_view getMnemonicEnd(uint8_t ch)
     }
 }
 
-void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits) // FIXME: should be removed when done
-{
-    tr_snprintf(
-        buf,
-        buflen,
-        "%s %d.%d.%d.%d",
-        name,
-        charint(digits[0]),
-        charint(digits[1]),
-        charint(digits[2]),
-        charint(digits[3]));
-}
-
 void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
     tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
@@ -251,6 +238,12 @@ constexpr void bitlord_formatter(char* buf, size_t buflen, std::string_view name
 constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
+}
+
+void bittorrent_dna_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
+    tr_snprintf(buf, buflen, "%d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
 }
 
 void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
@@ -435,7 +428,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 123>
+auto constexpr Clients = std::array<Client, 124>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -543,6 +536,7 @@ auto constexpr Clients = std::array<Client, 123>
     { "A2", "aria2", aria2_formatter },
     { "AZ2500BT", "BitTyrant (Azureus Mod)", no_version_formatter },
     { "BLZ", "Blizzard Downloader", blizzard_formatter },
+    { "DNA", "BitTorrent DNA", bittorrent_dna_formatter },
     { "LIME", "Limewire", no_version_formatter },
     { "M", "BitTorrent", mainline_formatter },
     { "Mbrst", "burst!", burst_formatter },
@@ -619,10 +613,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Everything else */
-    else if (strncmp(chid, "DNA", 3) == 0)
-    {
-        tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
-    }
     else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
     {
         tr_snprintf(buf, buflen, "BitSpirit %u", (id[1] == 0 ? 1 : id[1]));
