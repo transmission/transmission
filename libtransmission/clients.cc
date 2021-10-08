@@ -8,8 +8,6 @@
 
 /* thanks amc1! */
 
-#include <iostream> // FIXME do not commit
-
 #include <algorithm>
 #include <array>
 #include <optional>
