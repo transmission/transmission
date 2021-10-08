@@ -243,6 +243,11 @@ constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], id[5], id[6]);
 }
 
+constexpr void bitlord_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], '-', std::string_view(id+6, 3));
+}
+
 constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
@@ -425,7 +430,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 121>
+auto constexpr Clients = std::array<Client, 122>
 {{
     { "-AG", "Ares", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -441,6 +446,7 @@ auto constexpr Clients = std::array<Client, 121>
     { "-BG", "BTGetit", four_digit_formatter },
     { "-BH", "BitZilla", four_digit_formatter },
     { "-BI", "BiglyBT", four_digit_formatter },
+    { "-BL", "BitLord", bitlord_formatter },
     { "-BM", "BitMagnet", four_digit_formatter },
     { "-BN", "Baidu Netdisk", no_version_formatter },
     { "-BOW", "Bits on Wheels", bits_on_wheels_formatter },
@@ -618,10 +624,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     else if (strncmp(chid, "QVOD", 4) == 0)
     {
         four_digits(buf, buflen, "QVOD", id + 4);
-    }
-    else if (strncmp(chid, "-BL", 3) == 0)
-    {
-        tr_snprintf(buf, buflen, "BitLord %c.%c.%c-%c%c%c", id[3], id[4], id[5], id[6], id[7], id[8]);
     }
 
     /* Shad0w-style */
