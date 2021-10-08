@@ -301,6 +301,18 @@ void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* 
     }
 }
 
+void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+{
+    if (id[6] == '0')
+    {
+        three_digit_formatter(buf, buflen, name, id);
+    }
+    else
+    {
+        tr_snprintf(buf, buflen, "%*.*s %d.%d.%d", int(std::size(name)), int(std::size(name)), std::data(name), strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
+    }
+}
+
 struct Client
 {
     std::string_view begins_with;
@@ -308,7 +320,7 @@ struct Client
     format_func formatter;
 };
 
-auto constexpr Clients = std::array<Client, 85>
+auto constexpr Clients = std::array<Client, 86>
 {{
     { "-AG", "Aress", four_digit_formatter },
     { "-AR", "Arctic", four_digit_formatter },
@@ -384,6 +396,7 @@ auto constexpr Clients = std::array<Client, 85>
     { "-WT", "BitLet", four_digit_formatter },
     { "-WW", "WebTorrent", four_digit_formatter },
     { "-WY", "FireTorrent", four_digit_formatter },
+    { "-XF", "Xfplay", xfplay_formatter },
     { "-XL", "Xunlei", four_digit_formatter },
     { "-XS", "XSwifter", four_digit_formatter },
     { "-XT", "XanTorrent", four_digit_formatter },
@@ -488,17 +501,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "MG", 2) == 0)
         {
             tr_snprintf(buf, buflen, "MediaGet %d.%02d", charint(id[3]), charint(id[4]));
-        }
-        else if (strncmp(chid + 1, "XF", 2) == 0)
-        {
-            if (chid[6] == '0')
-            {
-                three_digits(buf, buflen, "Xfplay", id + 3);
-            }
-            else
-            {
-                tr_snprintf(buf, buflen, "Xfplay %d.%d.%d", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
-            }
         }
         else if (strncmp(chid + 1, "PI", 2) == 0)
         {
