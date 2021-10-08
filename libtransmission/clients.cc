@@ -366,16 +366,16 @@ constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
 }
 
-void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     auto const c = getFDMInt(id[5]);
     if (c)
     {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', *c);
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', *c);
     }
     else
     {
-        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', 'x');
     }
 }
 
