@@ -28,119 +28,6 @@ using namespace std::literals; // "foo"sv
 namespace
 {
 
-constexpr int charint(uint8_t ch)
-{
-    if ('0' <= ch && ch <= '9')
-    {
-        return ch - '0';
-    }
-
-    if ('A' <= ch && ch <= 'Z')
-    {
-        return 10 + ch - 'A';
-    }
-
-    if ('a' <= ch && ch <= 'z')
-    {
-        return 36 + ch - 'a';
-    }
-
-    return 0;
-}
-
-constexpr std::optional<int> getShadowInt(uint8_t ch)
-{
-    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
-    auto const pos = str.find(ch);
-    return pos != std::string_view::npos ? pos : std::optional<int>{};
-}
-
-constexpr std::optional<int> getFDMInt(uint8_t ch)
-{
-    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
-    auto const pos = str.find(ch);
-    return pos != std::string_view::npos ? pos : std::optional<int>{};
-}
-
-int strint(void const* pch, int span)
-{
-    char tmp[64];
-    memcpy(tmp, pch, span);
-    tmp[span] = '\0';
-    return strtol(tmp, nullptr, 0);
-}
-
-constexpr std::string_view getMnemonicEnd(uint8_t ch)
-{
-    switch (ch)
-    {
-    case 'b':
-    case 'B':
-        return " (Beta)"sv;
-
-    case 'd':
-        return " (Debug)"sv;
-
-    case 'x':
-    case 'X':
-    case 'Z':
-        return " (Dev)"sv;
-
-    default:
-        return ""sv;
-    }
-}
-
-void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
-{
-    tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
-}
-
-bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
-{
-    char const* chid = (char const*)id;
-    char const* mod = nullptr;
-
-    if (strncmp(chid, "exbc", 4) == 0)
-    {
-        mod = "";
-    }
-    else if (strncmp(chid, "FUTB", 4) == 0)
-    {
-        mod = " (Solidox Mod) ";
-    }
-    else if (strncmp(chid, "xUTB", 4) == 0)
-    {
-        mod = " (Mod 2) ";
-    }
-    else
-    {
-        return false;
-    }
-
-    bool const is_bitlord = strncmp(chid + 6, "LORD", 4) == 0;
-    char const* const name = (is_bitlord) ? "BitLord " : "BitComet ";
-    int const major = id[4];
-    int const minor = id[5];
-
-    /**
-     * Bitcomet, and older versions of BitLord, are of the form x.yy.
-     * Bitcoment 1.0 and onwards are of the form x.y.
-     */
-    if (is_bitlord && major > 0)
-    {
-        tr_snprintf(buf, buflen, "%s%s%d.%d", name, mod, major, minor);
-    }
-    else
-    {
-        tr_snprintf(buf, buflen, "%s%s%d.%02d", name, mod, major, minor);
-    }
-
-    return true;
-}
-
-using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
-
 constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, char ch)
 {
     if (buflen >= 2)
@@ -185,6 +72,168 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const 
     std::tie(buf, buflen) = buf_append(buf, buflen, t);
     return buf_append(buf, buflen, args...);
 }
+
+constexpr int charint(uint8_t ch)
+{
+    if ('0' <= ch && ch <= '9')
+    {
+        return ch - '0';
+    }
+
+    if ('A' <= ch && ch <= 'Z')
+    {
+        return 10 + ch - 'A';
+    }
+
+    if ('a' <= ch && ch <= 'z')
+    {
+        return 36 + ch - 'a';
+    }
+
+    return 0;
+}
+
+constexpr std::optional<int> getFDMInt(uint8_t ch)
+{
+    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
+    auto const pos = str.find(ch);
+    return pos != std::string_view::npos ? pos : std::optional<int>{};
+}
+
+int strint(void const* pch, int span)
+{
+    char tmp[64];
+    memcpy(tmp, pch, span);
+    tmp[span] = '\0';
+    return strtol(tmp, nullptr, 0);
+}
+
+constexpr std::string_view getMnemonicEnd(uint8_t ch)
+{
+    switch (ch)
+    {
+    case 'b':
+    case 'B':
+        return " (Beta)"sv;
+
+    case 'd':
+        return " (Debug)"sv;
+
+    case 'x':
+    case 'X':
+    case 'Z':
+        return " (Dev)"sv;
+
+    default:
+        return ""sv;
+    }
+}
+
+void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
+{
+    tr_snprintf(buf, buflen, "%*.*s %d.%02d", int(std::size(name)), int(std::size(name)), std::data(name), strint(digits + 3, 2), strint(digits + 5, 2));
+}
+
+constexpr std::optional<int> getShadowInt(uint8_t ch)
+{
+    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
+    auto const pos = str.find(ch);
+    return pos != std::string_view::npos ? pos : std::optional<int>{};
+}
+
+bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
+{
+    // Shad0w with his experimental BitTorrent implementation and BitTornado
+    // introduced peer ids that begin with a character which is``T`` in the
+    // case of BitTornado followed by up to five ascii characters for version
+    // number, padded with dashes if less than 5, followed by ---. The ascii
+    // characters denoting version are limited to the following characters:
+    // 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-
+    // For example: 'S58B-----'... for Shadow's 5.8.11
+
+    if (std::size(peer_id) != 9 || peer_id[6] != '-' || peer_id[7] != '-' || peer_id[8] != '-')
+    {
+        return false;
+    }
+    while (!std::empty(peer_id) && peer_id.back() == '-')
+    {
+        peer_id.remove_suffix(1);
+    }
+    auto vals = std::vector<int>{};
+    while(std::size(peer_id) > 1)
+    {
+        auto const num = getShadowInt(peer_id.back());
+        if (!num)
+        {
+            return false;
+        }
+        vals.push_back(*num);
+        peer_id.remove_suffix(1);
+    }
+
+    auto name = std::string_view{};
+    switch(peer_id.front())
+    {
+        case 'A': name = "ABC"sv; break;
+        case 'O': name = "Osprey"; break;
+        case 'Q': name = "BTQueue"; break;
+        case 'R': name = "Tribler"; break;
+        case 'S': name = "Shad0w"; break;
+        case 'T': name = "BitTornado"; break;
+        case 'U': name = "UPnP NAT Bit Torrent"; break;
+        default: return false;
+    }
+
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
+    std::for_each(std::rbegin(vals), std::rend(vals), [&buf, &buflen](int num){ std::tie(buf, buflen) = buf_append(buf, buflen, num, '.');});
+    buf[-1] = '\0'; // remove trailing '.'
+    return true;
+}
+
+bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
+{
+    auto mod = std::string_view{};
+
+    if (peer_id.find("exbc"sv) == 0)
+    {
+        mod = ""sv;
+    }
+    else if (peer_id.find("FUTB"sv) == 0)
+    {
+        mod = "(Solidox Mod) "sv;
+    }
+    else if (peer_id.find("xUTB"sv) == 0)
+    {
+        mod = "(Mod 2) ";
+    }
+    else
+    {
+        return false;
+    }
+
+    bool const is_bitlord = std::string_view(std::begin(peer_id)+6, 4) == "LORD"sv;
+    auto const name = is_bitlord ? "BitLord"sv : "BitComet"sv;
+    int const major = peer_id[4];
+    int const minor = peer_id[5];
+
+    /**
+     * Bitcomet, and older versions of BitLord, are of the form x.yy.
+     * Bitcoment 1.0 and onwards are of the form x.y.
+     */
+    if (is_bitlord && major > 0)
+    {
+        buf_append(buf, buflen, name, ' ', mod, major, '.', minor);
+    }
+    else
+    {
+        std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
+        tr_snprintf(buf, buflen, "%02d", minor);
+    }
+
+    return true;
+}
+
+using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
 
 constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* digits)
 {
@@ -562,10 +611,16 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
     auto const* id = static_cast<uint8_t const*>(id_in);
     auto const* chid = static_cast<char const*>(id_in);
+    auto const key = std::string_view{ chid };
 
     *buf = '\0';
 
     if (id == nullptr)
+    {
+        return buf;
+    }
+
+    if (decodeShad0wClient(buf, buflen, key) || decodeBitCometClient(buf, buflen, key))
     {
         return buf;
     }
@@ -575,42 +630,22 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         bool operator()(std::string_view const& key, Client const& client) const
         {
             auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            auto const ret = key_lhs < client.begins_with;
-            // std::cerr << "is [" << key_lhs << " less than " << client.begins_with << ' ' << ret << std::endl;
-            return ret;
+            return key_lhs < client.begins_with;
         }
-
         bool operator()(Client const& client, std::string_view const& key) const
         {
             auto const key_lhs = std::string_view{ std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-            auto const ret = client.begins_with < key_lhs;
-            // std::cerr << "is [" << client.begins_with << " less than " << key_lhs << ' ' << ret << std::endl;
-            return ret;
+            return client.begins_with < key_lhs;
         }
     };
 
-    auto const key = std::string_view{ chid };
-    auto const compare = Compare{};
-#if 0
-    auto constexpr compare = [](std::string_view const& key, Client const& client){
-        auto const key_lhs = std::string_view { std::data(key), std::min(std::size(key), std::size(client.begins_with)) };
-        return client.begins_with < key_lhs;
-    };
-#endif
-    auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, compare);
-    // std::cerr << "eq.first distance from begin " << std::distance(std::begin(Clients), eq.first) << std::endl;
-    // std::cerr << "eq.second distance from begin " << std::distance(std::begin(Clients), eq.second) << std::endl;
+    auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
     if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
         eq.first->formatter(buf, buflen, eq.first->name, chid);
-        std::cerr << "got a match [" << key << "] -> [" << buf << ']' << std::endl;
         return buf;
     }
 
-    if (decodeBitCometClient(buf, buflen, id))
-    {
-        return buf;
-    }
 
     /* Everything else */
     else if ('\0' == id[0] && strncmp(chid + 2, "BS", 2) == 0)
@@ -618,55 +653,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         tr_snprintf(buf, buflen, "BitSpirit %u", (id[1] == 0 ? 1 : id[1]));
     }
 
-    /* Shad0w-style */
-    if (tr_str_is_empty(buf))
-    {
-        auto const a = getShadowInt(id[1]);
-        auto const b = getShadowInt(id[2]);
-        auto const c = getShadowInt(id[3]);
-
-        if (strchr("AOQRSTU", id[0]) != nullptr && a && b && c)
-        {
-            char const* name = nullptr;
-
-            switch (id[0])
-            {
-            case 'A':
-                name = "ABC";
-                break;
-
-            case 'O':
-                name = "Osprey";
-                break;
-
-            case 'Q':
-                name = "BTQueue";
-                break;
-
-            case 'R':
-                name = "Tribler";
-                break;
-
-            case 'S':
-                name = "Shad0w";
-                break;
-
-            case 'T':
-                name = "BitTornado";
-                break;
-
-            case 'U':
-                name = "UPnP NAT Bit Torrent";
-                break;
-            }
-
-            if (name != nullptr)
-            {
-                tr_snprintf(buf, buflen, "%s %d.%d.%d", name, *a, *b, *c);
-                return buf;
-            }
-        }
-    }
 
     /* No match */
     if (tr_str_is_empty(buf))
