@@ -28,13 +28,10 @@ struct tr_peerIo;
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition. */
-enum
-{
-    HISTORY_MSEC = 2000U,
-    INTERVAL_MSEC = HISTORY_MSEC,
-    GRANULARITY_MSEC = 200,
-    HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC),
-};
+const size_t HISTORY_MSEC = 2000U;
+const size_t INTERVAL_MSEC = HISTORY_MSEC;
+const size_t GRANULARITY_MSEC = 200;
+const size_t HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC);
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition. */
@@ -89,12 +86,12 @@ struct tr_band
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidthAllocate() periodically. tr_bandwidth knows its current
+ *   Call tr_bandwidth::allocate() periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually
+ *   tr_bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
