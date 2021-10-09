@@ -51,9 +51,9 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, std::str
 constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
 {
     auto mybuf = std::array<char, 32>{};
-    auto const end = std::end(mybuf);
+    auto const end = std::data(mybuf) + std::size(mybuf);
     auto constexpr base = 10;
-    auto ptr = end;
+    auto* ptr = end;
 
     while ((n / base) > 0)
     {
@@ -62,7 +62,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
     }
     *--ptr = char('0' + (n % base));
 
-    return buf_append(buf, buflen, std::string_view(ptr, std::distance(ptr, end)));
+    return buf_append(buf, buflen, std::string_view(ptr, end - ptr));
 }
 
 template<typename T, typename... ArgTypes>
@@ -680,6 +680,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         auto out = std::array<char, 32>{};
         char* walk = std::data(out);
+        char const* const begin = walk;
+        char const* const end = begin + std::size(out);
 
         for (size_t i = 0; i < 8; ++i)
         {
@@ -691,12 +693,12 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
             else
             {
-                tr_snprintf(walk, std::end(out) - walk, "%%%02X", (unsigned int)c);
+                tr_snprintf(walk, end - walk, "%%%02X", (unsigned int)c);
                 walk += 3;
             }
         }
 
-        buf_append(buf, buflen, std::string_view(std::data(out), walk - std::data(out)));
+        buf_append(buf, buflen, std::string_view(begin, walk - begin));
     }
 
     return buf;
