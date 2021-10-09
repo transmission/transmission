@@ -163,50 +163,58 @@ enum piece_sort_state
 };
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
-struct tr_swarm
+class tr_swarm
 {
-    tr_swarm_stats stats;
+public:
+    tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in)
+        : manager{ manager_in }
+        , tor{ tor_in }
+    {
+    }
 
-    tr_ptrArray outgoingHandshakes; /* tr_handshake */
-    tr_ptrArray pool; /* struct peer_atom */
-    tr_ptrArray peers; /* tr_peerMsgs */
-    tr_ptrArray webseeds; /* tr_webseed */
+public:
+    tr_swarm_stats stats = {};
 
-    tr_torrent* tor;
-    struct tr_peerMgr* manager;
+    tr_ptrArray outgoingHandshakes = {}; /* tr_handshake */
+    tr_ptrArray pool = {}; /* struct peer_atom */
+    tr_ptrArray peers = {}; /* tr_peerMsgs */
+    tr_ptrArray webseeds = {}; /* tr_webseed */
 
-    tr_peerMsgs* optimistic; /* the optimistic peer, or nullptr if none */
-    int optimisticUnchokeTimeScaler;
+    tr_peerMgr* const manager;
+    tr_torrent* const tor;
 
-    bool poolIsAllSeeds;
-    bool poolIsAllSeedsDirty; /* true if poolIsAllSeeds needs to be recomputed */
-    bool isRunning;
-    bool needsCompletenessCheck;
+    tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
+    int optimisticUnchokeTimeScaler = 0;
 
-    struct block_request* requests;
-    int requestCount;
-    int requestAlloc;
+    bool poolIsAllSeeds = false;
+    bool poolIsAllSeedsDirty = true; /* true if poolIsAllSeeds needs to be recomputed */
+    bool isRunning = false;
+    bool needsCompletenessCheck = true;
 
-    struct weighted_piece* pieces;
-    int pieceCount;
-    enum piece_sort_state pieceSortState;
+    struct block_request* requests = nullptr;
+    int requestCount = 0;
+    int requestAlloc = 0;
+
+    struct weighted_piece* pieces = nullptr;
+    int pieceCount = 0;
+    enum piece_sort_state pieceSortState = PIECES_UNSORTED;
 
     /* An array of pieceCount items stating how many peers have each piece.
        This is used to help us for downloading pieces "rarest first."
        This may be nullptr if we don't have metainfo yet, or if we're not
        downloading and don't care about rarity */
-    uint16_t* pieceReplication;
-    size_t pieceReplicationSize;
+    uint16_t* pieceReplication = nullptr;
+    size_t pieceReplicationSize = 0;
 
-    int interestedCount;
-    int maxPeers;
-    time_t lastCancel;
+    int interestedCount = 0;
+    int maxPeers = 0;
+    time_t lastCancel = 0;
 
     /* Before the endgame this should be 0. In endgame, is contains the average
      * number of pending requests per peer. Only peers which have more pending
      * requests are considered 'fast' are allowed to request a block that's
      * already been requested from another (slower?) peer. */
-    int endgame;
+    int endgame = 0;
 };
 
 struct tr_peerMgr
@@ -438,7 +446,8 @@ static void swarmFree(void* vs)
 
     tr_free(s->requests);
     tr_free(s->pieces);
-    tr_free(s);
+
+    delete s;
 }
 
 static void peerCallbackFunc(tr_peer*, tr_peer_event const*, void*);
@@ -462,19 +471,11 @@ static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
 
 static tr_swarm* swarmNew(tr_peerMgr* manager, tr_torrent* tor)
 {
-    tr_swarm* s;
+    auto* swarm = new tr_swarm{ manager, tor };
 
-    s = tr_new0(tr_swarm, 1);
-    s->manager = manager;
-    s->tor = tor;
-    s->pool = {};
-    s->peers = {};
-    s->webseeds = {};
-    s->outgoingHandshakes = {};
+    rebuildWebseedArray(swarm, tor);
 
-    rebuildWebseedArray(s, tor);
-
-    return s;
+    return swarm;
 }
 
 static void ensureMgrTimersExist(struct tr_peerMgr* m);
@@ -4131,7 +4132,7 @@ static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, in
 
 #endif /* TR_ENABLE_ASSERTS */
 
-static bool calculateAllSeeds(struct tr_swarm* swarm)
+static bool calculateAllSeeds(tr_swarm* swarm)
 {
     int nAtoms = 0;
     struct peer_atom** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &nAtoms);
@@ -4147,7 +4148,7 @@ static bool calculateAllSeeds(struct tr_swarm* swarm)
     return true;
 }
 
-static bool swarmIsAllSeeds(struct tr_swarm* swarm)
+static bool swarmIsAllSeeds(tr_swarm* swarm)
 {
     if (swarm->poolIsAllSeedsDirty)
     {

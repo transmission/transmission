@@ -22,6 +22,7 @@
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
 
+class tr_swarm;
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 
@@ -261,7 +262,7 @@ struct tr_torrent
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     struct tr_bandwidth* bandwidth;
 
-    struct tr_swarm* swarm;
+    tr_swarm* swarm;
 
     float desiredRatio;
     tr_ratiolimit ratioLimitMode;
