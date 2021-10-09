@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <optional>
 #include <string_view>
 #include <ctype.h> /* isprint() */
@@ -52,7 +53,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
     auto mybuf = std::array<char, 32>{};
     auto const end = std::end(mybuf);
     auto constexpr base = 10;
-    auto* ptr = end;
+    auto ptr = end;
 
     while ((n / base) > 0)
     {
@@ -61,7 +62,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
     }
     *--ptr = char('0' + (n % base));
 
-    return buf_append(buf, buflen, std::string_view(ptr, end - ptr));
+    return buf_append(buf, buflen, std::string_view(ptr, std::distance(ptr, end)));
 }
 
 template<typename T, typename... ArgTypes>
@@ -75,19 +76,19 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const 
 // ['A'..'Z']: 10 + ch - '9'
 // ['a'..'z']: 36 + ch - '9'
 auto constexpr charints = std::array<std::string_view, 256>{
-    { "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "",   "",
-      "",   "",   "",   "",   "",   "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
-      "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "",   "",   "",   "",   "",   "",   "36", "37", "38",
+    { "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
+      "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "x",  "x",  "x",  "x",  "x",  "x",  "36", "37", "38",
       "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58",
-      "59", "60", "61", "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",
-      "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "",   "" }
+      "59", "60", "61", "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x" }
 };
 
 int strint(void const* pch, int span)
@@ -209,16 +210,16 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     // replaced exbc with FUTB. The encoding for BitComet Peer IDs changed
     // to Azureus-style as of BitComet version 0.59.
     auto mod = std::string_view{};
-
-    if (peer_id.find("exbc"sv) == 0)
+    auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) };
+    if (lead == "exbc")
     {
         mod = "";
     }
-    else if (peer_id.find("FUTB"sv) == 0)
+    else if (lead == "FUTB")
     {
         mod = "(Solidox Mod) ";
     }
-    else if (peer_id.find("xUTB"sv) == 0)
+    else if (lead == "xUTB"sv)
     {
         mod = "(Mod 2) ";
     }
@@ -227,7 +228,7 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
         return false;
     }
 
-    bool const is_bitlord = std::string_view(std::begin(peer_id) + 6, 4) == "LORD"sv;
+    bool const is_bitlord = std::string_view(std::data(peer_id) + 6, 4) == "LORD"sv;
     auto const name = is_bitlord ? "BitLord"sv : "BitComet"sv;
     int const major = peer_id[4];
     int const minor = peer_id[5];
@@ -339,6 +340,7 @@ constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
 }
 
+#if 0
 constexpr void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
@@ -352,6 +354,7 @@ constexpr void fdm_formatter(char* buf, size_t buflen, std::string_view name, ch
         buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', 'x');
     }
 }
+#endif
 
 constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
@@ -528,7 +531,7 @@ auto constexpr Clients = std::array<Client, 127>{ {
     { "-EB", "EBit", four_digit_formatter },
     { "-ES", "Electric Sheep", three_digit_formatter },
     { "-FC", "FileCroc", four_digit_formatter },
-    { "-FD", "Free Download Manager", fdm_formatter },
+    { "-FD", "Free Download Manager", three_digit_formatter },
     { "-FG", "FlashGet", two_major_two_minor_formatter },
     { "-FL", "Folx", folx_formatter },
     { "-FT", "FoxTorrent/RedSwoosh", four_digit_formatter },
@@ -676,7 +679,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     if (tr_str_is_empty(buf))
     {
         auto out = std::array<char, 32>{};
-        auto* walk = std::begin(out);
+        char* walk = std::data(out);
 
         for (size_t i = 0; i < 8; ++i)
         {
@@ -693,7 +696,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
         }
 
-        buf_append(buf, buflen, std::string_view(std::begin(out), walk - std::begin(out)));
+        buf_append(buf, buflen, std::string_view(std::data(out), walk - std::data(out)));
     }
 
     return buf;
