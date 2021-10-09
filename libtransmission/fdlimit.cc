@@ -124,7 +124,7 @@ struct tr_cached_file
     time_t used_at;
 };
 
-static inline bool cached_file_is_open(struct tr_cached_file const* o)
+static constexpr bool cached_file_is_open(struct tr_cached_file const* o)
 {
     TR_ASSERT(o != nullptr);
 

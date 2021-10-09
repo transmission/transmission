@@ -111,12 +111,12 @@ static void stat_to_sys_path_info(
     info->last_modified_at = filetime_to_unix_time(mtime);
 }
 
-static inline bool is_slash(char c)
+static constexpr bool is_slash(char c)
 {
     return c == '\\' || c == '/';
 }
 
-static inline bool is_unc_path(char const* path)
+static constexpr bool is_unc_path(char const* path)
 {
     return is_slash(path[0]) && path[1] == path[0];
 }

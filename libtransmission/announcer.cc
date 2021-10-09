@@ -1596,19 +1596,19 @@ static void flushCloseMessages(tr_announcer* announcer)
     stops.clear();
 }
 
-static inline bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
+static constexpr bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
 {
     return !tier->isAnnouncing && !tier->isScraping && tier->announceAt != 0 && tier->announceAt <= now &&
         tier->announce_event_count > 0;
 }
 
-static inline bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
+static constexpr bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 {
     return !tier->isScraping && tier->scrapeAt != 0 && tier->scrapeAt <= now && tier->currentTracker != nullptr &&
         tier->currentTracker->scrape_info != nullptr;
 }
 
-static inline int countDownloaders(tr_tier const* tier)
+static constexpr int countDownloaders(tr_tier const* tier)
 {
     tr_tracker const* const tracker = tier->currentTracker;
 

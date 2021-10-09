@@ -1885,7 +1885,7 @@ TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 /** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
-static inline bool tr_isDirection(tr_direction d)
+constexpr bool tr_isDirection(tr_direction d)
 {
     return d == TR_UP || d == TR_DOWN;
 }

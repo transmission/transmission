@@ -78,12 +78,12 @@ size_t tr_bitfieldCountRange(tr_bitfield const*, size_t begin, size_t end);
 
 size_t tr_bitfieldCountTrueBits(tr_bitfield const* b);
 
-static inline bool tr_bitfieldHasAll(tr_bitfield const* b)
+constexpr bool tr_bitfieldHasAll(tr_bitfield const* b)
 {
     return b->bit_count != 0 ? (b->true_count == b->bit_count) : b->have_all_hint;
 }
 
-static inline bool tr_bitfieldHasNone(tr_bitfield const* b)
+constexpr bool tr_bitfieldHasNone(tr_bitfield const* b)
 {
     return b->bit_count != 0 ? (b->true_count == 0) : b->have_none_hint;
 }

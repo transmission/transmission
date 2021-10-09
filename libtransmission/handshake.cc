@@ -201,9 +201,8 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
         walk += SHA_DIGEST_LENGTH;
         memcpy(walk, peer_id, PEER_ID_LEN);
-        walk += PEER_ID_LEN;
 
-        TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
+        TR_ASSERT(walk + PEER_ID_LEN - buf == HANDSHAKE_SIZE);
     }
 
     return success;

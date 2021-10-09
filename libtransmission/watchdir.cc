@@ -74,7 +74,7 @@ static bool is_regular_file(char const* dir, char const* name)
     return ret;
 }
 
-static char const* watchdir_status_to_string(tr_watchdir_status status)
+static constexpr char const* watchdir_status_to_string(tr_watchdir_status status)
 {
     switch (status)
     {

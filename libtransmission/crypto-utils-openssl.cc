@@ -227,13 +227,13 @@ static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
     return 1;
 }
 
-static inline int DH_set_length(DH* dh, long length)
+static constexpr int DH_set_length(DH* dh, long length)
 {
     dh->length = length;
     return 1;
 }
 
-static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
+static constexpr void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
 {
     if (pub_key != nullptr)
     {

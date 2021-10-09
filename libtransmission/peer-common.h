@@ -22,16 +22,14 @@
  * @{
  */
 
-struct tr_peer;
+class tr_peer;
 struct tr_swarm;
+struct peer_atom;
 
-enum
-{
-    /* this is the maximum size of a block request.
-       most bittorrent clients will reject requests
-       larger than this size. */
-    MAX_BLOCK_SIZE = (1024 * 16)
-};
+/* This is the maximum size of a block request.
+   most bittorrent clients will reject requests
+   larger than this size. */
+auto inline constexpr MAX_BLOCK_SIZE = 1024 * 16;
 
 /**
 ***  Peer Publish / Subscribe
@@ -66,22 +64,7 @@ struct tr_peer_event
     tr_port port; /* for GOT_PORT */
 };
 
-using tr_peer_callback = void (*)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
-
-/***
-****
-***/
-
-using tr_peer_destruct_func = void (*)(struct tr_peer* peer);
-
-using tr_peer_is_transferring_pieces_func =
-    bool (*)(tr_peer const* peer, uint64_t now, tr_direction direction, unsigned int* Bps);
-
-struct tr_peer_virtual_funcs
-{
-    tr_peer_destruct_func destruct;
-    tr_peer_is_transferring_pieces_func is_transferring_pieces;
-};
+using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const* event, void* client_data);
 
 /**
  * State information about a connected peer.
@@ -89,53 +72,55 @@ struct tr_peer_virtual_funcs
  * @see struct peer_atom
  * @see tr_peerMsgs
  */
-struct tr_peer
+class tr_peer
 {
+public:
+    tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
+    virtual ~tr_peer();
+
+    virtual bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
+
     /* whether or not we should free this peer soon.
        NOTE: private to peer-mgr.c */
-    bool doPurge;
+    bool doPurge = false;
 
     /* number of bad pieces they've contributed to */
-    uint8_t strikes;
+    uint8_t strikes = 0;
 
     /* how many requests the peer has made that we haven't responded to yet */
-    int pendingReqsToClient;
+    int pendingReqsToClient = 0;
 
     /* how many requests we've made and are currently awaiting a response for */
-    int pendingReqsToPeer;
+    int pendingReqsToPeer = 0;
+
+    tr_session* const session;
 
     /* Hook to private peer-mgr information */
-    struct peer_atom* atom;
+    peer_atom* const atom;
 
-    struct tr_swarm* swarm;
+    tr_swarm* const swarm;
 
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
-    float progress;
+    float progress = 0.0f;
 
-    struct tr_bitfield blame;
-    struct tr_bitfield have;
+    struct tr_bitfield blame = {};
+    struct tr_bitfield have = {};
 
     /* the client name.
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
-    tr_quark client;
+    tr_quark client = TR_KEY_NONE;
 
     tr_recentHistory blocksSentToClient;
     tr_recentHistory blocksSentToPeer;
 
     tr_recentHistory cancelsSentToClient;
     tr_recentHistory cancelsSentToPeer;
-
-    struct tr_peer_virtual_funcs const* funcs;
 };
 
-void tr_peerConstruct(struct tr_peer* peer, tr_torrent const* tor);
-
-void tr_peerDestruct(struct tr_peer* peer);
-
 /** Update the tr_peer.progress field based on the 'have' bitset. */
-void tr_peerUpdateProgress(tr_torrent* tor, struct tr_peer*);
+void tr_peerUpdateProgress(tr_torrent* tor, tr_peer*);
 
-bool tr_peerIsSeed(struct tr_peer const* peer);
+bool tr_peerIsSeed(tr_peer const* peer);
 
 /***
 ****

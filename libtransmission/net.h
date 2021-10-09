@@ -110,7 +110,7 @@ int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
-static inline bool tr_address_is_valid(tr_address const* a)
+constexpr bool tr_address_is_valid(tr_address const* a)
 {
     return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }

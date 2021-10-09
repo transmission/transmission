@@ -18,7 +18,7 @@
 *****
 ****/
 
-static int8_t const trueBitCount[256] = {
+static constexpr int8_t const trueBitCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, //
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, //
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, //
@@ -37,7 +37,7 @@ static int8_t const trueBitCount[256] = {
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8, //
 };
 
-static size_t countArray(tr_bitfield const* b)
+static constexpr size_t countArray(tr_bitfield const* b)
 {
     size_t ret = 0;
     size_t i = b->alloc_count;
@@ -50,7 +50,7 @@ static size_t countArray(tr_bitfield const* b)
     return ret;
 }
 
-static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
+static constexpr size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
 {
     size_t ret = 0;
     size_t const first_byte = begin >> 3U;
@@ -71,10 +71,9 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
 
     if (first_byte == last_byte)
     {
-        int i;
         uint8_t val = b->bits[first_byte];
 
-        i = begin - (first_byte * 8);
+        int i = begin - (first_byte * 8);
         val <<= i;
         val >>= i;
         i = (last_byte + 1) * 8 - end;
@@ -85,12 +84,11 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
     }
     else
     {
-        uint8_t val;
         size_t const walk_end = std::min(b->alloc_count, last_byte);
 
         /* first byte */
         size_t const first_shift = begin - (first_byte * 8);
-        val = b->bits[first_byte];
+        uint8_t val = b->bits[first_byte];
         val <<= first_shift;
         val >>= first_shift;
         ret += trueBitCount[val];
@@ -175,7 +173,7 @@ size_t tr_bitfieldCountTrueBits(tr_bitfield const* b)
     return b->true_count;
 }
 
-static size_t get_bytes_needed(size_t bit_count)
+static constexpr size_t get_bytes_needed(size_t bit_count)
 {
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
