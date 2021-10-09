@@ -181,7 +181,7 @@ private:
     void* icon_ = nullptr;
     std::unique_ptr<MainWindow> wind_;
     TrCore* core_ = nullptr;
-    Glib::RefPtr<Gtk::Window> msgwin_;
+    std::unique_ptr<MessageLogWindow> msgwin_;
     std::unique_ptr<PrefsDialog> prefs_;
     std::vector<std::string> error_list_;
     std::vector<std::string> duplicates_list_;
@@ -1588,9 +1588,8 @@ void Application::actions_handler(std::string const& action_name)
     {
         if (msgwin_ == nullptr)
         {
-            msgwin_ = Glib::make_refptr_for_instance(Glib::wrap(
-                GTK_WINDOW(gtr_message_log_window_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_))));
-            msgwin_->signal_unrealize().connect(sigc::mem_fun(this, &Application::on_message_window_closed));
+            msgwin_ = MessageLogWindow::create(*wind_, core_);
+            msgwin_->signal_hide().connect(sigc::mem_fun(this, &Application::on_message_window_closed));
         }
         else
         {
