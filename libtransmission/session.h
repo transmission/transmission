@@ -240,7 +240,9 @@ struct tr_session
     struct event* saveTimer;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth bandwidth;
+    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    struct tr_bandwidth* bandwidth;
 
     float desiredRatio;
 

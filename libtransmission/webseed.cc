@@ -64,6 +64,7 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
+        , bandwidth(tor->bandwidth)
     {
         // init parent bits
         tr_bitfieldSetHasAll(&have);
@@ -71,7 +72,6 @@ public:
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
 
-        tr_bandwidthConstruct(&bandwidth, &tor->bandwidth);
         timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
@@ -83,7 +83,6 @@ public:
         tasks.clear();
 
         event_free(timer);
-        tr_bandwidthDestruct(&bandwidth);
     }
 
     bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
@@ -94,7 +93,7 @@ public:
         if (direction == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            Bps = tr_bandwidthGetPieceSpeed_Bps(&bandwidth, now, direction);
+            Bps = bandwidth.getPieceSpeed_Bps(now, direction);
         }
 
         if (setme_Bps != nullptr)
@@ -110,7 +109,7 @@ public:
     tr_peer_callback const callback;
     void* const callback_data;
 
-    tr_bandwidth bandwidth = {};
+    tr_bandwidth bandwidth;
     std::set<tr_webseed_task*> tasks;
     struct event* timer = nullptr;
     int consecutive_failures = 0;
@@ -288,7 +287,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
         uint32_t len;
         struct tr_webseed* w = task->webseed;
 
-        tr_bandwidthUsed(&w->bandwidth, TR_DOWN, n_added, true, tr_time_msec());
+        w->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
         fire_client_got_piece_data(w, n_added);
         len = evbuffer_get_length(buf);
 

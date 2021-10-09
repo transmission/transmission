@@ -115,7 +115,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     {
         tr_torrent const* const tor = tr_torrentFindFromId(task->session, task->torrentId);
 
-        if (tor != nullptr && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
+        if (tor != nullptr && tor->bandwidth->clamp(TR_DOWN, nmemb) == 0)
         {
             task->session->web->paused_easy_handles.insert(task->curl_easy);
             return CURL_WRITEFUNC_PAUSE;
