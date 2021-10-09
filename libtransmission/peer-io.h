@@ -26,7 +26,7 @@
 #include "utils.h" /* tr_time() */
 
 struct evbuffer;
-struct tr_bandwidth;
+struct Bandwidth;
 struct tr_datatype;
 struct tr_peerIo;
 
@@ -93,7 +93,7 @@ struct tr_peerIo
 
     // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    struct tr_bandwidth* bandwidth;
+    struct Bandwidth* bandwidth;
     tr_crypto crypto;
 
     struct evbuffer* inbuf;
@@ -110,7 +110,7 @@ struct tr_peerIo
 
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
-    struct tr_bandwidth* parent,
+    struct Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
     uint8_t const* torrentHash,
@@ -119,7 +119,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
-    struct tr_bandwidth* parent,
+    struct Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
     struct tr_peer_socket const socket);
@@ -299,7 +299,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
-static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
+static inline void tr_peerIoSetParent(tr_peerIo* io, struct Bandwidth* parent)
 {
     TR_ASSERT(tr_isPeerIo(io));
 

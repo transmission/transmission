@@ -23,7 +23,7 @@
 ****
 ***/
 
-unsigned int tr_bandwidth::getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now)
+unsigned int Bandwidth::getSpeed_Bps(RateControl const* r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -34,7 +34,7 @@ unsigned int tr_bandwidth::getSpeed_Bps(struct bratecontrol const* r, unsigned i
     {
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
-        auto* rvolatile = (struct bratecontrol*)r;
+        auto* rvolatile = (RateControl*)r;
 
         for (int i = r->newest; r->transfers[i].date > cutoff;)
         {
@@ -58,7 +58,7 @@ unsigned int tr_bandwidth::getSpeed_Bps(struct bratecontrol const* r, unsigned i
     return r->cache_val;
 }
 
-void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, struct bratecontrol* r, size_t size)
+void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
     if (r->transfers[r->newest].date + GRANULARITY_MSEC >= now)
     {
@@ -83,7 +83,7 @@ void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, struct brate
 ****
 ***/
 
-tr_bandwidth::tr_bandwidth(tr_bandwidth* newParent)
+Bandwidth::Bandwidth(Bandwidth* newParent)
     : band{}
     , parent{ nullptr }
     , children{}
@@ -99,7 +99,7 @@ tr_bandwidth::tr_bandwidth(tr_bandwidth* newParent)
 ****
 ***/
 
-void tr_bandwidth::setParent(tr_bandwidth* newParent)
+void Bandwidth::setParent(Bandwidth* newParent)
 {
     TR_ASSERT(this != newParent);
 
@@ -123,7 +123,7 @@ void tr_bandwidth::setParent(tr_bandwidth* newParent)
 ****
 ***/
 
-void tr_bandwidth::allocateBandwidth(
+void Bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
     tr_direction dir,
     unsigned int period_msec,
@@ -154,7 +154,7 @@ void tr_bandwidth::allocateBandwidth(
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
+void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 {
     /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others. Loop through the peers, giving each a
@@ -185,7 +185,7 @@ void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir
     }
 }
 
-void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
+void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
     std::vector<tr_peerIo*> tmp;
     std::vector<tr_peerIo*> low;
@@ -228,7 +228,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     /* Second phase of IO. To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
-     * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
+     * or (2) the next Bandwidth::allocate () call, when we start over again. */
     for (auto io : tmp)
     {
         tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
@@ -244,7 +244,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 ****
 ***/
 
-unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const
+unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -292,11 +292,11 @@ unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int by
     return byteCount;
 }
 
-void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
+void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    struct tr_band* band_ = &this->band[dir];
+    Band* band_ = &this->band[dir];
 
     if (band_->isLimited && isPieceData)
     {

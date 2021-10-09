@@ -259,7 +259,7 @@ struct tr_torrent
 
     // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    struct tr_bandwidth* bandwidth;
+    struct Bandwidth* bandwidth;
 
     struct tr_swarm* swarm;
 
