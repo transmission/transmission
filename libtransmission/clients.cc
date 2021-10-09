@@ -340,22 +340,6 @@ constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view nam
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
 }
 
-#if 0
-constexpr void fdm_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
-{
-    auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()" };
-    auto const pos = str.find(id[5]);
-    if (pos != std::string_view::npos)
-    {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', int(pos));
-    }
-    else
-    {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', 'x');
-    }
-}
-#endif
-
 constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', 'x');
