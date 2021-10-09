@@ -28,10 +28,10 @@ struct tr_peerIo;
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition. */
-const size_t HISTORY_MSEC = 2000U;
-const size_t INTERVAL_MSEC = HISTORY_MSEC;
-const size_t GRANULARITY_MSEC = 200;
-const size_t HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC);
+constexpr size_t HISTORY_MSEC = 2000U;
+constexpr size_t INTERVAL_MSEC = HISTORY_MSEC;
+constexpr size_t GRANULARITY_MSEC = 200;
+constexpr size_t HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC);
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * it's included in the header for inlining and composition. */
@@ -170,8 +170,8 @@ public:
 
     /**
      * @brief Set the desired speed for this bandwidth subtree.
-     * @see tr_bandwidthAllocate
-     * @see tr_bandwidthGetDesiredSpeed
+     * @see tr_bandwidth::allocate
+     * @see tr_bandwidth::getDesiredSpeed
      */
     constexpr bool setDesiredSpeed_Bps(tr_direction dir, unsigned int desiredSpeed)
     {
@@ -183,7 +183,7 @@ public:
 
     /**
      * @brief Get the desired speed for the bandwidth subtree.
-     * @see tr_bandwidthSetDesiredSpeed
+     * @see tr_bandwidth::setDesiredSpeed
      */
     [[nodiscard]] constexpr double getDesiredSpeed_Bps(tr_direction dir) const
     {

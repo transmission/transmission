@@ -228,7 +228,7 @@ void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     /* Second phase of IO. To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
-     * or (2) the next tr_bandwidthAllocate () call, when we start over again. */
+     * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
     for (auto io : tmp)
     {
         tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
