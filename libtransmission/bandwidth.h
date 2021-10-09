@@ -85,7 +85,7 @@ public:
      */
     void setPeer(tr_peerIo* newPeer)
     {
-        this->peer = newPeer;
+        this->peer_ = newPeer;
     }
 
     /**
@@ -124,7 +124,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeed_Bps(&this->band[dir].raw, HISTORY_MSEC, now);
+        return getSpeed_Bps(&this->band_[dir].raw_, HISTORY_MSEC, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
@@ -132,7 +132,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeed_Bps(&this->band[dir].piece, HISTORY_MSEC, now);
+        return getSpeed_Bps(&this->band_[dir].piece_, HISTORY_MSEC, now);
     }
 
     /**
@@ -142,7 +142,7 @@ public:
      */
     constexpr bool setDesiredSpeed_Bps(tr_direction dir, unsigned int desiredSpeed)
     {
-        unsigned int* value = &this->band[dir].desiredSpeed_Bps;
+        unsigned int* value = &this->band_[dir].desired_speed_bps_;
         bool const didChange = desiredSpeed != *value;
         *value = desiredSpeed;
         return didChange;
@@ -154,7 +154,7 @@ public:
      */
     [[nodiscard]] constexpr double getDesiredSpeed_Bps(tr_direction dir) const
     {
-        return this->band[dir].desiredSpeed_Bps;
+        return this->band_[dir].desired_speed_bps_;
     }
 
     /**
@@ -162,7 +162,7 @@ public:
      */
     constexpr bool setLimited(tr_direction dir, bool isLimited)
     {
-        bool* value = &this->band[dir].isLimited;
+        bool* value = &this->band_[dir].is_limited_;
         bool const didChange = isLimited != *value;
         *value = isLimited;
         return didChange;
@@ -173,7 +173,7 @@ public:
      */
     [[nodiscard]] constexpr bool isLimited(tr_direction dir) const
     {
-        return this->band[dir].isLimited;
+        return this->band_[dir].is_limited_;
     }
 
     /**
@@ -184,7 +184,7 @@ public:
      */
     constexpr bool honorParentLimits(tr_direction direction, bool isEnabled)
     {
-        bool* value = &this->band[direction].honorParentLimits;
+        bool* value = &this->band_[direction].honor_parent_limits_;
         bool const didChange = isEnabled != *value;
         *value = isEnabled;
         return didChange;
@@ -194,7 +194,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(direction));
 
-        return this->band[direction].honorParentLimits;
+        return this->band_[direction].honor_parent_limits_;
     }
 
     static constexpr size_t HISTORY_MSEC = 2000U;
@@ -204,25 +204,25 @@ public:
 
     struct RateControl
     {
-        int newest;
+        int newest_;
         struct Transfer
         {
-            uint64_t date;
-            uint64_t size;
+            uint64_t date_;
+            uint64_t size_;
         };
-        std::array<Transfer, HISTORY_SIZE> transfers;
-        uint64_t cache_time;
-        unsigned int cache_val;
+        std::array<Transfer, HISTORY_SIZE> transfers_;
+        uint64_t cache_time_;
+        unsigned int cache_val_;
     };
 
     struct Band
     {
-        bool isLimited;
-        bool honorParentLimits;
-        unsigned int bytesLeft;
-        unsigned int desiredSpeed_Bps;
-        RateControl raw;
-        RateControl piece;
+        bool is_limited_;
+        bool honor_parent_limits_;
+        unsigned int bytes_left_;
+        unsigned int desired_speed_bps_;
+        RateControl raw_;
+        RateControl piece_;
     };
 
 private:
@@ -241,10 +241,10 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     tr_priority_t priority = 0;
-    std::array<Band, 2> band;
-    Bandwidth* parent;
-    std::unordered_set<Bandwidth*> children;
-    tr_peerIo* peer;
+    std::array<Band, 2> band_;
+    Bandwidth* parent_;
+    std::unordered_set<Bandwidth*> children_;
+    tr_peerIo* peer_;
 };
 
 /* @} */

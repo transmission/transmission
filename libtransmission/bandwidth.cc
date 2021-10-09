@@ -30,53 +30,53 @@ unsigned int Bandwidth::getSpeed_Bps(RateControl const* r, unsigned int interval
         now = tr_time_msec();
     }
 
-    if (now != r->cache_time)
+    if (now != r->cache_time_)
     {
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
         auto* rvolatile = (RateControl*)r;
 
-        for (int i = r->newest; r->transfers[i].date > cutoff;)
+        for (int i = r->newest_; r->transfers_[i].date_ > cutoff;)
         {
-            bytes += r->transfers[i].size;
+            bytes += r->transfers_[i].size_;
 
             if (--i == -1)
             {
                 i = HISTORY_SIZE - 1; /* circular history */
             }
 
-            if (i == r->newest)
+            if (i == r->newest_)
             {
                 break; /* we've come all the way around */
             }
         }
 
-        rvolatile->cache_val = (unsigned int)(bytes * 1000U / interval_msec);
-        rvolatile->cache_time = now;
+        rvolatile->cache_val_ = (unsigned int)(bytes * 1000U / interval_msec);
+        rvolatile->cache_time_ = now;
     }
 
-    return r->cache_val;
+    return r->cache_val_;
 }
 
 void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
-    if (r->transfers[r->newest].date + GRANULARITY_MSEC >= now)
+    if (r->transfers_[r->newest_].date_ + GRANULARITY_MSEC >= now)
     {
-        r->transfers[r->newest].size += size;
+        r->transfers_[r->newest_].size_ += size;
     }
     else
     {
-        if (++r->newest == HISTORY_SIZE)
+        if (++r->newest_ == HISTORY_SIZE)
         {
-            r->newest = 0;
+            r->newest_ = 0;
         }
 
-        r->transfers[r->newest].date = now;
-        r->transfers[r->newest].size = size;
+        r->transfers_[r->newest_].date_ = now;
+        r->transfers_[r->newest_].size_ = size;
     }
 
     /* invalidate cache_val*/
-    r->cache_time = 0;
+    r->cache_time_ = 0;
 }
 
 /***
@@ -84,14 +84,14 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ***/
 
 Bandwidth::Bandwidth(Bandwidth* newParent)
-    : band{}
-    , parent{ nullptr }
-    , children{}
-    , peer{ nullptr }
+    : band_{}
+    , parent_{ nullptr }
+    , children_{}
+    , peer_{ nullptr }
 {
-    this->children = {};
-    this->band[TR_UP].honorParentLimits = true;
-    this->band[TR_DOWN].honorParentLimits = true;
+    this->children_ = {};
+    this->band_[TR_UP].honor_parent_limits_ = true;
+    this->band_[TR_DOWN].honor_parent_limits_ = true;
     this->setParent(newParent);
 }
 
@@ -103,19 +103,19 @@ void Bandwidth::setParent(Bandwidth* newParent)
 {
     TR_ASSERT(this != newParent);
 
-    if (this->parent != nullptr)
+    if (this->parent_ != nullptr)
     {
-        this->parent->children.erase(this);
-        this->parent = nullptr;
+        this->parent_->children_.erase(this);
+        this->parent_ = nullptr;
     }
 
     if (newParent != nullptr)
     {
-        TR_ASSERT(newParent->parent != this);
-        TR_ASSERT(newParent->children.find(this) == newParent->children.end()); // does not exist
+        TR_ASSERT(newParent->parent_ != this);
+        TR_ASSERT(newParent->children_.find(this) == newParent->children_.end()); // does not exist
 
-        newParent->children.insert(this);
-        this->parent = newParent;
+        newParent->children_.insert(this);
+        this->parent_ = newParent;
     }
 }
 
@@ -134,21 +134,21 @@ void Bandwidth::allocateBandwidth(
     tr_priority_t const priority_ = std::max(parent_priority, this->priority);
 
     /* set the available bandwidth */
-    if (this->band[dir].isLimited)
+    if (this->band_[dir].is_limited_)
     {
-        uint64_t const nextPulseSpeed = this->band[dir].desiredSpeed_Bps;
-        this->band[dir].bytesLeft = nextPulseSpeed * period_msec / 1000U;
+        uint64_t const nextPulseSpeed = this->band_[dir].desired_speed_bps_;
+        this->band_[dir].bytes_left_ = nextPulseSpeed * period_msec / 1000U;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
-    if (this->peer != nullptr)
+    if (this->peer_ != nullptr)
     {
-        this->peer->priority = priority_;
-        peer_pool.push_back(this->peer);
+        this->peer_->priority = priority_;
+        peer_pool.push_back(this->peer_);
     }
 
     // traverse & repeat for the subtree
-    for (auto child : this->children)
+    for (auto child : this->children_)
     {
         child->allocateBandwidth(priority_, dir, period_msec, peer_pool);
     }
@@ -248,9 +248,9 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteC
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    if (this->band[dir].isLimited)
+    if (this->band_[dir].is_limited_)
     {
-        byteCount = std::min(byteCount, this->band[dir].bytesLeft);
+        byteCount = std::min(byteCount, this->band_[dir].bytes_left_);
 
         /* if we're getting close to exceeding the speed limit,
          * clamp down harder on the bytes available */
@@ -284,9 +284,9 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteC
         }
     }
 
-    if (this->parent != nullptr && this->band[dir].honorParentLimits && byteCount > 0)
+    if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byteCount > 0)
     {
-        byteCount = this->parent->clamp(now, dir, byteCount);
+        byteCount = this->parent_->clamp(now, dir, byteCount);
     }
 
     return byteCount;
@@ -296,11 +296,11 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    Band* band_ = &this->band[dir];
+    Band* band = &this->band_[dir];
 
-    if (band_->isLimited && isPieceData)
+    if (band->is_limited_ && isPieceData)
     {
-        band_->bytesLeft -= std::min(size_t{ band_->bytesLeft }, byteCount);
+        band->bytes_left_ -= std::min(size_t{ band->bytes_left_ }, byteCount);
     }
 
 #ifdef DEBUG_DIRECTION
@@ -319,15 +319,15 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool
 
 #endif
 
-    notifyBandwidthConsumedBytes(now, &band_->raw, byteCount);
+    notifyBandwidthConsumedBytes(now, &band->raw_, byteCount);
 
     if (isPieceData)
     {
-        notifyBandwidthConsumedBytes(now, &band_->piece, byteCount);
+        notifyBandwidthConsumedBytes(now, &band->piece_, byteCount);
     }
 
-    if (this->parent != nullptr)
+    if (this->parent_ != nullptr)
     {
-        this->parent->notifyBandwidthConsumed(dir, byteCount, isPieceData, now);
+        this->parent_->notifyBandwidthConsumed(dir, byteCount, isPieceData, now);
     }
 }
