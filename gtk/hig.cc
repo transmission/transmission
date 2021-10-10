@@ -1,169 +1,153 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
-#include <gtk/gtk.h>
-
 #include <libtransmission/tr-macros.h>
 
 #include "hig.h"
 
-GtkWidget* hig_workarea_create(void)
+HigWorkarea::HigWorkarea()
 {
-    GtkWidget* grid = gtk_grid_new();
-
-    gtk_container_set_border_width(GTK_CONTAINER(grid), GUI_PAD_BIG);
-    gtk_grid_set_row_spacing(GTK_GRID(grid), GUI_PAD);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), GUI_PAD_BIG);
-
-    return grid;
+    set_border_width(GUI_PAD_BIG);
+    set_row_spacing(GUI_PAD);
+    set_column_spacing(GUI_PAD_BIG);
 }
 
-void hig_workarea_add_section_divider(GtkWidget* t, guint* row)
+void HigWorkarea::add_section_divider(guint& row)
 {
-    GtkWidget* w = gtk_fixed_new();
-
-    gtk_widget_set_size_request(w, 0U, 6U);
-    gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
-    ++*row;
+    auto* w = Gtk::make_managed<Gtk::Fixed>();
+    w->set_size_request(0U, 6U);
+    attach(*w, 0, row, 2, 1);
+    ++row;
 }
 
-void hig_workarea_add_section_title_widget(GtkWidget* t, guint* row, GtkWidget* w)
+void HigWorkarea::add_section_title_widget(guint& row, Gtk::Widget& w)
 {
-    gtk_widget_set_hexpand(w, TRUE);
-    gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
-    ++*row;
+    w.set_hexpand(true);
+    attach(w, 0, row, 2, 1);
+    ++row;
 }
 
-void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* section_title)
+void HigWorkarea::add_section_title(guint& row, Glib::ustring const& section_title)
 {
-    char buf[512];
-    GtkWidget* l;
-
-    g_snprintf(buf, sizeof(buf), "<b>%s</b>", section_title);
-    l = gtk_label_new(buf);
-    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, nullptr);
-    gtk_label_set_use_markup(GTK_LABEL(l), TRUE);
-    hig_workarea_add_section_title_widget(t, row, l);
+    auto* l = Gtk::make_managed<Gtk::Label>(Glib::ustring::sprintf("<b>%s</b>", section_title));
+    l->set_halign(Gtk::ALIGN_START);
+    l->set_valign(Gtk::ALIGN_CENTER);
+    l->set_use_markup(true);
+    add_section_title_widget(row, *l);
 }
 
-void hig_workarea_add_wide_control(GtkWidget* t, guint* row, GtkWidget* w)
+void HigWorkarea::add_wide_control(guint& row, Gtk::Widget& w)
 {
-    gtk_widget_set_hexpand(w, TRUE);
+    w.set_hexpand(true);
 #if GTK_CHECK_VERSION(3, 12, 0)
-    gtk_widget_set_margin_start(w, 18);
+    w.set_margin_start(18);
 #else
-    gtk_widget_set_margin_left(w, 18);
+    w.set_margin_left(18);
 #endif
-    gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
-    ++*row;
+    attach(w, 0, row, 2, 1);
+    ++row;
 }
 
-void hig_workarea_add_wide_tall_control(GtkWidget* t, guint* row, GtkWidget* w)
+void HigWorkarea::add_wide_tall_control(guint& row, Gtk::Widget& w)
 {
-    gtk_widget_set_hexpand(w, TRUE);
-    gtk_widget_set_vexpand(w, TRUE);
-    hig_workarea_add_wide_control(t, row, w);
+    w.set_hexpand(true);
+    w.set_vexpand(true);
+    add_wide_control(row, w);
 }
 
-GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char const* mnemonic_string, gboolean is_active)
+Gtk::CheckButton* HigWorkarea::add_wide_checkbutton(guint& row, Glib::ustring const& mnemonic_string, bool is_active)
 {
-    GtkWidget* w = gtk_check_button_new_with_mnemonic(mnemonic_string);
-
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), is_active);
-    hig_workarea_add_wide_control(t, row, w);
+    auto* w = Gtk::make_managed<Gtk::CheckButton>(mnemonic_string, true);
+    w->set_active(is_active);
+    add_wide_control(row, *w);
     return w;
 }
 
-void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
+void HigWorkarea::add_label_w(guint row, Gtk::Widget& w)
 {
 #if GTK_CHECK_VERSION(3, 12, 0)
-    gtk_widget_set_margin_start(w, 18);
+    w.set_margin_start(18);
 #else
-    gtk_widget_set_margin_left(w, 18);
+    w.set_margin_left(18);
 #endif
 
-    if (GTK_IS_LABEL(w))
+    if (auto* label = dynamic_cast<Gtk::Label*>(&w); label != nullptr)
     {
-        g_object_set(
-            w,
-            TR_ARG_TUPLE("halign", GTK_ALIGN_START),
-            TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER),
-            TR_ARG_TUPLE("use-markup", TRUE),
-            nullptr);
+        label->set_halign(Gtk::ALIGN_START);
+        label->set_valign(Gtk::ALIGN_CENTER);
+        label->set_use_markup(true);
     }
 
-    gtk_grid_attach(GTK_GRID(t), w, 0, row, 1, 1);
+    attach(w, 0, row, 1, 1);
 }
 
-static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* control)
+void HigWorkarea::add_tall_control(guint row, Gtk::Widget& control)
 {
-    if (GTK_IS_LABEL(control))
+    if (auto* label = dynamic_cast<Gtk::Label*>(&control); label != nullptr)
     {
-        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), nullptr);
+        label->set_halign(Gtk::ALIGN_START);
+        label->set_valign(Gtk::ALIGN_CENTER);
     }
 
-    g_object_set(control, "expand", TRUE, nullptr);
-    gtk_grid_attach(GTK_GRID(t), control, 1, row, 1, 1);
+    control.set_hexpand(true);
+    control.set_vexpand(true);
+    attach(control, 1, row, 1, 1);
 }
 
-static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control)
+void HigWorkarea::add_control(guint row, Gtk::Widget& control)
 {
-    if (GTK_IS_LABEL(control))
+    if (auto* label = dynamic_cast<Gtk::Label*>(&control); label != nullptr)
     {
-        g_object_set(control, TR_ARG_TUPLE("halign", GTK_ALIGN_START), TR_ARG_TUPLE("valign", GTK_ALIGN_CENTER), nullptr);
+        label->set_halign(Gtk::ALIGN_START);
+        label->set_valign(Gtk::ALIGN_CENTER);
     }
 
-    gtk_widget_set_hexpand(control, TRUE);
-    gtk_grid_attach(GTK_GRID(t), control, 1, row, 1, 1);
+    control.set_hexpand(true);
+    attach(control, 1, row, 1, 1);
 }
 
-void hig_workarea_add_row_w(GtkWidget* t, guint* row, GtkWidget* label, GtkWidget* control, GtkWidget* mnemonic)
+void HigWorkarea::add_row_w(guint& row, Gtk::Widget& label_widget, Gtk::Widget& control, Gtk::Widget* mnemonic)
 {
-    hig_workarea_add_label_w(t, *row, label);
-    hig_workarea_add_control(t, *row, control);
+    add_label_w(row, label_widget);
+    add_control(row, control);
 
-    if (GTK_IS_LABEL(label))
+    if (auto* label = dynamic_cast<Gtk::Label*>(&label_widget); label != nullptr)
     {
-        gtk_label_set_mnemonic_widget(GTK_LABEL(label), mnemonic ? mnemonic : control);
+        label->set_mnemonic_widget(mnemonic != nullptr ? *mnemonic : control);
     }
 
-    ++*row;
+    ++row;
 }
 
-GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_string, GtkWidget* control, GtkWidget* mnemonic)
+Gtk::Label* HigWorkarea::add_row(guint& row, Glib::ustring const& mnemonic_string, Gtk::Widget& control, Gtk::Widget* mnemonic)
 {
-    GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);
-
-    hig_workarea_add_row_w(t, row, l, control, mnemonic);
+    auto* l = Gtk::make_managed<Gtk::Label>(mnemonic_string, true);
+    add_row_w(row, *l, control, mnemonic);
     return l;
 }
 
-GtkWidget* hig_workarea_add_tall_row(
-    GtkWidget* table,
-    guint* row,
-    char const* mnemonic_string,
-    GtkWidget* control,
-    GtkWidget* mnemonic)
+Gtk::Label* HigWorkarea::add_tall_row(
+    guint& row,
+    Glib::ustring const& mnemonic_string,
+    Gtk::Widget& control,
+    Gtk::Widget* mnemonic)
 {
-    GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);
-    GtkWidget* h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    GtkWidget* v = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start(GTK_BOX(h), l, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(v), h, FALSE, FALSE, GUI_PAD_SMALL);
+    auto* l = Gtk::make_managed<Gtk::Label>(mnemonic_string, true);
+    auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, 0);
+    auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
+    h->pack_start(*l, false, false, 0);
+    v->pack_start(*h, false, false, GUI_PAD_SMALL);
 
-    hig_workarea_add_label_w(table, *row, v);
-    hig_workarea_add_tall_control(table, *row, control);
+    add_label_w(row, *v);
+    add_tall_control(row, control);
 
-    if (GTK_IS_LABEL(l))
-    {
-        gtk_label_set_mnemonic_widget(GTK_LABEL(l), mnemonic ? mnemonic : control);
-    }
+    l->set_mnemonic_widget(mnemonic ? *mnemonic : control);
 
-    ++*row;
+    ++row;
     return l;
 }

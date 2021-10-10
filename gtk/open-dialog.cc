@@ -498,15 +498,15 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, TrCore* co
     signal_response().connect([this, core](int response) { onOpenURLResponse(response, core); });
 
     row = 0;
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Open torrent from URL"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Open torrent from URL"));
     auto* e = Gtk::make_managed<Gtk::Entry>();
     e->set_size_request(400, -1);
     gtr_paste_clipboard_url_into_entry(Glib::unwrap(static_cast<Gtk::Widget*>(e)));
     set_data("url-entry", e);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("_URL"), Glib::unwrap(static_cast<Gtk::Widget*>(e)), nullptr);
+    t->add_row(row, _("_URL"), *e);
 
-    gtr_dialog_set_content(Glib::unwrap(this), Glib::unwrap(t));
+    gtr_dialog_set_content(Glib::unwrap(this), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 
     if (e->get_text_length() == 0)
     {

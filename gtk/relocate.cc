@@ -159,8 +159,8 @@ RelocateDialog::Impl::Impl(RelocateDialog& dialog, TrCore* core, std::vector<int
     dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
 
     row = 0;
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Location"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Location"));
 
     if (previousLocation.empty())
     {
@@ -169,20 +169,14 @@ RelocateDialog::Impl::Impl(RelocateDialog& dialog, TrCore* core, std::vector<int
 
     chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(_("Set Torrent Location"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
     chooser_->set_current_folder(previousLocation);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Torrent _location:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(chooser_)),
-        nullptr);
+    t->add_row(row, _("Torrent _location:"), *chooser_);
 
     Gtk::RadioButton::Group group;
 
     move_tb_ = Gtk::make_managed<Gtk::RadioButton>(group, _("_Move from the current folder"), true);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(move_tb_)));
+    t->add_wide_control(row, *move_tb_);
 
-    auto* find_tb = Gtk::make_managed<Gtk::RadioButton>(group, _("Local data is _already there"), true);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(find_tb)));
+    t->add_wide_control(row, *Gtk::make_managed<Gtk::RadioButton>(group, _("Local data is _already there"), true));
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(t));
+    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 }

@@ -147,54 +147,44 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, TrCore* core)
     dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
     dialog_.set_default_response(Gtk::RESPONSE_CLOSE);
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Current Session"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Current Session"));
 
     one_up_lb_ = Gtk::make_managed<Gtk::Label>();
     one_up_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Uploaded:"), Glib::unwrap(static_cast<Gtk::Widget*>(one_up_lb_)), nullptr);
+    t->add_row(row, _("Uploaded:"), *one_up_lb_);
     one_down_lb_ = Gtk::make_managed<Gtk::Label>();
     one_down_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Downloaded:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(one_down_lb_)),
-        nullptr);
+    t->add_row(row, _("Downloaded:"), *one_down_lb_);
     one_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
     one_ratio_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Ratio:"), Glib::unwrap(static_cast<Gtk::Widget*>(one_ratio_lb_)), nullptr);
+    t->add_row(row, _("Ratio:"), *one_ratio_lb_);
     one_time_lb_ = Gtk::make_managed<Gtk::Label>();
     one_time_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Duration:"), Glib::unwrap(static_cast<Gtk::Widget*>(one_time_lb_)), nullptr);
+    t->add_row(row, _("Duration:"), *one_time_lb_);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Total"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Total"));
 
     all_sessions_lb_ = Gtk::make_managed<Gtk::Label>(_("Started %'d time"));
     all_sessions_lb_->set_single_line_mode(true);
-    hig_workarea_add_label_w(Glib::unwrap(t), row, Glib::unwrap(static_cast<Gtk::Widget*>(all_sessions_lb_)));
+    t->add_label_w(row, *all_sessions_lb_);
     ++row;
 
     all_up_lb_ = Gtk::make_managed<Gtk::Label>();
     all_up_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Uploaded:"), Glib::unwrap(static_cast<Gtk::Widget*>(all_up_lb_)), nullptr);
+    t->add_row(row, _("Uploaded:"), *all_up_lb_);
     all_down_lb_ = Gtk::make_managed<Gtk::Label>();
     all_down_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Downloaded:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(all_down_lb_)),
-        nullptr);
+    t->add_row(row, _("Downloaded:"), *all_down_lb_);
     all_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
     all_ratio_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Ratio:"), Glib::unwrap(static_cast<Gtk::Widget*>(all_ratio_lb_)), nullptr);
+    t->add_row(row, _("Ratio:"), *all_ratio_lb_);
     all_time_lb_ = Gtk::make_managed<Gtk::Label>();
     all_time_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Duration:"), Glib::unwrap(static_cast<Gtk::Widget*>(all_time_lb_)), nullptr);
+    t->add_row(row, _("Duration:"), *all_time_lb_);
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(t));
+    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 
     updateStats();
     dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::dialogResponse));

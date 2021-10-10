@@ -216,89 +216,55 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
 {
     guint row = 0;
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, C_("Gerund", "Adding"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, C_("Gerund", "Adding"));
 
     {
         auto* l = new_check_button(_("Automatically add .torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
         auto* w = new_path_chooser_button(TR_KEY_watch_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            nullptr);
+        t->add_row_w(row, *l, *w);
     }
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(
-            new_check_button(_("Show the Torrent Options _dialog"), TR_KEY_show_options_window, core_))));
+    t->add_wide_control(row, *new_check_button(_("Show the Torrent Options _dialog"), TR_KEY_show_options_window, core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(
-            static_cast<Gtk::Widget*>(new_check_button(_("_Start added torrents"), TR_KEY_start_added_torrents, core_))));
+    t->add_wide_control(row, *new_check_button(_("_Start added torrents"), TR_KEY_start_added_torrents, core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(
-            new_check_button(_("Mo_ve .torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Mo_ve .torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_));
 
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Save to _Location:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_path_chooser_button(TR_KEY_download_dir, core_))),
-        nullptr);
+    t->add_row(row, _("Save to _Location:"), *new_path_chooser_button(TR_KEY_download_dir, core_));
 
     freespace_label_ = Glib::wrap(GTK_LABEL(gtr_freespace_label_new(core_, nullptr)));
     freespace_label_->set_halign(Gtk::ALIGN_END);
     freespace_label_->set_valign(Gtk::ALIGN_CENTER);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(freespace_label_)));
+    t->add_wide_control(row, *freespace_label_);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Download Queue"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Download Queue"));
 
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Ma_ximum active downloads:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_download_queue_size, core_, 0, INT_MAX, 1))),
-        nullptr);
+    t->add_row(row, _("Ma_ximum active downloads:"), *new_spin_button(TR_KEY_download_queue_size, core_, 0, INT_MAX, 1));
 
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
+    t->add_row(
+        row,
         _("Downloads sharing data in the last _N minutes are active:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_queue_stalled_minutes, core_, 1, INT_MAX, 15))),
-        nullptr);
+        *new_spin_button(TR_KEY_queue_stalled_minutes, core_, 1, INT_MAX, 15));
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Incomplete"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Incomplete"));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(
-            new_check_button(_("Append \"._part\" to incomplete files' names"), TR_KEY_rename_partial_files, core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Append \"._part\" to incomplete files' names"), TR_KEY_rename_partial_files, core_));
 
     {
         auto* l = new_check_button(_("Keep _incomplete torrents in:"), TR_KEY_incomplete_dir_enabled, core_);
         auto* w = new_path_chooser_button(TR_KEY_incomplete_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_incomplete_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            nullptr);
+        t->add_row_w(row, *l, *w);
     }
 
     {
@@ -306,12 +272,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
         auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(l)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            nullptr);
+        t->add_row_w(row, *l, *w);
     }
 
     return t;
@@ -325,20 +286,15 @@ Gtk::Widget* PrefsDialog::Impl::seedingPage()
 {
     guint row = 0;
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Limits"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Limits"));
 
     {
         auto* w = new_check_button(_("Stop seeding at _ratio:"), TR_KEY_ratio_limit_enabled, core_);
         auto* w2 = new_spin_button_double(TR_KEY_ratio_limit, core_, 0, 1000, .05);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_ratio_limit_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
-            nullptr);
+        t->add_row_w(row, *w, *w2);
     }
 
     {
@@ -346,12 +302,7 @@ Gtk::Widget* PrefsDialog::Impl::seedingPage()
         auto* w2 = new_spin_button(TR_KEY_idle_seeding_limit, core_, 1, 40320, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
-            nullptr);
+        t->add_row_w(row, *w, *w2);
     }
 
     return t;
@@ -365,47 +316,31 @@ Gtk::Widget* PrefsDialog::Impl::desktopPage()
 {
     guint row = 0;
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Desktop"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Desktop"));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(
-            new_check_button(_("_Inhibit hibernation when torrents are active"), TR_KEY_inhibit_desktop_hibernation, core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("_Inhibit hibernation when torrents are active"), TR_KEY_inhibit_desktop_hibernation, core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
-            _("Show Transmission icon in the _notification area"),
-            TR_KEY_show_notification_area_icon,
-            core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Show Transmission icon in the _notification area"), TR_KEY_show_notification_area_icon, core_));
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Notification"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Notification"));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
-            _("Show a notification when torrents are a_dded"),
-            TR_KEY_torrent_added_notification_enabled,
-            core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Show a notification when torrents are a_dded"), TR_KEY_torrent_added_notification_enabled, core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
-            _("Show a notification when torrents _finish"),
-            TR_KEY_torrent_complete_notification_enabled,
-            core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Show a notification when torrents _finish"), TR_KEY_torrent_complete_notification_enabled, core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(
-            new_check_button(_("Play a _sound when torrents finish"), TR_KEY_torrent_complete_sound_enabled, core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Play a _sound when torrents finish"), TR_KEY_torrent_complete_sound_enabled, core_));
 
     return t;
 }
@@ -517,28 +452,18 @@ Gtk::Widget* PrefsDialog::Impl::privacyPage()
     auto const data = std::make_shared<blocklist_data>();
     data->core = core_;
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Privacy"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Privacy"));
 
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("_Encryption mode:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_encryption_combo(core_, TR_KEY_encryption))),
-        nullptr);
+    t->add_row(row, _("_Encryption mode:"), *new_encryption_combo(core_, TR_KEY_encryption));
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Blocklist"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Blocklist"));
 
     data->check = new_check_button(_("Enable _blocklist:"), TR_KEY_blocklist_enabled, core_);
     auto* e = new_entry(TR_KEY_blocklist_url, core_);
     e->set_size_request(300, -1);
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(data->check)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(e)),
-        nullptr);
+    t->add_row_w(row, *data->check, *e);
     data->check->signal_toggled().connect([data, e]() { target_cb(data->check, e); });
     target_cb(data->check, e);
 
@@ -555,12 +480,12 @@ Gtk::Widget* PrefsDialog::Impl::privacyPage()
     h->pack_start(*data->updateBlocklistButton, false, false, 0);
     data->check->signal_toggled().connect([data]() { target_cb(data->check, data->label); });
     target_cb(data->check, data->label);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h)));
+    t->add_wide_control(row, *h);
     e->signal_changed().connect([data, e]() { on_blocklist_url_changed(e, data->updateBlocklistButton); });
     on_blocklist_url_changed(e, data->updateBlocklistButton);
 
     auto* update_check = new_check_button(_("Enable _automatic updates"), TR_KEY_blocklist_updates_enabled, core_);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(update_check)));
+    t->add_wide_control(row, *update_check);
     data->check->signal_toggled().connect([data, update_check]() { target_cb(data->check, update_check); });
     target_cb(data->check, update_check);
 
@@ -712,9 +637,9 @@ Gtk::Widget* PrefsDialog::Impl::remotePage()
 
     page->core = core_;
 
-    auto* t = Glib::wrap(hig_workarea_create());
+    auto* t = Gtk::make_managed<HigWorkarea>();
 
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Remote Control"));
+    t->add_section_title(row, _("Remote Control"));
 
     /* "enabled" checkbutton */
     page->rpc_tb = new_check_button(_("Allow _remote access"), TR_KEY_rpc_enabled, core_);
@@ -725,48 +650,33 @@ Gtk::Widget* PrefsDialog::Impl::remotePage()
     page->widgets.push_back(open_button);
     open_button->signal_clicked().connect(&onLaunchClutchCB);
     h1->pack_start(*open_button, false, false, 0);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h1)));
+    t->add_wide_control(row, *h1);
 
     /* port */
     auto* port_spin = new_spin_button(TR_KEY_rpc_port, core_, 0, USHRT_MAX, 1);
     page->widgets.push_back(port_spin);
-    page->widgets.push_back(Glib::wrap(hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("HTTP _port:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(port_spin)),
-        nullptr)));
+    page->widgets.push_back(t->add_row(row, _("HTTP _port:"), *port_spin));
 
     /* require authentication */
     page->auth_tb = new_check_button(_("Use _authentication"), TR_KEY_rpc_authentication_required, core_);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(page->auth_tb)));
+    t->add_wide_control(row, *page->auth_tb);
     page->widgets.push_back(page->auth_tb);
     page->auth_tb->signal_clicked().connect([page]() { refreshRPCSensitivity(page); });
 
     /* username */
     auto* username_entry = new_entry(TR_KEY_rpc_username, core_);
     page->auth_widgets.push_back(username_entry);
-    page->auth_widgets.push_back(Glib::wrap(hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("_Username:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(username_entry)),
-        nullptr)));
+    page->auth_widgets.push_back(t->add_row(row, _("_Username:"), *username_entry));
 
     /* password */
     auto* password_entry = new_entry(TR_KEY_rpc_password, core_);
     password_entry->set_visibility(false);
     page->auth_widgets.push_back(password_entry);
-    page->auth_widgets.push_back(Glib::wrap(hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Pass_word:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(password_entry)),
-        nullptr)));
+    page->auth_widgets.push_back(t->add_row(row, _("Pass_word:"), *password_entry));
 
     /* require authentication */
     page->whitelist_tb = new_check_button(_("Only allow these IP a_ddresses:"), TR_KEY_rpc_whitelist_enabled, core_);
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(page->whitelist_tb)));
+    t->add_wide_control(row, *page->whitelist_tb);
     page->widgets.push_back(page->whitelist_tb);
     page->whitelist_tb->signal_clicked().connect([page]() { refreshRPCSensitivity(page); });
 
@@ -797,12 +707,7 @@ Gtk::Widget* PrefsDialog::Impl::remotePage()
         page->view->append_column(*c);
         page->view->set_headers_visible(false);
 
-        auto* w = Glib::wrap(hig_workarea_add_row(
-            Glib::unwrap(t),
-            &row,
-            _("Addresses:"),
-            Glib::unwrap(static_cast<Gtk::Widget*>(view_frame)),
-            nullptr));
+        auto* w = t->add_row(row, _("Addresses:"), *view_frame);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_START);
         w->set_margin_top(GUI_PAD);
@@ -820,7 +725,7 @@ Gtk::Widget* PrefsDialog::Impl::remotePage()
         h2->set_halign(Gtk::ALIGN_END);
         h2->set_valign(Gtk::ALIGN_CENTER);
         h2->pack_start(*add_button, true, true, 0);
-        hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h2)));
+        t->add_wide_control(row, *h2);
     }
 
     refreshRPCSensitivity(page);
@@ -921,8 +826,8 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     guint row = 0;
     auto page = std::make_shared<BandwidthPage>();
 
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Speed Limits"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Speed Limits"));
 
     {
         auto* w = new_check_button(
@@ -932,12 +837,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         auto* w2 = new_spin_button(TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
-            nullptr);
+        t->add_row_w(row, *w, *w2);
     }
 
     {
@@ -948,15 +848,10 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         auto* w2 = new_spin_button(TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w2)),
-            nullptr);
+        t->add_row_w(row, *w, *w2);
     }
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    t->add_section_divider(row);
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
@@ -966,7 +861,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         w->set_use_markup(true);
         h->pack_start(*w, false, false, 0);
         h->pack_start(*Gtk::make_managed<Gtk::Image>("alt-speed-on", Gtk::ICON_SIZE_MENU), false, false, 0);
-        hig_workarea_add_section_title_widget(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(h)));
+        t->add_section_title_widget(row, *h);
     }
 
     {
@@ -975,28 +870,18 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
-        hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+        t->add_wide_control(row, *w);
     }
 
-    {
-        auto* w = new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5);
-        hig_workarea_add_row(
-            Glib::unwrap(t),
-            &row,
-            Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)).c_str(),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            nullptr);
-    }
+    t->add_row(
+        row,
+        Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)).c_str(),
+        *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
-    {
-        auto* w = new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5);
-        hig_workarea_add_row(
-            Glib::unwrap(t),
-            &row,
-            Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)).c_str(),
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            nullptr);
-    }
+    t->add_row(
+        row,
+        Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)).c_str(),
+        *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, 0);
@@ -1012,23 +897,12 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         h->pack_start(*end_combo, true, true, 0);
         auto* w = new_check_button(_("_Scheduled times:"), TR_KEY_alt_speed_time_enabled, core_);
         w->signal_toggled().connect([page]() { refreshSchedSensitivity(page); });
-        hig_workarea_add_row_w(
-            Glib::unwrap(t),
-            &row,
-            Glib::unwrap(static_cast<Gtk::Widget*>(w)),
-            Glib::unwrap(static_cast<Gtk::Widget*>(h)),
-            nullptr);
+        t->add_row_w(row, *w, *h);
     }
 
     auto* week_combo = new_week_combo(core_, TR_KEY_alt_speed_time_day);
     page->sched_widgets.push_back(week_combo);
-    auto* week_row = Glib::wrap(hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("_On days:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(week_combo)),
-        nullptr));
-    page->sched_widgets.push_back(week_row);
+    page->sched_widgets.push_back(t->add_row(row, _("_On days:"), *week_combo));
 
     refreshSchedSensitivity(page);
     return t;
@@ -1108,16 +982,11 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     data->core = core_;
 
     /* build the page */
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Listening Port"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Listening Port"));
 
     data->portSpin = new_spin_button(TR_KEY_peer_port, core_, 1, USHRT_MAX, 1);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("_Port used for incoming connections:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(data->portSpin)),
-        nullptr);
+    t->add_row(row, _("_Port used for incoming connections:"), *data->portSpin);
 
     auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
     data->portLabel = Gtk::make_managed<Gtk::Label>(_("Status unknown"));
@@ -1127,63 +996,48 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     data->portButton = Gtk::make_managed<Gtk::Button>(_("Te_st Port"), true);
     h->pack_end(*data->portButton, false, false, 0);
     data->portButton->signal_clicked().connect([data]() { onPortTest(data); });
-    hig_workarea_add_row(Glib::unwrap(t), &row, nullptr, Glib::unwrap(static_cast<Gtk::Widget*>(h)), nullptr);
+    t->add_row(row, {}, *h);
     data->prefsTag = g_signal_connect(core_, "prefs-changed", G_CALLBACK(onCorePrefsChanged), data.get());
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
+    t->add_wide_control(
+        row,
+        *new_check_button(
             _("Pick a _random port every time Transmission is started"),
             TR_KEY_peer_port_random_on_start,
-            core_))));
+            core_));
 
-    hig_workarea_add_wide_control(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_check_button(
-            _("Use UPnP or NAT-PMP port _forwarding from my router"),
-            TR_KEY_port_forwarding_enabled,
-            core_))));
+    t->add_wide_control(
+        row,
+        *new_check_button(_("Use UPnP or NAT-PMP port _forwarding from my router"), TR_KEY_port_forwarding_enabled, core_));
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Peer Limits"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Peer Limits"));
 
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Maximum peers per _torrent:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_peer_limit_per_torrent, core_, 1, FD_SETSIZE, 5))),
-        nullptr);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Maximum peers _overall:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(new_spin_button(TR_KEY_peer_limit_global, core_, 1, FD_SETSIZE, 5))),
-        nullptr);
+    t->add_row(row, _("Maximum peers per _torrent:"), *new_spin_button(TR_KEY_peer_limit_per_torrent, core_, 1, FD_SETSIZE, 5));
+    t->add_row(row, _("Maximum peers _overall:"), *new_spin_button(TR_KEY_peer_limit_global, core_, 1, FD_SETSIZE, 5));
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Options"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Options"));
 
     Gtk::CheckButton* w;
 
 #ifdef WITH_UTP
     w = new_check_button(_("Enable _uTP for peer communication"), TR_KEY_utp_enabled, core_);
     w->set_tooltip_text(_("uTP is a tool for reducing network congestion."));
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+    t->add_wide_control(row, *w);
 #endif
 
     w = new_check_button(_("Use PE_X to find more peers"), TR_KEY_pex_enabled, core_);
     w->set_tooltip_text(_("PEX is a tool for exchanging peer lists with the peers you're connected to."));
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+    t->add_wide_control(row, *w);
 
     w = new_check_button(_("Use _DHT to find more peers"), TR_KEY_dht_enabled, core_);
     w->set_tooltip_text(_("DHT is a tool for finding peers without a tracker."));
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+    t->add_wide_control(row, *w);
 
     w = new_check_button(_("Use _Local Peer Discovery to find more peers"), TR_KEY_lpd_enabled, core_);
     w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
-    hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(w)));
+    t->add_wide_control(row, *w);
 
     return t;
 }

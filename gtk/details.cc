@@ -459,11 +459,10 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     char buf[128];
 
     row = 0;
-    auto* t = Glib::wrap(hig_workarea_create());
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Speed"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Speed"));
 
-    honor_limits_check_ = Glib::wrap(
-        GTK_CHECK_BUTTON(hig_workarea_add_wide_checkbutton(Glib::unwrap(t), &row, _("Honor global _limits"), 0)));
+    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), 0);
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
@@ -476,12 +475,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     down_limit_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(down_limited_check_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(down_limit_spin_)),
-        nullptr);
+    t->add_row_w(row, *down_limited_check_, *down_limit_spin_);
 
     g_snprintf(buf, sizeof(buf), _("Limit _upload speed (%s):"), _(speed_K_str));
     up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(buf, true);
@@ -491,25 +485,15 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     up_limit_sping_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(0, 0, INT_MAX, 5));
     up_limit_spin_tag_ = up_limit_sping_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_uploadLimit, up_limit_sping_->get_value_as_int()); });
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(up_limited_check_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(up_limit_sping_)),
-        nullptr);
+    t->add_row_w(row, *up_limited_check_, *up_limit_sping_);
 
     bandwidth_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_priority_combo_new()));
     bandwidth_combo_tag_ = bandwidth_combo_->signal_changed().connect(
         [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_priority_combo_get_value(Glib::unwrap(bandwidth_combo_))); });
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Torrent _priority:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(bandwidth_combo_)),
-        nullptr);
+    t->add_row(row, _("Torrent _priority:"), *bandwidth_combo_);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Seeding Limits"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Seeding Limits"));
 
     auto* h1 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
     ratio_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
@@ -529,7 +513,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     ratio_spin_tag_ = ratio_spin_->signal_value_changed().connect(
         [this]() { torrent_set_real(TR_KEY_seedRatioLimit, ratio_spin_->get_value()); });
     h1->pack_start(*ratio_spin_, false, false, 0);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("_Ratio:"), Glib::unwrap(static_cast<Gtk::Widget*>(h1)), nullptr);
+    t->add_row(row, _("_Ratio:"), *h1);
 
     auto* h2 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
     idle_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
@@ -548,18 +532,13 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     idle_spin_tag_ = idle_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_seedIdleLimit, idle_spin_->get_value_as_int()); });
     h2->pack_start(*idle_spin_, false, false, 0);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("_Idle:"), Glib::unwrap(static_cast<Gtk::Widget*>(h2)), nullptr);
+    t->add_row(row, _("_Idle:"), *h2);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Peer Connections"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Peer Connections"));
 
     max_peers_spin_ = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(1, 1, 3000, 5));
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("_Maximum peers:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(max_peers_spin_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(max_peers_spin_)));
+    t->add_row(row, _("_Maximum peers:"), *max_peers_spin_, max_peers_spin_);
     max_peers_spin_tag_ = max_peers_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_peer_limit, max_peers_spin_->get_value_as_int()); });
 
@@ -1096,101 +1075,81 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 Gtk::Widget* DetailsDialog::Impl::info_page_new()
 {
     guint row = 0;
-    Gtk::Widget* t = Glib::wrap(hig_workarea_create());
+    auto* t = Gtk::make_managed<HigWorkarea>();
 
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Activity"));
+    t->add_section_title(row, _("Activity"));
 
     /* size */
     size_lb_ = Gtk::make_managed<Gtk::Label>();
     size_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Torrent size:"), Glib::unwrap(static_cast<Gtk::Widget*>(size_lb_)), nullptr);
+    t->add_row(row, _("Torrent size:"), *size_lb_);
 
     /* have */
     have_lb_ = Gtk::make_managed<Gtk::Label>();
     have_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Have:"), Glib::unwrap(static_cast<Gtk::Widget*>(have_lb_)), nullptr);
+    t->add_row(row, _("Have:"), *have_lb_);
 
     /* uploaded */
     ul_lb_ = Gtk::make_managed<Gtk::Label>();
     ul_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Uploaded:"), Glib::unwrap(static_cast<Gtk::Widget*>(ul_lb_)), nullptr);
+    t->add_row(row, _("Uploaded:"), *ul_lb_);
 
     /* downloaded */
     dl_lb_ = Gtk::make_managed<Gtk::Label>();
     dl_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Downloaded:"), Glib::unwrap(static_cast<Gtk::Widget*>(dl_lb_)), nullptr);
+    t->add_row(row, _("Downloaded:"), *dl_lb_);
 
     /* state */
     state_lb_ = Gtk::make_managed<Gtk::Label>();
     state_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("State:"), Glib::unwrap(static_cast<Gtk::Widget*>(state_lb_)), nullptr);
+    t->add_row(row, _("State:"), *state_lb_);
 
     /* running for */
     date_started_lb_ = Gtk::make_managed<Gtk::Label>();
     date_started_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Running time:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(date_started_lb_)),
-        nullptr);
+    t->add_row(row, _("Running time:"), *date_started_lb_);
 
     /* eta */
     eta_lb_ = Gtk::make_managed<Gtk::Label>();
     eta_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Remaining time:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(eta_lb_)),
-        nullptr);
+    t->add_row(row, _("Remaining time:"), *eta_lb_);
 
     /* last activity */
     last_activity_lb_ = Gtk::make_managed<Gtk::Label>();
     last_activity_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Last activity:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(last_activity_lb_)),
-        nullptr);
+    t->add_row(row, _("Last activity:"), *last_activity_lb_);
 
     /* error */
     error_lb_ = Gtk::make_managed<Gtk::Label>();
     error_lb_->set_selectable(true);
     error_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Error:"), Glib::unwrap(static_cast<Gtk::Widget*>(error_lb_)), nullptr);
+    t->add_row(row, _("Error:"), *error_lb_);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Details"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Details"));
 
     /* destination */
     destination_lb_ = Gtk::make_managed<Gtk::Label>();
     destination_lb_->set_selectable(true);
     destination_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Location:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(destination_lb_)),
-        nullptr);
+    t->add_row(row, _("Location:"), *destination_lb_);
 
     /* hash */
     hash_lb_ = Gtk::make_managed<Gtk::Label>();
     hash_lb_->set_selectable(true);
     hash_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Hash:"), Glib::unwrap(static_cast<Gtk::Widget*>(hash_lb_)), nullptr);
+    t->add_row(row, _("Hash:"), *hash_lb_);
 
     /* privacy */
     privacy_lb_ = Gtk::make_managed<Gtk::Label>();
     privacy_lb_->set_single_line_mode(true);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Privacy:"), Glib::unwrap(static_cast<Gtk::Widget*>(privacy_lb_)), nullptr);
+    t->add_row(row, _("Privacy:"), *privacy_lb_);
 
     /* origins */
     origin_lb_ = Gtk::make_managed<Gtk::Label>();
     origin_lb_->set_selectable(true);
     origin_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
-    hig_workarea_add_row(Glib::unwrap(t), &row, _("Origin:"), Glib::unwrap(static_cast<Gtk::Widget*>(origin_lb_)), nullptr);
+    t->add_row(row, _("Origin:"), *origin_lb_);
 
     /* comment */
     comment_buffer_ = Gtk::TextBuffer::create();
@@ -1204,12 +1163,11 @@ Gtk::Widget* DetailsDialog::Impl::info_page_new()
     auto* fr = Gtk::make_managed<Gtk::Frame>();
     fr->set_shadow_type(Gtk::SHADOW_IN);
     fr->add(*sw);
-    auto* w = Glib::wrap(
-        hig_workarea_add_tall_row(Glib::unwrap(t), &row, _("Comment:"), Glib::unwrap(static_cast<Gtk::Widget*>(fr)), nullptr));
+    auto* w = t->add_tall_row(row, _("Comment:"), *fr);
     w->set_halign(Gtk::ALIGN_START);
     w->set_valign(Gtk::ALIGN_START);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
+    t->add_section_divider(row);
     return t;
 }
 
@@ -2416,8 +2374,8 @@ void DetailsDialog::Impl::on_edit_trackers()
         d->signal_response().connect([this, d](int response) { on_edit_trackers_response(response, d); });
 
         row = 0;
-        auto* t = Glib::wrap(hig_workarea_create());
-        hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Tracker Announce URLs"));
+        auto* t = Gtk::make_managed<HigWorkarea>();
+        t->add_section_title(row, _("Tracker Announce URLs"));
 
         auto* l = Gtk::make_managed<Gtk::Label>();
         l->set_markup(
@@ -2426,7 +2384,7 @@ void DetailsDialog::Impl::on_edit_trackers()
         l->set_justify(Gtk::JUSTIFY_LEFT);
         l->set_halign(Gtk::ALIGN_START);
         l->set_valign(Gtk::ALIGN_CENTER);
-        hig_workarea_add_wide_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(l)));
+        t->add_wide_control(row, *l);
 
         auto* w = Gtk::make_managed<Gtk::TextView>();
         w->get_buffer()->set_text(get_editable_tracker_list(tor));
@@ -2437,9 +2395,9 @@ void DetailsDialog::Impl::on_edit_trackers()
         sw->add(*w);
         fr->add(*sw);
         fr->set_size_request(500U, 166U);
-        hig_workarea_add_wide_tall_control(Glib::unwrap(t), &row, Glib::unwrap(static_cast<Gtk::Widget*>(fr)));
+        t->add_wide_tall_control(row, *fr);
 
-        gtr_dialog_set_content(Glib::unwrap(d), Glib::unwrap(t));
+        gtr_dialog_set_content(Glib::unwrap(d), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 
         d->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(torrent_id));
         d->set_data(TEXT_BUFFER_KEY, w->get_buffer().get());
@@ -2519,15 +2477,15 @@ void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
         w->signal_response().connect([this, w](int response) { on_add_tracker_response(response, w); });
 
         row = 0;
-        auto* t = Glib::wrap(hig_workarea_create());
-        hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Tracker"));
+        auto* t = Gtk::make_managed<HigWorkarea>();
+        t->add_section_title(row, _("Tracker"));
         auto* e = Gtk::make_managed<Gtk::Entry>();
         e->set_size_request(400, -1);
         gtr_paste_clipboard_url_into_entry(Glib::unwrap(static_cast<Gtk::Widget*>(e)));
         w->set_data(URL_ENTRY_KEY, e);
         w->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(tr_torrentId(tor)));
-        hig_workarea_add_row(Glib::unwrap(t), &row, _("_Announce URL:"), Glib::unwrap(static_cast<Gtk::Widget*>(e)), nullptr);
-        gtr_dialog_set_content(Glib::unwrap(w), Glib::unwrap(t));
+        t->add_row(row, _("_Announce URL:"), *e);
+        gtr_dialog_set_content(Glib::unwrap(w), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 
         w->show_all();
     }

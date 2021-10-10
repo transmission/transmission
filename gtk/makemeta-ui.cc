@@ -432,18 +432,13 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
     dialog_.add_button(_("_New"), Gtk::RESPONSE_ACCEPT);
     dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
 
-    auto* t = Glib::wrap(hig_workarea_create());
+    auto* t = Gtk::make_managed<HigWorkarea>();
 
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Files"));
+    t->add_section_title(row, _("Files"));
 
     destination_chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
     destination_chooser_->set_current_folder(Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP));
-    hig_workarea_add_row(
-        Glib::unwrap(t),
-        &row,
-        _("Sa_ve to:"),
-        Glib::unwrap(static_cast<Gtk::Widget*>(destination_chooser_)),
-        nullptr);
+    t->add_row(row, _("Sa_ve to:"), *destination_chooser_);
 
     Gtk::RadioButton::Group slist;
 
@@ -454,12 +449,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
     folder_radio_->signal_toggled().connect([this]() { onSourceToggled(folder_radio_, folder_chooser_); });
     folder_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(folder_chooser_); });
     folder_chooser_->set_sensitive(false);
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(folder_radio_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(folder_chooser_)),
-        nullptr);
+    t->add_row_w(row, *folder_radio_, *folder_chooser_);
 
     file_radio_ = Gtk::make_managed<Gtk::RadioButton>(slist, _("Source _File:"), true);
     file_radio_->set_active(true);
@@ -467,19 +457,14 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
     file_radio_->signal_toggled().connect([this]() { onSourceToggled2(file_radio_, file_chooser_); });
     file_radio_->signal_toggled().connect([this]() { onSourceToggled(file_radio_, file_chooser_); });
     file_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(file_chooser_); });
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(file_radio_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(file_chooser_)),
-        nullptr);
+    t->add_row_w(row, *file_radio_, *file_chooser_);
 
     pieces_lb_ = Gtk::make_managed<Gtk::Label>();
     pieces_lb_->set_markup(_("<i>No source selected</i>"));
-    hig_workarea_add_row(Glib::unwrap(t), &row, nullptr, Glib::unwrap(static_cast<Gtk::Widget*>(pieces_lb_)), nullptr);
+    t->add_row(row, {}, *pieces_lb_);
 
-    hig_workarea_add_section_divider(Glib::unwrap(t), &row);
-    hig_workarea_add_section_title(Glib::unwrap(t), &row, _("Properties"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Properties"));
 
     auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD_SMALL);
     announce_text_buffer_ = Gtk::TextBuffer::create();
@@ -500,24 +485,18 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
     l->set_halign(Gtk::ALIGN_START);
     l->set_valign(Gtk::ALIGN_CENTER);
     v->pack_start(*l, false, false, 0);
-    hig_workarea_add_tall_row(Glib::unwrap(t), &row, _("_Trackers:"), Glib::unwrap(static_cast<Gtk::Widget*>(v)), nullptr);
+    t->add_tall_row(row, _("_Trackers:"), *v);
 
     comment_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Co_mment:"), true);
     comment_check_->set_active(false);
     comment_entry_ = Gtk::make_managed<Gtk::Entry>();
     comment_entry_->set_sensitive(false);
     comment_check_->signal_toggled().connect([this]() { onSourceToggled(comment_check_, comment_entry_); });
-    hig_workarea_add_row_w(
-        Glib::unwrap(t),
-        &row,
-        Glib::unwrap(static_cast<Gtk::Widget*>(comment_check_)),
-        Glib::unwrap(static_cast<Gtk::Widget*>(comment_entry_)),
-        nullptr);
+    t->add_row_w(row, *comment_check_, *comment_entry_);
 
-    private_check_ = Glib::wrap(
-        GTK_CHECK_BUTTON(hig_workarea_add_wide_checkbutton(Glib::unwrap(t), &row, _("_Private torrent"), false)));
+    private_check_ = t->add_wide_checkbutton(row, _("_Private torrent"), false);
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(t));
+    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
 
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();
