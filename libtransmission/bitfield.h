@@ -25,7 +25,10 @@ public:
     ***/
     explicit Bitfield(size_t bit_count);
 
-    Bitfield(): Bitfield(0) {}
+    Bitfield()
+        : Bitfield(0)
+    {
+    }
 
     ~Bitfield()
     {
