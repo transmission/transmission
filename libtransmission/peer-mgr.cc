@@ -2305,7 +2305,6 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_t list_mode, size_t max)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(setme_pex != nullptr);
     TR_ASSERT(af == TR_AF_INET || af == TR_AF_INET6);
     TR_ASSERT(list_mode == TR_PEERS_CONNECTED || list_mode == TR_PEERS_INTERESTING);
 
