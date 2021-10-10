@@ -1410,7 +1410,7 @@ void Application::remove_selected(bool delete_files)
 
     if (!l.empty())
     {
-        gtr_confirm_remove(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_, l, delete_files);
+        gtr_confirm_remove(*wind_, core_, l, delete_files);
     }
 }
 

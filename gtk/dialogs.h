@@ -24,10 +24,11 @@
 
 #include <vector>
 
-#include "tr-core.h"
-#include "util.h"
+#include <gtkmm.h>
+
+typedef struct _TrCore TrCore;
 
 /**
  * Prompt the user to confirm removing a torrent.
  */
-void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const& gtorrents, gboolean doDelete);
+void gtr_confirm_remove(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids, bool delete_files);

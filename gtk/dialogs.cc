@@ -22,48 +22,21 @@
 
 #include <algorithm>
 
-#include <gtk/gtk.h>
-#include <glib/gi18n.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 
 #include "dialogs.h"
 #include "tr-core.h"
+#include "util.h"
 
 /***
 ****
 ***/
 
-struct delete_data
+void gtr_confirm_remove(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids, bool delete_files)
 {
-    gboolean delete_files;
-    GSList* torrent_ids;
-    TrCore* core;
-};
-
-static void on_remove_dialog_response(GtkDialog* dialog, gint response, gpointer gdd)
-{
-    auto* dd = static_cast<delete_data*>(gdd);
-
-    if (response == GTK_RESPONSE_ACCEPT)
-    {
-        for (GSList* l = dd->torrent_ids; l != nullptr; l = l->next)
-        {
-            gtr_core_remove_torrent(dd->core, GPOINTER_TO_INT(l->data), dd->delete_files);
-        }
-    }
-
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-    g_slist_free(dd->torrent_ids);
-    g_free(dd);
-}
-
-void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const& torrent_ids, gboolean delete_files)
-{
-    GtkWidget* d;
-    GString* primary_text;
-    GString* secondary_text;
-    struct delete_data* dd;
     int connected = 0;
     int incomplete = 0;
     int const count = torrent_ids.size();
@@ -72,16 +45,6 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const&
     {
         return;
     }
-
-    dd = g_new0(struct delete_data, 1);
-    dd->core = core;
-    dd->torrent_ids = g_slist_alloc();
-    dd->delete_files = delete_files;
-
-    std::for_each(
-        torrent_ids.rbegin(),
-        torrent_ids.rend(),
-        [dd](auto const id) { dd->torrent_ids = g_slist_prepend(dd->torrent_ids, GINT_TO_POINTER(id)); });
 
     for (auto const id : torrent_ids)
     {
@@ -99,93 +62,85 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, std::vector<int> const&
         }
     }
 
-    primary_text = g_string_new(nullptr);
-
-    if (!delete_files)
-    {
-        g_string_printf(primary_text, ngettext("Remove torrent?", "Remove %d torrents?", count), count);
-    }
-    else
-    {
-        g_string_printf(
-            primary_text,
+    auto const primary_text = Glib::ustring::sprintf(
+        !delete_files ?
+            ngettext("Remove torrent?", "Remove %d torrents?", count) :
             ngettext("Delete this torrent's downloaded files?", "Delete these %d torrents' downloaded files?", count),
-            count);
-    }
+        count);
 
-    secondary_text = g_string_new(nullptr);
-
+    Glib::ustring secondary_text;
     if (incomplete == 0 && connected == 0)
     {
-        g_string_assign(
-            secondary_text,
-            ngettext(
-                "Once removed, continuing the transfer will require the torrent file or magnet link.",
-                "Once removed, continuing the transfers will require the torrent files or magnet links.",
-                count));
+        secondary_text = ngettext(
+            "Once removed, continuing the transfer will require the torrent file or magnet link.",
+            "Once removed, continuing the transfers will require the torrent files or magnet links.",
+            count);
     }
     else if (count == incomplete)
     {
-        g_string_assign(
-            secondary_text,
-            ngettext("This torrent has not finished downloading.", "These torrents have not finished downloading.", count));
+        secondary_text = ngettext(
+            "This torrent has not finished downloading.",
+            "These torrents have not finished downloading.",
+            count);
     }
     else if (count == connected)
     {
-        g_string_assign(
-            secondary_text,
-            ngettext("This torrent is connected to peers.", "These torrents are connected to peers.", count));
+        secondary_text = ngettext("This torrent is connected to peers.", "These torrents are connected to peers.", count);
     }
     else
     {
         if (connected != 0)
         {
-            g_string_append(
-                secondary_text,
-                ngettext(
-                    "One of these torrents is connected to peers.",
-                    "Some of these torrents are connected to peers.",
-                    connected));
+            secondary_text += ngettext(
+                "One of these torrents is connected to peers.",
+                "Some of these torrents are connected to peers.",
+                connected);
         }
 
         if (connected != 0 && incomplete != 0)
         {
-            g_string_append(secondary_text, "\n");
+            secondary_text += "\n";
         }
 
         if (incomplete != 0)
         {
-            g_string_assign(
-                secondary_text,
-                ngettext(
-                    "One of these torrents has not finished downloading.",
-                    "Some of these torrents have not finished downloading.",
-                    incomplete));
+            secondary_text += ngettext(
+                "One of these torrents has not finished downloading.",
+                "Some of these torrents have not finished downloading.",
+                incomplete);
         }
     }
 
-    d = gtk_message_dialog_new_with_markup(
+    auto d = std::make_shared<Gtk::MessageDialog>(
         parent,
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_QUESTION,
-        GTK_BUTTONS_NONE,
-        "<big><b>%s</b></big>",
-        primary_text->str);
+        Glib::ustring::sprintf("<big><b>%s</b></big>", primary_text),
+        true,
+        Gtk::MESSAGE_QUESTION,
+        Gtk::BUTTONS_NONE,
+        false);
 
-    if (secondary_text->len != 0)
+    if (!secondary_text.empty())
     {
-        gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(d), "%s", secondary_text->str);
+        d->set_secondary_text(secondary_text, true);
     }
 
-    gtk_dialog_add_buttons(
-        GTK_DIALOG(d),
-        TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
-        TR_ARG_TUPLE(delete_files ? _("_Delete") : _("_Remove"), GTK_RESPONSE_ACCEPT),
-        nullptr);
-    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
-    g_signal_connect(d, "response", G_CALLBACK(on_remove_dialog_response), dd);
-    gtk_widget_show_all(d);
+    d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
+    d->add_button(delete_files ? _("_Delete") : _("_Remove"), Gtk::RESPONSE_ACCEPT);
+    d->set_default_response(Gtk::RESPONSE_CANCEL);
 
-    g_string_free(primary_text, TRUE);
-    g_string_free(secondary_text, TRUE);
+    d->signal_response().connect(
+        [d, core, torrent_ids, delete_files](int response) mutable
+        {
+            if (response == Gtk::RESPONSE_ACCEPT)
+            {
+                for (auto const id : torrent_ids)
+                {
+                    gtr_core_remove_torrent(core, id, delete_files);
+                }
+            }
+
+            d.reset();
+        });
+
+    d->show_all();
 }
