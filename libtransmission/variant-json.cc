@@ -77,8 +77,8 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
 
 static void error_handler(
     jsonsl_t jsn,
-    [[maybe_unused]] jsonsl_error_t error,
-    struct jsonsl_state_st* state,
+    jsonsl_error_t error,
+    [[maybe_unused]] struct jsonsl_state_st* state,
     jsonsl_char_t const* buf)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);

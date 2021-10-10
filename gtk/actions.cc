@@ -17,6 +17,7 @@
 #include "conf.h"
 #include "tr-core.h"
 #include "tr-prefs.h"
+#include "util.h"
 
 static TrCore* myCore = nullptr;
 static GtkActionGroup* myGroup = nullptr;

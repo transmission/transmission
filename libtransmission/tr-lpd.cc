@@ -693,7 +693,7 @@ static void on_upkeep_timer([[maybe_unused]] evutil_socket_t s, [[maybe_unused]]
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* user_data)
+static void event_callback([[maybe_unused]] evutil_socket_t s, short type, [[maybe_unused]] void* user_data)
 {
     TR_ASSERT(tr_isSession(session));
 
