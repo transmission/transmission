@@ -927,7 +927,12 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
+bool tr_sys_file_advise(
+    [[maybe_unused]] tr_sys_file_t handle,
+    [[maybe_unused]] uint64_t offset,
+    [[maybe_unused]] uint64_t size,
+    [[maybe_unused]] tr_sys_file_advice_t advice,
+    [[maybe_unused]] tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
@@ -966,14 +971,6 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
             set_system_error(error, errno);
         }
     }
-
-#else
-
-    TR_UNUSED(handle);
-    TR_UNUSED(offset);
-    TR_UNUSED(size);
-    TR_UNUSED(advice);
-    TR_UNUSED(error);
 
 #endif
 
@@ -1046,9 +1043,8 @@ bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
 
 } // unnamed namespace
 
-bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+bool tr_sys_file_preallocate(tr_sys_file_t handle, [[maybe_unused]] uint64_t size, int flags, tr_error** error)
 {
-    TR_UNUSED(size);
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     using prealloc_func = bool (*)(tr_sys_file_t, uint64_t);
@@ -1134,7 +1130,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
+bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
@@ -1204,9 +1200,6 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     } while (!ret && errno == EINTR);
 
 #else
-
-    TR_UNUSED(handle);
-    TR_UNUSED(operation);
 
     errno = ENOSYS;
     ret = false;
