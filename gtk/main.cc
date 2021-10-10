@@ -1497,7 +1497,8 @@ void Application::actions_handler(std::string const& action_name)
     }
     else if (action_name == "show-stats")
     {
-        Gtk::Widget* dialog = Glib::wrap(gtr_stats_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
+        auto dialog = std::shared_ptr<StatsDialog>(StatsDialog::create(*wind_, core_));
+        dialog->signal_hide().connect([dialog]() mutable { dialog.reset(); });
         dialog->show();
     }
     else if (action_name == "donate")
