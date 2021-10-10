@@ -129,10 +129,8 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
+static int sockoptfunction(void* vtask, curl_socket_t fd, [[maybe_unused]] curlsocktype purpose)
 {
-    TR_UNUSED(purpose);
-
     auto* task = static_cast<struct tr_web_task*>(vtask);
     bool const isScrape = strstr(task->url, "scrape") != nullptr;
     bool const isAnnounce = strstr(task->url, "announce") != nullptr;
@@ -154,11 +152,8 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 
 #endif
 
-static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
+static CURLcode ssl_context_func([[maybe_unused]] CURL* curl, void* ssl_ctx, [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(curl);
-    TR_UNUSED(user_data);
-
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
     {

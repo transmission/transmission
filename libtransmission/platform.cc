@@ -479,7 +479,7 @@ static bool isWebClientDir(char const* path)
     return ret;
 }
 
-char const* tr_getWebClientDir(tr_session const* session)
+char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 {
     static char const* s = nullptr;
 
@@ -527,8 +527,6 @@ char const* tr_getWebClientDir(tr_session const* session)
             }
 
 #elif defined(_WIN32)
-
-            TR_UNUSED(session);
 
             /* Generally, Web interface should be stored in a Web subdir of
              * calling executable dir. */
@@ -582,8 +580,6 @@ char const* tr_getWebClientDir(tr_session const* session)
             }
 
 #else /* everyone else, follow the XDG spec */
-
-            TR_UNUSED(session);
 
             auto candidates = std::list<std::string>{};
 

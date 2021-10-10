@@ -140,11 +140,8 @@ static int compare_retry_names(void const* a, void const* b)
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
 
-static void tr_watchdir_on_retry_timer(evutil_socket_t fd, short type, void* context)
+static void tr_watchdir_on_retry_timer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short type, void* context)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(type);
-
     TR_ASSERT(context != nullptr);
 
     auto* const retry = static_cast<tr_watchdir_retry*>(context);

@@ -62,40 +62,37 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
     return false;
 }
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+int tr_utpPacket(
+    [[maybe_unused]] unsigned char const* buf,
+    [[maybe_unused]] size_t buflen,
+    [[maybe_unused]] struct sockaddr const* from,
+    [[maybe_unused]] socklen_t fromlen,
+    [[maybe_unused]] tr_session* ss)
 {
-    TR_UNUSED(buf);
-    TR_UNUSED(buflen);
-    TR_UNUSED(from);
-    TR_UNUSED(fromlen);
-    TR_UNUSED(ss);
-
     return -1;
 }
 
-struct UTPSocket* UTP_Create(SendToProc* send_to_proc, void* send_to_userdata, struct sockaddr const* addr, socklen_t addrlen)
+struct UTPSocket* UTP_Create(
+    [[maybe_unused]] SendToProc* send_to_proc,
+    [[maybe_unused]] void* send_to_userdata,
+    [[maybe_unused]] struct sockaddr const* addr,
+    [[maybe_unused]] socklen_t addrlen)
 {
-    TR_UNUSED(send_to_proc);
-    TR_UNUSED(send_to_userdata);
-    TR_UNUSED(addr);
-    TR_UNUSED(addrlen);
-
     errno = ENOSYS;
     return nullptr;
 }
 
-void tr_utpClose(tr_session* ss)
+void tr_utpClose([[maybe_unused]] tr_session* ss)
 {
-    TR_UNUSED(ss);
 }
 
-void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
+void tr_utpSendTo(
+    [[maybe_unused]] void* closure,
+    [[maybe_unused]] unsigned char const* buf,
+    [[maybe_unused]] size_t buflen,
+    [[maybe_unused]] struct sockaddr const* to,
+    [[maybe_unused]] socklen_t tolen)
 {
-    TR_UNUSED(closure);
-    TR_UNUSED(buf);
-    TR_UNUSED(buflen);
-    TR_UNUSED(to);
-    TR_UNUSED(tolen);
 }
 
 #else
@@ -169,11 +166,8 @@ static void reset_timer(tr_session* ss)
     tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
-static void timer_callback(evutil_socket_t s, short type, void* vsession)
+static void timer_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(type);
-
     auto* session = static_cast<tr_session*>(vsession);
     UTP_CheckTimeouts();
     reset_timer(session);
