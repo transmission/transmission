@@ -45,26 +45,17 @@ static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_
 
 static void savePeers(tr_variant* dict, tr_torrent const* tor)
 {
-    int count;
-    tr_pex* pex;
-
-    count = tr_peerMgrGetPeers(tor, &pex, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
-
-    if (count > 0)
+    auto pex = tr_peerMgrGetPeers(tor, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
+    if (!std::empty(pex))
     {
-        tr_variantDictAddRaw(dict, TR_KEY_peers2, pex, sizeof(tr_pex) * count);
+        tr_variantDictAddRaw(dict, TR_KEY_peers2, std::data(pex), sizeof(tr_pex) * std::size(pex));
     }
 
-    tr_free(pex);
-
-    count = tr_peerMgrGetPeers(tor, &pex, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
-
-    if (count > 0)
+    pex = tr_peerMgrGetPeers(tor, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
+    if (!std::empty(pex))
     {
-        tr_variantDictAddRaw(dict, TR_KEY_peers2_6, pex, sizeof(tr_pex) * count);
+        tr_variantDictAddRaw(dict, TR_KEY_peers2_6, std::data(pex), sizeof(tr_pex) * std::size(pex));
     }
-
-    tr_free(pex);
 }
 
 static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)

@@ -13,6 +13,7 @@
 #endif
 
 #include <inttypes.h> /* uint16_t */
+#include <vector>
 
 #ifdef _WIN32
 #include <winsock2.h> /* struct in_addr */
@@ -117,12 +118,7 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(
-    tr_torrent const* tor,
-    tr_pex** setme_pex,
-    uint8_t address_type,
-    uint8_t peer_list_mode,
-    int max_peer_count);
+std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_t list_mode, size_t max);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 

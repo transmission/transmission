@@ -2470,40 +2470,38 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     {
         PexDiffs diffs;
         PexDiffs diffs6;
-        tr_pex* newPex = nullptr;
-        tr_pex* newPex6 = nullptr;
-        int const newCount = tr_peerMgrGetPeers(msgs->torrent, &newPex, TR_AF_INET, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
-        int const newCount6 = tr_peerMgrGetPeers(msgs->torrent, &newPex6, TR_AF_INET6, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
+        auto const newPex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
+        auto const newPex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
 
         /* build the diffs */
-        diffs.added = tr_new(tr_pex, newCount);
+        diffs.added = tr_new(tr_pex, std::size(newPex));
         diffs.addedCount = 0;
         diffs.dropped = tr_new(tr_pex, msgs->pexCount);
         diffs.droppedCount = 0;
-        diffs.elements = tr_new(tr_pex, newCount + msgs->pexCount);
+        diffs.elements = tr_new(tr_pex, std::size(newPex) + msgs->pexCount);
         diffs.elementCount = 0;
         tr_set_compare(
             msgs->pex,
             msgs->pexCount,
-            newPex,
-            newCount,
+            std::data(newPex),
+            std::size(newPex),
             tr_pexCompare,
             sizeof(tr_pex),
             pexDroppedCb,
             pexAddedCb,
             pexElementCb,
             &diffs);
-        diffs6.added = tr_new(tr_pex, newCount6);
+        diffs6.added = tr_new(tr_pex, std::size(newPex6));
         diffs6.addedCount = 0;
         diffs6.dropped = tr_new(tr_pex, msgs->pexCount6);
         diffs6.droppedCount = 0;
-        diffs6.elements = tr_new(tr_pex, newCount6 + msgs->pexCount6);
+        diffs6.elements = tr_new(tr_pex, std::size(newPex6) + msgs->pexCount6);
         diffs6.elementCount = 0;
         tr_set_compare(
             msgs->pex6,
             msgs->pexCount6,
-            newPex6,
-            newCount6,
+            std::data(newPex6),
+            std::size(newPex6),
             tr_pexCompare,
             sizeof(tr_pex),
             pexDroppedCb,
@@ -2512,11 +2510,11 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             &diffs6);
         dbgmsg(
             msgs,
-            "pex: old peer count %d+%d, new peer count %d+%d, added %d+%d, removed %d+%d",
+            "pex: old peer count %d+%d, new peer count %zu+%zu, added %d+%d, removed %d+%d",
             msgs->pexCount,
             msgs->pexCount6,
-            newCount,
-            newCount6,
+            std::size(newPex),
+            std::size(newPex6),
             diffs.addedCount,
             diffs6.addedCount,
             diffs.droppedCount,
@@ -2661,10 +2659,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         /* cleanup */
         tr_free(diffs.added);
         tr_free(diffs.dropped);
-        tr_free(newPex);
         tr_free(diffs6.added);
         tr_free(diffs6.dropped);
-        tr_free(newPex6);
     }
 }
 

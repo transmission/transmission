@@ -2277,33 +2277,6 @@ int tr_pexCompare(void const* va, void const* vb)
     return 0;
 }
 
-/* better goes first */
-static int compareAtomsByUsefulness(void const* va, void const* vb)
-{
-    struct peer_atom const* a = *(struct peer_atom const* const*)va;
-    struct peer_atom const* b = *(struct peer_atom const* const*)vb;
-
-    TR_ASSERT(tr_isAtom(a));
-    TR_ASSERT(tr_isAtom(b));
-
-    if (a->piece_data_time != b->piece_data_time)
-    {
-        return a->piece_data_time > b->piece_data_time ? -1 : 1;
-    }
-
-    if (a->fromBest != b->fromBest)
-    {
-        return a->fromBest < b->fromBest ? -1 : 1;
-    }
-
-    if (a->numFails != b->numFails)
-    {
-        return a->numFails < b->numFails ? -1 : 1;
-    }
-
-    return 0;
-}
-
 static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 {
     if (tr_torrentIsSeed(tor) && atomIsSeed(atom))
@@ -2329,87 +2302,77 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
     return true;
 }
 
-int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, uint8_t list_mode, int maxCount)
+std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_t list_mode, size_t max)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(setme_pex != nullptr);
     TR_ASSERT(af == TR_AF_INET || af == TR_AF_INET6);
     TR_ASSERT(list_mode == TR_PEERS_CONNECTED || list_mode == TR_PEERS_INTERESTING);
 
-    int n;
-    int count = 0;
-    int atomCount = 0;
-    tr_swarm const* s = tor->swarm;
-    struct peer_atom** atoms = nullptr;
-    tr_pex* pex;
-    tr_pex* walk;
+    auto const& swarm = tor->swarm;
+    managerLock(swarm->manager);
 
-    managerLock(s->manager);
-
-    /**
-    ***  build a list of atoms
-    **/
-
-    if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
+    // build a list of all candidates
+    auto atoms = std::vector<peer_atom*>{};
+    if (list_mode == TR_PEERS_CONNECTED) // connected peers only
     {
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
-        atomCount = tr_ptrArraySize(&s->peers);
-        atoms = tr_new(struct peer_atom*, atomCount);
-
-        for (int i = 0; i < atomCount; ++i)
-        {
-            atoms[i] = peers[i]->atom;
-        }
+        auto const n = tr_ptrArraySize(&swarm->peers);
+        atoms.reserve(n);
+        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&swarm->peers);
+        std::transform(peers, peers + n, std::back_inserter(atoms), [](auto const* peer) { return peer->atom; });
     }
-    else /* TR_PEERS_INTERESTING */
+    else // TR_PEERS_INTERESTING
     {
-        struct peer_atom** atomBase = (struct peer_atom**)tr_ptrArrayBase(&s->pool);
-        n = tr_ptrArraySize(&s->pool);
-        atoms = tr_new(struct peer_atom*, n);
+        auto const n = tr_ptrArraySize(&swarm->pool);
+        struct peer_atom** atomBase = (struct peer_atom**)tr_ptrArrayBase(&swarm->pool);
+        atoms.reserve(n);
+        std::copy_if(
+            atomBase,
+            atomBase + n,
+            std::back_inserter(atoms),
+            [&tor](auto* atom) { return isAtomInteresting(tor, atom); });
+    }
 
-        for (int i = 0; i < n; ++i)
+    // remove any that don't match the requested address type
+    atoms.erase(
+        std::remove_if(std::begin(atoms), std::end(atoms), [&af](auto const* atom) { return atom->addr.type != af; }),
+        std::end(atoms));
+
+    // if we have more than the caller wants, only use the first `max` best
+    if (std::size(atoms) > max)
+    {
+        auto constexpr compare = [](peer_atom const* a, peer_atom const* b)
         {
-            if (isAtomInteresting(tor, atomBase[i]))
+            if (a->piece_data_time != b->piece_data_time)
             {
-                atoms[atomCount++] = atomBase[i];
+                return a->piece_data_time > b->piece_data_time;
             }
-        }
+
+            if (a->fromBest != b->fromBest)
+            {
+                return a->fromBest < b->fromBest;
+            }
+
+            return a->numFails < b->numFails;
+        };
+
+        std::partial_sort(std::begin(atoms), std::begin(atoms) + max, std::end(atoms), compare);
+        atoms.resize(max);
     }
 
-    qsort(atoms, atomCount, sizeof(struct peer_atom*), compareAtomsByUsefulness);
+    // turn the remaining atoms into a pex vector and return it
+    auto pex = std::vector<tr_pex>{};
+    pex.reserve(std::size(atoms));
+    std::transform(
+        std::begin(atoms),
+        std::end(atoms),
+        std::back_inserter(pex),
+        [](auto const* atom) {
+            return tr_pex{ atom->addr, atom->port, atom->flags };
+        });
 
-    /**
-    ***  add the first N of them into our return list
-    **/
-
-    n = std::min(atomCount, maxCount);
-    pex = walk = tr_new0(tr_pex, n);
-
-    for (int i = 0; i < atomCount && count < n; ++i)
-    {
-        struct peer_atom const* atom = atoms[i];
-
-        if (atom->addr.type == af)
-        {
-            TR_ASSERT(tr_address_is_valid(&atom->addr));
-
-            walk->addr = atom->addr;
-            walk->port = atom->port;
-            walk->flags = atom->flags;
-            ++count;
-            ++walk;
-        }
-    }
-
-    qsort(pex, count, sizeof(tr_pex), tr_pexCompare);
-
-    TR_ASSERT(walk - pex == count);
-    *setme_pex = pex;
-
-    /* cleanup */
-    tr_free(atoms);
-    managerUnlock(s->manager);
-    return count;
+    managerUnlock(swarm->manager);
+    return pex;
 }
 
 static void atomPulse(evutil_socket_t, short, void*);
