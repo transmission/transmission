@@ -22,7 +22,7 @@ struct tr_completion
 
     // Changed to non-owning pointer temporarily till tr_completion becomes C++-constructible and destructible
     // TODO: remove * and own the value
-    tr_bitfield* blockBitfield;
+    Bitfield* blockBitfield;
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
@@ -50,7 +50,7 @@ struct tr_completion
 
 void tr_cpConstruct(tr_completion*, tr_torrent*);
 
-void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* blocks);
+void tr_cpBlockInit(tr_completion* cp, Bitfield const& blocks);
 
 static inline void tr_cpDestruct(tr_completion* cp)
 {
@@ -115,7 +115,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t i);
 
 static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
 {
-    return cp->blockBitfield->has(i);
+    return cp->blockBitfield->readBit(i);
 }
 
 /***

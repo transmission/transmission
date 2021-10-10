@@ -1524,7 +1524,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                t->minutes->add((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
+                t->minutes->setBit((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }
         }
     }
@@ -1578,7 +1578,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MINUTES_PER_WEEK - 1;
     }
 
-    return t->minutes->has(minute_of_the_week);
+    return t->minutes->readBit(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1610,7 +1610,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    turtle->minutes = new tr_bitfield(MINUTES_PER_WEEK);
+    turtle->minutes = new Bitfield(MINUTES_PER_WEEK);
 
     turtleUpdateTable(turtle);
 

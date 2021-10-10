@@ -27,11 +27,11 @@ static void tr_cpReset(tr_completion* cp)
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
 {
     cp->tor = tor;
-    cp->blockBitfield = new tr_bitfield(tor->blockCount);
+    cp->blockBitfield = new Bitfield(tor->blockCount);
     tr_cpReset(cp);
 }
 
-void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* b)
+void tr_cpBlockInit(tr_completion* cp, Bitfield const& b)
 {
     tr_cpReset(cp);
 
@@ -39,11 +39,11 @@ void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* b)
     cp->blockBitfield->setFromBitfield(b);
 
     // set sizeNow
-    cp->sizeNow = cp->blockBitfield->countTrueBits();
+    cp->sizeNow = cp->blockBitfield->countBits();
     TR_ASSERT(cp->sizeNow <= cp->tor->blockCount);
     cp->sizeNow *= cp->tor->blockSize;
 
-    if (b->has(cp->tor->blockCount - 1))
+    if (b.readBit(cp->tor->blockCount - 1))
     {
         cp->sizeNow -= (cp->tor->blockSize - cp->tor->lastBlockSize);
     }
@@ -93,7 +93,7 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
     cp->haveValidIsDirty = true;
     cp->sizeWhenDoneIsDirty = true;
-    cp->blockBitfield->remRange(f, l + 1);
+    cp->blockBitfield->clearBitRange(f, l + 1);
 }
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
@@ -116,7 +116,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
     {
         tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
 
-        cp->blockBitfield->add(block);
+        cp->blockBitfield->setBit(block);
         cp->sizeNow += tr_torBlockCountBytes(tor, block);
 
         cp->haveValidIsDirty = true;
@@ -185,7 +185,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     n = cp->blockBitfield->countRange(f, l + 1);
                     n *= cp->tor->blockSize;
 
-                    if (l == cp->tor->blockCount - 1 && cp->blockBitfield->has(l))
+                    if (l == cp->tor->blockCount - 1 && cp->blockBitfield->readBit(l))
                     {
                         n -= cp->tor->blockSize - cp->tor->lastBlockSize;
                     }
@@ -275,7 +275,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
             haveBytes *= cp->tor->blockSize;
         }
 
-        if (cp->blockBitfield->has(l)) /* handle the last block */
+        if (cp->blockBitfield->readBit(l)) /* handle the last block */
         {
             haveBytes += tr_torBlockCountBytes(cp->tor, l);
         }
@@ -309,7 +309,7 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
 
     n = cp->tor->info.pieceCount;
 
-    tr_bitfield pieces(n);
+    Bitfield pieces(n);
 
     if (tr_cpHasAll(cp))
     {

@@ -472,7 +472,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ***/
 
 // TODO: Refactor this into a constructor for tr_variant
-static void bitfieldToBenc(tr_bitfield const* b, tr_variant* benc)
+static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
 {
     if (b->hasAll())
     {
@@ -662,7 +662,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
         err = nullptr;
 
-        tr_bitfield blocks(tor->blockCount);
+        Bitfield blocks(tor->blockCount);
 
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
         if (b != nullptr)
@@ -713,7 +713,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tr_cpBlockInit(&tor->completion, &blocks);
+            tr_cpBlockInit(&tor->completion, blocks);
         }
 
         ret = TR_FR_PROGRESS;

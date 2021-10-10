@@ -483,7 +483,7 @@ public:
         publish(e);
     }
 
-    void publishClientGotBitfield(tr_bitfield* bitfield)
+    void publishClientGotBitfield(Bitfield* bitfield)
     {
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -1679,9 +1679,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!msgs->have.has(ui32))
+        if (!msgs->have.readBit(ui32))
         {
-            msgs->have.add(ui32);
+            msgs->have.setBit(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
@@ -1901,7 +1901,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return err;
     }
 
-    msgs->blame.add(req->index);
+    msgs->blame.setBit(req->index);
     msgs->publishGotBlock(req);
     return 0;
 }

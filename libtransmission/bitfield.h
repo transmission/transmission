@@ -17,17 +17,17 @@
 #include "tr-assert.h"
 
 /// @brief Implementation of the BitTorrent spec's Bitfield array of bits
-struct tr_bitfield
+struct Bitfield
 {
 public:
     /***
     ****  life cycle
     ***/
-    explicit tr_bitfield(size_t bit_count);
+    explicit Bitfield(size_t bit_count);
 
-    tr_bitfield(): tr_bitfield(0) {}
+    Bitfield(): Bitfield(0) {}
 
-    ~tr_bitfield()
+    ~Bitfield()
     {
         this->setHasNone();
     }
@@ -40,15 +40,17 @@ public:
 
     void setHasNone();
 
-    void add(size_t bit);
+    /// @brief Sets one bit
+    void setBit(size_t bit);
 
     /// @brief Sets bit range [begin, end) to 1
-    void addRange(size_t begin, size_t end);
+    void setBitRange(size_t begin, size_t end);
 
-    void rem(size_t bit);
+    /// @brief Clears one bit
+    void clearBit(size_t bit);
 
     /// @brief Clears bit range [begin, end) to 0
-    void remRange(size_t begin, size_t end);
+    void clearBitRange(size_t begin, size_t end);
 
     /***
     ****
@@ -69,19 +71,19 @@ public:
         return this->countRangeImpl(begin, end);
     }
 
-    [[nodiscard]] size_t countTrueBits() const;
+    [[nodiscard]] size_t countBits() const;
 
     [[nodiscard]] constexpr bool hasAll() const
     {
-        return this->bit_count != 0 ? (this->true_count == this->bit_count) : this->have_all_hint;
+        return this->bit_count_ != 0 ? (this->true_count_ == this->bit_count_) : this->hint_ == HAS_ALL;
     }
 
     [[nodiscard]] constexpr bool hasNone() const
     {
-        return this->bit_count != 0 ? (this->true_count == 0) : this->have_none_hint;
+        return this->bit_count_ != 0 ? (this->true_count_ == 0) : this->hint_ == HAS_NONE;
     }
 
-    [[nodiscard]] bool has(size_t n) const;
+    [[nodiscard]] bool readBit(size_t n) const;
 
     /***
     ****
@@ -89,7 +91,7 @@ public:
 
     void setFromFlags(bool const* bytes, size_t n);
 
-    void setFromBitfield(tr_bitfield const*);
+    void setFromBitfield(Bitfield const& src);
 
     void setRaw(void const* newBits, size_t byte_count, bool bounded);
 
@@ -97,7 +99,7 @@ public:
 
     [[nodiscard]] size_t getBitCount() const
     {
-        return bit_count;
+        return bit_count_;
     }
 
 private:
@@ -120,13 +122,22 @@ private:
     [[nodiscard]] bool isValid() const;
 #endif
 
-    uint8_t* bits = nullptr;
-    size_t alloc_count = 0;
-    size_t bit_count = 0;
-    size_t true_count = 0;
+    uint8_t* bits_ = nullptr;
+    size_t alloc_count_ = 0;
+    size_t bit_count_ = 0;
+    size_t true_count_ = 0;
 
-    /* Special cases for when full or empty but we don't know the bitCount.
-       This occurs when a magnet link's peers send have all / have none */
-    bool have_all_hint = false;
-    bool have_none_hint = false;
+    enum OperationMode
+    {
+        /// @brief Normal operation: storage of bytes contains bits to set or clear
+        NORMAL,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 1
+        HAS_ALL,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 0
+        HAS_NONE,
+    };
+
+    // Special cases for when full or empty but we don't know the bitCount.
+    // This occurs when a magnet link's peers send have all / have none
+    OperationMode hint_ = NORMAL;
 };

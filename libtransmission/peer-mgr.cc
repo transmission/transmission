@@ -413,7 +413,7 @@ static void replicationNew(tr_swarm* s)
         {
             auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, peer_i));
 
-            if (peer->have.has(piece_i))
+            if (peer->have.readBit(piece_i))
             {
                 ++r;
             }
@@ -1194,7 +1194,7 @@ static void tr_incrReplicationOfPiece(tr_swarm* s, size_t const index)
 /**
  * Increases the replication count of pieces present in the bitfield
  */
-static void tr_incrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
+static void tr_incrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
 {
     TR_ASSERT(replicationExists(s));
 
@@ -1202,7 +1202,7 @@ static void tr_incrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
 
     for (size_t i = 0, n = s->tor->info.pieceCount; i < n; ++i)
     {
-        if (b->has(i))
+        if (b->readBit(i))
         {
             ++rep[i];
         }
@@ -1231,7 +1231,7 @@ static void tr_incrReplication(tr_swarm* s)
 /**
  * Decrease the replication count of pieces present in the bitset.
  */
-static void tr_decrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
+static void tr_decrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
 {
     TR_ASSERT(replicationExists(s));
     TR_ASSERT(s->pieceReplicationSize == s->tor->info.pieceCount);
@@ -1247,7 +1247,7 @@ static void tr_decrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
     {
         for (size_t i = 0; i < s->pieceReplicationSize; ++i)
         {
-            if (b->has(i))
+            if (b->readBit(i))
             {
                 --s->pieceReplication[i];
             }
@@ -1284,7 +1284,7 @@ void tr_peerMgrGetNextRequests(
     TR_ASSERT(numwant > 0);
 
     tr_swarm* s;
-    tr_bitfield const* const have = &peer->have;
+    Bitfield const* const have = &peer->have;
 
     /* walk through the pieces and find blocks that should be requested */
     s = tor->swarm;
@@ -1323,7 +1323,7 @@ void tr_peerMgrGetNextRequests(
         struct weighted_piece* p = pieces + i;
 
         /* if the peer has this piece that we want... */
-        if (have->has(p->index))
+        if (have->readBit(p->index))
         {
             tr_block_index_t first;
             tr_block_index_t last;
@@ -1671,7 +1671,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 
         if (!pieceCameFromPeers)
         {
-            pieceCameFromPeers = peer->blame.has(p);
+            pieceCameFromPeers = peer->blame.readBit(p);
         }
     }
 
@@ -2236,7 +2236,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
     {
         auto* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
 
-        if (peer->blame.has(pieceIndex))
+        if (peer->blame.readBit(pieceIndex))
         {
             tordbg(
                 s,
@@ -2508,7 +2508,7 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 
 void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 {
-    tr_bitfield const* have = &peer->have;
+    Bitfield const* have = &peer->have;
 
     if (have->hasAll())
     {
@@ -2520,7 +2520,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     }
     else
     {
-        float const true_count = have->countTrueBits();
+        float const true_count = have->countBits();
 
         if (tr_torrentHasMetadata(tor))
         {
@@ -2603,7 +2603,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
             {
                 for (int j = 0; j < peerCount; ++j)
                 {
-                    if (peers[j]->have.has(piece))
+                    if (peers[j]->have.readBit(piece))
                     {
                         ++tab[i];
                     }
@@ -2892,7 +2892,7 @@ static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_
 
     for (tr_piece_index_t i = 0; i < tor->info.pieceCount; ++i)
     {
-        if (piece_is_interesting[i] && peer->have.has(i))
+        if (piece_is_interesting[i] && peer->have.readBit(i))
         {
             return true;
         }

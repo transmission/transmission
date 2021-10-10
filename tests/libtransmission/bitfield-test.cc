@@ -22,12 +22,11 @@ TEST(Bitfield, countRange)
         int const bit_count = 100 + tr_rand_int_weak(1000);
 
         // generate a random bitfield
-        tr_bitfield bf;
-        tr_bitfieldConstruct(&bf, bit_count);
+        Bitfield bf(bit_count);
 
         for (int j = 0, n = tr_rand_int_weak(bit_count); j < n; ++j)
         {
-            tr_bitfieldAdd(&bf, tr_rand_int_weak(bit_count));
+            bf.setBit(tr_rand_int_weak(bit_count));
         }
 
         int begin = tr_rand_int_weak(bit_count);
