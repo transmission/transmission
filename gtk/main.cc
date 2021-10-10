@@ -178,7 +178,7 @@ private:
     sigc::connection timer_;
     sigc::connection update_model_soon_tag_;
     sigc::connection refresh_actions_tag_;
-    void* icon_ = nullptr;
+    std::unique_ptr<SystemTrayIcon> icon_;
     std::unique_ptr<MainWindow> wind_;
     TrCore* core_ = nullptr;
     std::unique_ptr<MessageLogWindow> msgwin_;
@@ -928,10 +928,7 @@ bool Application::on_session_closed()
 
     g_object_unref(core_);
 
-    if (icon_ != nullptr)
-    {
-        g_object_unref(icon_);
-    }
+    icon_.reset();
 
     error_list_.clear();
     duplicates_list_.clear();
@@ -1126,11 +1123,11 @@ void Application::on_prefs_changed(TrCore const* /*core*/, tr_quark const key)
 
             if (show && icon_ == nullptr)
             {
-                icon_ = gtr_icon_new(core_);
+                icon_ = std::make_unique<SystemTrayIcon>(core_);
             }
             else if (!show && icon_ != nullptr)
             {
-                g_clear_object(&icon_);
+                icon_.reset();
             }
 
             break;
@@ -1310,7 +1307,7 @@ bool Application::update_model_once()
     /* update the status tray icon */
     if (icon_ != nullptr)
     {
-        gtr_icon_refresh(icon_);
+        icon_->refresh();
     }
 
     update_model_soon_tag_.disconnect();

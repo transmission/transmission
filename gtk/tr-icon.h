@@ -8,8 +8,17 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include "tr-core.h"
+#include <memory>
 
-gpointer gtr_icon_new(TrCore* core);
-void gtr_icon_refresh(gpointer);
+class SystemTrayIcon
+{
+public:
+    SystemTrayIcon(TrCore* core);
+    ~SystemTrayIcon();
+
+    void refresh();
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};
