@@ -436,8 +436,8 @@ void buildTree(FileRowNode& node, build_data& build)
     auto& child_data = node.data();
     bool const isLeaf = node.child_count() == 0;
 
-    char const* mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name.c_str()) : DIRECTORY_MIME_TYPE;
-    auto const icon = Glib::wrap(gtr_get_mime_type_icon(mime_type, GTK_ICON_SIZE_MENU, Glib::unwrap(build.w)), true);
+    auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DIRECTORY_MIME_TYPE;
+    auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
     auto const* inf = tr_torrentInfo(build.tor);
     int const priority = isLeaf ? inf->files[child_data.index].priority : 0;
     bool const enabled = isLeaf ? !inf->files[child_data.index].dnd : true;
@@ -751,10 +751,8 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         if (auto const iter = store_->get_iter(path_string); iter)
         {
             bool const isLeaf = iter->children().empty();
-            char const* mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname.c_str()) : DIRECTORY_MIME_TYPE;
-            auto const icon = Glib::wrap(
-                gtr_get_mime_type_icon(mime_type, GTK_ICON_SIZE_MENU, Glib::unwrap(static_cast<Gtk::Widget*>(view_))),
-                true);
+            auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname) : DIRECTORY_MIME_TYPE;
+            auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *view_);
 
             (*iter)[file_cols.label] = newname;
             (*iter)[file_cols.icon] = icon;

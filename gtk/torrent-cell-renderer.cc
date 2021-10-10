@@ -392,7 +392,7 @@ namespace
 
 Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
-    char const* mime_type;
+    Glib::ustring mime_type;
     auto const* const info = tr_torrentInfo(tor);
 
     if (info->fileCount == 0)
@@ -412,9 +412,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
         mime_type = gtr_get_mime_type_from_filename(info->files[0].name);
     }
 
-    return Glib::wrap(
-        gtr_get_mime_type_icon(mime_type, static_cast<GtkIconSize>(static_cast<int>(icon_size)), Glib::unwrap(&for_widget)),
-        true);
+    return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
 }
 
 } // namespace
