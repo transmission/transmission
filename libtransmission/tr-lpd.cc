@@ -290,10 +290,8 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
+int tr_lpdInit(tr_session* ss, [[maybe_unused]] tr_address* tr_addr)
 {
-    TR_UNUSED(tr_addr);
-
     /* if this check fails (i.e. the definition of hashString changed), update
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
      * However, the code should work as long as interfaces to the rest of
@@ -684,12 +682,8 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-static void on_upkeep_timer(evutil_socket_t s, short type, void* user_data)
+static void on_upkeep_timer([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(type);
-    TR_UNUSED(user_data);
-
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UPKEEP_INTERVAL_SECS);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
@@ -699,11 +693,8 @@ static void on_upkeep_timer(evutil_socket_t s, short type, void* user_data)
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback(evutil_socket_t s, short type, void* user_data)
+static void event_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* user_data)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(user_data);
-
     TR_ASSERT(tr_isSession(session));
 
     /* do not allow announces to be processed if LPD is disabled */
