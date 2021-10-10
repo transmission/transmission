@@ -26,39 +26,6 @@ struct tr_peerIo;
  * @{
  */
 
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * it's included in the header for inlining and composition. */
-constexpr size_t HISTORY_MSEC = 2000U;
-constexpr size_t INTERVAL_MSEC = HISTORY_MSEC;
-constexpr size_t GRANULARITY_MSEC = 200;
-constexpr size_t HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC);
-
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * it's included in the header for inlining and composition. */
-struct bratecontrol
-{
-    int newest;
-    struct
-    {
-        uint64_t date;
-        uint64_t size;
-    } transfers[HISTORY_SIZE];
-    uint64_t cache_time;
-    unsigned int cache_val;
-};
-
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * it's included in the header for inlining and composition. */
-struct tr_band
-{
-    bool isLimited;
-    bool honorParentLimits;
-    unsigned int bytesLeft;
-    unsigned int desiredSpeed_Bps;
-    struct bratecontrol raw;
-    struct bratecontrol piece;
-};
-
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
  *
@@ -86,29 +53,29 @@ struct tr_band
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidth::allocate() periodically. tr_bandwidth knows its current
+ *   Call Bandwidth::allocate() periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   tr_bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
+ *   Bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidth::clamp() before performing I/O to see how much
+ *   and call Bandwidth::clamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
-struct tr_bandwidth
+struct Bandwidth
 {
 public:
-    explicit tr_bandwidth(tr_bandwidth* newParent);
+    explicit Bandwidth(Bandwidth* newParent);
 
-    tr_bandwidth()
-        : tr_bandwidth(nullptr)
+    Bandwidth()
+        : Bandwidth(nullptr)
     {
     }
 
-    ~tr_bandwidth()
+    ~Bandwidth()
     {
         this->setParent(nullptr);
     }
@@ -118,7 +85,7 @@ public:
      */
     void setPeer(tr_peerIo* newPeer)
     {
-        this->peer = newPeer;
+        this->peer_ = newPeer;
     }
 
     /**
@@ -132,7 +99,7 @@ public:
      */
     void allocate(tr_direction dir, unsigned int period_msec);
 
-    void setParent(tr_bandwidth* newParent);
+    void setParent(Bandwidth* newParent);
 
     [[nodiscard]] tr_priority_t getPriority() const
     {
@@ -157,7 +124,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeed_Bps(&this->band[dir].raw, HISTORY_MSEC, now);
+        return getSpeed_Bps(&this->band_[dir].raw_, HISTORY_MSEC, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
@@ -165,17 +132,17 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeed_Bps(&this->band[dir].piece, HISTORY_MSEC, now);
+        return getSpeed_Bps(&this->band_[dir].piece_, HISTORY_MSEC, now);
     }
 
     /**
      * @brief Set the desired speed for this bandwidth subtree.
-     * @see tr_bandwidth::allocate
-     * @see tr_bandwidth::getDesiredSpeed
+     * @see Bandwidth::allocate
+     * @see Bandwidth::getDesiredSpeed
      */
     constexpr bool setDesiredSpeed_Bps(tr_direction dir, unsigned int desiredSpeed)
     {
-        unsigned int* value = &this->band[dir].desiredSpeed_Bps;
+        unsigned int* value = &this->band_[dir].desired_speed_bps_;
         bool const didChange = desiredSpeed != *value;
         *value = desiredSpeed;
         return didChange;
@@ -183,11 +150,11 @@ public:
 
     /**
      * @brief Get the desired speed for the bandwidth subtree.
-     * @see tr_bandwidth::setDesiredSpeed
+     * @see Bandwidth::setDesiredSpeed
      */
     [[nodiscard]] constexpr double getDesiredSpeed_Bps(tr_direction dir) const
     {
-        return this->band[dir].desiredSpeed_Bps;
+        return this->band_[dir].desired_speed_bps_;
     }
 
     /**
@@ -195,7 +162,7 @@ public:
      */
     constexpr bool setLimited(tr_direction dir, bool isLimited)
     {
-        bool* value = &this->band[dir].isLimited;
+        bool* value = &this->band_[dir].is_limited_;
         bool const didChange = isLimited != *value;
         *value = isLimited;
         return didChange;
@@ -206,7 +173,7 @@ public:
      */
     [[nodiscard]] constexpr bool isLimited(tr_direction dir) const
     {
-        return this->band[dir].isLimited;
+        return this->band_[dir].is_limited_;
     }
 
     /**
@@ -217,7 +184,7 @@ public:
      */
     constexpr bool honorParentLimits(tr_direction direction, bool isEnabled)
     {
-        bool* value = &this->band[direction].honorParentLimits;
+        bool* value = &this->band_[direction].honor_parent_limits_;
         bool const didChange = isEnabled != *value;
         *value = isEnabled;
         return didChange;
@@ -227,13 +194,41 @@ public:
     {
         TR_ASSERT(tr_isDirection(direction));
 
-        return this->band[direction].honorParentLimits;
+        return this->band_[direction].honor_parent_limits_;
     }
 
-private:
-    static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now);
+    static constexpr size_t HISTORY_MSEC = 2000U;
+    static constexpr size_t INTERVAL_MSEC = HISTORY_MSEC;
+    static constexpr size_t GRANULARITY_MSEC = 200;
+    static constexpr size_t HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC);
 
-    static void notifyBandwidthConsumedBytes(uint64_t now, struct bratecontrol* r, size_t size);
+    struct RateControl
+    {
+        int newest_;
+        struct Transfer
+        {
+            uint64_t date_;
+            uint64_t size_;
+        };
+        std::array<Transfer, HISTORY_SIZE> transfers_;
+        uint64_t cache_time_;
+        unsigned int cache_val_;
+    };
+
+    struct Band
+    {
+        bool is_limited_;
+        bool honor_parent_limits_;
+        unsigned int bytes_left_;
+        unsigned int desired_speed_bps_;
+        RateControl raw_;
+        RateControl piece_;
+    };
+
+private:
+    static unsigned int getSpeed_Bps(RateControl const* r, unsigned int interval_msec, uint64_t now);
+
+    static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 
     [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const;
 
@@ -246,10 +241,10 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     tr_priority_t priority = 0;
-    std::array<struct tr_band, 2> band;
-    struct tr_bandwidth* parent;
-    std::unordered_set<tr_bandwidth*> children;
-    struct tr_peerIo* peer;
+    std::array<Band, 2> band_;
+    Bandwidth* parent_;
+    std::unordered_set<Bandwidth*> children_;
+    tr_peerIo* peer_;
 };
 
 /* @} */
