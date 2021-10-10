@@ -1570,7 +1570,7 @@ static void peerSuggestedPiece(tr_swarm* s, tr_peer* peer, tr_piece_index_t piec
     }
 
     /* don't ask for it if they don't have it */
-    if (!tr_bitfieldHas(peer->have, pieceIndex))
+    if (!peer->have.readBit(pieceIndex))
     {
         return;
     }

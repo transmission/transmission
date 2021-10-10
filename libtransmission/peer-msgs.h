@@ -17,7 +17,6 @@
 
 class tr_peer;
 struct tr_address;
-struct Bitfield;
 struct tr_peerIo;
 struct tr_torrent;
 
