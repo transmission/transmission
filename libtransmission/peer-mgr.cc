@@ -11,6 +11,7 @@
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcpy, memcmp, strstr */
+#include <iterator>
 #include <vector>
 
 #include <event2/event.h>
