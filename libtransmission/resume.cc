@@ -484,10 +484,8 @@ static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
     }
     else
     {
-        size_t byte_count = 0;
-        auto* raw = static_cast<uint8_t*>(b->getRaw(&byte_count));
-        tr_variantInitRaw(benc, raw, byte_count);
-        tr_free(raw);
+        auto raw = b->getRaw();
+        tr_variantInitRaw(benc, raw.data(), raw.size());
     }
 }
 
@@ -684,7 +682,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
             else
             {
-                blocks.setRaw(buf, buflen, true);
+                blocks.setRaw(Span{ buf, buflen }, true);
             }
         }
         else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
@@ -700,7 +698,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks.setRaw(raw, rawlen, true);
+            blocks.setRaw(Span{ raw, rawlen }, true);
         }
         else
         {

@@ -757,12 +757,10 @@ static void initField(
     case TR_KEY_pieces:
         if (tr_torrentHasMetadata(tor))
         {
-            size_t byte_count = 0;
-            void* bytes = tr_torrentCreatePieceBitfield(tor, &byte_count);
-            auto* enc = static_cast<char*>(tr_base64_encode(bytes, byte_count, nullptr));
+            auto bytes = tr_torrentCreatePieceBitfield(tor);
+            auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), bytes.size(), nullptr));
             tr_variantInitStr(initme, enc != nullptr ? enc : "", TR_BAD_SIZE);
             tr_free(enc);
-            tr_free(bytes);
         }
         else
         {

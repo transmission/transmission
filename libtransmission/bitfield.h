@@ -12,9 +12,13 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
+#include <vector>
+
 #include "transmission.h"
 #include "tr-macros.h"
 #include "tr-assert.h"
+#include "span.h"
 
 /// @brief Implementation of the BitTorrent spec's Bitfield array of bits
 struct Bitfield
@@ -94,11 +98,11 @@ public:
 
     void setFromFlags(bool const* bytes, size_t n);
 
-    void setFromBitfield(Bitfield const& src);
+    /// @brief Copies bits from the readonly view newBits
+    /// @param bounded Whether incoming data is constrained by our memory and bit size
+    void setRaw(Span<uint8_t> newBits, bool bounded);
 
-    void setRaw(void const* newBits, size_t byte_count, bool bounded);
-
-    void* getRaw(size_t* byte_count) const;
+    [[nodiscard]] std::vector<uint8_t> getRaw() const;
 
     [[nodiscard]] size_t getBitCount() const
     {
@@ -106,13 +110,17 @@ public:
     }
 
 private:
-    [[nodiscard]] constexpr size_t countArray() const;
-    [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
-    static void setBitsInArray(uint8_t* array, size_t bit_count);
+    /// @brief Contains lookup table for how many set bits are there in 0..255
+    static std::array<int8_t const, 256> true_bits_lookup_;
+
     static constexpr size_t getStorageSize(size_t bit_count)
     {
         return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
     }
+
+    [[nodiscard]] size_t countArray() const;
+    [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
+    static void setBitsInArray(std::vector<uint8_t>& array, size_t bit_count);
     void ensureBitsAlloced(size_t n);
     bool ensureNthBitAlloced(size_t nth);
     void freeArray();
@@ -125,8 +133,7 @@ private:
     [[nodiscard]] bool isValid() const;
 #endif
 
-    uint8_t* bits_ = nullptr;
-    size_t alloc_count_ = 0;
+    std::vector<uint8_t> bits_;
     size_t bit_count_ = 0;
     size_t true_count_ = 0;
 
