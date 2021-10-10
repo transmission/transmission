@@ -157,10 +157,10 @@ size_t Bitfield::countBits() const
     return this->true_count_;
 }
 
-void Bitfield::set_all_true(uint8_t* array, size_t bit_count)
+void Bitfield::setBitsInArray(uint8_t* array, size_t bit_count)
 {
     uint8_t const val = 0xFF;
-    size_t const n = get_bytes_needed(bit_count);
+    size_t const n = getStorageSize(bit_count);
 
     if (n > 0)
     {
@@ -174,7 +174,7 @@ void* Bitfield::getRaw(size_t* byte_count) const
 {
     TR_ASSERT(this->bit_count_ > 0);
 
-    size_t const n = get_bytes_needed(this->bit_count_);
+    size_t const n = getStorageSize(this->bit_count_);
     uint8_t* newBits = tr_new0(uint8_t, n);
 
     if (this->alloc_count_ != 0)
@@ -184,7 +184,7 @@ void* Bitfield::getRaw(size_t* byte_count) const
     }
     else if (this->hasAll())
     {
-        set_all_true(newBits, this->bit_count_);
+        setBitsInArray(newBits, this->bit_count_);
     }
 
     *byte_count = n;
@@ -198,11 +198,11 @@ void Bitfield::ensureBitsAlloced(size_t n)
 
     if (has_all)
     {
-        bytes_needed = get_bytes_needed(std::max(n, this->true_count_));
+        bytes_needed = getStorageSize(std::max(n, this->true_count_));
     }
     else
     {
-        bytes_needed = get_bytes_needed(n);
+        bytes_needed = getStorageSize(n);
     }
 
     if (this->alloc_count_ < bytes_needed)
@@ -213,7 +213,7 @@ void Bitfield::ensureBitsAlloced(size_t n)
 
         if (has_all)
         {
-            set_all_true(this->bits_, this->true_count_);
+            setBitsInArray(this->bits_, this->true_count_);
         }
     }
 }
@@ -328,7 +328,7 @@ void Bitfield::setRaw(void const* newBits, size_t byte_count, bool bounded)
 
     if (bounded)
     {
-        byte_count = std::min(byte_count, get_bytes_needed(this->bit_count_));
+        byte_count = std::min(byte_count, getStorageSize(this->bit_count_));
     }
 
     this->bits_ = static_cast<uint8_t*>(tr_memdup(newBits, byte_count));

@@ -105,8 +105,8 @@ public:
 private:
     [[nodiscard]] constexpr size_t countArray() const;
     [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
-    static void set_all_true(uint8_t* array, size_t bit_count);
-    static constexpr size_t get_bytes_needed(size_t bit_count)
+    static void setBitsInArray(uint8_t* array, size_t bit_count);
+    static constexpr size_t getStorageSize(size_t bit_count)
     {
         return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
     }
