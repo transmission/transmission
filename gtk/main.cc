@@ -1550,8 +1550,8 @@ void Application::actions_handler(std::string const& action_name)
     }
     else if (action_name == "new-torrent")
     {
-        Gtk::Widget* w = Glib::wrap(
-            gtr_torrent_creation_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_));
+        auto w = std::shared_ptr<MakeDialog>(MakeDialog::create(*wind_, core_));
+        w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "remove-torrent")
