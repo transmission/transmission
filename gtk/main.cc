@@ -1527,8 +1527,8 @@ void Application::actions_handler(std::string const& action_name)
 
         if (!ids.empty())
         {
-            Gtk::Widget* w = Glib::wrap(
-                gtr_relocate_dialog_new(Glib::unwrap(static_cast<Gtk::Window*>(wind_.get())), core_, ids));
+            auto w = std::shared_ptr<RelocateDialog>(RelocateDialog::create(*wind_, core_, ids));
+            w->signal_hide().connect([w]() mutable { w.reset(); });
             w->show();
         }
     }
