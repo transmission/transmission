@@ -409,18 +409,13 @@ static void on_idle(tr_webseed* w)
 
 static void web_response_func(
     tr_session* session,
-    bool did_connect,
-    bool did_timeout,
+    [[maybe_unused]] bool did_connect,
+    [[maybe_unused]] bool did_timeout,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    [[maybe_unused]] void const* response,
+    [[maybe_unused]] size_t response_byte_count,
     void* vtask)
 {
-    TR_UNUSED(did_connect);
-    TR_UNUSED(did_timeout);
-    TR_UNUSED(response);
-    TR_UNUSED(response_byte_count);
-
     auto* t = static_cast<struct tr_webseed_task*>(vtask);
     bool const success = response_code == 206;
 
@@ -561,11 +556,8 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 namespace
 {
 
-void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
+void webseed_timer_func([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vw)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* w = static_cast<tr_webseed*>(vw);
 
     if (w->retry_tickcount != 0)
