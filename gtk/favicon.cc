@@ -1,13 +1,14 @@
 /*
- * This file Copyright (C) 2012-2014 Mnemosyne LLC
+ * This file Copyright (C) 2012-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
+#include <array>
+
 #include <glib/gstdio.h> /* g_remove() */
-#include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/web.h> /* tr_webRun() */
@@ -15,158 +16,144 @@
 #include "favicon.h"
 #include "util.h" /* gtr_get_host_from_url() */
 
-#define IMAGE_TYPES 4
-static char const* image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
+namespace
+{
+
+std::array<char const*, 4> image_types = { "ico", "png", "gif", "jpg" };
 
 struct favicon_data
 {
-    tr_session* session;
-    GFunc func;
-    gpointer data;
-    char* host;
-    char* contents;
-    size_t len;
-    int type;
+    tr_session* session = nullptr;
+    std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> func;
+    std::string host;
+    std::string contents;
+    size_t type = 0;
 };
 
-static char* get_url(char const* host, int image_type)
+Glib::ustring get_url(std::string const& host, size_t image_type)
 {
-    return g_strdup_printf("http://%s/favicon.%s", host, image_types[image_type]);
+    return Glib::ustring::sprintf("http://%s/favicon.%s", host, image_types[image_type]);
 }
 
-static char* favicon_get_cache_dir(void)
+std::string favicon_get_cache_dir()
 {
-    static char* dir = nullptr;
+    static std::string dir;
 
-    if (dir == nullptr)
+    if (dir.empty())
     {
-        dir = g_build_filename(g_get_user_cache_dir(), "transmission", "favicons", nullptr);
-        g_mkdir_with_parents(dir, 0777);
+        dir = Glib::build_filename(Glib::get_user_cache_dir(), "transmission", "favicons");
+        g_mkdir_with_parents(dir.c_str(), 0777);
     }
 
     return dir;
 }
 
-static char* favicon_get_cache_filename(char const* host)
+std::string favicon_get_cache_filename(std::string const& host)
 {
-    return g_build_filename(favicon_get_cache_dir(), host, nullptr);
+    return Glib::build_filename(favicon_get_cache_dir(), host);
 }
 
-static void favicon_save_to_cache(char const* host, void const* data, size_t len)
+void favicon_save_to_cache(std::string const& host, std::string const& data)
 {
-    char* filename = favicon_get_cache_filename(host);
-    g_file_set_contents(filename, static_cast<gchar const*>(data), len, nullptr);
-    g_free(filename);
+    Glib::file_set_contents(favicon_get_cache_filename(host), data);
 }
 
-static GdkPixbuf* favicon_load_from_cache(char const* host)
+Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
 {
-    char* filename = favicon_get_cache_filename(host);
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_size(filename, 16, 16, nullptr);
+    auto const filename = favicon_get_cache_filename(host);
 
-    if (pixbuf == nullptr) /* bad file */
+    try
     {
-        g_remove(filename);
+        return Gdk::Pixbuf::create_from_file(filename, 16, 16, false);
     }
-
-    g_free(filename);
-    return pixbuf;
+    catch (Glib::Error const&)
+    {
+        g_remove(filename.c_str());
+        return {};
+    }
 }
 
-static void favicon_web_done_cb(tr_session*, bool, bool, long, void const*, size_t, void*);
+void favicon_web_done_cb(tr_session*, bool, bool, long, void const*, size_t, void*);
 
-static gboolean favicon_web_done_idle_cb(gpointer vfav)
+bool favicon_web_done_idle_cb(favicon_data* fav)
 {
-    GdkPixbuf* pixbuf = nullptr;
-    gboolean finished = FALSE;
-    auto* fav = static_cast<favicon_data*>(vfav);
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf;
+    bool finished = false;
 
-    if (fav->len > 0) /* we got something... try to make a pixbuf from it */
+    if (!fav->contents.empty()) /* we got something... try to make a pixbuf from it */
     {
-        favicon_save_to_cache(fav->host, fav->contents, fav->len);
+        favicon_save_to_cache(fav->host, fav->contents);
         pixbuf = favicon_load_from_cache(fav->host);
         finished = pixbuf != nullptr;
     }
 
     if (!finished) /* no pixbuf yet... */
     {
-        if (++fav->type == IMAGE_TYPES) /* failure */
+        if (++fav->type == image_types.size()) /* failure */
         {
-            finished = TRUE;
+            finished = true;
         }
         else /* keep trying */
         {
-            char* url = get_url(fav->host, fav->type);
-
-            g_free(fav->contents);
-            fav->contents = nullptr;
-            fav->len = 0;
-
-            tr_webRun(fav->session, url, favicon_web_done_cb, fav);
-            g_free(url);
+            fav->contents.clear();
+            tr_webRun(fav->session, get_url(fav->host, fav->type).c_str(), favicon_web_done_cb, fav);
         }
     }
 
     if (finished)
     {
-        fav->func(pixbuf, fav->data);
-        g_free(fav->host);
-        g_free(fav->contents);
-        g_free(fav);
+        fav->func(pixbuf);
+        delete fav;
     }
 
-    return G_SOURCE_REMOVE;
+    return false;
 }
 
-static void favicon_web_done_cb(
-    tr_session* session,
-    bool did_connect,
-    bool did_timeout,
-    long code,
+void favicon_web_done_cb(
+    tr_session* /*session*/,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
+    long /*code*/,
     void const* data,
     size_t len,
     void* vfav)
 {
-    TR_UNUSED(session);
-    TR_UNUSED(did_connect);
-    TR_UNUSED(did_timeout);
-    TR_UNUSED(code);
-
     auto* fav = static_cast<favicon_data*>(vfav);
-    fav->contents = static_cast<char*>(g_memdup(data, len));
-    fav->len = len;
+    fav->contents.assign(static_cast<char const*>(data), len);
 
-    gdk_threads_add_idle(favicon_web_done_idle_cb, fav);
+    Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(fav); });
 }
 
-void gtr_get_favicon(tr_session* session, char const* host, GFunc pixbuf_ready_func, gpointer pixbuf_ready_func_data)
+} // namespace
+
+void gtr_get_favicon(
+    tr_session* session,
+    std::string const& host,
+    std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
-    GdkPixbuf* pixbuf = favicon_load_from_cache(host);
+    auto pixbuf = favicon_load_from_cache(host);
 
     if (pixbuf != nullptr)
     {
-        pixbuf_ready_func(pixbuf, pixbuf_ready_func_data);
+        pixbuf_ready_func(pixbuf);
     }
     else
     {
-        struct favicon_data* data;
-        char* url = get_url(host, 0);
-
-        data = g_new(struct favicon_data, 1);
+        auto* data = new favicon_data();
         data->session = session;
         data->func = pixbuf_ready_func;
-        data->data = pixbuf_ready_func_data;
-        data->host = g_strdup(host);
-        data->type = 0;
+        data->host = host;
 
-        tr_webRun(session, url, favicon_web_done_cb, data);
-        g_free(url);
+        tr_webRun(session, get_url(host, 0).c_str(), favicon_web_done_cb, data);
     }
 }
 
-void gtr_get_favicon_from_url(tr_session* session, char const* url, GFunc pixbuf_ready_func, gpointer pixbuf_ready_func_data)
+void gtr_get_favicon_from_url(
+    tr_session* session,
+    Glib::ustring const& url,
+    std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
     char host[1024];
-    gtr_get_host_from_url(host, sizeof(host), url);
-    gtr_get_favicon(session, host, pixbuf_ready_func, pixbuf_ready_func_data);
+    gtr_get_host_from_url(host, sizeof(host), url.c_str());
+    gtr_get_favicon(session, host, pixbuf_ready_func);
 }

@@ -143,22 +143,18 @@ void tracker_model_update_count(Gtk::TreeModel::iterator const& iter, int n)
     }
 }
 
-void favicon_ready_cb(gpointer vpixbuf, gpointer vreference)
+void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference)
 {
-    auto* reference = static_cast<Gtk::TreeRowReference*>(vreference);
-
-    if (auto const pixbuf = Glib::wrap(static_cast<GdkPixbuf*>(vpixbuf)); pixbuf != nullptr)
+    if (pixbuf != nullptr)
     {
-        auto const path = reference->get_path();
-        auto const model = reference->get_model();
+        auto const path = reference.get_path();
+        auto const model = reference.get_model();
 
         if (auto const iter = model->get_iter(path); iter)
         {
             iter->set_value(tracker_filter_cols.pixbuf, pixbuf);
         }
     }
-
-    delete reference;
 }
 
 bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_model)
@@ -268,7 +264,11 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
             add->set_value(tracker_filter_cols.count, hosts_hash.at(host));
             add->set_value(tracker_filter_cols.type, static_cast<int>(TRACKER_FILTER_TYPE_HOST));
             auto path = tracker_model->get_path(add);
-            gtr_get_favicon(session, host->c_str(), favicon_ready_cb, new Gtk::TreeRowReference(tracker_model, path));
+            gtr_get_favicon(
+                session,
+                *host,
+                [ref = Gtk::TreeRowReference(tracker_model, path)](auto const& pixbuf) mutable
+                { favicon_ready_cb(pixbuf, ref); });
             // ++iter;
             ++i;
         }

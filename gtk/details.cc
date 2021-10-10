@@ -2122,22 +2122,18 @@ tr_torrent* DetailsDialog::Impl::tracker_list_get_current_torrent() const
 namespace
 {
 
-void favicon_ready_cb(gpointer vpixbuf, gpointer vreference)
+void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference)
 {
-    auto* reference = static_cast<Gtk::TreeRowReference*>(vreference);
-
-    if (auto const pixbuf = Glib::wrap(static_cast<GdkPixbuf*>(vpixbuf)); pixbuf != nullptr)
+    if (pixbuf != nullptr)
     {
-        auto const path = reference->get_path();
-        auto const model = reference->get_model();
+        auto const path = reference.get_path();
+        auto const model = reference.get_model();
 
         if (auto const iter = model->get_iter(path); iter)
         {
             (*iter)[tracker_cols.favicon] = pixbuf;
         }
     }
-
-    delete reference;
 }
 
 } // namespace
@@ -2193,7 +2189,10 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 
                 auto const p = store->get_path(iter);
                 hash.emplace(gstr.str(), Gtk::TreeRowReference(store, p));
-                gtr_get_favicon_from_url(session, st->announce, &favicon_ready_cb, new Gtk::TreeRowReference(store, p));
+                gtr_get_favicon_from_url(
+                    session,
+                    st->announce,
+                    [ref = Gtk::TreeRowReference(store, p)](auto const& pixbuf) mutable { favicon_ready_cb(pixbuf, ref); });
             }
         }
     }
