@@ -109,7 +109,7 @@ public:
     tr_peer_callback const callback;
     void* const callback_data;
 
-    tr_bandwidth bandwidth;
+    Bandwidth bandwidth;
     std::set<tr_webseed_task*> tasks;
     struct event* timer = nullptr;
     int consecutive_failures = 0;

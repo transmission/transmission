@@ -643,7 +643,7 @@ static auto dummy_utp_function_table = UTPFunctionTable{
 
 static tr_peerIo* tr_peerIoNew(
     tr_session* session,
-    tr_bandwidth* parent,
+    Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     uint8_t const* torrentHash,
@@ -680,7 +680,7 @@ static tr_peerIo* tr_peerIoNew(
     io->timeCreated = tr_time();
     io->inbuf = evbuffer_new();
     io->outbuf = evbuffer_new();
-    io->bandwidth = new tr_bandwidth(parent);
+    io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
     dbgmsg(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
 
@@ -719,7 +719,7 @@ static tr_peerIo* tr_peerIoNew(
 
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
-    tr_bandwidth* parent,
+    Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     struct tr_peer_socket const socket)
@@ -732,7 +732,7 @@ tr_peerIo* tr_peerIoNewIncoming(
 
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
-    tr_bandwidth* parent,
+    Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     uint8_t const* torrentHash,

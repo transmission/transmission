@@ -3147,7 +3147,7 @@ static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
     return Bps;
 }
 
-static inline bool isBandwidthMaxedOut(tr_bandwidth const* b, uint64_t const now_msec, tr_direction dir)
+static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_msec, tr_direction dir)
 {
     if (!b->isLimited(dir))
     {
