@@ -655,8 +655,6 @@ static tr_peerIo* tr_peerIoNew(
     auto* io = new tr_peerIo{ session, *addr, port, isSeed };
     tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
     io->socket = socket;
-    io->inbuf = evbuffer_new();
-    io->outbuf = evbuffer_new();
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
     dbgmsg(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
@@ -899,8 +897,6 @@ static void io_dtor(void* vio)
     dbgmsg(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
     delete io->bandwidth;
-    evbuffer_free(io->outbuf);
-    evbuffer_free(io->inbuf);
     io_close_socket(io);
     tr_cryptoDestruct(&io->crypto);
 
@@ -909,6 +905,7 @@ static void io_dtor(void* vio)
         peer_io_pull_datatype(io);
     }
 
+    io->magic_number = ~0;
     delete io;
 }
 

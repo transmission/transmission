@@ -18,6 +18,8 @@
 
 #include <assert.h>
 
+#include <event2/buffer.h>
+
 #include "transmission.h"
 #include "bandwidth.h"
 #include "crypto.h"
@@ -63,14 +65,28 @@ public:
     tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_seed_in)
         : addr{ addr_in }
         , session{ session_in }
+        , inbuf{ evbuffer_new() }
+        , outbuf{ evbuffer_new() }
         , port{ port_in }
         , isSeed{ is_seed_in }
     {
     }
 
+    ~tr_peerIo()
+    {
+        evbuffer_free(outbuf);
+        evbuffer_free(inbuf);
+    }
+
     tr_crypto crypto = {};
 
     tr_address const addr;
+
+    // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
+    // like this one isn't being used just for assertions, but also in
+    // didWriteWrapper() to see if the tr_peerIo got freed during the
+    // notify-consumed events. Fix this before removing this field.
+    int magic_number = PEER_IO_MAGIC_NUMBER;
 
     struct tr_peer_socket socket = {};
 
@@ -87,19 +103,21 @@ public:
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     Bandwidth* bandwidth = nullptr;
 
-    struct evbuffer* inbuf = nullptr;
-    struct evbuffer* outbuf = nullptr;
+    evbuffer* const inbuf;
+    evbuffer* const outbuf;
     struct tr_datatype* outbuf_datatypes = nullptr;
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
 
+    // TODO(ckerr): this could be narrowed to 1 byte
     tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
 
-    // TODO: use std::shared_ptr instead of manual refcounting
+    // TODO: use std::shared_ptr instead of manual refcounting?
     int refCount = 1;
 
-    int const magicNumber = PEER_IO_MAGIC_NUMBER;
+    // TODO(ckerr): I think this can be moved to tr_handshake
+    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
 
     short int pendingEvents = 0;
 
@@ -107,13 +125,12 @@ public:
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
-
     bool const isSeed;
     bool dhtSupported = false;
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
     bool isEncrypted = false;
+    // TODO(ckerr): I think this can be moved to tr_handshake
     bool peerIdIsSet = false;
     bool utpSupported = false;
 };
@@ -148,7 +165,7 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
+    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
 }
 
 /**
@@ -219,6 +236,7 @@ constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
     return io->crypto.isIncoming;
 }
 
+// TODO: remove this func; let caller get the current time instead
 static inline int tr_peerIoGetAge(tr_peerIo const* io)
 {
     return tr_time() - io->timeCreated;
