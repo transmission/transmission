@@ -23,7 +23,7 @@
 ****
 ***/
 
-unsigned int Bandwidth::getSpeedBps(RateControl& r, unsigned int interval_msec, uint64_t now)
+unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -259,8 +259,8 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_
                 now = tr_time_msec();
             }
 
-            current = this->getRawSpeedBps(now, TR_DOWN);
-            desired = this->getDesiredSpeedBps(TR_DOWN);
+            current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
+            desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
             r = desired >= 1 ? current / desired : 0;
 
             if (r > 1.0)

@@ -125,19 +125,19 @@ public:
     }
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] unsigned int getRawSpeedBps(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] unsigned int getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeedBps(this->band_[dir].raw_, HistoryMSec, now);
+        return getSpeedBytesPerSecond(this->band_[dir].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] unsigned int getPieceSpeedBps(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] unsigned int getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return getSpeedBps(this->band_[dir].piece_, HistoryMSec, now);
+        return getSpeedBytesPerSecond(this->band_[dir].piece_, HistoryMSec, now);
     }
 
     /**
@@ -145,7 +145,7 @@ public:
      * @see Bandwidth::allocate
      * @see Bandwidth::getDesiredSpeed
      */
-    constexpr bool setDesiredSpeedBps(tr_direction dir, unsigned int desired_speed)
+    constexpr bool setDesiredSpeedBytesPerSecond(tr_direction dir, unsigned int desired_speed)
     {
         auto& value = this->band_[dir].desired_speed_bps_;
         bool const did_change = desired_speed != value;
@@ -157,7 +157,7 @@ public:
      * @brief Get the desired speed for the bandwidth subtree.
      * @see Bandwidth::setDesiredSpeed
      */
-    [[nodiscard]] constexpr double getDesiredSpeedBps(tr_direction dir) const
+    [[nodiscard]] constexpr double getDesiredSpeedBytesPerSecond(tr_direction dir) const
     {
         return this->band_[dir].desired_speed_bps_;
     }
@@ -231,7 +231,7 @@ public:
     };
 
 private:
-    static unsigned int getSpeedBps(RateControl& r, unsigned int interval_msec, uint64_t now);
+    static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 

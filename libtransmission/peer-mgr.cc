@@ -3181,8 +3181,8 @@ static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_ms
     }
     else
     {
-        unsigned int const got = b->getPieceSpeedBps(now_msec, dir);
-        unsigned int const want = b->getDesiredSpeedBps(dir);
+        unsigned int const got = b->getPieceSpeedBytesPerSecond(now_msec, dir);
+        unsigned int const want = b->getDesiredSpeedBytesPerSecond(dir);
         return got >= want;
     }
 }
