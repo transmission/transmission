@@ -533,10 +533,8 @@ static tr_lock* getQueueLock(void)
     return lock;
 }
 
-static void makeMetaWorkerFunc(void* user_data)
+static void makeMetaWorkerFunc([[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(user_data);
-
     for (;;)
     {
         tr_metainfo_builder* builder = nullptr;

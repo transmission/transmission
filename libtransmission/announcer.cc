@@ -1712,11 +1712,8 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     }
 }
 
-static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer)
+static void onUpkeepTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vannouncer)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* announcer = static_cast<tr_announcer*>(vannouncer);
     tr_session* session = announcer->session;
     bool const is_closing = session->isClosed;
@@ -1863,10 +1860,8 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     return ret;
 }
 
-void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount)
+void tr_announcerStatsFree(tr_tracker_stat* trackers, [[maybe_unused]] int trackerCount)
 {
-    TR_UNUSED(trackerCount);
-
     tr_free(trackers);
 }
 
@@ -1920,10 +1915,8 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     }
 }
 
-void tr_announcerResetTorrent(tr_announcer* announcer, tr_torrent* tor)
+void tr_announcerResetTorrent([[maybe_unused]] tr_announcer* announcer, tr_torrent* tor)
 {
-    TR_UNUSED(announcer);
-
     TR_ASSERT(tor->tiers != nullptr);
 
     time_t const now = tr_time();
