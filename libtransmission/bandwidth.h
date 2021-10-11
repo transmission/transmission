@@ -204,7 +204,6 @@ public:
 
     struct RateControl
     {
-        int newest_;
         struct Transfer
         {
             uint64_t date_;
@@ -213,16 +212,17 @@ public:
         std::array<Transfer, HISTORY_SIZE> transfers_;
         uint64_t cache_time_;
         unsigned int cache_val_;
+        int newest_;
     };
 
     struct Band
     {
-        bool is_limited_;
-        bool honor_parent_limits_;
-        unsigned int bytes_left_;
-        unsigned int desired_speed_bps_;
         RateControl raw_;
         RateControl piece_;
+        unsigned int bytes_left_;
+        unsigned int desired_speed_bps_;
+        bool is_limited_;
+        bool honor_parent_limits_;
     };
 
 private:
@@ -240,11 +240,11 @@ private:
         unsigned int period_msec,
         std::vector<tr_peerIo*>& peer_pool);
 
-    tr_priority_t priority = 0;
     std::array<Band, 2> band_;
     Bandwidth* parent_;
     std::unordered_set<Bandwidth*> children_;
     tr_peerIo* peer_;
+    tr_priority_t priority = 0;
 };
 
 /* @} */
