@@ -1117,7 +1117,7 @@
                                         </tableHeaderCell>
                                         <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:1782:image" id="1782"/>
                                     </tableColumn>
-                                    <tableColumn identifier="Name" editable="NO" width="106" minWidth="40" maxWidth="1000" id="1779">
+                                    <tableColumn identifier="Name" editable="NO" width="77" minWidth="40" maxWidth="1000" id="1779">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Имя">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1157,7 +1157,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1907">
-                    <rect key="frame" x="196" y="17" width="114" height="26"/>
+                    <rect key="frame" x="177" y="17" width="133" height="26"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" title="Каждый день" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="127" imageScaling="proportionallyDown" inset="2" selectedItem="1910" id="1908">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1223,7 +1223,7 @@
                     </connections>
                 </datePicker>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="310" customClass="ColorTextField">
-                    <rect key="frame" x="417" y="23" width="24" height="17"/>
+                    <rect key="frame" x="417" y="24" width="24" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="до" id="1281">
                         <font key="font" metaFont="system"/>
@@ -1445,7 +1445,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LMi-IQ-sN0" customClass="ColorTextField">
-                    <rect key="frame" x="313" y="21" width="10" height="17"/>
+                    <rect key="frame" x="313" y="24" width="10" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="c" id="sfg-7Q-XEp">
                         <font key="font" metaFont="system"/>
@@ -1457,6 +1457,7 @@
                     </connections>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="113" y="439.5"/>
         </customView>
         <customView id="1361" userLabel="Peers">
             <rect key="frame" x="0.0" y="0.0" width="542" height="366"/>
@@ -1973,7 +1974,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" width="294" minWidth="40" maxWidth="1000" id="1523">
+                                    <tableColumn identifier="IP" width="265" minWidth="40" maxWidth="1000" id="1523">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP-адрес">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
