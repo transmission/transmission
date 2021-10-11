@@ -88,7 +88,7 @@ class Application : public Gtk::Application
 public:
     Application(std::string const& config_dir, bool start_paused, bool is_iconified);
 
-    void actions_handler(std::string const& action_name);
+    void actions_handler(Glib::ustring const& action_name);
 
 protected:
     void on_startup() override;
@@ -554,7 +554,7 @@ void Application::on_startup()
 
     /* init the ui manager */
     ui_manager_ = Gtk::UIManager::create();
-    gtr_actions_init(Glib::unwrap(ui_manager_), this);
+    gtr_actions_init(ui_manager_, this);
     ui_manager_->add_ui_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
     ui_manager_->ensure_update();
 
@@ -1471,12 +1471,12 @@ void Application::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     tr_free(magnet);
 }
 
-void gtr_actions_handler(char const* action_name, gpointer user_data)
+void gtr_actions_handler(Glib::ustring const& action_name, void* user_data)
 {
     static_cast<Application*>(user_data)->actions_handler(action_name);
 }
 
-void Application::actions_handler(std::string const& action_name)
+void Application::actions_handler(Glib::ustring const& action_name)
 {
     bool changed = false;
 

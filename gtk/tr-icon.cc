@@ -183,7 +183,7 @@ SystemTrayIcon::Impl::Impl(TrCore* core)
     : core_(core)
 {
     auto const icon_name = getIconName();
-    menu_ = Glib::wrap(GTK_MENU(gtr_action_get_widget("/icon-popup")));
+    menu_ = gtr_action_get_widget<Gtk::Menu>("/icon-popup");
 
 #ifdef HAVE_LIBAPPINDICATOR
 

@@ -168,6 +168,15 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* entry);
  * and prevents selected text in the label from being deselected */
 void gtr_label_set_text(GtkLabel* lb, char const* text);
 
+template<>
+struct std::hash<Glib::ustring>
+{
+    std::size_t operator()(Glib::ustring const& s) const
+    {
+        return std::hash<std::string>()(s.raw());
+    }
+};
+
 namespace Glib
 {
 

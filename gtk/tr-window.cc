@@ -107,7 +107,7 @@ namespace
 
 void on_popup_menu(GdkEventButton* event)
 {
-    auto* menu = Glib::wrap(GTK_MENU(gtr_action_get_widget("/main-window-popup")));
+    auto* menu = gtr_action_get_widget<Gtk::Menu>("/main-window-popup");
 
 #if GTK_CHECK_VERSION(3, 22, 0)
     menu->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
@@ -506,13 +506,13 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     window.add(*vbox);
 
     /* main menu */
-    auto* mainmenu = Glib::wrap(GTK_MENU_BAR(gtr_action_get_widget("/main-window-menu")));
-    Glib::wrap(GTK_MENU_ITEM(gtr_action_get_widget("/main-window-menu/torrent-menu/torrent-reannounce")))
+    auto* mainmenu = gtr_action_get_widget<Gtk::MenuBar>("/main-window-menu");
+    gtr_action_get_widget<Gtk::MenuItem>("/main-window-menu/torrent-menu/torrent-reannounce")
         ->signal_query_tooltip()
         .connect(sigc::mem_fun(this, &Impl::onAskTrackerQueryTooltip));
 
     /* toolbar */
-    toolbar_ = Glib::wrap(GTK_TOOLBAR(gtr_action_get_widget("/main-window-toolbar")));
+    toolbar_ = gtr_action_get_widget<Gtk::Toolbar>("/main-window-toolbar");
     toolbar_->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     gtr_action_set_important("open-torrent-toolbar", true);
     gtr_action_set_important("show-torrent-properties", true);
