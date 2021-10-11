@@ -1160,7 +1160,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1907">
-                    <rect key="frame" x="302" y="51" width="160" height="26"/>
+                    <rect key="frame" x="309" y="51" width="160" height="26"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" title="Täglich" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="127" imageScaling="proportionallyDown" inset="2" selectedItem="1910" id="1908">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1188,7 +1188,7 @@
                     </connections>
                 </popUpButton>
                 <datePicker verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="526">
-                    <rect key="frame" x="401" y="20" width="61" height="27"/>
+                    <rect key="frame" x="408" y="20" width="68" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="1283">
                         <font key="font" metaFont="system"/>
@@ -1207,7 +1207,7 @@
                     </connections>
                 </datePicker>
                 <datePicker verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="525">
-                    <rect key="frame" x="305" y="20" width="68" height="27"/>
+                    <rect key="frame" x="312" y="20" width="68" height="27"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="1282">
                         <font key="font" metaFont="system"/>
@@ -1226,7 +1226,7 @@
                     </connections>
                 </datePicker>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="310" customClass="ColorTextField">
-                    <rect key="frame" x="375" y="24" width="23" height="17"/>
+                    <rect key="frame" x="382" y="24" width="23" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="bis" id="1281">
                         <font key="font" metaFont="system"/>
@@ -1238,7 +1238,7 @@
                     </connections>
                 </textField>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="307">
-                    <rect key="frame" x="284" y="81" width="166" height="18"/>
+                    <rect key="frame" x="291" y="81" width="166" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="automatisch aktivieren" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1280">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1249,13 +1249,8 @@
                         <binding destination="365" name="value" keyPath="values.SpeedLimitAuto" id="455"/>
                     </connections>
                 </button>
-                <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="228">
-                    <rect key="frame" x="17" y="173" width="20" height="14"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TurtleTemplate" id="1279"/>
-                </imageView>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="200">
-                    <rect key="frame" x="17" y="53" width="192" height="84"/>
+                    <rect key="frame" x="33" y="53" width="192" height="84"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="1278">
                         <font key="font" metaFont="smallSystem"/>
@@ -1265,7 +1260,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="199">
-                    <rect key="frame" x="283" y="152" width="69" height="17"/>
+                    <rect key="frame" x="311" y="152" width="69" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="höchstens" id="1277">
                         <font key="font" metaFont="system"/>
@@ -1274,7 +1269,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="198">
-                    <rect key="frame" x="283" y="123" width="69" height="17"/>
+                    <rect key="frame" x="311" y="123" width="69" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="höchstens" id="1276">
                         <font key="font" metaFont="system"/>
@@ -1283,7 +1278,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="196">
-                    <rect key="frame" x="17" y="152" width="264" height="17"/>
+                    <rect key="frame" x="24" y="152" width="264" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Begrenzte Übertragungsgeschwindigkeit:" id="1275">
                         <font key="font" metaFont="system"/>
@@ -1292,7 +1287,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="195">
-                    <rect key="frame" x="408" y="123" width="83" height="17"/>
+                    <rect key="frame" x="435" y="123" width="83" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s senden" id="1274">
                         <font key="font" metaFont="system"/>
@@ -1301,7 +1296,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="194">
-                    <rect key="frame" x="408" y="151" width="109" height="17"/>
+                    <rect key="frame" x="435" y="151" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s empfangen" id="1273">
                         <font key="font" metaFont="system"/>
@@ -1310,7 +1305,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="192">
-                    <rect key="frame" x="355" y="121" width="50" height="22"/>
+                    <rect key="frame" x="382" y="121" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1272">
                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="929">
@@ -1330,7 +1325,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="190">
-                    <rect key="frame" x="355" y="149" width="50" height="22"/>
+                    <rect key="frame" x="382" y="149" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1271">
                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="928">
@@ -1350,7 +1345,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="163">
-                    <rect key="frame" x="102" y="226" width="179" height="17"/>
+                    <rect key="frame" x="109" y="226" width="179" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Datendurchsatz begrenzen:" id="1270">
                         <font key="font" metaFont="system"/>
@@ -1359,7 +1354,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="159" customClass="ColorTextField">
-                    <rect key="frame" x="428" y="201" width="83" height="17"/>
+                    <rect key="frame" x="435" y="201" width="83" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s senden" id="1269">
                         <font key="font" metaFont="system"/>
@@ -1371,7 +1366,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="158" customClass="ColorTextField">
-                    <rect key="frame" x="428" y="226" width="109" height="17"/>
+                    <rect key="frame" x="435" y="226" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s empfangen" id="1268">
                         <font key="font" metaFont="system"/>
@@ -1383,7 +1378,7 @@
                     </connections>
                 </textField>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="157">
-                    <rect key="frame" x="284" y="225" width="87" height="18"/>
+                    <rect key="frame" x="291" y="225" width="87" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="höchstens" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1267">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1395,7 +1390,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="156">
-                    <rect key="frame" x="375" y="198" width="50" height="22"/>
+                    <rect key="frame" x="382" y="198" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1266">
                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="927">
@@ -1416,7 +1411,7 @@
                     </connections>
                 </textField>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="155">
-                    <rect key="frame" x="284" y="199" width="87" height="18"/>
+                    <rect key="frame" x="291" y="199" width="87" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="höchstens" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1265">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1428,7 +1423,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="154">
-                    <rect key="frame" x="375" y="224" width="50" height="22"/>
+                    <rect key="frame" x="382" y="224" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1264">
                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="926">
@@ -1448,6 +1443,11 @@
                         <outlet property="nextKeyView" destination="156" id="577"/>
                     </connections>
                 </textField>
+                <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="228">
+                    <rect key="frame" x="10" y="151" width="18" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TurtleTemplate" id="1279"/>
+                </imageView>
             </subviews>
             <point key="canvasLocation" x="-484" y="48"/>
         </customView>
