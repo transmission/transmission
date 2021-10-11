@@ -677,8 +677,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
         size_t const server_url_len = strlen(server->url);
         char const* const location = strncmp(req->uri, server->url, server_url_len) == 0 ? req->uri + server_url_len : NULL;
 
-        if (location == NULL || location[0] == '\0' ||
-            strcmp(location, "web") == 0)
+        if (location == NULL || location[0] == '\0' || strcmp(location, "web") == 0)
         {
             char* new_location = tr_strdup_printf("%sweb/", server->url);
             evhttp_add_header(req->output_headers, "Location", new_location);
