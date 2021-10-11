@@ -61,42 +61,23 @@ class tr_peerIo
 {
 public:
     tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_incoming_in, bool is_seed_in)
-        : isIncoming{ is_incoming_in }
-        , isSeed{ is_seed_in }
-        , port{ port_in }
+        : addr{ addr_in }
         , session{ session_in }
-        , addr{ addr_in }
+        , port{ port_in }
+        , isIncoming{ is_incoming_in }
+        , isSeed{ is_seed_in }
     {
     }
 
-    bool isEncrypted = false;
-    bool const isIncoming;
-    bool peerIdIsSet = false;
-    bool extendedProtocolSupported = false;
-    bool fastExtensionSupported = false;
-    bool dhtSupported = false;
-    bool utpSupported = false;
+    tr_crypto crypto = {};
 
-    tr_priority_t priority = TR_PRI_NORMAL;
+    tr_address const addr;
 
-    short int pendingEvents = 0;
-
-    int const magicNumber = PEER_IO_MAGIC_NUMBER;
-
-    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
-    bool const isSeed;
-
-    tr_port const port;
     struct tr_peer_socket socket = {};
 
-    int refCount = 1;
-
-    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
     time_t const timeCreated = tr_time();
 
     tr_session* const session;
-
-    tr_address const addr;
 
     tr_can_read_cb canRead = nullptr;
     tr_did_write_cb didWrite = nullptr;
@@ -106,7 +87,6 @@ public:
     // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     Bandwidth* bandwidth = nullptr;
-    tr_crypto crypto;
 
     struct evbuffer* inbuf = nullptr;
     struct evbuffer* outbuf = nullptr;
@@ -114,6 +94,30 @@ public:
 
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
+
+    tr_priority_t priority = TR_PRI_NORMAL;
+
+    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
+
+    // TODO: use std::shared_ptr instead of manual refcounting
+    int refCount = 1;
+
+    int const magicNumber = PEER_IO_MAGIC_NUMBER;
+
+    short int pendingEvents = 0;
+
+    tr_port const port;
+
+    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
+
+    bool const isIncoming;
+    bool const isSeed;
+    bool dhtSupported = false;
+    bool extendedProtocolSupported = false;
+    bool fastExtensionSupported = false;
+    bool isEncrypted = false;
+    bool peerIdIsSet = false;
+    bool utpSupported = false;
 };
 
 /**
