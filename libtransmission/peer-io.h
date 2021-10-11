@@ -55,54 +55,65 @@ using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPie
 
 using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
 
+auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
+
 class tr_peerIo
 {
 public:
-    bool isEncrypted;
-    bool isIncoming;
-    bool peerIdIsSet;
-    bool extendedProtocolSupported;
-    bool fastExtensionSupported;
-    bool dhtSupported;
-    bool utpSupported;
+    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_incoming_in, bool is_seed_in)
+        : isIncoming{ is_incoming_in }
+        , isSeed{ is_seed_in }
+        , port{ port_in }
+        , session{ session_in }
+        , addr{ addr_in }
+    {
+    }
 
-    tr_priority_t priority;
+    bool isEncrypted = false;
+    bool const isIncoming;
+    bool peerIdIsSet = false;
+    bool extendedProtocolSupported = false;
+    bool fastExtensionSupported = false;
+    bool dhtSupported = false;
+    bool utpSupported = false;
 
-    short int pendingEvents;
+    tr_priority_t priority = TR_PRI_NORMAL;
 
-    int magicNumber;
+    short int pendingEvents = 0;
 
-    tr_encryption_type encryption_type;
-    bool isSeed;
+    int const magicNumber = PEER_IO_MAGIC_NUMBER;
 
-    tr_port port;
-    struct tr_peer_socket socket;
+    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
+    bool const isSeed;
 
-    int refCount;
+    tr_port const port;
+    struct tr_peer_socket socket = {};
 
-    uint8_t peerId[SHA_DIGEST_LENGTH];
-    time_t timeCreated;
+    int refCount = 1;
 
-    tr_session* session;
+    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
+    time_t const timeCreated = tr_time();
 
-    tr_address addr;
+    tr_session* const session;
 
-    tr_can_read_cb canRead;
-    tr_did_write_cb didWrite;
-    tr_net_error_cb gotError;
-    void* userData;
+    tr_address const addr;
+
+    tr_can_read_cb canRead = nullptr;
+    tr_did_write_cb didWrite = nullptr;
+    tr_net_error_cb gotError = nullptr;
+    void* userData = nullptr;
 
     // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    Bandwidth* bandwidth;
+    Bandwidth* bandwidth = nullptr;
     tr_crypto crypto;
 
-    struct evbuffer* inbuf;
-    struct evbuffer* outbuf;
-    struct tr_datatype* outbuf_datatypes;
+    struct evbuffer* inbuf = nullptr;
+    struct evbuffer* outbuf = nullptr;
+    struct tr_datatype* outbuf_datatypes = nullptr;
 
-    struct event* event_read;
-    struct event* event_write;
+    struct event* event_read = nullptr;
+    struct event* event_write = nullptr;
 };
 
 /**
@@ -132,8 +143,6 @@ void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 #define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io))
-
-#define PEER_IO_MAGIC_NUMBER 206745
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {

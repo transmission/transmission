@@ -652,17 +652,9 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peer_congestion_algorithm);
     }
 
-    auto* io = new tr_peerIo{};
-    io->magicNumber = PEER_IO_MAGIC_NUMBER;
-    io->refCount = 1;
+    auto* io = new tr_peerIo{ session, *addr, port, isIncoming, isSeed };
     tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
-    io->session = session;
-    io->addr = *addr;
-    io->isSeed = isSeed;
-    io->port = port;
     io->socket = socket;
-    io->isIncoming = isIncoming;
-    io->timeCreated = tr_time();
     io->inbuf = evbuffer_new();
     io->outbuf = evbuffer_new();
     io->bandwidth = new Bandwidth(parent);
