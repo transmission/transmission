@@ -483,7 +483,7 @@ public:
         publish(e);
     }
 
-    void publishClientGotBitfield(tr_bitfield* bitfield)
+    void publishClientGotBitfield(Bitfield* bitfield)
     {
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -1677,9 +1677,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!tr_bitfieldHas(&msgs->have, ui32))
+        if (!msgs->have.readBit(ui32))
         {
-            tr_bitfieldAdd(&msgs->have, ui32);
+            msgs->have.setBit(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
@@ -1691,7 +1691,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            tr_bitfieldSetRaw(&msgs->have, tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
@@ -1785,8 +1785,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            tr_bitfieldSetHasAll(&msgs->have);
-            TR_ASSERT(tr_bitfieldHasAll(&msgs->have));
+            msgs->have.setHasAll();
+            TR_ASSERT(msgs->have.hasAll());
             msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
         }
@@ -1803,7 +1803,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            tr_bitfieldSetHasNone(&msgs->have);
+            msgs->have.setHasNone();
             msgs->publishClientGotHaveNone();
             updatePeerProgress(msgs);
         }
@@ -1899,7 +1899,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return err;
     }
 
-    tr_bitfieldAdd(&msgs->blame, req->index);
+    msgs->blame.setBit(req->index);
     msgs->publishGotBlock(req);
     return 0;
 }
