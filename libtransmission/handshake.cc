@@ -1147,7 +1147,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !tr_peerIoIsIncoming(io) && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 

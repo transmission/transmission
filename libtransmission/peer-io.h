@@ -60,11 +60,10 @@ auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 class tr_peerIo
 {
 public:
-    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_incoming_in, bool is_seed_in)
+    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_seed_in)
         : addr{ addr_in }
         , session{ session_in }
         , port{ port_in }
-        , isIncoming{ is_incoming_in }
         , isSeed{ is_seed_in }
     {
     }
@@ -95,8 +94,6 @@ public:
     struct event* event_read = nullptr;
     struct event* event_write = nullptr;
 
-    tr_priority_t priority = TR_PRI_NORMAL;
-
     tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
 
     // TODO: use std::shared_ptr instead of manual refcounting
@@ -108,9 +105,10 @@ public:
 
     tr_port const port;
 
+    tr_priority_t priority = TR_PRI_NORMAL;
+
     uint8_t peerId[SHA_DIGEST_LENGTH] = {};
 
-    bool const isIncoming;
     bool const isSeed;
     bool dhtSupported = false;
     bool extendedProtocolSupported = false;
@@ -218,7 +216,7 @@ int tr_peerIoReconnect(tr_peerIo* io);
 
 constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
-    return io->isIncoming;
+    return io->crypto.isIncoming;
 }
 
 static inline int tr_peerIoGetAge(tr_peerIo const* io)
