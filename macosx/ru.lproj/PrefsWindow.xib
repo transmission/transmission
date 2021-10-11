@@ -57,19 +57,20 @@
         <window title="Настройки" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="108" y="632" width="542" height="107"/>
+            <rect key="contentRect" x="108" y="632" width="555" height="107"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <value key="maxSize" type="size" width="555" height="107"/>
             <view key="contentView" id="24">
-                <rect key="frame" x="0.0" y="0.0" width="542" height="107"/>
+                <rect key="frame" x="0.0" y="0.0" width="555" height="107"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="2126"/>
             </connections>
-            <point key="canvasLocation" x="139" y="140"/>
+            <point key="canvasLocation" x="-550" y="-1439"/>
         </window>
         <customView id="28" userLabel="General">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="371"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="371"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="652">
@@ -114,7 +115,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="628">
-                    <rect key="frame" x="371" y="108" width="82" height="32"/>
+                    <rect key="frame" x="371" y="108" width="93" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="Сбросить" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1211">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -136,7 +137,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2113">
-                    <rect key="frame" x="188" y="230" width="265" height="32"/>
+                    <rect key="frame" x="188" y="230" width="276" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="push" title="Параметры в Системных настройках" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2114">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -274,19 +275,20 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="-550.5" y="456.5"/>
         </customView>
         <customView id="41" userLabel="Transfers">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="393"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="393"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <tabView fixedFrame="YES" initialItem="253" translatesAutoresizingMaskIntoConstraints="NO" id="252">
-                    <rect key="frame" x="13" y="10" width="516" height="379"/>
+                    <rect key="frame" x="13" y="10" width="529" height="379"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Основные" identifier="" id="253">
                             <view key="view" id="255">
-                                <rect key="frame" x="10" y="33" width="496" height="333"/>
+                                <rect key="frame" x="10" y="33" width="509" height="333"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="51">
@@ -566,11 +568,11 @@
                         </tabViewItem>
                         <tabViewItem label="Управление" identifier="" id="254">
                             <view key="view" id="256">
-                                <rect key="frame" x="10" y="33" width="496" height="333"/>
+                                <rect key="frame" x="10" y="33" width="509" height="333"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257">
-                                        <rect key="frame" x="347" y="175" width="35" height="22"/>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257">
+                                        <rect key="frame" x="356" y="175" width="35" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1229">
                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" id="920">
@@ -590,8 +592,8 @@
                                             <outlet property="nextKeyView" destination="604" id="1638"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="262">
-                                        <rect key="frame" x="15" y="177" width="73" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="262">
+                                        <rect key="frame" x="27" y="177" width="73" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Очередь:" id="1230">
                                             <font key="font" metaFont="system"/>
@@ -599,8 +601,8 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="263" customClass="ColorTextField">
-                                        <rect key="frame" x="387" y="177" width="101" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="263" customClass="ColorTextField">
+                                        <rect key="frame" x="396" y="177" width="101" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="раздач" id="1231">
                                             <font key="font" metaFont="system"/>
@@ -611,8 +613,8 @@
                                             <binding destination="365" name="enabled" keyPath="values.Queue" id="1697"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="264">
-                                        <rect key="frame" x="91" y="302" width="252" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="264">
+                                        <rect key="frame" x="103" y="302" width="252" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Прекратить раздачу при рейтинге:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1232">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -623,8 +625,8 @@
                                             <binding destination="365" name="value" keyPath="values.RatioCheck" id="430"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="265">
-                                        <rect key="frame" x="347" y="301" width="50" height="22"/>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="265">
+                                        <rect key="frame" x="357" y="301" width="50" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1233">
                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="2" maximumFractionDigits="2" id="840">
@@ -644,8 +646,8 @@
                                             <outlet property="nextKeyView" destination="257" id="1637"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1958">
-                                        <rect key="frame" x="91" y="258" width="221" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1958">
+                                        <rect key="frame" x="103" y="258" width="221" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="После неактивности в течение" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1962">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -656,8 +658,8 @@
                                             <binding destination="365" name="value" keyPath="values.IdleLimitCheck" id="1982"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1959">
-                                        <rect key="frame" x="316" y="257" width="41" height="22"/>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1959">
+                                        <rect key="frame" x="328" y="257" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1960">
                                             <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" lenient="YES" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="1961">
@@ -675,8 +677,8 @@
                                             <outlet property="nextKeyView" destination="257" id="1963"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="267">
-                                        <rect key="frame" x="-12" y="303" width="100" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="267">
+                                        <rect key="frame" x="0.0" y="303" width="100" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Ограничения:" id="1234">
                                             <font key="font" metaFont="system"/>
@@ -684,8 +686,8 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="268">
-                                        <rect key="frame" x="109" y="283" width="275" height="14"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="268">
+                                        <rect key="frame" x="123" y="283" width="275" height="14"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Рейтинг — отношение розданного к скачанному" id="1235">
                                             <font key="font" metaFont="smallSystem"/>
@@ -693,8 +695,8 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="337">
-                                        <rect key="frame" x="91" y="176" width="252" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="337">
+                                        <rect key="frame" x="103" y="176" width="252" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Скачивать одновременно не более" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1236">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -705,8 +707,8 @@
                                             <binding destination="365" name="value" keyPath="values.Queue" id="405"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="604">
-                                        <rect key="frame" x="344" y="149" width="35" height="22"/>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="604">
+                                        <rect key="frame" x="356" y="149" width="35" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1238">
                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" id="921">
@@ -726,8 +728,8 @@
                                             <outlet property="nextKeyView" destination="636" id="1639"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="606" customClass="ColorTextField">
-                                        <rect key="frame" x="384" y="151" width="101" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="606" customClass="ColorTextField">
+                                        <rect key="frame" x="396" y="151" width="101" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="раздач" id="1239">
                                             <font key="font" metaFont="system"/>
@@ -738,8 +740,8 @@
                                             <binding destination="365" name="enabled" keyPath="values.QueueSeed" id="1698"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="607">
-                                        <rect key="frame" x="91" y="150" width="252" height="20"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="607">
+                                        <rect key="frame" x="103" y="150" width="252" height="20"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Раздавать одновременно не более" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1240">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -750,8 +752,8 @@
                                             <binding destination="365" name="value" keyPath="values.QueueSeed" id="608"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="636">
-                                        <rect key="frame" x="374" y="123" width="41" height="22"/>
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="636">
+                                        <rect key="frame" x="367" y="123" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1241">
                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" currencySymbol="¤" internationalCurrencySymbol="¤¤" id="922">
@@ -771,7 +773,7 @@
                                             <outlet property="nextKeyView" destination="1298" id="1640"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="638" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="638" customClass="ColorTextField">
                                         <rect key="frame" x="420" y="125" width="55" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="мин" id="1242">
@@ -783,8 +785,8 @@
                                             <binding destination="365" name="enabled" keyPath="values.CheckStalled" id="1699"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="639">
-                                        <rect key="frame" x="91" y="124" width="268" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="639">
+                                        <rect key="frame" x="103" y="124" width="268" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="В конец при неактивности в течение" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1243">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -795,8 +797,8 @@
                                             <binding destination="365" name="value" keyPath="values.CheckStalled" id="640"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1297">
-                                        <rect key="frame" x="11" y="85" width="77" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1297">
+                                        <rect key="frame" x="23" y="85" width="77" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Звуки:" id="1310">
                                             <font key="font" metaFont="system"/>
@@ -804,8 +806,8 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1298">
-                                        <rect key="frame" x="299" y="79" width="130" height="26"/>
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1298">
+                                        <rect key="frame" x="311" y="79" width="130" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1309" id="1307">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -824,8 +826,8 @@
                                             <outlet property="nextKeyView" destination="1300" id="1641"/>
                                         </connections>
                                     </popUpButton>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1299">
-                                        <rect key="frame" x="91" y="59" width="195" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1299">
+                                        <rect key="frame" x="103" y="59" width="195" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="После остановки раздачи:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1306">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -835,8 +837,8 @@
                                             <binding destination="365" name="value" keyPath="values.PlaySeedingSound" id="1346"/>
                                         </connections>
                                     </button>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1300">
-                                        <rect key="frame" x="289" y="54" width="130" height="26"/>
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1300">
+                                        <rect key="frame" x="301" y="54" width="130" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1305" id="1303">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -854,8 +856,8 @@
                                             <binding destination="365" name="selectedValue" keyPath="values.SeedingSound" previousBinding="1332" id="1333"/>
                                         </connections>
                                     </popUpButton>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1301">
-                                        <rect key="frame" x="91" y="84" width="205" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1301">
+                                        <rect key="frame" x="103" y="84" width="205" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="По завершении скачивания:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1302">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -865,8 +867,8 @@
                                             <binding destination="365" name="value" keyPath="values.PlayDownloadSound" id="1322"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1969" customClass="ColorTextField">
-                                        <rect key="frame" x="362" y="259" width="55" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1969" customClass="ColorTextField">
+                                        <rect key="frame" x="374" y="259" width="55" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="мин" id="1970">
                                             <font key="font" metaFont="system"/>
@@ -877,8 +879,8 @@
                                             <binding destination="365" name="enabled" keyPath="values.IdleLimitCheck" id="1984"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2043">
-                                        <rect key="frame" x="91" y="19" width="205" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2043">
+                                        <rect key="frame" x="103" y="19" width="205" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="По завершении скачивания:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2044">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -889,8 +891,8 @@
                                             <binding destination="365" name="value" keyPath="values.DoneScriptEnabled" id="2058"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2046">
-                                        <rect key="frame" x="16" y="20" width="72" height="17"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2046">
+                                        <rect key="frame" x="28" y="20" width="72" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Cкрипт:" id="2047">
                                             <font key="font" metaFont="system"/>
@@ -898,8 +900,8 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2048">
-                                        <rect key="frame" x="295" y="14" width="162" height="26"/>
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2048">
+                                        <rect key="frame" x="307" y="14" width="162" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2051" id="2049">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -935,8 +937,8 @@
                                             <binding destination="365" name="enabled" keyPath="values.DoneScriptEnabled" id="2061"/>
                                         </connections>
                                     </popUpButton>
-                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2068">
-                                        <rect key="frame" x="459" y="14" width="25" height="25"/>
+                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2068">
+                                        <rect key="frame" x="471" y="14" width="25" height="25"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2069">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -946,8 +948,8 @@
                                             <action selector="helpForScript:" target="-2" id="2070"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2118">
-                                        <rect key="frame" x="91" y="235" width="359" height="18"/>
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2118">
+                                        <rect key="frame" x="103" y="235" width="359" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Удалить из списка раздач по завершении раздачи" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2119">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -958,8 +960,8 @@
                                             <binding destination="365" name="value" keyPath="values.RemoveWhenFinishSeeding" id="2125"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2122">
-                                        <rect key="frame" x="109" y="217" width="187" height="14"/>
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2122">
+                                        <rect key="frame" x="123" y="217" width="187" height="14"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Применимо к новым раздачам" id="2123">
                                             <font key="font" metaFont="smallSystem"/>
@@ -976,13 +978,14 @@
                     </connections>
                 </tabView>
             </subviews>
+            <point key="canvasLocation" x="-550.5" y="-647.5"/>
         </customView>
         <customView id="1760" userLabel="Groups">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="240"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="240"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1834">
-                    <rect key="frame" x="187" y="51" width="245" height="28"/>
+                    <rect key="frame" x="189" y="51" width="245" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="1835">
                         <font key="font" metaFont="smallSystem"/>
@@ -1015,7 +1018,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1823">
-                    <rect key="frame" x="187" y="121" width="292" height="14"/>
+                    <rect key="frame" x="190" y="121" width="292" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Будет выбрано при добавлении новых раздач" id="1824">
                         <font key="font" metaFont="smallSystem"/>
@@ -1150,10 +1153,10 @@
                     </connections>
                 </scrollView>
             </subviews>
-            <point key="canvasLocation" x="139" y="149"/>
+            <point key="canvasLocation" x="-550" y="1094"/>
         </customView>
         <customView id="153" userLabel="Bandwidth">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="227"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="227"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1907">
@@ -1457,10 +1460,10 @@
                     </connections>
                 </textField>
             </subviews>
-            <point key="canvasLocation" x="113" y="439.5"/>
+            <point key="canvasLocation" x="-550" y="814"/>
         </customView>
         <customView id="1361" userLabel="Peers">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="366"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="366"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1741">
@@ -1477,7 +1480,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1473">
-                    <rect key="frame" x="504" y="12" width="21" height="23"/>
+                    <rect key="frame" x="517" y="12" width="21" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" inset="2" id="1474">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1604,7 +1607,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1429">
-                    <rect key="frame" x="427" y="298" width="50" height="22"/>
+                    <rect key="frame" x="422" y="298" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1444">
                         <numberFormatter key="formatter" formatterBehavior="custom10_4" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" id="1445">
@@ -1622,7 +1625,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1428">
-                    <rect key="frame" x="482" y="300" width="56" height="17"/>
+                    <rect key="frame" x="477" y="300" width="56" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="польз." id="1446">
                         <font key="font" metaFont="system"/>
@@ -1689,7 +1692,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1422">
-                    <rect key="frame" x="57" y="183" width="75" height="17"/>
+                    <rect key="frame" x="30" y="183" width="102" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Шифрование:" id="1453">
                         <font key="font" metaFont="system"/>
@@ -1711,7 +1714,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1985">
-                    <rect key="frame" x="191" y="100" width="331" height="22"/>
+                    <rect key="frame" x="191" y="100" width="340" height="22"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1986">
                         <font key="font" metaFont="system"/>
@@ -1729,13 +1732,14 @@
             <connections>
                 <outlet property="nextKeyView" destination="1429" id="1636"/>
             </connections>
+            <point key="canvasLocation" x="-550.5" y="37"/>
         </customView>
         <customView id="66" userLabel="Network">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="220"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="220"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1891">
-                    <rect key="frame" x="376" y="107" width="147" height="32"/>
+                    <rect key="frame" x="376" y="108" width="147" height="32"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="push" title="Случайный порт" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1892">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1764,7 +1768,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
-                    <rect key="frame" x="234" y="143" width="291" height="17"/>
+                    <rect key="frame" x="234" y="143" width="304" height="17"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Проверяю статус порта…" id="1250">
                         <font key="font" metaFont="system"/>
@@ -1773,7 +1777,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="336">
-                    <rect key="frame" x="180" y="77" width="230" height="14"/>
+                    <rect key="frame" x="183" y="77" width="230" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Используя NAT-T с NAT-PMP или UPnP" id="1248">
                         <font key="font" metaFont="smallSystem"/>
@@ -1854,7 +1858,7 @@
                     </textFieldCell>
                 </textField>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="326">
-                    <rect key="frame" x="504" y="12" width="21" height="23"/>
+                    <rect key="frame" x="517" y="12" width="21" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" inset="2" id="1246">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1877,9 +1881,10 @@
                     </connections>
                 </button>
             </subviews>
+            <point key="canvasLocation" x="-550" y="-297"/>
         </customView>
         <customView id="1481" userLabel="Remote">
-            <rect key="frame" x="0.0" y="0.0" width="542" height="439"/>
+            <rect key="frame" x="0.0" y="0.0" width="555" height="439"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
@@ -1895,7 +1900,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
-                    <rect key="frame" x="500" y="12" width="25" height="25"/>
+                    <rect key="frame" x="513" y="12" width="25" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1661">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2038,7 +2043,7 @@
                     </connections>
                 </secureTextField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1644">
-                    <rect key="frame" x="80" y="387" width="362" height="14"/>
+                    <rect key="frame" x="83" y="387" width="362" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Управление программой будет доступно через веб-интерфейс" id="1645">
                         <font key="font" metaFont="smallSystem"/>
@@ -2171,7 +2176,7 @@
                     </connections>
                 </textField>
             </subviews>
-            <point key="canvasLocation" x="139" y="-256"/>
+            <point key="canvasLocation" x="-550" y="-1114"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="365" userLabel="Shared Defaults"/>
         <customObject id="1783" customClass="GroupsPrefsController">
