@@ -1488,7 +1488,7 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
 
     session->bandwidth->setLimited(dir, isLimited && !zeroCase);
 
-    session->bandwidth->setDesiredSpeed_Bps(dir, limit_Bps);
+    session->bandwidth->setDesiredSpeedBps(dir, limit_Bps);
 }
 
 enum
@@ -1881,12 +1881,12 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getPieceSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getPieceSpeedBps(0, dir) : 0;
 }
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getRawSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getRawSpeedBps(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)

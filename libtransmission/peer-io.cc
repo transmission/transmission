@@ -1067,7 +1067,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeed_Bps(now, TR_UP);
+    unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeedBps(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);
