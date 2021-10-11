@@ -214,7 +214,7 @@ struct tr_verifier
     int maxVerificationThreads = 1;
 };
 
-static void verifyThreadFunc(void* user_data)
+static void verifyThreadFunc([[maybe_unused]] void* user_data)
 {
     tr_verifier* v = static_cast<tr_verifier*>(user_data);
 

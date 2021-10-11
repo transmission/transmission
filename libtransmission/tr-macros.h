@@ -52,17 +52,6 @@
 ****
 ***/
 
-// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
-#define TR_UNUSED(x) \
-    do \
-    { \
-        ((void)sizeof(x)); \
-    } while (0)
-
-/***
-****
-***/
-
 #if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
 #define TR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define TR_UNLIKELY(x) __builtin_expect(!!(x), 0)

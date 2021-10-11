@@ -23,7 +23,7 @@
  */
 
 class tr_peer;
-struct tr_swarm;
+class tr_swarm;
 struct peer_atom;
 
 /* This is the maximum size of a block request.
@@ -134,9 +134,9 @@ struct tr_swarm_stats
     int peerFromCount[TR_PEER_FROM__MAX];
 };
 
-void tr_swarmGetStats(struct tr_swarm const* swarm, tr_swarm_stats* setme);
+void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);
 
-void tr_swarmIncrementActivePeers(struct tr_swarm* swarm, tr_direction direction, bool is_active);
+void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
 /***
 ****

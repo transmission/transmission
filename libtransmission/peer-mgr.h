@@ -29,13 +29,12 @@
  */
 
 class tr_peerMsgs;
+class tr_swarm;
 struct UTPSocket;
 struct peer_atom;
 struct tr_peerIo;
 struct tr_peerMgr;
-struct tr_peerMsgs;
 struct tr_peer_stat;
-struct tr_swarm;
 struct tr_torrent;
 
 /* added_f's bitwise-or'ed flags */

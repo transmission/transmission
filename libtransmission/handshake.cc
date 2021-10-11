@@ -201,9 +201,8 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
         walk += SHA_DIGEST_LENGTH;
         memcpy(walk, peer_id, PEER_ID_LEN);
-        walk += PEER_ID_LEN;
 
-        TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
+        TR_ASSERT(walk + PEER_ID_LEN - buf == HANDSHAKE_SIZE);
     }
 
     return success;
@@ -1204,11 +1203,8 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-static void handshakeTimeout(evutil_socket_t s, short type, void* handshake)
+static void handshakeTimeout([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* handshake)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(type);
-
     tr_handshakeAbort(static_cast<tr_handshake*>(handshake));
 }
 
