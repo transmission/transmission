@@ -25,10 +25,10 @@
 #include "peer-socket.h"
 #include "utils.h" /* tr_time() */
 
-struct evbuffer;
+class tr_peerIo;
 struct Bandwidth;
+struct evbuffer;
 struct tr_datatype;
-struct tr_peerIo;
 
 /**
  * @addtogroup networked_io Networked IO
@@ -49,14 +49,15 @@ enum tr_encryption_type
     PEER_ENCRYPTION_RC4 = (1 << 1)
 };
 
-using tr_can_read_cb = ReadState (*)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
 
-using tr_did_write_cb = void (*)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
 
-using tr_net_error_cb = void (*)(struct tr_peerIo* io, short what, void* userData);
+using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
 
-struct tr_peerIo
+class tr_peerIo
 {
+public:
     bool isEncrypted;
     bool isIncoming;
     bool peerIdIsSet;

@@ -998,7 +998,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 ****
 ***/
 
-static ReadState canRead(struct tr_peerIo* io, void* vhandshake, size_t* piece)
+static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -1248,12 +1248,12 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     return handshake;
 }
 
-struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
+tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
 {
     TR_ASSERT(handshake != nullptr);
     TR_ASSERT(handshake->io != nullptr);
 
-    struct tr_peerIo* io = handshake->io;
+    tr_peerIo* io = handshake->io;
     handshake->io = nullptr;
     return io;
 }

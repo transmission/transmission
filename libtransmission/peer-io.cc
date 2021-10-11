@@ -652,7 +652,7 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peer_congestion_algorithm);
     }
 
-    tr_peerIo* io = tr_new0(tr_peerIo, 1);
+    auto* io = new tr_peerIo{};
     io->magicNumber = PEER_IO_MAGIC_NUMBER;
     io->refCount = 1;
     tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
@@ -795,7 +795,7 @@ static void event_enable(tr_peerIo* io, short event)
     }
 }
 
-static void event_disable(struct tr_peerIo* io, short event)
+static void event_disable(tr_peerIo* io, short event)
 {
     TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session != nullptr);
@@ -917,8 +917,7 @@ static void io_dtor(void* vio)
         peer_io_pull_datatype(io);
     }
 
-    memset(io, ~0, sizeof(tr_peerIo));
-    tr_free(io);
+    delete io;
 }
 
 static void tr_peerIoFree(tr_peerIo* io)

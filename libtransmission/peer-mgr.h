@@ -28,11 +28,11 @@
  * @{
  */
 
+class tr_peerIo;
 class tr_peerMsgs;
 class tr_swarm;
 struct UTPSocket;
 struct peer_atom;
-struct tr_peerIo;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_torrent;
