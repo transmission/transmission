@@ -19,7 +19,7 @@
 #include "tr-assert.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
-struct tr_peerIo;
+class tr_peerIo;
 
 /**
  * @addtogroup networked_io Networked IO

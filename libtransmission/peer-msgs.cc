@@ -610,7 +610,7 @@ public:
 
     UniqueTimer pex_timer;
 
-    struct tr_peerIo* io = nullptr;
+    tr_peerIo* io = nullptr;
 
 private:
     bool is_active_[2] = { false, false };
