@@ -377,7 +377,7 @@ static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server,
     else
     {
         tr_error* error = nullptr;
-        auto file_len = size_t {};
+        auto file_len = size_t{};
         void* const file = tr_loadFile(filename, &file_len, &error);
 
         if (file == nullptr)
@@ -430,7 +430,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
         char* const subpath = tr_strdup(req->uri + strlen(server->url) + 4);
 
         char* pch = strchr(subpath, '?');
-        if (pch !=  nullptr)
+        if (pch != nullptr)
         {
             *pch = '\0';
         }
@@ -1088,7 +1088,7 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 {
-    auto boolVal = bool {};
+    auto boolVal = bool{};
     auto i = int64_t{};
     char const* str = nullptr;
     tr_address address;
