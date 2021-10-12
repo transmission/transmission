@@ -302,11 +302,9 @@ static char const* getHomeDir(void)
 
 void tr_setConfigDir(tr_session* session, char const* configDir)
 {
-    char* path;
-
     session->configDir = tr_strdup(configDir);
 
-    path = tr_buildPath(configDir, RESUME_SUBDIR, nullptr);
+    char* path = tr_buildPath(configDir, RESUME_SUBDIR, nullptr);
     tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
     session->resumeDir = path;
 
@@ -388,27 +386,16 @@ char const* tr_getDefaultDownloadDir(void)
 
     if (user_dir == nullptr)
     {
-        char* config_home;
-        char* config_file;
-        char* content;
-        size_t content_len;
-
         /* figure out where to look for user-dirs.dirs */
-        config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
-
-        if (!tr_str_is_empty(config_home))
-        {
-            config_file = tr_buildPath(config_home, "user-dirs.dirs", nullptr);
-        }
-        else
-        {
-            config_file = tr_buildPath(getHomeDir(), ".config", "user-dirs.dirs", nullptr);
-        }
-
+        char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
+        char* const config_file = !tr_str_is_empty(config_home) ?
+            tr_buildPath(config_home, "user-dirs.dirs", nullptr) :
+            tr_buildPath(getHomeDir(), ".config", "user-dirs.dirs", nullptr);
         tr_free(config_home);
 
         /* read in user-dirs.dirs and look for the download dir entry */
-        content = (char*)tr_loadFile(config_file, &content_len, nullptr);
+        auto content_len = size_t{};
+        auto* content = (char*)tr_loadFile(config_file, &content_len, nullptr);
 
         if (content != nullptr && content_len > 0)
         {
