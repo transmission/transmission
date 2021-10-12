@@ -335,7 +335,7 @@ static struct tr_disk_space getquota(char const* device)
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
     {
-        return -1;
+        return disk_space;
     }
 #elif defined(__sun)
     struct quotctl op;
