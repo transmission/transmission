@@ -407,7 +407,6 @@ struct tr_disk_space tr_getDirSpace(char const* dir)
     return disk_space;
 }
 
-
 /****
 *****
 ****/

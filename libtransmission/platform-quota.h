@@ -26,8 +26,8 @@ struct tr_device_info
 
 struct tr_disk_space
 {
-   int64_t  free;
-   int64_t  total;
+    int64_t free;
+    int64_t total;
 };
 
 struct tr_device_info* tr_device_info_create(char const* path);
