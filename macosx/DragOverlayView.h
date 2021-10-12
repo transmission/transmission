@@ -24,11 +24,12 @@
 
 @interface DragOverlayView : NSView
 {
-    NSImage * fBadge;
+    NSImage* fBadge;
 
-    NSDictionary * fMainLineAttributes, * fSubLineAttributes;
+    NSDictionary* fMainLineAttributes;
+    NSDictionary* fSubLineAttributes;
 }
 
-- (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine;
+- (void)setOverlay:(NSImage*)icon mainLine:(NSString*)mainLine subLine:(NSString*)subLine;
 
 @end

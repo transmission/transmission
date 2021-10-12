@@ -27,10 +27,10 @@ void RelocateDialog::onMoveToggled(bool b) const
     move_flag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    ids_(std::move(ids))
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , ids_(std::move(ids))
 {
     ui_.setupUi(this);
 
@@ -46,7 +46,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
         else if (path != tor->getPath())
         {
-            if (session_.isServer())
+            if (session_.isLocal())
             {
                 path = QDir::homePath();
             }
@@ -59,7 +59,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
     }
 
-    if (session_.isServer())
+    if (session_.isLocal())
     {
         ui_.newLocationStack->setCurrentWidget(ui_.newLocationButton);
         ui_.newLocationButton->setMode(PathButton::DirectoryMode);
@@ -93,5 +93,5 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
 QString RelocateDialog::newLocation() const
 {
     return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
-        ui_.newLocationEdit->text();
+                                                                            ui_.newLocationEdit->text();
 }

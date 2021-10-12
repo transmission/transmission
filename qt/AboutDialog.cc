@@ -19,8 +19,8 @@
 #include "Session.h"
 #include "Utils.h"
 
-AboutDialog::AboutDialog(Session& session, QWidget* parent) :
-    BaseDialog(parent)
+AboutDialog::AboutDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
 {
     ui_.setupUi(this);
 
@@ -29,7 +29,7 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent) :
     if (session.isServer())
     {
         auto const title = QStringLiteral("<b style='font-size:x-large'>Transmission %1</b>")
-            .arg(QStringLiteral(LONG_VERSION_STRING));
+                               .arg(QStringLiteral(LONG_VERSION_STRING));
         ui_.titleLabel->setText(title);
     }
     else
@@ -37,11 +37,9 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent) :
         QString title = QStringLiteral(
             "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
-            .arg(tr("This GUI"))
-            .arg(QStringLiteral(LONG_VERSION_STRING));
-        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
-            .arg(tr("Remote"))
-            .arg(session.sessionVersion());
+                     .arg(tr("This GUI"))
+                     .arg(QStringLiteral(LONG_VERSION_STRING));
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Remote")).arg(session.sessionVersion());
         ui_.titleLabel->setText(title);
     }
 
@@ -56,10 +54,12 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent) :
 
 void AboutDialog::showCredits()
 {
-    QMessageBox::about(this, tr("Credits"), QString::fromUtf8(
-        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-        "Mitchell Livingston (OS X)\n"
-        "Mike Gelfand\n"));
+    QMessageBox::about(
+        this,
+        tr("Credits"),
+        QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+                          "Mitchell Livingston (OS X)\n"
+                          "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()

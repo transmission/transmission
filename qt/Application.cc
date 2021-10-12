@@ -44,8 +44,7 @@
 namespace
 {
 
-std::array<tr_option, 8> const Opts =
-{
+std::array<tr_option, 8> const Opts = {
     tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
     { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
     { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
@@ -59,7 +58,7 @@ std::array<tr_option, 8> const Opts =
 char const* getUsage()
 {
     return "Usage:\n"
-        "  transmission [OPTIONS...] [torrent files]";
+           "  transmission [OPTIONS...] [torrent files]";
 }
 
 enum
@@ -84,10 +83,10 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 
 } // namespace
 
-Application::Application(int& argc, char** argv) :
-    QApplication(argc, argv),
-    config_name_{QStringLiteral("transmission")},
-    display_name_{QStringLiteral("transmission-qt")}
+Application::Application(int& argc, char** argv)
+    : QApplication(argc, argv)
+    , config_name_{ QStringLiteral("transmission") }
+    , display_name_{ QStringLiteral("transmission-qt") }
 {
     setApplicationName(config_name_);
     loadTranslations();
@@ -329,10 +328,15 @@ Application::Application(int& argc, char** argv) :
 
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
-            tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, window_.get());
-        dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
-            "Any content you share is your sole responsibility."));
+        auto* dialog = new QMessageBox(
+            QMessageBox::Information,
+            QString(),
+            tr("<b>Transmission is a file sharing program.</b>"),
+            QMessageBox::Ok | QMessageBox::Cancel,
+            window_.get());
+        dialog->setInformativeText(
+            tr("When you run a torrent, its data will be made available to others by means of upload. "
+               "Any content you share is your sole responsibility."));
         dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
         dialog->setDefaultButton(QMessageBox::Ok);
         dialog->setModal(true);
@@ -487,8 +491,7 @@ void Application::refreshPref(int key) const
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH),
-            prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH), prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
         break;
 
     default:
@@ -589,8 +592,11 @@ bool Application::notifyApp(QString const& title, QString const& body) const
 
     if (bus.isConnected())
     {
-        QDBusMessage m =
-            QDBusMessage::createMethodCall(dbus_service_name, dbus_path, dbus_interface_name, QStringLiteral("Notify"));
+        QDBusMessage m = QDBusMessage::createMethodCall(
+            dbus_service_name,
+            dbus_path,
+            dbus_interface_name,
+            QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
@@ -599,7 +605,7 @@ bool Application::notifyApp(QString const& title, QString const& body) const
         args.append(body); // body
         args.append(QStringList()); // actions - unused for plain passive popups
         args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))
+            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
         })); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);

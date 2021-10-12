@@ -86,6 +86,7 @@
       <menuitem action='sort-by-age'/> 
       <menuitem action='sort-by-name'/> 
       <menuitem action='sort-by-progress'/> 
+      <menuitem action='sort-by-queue'/> 
       <menuitem action='sort-by-ratio'/> 
       <menuitem action='sort-by-size'/> 
       <menuitem action='sort-by-state'/> 

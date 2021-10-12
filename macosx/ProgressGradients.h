@@ -25,15 +25,15 @@
 
 @interface ProgressGradients : NSObject
 
-+ (NSGradient *) progressWhiteGradient;
-+ (NSGradient *) progressGrayGradient;
-+ (NSGradient *) progressLightGrayGradient;
-+ (NSGradient *) progressBlueGradient;
-+ (NSGradient *) progressDarkBlueGradient;
-+ (NSGradient *) progressGreenGradient;
-+ (NSGradient *) progressLightGreenGradient;
-+ (NSGradient *) progressDarkGreenGradient;
-+ (NSGradient *) progressRedGradient;
-+ (NSGradient *) progressYellowGradient;
+@property(nonatomic, class, readonly) NSGradient* progressWhiteGradient;
+@property(nonatomic, class, readonly) NSGradient* progressGrayGradient;
+@property(nonatomic, class, readonly) NSGradient* progressLightGrayGradient;
+@property(nonatomic, class, readonly) NSGradient* progressBlueGradient;
+@property(nonatomic, class, readonly) NSGradient* progressDarkBlueGradient;
+@property(nonatomic, class, readonly) NSGradient* progressGreenGradient;
+@property(nonatomic, class, readonly) NSGradient* progressLightGreenGradient;
+@property(nonatomic, class, readonly) NSGradient* progressDarkGreenGradient;
+@property(nonatomic, class, readonly) NSGradient* progressRedGradient;
+@property(nonatomic, class, readonly) NSGradient* progressYellowGradient;
 
 @end

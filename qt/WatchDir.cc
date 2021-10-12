@@ -20,8 +20,8 @@
 ****
 ***/
 
-WatchDir::WatchDir(TorrentModel const& model) :
-    model_(model)
+WatchDir::WatchDir(TorrentModel const& model)
+    : model_(model)
 {
 }
 
@@ -32,7 +32,7 @@ WatchDir::WatchDir(TorrentModel const& model) :
 int WatchDir::metainfoTest(QString const& filename) const
 {
     int ret;
-    tr_info inf;
+    auto inf = tr_info{};
     tr_ctor* ctor = tr_ctorNew(nullptr);
 
     // parse
@@ -86,7 +86,8 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     {
         watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
         connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcherActivated);
-        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
+        // trigger the watchdir for .torrent files in there already
+        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories()));
     }
 }
 

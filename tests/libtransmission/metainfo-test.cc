@@ -29,7 +29,7 @@ TEST(Metainfo, magnetLink)
 
     auto* ctor = tr_ctorNew(nullptr);
     tr_ctorSetMetainfoFromMagnetLink(ctor, MagnetLink);
-    tr_info inf;
+    auto inf = tr_info{};
     auto const parse_result = tr_torrentParse(ctor, &inf);
     EXPECT_EQ(TR_PARSE_OK, parse_result);
     EXPECT_EQ(0, inf.fileCount); // because it's a magnet link
@@ -78,7 +78,7 @@ TEST(Metainfo, bucket)
         { 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt2:.." AFTER_PATH },
 
         /* fail on empty string */
-        { EILSEQ, TR_PARSE_ERR, "" }
+        { EILSEQ, TR_PARSE_ERR, "" },
     };
 
     tr_logSetLevel(TR_LOG_SILENT);
@@ -143,7 +143,7 @@ TEST(Metainfo, sanitize)
         { "..foo", 5, "..foo", false },
         { "foo.bar.baz", 11, "foo.bar.baz", false },
         { "null", 4, "null", false },
-        { "compass", 7, "compass", false }
+        { "compass", 7, "compass", false },
     };
 
     for (auto const& test : tests)

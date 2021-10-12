@@ -11,11 +11,11 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string_view>
 #include <time.h> /* time_t */
+#include <vector>
 
 #include "tr-macros.h"
-
-TR_BEGIN_DECLS
 
 /***
 ****
@@ -62,7 +62,7 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
-char const* tr_get_mime_type_for_filename(char const* filename);
+char const* tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
@@ -118,18 +118,25 @@ char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
 #ifdef _WIN32
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
-char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before, int extra_chars_after,
+char* tr_win32_native_to_utf8_ex(
+    wchar_t const* text,
+    int text_size,
+    int extra_chars_before,
+    int extra_chars_after,
     int* real_result_size);
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size);
-wchar_t* tr_win32_utf8_to_native_ex(char const* text, int text_size, int extra_chars_before, int extra_chars_after,
+wchar_t* tr_win32_utf8_to_native_ex(
+    char const* text,
+    int text_size,
+    int extra_chars_before,
+    int extra_chars_after,
     int* real_result_size);
 char* tr_win32_format_message(uint32_t code);
 
 void tr_win32_make_args_utf8(int* argc, char*** argv);
 
-int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
+int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
-/* *INDENT-OFF* */
 #define tr_main(...) \
     main_impl(__VA_ARGS__); \
     int main(int argc, char* argv[]) \
@@ -137,7 +144,6 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
         return tr_main_win32(argc, argv, &main_impl); \
     } \
     int main_impl(__VA_ARGS__)
-/* *INDENT-ON* */
 
 #else
 
@@ -158,10 +164,10 @@ void* tr_malloc0(size_t size);
 /** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
 void* tr_realloc(void* p, size_t size);
 
-/** @brief Portability wrapper around free() in which `NULL' is a safe argument */
+/** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
-/** @brief Free pointers in a NULL-terminated array (the array itself is not freed) */
+/** @brief Free pointers in a nullptr-terminated array (the array itself is not freed) */
 void tr_free_ptrv(void* const* p);
 
 /**
@@ -172,16 +178,11 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-/* *INDENT-OFF* */
-#define tr_new(struct_type, n_structs) \
-    ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
 
-#define tr_new0(struct_type, n_structs) \
-    ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
 
-#define tr_renew(struct_type, mem, n_structs) \
-    ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
-/* *INDENT-ON* */
+#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -199,23 +200,25 @@ char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 char* tr_strdup(void const* in);
 
 /**
- * @brief like strcmp() but gracefully handles NULL strings
+ * @brief like strcmp() but gracefully handles nullptr strings
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
-static inline bool tr_str_is_empty(char const* value)
+constexpr bool tr_str_is_empty(char const* value)
 {
-    return value == NULL || *value == '\0';
+    return value == nullptr || *value == '\0';
 }
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+int tr_lowerBound(
+    void const* key,
+    void const* base,
+    size_t nmemb,
+    size_t size,
+    tr_voidptr_compare_func compar,
     bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
-
-/** @brief moves the best k items to the first slots in the array. O(n) */
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
@@ -230,7 +233,7 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
 int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
-/** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
+/** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
@@ -250,14 +253,9 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
-/** @brief Concatenates array of strings with delimiter in between elements */
-char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
-
 /***
 ****
 ***/
-
-int compareInt(void const* va, void const* vb);
 
 void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
@@ -273,8 +271,8 @@ bool tr_urlIsValid(char const* url, size_t url_len);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port,
-    char** setme_path) TR_GNUC_NONNULL(1);
+bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
+    TR_GNUC_NONNULL(1);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
@@ -284,11 +282,11 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
  * @return a newly-allocated array of integers that must be freed with tr_free(),
- *         or NULL if a fragment of the string can't be parsed.
+ *         or nullptr if a fragment of the string can't be parsed.
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-int* tr_parseNumberRange(char const* str, size_t str_len, int* setmeCount) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NONNULL(1);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
@@ -343,7 +341,7 @@ void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeo
 extern time_t __tr_current_time;
 
 /**
- * @brief very inexpensive form of time(NULL)
+ * @brief very inexpensive form of time(nullptr)
  * @return the current epoch time in seconds
  *
  * This function returns a second counter that is updated once per second.
@@ -358,7 +356,7 @@ static inline time_t tr_time(void)
 }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
-static inline void tr_timeUpdate(time_t now)
+constexpr void tr_timeUpdate(time_t now)
 {
     __tr_current_time = now;
 }
@@ -420,7 +418,3 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ***/
 
 void tr_net_init(void);
-
-/** @} */
-
-TR_END_DECLS
