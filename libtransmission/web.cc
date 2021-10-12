@@ -211,33 +211,26 @@ static CURLcode ssl_context_func([[maybe_unused]] CURL* curl, void* ssl_ctx, [[m
 
 static long getTimeoutFromURL(struct tr_web_task const* task)
 {
-    long timeout;
-    tr_session const* session = task->session;
+    tr_session const* const session = task->session;
 
     if (session == nullptr || session->isClosed)
     {
-        timeout = 20L;
+        return 20L;
     }
-    else if (strstr(task->url, "scrape") != nullptr)
+    if (strstr(task->url, "scrape") != nullptr)
     {
-        timeout = 30L;
+        return 30L;
     }
-    else if (strstr(task->url, "announce") != nullptr)
+    if (strstr(task->url, "announce") != nullptr)
     {
-        timeout = 90L;
-    }
-    else
-    {
-        timeout = 240L;
+        return 90L;
     }
 
-    return timeout;
+    return 240L;
 }
 
 static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
 {
-    bool is_default_value;
-    tr_address const* addr;
     CURL* e = curl_easy_init();
 
     task->curl_easy = e;
@@ -279,6 +272,8 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
     curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);
 
+    tr_address const* addr = nullptr;
+    auto is_default_value = bool{};
     if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value)) != nullptr && !is_default_value)
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
@@ -410,8 +405,6 @@ struct tr_web_task* tr_webRunWebseed(
 
 static void tr_webThreadFunc(void* vsession)
 {
-    char* str;
-    CURLM* multi;
     int taskCount = 0;
     uint32_t repeats = 0;
     auto* session = static_cast<tr_session*>(vsession);
@@ -441,26 +434,18 @@ static void tr_webThreadFunc(void* vsession)
         tr_logAddNamedInfo("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
 
-    str = tr_buildPath(session->configDir, "cookies.txt", nullptr);
-
+    char* const str = tr_buildPath(session->configDir, "cookies.txt", nullptr);
     if (tr_sys_path_exists(str, nullptr))
     {
         web->cookie_filename = tr_strdup(str);
     }
-
     tr_free(str);
 
-    multi = curl_multi_init();
+    CURLM* const multi = curl_multi_init();
     session->web = web;
 
     for (;;)
     {
-        long msec;
-        int numfds;
-        int unused;
-        CURLMsg* msg;
-        CURLMcode mcode;
-
         if (web->close_mode == TR_WEB_CLOSE_NOW)
         {
             break;
@@ -496,7 +481,7 @@ static void tr_webThreadFunc(void* vsession)
         std::for_each(std::begin(paused), std::end(paused), [](auto* curl) { curl_easy_pause(curl, CURLPAUSE_CONT); });
 
         /* maybe wait a little while before calling curl_multi_perform() */
-        msec = 0;
+        auto msec = long{};
         curl_multi_timeout(multi, &msec);
 
         if (msec < 0)
@@ -516,6 +501,7 @@ static void tr_webThreadFunc(void* vsession)
                 msec = THREADFUNC_MAX_SLEEP_MSEC;
             }
 
+            auto numfds = int{};
             curl_multi_wait(multi, nullptr, 0, msec, &numfds);
             if (!numfds)
             {
@@ -535,26 +521,29 @@ static void tr_webThreadFunc(void* vsession)
         }
 
         /* call curl_multi_perform() */
+        auto mcode = CURLMcode{};
+        auto unused = int{};
         do
         {
             mcode = curl_multi_perform(multi, &unused);
         } while (mcode == CURLM_CALL_MULTI_PERFORM);
 
         /* pump completed tasks from the multi */
+        CURLMsg* msg = nullptr;
         while ((msg = curl_multi_info_read(multi, &unused)) != nullptr)
         {
             if (msg->msg == CURLMSG_DONE && msg->easy_handle != nullptr)
             {
-                double total_time;
-                struct tr_web_task* task;
-                long req_bytes_sent;
                 CURL* e = msg->easy_handle;
+                tr_web_task* task = nullptr;
                 curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
 
                 TR_ASSERT(e == task->curl_easy);
 
                 curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->code);
+                auto req_bytes_sent = long{};
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
+                auto total_time = double{};
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                 task->did_connect = task->code > 0 || req_bytes_sent > 0;
                 task->did_timeout = task->code == 0 && total_time >= task->timeout_secs;
