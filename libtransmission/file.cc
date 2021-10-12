@@ -23,12 +23,12 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     bool ret = false;
     size_t offset = 0;
-    uint64_t bytes_read;
 
     while (buffer_size > 0)
     {
         size_t const bytes_needed = std::min(buffer_size, size_t{ 1024 });
 
+        auto bytes_read = uint64_t{};
         ret = tr_sys_file_read(handle, buffer + offset, bytes_needed, &bytes_read, error);
 
         if (!ret || (offset == 0 && bytes_read == 0))
@@ -103,11 +103,10 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     TR_ASSERT(format != nullptr);
 
     bool ret = false;
-    char* buffer;
     va_list args;
 
     va_start(args, error);
-    buffer = tr_strdup_vprintf(format, args);
+    char* const buffer = tr_strdup_vprintf(format, args);
     va_end(args);
 
     if (buffer != nullptr)
