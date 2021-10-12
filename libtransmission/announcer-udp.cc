@@ -48,7 +48,7 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 
 static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
 {
-    tr_socket_t sockfd;
+    auto sockfd = tr_socket_t{};
 
     if (ai->ai_addr->sa_family == AF_INET)
     {
@@ -79,14 +79,14 @@ static int tau_sendto(tr_session const* session, struct evutil_addrinfo* ai, tr_
 
 static uint32_t evbuffer_read_ntoh_32(struct evbuffer* buf)
 {
-    uint32_t val;
+    auto val = uint32_t{};
     evbuffer_remove(buf, &val, sizeof(uint32_t));
     return ntohl(val);
 }
 
 static uint64_t evbuffer_read_ntoh_64(struct evbuffer* buf)
 {
-    uint64_t val;
+    auto val = uint64_t{};
     evbuffer_remove(buf, &val, sizeof(uint64_t));
     return tr_ntohll(val);
 }
@@ -106,7 +106,7 @@ using tau_transaction_t = uint32_t;
 
 static tau_transaction_t tau_transaction_new(void)
 {
-    tau_transaction_t tmp;
+    auto tmp = tau_transaction_t{};
     tr_rand_buffer(&tmp, sizeof(tau_transaction_t));
     return tmp;
 }
@@ -242,35 +242,24 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
     {
         for (int i = 0; i < request->response.row_count; ++i)
         {
-            struct tr_scrape_response_row* row;
-
             if (evbuffer_get_length(buf) < sizeof(uint32_t) * 3)
             {
                 break;
             }
 
-            row = &request->response.rows[i];
-            row->seeders = evbuffer_read_ntoh_32(buf);
-            row->downloads = evbuffer_read_ntoh_32(buf);
-            row->leechers = evbuffer_read_ntoh_32(buf);
+            tr_scrape_response_row& row = request->response.rows[i];
+            row.seeders = evbuffer_read_ntoh_32(buf);
+            row.downloads = evbuffer_read_ntoh_32(buf);
+            row.leechers = evbuffer_read_ntoh_32(buf);
         }
 
         tau_scrape_request_finished(request);
     }
     else
     {
-        char* errmsg;
         size_t const buflen = evbuffer_get_length(buf);
-
-        if (action == TAU_ACTION_ERROR && buflen > 0)
-        {
-            errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
-        }
-        else
-        {
-            errmsg = tr_strdup(_("Unknown error"));
-        }
-
+        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
+                                                                        tr_strdup(_("Unknown error"));
         tau_scrape_request_fail(request, true, false, errmsg);
         tr_free(errmsg);
     }
@@ -415,17 +404,8 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
     }
     else
     {
-        char* errmsg;
-
-        if (action == TAU_ACTION_ERROR && buflen > 0)
-        {
-            errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
-        }
-        else
-        {
-            errmsg = tr_strdup(_("Unknown error"));
-        }
-
+        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
+                                                                        tr_strdup(_("Unknown error"));
         tau_announce_request_fail(request, true, false, errmsg);
         tr_free(errmsg);
     }
@@ -613,18 +593,10 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     }
     else
     {
-        char* errmsg;
         size_t const buflen = buf != nullptr ? evbuffer_get_length(buf) : 0;
 
-        if (action == TAU_ACTION_ERROR && buflen > 0)
-        {
-            errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
-        }
-        else
-        {
-            errmsg = tr_strdup(_("Connection failed"));
-        }
-
+        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
+                                                                        tr_strdup(_("Connection failed"));
         dbgmsg(tracker->key, "%s", errmsg);
         tau_tracker_fail_all(tracker, true, false, errmsg);
         tr_free(errmsg);
@@ -635,7 +607,6 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
 
 static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 {
-    tr_ptrArray* reqs;
     time_t const now = time(nullptr);
     bool const cancel_all = tracker->close_at != 0 && (tracker->close_at <= now);
 
@@ -644,7 +615,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
         on_tracker_connection_response(tracker, TAU_ACTION_ERROR, nullptr);
     }
 
-    reqs = &tracker->announces;
+    tr_ptrArray* reqs = &tracker->announces;
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
@@ -665,7 +636,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
-        auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
+        auto* const req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
 
         if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
         {
@@ -778,14 +749,12 @@ struct tr_announcer_udp
 
 static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 {
-    struct tr_announcer_udp* tau;
-
     if (session->announcer_udp != nullptr)
     {
         return session->announcer_udp;
     }
 
-    tau = tr_new0(struct tr_announcer_udp, 1);
+    auto* tau = tr_new0(struct tr_announcer_udp, 1);
     tau->trackers = {};
     tau->session = session;
     session->announcer_udp = tau;
@@ -796,15 +765,12 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
    If it doesn't exist yet, create one. */
 static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau, char const* url)
 {
-    int port;
-    char* host;
-    char* key;
-    struct tau_tracker* tracker = nullptr;
-
     /* see if we've already got a tracker that matches this host + port */
+    struct tau_tracker* tracker = nullptr;
+    int port = 0;
+    char* host = nullptr;
     tr_urlParse(url, TR_BAD_SIZE, nullptr, &host, &port, nullptr);
-    key = tr_strdup_printf("%s:%d", host, port);
-
+    char* const key = tr_strdup_printf("%s:%d", host, port);
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); tracker == nullptr && i < n; ++i)
     {
         auto* tmp = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
@@ -908,10 +874,6 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
  * @return true if msg was a tracker response; false otherwise */
 bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 {
-    struct tr_announcer_udp* tau;
-    tau_transaction_t transaction_id;
-    struct evbuffer* buf;
-
     if (session == nullptr || session->announcer_udp == nullptr)
     {
         return false;
@@ -923,7 +885,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     }
 
     /* extract the action_id and see if it makes sense */
-    buf = evbuffer_new();
+    struct evbuffer* const buf = evbuffer_new();
     evbuffer_add_reference(buf, msg, msglen, nullptr, nullptr);
     auto const action_id = tau_action_t(evbuffer_read_ntoh_32(buf));
 
@@ -934,12 +896,11 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     }
 
     /* extract the transaction_id and look for a match */
-    tau = session->announcer_udp;
-    transaction_id = evbuffer_read_ntoh_32(buf);
+    tr_announcer_udp* tau = session->announcer_udp;
+    tau_transaction_t const transaction_id = evbuffer_read_ntoh_32(buf);
 
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
-        tr_ptrArray* reqs;
         auto* tracker = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
 
         /* is it a connection response? */
@@ -952,7 +913,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         }
 
         /* is it a response to one of this tracker's announces? */
-        reqs = &tracker->announces;
+        tr_ptrArray* reqs = &tracker->announces;
 
         for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
@@ -974,7 +935,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 
         for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
-            auto* req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, j));
+            auto* const req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, j));
 
             if (req->sent_at != 0 && transaction_id == req->transaction_id)
             {
