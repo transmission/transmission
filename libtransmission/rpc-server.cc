@@ -674,18 +674,21 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         server->loginattempts = 0;
 
-        if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
+        size_t const server_url_len = strlen(server->url);
+        char const* const location = strncmp(req->uri, server->url, server_url_len) == 0 ? req->uri + server_url_len : NULL;
+
+        if (location == NULL || location[0] == '\0' || strcmp(location, "web") == 0)
         {
-            char* location = tr_strdup_printf("%sweb/", server->url);
-            evhttp_add_header(req->output_headers, "Location", location);
-            send_simple_response(req, HTTP_MOVEPERM, nullptr);
-            tr_free(location);
+            char* new_location = tr_strdup_printf("%sweb/", server->url);
+            evhttp_add_header(req->output_headers, "Location", new_location);
+            send_simple_response(req, HTTP_MOVEPERM, NULL);
+            tr_free(new_location);
         }
-        else if (strncmp(req->uri + strlen(server->url), "web/", 4) == 0)
+        else if (strncmp(location, "web/", 4) == 0)
         {
             handle_web_client(req, server);
         }
-        else if (strcmp(req->uri + strlen(server->url), "upload") == 0)
+        else if (strcmp(location, "upload") == 0)
         {
             handle_upload(req, server);
         }
@@ -731,7 +734,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
 #endif
 
-        else if (strncmp(req->uri + strlen(server->url), "rpc", 3) == 0)
+        else if (strncmp(location, "rpc", 3) == 0)
         {
             handle_rpc(req, server);
         }
@@ -1133,14 +1136,22 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_url;
+    size_t url_len;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStr(settings, key, &str, &url_len))
     {
         missing_settings_key(key);
     }
     else
     {
-        s->url = tr_strdup(str);
+        if (url_len == 0 || str[url_len - 1] != '/')
+        {
+            s->url = tr_strdup_printf("%s/", str);
+        }
+        else
+        {
+            s->url = tr_strdup(str);
+        }
     }
 
     key = TR_KEY_rpc_whitelist_enabled;
