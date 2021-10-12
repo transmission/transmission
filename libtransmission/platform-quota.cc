@@ -498,7 +498,9 @@ static struct tr_disk_space tr_getDiskSpace(char const* path)
 #elif defined(HAVE_STATVFS)
 
     struct statvfs buf;
-    return statvfs(path, &buf) ? (struct tr_disk_space){ -1, -1 } : (struct tr_disk_space){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize, (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
+    return statvfs(path, &buf) ?
+        (struct tr_disk_space){ -1, -1 } :
+        (struct tr_disk_space){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize, (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
 
 #else
 
