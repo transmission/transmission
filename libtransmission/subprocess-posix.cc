@@ -24,8 +24,7 @@
 
 static void handle_sigchld([[maybe_unused]] int i)
 {
-    int rc;
-
+    auto rc = int{};
     do
     {
         /* FIXME: Only check for our own PIDs */
@@ -84,11 +83,10 @@ FAIL:
 
 static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
 {
-    int child_errno;
-    ssize_t count;
-
+    auto child_errno = int{};
     TR_STATIC_ASSERT(sizeof(child_errno) == sizeof(errno), "");
 
+    auto count = ssize_t{};
     do
     {
         count = read(pipe_fd, &child_errno, sizeof(child_errno));
