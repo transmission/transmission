@@ -70,11 +70,13 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
     }
 
     char* lock_file_path = get_session_id_lock_file_path(session_id);
-    tr_sys_file_t lock_file;
     tr_error* error = nullptr;
 
-    lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
-
+    tr_sys_file_t lock_file = tr_sys_file_open(
+        lock_file_path,
+        TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE,
+        0600,
+        &error);
     if (lock_file != TR_BAD_SYS_FILE)
     {
         if (tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB, &error))
@@ -170,10 +172,9 @@ bool tr_session_id_is_local(char const* session_id)
     if (session_id != nullptr)
     {
         char* lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_file_t lock_file;
         tr_error* error = nullptr;
 
-        lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ, 0, &error);
+        tr_sys_file_t const lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ, 0, &error);
 
         if (lock_file == TR_BAD_SYS_FILE)
         {
