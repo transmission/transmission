@@ -275,22 +275,17 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, 
 
 static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, size_t* len, struct evbuffer* buf)
 {
-    char const* ret;
-    char const* in_begin;
-    char const* in_end;
-    size_t in_len;
-
     /* figure out where the string is */
-    in_begin = jsn->base + state->pos_begin;
-
+    char const* in_begin = jsn->base + state->pos_begin;
     if (*in_begin == '"')
     {
         in_begin++;
     }
 
-    in_end = jsn->base + state->pos_cur;
-    in_len = in_end - in_begin;
+    char const* const in_end = jsn->base + state->pos_cur;
+    size_t const in_len = in_end - in_begin;
 
+    char const* ret = nullptr;
     if (memchr(in_begin, '\\', in_len) == nullptr)
     {
         /* it's not escaped */
@@ -315,7 +310,7 @@ static void action_callback_POP(
 
     if (state->type == JSONSL_T_STRING)
     {
-        size_t len;
+        auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
         tr_variantInitStr(get_node(jsn), str, len);
         data->has_content = true;
@@ -365,11 +360,9 @@ static void action_callback_POP(
 
 int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant, char const** setme_end)
 {
-    int error;
-    jsonsl_t jsn;
-    struct json_wrapper_data data;
+    auto data = json_wrapper_data{};
 
-    jsn = jsonsl_new(MAX_DEPTH);
+    jsonsl_t jsn = jsonsl_new(MAX_DEPTH);
     jsn->action_callback_PUSH = action_callback_PUSH;
     jsn->action_callback_POP = action_callback_POP;
     jsn->error_callback = error_callback;
@@ -405,7 +398,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     }
 
     /* cleanup */
-    error = data.error;
+    int const error = data.error;
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
     jsonsl_destroy(jsn);
