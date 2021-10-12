@@ -699,6 +699,14 @@ tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* set
 ***
 **/
 
+bool tr_sessionIsTorrentAddedScriptEnabled(tr_session const*);
+
+void tr_sessionSetTorrentAddedScriptEnabled(tr_session*, bool isEnabled);
+
+char const* tr_sessionGetTorrentAddedScript(tr_session const*);
+
+void tr_sessionSetTorrentAddedScript(tr_session*, char const* scriptFilename);
+
 bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const*);
 
 void tr_sessionSetTorrentDoneScriptEnabled(tr_session*, bool isEnabled);
