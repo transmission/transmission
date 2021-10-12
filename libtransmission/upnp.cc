@@ -109,7 +109,6 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
 
 static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto)
 {
-    int err;
     char intClient[16];
     char intPort[16];
     char portStr[16];
@@ -151,6 +150,8 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         intClient,
         intPort);
 #endif
+
+    return err;
 }
 
 static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
