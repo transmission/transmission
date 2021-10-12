@@ -176,7 +176,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
     /* read the command type */
     char ch = '\0';
 
-    int ret;
+    auto ret = int{};
     do
     {
         ret = piperead(fd, &ch, 1);
@@ -269,11 +269,9 @@ static void libeventThreadFunc(void* veh)
 
 void tr_eventInit(tr_session* session)
 {
-    tr_event_handle* eh;
-
     session->events = nullptr;
 
-    eh = tr_new0(tr_event_handle, 1);
+    auto* const eh = tr_new0(tr_event_handle, 1);
     eh->lock = tr_lockNew();
 
     if (pipe(eh->fds) == -1)
@@ -336,22 +334,18 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
     }
     else
     {
-        tr_pipe_end_t fd;
-        char ch;
-        ev_ssize_t res_1;
-        ev_ssize_t res_2;
-        tr_event_handle* e = session->events;
+        tr_event_handle* const e = session->events;
         struct tr_run_data data;
 
         tr_lockLock(e->lock);
 
-        fd = e->fds[1];
-        ch = 'r';
-        res_1 = pipewrite(fd, &ch, 1);
+        tr_pipe_end_t const fd = e->fds[1];
+        char const ch = 'r';
+        ev_ssize_t const res_1 = pipewrite(fd, &ch, 1);
 
         data.func = func;
         data.user_data = user_data;
-        res_2 = pipewrite(fd, &data, sizeof(data));
+        ev_ssize_t const res_2 = pipewrite(fd, &data, sizeof(data));
 
         tr_lockUnlock(e->lock);
 
