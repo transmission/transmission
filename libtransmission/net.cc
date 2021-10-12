@@ -153,7 +153,7 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
  * TCP sockets
  **********************************************************************/
 
-void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
+void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
 {
     if (type == TR_AF_INET)
     {
@@ -165,12 +165,6 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
             tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, err_buf);
         }
-
-#else
-
-        TR_UNUSED(s);
-        TR_UNUSED(tos);
-
 #endif
     }
     else if (type == TR_AF_INET6)
@@ -182,12 +176,6 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
             tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, err_buf);
         }
-
-#else
-
-        TR_UNUSED(s);
-        TR_UNUSED(tos);
-
 #endif
     }
     else
@@ -197,7 +185,7 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
     }
 }
 
-void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)
+void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]] char const* algorithm)
 {
 #ifdef TCP_CONGESTION
 
@@ -210,11 +198,6 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)
             algorithm,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
-
-#else
-
-    TR_UNUSED(s);
-    TR_UNUSED(algorithm);
 
 #endif
 }
@@ -370,10 +353,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(
+    tr_session* session,
+    tr_address const* addr,
+    tr_port port,
+    [[maybe_unused]] bool clientIsSeed)
 {
-    TR_UNUSED(clientIsSeed);
-
     auto ret = tr_peer_socket{};
 
     if (tr_address_is_valid_for_peers(addr, port))

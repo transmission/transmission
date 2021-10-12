@@ -51,11 +51,9 @@ protected:
         return test_dir;
     }
 
-    bool createSymlink(char const* dst_path, char const* src_path, bool dst_is_dir)
+    bool createSymlink(char const* dst_path, char const* src_path, [[maybe_unused]] bool dst_is_dir)
     {
 #ifndef _WIN32
-
-        TR_UNUSED(dst_is_dir);
 
         return symlink(src_path, dst_path) != -1;
 
@@ -138,7 +136,7 @@ protected:
         return true;
     }
 
-    bool validatePermissions(char const* path, unsigned int permissions)
+    bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
     {
 #ifndef _WIN32
 
@@ -146,9 +144,6 @@ protected:
         return stat(path, &sb) != -1 && (sb.st_mode & 0777) == permissions;
 
 #else
-
-        TR_UNUSED(path);
-        TR_UNUSED(permissions);
 
         /* No UNIX permissions on Windows */
         return true;

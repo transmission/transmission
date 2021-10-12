@@ -894,23 +894,17 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
 *****
 ****/
 
-static void freeDummyFunc(tr_variant const* v, void* buf)
+static void freeDummyFunc([[maybe_unused]] tr_variant const* v, [[maybe_unused]] void* buf)
 {
-    TR_UNUSED(v);
-    TR_UNUSED(buf);
 }
 
-static void freeStringFunc(tr_variant const* v, void* user_data)
+static void freeStringFunc(tr_variant const* v, [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(user_data);
-
     tr_variant_string_clear(&((tr_variant*)v)->val.s);
 }
 
-static void freeContainerEndFunc(tr_variant const* v, void* user_data)
+static void freeContainerEndFunc(tr_variant const* v, [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(user_data);
-
     tr_free(v->val.l.vals);
 }
 

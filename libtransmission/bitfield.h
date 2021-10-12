@@ -14,78 +14,133 @@
 
 #include "transmission.h"
 #include "tr-macros.h"
+#include "tr-assert.h"
 
-/** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
-struct tr_bitfield
+/// @brief Implementation of the BitTorrent spec's Bitfield array of bits
+struct Bitfield
 {
-    uint8_t* bits = nullptr;
-    size_t alloc_count = 0;
+public:
+    /***
+    ****  life cycle
+    ***/
+    explicit Bitfield(size_t bit_count);
 
-    size_t bit_count = 0;
+    Bitfield()
+        : Bitfield(0)
+    {
+    }
 
-    size_t true_count = 0;
+    ~Bitfield()
+    {
+        this->setHasNone();
+    }
 
-    /* Special cases for when full or empty but we don't know the bitCount.
-       This occurs when a magnet link's peers send have all / have none */
-    bool have_all_hint = false;
-    bool have_none_hint = false;
+    /***
+    ****
+    ***/
+
+    void setHasAll();
+
+    void setHasNone();
+
+    /// @brief Sets one bit
+    void setBit(size_t bit);
+
+    /// @brief Sets bit range [begin, end) to 1
+    void setBitRange(size_t begin, size_t end);
+
+    /// @brief Clears one bit
+    void clearBit(size_t bit);
+
+    /// @brief Clears bit range [begin, end) to 0
+    void clearBitRange(size_t begin, size_t end);
+
+    /***
+    ****
+    ***/
+
+    [[nodiscard]] size_t countRange(size_t begin, size_t end) const
+    {
+        if (this->hasAll())
+        {
+            return end - begin;
+        }
+
+        if (this->hasNone())
+        {
+            return 0;
+        }
+
+        return this->countRangeImpl(begin, end);
+    }
+
+    [[nodiscard]] size_t countBits() const;
+
+    [[nodiscard]] constexpr bool hasAll() const
+    {
+        return this->bit_count_ != 0 ? (this->true_count_ == this->bit_count_) : this->hint_ == HAS_ALL;
+    }
+
+    [[nodiscard]] constexpr bool hasNone() const
+    {
+        return this->bit_count_ != 0 ? (this->true_count_ == 0) : this->hint_ == HAS_NONE;
+    }
+
+    [[nodiscard]] bool readBit(size_t n) const;
+
+    /***
+    ****
+    ***/
+
+    void setFromFlags(bool const* bytes, size_t n);
+
+    void setFromBitfield(Bitfield const& src);
+
+    void setRaw(void const* newBits, size_t byte_count, bool bounded);
+
+    void* getRaw(size_t* byte_count) const;
+
+    [[nodiscard]] size_t getBitCount() const
+    {
+        return bit_count_;
+    }
+
+private:
+    [[nodiscard]] constexpr size_t countArray() const;
+    [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
+    static void setBitsInArray(uint8_t* array, size_t bit_count);
+    static constexpr size_t getStorageSize(size_t bit_count)
+    {
+        return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
+    }
+    void ensureBitsAlloced(size_t n);
+    bool ensureNthBitAlloced(size_t nth);
+    void freeArray();
+    void setTrueCount(size_t n);
+    void rebuildTrueCount();
+    void incTrueCount(size_t i);
+    void decTrueCount(size_t i);
+
+#ifdef TR_ENABLE_ASSERTS
+    [[nodiscard]] bool isValid() const;
+#endif
+
+    uint8_t* bits_ = nullptr;
+    size_t alloc_count_ = 0;
+    size_t bit_count_ = 0;
+    size_t true_count_ = 0;
+
+    enum OperationMode
+    {
+        /// @brief Normal operation: storage of bytes contains bits to set or clear
+        NORMAL,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 1
+        HAS_ALL,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 0
+        HAS_NONE,
+    };
+
+    // Special cases for when full or empty but we don't know the bitCount.
+    // This occurs when a magnet link's peers send have all / have none
+    OperationMode hint_ = NORMAL;
 };
-
-/***
-****
-***/
-
-void tr_bitfieldSetHasAll(tr_bitfield*);
-
-void tr_bitfieldSetHasNone(tr_bitfield*);
-
-void tr_bitfieldAdd(tr_bitfield*, size_t bit);
-
-void tr_bitfieldRem(tr_bitfield*, size_t bit);
-
-void tr_bitfieldAddRange(tr_bitfield*, size_t begin, size_t end);
-
-void tr_bitfieldRemRange(tr_bitfield*, size_t begin, size_t end);
-
-/***
-****  life cycle
-***/
-
-void tr_bitfieldConstruct(tr_bitfield*, size_t bit_count);
-
-static inline void tr_bitfieldDestruct(tr_bitfield* b)
-{
-    tr_bitfieldSetHasNone(b);
-}
-
-/***
-****
-***/
-
-void tr_bitfieldSetFromFlags(tr_bitfield*, bool const* bytes, size_t n);
-
-void tr_bitfieldSetFromBitfield(tr_bitfield*, tr_bitfield const*);
-
-void tr_bitfieldSetRaw(tr_bitfield*, void const* bits, size_t byte_count, bool bounded);
-
-void* tr_bitfieldGetRaw(tr_bitfield const* b, size_t* byte_count);
-
-/***
-****
-***/
-
-size_t tr_bitfieldCountRange(tr_bitfield const*, size_t begin, size_t end);
-
-size_t tr_bitfieldCountTrueBits(tr_bitfield const* b);
-
-constexpr bool tr_bitfieldHasAll(tr_bitfield const* b)
-{
-    return b->bit_count != 0 ? (b->true_count == b->bit_count) : b->have_all_hint;
-}
-
-constexpr bool tr_bitfieldHasNone(tr_bitfield const* b)
-{
-    return b->bit_count != 0 ? (b->true_count == 0) : b->have_none_hint;
-}
-
-bool tr_bitfieldHas(tr_bitfield const* b, size_t n);
