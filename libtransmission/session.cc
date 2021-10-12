@@ -166,10 +166,8 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
 {
-    TR_UNUSED(what);
-
     tr_socket_t clientSocket;
     tr_port clientPort;
     tr_address clientAddr;
@@ -586,11 +584,8 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
+static void onSaveTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* session = static_cast<tr_session*>(vsession);
 
     if (tr_cacheFlushDone(session->cache) != 0)
@@ -640,7 +635,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
-    tr_bandwidthConstruct(&session->bandwidth, nullptr);
+    session->bandwidth = new Bandwidth(nullptr);
     tr_variantInitList(&session->removedTorrents, 0);
 
     /* nice to start logging at the very beginning */
@@ -672,11 +667,8 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
+static void onNowTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
@@ -1508,9 +1500,9 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
     bool const isLimited = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &limit_Bps);
     bool const zeroCase = isLimited && limit_Bps == 0;
 
-    tr_bandwidthSetLimited(&session->bandwidth, dir, isLimited && !zeroCase);
+    session->bandwidth->setLimited(dir, isLimited && !zeroCase);
 
-    tr_bandwidthSetDesiredSpeed_Bps(&session->bandwidth, dir, limit_Bps);
+    session->bandwidth->setDesiredSpeedBytesPerSecond(dir, limit_Bps);
 }
 
 enum
@@ -1522,9 +1514,7 @@ enum
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    tr_bitfield* b = &t->minutes;
-
-    tr_bitfieldSetHasNone(b);
+    t->minutes->setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1540,7 +1530,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
+                t->minutes->setBit((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }
         }
     }
@@ -1594,7 +1584,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MINUTES_PER_WEEK - 1;
     }
 
-    return tr_bitfieldHas(&t->minutes, minute_of_the_week);
+    return t->minutes->readBit(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1626,7 +1616,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    tr_bitfieldConstruct(&turtle->minutes, MINUTES_PER_WEEK);
+    turtle->minutes = new Bitfield(MINUTES_PER_WEEK);
 
     turtleUpdateTable(turtle);
 
@@ -1905,12 +1895,12 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? tr_bandwidthGetPieceSpeed_Bps(&session->bandwidth, 0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getPieceSpeedBytesPerSecond(0, dir) : 0;
 }
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? tr_bandwidthGetRawSpeed_Bps(&session->bandwidth, 0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getRawSpeedBytesPerSecond(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -2003,11 +1993,8 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession)
+static void sessionCloseImplWaitForIdleUdp([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* session = static_cast<tr_session*>(vsession);
 
     TR_ASSERT(tr_isSession(session));
@@ -2126,8 +2113,8 @@ void tr_sessionClose(tr_session* session)
 
     /* free the session memory */
     tr_variantFree(&session->removedTorrents);
-    tr_bandwidthDestruct(&session->bandwidth);
-    tr_bitfieldDestruct(&session->turtle.minutes);
+    delete session->bandwidth;
+    delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 

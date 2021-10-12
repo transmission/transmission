@@ -435,7 +435,7 @@ static int64_t getxfsquota(char* device)
 
 #endif /* _WIN32 */
 
-static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
+static int64_t tr_getQuotaFreeSpace([[maybe_unused]] struct tr_device_info const* info)
 {
     int64_t ret = -1;
 
@@ -451,10 +451,6 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
     {
         ret = getquota(info->device);
     }
-
-#else /* _WIN32 */
-
-    TR_UNUSED(info);
 
 #endif /* _WIN32 */
 

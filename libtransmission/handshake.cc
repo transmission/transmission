@@ -201,9 +201,8 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
         walk += SHA_DIGEST_LENGTH;
         memcpy(walk, peer_id, PEER_ID_LEN);
-        walk += PEER_ID_LEN;
 
-        TR_ASSERT(walk - buf == HANDSHAKE_SIZE);
+        TR_ASSERT(walk + PEER_ID_LEN - buf == HANDSHAKE_SIZE);
     }
 
     return success;
@@ -999,7 +998,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 ****
 ***/
 
-static ReadState canRead(struct tr_peerIo* io, void* vhandshake, size_t* piece)
+static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -1148,7 +1147,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !tr_peerIoIsIncoming(io) && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1204,11 +1203,8 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-static void handshakeTimeout(evutil_socket_t s, short type, void* handshake)
+static void handshakeTimeout([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* handshake)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(type);
-
     tr_handshakeAbort(static_cast<tr_handshake*>(handshake));
 }
 
@@ -1252,12 +1248,12 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     return handshake;
 }
 
-struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
+tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
 {
     TR_ASSERT(handshake != nullptr);
     TR_ASSERT(handshake->io != nullptr);
 
-    struct tr_peerIo* io = handshake->io;
+    tr_peerIo* io = handshake->io;
     handshake->io = nullptr;
     return io;
 }

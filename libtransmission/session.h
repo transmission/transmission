@@ -95,7 +95,9 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    tr_bitfield minutes;
+    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
+    // TODO: remove * and own the value
+    Bitfield* minutes;
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
@@ -242,7 +244,9 @@ struct tr_session
     struct event* saveTimer;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth bandwidth;
+    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    Bandwidth* bandwidth;
 
     float desiredRatio;
 
