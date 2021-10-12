@@ -353,14 +353,14 @@ static struct tr_disk_space getquota(char const* device)
     if (ioctl(fd, Q_QUOTACTL, &op) != 0)
     {
         close(fd);
-        return -1;
+        return disk_space;
     }
 
     close(fd);
 #else
     if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) != 0)
     {
-        return -1;
+        return disk_space;
     }
 #endif
 
