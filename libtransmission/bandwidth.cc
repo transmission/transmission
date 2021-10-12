@@ -23,50 +23,49 @@
 ****
 ***/
 
-unsigned int Bandwidth::getSpeed_Bps(RateControl const* r, unsigned int interval_msec, uint64_t now)
+unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
         now = tr_time_msec();
     }
 
-    if (now != r->cache_time_)
+    if (now != r.cache_time_)
     {
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
-        auto* rvolatile = (RateControl*)r;
 
-        for (int i = r->newest_; r->transfers_[i].date_ > cutoff;)
+        for (int i = r.newest_; r.transfers_[i].date_ > cutoff;)
         {
-            bytes += r->transfers_[i].size_;
+            bytes += r.transfers_[i].size_;
 
             if (--i == -1)
             {
-                i = HISTORY_SIZE - 1; /* circular history */
+                i = HistorySize - 1; /* circular history */
             }
 
-            if (i == r->newest_)
+            if (i == r.newest_)
             {
                 break; /* we've come all the way around */
             }
         }
 
-        rvolatile->cache_val_ = (unsigned int)(bytes * 1000U / interval_msec);
-        rvolatile->cache_time_ = now;
+        r.cache_val_ = unsigned(bytes * 1000U / interval_msec);
+        r.cache_time_ = now;
     }
 
-    return r->cache_val_;
+    return r.cache_val_;
 }
 
 void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
-    if (r->transfers_[r->newest_].date_ + GRANULARITY_MSEC >= now)
+    if (r->transfers_[r->newest_].date_ + GranularityMSec >= now)
     {
         r->transfers_[r->newest_].size_ += size;
     }
     else
     {
-        if (++r->newest_ == HISTORY_SIZE)
+        if (++r->newest_ == HistorySize)
         {
             r->newest_ = 0;
         }
@@ -83,25 +82,20 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ****
 ***/
 
-Bandwidth::Bandwidth(Bandwidth* newParent)
-    : band_{}
-    , parent_{ nullptr }
-    , children_{}
-    , peer_{ nullptr }
+Bandwidth::Bandwidth(Bandwidth* new_parent)
 {
-    this->children_ = {};
     this->band_[TR_UP].honor_parent_limits_ = true;
     this->band_[TR_DOWN].honor_parent_limits_ = true;
-    this->setParent(newParent);
+    this->setParent(new_parent);
 }
 
 /***
 ****
 ***/
 
-void Bandwidth::setParent(Bandwidth* newParent)
+void Bandwidth::setParent(Bandwidth* new_parent)
 {
-    TR_ASSERT(this != newParent);
+    TR_ASSERT(this != new_parent);
 
     if (this->parent_ != nullptr)
     {
@@ -109,13 +103,13 @@ void Bandwidth::setParent(Bandwidth* newParent)
         this->parent_ = nullptr;
     }
 
-    if (newParent != nullptr)
+    if (new_parent != nullptr)
     {
-        TR_ASSERT(newParent->parent_ != this);
-        TR_ASSERT(newParent->children_.find(this) == newParent->children_.end()); // does not exist
+        TR_ASSERT(new_parent->parent_ != this);
+        TR_ASSERT(new_parent->children_.find(this) == new_parent->children_.end()); // does not exist
 
-        newParent->children_.insert(this);
-        this->parent_ = newParent;
+        new_parent->children_.insert(this);
+        this->parent_ = new_parent;
     }
 }
 
@@ -131,26 +125,26 @@ void Bandwidth::allocateBandwidth(
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    tr_priority_t const priority_ = std::max(parent_priority, this->priority);
+    tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
     if (this->band_[dir].is_limited_)
     {
-        uint64_t const nextPulseSpeed = this->band_[dir].desired_speed_bps_;
-        this->band_[dir].bytes_left_ = nextPulseSpeed * period_msec / 1000U;
+        uint64_t const next_pulse_speed = this->band_[dir].desired_speed_bps_;
+        this->band_[dir].bytes_left_ = next_pulse_speed * period_msec / 1000U;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
     if (this->peer_ != nullptr)
     {
-        this->peer_->priority = priority_;
+        this->peer_->priority = priority;
         peer_pool.push_back(this->peer_);
     }
 
     // traverse & repeat for the subtree
-    for (auto child : this->children_)
+    for (auto* child : this->children_)
     {
-        child->allocateBandwidth(priority_, dir, period_msec, peer_pool);
+        child->allocateBandwidth(priority, dir, period_msec, peer_pool);
     }
 }
 
@@ -172,11 +166,11 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
          * out in a timely manner. */
         size_t const increment = 3000;
 
-        int const bytesUsed = tr_peerIoFlush(peerArray[i], dir, increment);
+        int const bytes_used = tr_peerIoFlush(peerArray[i], dir, increment);
 
-        dbgmsg("peer #%d of %zu used %d bytes in this pass", i, n, bytesUsed);
+        dbgmsg("peer #%d of %zu used %d bytes in this pass", i, n, bytes_used);
 
-        if (bytesUsed != (int)increment)
+        if (bytes_used != int(increment))
         {
             /* peer is done writing for now; move it to the end of the list */
             std::swap(peerArray[i], peerArray[n - 1]);
@@ -197,7 +191,7 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * 2. accumulate an array of all the peerIos from b and its subtree. */
     this->allocateBandwidth(TR_PRI_LOW, dir, period_msec, tmp);
 
-    for (auto io : tmp)
+    for (auto* io : tmp)
     {
         tr_peerIoRef(io);
         tr_peerIoFlushOutgoingProtocolMsgs(io);
@@ -229,12 +223,12 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next Bandwidth::allocate () call, when we start over again. */
-    for (auto io : tmp)
+    for (auto* io : tmp)
     {
         tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
     }
 
-    for (auto io : tmp)
+    for (auto* io : tmp)
     {
         tr_peerIoUnref(io);
     }
@@ -244,17 +238,17 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 ****
 ***/
 
-unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteCount) const
+unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_count) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
     if (this->band_[dir].is_limited_)
     {
-        byteCount = std::min(byteCount, this->band_[dir].bytes_left_);
+        byte_count = std::min(byte_count, this->band_[dir].bytes_left_);
 
         /* if we're getting close to exceeding the speed limit,
          * clamp down harder on the bytes available */
-        if (byteCount > 0)
+        if (byte_count > 0)
         {
             double current;
             double desired;
@@ -265,42 +259,42 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byteC
                 now = tr_time_msec();
             }
 
-            current = this->getRawSpeed_Bps(now, TR_DOWN);
-            desired = this->getDesiredSpeed_Bps(TR_DOWN);
+            current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
+            desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
             r = desired >= 1 ? current / desired : 0;
 
             if (r > 1.0)
             {
-                byteCount = 0;
+                byte_count = 0;
             }
             else if (r > 0.9)
             {
-                byteCount = static_cast<unsigned int>(byteCount * 0.8);
+                byte_count = static_cast<unsigned int>(byte_count * 0.8);
             }
             else if (r > 0.8)
             {
-                byteCount = static_cast<unsigned int>(byteCount * 0.9);
+                byte_count = static_cast<unsigned int>(byte_count * 0.9);
             }
         }
     }
 
-    if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byteCount > 0)
+    if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byte_count > 0)
     {
-        byteCount = this->parent_->clamp(now, dir, byteCount);
+        byte_count = this->parent_->clamp(now, dir, byte_count);
     }
 
-    return byteCount;
+    return byte_count;
 }
 
-void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
+void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
 
     Band* band = &this->band_[dir];
 
-    if (band->is_limited_ && isPieceData)
+    if (band->is_limited_ && is_piece_data)
     {
-        band->bytes_left_ -= std::min(size_t{ band->bytes_left_ }, byteCount);
+        band->bytes_left_ -= std::min(size_t{ band->bytes_left_ }, byte_count);
     }
 
 #ifdef DEBUG_DIRECTION
@@ -311,23 +305,23 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byteCount, bool
             stderr,
             "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n",
             this,
-            byteCount,
-            isPieceData ? "piece" : "raw",
+            byte_count,
+            is_piece_data ? "piece" : "raw",
             oldBytesLeft,
             band_->bytesLeft);
     }
 
 #endif
 
-    notifyBandwidthConsumedBytes(now, &band->raw_, byteCount);
+    notifyBandwidthConsumedBytes(now, &band->raw_, byte_count);
 
-    if (isPieceData)
+    if (is_piece_data)
     {
-        notifyBandwidthConsumedBytes(now, &band->piece_, byteCount);
+        notifyBandwidthConsumedBytes(now, &band->piece_, byte_count);
     }
 
     if (this->parent_ != nullptr)
     {
-        this->parent_->notifyBandwidthConsumed(dir, byteCount, isPieceData, now);
+        this->parent_->notifyBandwidthConsumed(dir, byte_count, is_piece_data, now);
     }
 }

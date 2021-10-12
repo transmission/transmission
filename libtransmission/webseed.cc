@@ -67,7 +67,7 @@ public:
         , bandwidth(tor->bandwidth)
     {
         // init parent bits
-        tr_bitfieldSetHasAll(&have);
+        have.setHasAll();
         tr_peerUpdateProgress(tor, this);
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
@@ -93,7 +93,7 @@ public:
         if (direction == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            Bps = bandwidth.getPieceSpeed_Bps(now, direction);
+            Bps = bandwidth.getPieceSpeedBytesPerSecond(now, direction);
         }
 
         if (setme_Bps != nullptr)

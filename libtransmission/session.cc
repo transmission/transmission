@@ -1501,7 +1501,7 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
 
     session->bandwidth->setLimited(dir, isLimited && !zeroCase);
 
-    session->bandwidth->setDesiredSpeed_Bps(dir, limit_Bps);
+    session->bandwidth->setDesiredSpeedBytesPerSecond(dir, limit_Bps);
 }
 
 enum
@@ -1513,9 +1513,7 @@ enum
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    tr_bitfield* b = &t->minutes;
-
-    tr_bitfieldSetHasNone(b);
+    t->minutes->setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1531,7 +1529,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
+                t->minutes->setBit((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }
         }
     }
@@ -1585,7 +1583,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MINUTES_PER_WEEK - 1;
     }
 
-    return tr_bitfieldHas(&t->minutes, minute_of_the_week);
+    return t->minutes->readBit(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1617,7 +1615,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    tr_bitfieldConstruct(&turtle->minutes, MINUTES_PER_WEEK);
+    turtle->minutes = new Bitfield(MINUTES_PER_WEEK);
 
     turtleUpdateTable(turtle);
 
@@ -1896,12 +1894,12 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getPieceSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getPieceSpeedBytesPerSecond(0, dir) : 0;
 }
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getRawSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getRawSpeedBytesPerSecond(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -2117,7 +2115,7 @@ void tr_sessionClose(tr_session* session)
     /* free the session memory */
     tr_variantFree(&session->removedTorrents);
     delete session->bandwidth;
-    tr_bitfieldDestruct(&session->turtle.minutes);
+    delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
