@@ -241,7 +241,6 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     };
 
     char sstr[maxLength] = { 0 };
-    char const* pos;
 
     if (strlen(name) > maxLength - strlen(CRLF ": "))
     {
@@ -251,26 +250,23 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     /* compose the string token to search for */
     tr_snprintf(sstr, maxLength, CRLF "%s: ", name);
 
-    pos = strstr(str, sstr);
-
+    char const* const pos = strstr(str, sstr);
     if (pos == nullptr)
     {
         return false; /* search was not successful */
     }
 
-    {
-        char const* const beg = pos + strlen(sstr);
-        char const* const new_line = strstr(beg, CRLF);
+    char const* const beg = pos + strlen(sstr);
+    char const* const new_line = strstr(beg, CRLF);
 
-        /* the value is delimited by the next CRLF */
-        int const len = new_line - beg;
+    /* the value is delimited by the next CRLF */
+    int const len = new_line - beg;
 
-        /* if value string hits the length limit n,
-         * leave space for a trailing '\0' character */
-        n = std::min(len, n - 1);
-        strncpy(val, beg, n);
-        val[n] = 0;
-    }
+    /* if value string hits the length limit n,
+     * leave space for a trailing '\0' character */
+    n = std::min(len, n - 1);
+    strncpy(val, beg, n);
+    val[n] = 0;
 
     /* we successfully returned the value string */
     return true;
