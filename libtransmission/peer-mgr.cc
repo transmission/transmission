@@ -1016,7 +1016,7 @@ static void pieceListRebuild(tr_swarm* s)
         tr_info const* const inf = tr_torrentInfo(tor);
 
         /* build the new list */
-        tr_piece_index_t poolCount = 0;
+        auto poolCount = tr_piece_index_t{};
         auto* const pool = tr_new(tr_piece_index_t, inf->pieceCount);
         for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
         {
@@ -1027,7 +1027,7 @@ static void pieceListRebuild(tr_swarm* s)
         }
 
         int const pieceCount = poolCount;
-        auto* const pieces = tr_new0(struct weighted_piece, pieceCount);
+        auto* const pieces = tr_new0(weighted_piece, pieceCount);
 
         for (tr_piece_index_t i = 0; i < poolCount; ++i)
         {
@@ -1148,7 +1148,7 @@ static void pieceListRemoveRequest(tr_swarm* s, tr_block_index_t block)
 {
     tr_piece_index_t const index = tr_torBlockPiece(s->tor, block);
 
-    struct weighted_piece* const p = pieceListLookup(s, index);
+    weighted_piece* const p = pieceListLookup(s, index);
     if (p != nullptr && p->requestCount > 0)
     {
         --p->requestCount;
@@ -2015,7 +2015,7 @@ static bool myHandshakeDoneCB(
             }
             else
             {
-                tr_quark client = TR_KEY_NONE;
+                auto client = tr_quark{ TR_KEY_NONE };
                 if (peer_id != nullptr)
                 {
                     char buf[128];
@@ -2309,7 +2309,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     ***  build a list of atoms
     **/
 
-    int atomCount = 0;
+    auto atomCount = int{};
     struct peer_atom** atoms = nullptr;
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
@@ -3355,8 +3355,7 @@ static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSi
     TR_ASSERT(swarmIsLocked(s));
 
     tr_peer** ret = nullptr;
-    int outsize = 0;
-
+    auto outsize = int{};
     auto peerCount = int{};
     tr_peer** const peers = (tr_peer**)tr_ptrArrayPeek(&s->peers, &peerCount);
 
@@ -3862,7 +3861,7 @@ static void atomPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] shor
         tr_swarm* s = tor->swarm;
         int const maxAtomCount = getMaxAtomCount(tor);
         auto atomCount = int{};
-        struct peer_atom** const atoms = (struct peer_atom**)tr_ptrArrayPeek(&s->pool, &atomCount);
+        peer_atom** const atoms = (peer_atom**)tr_ptrArrayPeek(&s->pool, &atomCount);
 
         if (atomCount > maxAtomCount) /* we've got too many atoms... time to prune */
         {
@@ -4129,8 +4128,8 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     }
 
     /* allocate an array of candidates */
-    struct peer_candidate* const candidates = tr_new(struct peer_candidate, atomCount);
-    struct peer_candidate* walk = candidates;
+    peer_candidate* const candidates = tr_new(peer_candidate, atomCount);
+    peer_candidate* walk = candidates;
 
     /* populate the candidate array */
     for (auto* tor : session->torrents)
