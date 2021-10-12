@@ -53,19 +53,11 @@ THE SOFTWARE.
 
 static void set_socket_buffers(tr_socket_t fd, bool large)
 {
-    int size;
-    int rbuf;
-    int sbuf;
-    int rc;
-    socklen_t rbuf_len = sizeof(rbuf);
-    socklen_t sbuf_len = sizeof(sbuf);
-    char err_buf[512];
-
-    size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
-
+    int size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
     if (rc < 0)
     {
+        char err_buf[512];
         tr_logAddNamedError("UDP", "Failed to set receive buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
@@ -74,20 +66,23 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
+        char err_buf[512];
         tr_logAddNamedError("UDP", "Failed to set send buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
     if (large)
     {
+        auto rbuf = int{};
+        auto rbuf_len = socklen_t{ sizeof(rbuf) };
         rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len);
-
         if (rc < 0)
         {
             rbuf = 0;
         }
 
+        auto sbuf = int{};
+        auto sbuf_len = socklen_t{ sizeof(sbuf) };
         rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len);
-
         if (rc < 0)
         {
             sbuf = 0;
@@ -131,13 +126,13 @@ void tr_udpSetSocketBuffers(tr_session* session)
 
 static void rebind_ipv6(tr_session* ss, bool force)
 {
-    bool is_default;
-    struct tr_address const* public_addr;
-    struct sockaddr_in6 sin6;
-    unsigned char const* ipv6 = tr_globalIPv6();
-    tr_socket_t s = TR_BAD_SOCKET;
-    int rc;
-    int one = 1;
+    auto is_default = bool{};
+    auto one = int{ 1 };
+    auto rc = int{};
+    auto s = tr_socket_t{ TR_BAD_SOCKET };
+    auto sin6 = sockaddr_in6{};
+    struct tr_address const* public_addr = nullptr;
+    unsigned char const* const ipv6 = tr_globalIPv6();
 
     /* We currently have no way to enable or disable IPv6 after initialisation.
        No way to fix that without some surgery to the DHT code itself. */
@@ -241,17 +236,15 @@ FAIL:
 
 static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
-    TR_ASSERT(tr_isSession(static_cast<tr_session*>(vsession)));
+    auto* session = static_cast<tr_session*>(vsession);
+    TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type == EV_READ);
 
-    int rc;
-    socklen_t fromlen;
     unsigned char buf[4096];
-    struct sockaddr_storage from;
-    auto* session = static_cast<tr_session*>(vsession);
 
-    fromlen = sizeof(from);
-    rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
+    auto from = sockaddr_storage{};
+    auto fromlen = socklen_t{ sizeof(from) };
+    int rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:
@@ -299,10 +292,10 @@ void tr_udpInit(tr_session* ss)
     TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
     TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
-    bool is_default;
-    struct tr_address const* public_addr;
-    struct sockaddr_in sin;
-    int rc;
+    auto is_default = bool{};
+    auto rc = int{};
+    auto sin = sockaddr_in{};
+    tr_address const* public_addr = nullptr;
 
     ss->udp_port = tr_sessionGetPeerPort(ss);
 
