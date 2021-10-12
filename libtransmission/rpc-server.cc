@@ -129,14 +129,13 @@ static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct
 
     while (delim != nullptr)
     {
-        size_t part_len;
         char const* part = delim + boundary_len;
 
         inlen -= part - in;
         in = part;
 
         delim = tr_memmem(in, inlen, boundary, boundary_len);
-        part_len = delim != nullptr ? (size_t)(delim - part) : inlen;
+        size_t const part_len = delim != nullptr ? (size_t)(delim - part) : inlen;
 
         if (part_len != 0)
         {
@@ -200,7 +199,6 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                 auto const& body = p.body;
                 size_t body_len = std::size(body);
                 tr_variant top;
-                tr_variant* args;
                 tr_variant test;
                 bool have_source = false;
 
@@ -211,7 +209,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStr(&top, TR_KEY_method, "torrent-add");
-                args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+                tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddBool(args, TR_KEY_paused, paused);
 
                 if (tr_urlIsValid(body.c_str(), body_len))
@@ -297,15 +295,12 @@ static void add_response(
     }
     else
     {
-        int state;
         struct evbuffer_iovec iovec[1];
         void* content_ptr = evbuffer_pullup(content, -1);
         size_t const content_len = evbuffer_get_length(content);
 
         if (!server->isStreamInitialized)
         {
-            int compressionLevel;
-
             server->isStreamInitialized = true;
             server->stream.zalloc = (alloc_func)Z_NULL;
             server->stream.zfree = (free_func)Z_NULL;
@@ -314,9 +309,9 @@ static void add_response(
             /* zlib's manual says: "Add 16 to windowBits to write a simple gzip header
              * and trailer around the compressed data instead of a zlib wrapper." */
 #ifdef TR_LIGHTWEIGHT
-            compressionLevel = Z_DEFAULT_COMPRESSION;
+            auto constexpr compressionLevel = Z_DEFAULT_COMPRESSION;
 #else
-            compressionLevel = Z_BEST_COMPRESSION;
+            auto constexpr compressionLevel = Z_BEST_COMPRESSION;
 #endif
             deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
         }
@@ -330,7 +325,7 @@ static void add_response(
         evbuffer_reserve_space(out, content_len, iovec, 1);
         server->stream.next_out = static_cast<Bytef*>(iovec[0].iov_base);
         server->stream.avail_out = iovec[0].iov_len;
-        state = deflate(&server->stream, Z_FINISH);
+        int const state = deflate(&server->stream, Z_FINISH);
 
         if (state == Z_STREAM_END)
         {
@@ -381,12 +376,9 @@ static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server,
     }
     else
     {
-        void* file;
-        size_t file_len;
         tr_error* error = nullptr;
-
-        file_len = 0;
-        file = tr_loadFile(filename, &file_len, &error);
+        auto file_len = size_t {};
+        void* const file = tr_loadFile(filename, &file_len, &error);
 
         if (file == nullptr)
         {
@@ -397,14 +389,12 @@ static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server,
         }
         else
         {
-            struct evbuffer* content;
-            struct evbuffer* out;
             time_t const now = tr_time();
 
-            content = evbuffer_new();
+            struct evbuffer* const content = evbuffer_new();
             evbuffer_add_reference(content, file, file_len, evbuffer_ref_cleanup_tr_free, file);
 
-            out = evbuffer_new();
+            struct evbuffer* const out = evbuffer_new();
             evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
             add_time_header(req->output_headers, "Date", now);
             add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
@@ -437,12 +427,10 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
     }
     else
     {
-        char* pch;
-        char* subpath;
+        char* const subpath = tr_strdup(req->uri + strlen(server->url) + 4);
 
-        subpath = tr_strdup(req->uri + strlen(server->url) + 4);
-
-        if ((pch = strchr(subpath, '?')) != nullptr)
+        char* pch = strchr(subpath, '?');
+        if (pch !=  nullptr)
         {
             *pch = '\0';
         }
@@ -491,9 +479,8 @@ static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_serve
 {
     tr_variant top;
     bool have_content = tr_variantFromJson(&top, json, json_len) == 0;
-    struct rpc_response_data* data;
 
-    data = tr_new0(struct rpc_response_data, 1);
+    auto* const data = tr_new0(struct rpc_response_data, 1);
     data->req = req;
     data->server = server;
 
@@ -609,7 +596,6 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
     if (req != nullptr && req->evcon != nullptr)
     {
-        char const* auth;
         char* user = nullptr;
         char* pass = nullptr;
 
@@ -633,7 +619,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
-        auth = evhttp_find_header(req->input_headers, "Authorization");
+        char const* const auth = evhttp_find_header(req->input_headers, "Authorization");
 
         if (auth != nullptr && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
@@ -1102,9 +1088,9 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 {
-    bool boolVal;
-    int64_t i;
-    char const* str;
+    auto boolVal = bool {};
+    auto i = int64_t{};
+    char const* str = nullptr;
     tr_address address;
 
     tr_rpc_server* s = new tr_rpc_server{};

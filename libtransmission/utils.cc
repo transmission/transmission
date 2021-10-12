@@ -281,6 +281,7 @@ void tr_timerAddMsec(struct event* timer, int msec)
 ***
 **/
 
+// TODO: return a std::vector<>
 uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
     tr_sys_path_info info;
