@@ -1914,7 +1914,7 @@ static int getPeerCount(tr_swarm const* s)
     return tr_ptrArraySize(&s->peers);
 }
 
-static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct peer_atom* atom, tr_quark client)
+static void createBitTorrentPeer(tr_torrent* tor, tr_peerIo* io, struct peer_atom* atom, tr_quark client)
 {
     TR_ASSERT(atom != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
@@ -3181,8 +3181,8 @@ static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_ms
     }
     else
     {
-        unsigned int const got = b->getPieceSpeed_Bps(now_msec, dir);
-        unsigned int const want = b->getDesiredSpeed_Bps(dir);
+        unsigned int const got = b->getPieceSpeedBytesPerSecond(now_msec, dir);
+        unsigned int const want = b->getDesiredSpeedBytesPerSecond(dir);
         return got >= want;
     }
 }

@@ -93,7 +93,7 @@ public:
         if (direction == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            Bps = bandwidth.getPieceSpeed_Bps(now, direction);
+            Bps = bandwidth.getPieceSpeedBytesPerSecond(now, direction);
         }
 
         if (setme_Bps != nullptr)
