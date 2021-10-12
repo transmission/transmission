@@ -403,13 +403,9 @@ int tr_cacheFlushDone(tr_cache* cache)
 
     if (tr_ptrArraySize(&cache->blocks) > 0)
     {
-        int i;
-        int n;
-        struct run_info* runs;
-
-        runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        i = 0;
-        n = calcRuns(cache, runs);
+        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
+        int i = 0;
+        int const n = calcRuns(cache, runs);
 
         while (i < n && (runs[i].is_piece_done || runs[i].is_multi_piece))
         {
@@ -425,16 +421,14 @@ int tr_cacheFlushDone(tr_cache* cache)
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 {
-    int pos;
-    int err = 0;
-    tr_block_index_t first;
-    tr_block_index_t last;
-
+    auto first = tr_block_index_t{};
+    auto last = tr_block_index_t{};
     tr_torGetFileBlockRange(torrent, i, &first, &last);
-    pos = findBlockPos(cache, torrent, first);
+    int const pos = findBlockPos(cache, torrent, first);
     dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
 
     /* flush out all the blocks in that file */
+    int err = 0;
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
         auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
