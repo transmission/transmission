@@ -196,7 +196,7 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth->setDesiredSpeed_Bps(dir, Bps))
+    if (tor->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
     {
         tr_torrentSetDirty(tor);
     }
@@ -212,7 +212,7 @@ unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tor->bandwidth->getDesiredSpeed_Bps(dir);
+    return tor->bandwidth->getDesiredSpeedBytesPerSecond(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -1294,10 +1294,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peerFromCount[i];
     }
 
-    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeed_Bps(now, TR_UP));
-    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeed_Bps(now, TR_DOWN));
-    pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeed_Bps(now, TR_UP);
-    pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeed_Bps(now, TR_DOWN);
+    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_UP));
+    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_DOWN));
+    pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
+    pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_DOWN);
     s->pieceUploadSpeed_KBps = toSpeedKBps(pieceUploadSpeed_Bps);
     s->pieceDownloadSpeed_KBps = toSpeedKBps(pieceDownloadSpeed_Bps);
 

@@ -345,7 +345,7 @@ static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction d
 
 static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
 {
-    return io->bandwidth->getPieceSpeed_Bps(now, dir);
+    return io->bandwidth->getPieceSpeedBytesPerSecond(now, dir);
 }
 
 /**
