@@ -466,10 +466,10 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, tr_sessionIsTorrentAddedScriptEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, tr_sessionGetTorrentAddedScript(s));
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsTorrentDoneScriptEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetTorrentDoneScript(s));
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -1137,22 +1137,22 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_added_enabled, &boolVal))
     {
-        tr_sessionSetTorrentAddedScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, NULL))
     {
-        tr_sessionSetTorrentAddedScript(session, strVal);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetTorrentDoneScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &strVal, nullptr))
     {
-        tr_sessionSetTorrentDoneScript(session, strVal);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
@@ -2125,8 +2125,6 @@ void tr_sessionClose(tr_session* session)
     }
 
     tr_device_info_free(session->downloadDir);
-    tr_free(session->torrentAddedScript);
-    tr_free(session->torrentDoneScript);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
@@ -2841,68 +2839,36 @@ char const* tr_sessionGetRPCBindAddress(tr_session const* session)
 *****
 ****/
 
-bool tr_sessionIsTorrentAddedScriptEnabled(tr_session const* session)
+void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->isTorrentAddedScriptEnabled;
+    session->scripts_enabled[type] = enabled;
 }
 
-void tr_sessionSetTorrentAddedScriptEnabled(tr_session* session, bool isEnabled)
+bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->isTorrentAddedScriptEnabled = isEnabled;
+    return session->scripts_enabled[type];
 }
 
-char const* tr_sessionGetTorrentAddedScript(tr_session const* session)
+void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->torrentAddedScript;
+    session->scripts[type].assign(script ? script : "");
 }
 
-void tr_sessionSetTorrentAddedScript(tr_session* session, char const* scriptFilename)
+char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    if (session->torrentAddedScript != scriptFilename)
-    {
-        tr_free(session->torrentAddedScript);
-        session->torrentAddedScript = tr_strdup(scriptFilename);
-    }
-}
-
-bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return session->isTorrentDoneScriptEnabled;
-}
-
-void tr_sessionSetTorrentDoneScriptEnabled(tr_session* session, bool isEnabled)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    session->isTorrentDoneScriptEnabled = isEnabled;
-}
-
-char const* tr_sessionGetTorrentDoneScript(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return session->torrentDoneScript;
-}
-
-void tr_sessionSetTorrentDoneScript(tr_session* session, char const* scriptFilename)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    if (session->torrentDoneScript != scriptFilename)
-    {
-        tr_free(session->torrentDoneScript);
-        session->torrentDoneScript = tr_strdup(scriptFilename);
-    }
+    return session->scripts[type].c_str();
 }
 
 /***
