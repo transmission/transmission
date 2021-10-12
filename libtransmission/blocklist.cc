@@ -55,28 +55,24 @@ static void blocklistClose(tr_blocklistFile* b)
 
 static void blocklistLoad(tr_blocklistFile* b)
 {
-    tr_sys_file_t fd;
-    uint64_t byteCount;
-    tr_sys_path_info info;
-    char* base;
     tr_error* error = nullptr;
     char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     blocklistClose(b);
 
+    auto info = tr_sys_path_info{};
     if (!tr_sys_path_get_info(b->filename, 0, &info, nullptr))
     {
         return;
     }
 
-    byteCount = info.size;
-
+    uint64_t const byteCount = info.size;
     if (byteCount == 0)
     {
         return;
     }
 
-    fd = tr_sys_file_open(b->filename, TR_SYS_FILE_READ, 0, &error);
+    tr_sys_file_t const fd = tr_sys_file_open(b->filename, TR_SYS_FILE_READ, 0, &error);
 
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -99,7 +95,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->byteCount = byteCount;
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
-    base = tr_sys_path_basename(b->filename, nullptr);
+    char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
     tr_free(base);
 }
@@ -142,13 +138,10 @@ static void blocklistDelete(tr_blocklistFile* b)
 
 tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled)
 {
-    tr_blocklistFile* b;
-
-    b = tr_new0(tr_blocklistFile, 1);
+    auto* const b = tr_new0(tr_blocklistFile, 1);
     b->fd = TR_BAD_SYS_FILE;
     b->filename = tr_strdup(filename);
     b->isEnabled = isEnabled;
-
     return b;
 }
 
@@ -171,7 +164,7 @@ bool tr_blocklistFileExists(tr_blocklistFile const* b)
 
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
-    blocklistEnsureLoaded((tr_blocklistFile*)b);
+    blocklistEnsureLoaded(const_cast<tr_blocklistFile*>(b));
 
     return b->ruleCount;
 }
@@ -192,8 +185,6 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    uint32_t needle;
-
     if (!b->isEnabled || addr->type == TR_AF_INET6)
     {
         return false;
@@ -206,7 +197,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
         return false;
     }
 
-    needle = ntohl(addr->addr.addr4.s_addr);
+    uint32_t const needle = ntohl(addr->addr.addr4.s_addr);
 
     auto const* range = static_cast<struct tr_ipv4_range const*>(
         bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange));
@@ -223,7 +214,6 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 {
     int b[4];
     int e[4];
-    char str[64];
     tr_address addr;
 
     char const* walk = strrchr(line, ':');
@@ -244,6 +234,7 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
         return false;
     }
 
+    char str[64];
     tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
 
     if (!tr_address_from_string(&addr, str))
@@ -271,10 +262,9 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
  */
 static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 {
-    int unk;
+    int unk = 0;
     int a[4];
     int b[4];
-    char str[32];
     tr_address addr;
 
     if (sscanf(
@@ -287,6 +277,7 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
         return false;
     }
 
+    char str[32];
     tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(a[0], a[1], a[2], a[3]));
 
     if (!tr_address_from_string(&addr, str))
@@ -315,9 +306,7 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 static bool parseLine3(char const* line, struct tr_ipv4_range* range)
 {
     unsigned int ip[4];
-    unsigned int pflen;
-    uint32_t ip_u;
-    uint32_t mask = 0xffffffff;
+    unsigned int pflen = 0;
 
     if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
     {
@@ -330,8 +319,9 @@ static bool parseLine3(char const* line, struct tr_ipv4_range* range)
     }
 
     /* this is host order */
+    uint32_t mask = 0xffffffff;
     mask <<= 32 - pflen;
-    ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
+    uint32_t const ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
 
     /* fill the non-prefix bits the way we need it */
     range->begin = ip_u & mask;
@@ -360,14 +350,7 @@ static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 {
-    tr_sys_file_t in;
-    tr_sys_file_t out;
-    int inCount = 0;
-    char line[2048];
     char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
-    struct tr_ipv4_range* ranges = nullptr;
-    size_t ranges_alloc = 0;
-    size_t ranges_count = 0;
     tr_error* error = nullptr;
 
     if (filename == nullptr)
@@ -376,8 +359,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         return 0;
     }
 
-    in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
-
+    tr_sys_file_t const in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, filename, error->message);
@@ -387,8 +369,11 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     blocklistClose(b);
 
-    out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
-
+    tr_sys_file_t const out = tr_sys_file_open(
+        b->filename,
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+        0666,
+        &error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, b->filename, error->message);
@@ -398,6 +383,11 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     }
 
     /* load the rules into memory */
+    int inCount = 0;
+    char line[2048];
+    struct tr_ipv4_range* ranges = nullptr;
+    auto ranges_alloc = size_t{};
+    auto ranges_count = size_t{};
     while (tr_sys_file_read_line(in, line, sizeof(line), nullptr))
     {
         struct tr_ipv4_range range;
