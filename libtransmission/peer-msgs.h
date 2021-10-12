@@ -16,9 +16,8 @@
 #include "peer-common.h"
 
 class tr_peer;
+class tr_peerIo;
 struct tr_address;
-struct tr_bitfield;
-struct tr_peerIo;
 struct tr_torrent;
 
 /**

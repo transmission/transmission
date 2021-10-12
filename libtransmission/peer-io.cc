@@ -652,19 +652,9 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peer_congestion_algorithm);
     }
 
-    tr_peerIo* io = tr_new0(tr_peerIo, 1);
-    io->magicNumber = PEER_IO_MAGIC_NUMBER;
-    io->refCount = 1;
+    auto* io = new tr_peerIo{ session, *addr, port, isSeed };
     tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
-    io->session = session;
-    io->addr = *addr;
-    io->isSeed = isSeed;
-    io->port = port;
     io->socket = socket;
-    io->isIncoming = isIncoming;
-    io->timeCreated = tr_time();
-    io->inbuf = evbuffer_new();
-    io->outbuf = evbuffer_new();
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
     dbgmsg(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
@@ -795,7 +785,7 @@ static void event_enable(tr_peerIo* io, short event)
     }
 }
 
-static void event_disable(struct tr_peerIo* io, short event)
+static void event_disable(tr_peerIo* io, short event)
 {
     TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session != nullptr);
@@ -907,8 +897,6 @@ static void io_dtor(void* vio)
     dbgmsg(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
     delete io->bandwidth;
-    evbuffer_free(io->outbuf);
-    evbuffer_free(io->inbuf);
     io_close_socket(io);
     tr_cryptoDestruct(&io->crypto);
 
@@ -917,8 +905,8 @@ static void io_dtor(void* vio)
         peer_io_pull_datatype(io);
     }
 
-    memset(io, ~0, sizeof(tr_peerIo));
-    tr_free(io);
+    io->magic_number = ~0;
+    delete io;
 }
 
 static void tr_peerIoFree(tr_peerIo* io)
@@ -1079,7 +1067,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeed_Bps(now, TR_UP);
+    unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);

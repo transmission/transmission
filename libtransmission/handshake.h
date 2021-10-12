@@ -18,7 +18,7 @@
 /** @addtogroup peers Peers
     @{ */
 
-struct tr_peerIo;
+class tr_peerIo;
 
 /** @brief opaque struct holding hanshake state information.
            freed when the handshake is completed. */
@@ -27,23 +27,19 @@ struct tr_handshake;
 /* returns true on success, false on error */
 using handshakeDoneCB = bool (*)(
     struct tr_handshake* handshake,
-    struct tr_peerIo* io,
+    tr_peerIo* io,
     bool readAnythingFromPeer,
     bool isConnected,
     uint8_t const* peerId,
     void* userData);
 
 /** @brief instantiate a new handshake */
-tr_handshake* tr_handshakeNew(
-    struct tr_peerIo* io,
-    tr_encryption_mode encryptionMode,
-    handshakeDoneCB doneCB,
-    void* doneUserData);
+tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB, void* doneUserData);
 
 tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
 void tr_handshakeAbort(tr_handshake* handshake);
 
-struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
+tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
 
 /** @} */
