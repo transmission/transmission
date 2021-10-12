@@ -97,7 +97,7 @@ static struct tr_datatype* datatype_pool = nullptr;
 
 static struct tr_datatype* datatype_new(void)
 {
-    struct tr_datatype* ret;
+    tr_datatype* ret = nullptr;
 
     if (datatype_pool == nullptr)
     {
@@ -121,8 +121,7 @@ static void datatype_free(struct tr_datatype* datatype)
 
 static void peer_io_pull_datatype(tr_peerIo* io)
 {
-    struct tr_datatype* tmp;
-
+    tr_datatype* tmp = nullptr;
     if ((tmp = io->outbuf_datatypes) != nullptr)
     {
         io->outbuf_datatypes = tmp->next;
@@ -132,8 +131,7 @@ static void peer_io_pull_datatype(tr_peerIo* io)
 
 static void peer_io_push_datatype(tr_peerIo* io, struct tr_datatype* datatype)
 {
-    struct tr_datatype* tmp;
-
+    tr_datatype* tmp = nullptr;
     if ((tmp = io->outbuf_datatypes) != nullptr)
     {
         while (tmp->next != nullptr)
@@ -193,13 +191,12 @@ static void canReadWrapper(tr_peerIo* io)
 {
     bool err = false;
     bool done = false;
-    tr_session* session;
 
     dbgmsg(io, "canRead");
 
     tr_peerIoRef(io);
 
-    session = io->session;
+    tr_session* const session = io->session;
 
     /* try to consume the input buffer */
     if (io->canRead != nullptr)
@@ -270,19 +267,14 @@ static void event_read_cb(evutil_socket_t fd, [[maybe_unused]] short event, void
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
 
-    int res;
-    int e;
-
     /* Limit the input buffer to 256K, so it doesn't grow too large */
-    unsigned int howmuch;
-    unsigned int curlen;
     tr_direction const dir = TR_DOWN;
     unsigned int const max = 256 * 1024;
 
     io->pendingEvents &= ~EV_READ;
 
-    curlen = evbuffer_get_length(io->inbuf);
-    howmuch = curlen >= max ? 0 : max - curlen;
+    unsigned int const curlen = evbuffer_get_length(io->inbuf);
+    unsigned int howmuch = curlen >= max ? 0 : max - curlen;
     howmuch = io->bandwidth->clamp(TR_DOWN, howmuch);
 
     dbgmsg(io, "libevent says this peer is ready to read");
@@ -295,8 +287,8 @@ static void event_read_cb(evutil_socket_t fd, [[maybe_unused]] short event, void
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    res = evbuffer_read(io->inbuf, fd, (int)howmuch);
-    e = EVUTIL_SOCKET_ERROR();
+    int const res = evbuffer_read(io->inbuf, fd, (int)howmuch);
+    int const e = EVUTIL_SOCKET_ERROR();
 
     if (res > 0)
     {
@@ -342,13 +334,11 @@ static void event_read_cb(evutil_socket_t fd, [[maybe_unused]] short event, void
 
 static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
 {
-    int e;
-    int n;
     char errstr[256];
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    n = evbuffer_write_atmost(io->outbuf, fd, howmuch);
-    e = EVUTIL_SOCKET_ERROR();
+    int const n = evbuffer_write_atmost(io->outbuf, fd, howmuch);
+    int const e = EVUTIL_SOCKET_ERROR();
     dbgmsg(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(errstr, sizeof(errstr), e) : ""));
 
     return n;
@@ -361,10 +351,7 @@ static void event_write_cb(evutil_socket_t fd, [[maybe_unused]] short event, voi
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket.type == TR_PEER_SOCKET_TYPE_TCP);
 
-    int res = 0;
-    int e;
     short what = BEV_EVENT_WRITING;
-    size_t howmuch;
     tr_direction const dir = TR_UP;
     char errstr[1024];
 
@@ -374,7 +361,7 @@ static void event_write_cb(evutil_socket_t fd, [[maybe_unused]] short event, voi
 
     /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
-    howmuch = io->bandwidth->clamp(dir, evbuffer_get_length(io->outbuf));
+    size_t const howmuch = io->bandwidth->clamp(dir, evbuffer_get_length(io->outbuf));
 
     /* if we don't have any bandwidth left, stop writing */
     if (howmuch < 1)
@@ -384,8 +371,8 @@ static void event_write_cb(evutil_socket_t fd, [[maybe_unused]] short event, voi
     }
 
     EVUTIL_SET_SOCKET_ERROR(0);
-    res = tr_evbuffer_write(io, fd, howmuch);
-    e = EVUTIL_SOCKET_ERROR();
+    int const res = tr_evbuffer_write(io, fd, howmuch);
+    int const e = EVUTIL_SOCKET_ERROR();
 
     if (res == -1)
     {
@@ -502,11 +489,9 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
 
 static void utp_on_writable(tr_peerIo* io)
 {
-    int n;
-
     dbgmsg(io, "libutp says this peer is ready to write");
 
-    n = tr_peerIoTryWrite(io, SIZE_MAX);
+    int const n = tr_peerIoTryWrite(io, SIZE_MAX);
     tr_peerIoSetEnabled(io, TR_UP, n != 0 && evbuffer_get_length(io->outbuf) != 0);
 }
 
@@ -1134,8 +1119,7 @@ static inline void processBuffer(
 
 static void addDatatype(tr_peerIo* io, size_t byteCount, bool isPieceData)
 {
-    struct tr_datatype* d;
-    d = datatype_new();
+    auto* const d = datatype_new();
     d->isPieceData = isPieceData;
     d->length = byteCount;
     peer_io_push_datatype(io, d);
@@ -1256,14 +1240,14 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
 
 void tr_peerIoReadUint16(tr_peerIo* io, struct evbuffer* inbuf, uint16_t* setme)
 {
-    uint16_t tmp;
+    auto tmp = uint16_t{};
     tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint16_t));
     *setme = ntohs(tmp);
 }
 
 void tr_peerIoReadUint32(tr_peerIo* io, struct evbuffer* inbuf, uint32_t* setme)
 {
-    uint32_t tmp;
+    auto tmp = uint32_t{};
     tr_peerIoReadBytes(io, inbuf, &tmp, sizeof(uint32_t));
     *setme = ntohl(tmp);
 }
@@ -1306,12 +1290,11 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 
         case TR_PEER_SOCKET_TYPE_TCP:
             {
-                int e;
                 char err_buf[512];
 
                 EVUTIL_SET_SOCKET_ERROR(0);
                 res = evbuffer_read(io->inbuf, io->socket.handle.tcp, (int)howmuch);
-                e = EVUTIL_SOCKET_ERROR();
+                int const e = EVUTIL_SOCKET_ERROR();
 
                 dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(err_buf, sizeof(err_buf), e) : "");
 
@@ -1373,11 +1356,9 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 
         case TR_PEER_SOCKET_TYPE_TCP:
             {
-                int e;
-
                 EVUTIL_SET_SOCKET_ERROR(0);
                 n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
-                e = EVUTIL_SOCKET_ERROR();
+                int e = EVUTIL_SOCKET_ERROR();
 
                 if (n > 0)
                 {
