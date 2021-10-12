@@ -189,16 +189,15 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
 
         for (int i = 0, n = tr_variantListSize(path); i < n; i++)
         {
-            size_t len;
-            char const* str;
-
+            auto len = size_t{};
+            char const* str = nullptr;
             if (!tr_variantGetStr(tr_variantListChild(path, i), &str, &len))
             {
                 success = false;
                 break;
             }
 
-            bool is_component_adjusted;
+            auto is_component_adjusted = bool{};
             char* final_str = tr_metainfo_sanitize_path_component(str, len, &is_component_adjusted);
             if (final_str == nullptr)
             {
@@ -237,11 +236,9 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
 
 static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const* length)
 {
-    int64_t len;
-
     inf->totalSize = 0;
 
-    bool is_root_adjusted;
+    auto is_root_adjusted = bool{};
     char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
     if (root_name == nullptr)
     {
@@ -249,12 +246,10 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     }
 
     char const* result = nullptr;
-
+    auto len = int64_t{};
     if (tr_variantIsList(files)) /* multi-file mode */
     {
-        struct evbuffer* buf;
-
-        buf = evbuffer_new();
+        struct evbuffer* buf = evbuffer_new();
         result = nullptr;
 
         inf->isFolder = true;
@@ -263,10 +258,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
         for (tr_file_index_t i = 0; i < inf->fileCount; i++)
         {
-            tr_variant* file;
-            tr_variant* path;
-
-            file = tr_variantListChild(files, i);
+            tr_variant* const file = tr_variantListChild(files, i);
 
             if (!tr_variantIsDict(file))
             {
@@ -274,13 +266,14 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
+            tr_variant* path = nullptr;
             if (!tr_variantDictFindList(file, TR_KEY_path_utf_8, &path) && !tr_variantDictFindList(file, TR_KEY_path, &path))
             {
                 result = "path";
                 break;
             }
 
-            bool is_file_adjusted;
+            auto is_file_adjusted = bool{};
             if (!getfile(&inf->files[i].name, &is_file_adjusted, root_name, path, buf))
             {
                 result = "path";
@@ -364,20 +357,18 @@ static char* tr_convertAnnounceToScrape(char const* announce)
 
 static char const* getannounce(tr_info* inf, tr_variant* meta)
 {
-    size_t len;
-    char const* str;
     tr_tracker_info* trackers = nullptr;
+    auto len = size_t{};
+    char const* str = nullptr;
     int trackerCount = 0;
-    tr_variant* tiers;
 
     /* Announce-list */
+    tr_variant* tiers = nullptr;
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
-        int n;
         int const numTiers = tr_variantListSize(tiers);
 
-        n = 0;
-
+        auto n = int{};
         for (int i = 0; i < numTiers; i++)
         {
             n += tr_variantListSize(tr_variantListChild(tiers, i));
@@ -469,13 +460,11 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
  */
 static char* fix_webseed_url(tr_info const* inf, char const* url_in)
 {
-    size_t len;
-    char* url;
     char* ret = nullptr;
 
-    url = tr_strdup(url_in);
+    char* const url = tr_strdup(url_in);
     tr_strstrip(url);
-    len = strlen(url);
+    size_t const len = strlen(url);
 
     if (tr_urlIsValid(url, len))
     {
@@ -495,9 +484,9 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
 
 static void geturllist(tr_info* inf, tr_variant* meta)
 {
-    tr_variant* urls;
-    char const* url;
+    char const* url = nullptr;
 
+    tr_variant* urls = nullptr;
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
         int const n = tr_variantListSize(urls);
@@ -538,20 +527,19 @@ static char const* tr_metainfoParseImpl(
     size_t* infoDictLength,
     tr_variant const* meta_in)
 {
-    int64_t i;
-    size_t len;
-    char const* str;
-    uint8_t const* raw;
-    tr_variant* d;
+    auto i = int64_t{};
+    auto len = size_t{};
+    char const* str = nullptr;
+    uint8_t const* raw = nullptr;
+    tr_variant* d = nullptr;
     tr_variant* infoDict = nullptr;
     tr_variant* meta = (tr_variant*)meta_in;
-    bool b;
     bool isMagnet = false;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded
      * dictionary, given the definition of the info key above. */
-    b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
+    bool const b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
 
     if (hasInfoDict != nullptr)
     {
@@ -605,7 +593,7 @@ static char const* tr_metainfoParseImpl(
     }
     else
     {
-        size_t blen;
+        auto blen = size_t{};
         char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
         tr_sha1(inf->hash, bstr, (int)blen, nullptr);
         tr_sha1_to_hex(inf->hashString, inf->hash);
@@ -802,9 +790,7 @@ void tr_metainfoFree(tr_info* inf)
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
 {
-    char* filename;
-
-    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
+    char* filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
     tr_sys_path_remove(filename, nullptr);
     tr_free(filename);
 
