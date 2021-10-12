@@ -339,7 +339,6 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* v, bool* setme)
 {
-    char const* str;
     bool success = false;
 
     if (tr_variantIsBool(v))
@@ -354,6 +353,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         success = true;
     }
 
+    char const* str = nullptr;
     if ((!success) && tr_variantGetStr(v, &str, nullptr) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
     {
         *setme = strcmp(str, "true") == 0;
@@ -381,13 +381,11 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 
     if (!success && tr_variantIsString(v))
     {
-        char* endptr;
-        struct locale_context locale_ctx;
-        double d;
-
         /* the json spec requires a '.' decimal point regardless of locale */
+        struct locale_context locale_ctx;
         use_numeric_locale(&locale_ctx, "C");
-        d = strtod(getStr(v), &endptr);
+        char* endptr = nullptr;
+        double const d = strtod(getStr(v), &endptr);
         restore_locale(&locale_ctx);
 
         if (getStr(v) != endptr && *endptr == '\0')
@@ -611,10 +609,9 @@ tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark const key)
 
 static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
 {
-    tr_variant* child;
-
     /* see if it already exists, and if so, try to reuse it */
-    if ((child = tr_variantDictFind(dict, key)) != nullptr)
+    tr_variant* child = tr_variantDictFind(dict, key);
+    if (child != nullptr)
     {
         if (!tr_variantIsType(child, type))
         {
@@ -812,7 +809,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
     while (!stack.empty())
     {
         auto& node = stack.top();
-        tr_variant const* v;
+        tr_variant const* v = nullptr;
 
         if (!node.is_visited)
         {
@@ -933,7 +930,7 @@ void tr_variantFree(tr_variant* v)
 static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 {
     int i = 0;
-    tr_variant const* val;
+    tr_variant const* val = nullptr;
 
     while ((val = tr_variantListChild((tr_variant*)src, i)) != nullptr)
     {
@@ -1011,9 +1008,9 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
     for (size_t i = 0; i < sourceCount; ++i)
     {
-        tr_quark key;
-        tr_variant* val;
-        tr_variant* t;
+        auto key = tr_quark{};
+        tr_variant* val = nullptr;
+        tr_variant* t = nullptr;
 
         if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
         {
@@ -1212,11 +1209,9 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
 {
     bool ret = false;
-    uint8_t* buf;
-    size_t buflen;
 
-    buf = tr_loadFile(filename, &buflen, error);
-
+    auto buflen = size_t{};
+    uint8_t* const buf = tr_loadFile(filename, &buflen, error);
     if (buf != nullptr)
     {
         if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
@@ -1242,7 +1237,7 @@ int tr_variantFromBuf(
     char const* optional_source,
     char const** setme_end)
 {
-    int err;
+    auto err = int{};
     struct locale_context locale_ctx;
 
     /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
