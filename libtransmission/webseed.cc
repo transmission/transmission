@@ -199,10 +199,8 @@ static void write_block_func(void* vdata)
     auto* data = static_cast<struct write_block_data*>(vdata);
     struct tr_webseed* w = data->webseed;
     struct evbuffer* buf = data->content;
-    struct tr_torrent* tor;
 
-    tor = tr_torrentFindFromId(data->session, data->torrent_id);
-
+    struct tr_torrent* const tor = tr_torrentFindFromId(data->session, data->torrent_id);
     if (tor != nullptr)
     {
         uint32_t const block_size = tor->blockSize;
@@ -257,8 +255,8 @@ static void connection_succeeded(void* vdata)
 
         if (tor != nullptr)
         {
-            uint64_t file_offset;
-            tr_file_index_t file_index;
+            auto file_offset = uint64_t{};
+            auto file_index = tr_file_index_t{};
 
             tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
             w->file_urls[file_index].assign(data->real_url);
@@ -284,12 +282,11 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
     if (!task->dead && n_added > 0)
     {
-        uint32_t len;
         struct tr_webseed* w = task->webseed;
 
         w->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
         fire_client_got_piece_data(w, n_added);
-        len = evbuffer_get_length(buf);
+        uint32_t const len = evbuffer_get_length(buf);
 
         if (task->response_code == 0)
         {
@@ -297,8 +294,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             if (task->response_code == 206)
             {
-                struct connection_succeeded_data* data;
-                data = tr_new(struct connection_succeeded_data, 1);
+                auto* const data = tr_new(struct connection_succeeded_data, 1);
                 data->webseed = w;
                 data->real_url = tr_strdup(tr_webGetTaskRealUrl(task->web_task));
                 data->piece_index = task->piece_index;
@@ -317,8 +313,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
             uint32_t const block_size = task->block_size;
             tr_block_index_t const completed = len / block_size;
 
-            struct write_block_data* data;
-            data = tr_new(struct write_block_data, 1);
+            auto* const data = tr_new(struct write_block_data, 1);
             data->webseed = task->webseed;
             data->piece_index = task->piece_index;
             data->block_index = task->block + task->blocks_done;
@@ -344,7 +339,7 @@ static void task_request_next_chunk(struct tr_webseed_task* task);
 
 static void on_idle(tr_webseed* w)
 {
-    int want;
+    auto want = int{};
     int const running_tasks = std::size(w->tasks);
     tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
@@ -385,9 +380,8 @@ static void on_idle(tr_webseed* w)
         {
             tr_block_index_t const b = blocks[i * 2];
             tr_block_index_t const be = blocks[i * 2 + 1];
-            struct tr_webseed_task* task;
 
-            task = tr_new0(struct tr_webseed_task, 1);
+            auto* const task = tr_new0(struct tr_webseed_task, 1);
             task->session = tor->session;
             task->webseed = w;
             task->block = b;
@@ -528,14 +522,11 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         tr_piece_index_t const step_piece = total_offset / inf->pieceSize;
         uint64_t const step_piece_offset = total_offset - (uint64_t)inf->pieceSize * step_piece;
 
-        tr_file_index_t file_index;
-        tr_file const* file;
-        uint64_t file_offset;
-        uint64_t this_pass;
-
+        auto file_index = tr_file_index_t{};
+        auto file_offset = uint64_t{};
         tr_ioFindFileLocation(tor, step_piece, step_piece_offset, &file_index, &file_offset);
-        file = &inf->files[file_index];
-        this_pass = std::min(remain, file->length - file_offset);
+        tr_file const* const file = &inf->files[file_index];
+        uint64_t this_pass = std::min(remain, file->length - file_offset);
 
         if (std::empty(urls[file_index]))
         {
