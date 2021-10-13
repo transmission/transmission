@@ -757,8 +757,8 @@ static void initField(
     case TR_KEY_pieces:
         if (tr_torrentHasMetadata(tor))
         {
-            auto bytes = tr_torrentCreatePieceBitfield(tor);
-            auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), bytes.size(), nullptr));
+            auto const bytes = tr_torrentCreatePieceBitfield(tor);
+            auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));
             tr_variantInitStr(initme, enc != nullptr ? enc : "", TR_BAD_SIZE);
             tr_free(enc);
         }

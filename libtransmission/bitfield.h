@@ -62,7 +62,8 @@ public:
     ***/
 
     /// @brief Creates new Bitfield with same count of bits as *this and replaces data from new_bits
-    void setFrom(Span<uint8_t> new_bits, bool bounded) {
+    void setFrom(Span<uint8_t> new_bits, bool bounded)
+    {
         *this = Bitfield(new_bits, this->bit_count_, bounded);
     }
 
@@ -163,7 +164,8 @@ private:
 #endif
 
     /// @brief Set the bit
-    inline void setBitImpl(size_t bit) {
+    inline void setBitImpl(size_t bit)
+    {
         TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
         TR_ASSERT(isValid());
 
@@ -172,7 +174,7 @@ private:
             ensureNthBitFits(bit);
 
             auto const byte_offset = bit >> 3;
-            size_t bit_value = size_t { 0x80U } >> (bit & 7);
+            size_t bit_value = size_t{ 0x80U } >> (bit & 7);
 
             bits_[byte_offset] |= bit_value;
             setTrueCount(true_count_ + 1);
@@ -182,7 +184,8 @@ private:
     }
 
     /// @brief Clear the bit
-    inline void clearBitImpl(size_t bit) {
+    inline void clearBitImpl(size_t bit)
+    {
         TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
         TR_ASSERT(isValid());
 
@@ -190,7 +193,7 @@ private:
         {
             ensureNthBitFits(bit);
 
-            size_t const byte_mask = size_t { 0xFF7FU } >> (bit & 7U);
+            size_t const byte_mask = size_t{ 0xFF7FU } >> (bit & 7U);
             bits_[bit >> 3] &= byte_mask;
 
             TR_ASSERT(true_count_ > 0);

@@ -2314,7 +2314,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
     auto bytes = tr_torrentCreatePieceBitfield(msgs->torrent);
     evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
     evbuffer_add_uint8(out, BT_BITFIELD);
-    evbuffer_add(out, bytes.data(), bytes.size());
+    evbuffer_add(out, bytes.data(), std::size(bytes));
     dbgmsg(msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length(out));
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 }

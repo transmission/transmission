@@ -485,7 +485,7 @@ static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
     else
     {
         auto const raw = b->getRaw();
-        tr_variantInitRaw(benc, raw.data(), raw.size());
+        tr_variantInitRaw(benc, raw.data(), std::size(raw));
     }
 }
 

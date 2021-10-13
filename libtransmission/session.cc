@@ -2968,7 +2968,7 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     }
 
     // find the best n candidates
-    num_wanted = std::min(num_wanted, candidates.size());
+    num_wanted = std::min(num_wanted, std::size(candidates));
     if (num_wanted < candidates.size())
     {
         std::partial_sort(

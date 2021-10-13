@@ -223,9 +223,11 @@ Bitfield::Bitfield(size_t bit_count)
 
 void Bitfield::setMode(Bitfield::OperationMode new_mode)
 {
-    switch (new_mode) {
+    switch (new_mode)
+    {
     case OperationMode::Normal:
-        switch (mode_) {
+        switch (mode_)
+        {
         case OperationMode::All:
             {
                 // Switching from ALL mode to NORMAL, should set the bits
@@ -295,7 +297,8 @@ Bitfield::Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded)
     setTrueCount(countArray());
 }
 
-Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
+Bitfield::Bitfield(bool const* flags, size_t n)
+    : mode_(OperationMode::Normal)
 {
     size_t trueCount = 0;
 
@@ -318,8 +321,10 @@ Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
 
 void Bitfield::setBit(size_t bit_index)
 {
-    switch (mode_) {
-    case OperationMode::Normal: {
+    switch (mode_)
+    {
+    case OperationMode::Normal:
+        {
             setBitImpl(bit_index);
             break;
         }
@@ -371,7 +376,8 @@ void Bitfield::clearBit(size_t bit)
 {
     TR_ASSERT(isValid());
 
-    switch (mode_) {
+    switch (mode_)
+    {
     case OperationMode::Normal:
         clearBitImpl(bit);
         break;
