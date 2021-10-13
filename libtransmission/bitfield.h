@@ -49,10 +49,6 @@ public:
     {
     }
 
-    /// @brief Copies bits from the readonly view new_bits
-    /// @param bounded Whether incoming data is constrained by our memory and bit size
-    Bitfield(Span<uint8_t> new_bits, bool bounded);
-
     /// @brief Builds bits from array of boolean flags
     Bitfield(bool const* bytes, size_t n);
 
@@ -64,6 +60,11 @@ public:
     /***
     ****
     ***/
+
+    /// @brief Creates new Bitfield with same count of bits as *this and replaces data from new_bits
+    void setFrom(Span<uint8_t> new_bits, bool bounded) {
+        *this = Bitfield(new_bits, this->bit_count_, bounded);
+    }
 
     /// @brief Change the state (mode of operation)
     void setMode(OperationMode new_mode);
@@ -125,19 +126,25 @@ public:
     }
 
 private:
+    /// @brief Copies bits from the readonly view new_bits. Use Bitfield::setFrom to access this constructor
+    /// @param bounded Whether incoming data is constrained by our memory and bit size
+    Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded);
+
     /// @brief Contains lookup table for how many set bits are there in 0..255
     static std::array<int8_t const, 256> true_bits_lookup_;
 
     static constexpr size_t getStorageSize(size_t bit_count)
     {
-        return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
+        return 1 + ((bit_count + 7) >> 3);
     }
 
     [[nodiscard]] size_t countArray() const;
     [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
+
+    /// @brief Given bit count, sets that many bits in the array, assumes array size is big enough.
     static void setBitsInArray(std::vector<uint8_t>& array, size_t bit_count);
-    void ensureNthBitFitsImpl(size_t n);
-    bool ensureNthBitFits(size_t nth);
+
+    void ensureNthBitFits(size_t n);
 
     inline void setTrueCount(size_t n)
     {
@@ -158,12 +165,34 @@ private:
         TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
         TR_ASSERT(isValid());
 
-        if (!readBit(bit) && ensureNthBitFits(bit))
+        if (!readBit(bit))
         {
-            size_t const byte_offset = bit >> 3U;
-            uint8_t bit_value = 0x80 >> (bit & 7U);
+            ensureNthBitFits(bit);
+
+            auto const byte_offset = bit >> 3;
+            size_t bit_value = size_t { 0x80U } >> (bit & 7);
+
             bits_[byte_offset] |= bit_value;
             setTrueCount(true_count_ + 1);
+        }
+
+        TR_ASSERT(isValid());
+    }
+
+    /// @brief Clear the bit
+    inline void clearBitImpl(size_t bit) {
+        TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
+        TR_ASSERT(isValid());
+
+        if (readBit(bit))
+        {
+            ensureNthBitFits(bit);
+
+            size_t const byte_mask = size_t { 0xFF7FU } >> (bit & 7U);
+            bits_[bit >> 3] &= byte_mask;
+
+            TR_ASSERT(true_count_ > 0);
+            setTrueCount(true_count_ - 1);
         }
 
         TR_ASSERT(isValid());

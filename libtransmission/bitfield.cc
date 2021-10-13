@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstring> // std::memset
 #include <iterator> // std::back_inserter
 #include <numeric> // std::accumulate
 
@@ -117,12 +116,14 @@ bool Bitfield::readBit(size_t n) const
     {
     case OperationMode::Normal:
         {
-            size_t byte_offset = n >> 3U;
+            auto const byte_offset = n >> 3;
+
             if (byte_offset >= std::size(bits_))
             {
                 return false;
             }
-            return (bits_[byte_offset] << (n & 7U) & 0x80) != 0;
+
+            return ((bits_[byte_offset] << (n & 7)) & 0x80) != 0;
         }
     case OperationMode::All:
         return true;
@@ -159,13 +160,14 @@ size_t Bitfield::countBits() const
 
 void Bitfield::setBitsInArray(std::vector<uint8_t>& array, size_t bit_count)
 {
-    size_t const byte_count = getStorageSize(bit_count);
+    TR_ASSERT(getStorageSize(bit_count) == std::size(array));
 
-    if (byte_count > 0)
+    if (!std::empty(array) && bit_count > 0)
     {
-        std::fill_n(std::begin(array), byte_count - 1, 0xFF);
+        auto const last_byte_index = getStorageSize(bit_count) - 1;
 
-        array[byte_count - 1] = 0xFF << (byte_count * 8 - bit_count);
+        std::fill_n(std::begin(array), last_byte_index, 0xFF);
+        array[last_byte_index] = 0xFF << (last_byte_index * 8 - bit_count);
     }
 }
 
@@ -189,29 +191,16 @@ std::vector<uint8_t> Bitfield::getRaw() const
     return new_bits;
 }
 
-void Bitfield::ensureNthBitFitsImpl(size_t n)
+void Bitfield::ensureNthBitFits(size_t n)
 {
     TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only reallocate storage in Normal mode");
 
     size_t bytes_needed = getStorageSize(std::max(n, true_count_));
 
-    if (std::size(bits_) != bytes_needed)
+    if (std::size(bits_) < bytes_needed)
     {
-        // this will not reallocate if bytes_needed is fewer than allocated
         bits_.resize(bytes_needed);
     }
-}
-
-bool Bitfield::ensureNthBitFits(size_t nth)
-{
-    // count is zero-based, so we need to allocate nth+1 bits before setting the nth
-    if (nth == SIZE_MAX)
-    {
-        return false;
-    }
-
-    ensureNthBitFitsImpl(nth + 1);
-    return true;
 }
 
 /****
@@ -231,6 +220,10 @@ void Bitfield::setMode(Bitfield::OperationMode new_mode)
 {
     switch (new_mode) {
     case OperationMode::Normal:
+        if (mode_ == OperationMode::All) {
+            // Switching from ALL mode to NORMAL, should set the bits
+            setBitsInArray(bits_, bit_count_);
+        }
         mode_ = OperationMode::Normal;
         break;
     case OperationMode::All:
@@ -251,12 +244,14 @@ void Bitfield::setMode(Bitfield::OperationMode new_mode)
     TR_ASSERT(isValid());
 }
 
-Bitfield::Bitfield(Span<uint8_t> new_bits, bool bounded): bits_(std::size(new_bits))
+Bitfield::Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded)
+    : bit_count_(bit_count)
 {
     true_count_ = 0;
+    setMode(OperationMode::Normal);
 
     // Having bounded=true, limits the amount of moved data to available storage size
-    size_t byte_count = bounded ? std::min(new_bits.size(), getStorageSize(bit_count_)) : new_bits.size();
+    size_t byte_count = bounded ? std::min(std::size(new_bits), getStorageSize(bit_count_)) : std::size(new_bits);
 
     bits_.resize(byte_count);
     std::copy_n(std::begin(new_bits), byte_count, std::begin(bits_));
@@ -264,14 +259,11 @@ Bitfield::Bitfield(Span<uint8_t> new_bits, bool bounded): bits_(std::size(new_bi
     if (bounded)
     {
         /* ensure the excess new_bits are set to '0' */
-        int const excess_bit_count = byte_count * 8 - bit_count_;
-
-        TR_ASSERT(excess_bit_count >= 0);
-        TR_ASSERT(excess_bit_count <= 7);
+        int const excess_bit_count = bit_count_ & 7;
 
         if (excess_bit_count != 0)
         {
-            bits_[std::size(bits_) - 1] &= 0xFF << excess_bit_count;
+            bits_[byte_count - 1] &= 0xFF << excess_bit_count;
         }
     }
 
@@ -283,7 +275,8 @@ Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
     size_t trueCount = 0;
 
     bits_.clear();
-    ensureNthBitFitsImpl(n);
+    ensureNthBitFits(n);
+
     TR_ASSERT(std::size(bits_) >= getStorageSize(n));
 
     for (size_t index = 0; index < n; ++index)
@@ -291,7 +284,7 @@ Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
         if (flags[index])
         {
             ++trueCount;
-            bits_[index >> 3U] |= (0x80 >> (index & 7U));
+            bits_[index >> 3] |= (0x80 >> (index & 7));
         }
     }
 
@@ -300,8 +293,6 @@ Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
 
 void Bitfield::setBit(size_t bit_index)
 {
-    fprintf(stderr, "setbit %zu (truecount %zu) mode=%zu", bit_index, true_count_, (size_t)mode_);
-
     switch (mode_) {
     case OperationMode::Normal: {
             setBitImpl(bit_index);
@@ -345,10 +336,7 @@ void Bitfield::setBitRange(size_t begin, size_t end)
     eb = end >> 3;
     em = 0xFF << (7 - (end & 7));
 
-    if (!ensureNthBitFits(end))
-    {
-        return;
-    }
+    ensureNthBitFits(end);
 
     if (sb == eb)
     {
@@ -372,12 +360,19 @@ void Bitfield::clearBit(size_t bit)
 {
     TR_ASSERT(isValid());
 
-    if (readBit(bit) && ensureNthBitFits(bit))
-    {
-        bits_[bit >> 3U] &= 0xff7f >> (bit & 7U);
-
-        TR_ASSERT(true_count_ > 0);
-        setTrueCount(true_count_ - 1);
+    switch (mode_) {
+    case OperationMode::Normal:
+        clearBitImpl(bit);
+        break;
+    case OperationMode::All:
+        setMode(OperationMode::Normal);
+        clearBitImpl(bit);
+        break;
+    case OperationMode::None:
+        break;
+    case OperationMode::Start:
+        TR_UNREACHABLE();
+        break;
     }
 }
 
@@ -406,10 +401,7 @@ void Bitfield::clearBitRange(size_t begin, size_t end)
     eb = end >> 3;
     em = ~(0xFF << (7 - (end & 7)));
 
-    if (!ensureNthBitFits(end))
-    {
-        return;
-    }
+    ensureNthBitFits(end);
 
     if (sb == eb)
     {

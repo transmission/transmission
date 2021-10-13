@@ -682,7 +682,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
             else
             {
-                blocks = Bitfield(Span{ buf, buflen }, true);
+                blocks.setFrom(Span{ buf, buflen }, true);
             }
         }
         else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
@@ -698,7 +698,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks = Bitfield(Span{ raw, rawlen }, true);
+            blocks.setFrom(Span{ raw, rawlen }, true);
         }
         else
         {

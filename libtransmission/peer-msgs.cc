@@ -1691,7 +1691,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have = Bitfield(Span{ tmp, msglen }, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setFrom(Span{ tmp, msglen }, tr_torrentHasMetadata(msgs->torrent));
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
