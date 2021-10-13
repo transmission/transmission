@@ -143,8 +143,13 @@ bool Bitfield::readBit(size_t n) const
 
 bool Bitfield::isValid() const
 {
-    size_t count_array = countArray();
-    TR_ASSERT(std::size(bits_) == 0 || true_count_ == count_array);
+    TR_ASSERT_MSG(
+        std::size(bits_) == 0 || true_count_ == countArray(),
+        "Invalid Bitfield state: bits.size()=%zu bit_count=%zu true_count=%zu countArray()=%zu",
+        std::size(bits_),
+        bit_count_,
+        true_count_,
+        countArray());
 
     return true;
 }
@@ -220,19 +225,39 @@ void Bitfield::setMode(Bitfield::OperationMode new_mode)
 {
     switch (new_mode) {
     case OperationMode::Normal:
-        if (mode_ == OperationMode::All) {
-            // Switching from ALL mode to NORMAL, should set the bits
-            setBitsInArray(bits_, bit_count_);
+        switch (mode_) {
+        case OperationMode::All:
+            {
+                // Switching from ALL mode to NORMAL, should set the bits
+                mode_ = OperationMode::Normal;
+                ensureNthBitFits(bit_count_);
+                setBitRangeImpl(0, bit_count_ - 1);
+                true_count_ = bit_count_; // switching from mode ALL, all bits are set
+                break;
+            }
+        case OperationMode::None:
+            {
+                // Switching from ALL mode to NORMAL, should set the bits
+                mode_ = OperationMode::Normal;
+                ensureNthBitFits(bit_count_);
+                clearBitRangeImpl(0, bit_count_ - 1);
+                true_count_ = 0; // switching from mode NONE, all bits are not set
+                break;
+            }
+        case OperationMode::Start:
+            mode_ = OperationMode::Normal;
+            // fall through
+        case OperationMode::Normal:
+            break;
         }
-        mode_ = OperationMode::Normal;
         break;
     case OperationMode::All:
-        bits_.clear();
+        clearStorage();
         true_count_ = bit_count_;
         mode_ = OperationMode::All;
         break;
     case OperationMode::None:
-        bits_.clear();
+        clearStorage();
         true_count_ = 0;
         mode_ = OperationMode::None;
         break;
@@ -274,7 +299,7 @@ Bitfield::Bitfield(bool const* flags, size_t n): mode_(OperationMode::Normal)
 {
     size_t trueCount = 0;
 
-    bits_.clear();
+    clearStorage();
     ensureNthBitFits(n);
 
     TR_ASSERT(std::size(bits_) >= getStorageSize(n));
@@ -313,13 +338,18 @@ void Bitfield::setBit(size_t bit_index)
 
 void Bitfield::setBitRange(size_t begin, size_t end)
 {
-    size_t sb;
-    size_t eb;
-    unsigned char sm;
-    unsigned char em;
-    size_t const diff = (end - begin) - countRange(begin, end);
+    if (mode_ == OperationMode::All)
+    {
+        return;
+    }
+    else if (mode_ == OperationMode::None)
+    {
+        setMode(OperationMode::Normal);
+    }
 
-    if (diff == 0)
+    size_t const true_bits_difference = (end - begin) - countRange(begin, end);
+
+    if (true_bits_difference == 0)
     {
         return;
     }
@@ -331,29 +361,10 @@ void Bitfield::setBitRange(size_t begin, size_t end)
         return;
     }
 
-    sb = begin >> 3;
-    sm = ~(0xFF << (8 - (begin & 7)));
-    eb = end >> 3;
-    em = 0xFF << (7 - (end & 7));
+    setBitRangeImpl(begin, end);
 
-    ensureNthBitFits(end);
-
-    if (sb == eb)
-    {
-        bits_[sb] |= sm & em;
-    }
-    else
-    {
-        bits_[sb] |= sm;
-        bits_[eb] |= em;
-
-        if (++sb < eb)
-        {
-            std::fill_n(std::begin(bits_) + sb, eb - sb, 0xFF);
-        }
-    }
-
-    setTrueCount(true_count_ + diff);
+    TR_ASSERT(true_count_ + true_bits_difference <= bit_count_);
+    setTrueCount(true_count_ + true_bits_difference);
 }
 
 void Bitfield::clearBit(size_t bit)
@@ -378,13 +389,18 @@ void Bitfield::clearBit(size_t bit)
 
 void Bitfield::clearBitRange(size_t begin, size_t end)
 {
-    size_t sb;
-    size_t eb;
-    unsigned char sm;
-    unsigned char em;
-    size_t const diff = countRange(begin, end);
+    if (mode_ == OperationMode::None)
+    {
+        return;
+    }
+    else if (mode_ == OperationMode::All)
+    {
+        setMode(OperationMode::Normal);
+    }
 
-    if (diff == 0)
+    size_t const true_bits_difference = countRange(begin, end); // all true bits in range will be gone
+
+    if (true_bits_difference == 0)
     {
         return;
     }
@@ -396,28 +412,8 @@ void Bitfield::clearBitRange(size_t begin, size_t end)
         return;
     }
 
-    sb = begin >> 3;
-    sm = 0xFF << (8 - (begin & 7));
-    eb = end >> 3;
-    em = ~(0xFF << (7 - (end & 7)));
+    clearBitRangeImpl(begin, end);
 
-    ensureNthBitFits(end);
-
-    if (sb == eb)
-    {
-        bits_[sb] &= sm | em;
-    }
-    else
-    {
-        bits_[sb] &= sm;
-        bits_[eb] &= em;
-
-        if (++sb < eb)
-        {
-            std::fill_n(std::begin(bits_) + sb, eb - sb, 0);
-        }
-    }
-
-    TR_ASSERT(true_count_ >= diff);
-    setTrueCount(true_count_ - diff);
+    TR_ASSERT(true_count_ >= true_bits_difference);
+    setTrueCount(true_count_ - true_bits_difference);
 }

@@ -102,14 +102,16 @@ public:
 
     [[nodiscard]] size_t countBits() const;
 
+    /// @brief Returns whether all bits are set, or mode is ALL. Always false for zero sized bitfield.
     [[nodiscard]] constexpr bool hasAll() const
     {
-        return mode_ == OperationMode::All;
+        return ((bit_count_ != 0) && (true_count_ == bit_count_)) || (mode_ == OperationMode::All);
     }
 
+    /// @brief Returns whether all bits are clear, or mode is NONE. Always false for zero sized bitfield.
     [[nodiscard]] constexpr bool hasNone() const
     {
-        return mode_ == OperationMode::None;
+        return ((bit_count_ != 0) && (true_count_ == 0)) || (mode_ == OperationMode::None);
     }
 
     [[nodiscard]] bool readBit(size_t n) const;
@@ -196,6 +198,64 @@ private:
         }
 
         TR_ASSERT(isValid());
+    }
+
+    /// @brief Ensure that the memory is properly deallocated and size becomes zero
+    inline void clearStorage()
+    {
+        bits_ = std::vector<uint8_t>();
+    }
+
+    inline void setBitRangeImpl(size_t begin, size_t end)
+    {
+        size_t start_byte = begin >> 3;
+        size_t start_mask = ~(size_t{ 0xFFU } << (8 - (begin & 7)));
+
+        size_t end_byte = end >> 3;
+        size_t end_mask = size_t{ 0xFFU } << (7 - (end & 7));
+
+        ensureNthBitFits(end);
+
+        if (start_byte == end_byte)
+        {
+            bits_[start_byte] |= start_mask & end_mask;
+        }
+        else
+        {
+            bits_[start_byte] |= start_mask;
+            bits_[end_byte] |= end_mask;
+
+            if (++start_byte < end_byte)
+            {
+                std::fill_n(std::begin(bits_) + start_byte, end_byte - start_byte, 0xFF);
+            }
+        }
+    }
+
+    inline void clearBitRangeImpl(size_t begin, size_t end)
+    {
+        size_t start_byte = begin >> 3;
+        size_t start_mask = size_t{ 0xFFU } << (8 - (begin & 7));
+
+        size_t end_byte = end >> 3;
+        size_t end_mask = ~(size_t{ 0xFFU } << (7 - (end & 7)));
+
+        ensureNthBitFits(end);
+
+        if (start_byte == end_byte)
+        {
+            bits_[start_byte] &= start_mask | end_mask;
+        }
+        else
+        {
+            bits_[start_byte] &= start_mask;
+            bits_[end_byte] &= end_mask;
+
+            if (++start_byte < end_byte)
+            {
+                std::fill_n(std::begin(bits_) + start_byte, end_byte - start_byte, 0);
+            }
+        }
     }
 
     std::vector<uint8_t> bits_;
