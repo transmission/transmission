@@ -843,6 +843,18 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+static void torrentCallScript(tr_torrent const* tor, char const* script);
+
+static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+{
+    auto* session = tor->session;
+
+    if (tr_sessionIsScriptEnabled(session, type))
+    {
+        torrentCallScript(tor, tr_sessionGetScript(session, type));
+    }
+}
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -963,6 +975,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
+        if (tr_torrentHasMetadata(tor))
+        {
+            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
+        }
+
         if (!tr_torrentHasMetadata(tor) && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
@@ -1920,6 +1937,8 @@ static void stopTorrent(void* vtor)
         tr_logAddTorInfo(tor, "%s", "Magnet Verify");
         refreshCurrentDir(tor);
         tr_torrentVerify(tor, nullptr, nullptr);
+
+        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
     }
 }
 
@@ -2216,11 +2235,10 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         tr_torrentSetDirty(tor);
 
-        if (tr_torrentIsSeed(tor) && tr_sessionIsTorrentDoneScriptEnabled(tor->session))
+        if (tr_torrentIsSeed(tor))
         {
             tr_torrentSave(tor);
-
-            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
 

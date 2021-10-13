@@ -39,8 +39,9 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION 18
-#define RPC_VERSION_MIN 1
+#define RPC_VERSION 17
+#define RPC_VERSION_MIN 14
+#define RPC_VERSION_SEMVER "5.3.0"
 
 #define RECENTLY_ACTIVE_SECONDS 60
 
@@ -2213,14 +2214,24 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
+    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_added_filename, &str, nullptr))
+    {
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, str);
+    }
+
+    if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_added_enabled, &boolVal))
+    {
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
+    }
+
     if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, nullptr))
     {
-        tr_sessionSetTorrentDoneScript(session, str);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, str);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetTorrentDoneScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &boolVal))
@@ -2440,6 +2451,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         tr_variantDictAddInt(d, key, RPC_VERSION);
         break;
 
+    case TR_KEY_rpc_version_semver:
+        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
+        break;
+
     case TR_KEY_rpc_version_minimum:
         tr_variantDictAddInt(d, key, RPC_VERSION_MIN);
         break;
@@ -2492,12 +2507,20 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_DOWN));
         break;
 
+    case TR_KEY_script_torrent_added_filename:
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        break;
+
+    case TR_KEY_script_torrent_added_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        break;
+
     case TR_KEY_script_torrent_done_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetTorrentDoneScript(s));
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsTorrentDoneScriptEnabled(s));
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_queue_stalled_enabled:
