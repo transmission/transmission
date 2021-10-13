@@ -541,6 +541,8 @@
    "rpc-version"                    | number     | the current RPC API version
    "rpc-version-minimum"            | number     | the minimum RPC API version supported
    "rpc-version-semver"             | number     | the current RPC API version in a semver-compatible string
+   "script-torrent-added-filename"  | string     | filename of the script to run
+   "script-torrent-added-enabled"   | boolean    | whether or not to call the "done" script
    "script-torrent-done-filename"   | string     | filename of the script to run
    "script-torrent-done-enabled"    | boolean    | whether or not to call the "done" script
    "seedRatioLimit"                 | double     | the default seed ratio for torrents to use
@@ -847,9 +849,11 @@
        |       |      | torrent-get          | new arg "editDate"
        |       |      | torrent-get          | new request arg "format"
    ----+-------+------+----------------------+-------------------------------
-   17  | 5.3.0 | 3.xx | torrent-get          | new arg "file-count"
+   17  | 5.3.0 | 3.xx | session-get          | new arg "rpc-version-semver"
+       |       |      | session-get          | new arg "script-torrent-added-enabled"
+       |       |      | session-get          | new arg "script-torrent-added-filename"
+       |       |      | torrent-get          | new arg "file-count"
        |       |      | torrent-get          | new arg "primary-mime-type"
-       |       |      | session-get          | new arg "rpc-version-semver"
 
 
 5.1.  Upcoming Breakage

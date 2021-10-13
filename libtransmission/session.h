@@ -14,9 +14,11 @@
 
 #define TR_NAME "Transmission"
 
+#include <array>
 #include <cstring> // memcmp()
 #include <list>
 #include <map>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -129,8 +131,6 @@ struct tr_session
     bool isLPDEnabled;
     bool isBlocklistEnabled;
     bool isPrefetchEnabled;
-    bool isTorrentAddedScriptEnabled;
-    bool isTorrentDoneScriptEnabled;
     bool isClosing;
     bool isClosed;
     bool isIncompleteFileNamingEnabled;
@@ -140,6 +140,7 @@ struct tr_session
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled;
 
     uint8_t peer_id_ttl_hours;
 
@@ -206,8 +207,7 @@ struct tr_session
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
     std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
-    char* torrentAddedScript;
-    char* torrentDoneScript;
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
 
     char* configDir;
     char* resumeDir;
