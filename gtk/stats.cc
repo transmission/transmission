@@ -54,31 +54,27 @@ namespace
 
 void setLabel(Gtk::Label* l, Glib::ustring const& str)
 {
-    gtr_label_set_text(Glib::unwrap(l), str.c_str());
+    gtr_label_set_text(*l, str);
 }
 
 void setLabelFromRatio(Gtk::Label* l, double d)
 {
-    char buf[128];
-    tr_strlratio(buf, d, sizeof(buf));
-    setLabel(l, buf);
+    setLabel(l, tr_strlratio(d));
 }
 
 } // namespace
 
 bool StatsDialog::Impl::updateStats()
 {
-    char buf[128];
     tr_session_stats one;
     tr_session_stats all;
-    auto const buflen = sizeof(buf);
 
     tr_sessionGetStats(gtr_core_session(core_), &one);
     tr_sessionGetCumulativeStats(gtr_core_session(core_), &all);
 
-    setLabel(one_up_lb_, tr_strlsize(buf, one.uploadedBytes, buflen));
-    setLabel(one_down_lb_, tr_strlsize(buf, one.downloadedBytes, buflen));
-    setLabel(one_time_lb_, tr_strltime(buf, one.secondsActive, buflen));
+    setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
+    setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
+    setLabel(one_time_lb_, tr_strltime(one.secondsActive));
     setLabelFromRatio(one_ratio_lb_, one.ratio);
 
     setLabel(
@@ -87,9 +83,9 @@ bool StatsDialog::Impl::updateStats()
             ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount),
             (int)all.sessionCount));
 
-    setLabel(all_up_lb_, tr_strlsize(buf, all.uploadedBytes, buflen));
-    setLabel(all_down_lb_, tr_strlsize(buf, all.downloadedBytes, buflen));
-    setLabel(all_time_lb_, tr_strltime(buf, all.secondsActive, buflen));
+    setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
+    setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
+    setLabel(all_time_lb_, tr_strltime(all.secondsActive));
     setLabelFromRatio(all_ratio_lb_, all.ratio);
 
     return true;
@@ -184,7 +180,7 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, TrCore* core)
     all_time_lb_->set_single_line_mode(true);
     t->add_row(row, _("Duration:"), *all_time_lb_);
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+    gtr_dialog_set_content(dialog_, *t);
 
     updateStats();
     dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::dialogResponse));

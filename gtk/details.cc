@@ -327,7 +327,7 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
         if (is_uniform)
         {
             bandwidth_combo_tag_.block();
-            gtr_priority_combo_set_value(Glib::unwrap(bandwidth_combo_), baseline);
+            gtr_priority_combo_set_value(*bandwidth_combo_, baseline);
             bandwidth_combo_tag_.unblock();
         }
         else
@@ -349,8 +349,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
         if (is_uniform)
         {
             ratio_combo_tag_.block();
-            gtr_combo_box_set_active_enum(Glib::unwrap(ratio_combo_), baseline);
-            gtr_widget_set_visible(Glib::unwrap(static_cast<Gtk::Widget*>(ratio_spin_)), baseline == TR_RATIOLIMIT_SINGLE);
+            gtr_combo_box_set_active_enum(*ratio_combo_, baseline);
+            gtr_widget_set_visible(*ratio_spin_, baseline == TR_RATIOLIMIT_SINGLE);
             ratio_combo_tag_.unblock();
         }
     }
@@ -375,8 +375,8 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
         if (is_uniform)
         {
             idle_combo_tag_.block();
-            gtr_combo_box_set_active_enum(Glib::unwrap(idle_combo_), baseline);
-            gtr_widget_set_visible(Glib::unwrap(static_cast<Gtk::Widget*>(idle_spin_)), baseline == TR_IDLELIMIT_SINGLE);
+            gtr_combo_box_set_active_enum(*idle_combo_, baseline);
+            gtr_widget_set_visible(*idle_spin_, baseline == TR_IDLELIMIT_SINGLE);
             idle_combo_tag_.unblock();
         }
     }
@@ -456,7 +456,6 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
 Gtk::Widget* DetailsDialog::Impl::options_page_new()
 {
     guint row;
-    char buf[128];
 
     row = 0;
     auto* t = Gtk::make_managed<HigWorkarea>();
@@ -466,8 +465,9 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
-    g_snprintf(buf, sizeof(buf), _("Limit _download speed (%s):"), _(speed_K_str));
-    down_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(buf, true);
+    down_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
+        Glib::ustring::sprintf(_("Limit _download speed (%s):"), _(speed_K_str)),
+        true);
     down_limited_check_->set_active(false);
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_downloadLimited, down_limited_check_->get_active()); });
@@ -477,8 +477,9 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
     t->add_row_w(row, *down_limited_check_, *down_limit_spin_);
 
-    g_snprintf(buf, sizeof(buf), _("Limit _upload speed (%s):"), _(speed_K_str));
-    up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(buf, true);
+    up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
+        Glib::ustring::sprintf(_("Limit _upload speed (%s):"), _(speed_K_str)),
+        true);
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
@@ -487,24 +488,24 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
         [this]() { torrent_set_int(TR_KEY_uploadLimit, up_limit_sping_->get_value_as_int()); });
     t->add_row_w(row, *up_limited_check_, *up_limit_sping_);
 
-    bandwidth_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_priority_combo_new()));
+    bandwidth_combo_ = gtr_priority_combo_new();
     bandwidth_combo_tag_ = bandwidth_combo_->signal_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_priority_combo_get_value(Glib::unwrap(bandwidth_combo_))); });
+        [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_priority_combo_get_value(*bandwidth_combo_)); });
     t->add_row(row, _("Torrent _priority:"), *bandwidth_combo_);
 
     t->add_section_divider(row);
     t->add_section_title(row, _("Seeding Limits"));
 
     auto* h1 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-    ratio_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
-        TR_ARG_TUPLE(_("Use global settings"), TR_RATIOLIMIT_GLOBAL),
-        TR_ARG_TUPLE(_("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED),
-        TR_ARG_TUPLE(_("Stop seeding at ratio:"), TR_RATIOLIMIT_SINGLE),
-        nullptr)));
+    ratio_combo_ = gtr_combo_box_new_enum({
+        { _("Use global settings"), TR_RATIOLIMIT_GLOBAL },
+        { _("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED },
+        { _("Stop seeding at ratio:"), TR_RATIOLIMIT_SINGLE },
+    });
     ratio_combo_tag_ = ratio_combo_->signal_changed().connect(
         [this]()
         {
-            torrent_set_int(TR_KEY_seedRatioMode, gtr_combo_box_get_active_enum(Glib::unwrap(ratio_combo_)));
+            torrent_set_int(TR_KEY_seedRatioMode, gtr_combo_box_get_active_enum(*ratio_combo_));
             refresh();
         });
     h1->pack_start(*ratio_combo_, true, true, 0);
@@ -516,15 +517,15 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     t->add_row(row, _("_Ratio:"), *h1);
 
     auto* h2 = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-    idle_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
-        TR_ARG_TUPLE(_("Use global settings"), TR_IDLELIMIT_GLOBAL),
-        TR_ARG_TUPLE(_("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED),
-        TR_ARG_TUPLE(_("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE),
-        nullptr)));
+    idle_combo_ = gtr_combo_box_new_enum({
+        { _("Use global settings"), TR_IDLELIMIT_GLOBAL },
+        { _("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED },
+        { _("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE },
+    });
     idle_combo_tag_ = idle_combo_->signal_changed().connect(
         [this]()
         {
-            torrent_set_int(TR_KEY_seedIdleMode, gtr_combo_box_get_active_enum(Glib::unwrap(idle_combo_)));
+            torrent_set_int(TR_KEY_seedIdleMode, gtr_combo_box_get_active_enum(*idle_combo_));
             refresh();
         });
     h2->pack_start(*idle_combo_, true, true, 0);
@@ -616,7 +617,6 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     Glib::ustring const mixed = _("Mixed");
     Glib::ustring const no_torrent = _("No Torrents Selected");
     Glib::ustring stateString;
-    char buf[512];
     uint64_t sizeWhenDone = 0;
     std::vector<tr_stat const*> stats;
     std::vector<tr_info const*> infos;
@@ -689,18 +689,16 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         {
             if (empty_date && !empty_creator)
             {
-                g_snprintf(buf, sizeof(buf), _("Created by %1$s"), creator.c_str());
+                str = Glib::ustring::sprintf(_("Created by %1$s"), creator);
             }
             else if (empty_creator && !empty_date)
             {
-                g_snprintf(buf, sizeof(buf), _("Created on %1$s"), datestr.c_str());
+                str = Glib::ustring::sprintf(_("Created on %1$s"), datestr);
             }
             else
             {
-                g_snprintf(buf, sizeof(buf), _("Created by %1$s on %2$s"), creator.c_str(), datestr.c_str());
+                str = Glib::ustring::sprintf(_("Created by %1$s on %2$s"), creator, datestr);
             }
-
-            str = buf;
         }
     }
 
@@ -788,7 +786,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_strltime(buf, time(nullptr) - baseline, sizeof(buf));
+            str = tr_strltime(time(nullptr) - baseline);
         }
     }
 
@@ -817,7 +815,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_strltime(buf, baseline, sizeof(buf));
+            str = tr_strltime(baseline);
         }
     }
 
@@ -825,7 +823,6 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
     /* size_lb */
     {
-        char sizebuf[128];
         uint64_t size = 0;
         int pieces = 0;
         int32_t pieceSize = 0;
@@ -845,7 +842,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             }
         }
 
-        tr_strlsize(sizebuf, size, sizeof(sizebuf));
+        auto const sizebuf = tr_strlsize(size);
 
         if (size == 0)
         {
@@ -855,19 +852,15 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         {
             char piecebuf[128];
             tr_formatter_mem_B(piecebuf, pieceSize, sizeof(piecebuf));
-            g_snprintf(
-                buf,
-                sizeof(buf),
+            str = Glib::ustring::sprintf(
                 ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)", pieces),
                 sizebuf,
                 pieces,
                 piecebuf);
-            str = buf;
         }
         else
         {
-            g_snprintf(buf, sizeof(buf), ngettext("%1$s (%2$'d piece)", "%1$s (%2$'d pieces)", pieces), sizebuf, pieces);
-            str = buf;
+            str = Glib::ustring::sprintf(ngettext("%1$s (%2$'d piece)", "%1$s (%2$'d pieces)", pieces), sizebuf, pieces);
         }
 
         size_lb_->set_text(str);
@@ -895,39 +888,31 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
 
         {
-            char buf2[32];
-            char unver[64];
-            char total[64];
-            char avail[32];
             double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
             double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
-            tr_strlpercent(avail, d, sizeof(avail));
-            tr_strlpercent(buf2, ratio, sizeof(buf2));
-            tr_strlsize(total, haveUnchecked + haveValid, sizeof(total));
-            tr_strlsize(unver, haveUnchecked, sizeof(unver));
+            auto const avail = tr_strlpercent(d);
+            auto const buf2 = tr_strlpercent(ratio);
+            auto const total = tr_strlsize(haveUnchecked + haveValid);
+            auto const unver = tr_strlsize(haveUnchecked);
 
             if (haveUnchecked == 0 && leftUntilDone == 0)
             {
-                g_snprintf(buf, sizeof(buf), _("%1$s (%2$s%%)"), total, buf2);
+                str = Glib::ustring::sprintf(_("%1$s (%2$s%%)"), total, buf2);
             }
             else if (haveUnchecked == 0)
             {
-                g_snprintf(buf, sizeof(buf), _("%1$s (%2$s%% of %3$s%% Available)"), total, buf2, avail);
+                str = Glib::ustring::sprintf(_("%1$s (%2$s%% of %3$s%% Available)"), total, buf2, avail);
             }
             else
             {
-                g_snprintf(
-                    buf,
-                    sizeof(buf),
+                str = Glib::ustring::sprintf(
                     _("%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"),
                     total,
                     buf2,
                     avail,
                     unver);
             }
-
-            str = buf;
         }
     }
 
@@ -940,8 +925,6 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        char dbuf[64];
-        char fbuf[64];
         uint64_t d = 0;
         uint64_t f = 0;
 
@@ -951,19 +934,17 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             f += st->corruptEver;
         }
 
-        tr_strlsize(dbuf, d, sizeof(dbuf));
-        tr_strlsize(fbuf, f, sizeof(fbuf));
+        auto const dbuf = tr_strlsize(d);
+        auto const fbuf = tr_strlsize(f);
 
         if (f != 0)
         {
-            g_snprintf(buf, sizeof(buf), _("%1$s (+%2$s corrupt)"), dbuf, fbuf);
+            str = Glib::ustring::sprintf(_("%1$s (+%2$s corrupt)"), dbuf, fbuf);
         }
         else
         {
-            tr_strlcpy(buf, dbuf, sizeof(buf));
+            str = dbuf;
         }
-
-        str = buf;
     }
 
     dl_lb_->set_text(str);
@@ -975,8 +956,6 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        char upstr[64];
-        char ratiostr[64];
         uint64_t up = 0;
         uint64_t down = 0;
 
@@ -986,10 +965,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             down += st->downloadedEver;
         }
 
-        tr_strlsize(upstr, up, sizeof(upstr));
-        tr_strlratio(ratiostr, tr_getRatio(up, down), sizeof(ratiostr));
-        g_snprintf(buf, sizeof(buf), _("%s (Ratio: %s)"), upstr, ratiostr);
-        str = buf;
+        str = Glib::ustring::sprintf(_("%s (Ratio: %s)"), tr_strlsize(up), tr_strlratio(tr_getRatio(up, down)));
     }
 
     ul_lb_->set_text(str);
@@ -1056,16 +1032,12 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
             if (period < 5)
             {
-                tr_strlcpy(buf, _("Active now"), sizeof(buf));
+                str = _("Active now");
             }
             else
             {
-                char tbuf[128];
-                tr_strltime(tbuf, period, sizeof(tbuf));
-                g_snprintf(buf, sizeof(buf), _("%1$s ago"), tbuf);
+                str = Glib::ustring::sprintf(_("%1$s ago"), tr_strltime(period));
             }
-
-            str = buf;
         }
     }
 
@@ -1273,14 +1245,14 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
     }
 
     int q[4];
-    char collated_name[128];
+    Glib::ustring collated_name;
     if (sscanf(peer->addr, "%d.%d.%d.%d", q, q + 1, q + 2, q + 3) != 4)
     {
-        g_strlcpy(collated_name, peer->addr, sizeof(collated_name));
+        collated_name = peer->addr;
     }
     else
     {
-        g_snprintf(collated_name, sizeof(collated_name), "%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
+        collated_name = Glib::ustring::sprintf("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
     }
 
     (*iter)[peer_cols.address] = peer->addr;
@@ -1398,10 +1370,8 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
         for (int j = 0; j < peerCount[i]; ++j)
         {
-            char key[128];
             auto const* s = &peers.at(i)[j];
-
-            g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), s->addr);
+            auto const key = Glib::ustring::sprintf("%d.%s", tr_torrentId(tor), s->addr);
 
             if (hash.find(key) == hash.end())
             {
@@ -1419,10 +1389,8 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
         for (int j = 0; j < peerCount[i]; ++j)
         {
-            char key[128];
             auto const* s = &peers.at(i)[j];
-
-            g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), s->addr);
+            auto const key = Glib::ustring::sprintf("%d.%s", tr_torrentId(tor), s->addr);
             refreshPeerRow(store->get_iter(hash.at(key).get_path()), s);
         }
     }
@@ -1474,9 +1442,8 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 
         for (unsigned int j = 0; j < inf->webseedCount; ++j)
         {
-            char key[256];
             char const* url = inf->webseeds[j];
-            g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
+            auto const key = Glib::ustring::sprintf("%d.%s", tr_torrentId(tor), url);
 
             if (hash.find(key) == hash.end())
             {
@@ -1498,9 +1465,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
         for (unsigned int j = 0; j < inf->webseedCount; ++j)
         {
             char const* const url = inf->webseeds[j];
-
-            char key[256];
-            g_snprintf(key, sizeof(key), "%d.%s", tr_torrentId(tor), url);
+            auto const key = Glib::ustring::sprintf("%d.%s", tr_torrentId(tor), url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             char buf[128] = { 0 };
@@ -1903,24 +1868,22 @@ char const success_markup_begin[] = "<span color=\"#080\">";
 char const success_markup_end[] = "</span>";
 
 // if it's been longer than a minute, don't bother showing the seconds
-void tr_strltime_rounded(char* buf, time_t t, size_t buflen)
+Glib::ustring tr_strltime_rounded(time_t t)
 {
     if (t > 60)
     {
         t -= (t % 60);
     }
 
-    tr_strltime(buf, t, buflen);
+    return tr_strltime(t);
 }
 
 void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::ostream& gstr)
 {
-    char timebuf[256];
-
     if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
     {
         gstr << '\n';
-        tr_strltime_rounded(timebuf, now - st->lastAnnounceTime, sizeof(timebuf));
+        auto const timebuf = tr_strltime_rounded(now - st->lastAnnounceTime);
 
         if (st->lastAnnounceSucceeded)
         {
@@ -1958,9 +1921,8 @@ void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::
         break;
 
     case TR_TRACKER_WAITING:
-        tr_strltime_rounded(timebuf, st->nextAnnounceTime - now, sizeof(timebuf));
         gstr << '\n';
-        gstr << Glib::ustring::sprintf(_("Asking for more peers in %s"), timebuf);
+        gstr << Glib::ustring::sprintf(_("Asking for more peers in %s"), tr_strltime_rounded(st->nextAnnounceTime - now));
         break;
 
     case TR_TRACKER_QUEUED:
@@ -1969,21 +1931,20 @@ void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::
         break;
 
     case TR_TRACKER_ACTIVE:
-        tr_strltime_rounded(timebuf, now - st->lastAnnounceStartTime, sizeof(timebuf));
         gstr << '\n';
-        gstr << Glib::ustring::sprintf(_("Asking for more peers now… <small>%s</small>"), timebuf);
+        gstr << Glib::ustring::sprintf(
+            _("Asking for more peers now… <small>%s</small>"),
+            tr_strltime_rounded(now - st->lastAnnounceStartTime));
         break;
     }
 }
 
 void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::ostream& gstr)
 {
-    char timebuf[256];
-
     if (st->hasScraped)
     {
         gstr << '\n';
-        tr_strltime_rounded(timebuf, now - st->lastScrapeTime, sizeof(timebuf));
+        auto const timebuf = tr_strltime_rounded(now - st->lastScrapeTime);
 
         if (st->lastScrapeSucceeded)
         {
@@ -2013,8 +1974,7 @@ void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::os
 
     case TR_TRACKER_WAITING:
         gstr << '\n';
-        tr_strltime_rounded(timebuf, st->nextScrapeTime - now, sizeof(timebuf));
-        gstr << Glib::ustring::sprintf(_("Asking for peer counts in %s"), timebuf);
+        gstr << Glib::ustring::sprintf(_("Asking for peer counts in %s"), tr_strltime_rounded(st->nextScrapeTime - now));
         break;
 
     case TR_TRACKER_QUEUED:
@@ -2024,8 +1984,9 @@ void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::os
 
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
-        tr_strltime_rounded(timebuf, now - st->lastScrapeStartTime, sizeof(timebuf));
-        gstr << Glib::ustring::sprintf(_("Asking for peer counts now… <small>%s</small>"), timebuf);
+        gstr << Glib::ustring::sprintf(
+            _("Asking for peer counts now… <small>%s</small>"),
+            tr_strltime_rounded(now - st->lastScrapeStartTime));
         break;
     }
 }
@@ -2396,7 +2357,7 @@ void DetailsDialog::Impl::on_edit_trackers()
         fr->set_size_request(500U, 166U);
         t->add_wide_tall_control(row, *fr);
 
-        gtr_dialog_set_content(Glib::unwrap(d), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+        gtr_dialog_set_content(*d, *t);
 
         d->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(torrent_id));
         d->set_data(TEXT_BUFFER_KEY, w->get_buffer().get());
@@ -2423,7 +2384,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
     {
         auto* e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
         int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
-        auto const url = Glib::str_strip(e->get_text());
+        auto const url = gtr_str_strip(e->get_text());
 
         if (!url.empty())
         {
@@ -2447,7 +2408,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
             }
             else
             {
-                gtr_unrecognized_url_dialog(Glib::unwrap(static_cast<Gtk::Widget*>(dialog)), url.c_str());
+                gtr_unrecognized_url_dialog(*dialog, url);
                 destroy = false;
             }
         }
@@ -2480,11 +2441,11 @@ void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
         t->add_section_title(row, _("Tracker"));
         auto* e = Gtk::make_managed<Gtk::Entry>();
         e->set_size_request(400, -1);
-        gtr_paste_clipboard_url_into_entry(Glib::unwrap(static_cast<Gtk::Widget*>(e)));
+        gtr_paste_clipboard_url_into_entry(*e);
         w->set_data(URL_ENTRY_KEY, e);
         w->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(tr_torrentId(tor)));
         t->add_row(row, _("_Announce URL:"), *e);
-        gtr_dialog_set_content(Glib::unwrap(w), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+        gtr_dialog_set_content(*w, *t);
 
         w->show_all();
     }
@@ -2682,7 +2643,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, TrCore* core)
 
     n->append_page(*options_page_new(), _("Options"));
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(n)));
+    gtr_dialog_set_content(dialog_, *n);
     periodic_refresh_tag_ = Glib::signal_timeout().connect_seconds(
         [this]() { return refresh(), true; },
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
@@ -2695,7 +2656,7 @@ void DetailsDialog::set_torrents(std::vector<int> const& ids)
 
 void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
 {
-    char title[256];
+    Glib::ustring title;
     int const len = ids.size();
 
     ids_ = ids;
@@ -2705,7 +2666,7 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
         int const id = ids.front();
         auto const* tor = gtr_core_find_torrent(core_, id);
         auto const* inf = tr_torrentInfo(tor);
-        g_snprintf(title, sizeof(title), _("%s Properties"), inf->name);
+        title = Glib::ustring::sprintf(_("%s Properties"), inf->name);
 
         file_list_->set_torrent(id);
         file_list_->show();
@@ -2716,7 +2677,7 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
         file_list_->clear();
         file_list_->hide();
         file_label_->show();
-        g_snprintf(title, sizeof(title), _("%'d Torrent Properties"), len);
+        title = Glib::ustring::sprintf(_("%'d Torrent Properties"), len);
     }
 
     dialog_.set_title(title);

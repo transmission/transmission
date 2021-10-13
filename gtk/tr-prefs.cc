@@ -53,7 +53,7 @@ private:
     TrCore* core_ = nullptr;
     gulong core_prefs_tag_ = 0;
 
-    Gtk::Label* freespace_label_ = nullptr;
+    FreeSpaceLabel* freespace_label_ = nullptr;
 
     Gtk::Label* port_label_ = nullptr;
     Gtk::Button* port_button_ = nullptr;
@@ -68,7 +68,7 @@ void PrefsDialog::Impl::response_cb(int response)
 {
     if (response == Gtk::RESPONSE_HELP)
     {
-        gtr_open_uri((Glib::ustring(gtr_get_help_uri()) + "/html/preferences.html").c_str());
+        gtr_open_uri(gtr_get_help_uri() + "/html/preferences.html");
     }
 
     if (response == Gtk::RESPONSE_CLOSE)
@@ -237,7 +237,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
 
     t->add_row(row, _("Save to _Location:"), *new_path_chooser_button(TR_KEY_download_dir, core_));
 
-    freespace_label_ = Glib::wrap(GTK_LABEL(gtr_freespace_label_new(core_, nullptr)));
+    freespace_label_ = Gtk::make_managed<FreeSpaceLabel>(core_);
     freespace_label_->set_halign(Gtk::ALIGN_END);
     freespace_label_->set_valign(Gtk::ALIGN_CENTER);
     t->add_wide_control(row, *freespace_label_);
@@ -428,17 +428,17 @@ void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
 
 void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, TrCore* core)
 {
-    gtr_core_set_pref_int(core, key, gtr_combo_box_get_active_enum(Glib::unwrap(combo_box)));
+    gtr_core_set_pref_int(core, key, gtr_combo_box_get_active_enum(*combo_box));
 }
 
 Gtk::ComboBox* new_encryption_combo(TrCore* core, tr_quark const key)
 {
-    auto* w = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
-        TR_ARG_TUPLE(_("Allow encryption"), TR_CLEAR_PREFERRED),
-        TR_ARG_TUPLE(_("Prefer encryption"), TR_ENCRYPTION_PREFERRED),
-        TR_ARG_TUPLE(_("Require encryption"), TR_ENCRYPTION_REQUIRED),
-        nullptr)));
-    gtr_combo_box_set_active_enum(Glib::unwrap(w), gtr_pref_int_get(key));
+    auto* w = gtr_combo_box_new_enum({
+        { _("Allow encryption"), TR_CLEAR_PREFERRED },
+        { _("Prefer encryption"), TR_ENCRYPTION_PREFERRED },
+        { _("Require encryption"), TR_ENCRYPTION_REQUIRED },
+    });
+    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(key));
     w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
     return w;
 }
@@ -521,7 +521,7 @@ Glib::RefPtr<Gtk::ListStore> whitelist_tree_model_new(char const* whitelist)
 
     while (std::getline(stream, s, ','))
     {
-        s = Glib::str_strip(s);
+        s = gtr_str_strip(s);
 
         if (s.empty())
         {
@@ -625,7 +625,7 @@ void refreshRPCSensitivity(std::shared_ptr<remote_page> const& page)
 
 void onLaunchClutchCB()
 {
-    gtr_open_uri(Glib::ustring::sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)).c_str());
+    gtr_open_uri(Glib::ustring::sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)));
 }
 
 } // namespace
@@ -802,19 +802,19 @@ Gtk::ComboBox* new_time_combo(TrCore* core, tr_quark const key)
 
 Gtk::ComboBox* new_week_combo(TrCore* core, tr_quark const key)
 {
-    auto* w = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
-        TR_ARG_TUPLE(_("Every Day"), TR_SCHED_ALL),
-        TR_ARG_TUPLE(_("Weekdays"), TR_SCHED_WEEKDAY),
-        TR_ARG_TUPLE(_("Weekends"), TR_SCHED_WEEKEND),
-        TR_ARG_TUPLE(_("Sunday"), TR_SCHED_SUN),
-        TR_ARG_TUPLE(_("Monday"), TR_SCHED_MON),
-        TR_ARG_TUPLE(_("Tuesday"), TR_SCHED_TUES),
-        TR_ARG_TUPLE(_("Wednesday"), TR_SCHED_WED),
-        TR_ARG_TUPLE(_("Thursday"), TR_SCHED_THURS),
-        TR_ARG_TUPLE(_("Friday"), TR_SCHED_FRI),
-        TR_ARG_TUPLE(_("Saturday"), TR_SCHED_SAT),
-        nullptr)));
-    gtr_combo_box_set_active_enum(Glib::unwrap(w), gtr_pref_int_get(key));
+    auto* w = gtr_combo_box_new_enum({
+        { _("Every Day"), TR_SCHED_ALL },
+        { _("Weekdays"), TR_SCHED_WEEKDAY },
+        { _("Weekends"), TR_SCHED_WEEKEND },
+        { _("Sunday"), TR_SCHED_SUN },
+        { _("Monday"), TR_SCHED_MON },
+        { _("Tuesday"), TR_SCHED_TUES },
+        { _("Wednesday"), TR_SCHED_WED },
+        { _("Thursday"), TR_SCHED_THURS },
+        { _("Friday"), TR_SCHED_FRI },
+        { _("Saturday"), TR_SCHED_SAT },
+    });
+    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(key));
     w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
     return w;
 }
@@ -875,12 +875,12 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     t->add_row(
         row,
-        Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)).c_str(),
+        Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
     t->add_row(
         row,
-        Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)).c_str(),
+        Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {
@@ -931,7 +931,7 @@ void onCorePrefsChanged(TrCore* /*core*/, tr_quark const key, network_page_data*
 {
     if (key == TR_KEY_peer_port)
     {
-        gtr_label_set_text(Glib::unwrap(data->portLabel), _("Status unknown"));
+        gtr_label_set_text(*data->portLabel, _("Status unknown"));
         data->portButton->set_sensitive(true);
         data->portSpin->set_sensitive(true);
     }
@@ -1070,7 +1070,7 @@ void PrefsDialog::Impl::on_core_prefs_changed(tr_quark const key)
     if (key == TR_KEY_download_dir)
     {
         char const* downloadDir = tr_sessionGetDownloadDir(gtr_core_session(core_));
-        gtr_freespace_label_set_dir(Glib::unwrap(static_cast<Gtk::Widget*>(freespace_label_)), downloadDir);
+        freespace_label_->set_dir(downloadDir);
     }
 }
 
@@ -1123,5 +1123,5 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, TrCore* core)
     }
 
     dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::response_cb));
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(n)));
+    gtr_dialog_set_content(dialog_, *n);
 }

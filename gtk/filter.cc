@@ -178,9 +178,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
 
         for (unsigned int i = 0; i < inf->trackerCount; ++i)
         {
-            char name[1024];
-            gtr_get_host_from_url(name, sizeof(name), inf->trackers[i].announce);
-            auto const* const key = &*strings.insert(name).first;
+            auto const* const key = &*strings.insert(gtr_get_host_from_url(inf->trackers[i].announce)).first;
 
             if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
             {
@@ -382,21 +380,19 @@ Gtk::ComboBox* FilterBar::Impl::tracker_combo_box_new(Glib::RefPtr<Gtk::TreeMode
 namespace
 {
 
-bool test_tracker(tr_torrent const* tor, int active_tracker_type, char const* host)
+bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring const& host)
 {
     bool matches = true;
 
     if (active_tracker_type == TRACKER_FILTER_TYPE_HOST)
     {
-        char tmp[1024];
         auto const* const inf = tr_torrentInfo(tor);
 
         matches = false;
 
         for (unsigned int i = 0; !matches && i < inf->trackerCount; ++i)
         {
-            gtr_get_host_from_url(tmp, sizeof(tmp), inf->trackers[i].announce);
-            matches = g_strcmp0(tmp, host) == 0;
+            matches = gtr_get_host_from_url(inf->trackers[i].announce) == host;
         }
     }
 
@@ -632,7 +628,7 @@ bool testText(tr_torrent const* tor, Glib::ustring const* key)
         /* test the files... */
         for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
         {
-            ret = Glib::ustring(inf->files[i].name).casefold().find(key->c_str()) != Glib::ustring::npos;
+            ret = Glib::ustring(inf->files[i].name).casefold().find(*key) != Glib::ustring::npos;
         }
     }
 
@@ -645,7 +641,7 @@ void FilterBar::Impl::filter_entry_changed()
 {
     filter_model_->set_data(
         TEXT_KEY,
-        new Glib::ustring(Glib::str_strip(entry_->get_text().casefold())),
+        new Glib::ustring(gtr_str_strip(entry_->get_text().casefold())),
         [](void* p) { delete static_cast<Glib::ustring*>(p); });
     filter_model_->refilter();
 }
@@ -661,7 +657,7 @@ bool FilterBar::Impl::is_row_visible(Gtk::TreeModel::const_iterator const& iter)
     auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
     auto const* text = static_cast<Glib::ustring const*>(filter_model_->get_data(TEXT_KEY));
 
-    return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_host_.c_str()) &&
+    return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_host_) &&
         test_torrent_activity(tor, active_activity_type_) && testText(tor, text);
 }
 

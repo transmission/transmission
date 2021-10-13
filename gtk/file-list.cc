@@ -227,11 +227,8 @@ bool refreshFilesForeach(
 
         if (size != sub_size || have != old_have || priority != old_priority || enabled != old_enabled || prog != old_prog)
         {
-            char size_str[64];
-            tr_strlsize(size_str, sub_size, sizeof(size_str));
-
             (*iter)[file_cols.size] = sub_size;
-            (*iter)[file_cols.size_str] = size_str;
+            (*iter)[file_cols.size_str] = tr_strlsize(sub_size);
             (*iter)[file_cols.have] = have;
             (*iter)[file_cols.priority] = priority;
             (*iter)[file_cols.enabled] = enabled;
@@ -432,7 +429,6 @@ using FileRowNode = Glib::NodeTree<row_struct>;
 
 void buildTree(FileRowNode& node, build_data& build)
 {
-    char size_str[64];
     auto& child_data = node.data();
     bool const isLeaf = node.child_count() == 0;
 
@@ -443,14 +439,12 @@ void buildTree(FileRowNode& node, build_data& build)
     bool const enabled = isLeaf ? !inf->files[child_data.index].dnd : true;
     auto name_esc = Glib::Markup::escape_text(child_data.name);
 
-    tr_strlsize(size_str, child_data.length, sizeof(size_str));
-
     auto const child_iter = build.store->append(build.iter->children());
     (*child_iter)[file_cols.index] = child_data.index;
     (*child_iter)[file_cols.label] = child_data.name;
     (*child_iter)[file_cols.label_esc] = name_esc;
     (*child_iter)[file_cols.size] = child_data.length;
-    (*child_iter)[file_cols.size_str] = size_str;
+    (*child_iter)[file_cols.size_str] = tr_strlsize(child_data.length);
     (*child_iter)[file_cols.icon] = icon;
     (*child_iter)[file_cols.priority] = priority;
     (*child_iter)[file_cols.enabled] = enabled;
@@ -636,7 +630,7 @@ void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeV
 
             if (handled = !filename.empty(); handled)
             {
-                gtr_open_file(filename.c_str());
+                gtr_open_file(filename);
             }
         }
     }

@@ -129,7 +129,7 @@ void g_signal_callback(
             auto const* inf = tr_torrentInfo(tor);
             char const* dir = tr_torrentGetDownloadDir(tor);
             auto const path = Glib::build_filename(dir, inf->files[0].name);
-            gtr_open_file(path.c_str());
+            gtr_open_file(path);
         }
     }
 }

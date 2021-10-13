@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
+ * This file Copyright (C) 2008-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -10,9 +10,7 @@
 
 #include <functional>
 #include <sys/types.h>
-#include <glib.h>
 #include <glibmm.h>
-#include <gtk/gtk.h>
 #include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
@@ -36,27 +34,6 @@ extern char const* speed_M_str;
 extern char const* speed_G_str;
 extern char const* speed_T_str;
 
-#if GLIB_CHECK_VERSION(2, 33, 12)
-
-#define TR_DEFINE_QUARK G_DEFINE_QUARK
-
-#else
-
-#define TR_DEFINE_QUARK(QN, q_n) \
-    GQuark q_n##_quark(void) \
-    { \
-        static GQuark q; \
-\
-        if (G_UNLIKELY(q == 0)) \
-        { \
-            q = g_quark_from_static_string(#QN); \
-        } \
-\
-        return q; \
-    }
-
-#endif
-
 // http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
 #define TR_UNUSED(x) \
     do \
@@ -72,101 +49,120 @@ enum
     GTR_UNICODE_BULLET
 };
 
-char const* gtr_get_unicode_string(int);
+Glib::ustring gtr_get_unicode_string(int);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-char* tr_strlpercent(char* buf, double x, size_t buflen);
+Glib::ustring tr_strlpercent(double x);
 
 /* return a human-readable string for the size given in bytes. */
-char* tr_strlsize(char* buf, guint64 size, size_t buflen);
+Glib::ustring tr_strlsize(guint64 size);
 
 /* return a human-readable string for the given ratio. */
-char* tr_strlratio(char* buf, double ratio, size_t buflen);
+Glib::ustring tr_strlratio(double ratio);
 
 /* return a human-readable string for the time given in seconds. */
-char* tr_strltime(char* buf, time_t secs, size_t buflen);
+Glib::ustring tr_strltime(time_t secs);
 
 /***
 ****
 ***/
 
 /* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-void gtr_get_host_from_url(char* buf, size_t buflen, char const* url);
+Glib::ustring gtr_get_host_from_url(Glib::ustring const& url);
 
-gboolean gtr_is_magnet_link(char const* str);
+bool gtr_is_magnet_link(Glib::ustring const& str);
 
-gboolean gtr_is_hex_hashcode(char const* str);
+bool gtr_is_hex_hashcode(std::string const& str);
 
 /***
 ****
 ***/
 
-void gtr_open_uri(char const* uri);
+void gtr_open_uri(Glib::ustring const& uri);
 
-void gtr_open_file(char const* path);
+void gtr_open_file(std::string const& path);
 
-char const* gtr_get_help_uri(void);
+Glib::ustring gtr_get_help_uri();
 
 /***
 ****
 ***/
 
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
-void gtr_widget_set_visible(GtkWidget*, gboolean);
+void gtr_widget_set_visible(Gtk::Widget&, bool);
 
-void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content);
+void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content);
 
 /***
 ****
 ***/
 
-GtkWidget* gtr_priority_combo_new(void);
+Gtk::ComboBox* gtr_priority_combo_new();
 #define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_enum(w)
 #define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
-GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...);
-int gtr_combo_box_get_active_enum(GtkComboBox*);
-void gtr_combo_box_set_active_enum(GtkComboBox*, int value);
+Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>> const& items);
+int gtr_combo_box_get_active_enum(Gtk::ComboBox const&);
+void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
 
 /***
 ****
 ***/
 
-struct _TrCore;
+typedef struct _TrCore TrCore;
 
-GtkWidget* gtr_freespace_label_new(struct _TrCore* core, char const* dir);
+class FreeSpaceLabel : public Gtk::Label
+{
+public:
+    FreeSpaceLabel(TrCore* core, std::string const& dir = {});
+    ~FreeSpaceLabel() override;
 
-void gtr_freespace_label_set_dir(GtkWidget* label, char const* dir);
+    void set_dir(std::string const& dir);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};
 
 /***
 ****
 ***/
 
-void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url);
+void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url);
 
-void gtr_add_torrent_error_dialog(GtkWidget* window_or_child, int err, tr_torrent* duplicate_torrent, char const* filename);
+void gtr_add_torrent_error_dialog(
+    Gtk::Widget& window_or_child,
+    int err,
+    tr_torrent* duplicate_torrent,
+    std::string const& filename);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-gboolean on_tree_view_button_pressed_old(GtkWidget* view, GdkEventButton* event, gpointer unused);
 bool on_tree_view_button_pressed(
     Gtk::TreeView* view,
     GdkEventButton* event,
     std::function<void(GdkEventButton*)> const& callback = {});
 
 /* if the click didn't specify a row, clear the selection */
-gboolean on_tree_view_button_released_old(GtkWidget* view, GdkEventButton* event, gpointer unused);
 bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(char const* filename, struct tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
 
-void gtr_paste_clipboard_url_into_entry(GtkWidget* entry);
+void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 
 /* Only call gtk_label_set_text() if the new text differs from the old.
  * This prevents the label from having to recalculate its size
  * and prevents selected text in the label from being deselected */
-void gtr_label_set_text(GtkLabel* lb, char const* text);
+void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& text);
+
+template<typename T>
+inline T gtr_str_strip(T const& text)
+{
+    auto const new_begin = text.find_first_not_of("\t\n\v\f\r ");
+    auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
+    return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin);
+}
 
 template<>
 struct std::hash<Glib::ustring>
@@ -201,13 +197,5 @@ inline RefPtr<T> make_refptr_for_instance(T* object)
 }
 
 #endif
-
-template<typename T>
-T str_strip(T const& text)
-{
-    auto const new_begin = text.find_first_not_of("\t\n\v\f\r ");
-    auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
-    return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin);
-}
 
 } // namespace Glib

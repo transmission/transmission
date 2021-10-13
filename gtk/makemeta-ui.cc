@@ -126,7 +126,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         g_assert_not_reached();
     }
 
-    gtr_label_set_text(Glib::unwrap(progress_label_), str.c_str());
+    gtr_label_set_text(*progress_label_, str);
 
     /* progress bar */
     if (builder_.pieceIndex == 0)
@@ -135,10 +135,10 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else
     {
-        char sizebuf[128];
-        tr_strlsize(sizebuf, (uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize, sizeof(sizebuf));
         /* how much data we've scanned through to generate checksums */
-        str = Glib::ustring::sprintf(_("Scanned %s"), sizebuf);
+        str = Glib::ustring::sprintf(
+            _("Scanned %s"),
+            tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize));
     }
 
     progress_bar_->set_fraction(fraction);
@@ -222,7 +222,7 @@ MakeProgressDialog::MakeProgressDialog(
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
     onProgressDialogRefresh();
 
-    gtr_dialog_set_content(Glib::unwrap(this), Glib::unwrap(static_cast<Gtk::Widget*>(fr)));
+    gtr_dialog_set_content(*this, *fr);
 }
 
 void MakeDialog::Impl::makeProgressDialog(std::string const& target)
@@ -322,14 +322,13 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        char buf[128];
-        tr_strlsize(buf, builder_->totalSize, sizeof(buf));
         gstr += Glib::ustring::sprintf(
             ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder_->fileCount),
-            buf,
+            tr_strlsize(builder_->totalSize),
             builder_->fileCount);
         gstr += "; ";
 
+        char buf[128];
         tr_formatter_mem_B(buf, builder_->pieceSize, sizeof(buf));
         gstr += Glib::ustring::sprintf(
             ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
@@ -496,7 +495,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
 
     private_check_ = t->add_wide_checkbutton(row, _("_Private torrent"), false);
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+    gtr_dialog_set_content(dialog_, *t);
 
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();

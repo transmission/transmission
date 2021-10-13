@@ -136,7 +136,7 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
 {
-    auto const level = static_cast<tr_log_level>(gtr_combo_box_get_active_enum(Glib::unwrap(combo_box)));
+    auto const level = static_cast<tr_log_level>(gtr_combo_box_get_active_enum(*combo_box));
     bool const pinned_to_new = is_pinned_to_new();
 
     tr_logSetLevel(level);
@@ -414,12 +414,12 @@ namespace
 
 Gtk::ComboBox* debug_level_combo_new()
 {
-    auto* w = Glib::wrap(GTK_COMBO_BOX(gtr_combo_box_new_enum(
-        TR_ARG_TUPLE(_("Error"), TR_LOG_ERROR),
-        TR_ARG_TUPLE(_("Information"), TR_LOG_INFO),
-        TR_ARG_TUPLE(_("Debug"), TR_LOG_DEBUG),
-        nullptr)));
-    gtr_combo_box_set_active_enum(Glib::unwrap(w), gtr_pref_int_get(TR_KEY_message_level));
+    auto* w = gtr_combo_box_new_enum({
+        { _("Error"), TR_LOG_ERROR },
+        { _("Information"), TR_LOG_INFO },
+        { _("Debug"), TR_LOG_DEBUG },
+    });
+    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
     return w;
 }
 

@@ -104,7 +104,7 @@ private:
     Gtk::CheckButton* run_check_ = nullptr;
     Gtk::CheckButton* trash_check_ = nullptr;
     Gtk::ComboBox* priority_combo_ = nullptr;
-    Gtk::Label* freespace_label_ = nullptr;
+    FreeSpaceLabel* freespace_label_ = nullptr;
     std::string filename_;
     std::string downloadDir_;
     tr_torrent* tor_ = nullptr;
@@ -131,7 +131,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
         }
         else
         {
-            tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(Glib::unwrap(priority_combo_)));
+            tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(*priority_combo_));
 
             if (run_check_->get_active())
             {
@@ -142,7 +142,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
 
             if (trash_check_->get_active())
             {
-                gtr_file_trash_or_remove(filename_.c_str(), nullptr);
+                gtr_file_trash_or_remove(filename_, nullptr);
             }
 
             save_recent_destination(core_, downloadDir_);
@@ -209,7 +209,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
         else if (new_file)
         {
             tr_torrent* tor = duplicate_id != 0 ? gtr_core_find_torrent(core_, duplicate_id) : nullptr;
-            gtr_add_torrent_error_dialog(Glib::unwrap(static_cast<Gtk::Widget*>(b)), err, tor, filename_.c_str());
+            gtr_add_torrent_error_dialog(*b, err, tor, filename_);
         }
 
         updateTorrent();
@@ -225,7 +225,7 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
         downloadDir_ = fname;
         updateTorrent();
 
-        gtr_freespace_label_set_dir(Glib::unwrap(static_cast<Gtk::Widget*>(freespace_label_)), downloadDir_.c_str());
+        freespace_label_->set_dir(downloadDir_);
     }
 }
 
@@ -293,8 +293,8 @@ OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<t
     trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve .torrent file to the trash"), true);
     run_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Start when added"), true);
 
-    priority_combo_ = Glib::wrap(GTK_COMBO_BOX(gtr_priority_combo_new()));
-    gtr_priority_combo_set_value(Glib::unwrap(priority_combo_), TR_PRI_NORMAL);
+    priority_combo_ = gtr_priority_combo_new();
+    gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
 
     dialog.signal_response().connect(sigc::mem_fun(this, &Impl::addResponseCB));
 
@@ -341,7 +341,7 @@ OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<t
                                                             { downloadDirChanged(destination_chooser); });
 
     row++;
-    freespace_label_ = Glib::wrap(GTK_LABEL(gtr_freespace_label_new(core_, downloadDir_.c_str())));
+    freespace_label_ = Gtk::make_managed<FreeSpaceLabel>(core_, downloadDir_);
     freespace_label_->set_margin_bottom(GUI_PAD_BIG);
     freespace_label_->set_halign(Gtk::ALIGN_END);
     freespace_label_->set_valign(Gtk::ALIGN_CENTER);
@@ -396,7 +396,7 @@ OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<t
         sourceChanged(source_chooser);
     }
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(grid)));
+    gtr_dialog_set_content(dialog_, *grid);
     dialog_.get_widget_for_response(Gtk::RESPONSE_ACCEPT)->grab_focus();
 }
 
@@ -460,7 +460,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, TrCore* core)
     if (response == Gtk::RESPONSE_ACCEPT)
     {
         auto* e = static_cast<Gtk::Entry*>(get_data("url-entry"));
-        auto const url = Glib::str_strip(e->get_text());
+        auto const url = gtr_str_strip(e->get_text());
 
         if (!url.empty())
         {
@@ -468,7 +468,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, TrCore* core)
 
             if (!handled)
             {
-                gtr_unrecognized_url_dialog(Glib::unwrap(static_cast<Gtk::Widget*>(this)), url.c_str());
+                gtr_unrecognized_url_dialog(*this, url);
             }
         }
     }
@@ -502,11 +502,11 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, TrCore* co
     t->add_section_title(row, _("Open torrent from URL"));
     auto* e = Gtk::make_managed<Gtk::Entry>();
     e->set_size_request(400, -1);
-    gtr_paste_clipboard_url_into_entry(Glib::unwrap(static_cast<Gtk::Widget*>(e)));
+    gtr_paste_clipboard_url_into_entry(*e);
     set_data("url-entry", e);
     t->add_row(row, _("_URL"), *e);
 
-    gtr_dialog_set_content(Glib::unwrap(this), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+    gtr_dialog_set_content(*this, *t);
 
     if (e->get_text_length() == 0)
     {

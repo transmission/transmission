@@ -1524,7 +1524,10 @@ void gtr_core_remove_torrent(TrCore* core, int id, gboolean delete_local_data)
         }
 
         /* remove the torrent */
-        tr_torrentRemove(tor, delete_local_data, gtr_file_trash_or_remove);
+        tr_torrentRemove(
+            tor,
+            delete_local_data,
+            [](char const* filename, tr_error** error) { return gtr_file_trash_or_remove(filename, error); });
     }
 }
 

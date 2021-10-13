@@ -40,12 +40,6 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
     bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
     bool const isSeed = st->haveValid >= info->totalSize;
-    char buf1[32];
-    char buf2[32];
-    char buf3[32];
-    char buf4[32];
-    char buf5[32];
-    char buf6[32];
     double seedRatio;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
@@ -56,9 +50,9 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                %2$s is how much we'll have when done,
                %3$s%% is a percentage of the two */
             _("%1$s of %2$s (%3$s%%)"),
-            tr_strlsize(buf1, haveTotal, sizeof(buf1)),
-            tr_strlsize(buf2, st->sizeWhenDone, sizeof(buf2)),
-            tr_strlpercent(buf3, st->percentDone * 100.0, sizeof(buf3)));
+            tr_strlsize(haveTotal),
+            tr_strlsize(st->sizeWhenDone),
+            tr_strlpercent(st->percentDone * 100.0));
     }
     else if (!isSeed) /* partial seeds */
     {
@@ -72,12 +66,12 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %5$s is our upload-to-download ratio,
                    %6$s is the ratio we want to reach before we stop uploading */
                 _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"),
-                tr_strlsize(buf1, haveTotal, sizeof(buf1)),
-                tr_strlsize(buf2, info->totalSize, sizeof(buf2)),
-                tr_strlpercent(buf3, st->percentComplete * 100.0, sizeof(buf3)),
-                tr_strlsize(buf4, st->uploadedEver, sizeof(buf4)),
-                tr_strlratio(buf5, st->ratio, sizeof(buf5)),
-                tr_strlratio(buf6, seedRatio, sizeof(buf6)));
+                tr_strlsize(haveTotal),
+                tr_strlsize(info->totalSize),
+                tr_strlpercent(st->percentComplete * 100.0),
+                tr_strlsize(st->uploadedEver),
+                tr_strlratio(st->ratio),
+                tr_strlratio(seedRatio));
         }
         else
         {
@@ -88,11 +82,11 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %4$s is how much we've uploaded,
                    %5$s is our upload-to-download ratio */
                 _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"),
-                tr_strlsize(buf1, haveTotal, sizeof(buf1)),
-                tr_strlsize(buf2, info->totalSize, sizeof(buf2)),
-                tr_strlpercent(buf3, st->percentComplete * 100.0, sizeof(buf3)),
-                tr_strlsize(buf4, st->uploadedEver, sizeof(buf4)),
-                tr_strlratio(buf5, st->ratio, sizeof(buf5)));
+                tr_strlsize(haveTotal),
+                tr_strlsize(info->totalSize),
+                tr_strlpercent(st->percentComplete * 100.0),
+                tr_strlsize(st->uploadedEver),
+                tr_strlratio(st->ratio));
         }
     }
     else /* seeding */
@@ -105,10 +99,10 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %3$s is our upload-to-download ratio,
                    %4$s is the ratio we want to reach before we stop uploading */
                 _("%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"),
-                tr_strlsize(buf1, info->totalSize, sizeof(buf1)),
-                tr_strlsize(buf2, st->uploadedEver, sizeof(buf2)),
-                tr_strlratio(buf3, st->ratio, sizeof(buf3)),
-                tr_strlratio(buf4, seedRatio, sizeof(buf4)));
+                tr_strlsize(info->totalSize),
+                tr_strlsize(st->uploadedEver),
+                tr_strlratio(st->ratio),
+                tr_strlratio(seedRatio));
         }
         else /* seeding w/o a ratio */
         {
@@ -117,9 +111,9 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %2$s is how much we've uploaded,
                    %3$s is our upload-to-download ratio */
                 _("%1$s, uploaded %2$s (Ratio: %3$s)"),
-                tr_strlsize(buf1, info->totalSize, sizeof(buf1)),
-                tr_strlsize(buf2, st->uploadedEver, sizeof(buf2)),
-                tr_strlratio(buf3, st->ratio, sizeof(buf3)));
+                tr_strlsize(info->totalSize),
+                tr_strlsize(st->uploadedEver),
+                tr_strlratio(st->ratio));
         }
     }
 
@@ -135,10 +129,8 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
         }
         else
         {
-            char timestr[128];
-            tr_strltime(timestr, eta, sizeof(timestr));
             /* time remaining */
-            gstr += Glib::ustring::sprintf(_("%s remaining"), timestr);
+            gstr += Glib::ustring::sprintf(_("%s remaining"), tr_strltime(eta));
         }
     }
 
@@ -217,11 +209,9 @@ Glib::ustring getShortStatusString(tr_torrent const* tor, tr_stat const* st, dou
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         {
-            char ratioStr[64];
-            tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
             /* download/upload speed, ratio */
             gstr += Glib::ustring::sprintf("%s  ", getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
-            gstr += Glib::ustring::sprintf(_("Ratio: %s"), ratioStr);
+            gstr += Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(st->ratio));
             break;
         }
 

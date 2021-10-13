@@ -178,5 +178,5 @@ RelocateDialog::Impl::Impl(RelocateDialog& dialog, TrCore* core, std::vector<int
 
     t->add_wide_control(row, *Gtk::make_managed<Gtk::RadioButton>(group, _("Local data is _already there"), true));
 
-    gtr_dialog_set_content(Glib::unwrap(&dialog_), Glib::unwrap(static_cast<Gtk::Widget*>(t)));
+    gtr_dialog_set_content(dialog_, *t);
 }

@@ -830,7 +830,7 @@ void Application::presentMainWindow()
     if (!wind_->get_visible())
     {
         placeWindowFromPrefs();
-        gtr_widget_set_visible(Glib::unwrap(static_cast<Gtk::Widget*>(wind_.get())), true);
+        gtr_widget_set_visible(*wind_, true);
     }
 
     gtr_window_present(wind_);
@@ -840,7 +840,7 @@ void Application::presentMainWindow()
 void Application::hideMainWindow()
 {
     wind_->set_skip_taskbar_hint(true);
-    gtr_widget_set_visible(Glib::unwrap(static_cast<Gtk::Widget*>(wind_.get())), false);
+    gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
 }
 
@@ -1008,7 +1008,7 @@ void Application::on_app_exit()
 void Application::show_torrent_errors(Glib::ustring const& primary, std::vector<std::string>& files)
 {
     std::ostringstream s;
-    char const* leader = files.size() > 1 ? gtr_get_unicode_string(GTR_UNICODE_BULLET) : "";
+    auto const leader = files.size() > 1 ? gtr_get_unicode_string(GTR_UNICODE_BULLET) : "";
 
     for (auto const& f : files)
     {

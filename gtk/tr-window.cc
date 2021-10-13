@@ -279,11 +279,9 @@ bool MainWindow::Impl::onAskTrackerQueryTooltip(int /*x*/, int /*y*/, bool /*key
     }
     else
     {
-        char timebuf[64];
         time_t const seconds = maxTime - now;
 
-        tr_strltime(timebuf, seconds, sizeof(timebuf));
-        tooltip->set_text(Glib::ustring::sprintf(_("Tracker will allow requests in %s"), timebuf));
+        tooltip->set_text(Glib::ustring::sprintf(_("Tracker will allow requests in %s"), tr_strltime(seconds)));
         handled = true;
     }
 
@@ -380,9 +378,7 @@ Gtk::Menu* MainWindow::Impl::createRatioMenu()
 
     for (auto const ratio : stockRatios)
     {
-        char buf[128];
-        tr_strlratio(buf, ratio, sizeof(buf));
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(buf);
+        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_strlratio(ratio));
         w->signal_activate().connect([this, ratio]() { onRatioSet(ratio); });
         m->append(*w);
     }
@@ -420,23 +416,22 @@ Gtk::Menu* MainWindow::Impl::createOptionsMenu()
 void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 {
     char buf1[512];
-    char buf2[512];
 
     tr_formatter_speed_KBps(buf1, gtr_pref_int_get(TR_KEY_speed_limit_down), sizeof(buf1));
-    gtr_label_set_text(Glib::unwrap(static_cast<Gtk::Label*>(speedlimit_on_item_[TR_DOWN]->get_child())), buf1);
+    gtr_label_set_text(*static_cast<Gtk::Label*>(speedlimit_on_item_[TR_DOWN]->get_child()), buf1);
 
     (gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled) ? speedlimit_on_item_[TR_DOWN] : speedlimit_off_item_[TR_DOWN])
         ->set_active(true);
 
     tr_formatter_speed_KBps(buf1, gtr_pref_int_get(TR_KEY_speed_limit_up), sizeof(buf1));
-    gtr_label_set_text(Glib::unwrap(static_cast<Gtk::Label*>(speedlimit_on_item_[TR_UP]->get_child())), buf1);
+    gtr_label_set_text(*static_cast<Gtk::Label*>(speedlimit_on_item_[TR_UP]->get_child()), buf1);
 
     (gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled) ? speedlimit_on_item_[TR_UP] : speedlimit_off_item_[TR_UP])
         ->set_active(true);
 
-    tr_strlratio(buf1, gtr_pref_double_get(TR_KEY_ratio_limit), sizeof(buf1));
-    g_snprintf(buf2, sizeof(buf2), _("Stop at Ratio (%s)"), buf1);
-    gtr_label_set_text(Glib::unwrap(static_cast<Gtk::Label*>(ratio_on_item_->get_child())), buf2);
+    gtr_label_set_text(
+        *static_cast<Gtk::Label*>(ratio_on_item_->get_child()),
+        Glib::ustring::sprintf(_("Stop at Ratio (%s)"), tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit))));
 
     (gtr_pref_flag_get(TR_KEY_ratio_limit_enabled) ? ratio_on_item_ : ratio_off_item_)->set_active(true);
 
@@ -650,9 +645,6 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
 
 void MainWindow::Impl::updateStats()
 {
-    char up[32];
-    char down[32];
-    char ratio[32];
     Glib::ustring buf;
     tr_session_stats stats;
     auto const* const session = gtr_core_session(core_);
@@ -663,34 +655,34 @@ void MainWindow::Impl::updateStats()
     if (g_strcmp0(pch, "session-ratio") == 0)
     {
         tr_sessionGetStats(session, &stats);
-        tr_strlratio(ratio, stats.ratio, sizeof(ratio));
-        buf = Glib::ustring::sprintf(_("Ratio: %s"), ratio);
+        buf = Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
     }
     else if (g_strcmp0(pch, "session-transfer") == 0)
     {
         tr_sessionGetStats(session, &stats);
-        tr_strlsize(up, stats.uploadedBytes, sizeof(up));
-        tr_strlsize(down, stats.downloadedBytes, sizeof(down));
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
-        buf = Glib::ustring::sprintf(Q_("Down: %1$s, Up: %2$s"), down, up);
+        buf = Glib::ustring::sprintf(
+            Q_("Down: %1$s, Up: %2$s"),
+            tr_strlsize(stats.downloadedBytes),
+            tr_strlsize(stats.uploadedBytes));
     }
     else if (g_strcmp0(pch, "total-transfer") == 0)
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        tr_strlsize(up, stats.uploadedBytes, sizeof(up));
-        tr_strlsize(down, stats.downloadedBytes, sizeof(down));
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
-        buf = Glib::ustring::sprintf(Q_("size|Down: %1$s, Up: %2$s"), down, up);
+        buf = Glib::ustring::sprintf(
+            Q_("size|Down: %1$s, Up: %2$s"),
+            tr_strlsize(stats.downloadedBytes),
+            tr_strlsize(stats.uploadedBytes));
     }
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        tr_strlratio(ratio, stats.ratio, sizeof(ratio));
-        buf = Glib::ustring::sprintf(_("Ratio: %s"), ratio);
+        buf = Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
     }
 
     stats_lb_->set_text(buf);
