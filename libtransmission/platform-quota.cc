@@ -314,7 +314,7 @@ struct tr_disk_space getquota(char const* device)
 
     freespace = limit - spaceused;
     disk_space.free = freespace < 0 ? 0 : freespace;
-    disk_space.total = limit < 0 ? 0 : limit;
+    disk_space.total = limit;
     return disk_space;
 }
 
