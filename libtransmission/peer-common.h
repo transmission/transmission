@@ -23,7 +23,7 @@
  */
 
 class tr_peer;
-struct tr_swarm;
+class tr_swarm;
 struct peer_atom;
 
 /* This is the maximum size of a block request.
@@ -57,7 +57,7 @@ struct tr_peer_event
     PeerEventType eventType;
 
     uint32_t pieceIndex; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
-    struct tr_bitfield* bitfield; /* for GOT_BITFIELD */
+    Bitfield* bitfield; /* for GOT_BITFIELD */
     uint32_t offset; /* for GOT_BLOCK */
     uint32_t length; /* for GOT_BLOCK + GOT_PIECE_DATA */
     int err; /* errno for GOT_ERROR */
@@ -103,8 +103,8 @@ public:
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float progress = 0.0f;
 
-    struct tr_bitfield blame = {};
-    struct tr_bitfield have = {};
+    Bitfield blame;
+    Bitfield have;
 
     /* the client name.
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
@@ -134,9 +134,9 @@ struct tr_swarm_stats
     int peerFromCount[TR_PEER_FROM__MAX];
 };
 
-void tr_swarmGetStats(struct tr_swarm const* swarm, tr_swarm_stats* setme);
+void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);
 
-void tr_swarmIncrementActivePeers(struct tr_swarm* swarm, tr_direction direction, bool is_active);
+void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
 /***
 ****

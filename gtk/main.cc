@@ -1349,11 +1349,11 @@ static void on_prefs_changed(TrCore const* core, tr_quark const key, gpointer da
         break;
 
     case TR_KEY_script_torrent_done_enabled:
-        tr_sessionSetTorrentDoneScriptEnabled(tr, gtr_pref_flag_get(key));
+        tr_sessionSetScriptEnabled(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_flag_get(key));
         break;
 
     case TR_KEY_script_torrent_done_filename:
-        tr_sessionSetTorrentDoneScript(tr, gtr_pref_string_get(key));
+        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_string_get(key));
         break;
 
     case TR_KEY_start_added_torrents:

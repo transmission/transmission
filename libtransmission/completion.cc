@@ -21,29 +21,29 @@ static void tr_cpReset(tr_completion* cp)
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = true;
     cp->haveValidIsDirty = true;
-    tr_bitfieldSetHasNone(&cp->blockBitfield);
+    cp->blockBitfield->setHasNone();
 }
 
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
 {
     cp->tor = tor;
-    tr_bitfieldConstruct(&cp->blockBitfield, tor->blockCount);
+    cp->blockBitfield = new Bitfield(tor->blockCount);
     tr_cpReset(cp);
 }
 
-void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* b)
+void tr_cpBlockInit(tr_completion* cp, Bitfield const& b)
 {
     tr_cpReset(cp);
 
-    /* set blockBitfield */
-    tr_bitfieldSetFromBitfield(&cp->blockBitfield, b);
+    // set blockBitfield
+    cp->blockBitfield->setFromBitfield(b);
 
-    /* set sizeNow */
-    cp->sizeNow = tr_bitfieldCountTrueBits(&cp->blockBitfield);
+    // set sizeNow
+    cp->sizeNow = cp->blockBitfield->countBits();
     TR_ASSERT(cp->sizeNow <= cp->tor->blockCount);
     cp->sizeNow *= cp->tor->blockSize;
 
-    if (tr_bitfieldHas(b, cp->tor->blockCount - 1))
+    if (b.readBit(cp->tor->blockCount - 1))
     {
         cp->sizeNow -= (cp->tor->blockSize - cp->tor->lastBlockSize);
     }
@@ -93,7 +93,7 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
     cp->haveValidIsDirty = true;
     cp->sizeWhenDoneIsDirty = true;
-    tr_bitfieldRemRange(&cp->blockBitfield, f, l + 1);
+    cp->blockBitfield->clearBitRange(f, l + 1);
 }
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
@@ -116,7 +116,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
     {
         tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
 
-        tr_bitfieldAdd(&cp->blockBitfield, block);
+        cp->blockBitfield->setBit(block);
         cp->sizeNow += tr_torBlockCountBytes(tor, block);
 
         cp->haveValidIsDirty = true;
@@ -182,10 +182,10 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     tr_block_index_t l;
                     tr_torGetPieceBlockRange(cp->tor, p, &f, &l);
 
-                    n = tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1);
+                    n = cp->blockBitfield->countRange(f, l + 1);
                     n *= cp->tor->blockSize;
 
-                    if (l == cp->tor->blockCount - 1 && tr_bitfieldHas(&cp->blockBitfield, l))
+                    if (l == cp->tor->blockCount - 1 && cp->blockBitfield->readBit(l))
                     {
                         n -= cp->tor->blockSize - cp->tor->lastBlockSize;
                     }
@@ -232,7 +232,7 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
             tr_block_index_t l;
             tr_piece_index_t const piece = (tr_piece_index_t)i * interval;
             tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
-            tab[i] = tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1) / (float)(l + 1 - f);
+            tab[i] = cp->blockBitfield->countRange(f, l + 1) / (float)(l + 1 - f);
         }
     }
 }
@@ -248,7 +248,7 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const* cp, tr_piece_index_t piece
         tr_block_index_t f;
         tr_block_index_t l;
         tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
-        return (l + 1 - f) - tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1);
+        return (l + 1 - f) - cp->blockBitfield->countRange(f, l + 1);
     }
 }
 
@@ -268,14 +268,14 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
 
         if (f != l)
         {
-            /* nb: we don't pass the usual l+1 here to tr_bitfieldCountRange().
+            /* nb: we don't pass the usual l+1 here to Bitfield::countRange().
                It's faster to handle the last block separately because its size
                needs to be checked separately. */
-            haveBytes = tr_bitfieldCountRange(&cp->blockBitfield, f, l);
+            haveBytes = cp->blockBitfield->countRange(f, l);
             haveBytes *= cp->tor->blockSize;
         }
 
-        if (tr_bitfieldHas(&cp->blockBitfield, l)) /* handle the last block */
+        if (cp->blockBitfield->readBit(l)) /* handle the last block */
         {
             haveBytes += tr_torBlockCountBytes(cp->tor, l);
         }
@@ -296,7 +296,7 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t i)
         tr_block_index_t f;
         tr_block_index_t l;
         tr_torGetFileBlockRange(cp->tor, i, &f, &l);
-        return tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1) == (l + 1 - f);
+        return cp->blockBitfield->countRange(f, l + 1) == (l + 1 - f);
     }
 }
 
@@ -306,14 +306,14 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
 
     void* ret;
     tr_piece_index_t n;
-    tr_bitfield pieces;
 
     n = cp->tor->info.pieceCount;
-    tr_bitfieldConstruct(&pieces, n);
+
+    Bitfield pieces(n);
 
     if (tr_cpHasAll(cp))
     {
-        tr_bitfieldSetHasAll(&pieces);
+        pieces.setHasAll();
     }
     else if (!tr_cpHasNone(cp))
     {
@@ -324,12 +324,11 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }
 
-        tr_bitfieldSetFromFlags(&pieces, flags, n);
+        pieces.setFromFlags(flags, n);
         tr_free(flags);
     }
 
-    ret = tr_bitfieldGetRaw(&pieces, byte_count);
-    tr_bitfieldDestruct(&pieces);
+    ret = pieces.getRaw(byte_count);
     return ret;
 }
 

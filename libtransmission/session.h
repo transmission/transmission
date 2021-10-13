@@ -14,9 +14,11 @@
 
 #define TR_NAME "Transmission"
 
+#include <array>
 #include <cstring> // memcmp()
 #include <list>
 #include <map>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -95,7 +97,9 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    tr_bitfield minutes;
+    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
+    // TODO: remove * and own the value
+    Bitfield* minutes;
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
@@ -127,7 +131,6 @@ struct tr_session
     bool isLPDEnabled;
     bool isBlocklistEnabled;
     bool isPrefetchEnabled;
-    bool isTorrentDoneScriptEnabled;
     bool isClosing;
     bool isClosed;
     bool isIncompleteFileNamingEnabled;
@@ -137,6 +140,7 @@ struct tr_session
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled;
 
     uint8_t peer_id_ttl_hours;
 
@@ -203,7 +207,7 @@ struct tr_session
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
     std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
-    char* torrentDoneScript;
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
 
     char* configDir;
     char* resumeDir;
@@ -240,7 +244,9 @@ struct tr_session
     struct event* saveTimer;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth bandwidth;
+    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    Bandwidth* bandwidth;
 
     float desiredRatio;
 
