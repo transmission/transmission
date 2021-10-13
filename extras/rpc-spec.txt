@@ -680,7 +680,7 @@
    -------------+----------------------------------------------------------
    "path"       | string  same as the Request argument
    "size-bytes" | number  the size, in bytes, of the free space in that directory
-   "total_size" | number  the total size, in bytes, that exists in that directory
+   "total_size" | number  the total capacity, in bytes, of that directory
 
 
 5.0.  Protocol Versions
@@ -837,6 +837,9 @@
    ------+---------+-----------+----------------------+-------------------------------
    17    | 3.01    | yes       | torrent-get          | new arg "file-count"
          |         | yes       | torrent-get          | new arg "primary-mime-type"
+   ------+---------+-----------+----------------------+-------------------------------
+   18    | 3.02    | yes       | free-space           | new return arg "total-capacity"
+
 
 
 5.1.  Upcoming Breakage
