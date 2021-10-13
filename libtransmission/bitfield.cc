@@ -107,7 +107,7 @@ size_t Bitfield::countRangeImpl(size_t begin, size_t end) const
         }
     }
 
-    TR_ASSERT(ret <= (begin - end));
+    TR_ASSERT(ret <= (end - begin));
     return ret;
 }
 
