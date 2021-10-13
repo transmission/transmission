@@ -953,10 +953,10 @@
             assert(filePath.length > 0);
 
             [fDefaults setObject:filePath forKey:@"DoneScriptPath"];
-            tr_sessionSetTorrentDoneScript(fHandle, filePath.fileSystemRepresentation);
+            tr_sessionSetScript(fHandle, TR_SCRIPT_ON_TORRENT_DONE, filePath.fileSystemRepresentation);
 
             [fDefaults setBool:YES forKey:@"DoneScriptEnabled"];
-            tr_sessionSetTorrentDoneScriptEnabled(fHandle, YES);
+            tr_sessionSetScriptEnabled(fHandle, TR_SCRIPT_ON_TORRENT_DONE, YES);
         }
         [fDoneScriptPopUp selectItemAtIndex:0];
     }];
@@ -1001,7 +1001,7 @@
         [fDefaults setBool:NO forKey:@"DoneScriptEnabled"];
         [self doneScriptSheetShow:sender];
     }
-    tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey:@"DoneScriptEnabled"]);
+    tr_sessionSetScriptEnabled(fHandle, TR_SCRIPT_ON_TORRENT_DONE, [fDefaults boolForKey:@"DoneScriptEnabled"]);
 }
 
 - (void)setAutoImport:(id)sender
@@ -1443,10 +1443,10 @@
     [fDefaults setInteger:stalledMinutes forKey:@"StalledMinutes"];
 
     //done script
-    BOOL const doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
+    BOOL const doneScriptEnabled = tr_sessionIsScriptEnabled(fHandle, TR_SCRIPT_ON_TORRENT_DONE);
     [fDefaults setBool:doneScriptEnabled forKey:@"DoneScriptEnabled"];
 
-    NSString* doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
+    NSString* doneScriptPath = @(tr_sessionGetScript(fHandle, TR_SCRIPT_ON_TORRENT_DONE));
     [fDefaults setObject:doneScriptPath forKey:@"DoneScriptPath"];
 
     //update gui if loaded
