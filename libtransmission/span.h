@@ -34,7 +34,7 @@ public:
         return this->ptr_ + this->size_;
     }
 
-    [[nodiscard]] size_t getSize() const
+    [[nodiscard]] size_t size() const
     {
         return size_;
     }

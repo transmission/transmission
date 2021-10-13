@@ -1500,7 +1500,7 @@ enum
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    t->minutes->setHasNone();
+    t->minutes->setMode(Bitfield::OperationMode::None);
 
     for (int day = 0; day < 7; ++day)
     {

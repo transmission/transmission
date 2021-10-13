@@ -674,22 +674,22 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
             else if (buflen == 3 && memcmp(buf, "all", 3) == 0)
             {
-                blocks.setHasAll();
+                blocks.setMode(Bitfield::OperationMode::All);
             }
             else if (buflen == 4 && memcmp(buf, "none", 4) == 0)
             {
-                blocks.setHasNone();
+                blocks.setMode(Bitfield::OperationMode::None);
             }
             else
             {
-                blocks.setRaw(Span{ buf, buflen }, true);
+                blocks = Bitfield(Span{ buf, buflen }, true);
             }
         }
         else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
         {
             if (strcmp(str, "all") == 0)
             {
-                blocks.setHasAll();
+                blocks.setMode(Bitfield::OperationMode::All);
             }
             else
             {
@@ -698,7 +698,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks.setRaw(Span{ raw, rawlen }, true);
+            blocks = Bitfield(Span{ raw, rawlen }, true);
         }
         else
         {

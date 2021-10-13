@@ -24,6 +24,21 @@
 struct Bitfield
 {
 public:
+    /// @brief State diagram for modes of operation: None -> Normal <==> All
+    /// ALL and NONE: Special cases for when full or empty but we don't know the bitCount.
+    /// This occurs when a magnet link's peers send have all / have none
+    enum struct OperationMode
+    {
+        /// @brief State at the creation
+        Start,
+        /// @brief Normal operation: storage of bytes contains bits to set or clear
+        Normal,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 1
+        All,
+        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 0
+        None,
+    };
+
     /***
     ****  life cycle
     ***/
@@ -34,21 +49,27 @@ public:
     {
     }
 
+    /// @brief Copies bits from the readonly view new_bits
+    /// @param bounded Whether incoming data is constrained by our memory and bit size
+    Bitfield(Span<uint8_t> new_bits, bool bounded);
+
+    /// @brief Builds bits from array of boolean flags
+    Bitfield(bool const* bytes, size_t n);
+
     ~Bitfield()
     {
-        this->setHasNone();
+        setMode(OperationMode::None);
     }
 
     /***
     ****
     ***/
 
-    void setHasAll();
-
-    void setHasNone();
+    /// @brief Change the state (mode of operation)
+    void setMode(OperationMode new_mode);
 
     /// @brief Sets one bit
-    void setBit(size_t bit);
+    void setBit(size_t bit_index);
 
     /// @brief Sets bit range [begin, end) to 1
     void setBitRange(size_t begin, size_t end);
@@ -65,29 +86,29 @@ public:
 
     [[nodiscard]] size_t countRange(size_t begin, size_t end) const
     {
-        if (this->hasAll())
+        if (hasAll())
         {
             return end - begin;
         }
 
-        if (this->hasNone())
+        if (hasNone())
         {
             return 0;
         }
 
-        return this->countRangeImpl(begin, end);
+        return countRangeImpl(begin, end);
     }
 
     [[nodiscard]] size_t countBits() const;
 
     [[nodiscard]] constexpr bool hasAll() const
     {
-        return this->bit_count_ != 0 ? (this->true_count_ == this->bit_count_) : this->hint_ == HAS_ALL;
+        return mode_ == OperationMode::All;
     }
 
     [[nodiscard]] constexpr bool hasNone() const
     {
-        return this->bit_count_ != 0 ? (this->true_count_ == 0) : this->hint_ == HAS_NONE;
+        return mode_ == OperationMode::None;
     }
 
     [[nodiscard]] bool readBit(size_t n) const;
@@ -95,12 +116,6 @@ public:
     /***
     ****
     ***/
-
-    void setFromFlags(bool const* bytes, size_t n);
-
-    /// @brief Copies bits from the readonly view newBits
-    /// @param bounded Whether incoming data is constrained by our memory and bit size
-    void setRaw(Span<uint8_t> newBits, bool bounded);
 
     [[nodiscard]] std::vector<uint8_t> getRaw() const;
 
@@ -121,33 +136,41 @@ private:
     [[nodiscard]] size_t countArray() const;
     [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
     static void setBitsInArray(std::vector<uint8_t>& array, size_t bit_count);
-    void ensureBitsAlloced(size_t n);
-    bool ensureNthBitAlloced(size_t nth);
-    void freeArray();
-    void setTrueCount(size_t n);
-    void rebuildTrueCount();
-    void incTrueCount(size_t i);
-    void decTrueCount(size_t i);
+    void ensureNthBitFitsImpl(size_t n);
+    bool ensureNthBitFits(size_t nth);
+
+    inline void setTrueCount(size_t n)
+    {
+        TR_ASSERT(mode_ == OperationMode::Normal);
+        TR_ASSERT(n <= bit_count_);
+
+        true_count_ = n;
+
+        TR_ASSERT(isValid());
+    }
 
 #ifdef TR_ENABLE_ASSERTS
     [[nodiscard]] bool isValid() const;
 #endif
 
+    /// @brief Set the bit
+    inline void setBitImpl(size_t bit) {
+        TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
+        TR_ASSERT(isValid());
+
+        if (!readBit(bit) && ensureNthBitFits(bit))
+        {
+            size_t const byte_offset = bit >> 3U;
+            uint8_t bit_value = 0x80 >> (bit & 7U);
+            bits_[byte_offset] |= bit_value;
+            setTrueCount(true_count_ + 1);
+        }
+
+        TR_ASSERT(isValid());
+    }
+
     std::vector<uint8_t> bits_;
     size_t bit_count_ = 0;
     size_t true_count_ = 0;
-
-    enum OperationMode
-    {
-        /// @brief Normal operation: storage of bytes contains bits to set or clear
-        NORMAL,
-        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 1
-        HAS_ALL,
-        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 0
-        HAS_NONE,
-    };
-
-    // Special cases for when full or empty but we don't know the bitCount.
-    // This occurs when a magnet link's peers send have all / have none
-    OperationMode hint_ = NORMAL;
+    OperationMode mode_ = OperationMode::Start;
 };

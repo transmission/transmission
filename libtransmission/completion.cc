@@ -21,7 +21,7 @@ static void tr_cpReset(tr_completion* cp)
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = true;
     cp->haveValidIsDirty = true;
-    cp->blockBitfield->setHasNone();
+    cp->blockBitfield->setMode(Bitfield::OperationMode::None);
 }
 
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
@@ -312,7 +312,7 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
 
     if (tr_cpHasAll(cp))
     {
-        pieces.setHasAll();
+        pieces.setMode(Bitfield::OperationMode::All);
     }
     else if (!tr_cpHasNone(cp))
     {
@@ -323,7 +323,7 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }
 
-        pieces.setFromFlags(flags, n);
+        pieces = Bitfield(flags, n);
         tr_free(flags);
     }
 

@@ -67,7 +67,7 @@ public:
         , bandwidth(tor->bandwidth)
     {
         // init parent bits
-        have.setHasAll();
+        have.setMode(Bitfield::OperationMode::All);
         tr_peerUpdateProgress(tor, this);
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
