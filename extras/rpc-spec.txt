@@ -540,6 +540,7 @@
    "rename-partial-files"           | boolean    | true means append ".part" to incomplete files
    "rpc-version"                    | number     | the current RPC API version
    "rpc-version-minimum"            | number     | the minimum RPC API version supported
+   "rpc-version-semver"             | number     | the current RPC API version in a semver-compatible string
    "script-torrent-done-filename"   | string     | filename of the script to run
    "script-torrent-done-enabled"    | boolean    | whether or not to call the "done" script
    "seedRatioLimit"                 | double     | the default seed ratio for torrents to use
@@ -684,28 +685,43 @@
 
 5.0.  Protocol Versions
 
-  The following changes have been made to the RPC interface:
+   This section lists the changes that have been made to the RPC protocol.
 
-   RPC   | Release | Backwards |                      |
-   Vers. | Version | Compat?   | Method               | Description
+   There are two ways to check for API compatibility. Since most developers know
+   semver, session-get's "rpc-version-semver" is the recommended way. That value
+   is a semver-compatible string of the RPC protocol version number.
+
+   Since Transmission predates the semver 1.0 spec, the previous scheme was for
+   the RPC version to be a whole number and to increment it whenever a change was
+   made. That is session-get's "rpc-version". "rpc-version-minimum" lists the
+   oldest version that is compatible with the current version; i.e. an app coded
+   to use `rpc-version-minimum` would still work on a Transmission release running
+   `rpc-version`.
+
+   RPC   | Transm. | Backwards |                      |
+   Vers, | Version | Compat?   | Method               | Description
+   Sem.  |         |           |                      |
+   Vers  |         |           |                      |
    ------+---------+-----------+----------------------+-------------------------------
    1     | 1.30    | n/a       | n/a                  | Initial version
+   1.0.0 |         |           |                      |
    ------+---------+-----------+----------------------+-------------------------------
    2     | 1.34    | yes       | torrent-get          | new arg "peers"
+   1.1.0 |         |           |                      |
    ------+---------+-----------+----------------------+-------------------------------
    3     | 1.41    | yes       | torrent-get          | added "port" to "peers"
-         |         | yes       | torrent-get          | new arg "downloaders"
+   1.2.0 |         | yes       | torrent-get          | new arg "downloaders"
          |         | yes       | session-get          | new arg "version"
          |         | yes       | torrent-remove       | new method
    ------+---------+-----------+----------------------+-------------------------------
    4     | 1.50    | yes       | session-get          | new arg "rpc-version"
-         |         | yes       | session-get          | new arg "rpc-version-minimum"
+   1.3.0 |         | yes       | session-get          | new arg "rpc-version-minimum"
          |         | yes       | session-stats        | added "cumulative-stats"
          |         | yes       | session-stats        | added "current-stats"
          |         | yes       | torrent-get          | new arg "downloadDir"
    ------+---------+-----------+----------------------+-------------------------------
    5     | 1.60    | yes       |                      | new method "torrent-reannounce"
-         |         | yes       |                      | new method "blocklist-update"
+   2.0.0 |         | yes       |                      | new method "blocklist-update"
          |         | yes       |                      | new method "port-test"
          |         |           |                      |
          |         | yes       | session-get          | new arg "alt-speed-begin"
@@ -751,9 +767,10 @@
          |         |        NO | torrent-get          | removed arg "uploadLimitMode"
    ------+---------+-----------+----------------------+-------------------------------
    6     | 1.70    | yes       |                      | new "method torrent-set-location"
+   2.1.0 |         |           |                      |
    ------+---------+-----------+----------------------+-------------------------------
    7     | 1.80    |        NO | torrent-get          | removed arg "announceResponse"
-         |         |        NO | torrent-get          | removed arg "announceURL"
+   3.0.0 |         |        NO | torrent-get          | removed arg "announceURL"
          |         |        NO | torrent-get          | removed arg "downloaders"
          |         |        NO | torrent-get          | removed arg "lastAnnounceTime"
          |         |        NO | torrent-get          | removed arg "lastScrapeTime"
@@ -772,21 +789,22 @@
          |         | yes       | session-set          | new arg "incomplete-dir-enabled"
    ------+---------+-----------+----------------------+-------------------------------
    8     | 1.90    | yes       | session-set          | new arg "rename-partial-files"
-         |         | yes       | session-get          | new arg "rename-partial-files"
+   3.1.0 |         | yes       | session-get          | new arg "rename-partial-files"
          |         | yes       | session-get          | new arg "config-dir"
          |         | yes       | torrent-add          | new arg "bandwidthPriority"
          |         | yes       | torrent-get          | new trackerStats arg "lastAnnounceTimedOut"
    ------+---------+-----------+----------------------+-------------------------------
    8     | 1.92    | yes       | torrent-get          | new trackerStats arg "lastScrapeTimedOut"
+   3.2.0 |         |           |                      |
    ------+---------+-----------+----------------------+-------------------------------
    9     | 2.00    | yes       | session-set          | new arg "start-added-torrents"
-         |         | yes       | session-set          | new arg "trash-original-torrent-files"
+   3.3.0 |         | yes       | session-set          | new arg "trash-original-torrent-files"
          |         | yes       | session-get          | new arg "start-added-torrents"
          |         | yes       | session-get          | new arg "trash-original-torrent-files"
          |         | yes       | torrent-get          | new arg "isFinished"
    ------+---------+-----------+----------------------+-------------------------------
    10    | 2.10    | yes       | session-get          | new arg "cache-size-mb"
-         |         | yes       | torrent-set          | new arg "trackerAdd"
+   3.4.0 |         | yes       | torrent-set          | new arg "trackerAdd"
          |         | yes       | torrent-set          | new arg "trackerRemove"
          |         | yes       | torrent-set          | new arg "trackerReplace"
          |         | yes       | session-set          | new arg "idle-seeding-limit"
@@ -796,17 +814,17 @@
          |         | yes       | torrent-set          | new arg "seedIdleMode"
    ------+---------+-----------+----------------------+-------------------------------
    11    | 2.12    | yes       | session-get          | new arg "blocklist-url"
-         |         | yes       | session-set          | new arg "blocklist-url"
+   3.5.0 |         | yes       | session-set          | new arg "blocklist-url"
    ------+---------+-----------+----------------------+-------------------------------
    12    | 2.20    | yes       | session-get          | new arg "download-dir-free-space"
-         |         | yes       | session-close        | new method
+   3.6.0 |         | yes       | session-close        | new method
    ------+---------+-----------+----------------------+-------------------------------
    13    | 2.30    | yes       | session-get          | new arg "isUTP" to the "peers" list
-         |         | yes       | torrent-add          | new arg "cookies"
+   4.0.0 |         | yes       | torrent-add          | new arg "cookies"
          |         |        NO | torrent-get          | removed arg "peersKnown"
    ------+---------+-----------+----------------------+-------------------------------
    14    | 2.40    |        NO | torrent-get          | values of "status" field changed
-         |         | yes       | torrent-get          | new arg "queuePosition"
+   5.0.0 |         | yes       | torrent-get          | new arg "queuePosition"
          |         | yes       | torrent-get          | new arg "isStalled"
          |         | yes       | torrent-get          | new arg "fromLpd" in peersFrom
          |         | yes       | torrent-set          | new arg "queuePosition"
@@ -823,19 +841,20 @@
          |         | yes       |                      | new method "torrent-start-now"
    ------+---------+-----------+----------------------+-------------------------------
    15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
-         |         | yes       | torrent-rename-path  | new method
+   5.1.0 |         | yes       | torrent-rename-path  | new method
          |         | yes       | free-space           | new method
          |         | yes       | torrent-add          | new return arg "torrent-duplicate"
    ------+---------+-----------+----------------------+-------------------------------
    16    | 3.00    | yes       | session-get          | new request arg "fields"
-         |         | yes       | session-get          | new arg "session-id"
+   5.2.0 |         | yes       | session-get          | new arg "session-id"
          |         | yes       | torrent-get          | new arg "labels"
          |         | yes       | torrent-set          | new arg "labels"
          |         | yes       | torrent-get          | new arg "editDate"
          |         | yes       | torrent-get          | new request arg "format"
    ------+---------+-----------+----------------------+-------------------------------
-   17    | 3.01    | yes       | torrent-get          | new arg "file-count"
-         |         | yes       | torrent-get          | new arg "primary-mime-type"
+   17    | 3.xx    | yes       | torrent-get          | new arg "file-count"
+   5.3.0 |         | yes       | torrent-get          | new arg "primary-mime-type"
+         |         | yes       | session-get          | new arg "rpc-version-semver"
 
 
 5.1.  Upcoming Breakage

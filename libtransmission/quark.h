@@ -304,6 +304,7 @@ enum
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
     TR_KEY_rpc_version_minimum,
+    TR_KEY_rpc_version_semver,
     TR_KEY_rpc_whitelist,
     TR_KEY_rpc_whitelist_enabled,
     TR_KEY_scrape,

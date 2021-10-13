@@ -39,8 +39,9 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION 16
-#define RPC_VERSION_MIN 1
+#define RPC_VERSION 17
+#define RPC_VERSION_MIN 14
+#define RPC_VERSION_SEMVER "5.3.0"
 
 #define RECENTLY_ACTIVE_SECONDS 60
 
@@ -2448,6 +2449,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_rpc_version:
         tr_variantDictAddInt(d, key, RPC_VERSION);
+        break;
+
+    case TR_KEY_rpc_version_semver:
+        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
         break;
 
     case TR_KEY_rpc_version_minimum:
