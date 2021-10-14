@@ -2899,30 +2899,25 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static bool isJunkFile(char const* base)
+static bool isJunkFile(std::string_view base)
 {
-    static char const* files[] = {
+    auto constexpr Files = std::array<std::string_view, 3>{
         ".DS_Store",
-        "desktop.ini",
         "Thumbs.db",
+        "desktop.ini",
     };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(files); ++i)
-    {
-        if (strcmp(base, files[i]) == 0)
-        {
-            return true;
-        }
-    }
-
-#ifdef __APPLE__
-
-    /* check for resource forks. <http://support.apple.com/kb/TA20578> */
-    if (memcmp(base, "._", 2) == 0)
+    if (std::binary_search(std::begin(Files), std::end(Files), base))
     {
         return true;
     }
 
+#ifdef __APPLE__
+    // check for resource forks. <http://support.apple.com/kb/TA20578>
+    if (base.find("._") == 0)
+    {
+        return true;
+    }
 #endif
 
     return false;

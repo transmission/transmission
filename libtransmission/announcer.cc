@@ -7,12 +7,14 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <climits> /* INT_MAX */
 #include <cstdio>
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
 #include <map>
 #include <set>
+#include <string_view>
 #include <vector>
 
 #include <event2/buffer.h>
@@ -1309,30 +1311,20 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 ****
 ***/
 
-static bool multiscrape_too_big(char const* errmsg)
+static bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
-    static char const* const too_long_errors[] = {
+    auto constexpr TooLongErrors = std::array<std::string_view, 3>{
         "Bad Request",
         "GET string too long",
         "Request-URI Too Long",
     };
 
-    if (errmsg == nullptr)
-    {
-        return false;
-    }
-
-    for (size_t i = 0; i < TR_N_ELEMENTS(too_long_errors); ++i)
-    {
-        if (strstr(errmsg, too_long_errors[i]) != nullptr)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return std::any_of(
+        std::begin(TooLongErrors),
+        std::end(TooLongErrors),
+        [&errmsg](auto const& toolong) { return errmsg.find(toolong) != std::string_view::npos; });
 }
 
 static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
@@ -1472,7 +1464,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     }
 
     /* Maybe reduce the number of torrents in a multiscrape req */
-    if (multiscrape_too_big(response->errmsg.c_str()))
+    if (multiscrape_too_big(response->errmsg))
     {
         auto const& url = response->url;
         struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);

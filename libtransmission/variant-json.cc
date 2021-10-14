@@ -384,10 +384,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();
-    for (int i = 0; i < MAX_DEPTH; ++i)
-    {
-        data.preallocGuess[i] = 0;
-    }
+    std::fill_n(data.preallocGuess, MAX_DEPTH, 0);
 
     /* parse it */
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
