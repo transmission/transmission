@@ -41,9 +41,7 @@ static char const* get_event_string(tr_announce_request const* req)
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    char const* str;
-    unsigned char const* ipv6;
-    struct evbuffer* buf = evbuffer_new();
+    evbuffer* const buf = evbuffer_new();
     char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
 
     tr_http_escape_sha1(escaped_info_hash, req->info_hash);
@@ -85,15 +83,13 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         evbuffer_add_printf(buf, "&corrupt=%" PRIu64, req->corrupt);
     }
 
-    str = get_event_string(req);
-
+    char const* str = get_event_string(req);
     if (!tr_str_is_empty(str))
     {
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
     str = req->tracker_id_str;
-
     if (!tr_str_is_empty(str))
     {
         evbuffer_add_printf(buf, "&trackerid=%s", str);
@@ -108,8 +104,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    ipv6 = tr_globalIPv6();
-
+    unsigned char const* const ipv6 = tr_globalIPv6();
     if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
@@ -129,26 +124,26 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
 
     for (size_t i = 0; i < len; ++i)
     {
-        int64_t port;
-        char const* ip;
-        tr_address addr;
-        tr_variant* peer = tr_variantListChild(peerList, i);
+        tr_variant* const peer = tr_variantListChild(peerList, i);
 
         if (peer == nullptr)
         {
             continue;
         }
 
+        char const* ip = nullptr;
         if (!tr_variantDictFindStr(peer, TR_KEY_ip, &ip, nullptr))
         {
             continue;
         }
 
+        auto addr = tr_address{};
         if (!tr_address_from_string(&addr, ip))
         {
             continue;
         }
 
+        auto port = int64_t{};
         if (!tr_variantDictFindInt(peer, TR_KEY_port, &port))
         {
             continue;
@@ -207,10 +202,9 @@ static void on_announce_done(
     size_t msglen,
     void* vdata)
 {
-    tr_announce_response* response;
     auto* data = static_cast<struct announce_data*>(vdata);
 
-    response = &data->response;
+    tr_announce_response* const response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
     dbgmsg(data->log_name, "Got announce response");
@@ -234,7 +228,7 @@ static void on_announce_done(
             }
             else
             {
-                size_t len;
+                auto len = size_t{};
                 char* str = tr_variantToStr(&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Announce response:\n< ");
 
@@ -250,11 +244,11 @@ static void on_announce_done(
 
         if (variant_loaded && tr_variantIsDict(&benc))
         {
-            int64_t i;
-            size_t len;
-            tr_variant* tmp;
-            char const* str;
-            uint8_t const* raw;
+            auto i = int64_t{};
+            auto len = size_t{};
+            tr_variant* tmp = nullptr;
+            char const* str = nullptr;
+            uint8_t const* raw = nullptr;
 
             if (tr_variantDictFindStr(&benc, TR_KEY_failure_reason, &str, &len))
             {
@@ -329,10 +323,9 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    struct announce_data* d;
-    char* url = announce_url_new(session, request);
+    char* const url = announce_url_new(session, request);
 
-    d = tr_new0(struct announce_data, 1);
+    auto* const d = tr_new0(announce_data, 1);
     d->response.seeders = -1;
     d->response.leechers = -1;
     d->response.downloads = -1;
@@ -397,11 +390,8 @@ static void on_scrape_done(
     }
     else
     {
-        tr_variant top;
-        int64_t intVal;
-        tr_variant* files;
-        tr_variant* flags;
-        bool const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
+        auto top = tr_variant{};
+        auto const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -411,7 +401,7 @@ static void on_scrape_done(
             }
             else
             {
-                size_t len;
+                auto len = size_t{};
                 char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
 
@@ -427,23 +417,26 @@ static void on_scrape_done(
 
         if (variant_loaded)
         {
-            size_t len;
-            char const* str;
+            auto len = size_t{};
+            char const* str = nullptr;
             if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
             {
                 response->errmsg = tr_strndup(str, len);
             }
 
+            tr_variant* flags = nullptr;
+            auto intVal = int64_t{};
             if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags) &&
                 tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
             {
                 response->min_request_interval = intVal;
             }
 
+            tr_variant* files = nullptr;
             if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
             {
-                tr_quark key;
-                tr_variant* val;
+                auto key = tr_quark{};
+                tr_variant* val = nullptr;
 
                 for (int i = 0; tr_variantDictChild(files, i, &key, &val); ++i)
                 {
@@ -489,11 +482,10 @@ static void on_scrape_done(
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    char delimiter;
-    struct evbuffer* buf = evbuffer_new();
+    struct evbuffer* const buf = evbuffer_new();
 
     evbuffer_add_printf(buf, "%s", req->url);
-    delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
+    char delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
 
     for (int i = 0; i < req->info_hash_count; ++i)
     {
