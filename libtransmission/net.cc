@@ -225,8 +225,7 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
 
     if (addr->type == TR_AF_INET)
     {
-        struct sockaddr_in sock4;
-        memset(&sock4, 0, sizeof(sock4));
+        sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
         sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
         sock4.sin_port = port;
@@ -234,8 +233,7 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
         return sizeof(struct sockaddr_in);
     }
 
-    struct sockaddr_in6 sock6;
-    memset(&sock6, 0, sizeof(sock6));
+    sockaddr_in6 sock6 = {};
     sock6.sin6_family = AF_INET6;
     sock6.sin6_port = port;
     sock6.sin6_flowinfo = 0;
