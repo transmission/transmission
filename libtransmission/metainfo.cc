@@ -108,7 +108,7 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
 
     /* https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file */
     char const* const reserved_chars = "<>:\"/\\|?*";
-    auto constexpr ReservedNames = std::array<std::string_view, 24>{
+    auto constexpr ReservedNames = std::array<std::string_view, 22>{
         "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
         "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
     };
