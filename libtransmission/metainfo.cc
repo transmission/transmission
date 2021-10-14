@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <string.h> /* strlen() */
+#include <string_view>
 
 #include <event2/buffer.h>
 
@@ -107,10 +108,9 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
 
     /* https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file */
     char const* const reserved_chars = "<>:\"/\\|?*";
-    char const* const reserved_names[] = {
-        "CON",  "PRN",  "AUX",  "NUL", //
-        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", //
-        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", //
+    auto constexpr ReservedNames = std::array<std::string_view, 22>{
+        "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
+        "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
     };
 
     char* const ret = tr_new(char, len + 2);
@@ -126,10 +126,10 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
         }
     }
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(reserved_names); ++i)
+    for (auto const& reserved_name : ReservedNames)
     {
-        size_t const reserved_name_len = strlen(reserved_names[i]);
-        if (evutil_ascii_strncasecmp(ret, reserved_names[i], reserved_name_len) != 0 ||
+        size_t const reserved_name_len = std::size(reserved_name);
+        if (evutil_ascii_strncasecmp(ret, std::data(reserved_name), reserved_name_len) != 0 ||
             (ret[reserved_name_len] != '\0' && ret[reserved_name_len] != '.'))
         {
             continue;
