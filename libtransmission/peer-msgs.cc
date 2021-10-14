@@ -199,10 +199,8 @@ public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
-        , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
-        , outMessagesBatchedAt{ 0 }
         , io{ io_in }
         , callback_{ callback }
         , callbackData_{ callbackData }
