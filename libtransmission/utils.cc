@@ -63,7 +63,7 @@
 #include "mime-types.h"
 #include "net.h"
 #include "platform.h" /* tr_lockLock() */
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
+#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -390,24 +390,21 @@ char* tr_buildPath(char const* first_element, ...)
     return buf;
 }
 
-int64_t tr_getDirFreeSpace(char const* dir)
+struct tr_disk_space tr_getDirSpace(char const* dir)
 {
-    int64_t free_space;
+    struct tr_disk_space disk_space = { -1, -1 };
 
     if (tr_str_is_empty(dir))
     {
         errno = EINVAL;
-        free_space = -1;
-    }
-    else
-    {
-        struct tr_device_info* info;
-        info = tr_device_info_create(dir);
-        free_space = tr_device_info_get_free_space(info);
-        tr_device_info_free(info);
+        return disk_space;
     }
 
-    return free_space;
+    struct tr_device_info* info;
+    info = tr_device_info_create(dir);
+    disk_space = tr_device_info_get_disk_space(info);
+    tr_device_info_free(info);
+    return disk_space;
 }
 
 /****
