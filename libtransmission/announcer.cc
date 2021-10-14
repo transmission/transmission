@@ -230,13 +230,16 @@ struct tr_tracker
 /* format: host+':'+ port */
 static char* getKey(char const* url)
 {
-    char* ret;
     char* scheme = nullptr;
     char* host = nullptr;
     int port = 0;
 
     tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, nullptr);
-    ret = tr_strdup_printf("%s://%s:%d", scheme != nullptr ? scheme : "invalid", host != nullptr ? host : "invalid", port);
+    char* const ret = tr_strdup_printf(
+        "%s://%s:%d",
+        scheme != nullptr ? scheme : "invalid",
+        host != nullptr ? host : "invalid",
+        port);
 
     tr_free(host);
     tr_free(scheme);
@@ -320,25 +323,20 @@ struct tr_tier
 
 static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tier, int interval)
 {
-    time_t ret;
-    time_t const now = tr_time();
-
     /* Maybe don't scrape paused torrents */
     if (!tier->isRunning && !session->scrapePausedTorrents)
     {
-        ret = 0;
+        return 0;
     }
+
     /* Add the interval, and then increment to the nearest 10th second.
      * The latter step is to increase the odds of several torrents coming
      * due at the same time to improve multiscrape. */
-    else
+    time_t const now = tr_time();
+    time_t ret = now + interval;
+    while (ret % 10 != 0)
     {
-        ret = now + interval;
-
-        while (ret % 10 != 0)
-        {
-            ++ret;
-        }
+        ++ret;
     }
 
     return ret;
@@ -568,7 +566,6 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
 static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_count, int* setme_count)
 {
     int n = 0;
-    struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
 
     /* build a list of valid trackers */
@@ -576,17 +573,17 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
     {
         if (tr_urlIsValidTracker(input[i].announce))
         {
-            int port;
-            char* scheme;
-            char* host;
-            char* path;
-            bool is_duplicate = false;
+            int port = 0;
+            char* scheme = nullptr;
+            char* host = nullptr;
+            char* path = nullptr;
             tr_urlParse(input[i].announce, TR_BAD_SIZE, &scheme, &host, &port, &path);
 
             /* weed out one common source of duplicates:
              * "http://tracker/announce" +
              * "http://tracker:80/announce"
              */
+            bool is_duplicate = false;
             for (int j = 0; !is_duplicate && j < n; ++j)
             {
                 is_duplicate = tmp[j].port == port && strcmp(tmp[j].scheme, scheme) == 0 && strcmp(tmp[j].host, host) == 0 &&
@@ -632,7 +629,7 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
 
     /* build the output */
     *setme_count = n;
-    ret = tr_new0(tr_tracker_info, n);
+    struct tr_tracker_info* const ret = tr_new0(tr_tracker_info, n);
 
     for (int i = 0; i < n; ++i)
     {
@@ -654,9 +651,7 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
 
 static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
 {
-    int n;
-    int tier_count;
-    tr_tier* tier;
+    auto n = int{};
     tr_tracker_info* infos = filter_trackers(tor->info.trackers, tor->info.trackerCount, &n);
 
     /* build the array of trackers */
@@ -669,8 +664,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     }
 
     /* count how many tiers there are */
-    tier_count = 0;
-
+    auto tier_count = int{};
     for (int i = 0; i < n; ++i)
     {
         if (i == 0 || infos[i].tier != infos[i - 1].tier)
@@ -680,7 +674,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     }
 
     /* build the array of tiers */
-    tier = nullptr;
+    tr_tier* tier = nullptr;
     tt->tiers = tr_new0(tr_tier, tier_count);
     tt->tier_count = 0;
 
@@ -772,7 +766,6 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
     if (tr_logGetDeepEnabled())
     {
         char name[128];
-        char* message;
         struct evbuffer* buf = evbuffer_new();
 
         tier_build_log_name(tier, name, sizeof(name));
@@ -784,7 +777,7 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
             evbuffer_add_printf(buf, "[%d:%s]", i, str);
         }
 
-        message = evbuffer_free_to_str(buf, nullptr);
+        char* const message = evbuffer_free_to_str(buf, nullptr);
         tr_logAddDeep(__FILE__, __LINE__, name, "announce queue is %s", message);
         tr_free(message);
     }
@@ -1031,8 +1024,6 @@ struct announce_data
 
 static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 {
-    int interval;
-
     /* increment the error count */
     if (tier->currentTracker != nullptr)
     {
@@ -1048,7 +1039,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     tierIncrementTracker(tier);
 
     /* schedule a reannounce */
-    interval = getRetryInterval(tier->currentTracker);
+    int const interval = getRetryInterval(tier->currentTracker);
     dbgmsg(tier, "Retrying announce in %d seconds.", interval);
     tr_logAddTorInfo(tier->tor, "Retrying announce in %d seconds.", interval);
     tier_announce_event_push(tier, e, tr_time() + interval);
@@ -1064,8 +1055,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
     if (tier != nullptr)
     {
-        tr_tracker* tracker;
-
         dbgmsg(
             tier,
             "Got announce response: "
@@ -1123,16 +1112,15 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
         }
         else
         {
-            int i;
-            char const* str;
-            int scrape_fields = 0;
-            int seeders = 0;
-            int leechers = 0;
-            bool const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+            auto const isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+            auto leechers = int{};
+            auto scrape_fields = int{};
+            auto seeders = int{};
 
             publishErrorClear(tier);
 
-            if ((tracker = tier->currentTracker) != nullptr)
+            tr_tracker* const tracker = tier->currentTracker;
+            if (tracker != nullptr)
             {
                 tracker->consecutiveFailures = 0;
 
@@ -1154,14 +1142,15 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                     ++scrape_fields;
                 }
 
-                if ((str = response->tracker_id_str) != nullptr)
+                if (response->tracker_id_str != nullptr)
                 {
                     tr_free(tracker->tracker_id_str);
-                    tracker->tracker_id_str = tr_strdup(str);
+                    tracker->tracker_id_str = tr_strdup(response->tracker_id_str);
                 }
             }
 
-            if ((str = response->warning) != nullptr)
+            char const* const str = response->warning;
+            if (str != nullptr)
             {
                 tr_strlcpy(tier->lastAnnounceStr, str, sizeof(tier->lastAnnounceStr));
                 dbgmsg(tier, "tracker gave \"%s\"", str);
@@ -1172,14 +1161,14 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 tr_strlcpy(tier->lastAnnounceStr, _("Success"), sizeof(tier->lastAnnounceStr));
             }
 
-            if ((i = response->min_interval) != 0)
+            if (response->min_interval != 0)
             {
-                tier->announceMinIntervalSec = i;
+                tier->announceMinIntervalSec = response->min_interval;
             }
 
-            if ((i = response->interval) != 0)
+            if (response->interval != 0)
             {
-                tier->announceIntervalSec = i;
+                tier->announceIntervalSec = response->interval;
             }
 
             if (response->pex_count > 0)
@@ -1230,7 +1219,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             if (!isStopped && tier->announce_event_count == 0)
             {
                 /* the queue is empty, so enqueue a perodic update */
-                i = tier->announceIntervalSec;
+                int const i = tier->announceIntervalSec;
                 dbgmsg(tier, "Sending periodic reannounce in %d seconds", i);
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
             }
@@ -1334,8 +1323,6 @@ static constexpr bool multiscrape_too_big(std::string_view errmsg)
 
 static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
 {
-    int interval;
-
     /* increment the error count */
     if (tier->currentTracker != nullptr)
     {
@@ -1351,7 +1338,7 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     tierIncrementTracker(tier);
 
     /* schedule a rescrape */
-    interval = getRetryInterval(tier->currentTracker);
+    int const interval = getRetryInterval(tier->currentTracker);
     dbgmsg(tier, "Retrying scrape in %zu seconds.", (size_t)interval);
     tr_logAddTorInfo(tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
     tier->lastScrapeSucceeded = false;
@@ -1487,7 +1474,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 {
                     char* scheme = nullptr;
                     char* host = nullptr;
-                    int port;
+                    auto port = int{};
                     if (tr_urlParse(std::data(url), std::size(url), &scheme, &host, &port, nullptr))
                     {
                         /* don't log the full URL, since that might have a personal announce id */
