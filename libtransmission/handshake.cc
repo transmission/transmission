@@ -659,11 +659,9 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             dbgmsg(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
         }
-        else
-        {
-            TR_ASSERT(!tr_peerIoHasTorrentHash(handshake->io));
-            tr_peerIoSetTorrentHash(handshake->io, hash);
-        }
+
+        TR_ASSERT(!tr_peerIoHasTorrentHash(handshake->io));
+        tr_peerIoSetTorrentHash(handshake->io, hash);
     }
     else /* outgoing */
     {
@@ -775,17 +773,14 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
         return READ_NOW;
     }
-    else
+
+    size_t const len = evbuffer_get_length(inbuf);
+    if (len > SHA_DIGEST_LENGTH)
     {
-        size_t const len = evbuffer_get_length(inbuf);
-
-        if (len > SHA_DIGEST_LENGTH)
-        {
-            evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
-        }
-
-        return READ_LATER;
+        evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
+
+    return READ_LATER;
 }
 
 static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inbuf)

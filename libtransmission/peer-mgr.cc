@@ -2643,16 +2643,13 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         return 0;
     }
-    else
-    {
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
 
-        for (size_t i = 0; i < peer_count; ++i)
+    tr_peer const** const peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
+    for (size_t i = 0; i < peer_count; ++i)
+    {
+        if (peers[i]->atom != nullptr && atomIsSeed(peers[i]->atom))
         {
-            if (peers[i]->atom != nullptr && atomIsSeed(peers[i]->atom))
-            {
-                return tr_torrentGetLeftUntilDone(tor);
-            }
+            return tr_torrentGetLeftUntilDone(tor);
         }
     }
 
@@ -3147,12 +3144,10 @@ static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_ms
     {
         return false;
     }
-    else
-    {
-        unsigned int const got = b->getPieceSpeedBytesPerSecond(now_msec, dir);
-        unsigned int const want = b->getDesiredSpeedBytesPerSecond(dir);
-        return got >= want;
-    }
+
+    unsigned int const got = b->getPieceSpeedBytesPerSecond(now_msec, dir);
+    unsigned int const want = b->getDesiredSpeedBytesPerSecond(dir);
+    return got >= want;
 }
 
 static void rechokeUploads(tr_swarm* s, uint64_t const now)
@@ -3662,7 +3657,7 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
     }
 }
 
-static void makeNewPeerConnections(tr_peerMgr* mgr, int const max);
+static void makeNewPeerConnections(tr_peerMgr* mgr, int max);
 
 static void reconnectPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vmgr)
 {
@@ -4250,7 +4245,7 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
     initiateConnection(mgr, c->tor->swarm, c->atom);
 }
 
-static void makeNewPeerConnections(struct tr_peerMgr* mgr, int const max)
+static void makeNewPeerConnections(struct tr_peerMgr* mgr, int max)
 {
     auto n = int{};
     struct peer_candidate* candidates = getPeerCandidates(mgr->session, &n, max);
