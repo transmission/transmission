@@ -1101,7 +1101,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="F5C-Uu-ttQ">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1872,18 +1872,6 @@
             <rect key="frame" x="0.0" y="0.0" width="542" height="439"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                    <rect key="frame" x="83" y="343" width="149" height="25"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="roundTextured" title="Launch Web Interface" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="linkWebUI:" target="-2" id="1720"/>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
-                    </connections>
-                </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
                     <rect key="frame" x="500" y="12" width="25" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -2160,8 +2148,20 @@
                         <binding destination="365" name="enabled" keyPath="values.RPC" id="1695"/>
                     </connections>
                 </textField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
+                    <rect key="frame" x="76" y="340" width="180" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Launch Web Interface" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="linkWebUI:" target="-2" id="1720"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
+                    </connections>
+                </button>
             </subviews>
-            <point key="canvasLocation" x="-500" y="863"/>
+            <point key="canvasLocation" x="-500" y="862.5"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="365" userLabel="Shared Defaults"/>
         <customObject id="1783" customClass="GroupsPrefsController">
