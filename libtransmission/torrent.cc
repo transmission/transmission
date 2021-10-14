@@ -2899,7 +2899,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static bool isJunkFile(std::string_view base)
+static constexpr bool isJunkFile(std::string_view base)
 {
     auto constexpr Files = std::array<std::string_view, 3>{
         ".DS_Store",
@@ -2907,9 +2907,13 @@ static bool isJunkFile(std::string_view base)
         "desktop.ini",
     };
 
-    if (std::binary_search(std::begin(Files), std::end(Files), base))
+    // TODO(C++20): std::any_of is constexpr in C++20
+    for (auto const& file : Files)
     {
-        return true;
+        if (file == base)
+        {
+            return true;
+        }
     }
 
 #ifdef __APPLE__

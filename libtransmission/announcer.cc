@@ -1311,7 +1311,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 ****
 ***/
 
-static bool multiscrape_too_big(std::string_view errmsg)
+static constexpr bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
@@ -1321,10 +1321,15 @@ static bool multiscrape_too_big(std::string_view errmsg)
         "Request-URI Too Long",
     };
 
-    return std::any_of(
-        std::begin(TooLongErrors),
-        std::end(TooLongErrors),
-        [&errmsg](auto const& toolong) { return errmsg.find(toolong) != std::string_view::npos; });
+    for (auto const& tle : TooLongErrors)
+    {
+        if (errmsg.find(tle) != std::string_view::npos)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
