@@ -1140,7 +1140,7 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, NULL))
+    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, nullptr))
     {
         tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, strVal);
     }
