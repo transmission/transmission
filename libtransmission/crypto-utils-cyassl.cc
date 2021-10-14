@@ -18,6 +18,7 @@
 #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
 #endif
 
+#include API_HEADER(options.h)
 #include API_HEADER_CRYPT(dh.h)
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)

@@ -135,8 +135,8 @@ struct tr_scrape_info
 
     int multiscrape_max;
 
-    tr_scrape_info(std::string const& url_in, int const multiscrape_max_in)
-        : url{ url_in }
+    tr_scrape_info(std::string url_in, int const multiscrape_max_in)
+        : url{ std::move(url_in) }
         , multiscrape_max{ multiscrape_max_in }
     {
     }

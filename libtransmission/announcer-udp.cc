@@ -439,10 +439,10 @@ struct tau_tracker
     tr_ptrArray announces = {};
     tr_ptrArray scrapes = {};
 
-    tau_tracker(tr_session* session_in, std::string const& key_in, std::string const& host_in, int port_in)
+    tau_tracker(tr_session* session_in, std::string key_in, std::string host_in, int port_in)
         : session{ session_in }
-        , key{ key_in }
-        , host{ host_in }
+        , key{ std::move(key_in) }
+        , host{ std::move(host_in) }
         , port{ port_in }
     {
     }
