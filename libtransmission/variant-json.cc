@@ -6,9 +6,10 @@
  *
  */
 
+#include <array>
 #include <ctype.h>
-#include <errno.h> /* EILSEQ, EINVAL */
 #include <deque>
+#include <errno.h> /* EILSEQ, EINVAL */
 #include <math.h> /* fabs() */
 #include <stdio.h>
 #include <string.h>
@@ -46,7 +47,7 @@ struct json_wrapper_data
      * e.g. they may all be objects with the same set of keys. So when
      * a container is popped off the stack, remember its size to use as
      * a preallocation heuristic for the next container at that depth. */
-    size_t preallocGuess[MAX_DEPTH];
+    std::array<size_t, MAX_DEPTH> preallocGuess;
 };
 
 static tr_variant* get_node(struct jsonsl_st* jsn)
@@ -384,10 +385,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();
-    for (int i = 0; i < MAX_DEPTH; ++i)
-    {
-        data.preallocGuess[i] = 0;
-    }
+    data.preallocGuess = {};
 
     /* parse it */
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
