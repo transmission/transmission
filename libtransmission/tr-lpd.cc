@@ -296,7 +296,7 @@ int tr_lpdInit(tr_session* ss, [[maybe_unused]] tr_address* tr_addr)
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
      * However, the code should work as long as interfaces to the rest of
      * libtransmission are compatible with char* strings. */
-    TR_STATIC_ASSERT(sizeof(((struct tr_info*)nullptr)->hashString[0]) == sizeof(char), "");
+    static_assert(sizeof(((struct tr_info*)nullptr)->hashString[0]) == sizeof(char), "");
 
     struct ip_mreq mcastReq;
     int const opt_on = 1;
