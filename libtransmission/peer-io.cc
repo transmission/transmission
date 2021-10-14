@@ -1443,10 +1443,8 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
         {
             break;
         }
-        else
-        {
-            byteCount += it->length;
-        }
+
+        byteCount += it->length;
     }
 
     return tr_peerIoFlush(io, TR_UP, byteCount);

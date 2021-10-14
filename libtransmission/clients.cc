@@ -66,7 +66,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
 }
 
 template<typename T, typename... ArgTypes>
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const t, ArgTypes... args)
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, ArgTypes... args)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, t);
     return buf_append(buf, buflen, args...);

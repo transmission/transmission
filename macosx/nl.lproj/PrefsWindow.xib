@@ -1103,7 +1103,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="97f-WE-FbD">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1872,18 +1872,6 @@
             <rect key="frame" x="0.0" y="0.0" width="542" height="426"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                    <rect key="frame" x="83" y="342" width="149" height="25"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="roundTextured" title="Start web interface" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="linkWebUI:" target="-2" id="1720"/>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
-                    </connections>
-                </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
                     <rect key="frame" x="500" y="12" width="25" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -2164,6 +2152,18 @@
                         <binding destination="365" name="enabled" keyPath="values.RPC" id="1695"/>
                     </connections>
                 </textField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
+                    <rect key="frame" x="76" y="340" width="180" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="push" title="Start web interface" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="linkWebUI:" target="-2" id="1720"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="139" y="-249"/>
         </customView>

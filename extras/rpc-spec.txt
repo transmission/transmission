@@ -679,10 +679,11 @@
 
    Response arguments:
 
-   string      | value type & description
-   ------------+----------------------------------------------------------
-   "path"      | string  same as the Request argument
-   "size-bytes"| number  the size, in bytes, of the free space in that directory
+   string       | value type & description
+   -------------+----------------------------------------------------------
+   "path"       | string  same as the Request argument
+   "size-bytes" | number  the size, in bytes, of the free space in that directory
+   "total_size" | number  the total capacity, in bytes, of that directory
 
 
 5.0.  Protocol Versions
@@ -854,6 +855,7 @@
        |       |      | session-get          | new arg "script-torrent-added-filename"
        |       |      | torrent-get          | new arg "file-count"
        |       |      | torrent-get          | new arg "primary-mime-type"
+       |       |      | free-space           | new return arg "total-capacity"
 
 
 5.1.  Upcoming Breakage

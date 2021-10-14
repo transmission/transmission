@@ -103,14 +103,13 @@ static int bootstrap_af(tr_session* session)
     {
         return AF_INET;
     }
-    else if (bootstrap_done(session, AF_INET))
+
+    if (bootstrap_done(session, AF_INET))
     {
         return AF_INET6;
     }
-    else
-    {
-        return 0;
-    }
+
+    return 0;
 }
 
 static void bootstrap_from_name(char const* name, tr_port port, int af)
@@ -608,7 +607,8 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
-    else if (address->type == TR_AF_INET6)
+
+    if (address->type == TR_AF_INET6)
     {
         struct sockaddr_in6 sin6;
         memset(&sin6, 0, sizeof(sin6));

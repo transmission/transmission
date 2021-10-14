@@ -592,10 +592,8 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 
             return 1;
         }
-        else
-        {
-            tr_logAddNamedDbg("LPD", "Cannot serve torrent #%s", hashString);
-        }
+
+        tr_logAddNamedDbg("LPD", "Cannot serve torrent #%s", hashString);
     }
 
     return res;
