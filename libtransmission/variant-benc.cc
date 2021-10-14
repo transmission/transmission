@@ -240,14 +240,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
                 err = EILSEQ;
                 break;
             }
-            else
-            {
-                stack.pop_back();
 
-                if (std::empty(stack))
-                {
-                    break;
-                }
+            stack.pop_back();
+            if (std::empty(stack))
+            {
+                break;
             }
         }
         else if (isdigit(*buf)) /* string? */

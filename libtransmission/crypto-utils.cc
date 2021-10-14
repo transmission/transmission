@@ -223,10 +223,8 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 
             return ret;
         }
-        else
-        {
-            ret = tr_strdup("");
-        }
+
+        ret = tr_strdup("");
     }
     else
     {
@@ -271,10 +269,8 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
 
             return ret;
         }
-        else
-        {
-            ret = tr_strdup("");
-        }
+
+        ret = tr_strdup("");
     }
     else
     {

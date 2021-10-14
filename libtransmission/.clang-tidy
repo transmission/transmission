@@ -7,5 +7,7 @@ Checks: >
   modernize-use-default-member-init,
   modernize-use-nullptr,
   modernize-use-override,
-  modernize-use-using
+  modernize-use-using,
+  readability-avoid-const-params-in-decls,
+  readability-else-after-return
 
