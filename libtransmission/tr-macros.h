@@ -114,26 +114,6 @@
 ****
 ***/
 
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(__cplusplus) || defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert) || TR_GNUC_CHECK_VERSION(4, 6)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) \
-    do \
-    { \
-        ((void)sizeof(x)); \
-    } while (0)
-#endif
-
-/***
-****
-***/
-
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
