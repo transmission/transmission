@@ -161,3 +161,16 @@ TEST(Metainfo, sanitize)
         tr_free(result);
     }
 }
+
+TEST(Metainfo, AndroidTorrent)
+{
+    auto* ctor = tr_ctorNew(nullptr);
+
+    auto filename = std::string{ LIBTRANSMISSION_TEST_ASSETS_DIR };
+    filename += '/'; // FIXME
+    filename += "Android-x86 8.1 r6 iso.torrent";
+    auto const err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
+    EXPECT_EQ(0, err);
+
+    tr_ctorFree(ctor);
+}
