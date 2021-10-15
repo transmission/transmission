@@ -601,7 +601,7 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
 
         if (isNum || isList)
         {
-            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str, strlen(id_str));
+            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str);
         }
         else
         {
