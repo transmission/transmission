@@ -1377,7 +1377,7 @@ static bool parseNumberSection(std::string_view str, number_range& range)
     auto const error = errno;
 
 #if defined(HAVE_CHARCONV)
-    auto result = std::from_chars(std::begin(str), std::end(str), range.low);
+    auto result = std::from_chars(std::data(str), std::data(str) + std::size(str), range.low);
     success = result.ec == std::errc{};
     if (success)
     {
