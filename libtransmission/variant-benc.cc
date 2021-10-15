@@ -129,15 +129,12 @@ int tr_bencParseStr(
     return EILSEQ;
 }
 
-#include <iostream>
-
 static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_quark>& dict_key, tr_variant* top, int* err)
 {
     tr_variant* node = nullptr;
 
     if (std::empty(stack))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " empty stack; returning top" << std::endl;
         node = top;
     }
     else
@@ -146,28 +143,21 @@ static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_qua
 
         if (tr_variantIsList(parent))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " since we're building a list; appending new list node" << std::endl;
             node = tr_variantListAdd(parent);
         }
         else if (dict_key && tr_variantIsDict(parent))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " since we're building a dict; appending new dict node w key "
-                      << tr_quark_get_string(*dict_key, nullptr) << std::endl;
             node = tr_variantDictAdd(parent, *dict_key);
-            std::cerr << __FILE__ << ':' << __LINE__ << " consuming key" << std::endl;
             dict_key.reset();
         }
         else
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " error in get_node" << std::endl;
             *err = EILSEQ;
         }
     }
 
     return node;
 }
-
-#include <iostream>
 
 /**
  * This function's previous recursive implementation was
@@ -182,14 +172,8 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     auto stack = std::deque<tr_variant*>{};
     auto key = std::optional<tr_quark>{};
 
-    std::cerr << "here is the full metainfo:" << std::endl;
-    for (auto const* walk = buf; walk != bufend; ++walk)
-        std::cerr << *walk;
-    std::cerr << std::endl;
-
     if ((buf_in == nullptr) || (bufend_in == nullptr) || (top == nullptr))
     {
-        std::cerr << "bad args in" << std::endl;
         return EINVAL;
     }
 
@@ -199,7 +183,6 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     {
         if (buf > bufend) /* no more text to parse... */
         {
-            std::cerr << "expected more data" << std::endl;
             err = EILSEQ;
         }
 
@@ -216,10 +199,8 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             if ((err = tr_bencParseInt(buf, bufend, &end, &val)) != 0)
             {
-                std::cerr << "error parsing int" << std::endl;
                 break;
             }
-            std::cerr << "got benc int " << val << std::endl;
 
             buf = end;
 
@@ -231,44 +212,36 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         else if (*buf == 'l') /* list */
         {
             tr_variant* v;
-            std::cerr << "list starting" << std::endl;
 
             ++buf;
 
             if ((v = get_node(stack, key, top, &err)) != nullptr)
             {
                 tr_variantInitList(v, 0);
-                std::cerr << "pushing to the stack" << std::endl;
                 stack.push_back(v);
             }
         }
         else if (*buf == 'd') /* dict */
         {
-            std::cerr << "dict starting" << std::endl;
-
             ++buf;
 
             tr_variant* const v = get_node(stack, key, top, &err);
             if (v != nullptr)
             {
                 tr_variantInitDict(v, 0);
-                std::cerr << "pushing to the stack" << std::endl;
                 stack.push_back(v);
             }
         }
         else if (*buf == 'e') /* end of list or dict */
         {
-            std::cerr << "end" << std::endl;
             ++buf;
 
             if (std::empty(stack) || key)
             {
-                std::cerr << "empty stack or pending key" << std::endl;
                 err = EILSEQ;
                 break;
             }
 
-            std::cerr << "popping the stack" << std::endl;
             stack.pop_back();
             if (std::empty(stack))
             {
@@ -284,21 +257,15 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)) != 0)
             {
-                std::cerr << "unable to parse string" << std::endl;
                 break;
             }
 
-            std::cerr << "got string length " << str_len << std::endl;
             buf = end;
 
             if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
             {
-                std::cerr << "I think it's a dict key" << std::endl;
-                std::cerr << "str_len " << str_len << std::endl;
                 auto const sv = std::string_view{ reinterpret_cast<char const*>(str), str_len };
-                std::cerr << "sv " << sv << std::endl;
                 key = tr_quark_new(sv);
-                std::cerr << "key quark " << *key << " -- [" << tr_quark_get_string(*key, nullptr) << ']' << std::endl;
             }
             else if ((v = get_node(stack, key, top, &err)) != nullptr)
             {
@@ -307,7 +274,6 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         }
         else /* invalid bencoded text... march past it */
         {
-            std::cerr << "invalid benc text; skipping 1 byte" << std::endl;
             ++buf;
         }
 
@@ -319,7 +285,6 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
     if (err == 0 && (top->type == 0 || !std::empty(stack)))
     {
-        std::cerr << "no top type or stack not empty" << std::endl;
         err = EILSEQ;
     }
 
