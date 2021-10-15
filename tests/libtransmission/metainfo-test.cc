@@ -109,7 +109,7 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 29>{
+    auto const tests = std::array<LocalTest, 29>{
         // skipped
         LocalTest{ "", 0, nullptr, false },
         { ".", 1, nullptr, false },
@@ -146,7 +146,7 @@ TEST(Metainfo, sanitize)
         { "compass", 7, "compass", false },
     };
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         bool is_adjusted;
         char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);

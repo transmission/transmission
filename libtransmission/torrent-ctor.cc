@@ -124,10 +124,11 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
-    auto err = int{};
+    uint8_t* metainfo;
+    size_t len;
+    int err;
 
-    auto len = size_t{};
-    uint8_t* const metainfo = tr_loadFile(filename, &len, nullptr);
+    metainfo = tr_loadFile(filename, &len, nullptr);
 
     if (metainfo != nullptr && len != 0)
     {
