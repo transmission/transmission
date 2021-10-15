@@ -199,10 +199,8 @@ public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
-        , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
-        , outMessagesBatchedAt{ 0 }
         , io{ io_in }
         , callback_{ callback }
         , callbackData_{ callbackData }
@@ -483,7 +481,7 @@ public:
         publish(e);
     }
 
-    void publishClientGotBitfield(tr_bitfield* bitfield)
+    void publishClientGotBitfield(Bitfield* bitfield)
     {
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -610,7 +608,7 @@ public:
 
     UniqueTimer pex_timer;
 
-    struct tr_peerIo* io = nullptr;
+    tr_peerIo* io = nullptr;
 
 private:
     bool is_active_[2] = { false, false };
@@ -878,10 +876,8 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
     return setSize;
 }
 
-static void updateFastSet(tr_peerMsgs* msgs)
+static void updateFastSet([[maybe_unused]] tr_peerMsgs* msgs)
 {
-    TR_UNUSED(msgs);
-
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
 
@@ -1000,7 +996,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     if (version_quark == 0)
     {
-        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX, TR_BAD_SIZE);
+        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX);
     }
 
     dbgmsg(msgs, "sending an ltep handshake");
@@ -1407,15 +1403,14 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
         msgs->state = AWAITING_BT_PIECE;
         return READ_NOW;
     }
-    else if (msgs->incoming.length != 1)
+
+    if (msgs->incoming.length != 1)
     {
         msgs->state = AWAITING_BT_MESSAGE;
         return READ_NOW;
     }
-    else
-    {
-        return readBtMessage(msgs, inbuf, inlen - 1);
-    }
+
+    return readBtMessage(msgs, inbuf, inlen - 1);
 }
 
 static void updatePeerProgress(tr_peerMsgsImpl* msgs)
@@ -1559,51 +1554,44 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         dbgmsg(msgs, "got incoming block header %u:%u->%u", req->index, req->offset, req->length);
         return READ_NOW;
     }
-    else
+
+    if (msgs->incoming.block == nullptr)
     {
-        int err;
-        size_t n;
-        size_t nLeft;
-        struct evbuffer* block_buffer;
-
-        if (msgs->incoming.block == nullptr)
-        {
-            msgs->incoming.block = evbuffer_new();
-        }
-
-        block_buffer = msgs->incoming.block;
-
-        /* read in another chunk of data */
-        nLeft = req->length - evbuffer_get_length(block_buffer);
-        n = std::min(nLeft, inlen);
-
-        tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
-
-        msgs->publishClientGotPieceData(n);
-        *setme_piece_bytes_read += n;
-        dbgmsg(
-            msgs,
-            "got %zu bytes for block %u:%u->%u ... %d remain",
-            n,
-            req->index,
-            req->offset,
-            req->length,
-            (int)(req->length - evbuffer_get_length(block_buffer)));
-
-        if (evbuffer_get_length(block_buffer) < req->length)
-        {
-            return READ_LATER;
-        }
-
-        /* pass the block along... */
-        err = clientGotBlock(msgs, block_buffer, req);
-        evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
-
-        /* cleanup */
-        req->length = 0;
-        msgs->state = AWAITING_BT_LENGTH;
-        return err != 0 ? READ_ERR : READ_NOW;
+        msgs->incoming.block = evbuffer_new();
     }
+
+    struct evbuffer* const block_buffer = msgs->incoming.block;
+
+    /* read in another chunk of data */
+    size_t const nLeft = req->length - evbuffer_get_length(block_buffer);
+    size_t const n = std::min(nLeft, inlen);
+
+    tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
+
+    msgs->publishClientGotPieceData(n);
+    *setme_piece_bytes_read += n;
+    dbgmsg(
+        msgs,
+        "got %zu bytes for block %u:%u->%u ... %d remain",
+        n,
+        req->index,
+        req->offset,
+        req->length,
+        (int)(req->length - evbuffer_get_length(block_buffer)));
+
+    if (evbuffer_get_length(block_buffer) < req->length)
+    {
+        return READ_LATER;
+    }
+
+    /* pass the block along... */
+    int const err = clientGotBlock(msgs, block_buffer, req);
+    evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
+
+    /* cleanup */
+    req->length = 0;
+    msgs->state = AWAITING_BT_LENGTH;
+    return err != 0 ? READ_ERR : READ_NOW;
 }
 
 static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
@@ -1679,9 +1667,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!tr_bitfieldHas(&msgs->have, ui32))
+        if (!msgs->have.readBit(ui32))
         {
-            tr_bitfieldAdd(&msgs->have, ui32);
+            msgs->have.setBit(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
@@ -1693,7 +1681,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            tr_bitfieldSetRaw(&msgs->have, tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
@@ -1787,8 +1775,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            tr_bitfieldSetHasAll(&msgs->have);
-            TR_ASSERT(tr_bitfieldHasAll(&msgs->have));
+            msgs->have.setHasAll();
+            TR_ASSERT(msgs->have.hasAll());
             msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
         }
@@ -1805,7 +1793,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            tr_bitfieldSetHasNone(&msgs->have);
+            msgs->have.setHasNone();
             msgs->publishClientGotHaveNone();
             updatePeerProgress(msgs);
         }
@@ -1901,7 +1889,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return err;
     }
 
-    tr_bitfieldAdd(&msgs->blame, req->index);
+    msgs->blame.setBit(req->index);
     msgs->publishGotBlock(req);
     return 0;
 }
@@ -2290,11 +2278,9 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError(tr_peerIo* io, short what, void* vmsgs)
+static void gotError([[maybe_unused]] tr_peerIo* io, short what, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-
-    TR_UNUSED(io);
 
     if ((what & BEV_EVENT_TIMEOUT) != 0)
     {
@@ -2668,11 +2654,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     }
 }
 
-static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
+static void pexPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vmsgs)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     sendPex(msgs);

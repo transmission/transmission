@@ -22,10 +22,8 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-static void handle_sigchld(int i)
+static void handle_sigchld([[maybe_unused]] int i)
 {
-    TR_UNUSED(i);
-
     int rc;
 
     do
@@ -89,7 +87,7 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     int child_errno;
     ssize_t count;
 
-    TR_STATIC_ASSERT(sizeof(child_errno) == sizeof(errno), "");
+    static_assert(sizeof(child_errno) == sizeof(errno), "");
 
     do
     {

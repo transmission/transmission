@@ -66,7 +66,7 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, int n)
 }
 
 template<typename T, typename... ArgTypes>
-constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T const t, ArgTypes... args)
+constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, ArgTypes... args)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, t);
     return buf_append(buf, buflen, args...);
@@ -250,9 +250,8 @@ constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view n
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', charints[id[5]], '.', charints[id[6]]);
 }
 
-constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, [[maybe_unused]] char const* id)
 {
-    TR_UNUSED(id);
     buf_append(buf, buflen, name);
 }
 

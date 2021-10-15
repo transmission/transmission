@@ -76,32 +76,23 @@ void tr_dh_secret_free(tr_dh_secret_t handle)
 
 #ifdef TR_CRYPTO_X509_FALLBACK
 
-tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
+tr_x509_store_t tr_ssl_get_x509_store([[maybe_unused]] tr_ssl_ctx_t handle)
 {
-    TR_UNUSED(handle);
-
     return nullptr;
 }
 
-bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
+bool tr_x509_store_add([[maybe_unused]] tr_x509_store_t handle, [[maybe_unused]] tr_x509_cert_t cert)
 {
-    TR_UNUSED(handle);
-    TR_UNUSED(cert);
-
     return false;
 }
 
-tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
+tr_x509_cert_t tr_x509_cert_new([[maybe_unused]] void const* der, [[maybe_unused]] size_t der_length)
 {
-    TR_UNUSED(der);
-    TR_UNUSED(der_length);
-
     return nullptr;
 }
 
-void tr_x509_cert_free(tr_x509_cert_t handle)
+void tr_x509_cert_free([[maybe_unused]] tr_x509_cert_t handle)
 {
-    TR_UNUSED(handle);
 }
 
 #endif /* TR_CRYPTO_X509_FALLBACK */

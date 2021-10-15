@@ -103,14 +103,13 @@ static int bootstrap_af(tr_session* session)
     {
         return AF_INET;
     }
-    else if (bootstrap_done(session, AF_INET))
+
+    if (bootstrap_done(session, AF_INET))
     {
         return AF_INET6;
     }
-    else
-    {
-        return 0;
-    }
+
+    return 0;
 }
 
 static void bootstrap_from_name(char const* name, tr_port port, int af)
@@ -608,7 +607,8 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
-    else if (address->type == TR_AF_INET6)
+
+    if (address->type == TR_AF_INET6)
     {
         struct sockaddr_in6 sin6;
         memset(&sin6, 0, sizeof(sin6));
@@ -646,10 +646,13 @@ char const* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(void* ignore, int event, unsigned char const* info_hash, void const* data, size_t data_len)
+static void callback(
+    [[maybe_unused]] void* ignore,
+    int event,
+    unsigned char const* info_hash,
+    void const* data,
+    size_t data_len)
 {
-    TR_UNUSED(ignore);
-
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
         tr_torrent* tor;
@@ -829,11 +832,8 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
-static void timer_callback(evutil_socket_t s, short type, void* session)
+static void timer_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* session)
 {
-    TR_UNUSED(s);
-    TR_UNUSED(type);
-
     tr_dhtCallback(nullptr, 0, nullptr, 0, session);
 }
 
@@ -843,11 +843,8 @@ static void timer_callback(evutil_socket_t s, short type, void* session)
    free to add support to your private copy as long as you don't
    redistribute it. */
 
-int dht_blacklisted(struct sockaddr const* sa, int salen)
+int dht_blacklisted([[maybe_unused]] struct sockaddr const* sa, [[maybe_unused]] int salen)
 {
-    TR_UNUSED(sa);
-    TR_UNUSED(salen);
-
     return 0;
 }
 

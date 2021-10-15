@@ -17,6 +17,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -60,6 +61,8 @@
 ***/
 
 #define tr_deeplog_tor(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
+
+using namespace std::literals;
 
 /***
 ****
@@ -196,7 +199,7 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tr_bandwidthSetDesiredSpeed_Bps(&tor->bandwidth, dir, Bps))
+    if (tor->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
     {
         tr_torrentSetDirty(tor);
     }
@@ -212,7 +215,7 @@ unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tr_bandwidthGetDesiredSpeed_Bps(&tor->bandwidth, dir);
+    return tor->bandwidth->getDesiredSpeedBytesPerSecond(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -228,7 +231,7 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tr_bandwidthSetLimited(&tor->bandwidth, dir, do_use))
+    if (tor->bandwidth->setLimited(dir, do_use))
     {
         tr_torrentSetDirty(tor);
     }
@@ -238,19 +241,14 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_bandwidthIsLimited(&tor->bandwidth, dir);
+    return tor->bandwidth->isLimited(dir);
 }
 
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool doUse)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    bool changed;
-
-    changed = tr_bandwidthHonorParentLimits(&tor->bandwidth, TR_UP, doUse);
-    changed |= tr_bandwidthHonorParentLimits(&tor->bandwidth, TR_DOWN, doUse);
-
-    if (changed)
+    if (tor->bandwidth->honorParentLimits(TR_UP, doUse) || tor->bandwidth->honorParentLimits(TR_DOWN, doUse))
     {
         tr_torrentSetDirty(tor);
     }
@@ -260,7 +258,7 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_bandwidthAreParentLimitsHonored(&tor->bandwidth, TR_UP);
+    return tor->bandwidth->areParentLimitsHonored(TR_UP);
 }
 
 /***
@@ -537,10 +535,8 @@ static constexpr void tr_torrentClearError(tr_torrent* tor)
     tor->errorTracker[0] = '\0';
 }
 
-static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* user_data)
+static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(user_data);
-
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
@@ -850,6 +846,18 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+static void torrentCallScript(tr_torrent const* tor, char const* script);
+
+static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+{
+    auto* session = tor->session;
+
+    if (tr_sessionIsScriptEnabled(session, type))
+    {
+        torrentCallScript(tor, tr_sessionGetScript(session, type));
+    }
+}
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -886,9 +894,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tor->incompleteDir = tr_strdup(dir);
     }
 
-    tr_bandwidthConstruct(&tor->bandwidth, &session->bandwidth);
+    tor->bandwidth = new Bandwidth(session->bandwidth);
 
-    tor->bandwidth.priority = tr_ctorGetBandwidthPriority(ctor);
+    tor->bandwidth->setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
@@ -970,6 +978,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
+        if (tr_torrentHasMetadata(tor))
+        {
+            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
+        }
+
         if (!tr_torrentHasMetadata(tor) && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
@@ -1301,10 +1314,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peerFromCount[i];
     }
 
-    s->rawUploadSpeed_KBps = toSpeedKBps(tr_bandwidthGetRawSpeed_Bps(&tor->bandwidth, now, TR_UP));
-    s->rawDownloadSpeed_KBps = toSpeedKBps(tr_bandwidthGetRawSpeed_Bps(&tor->bandwidth, now, TR_DOWN));
-    pieceUploadSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&tor->bandwidth, now, TR_UP);
-    pieceDownloadSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&tor->bandwidth, now, TR_DOWN);
+    s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_UP));
+    s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_DOWN));
+    pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
+    pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_DOWN);
     s->pieceUploadSpeed_KBps = toSpeedKBps(pieceUploadSpeed_Bps);
     s->pieceDownloadSpeed_KBps = toSpeedKBps(pieceDownloadSpeed_Bps);
 
@@ -1465,7 +1478,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
             /* the middle blocks */
             if (first + 1 < last)
             {
-                uint64_t u = tr_bitfieldCountRange(&tor->completion.blockBitfield, first + 1, last);
+                uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
                 u *= tor->blockSize;
                 total += u;
             }
@@ -1507,10 +1520,8 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
     return files;
 }
 
-void tr_torrentFilesFree(tr_file_stat* files, tr_file_index_t fileCount)
+void tr_torrentFilesFree(tr_file_stat* files, [[maybe_unused]] tr_file_index_t fileCount)
 {
-    TR_UNUSED(fileCount);
-
     tr_free(files);
 }
 
@@ -1532,10 +1543,8 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
     return tr_peerMgrPeerStats(tor, peerCount);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, int peerCount)
+void tr_torrentPeersFree(tr_peer_stat* peers, [[maybe_unused]] int peerCount)
 {
-    TR_UNUSED(peerCount);
-
     tr_free(peers);
 }
 
@@ -1638,7 +1647,7 @@ static void freeTorrent(tr_torrent* tor)
 
     TR_ASSERT(queueIsSequenced(session));
 
-    tr_bandwidthDestruct(&tor->bandwidth);
+    delete tor->bandwidth;
 
     tr_metainfoFree(inf);
     delete tor;
@@ -1931,6 +1940,8 @@ static void stopTorrent(void* vtor)
         tr_logAddTorInfo(tor, "%s", "Magnet Verify");
         refreshCurrentDir(tor);
         tr_torrentVerify(tor, nullptr, nullptr);
+
+        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
     }
 }
 
@@ -2227,11 +2238,10 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         tr_torrentSetDirty(tor);
 
-        if (tr_torrentIsSeed(tor) && tr_sessionIsTorrentDoneScriptEnabled(tor->session))
+        if (tr_torrentIsSeed(tor))
         {
             tr_torrentSave(tor);
-
-            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
 
@@ -2444,7 +2454,7 @@ tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->bandwidth.priority;
+    return tor->bandwidth->getPriority();
 }
 
 void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
@@ -2452,9 +2462,9 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));
 
-    if (tor->bandwidth.priority != priority)
+    if (tor->bandwidth->getPriority() != priority)
     {
-        tor->bandwidth.priority = priority;
+        tor->bandwidth->setPriority(priority);
 
         tr_torrentSetDirty(tor);
     }
@@ -2892,30 +2902,29 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static bool isJunkFile(char const* base)
+static constexpr bool isJunkFile(std::string_view base)
 {
-    static char const* files[] = {
-        ".DS_Store",
-        "desktop.ini",
-        "Thumbs.db",
+    auto constexpr Files = std::array<std::string_view, 3>{
+        ".DS_Store"sv,
+        "Thumbs.db"sv,
+        "desktop.ini"sv,
     };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(files); ++i)
+    // TODO(C++20): std::any_of is constexpr in C++20
+    for (auto const& file : Files)
     {
-        if (strcmp(base, files[i]) == 0)
+        if (file == base)
         {
             return true;
         }
     }
 
 #ifdef __APPLE__
-
-    /* check for resource forks. <http://support.apple.com/kb/TA20578> */
-    if (memcmp(base, "._", 2) == 0)
+    // check for resource forks. <http://support.apple.com/kb/TA20578>
+    if (base.find("._") == 0)
     {
         return true;
     }
-
 #endif
 
     return false;

@@ -131,19 +131,15 @@ typedef NS_ENUM(unsigned int, sortOrderTag) { //
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
 
-static void altSpeedToggledCallback(tr_session* handle, bool active, bool byUser, void* controller)
+static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
 {
-    TR_UNUSED(handle);
-
     NSDictionary* dict = [[NSDictionary alloc] initWithObjects:@[ @(active), @(byUser) ] forKeys:@[ @"Active", @"ByUser" ]];
     [(__bridge Controller*)controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
                                                     waitUntilDone:NO];
 }
 
-static tr_rpc_callback_status rpcCallback(tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
+static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, tr_rpc_callback_type type, struct tr_torrent* torrentStruct, void* controller)
 {
-    TR_UNUSED(handle);
-
     [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
 }

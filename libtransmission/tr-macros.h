@@ -52,17 +52,6 @@
 ****
 ***/
 
-// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
-#define TR_UNUSED(x) \
-    do \
-    { \
-        ((void)sizeof(x)); \
-    } while (0)
-
-/***
-****
-***/
-
 #if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
 #define TR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define TR_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -74,14 +63,6 @@
 /***
 ****
 ***/
-
-#if __has_attribute(__noreturn__) || TR_GNUC_CHECK_VERSION(2, 5)
-#define TR_NORETURN __attribute__((__noreturn__))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
 
 #if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
 #define TR_DEPRECATED __attribute__((__deprecated__))
@@ -119,26 +100,6 @@
 #define TR_GNUC_MALLOC __attribute__((__malloc__))
 #else
 #define TR_GNUC_MALLOC
-#endif
-
-/***
-****
-***/
-
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(__cplusplus) || defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert) || TR_GNUC_CHECK_VERSION(4, 6)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) \
-    do \
-    { \
-        ((void)sizeof(x)); \
-    } while (0)
 #endif
 
 /***

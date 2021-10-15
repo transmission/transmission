@@ -18,6 +18,7 @@
 #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
 #endif
 
+#include API_HEADER(options.h)
 #include API_HEADER_CRYPT(dh.h)
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)
@@ -204,10 +205,12 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
     tr_free(handle);
 }
 
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
+bool tr_dh_make_key(
+    tr_dh_ctx_t raw_handle,
+    [[maybe_unused]] size_t private_key_length,
+    uint8_t* public_key,
+    size_t* public_key_length)
 {
-    TR_UNUSED(private_key_length);
-
     TR_ASSERT(raw_handle != nullptr);
     TR_ASSERT(public_key != nullptr);
 

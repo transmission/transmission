@@ -72,10 +72,8 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
 ****
 ***/
 
-static BOOL WINAPI handle_console_ctrl(DWORD control_type)
+static BOOL WINAPI handle_console_ctrl([[maybe_unused]] DWORD control_type)
 {
-    TR_UNUSED(control_type);
-
     callbacks->on_stop(callback_arg);
     return TRUE;
 }
@@ -147,12 +145,12 @@ static void stop_service(void)
     }
 }
 
-static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LPVOID event_data, LPVOID context)
+static DWORD WINAPI handle_service_ctrl(
+    DWORD control_code,
+    [[maybe_unused]] DWORD event_type,
+    [[maybe_unused]] LPVOID event_data,
+    [[maybe_unused]] LPVOID context)
 {
-    TR_UNUSED(event_type);
-    TR_UNUSED(event_data);
-    TR_UNUSED(context);
-
     switch (control_code)
     {
     case SERVICE_CONTROL_PRESHUTDOWN:
@@ -173,18 +171,13 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LP
     return ERROR_CALL_NOT_IMPLEMENTED;
 }
 
-static unsigned int __stdcall service_thread_main(void* context)
+static unsigned int __stdcall service_thread_main([[maybe_unused]] void* context)
 {
-    TR_UNUSED(context);
-
     return callbacks->on_start(callback_arg, false);
 }
 
-static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
+static VOID WINAPI service_main([[maybe_unused]] DWORD argc, [[maybe_unused]] LPWSTR* argv)
 {
-    TR_UNUSED(argc);
-    TR_UNUSED(argv);
-
     status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, nullptr);
 
     if (status_handle == nullptr)

@@ -260,10 +260,8 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
     return ret;
 }
 
-static bool create_dir(char const* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
+static bool create_dir(char const* path, int flags, [[maybe_unused]] int permissions, bool okay_if_exists, tr_error** error)
 {
-    TR_UNUSED(permissions);
-
     TR_ASSERT(path != nullptr);
 
     bool ret;
@@ -877,10 +875,8 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
     return ret;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, [[maybe_unused]] int permissions, tr_error** error)
 {
-    TR_UNUSED(permissions);
-
     TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
 
@@ -1002,9 +998,9 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
 {
-    TR_STATIC_ASSERT(TR_SEEK_SET == FILE_BEGIN, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_CUR == FILE_CURRENT, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_END == FILE_END, "values should match");
+    static_assert(TR_SEEK_SET == FILE_BEGIN, "values should match");
+    static_assert(TR_SEEK_CUR == FILE_CURRENT, "values should match");
+    static_assert(TR_SEEK_END == FILE_END, "values should match");
 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
@@ -1211,14 +1207,13 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
+bool tr_sys_file_advise(
+    [[maybe_unused]] tr_sys_file_t handle,
+    [[maybe_unused]] uint64_t offset,
+    [[maybe_unused]] uint64_t size,
+    [[maybe_unused]] tr_sys_file_advice_t advice,
+    [[maybe_unused]] tr_error** error)
 {
-    TR_UNUSED(handle);
-    TR_UNUSED(offset);
-    TR_UNUSED(size);
-    TR_UNUSED(advice);
-    TR_UNUSED(error);
-
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
     TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
@@ -1281,10 +1276,8 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     return ret;
 }
 
-bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
+bool tr_sys_file_unmap(void const* address, [[maybe_unused]] uint64_t size, tr_error** error)
 {
-    TR_UNUSED(size);
-
     TR_ASSERT(address != nullptr);
     TR_ASSERT(size > 0);
 
@@ -1394,7 +1387,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
 #ifndef __clang__
     /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == nullptr, "values should match");
+    static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
 #endif
 
     TR_ASSERT(path != nullptr);

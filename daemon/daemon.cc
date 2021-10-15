@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* atoi */
+#include <string_view>
+#include <typeinfo>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -33,22 +35,20 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
+using namespace std::literals;
+
 #ifdef USE_SYSTEMD
 
 #include <systemd/sd-daemon.h>
 
 #else
 
-static void sd_notify(int status, char const* str)
+static void sd_notify([[maybe_unused]] int status, [[maybe_unused]] char const* str)
 {
-    TR_UNUSED(status);
-    TR_UNUSED(str);
 }
 
-static void sd_notifyf(int status, char const* fmt, ...)
+static void sd_notifyf([[maybe_unused]] int status, [[maybe_unused]] char const* fmt, ...)
 {
-    TR_UNUSED(status);
-    TR_UNUSED(fmt);
 }
 
 #endif
@@ -282,7 +282,13 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
+static void printMessage(
+    tr_sys_file_t file,
+    [[maybe_unused]] int level,
+    char const* name,
+    char const* message,
+    char const* filename,
+    int line)
 {
     if (file != TR_BAD_SYS_FILE)
     {
@@ -339,10 +345,6 @@ static void printMessage(tr_sys_file_t file, int level, char const* name, char c
         }
     }
 
-#else
-
-    TR_UNUSED(level);
-
 #endif
 }
 
@@ -378,26 +380,18 @@ static void reportStatus(void)
     }
 }
 
-static void periodicUpdate(evutil_socket_t fd, short what, void* context)
+static void periodicUpdate([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, [[maybe_unused]] void* context)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-    TR_UNUSED(context);
-
     pumpLogMessages(logfile);
     reportStatus();
 }
 
 static tr_rpc_callback_status on_rpc_callback(
-    tr_session* session,
+    [[maybe_unused]] tr_session* session,
     tr_rpc_callback_type type,
-    struct tr_torrent* tor,
-    void* user_data)
+    [[maybe_unused]] struct tr_torrent* tor,
+    [[maybe_unused]] void* user_data)
 {
-    TR_UNUSED(session);
-    TR_UNUSED(tor);
-    TR_UNUSED(user_data);
-
     if (type == TR_RPC_SESSION_CLOSE)
     {
         event_base_loopexit(ev_base, nullptr);
@@ -621,10 +615,8 @@ struct daemon_data
     bool paused;
 };
 
-static void daemon_reconfigure(void* arg)
+static void daemon_reconfigure([[maybe_unused]] void* arg)
 {
-    TR_UNUSED(arg);
-
     if (mySession == nullptr)
     {
         tr_logAddInfo("Deferring reload until session is fully started.");
@@ -652,19 +644,13 @@ static void daemon_reconfigure(void* arg)
     }
 }
 
-static void daemon_stop(void* arg)
+static void daemon_stop([[maybe_unused]] void* arg)
 {
-    TR_UNUSED(arg);
-
     event_base_loopexit(ev_base, nullptr);
 }
 
-static int daemon_start(void* varg, bool foreground)
+static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 {
-#ifndef HAVE_SYSLOG
-    TR_UNUSED(foreground);
-#endif
-
     bool boolVal;
     char const* pid_filename;
     bool pidfile_created = false;
@@ -901,8 +887,8 @@ EXIT_EARLY:
 
 int tr_main(int argc, char* argv[])
 {
-    key_pidfile = tr_quark_new("pidfile", TR_BAD_SIZE);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", TR_BAD_SIZE);
+    key_pidfile = tr_quark_new("pidfile"sv);
+    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic"sv);
 
     struct daemon_data data;
     bool foreground;

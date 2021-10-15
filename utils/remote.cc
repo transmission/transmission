@@ -798,10 +798,8 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
-static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* stream)
+static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, [[maybe_unused]] void* stream)
 {
-    TR_UNUSED(stream);
-
     auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";

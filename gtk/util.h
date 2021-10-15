@@ -54,6 +54,13 @@ extern char const* speed_T_str;
 
 #endif
 
+// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
+#define TR_UNUSED(x) \
+    do \
+    { \
+        ((void)sizeof(x)); \
+    } while (0)
+
 enum
 {
     GTR_UNICODE_UP,

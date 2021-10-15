@@ -143,11 +143,8 @@ static void set_evtimer_from_status(tr_shared* s)
     }
 }
 
-static void onTimer(evutil_socket_t fd, short what, void* vshared)
+static void onTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vshared)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(what);
-
     auto* s = static_cast<tr_shared*>(vshared);
 
     TR_ASSERT(s != nullptr);

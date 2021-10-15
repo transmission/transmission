@@ -367,11 +367,8 @@ static void add_time_header(struct evkeyvalq* headers, char const* key, time_t v
     evhttp_add_header(headers, key, buf);
 }
 
-static void evbuffer_ref_cleanup_tr_free(void const* data, size_t datalen, void* extra)
+static void evbuffer_ref_cleanup_tr_free([[maybe_unused]] void const* data, [[maybe_unused]] size_t datalen, void* extra)
 {
-    TR_UNUSED(data);
-    TR_UNUSED(datalen);
-
     tr_free(extra);
 }
 
@@ -475,10 +472,8 @@ struct rpc_response_data
     struct tr_rpc_server* server;
 };
 
-static void rpc_response_func(tr_session* session, tr_variant* response, void* user_data)
+static void rpc_response_func([[maybe_unused]] tr_session* session, tr_variant* response, void* user_data)
 {
-    TR_UNUSED(session);
-
     auto* data = static_cast<struct rpc_response_data*>(user_data);
     struct evbuffer* response_buf = tr_variantToBuf(response, TR_VARIANT_FMT_JSON_LEAN);
     struct evbuffer* buf = evbuffer_new();
@@ -694,18 +689,21 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         server->loginattempts = 0;
 
-        if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
+        size_t const server_url_len = strlen(server->url);
+        char const* const location = strncmp(req->uri, server->url, server_url_len) == 0 ? req->uri + server_url_len : nullptr;
+
+        if (location == nullptr || location[0] == '\0' || strcmp(location, "web") == 0)
         {
-            char* location = tr_strdup_printf("%sweb/", server->url);
-            evhttp_add_header(req->output_headers, "Location", location);
+            char* new_location = tr_strdup_printf("%sweb/", server->url);
+            evhttp_add_header(req->output_headers, "Location", new_location);
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
-            tr_free(location);
+            tr_free(new_location);
         }
-        else if (strncmp(req->uri + strlen(server->url), "web/", 4) == 0)
+        else if (strncmp(location, "web/", 4) == 0)
         {
             handle_web_client(req, server);
         }
-        else if (strcmp(req->uri + strlen(server->url), "upload") == 0)
+        else if (strcmp(location, "upload") == 0)
         {
             handle_upload(req, server);
         }
@@ -752,7 +750,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
 #endif
 
-        else if (strncmp(req->uri + strlen(server->url), "rpc", 3) == 0)
+        else if (strncmp(location, "rpc", 3) == 0)
         {
             handle_rpc(req, server);
         }
@@ -775,11 +773,8 @@ enum
 
 static void startServer(void* vserver);
 
-static void rpc_server_on_start_retry(evutil_socket_t fd, short type, void* context)
+static void rpc_server_on_start_retry([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short type, void* context)
 {
-    TR_UNUSED(fd);
-    TR_UNUSED(type);
-
     startServer(context);
 }
 
@@ -1158,14 +1153,22 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_url;
+    size_t url_len;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStr(settings, key, &str, &url_len))
     {
         missing_settings_key(key);
     }
     else
     {
-        s->url = tr_strdup(str);
+        if (url_len == 0 || str[url_len - 1] != '/')
+        {
+            s->url = tr_strdup_printf("%s/", str);
+        }
+        else
+        {
+            s->url = tr_strdup(str);
+        }
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

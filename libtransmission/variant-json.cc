@@ -6,9 +6,10 @@
  *
  */
 
+#include <array>
 #include <ctype.h>
-#include <errno.h> /* EILSEQ, EINVAL */
 #include <deque>
+#include <errno.h> /* EILSEQ, EINVAL */
 #include <math.h> /* fabs() */
 #include <stdio.h>
 #include <string.h>
@@ -46,7 +47,7 @@ struct json_wrapper_data
      * e.g. they may all be objects with the same set of keys. So when
      * a container is popped off the stack, remember its size to use as
      * a preallocation heuristic for the next container at that depth. */
-    size_t preallocGuess[MAX_DEPTH];
+    std::array<size_t, MAX_DEPTH> preallocGuess;
 };
 
 static tr_variant* get_node(struct jsonsl_st* jsn)
@@ -66,7 +67,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     }
     else if (tr_variantIsDict(parent) && data->key != nullptr)
     {
-        node = tr_variantDictAdd(parent, tr_quark_new(data->key, data->keylen));
+        node = tr_variantDictAdd(parent, tr_quark_new(std::string_view{ data->key, data->keylen }));
 
         data->key = nullptr;
         data->keylen = 0;
@@ -75,10 +76,12 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     return node;
 }
 
-static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
+static void error_handler(
+    jsonsl_t jsn,
+    jsonsl_error_t error,
+    [[maybe_unused]] struct jsonsl_state_st* state,
+    jsonsl_char_t const* buf)
 {
-    TR_UNUSED(state);
-
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if (data->source != nullptr)
@@ -104,11 +107,12 @@ static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
     return 0; /* bail */
 }
 
-static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
+static void action_callback_PUSH(
+    jsonsl_t jsn,
+    [[maybe_unused]] jsonsl_action_t action,
+    struct jsonsl_state_st* state,
+    [[maybe_unused]] jsonsl_char_t const* buf)
 {
-    TR_UNUSED(action);
-    TR_UNUSED(buf);
-
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
@@ -272,46 +276,37 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, 
 
 static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, size_t* len, struct evbuffer* buf)
 {
-    char const* ret;
-    char const* in_begin;
-    char const* in_end;
-    size_t in_len;
-
     /* figure out where the string is */
-    in_begin = jsn->base + state->pos_begin;
-
+    char const* in_begin = jsn->base + state->pos_begin;
     if (*in_begin == '"')
     {
         in_begin++;
     }
 
-    in_end = jsn->base + state->pos_cur;
-    in_len = in_end - in_begin;
+    char const* const in_end = jsn->base + state->pos_cur;
+    size_t const in_len = in_end - in_begin;
 
     if (memchr(in_begin, '\\', in_len) == nullptr)
     {
         /* it's not escaped */
-        ret = in_begin;
         *len = in_len;
-    }
-    else
-    {
-        ret = extract_escaped_string(in_begin, in_len, len, buf);
+        return in_begin;
     }
 
-    return ret;
+    return extract_escaped_string(in_begin, in_len, len, buf);
 }
 
-static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
+static void action_callback_POP(
+    jsonsl_t jsn,
+    [[maybe_unused]] jsonsl_action_t action,
+    struct jsonsl_state_st* state,
+    [[maybe_unused]] jsonsl_char_t const* buf)
 {
-    TR_UNUSED(action);
-    TR_UNUSED(buf);
-
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     if (state->type == JSONSL_T_STRING)
     {
-        size_t len;
+        auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
         tr_variantInitStr(get_node(jsn), str, len);
         data->has_content = true;
@@ -361,11 +356,9 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
 
 int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant, char const** setme_end)
 {
-    int error;
-    jsonsl_t jsn;
-    struct json_wrapper_data data;
+    auto data = json_wrapper_data{};
 
-    jsn = jsonsl_new(MAX_DEPTH);
+    jsonsl_t jsn = jsonsl_new(MAX_DEPTH);
     jsn->action_callback_PUSH = action_callback_PUSH;
     jsn->action_callback_POP = action_callback_POP;
     jsn->error_callback = error_callback;
@@ -380,10 +373,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();
-    for (int i = 0; i < MAX_DEPTH; ++i)
-    {
-        data.preallocGuess[i] = 0;
-    }
+    data.preallocGuess = {};
 
     /* parse it */
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
@@ -401,7 +391,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     }
 
     /* cleanup */
-    error = data.error;
+    int const error = data.error;
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
     jsonsl_destroy(jsn);
