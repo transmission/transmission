@@ -1371,27 +1371,27 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(char const* str, char const* const end, number_range& range)
+static bool parseNumberSection(std::string_view str, number_range& range)
 {
     bool success;
     auto const error = errno;
 
 #if defined(HAVE_CHARCONV)
-    auto result = std::from_chars(str, end, range.low);
+    auto result = std::from_chars(std::begin(str), std::end(str), range.low);
     success = result.ec == std::errc{};
     if (success)
     {
         range.high = range.low;
-        if (result.ptr != end && *result.ptr == '-')
+        if (result.ptr != std::end(str) && *result.ptr == '-')
         {
-            result = std::from_chars(result.ptr + 1, end, range.high);
+            result = std::from_chars(result.ptr + 1, std::end(str), range.high);
             success = result.ec == std::errc{};
         }
     }
 #else
     try
     {
-        auto tmp = std::string(str, end);
+        auto tmp = std::string(str);
         auto pos = size_t{};
         range.low = range.high = std::stoi(tmp, &pos);
         if (pos != std::size(tmp) && tmp[pos] == '-')
@@ -1418,26 +1418,27 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
  * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
+std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
 
-    auto const* const end = str + (len != TR_BAD_SIZE ? len : strlen(str));
-    for (auto const* walk = str; walk < end;)
+    for (;;)
     {
-        auto delim = std::find(walk, end, ',');
+        auto const delim = str.find(',');
         auto range = number_range{};
-        if (!parseNumberSection(walk, delim, range))
+        if (!parseNumberSection(str.substr(0, delim), range))
         {
             break;
         }
-
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-
-        walk = delim + 1;
+        if (delim == std::string_view::npos)
+        {
+            break;
+        }
+        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };

@@ -645,7 +645,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
     if (arg != nullptr)
     {
-        for (int& day : tr_parseNumberRange(arg, TR_BAD_SIZE))
+        for (int& day : tr_parseNumberRange(arg))
         {
             if (day < 0 || day > 7)
             {
@@ -706,7 +706,7 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 
     if (strcmp(arg, "all") != 0)
     {
-        for (auto const& idx : tr_parseNumberRange(arg, TR_BAD_SIZE))
+        for (auto const& idx : tr_parseNumberRange(arg))
         {
             tr_variantListAddInt(files, idx);
         }

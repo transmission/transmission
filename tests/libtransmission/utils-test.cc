@@ -6,6 +6,9 @@
  *
  */
 
+#include <string_view>
+#include <typeinfo>
+
 #ifdef _WIN32
 #include <windows.h>
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
@@ -30,8 +33,8 @@
 #include <string>
 
 using ::libtransmission::test::makeString;
-
 using UtilsTest = ::testing::Test;
+using namespace std::literals;
 
 TEST_F(UtilsTest, trStripPositionalArgs)
 {
@@ -125,20 +128,20 @@ TEST_F(UtilsTest, numbers)
         return ss.str();
     };
 
-    auto numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE);
+    auto numbers = tr_parseNumberRange("1-10,13,16-19"sv);
     EXPECT_EQ(std::string("1 2 3 4 5 6 7 8 9 10 13 16 17 18 19 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE);
+    numbers = tr_parseNumberRange("1-5,3-7,2-6"sv);
     EXPECT_EQ(std::string("1 2 3 4 5 6 7 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE);
+    numbers = tr_parseNumberRange("1-Hello"sv);
     auto const empty_string = std::string{};
     EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE);
+    numbers = tr_parseNumberRange("1-"sv);
     EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE);
+    numbers = tr_parseNumberRange("Hello"sv);
     EXPECT_EQ(empty_string, tostring(numbers));
 }
 
