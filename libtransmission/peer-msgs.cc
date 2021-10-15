@@ -996,7 +996,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     if (version_quark == 0)
     {
-        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX, TR_BAD_SIZE);
+        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX);
     }
 
     dbgmsg(msgs, "sending an ltep handshake");

@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <string_view>
+
 #include "tr-macros.h"
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
@@ -433,4 +436,4 @@ char const* tr_quark_get_string(tr_quark quark, size_t* len);
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(void const* str, size_t len);
+tr_quark tr_quark_new(std::string_view);

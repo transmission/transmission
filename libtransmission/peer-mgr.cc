@@ -2019,7 +2019,7 @@ static bool myHandshakeDoneCB(
                 if (peer_id != nullptr)
                 {
                     char buf[128];
-                    client = tr_quark_new(tr_clientForId(buf, sizeof(buf), peer_id), TR_BAD_SIZE);
+                    client = tr_quark_new(tr_clientForId(buf, sizeof(buf), peer_id));
                 }
 
                 /* this steals its refcount too, which is balanced by our unref in peerDelete() */

@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <cstdlib> /* strtol */
 #include <cstring> /* strcmp */
+#include <string_view>
 
 #ifndef ZLIB_CONST
 #define ZLIB_CONST
@@ -998,7 +999,7 @@ static char const* torrentGet(
             size_t len;
             if (tr_variantGetStr(tr_variantListChild(fields, i), &strVal, &len))
             {
-                keys[keyCount++] = tr_quark_new(strVal, len);
+                keys[keyCount++] = tr_quark_new(std::string_view{ strVal, len });
             }
         }
 
@@ -2890,15 +2891,14 @@ void tr_rpc_request_exec_uri(
 
         if (delim != nullptr)
         {
-            char* key = tr_strndup(pch, (size_t)(delim - pch));
-            bool isArg = strcmp(key, "method") != 0 && strcmp(key, "tag") != 0;
+            auto const key = std::string_view{ pch, size_t(delim - pch) };
+            bool isArg = key != "method" && key != "tag";
             tr_variant* parent = isArg ? args : &top;
 
             tr_rpc_parse_list_str(
-                tr_variantDictAdd(parent, tr_quark_new(key, (size_t)(delim - pch))),
+                tr_variantDictAdd(parent, tr_quark_new(key)),
                 delim + 1,
                 next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
-            tr_free(key);
         }
 
         pch = next != nullptr ? next + 1 : nullptr;

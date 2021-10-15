@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* atoi */
+#include <string_view>
+#include <typeinfo>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -32,6 +34,8 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
+
+using namespace std::literals;
 
 #ifdef USE_SYSTEMD
 
@@ -883,8 +887,8 @@ EXIT_EARLY:
 
 int tr_main(int argc, char* argv[])
 {
-    key_pidfile = tr_quark_new("pidfile", TR_BAD_SIZE);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", TR_BAD_SIZE);
+    key_pidfile = tr_quark_new("pidfile"sv);
+    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic"sv);
 
     struct daemon_data data;
     bool foreground;

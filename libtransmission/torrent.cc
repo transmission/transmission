@@ -17,6 +17,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -60,6 +61,8 @@
 ***/
 
 #define tr_deeplog_tor(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
+
+using namespace std::literals;
 
 /***
 ****
@@ -2902,9 +2905,9 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 static constexpr bool isJunkFile(std::string_view base)
 {
     auto constexpr Files = std::array<std::string_view, 3>{
-        ".DS_Store",
-        "Thumbs.db",
-        "desktop.ini",
+        ".DS_Store"sv,
+        "Thumbs.db"sv,
+        "desktop.ini"sv,
     };
 
     // TODO(C++20): std::any_of is constexpr in C++20

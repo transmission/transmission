@@ -67,7 +67,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     }
     else if (tr_variantIsDict(parent) && data->key != nullptr)
     {
-        node = tr_variantDictAdd(parent, tr_quark_new(data->key, data->keylen));
+        node = tr_variantDictAdd(parent, tr_quark_new(std::string_view{ data->key, data->keylen }));
 
         data->key = nullptr;
         data->keylen = 0;

@@ -18,8 +18,12 @@
 #include <cmath> // lrint()
 #include <cctype> // isspace()
 #include <string>
+#include <string_view>
+#include <typeinfo>
 
 #include "gtest/gtest.h"
+
+using namespace std::literals;
 
 class VariantTest : public ::testing::Test
 {
@@ -371,14 +375,14 @@ TEST_F(VariantTest, bencToJson)
 
 TEST_F(VariantTest, merge)
 {
-    auto const i1 = tr_quark_new("i1", 2);
-    auto const i2 = tr_quark_new("i2", 2);
-    auto const i3 = tr_quark_new("i3", 2);
-    auto const i4 = tr_quark_new("i4", 2);
-    auto const s5 = tr_quark_new("s5", 2);
-    auto const s6 = tr_quark_new("s6", 2);
-    auto const s7 = tr_quark_new("s7", 2);
-    auto const s8 = tr_quark_new("s8", 2);
+    auto const i1 = tr_quark_new("i1"sv);
+    auto const i2 = tr_quark_new("i2"sv);
+    auto const i3 = tr_quark_new("i3"sv);
+    auto const i4 = tr_quark_new("i4"sv);
+    auto const s5 = tr_quark_new("s5"sv);
+    auto const s6 = tr_quark_new("s6"sv);
+    auto const s7 = tr_quark_new("s7"sv);
+    auto const s8 = tr_quark_new("s8"sv);
 
     /* initial dictionary (default values) */
     tr_variant dest;
@@ -455,10 +459,10 @@ TEST_F(VariantTest, stackSmash)
 
 TEST_F(VariantTest, boolAndIntRecast)
 {
-    auto const key1 = tr_quark_new("key1", 4);
-    auto const key2 = tr_quark_new("key2", 4);
-    auto const key3 = tr_quark_new("key3", 4);
-    auto const key4 = tr_quark_new("key4", 4);
+    auto const key1 = tr_quark_new("key1"sv);
+    auto const key2 = tr_quark_new("key2"sv);
+    auto const key3 = tr_quark_new("key3"sv);
+    auto const key4 = tr_quark_new("key4"sv);
 
     tr_variant top;
     tr_variantInitDict(&top, 10);
@@ -499,10 +503,10 @@ TEST_F(VariantTest, dictFindType)
     auto const expected_int = int{ 1234 };
     auto const expected_real = double{ 0.3 };
 
-    auto const key_bool = tr_quark_new("this-is-a-bool", TR_BAD_SIZE);
-    auto const key_real = tr_quark_new("this-is-a-real", TR_BAD_SIZE);
-    auto const key_int = tr_quark_new("this-is-an-int", TR_BAD_SIZE);
-    auto const key_str = tr_quark_new("this-is-a-string", TR_BAD_SIZE);
+    auto const key_bool = tr_quark_new("this-is-a-bool"sv);
+    auto const key_real = tr_quark_new("this-is-a-real"sv);
+    auto const key_int = tr_quark_new("this-is-an-int"sv);
+    auto const key_str = tr_quark_new("this-is-a-string"sv);
 
     // populate a dict
     tr_variant top;
