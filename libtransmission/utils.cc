@@ -1377,14 +1377,17 @@ static bool parseNumberSection(std::string_view str, number_range& range)
     auto const error = errno;
 
 #if defined(HAVE_CHARCONV)
-    auto result = std::from_chars(std::data(str), std::data(str) + std::size(str), range.low);
+    // wants char*, so string_view::iterator don't work. make our own begin/end
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
+    auto result = std::from_chars(begin_ch, end_ch, range.low);
     success = result.ec == std::errc{};
     if (success)
     {
         range.high = range.low;
-        if (result.ptr != std::end(str) && *result.ptr == '-')
+        if (result.ptr < end_ch && *result.ptr == '-')
         {
-            result = std::from_chars(result.ptr + 1, std::end(str), range.high);
+            result = std::from_chars(result.ptr + 1, end_ch, range.high);
             success = result.ec == std::errc{};
         }
     }
