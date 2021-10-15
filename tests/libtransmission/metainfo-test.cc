@@ -109,7 +109,7 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto const tests = std::array<LocalTest, 29>{
+    auto constexpr Tests = std::array<LocalTest, 29>{
         // skipped
         LocalTest{ "", 0, nullptr, false },
         { ".", 1, nullptr, false },
@@ -146,7 +146,7 @@ TEST(Metainfo, sanitize)
         { "compass", 7, "compass", false },
     };
 
-    for (auto const& test : tests)
+    for (auto const& test : Tests)
     {
         bool is_adjusted;
         char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);
@@ -160,4 +160,17 @@ TEST(Metainfo, sanitize)
 
         tr_free(result);
     }
+}
+
+TEST(Metainfo, AndroidTorrent)
+{
+    auto* ctor = tr_ctorNew(nullptr);
+
+    auto filename = std::string{ LIBTRANSMISSION_TEST_ASSETS_DIR };
+    filename += '/'; // FIXME
+    filename += "Android-x86 8.1 r6 iso.torrent";
+    auto const err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
+    EXPECT_EQ(0, err);
+
+    tr_ctorFree(ctor);
 }

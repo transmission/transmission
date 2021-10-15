@@ -365,7 +365,7 @@ static char* tr_convertAnnounceToScrape(char const* announce)
     return scrape;
 }
 
-static char const* getannounce(tr_info* inf, tr_variant* meta)
+static void getAnnounce(tr_info* inf, tr_variant* meta)
 {
     size_t len;
     char const* str;
@@ -455,8 +455,6 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
 
     inf->trackers = trackers;
     inf->trackerCount = trackerCount;
-
-    return nullptr;
 }
 
 /**
@@ -496,7 +494,7 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
     return ret;
 }
 
-static void geturllist(tr_info* inf, tr_variant* meta)
+static void getURLs(tr_info* inf, tr_variant* meta)
 {
     tr_variant* urls;
     char const* url;
@@ -536,37 +534,36 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
 static char const* tr_metainfoParseImpl(
     tr_session const* session,
-    tr_info* inf,
-    bool* hasInfoDict,
-    size_t* infoDictLength,
+    tr_info* const inf,
+    bool* has_info_dict,
+    size_t* info_dict_length,
     tr_variant const* meta_in)
 {
     int64_t i;
     size_t len;
     char const* str;
     uint8_t const* raw;
-    tr_variant* d;
     tr_variant* infoDict = nullptr;
-    tr_variant* meta = (tr_variant*)meta_in;
-    bool b;
-    bool isMagnet = false;
+    auto* meta = const_cast<tr_variant*>(meta_in);
+    bool is_magnet = false;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded
      * dictionary, given the definition of the info key above. */
-    b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
+    bool const b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
 
-    if (hasInfoDict != nullptr)
+    if (has_info_dict != nullptr)
     {
-        *hasInfoDict = b;
+        *has_info_dict = b;
     }
 
     if (!b)
     {
         /* no info dictionary... is this a magnet link? */
+        tr_variant* d = nullptr;
         if (tr_variantDictFindDict(meta, TR_KEY_magnet_info, &d))
         {
-            isMagnet = true;
+            is_magnet = true;
 
             /* get the info-hash */
             if (!tr_variantDictFindRaw(d, TR_KEY_info_hash, &raw, &len))
@@ -613,16 +610,16 @@ static char const* tr_metainfoParseImpl(
         tr_sha1(inf->hash, bstr, (int)blen, nullptr);
         tr_sha1_to_hex(inf->hashString, inf->hash);
 
-        if (infoDictLength != nullptr)
+        if (info_dict_length != nullptr)
         {
-            *infoDictLength = blen;
+            *info_dict_length = blen;
         }
 
         tr_free(bstr);
     }
 
     /* name */
-    if (!isMagnet)
+    if (!is_magnet)
     {
         len = 0;
 
@@ -684,7 +681,7 @@ static char const* tr_metainfoParseImpl(
     inf->isPrivate = i != 0;
 
     /* piece length */
-    if (!isMagnet)
+    if (!is_magnet)
     {
         if (!tr_variantDictFindInt(infoDict, TR_KEY_piece_length, &i) || (i < 1))
         {
@@ -695,7 +692,7 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* pieces */
-    if (!isMagnet)
+    if (!is_magnet)
     {
         if (!tr_variantDictFindRaw(infoDict, TR_KEY_pieces, &raw, &len))
         {
@@ -717,7 +714,7 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* files */
-    if (!isMagnet)
+    if (!is_magnet)
     {
         if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) !=
             nullptr)
@@ -737,13 +734,10 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* get announce or announce-list */
-    if ((str = getannounce(inf, meta)) != nullptr)
-    {
-        return str;
-    }
+    getAnnounce(inf, meta);
 
     /* get the url-list */
-    geturllist(inf, meta);
+    getURLs(inf, meta);
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
@@ -756,15 +750,15 @@ bool tr_metainfoParse(
     tr_session const* session,
     tr_variant const* meta_in,
     tr_info* inf,
-    bool* hasInfoDict,
-    size_t* infoDictLength)
+    bool* has_info_dict,
+    size_t* info_dict_length)
 {
-    char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
-    bool const success = badTag == nullptr;
+    char const* errmsg = tr_metainfoParseImpl(session, inf, has_info_dict, info_dict_length, meta_in);
+    bool const success = errmsg == nullptr;
 
-    if (badTag != nullptr)
+    if (errmsg != nullptr)
     {
-        tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
+        tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), errmsg);
         tr_metainfoFree(inf);
     }
 
