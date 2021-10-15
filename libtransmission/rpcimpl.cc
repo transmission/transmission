@@ -2838,19 +2838,14 @@ void tr_rpc_request_exec_json(
  * - values that are all-digits or commas are number lists
  * - all other values are strings
  */
-void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
+void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    if (len == TR_BAD_SIZE)
-    {
-        len = strlen(str);
-    }
-
-    auto const values = tr_parseNumberRange(std::string_view{ str, len });
+    auto const values = tr_parseNumberRange(str);
     auto const valueCount = std::size(values);
 
     if (valueCount == 0)
     {
-        tr_variantInitStr(setme, str, len);
+        tr_variantInitStr(setme, std::data(str), std::size(str));
     }
     else if (valueCount == 1)
     {
@@ -2900,10 +2895,8 @@ void tr_rpc_request_exec_uri(
             bool isArg = key != "method" && key != "tag";
             tr_variant* parent = isArg ? args : &top;
 
-            tr_rpc_parse_list_str(
-                tr_variantDictAdd(parent, tr_quark_new(key)),
-                delim + 1,
-                next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
+            auto const val = std::string_view{ delim + 1, next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1) };
+            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
         }
 
         pch = next != nullptr ? next + 1 : nullptr;
