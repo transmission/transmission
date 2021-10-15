@@ -12,6 +12,7 @@
 #include <stdlib.h> /* strtoul() */
 #include <string.h> /* strlen(), memchr() */
 #include <string_view>
+#include <optional>
 
 #include <event2/buffer.h>
 
@@ -62,7 +63,7 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
     }
 
     errno = 0;
-    char* endptr;
+    char* endptr = nullptr;
     int64_t val = evutil_strtoll(static_cast<char const*>(begin), &endptr, 10);
 
     if (errno != 0 || endptr != end) /* incomplete parse */
@@ -103,7 +104,7 @@ int tr_bencParseStr(
         if (end != nullptr)
         {
             errno = 0;
-            char* ulend;
+            char* ulend = nullptr;
             size_t len = strtoul((char const*)buf, &ulend, 10);
 
             if (errno == 0 && ulend == end && len <= MAX_BENC_STR_LENGTH)
@@ -128,7 +129,7 @@ int tr_bencParseStr(
     return EILSEQ;
 }
 
-static tr_variant* get_node(std::deque<tr_variant*>& stack, tr_quark* key, tr_variant* top, int* err)
+static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_quark>& dict_key, tr_variant* top, int* err)
 {
     tr_variant* node = nullptr;
 
@@ -144,10 +145,10 @@ static tr_variant* get_node(std::deque<tr_variant*>& stack, tr_quark* key, tr_va
         {
             node = tr_variantListAdd(parent);
         }
-        else if (*key != 0 && tr_variantIsDict(parent))
+        else if (dict_key && tr_variantIsDict(parent))
         {
-            node = tr_variantDictAdd(parent, *key);
-            *key = 0;
+            node = tr_variantDictAdd(parent, *dict_key);
+            dict_key.reset();
         }
         else
         {
@@ -169,7 +170,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     auto const* buf = static_cast<uint8_t const*>(buf_in);
     auto const* const bufend = static_cast<uint8_t const*>(bufend_in);
     auto stack = std::deque<tr_variant*>{};
-    tr_quark key = 0;
+    auto key = std::optional<tr_quark>{};
 
     if ((buf_in == nullptr) || (bufend_in == nullptr) || (top == nullptr))
     {
@@ -192,10 +193,8 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
         if (*buf == 'i') /* int */
         {
-            int64_t val;
-            uint8_t const* end;
-            tr_variant* v;
-
+            uint8_t const* end = nullptr;
+            auto val = int64_t{};
             if ((err = tr_bencParseInt(buf, bufend, &end, &val)) != 0)
             {
                 break;
@@ -203,18 +202,18 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if ((v = get_node(stack, &key, top, &err)) != nullptr)
+            tr_variant* const v = get_node(stack, key, top, &err);
+            if (v != nullptr)
             {
                 tr_variantInitInt(v, val);
             }
         }
         else if (*buf == 'l') /* list */
         {
-            tr_variant* v;
-
             ++buf;
 
-            if ((v = get_node(stack, &key, top, &err)) != nullptr)
+            tr_variant* const v = get_node(stack, key, top, &err);
+            if (v != nullptr)
             {
                 tr_variantInitList(v, 0);
                 stack.push_back(v);
@@ -222,11 +221,10 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         }
         else if (*buf == 'd') /* dict */
         {
-            tr_variant* v;
-
             ++buf;
 
-            if ((v = get_node(stack, &key, top, &err)) != nullptr)
+            tr_variant* const v = get_node(stack, key, top, &err);
+            if (v != nullptr)
             {
                 tr_variantInitDict(v, 0);
                 stack.push_back(v);
@@ -236,7 +234,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         {
             ++buf;
 
-            if (std::empty(stack) || key != 0)
+            if (std::empty(stack) || key)
             {
                 err = EILSEQ;
                 break;
@@ -250,11 +248,9 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         }
         else if (isdigit(*buf)) /* string? */
         {
-            tr_variant* v;
-            uint8_t const* end;
-            uint8_t const* str;
-            size_t str_len;
-
+            uint8_t const* end = nullptr;
+            uint8_t const* str = nullptr;
+            auto str_len = size_t{};
             if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)) != 0)
             {
                 break;
@@ -262,13 +258,18 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             buf = end;
 
-            if (key == 0 && !std::empty(stack) && tr_variantIsDict(stack.back()))
+            if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
             {
-                key = tr_quark_new(std::string_view{ reinterpret_cast<char const*>(str), str_len });
+                auto const sv = std::string_view{ reinterpret_cast<char const*>(str), str_len };
+                key = tr_quark_new(sv);
             }
-            else if ((v = get_node(stack, &key, top, &err)) != nullptr)
+            else
             {
-                tr_variantInitStr(v, str, str_len);
+                tr_variant* const v = get_node(stack, key, top, &err);
+                if (v != nullptr)
+                {
+                    tr_variantInitStr(v, str, str_len);
+                }
             }
         }
         else /* invalid bencoded text... march past it */
@@ -338,8 +339,8 @@ static void saveRealFunc(tr_variant const* val, void* vevbuf)
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
-    size_t len;
-    char const* str;
+    auto len = size_t{};
+    char const* str = nullptr;
     if (!tr_variantGetStr(v, &str, &len))
     {
         len = 0;
