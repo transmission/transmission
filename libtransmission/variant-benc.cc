@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stdlib.h> /* strtoul() */
 #include <string.h> /* strlen(), memchr() */
+#include <string_view>
 
 #include <event2/buffer.h>
 
@@ -237,14 +238,11 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
                 err = EILSEQ;
                 break;
             }
-            else
-            {
-                stack.pop_back();
 
-                if (std::empty(stack))
-                {
-                    break;
-                }
+            stack.pop_back();
+            if (std::empty(stack))
+            {
+                break;
             }
         }
         else if (isdigit(*buf)) /* string? */
@@ -261,7 +259,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             if (key == 0 && !std::empty(stack) && tr_variantIsDict(stack.back()))
             {
-                key = tr_quark_new(str, str_len);
+                key = tr_quark_new(std::string_view{ reinterpret_cast<char const*>(str), str_len });
             }
             else
             {

@@ -90,14 +90,8 @@ char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, siz
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    if (addr->type == TR_AF_INET)
-    {
-        return evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen);
-    }
-    else
-    {
-        return evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
-    }
+    return addr->type == TR_AF_INET ? evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen) :
+                                      evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
 }
 
 /*
@@ -231,25 +225,21 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
 
     if (addr->type == TR_AF_INET)
     {
-        struct sockaddr_in sock4;
-        memset(&sock4, 0, sizeof(sock4));
+        sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
         sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
         sock4.sin_port = port;
         memcpy(sockaddr, &sock4, sizeof(sock4));
         return sizeof(struct sockaddr_in);
     }
-    else
-    {
-        struct sockaddr_in6 sock6;
-        memset(&sock6, 0, sizeof(sock6));
-        sock6.sin6_family = AF_INET6;
-        sock6.sin6_port = port;
-        sock6.sin6_flowinfo = 0;
-        sock6.sin6_addr = addr->addr.addr6;
-        memcpy(sockaddr, &sock6, sizeof(sock6));
-        return sizeof(struct sockaddr_in6);
-    }
+
+    sockaddr_in6 sock6 = {};
+    sock6.sin6_family = AF_INET6;
+    sock6.sin6_port = port;
+    sock6.sin6_flowinfo = 0;
+    sock6.sin6_addr = addr->addr.addr6;
+    memcpy(sockaddr, &sock6, sizeof(sock6));
+    return sizeof(struct sockaddr_in6);
 }
 
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
@@ -606,17 +596,16 @@ static int global_unicast_address(struct sockaddr_storage* ss)
 
         return 1;
     }
-    else if (ss->ss_family == AF_INET6)
+
+    if (ss->ss_family == AF_INET6)
     {
         unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)ss)->sin6_addr;
         /* 2000::/3 */
         return (a[0] & 0xE0) == 0x20 ? 1 : 0;
     }
-    else
-    {
-        errno = EAFNOSUPPORT;
-        return -1;
-    }
+
+    errno = EAFNOSUPPORT;
+    return -1;
 }
 
 static int tr_globalAddress(int af, void* addr, int* addr_len)

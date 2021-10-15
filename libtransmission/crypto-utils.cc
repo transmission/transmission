@@ -146,9 +146,9 @@ char* tr_ssha1(char const* plain_text)
 
     tr_rand_buffer(salt, saltval_len);
 
-    for (size_t i = 0; i < saltval_len; ++i)
+    for (auto& ch : salt)
     {
-        salt[i] = salter[salt[i] % salter_len];
+        ch = salter[ch % salter_len];
     }
 
     tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, saltval_len, nullptr);
@@ -223,10 +223,8 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 
             return ret;
         }
-        else
-        {
-            ret = tr_strdup("");
-        }
+
+        ret = tr_strdup("");
     }
     else
     {
@@ -271,10 +269,8 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
 
             return ret;
         }
-        else
-        {
-            ret = tr_strdup("");
-        }
+
+        ret = tr_strdup("");
     }
     else
     {

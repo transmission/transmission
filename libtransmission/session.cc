@@ -1232,11 +1232,11 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 
     if (tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0)
     {
-        free_space = tr_device_info_get_free_space(session->downloadDir);
+        free_space = tr_device_info_get_disk_space(session->downloadDir).free;
     }
     else
     {
-        free_space = tr_getDirFreeSpace(dir);
+        free_space = tr_getDirSpace(dir).free;
     }
 
     return free_space;
@@ -2665,7 +2665,7 @@ static void metainfoLookupInit(tr_session* session)
                 if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
                 {
                     ++n;
-                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString, TR_BAD_SIZE), path);
+                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString), path);
                 }
 
                 tr_free(path);
@@ -2688,7 +2688,7 @@ char const* tr_sessionFindTorrentFile(tr_session const* session, char const* has
     }
 
     char const* filename = nullptr;
-    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, nullptr);
+    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString), &filename, nullptr);
     return filename;
 }
 
@@ -2700,7 +2700,7 @@ void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char 
      * lookup table hasn't been built yet */
     if (session->metainfoLookup != nullptr)
     {
-        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), filename);
+        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString), filename);
     }
 }
 

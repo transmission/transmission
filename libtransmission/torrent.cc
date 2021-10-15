@@ -17,6 +17,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -60,6 +61,8 @@
 ***/
 
 #define tr_deeplog_tor(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
+
+using namespace std::literals;
 
 /***
 ****
@@ -2899,30 +2902,29 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static bool isJunkFile(char const* base)
+static constexpr bool isJunkFile(std::string_view base)
 {
-    static char const* files[] = {
-        ".DS_Store",
-        "desktop.ini",
-        "Thumbs.db",
+    auto constexpr Files = std::array<std::string_view, 3>{
+        ".DS_Store"sv,
+        "Thumbs.db"sv,
+        "desktop.ini"sv,
     };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(files); ++i)
+    // TODO(C++20): std::any_of is constexpr in C++20
+    for (auto const& file : Files)
     {
-        if (strcmp(base, files[i]) == 0)
+        if (file == base)
         {
             return true;
         }
     }
 
 #ifdef __APPLE__
-
-    /* check for resource forks. <http://support.apple.com/kb/TA20578> */
-    if (memcmp(base, "._", 2) == 0)
+    // check for resource forks. <http://support.apple.com/kb/TA20578>
+    if (base.find("._") == 0)
     {
         return true;
     }
-
 #endif
 
     return false;

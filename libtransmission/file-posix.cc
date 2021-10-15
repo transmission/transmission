@@ -706,9 +706,9 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
 {
-    TR_STATIC_ASSERT(TR_SEEK_SET == SEEK_SET, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_CUR == SEEK_CUR, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_END == SEEK_END, "values should match");
+    static_assert(TR_SEEK_SET == SEEK_SET, "values should match");
+    static_assert(TR_SEEK_CUR == SEEK_CUR, "values should match");
+    static_assert(TR_SEEK_END == SEEK_END, "values should match");
 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
@@ -716,7 +716,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     bool ret = false;
     off_t my_new_offset;
 
-    TR_STATIC_ASSERT(sizeof(*new_offset) >= sizeof(my_new_offset), "");
+    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset), "");
 
     my_new_offset = lseek(handle, offset, origin);
 
@@ -745,7 +745,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     bool ret = false;
     ssize_t my_bytes_read;
 
-    TR_STATIC_ASSERT(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
 
     my_bytes_read = read(handle, buffer, size);
 
@@ -782,7 +782,7 @@ bool tr_sys_file_read_at(
     bool ret = false;
     ssize_t my_bytes_read;
 
-    TR_STATIC_ASSERT(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
 
 #ifdef HAVE_PREAD
 
@@ -826,7 +826,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     bool ret = false;
     ssize_t my_bytes_written;
 
-    TR_STATIC_ASSERT(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
 
     my_bytes_written = write(handle, buffer, size);
 
@@ -863,7 +863,7 @@ bool tr_sys_file_write_at(
     bool ret = false;
     ssize_t my_bytes_written;
 
-    TR_STATIC_ASSERT(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
 
 #ifdef HAVE_PWRITE
 
