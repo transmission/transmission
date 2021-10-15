@@ -2840,6 +2840,11 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
 {
+    if (len == TR_BAD_SIZE)
+    {
+        len = strlen(str);
+    }
+
     auto const values = tr_parseNumberRange(std::string_view{ str, len });
     auto const valueCount = std::size(values);
 
