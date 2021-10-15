@@ -286,7 +286,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
