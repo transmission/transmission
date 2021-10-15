@@ -64,14 +64,6 @@
 ****
 ***/
 
-#if __has_attribute(__noreturn__) || TR_GNUC_CHECK_VERSION(2, 5)
-#define TR_NORETURN __attribute__((__noreturn__))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
-
 #if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
 #define TR_DEPRECATED __attribute__((__deprecated__))
 #elif defined(_MSC_VER)
