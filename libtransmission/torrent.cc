@@ -3771,20 +3771,11 @@ static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* old
 
 static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 {
-    char* src;
-    char const* base;
     int err = 0;
 
-    if (!tr_torrentIsSeed(tor) && tor->incompleteDir != nullptr)
-    {
-        base = tor->incompleteDir;
-    }
-    else
-    {
-        base = tor->downloadDir;
-    }
+    char const* const base = !tr_torrentIsSeed(tor) && tor->incompleteDir != nullptr ? tor->incompleteDir : tor->downloadDir;
 
-    src = tr_buildPath(base, oldpath, nullptr);
+    char* src = tr_buildPath(base, oldpath, nullptr);
 
     if (!tr_sys_path_exists(src, nullptr)) /* check for it as a partial */
     {
