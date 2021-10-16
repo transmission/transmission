@@ -345,11 +345,11 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
  * it applies if the torrent's a seed AND it has a seed ratio set */
 static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLeft, uint64_t* setmeGoal)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    double seedRatio;
     bool seedRatioApplies = false;
 
+    TR_ASSERT(tr_isTorrent(tor));
+
+    auto seedRatio = double{};
     if (tr_torrentGetSeedRatio(tor, &seedRatio))
     {
         uint64_t const u = tor->uploadedCur + tor->uploadedPrev;
