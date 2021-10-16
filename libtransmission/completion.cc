@@ -21,7 +21,7 @@ static void tr_cpReset(tr_completion* cp)
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = true;
     cp->haveValidIsDirty = true;
-    cp->blockBitfield->setHasNone();
+    cp->blockBitfield->setMode(Bitfield::OperationMode::None);
 }
 
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
@@ -36,7 +36,7 @@ void tr_cpBlockInit(tr_completion* cp, Bitfield const& b)
     tr_cpReset(cp);
 
     // set blockBitfield
-    cp->blockBitfield->setFromBitfield(b);
+    *(cp->blockBitfield) = b;
 
     // set sizeNow
     cp->sizeNow = cp->blockBitfield->countBits();
@@ -294,11 +294,10 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t i)
     return cp->blockBitfield->countRange(f, l + 1) == (l + 1 - f);
 }
 
-void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
+std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
 {
     TR_ASSERT(tr_torrentHasMetadata(cp->tor));
 
-    void* ret;
     tr_piece_index_t n;
 
     n = cp->tor->info.pieceCount;
@@ -307,7 +306,7 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
 
     if (tr_cpHasAll(cp))
     {
-        pieces.setHasAll();
+        pieces.setMode(Bitfield::OperationMode::All);
     }
     else if (!tr_cpHasNone(cp))
     {
@@ -318,12 +317,11 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }
 
-        pieces.setFromFlags(flags, n);
+        pieces = Bitfield(flags, n);
         tr_free(flags);
     }
 
-    ret = pieces.getRaw(byte_count);
-    return ret;
+    return pieces.getRaw();
 }
 
 double tr_cpPercentComplete(tr_completion const* cp)

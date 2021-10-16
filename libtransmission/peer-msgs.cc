@@ -1681,7 +1681,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setFrom(Span{ tmp, msglen }, tr_torrentHasMetadata(msgs->torrent));
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
@@ -1775,7 +1775,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setHasAll();
+            msgs->have.setMode(Bitfield::OperationMode::All);
             TR_ASSERT(msgs->have.hasAll());
             msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
@@ -1793,7 +1793,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setHasNone();
+            msgs->have.setMode(Bitfield::OperationMode::None);
             msgs->publishClientGotHaveNone();
             updatePeerProgress(msgs);
         }
@@ -2299,18 +2299,14 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(tr_torrentHasMetadata(msgs->torrent));
 
-    void* bytes;
-    size_t byte_count = 0;
     struct evbuffer* out = msgs->outMessages;
 
-    bytes = tr_torrentCreatePieceBitfield(msgs->torrent, &byte_count);
-    evbuffer_add_uint32(out, sizeof(uint8_t) + byte_count);
+    auto bytes = tr_torrentCreatePieceBitfield(msgs->torrent);
+    evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
     evbuffer_add_uint8(out, BT_BITFIELD);
-    evbuffer_add(out, bytes, byte_count);
+    evbuffer_add(out, bytes.data(), std::size(bytes));
     dbgmsg(msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length(out));
     pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
-
-    tr_free(bytes);
 }
 
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
