@@ -375,7 +375,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLe
 
 static bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
 {
-    uint64_t bytesLeft;
+    auto bytesLeft = uint64_t{};
     return tr_torrentGetSeedRatioBytes(tor, &bytesLeft, nullptr) && bytesLeft == 0;
 }
 
