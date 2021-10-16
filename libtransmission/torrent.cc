@@ -2172,11 +2172,9 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
 void tr_torrentRecheckCompleteness(tr_torrent* tor)
 {
-    tr_completeness completeness;
-
     tr_torrentLock(tor);
 
-    completeness = tr_cpGetStatus(&tor->completion);
+    auto const completeness = tr_cpGetStatus(&tor->completion);
 
     if (completeness != tor->completeness)
     {
