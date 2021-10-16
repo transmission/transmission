@@ -3747,12 +3747,10 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)
 {
-    size_t n;
-    size_t oldpath_len;
+    auto n = size_t{};
     tr_file_index_t* indices = tr_new0(tr_file_index_t, tor->info.fileCount);
 
-    n = 0;
-    oldpath_len = strlen(oldpath);
+    auto const oldpath_len = strlen(oldpath);
 
     for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
     {
