@@ -2336,19 +2336,15 @@ tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* tor)
 static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownload)
 {
     bool const dnd = !doDownload;
-    tr_piece_index_t firstPiece;
-    bool firstPieceDND;
-    tr_piece_index_t lastPiece;
-    bool lastPieceDND;
     tr_file* file = &tor->info.files[fileIndex];
 
     file->dnd = dnd;
-    firstPiece = file->firstPiece;
-    lastPiece = file->lastPiece;
+    auto const firstPiece = file->firstPiece;
+    auto const lastPiece = file->lastPiece;
 
     /* can't set the first piece to DND unless
        every file using that piece is DND */
-    firstPieceDND = dnd;
+    auto firstPieceDND = dnd;
 
     if (fileIndex > 0)
     {
@@ -2370,7 +2366,7 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
 
     /* can't set the last piece to DND unless
        every file using that piece is DND */
-    lastPieceDND = dnd;
+    auto lastPieceDND = dnd;
 
     for (tr_file_index_t i = fileIndex + 1; lastPieceDND && i < tor->info.fileCount; ++i)
     {
