@@ -102,10 +102,10 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
 {
-    tr_magnet_info* info;
     tr_torrent* tor = nullptr;
 
-    if ((info = tr_magnetParse(magnet)) != nullptr)
+    tr_magnet_info* const info = tr_magnetParse(magnet);
+    if (info != nullptr)
     {
         tor = tr_torrentFindFromHash(session, info->hash);
         tr_magnetFree(info);
