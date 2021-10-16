@@ -2580,8 +2580,7 @@ uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t 
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    uint64_t ret;
-
+    auto ret = uint64_t{};
     ret = tor->info.pieceSize;
     ret *= index;
     ret += offset;
@@ -2657,7 +2656,7 @@ bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 
 time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
 {
-    time_t mtime = 0;
+    auto mtime = time_t{};
 
     if (!tr_fdFileGetCachedMTime(tor->session, tor->uniqueId, i, &mtime))
     {
