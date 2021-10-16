@@ -71,7 +71,7 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     torrent_ids_.pop_back();
 
-    message_dialog_->set_message(Glib::ustring::sprintf(_("Moving \"%s\""), tr_torrentName(tor)), true);
+    message_dialog_->set_message(gtr_sprintf(_("Moving \"%s\""), tr_torrentName(tor)), true);
 }
 
 /* every once in awhile, check to see if the move is done.

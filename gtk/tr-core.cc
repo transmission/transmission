@@ -632,7 +632,7 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     if (info != nullptr)
     {
         auto const old_name = info->get_attribute_as_string(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-        auto const new_name = Glib::ustring::sprintf("%s.added", old_name);
+        auto const new_name = gtr_sprintf("%s.added", old_name);
 
         try
         {
@@ -894,7 +894,7 @@ namespace
 Glib::ustring get_collated_name(tr_torrent const* tor)
 {
     auto const* const inf = tr_torrentInfo(tor);
-    return Glib::ustring::sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), inf->hashString);
+    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), inf->hashString);
 }
 
 struct metadata_callback_data
@@ -1196,7 +1196,7 @@ bool TrCore::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, 
         {
             /* GFile mangles the original string with /// so we have to un-mangle */
             auto const str = file->get_parse_name();
-            auto const magnet = Glib::ustring::sprintf("magnet:%s", str.substr(str.find('?')));
+            auto const magnet = gtr_sprintf("magnet:%s", str.substr(str.find('?')));
             tried = true;
             loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
         }
@@ -1208,7 +1208,7 @@ bool TrCore::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, 
 
             if (gtr_is_hex_hashcode(str))
             {
-                auto const magnet = Glib::ustring::sprintf("magnet:?xt=urn:btih:%s", str);
+                auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
                 tried = true;
                 loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
             }

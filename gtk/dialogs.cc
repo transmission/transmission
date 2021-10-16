@@ -66,7 +66,7 @@ void gtr_confirm_remove(
         }
     }
 
-    auto const primary_text = Glib::ustring::sprintf(
+    auto const primary_text = gtr_sprintf(
         !delete_files ?
             ngettext("Remove torrent?", "Remove %d torrents?", count) :
             ngettext("Delete this torrent's downloaded files?", "Delete these %d torrents' downloaded files?", count),
@@ -117,7 +117,7 @@ void gtr_confirm_remove(
 
     auto d = std::make_shared<Gtk::MessageDialog>(
         parent,
-        Glib::ustring::sprintf("<big><b>%s</b></big>", primary_text),
+        gtr_sprintf("<big><b>%s</b></big>", primary_text),
         true,
         Gtk::MESSAGE_QUESTION,
         Gtk::BUTTONS_NONE,

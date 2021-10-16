@@ -323,7 +323,7 @@ void render_pixbuf_func(Gtk::CellRendererPixbuf* cell_renderer, Gtk::TreeModel::
 void render_number_func(Gtk::CellRendererText* cell_renderer, Gtk::TreeModel::const_iterator const& iter)
 {
     auto const count = iter->get_value(tracker_filter_cols.count);
-    cell_renderer->property_text() = count >= 0 ? Glib::ustring::sprintf("%'d", count) : "";
+    cell_renderer->property_text() = count >= 0 ? gtr_sprintf("%'d", count) : "";
 }
 
 Gtk::CellRendererText* number_renderer_new()
@@ -722,8 +722,7 @@ bool FilterBar::Impl::update_count_label()
 
     /* set the text */
     show_lb_->set_markup_with_mnemonic(
-        visibleCount == std::min(activityCount, trackerCount) ? _("_Show:") :
-                                                                Glib::ustring::sprintf(_("_Show %'d of:"), visibleCount));
+        visibleCount == std::min(activityCount, trackerCount) ? _("_Show:") : gtr_sprintf(_("_Show %'d of:"), visibleCount));
 
     show_lb_->steal_data(DIRTY_KEY);
     return false;

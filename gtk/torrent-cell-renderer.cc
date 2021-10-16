@@ -45,7 +45,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
 
     if (!isDone) /* downloading */
     {
-        gstr += Glib::ustring::sprintf(
+        gstr += gtr_sprintf(
             /* %1$s is how much we've got,
                %2$s is how much we'll have when done,
                %3$s%% is a percentage of the two */
@@ -58,7 +58,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
     {
         if (hasSeedRatio)
         {
-            gstr += Glib::ustring::sprintf(
+            gstr += gtr_sprintf(
                 /* %1$s is how much we've got,
                    %2$s is the torrent's total size,
                    %3$s%% is a percentage of the two,
@@ -75,7 +75,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
         }
         else
         {
-            gstr += Glib::ustring::sprintf(
+            gstr += gtr_sprintf(
                 /* %1$s is how much we've got,
                    %2$s is the torrent's total size,
                    %3$s%% is a percentage of the two,
@@ -93,7 +93,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
     {
         if (hasSeedRatio)
         {
-            gstr += Glib::ustring::sprintf(
+            gstr += gtr_sprintf(
                 /* %1$s is the torrent's total size,
                    %2$s is how much we've uploaded,
                    %3$s is our upload-to-download ratio,
@@ -106,7 +106,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
         }
         else /* seeding w/o a ratio */
         {
-            gstr += Glib::ustring::sprintf(
+            gstr += gtr_sprintf(
                 /* %1$s is the torrent's total size,
                    %2$s is how much we've uploaded,
                    %3$s is our upload-to-download ratio */
@@ -130,7 +130,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
         else
         {
             /* time remaining */
-            gstr += Glib::ustring::sprintf(_("%s remaining"), tr_strltime(eta));
+            gstr += gtr_sprintf(_("%s remaining"), tr_strltime(eta));
         }
     }
 
@@ -157,7 +157,7 @@ Glib::ustring getShortTransferString(
         tr_formatter_speed_KBps(upStr, uploadSpeed_KBps, sizeof(upStr));
 
         /* down speed, down symbol, up speed, up symbol */
-        buf += Glib::ustring::sprintf(
+        buf += gtr_sprintf(
             _("%1$s %2$s  %3$s %4$s"),
             dnStr,
             gtr_get_unicode_string(GTR_UNICODE_DOWN),
@@ -170,7 +170,7 @@ Glib::ustring getShortTransferString(
         tr_formatter_speed_KBps(upStr, uploadSpeed_KBps, sizeof(upStr));
 
         /* up speed, up symbol */
-        buf += Glib::ustring::sprintf(_("%1$s  %2$s"), upStr, gtr_get_unicode_string(GTR_UNICODE_UP));
+        buf += gtr_sprintf(_("%1$s  %2$s"), upStr, gtr_get_unicode_string(GTR_UNICODE_UP));
     }
     else if (st->isStalled)
     {
@@ -203,15 +203,15 @@ Glib::ustring getShortStatusString(tr_torrent const* tor, tr_stat const* st, dou
         break;
 
     case TR_STATUS_CHECK:
-        gstr += Glib::ustring::sprintf(_("Verifying local data (%.1f%% tested)"), tr_truncd(st->recheckProgress * 100.0, 1));
+        gstr += gtr_sprintf(_("Verifying local data (%.1f%% tested)"), tr_truncd(st->recheckProgress * 100.0, 1));
         break;
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         {
             /* download/upload speed, ratio */
-            gstr += Glib::ustring::sprintf("%s  ", getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
-            gstr += Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(st->ratio));
+            gstr += gtr_sprintf("%s  ", getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
+            gstr += gtr_sprintf(_("Ratio: %s"), tr_strlratio(st->ratio));
             break;
         }
 
@@ -239,7 +239,7 @@ Glib::ustring getStatusString(
             N_("Error: %s"),
         };
 
-        gstr += Glib::ustring::sprintf(_(fmt[st->error]), st->errorString);
+        gstr += gtr_sprintf(_(fmt[st->error]), st->errorString);
     }
     else
     {
@@ -260,7 +260,7 @@ Glib::ustring getStatusString(
                 if (!tr_torrentHasMetadata(tor))
                 {
                     /* Downloading metadata from 2 peer (s)(50% done) */
-                    gstr += Glib::ustring::sprintf(
+                    gstr += gtr_sprintf(
                         _("Downloading metadata from %1$'d %2$s (%3$d%% done)"),
                         st->peersConnected,
                         ngettext("peer", "peers", st->peersConnected),
@@ -269,7 +269,7 @@ Glib::ustring getStatusString(
                 else if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
                 {
                     /* Downloading from 2 of 3 peer (s) and 2 webseed (s) */
-                    gstr += Glib::ustring::sprintf(
+                    gstr += gtr_sprintf(
                         _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"),
                         st->peersSendingToUs,
                         st->peersConnected,
@@ -280,7 +280,7 @@ Glib::ustring getStatusString(
                 else if (st->webseedsSendingToUs != 0)
                 {
                     /* Downloading from 3 web seed (s) */
-                    gstr += Glib::ustring::sprintf(
+                    gstr += gtr_sprintf(
                         _("Downloading from %1$'d %2$s"),
                         st->webseedsSendingToUs,
                         ngettext("web seed", "web seeds", st->webseedsSendingToUs));
@@ -288,7 +288,7 @@ Glib::ustring getStatusString(
                 else
                 {
                     /* Downloading from 2 of 3 peer (s) */
-                    gstr += Glib::ustring::sprintf(
+                    gstr += gtr_sprintf(
                         _("Downloading from %1$'d of %2$'d %3$s"),
                         st->peersSendingToUs,
                         st->peersConnected,
@@ -299,7 +299,7 @@ Glib::ustring getStatusString(
             }
 
         case TR_STATUS_SEED:
-            gstr += Glib::ustring::sprintf(
+            gstr += gtr_sprintf(
                 ngettext(
                     "Seeding to %1$'d of %2$'d connected peer",
                     "Seeding to %1$'d of %2$'d connected peers",
@@ -317,7 +317,7 @@ Glib::ustring getStatusString(
 
         if (!buf.empty())
         {
-            gstr += Glib::ustring::sprintf(" - %s", buf);
+            gstr += gtr_sprintf(" - %s", buf);
         }
     }
 

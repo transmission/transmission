@@ -240,8 +240,8 @@ void MainWindow::Impl::syncAltSpeedButton()
     char d[32];
     tr_formatter_speed_KBps(d, gtr_pref_int_get(TR_KEY_alt_speed_down), sizeof(d));
 
-    auto const str = b ? Glib::ustring::sprintf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
-                         Glib::ustring::sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
+    auto const str = b ? gtr_sprintf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
+                         gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     alt_speed_button_->set_active(b);
     alt_speed_image_->set(Gtk::StockID(stock), Gtk::IconSize(-1));
@@ -281,7 +281,7 @@ bool MainWindow::Impl::onAskTrackerQueryTooltip(int /*x*/, int /*y*/, bool /*key
     {
         time_t const seconds = maxTime - now;
 
-        tooltip->set_text(Glib::ustring::sprintf(_("Tracker will allow requests in %s"), tr_strltime(seconds)));
+        tooltip->set_text(gtr_sprintf(_("Tracker will allow requests in %s"), tr_strltime(seconds)));
         handled = true;
     }
 
@@ -431,7 +431,7 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 
     gtr_label_set_text(
         *static_cast<Gtk::Label*>(ratio_on_item_->get_child()),
-        Glib::ustring::sprintf(_("Stop at Ratio (%s)"), tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit))));
+        gtr_sprintf(_("Stop at Ratio (%s)"), tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit))));
 
     (gtr_pref_flag_get(TR_KEY_ratio_limit_enabled) ? ratio_on_item_ : ratio_off_item_)->set_active(true);
 
@@ -653,7 +653,7 @@ void MainWindow::Impl::updateStats()
     if (pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
-        buf = Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
     }
     else if (pch == "session-transfer")
     {
@@ -661,10 +661,7 @@ void MainWindow::Impl::updateStats()
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
-        buf = Glib::ustring::sprintf(
-            Q_("Down: %1$s, Up: %2$s"),
-            tr_strlsize(stats.downloadedBytes),
-            tr_strlsize(stats.uploadedBytes));
+        buf = gtr_sprintf(Q_("Down: %1$s, Up: %2$s"), tr_strlsize(stats.downloadedBytes), tr_strlsize(stats.uploadedBytes));
     }
     else if (pch == "total-transfer")
     {
@@ -672,7 +669,7 @@ void MainWindow::Impl::updateStats()
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
-        buf = Glib::ustring::sprintf(
+        buf = gtr_sprintf(
             Q_("size|Down: %1$s, Up: %2$s"),
             tr_strlsize(stats.downloadedBytes),
             tr_strlsize(stats.uploadedBytes));
@@ -680,7 +677,7 @@ void MainWindow::Impl::updateStats()
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        buf = Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
     }
 
     stats_lb_->set_text(buf);
@@ -708,11 +705,11 @@ void MainWindow::Impl::updateSpeeds()
         }
 
         tr_formatter_speed_KBps(speed_str, downSpeed, sizeof(speed_str));
-        dl_lb_->set_text(Glib::ustring::sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_DOWN)));
+        dl_lb_->set_text(gtr_sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_DOWN)));
         dl_lb_->set_visible(downCount > 0);
 
         tr_formatter_speed_KBps(speed_str, upSpeed, sizeof(speed_str));
-        ul_lb_->set_text(Glib::ustring::sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_UP)));
+        ul_lb_->set_text(gtr_sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_UP)));
         ul_lb_->set_visible(downCount > 0 || upCount > 0);
     }
 }

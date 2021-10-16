@@ -9,6 +9,7 @@
 #include <libtransmission/tr-macros.h>
 
 #include "hig.h"
+#include "util.h"
 
 HigWorkarea::HigWorkarea()
 {
@@ -34,7 +35,7 @@ void HigWorkarea::add_section_title_widget(guint& row, Gtk::Widget& w)
 
 void HigWorkarea::add_section_title(guint& row, Glib::ustring const& section_title)
 {
-    auto* l = Gtk::make_managed<Gtk::Label>(Glib::ustring::sprintf("<b>%s</b>", section_title));
+    auto* l = Gtk::make_managed<Gtk::Label>(gtr_sprintf("<b>%s</b>", section_title));
     l->set_halign(Gtk::ALIGN_START);
     l->set_valign(Gtk::ALIGN_CENTER);
     l->set_use_markup(true);

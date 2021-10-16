@@ -79,9 +79,7 @@ bool StatsDialog::Impl::updateStats()
 
     setLabel(
         all_sessions_lb_,
-        Glib::ustring::sprintf(
-            ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount),
-            (int)all.sessionCount));
+        gtr_sprintf(ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount), (int)all.sessionCount));
 
     setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
     setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));

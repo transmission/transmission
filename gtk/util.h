@@ -157,6 +157,55 @@ inline T gtr_str_strip(T const& text)
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin);
 }
 
+namespace gtr_detail
+{
+
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 62)
+
+template<typename T>
+inline T const& sprintify(T const& arg)
+{
+    return arg;
+}
+
+inline char const* sprintify(Glib::ustring const& arg)
+{
+    return arg.c_str();
+}
+
+inline char const* sprintify(std::string const& arg)
+{
+    return arg.c_str();
+}
+
+#endif
+
+} // namespace gtr_detail
+
+template<typename... Ts>
+inline Glib::ustring gtr_sprintf(char const* fmt, Ts const&... args)
+{
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 62)
+    auto* const c_str = g_strdup_printf(fmt, gtr_detail::sprintify(args)...);
+    Glib::ustring ustr(c_str);
+    g_free(c_str);
+
+    return ustr;
+#else
+    return Glib::ustring::sprintf(fmt, args...);
+#endif
+}
+
+template<typename... Ts>
+inline Glib::ustring gtr_sprintf(Glib::ustring const& fmt, Ts const&... args)
+{
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 62)
+    return gtr_sprintf(fmt.c_str(), args...);
+#else
+    return Glib::ustring::sprintf(fmt, args...);
+#endif
+}
+
 template<>
 struct std::hash<Glib::ustring>
 {

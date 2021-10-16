@@ -372,9 +372,8 @@ struct blocklist_data
 void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<TrCore> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
-    w->set_markup(Glib::ustring::sprintf(
-        "<i>%s</i>",
-        Glib::ustring::sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
+    w->set_markup(
+        gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -402,7 +401,7 @@ void onBlocklistUpdated(Glib::RefPtr<TrCore> const& core, int n, blocklist_data*
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
     data->updateBlocklistDialog->set_secondary_text(
-        Glib::ustring::sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
+        gtr_sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
     updateBlocklistText(data->label, core);
 }
 
@@ -630,7 +629,7 @@ void refreshRPCSensitivity(std::shared_ptr<remote_page> const& page)
 
 void onLaunchClutchCB()
 {
-    gtr_open_uri(Glib::ustring::sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)));
+    gtr_open_uri(gtr_sprintf("http://localhost:%d/", (int)gtr_pref_int_get(TR_KEY_rpc_port)));
 }
 
 } // namespace
@@ -783,7 +782,7 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<TrCore> const& core, tr_quark const k
     {
         auto const iter = store->append();
         (*iter)[time_cols.offset] = i;
-        (*iter)[time_cols.title] = Glib::ustring::sprintf("%02d:%02d", i / 60, i % 60);
+        (*iter)[time_cols.title] = gtr_sprintf("%02d:%02d", i / 60, i % 60);
     }
 
     /* build the widget */
@@ -835,10 +834,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     t->add_section_title(row, _("Speed Limits"));
 
     {
-        auto* w = new_check_button(
-            Glib::ustring::sprintf(_("_Upload (%s):"), _(speed_K_str)),
-            TR_KEY_speed_limit_up_enabled,
-            core_);
+        auto* w = new_check_button(gtr_sprintf(_("_Upload (%s):"), _(speed_K_str)), TR_KEY_speed_limit_up_enabled, core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -846,10 +842,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     }
 
     {
-        auto* w = new_check_button(
-            Glib::ustring::sprintf(_("_Download (%s):"), _(speed_K_str)),
-            TR_KEY_speed_limit_down_enabled,
-            core_);
+        auto* w = new_check_button(gtr_sprintf(_("_Download (%s):"), _(speed_K_str)), TR_KEY_speed_limit_down_enabled, core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -860,7 +853,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-        auto* w = Gtk::make_managed<Gtk::Label>(Glib::ustring::sprintf("<b>%s</b>", _("Alternative Speed Limits")));
+        auto* w = Gtk::make_managed<Gtk::Label>(gtr_sprintf("<b>%s</b>", _("Alternative Speed Limits")));
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
         w->set_use_markup(true);
@@ -871,7 +864,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* w = Gtk::make_managed<Gtk::Label>(
-            Glib::ustring::sprintf("<small>%s</small>", _("Override normal speed limits manually or at scheduled times")));
+            gtr_sprintf("<small>%s</small>", _("Override normal speed limits manually or at scheduled times")));
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
@@ -880,12 +873,12 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     t->add_row(
         row,
-        Glib::ustring::sprintf(_("U_pload (%s):"), _(speed_K_str)),
+        gtr_sprintf(_("U_pload (%s):"), _(speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
     t->add_row(
         row,
-        Glib::ustring::sprintf(_("Do_wnload (%s):"), _(speed_K_str)),
+        gtr_sprintf(_("Do_wnload (%s):"), _(speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {

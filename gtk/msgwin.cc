@@ -169,7 +169,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window* parent, Glib::ustring const& fi
     {
         auto* w = new Gtk::MessageDialog(
             *parent,
-            Glib::ustring::sprintf(_("Couldn't save \"%s\""), filename),
+            gtr_sprintf(_("Couldn't save \"%s\""), filename),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);
@@ -358,11 +358,11 @@ tr_log_message* addMessages(Glib::RefPtr<Gtk::ListStore> const& store, tr_log_me
         /* if it's an error message, dump it to the terminal too */
         if (i->level == TR_LOG_ERROR)
         {
-            auto gstr = Glib::ustring::sprintf("%s:%d %s", i->file, i->line, i->message);
+            auto gstr = gtr_sprintf("%s:%d %s", i->file, i->line, i->message);
 
             if (i->name != nullptr)
             {
-                gstr += Glib::ustring::sprintf(" (%s)", i->name);
+                gstr += gtr_sprintf(" (%s)", i->name);
             }
 
             g_warning("%s", gstr.c_str());

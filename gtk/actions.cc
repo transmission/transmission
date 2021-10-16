@@ -161,8 +161,7 @@ void register_my_icons()
     {
         if (!theme->has_icon(icon.name))
         {
-            auto const p = Gdk::Pixbuf::create_from_resource(
-                Glib::ustring::sprintf(TR_RESOURCE_PATH "icons/%s.png", icon.filename));
+            auto const p = Gdk::Pixbuf::create_from_resource(gtr_sprintf(TR_RESOURCE_PATH "icons/%s.png", icon.filename));
 
             if (p != nullptr)
             {

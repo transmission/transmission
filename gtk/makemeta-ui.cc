@@ -103,15 +103,15 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     /* progress label */
     if (!builder_.isDone)
     {
-        str = Glib::ustring::sprintf(_("Creating \"%s\""), base);
+        str = gtr_sprintf(_("Creating \"%s\""), base);
     }
     else if (builder_.result == TR_MAKEMETA_OK)
     {
-        str = Glib::ustring::sprintf(_("Created \"%s\"!"), base);
+        str = gtr_sprintf(_("Created \"%s\"!"), base);
     }
     else if (builder_.result == TR_MAKEMETA_URL)
     {
-        str = Glib::ustring::sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
     }
     else if (builder_.result == TR_MAKEMETA_CANCELLED)
     {
@@ -119,11 +119,11 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TR_MAKEMETA_IO_READ)
     {
-        str = Glib::ustring::sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = gtr_sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
     }
     else if (builder_.result == TR_MAKEMETA_IO_WRITE)
     {
-        str = Glib::ustring::sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = gtr_sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
     }
     else
     {
@@ -140,9 +140,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     else
     {
         /* how much data we've scanned through to generate checksums */
-        str = Glib::ustring::sprintf(
-            _("Scanned %s"),
-            tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize));
+        str = gtr_sprintf(_("Scanned %s"), tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize));
     }
 
     progress_bar_->set_fraction(fraction);
@@ -258,7 +256,7 @@ void MakeDialog::Impl::onResponse(int response)
             /* destination file */
             auto const dir = destination_chooser_->get_filename();
             auto const base = Glib::path_get_basename(builder_->top);
-            auto const target = Glib::ustring::sprintf("%s/%s.torrent", dir, base).raw();
+            auto const target = gtr_sprintf("%s/%s.torrent", dir, base).raw();
 
             /* build the array of trackers */
             auto const tracker_text = announce_text_buffer_->get_text(false);
@@ -326,7 +324,7 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        gstr += Glib::ustring::sprintf(
+        gstr += gtr_sprintf(
             ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder_->fileCount),
             tr_strlsize(builder_->totalSize),
             builder_->fileCount);
@@ -334,7 +332,7 @@ void MakeDialog::Impl::updatePiecesLabel()
 
         char buf[128];
         tr_formatter_mem_B(buf, builder_->pieceSize, sizeof(buf));
-        gstr += Glib::ustring::sprintf(
+        gstr += gtr_sprintf(
             ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
             builder_->pieceCount,
             buf);

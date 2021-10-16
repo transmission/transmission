@@ -38,7 +38,7 @@ std::list<std::string> get_recent_destinations()
 
     for (int i = 0; i < N_RECENT; ++i)
     {
-        auto const key = Glib::ustring::sprintf("recent-download-dir-%d", i + 1);
+        auto const key = gtr_sprintf("recent-download-dir-%d", i + 1);
 
         if (auto const val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); !val.empty())
         {
@@ -69,7 +69,7 @@ void save_recent_destination(Glib::RefPtr<TrCore> const& core, std::string const
     int i = 0;
     for (auto const& d : list)
     {
-        auto const key = Glib::ustring::sprintf("recent-download-dir-%d", ++i);
+        auto const key = gtr_sprintf("recent-download-dir-%d", ++i);
         gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d);
     }
 

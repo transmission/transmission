@@ -110,22 +110,22 @@ Glib::ustring tr_strltime(time_t seconds)
     int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
-    auto const d = Glib::ustring::sprintf(ngettext("%'d day", "%'d days", days), days);
-    auto const h = Glib::ustring::sprintf(ngettext("%'d hour", "%'d hours", hours), hours);
-    auto const m = Glib::ustring::sprintf(ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    auto const s = Glib::ustring::sprintf(ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
+    auto const d = gtr_sprintf(ngettext("%'d day", "%'d days", days), days);
+    auto const h = gtr_sprintf(ngettext("%'d hour", "%'d hours", hours), hours);
+    auto const m = gtr_sprintf(ngettext("%'d minute", "%'d minutes", minutes), minutes);
+    auto const s = gtr_sprintf(ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
 
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : Glib::ustring::sprintf("%s, %s", d, h);
+        return (days >= 4 || hours == 0) ? d : gtr_sprintf("%s, %s", d, h);
     }
     else if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : Glib::ustring::sprintf("%s, %s", h, m);
+        return (hours >= 4 || minutes == 0) ? h : gtr_sprintf("%s, %s", h, m);
     }
     else if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : Glib::ustring::sprintf("%s, %s", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : gtr_sprintf("%s, %s", m, s);
     }
     else
     {
@@ -225,18 +225,18 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* dupli
 
     if (err == TR_PARSE_ERR)
     {
-        secondary = Glib::ustring::sprintf(_("The torrent file \"%s\" contains invalid data."), filename);
+        secondary = gtr_sprintf(_("The torrent file \"%s\" contains invalid data."), filename);
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
-        secondary = Glib::ustring::sprintf(
+        secondary = gtr_sprintf(
             _("The torrent file \"%s\" is already in use by \"%s.\""),
             filename,
             tr_torrentName(duplicate_torrent));
     }
     else
     {
-        secondary = Glib::ustring::sprintf(_("The torrent file \"%s\" encountered an unknown error."), filename);
+        secondary = gtr_sprintf(_("The torrent file \"%s\" encountered an unknown error."), filename);
     }
 
     auto* w = new Gtk::MessageDialog(*win, _("Error opening torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
@@ -333,10 +333,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
 
 Glib::ustring gtr_get_help_uri()
 {
-    static auto const uri = Glib::ustring::sprintf(
-        "https://transmissionbt.com/help/gtk/%d.%dx",
-        MAJOR_VERSION,
-        MINOR_VERSION / 10);
+    static auto const uri = gtr_sprintf("https://transmissionbt.com/help/gtk/%d.%dx", MAJOR_VERSION, MINOR_VERSION / 10);
     return uri;
 }
 
@@ -529,12 +526,12 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto* w = new Gtk::MessageDialog(*window, _("Unrecognized URL"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
 
-    gstr += Glib::ustring::sprintf(_("Transmission doesn't know how to use \"%s\""), url);
+    gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 
     if (gtr_is_magnet_link(url) && url.find(xt) == Glib::ustring::npos)
     {
         gstr += "\n \n";
-        gstr += Glib::ustring::sprintf(
+        gstr += gtr_sprintf(
             _("This magnet link appears to be intended for something other than BitTorrent. "
               "BitTorrent magnet links have a section containing \"%s\"."),
             xt);
@@ -614,8 +611,8 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     }
 
     auto const bytes = tr_sessionGetDirFreeSpace(session, dir_.c_str());
-    auto const text = bytes < 0 ? _("Error") : Glib::ustring::sprintf(_("%s free"), tr_strlsize(bytes));
-    auto const markup = Glib::ustring::sprintf("<i>%s</i>", text);
+    auto const text = bytes < 0 ? _("Error") : gtr_sprintf(_("%s free"), tr_strlsize(bytes));
+    auto const markup = gtr_sprintf("<i>%s</i>", text);
     label_.set_markup(markup);
 
     return true;

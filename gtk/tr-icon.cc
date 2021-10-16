@@ -105,7 +105,7 @@ void SystemTrayIcon::Impl::refresh()
     {
         char buf[64];
         tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        upLimit = Glib::ustring::sprintf(_(" (Limit: %s)"), buf);
+        upLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
     }
 
     /* down */
@@ -125,14 +125,14 @@ void SystemTrayIcon::Impl::refresh()
     {
         char buf[64];
         tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        downLimit = Glib::ustring::sprintf(_(" (Limit: %s)"), buf);
+        downLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
     }
 
     /* %1$s: current upload speed
      * %2$s: current upload limit, if any
      * %3$s: current download speed
      * %4$s: current download limit, if any */
-    auto const tip = Glib::ustring::sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
+    auto const tip = gtr_sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
 
     icon_->set_tooltip_text(tip);
 }
