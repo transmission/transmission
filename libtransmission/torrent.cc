@@ -3002,10 +3002,8 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 
     for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
     {
-        char* filename;
-
         /* try to find the file, looking in the partial and download dirs */
-        filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
+        char* filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
 
         if (!tr_sys_path_exists(filename, nullptr))
         {
@@ -3042,11 +3040,10 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
-    tr_sys_dir_t odir;
-    if ((odir = tr_sys_dir_open(tmpdir, nullptr)) != TR_BAD_SYS_DIR)
+    tr_sys_dir_t const odir = tr_sys_dir_open(tmpdir, nullptr);
+    if (odir != TR_BAD_SYS_DIR)
     {
-        char const* name;
-
+        char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
@@ -3085,12 +3082,9 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     /* build a list of 'top's child directories that belong to this torrent */
     for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
     {
-        char* dir;
-        char* filename;
-
         /* get the directory that this file goes in... */
-        filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
-        dir = tr_sys_path_dirname(filename, nullptr);
+        char* const filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
+        char* dir = tr_sys_path_dirname(filename, nullptr);
         tr_free(filename);
 
         if (dir == nullptr)
@@ -3188,10 +3182,10 @@ static void setLocation(void* vdata)
          * if the target directory runs out of space halfway through... */
         for (tr_file_index_t i = 0; !err && i < tor->info.fileCount; ++i)
         {
-            char* sub;
-            char const* oldbase;
-            tr_file const* f = &tor->info.files[i];
+            tr_file const* const f = &tor->info.files[i];
 
+            char const* oldbase = nullptr;
+            char* sub = nullptr;
             if (tr_torrentFindFile2(tor, i, &oldbase, &sub, nullptr))
             {
                 char* oldpath = tr_buildPath(oldbase, sub, nullptr);
