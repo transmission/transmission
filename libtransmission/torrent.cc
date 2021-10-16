@@ -3529,10 +3529,10 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
 
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 {
-    char* subpath;
     char* ret = nullptr;
-    char const* base;
 
+    char const* base = nullptr;
+    char* subpath = nullptr;
     if (tr_torrentFindFile2(tor, fileNum, &base, &subpath, nullptr))
     {
         ret = tr_buildPath(base, subpath, nullptr);
