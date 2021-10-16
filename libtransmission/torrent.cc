@@ -1078,16 +1078,15 @@ tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
 
 tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_duplicate_id)
 {
+    tr_torrent* tor = nullptr;
+
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(tr_isSession(tr_ctorGetSession(ctor)));
 
-    size_t len;
-    bool hasInfo;
-    tr_info tmpInfo;
-    tr_parse_result r;
-    tr_torrent* tor = nullptr;
-
-    r = torrentParseImpl(ctor, &tmpInfo, &hasInfo, &len, setme_duplicate_id);
+    auto tmpInfo = tr_info{};
+    auto hasInfo = bool{};
+    auto len = size_t{};
+    tr_parse_result const r = torrentParseImpl(ctor, &tmpInfo, &hasInfo, &len, setme_duplicate_id);
 
     if (r == TR_PARSE_OK)
     {
