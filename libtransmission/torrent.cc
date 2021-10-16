@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -3286,54 +3287,33 @@ void tr_torrentSetLocation(
 
 char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
 {
-    struct count
-    {
-        uint64_t length;
-        char const* mime_type;
-    };
-
     tr_info const* inf = &tor->info;
-    struct count* counts = tr_new0(struct count, inf->fileCount);
-    size_t num_counts = 0;
 
+    // count up how many bytes there are for each mime-type in the torrent
+    // NB: get_mime_type_for_filename() always returns the same ptr for a
+    // mime_type, so its raw pointer can be used as a key.
+    // TODO: tr_get_mime_type_for_filename should return a std::string_view
+    auto size_per_mime_type = std::unordered_map<char const*, size_t>{};
     for (tr_file const *it = inf->files, *end = it + inf->fileCount; it != end; ++it)
     {
         char const* mime_type = tr_get_mime_type_for_filename(it->name);
-        size_t i;
-        for (i = 0; i < num_counts; ++i)
-        {
-            if (counts[i].mime_type == mime_type)
-            {
-                counts[i].length += it->length;
-                break;
-            }
-        }
-
-        if (i == num_counts)
-        {
-            counts[i].mime_type = mime_type;
-            counts[i].length = it->length;
-            ++num_counts;
-        }
+        size_per_mime_type[mime_type] += it->length;
     }
 
-    uint64_t max_len = 0;
-    char const* mime_type = nullptr;
-    for (struct count const *it = counts, *end = it + num_counts; it != end; ++it)
+    // now that we have the totals,
+    // sort by number so that we can get the biggest
+    auto mime_type_per_size = std::map<size_t, char const*>{};
+    for (auto it : size_per_mime_type)
     {
-        if ((max_len < it->length) && (it->mime_type != nullptr))
-        {
-            max_len = it->length;
-            mime_type = it->mime_type;
-        }
+        mime_type_per_size.emplace(it.second, it.first);
     }
-
-    tr_free(counts);
 
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     // application/octet-stream is the default value for all other cases.
     // An unknown file type should use this type.
-    return mime_type != nullptr ? mime_type : "application/octet-stream";
+    char const* const fallback = "application/octet-stream";
+
+    return std::empty(mime_type_per_size) ? fallback : mime_type_per_size.rbegin()->second;
 }
 
 /***
