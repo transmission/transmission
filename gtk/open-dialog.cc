@@ -37,7 +37,7 @@ static GSList* get_recent_destinations(void)
         char const* val;
         g_snprintf(key, sizeof(key), "recent-download-dir-%d", i + 1);
 
-        if ((val = gtr_pref_string_get(tr_quark_new(key, TR_BAD_SIZE))) != nullptr)
+        if ((val = gtr_pref_string_get(tr_quark_new(key))) != nullptr)
         {
             list = g_slist_append(list, (void*)val);
         }
@@ -78,7 +78,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
     {
         char key[64];
         g_snprintf(key, sizeof(key), "recent-download-dir-%d", i + 1);
-        gtr_pref_string_set(tr_quark_new(key, TR_BAD_SIZE), static_cast<char const*>(l->data));
+        gtr_pref_string_set(tr_quark_new(key), static_cast<char const*>(l->data));
     }
 
     gtr_pref_save(gtr_core_session(core));

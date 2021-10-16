@@ -7,6 +7,7 @@
  */
 
 #include "transmission.h"
+
 #include "metainfo.h"
 #include "utils.h"
 
@@ -21,11 +22,11 @@ TEST(Metainfo, magnetLink)
     // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
     char const constexpr* const MagnetLink =
         "magnet:?"
-        "xt=urn:btih:14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E"
-        "&dn=ubuntu+12+04+1+desktop+32+bit"
+        "xt=urn:btih:14ffe5dd23188fd5cb53a1d47f1289db70abf31e"
+        "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http://transmissionbt.com ";
+        "&ws=http%3A%2F%2Ftransmissionbt.com";
 
     auto* ctor = tr_ctorNew(nullptr);
     tr_ctorSetMetainfoFromMagnetLink(ctor, MagnetLink);
@@ -38,6 +39,10 @@ TEST(Metainfo, magnetLink)
     EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
     EXPECT_EQ(1, inf.webseedCount);
     EXPECT_STREQ("http://transmissionbt.com", inf.webseeds[0]);
+
+    auto* const link = tr_torrentInfoGetMagnetLink(&inf);
+    EXPECT_STREQ(MagnetLink, link);
+    tr_free(link);
 
     /* cleanup */
     tr_metainfoFree(&inf);
@@ -160,4 +165,17 @@ TEST(Metainfo, sanitize)
 
         tr_free(result);
     }
+}
+
+TEST(Metainfo, AndroidTorrent)
+{
+    auto* ctor = tr_ctorNew(nullptr);
+
+    auto filename = std::string{ LIBTRANSMISSION_TEST_ASSETS_DIR };
+    filename += '/'; // FIXME
+    filename += "Android-x86 8.1 r6 iso.torrent";
+    auto const err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
+    EXPECT_EQ(0, err);
+
+    tr_ctorFree(ctor);
 }

@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <cstdlib> /* strtol */
 #include <cstring> /* strcmp */
+#include <string_view>
 
 #ifndef ZLIB_CONST
 #define ZLIB_CONST
@@ -26,7 +27,7 @@
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
-#include "platform-quota.h" /* tr_device_info_get_free_space() */
+#include "platform-quota.h" /* tr_device_info_get_disk_space() */
 #include "rpcimpl.h"
 #include "session.h"
 #include "session-id.h"
@@ -39,8 +40,9 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION 16
-#define RPC_VERSION_MIN 1
+#define RPC_VERSION 17
+#define RPC_VERSION_MIN 14
+#define RPC_VERSION_SEMVER "5.3.0"
 
 #define RECENTLY_ACTIVE_SECONDS 60
 
@@ -995,7 +997,7 @@ static char const* torrentGet(
             size_t len;
             if (tr_variantGetStr(tr_variantListChild(fields, i), &strVal, &len))
             {
-                keys[keyCount++] = tr_quark_new(strVal, len);
+                keys[keyCount++] = tr_quark_new(std::string_view{ strVal, len });
             }
         }
 
@@ -2211,14 +2213,24 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
+    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_added_filename, &str, nullptr))
+    {
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, str);
+    }
+
+    if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_added_enabled, &boolVal))
+    {
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
+    }
+
     if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_filename, &str, nullptr))
     {
-        tr_sessionSetTorrentDoneScript(session, str);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, str);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetTorrentDoneScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &boolVal))
@@ -2375,7 +2387,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_device_info_get_free_space(s->downloadDir));
+        tr_variantDictAddInt(d, key, tr_device_info_get_disk_space(s->downloadDir).free);
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2438,6 +2450,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         tr_variantDictAddInt(d, key, RPC_VERSION);
         break;
 
+    case TR_KEY_rpc_version_semver:
+        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
+        break;
+
     case TR_KEY_rpc_version_minimum:
         tr_variantDictAddInt(d, key, RPC_VERSION_MIN);
         break;
@@ -2490,12 +2506,20 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         tr_variantDictAddBool(d, key, tr_sessionIsSpeedLimited(s, TR_DOWN));
         break;
 
+    case TR_KEY_script_torrent_added_filename:
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        break;
+
+    case TR_KEY_script_torrent_added_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        break;
+
     case TR_KEY_script_torrent_done_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetTorrentDoneScript(s));
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsTorrentDoneScriptEnabled(s));
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_queue_stalled_enabled:
@@ -2602,7 +2626,7 @@ static char const* freeSpace(
     int tmperr;
     char const* path = nullptr;
     char const* err = nullptr;
-    int64_t free_space = -1;
+    struct tr_disk_space dir_space = { -1, -1 };
 
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, nullptr))
     {
@@ -2617,9 +2641,9 @@ static char const* freeSpace(
     /* get the free space */
     tmperr = errno;
     errno = 0;
-    free_space = tr_sessionGetDirFreeSpace(session, path);
+    dir_space = tr_getDirSpace(path);
 
-    if (free_space < 0)
+    if (dir_space.free < 0 || dir_space.total < 0)
     {
         err = tr_strerror(errno);
     }
@@ -2632,7 +2656,8 @@ static char const* freeSpace(
         tr_variantDictAddStr(args_out, TR_KEY_path, path);
     }
 
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, free_space);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
     return err;
 }
 
@@ -2811,14 +2836,14 @@ void tr_rpc_request_exec_json(
  * - values that are all-digits or commas are number lists
  * - all other values are strings
  */
-void tr_rpc_parse_list_str(tr_variant* setme, char const* str, size_t len)
+void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    auto const values = tr_parseNumberRange(str, len);
+    auto const values = tr_parseNumberRange(str);
     auto const valueCount = std::size(values);
 
     if (valueCount == 0)
     {
-        tr_variantInitStr(setme, str, len);
+        tr_variantInitStr(setme, std::data(str), std::size(str));
     }
     else if (valueCount == 1)
     {
@@ -2864,15 +2889,12 @@ void tr_rpc_request_exec_uri(
 
         if (delim != nullptr)
         {
-            char* key = tr_strndup(pch, (size_t)(delim - pch));
-            bool isArg = strcmp(key, "method") != 0 && strcmp(key, "tag") != 0;
+            auto const key = std::string_view{ pch, size_t(delim - pch) };
+            bool isArg = key != "method" && key != "tag";
             tr_variant* parent = isArg ? args : &top;
 
-            tr_rpc_parse_list_str(
-                tr_variantDictAdd(parent, tr_quark_new(key, (size_t)(delim - pch))),
-                delim + 1,
-                next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
-            tr_free(key);
+            auto const val = std::string_view{ delim + 1, next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1) };
+            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
         }
 
         pch = next != nullptr ? next + 1 : nullptr;

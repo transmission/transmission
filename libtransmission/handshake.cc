@@ -659,11 +659,9 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             dbgmsg(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
         }
-        else
-        {
-            TR_ASSERT(!tr_peerIoHasTorrentHash(handshake->io));
-            tr_peerIoSetTorrentHash(handshake->io, hash);
-        }
+
+        TR_ASSERT(!tr_peerIoHasTorrentHash(handshake->io));
+        tr_peerIoSetTorrentHash(handshake->io, hash);
     }
     else /* outgoing */
     {
@@ -775,17 +773,14 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         setState(handshake, AWAITING_CRYPTO_PROVIDE);
         return READ_NOW;
     }
-    else
+
+    size_t const len = evbuffer_get_length(inbuf);
+    if (len > SHA_DIGEST_LENGTH)
     {
-        size_t const len = evbuffer_get_length(inbuf);
-
-        if (len > SHA_DIGEST_LENGTH)
-        {
-            evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
-        }
-
-        return READ_LATER;
+        evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
+
+    return READ_LATER;
 }
 
 static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inbuf)
@@ -998,7 +993,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 ****
 ***/
 
-static ReadState canRead(struct tr_peerIo* io, void* vhandshake, size_t* piece)
+static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
@@ -1147,7 +1142,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !tr_peerIoIsIncoming(io) && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1248,12 +1243,12 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     return handshake;
 }
 
-struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
+tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
 {
     TR_ASSERT(handshake != nullptr);
     TR_ASSERT(handshake->io != nullptr);
 
-    struct tr_peerIo* io = handshake->io;
+    tr_peerIo* io = handshake->io;
     handshake->io = nullptr;
     return io;
 }

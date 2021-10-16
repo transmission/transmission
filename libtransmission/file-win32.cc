@@ -998,9 +998,9 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
 {
-    TR_STATIC_ASSERT(TR_SEEK_SET == FILE_BEGIN, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_CUR == FILE_CURRENT, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_END == FILE_END, "values should match");
+    static_assert(TR_SEEK_SET == FILE_BEGIN, "values should match");
+    static_assert(TR_SEEK_CUR == FILE_CURRENT, "values should match");
+    static_assert(TR_SEEK_END == FILE_END, "values should match");
 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
@@ -1387,7 +1387,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
 #ifndef __clang__
     /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == nullptr, "values should match");
+    static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
 #endif
 
     TR_ASSERT(path != nullptr);

@@ -199,10 +199,8 @@ public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
         , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
-        , state{ AWAITING_BT_LENGTH }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
-        , outMessagesBatchedAt{ 0 }
         , io{ io_in }
         , callback_{ callback }
         , callbackData_{ callbackData }
@@ -610,7 +608,7 @@ public:
 
     UniqueTimer pex_timer;
 
-    struct tr_peerIo* io = nullptr;
+    tr_peerIo* io = nullptr;
 
 private:
     bool is_active_[2] = { false, false };
@@ -998,7 +996,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     if (version_quark == 0)
     {
-        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX, TR_BAD_SIZE);
+        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX);
     }
 
     dbgmsg(msgs, "sending an ltep handshake");
@@ -1405,15 +1403,14 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
         msgs->state = AWAITING_BT_PIECE;
         return READ_NOW;
     }
-    else if (msgs->incoming.length != 1)
+
+    if (msgs->incoming.length != 1)
     {
         msgs->state = AWAITING_BT_MESSAGE;
         return READ_NOW;
     }
-    else
-    {
-        return readBtMessage(msgs, inbuf, inlen - 1);
-    }
+
+    return readBtMessage(msgs, inbuf, inlen - 1);
 }
 
 static void updatePeerProgress(tr_peerMsgsImpl* msgs)
@@ -1557,51 +1554,44 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         dbgmsg(msgs, "got incoming block header %u:%u->%u", req->index, req->offset, req->length);
         return READ_NOW;
     }
-    else
+
+    if (msgs->incoming.block == nullptr)
     {
-        int err;
-        size_t n;
-        size_t nLeft;
-        struct evbuffer* block_buffer;
-
-        if (msgs->incoming.block == nullptr)
-        {
-            msgs->incoming.block = evbuffer_new();
-        }
-
-        block_buffer = msgs->incoming.block;
-
-        /* read in another chunk of data */
-        nLeft = req->length - evbuffer_get_length(block_buffer);
-        n = std::min(nLeft, inlen);
-
-        tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
-
-        msgs->publishClientGotPieceData(n);
-        *setme_piece_bytes_read += n;
-        dbgmsg(
-            msgs,
-            "got %zu bytes for block %u:%u->%u ... %d remain",
-            n,
-            req->index,
-            req->offset,
-            req->length,
-            (int)(req->length - evbuffer_get_length(block_buffer)));
-
-        if (evbuffer_get_length(block_buffer) < req->length)
-        {
-            return READ_LATER;
-        }
-
-        /* pass the block along... */
-        err = clientGotBlock(msgs, block_buffer, req);
-        evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
-
-        /* cleanup */
-        req->length = 0;
-        msgs->state = AWAITING_BT_LENGTH;
-        return err != 0 ? READ_ERR : READ_NOW;
+        msgs->incoming.block = evbuffer_new();
     }
+
+    struct evbuffer* const block_buffer = msgs->incoming.block;
+
+    /* read in another chunk of data */
+    size_t const nLeft = req->length - evbuffer_get_length(block_buffer);
+    size_t const n = std::min(nLeft, inlen);
+
+    tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
+
+    msgs->publishClientGotPieceData(n);
+    *setme_piece_bytes_read += n;
+    dbgmsg(
+        msgs,
+        "got %zu bytes for block %u:%u->%u ... %d remain",
+        n,
+        req->index,
+        req->offset,
+        req->length,
+        (int)(req->length - evbuffer_get_length(block_buffer)));
+
+    if (evbuffer_get_length(block_buffer) < req->length)
+    {
+        return READ_LATER;
+    }
+
+    /* pass the block along... */
+    int const err = clientGotBlock(msgs, block_buffer, req);
+    evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
+
+    /* cleanup */
+    req->length = 0;
+    msgs->state = AWAITING_BT_LENGTH;
+    return err != 0 ? READ_ERR : READ_NOW;
 }
 
 static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)

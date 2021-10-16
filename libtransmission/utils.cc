@@ -63,7 +63,7 @@
 #include "mime-types.h"
 #include "net.h"
 #include "platform.h" /* tr_lockLock() */
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
+#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -390,24 +390,21 @@ char* tr_buildPath(char const* first_element, ...)
     return buf;
 }
 
-int64_t tr_getDirFreeSpace(char const* dir)
+struct tr_disk_space tr_getDirSpace(char const* dir)
 {
-    int64_t free_space;
+    struct tr_disk_space disk_space = { -1, -1 };
 
     if (tr_str_is_empty(dir))
     {
         errno = EINVAL;
-        free_space = -1;
-    }
-    else
-    {
-        struct tr_device_info* info;
-        info = tr_device_info_create(dir);
-        free_space = tr_device_info_get_free_space(info);
-        tr_device_info_free(info);
+        return disk_space;
     }
 
-    return free_space;
+    struct tr_device_info* info;
+    info = tr_device_info_create(dir);
+    disk_space = tr_device_info_get_disk_space(info);
+    tr_device_info_free(info);
+    return disk_space;
 }
 
 /****
@@ -1134,26 +1131,11 @@ static char* to_utf8(char const* in, size_t inlen)
     return ret;
 }
 
-char* tr_utf8clean(char const* str, size_t max_len)
+char* tr_utf8clean(std::string_view str)
 {
-    char* ret;
-    char const* end;
-
-    if (max_len == TR_BAD_SIZE)
-    {
-        max_len = strlen(str);
-    }
-
-    if (tr_utf8_validate(str, max_len, &end))
-    {
-        ret = tr_strndup(str, max_len);
-    }
-    else
-    {
-        ret = to_utf8(str, max_len);
-    }
-
-    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, nullptr));
+    char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
+                                                                                  to_utf8(std::data(str), std::size(str));
+    TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
     return ret;
 }
 
@@ -1374,27 +1356,30 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(char const* str, char const* const end, number_range& range)
+static bool parseNumberSection(std::string_view str, number_range& range)
 {
     bool success;
     auto const error = errno;
 
 #if defined(HAVE_CHARCONV)
-    auto result = std::from_chars(str, end, range.low);
+    // wants char*, so string_view::iterator don't work. make our own begin/end
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
+    auto result = std::from_chars(begin_ch, end_ch, range.low);
     success = result.ec == std::errc{};
     if (success)
     {
         range.high = range.low;
-        if (result.ptr != end && *result.ptr == '-')
+        if (result.ptr < end_ch && *result.ptr == '-')
         {
-            result = std::from_chars(result.ptr + 1, end, range.high);
+            result = std::from_chars(result.ptr + 1, end_ch, range.high);
             success = result.ec == std::errc{};
         }
     }
 #else
     try
     {
-        auto tmp = std::string(str, end);
+        auto tmp = std::string(str);
         auto pos = size_t{};
         range.low = range.high = std::stoi(tmp, &pos);
         if (pos != std::size(tmp) && tmp[pos] == '-')
@@ -1421,26 +1406,27 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
  * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
+std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
 
-    auto const* const end = str + (len != TR_BAD_SIZE ? len : strlen(str));
-    for (auto const* walk = str; walk < end;)
+    for (;;)
     {
-        auto delim = std::find(walk, end, ',');
+        auto const delim = str.find(',');
         auto range = number_range{};
-        if (!parseNumberSection(walk, delim, range))
+        if (!parseNumberSection(str.substr(0, delim), range))
         {
             break;
         }
-
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-
-        walk = delim + 1;
+        if (delim == std::string_view::npos)
+        {
+            break;
+        }
+        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };
@@ -1620,10 +1606,13 @@ struct formatter_unit
     size_t value;
 };
 
+using formatter_units = std::array<formatter_unit, 4>;
+/*
 struct formatter_units
 {
     struct formatter_unit units[4];
 };
+*/
 
 enum
 {
@@ -1633,60 +1622,52 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(
-    struct formatter_units* units,
-    size_t kilo,
-    char const* kb,
-    char const* mb,
-    char const* gb,
-    char const* tb)
+static void formatter_init(formatter_units& units, size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     size_t value;
 
     value = kilo;
-    units->units[TR_FMT_KB].name = tr_strdup(kb);
-    units->units[TR_FMT_KB].value = value;
+    units[TR_FMT_KB].name = tr_strdup(kb);
+    units[TR_FMT_KB].value = value;
 
     value *= kilo;
-    units->units[TR_FMT_MB].name = tr_strdup(mb);
-    units->units[TR_FMT_MB].value = value;
+    units[TR_FMT_MB].name = tr_strdup(mb);
+    units[TR_FMT_MB].value = value;
 
     value *= kilo;
-    units->units[TR_FMT_GB].name = tr_strdup(gb);
-    units->units[TR_FMT_GB].value = value;
+    units[TR_FMT_GB].name = tr_strdup(gb);
+    units[TR_FMT_GB].value = value;
 
     value *= kilo;
-    units->units[TR_FMT_TB].name = tr_strdup(tb);
-    units->units[TR_FMT_TB].value = value;
+    units[TR_FMT_TB].name = tr_strdup(tb);
+    units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(struct formatter_units const* u, char* buf, size_t bytes, size_t buflen)
+static char* formatter_get_size_str(formatter_units const& u, char* buf, size_t bytes, size_t buflen)
 {
-    int precision;
-    double value;
-    char const* units;
-    struct formatter_unit const* unit;
+    formatter_unit const* unit;
 
-    if (bytes < u->units[1].value)
+    if (bytes < u[1].value)
     {
-        unit = &u->units[0];
+        unit = &u[0];
     }
-    else if (bytes < u->units[2].value)
+    else if (bytes < u[2].value)
     {
-        unit = &u->units[1];
+        unit = &u[1];
     }
-    else if (bytes < u->units[3].value)
+    else if (bytes < u[3].value)
     {
-        unit = &u->units[2];
+        unit = &u[2];
     }
     else
     {
-        unit = &u->units[3];
+        unit = &u[3];
     }
 
-    value = (double)bytes / unit->value;
-    units = unit->name;
+    double value = (double)bytes / unit->value;
+    char const* units = unit->name;
 
+    int precision = 0;
     if (unit->value == 1)
     {
         precision = 0;
@@ -1704,36 +1685,36 @@ static char* formatter_get_size_str(struct formatter_units const* u, char* buf, 
     return buf;
 }
 
-static struct formatter_units size_units;
+static formatter_units size_units;
 
 void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
-    formatter_init(&size_units, kilo, kb, mb, gb, tb);
+    formatter_init(size_units, kilo, kb, mb, gb, tb);
 }
 
 char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen)
 {
-    return formatter_get_size_str(&size_units, buf, bytes, buflen);
+    return formatter_get_size_str(size_units, buf, bytes, buflen);
 }
 
-static struct formatter_units speed_units;
+static formatter_units speed_units;
 
 size_t tr_speed_K = 0;
 
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_speed_K = kilo;
-    formatter_init(&speed_units, kilo, kb, mb, gb, tb);
+    formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 {
-    double const K = speed_units.units[TR_FMT_KB].value;
+    double const K = speed_units[TR_FMT_KB].value;
     double speed = KBps;
 
     if (speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
-        tr_snprintf(buf, buflen, "%d %s", (int)speed, speed_units.units[TR_FMT_KB].name);
+        tr_snprintf(buf, buflen, "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
     }
     else
     {
@@ -1741,34 +1722,34 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
         {
-            tr_snprintf(buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_MB].name);
+            tr_snprintf(buf, buflen, "%.2f %s", speed, speed_units[TR_FMT_MB].name);
         }
         else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
         {
-            tr_snprintf(buf, buflen, "%.1f %s", speed, speed_units.units[TR_FMT_MB].name);
+            tr_snprintf(buf, buflen, "%.1f %s", speed, speed_units[TR_FMT_MB].name);
         }
         else
         {
-            tr_snprintf(buf, buflen, "%.1f %s", speed / K, speed_units.units[TR_FMT_GB].name);
+            tr_snprintf(buf, buflen, "%.1f %s", speed / K, speed_units[TR_FMT_GB].name);
         }
     }
 
     return buf;
 }
 
-static struct formatter_units mem_units;
+static formatter_units mem_units;
 
 size_t tr_mem_K = 0;
 
 void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_mem_K = kilo;
-    formatter_init(&mem_units, kilo, kb, mb, gb, tb);
+    formatter_init(mem_units, kilo, kb, mb, gb, tb);
 }
 
 char* tr_formatter_mem_B(char* buf, size_t bytes_per_second, size_t buflen)
 {
-    return formatter_get_size_str(&mem_units, buf, bytes_per_second, buflen);
+    return formatter_get_size_str(mem_units, buf, bytes_per_second, buflen);
 }
 
 void tr_formatter_get_units(void* vdict)
@@ -1778,28 +1759,25 @@ void tr_formatter_get_units(void* vdict)
 
     tr_variantDictReserve(dict, 6);
 
-    tr_variantDictAddInt(dict, TR_KEY_memory_bytes, mem_units.units[TR_FMT_KB].value);
-    l = tr_variantDictAddList(dict, TR_KEY_memory_units, 4);
-
-    for (int i = 0; i < 4; i++)
+    tr_variantDictAddInt(dict, TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
+    l = tr_variantDictAddList(dict, TR_KEY_memory_units, std::size(mem_units));
+    for (auto const& unit : mem_units)
     {
-        tr_variantListAddStr(l, mem_units.units[i].name);
+        tr_variantListAddStr(l, unit.name);
     }
 
-    tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units.units[TR_FMT_KB].value);
-    l = tr_variantDictAddList(dict, TR_KEY_size_units, 4);
-
-    for (int i = 0; i < 4; i++)
+    tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
+    l = tr_variantDictAddList(dict, TR_KEY_size_units, std::size(size_units));
+    for (auto const& unit : size_units)
     {
-        tr_variantListAddStr(l, size_units.units[i].name);
+        tr_variantListAddStr(l, unit.name);
     }
 
-    tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units.units[TR_FMT_KB].value);
-    l = tr_variantDictAddList(dict, TR_KEY_speed_units, 4);
-
-    for (int i = 0; i < 4; i++)
+    tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
+    l = tr_variantDictAddList(dict, TR_KEY_speed_units, std::size(speed_units));
+    for (auto const& unit : speed_units)
     {
-        tr_variantListAddStr(l, speed_units.units[i].name);
+        tr_variantListAddStr(l, unit.name);
     }
 }
 
