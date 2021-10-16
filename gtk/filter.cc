@@ -6,6 +6,7 @@
  *
  */
 
+#include <set>
 #include <stdlib.h> /* qsort() */
 #include <unordered_map>
 

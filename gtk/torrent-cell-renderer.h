@@ -22,19 +22,10 @@ public:
     ~TorrentCellRenderer() override;
 
     Glib::PropertyProxy<void*> property_torrent();
-    Glib::PropertyProxy_ReadOnly<void*> property_torrent() const;
-
     Glib::PropertyProxy<double> property_piece_upload_speed();
-    Glib::PropertyProxy_ReadOnly<double> property_piece_upload_speed() const;
-
     Glib::PropertyProxy<double> property_piece_download_speed();
-    Glib::PropertyProxy_ReadOnly<double> property_piece_download_speed() const;
-
     Glib::PropertyProxy<int> property_bar_height();
-    Glib::PropertyProxy_ReadOnly<int> property_bar_height() const;
-
     Glib::PropertyProxy<bool> property_compact();
-    Glib::PropertyProxy_ReadOnly<bool> property_compact() const;
 
 protected:
     void get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const override;

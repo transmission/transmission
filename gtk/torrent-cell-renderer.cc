@@ -837,19 +837,9 @@ Glib::PropertyProxy<void*> TorrentCellRenderer::property_torrent()
     return impl_->torrent.get_proxy();
 }
 
-Glib::PropertyProxy_ReadOnly<void*> TorrentCellRenderer::property_torrent() const
-{
-    return std::as_const(impl_->torrent).get_proxy();
-}
-
 Glib::PropertyProxy<double> TorrentCellRenderer::property_piece_upload_speed()
 {
     return impl_->upload_speed_KBps.get_proxy();
-}
-
-Glib::PropertyProxy_ReadOnly<double> TorrentCellRenderer::property_piece_upload_speed() const
-{
-    return std::as_const(impl_->upload_speed_KBps).get_proxy();
 }
 
 Glib::PropertyProxy<double> TorrentCellRenderer::property_piece_download_speed()
@@ -857,27 +847,12 @@ Glib::PropertyProxy<double> TorrentCellRenderer::property_piece_download_speed()
     return impl_->download_speed_KBps.get_proxy();
 }
 
-Glib::PropertyProxy_ReadOnly<double> TorrentCellRenderer::property_piece_download_speed() const
-{
-    return std::as_const(impl_->download_speed_KBps).get_proxy();
-}
-
 Glib::PropertyProxy<int> TorrentCellRenderer::property_bar_height()
 {
     return impl_->bar_height.get_proxy();
 }
 
-Glib::PropertyProxy_ReadOnly<int> TorrentCellRenderer::property_bar_height() const
-{
-    return std::as_const(impl_->bar_height).get_proxy();
-}
-
 Glib::PropertyProxy<bool> TorrentCellRenderer::property_compact()
 {
     return impl_->compact.get_proxy();
-}
-
-Glib::PropertyProxy_ReadOnly<bool> TorrentCellRenderer::property_compact() const
-{
-    return std::as_const(impl_->compact).get_proxy();
 }
