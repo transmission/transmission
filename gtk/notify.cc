@@ -164,9 +164,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<TrCore> const& core, int torrent_
 {
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
-        auto const argv = Glib::ArrayHandle<std::string>(
-            gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command),
-            Glib::OWNERSHIP_DEEP);
+        auto const argv = gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command);
 
         try
         {

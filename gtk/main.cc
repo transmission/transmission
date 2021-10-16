@@ -535,14 +535,14 @@ void Application::on_startup()
     sighandler_cbdata = this;
 
     /* ensure the directories are created */
-    if (char const* str = gtr_pref_string_get(TR_KEY_download_dir); str != nullptr)
+    if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
     {
-        g_mkdir_with_parents(str, 0777);
+        g_mkdir_with_parents(str.c_str(), 0777);
     }
 
-    if (char const* str = gtr_pref_string_get(TR_KEY_incomplete_dir); str != nullptr)
+    if (auto const str = gtr_pref_string_get(TR_KEY_incomplete_dir); !str.empty())
     {
-        g_mkdir_with_parents(str, 0777);
+        g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     /* initialize the libtransmission session */
@@ -688,7 +688,7 @@ int main(int argc, char** argv)
     tr_formatter_speed_init(speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str));
 
     /* set up the config dir */
-    gtr_pref_init(config_dir.c_str());
+    gtr_pref_init(config_dir);
     g_mkdir_with_parents(config_dir.c_str(), 0755);
 
     /* init notifications */
@@ -1075,7 +1075,7 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_download_dir:
-        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key));
+        tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_message_level:
@@ -1091,7 +1091,7 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_blocklist_url:
-        tr_blocklistSetURL(tr, gtr_pref_string_get(key));
+        tr_blocklistSetURL(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_show_notification_area_icon:
@@ -1183,7 +1183,7 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_whitelist:
-        tr_sessionSetRPCWhitelist(tr, gtr_pref_string_get(key));
+        tr_sessionSetRPCWhitelist(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_rpc_whitelist_enabled:
@@ -1191,11 +1191,11 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_rpc_username:
-        tr_sessionSetRPCUsername(tr, gtr_pref_string_get(key));
+        tr_sessionSetRPCUsername(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_rpc_password:
-        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key));
+        tr_sessionSetRPCPassword(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_rpc_authentication_required:
@@ -1239,7 +1239,7 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_incomplete_dir:
-        tr_sessionSetIncompleteDir(tr, gtr_pref_string_get(key));
+        tr_sessionSetIncompleteDir(tr, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_incomplete_dir_enabled:
@@ -1251,7 +1251,7 @@ void Application::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_script_torrent_done_filename:
-        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_string_get(key));
+        tr_sessionSetScript(tr, TR_SCRIPT_ON_TORRENT_DONE, gtr_pref_string_get(key).c_str());
         break;
 
     case TR_KEY_start_added_torrents:

@@ -59,7 +59,7 @@ void sort_changed_cb(Glib::RefPtr<Gtk::RadioAction> const& action, void* /*user_
         return;
     }
 
-    myCore->set_pref(TR_KEY_sort_mode, action->get_name().c_str());
+    myCore->set_pref(TR_KEY_sort_mode, action->get_name());
 }
 
 struct : ActionEntryBase
@@ -190,14 +190,14 @@ void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* call
 
     auto const action_group = Gtk::ActionGroup::create("Actions");
 
-    char const* const match = gtr_pref_string_get(TR_KEY_sort_mode);
+    auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
     Gtk::RadioAction::Group sort_group;
 
     for (auto const& entry : sort_radio_entries)
     {
         auto const action = Gtk::RadioAction::create(sort_group, entry.name, _(entry.label));
 
-        if (g_strcmp0(entry.name, match) == 0)
+        if (entry.name == match)
         {
             action->set_active(true);
         }

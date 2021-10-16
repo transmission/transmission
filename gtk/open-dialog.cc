@@ -40,7 +40,7 @@ std::list<std::string> get_recent_destinations()
     {
         auto const key = Glib::ustring::sprintf("recent-download-dir-%d", i + 1);
 
-        if (char const* val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); val != nullptr)
+        if (auto const val = gtr_pref_string_get(tr_quark_new({ key.c_str(), key.size() })); !val.empty())
         {
             list.push_back(val);
         }
@@ -70,7 +70,7 @@ void save_recent_destination(Glib::RefPtr<TrCore> const& core, std::string const
     for (auto const& d : list)
     {
         auto const key = Glib::ustring::sprintf("recent-download-dir-%d", ++i);
-        gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d.c_str());
+        gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d);
     }
 
     gtr_pref_save(core->get_session());
@@ -413,7 +413,7 @@ OptionsDialog::Impl::Impl(
 void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<TrCore> const& core)
 {
     /* remember this folder the next time we use this dialog */
-    gtr_pref_string_set(TR_KEY_open_dialog_dir, get_current_folder().c_str());
+    gtr_pref_string_set(TR_KEY_open_dialog_dir, get_current_folder());
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
@@ -446,7 +446,7 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
     addTorrentFilters(this);
     signal_response().connect([this, core](int response) { onOpenDialogResponse(response, core); });
 
-    if (char const* folder = gtr_pref_string_get(TR_KEY_open_dialog_dir); folder != nullptr)
+    if (auto const folder = gtr_pref_string_get(TR_KEY_open_dialog_dir); !folder.empty())
     {
         set_current_folder(folder);
     }

@@ -121,7 +121,7 @@ private:
 
     tr_torrent* create_new_torrent(tr_ctor* ctor);
 
-    void set_sort_mode(char const* mode, bool is_reversed);
+    void set_sort_mode(std::string const& mode, bool is_reversed);
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -561,42 +561,42 @@ int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
 
 } // namespace
 
-void TrCore::Impl::set_sort_mode(char const* mode, bool is_reversed)
+void TrCore::Impl::set_sort_mode(std::string const& mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
     auto type = is_reversed ? Gtk::SORT_ASCENDING : Gtk::SORT_DESCENDING;
     auto const sortable = get_model();
 
-    if (g_strcmp0(mode, "sort-by-activity") == 0)
+    if (mode == "sort-by-activity")
     {
         sort_func = &compare_by_activity;
     }
-    else if (g_strcmp0(mode, "sort-by-age") == 0)
+    else if (mode == "sort-by-age")
     {
         sort_func = &compare_by_age;
     }
-    else if (g_strcmp0(mode, "sort-by-progress") == 0)
+    else if (mode == "sort-by-progress")
     {
         sort_func = &compare_by_progress;
     }
-    else if (g_strcmp0(mode, "sort-by-queue") == 0)
+    else if (mode == "sort-by-queue")
     {
         sort_func = &compare_by_queue;
     }
-    else if (g_strcmp0(mode, "sort-by-time-left") == 0)
+    else if (mode == "sort-by-time-left")
     {
         sort_func = &compare_by_eta;
     }
-    else if (g_strcmp0(mode, "sort-by-ratio") == 0)
+    else if (mode == "sort-by-ratio")
     {
         sort_func = &compare_by_ratio;
     }
-    else if (g_strcmp0(mode, "sort-by-state") == 0)
+    else if (mode == "sort-by-state")
     {
         sort_func = &compare_by_state;
     }
-    else if (g_strcmp0(mode, "sort-by-size") == 0)
+    else if (mode == "sort-by-size")
     {
         sort_func = &compare_by_size;
     }
@@ -734,7 +734,7 @@ void TrCore::Impl::on_file_changed_in_watchdir(
 /* walk through the pre-existing files in the watchdir */
 void TrCore::Impl::watchdir_scan()
 {
-    char const* dirname = gtr_pref_string_get(TR_KEY_watch_dir);
+    auto const dirname = gtr_pref_string_get(TR_KEY_watch_dir);
 
     try
     {
@@ -784,7 +784,7 @@ void TrCore::Impl::on_pref_changed(tr_quark const key)
     case TR_KEY_sort_mode:
     case TR_KEY_sort_reversed:
         {
-            char const* mode = gtr_pref_string_get(TR_KEY_sort_mode);
+            auto const mode = gtr_pref_string_get(TR_KEY_sort_mode);
             bool const is_reversed = gtr_pref_flag_get(TR_KEY_sort_reversed);
             set_sort_mode(mode, is_reversed);
             break;
@@ -1114,7 +1114,7 @@ void core_apply_defaults(tr_ctor* ctor)
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, nullptr))
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir));
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, gtr_pref_string_get(TR_KEY_download_dir).c_str());
     }
 }
 
@@ -1572,9 +1572,9 @@ void TrCore::Impl::commit_prefs_change(tr_quark const key)
     gtr_pref_save(session_);
 }
 
-void TrCore::set_pref(tr_quark const key, char const* newval)
+void TrCore::set_pref(tr_quark const key, std::string const& newval)
 {
-    if (g_strcmp0(newval, gtr_pref_string_get(key)) != 0)
+    if (newval != gtr_pref_string_get(key))
     {
         gtr_pref_string_set(key, newval);
         impl_->commit_prefs_change(key);

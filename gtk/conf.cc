@@ -27,9 +27,8 @@
 
 #include <unistd.h>
 
-#include <glib.h>
-#include <glib/gi18n.h>
-#include <glib/gstdio.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
@@ -40,11 +39,11 @@
 
 #define MY_CONFIG_NAME "transmission"
 
-static char* gl_confdir = nullptr;
+std::string gl_confdir;
 
-void gtr_pref_init(char const* config_dir)
+void gtr_pref_init(std::string const& config_dir)
 {
-    gl_confdir = g_strdup(config_dir);
+    gl_confdir = config_dir;
 }
 
 /***
@@ -59,51 +58,49 @@ void gtr_pref_init(char const* config_dir)
  */
 static void tr_prefs_init_defaults(tr_variant* d)
 {
-    char const* dir;
+    auto dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DOWNLOAD);
 
-    dir = g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD);
-
-    if (dir == nullptr)
+    if (dir.empty())
     {
-        dir = g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
+        dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP);
     }
 
-    if (dir == nullptr)
+    if (dir.empty())
     {
         dir = tr_getDefaultDownloadDir();
     }
 
     tr_variantDictReserve(d, 31);
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
-    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, TRUE);
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, g_get_home_dir());
-    tr_variantDictAddBool(d, TR_KEY_show_toolbar, TRUE);
-    tr_variantDictAddBool(d, TR_KEY_show_filterbar, TRUE);
-    tr_variantDictAddBool(d, TR_KEY_show_statusbar, TRUE);
-    tr_variantDictAddBool(d, TR_KEY_trash_can_enabled, TRUE);
-    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, FALSE);
+    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir.c_str());
+    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
+    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
+    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
+    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
+    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, Glib::get_home_dir().c_str());
+    tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
+    tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
+    tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
+    tr_variantDictAddBool(d, TR_KEY_trash_can_enabled, true);
+    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
+    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
+    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
+    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
     tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
     tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_show_options_window, TRUE);
-    tr_variantDictAddBool(d, TR_KEY_main_window_is_maximized, FALSE);
+    tr_variantDictAddBool(d, TR_KEY_show_options_window, true);
+    tr_variantDictAddBool(d, TR_KEY_main_window_is_maximized, false);
     tr_variantDictAddInt(d, TR_KEY_main_window_height, 500);
     tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
     tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
     tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
     tr_variantDictAddInt(d, TR_KEY_details_window_height, 500);
     tr_variantDictAddInt(d, TR_KEY_details_window_width, 700);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, dir);
+    tr_variantDictAddStr(d, TR_KEY_download_dir, dir.c_str());
     tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name");
-    tr_variantDictAddBool(d, TR_KEY_sort_reversed, FALSE);
-    tr_variantDictAddBool(d, TR_KEY_compact_view, FALSE);
+    tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
+    tr_variantDictAddBool(d, TR_KEY_compact_view, false);
 }
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
@@ -124,18 +121,18 @@ static void ensure_sound_cmd_is_a_list(tr_variant* dict)
     tr_variantListAddStr(list, "transmission torrent downloaded");
 }
 
-static tr_variant* getPrefs(void)
+static tr_variant* getPrefs()
 {
     static tr_variant settings;
-    static gboolean loaded = FALSE;
+    static bool loaded = false;
 
     if (!loaded)
     {
         tr_variantInitDict(&settings, 0);
         tr_prefs_init_defaults(&settings);
-        tr_sessionLoadSettings(&settings, gl_confdir, MY_CONFIG_NAME);
+        tr_sessionLoadSettings(&settings, gl_confdir.c_str(), MY_CONFIG_NAME);
         ensure_sound_cmd_is_a_list(&settings);
-        loaded = TRUE;
+        loaded = true;
     }
 
     return &settings;
@@ -145,7 +142,7 @@ static tr_variant* getPrefs(void)
 ****
 ***/
 
-tr_variant* gtr_pref_get_all(void)
+tr_variant* gtr_pref_get_all()
 {
     return getPrefs();
 }
@@ -178,14 +175,14 @@ void gtr_pref_double_set(tr_quark const key, double value)
 ****
 ***/
 
-gboolean gtr_pref_flag_get(tr_quark const key)
+bool gtr_pref_flag_get(tr_quark const key)
 {
     bool boolVal;
 
     return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
 }
 
-void gtr_pref_flag_set(tr_quark const key, gboolean value)
+void gtr_pref_flag_set(tr_quark const key, bool value)
 {
     tr_variantDictAddBool(getPrefs(), key, value);
 }
@@ -194,16 +191,15 @@ void gtr_pref_flag_set(tr_quark const key, gboolean value)
 ****
 ***/
 
-char** gtr_pref_strv_get(tr_quark const key)
+std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
-    char** ret = nullptr;
+    std::vector<std::string> ret;
 
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(getPrefs(), key, &list))
     {
-        size_t out = 0;
         size_t const n = tr_variantListSize(list);
-        ret = g_new0(char*, n + 1);
+        ret.reserve(n + 1);
 
         for (size_t i = 0; i < n; ++i)
         {
@@ -211,7 +207,7 @@ char** gtr_pref_strv_get(tr_quark const key)
             size_t len = 0;
             if (tr_variantGetStr(tr_variantListChild(list, i), &str, &len))
             {
-                ret[out++] = g_strndup(str, len);
+                ret.push_back(std::string(str, len));
             }
         }
     }
@@ -219,16 +215,16 @@ char** gtr_pref_strv_get(tr_quark const key)
     return ret;
 }
 
-char const* gtr_pref_string_get(tr_quark const key)
+std::string gtr_pref_string_get(tr_quark const key)
 {
     char const* str;
 
-    return tr_variantDictFindStr(getPrefs(), key, &str, nullptr) ? str : nullptr;
+    return tr_variantDictFindStr(getPrefs(), key, &str, nullptr) ? str : std::string();
 }
 
-void gtr_pref_string_set(tr_quark const key, char const* value)
+void gtr_pref_string_set(tr_quark const key, std::string const& value)
 {
-    tr_variantDictAddStr(getPrefs(), key, value);
+    tr_variantDictAddStr(getPrefs(), key, value.c_str());
 }
 
 /***
@@ -237,5 +233,5 @@ void gtr_pref_string_set(tr_quark const key, char const* value)
 
 void gtr_pref_save(tr_session* session)
 {
-    tr_sessionSaveSettings(session, gl_confdir, getPrefs());
+    tr_sessionSaveSettings(session, gl_confdir.c_str(), getPrefs());
 }

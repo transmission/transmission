@@ -115,7 +115,7 @@ public:
     ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
     **/
 
-    void set_pref(tr_quark key, char const* val);
+    void set_pref(tr_quark key, std::string const& val);
     void set_pref(tr_quark key, bool val);
     void set_pref(tr_quark key, int val);
     void set_pref(tr_quark key, double val);

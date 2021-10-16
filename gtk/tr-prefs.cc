@@ -159,14 +159,14 @@ Gtk::SpinButton* new_spin_button_double(
 
 void entry_changed_cb(Gtk::Entry* w, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
-    core->set_pref(key, w->get_text().c_str());
+    core->set_pref(key, w->get_text());
 }
 
 Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::Entry>();
 
-    if (char const* value = gtr_pref_string_get(key); value != nullptr)
+    if (auto const value = gtr_pref_string_get(key); !value.empty())
     {
         w->set_text(value);
     }
@@ -177,14 +177,14 @@ Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 
 void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
-    core->set_pref(key, w->get_filename().c_str());
+    core->set_pref(key, w->get_filename());
 }
 
 Gtk::FileChooserButton* new_path_chooser_button(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
-    if (char const* path = gtr_pref_string_get(key); path != nullptr)
+    if (auto const path = gtr_pref_string_get(key); !path.empty())
     {
         w->set_filename(path);
     }
@@ -197,7 +197,7 @@ Gtk::FileChooserButton* new_file_chooser_button(tr_quark const key, Glib::RefPtr
 {
     auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_OPEN);
 
-    if (char const* path = gtr_pref_string_get(key); path != nullptr)
+    if (auto const path = gtr_pref_string_get(key); !path.empty())
     {
         w->set_filename(path);
     }
@@ -517,11 +517,11 @@ public:
 
 WhitelistModelColumns const whitelist_cols;
 
-Glib::RefPtr<Gtk::ListStore> whitelist_tree_model_new(char const* whitelist)
+Glib::RefPtr<Gtk::ListStore> whitelist_tree_model_new(std::string const& whitelist)
 {
     auto const store = Gtk::ListStore::create(whitelist_cols);
 
-    std::istringstream stream(whitelist != nullptr ? whitelist : "");
+    std::istringstream stream(whitelist);
     std::string s;
 
     while (std::getline(stream, s, ','))
@@ -569,7 +569,7 @@ void refreshWhitelist(std::shared_ptr<remote_page> const& page)
         str.resize(str.size() - 1); /* remove the trailing comma */
     }
 
-    page->core->set_pref(TR_KEY_rpc_whitelist, str.c_str());
+    page->core->set_pref(TR_KEY_rpc_whitelist, str);
 }
 
 void onAddressEdited(Glib::ustring const& path, Glib::ustring const& address, std::shared_ptr<remote_page> const& page)

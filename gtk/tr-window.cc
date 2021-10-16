@@ -522,12 +522,12 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     /* status menu */
     status_menu_ = Gtk::make_managed<Gtk::Menu>();
     Gtk::RadioButtonGroup stats_modes_group;
-    char const* pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
+    auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
     for (auto const& mode : stats_modes)
     {
         auto* w = Gtk::make_managed<Gtk::RadioMenuItem>(stats_modes_group, _(mode.i18n));
-        w->set_active(g_strcmp0(mode.val, pch) == 0);
+        w->set_active(mode.val == pch);
         w->signal_toggled().connect([this, w, val = mode.val]() { status_menu_toggled_cb(w, val); });
         status_menu_->append(*w);
         w->show();
@@ -648,14 +648,14 @@ void MainWindow::Impl::updateStats()
     auto const* const session = core_->get_session();
 
     /* update the stats */
-    char const* pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
+    auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
-    if (g_strcmp0(pch, "session-ratio") == 0)
+    if (pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
         buf = Glib::ustring::sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
     }
-    else if (g_strcmp0(pch, "session-transfer") == 0)
+    else if (pch == "session-transfer")
     {
         tr_sessionGetStats(session, &stats);
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
@@ -666,7 +666,7 @@ void MainWindow::Impl::updateStats()
             tr_strlsize(stats.downloadedBytes),
             tr_strlsize(stats.uploadedBytes));
     }
-    else if (g_strcmp0(pch, "total-transfer") == 0)
+    else if (pch == "total-transfer")
     {
         tr_sessionGetCumulativeStats(session, &stats);
         /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
