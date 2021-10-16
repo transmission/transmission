@@ -3821,7 +3821,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
 static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char const* newname, tr_file_index_t fileIndex)
 {
-    char* name;
+    char* name = nullptr;
     tr_file* file = &tor->info.files[fileIndex];
     size_t const oldpath_len = strlen(oldpath);
 
