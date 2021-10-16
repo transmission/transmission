@@ -307,9 +307,9 @@ double tr_torrentGetRatioLimit(tr_torrent const* tor)
 
 bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 {
-    TR_ASSERT(tr_isTorrent(tor));
+    auto isLimited = bool{};
 
-    bool isLimited;
+    TR_ASSERT(tr_isTorrent(tor));
 
     switch (tr_torrentGetRatioMode(tor))
     {
