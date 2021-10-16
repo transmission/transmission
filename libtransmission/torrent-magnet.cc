@@ -427,19 +427,19 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
     if (!tr_str_is_empty(name))
     {
         evbuffer_add_printf(s, "%s", "&dn=");
-        tr_http_escape(s, name, TR_BAD_SIZE, true);
+        tr_http_escape(s, name, true);
     }
 
     for (unsigned int i = 0; i < inf->trackerCount; ++i)
     {
         evbuffer_add_printf(s, "%s", "&tr=");
-        tr_http_escape(s, inf->trackers[i].announce, TR_BAD_SIZE, true);
+        tr_http_escape(s, inf->trackers[i].announce, true);
     }
 
     for (unsigned int i = 0; i < inf->webseedCount; i++)
     {
         evbuffer_add_printf(s, "%s", "&ws=");
-        tr_http_escape(s, inf->webseeds[i], TR_BAD_SIZE, true);
+        tr_http_escape(s, inf->webseeds[i], true);
     }
 
     return evbuffer_free_to_str(s, nullptr);

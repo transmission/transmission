@@ -55,7 +55,7 @@ long tr_webGetTaskResponseCode(struct tr_web_task* task);
 
 char const* tr_webGetTaskRealUrl(struct tr_web_task* task);
 
-void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool escape_slashes);
+void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
