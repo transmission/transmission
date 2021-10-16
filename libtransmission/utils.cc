@@ -1131,26 +1131,11 @@ static char* to_utf8(char const* in, size_t inlen)
     return ret;
 }
 
-char* tr_utf8clean(char const* str, size_t max_len)
+char* tr_utf8clean(std::string_view str)
 {
-    char* ret;
-    char const* end;
-
-    if (max_len == TR_BAD_SIZE)
-    {
-        max_len = strlen(str);
-    }
-
-    if (tr_utf8_validate(str, max_len, &end))
-    {
-        ret = tr_strndup(str, max_len);
-    }
-    else
-    {
-        ret = to_utf8(str, max_len);
-    }
-
-    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, nullptr));
+    char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
+                                                                                  to_utf8(std::data(str), std::size(str));
+    TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
     return ret;
 }
 
@@ -1371,27 +1356,30 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(char const* str, char const* const end, number_range& range)
+static bool parseNumberSection(std::string_view str, number_range& range)
 {
     bool success;
     auto const error = errno;
 
 #if defined(HAVE_CHARCONV)
-    auto result = std::from_chars(str, end, range.low);
+    // wants char*, so string_view::iterator don't work. make our own begin/end
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
+    auto result = std::from_chars(begin_ch, end_ch, range.low);
     success = result.ec == std::errc{};
     if (success)
     {
         range.high = range.low;
-        if (result.ptr != end && *result.ptr == '-')
+        if (result.ptr < end_ch && *result.ptr == '-')
         {
-            result = std::from_chars(result.ptr + 1, end, range.high);
+            result = std::from_chars(result.ptr + 1, end_ch, range.high);
             success = result.ec == std::errc{};
         }
     }
 #else
     try
     {
-        auto tmp = std::string(str, end);
+        auto tmp = std::string(str);
         auto pos = size_t{};
         range.low = range.high = std::stoi(tmp, &pos);
         if (pos != std::size(tmp) && tmp[pos] == '-')
@@ -1418,26 +1406,27 @@ static bool parseNumberSection(char const* str, char const* const end, number_ra
  * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t len) // TODO: string_view
+std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
 
-    auto const* const end = str + (len != TR_BAD_SIZE ? len : strlen(str));
-    for (auto const* walk = str; walk < end;)
+    for (;;)
     {
-        auto delim = std::find(walk, end, ',');
+        auto const delim = str.find(',');
         auto range = number_range{};
-        if (!parseNumberSection(walk, delim, range))
+        if (!parseNumberSection(str.substr(0, delim), range))
         {
             break;
         }
-
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-
-        walk = delim + 1;
+        if (delim == std::string_view::npos)
+        {
+            break;
+        }
+        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };

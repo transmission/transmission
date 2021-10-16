@@ -110,7 +110,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         char ipv6_readable[INET6_ADDRSTRLEN];
         evutil_inet_ntop(AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN);
         evbuffer_add_printf(buf, "&ipv6=");
-        tr_http_escape(buf, ipv6_readable, TR_BAD_SIZE, true);
+        tr_http_escape(buf, ipv6_readable, true);
     }
 
     return evbuffer_free_to_str(buf, nullptr);

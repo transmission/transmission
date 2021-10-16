@@ -746,28 +746,20 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool escape_slashes)
+void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved)
 {
-    if (str == nullptr)
-    {
-        return;
-    }
+    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
+    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    if (len == TR_BAD_SIZE)
+    for (auto& ch : str)
     {
-        len = strlen(str);
-    }
-
-    for (char const* end = str + len; str != end; ++str)
-    {
-        if (*str == ',' || *str == '-' || *str == '.' || ('0' <= *str && *str <= '9') || ('A' <= *str && *str <= 'Z') ||
-            ('a' <= *str && *str <= 'z') || (*str == '/' && !escape_slashes))
+        if ((UnescapedChars.find(ch) != std::string_view::npos) || (ReservedChars.find(ch) && !escape_reserved))
         {
-            evbuffer_add_printf(out, "%c", *str);
+            evbuffer_add_printf(out, "%c", ch);
         }
         else
         {
-            evbuffer_add_printf(out, "%%%02X", (unsigned)(*str & 0xFF));
+            evbuffer_add_printf(out, "%%%02X", (unsigned)(ch & 0xFF));
         }
     }
 }
