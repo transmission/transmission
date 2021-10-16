@@ -1452,44 +1452,41 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
 static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t index)
 {
-    uint64_t total = 0;
-    tr_file const* f = &tor->info.files[index];
-
-    if (f->length != 0)
+    tr_file const& f = tor->info.files[index];
+    if (f.length == 0)
     {
-        tr_block_index_t first;
-        tr_block_index_t last;
-        tr_torGetFileBlockRange(tor, index, &first, &last);
+        return 0;
+    }
 
-        if (first == last)
-        {
-            if (tr_torrentBlockIsComplete(tor, first))
-            {
-                total = f->length;
-            }
-        }
-        else
-        {
-            /* the first block */
-            if (tr_torrentBlockIsComplete(tor, first))
-            {
-                total += tor->blockSize - f->offset % tor->blockSize;
-            }
+    auto first = tr_block_index_t{};
+    auto last = tr_block_index_t{};
+    tr_torGetFileBlockRange(tor, index, &first, &last);
 
-            /* the middle blocks */
-            if (first + 1 < last)
-            {
-                uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
-                u *= tor->blockSize;
-                total += u;
-            }
+    if (first == last)
+    {
+        return tr_torrentBlockIsComplete(tor, first) ? f.length : 0;
+    }
 
-            /* the last block */
-            if (tr_torrentBlockIsComplete(tor, last))
-            {
-                total += f->offset + f->length - (uint64_t)tor->blockSize * last;
-            }
-        }
+    auto total = uint64_t{};
+
+    // the first block
+    if (tr_torrentBlockIsComplete(tor, first))
+    {
+        total += tor->blockSize - f.offset % tor->blockSize;
+    }
+
+    // the middle blocks
+    if (first + 1 < last)
+    {
+        uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
+        u *= tor->blockSize;
+        total += u;
+    }
+
+    // the last block
+    if (tr_torrentBlockIsComplete(tor, last))
+    {
+        total += f.offset + f.length - (uint64_t)tor->blockSize * last;
     }
 
     return total;
