@@ -156,7 +156,7 @@ namespace
 /* similar to asctime, but is utf8-clean */
 Glib::ustring gtr_asctime(time_t t)
 {
-    return Glib::DateTime::create_now_local(t).format("%a %b %2e %T %Y%n"); /* ctime equiv */
+    return Glib::DateTime::create_now_local(t).format("%a %b %e %T %Y"); /* ctime equiv */
 }
 
 } // namespace
