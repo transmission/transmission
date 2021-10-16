@@ -1279,13 +1279,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     uint64_t const now = tr_time_msec();
 
-    tr_stat* s;
-    uint64_t seedRatioBytesLeft;
-    uint64_t seedRatioBytesGoal;
-    bool seedRatioApplies;
-    uint16_t seedIdleMinutes;
-    unsigned int pieceUploadSpeed_Bps;
-    unsigned int pieceDownloadSpeed_Bps;
     auto swarm_stats = tr_swarm_stats{};
 
     tor->lastStatTime = tr_time();
@@ -1295,7 +1288,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         tr_swarmGetStats(tor->swarm, &swarm_stats);
     }
 
-    s = &tor->stats;
+    tr_stat* const s = &tor->stats;
     s->id = tor->uniqueId;
     s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
@@ -1317,9 +1310,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     s->rawUploadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_UP));
     s->rawDownloadSpeed_KBps = toSpeedKBps(tor->bandwidth->getRawSpeedBytesPerSecond(now, TR_DOWN));
-    pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
-    pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_DOWN);
+    auto const pieceUploadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
     s->pieceUploadSpeed_KBps = toSpeedKBps(pieceUploadSpeed_Bps);
+    auto const pieceDownloadSpeed_Bps = tor->bandwidth->getPieceSpeedBytesPerSecond(now, TR_DOWN);
     s->pieceDownloadSpeed_KBps = toSpeedKBps(pieceDownloadSpeed_Bps);
 
     s->percentComplete = tr_cpPercentComplete(&tor->completion);
@@ -1346,7 +1339,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
 
-    seedRatioApplies = tr_torrentGetSeedRatioBytes(tor, &seedRatioBytesLeft, &seedRatioBytesGoal);
+    auto seedRatioBytesLeft = uint64_t{};
+    auto seedRatioBytesGoal = uint64_t{};
+    bool const seedRatioApplies = tr_torrentGetSeedRatioBytes(tor, &seedRatioBytesLeft, &seedRatioBytesGoal);
 
     switch (s->activity)
     {
@@ -1404,13 +1399,11 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             }
         }
 
-        if (tor->etaULSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes))
         {
-            s->etaIdle = seedIdleMinutes * 60 - s->idleSecs;
-        }
-        else
-        {
-            s->etaIdle = TR_ETA_NOT_AVAIL;
+            auto seedIdleMinutes = uint16_t{};
+            s->etaIdle = tor->etaULSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
+                seedIdleMinutes * 60 - s->idleSecs :
+                TR_ETA_NOT_AVAIL;
         }
 
         break;
