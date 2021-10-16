@@ -13,7 +13,7 @@
 class SystemTrayIcon
 {
 public:
-    SystemTrayIcon(TrCore* core);
+    SystemTrayIcon(Glib::RefPtr<TrCore> const& core);
     ~SystemTrayIcon();
 
     void refresh();

@@ -27,7 +27,11 @@ namespace
 class MakeProgressDialog : public Gtk::Dialog
 {
 public:
-    MakeProgressDialog(Gtk::Window& parent, tr_metainfo_builder& builder, std::string const& target, TrCore* core);
+    MakeProgressDialog(
+        Gtk::Window& parent,
+        tr_metainfo_builder& builder,
+        std::string const& target,
+        Glib::RefPtr<TrCore> const& core);
     ~MakeProgressDialog();
 
 private:
@@ -39,7 +43,7 @@ private:
 private:
     tr_metainfo_builder& builder_;
     std::string const target_;
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
 
     sigc::connection progress_tag_;
     Gtk::Label* progress_label_ = nullptr;
@@ -51,7 +55,7 @@ private:
 class MakeDialog::Impl
 {
 public:
-    Impl(MakeDialog& dialog, TrCore* core);
+    Impl(MakeDialog& dialog, Glib::RefPtr<TrCore> const& core);
 
 private:
     void onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser);
@@ -74,7 +78,7 @@ private:
 
 private:
     MakeDialog& dialog_;
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
 
     Gtk::RadioButton* file_radio_ = nullptr;
     Gtk::FileChooserButton* file_chooser_ = nullptr;
@@ -159,10 +163,10 @@ MakeProgressDialog::~MakeProgressDialog()
 
 void MakeProgressDialog::addTorrent()
 {
-    tr_ctor* ctor = tr_ctorNew(gtr_core_session(core_));
+    tr_ctor* ctor = tr_ctorNew(core_->get_session());
     tr_ctorSetMetainfoFromFile(ctor, target_.c_str());
     tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top).c_str());
-    gtr_core_add_ctor(core_, ctor);
+    core_->add_ctor(ctor);
 }
 
 void MakeProgressDialog::onProgressDialogResponse(int response)
@@ -191,7 +195,7 @@ MakeProgressDialog::MakeProgressDialog(
     Gtk::Window& parent,
     tr_metainfo_builder& builder,
     std::string const& target,
-    TrCore* core)
+    Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog(_("New Torrent"), parent, true)
     , builder_(builder)
     , target_(target)
@@ -408,12 +412,12 @@ void MakeDialog::Impl::on_drag_data_received(
     drag_context->drag_finish(success, false, time_);
 }
 
-std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<MakeDialog> MakeDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<MakeDialog>(new MakeDialog(parent, core));
 }
 
-MakeDialog::MakeDialog(Gtk::Window& parent, TrCore* core)
+MakeDialog::MakeDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog(_("New Torrent"), parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
@@ -421,7 +425,7 @@ MakeDialog::MakeDialog(Gtk::Window& parent, TrCore* core)
 
 MakeDialog::~MakeDialog() = default;
 
-MakeDialog::Impl::Impl(MakeDialog& dialog, TrCore* core)
+MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<TrCore> const& core)
     : dialog_(dialog)
     , core_(core)
 {

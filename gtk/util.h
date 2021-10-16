@@ -34,13 +34,6 @@ extern char const* speed_M_str;
 extern char const* speed_G_str;
 extern char const* speed_T_str;
 
-// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
-#define TR_UNUSED(x) \
-    do \
-    { \
-        ((void)sizeof(x)); \
-    } while (0)
-
 enum
 {
     GTR_UNICODE_UP,
@@ -109,12 +102,12 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
 ****
 ***/
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class FreeSpaceLabel : public Gtk::Label
 {
 public:
-    FreeSpaceLabel(TrCore* core, std::string const& dir = {});
+    FreeSpaceLabel(Glib::RefPtr<TrCore> const& core, std::string const& dir = {});
     ~FreeSpaceLabel() override;
 
     void set_dir(std::string const& dir);

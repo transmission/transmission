@@ -31,7 +31,7 @@
 class PrefsDialog::Impl
 {
 public:
-    Impl(PrefsDialog& dialog, TrCore* core);
+    Impl(PrefsDialog& dialog, Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
 private:
@@ -50,8 +50,8 @@ private:
 private:
     PrefsDialog& dialog_;
 
-    TrCore* core_ = nullptr;
-    gulong core_prefs_tag_ = 0;
+    Glib::RefPtr<TrCore> const core_;
+    sigc::connection core_prefs_tag_;
 
     FreeSpaceLabel* freespace_label_ = nullptr;
 
@@ -80,17 +80,17 @@ void PrefsDialog::Impl::response_cb(int response)
 namespace
 {
 
-Gtk::CheckButton* new_check_button(Glib::ustring const& mnemonic, tr_quark const key, TrCore* core)
+Gtk::CheckButton* new_check_button(Glib::ustring const& mnemonic, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::CheckButton>(mnemonic, true);
     w->set_active(gtr_pref_flag_get(key));
-    w->signal_toggled().connect([w, key, core]() { gtr_core_set_pref_bool(core, key, w->get_active()); });
+    w->signal_toggled().connect([w, key, core]() { core->set_pref(key, w->get_active()); });
     return w;
 }
 
 #define IDLE_DATA "idle-data"
 
-bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, TrCore* core, bool isDouble)
+bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<TrCore> const& core, bool isDouble)
 {
     bool keep_waiting = true;
     auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IDLE_DATA));
@@ -102,12 +102,12 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, TrCore* core, bool 
         if (isDouble)
         {
             double const value = spin->get_value();
-            gtr_core_set_pref_double(core, key, value);
+            core->set_pref(key, value);
         }
         else
         {
             int const value = spin->get_value_as_int();
-            gtr_core_set_pref_int(core, key, value);
+            core->set_pref(key, value);
         }
 
         /* cleanup */
@@ -119,7 +119,7 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, TrCore* core, bool 
     return keep_waiting;
 }
 
-void spun_cb(Gtk::SpinButton* w, tr_quark const key, TrCore* core, bool isDouble)
+void spun_cb(Gtk::SpinButton* w, tr_quark const key, Glib::RefPtr<TrCore> const& core, bool isDouble)
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
@@ -136,7 +136,7 @@ void spun_cb(Gtk::SpinButton* w, tr_quark const key, TrCore* core, bool isDouble
     last_change->start();
 }
 
-Gtk::SpinButton* new_spin_button(tr_quark const key, TrCore* core, int low, int high, int step)
+Gtk::SpinButton* new_spin_button(tr_quark const key, Glib::RefPtr<TrCore> const& core, int low, int high, int step)
 {
     auto* w = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(gtr_pref_int_get(key), low, high, step));
     w->set_digits(0);
@@ -144,7 +144,12 @@ Gtk::SpinButton* new_spin_button(tr_quark const key, TrCore* core, int low, int 
     return w;
 }
 
-Gtk::SpinButton* new_spin_button_double(tr_quark const key, TrCore* core, double low, double high, double step)
+Gtk::SpinButton* new_spin_button_double(
+    tr_quark const key,
+    Glib::RefPtr<TrCore> const& core,
+    double low,
+    double high,
+    double step)
 {
     auto* w = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(gtr_pref_double_get(key), low, high, step));
     w->set_digits(2);
@@ -152,12 +157,12 @@ Gtk::SpinButton* new_spin_button_double(tr_quark const key, TrCore* core, double
     return w;
 }
 
-void entry_changed_cb(Gtk::Entry* w, tr_quark const key, TrCore* core)
+void entry_changed_cb(Gtk::Entry* w, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
-    gtr_core_set_pref(core, key, w->get_text().c_str());
+    core->set_pref(key, w->get_text().c_str());
 }
 
-Gtk::Entry* new_entry(tr_quark const key, TrCore* core)
+Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::Entry>();
 
@@ -170,12 +175,12 @@ Gtk::Entry* new_entry(tr_quark const key, TrCore* core)
     return w;
 }
 
-void chosen_cb(Gtk::FileChooser* w, tr_quark const key, TrCore* core)
+void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
-    gtr_core_set_pref(core, key, w->get_filename().c_str());
+    core->set_pref(key, w->get_filename().c_str());
 }
 
-Gtk::FileChooserButton* new_path_chooser_button(tr_quark const key, TrCore* core)
+Gtk::FileChooserButton* new_path_chooser_button(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
@@ -188,7 +193,7 @@ Gtk::FileChooserButton* new_path_chooser_button(tr_quark const key, TrCore* core
     return w;
 }
 
-Gtk::FileChooserButton* new_file_chooser_button(tr_quark const key, TrCore* core)
+Gtk::FileChooserButton* new_file_chooser_button(tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::FileChooserButton>(Gtk::FILE_CHOOSER_ACTION_OPEN);
 
@@ -356,17 +361,17 @@ struct blocklist_data
 {
     ~blocklist_data();
 
-    gulong updateBlocklistTag = 0;
+    sigc::connection updateBlocklistTag;
     Gtk::Button* updateBlocklistButton = nullptr;
     std::unique_ptr<Gtk::MessageDialog> updateBlocklistDialog;
     Gtk::Label* label = nullptr;
     Gtk::CheckButton* check = nullptr;
-    TrCore* core = nullptr;
+    Glib::RefPtr<TrCore> core;
 };
 
-void updateBlocklistText(Gtk::Label* w, TrCore* core)
+void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<TrCore> const& core)
 {
-    int const n = tr_blocklistGetRuleCount(gtr_core_session(core));
+    int const n = tr_blocklistGetRuleCount(core->get_session());
     w->set_markup(Glib::ustring::sprintf(
         "<i>%s</i>",
         Glib::ustring::sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
@@ -375,9 +380,9 @@ void updateBlocklistText(Gtk::Label* w, TrCore* core)
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
 blocklist_data::~blocklist_data()
 {
-    if (updateBlocklistTag > 0)
+    if (updateBlocklistTag.connected())
     {
-        g_signal_handler_disconnect(core, updateBlocklistTag);
+        updateBlocklistTag.disconnect();
     }
 }
 
@@ -386,15 +391,14 @@ void onBlocklistUpdateResponse(std::shared_ptr<blocklist_data> const& data)
 {
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog.reset();
-    g_signal_handler_disconnect(data->core, data->updateBlocklistTag);
-    data->updateBlocklistTag = 0;
+    data->updateBlocklistTag.disconnect();
 }
 
 /* core says the blocklist was updated */
-void onBlocklistUpdated(TrCore* core, int n, blocklist_data* data)
+void onBlocklistUpdated(Glib::RefPtr<TrCore> const& core, int n, blocklist_data* data)
 {
     bool const success = n >= 0;
-    int const count = n >= 0 ? n : tr_blocklistGetRuleCount(gtr_core_session(core));
+    int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
     data->updateBlocklistDialog->set_secondary_text(
@@ -415,8 +419,9 @@ void onBlocklistUpdate(Gtk::Button* w, std::shared_ptr<blocklist_data> const& da
     data->updateBlocklistDialog->set_secondary_text(_("Getting new blocklist…"));
     data->updateBlocklistDialog->signal_response().connect([data](int /*response*/) { onBlocklistUpdateResponse(data); });
     data->updateBlocklistDialog->show();
-    gtr_core_blocklist_update(data->core);
-    data->updateBlocklistTag = g_signal_connect(data->core, "blocklist-updated", G_CALLBACK(onBlocklistUpdated), data.get());
+    data->core->blocklist_update();
+    data->updateBlocklistTag = data->core->signal_blocklist_updated().connect(
+        [data](auto n) { onBlocklistUpdated(data->core, n, data.get()); });
 }
 
 void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
@@ -426,12 +431,12 @@ void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
     button->set_sensitive(is_url_valid);
 }
 
-void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, TrCore* core)
+void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, Glib::RefPtr<TrCore> const& core)
 {
-    gtr_core_set_pref_int(core, key, gtr_combo_box_get_active_enum(*combo_box));
+    core->set_pref(key, gtr_combo_box_get_active_enum(*combo_box));
 }
 
-Gtk::ComboBox* new_encryption_combo(TrCore* core, tr_quark const key)
+Gtk::ComboBox* new_encryption_combo(Glib::RefPtr<TrCore> const& core, tr_quark const key)
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Allow encryption"), TR_CLEAR_PREFERRED },
@@ -474,7 +479,7 @@ Gtk::Widget* PrefsDialog::Impl::privacyPage()
     auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
     h->pack_start(*data->label, true, true, 0);
     data->updateBlocklistButton = Gtk::make_managed<Gtk::Button>(_("_Update"), true);
-    data->updateBlocklistButton->set_data("session", gtr_core_session(core_));
+    data->updateBlocklistButton->set_data("session", core_->get_session());
     data->updateBlocklistButton->signal_clicked().connect([data]() { onBlocklistUpdate(data->updateBlocklistButton, data); });
     target_cb(data->check, data->updateBlocklistButton);
     h->pack_start(*data->updateBlocklistButton, false, false, 0);
@@ -537,7 +542,7 @@ Glib::RefPtr<Gtk::ListStore> whitelist_tree_model_new(char const* whitelist)
 
 struct remote_page
 {
-    TrCore* core;
+    Glib::RefPtr<TrCore> core;
     Gtk::TreeView* view;
     Glib::RefPtr<Gtk::ListStore> store;
     Gtk::Button* remove_button;
@@ -564,7 +569,7 @@ void refreshWhitelist(std::shared_ptr<remote_page> const& page)
         str.resize(str.size() - 1); /* remove the trailing comma */
     }
 
-    gtr_core_set_pref(page->core, TR_KEY_rpc_whitelist, str.c_str());
+    page->core->set_pref(TR_KEY_rpc_whitelist, str.c_str());
 }
 
 void onAddressEdited(Glib::ustring const& path, Glib::ustring const& address, std::shared_ptr<remote_page> const& page)
@@ -754,7 +759,7 @@ void refreshSchedSensitivity(std::shared_ptr<BandwidthPage> const& p)
     }
 }
 
-Gtk::ComboBox* new_time_combo(TrCore* core, tr_quark const key)
+Gtk::ComboBox* new_time_combo(Glib::RefPtr<TrCore> const& core, tr_quark const key)
 {
     class TimeModelColumns : public Gtk::TreeModelColumnRecord
     {
@@ -793,14 +798,14 @@ Gtk::ComboBox* new_time_combo(TrCore* core, tr_quark const key)
         {
             if (auto const iter = w->get_active(); iter)
             {
-                gtr_core_set_pref_int(core, key, iter->get_value(time_cols.offset));
+                core->set_pref(key, iter->get_value(time_cols.offset));
             }
         });
 
     return w;
 }
 
-Gtk::ComboBox* new_week_combo(TrCore* core, tr_quark const key)
+Gtk::ComboBox* new_week_combo(Glib::RefPtr<TrCore> const& core, tr_quark const key)
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Every Day"), TR_SCHED_ALL },
@@ -919,15 +924,15 @@ struct network_page_data
 {
     ~network_page_data();
 
-    TrCore* core = nullptr;
+    Glib::RefPtr<TrCore> core;
     Gtk::Label* portLabel = nullptr;
     Gtk::Button* portButton = nullptr;
     Gtk::SpinButton* portSpin = nullptr;
-    gulong portTag = 0;
-    gulong prefsTag = 0;
+    sigc::connection portTag;
+    sigc::connection prefsTag;
 };
 
-void onCorePrefsChanged(TrCore* /*core*/, tr_quark const key, network_page_data* data)
+void onCorePrefsChanged(tr_quark const key, network_page_data* data)
 {
     if (key == TR_KEY_peer_port)
     {
@@ -939,18 +944,18 @@ void onCorePrefsChanged(TrCore* /*core*/, tr_quark const key, network_page_data*
 
 network_page_data::~network_page_data()
 {
-    if (prefsTag > 0)
+    if (prefsTag.connected())
     {
-        g_signal_handler_disconnect(core, prefsTag);
+        prefsTag.disconnect();
     }
 
-    if (portTag > 0)
+    if (portTag.connected())
     {
-        g_signal_handler_disconnect(core, portTag);
+        portTag.disconnect();
     }
 }
 
-void onPortTested(TrCore* /*core*/, bool isOpen, network_page_data* data)
+void onPortTested(bool isOpen, network_page_data* data)
 {
     data->portLabel->set_markup(isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>"));
     data->portButton->set_sensitive(true);
@@ -963,12 +968,12 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
     data->portSpin->set_sensitive(false);
     data->portLabel->set_markup(_("<i>Testing TCP port…</i>"));
 
-    if (data->portTag == 0)
+    if (!data->portTag.connected())
     {
-        data->portTag = g_signal_connect(data->core, "port-tested", G_CALLBACK(onPortTested), data.get());
+        data->portTag = data->core->signal_port_tested().connect([data](bool is_open) { onPortTested(is_open, data.get()); });
     }
 
-    gtr_core_port_test(data->core);
+    data->core->port_test();
 }
 
 } // namespace
@@ -997,7 +1002,7 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     h->pack_end(*data->portButton, false, false, 0);
     data->portButton->signal_clicked().connect([data]() { onPortTest(data); });
     t->add_row(row, {}, *h);
-    data->prefsTag = g_signal_connect(core_, "prefs-changed", G_CALLBACK(onCorePrefsChanged), data.get());
+    data->prefsTag = core_->signal_prefs_changed().connect([data](auto key) { onCorePrefsChanged(key, data.get()); });
 
     t->add_wide_control(
         row,
@@ -1048,9 +1053,9 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
 
 PrefsDialog::Impl::~Impl()
 {
-    if (core_prefs_tag_ > 0)
+    if (core_prefs_tag_.connected())
     {
-        g_signal_handler_disconnect(core_, core_prefs_tag_);
+        core_prefs_tag_.disconnect();
     }
 }
 
@@ -1069,17 +1074,17 @@ void PrefsDialog::Impl::on_core_prefs_changed(tr_quark const key)
 
     if (key == TR_KEY_download_dir)
     {
-        char const* downloadDir = tr_sessionGetDownloadDir(gtr_core_session(core_));
+        char const* downloadDir = tr_sessionGetDownloadDir(core_->get_session());
         freespace_label_->set_dir(downloadDir);
     }
 }
 
-std::unique_ptr<PrefsDialog> PrefsDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<PrefsDialog> PrefsDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<PrefsDialog>(new PrefsDialog(parent, core));
 }
 
-PrefsDialog::PrefsDialog(Gtk::Window& parent, TrCore* core)
+PrefsDialog::PrefsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog(_("Transmission Preferences"), parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
@@ -1087,18 +1092,13 @@ PrefsDialog::PrefsDialog(Gtk::Window& parent, TrCore* core)
 
 PrefsDialog::~PrefsDialog() = default;
 
-PrefsDialog::Impl::Impl(PrefsDialog& dialog, TrCore* core)
+PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<TrCore> const& core)
     : dialog_(dialog)
     , core_(core)
 {
     static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
 
-    core_prefs_tag_ = g_signal_connect(
-        core_,
-        "prefs-changed",
-        G_CALLBACK(static_cast<void (*)(TrCore*, tr_quark, Impl*)>([](TrCore* /*core*/, tr_quark key, Impl* impl)
-                                                                   { impl->on_core_prefs_changed(key); })),
-        this);
+    core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_core_prefs_changed));
 
     dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
     dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);

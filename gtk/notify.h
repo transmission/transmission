@@ -10,10 +10,10 @@
 
 #include <glibmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 void gtr_notify_init();
 
 void gtr_notify_torrent_added(Glib::ustring const& name);
 
-void gtr_notify_torrent_completed(TrCore* core, int torrent_id);
+void gtr_notify_torrent_completed(Glib::RefPtr<TrCore> const& core, int torrent_id);

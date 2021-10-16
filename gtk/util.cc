@@ -585,7 +585,7 @@ void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& newstr)
 class FreeSpaceLabel::Impl
 {
 public:
-    Impl(FreeSpaceLabel& label, TrCore* core, std::string const& dir);
+    Impl(FreeSpaceLabel& label, Glib::RefPtr<TrCore> const& core, std::string const& dir);
     ~Impl();
 
     void set_dir(std::string const& dir);
@@ -595,7 +595,7 @@ private:
 
 private:
     FreeSpaceLabel& label_;
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
     std::string dir_;
     sigc::connection timer_id_;
 };
@@ -607,7 +607,7 @@ FreeSpaceLabel::Impl::~Impl()
 
 bool FreeSpaceLabel::Impl::on_freespace_timer()
 {
-    auto* const session = gtr_core_session(core_);
+    auto* const session = core_->get_session();
     if (session == nullptr)
     {
         return false;
@@ -621,7 +621,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     return true;
 }
 
-FreeSpaceLabel::FreeSpaceLabel(TrCore* core, std::string const& dir)
+FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<TrCore> const& core, std::string const& dir)
     : Gtk::Label()
     , impl_(std::make_unique<Impl>(*this, core, dir))
 {
@@ -629,7 +629,7 @@ FreeSpaceLabel::FreeSpaceLabel(TrCore* core, std::string const& dir)
 
 FreeSpaceLabel::~FreeSpaceLabel() = default;
 
-FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, TrCore* core, std::string const& dir)
+FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<TrCore> const& core, std::string const& dir)
     : label_(label)
     , core_(core)
     , dir_(dir)

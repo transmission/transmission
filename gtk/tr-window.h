@@ -27,14 +27,17 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class MainWindow : public Gtk::ApplicationWindow
 {
 public:
     ~MainWindow() override;
 
-    static std::unique_ptr<MainWindow> create(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, TrCore* core);
+    static std::unique_ptr<MainWindow> create(
+        Gtk::Application& app,
+        Glib::RefPtr<Gtk::UIManager> const& uim,
+        Glib::RefPtr<TrCore> const& core);
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
@@ -42,7 +45,7 @@ public:
     void refresh();
 
 protected:
-    MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, TrCore* core);
+    MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

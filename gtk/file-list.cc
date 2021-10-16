@@ -73,7 +73,7 @@ FileModelColumns const file_cols;
 class FileList::Impl
 {
 public:
-    Impl(FileList& widget, TrCore* core, int torrent_id);
+    Impl(FileList& widget, Glib::RefPtr<TrCore> const& core, int torrent_id);
     ~Impl();
 
     void set_torrent(int torrent_id);
@@ -97,7 +97,7 @@ private:
 private:
     FileList& widget_;
 
-    TrCore* core_ = nullptr;
+    Glib::RefPtr<TrCore> const core_;
     // GtkWidget* top_ = nullptr; // == widget_
     Gtk::TreeView* view_ = nullptr;
     Glib::RefPtr<Gtk::TreeStore> store_;
@@ -266,7 +266,7 @@ void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model,
 
 void FileList::Impl::refresh()
 {
-    tr_torrent* tor = gtr_core_find_torrent(core_, torrent_id_);
+    tr_torrent* tor = core_->find_torrent(torrent_id_);
 
     if (tor == nullptr)
     {
@@ -489,7 +489,7 @@ void FileList::Impl::set_torrent(int torrentId)
     torrent_id_ = torrentId;
 
     /* populate the model */
-    auto* const tor = torrent_id_ > 0 ? gtr_core_find_torrent(core_, torrent_id_) : nullptr;
+    auto* const tor = torrent_id_ > 0 ? core_->find_torrent(torrent_id_) : nullptr;
     if (tor != nullptr)
     {
         // build a GNode tree of the files
@@ -609,7 +609,7 @@ std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const&
 void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* /*col*/)
 {
     bool handled = false;
-    auto const* tor = gtr_core_find_torrent(core_, torrent_id_);
+    auto const* tor = core_->find_torrent(torrent_id_);
 
     if (tor != nullptr)
     {
@@ -648,7 +648,7 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
     bool handled = false;
 
     auto const cid = GPOINTER_TO_INT(col->get_data(TR_COLUMN_ID_KEY));
-    auto* tor = gtr_core_find_torrent(core_, torrent_id_);
+    auto* tor = core_->find_torrent(torrent_id_);
 
     if (tor != nullptr && (cid == file_cols.priority.index() || cid == file_cols.enabled.index()))
     {
@@ -753,7 +753,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
 
             if (!iter->parent())
             {
-                gtr_core_torrent_changed(core_, torrent_id_);
+                core_->torrent_changed(torrent_id_);
             }
         }
     }
@@ -775,7 +775,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
 
 void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib::ustring const& newname)
 {
-    tr_torrent* const tor = gtr_core_find_torrent(core_, torrent_id_);
+    tr_torrent* const tor = core_->find_torrent(torrent_id_);
 
     if (tor == nullptr)
     {
@@ -824,13 +824,13 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         rename_data);
 }
 
-FileList::FileList(TrCore* core, int torrent_id)
+FileList::FileList(Glib::RefPtr<TrCore> const& core, int torrent_id)
     : Gtk::ScrolledWindow()
     , impl_(std::make_unique<Impl>(*this, core, torrent_id))
 {
 }
 
-FileList::Impl::Impl(FileList& widget, TrCore* core, int torrent_id)
+FileList::Impl::Impl(FileList& widget, Glib::RefPtr<TrCore> const& core, int torrent_id)
     : widget_(widget)
     , core_(core)
 {

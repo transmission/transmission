@@ -59,7 +59,7 @@ void sort_changed_cb(Glib::RefPtr<Gtk::RadioAction> const& action, void* /*user_
         return;
     }
 
-    gtr_core_set_pref(myCore, TR_KEY_sort_mode, action->get_name().c_str());
+    myCore->set_pref(TR_KEY_sort_mode, action->get_name().c_str());
 }
 
 struct : ActionEntryBase
@@ -75,7 +75,7 @@ void toggle_pref_cb(Glib::RefPtr<Gtk::ToggleAction> const& action, void* /*user_
     auto const key = action->get_name();
     bool const val = action->get_active();
 
-    gtr_core_set_pref_bool(myCore, tr_quark_new({ key.c_str(), key.size() }), val);
+    myCore->set_pref(tr_quark_new({ key.c_str(), key.size() }), val);
 }
 
 struct : ActionEntryBase
@@ -177,9 +177,9 @@ Gtk::UIManager* myUIManager = nullptr;
 
 } // namespace
 
-void gtr_actions_set_core(TrCore* core)
+void gtr_actions_set_core(Glib::RefPtr<TrCore> const& core)
 {
-    myCore = core;
+    myCore = core.get();
 }
 
 void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* callback_user_data)

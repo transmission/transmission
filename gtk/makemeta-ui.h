@@ -12,17 +12,17 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class MakeDialog : public Gtk::Dialog
 {
 public:
     ~MakeDialog() override;
 
-    static std::unique_ptr<MakeDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<MakeDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    MakeDialog(Gtk::Window& parent, TrCore* core);
+    MakeDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

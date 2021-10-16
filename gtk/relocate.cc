@@ -29,7 +29,7 @@ std::string previousLocation;
 class RelocateDialog::Impl
 {
 public:
-    Impl(RelocateDialog& dialog, TrCore* core, std::vector<int> const& torrent_ids);
+    Impl(RelocateDialog& dialog, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids);
     ~Impl();
 
 private:
@@ -40,7 +40,7 @@ private:
 
 private:
     RelocateDialog& dialog_;
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
     std::vector<int> torrent_ids_;
 
     int done_ = 0;
@@ -62,7 +62,7 @@ RelocateDialog::Impl::~Impl()
 
 void RelocateDialog::Impl::startMovingNextTorrent()
 {
-    auto* const tor = gtr_core_find_torrent(core_, torrent_ids_.back());
+    auto* const tor = core_->find_torrent(torrent_ids_.back());
 
     if (tor != nullptr)
     {
@@ -133,12 +133,15 @@ void RelocateDialog::Impl::onResponse(int response)
     }
 }
 
-std::unique_ptr<RelocateDialog> RelocateDialog::create(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids)
+std::unique_ptr<RelocateDialog> RelocateDialog::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<TrCore> const& core,
+    std::vector<int> const& torrent_ids)
 {
     return std::unique_ptr<RelocateDialog>(new RelocateDialog(parent, core, torrent_ids));
 }
 
-RelocateDialog::RelocateDialog(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids)
+RelocateDialog::RelocateDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids)
     : Gtk::Dialog(_("Set Torrent Location"), parent, true)
     , impl_(std::make_unique<Impl>(*this, core, torrent_ids))
 {
@@ -146,7 +149,7 @@ RelocateDialog::RelocateDialog(Gtk::Window& parent, TrCore* core, std::vector<in
 
 RelocateDialog::~RelocateDialog() = default;
 
-RelocateDialog::Impl::Impl(RelocateDialog& dialog, TrCore* core, std::vector<int> const& torrent_ids)
+RelocateDialog::Impl::Impl(RelocateDialog& dialog, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids)
     : dialog_(dialog)
     , core_(core)
     , torrent_ids_(torrent_ids)

@@ -49,7 +49,7 @@ std::list<std::string> get_recent_destinations()
     return list;
 }
 
-void save_recent_destination(TrCore* core, std::string const& dir)
+void save_recent_destination(Glib::RefPtr<TrCore> const& core, std::string const& dir)
 {
     if (dir.empty())
     {
@@ -73,7 +73,7 @@ void save_recent_destination(TrCore* core, std::string const& dir)
         gtr_pref_string_set(tr_quark_new({ key.c_str(), key.size() }), d.c_str());
     }
 
-    gtr_pref_save(gtr_core_session(core));
+    gtr_pref_save(core->get_session());
 }
 
 } // namespace
@@ -85,7 +85,7 @@ void save_recent_destination(TrCore* core, std::string const& dir)
 class OptionsDialog::Impl
 {
 public:
-    Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+    Impl(OptionsDialog& dialog, Glib::RefPtr<TrCore> const& core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
 private:
     void sourceChanged(Gtk::FileChooserButton* b);
@@ -99,7 +99,7 @@ private:
 private:
     OptionsDialog& dialog_;
 
-    TrCore* core_ = nullptr;
+    Glib::RefPtr<TrCore> const core_;
     FileList* file_list_ = nullptr;
     Gtk::CheckButton* run_check_ = nullptr;
     Gtk::CheckButton* trash_check_ = nullptr;
@@ -138,7 +138,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
                 tr_torrentStart(tor_);
             }
 
-            gtr_core_add_torrent(core_, tor_, false);
+            core_->add_torrent(tor_, false);
 
             if (trash_check_->get_active())
             {
@@ -208,7 +208,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
         }
         else if (new_file)
         {
-            tr_torrent* tor = duplicate_id != 0 ? gtr_core_find_torrent(core_, duplicate_id) : nullptr;
+            tr_torrent* tor = duplicate_id != 0 ? core_->find_torrent(duplicate_id) : nullptr;
             gtr_add_torrent_error_dialog(*b, err, tor, filename_);
         }
 
@@ -253,13 +253,16 @@ void addTorrentFilters(Gtk::FileChooser* chooser)
 
 std::unique_ptr<OptionsDialog> OptionsDialog::create(
     Gtk::Window& parent,
-    TrCore* core,
+    Glib::RefPtr<TrCore> const& core,
     std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
 {
     return std::unique_ptr<OptionsDialog>(new OptionsDialog(parent, core, std::move(ctor)));
 }
 
-OptionsDialog::OptionsDialog(Gtk::Window& parent, TrCore* core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
+OptionsDialog::OptionsDialog(
+    Gtk::Window& parent,
+    Glib::RefPtr<TrCore> const& core,
+    std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
     : Gtk::Dialog(_("Torrent Options"), parent)
     , impl_(std::make_unique<Impl>(*this, core, std::move(ctor)))
 {
@@ -267,7 +270,10 @@ OptionsDialog::OptionsDialog(Gtk::Window& parent, TrCore* core, std::unique_ptr<
 
 OptionsDialog::~OptionsDialog() = default;
 
-OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
+OptionsDialog::Impl::Impl(
+    OptionsDialog& dialog,
+    Glib::RefPtr<TrCore> const& core,
+    std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
     : dialog_(dialog)
     , core_(core)
     , ctor_(std::move(ctor))
@@ -404,7 +410,7 @@ OptionsDialog::Impl::Impl(OptionsDialog& dialog, TrCore* core, std::unique_ptr<t
 *****
 ****/
 
-void TorrentFileChooserDialog::onOpenDialogResponse(int response, TrCore* core)
+void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<TrCore> const& core)
 {
     /* remember this folder the next time we use this dialog */
     gtr_pref_string_set(TR_KEY_open_dialog_dir, get_current_folder().c_str());
@@ -417,18 +423,20 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, TrCore* core)
         bool const do_notify = false;
         auto const files = get_files();
 
-        gtr_core_add_files(core, files, do_start, do_prompt, do_notify);
+        core->add_files(files, do_start, do_prompt, do_notify);
     }
 
     hide();
 }
 
-std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<TorrentFileChooserDialog>(new TorrentFileChooserDialog(parent, core));
 }
 
-TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, TrCore* core)
+TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::FileChooserDialog(parent, _("Open a Torrent"), Gtk::FILE_CHOOSER_ACTION_OPEN)
 {
     add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
@@ -453,7 +461,7 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, TrCore* 
 ****
 ***/
 
-void TorrentUrlChooserDialog::onOpenURLResponse(int response, TrCore* core)
+void TorrentUrlChooserDialog::onOpenURLResponse(int response, Glib::RefPtr<TrCore> const& core)
 {
     bool handled = false;
 
@@ -464,7 +472,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, TrCore* core)
 
         if (!url.empty())
         {
-            handled = gtr_core_add_from_url(core, url.c_str());
+            handled = core->add_from_url(url);
 
             if (!handled)
             {
@@ -483,12 +491,12 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, TrCore* core)
     }
 }
 
-std::unique_ptr<TorrentUrlChooserDialog> TorrentUrlChooserDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<TorrentUrlChooserDialog> TorrentUrlChooserDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<TorrentUrlChooserDialog>(new TorrentUrlChooserDialog(parent, core));
 }
 
-TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, TrCore* core)
+TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog(_("Open URL"), parent)
 {
     guint row;

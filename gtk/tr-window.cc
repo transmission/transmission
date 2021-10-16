@@ -40,7 +40,7 @@
 class MainWindow::Impl
 {
 public:
-    Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, TrCore* core);
+    Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
@@ -68,7 +68,7 @@ private:
     void syncAltSpeedButton();
 
     bool onAskTrackerQueryTooltip(int x, int y, bool keyboard_tip, Glib::RefPtr<Gtk::Tooltip> tooltip);
-    void status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, char const* val);
+    void status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val);
     void onOptionsClicked(Gtk::Button* button);
     void onYinYangClicked(Gtk::Button* button);
     void alt_speed_toggled_cb();
@@ -94,8 +94,8 @@ private:
     Glib::RefPtr<Gtk::TreeSelection> selection_;
     TorrentCellRenderer* renderer_ = nullptr;
     Gtk::TreeViewColumn* column_ = nullptr;
-    TrCore* core_ = nullptr;
-    gulong pref_handler_id_ = 0;
+    Glib::RefPtr<TrCore> const core_;
+    sigc::connection pref_handler_id_;
 };
 
 /***
@@ -210,7 +210,7 @@ void MainWindow::Impl::prefsChanged(tr_quark const key)
 
 MainWindow::Impl::~Impl()
 {
-    g_signal_handler_disconnect(core_, pref_handler_id_);
+    pref_handler_id_.disconnect();
 }
 
 void MainWindow::Impl::onYinYangClicked(Gtk::Button* button)
@@ -222,11 +222,11 @@ void MainWindow::Impl::onYinYangClicked(Gtk::Button* button)
 #endif
 }
 
-void MainWindow::Impl::status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, char const* val)
+void MainWindow::Impl::status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val)
 {
     if (menu_item->get_active())
     {
-        gtr_core_set_pref(core_, TR_KEY_statusbar_stats, val);
+        core_->set_pref(TR_KEY_statusbar_stats, val);
     }
 }
 
@@ -252,7 +252,7 @@ void MainWindow::Impl::syncAltSpeedButton()
 
 void MainWindow::Impl::alt_speed_toggled_cb()
 {
-    gtr_core_set_pref_bool(core_, TR_KEY_alt_speed_enabled, alt_speed_button_->get_active());
+    core_->set_pref(TR_KEY_alt_speed_enabled, alt_speed_button_->get_active());
 }
 
 /***
@@ -290,7 +290,7 @@ bool MainWindow::Impl::onAskTrackerQueryTooltip(int /*x*/, int /*y*/, bool /*key
 
 void MainWindow::Impl::onAltSpeedToggledIdle()
 {
-    gtr_core_set_pref_bool(core_, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(gtr_core_session(core_)));
+    core_->set_pref(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(core_->get_session()));
 }
 
 /***
@@ -301,14 +301,14 @@ void MainWindow::Impl::onSpeedToggled(Gtk::CheckMenuItem* check, tr_direction di
 {
     if (check->get_active())
     {
-        gtr_core_set_pref_bool(core_, dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
+        core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, enabled);
     }
 }
 
 void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
 {
-    gtr_core_set_pref_int(core_, dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down, KBps);
-    gtr_core_set_pref_bool(core_, dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
+    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down, KBps);
+    core_->set_pref(dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled, true);
 }
 
 Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
@@ -349,14 +349,14 @@ void MainWindow::Impl::onRatioToggled(Gtk::CheckMenuItem* check, bool enabled)
 {
     if (check->get_active())
     {
-        gtr_core_set_pref_bool(core_, TR_KEY_ratio_limit_enabled, enabled);
+        core_->set_pref(TR_KEY_ratio_limit_enabled, enabled);
     }
 }
 
 void MainWindow::Impl::onRatioSet(double ratio)
 {
-    gtr_core_set_pref_double(core_, TR_KEY_ratio_limit, ratio);
-    gtr_core_set_pref_bool(core_, TR_KEY_ratio_limit_enabled, true);
+    core_->set_pref(TR_KEY_ratio_limit, ratio);
+    core_->set_pref(TR_KEY_ratio_limit_enabled, true);
 }
 
 Gtk::Menu* MainWindow::Impl::createRatioMenu()
@@ -446,12 +446,15 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 ****  PUBLIC
 ***/
 
-std::unique_ptr<MainWindow> MainWindow::create(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& uim, TrCore* core)
+std::unique_ptr<MainWindow> MainWindow::create(
+    Gtk::Application& app,
+    Glib::RefPtr<Gtk::UIManager> const& uim,
+    Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<MainWindow>(new MainWindow(app, uim, core));
 }
 
-MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, TrCore* core)
+MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<TrCore> const& core)
     : Gtk::ApplicationWindow()
     , impl_(std::make_unique<Impl>(*this, ui_mgr, core))
 {
@@ -460,7 +463,7 @@ MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const
 
 MainWindow::~MainWindow() = default;
 
-MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, TrCore* core)
+MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<TrCore> const& core)
     : core_(core)
 {
     static struct
@@ -513,7 +516,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     gtr_action_set_important("show-torrent-properties", true);
 
     /* filter */
-    filter_ = Gtk::make_managed<FilterBar>(gtr_core_session(core_), Glib::wrap(gtr_core_model(core_), true));
+    filter_ = Gtk::make_managed<FilterBar>(core_->get_session(), core_->get_model());
     filter_->set_border_width(GUI_PAD_SMALL);
 
     /* status menu */
@@ -627,15 +630,10 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     prefsChanged(TR_KEY_statusbar_stats);
     prefsChanged(TR_KEY_show_toolbar);
     prefsChanged(TR_KEY_alt_speed_enabled);
-    pref_handler_id_ = g_signal_connect(
-        core_,
-        "prefs-changed",
-        G_CALLBACK(static_cast<void (*)(TrCore*, tr_quark, MainWindow::Impl*)>(
-            [](TrCore* /*core*/, tr_quark key, MainWindow::Impl* impl) { impl->prefsChanged(key); })),
-        this);
+    pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::prefsChanged));
 
     tr_sessionSetAltSpeedFunc(
-        gtr_core_session(core_),
+        core_->get_session(),
         [](tr_session* /*s*/, bool /*isEnabled*/, bool /*byUser*/, void* p)
         { Glib::signal_idle().connect_once([p]() { static_cast<Impl*>(p)->onAltSpeedToggledIdle(); }); },
         this);
@@ -647,7 +645,7 @@ void MainWindow::Impl::updateStats()
 {
     Glib::ustring buf;
     tr_session_stats stats;
-    auto const* const session = gtr_core_session(core_);
+    auto const* const session = core_->get_session();
 
     /* update the stats */
     char const* pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
@@ -690,7 +688,7 @@ void MainWindow::Impl::updateStats()
 
 void MainWindow::Impl::updateSpeeds()
 {
-    auto const* const session = gtr_core_session(core_);
+    auto const* const session = core_->get_session();
 
     if (session != nullptr)
     {
@@ -699,7 +697,7 @@ void MainWindow::Impl::updateSpeeds()
         double downSpeed = 0;
         int upCount = 0;
         int downCount = 0;
-        auto const model = Glib::wrap(gtr_core_model(core_), true);
+        auto const model = core_->get_model();
 
         for (auto const& row : model->children())
         {
@@ -726,7 +724,7 @@ void MainWindow::refresh()
 
 void MainWindow::Impl::refresh()
 {
-    if (core_ != nullptr && gtr_core_session(core_) != nullptr)
+    if (core_ != nullptr && core_->get_session() != nullptr)
     {
         updateSpeeds();
         updateStats();

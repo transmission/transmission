@@ -12,31 +12,31 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 typedef struct tr_ctor tr_ctor;
 
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
 public:
-    static std::unique_ptr<TorrentUrlChooserDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<TorrentUrlChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    TorrentUrlChooserDialog(Gtk::Window& parent, TrCore* core);
+    TorrentUrlChooserDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
-    void onOpenURLResponse(int response, TrCore* core);
+    void onOpenURLResponse(int response, Glib::RefPtr<TrCore> const& core);
 };
 
 class TorrentFileChooserDialog : public Gtk::FileChooserDialog
 {
 public:
-    static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    TorrentFileChooserDialog(Gtk::Window& parent, TrCore* core);
+    TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
-    void onOpenDialogResponse(int response, TrCore* core);
+    void onOpenDialogResponse(int response, Glib::RefPtr<TrCore> const& core);
 };
 
 class OptionsDialog : public Gtk::Dialog
@@ -46,11 +46,11 @@ public:
 
     static std::unique_ptr<OptionsDialog> create(
         Gtk::Window& parent,
-        TrCore* core,
+        Glib::RefPtr<TrCore> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
 protected:
-    OptionsDialog(Gtk::Window& parent, TrCore* core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+    OptionsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
 private:
     class Impl;

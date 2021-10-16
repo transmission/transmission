@@ -23,7 +23,7 @@ enum
 class StatsDialog::Impl
 {
 public:
-    Impl(StatsDialog& dialog, TrCore* core);
+    Impl(StatsDialog& dialog, Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
 private:
@@ -32,7 +32,7 @@ private:
 
 private:
     StatsDialog& dialog_;
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
 
     Gtk::Label* one_up_lb_;
     Gtk::Label* one_down_lb_;
@@ -69,8 +69,8 @@ bool StatsDialog::Impl::updateStats()
     tr_session_stats one;
     tr_session_stats all;
 
-    tr_sessionGetStats(gtr_core_session(core_), &one);
-    tr_sessionGetCumulativeStats(gtr_core_session(core_), &all);
+    tr_sessionGetStats(core_->get_session(), &one);
+    tr_sessionGetCumulativeStats(core_->get_session(), &all);
 
     setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
     setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
@@ -109,7 +109,7 @@ void StatsDialog::Impl::dialogResponse(int response)
 
         if (w.run() == TR_RESPONSE_RESET)
         {
-            tr_sessionClearStats(gtr_core_session(core_));
+            tr_sessionClearStats(core_->get_session());
             updateStats();
         }
     }
@@ -120,12 +120,12 @@ void StatsDialog::Impl::dialogResponse(int response)
     }
 }
 
-std::unique_ptr<StatsDialog> StatsDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<StatsDialog> StatsDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<StatsDialog>(new StatsDialog(parent, core));
 }
 
-StatsDialog::StatsDialog(Gtk::Window& parent, TrCore* core)
+StatsDialog::StatsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog(_("Statistics"), parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
@@ -133,7 +133,7 @@ StatsDialog::StatsDialog(Gtk::Window& parent, TrCore* core)
 
 StatsDialog::~StatsDialog() = default;
 
-StatsDialog::Impl::Impl(StatsDialog& dialog, TrCore* core)
+StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<TrCore> const& core)
     : dialog_(dialog)
     , core_(core)
 {

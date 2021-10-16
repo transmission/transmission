@@ -12,17 +12,17 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class PrefsDialog : public Gtk::Dialog
 {
 public:
     ~PrefsDialog() override;
 
-    static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    PrefsDialog(Gtk::Window& parent, TrCore* core);
+    PrefsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

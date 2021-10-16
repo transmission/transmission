@@ -35,7 +35,11 @@
 ****
 ***/
 
-void gtr_confirm_remove(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids, bool delete_files)
+void gtr_confirm_remove(
+    Gtk::Window& parent,
+    Glib::RefPtr<TrCore> const& core,
+    std::vector<int> const& torrent_ids,
+    bool delete_files)
 {
     int connected = 0;
     int incomplete = 0;
@@ -48,7 +52,7 @@ void gtr_confirm_remove(Gtk::Window& parent, TrCore* core, std::vector<int> cons
 
     for (auto const id : torrent_ids)
     {
-        tr_torrent* tor = gtr_core_find_torrent(core, id);
+        tr_torrent* tor = core->find_torrent(id);
         tr_stat const* stat = tr_torrentStat(tor);
 
         if (stat->leftUntilDone != 0)
@@ -135,7 +139,7 @@ void gtr_confirm_remove(Gtk::Window& parent, TrCore* core, std::vector<int> cons
             {
                 for (auto const id : torrent_ids)
                 {
-                    gtr_core_remove_torrent(core, id, delete_files);
+                    core->remove_torrent(id, delete_files);
                 }
             }
 

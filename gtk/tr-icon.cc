@@ -27,7 +27,7 @@
 class SystemTrayIcon::Impl
 {
 public:
-    Impl(TrCore* core);
+    Impl(Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
     void refresh();
@@ -37,7 +37,7 @@ private:
     void popup(guint button, guint when);
 
 private:
-    TrCore* const core_;
+    Glib::RefPtr<TrCore> const core_;
 
     Gtk::Menu* menu_;
 
@@ -86,7 +86,7 @@ void SystemTrayIcon::Impl::refresh()
     char down[64];
     Glib::ustring downLimit;
     char const* idle = _("Idle");
-    tr_session* session = gtr_core_session(core_);
+    auto* session = core_->get_session();
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
@@ -167,7 +167,7 @@ std::string getIconName()
 
 } // namespace
 
-SystemTrayIcon::SystemTrayIcon(TrCore* core)
+SystemTrayIcon::SystemTrayIcon(Glib::RefPtr<TrCore> const& core)
     : impl_(std::make_unique<Impl>(core))
 {
 }
@@ -179,7 +179,7 @@ void SystemTrayIcon::refresh()
     impl_->refresh();
 }
 
-SystemTrayIcon::Impl::Impl(TrCore* core)
+SystemTrayIcon::Impl::Impl(Glib::RefPtr<TrCore> const& core)
     : core_(core)
 {
     auto const icon_name = getIconName();

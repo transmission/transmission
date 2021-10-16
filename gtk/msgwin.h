@@ -12,17 +12,17 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class MessageLogWindow : public Gtk::Window
 {
 public:
     ~MessageLogWindow() override;
 
-    static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    MessageLogWindow(Gtk::Window& parent, TrCore* core);
+    MessageLogWindow(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

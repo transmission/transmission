@@ -28,31 +28,10 @@ using UInt32VariantType = Glib::Variant<guint32>;
 namespace
 {
 
-class TrNotification
+struct TrNotification
 {
-public:
-    TrNotification() = default;
-
-    TrNotification(TrCore* core, int torrent_id)
-        : core_(core, [](TrCore* c) { g_object_unref(G_OBJECT(c)); })
-        , torrent_id_(torrent_id)
-    {
-        g_object_ref(G_OBJECT(core_.get()));
-    }
-
-    TrCore* get_core() const
-    {
-        return core_.get();
-    }
-
-    int get_torrent_id() const
-    {
-        return torrent_id_;
-    }
-
-private:
-    std::shared_ptr<TrCore> core_;
-    int torrent_id_ = 0;
+    Glib::RefPtr<TrCore> core;
+    int torrent_id = 0;
 };
 
 Glib::RefPtr<Gio::DBus::Proxy> proxy;
@@ -112,7 +91,7 @@ void g_signal_callback(
         signal_name == "ActionInvoked" && params.get_n_children() > 1 &&
         params.get_child(1).is_of_type(StringVariantType::variant_type()))
     {
-        auto const* tor = gtr_core_find_torrent(n.get_core(), n.get_torrent_id());
+        auto const* tor = n.core->find_torrent(n.torrent_id);
         if (tor == nullptr)
         {
             return;
@@ -122,7 +101,7 @@ void g_signal_callback(
 
         if (action == "folder")
         {
-            gtr_core_open_folder(n.get_core(), n.get_torrent_id());
+            n.core->open_folder(n.torrent_id);
         }
         else if (action == "file")
         {
@@ -181,7 +160,7 @@ void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& 
 
 } // namespace
 
-void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
+void gtr_notify_torrent_completed(Glib::RefPtr<TrCore> const& core, int torrent_id)
 {
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
@@ -205,9 +184,9 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 
     g_return_if_fail(proxy != nullptr);
 
-    auto const* const tor = gtr_core_find_torrent(core, torrent_id);
+    auto const* const tor = core->find_torrent(torrent_id);
 
-    auto const n = TrNotification(core, torrent_id);
+    auto const n = TrNotification{ core, torrent_id };
 
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)

@@ -41,7 +41,7 @@ auto const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
 class DetailsDialog::Impl
 {
 public:
-    Impl(DetailsDialog& dialog, TrCore* core);
+    Impl(DetailsDialog& dialog, Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
     void set_torrents(std::vector<int> const& torrent_ids);
@@ -154,7 +154,7 @@ private:
     Gtk::Label* file_label_ = nullptr;
 
     std::vector<int> ids_;
-    TrCore* core_;
+    Glib::RefPtr<TrCore> const core_;
     sigc::connection periodic_refresh_tag_;
 };
 
@@ -165,7 +165,7 @@ std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 
     for (auto const id : ids_)
     {
-        if (auto* torrent = gtr_core_find_torrent(core_, id); torrent != nullptr)
+        if (auto* torrent = core_->find_torrent(id); torrent != nullptr)
         {
             torrents.push_back(torrent);
         }
@@ -411,7 +411,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
         tr_variantListAddInt(ids, id);
     }
 
-    gtr_core_exec(core_, &top);
+    core_->exec(&top);
     tr_variantFree(&top);
 }
 
@@ -430,7 +430,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
         tr_variantListAddInt(ids, id);
     }
 
-    gtr_core_exec(core_, &top);
+    core_->exec(&top);
     tr_variantFree(&top);
 }
 
@@ -449,7 +449,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
         tr_variantListAddInt(ids, id);
     }
 
-    gtr_core_exec(core_, &top);
+    core_->exec(&top);
     tr_variantFree(&top);
 }
 
@@ -1780,7 +1780,7 @@ void DetailsDialog::Impl::onMorePeerInfoToggled()
 {
     tr_quark const key = TR_KEY_show_extra_peer_details;
     bool const value = more_peer_details_check_->get_active();
-    gtr_core_set_pref_bool(core_, key, value);
+    core_->set_pref(key, value);
     setPeerViewColumns(peer_view_);
 }
 
@@ -2077,7 +2077,7 @@ int DetailsDialog::Impl::tracker_list_get_current_torrent_id() const
 tr_torrent* DetailsDialog::Impl::tracker_list_get_current_torrent() const
 {
     int const torrent_id = tracker_list_get_current_torrent_id();
-    return gtr_core_find_torrent(core_, torrent_id);
+    return core_->find_torrent(torrent_id);
 }
 
 namespace
@@ -2104,7 +2104,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
     auto& store = tracker_store_;
-    tr_session* session = gtr_core_session(core_);
+    auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
     /* step 1: get all the trackers */
@@ -2214,7 +2214,7 @@ void DetailsDialog::Impl::onScrapeToggled()
 {
     tr_quark const key = TR_KEY_show_tracker_scrapes;
     bool const value = scrape_check_->get_active();
-    gtr_core_set_pref_bool(core_, key, value);
+    core_->set_pref(key, value);
     refresh();
 }
 
@@ -2222,7 +2222,7 @@ void DetailsDialog::Impl::onBackupToggled()
 {
     tr_quark const key = TR_KEY_show_backup_trackers;
     bool const value = all_check_->get_active();
-    gtr_core_set_pref_bool(core_, key, value);
+    core_->set_pref(key, value);
     refresh();
 }
 
@@ -2234,7 +2234,7 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, Gtk::Dialog* d
     {
         int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
-        tr_torrent* const tor = gtr_core_find_torrent(core_, torrent_id);
+        tr_torrent* const tor = core_->find_torrent(torrent_id);
 
         if (tor != nullptr)
         {
@@ -2401,7 +2401,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
                 trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                 tr_variantListAddStr(trackers, url.c_str());
 
-                gtr_core_exec(core_, &top);
+                core_->exec(&top);
                 refresh();
 
                 tr_variantFree(&top);
@@ -2471,7 +2471,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
         tr_variantListAddInt(trackers, tracker_id);
 
-        gtr_core_exec(core_, &top);
+        core_->exec(&top);
         refresh();
 
         tr_variantFree(&top);
@@ -2598,12 +2598,12 @@ DetailsDialog::Impl::~Impl()
     periodic_refresh_tag_.disconnect();
 }
 
-std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<DetailsDialog>(new DetailsDialog(parent, core));
 }
 
-DetailsDialog::DetailsDialog(Gtk::Window& parent, TrCore* core)
+DetailsDialog::DetailsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Dialog({}, parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
@@ -2611,7 +2611,7 @@ DetailsDialog::DetailsDialog(Gtk::Window& parent, TrCore* core)
 
 DetailsDialog::~DetailsDialog() = default;
 
-DetailsDialog::Impl::Impl(DetailsDialog& dialog, TrCore* core)
+DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<TrCore> const& core)
     : dialog_(dialog)
     , core_(core)
 {
@@ -2664,7 +2664,7 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     if (len == 1)
     {
         int const id = ids.front();
-        auto const* tor = gtr_core_find_torrent(core_, id);
+        auto const* tor = core_->find_torrent(id);
         auto const* inf = tr_torrentInfo(tor);
         title = Glib::ustring::sprintf(_("%s Properties"), inf->name);
 

@@ -146,10 +146,10 @@ private:
     void update_model_soon();
     bool update_model_loop();
 
-    void on_core_busy(TrCore const* core, bool busy);
-    void on_core_error(TrCore const* core, guint code, char const* msg);
-    void on_add_torrent(TrCore* core, tr_ctor* ctor);
-    void on_prefs_changed(TrCore const* core, tr_quark key);
+    void on_core_busy(bool busy);
+    void on_core_error(TrCore::ErrorCode code, Glib::ustring const& msg);
+    void on_add_torrent(tr_ctor* ctor);
+    void on_prefs_changed(tr_quark key);
 
     void on_message_window_closed();
 
@@ -180,7 +180,7 @@ private:
     sigc::connection refresh_actions_tag_;
     std::unique_ptr<SystemTrayIcon> icon_;
     std::unique_ptr<MainWindow> wind_;
-    TrCore* core_ = nullptr;
+    Glib::RefPtr<TrCore> core_;
     std::unique_ptr<MessageLogWindow> msgwin_;
     std::unique_ptr<PrefsDialog> prefs_;
     std::vector<std::string> error_list_;
@@ -280,9 +280,9 @@ bool Application::refresh_actions()
 {
     if (!is_closing_)
     {
-        size_t const total = gtr_core_get_torrent_count(core_);
-        size_t const active = gtr_core_get_active_torrent_count(core_);
-        int const torrent_count = gtk_tree_model_iter_n_children(gtr_core_model(core_), nullptr);
+        size_t const total = core_->get_torrent_count();
+        size_t const active = core_->get_active_torrent_count();
+        auto const torrent_count = core_->get_model()->children().size();
         bool has_selection;
 
         auto const sel_counts = get_selected_torrent_counts();
@@ -405,19 +405,19 @@ bool Application::on_rpc_changed_idle(tr_rpc_callback_type type, int torrent_id)
         break;
 
     case TR_RPC_TORRENT_ADDED:
-        if (auto* tor = gtr_core_find_torrent(core_, torrent_id); tor != nullptr)
+        if (auto* tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
-            gtr_core_add_torrent(core_, tor, true);
+            core_->add_torrent(tor, true);
         }
 
         break;
 
     case TR_RPC_TORRENT_REMOVING:
-        gtr_core_remove_torrent(core_, torrent_id, false);
+        core_->remove_torrent(torrent_id, false);
         break;
 
     case TR_RPC_TORRENT_TRASHING:
-        gtr_core_remove_torrent(core_, torrent_id, true);
+        core_->remove_torrent(torrent_id, true);
         break;
 
     case TR_RPC_SESSION_CHANGED:
@@ -427,7 +427,7 @@ bool Application::on_rpc_changed_idle(tr_rpc_callback_type type, int torrent_id)
             tr_variant* oldvals = gtr_pref_get_all();
             tr_quark key;
             std::vector<tr_quark> changed_keys;
-            tr_session* session = gtr_core_session(core_);
+            auto* session = core_->get_session();
             tr_variantInitDict(&tmp, 100);
             tr_sessionGetSettings(session, &tmp);
 
@@ -459,7 +459,7 @@ bool Application::on_rpc_changed_idle(tr_rpc_callback_type type, int torrent_id)
 
             for (auto const changed_key : changed_keys)
             {
-                gtr_core_pref_changed(core_, changed_key);
+                core_->signal_prefs_changed().emit(changed_key);
             }
 
             tr_variantFree(&tmp);
@@ -550,7 +550,7 @@ void Application::on_startup()
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));
-    core_ = gtr_core_new(session);
+    core_ = TrCore::create(session);
 
     /* init the ui manager */
     ui_manager_ = Gtk::UIManager::create();
@@ -574,7 +574,7 @@ void Application::on_startup()
 
         if (last_time + SECONDS_IN_A_WEEK < now)
         {
-            gtr_core_blocklist_update(core_);
+            core_->blocklist_update();
         }
     }
 
@@ -605,7 +605,7 @@ void Application::open_files(type_vec_files const& files)
     bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
     bool const do_notify = true;
 
-    gtr_core_add_files(core_, files, do_start, do_prompt, do_notify);
+    core_->add_files(files, do_start, do_prompt, do_notify);
 }
 
 void Application::on_open(type_vec_files const& files, Glib::ustring const& hint)
@@ -717,7 +717,7 @@ std::string Application::get_application_id(std::string const& config_dir)
     return id.str();
 }
 
-void Application::on_core_busy(TrCore const* /*core*/, bool busy)
+void Application::on_core_busy(bool busy)
 {
     wind_->set_busy(busy);
 }
@@ -732,40 +732,20 @@ void Application::app_setup()
     gtr_actions_set_core(core_);
 
     /* set up core handlers */
-    g_signal_connect(
-        core_,
-        "busy",
-        G_CALLBACK(static_cast<void (*)(TrCore const*, gboolean, Application*)>(
-            [](TrCore const* core, gboolean busy, Application* app) { app->on_core_busy(core, busy); })),
-        this);
-    g_signal_connect(
-        core_,
-        "add-error",
-        G_CALLBACK(static_cast<void (*)(TrCore const*, guint, char const*, Application*)>(
-            [](TrCore const* core, guint code, char const* msg, Application* app) { app->on_core_error(core, code, msg); })),
-        this);
-    g_signal_connect(
-        core_,
-        "add-prompt",
-        G_CALLBACK(static_cast<void (*)(TrCore*, tr_ctor*, Application*)>( //
-            [](TrCore* core, tr_ctor* ctor, Application* app) { app->on_add_torrent(core, ctor); })),
-        this);
-    g_signal_connect(
-        core_,
-        "prefs-changed",
-        G_CALLBACK(static_cast<void (*)(TrCore const*, tr_quark, Application*)>(
-            [](TrCore const* core, tr_quark key, Application* app) { app->on_prefs_changed(core, key); })),
-        this);
+    core_->signal_busy().connect(sigc::mem_fun(this, &Application::on_core_busy));
+    core_->signal_add_error().connect(sigc::mem_fun(this, &Application::on_core_error));
+    core_->signal_add_prompt().connect(sigc::mem_fun(this, &Application::on_add_torrent));
+    core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Application::on_prefs_changed));
 
     /* add torrents from command-line and saved state */
-    gtr_core_load(core_, start_paused_);
-    gtr_core_torrents_added(core_);
+    core_->load(start_paused_);
+    core_->torrents_added();
 
     /* set up main window */
     main_window_setup();
 
     /* set up the icon */
-    on_prefs_changed(core_, TR_KEY_show_notification_area_icon);
+    on_prefs_changed(TR_KEY_show_notification_area_icon);
 
     /* start model update timer */
     timer_ = Glib::signal_timeout().connect_seconds(
@@ -899,16 +879,13 @@ void Application::on_drag_data_received(
 
 void Application::main_window_setup()
 {
-    Glib::RefPtr<Gtk::TreeModel> model;
-    Glib::RefPtr<Gtk::TreeSelection> sel;
-
     // g_assert(nullptr == cbdata->wind);
     // cbdata->wind = wind;
-    sel_ = sel = wind_->get_selection();
+    sel_ = wind_->get_selection();
 
-    sel->signal_changed().connect(sigc::mem_fun(this, &Application::refresh_actions_soon));
+    sel_->signal_changed().connect(sigc::mem_fun(this, &Application::refresh_actions_soon));
     refresh_actions_soon();
-    model = Glib::wrap(gtr_core_model(core_), true);
+    auto const model = core_->get_model();
     model->signal_row_changed().connect(sigc::mem_fun(this, &Application::rowChangedCB));
     wind_->signal_delete_event().connect(sigc::mem_fun(this, &Application::winclose));
     refresh_actions();
@@ -926,7 +903,7 @@ bool Application::on_session_closed()
     prefs_.reset();
     wind_.reset();
 
-    g_object_unref(core_);
+    core_.reset();
 
     icon_.reset();
 
@@ -986,7 +963,7 @@ void Application::on_app_exit()
     button->grab_focus();
 
     /* clear the UI */
-    gtr_core_clear(core_);
+    core_->clear();
 
     /* ensure the window is in its previous position & size.
      * this seems to be necessary because changing the main window's
@@ -998,7 +975,7 @@ void Application::on_app_exit()
      * delegate its call to another thread here... when it's done,
      * punt the GUI teardown back to the GTK+ thread */
     Glib::Thread::create(
-        [this, session = gtr_core_close(core_)]()
+        [this, session = core_->close()]()
         {
             tr_sessionClose(session);
             Glib::signal_idle().connect(sigc::mem_fun(this, &Application::on_session_closed));
@@ -1039,19 +1016,19 @@ void Application::flush_torrent_errors()
     }
 }
 
-void Application::on_core_error(TrCore const* /*core*/, guint code, char const* msg)
+void Application::on_core_error(TrCore::ErrorCode code, Glib::ustring const& msg)
 {
     switch (code)
     {
-    case TR_PARSE_ERR:
+    case TrCore::ERR_ADD_TORRENT_ERR:
         error_list_.push_back(Glib::path_get_basename(msg));
         break;
 
-    case TR_PARSE_DUPLICATE:
+    case TrCore::ERR_ADD_TORRENT_DUP:
         duplicates_list_.push_back(msg);
         break;
 
-    case TR_CORE_ERR_NO_MORE_TORRENTS:
+    case TrCore::ERR_NO_MORE_TORRENTS:
         flush_torrent_errors();
         break;
 
@@ -1071,10 +1048,10 @@ bool Application::on_main_window_focus_in(GdkEventFocus* /*event*/)
     return false;
 }
 
-void Application::on_add_torrent(TrCore* core, tr_ctor* ctor)
+void Application::on_add_torrent(tr_ctor* ctor)
 {
     auto w = std::shared_ptr<OptionsDialog>(
-        OptionsDialog::create(*wind_, core, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
+        OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     w->signal_hide().connect([w]() mutable { w.reset(); });
     w->signal_focus_in_event().connect(sigc::mem_fun(this, &Application::on_main_window_focus_in));
@@ -1087,9 +1064,9 @@ void Application::on_add_torrent(TrCore* core, tr_ctor* ctor)
     w->show();
 }
 
-void Application::on_prefs_changed(TrCore const* /*core*/, tr_quark const key)
+void Application::on_prefs_changed(tr_quark const key)
 {
-    tr_session* tr = gtr_core_session(core_);
+    auto* tr = core_->get_session();
 
     switch (key)
     {
@@ -1293,7 +1270,7 @@ void Application::on_prefs_changed(TrCore const* /*core*/, tr_quark const key)
 bool Application::update_model_once()
 {
     /* update the torrent data in the model */
-    gtr_core_update(core_);
+    core_->update();
 
     /* refresh the main window's statusbar and toolbar buttons */
     if (wind_ != nullptr)
@@ -1370,7 +1347,7 @@ bool Application::call_rpc_for_selected_torrents(std::string const& method)
     tr_variant* args;
     tr_variant* ids;
     bool invoked = false;
-    tr_session* session = gtr_core_session(core_);
+    auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, method.c_str());
@@ -1413,7 +1390,7 @@ void Application::remove_selected(bool delete_files)
 
 void Application::start_all_torrents()
 {
-    tr_session* session = gtr_core_session(core_);
+    auto* session = core_->get_session();
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
@@ -1424,7 +1401,7 @@ void Application::start_all_torrents()
 
 void Application::pause_all_torrents()
 {
-    tr_session* session = gtr_core_session(core_);
+    auto* session = core_->get_session();
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
@@ -1540,7 +1517,7 @@ void Application::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "open-torrent-folder")
     {
         sel_->selected_foreach([this](auto const& /*path*/, auto const& iter)
-                               { gtr_core_open_folder(core_, iter->get_value(torrent_cols.torrent_id)); });
+                               { core_->open_folder(iter->get_value(torrent_cols.torrent_id)); });
     }
     else if (action_name == "show-torrent-properties")
     {

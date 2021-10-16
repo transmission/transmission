@@ -12,12 +12,12 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class FileList : public Gtk::ScrolledWindow
 {
 public:
-    FileList(TrCore* core, int torrent_id);
+    FileList(Glib::RefPtr<TrCore> const& core, int torrent_id);
     ~FileList() override;
 
     void clear();

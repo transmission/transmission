@@ -45,7 +45,7 @@ MessageLogColumnsModel const message_log_cols;
 class MessageLogWindow::Impl
 {
 public:
-    Impl(MessageLogWindow& window, TrCore* core);
+    Impl(MessageLogWindow& window, Glib::RefPtr<TrCore> const& core);
     ~Impl();
 
 private:
@@ -67,7 +67,7 @@ private:
 private:
     MessageLogWindow& window_;
 
-    TrCore* core_ = nullptr;
+    Glib::RefPtr<TrCore> const core_;
     Gtk::TreeView* view_ = nullptr;
     Glib::RefPtr<Gtk::ListStore> store_;
     Glib::RefPtr<Gtk::TreeModelFilter> filter_;
@@ -140,7 +140,7 @@ void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
     bool const pinned_to_new = is_pinned_to_new();
 
     tr_logSetLevel(level);
-    gtr_core_set_pref_int(core_, TR_KEY_message_level, level);
+    core_->set_pref(TR_KEY_message_level, level);
     maxLevel_ = level;
     filter_->refilter();
 
@@ -429,12 +429,12 @@ Gtk::ComboBox* debug_level_combo_new()
 ***  Public Functions
 **/
 
-std::unique_ptr<MessageLogWindow> MessageLogWindow::create(Gtk::Window& parent, TrCore* core)
+std::unique_ptr<MessageLogWindow> MessageLogWindow::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
     return std::unique_ptr<MessageLogWindow>(new MessageLogWindow(parent, core));
 }
 
-MessageLogWindow::MessageLogWindow(Gtk::Window& parent, TrCore* core)
+MessageLogWindow::MessageLogWindow(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
     : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
     , impl_(std::make_unique<Impl>(*this, core))
 {
@@ -443,7 +443,7 @@ MessageLogWindow::MessageLogWindow(Gtk::Window& parent, TrCore* core)
 
 MessageLogWindow::~MessageLogWindow() = default;
 
-MessageLogWindow::Impl::Impl(MessageLogWindow& window, TrCore* core)
+MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<TrCore> const& core)
     : window_(window)
     , core_(core)
 {

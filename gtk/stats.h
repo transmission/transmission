@@ -12,17 +12,17 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class StatsDialog : public Gtk::Dialog
 {
 public:
     ~StatsDialog() override;
 
-    static std::unique_ptr<StatsDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<StatsDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 protected:
-    StatsDialog(Gtk::Window& parent, TrCore* core);
+    StatsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

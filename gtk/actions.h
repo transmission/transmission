@@ -17,7 +17,7 @@
 #define NOTIFICATION_ICON "transmission-notification-icon"
 
 void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* callback_user_data);
-void gtr_actions_set_core(TrCore* core);
+void gtr_actions_set_core(Glib::RefPtr<TrCore> const& core);
 void gtr_actions_handler(Glib::ustring const& action_name, void* user_data);
 
 void gtr_action_activate(Glib::ustring const& action_name);

@@ -14,19 +14,19 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class DetailsDialog : public Gtk::Dialog
 {
 public:
     ~DetailsDialog() override;
 
-    static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, TrCore* core);
+    static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
     void set_torrents(std::vector<int> const& torrent_ids);
 
 protected:
-    DetailsDialog(Gtk::Window& parent, TrCore* core);
+    DetailsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core);
 
 private:
     class Impl;

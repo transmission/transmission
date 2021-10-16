@@ -13,17 +13,20 @@
 
 #include <gtkmm.h>
 
-typedef struct _TrCore TrCore;
+class TrCore;
 
 class RelocateDialog : public Gtk::Dialog
 {
 public:
     ~RelocateDialog() override;
 
-    static std::unique_ptr<RelocateDialog> create(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids);
+    static std::unique_ptr<RelocateDialog> create(
+        Gtk::Window& parent,
+        Glib::RefPtr<TrCore> const& core,
+        std::vector<int> const& torrent_ids);
 
 protected:
-    RelocateDialog(Gtk::Window& parent, TrCore* core, std::vector<int> const& torrent_ids);
+    RelocateDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids);
 
 private:
     class Impl;
