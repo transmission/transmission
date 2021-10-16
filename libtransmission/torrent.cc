@@ -424,7 +424,7 @@ uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
 
 bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
 {
-    bool isLimited;
+    auto isLimited = bool{};
 
     switch (tr_torrentGetIdleMode(tor))
     {
