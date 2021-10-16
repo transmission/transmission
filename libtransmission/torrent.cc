@@ -3409,12 +3409,10 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
     if (block_is_new)
     {
-        tr_piece_index_t p;
-
         tr_cpBlockAdd(&tor->completion, block);
         tr_torrentSetDirty(tor);
 
-        p = tr_torBlockPiece(tor, block);
+        tr_piece_index_t const p = tr_torBlockPiece(tor, block);
 
         if (tr_torrentPieceIsComplete(tor, p))
         {
