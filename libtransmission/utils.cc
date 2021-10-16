@@ -1131,26 +1131,11 @@ static char* to_utf8(char const* in, size_t inlen)
     return ret;
 }
 
-char* tr_utf8clean(char const* str, size_t max_len)
+char* tr_utf8clean(std::string_view str)
 {
-    char* ret;
-    char const* end;
-
-    if (max_len == TR_BAD_SIZE)
-    {
-        max_len = strlen(str);
-    }
-
-    if (tr_utf8_validate(str, max_len, &end))
-    {
-        ret = tr_strndup(str, max_len);
-    }
-    else
-    {
-        ret = to_utf8(str, max_len);
-    }
-
-    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, nullptr));
+    char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
+                                                                                  to_utf8(std::data(str), std::size(str));
+    TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
     return ret;
 }
 
