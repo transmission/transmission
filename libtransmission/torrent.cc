@@ -3978,9 +3978,7 @@ void tr_torrentRenamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    struct rename_data* data;
-
-    data = tr_new0(struct rename_data, 1);
+    auto* const data = tr_new0(struct rename_data, 1);
     data->tor = tor;
     data->oldpath = tr_strdup(oldpath);
     data->newname = tr_strdup(newname);
