@@ -867,10 +867,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sessionLock(session);
 
-    bool doStart;
-    uint64_t loaded;
-    char const* dir;
-    bool isNewTorrent;
     static int nextUniqueId = 1;
 
     tor->session = session;
@@ -880,6 +876,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
 
+    char const* dir = nullptr;
     if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
     {
         tor->downloadDir = tr_strdup(dir);
@@ -911,7 +908,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     torrentInitFromInfo(tor);
 
     bool didRenameResumeFileToHashOnlyName = false;
-    loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
+    auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
 
     if (didRenameResumeFileToHashOnlyName)
     {
@@ -927,7 +924,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     refreshCurrentDir(tor);
 
-    doStart = tor->isRunning;
+    bool const doStart = tor->isRunning;
     tor->isRunning = false;
 
     if ((loaded & TR_FR_SPEEDLIMIT) == 0)
@@ -954,13 +951,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
-    isNewTorrent = !tr_sys_path_exists(tor->info.torrent, nullptr);
+    bool const isNewTorrent = !tr_sys_path_exists(tor->info.torrent, nullptr);
 
     /* maybe save our own copy of the metainfo */
     if (tr_ctorGetSave(ctor))
     {
-        tr_variant const* val;
-
+        tr_variant const* val = nullptr;
         if (tr_ctorGetMetainfo(ctor, &val))
         {
             char const* path = tor->info.torrent;
