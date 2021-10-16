@@ -2724,8 +2724,8 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 
     tr_torrentLock(tor);
 
-    tr_variant metainfo;
-    bool ok = true;
+    auto metainfo = tr_variant{};
+    auto ok = bool{ true };
 
     /* ensure the trackers' tiers are in ascending order */
     auto* trackers = static_cast<tr_tracker_info*>(tr_memdup(trackers_in, sizeof(tr_tracker_info) * trackerCount));
@@ -2743,9 +2743,6 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
     /* save to the .torrent file */
     if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent, nullptr))
     {
-        bool hasInfo;
-        tr_info tmpInfo;
-
         /* remove the old fields */
         tr_variantDictRemove(&metainfo, TR_KEY_announce);
         tr_variantDictRemove(&metainfo, TR_KEY_announce_list);
@@ -2775,12 +2772,11 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
         }
 
         /* try to parse it back again, to make sure it's good */
-        memset(&tmpInfo, 0, sizeof(tr_info));
-
+        auto tmpInfo = tr_info{};
+        auto hasInfo = bool{};
         if (tr_metainfoParse(tor->session, &metainfo, &tmpInfo, &hasInfo, &tor->infoDictLength))
         {
             /* it's good, so keep these new trackers and free the old ones */
-
             tr_info swap;
             swap.trackers = tor->info.trackers;
             swap.trackerCount = tor->info.trackerCount;
