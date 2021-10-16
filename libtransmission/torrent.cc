@@ -3342,8 +3342,6 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
 
 static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
 {
-    char* sub;
-    char const* base;
     tr_info const* inf = &tor->info;
     tr_file const* f = &inf->files[fileIndex];
     time_t const now = tr_time();
@@ -3362,6 +3360,8 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
+    char const* base = nullptr;
+    char* sub = nullptr;
     if (tr_torrentFindFile2(tor, fileIndex, &base, &sub, nullptr))
     {
         if (strcmp(sub, f->name) != 0)
