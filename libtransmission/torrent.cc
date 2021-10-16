@@ -2684,8 +2684,8 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
     /* If we think we've completed one of the files in this piece,
      * but it's been modified since we last checked it,
      * then it needs to be rechecked */
-    tr_file_index_t f;
-    uint64_t unused;
+    auto f = tr_file_index_t{};
+    auto unused = uint64_t{};
     tr_ioFindFileLocation(tor, p, 0, &f, &unused);
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
