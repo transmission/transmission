@@ -2933,35 +2933,35 @@ static constexpr bool isJunkFile(std::string_view base)
 
 static void removeEmptyFoldersAndJunkFiles(char const* folder)
 {
-    tr_sys_dir_t odir;
-
-    if ((odir = tr_sys_dir_open(folder, nullptr)) != TR_BAD_SYS_DIR)
+    auto const odir = tr_sys_dir_open(folder, nullptr);
+    if (odir == TR_BAD_SYS_DIR)
     {
-        char const* name;
-
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
-        {
-            if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-            {
-                tr_sys_path_info info;
-                char* filename = tr_buildPath(folder, name, nullptr);
-
-                if (tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
-                {
-                    removeEmptyFoldersAndJunkFiles(filename);
-                }
-                else if (isJunkFile(name))
-                {
-                    tr_sys_path_remove(filename, nullptr);
-                }
-
-                tr_free(filename);
-            }
-        }
-
-        tr_sys_path_remove(folder, nullptr);
-        tr_sys_dir_close(odir, nullptr);
+        return;
     }
+
+    char const* name = nullptr;
+    while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+    {
+        if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+        {
+            char* const filename = tr_buildPath(folder, name, nullptr);
+
+            auto info = tr_sys_path_info{};
+            if (tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
+            {
+                removeEmptyFoldersAndJunkFiles(filename);
+            }
+            else if (isJunkFile(name))
+            {
+                tr_sys_path_remove(filename, nullptr);
+            }
+
+            tr_free(filename);
+        }
+    }
+
+    tr_sys_path_remove(folder, nullptr);
+    tr_sys_dir_close(odir, nullptr);
 }
 
 /**
