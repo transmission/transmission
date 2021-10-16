@@ -227,7 +227,7 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
         char const* const buf_data = (char*)evbuffer_pullup(buf, -1);
         size_t const buf_len = evbuffer_get_length(buf);
 
-        *setme = tr_utf8clean(buf_data, buf_len);
+        *setme = tr_utf8clean(std::string_view{ buf_data, buf_len });
 
         if (!*is_adjusted)
         {
@@ -639,7 +639,7 @@ static char const* tr_metainfoParseImpl(
 
         tr_free(inf->name);
         tr_free(inf->originalName);
-        inf->name = tr_utf8clean(str, len);
+        inf->name = tr_utf8clean(std::string_view{ str, len });
         inf->originalName = tr_strdup(inf->name);
     }
 
@@ -653,7 +653,7 @@ static char const* tr_metainfoParseImpl(
     }
 
     tr_free(inf->comment);
-    inf->comment = tr_utf8clean(str, len);
+    inf->comment = tr_utf8clean(std::string_view{ str, len });
 
     /* created by */
     len = 0;
@@ -665,7 +665,7 @@ static char const* tr_metainfoParseImpl(
     }
 
     tr_free(inf->creator);
-    inf->creator = tr_utf8clean(str, len);
+    inf->creator = tr_utf8clean(std::string_view{ str, len });
 
     /* creation date */
     if (!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i))

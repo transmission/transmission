@@ -82,35 +82,35 @@ TEST_F(UtilsTest, trBuildpath)
 
 TEST_F(UtilsTest, trUtf8clean)
 {
-    auto const* in = "hello world";
-    auto out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
+    auto in = "hello world"sv;
+    auto out = makeString(tr_utf8clean(in));
     EXPECT_EQ(in, out);
 
-    in = "hello world";
-    out = makeString(tr_utf8clean(in, 5));
-    EXPECT_EQ("hello", out);
+    in = "hello world"sv;
+    out = makeString(tr_utf8clean(in.substr(0, 5)));
+    EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
-    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
-    out = makeString(tr_utf8clean(in, 17));
-    EXPECT_TRUE(out.size() == 17 || out.size() == 33);
+    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
+    out = makeString(tr_utf8clean(in));
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
     // same string, but utf-8 clean
-    in = "Трудно быть Богом";
-    out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
+    in = "Трудно быть Богом"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
     EXPECT_EQ(in, out);
 
-    in = "\xF4\x00\x81\x82";
-    out = makeString(tr_utf8clean(in, 4));
+    in = "\xF4\x00\x81\x82"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 1 || out.size() == 2);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
-    in = "\xF4\x33\x81\x82";
-    out = makeString(tr_utf8clean(in, 4));
+    in = "\xF4\x33\x81\x82"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
