@@ -458,7 +458,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
 
 static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
-    uint16_t idleMinutes;
+    auto idleMinutes = uint16_t{};
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
         difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
