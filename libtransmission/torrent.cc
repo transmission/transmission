@@ -1010,28 +1010,26 @@ static tr_parse_result torrentParseImpl(
     size_t* dictLength,
     int* setme_duplicate_id)
 {
-    bool doFree;
-    bool didParse;
-    bool hasInfo = false;
-    tr_info tmp;
-    tr_variant const* metainfo;
     tr_session* session = tr_ctorGetSession(ctor);
     tr_parse_result result = TR_PARSE_OK;
 
+    tr_info tmp;
     if (setmeInfo == nullptr)
     {
         setmeInfo = &tmp;
     }
 
-    memset(setmeInfo, 0, sizeof(tr_info));
+    *setmeInfo = {};
 
+    tr_variant const* metainfo = nullptr;
     if (!tr_ctorGetMetainfo(ctor, &metainfo))
     {
         return TR_PARSE_ERR;
     }
 
-    didParse = tr_metainfoParse(session, metainfo, setmeInfo, &hasInfo, dictLength);
-    doFree = didParse && (setmeInfo == &tmp);
+    auto hasInfo = bool{};
+    bool const didParse = tr_metainfoParse(session, metainfo, setmeInfo, &hasInfo, dictLength);
+    bool const doFree = didParse && (setmeInfo == &tmp);
 
     if (!didParse)
     {
