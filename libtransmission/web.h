@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string_view>
+
 #include "tr-macros.h"
 
 struct tr_address;
