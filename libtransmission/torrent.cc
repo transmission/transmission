@@ -1853,38 +1853,37 @@ static void onVerifyDone(tr_torrent* tor, bool aborted, void* vdata)
 static void verifyTorrent(void* vdata)
 {
     auto* data = static_cast<struct verify_data*>(vdata);
-    bool startAfter;
     tr_torrent* tor = data->tor;
     tr_sessionLock(tor->session);
 
     if (tor->isDeleting)
     {
         tr_free(data);
-        goto unlock;
-    }
-
-    /* if the torrent's already being verified, stop it */
-    tr_verifyRemove(tor);
-
-    startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
-
-    if (tor->isRunning)
-    {
-        tr_torrentStop(tor);
-    }
-
-    tor->startAfterVerify = startAfter;
-
-    if (setLocalErrorIfFilesDisappeared(tor))
-    {
-        tor->startAfterVerify = false;
     }
     else
     {
-        tr_verifyAdd(tor, onVerifyDone, data);
+        /* if the torrent's already being verified, stop it */
+        tr_verifyRemove(tor);
+
+        bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+
+        if (tor->isRunning)
+        {
+            tr_torrentStop(tor);
+        }
+
+        tor->startAfterVerify = startAfter;
+
+        if (setLocalErrorIfFilesDisappeared(tor))
+        {
+            tor->startAfterVerify = false;
+        }
+        else
+        {
+            tr_verifyAdd(tor, onVerifyDone, data);
+        }
     }
 
-unlock:
     tr_sessionUnlock(tor->session);
 }
 
