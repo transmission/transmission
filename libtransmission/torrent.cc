@@ -3917,10 +3917,8 @@ static void torrentRenamePath(void* vdata)
     }
     else
     {
-        size_t n;
-        tr_file_index_t* file_indices;
-
-        file_indices = renameFindAffectedFiles(tor, oldpath, &n);
+        auto n = size_t{};
+        tr_file_index_t* const file_indices = renameFindAffectedFiles(tor, oldpath, &n);
 
         if (n == 0)
         {
