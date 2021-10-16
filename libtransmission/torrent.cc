@@ -3470,18 +3470,14 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     TR_ASSERT(fileNum < tor->info.fileCount);
 
     char* part = nullptr;
-    tr_file const* file;
-    char const* b = nullptr;
     char const* s = nullptr;
     auto file_info = tr_sys_path_info{};
 
-    file = &tor->info.files[fileNum];
+    tr_file const* const file = &tor->info.files[fileNum];
 
     /* look in the download dir... */
-    if (b == nullptr)
-    {
-        find_file_in_dir(file->name, tor->downloadDir, &b, &s, &file_info);
-    }
+    char const* b = nullptr;
+    find_file_in_dir(file->name, tor->downloadDir, &b, &s, &file_info);
 
     /* look in the incomplete dir... */
     if (b == nullptr && tor->incompleteDir != nullptr)
