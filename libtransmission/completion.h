@@ -124,7 +124,7 @@ static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_
 
 bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t);
 
-void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count);
+std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp);
 
 constexpr void tr_cpInvalidateDND(tr_completion* cp)
 {
