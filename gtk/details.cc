@@ -2353,7 +2353,7 @@ void DetailsDialog::Impl::on_edit_trackers()
         gtr_dialog_set_content(*d, *t);
 
         d->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(torrent_id));
-        d->set_data(TEXT_BUFFER_KEY, w->get_buffer().get());
+        d->set_data(TEXT_BUFFER_KEY, gtr_get_ptr(w->get_buffer()));
 
         d->show();
     }

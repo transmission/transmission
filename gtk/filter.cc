@@ -294,7 +294,7 @@ Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new(Glib::RefPtr<Gtk::TreeMode
     iter = store->append();
     iter->set_value(tracker_filter_cols.type, static_cast<int>(TRACKER_FILTER_TYPE_SEPARATOR));
 
-    store->set_data(TORRENT_MODEL_KEY, tmodel.get());
+    store->set_data(TORRENT_MODEL_KEY, gtr_get_ptr(tmodel));
     tracker_filter_model_update(store);
     return store;
 }
@@ -540,7 +540,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         iter->set_value(activity_filter_cols.icon_name, type.icon_name);
     }
 
-    store->set_data(TORRENT_MODEL_KEY, tmodel.get());
+    store->set_data(TORRENT_MODEL_KEY, gtr_get_ptr(tmodel));
     activity_filter_model_update(store);
     return store;
 }
@@ -761,7 +761,7 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
                                                  { update_count_label_idle(); });
 
     tracker_->property_width_request() = 170;
-    static_cast<Gtk::TreeStore*>(tracker_->get_model().get())->set_data(SESSION_KEY, session);
+    static_cast<Gtk::TreeStore*>(gtr_get_ptr(tracker_->get_model()))->set_data(SESSION_KEY, session);
 
     filter_model_->set_visible_func(sigc::mem_fun(this, &Impl::is_row_visible));
 

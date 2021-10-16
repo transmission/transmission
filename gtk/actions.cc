@@ -178,12 +178,12 @@ Gtk::UIManager* myUIManager = nullptr;
 
 void gtr_actions_set_core(Glib::RefPtr<TrCore> const& core)
 {
-    myCore = core.get();
+    myCore = gtr_get_ptr(core);
 }
 
 void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* callback_user_data)
 {
-    myUIManager = ui_manager.get();
+    myUIManager = gtr_get_ptr(ui_manager);
 
     register_my_icons();
 
@@ -307,7 +307,7 @@ void gtr_action_set_important(Glib::ustring const& name, bool b)
 
 void gtr_action_set_toggled(Glib::ustring const& name, bool b)
 {
-    dynamic_cast<Gtk::ToggleAction*>(get_action(name).get())->set_active(b);
+    dynamic_cast<Gtk::ToggleAction*>(gtr_get_ptr(get_action(name)))->set_active(b);
 }
 
 Gtk::Widget* gtr_action_get_widget(Glib::ustring const& path)

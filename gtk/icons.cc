@@ -56,7 +56,7 @@ std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
 {
     std::string key;
 
-    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(icon.get()); ticon != nullptr)
+    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
         std::ostringstream names;
         for (auto const& name : ticon->get_names())
@@ -66,7 +66,7 @@ std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
 
         key = names.str();
     }
-    else if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(icon.get()); ficon != nullptr)
+    else if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
     {
         key = ficon->get_file()->get_path();
     }
@@ -115,12 +115,12 @@ Glib::RefPtr<Gdk::Pixbuf> _get_icon_pixbuf(Glib::RefPtr<Gio::Icon> const& icon, 
         return {};
     }
 
-    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(icon.get()); ticon != nullptr)
+    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
         return get_themed_icon_pixbuf(*ticon, size, theme);
     }
 
-    if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(icon.get()); ficon != nullptr)
+    if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
     {
         return get_file_icon_pixbuf(*ficon, size);
     }
@@ -142,7 +142,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
         return pixbuf_it->second;
     }
 
-    auto const pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *icons.icon_theme.get());
+    auto const pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *gtr_get_ptr(icons.icon_theme));
 
     if (pixbuf != nullptr)
     {

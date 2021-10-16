@@ -974,7 +974,7 @@ bool is_torrent_active(tr_stat const* st)
 
 void TrCore::add_torrent(tr_torrent* tor, bool do_notify)
 {
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
     impl_->add_torrent(tor, do_notify);
 }
 
@@ -1080,7 +1080,7 @@ int TrCore::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         }
         else
         {
-            ScopedModelSortBlocker disable_sort(*sorted_model_.get());
+            ScopedModelSortBlocker disable_sort(*gtr_get_ptr(sorted_model_));
             add_torrent(create_new_torrent(ctor), do_notify);
             tr_ctorFree(ctor);
         }
@@ -1331,7 +1331,7 @@ void TrCore::load(bool forcePaused)
 
     torrents = tr_sessionLoadTorrents(impl_->get_session(), ctor, &count);
 
-    ScopedModelSortBlocker disable_sort(*impl_->get_model().get());
+    ScopedModelSortBlocker disable_sort(*gtr_get_ptr(impl_->get_model()));
 
     for (int i = 0; i < count; ++i)
     {
