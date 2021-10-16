@@ -3795,22 +3795,13 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     if (tr_sys_path_exists(src, nullptr))
     {
-        int tmp;
-        bool tgt_exists;
         char* parent = tr_sys_path_dirname(src, nullptr);
-        char* tgt;
+        char* const tgt = tr_str_has_suffix(src, ".part") ?
+            tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.part", parent, newname) :
+            tr_buildPath(parent, newname, nullptr);
 
-        if (tr_str_has_suffix(src, ".part"))
-        {
-            tgt = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.part", parent, newname);
-        }
-        else
-        {
-            tgt = tr_buildPath(parent, newname, nullptr);
-        }
-
-        tmp = errno;
-        tgt_exists = tr_sys_path_exists(tgt, nullptr);
+        auto tmp = errno;
+        bool const tgt_exists = tr_sys_path_exists(tgt, nullptr);
         errno = tmp;
 
         if (!tgt_exists)
