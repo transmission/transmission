@@ -223,7 +223,7 @@ char const* tr_strip_positional_args(char const* str)
     char const* in = str;
     size_t pos = 0;
 
-    for (; str && *str && pos + 1 < buf.size(); ++str)
+    for (; str && *str && pos + 1 < std::size(buf); ++str)
     {
         buf[pos++] = *str;
 
