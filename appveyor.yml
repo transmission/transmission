@@ -26,7 +26,7 @@ for:
   - pwsh: |
       $Version = git describe --tags --abbrev=10 --always
       if ($Version -ne $Env:APPVEYOR_REPO_BRANCH) {
-          $version += "-${Env:APPVEYOR_REPO_BRANCH}"
+          $Version += "-${Env:APPVEYOR_REPO_BRANCH}"
       }
 
       $BuildIndex = 0
@@ -63,7 +63,7 @@ for:
           & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
               -Mode Build `
               -BuildArch $env:TR_ARCH `
-              -NoPackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -match "/")
+              -PackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -eq "master" -or $Env:APPVEYOR_REPO_TAG -eq "true")
       } catch {
           Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
           exit 1
