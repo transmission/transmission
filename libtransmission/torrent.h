@@ -14,6 +14,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
@@ -460,9 +461,9 @@ static inline size_t tr_torrentMissingBytesInPiece(tr_torrent const* tor, tr_pie
     return tr_cpMissingBytesInPiece(&tor->completion, i);
 }
 
-static inline void* tr_torrentCreatePieceBitfield(tr_torrent const* tor, size_t* byte_count)
+static inline std::vector<uint8_t> tr_torrentCreatePieceBitfield(tr_torrent const* tor)
 {
-    return tr_cpCreatePieceBitfield(&tor->completion, byte_count);
+    return tr_cpCreatePieceBitfield(&tor->completion);
 }
 
 constexpr uint64_t tr_torrentHaveTotal(tr_torrent const* tor)

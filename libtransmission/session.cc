@@ -344,7 +344,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 63);
+    tr_variantDictReserve(d, 69);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DEFAULT_CACHE_SIZE_MB);
@@ -391,6 +391,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStr(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, "");
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, 10);
@@ -418,7 +420,7 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 63);
+    tr_variantDictReserve(d, 68);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, tr_blocklistGetURL(s));
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
@@ -464,8 +466,10 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsTorrentDoneScriptEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetTorrentDoneScript(s));
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -1131,14 +1135,24 @@ static void sessionSetImpl(void* vdata)
     ***  Scripts
     **/
 
+    if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_added_enabled, &boolVal))
+    {
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
+    }
+
+    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, nullptr))
+    {
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, strVal);
+    }
+
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetTorrentDoneScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &strVal, nullptr))
     {
-        tr_sessionSetTorrentDoneScript(session, strVal);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, strVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
@@ -1218,11 +1232,11 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 
     if (tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0)
     {
-        free_space = tr_device_info_get_free_space(session->downloadDir);
+        free_space = tr_device_info_get_disk_space(session->downloadDir).free;
     }
     else
     {
-        free_space = tr_getDirFreeSpace(dir);
+        free_space = tr_getDirSpace(dir).free;
     }
 
     return free_space;
@@ -1488,7 +1502,7 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
 
     session->bandwidth->setLimited(dir, isLimited && !zeroCase);
 
-    session->bandwidth->setDesiredSpeed_Bps(dir, limit_Bps);
+    session->bandwidth->setDesiredSpeedBytesPerSecond(dir, limit_Bps);
 }
 
 enum
@@ -1500,9 +1514,7 @@ enum
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    tr_bitfield* b = &t->minutes;
-
-    tr_bitfieldSetHasNone(b);
+    t->minutes->setMode(Bitfield::OperationMode::None);
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1518,7 +1530,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
+                t->minutes->setBit((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }
         }
     }
@@ -1572,7 +1584,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MINUTES_PER_WEEK - 1;
     }
 
-    return tr_bitfieldHas(&t->minutes, minute_of_the_week);
+    return t->minutes->readBit(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1604,7 +1616,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    tr_bitfieldConstruct(&turtle->minutes, MINUTES_PER_WEEK);
+    turtle->minutes = new Bitfield(MINUTES_PER_WEEK);
 
     turtleUpdateTable(turtle);
 
@@ -1883,12 +1895,12 @@ bool tr_sessionGetDeleteSource(tr_session const* session)
 
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getPieceSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getPieceSpeedBytesPerSecond(0, dir) : 0;
 }
 
 static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
 {
-    return tr_isSession(session) ? session->bandwidth->getRawSpeed_Bps(0, dir) : 0;
+    return tr_isSession(session) ? session->bandwidth->getRawSpeedBytesPerSecond(0, dir) : 0;
 }
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -2102,7 +2114,7 @@ void tr_sessionClose(tr_session* session)
     /* free the session memory */
     tr_variantFree(&session->removedTorrents);
     delete session->bandwidth;
-    tr_bitfieldDestruct(&session->turtle.minutes);
+    delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
@@ -2113,7 +2125,6 @@ void tr_sessionClose(tr_session* session)
     }
 
     tr_device_info_free(session->downloadDir);
-    tr_free(session->torrentDoneScript);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
@@ -2654,7 +2665,7 @@ static void metainfoLookupInit(tr_session* session)
                 if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
                 {
                     ++n;
-                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString, TR_BAD_SIZE), path);
+                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString), path);
                 }
 
                 tr_free(path);
@@ -2677,7 +2688,7 @@ char const* tr_sessionFindTorrentFile(tr_session const* session, char const* has
     }
 
     char const* filename = nullptr;
-    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, nullptr);
+    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString), &filename, nullptr);
     return filename;
 }
 
@@ -2689,7 +2700,7 @@ void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char 
      * lookup table hasn't been built yet */
     if (session->metainfoLookup != nullptr)
     {
-        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), filename);
+        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString), filename);
     }
 }
 
@@ -2828,36 +2839,36 @@ char const* tr_sessionGetRPCBindAddress(tr_session const* session)
 *****
 ****/
 
-bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const* session)
+void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->isTorrentDoneScriptEnabled;
+    session->scripts_enabled[type] = enabled;
 }
 
-void tr_sessionSetTorrentDoneScriptEnabled(tr_session* session, bool isEnabled)
+bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->isTorrentDoneScriptEnabled = isEnabled;
+    return session->scripts_enabled[type];
 }
 
-char const* tr_sessionGetTorrentDoneScript(tr_session const* session)
+void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->torrentDoneScript;
+    session->scripts[type].assign(script ? script : "");
 }
 
-void tr_sessionSetTorrentDoneScript(tr_session* session, char const* scriptFilename)
+char const* tr_sessionGetScript(tr_session const* session, TrScript type)
 {
     TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    if (session->torrentDoneScript != scriptFilename)
-    {
-        tr_free(session->torrentDoneScript);
-        session->torrentDoneScript = tr_strdup(scriptFilename);
-    }
+    return session->scripts[type].c_str();
 }
 
 /***
@@ -2970,7 +2981,7 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     }
 
     // find the best n candidates
-    num_wanted = std::min(num_wanted, candidates.size());
+    num_wanted = std::min(num_wanted, std::size(candidates));
     if (num_wanted < candidates.size())
     {
         std::partial_sort(

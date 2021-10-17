@@ -633,6 +633,21 @@ static void handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
+        evhttp_add_header(req->output_headers, "Access-Control-Allow-Origin", "*");
+
+        if (req->type == EVHTTP_REQ_OPTIONS)
+        {
+            char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");
+            if (headers != nullptr)
+            {
+                evhttp_add_header(req->output_headers, "Access-Control-Allow-Headers", headers);
+            }
+
+            evhttp_add_header(req->output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            send_simple_response(req, 200, "");
+            return;
+        }
+
         auth = evhttp_find_header(req->input_headers, "Authorization");
 
         if (auth != nullptr && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
@@ -674,18 +689,21 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         server->loginattempts = 0;
 
-        if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
+        size_t const server_url_len = strlen(server->url);
+        char const* const location = strncmp(req->uri, server->url, server_url_len) == 0 ? req->uri + server_url_len : nullptr;
+
+        if (location == nullptr || location[0] == '\0' || strcmp(location, "web") == 0)
         {
-            char* location = tr_strdup_printf("%sweb/", server->url);
-            evhttp_add_header(req->output_headers, "Location", location);
+            char* new_location = tr_strdup_printf("%sweb/", server->url);
+            evhttp_add_header(req->output_headers, "Location", new_location);
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
-            tr_free(location);
+            tr_free(new_location);
         }
-        else if (strncmp(req->uri + strlen(server->url), "web/", 4) == 0)
+        else if (strncmp(location, "web/", 4) == 0)
         {
             handle_web_client(req, server);
         }
-        else if (strcmp(req->uri + strlen(server->url), "upload") == 0)
+        else if (strcmp(location, "upload") == 0)
         {
             handle_upload(req, server);
         }
@@ -725,13 +743,14 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 TR_RPC_SESSION_ID_HEADER,
                 sessionId);
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
+            evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp);
             tr_free(tmp);
         }
 
 #endif
 
-        else if (strncmp(req->uri + strlen(server->url), "rpc", 3) == 0)
+        else if (strncmp(location, "rpc", 3) == 0)
         {
             handle_rpc(req, server);
         }
@@ -796,6 +815,7 @@ static void startServer(void* vserver)
     }
 
     struct evhttp* httpd = evhttp_new(server->session->event_base);
+    evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
     char const* address = tr_rpcGetBindAddress(server);
 
@@ -1133,14 +1153,22 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_url;
+    size_t url_len;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStr(settings, key, &str, &url_len))
     {
         missing_settings_key(key);
     }
     else
     {
-        s->url = tr_strdup(str);
+        if (url_len == 0 || str[url_len - 1] != '/')
+        {
+            s->url = tr_strdup_printf("%s/", str);
+        }
+        else
+        {
+            s->url = tr_strdup(str);
+        }
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

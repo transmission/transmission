@@ -20,7 +20,9 @@ struct tr_completion
 {
     tr_torrent* tor;
 
-    tr_bitfield blockBitfield;
+    // Changed to non-owning pointer temporarily till tr_completion becomes C++-constructible and destructible
+    // TODO: remove * and own the value
+    Bitfield* blockBitfield;
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
@@ -48,11 +50,11 @@ struct tr_completion
 
 void tr_cpConstruct(tr_completion*, tr_torrent*);
 
-void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* blocks);
+void tr_cpBlockInit(tr_completion* cp, Bitfield const& blocks);
 
 static inline void tr_cpDestruct(tr_completion* cp)
 {
-    tr_bitfieldDestruct(&cp->blockBitfield);
+    delete cp->blockBitfield;
 }
 
 /**
@@ -80,12 +82,12 @@ constexpr uint64_t tr_cpHaveTotal(tr_completion const* cp)
 
 static inline bool tr_cpHasAll(tr_completion const* cp)
 {
-    return tr_torrentHasMetadata(cp->tor) && tr_bitfieldHasAll(&cp->blockBitfield);
+    return tr_torrentHasMetadata(cp->tor) && cp->blockBitfield->hasAll();
 }
 
 static inline bool tr_cpHasNone(tr_completion const* cp)
 {
-    return !tr_torrentHasMetadata(cp->tor) || tr_bitfieldHasNone(&cp->blockBitfield);
+    return !tr_torrentHasMetadata(cp->tor) || cp->blockBitfield->hasNone();
 }
 
 /**
@@ -113,7 +115,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t i);
 
 static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
 {
-    return tr_bitfieldHas(&cp->blockBitfield, i);
+    return cp->blockBitfield->readBit(i);
 }
 
 /***
@@ -122,7 +124,7 @@ static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_
 
 bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t);
 
-void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count);
+std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp);
 
 constexpr void tr_cpInvalidateDND(tr_completion* cp)
 {

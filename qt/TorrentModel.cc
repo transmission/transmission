@@ -182,7 +182,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
         keys.reserve(tr_variantListSize(first_child));
         while (tr_variantGetStr(tr_variantListChild(first_child, i++), &str, &len))
         {
-            keys.push_back(tr_quark_new(str, len));
+            keys.push_back(tr_quark_new(std::string_view(str, len)));
         }
     }
     else if (first_child != nullptr)

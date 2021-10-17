@@ -27,6 +27,8 @@ struct timeval;
 
 struct tr_error;
 
+struct tr_disk_space;
+
 /**
  * @addtogroup utils Utilities
  * @{
@@ -79,10 +81,10 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
 /**
- * @brief Get available disk space (in bytes) for the specified folder.
- * @return zero or positive integer on success, -1 in case of error.
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-int64_t tr_getDirFreeSpace(char const* path);
+struct tr_disk_space tr_getDirSpace(char const* path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
@@ -109,9 +111,8 @@ void tr_wait_msec(long int delay_milliseconds);
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
  * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of
- * @param len the length of the string to copy. If -1, the entire string is used.
  */
-char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
+char* tr_utf8clean(std::string_view str) TR_GNUC_MALLOC;
 
 #ifdef _WIN32
 
@@ -284,7 +285,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.

@@ -699,13 +699,21 @@ tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* set
 ***
 **/
 
-bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const*);
+enum TrScript
+{
+    TR_SCRIPT_ON_TORRENT_ADDED,
+    TR_SCRIPT_ON_TORRENT_DONE,
 
-void tr_sessionSetTorrentDoneScriptEnabled(tr_session*, bool isEnabled);
+    TR_SCRIPT_N_TYPES
+};
 
-char const* tr_sessionGetTorrentDoneScript(tr_session const*);
+void tr_sessionSetScript(tr_session*, TrScript, char const* script_filename);
 
-void tr_sessionSetTorrentDoneScript(tr_session*, char const* scriptFilename);
+char const* tr_sessionGetScript(tr_session const*, TrScript);
+
+void tr_sessionSetScriptEnabled(tr_session*, TrScript, bool enabled);
+
+bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
 
 /** @} */
 
@@ -1171,7 +1179,7 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 enum
 {
     TR_PRI_LOW = -1,
-    TR_PRI_NORMAL = 0, /* since NORMAL is 0, memset initializes nicely */
+    TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
     TR_PRI_HIGH = 1
 };
 

@@ -61,9 +61,11 @@ static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
     TR_UNUSED(user_data);
 
     char const* key = gtk_action_get_name(GTK_ACTION(action));
-    gboolean const val = gtk_toggle_action_get_active(action);
-
-    gtr_core_set_pref_bool(myCore, tr_quark_new(key, TR_BAD_SIZE), val);
+    if (key != nullptr)
+    {
+        gboolean const val = gtk_toggle_action_get_active(action);
+        gtr_core_set_pref_bool(myCore, tr_quark_new(key), val);
+    }
 }
 
 static GtkToggleActionEntry pref_toggle_entries[] = {
@@ -245,7 +247,7 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 
     for (size_t i = 0; i < G_N_ELEMENTS(pref_toggle_entries); ++i)
     {
-        pref_toggle_entries[i].is_active = gtr_pref_flag_get(tr_quark_new(pref_toggle_entries[i].name, TR_BAD_SIZE));
+        pref_toggle_entries[i].is_active = gtr_pref_flag_get(tr_quark_new(pref_toggle_entries[i].name));
     }
 
     gtk_action_group_add_toggle_actions(
