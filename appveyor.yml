@@ -62,7 +62,8 @@ for:
       try {
           & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
               -Mode Build `
-              -BuildArch $env:TR_ARCH
+              -BuildArch $env:TR_ARCH `
+              -NoPackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -match "/")
       } catch {
           Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
           exit 1
