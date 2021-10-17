@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir, [string] $SourceDir, [string] $ArtifactsDir, [boolean] $NoPackDebugSyms) {
+function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir, [string] $SourceDir, [string] $ArtifactsDir, [boolean] $PackDebugSyms) {
     $BuildDir = Join-Path $SourceDir .build
 
     $env:PATH = @(
@@ -65,7 +65,7 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
     $MsiPackage = (Get-ChildItem (Join-Path $BuildDir dist msi 'transmission-*.msi'))[0]
     Move-Item -Path $MsiPackage.FullName -Destination $ArtifactsDir
 
-    if (-not $NoPackDebugSyms) {
+    if ($PackDebugSyms) {
         Invoke-NativeCommand cmake -E chdir $DebugSymbolsDir 7z a -y (Join-Path $ArtifactsDir "$($MsiPackage.BaseName)-pdb.7z")
     }
 }
