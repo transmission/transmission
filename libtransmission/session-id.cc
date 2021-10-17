@@ -6,8 +6,8 @@
  *
  */
 
-#include <string.h>
-#include <time.h>
+#include <cstring>
+#include <ctime>
 
 #ifndef _WIN32
 #include <sys/stat.h>

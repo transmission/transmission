@@ -6,9 +6,9 @@
  *
  */
 
-#include <stdarg.h>
-#include <stdlib.h> /* abs(), srand(), rand() */
-#include <string.h> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
+#include <cstdarg>
+#include <cstdlib> /* abs(), srand(), rand() */
+#include <cstring> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 
 #include <arc4.h>
 
