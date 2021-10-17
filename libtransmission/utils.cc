@@ -1108,7 +1108,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
         iconv_t cd = iconv_open("UTF-8", test_encoding);
 
-        if (cd != (iconv_t)-1)
+        if (cd != (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
         {
             if (iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft) != (size_t)-1)
             {

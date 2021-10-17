@@ -13,5 +13,6 @@ Checks: >
   modernize-use-nullptr,
   modernize-use-override,
   modernize-use-using,
+  performance-*,
   readability-avoid-const-params-in-decls,
   readability-else-after-return

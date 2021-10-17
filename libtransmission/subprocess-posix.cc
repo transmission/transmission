@@ -122,7 +122,7 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
     if (!sigchld_handler_set)
     {
         /* FIXME: "The effects of signal() in a multithreaded process are unspecified." (c) man 2 signal */
-        if (signal(SIGCHLD, &handle_sigchld) == SIG_ERR)
+        if (signal(SIGCHLD, &handle_sigchld) == SIG_ERR) // NOLINT(performance-no-int-to-ptr)
         {
             set_system_error(error, errno, "Call to signal()");
             return false;

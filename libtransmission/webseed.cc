@@ -498,7 +498,7 @@ static std::string make_url(tr_webseed* w, tr_file const* file)
         tr_http_escape(buf, file->name, false);
     }
 
-    auto const url = std::string{ (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
+    auto url = std::string{ (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
     evbuffer_free(buf);
     return url;
 }
