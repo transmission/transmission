@@ -238,11 +238,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         bool const baseline = tr_torrentUsesSessionLimits(torrents.front());
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentUsesSessionLimits(torrent); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSessionLimits(torrent); });
 
         if (is_uniform)
         {
@@ -254,11 +253,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentUsesSpeedLimit(torrent, TR_DOWN); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_DOWN); });
 
         if (is_uniform)
         {
@@ -270,11 +268,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_DOWN);
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetSpeedLimit_KBps(torrent, TR_DOWN); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_DOWN); });
 
         if (is_uniform)
         {
@@ -286,11 +283,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         bool const baseline = tr_torrentUsesSpeedLimit(torrents.front(), TR_UP);
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentUsesSpeedLimit(torrent, TR_UP); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentUsesSpeedLimit(torrent, TR_UP); });
 
         if (is_uniform)
         {
@@ -302,11 +298,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetSpeedLimit_KBps(torrents.front(), TR_UP);
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetSpeedLimit_KBps(torrent, TR_UP); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetSpeedLimit_KBps(torrent, TR_UP); });
 
         if (is_uniform)
         {
@@ -318,11 +313,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetPriority(torrents.front());
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetPriority(torrent); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetPriority(torrent); });
 
         if (is_uniform)
         {
@@ -340,11 +334,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetRatioMode(torrents.front());
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetRatioMode(torrent); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetRatioMode(torrent); });
 
         if (is_uniform)
         {
@@ -366,11 +359,10 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
     if (!torrents.empty())
     {
         auto const baseline = tr_torrentGetIdleMode(torrents.front());
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetIdleMode(torrent); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [baseline](auto const* torrent) { return baseline == tr_torrentGetIdleMode(torrent); });
 
         if (is_uniform)
         {
@@ -635,10 +627,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         bool const baseline = infos.front()->isPrivate;
-        bool const is_uniform = std::find_if(
-                                    infos.begin(),
-                                    infos.end(),
-                                    [baseline](auto const* info) { return info->isPrivate != baseline; }) == infos.end();
+        bool const is_uniform = std::all_of(
+            infos.begin(),
+            infos.end(),
+            [baseline](auto const* info) { return info->isPrivate == baseline; });
 
         if (is_uniform)
         {
@@ -662,15 +654,14 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         auto const creator = Glib::ustring(infos.front()->creator != nullptr ? infos.front()->creator : "");
         time_t const date = infos.front()->dateCreated;
         auto const datestr = get_short_date_string(date);
-        bool const mixed_creator = std::find_if(
-                                       infos.begin(),
-                                       infos.end(),
-                                       [&creator](auto const* info)
-                                       { return creator != (info->creator != nullptr ? info->creator : ""); }) != infos.end();
-        bool const mixed_date = std::find_if(
-                                    infos.begin(),
-                                    infos.end(),
-                                    [date](auto const* info) { return date != info->dateCreated; }) != infos.end();
+        bool const mixed_creator = std::any_of(
+            infos.begin(),
+            infos.end(),
+            [&creator](auto const* info) { return creator != (info->creator != nullptr ? info->creator : ""); });
+        bool const mixed_date = std::any_of(
+            infos.begin(),
+            infos.end(),
+            [date](auto const* info) { return date != info->dateCreated; });
 
         bool const empty_creator = creator.empty();
         bool const empty_date = date == 0;
@@ -710,11 +701,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const baseline = Glib::ustring(infos.front()->comment != nullptr ? infos.front()->comment : "");
-        bool const is_uniform = std::find_if(
-                                    infos.begin(),
-                                    infos.end(),
-                                    [&baseline](auto const* info)
-                                    { return baseline != (info->comment != nullptr ? info->comment : ""); }) == infos.end();
+        bool const is_uniform = std::all_of(
+            infos.begin(),
+            infos.end(),
+            [&baseline](auto const* info) { return baseline == (info->comment != nullptr ? info->comment : ""); });
 
         str = is_uniform ? baseline : mixed;
     }
@@ -729,11 +719,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const baseline = Glib::ustring(tr_torrentGetDownloadDir(torrents.front()));
-        bool const is_uniform = std::find_if(
-                                    torrents.begin(),
-                                    torrents.end(),
-                                    [&baseline](auto const* torrent)
-                                    { return baseline != tr_torrentGetDownloadDir(torrent); }) == torrents.end();
+        bool const is_uniform = std::all_of(
+            torrents.begin(),
+            torrents.end(),
+            [&baseline](auto const* torrent) { return baseline == tr_torrentGetDownloadDir(torrent); });
 
         str = is_uniform ? baseline : mixed;
     }
@@ -748,12 +737,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const activity = stats.front()->activity;
-        bool const is_uniform = std::find_if(
-                                    stats.begin(),
-                                    stats.end(),
-                                    [activity](auto const* st) { return activity != st->activity; }) == stats.end();
-        bool const allFinished = std::find_if(stats.begin(), stats.end(), [](auto const* st) { return !st->finished; }) ==
-            stats.end();
+        bool const is_uniform = std::all_of(
+            stats.begin(),
+            stats.end(),
+            [activity](auto const* st) { return activity == st->activity; });
+        bool const allFinished = std::all_of(stats.begin(), stats.end(), [](auto const* st) { return st->finished; });
 
         str = is_uniform ? activityString(activity, allFinished) : mixed;
     }
@@ -769,10 +757,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         time_t const baseline = stats.front()->startDate;
-        bool const is_uniform = std::find_if(
-                                    stats.begin(),
-                                    stats.end(),
-                                    [baseline](auto const* st) { return baseline != st->startDate; }) == stats.end();
+        bool const is_uniform = std::all_of(
+            stats.begin(),
+            stats.end(),
+            [baseline](auto const* st) { return baseline == st->startDate; });
 
         if (!is_uniform)
         {
@@ -798,10 +786,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         int const baseline = stats.front()->eta;
-        bool const is_uniform = std::find_if(
-                                    stats.begin(),
-                                    stats.end(),
-                                    [baseline](auto const* st) { return baseline != st->eta; }) == stats.end();
+        bool const is_uniform = std::all_of(
+            stats.begin(),
+            stats.end(),
+            [baseline](auto const* st) { return baseline == st->eta; });
 
         if (!is_uniform)
         {
@@ -987,10 +975,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const baseline = Glib::ustring(stats.front()->errorString);
-        bool const is_uniform = std::find_if(
-                                    stats.begin(),
-                                    stats.end(),
-                                    [&baseline](auto const* st) { return baseline != st->errorString; }) == stats.end();
+        bool const is_uniform = std::all_of(
+            stats.begin(),
+            stats.end(),
+            [&baseline](auto const* st) { return baseline == st->errorString; });
 
         str = is_uniform ? baseline : mixed;
     }
@@ -1426,9 +1414,8 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     }
 
     /* step 2: add any new webseeds */
-    for (size_t i = 0; i < torrents.size(); ++i)
+    for (auto const* const tor : torrents)
     {
-        auto const* tor = torrents.at(i);
         auto const* inf = tr_torrentInfo(tor);
 
         total += inf->webseedCount;
@@ -1449,9 +1436,8 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     }
 
     /* step 3: update the webseeds */
-    for (size_t i = 0; i < torrents.size(); ++i)
+    for (auto const* const tor : torrents)
     {
-        auto const* tor = torrents.at(i);
         auto const* inf = tr_torrentInfo(tor);
         double* speeds_KBps = tr_torrentWebSpeeds_KBps(tor);
 
@@ -1487,12 +1473,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             else
             {
                 auto const key = iter->get_value(webseed_cols.key);
-
-                if (!key.empty())
-                {
-                    hash.erase(key);
-                }
-
+                hash.erase(key);
                 iter = store->erase(iter);
             }
         }

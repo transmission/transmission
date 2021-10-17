@@ -702,10 +702,10 @@ void TrCore::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
     if (is_torrent)
     {
         /* if we're not already watching this file, start watching it now */
-        bool const found = std::find_if(
-                               monitor_files_.begin(),
-                               monitor_files_.end(),
-                               [file](auto const& f) { return file->equal(f); }) != monitor_files_.end();
+        bool const found = std::any_of(
+            monitor_files_.begin(),
+            monitor_files_.end(),
+            [file](auto const& f) { return file->equal(f); });
 
         if (!found)
         {
