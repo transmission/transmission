@@ -2093,7 +2093,7 @@
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1483">
                     <rect key="frame" x="62" y="403" width="252" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Включить удаленное управление" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1502">
+                    <buttonCell key="cell" type="check" title="Включить удалённый доступ" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1502">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>

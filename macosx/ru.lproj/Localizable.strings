@@ -779,7 +779,7 @@
 "remaining time unknown" = "оставшееся время неизвестно";
 
 /* Preferences -> toolbar item title */
-"Remote" = "Удаленное управление";
+"Remote" = "Удалённый доступ";
 
 /* Removal confirm panel -> button
    Remove completed confirm panel -> button
