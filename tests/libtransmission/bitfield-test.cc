@@ -71,11 +71,18 @@ TEST(Bitfield, ctorFromFlagArray)
 
     for (auto const& flags : Tests)
     {
-        auto bf = Bitfield(std::data(flags), std::size(flags));
-        EXPECT_EQ(std::size(flags), bf.getBitCount());
-        EXPECT_EQ(size_t(std::count(std::begin(flags), std::end(flags), true)) == std::size(flags), bf.hasAll());
-        EXPECT_EQ(size_t(std::count(std::begin(flags), std::end(flags), false)) == std::size(flags), bf.hasNone());
-        EXPECT_EQ(std::count(std::begin(flags), std::end(flags), true), bf.countBits());
+        size_t const true_count = std::count(std::begin(flags), std::end(flags), true);
+        size_t const n = std::size(flags);
+        bool const have_all = true_count == n;
+        bool const have_none = true_count == 0;
+
+        auto const bf = Bitfield(std::data(flags), std::size(flags));
+
+        EXPECT_EQ(n, bf.getBitCount());
+        EXPECT_EQ(have_all, bf.hasAll());
+        EXPECT_EQ(have_none, bf.hasNone());
+        EXPECT_EQ(true_count, bf.countBits());
+
         for (size_t i = 0; i < std::size(flags); ++i)
         {
             EXPECT_EQ(flags[i], bf.readBit(i));
