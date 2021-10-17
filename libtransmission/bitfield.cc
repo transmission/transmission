@@ -298,8 +298,8 @@ Bitfield::Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded)
 }
 
 Bitfield::Bitfield(bool const* flags, size_t n)
-    : bit_count_(n)
-    , true_count_(std::count(flags, flags + n, true))
+    : bit_count_{ n }
+    , true_count_{ size_t(std::count(flags, flags + n, true)) }
 {
     if (true_count_ == 0)
     {
