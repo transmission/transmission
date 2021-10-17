@@ -18,6 +18,7 @@
 
 #define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, "%s", #x)))
 #define TR_ASSERT_MSG(x, ...) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, __VA_ARGS__)))
+#define TR_UNREACHABLE() tr_assert_report(__FILE__, __LINE__, "Unreachable code")
 
 #define TR_ENABLE_ASSERTS
 
@@ -25,6 +26,7 @@
 
 #define TR_ASSERT(x) ((void)0)
 #define TR_ASSERT_MSG(x, ...) ((void)0)
+#define TR_UNREACHABLE() ((void)0)
 
 #undef TR_ENABLE_ASSERTS
 

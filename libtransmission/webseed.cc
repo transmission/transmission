@@ -67,7 +67,7 @@ public:
         , bandwidth(tor->bandwidth)
     {
         // init parent bits
-        have.setHasAll();
+        have.setMode(Bitfield::OperationMode::All);
         tr_peerUpdateProgress(tor, this);
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
@@ -495,7 +495,7 @@ static std::string make_url(tr_webseed* w, tr_file const* file)
     /* if url ends with a '/', add the torrent name */
     if (*std::rbegin(w->base_url) == '/' && file->name != nullptr)
     {
-        tr_http_escape(buf, file->name, strlen(file->name), false);
+        tr_http_escape(buf, file->name, false);
     }
 
     auto const url = std::string{ (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };

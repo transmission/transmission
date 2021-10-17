@@ -182,11 +182,11 @@ TEST(Bitfields, hasAllNone)
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.setHasNone();
+        field.setMode(Bitfield::OperationMode::None);
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(field.hasNone());
 
-        field.setHasAll();
+        field.setMode(Bitfield::OperationMode::All);
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
     }
@@ -197,11 +197,11 @@ TEST(Bitfields, hasAllNone)
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.setHasNone();
+        field.setMode(Bitfield::OperationMode::None);
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(field.hasNone());
 
-        field.setHasAll();
+        field.setMode(Bitfield::OperationMode::All);
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
     }
