@@ -354,7 +354,8 @@ void Bitfield::setBitRange(size_t begin, size_t end)
     {
         return;
     }
-    else if (mode_ == OperationMode::None)
+
+    if (mode_ == OperationMode::None)
     {
         setMode(OperationMode::Normal);
     }
@@ -406,7 +407,8 @@ void Bitfield::clearBitRange(size_t begin, size_t end)
     {
         return;
     }
-    else if (mode_ == OperationMode::All)
+
+    if (mode_ == OperationMode::All)
     {
         setMode(OperationMode::Normal);
     }
