@@ -21,8 +21,8 @@ THE SOFTWARE.
 
 */
 
-#include <string.h> /* memcmp(), memcpy(), memset() */
-#include <stdlib.h> /* malloc(), free() */
+#include <cstring> /* memcmp(), memcpy(), memset() */
+#include <cstdlib> /* malloc(), free() */
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"

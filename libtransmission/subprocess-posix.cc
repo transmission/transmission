@@ -6,9 +6,9 @@
  *
  */
 
-#include <errno.h>
-#include <signal.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <csignal>
+#include <cstdlib>
 
 #include <fcntl.h>
 #include <sys/types.h>

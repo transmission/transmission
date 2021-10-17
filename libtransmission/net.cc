@@ -20,9 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <errno.h>
-#include <limits.h>
-#include <string.h>
+#include <cerrno>
+#include <climits>
+#include <cstring>
 
 #include <sys/types.h>
 
@@ -34,7 +34,7 @@
 
 #include <event2/util.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"

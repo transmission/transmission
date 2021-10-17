@@ -6,8 +6,8 @@
  *
  */
 
-#include <errno.h>
-#include <string.h> /* strcmp(), strlen(), strncmp() */
+#include <cerrno>
+#include <cstring> /* strcmp(), strlen(), strncmp() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>

@@ -6,7 +6,7 @@
  *
  */
 
-#include <errno.h>
+#include <cerrno>
 
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
