@@ -298,25 +298,32 @@ Bitfield::Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded)
 }
 
 Bitfield::Bitfield(bool const* flags, size_t n)
-    : mode_(OperationMode::Normal)
+    : bit_count_(n)
+    , true_count_(std::count(flags, flags + n, true))
 {
-    size_t trueCount = 0;
-
-    clearStorage();
-    ensureNthBitFits(n);
-
-    TR_ASSERT(std::size(bits_) >= getStorageSize(n));
-
-    for (size_t index = 0; index < n; ++index)
+    if (true_count_ == 0)
     {
-        if (flags[index])
+        mode_ = OperationMode::None;
+    }
+    else if (true_count_ == bit_count_)
+    {
+        mode_ = OperationMode::All;
+    }
+    else
+    {
+        mode_ = OperationMode::Normal;
+        ensureNthBitFits(n);
+        TR_ASSERT(std::size(bits_) >= getStorageSize(n));
+        for (size_t index = 0; index < n; ++index)
         {
-            ++trueCount;
-            bits_[index >> 3] |= (0x80 >> (index & 7));
+            if (flags[index])
+            {
+                bits_[index >> 3] |= (0x80 >> (index & 7));
+            }
         }
     }
 
-    setTrueCount(trueCount);
+    TR_ASSERT(isValid());
 }
 
 void Bitfield::setBit(size_t bit_index)

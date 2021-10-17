@@ -6,6 +6,8 @@
  *
  */
 
+#include <array>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "bitfield.h"
@@ -59,7 +61,29 @@ TEST(Bitfield, countRange)
     }
 }
 
-TEST(Bitfields, bitfields)
+TEST(Bitfield, ctorFromFlagArray)
+{
+    auto constexpr Tests = std::array<std::array<bool, 10>, 3>{{
+        { false, true, false, true, false, false, true, false, false, true }, // mixed
+        { true, true, true, true, true, true, true, true, true, true }, // have all
+        { false, false, false, false, false, false, false, false, false, false }, // have none
+    }};
+
+    for (auto const& flags : Tests)
+    {
+        auto bf = Bitfield(std::data(flags), std::size(flags));
+        EXPECT_EQ(std::size(flags), bf.getBitCount());
+        EXPECT_EQ(size_t(std::count(std::begin(flags), std::end(flags), true)) == std::size(flags), bf.hasAll());
+        EXPECT_EQ(size_t(std::count(std::begin(flags), std::end(flags), false)) == std::size(flags), bf.hasNone());
+        EXPECT_EQ(std::count(std::begin(flags), std::end(flags), true), bf.countBits());
+        for (size_t i = 0; i < std::size(flags); ++i)
+        {
+            EXPECT_EQ(flags[i], bf.readBit(i));
+        }
+    }
+}
+
+TEST(Bitfield, bitfields)
 {
     unsigned int bitcount = 500;
     Bitfield field(bitcount);
@@ -155,7 +179,7 @@ TEST(Bitfields, bitfields)
     }
 }
 
-TEST(Bitfields, hasAllNone)
+TEST(Bitfield, hasAllNone)
 {
     {
         Bitfield field(3);
