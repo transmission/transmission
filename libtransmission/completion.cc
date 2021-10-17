@@ -133,7 +133,7 @@ uint64_t tr_cpHaveValid(tr_completion const* ccp)
     if (ccp->haveValidIsDirty)
     {
         uint64_t size = 0;
-        tr_completion* cp = (tr_completion*)ccp; /* mutable */
+        tr_completion* cp = const_cast<tr_completion*>(ccp); /* mutable */
         tr_torrent const* tor = ccp->tor;
         tr_info const* info = &tor->info;
 
@@ -159,7 +159,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
         uint64_t size = 0;
         tr_torrent const* tor = ccp->tor;
         tr_info const* inf = tr_torrentInfo(tor);
-        tr_completion* cp = (tr_completion*)ccp; /* mutable */
+        tr_completion* cp = const_cast<tr_completion*>(ccp); /* mutable */
 
         if (tr_cpHasAll(ccp))
         {
