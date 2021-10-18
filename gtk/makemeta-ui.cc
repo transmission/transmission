@@ -89,6 +89,8 @@ private:
     Gtk::CheckButton* comment_check_ = nullptr;
     Gtk::Entry* comment_entry_ = nullptr;
     Gtk::CheckButton* private_check_ = nullptr;
+    Gtk::CheckButton* source_check_ = nullptr;
+    Gtk::Entry* source_entry_ = nullptr;
     std::unique_ptr<MakeProgressDialog> progress_dialog_;
     Glib::RefPtr<Gtk::TextBuffer> announce_text_buffer_;
     std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_ = { nullptr, nullptr };
@@ -252,6 +254,8 @@ void MakeDialog::Impl::onResponse(int response)
             auto const comment = comment_entry_->get_text();
             bool const isPrivate = private_check_->get_active();
             bool const useComment = comment_check_->get_active();
+            bool const useSource = source_check_->get_active();
+            auto const source = source_entry_->get_text();
 
             /* destination file */
             auto const dir = destination_chooser_->get_filename();
@@ -288,7 +292,8 @@ void MakeDialog::Impl::onResponse(int response)
                 trackers.data(),
                 trackers.size(),
                 useComment ? comment.c_str() : nullptr,
-                isPrivate);
+                isPrivate,
+                useSource ? source.c_str() : nullptr);
         }
     }
     else if (response == Gtk::RESPONSE_CLOSE)
@@ -494,6 +499,13 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<TrCore> const& core)
     comment_entry_->set_sensitive(false);
     comment_check_->signal_toggled().connect([this]() { onSourceToggled(comment_check_, comment_entry_); });
     t->add_row_w(row, *comment_check_, *comment_entry_);
+
+    source_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Source:"), true);
+    source_check_->set_active(false);
+    source_entry_ = Gtk::make_managed<Gtk::Entry>();
+    source_entry_->set_sensitive(false);
+    source_check_->signal_toggled().connect([this]() { onSourceToggled(source_check_, source_entry_); });
+    t->add_row_w(row, *source_check_, *source_entry_);
 
     private_check_ = t->add_wide_checkbutton(row, _("_Private torrent"), false);
 

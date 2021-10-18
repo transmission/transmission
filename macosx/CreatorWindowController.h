@@ -37,6 +37,7 @@
     IBOutlet NSTextView* fCommentView;
     IBOutlet NSButton* fPrivateCheck;
     IBOutlet NSButton* fOpenCheck;
+    IBOutlet NSTextField* fSource;
 
     IBOutlet NSView* fProgressView;
     IBOutlet NSProgressIndicator* fProgressIndicator;
