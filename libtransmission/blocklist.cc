@@ -6,10 +6,10 @@
  *
  */
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h> /* bsearch(), qsort() */
-#include <string.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib> /* bsearch(), qsort() */
+#include <cstring>
 
 #include "transmission.h"
 #include "blocklist.h"

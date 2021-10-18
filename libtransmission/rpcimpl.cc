@@ -2618,16 +2618,12 @@ static char const* sessionGet(
 }
 
 static char const* freeSpace(
-    tr_session* session,
+    [[maybe_unused]] tr_session* session,
     tr_variant* args_in,
     tr_variant* args_out,
     [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
 {
-    int tmperr;
     char const* path = nullptr;
-    char const* err = nullptr;
-    struct tr_disk_space dir_space = { -1, -1 };
-
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, nullptr))
     {
         return "directory path argument is missing";
@@ -2639,16 +2635,11 @@ static char const* freeSpace(
     }
 
     /* get the free space */
-    tmperr = errno;
+    auto const old_errno = errno;
     errno = 0;
-    dir_space = tr_getDirSpace(path);
-
-    if (dir_space.free < 0 || dir_space.total < 0)
-    {
-        err = tr_strerror(errno);
-    }
-
-    errno = tmperr;
+    auto const dir_space = tr_getDirSpace(path);
+    char const* const err = dir_space.free < 0 || dir_space.total < 0 ? tr_strerror(errno) : nullptr;
+    errno = old_errno;
 
     /* response */
     if (path != nullptr)

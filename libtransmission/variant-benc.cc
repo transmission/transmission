@@ -6,11 +6,11 @@
  *
  */
 
-#include <ctype.h> /* isdigit() */
+#include <cctype> /* isdigit() */
 #include <deque>
-#include <errno.h>
-#include <stdlib.h> /* strtoul() */
-#include <string.h> /* strlen(), memchr() */
+#include <cerrno>
+#include <cstdlib> /* strtoul() */
+#include <cstring> /* strlen(), memchr() */
 #include <string_view>
 #include <optional>
 

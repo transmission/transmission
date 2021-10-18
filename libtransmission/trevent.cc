@@ -6,10 +6,10 @@
  *
  */
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 
-#include <signal.h>
+#include <csignal>
 
 #ifdef _WIN32
 #include <winsock2.h>

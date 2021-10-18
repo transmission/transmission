@@ -6,7 +6,7 @@
  *
  */
 
-#include <string.h> /* memcpy(), memmove(), memset() */
+#include <cstring> /* memcpy(), memmove(), memset() */
 
 #include <arc4.h>
 

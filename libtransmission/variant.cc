@@ -16,17 +16,17 @@
 #endif
 
 #include <algorithm> // std::sort
-#include <errno.h>
+#include <cerrno>
 #include <stack>
-#include <stdlib.h> /* strtod() */
-#include <string.h>
+#include <cstdlib> /* strtod() */
+#include <cstring>
 #include <vector>
 
 #ifdef _WIN32
 #include <share.h>
 #endif
 
-#include <locale.h> /* setlocale() */
+#include <clocale> /* setlocale() */
 
 #if defined(HAVE_USELOCALE) && defined(HAVE_XLOCALE_H)
 #include <xlocale.h>

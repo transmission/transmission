@@ -6,8 +6,8 @@
  *
  */
 
-#include <string.h> /* strchr() */
-#include <stdio.h> /* sscanf() */
+#include <cstring> /* strchr() */
+#include <cstdio> /* sscanf() */
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_hex_to_sha1() */

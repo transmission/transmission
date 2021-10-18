@@ -6,7 +6,7 @@
  *
  */
 
-#include <errno.h>
+#include <cerrno>
 #include <string>
 #include <unordered_set>
 

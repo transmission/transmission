@@ -6,9 +6,9 @@
  *
  */
 
-#include <errno.h>
-#include <limits.h> /* NAME_MAX */
-#include <stdlib.h> /* realloc() */
+#include <cerrno>
+#include <climits> /* NAME_MAX */
+#include <cstdlib> /* realloc() */
 
 #include <unistd.h> /* close() */
 

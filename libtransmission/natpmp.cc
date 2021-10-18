@@ -6,9 +6,9 @@
  *
  */
 
-#include <errno.h>
-#include <time.h>
-#include <inttypes.h>
+#include <cerrno>
+#include <ctime>
+#include <cinttypes>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
