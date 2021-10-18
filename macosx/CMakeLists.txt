@@ -9,6 +9,7 @@ else()
 endif()
 
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
+find_program(ICONUTIL_EXECUTABLE iconutil REQUIRED)
 find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
 find_program(INSTALL_NAME_TOOL_EXECUTABLE install_name_tool REQUIRED)
 
@@ -37,75 +38,75 @@ function(tr_tiff_from_pngs OFILE)
 endfunction()
 
 set(${PROJECT_NAME}_SOURCES
-    AboutWindowController.m
-    AddMagnetWindowController.m
-    AddWindowController.m
-    BadgeView.m
-    Badger.m
-    BlocklistDownloader.m
-    BlocklistDownloaderViewController.m
-    BlocklistScheduler.m
-    BonjourController.m
-    ButtonToolbarItem.m
-    ColorTextField.m
-    Controller.m
-    CreatorWindowController.m
-    DragOverlayView.m
-    DragOverlayWindow.m
-    ExpandedPathToIconTransformer.m
-    ExpandedPathToPathTransformer.m
-    FileListNode.m
-    FileNameCell.m
-    FileOutlineController.m
-    FileOutlineView.m
-    FilePriorityCell.m
-    FileRenameSheetController.m
-    FilterBarController.m
-    FilterBarView.m
-    FilterButton.m
-    GlobalOptionsPopoverViewController.m
-    GroupToolbarItem.m
-    GroupsController.m
-    GroupsPrefsController.m
-    InfoActivityViewController.m
-    InfoFileViewController.m
-    InfoGeneralViewController.m
-    InfoOptionsViewController.m
-    InfoPeersViewController.m
-    InfoTabButtonBack.m
-    InfoTabButtonCell.m
-    InfoTextField.m
-    InfoTrackersViewController.m
-    InfoWindowController.m
-    main.m
-    MessageWindowController.m
-    NSApplicationAdditions.m
-    NSImageAdditions.m
-    NSMutableArrayAdditions.m
-    NSStringAdditions.m
-    PeerProgressIndicatorCell.m
-    PeerTableView.m
-    PiecesView.m
-    PortChecker.m
-    PredicateEditorRowTemplateAny.m
-    PrefsController.m
-    PrefsWindow.m
-    ProgressGradients.m
-    ShareToolbarItem.m
-    ShareTorrentFileHelper.m
-    StatsWindowController.m
-    StatusBarController.m
-    StatusBarView.m
-    ToolbarSegmentedCell.m
-    Torrent.m
-    TorrentCell.m
-    TorrentGroup.m
-    TorrentTableView.m
-    TrackerCell.m
-    TrackerNode.m
-    TrackerTableView.m
-    URLSheetWindowController.m
-    WebSeedTableView.m
+    AboutWindowController.mm
+    AddMagnetWindowController.mm
+    AddWindowController.mm
+    BadgeView.mm
+    Badger.mm
+    BlocklistDownloader.mm
+    BlocklistDownloaderViewController.mm
+    BlocklistScheduler.mm
+    BonjourController.mm
+    ButtonToolbarItem.mm
+    ColorTextField.mm
+    Controller.mm
+    CreatorWindowController.mm
+    DragOverlayView.mm
+    DragOverlayWindow.mm
+    ExpandedPathToIconTransformer.mm
+    ExpandedPathToPathTransformer.mm
+    FileListNode.mm
+    FileNameCell.mm
+    FileOutlineController.mm
+    FileOutlineView.mm
+    FilePriorityCell.mm
+    FileRenameSheetController.mm
+    FilterBarController.mm
+    FilterBarView.mm
+    FilterButton.mm
+    GlobalOptionsPopoverViewController.mm
+    GroupToolbarItem.mm
+    GroupsController.mm
+    GroupsPrefsController.mm
+    InfoActivityViewController.mm
+    InfoFileViewController.mm
+    InfoGeneralViewController.mm
+    InfoOptionsViewController.mm
+    InfoPeersViewController.mm
+    InfoTabButtonBack.mm
+    InfoTabButtonCell.mm
+    InfoTextField.mm
+    InfoTrackersViewController.mm
+    InfoWindowController.mm
+    main.mm
+    MessageWindowController.mm
+    NSApplicationAdditions.mm
+    NSImageAdditions.mm
+    NSMutableArrayAdditions.mm
+    NSStringAdditions.mm
+    PeerProgressIndicatorCell.mm
+    PeerTableView.mm
+    PiecesView.mm
+    PortChecker.mm
+    PredicateEditorRowTemplateAny.mm
+    PrefsController.mm
+    PrefsWindow.mm
+    ProgressGradients.mm
+    ShareToolbarItem.mm
+    ShareTorrentFileHelper.mm
+    StatsWindowController.mm
+    StatusBarController.mm
+    StatusBarView.mm
+    ToolbarSegmentedCell.mm
+    Torrent.mm
+    TorrentCell.mm
+    TorrentGroup.mm
+    TorrentTableView.mm
+    TrackerCell.mm
+    TrackerNode.mm
+    TrackerTableView.mm
+    URLSheetWindowController.mm
+    WebSeedTableView.mm
 )
 
 set(${PROJECT_NAME}_HEADERS
@@ -195,12 +196,42 @@ set(${PROJECT_NAME}_XIB_FILES
     URLSheetWindow.xib
 )
 
+set(APPICONSET_DIR "${PROJECT_SOURCE_DIR}/Images/Images.xcassets/AppIcon.appiconset")
+set(APPICON_FILE "${PROJECT_BINARY_DIR}/Transmission.icns")
+add_custom_command(
+    OUTPUT "${APPICON_FILE}"
+    COMMAND "${CMAKE_COMMAND}" -E rm -f
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${APPICONSET_DIR}"
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    COMMAND "${CMAKE_COMMAND}" -E rm
+        "${PROJECT_BINARY_DIR}/Transmission.iconset/Contents.json"
+    COMMAND "${ICONUTIL_EXECUTABLE}"
+        --convert icns
+        --output "${APPICON_FILE}"
+        "${PROJECT_BINARY_DIR}/Transmission.iconset"
+    DEPENDS
+        "${APPICONSET_DIR}/icon_128x128.png"
+        "${APPICONSET_DIR}/icon_128x128@2x.png"
+        "${APPICONSET_DIR}/icon_16x16.png"
+        "${APPICONSET_DIR}/icon_16x16@2x.png"
+        "${APPICONSET_DIR}/icon_256x256.png"
+        "${APPICONSET_DIR}/icon_256x256@2x.png"
+        "${APPICONSET_DIR}/icon_32x32.png"
+        "${APPICONSET_DIR}/icon_32x32@2x.png"
+        "${APPICONSET_DIR}/icon_512x512.png"
+        "${APPICONSET_DIR}/icon_512x512@2x.png"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    VERBATIM
+)
+
 set(${PROJECT_NAME}_RESOURCES
     Defaults.plist
     Credits.rtf
     sparkle_dsa_pub.pem
     ../COPYING
-    Images/Transmission.icns
+    "${APPICON_FILE}"
     Images/TransmissionDocument.icns
 )
 
@@ -240,9 +271,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     PriorityLowTemplate
     PriorityNormalTemplate
     PurpleDotFlat
-    PurpleDotGlossy
     RedDotFlat
-    RedDotGlossy
     Remote
     ResumeHover
     ResumeNoWaitHover
@@ -268,7 +297,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
-    YellowDotGlossy
     YingYangGroupTemplate
     YingYangTemplate
 )

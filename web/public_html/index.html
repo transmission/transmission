@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+    <!-- ticket #4555 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="./images/favicon.ico" rel="icon" />
+    <link href="./images/favicon.png" rel="shortcut icon" />
+    <link rel="apple-touch-icon" href="./images/webclip-icon.png" />
+    <script type="text/javascript" src="./transmission-app.js"></script>
+    <title>Transmission Web Interface</title>
+  </head>
+  <body>
+    <div class="mainwin">
+      <header class="mainwin-toolbar" id="mainwin-toolbar">
+        <button
+          aria-keyshortcuts="Alt+O"
+          aria-label="Open torrent"
+          class="toolbar-button"
+          data-action="open-torrent"
+          id="toolbar-open"
+        ></button>
+        <button
+          aria-keyshortcuts="Alt+Delete"
+          aria-label="Remove selected torrents"
+          class="toolbar-button"
+          data-action="remove-selected-torrents"
+          href="#"
+          id="toolbar-remove"
+        ></button>
+        <div href="#" class="toolbar-separator"></div>
+        <button
+          aria-keyshortcuts="Alt+R"
+          aria-label="Resume selected torrents"
+          class="toolbar-button"
+          data-action="resume-selected-torrents"
+          id="toolbar-start"
+        ></button>
+        <button
+          aria-keyshortcuts="Alt+P"
+          aria-label="Pause selected torrents"
+          class="toolbar-button"
+          data-action="pause-selected-torrents"
+          id="toolbar-pause"
+        ></button>
+        <div href="#" class="toolbar-separator"></div>
+        <button
+          aria-keyshortcuts="Alt+I"
+          aria-label="Toggle inspector"
+          class="toolbar-button"
+          data-action="show-inspector"
+          id="toolbar-inspector"
+        ></button>
+        <div class="toolbar-separator"></div>
+        <button
+          aria-keyshortcuts="Alt+M"
+          aria-label="Show sidebar menu"
+          class="toolbar-button"
+          data-action="show-overflow-menu"
+          id="toolbar-overflow"
+        ></button>
+      </header>
+
+      <header class="mainwin-filterbar" id="statusbar">
+        <span>Show</span>
+        <select id="filter-mode">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="downloading">Downloading</option>
+          <option value="seeding">Seeding</option>
+          <option value="paused">Paused</option>
+          <option value="finished">Finished</option>
+        </select>
+        <select id="filter-tracker"></select>
+        <input type="search" id="torrent-search" placeholder="Filter" />
+        <span id="filter-count">&nbsp;</span>
+        <span class="flex"></span>
+        <div class="speed-dn-icon"></div>
+        <div id="speed-dn-label"></div>
+        <div class="speed-up-icon"></div>
+        <div id="speed-up-label"></div>
+      </header>
+
+      <main class="mainwin-workarea">
+        <div id="torrent-container">
+          <ul class="torrent-list flex" id="torrent-list"></ul>
+        </div>
+      </main>
+
+      <iframe
+        name="torrent-upload-frame"
+        id="torrent-upload-frame"
+        src="about:blank"
+        title="Add Torrent"
+      ></iframe>
+    </div>
+  </body>
+</html>

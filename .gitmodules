@@ -1,3 +1,6 @@
+[submodule "third-party/arc4"]
+	path = third-party/arc4
+	url = https://github.com/transmission/arc4
 [submodule "third-party/dht"]
 	path = third-party/dht
 	url = https://github.com/transmission/dht
@@ -22,3 +25,6 @@
 	path = third-party/miniupnpc
 	url = https://github.com/transmission/miniupnpc
 	branch = post-2.0.20170509-transmission
+[submodule "third-party/googletest"]
+	path = third-party/googletest
+	url = https://github.com/google/googletest.git
