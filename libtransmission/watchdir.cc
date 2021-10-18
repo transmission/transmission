@@ -6,7 +6,7 @@
  *
  */
 
-#include <string.h> /* strcmp() */
+#include <cstring> /* strcmp() */
 
 #include <event2/event.h>
 #include <event2/util.h>

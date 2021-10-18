@@ -1106,7 +1106,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 
     void* ret = mmap(nullptr, size, PROT_READ, MAP_SHARED, handle, offset);
 
-    if (ret == MAP_FAILED)
+    if (ret == MAP_FAILED) // NOLINT(performance-no-int-to-ptr)
     {
         set_system_error(error, errno);
         ret = nullptr;

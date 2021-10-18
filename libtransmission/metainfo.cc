@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <array>
-#include <string.h> /* strlen() */
+#include <cstring> /* strlen() */
 #include <string_view>
 #include <typeinfo>
 

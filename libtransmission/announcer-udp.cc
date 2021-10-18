@@ -6,8 +6,8 @@
  *
  */
 
-#include <errno.h> /* errno, EAFNOSUPPORT */
-#include <string.h> /* memcpy(), memset() */
+#include <cerrno> /* errno, EAFNOSUPPORT */
+#include <cstring> /* memcpy(), memset() */
 #include <vector>
 
 #include <event2/buffer.h>

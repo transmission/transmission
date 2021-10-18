@@ -1894,7 +1894,7 @@ msgstr "Сеть"
 
 #: ../gtk/tr-prefs.c:1286
 msgid "Remote"
-msgstr "Удалённое управление"
+msgstr "Удалённый доступ"
 
 #: ../gtk/tr-window.c:136
 msgid "Torrent"

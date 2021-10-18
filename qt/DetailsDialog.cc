@@ -476,25 +476,16 @@ void DetailsDialog::refreshUI()
     else
     {
         uint64_t left_until_done = 0;
-        int64_t have_total = 0;
         int64_t have_verified = 0;
         int64_t have_unverified = 0;
-        int64_t verified_pieces = 0;
 
         for (Torrent const* const t : torrents)
         {
             if (t->hasMetadata())
             {
-                have_total += t->haveTotal();
                 have_unverified += t->haveUnverified();
                 uint64_t const v = t->haveVerified();
                 have_verified += v;
-
-                if (t->pieceSize())
-                {
-                    verified_pieces += v / t->pieceSize();
-                }
-
                 size_when_done += t->sizeWhenDone();
                 left_until_done += t->leftUntilDone();
                 available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();

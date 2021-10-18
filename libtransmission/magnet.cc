@@ -6,8 +6,8 @@
  *
  */
 
-#include <string.h> /* strchr() */
-#include <stdio.h> /* sscanf() */
+#include <cstring> /* strchr() */
+#include <cstdio> /* sscanf() */
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_hex_to_sha1() */
@@ -126,9 +126,8 @@ tr_magnet_info* tr_magnetParse(char const* uri)
             char const* delim = strchr(key, '=');
             char const* val = delim == nullptr ? nullptr : delim + 1;
             char const* next = strchr(delim == nullptr ? key : val, '&');
-            size_t keylen;
-            size_t vallen;
 
+            auto keylen = size_t{};
             if (delim != nullptr)
             {
                 keylen = (size_t)(delim - key);
@@ -142,6 +141,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 keylen = strlen(key);
             }
 
+            auto vallen = size_t{};
             if (val == nullptr)
             {
                 vallen = 0;
@@ -179,7 +179,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
 
             if (vallen > 0 && trCount < MAX_TRACKERS)
             {
-                int i;
+                auto i = int{};
 
                 if (keylen == 2 && memcmp(key, "tr", 2) == 0)
                 {
@@ -253,7 +253,6 @@ void tr_magnetFree(tr_magnet_info* info)
 
 void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
 {
-    tr_variant* d;
     tr_variantInitDict(top, 4);
 
     /* announce list */
@@ -283,7 +282,7 @@ void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
     }
 
     /* nonstandard keys */
-    d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
+    auto* const d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
     tr_variantDictAddRaw(d, TR_KEY_info_hash, info->hash, 20);
 
     if (info->displayName != nullptr)

@@ -77,10 +77,10 @@ tr_completeness tr_cpGetStatus(tr_completion const* cp)
 
 void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t f;
-    tr_block_index_t l;
     tr_torrent const* tor = cp->tor;
 
+    auto f = tr_block_index_t{};
+    auto l = tr_block_index_t{};
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
     for (tr_block_index_t i = f; i <= l; ++i)
@@ -98,8 +98,8 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t f;
-    tr_block_index_t l;
+    auto f = tr_block_index_t{};
+    auto l = tr_block_index_t{};
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
     for (tr_block_index_t i = f; i <= l; ++i)
@@ -133,7 +133,7 @@ uint64_t tr_cpHaveValid(tr_completion const* ccp)
     if (ccp->haveValidIsDirty)
     {
         uint64_t size = 0;
-        tr_completion* cp = (tr_completion*)ccp; /* mutable */
+        tr_completion* cp = const_cast<tr_completion*>(ccp); /* mutable */
         tr_torrent const* tor = ccp->tor;
         tr_info const* info = &tor->info;
 
@@ -159,7 +159,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
         uint64_t size = 0;
         tr_torrent const* tor = ccp->tor;
         tr_info const* inf = tr_torrentInfo(tor);
-        tr_completion* cp = (tr_completion*)ccp; /* mutable */
+        tr_completion* cp = const_cast<tr_completion*>(ccp); /* mutable */
 
         if (tr_cpHasAll(ccp))
         {
@@ -178,8 +178,8 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                 }
                 else
                 {
-                    tr_block_index_t f;
-                    tr_block_index_t l;
+                    auto f = tr_block_index_t{};
+                    auto l = tr_block_index_t{};
                     tr_torGetPieceBlockRange(cp->tor, p, &f, &l);
 
                     n = cp->blockBitfield->countRange(f, l + 1);
@@ -228,9 +228,9 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
         }
         else
         {
-            tr_block_index_t f;
-            tr_block_index_t l;
             tr_piece_index_t const piece = (tr_piece_index_t)i * interval;
+            auto f = tr_block_index_t{};
+            auto l = tr_block_index_t{};
             tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
             tab[i] = cp->blockBitfield->countRange(f, l + 1) / (float)(l + 1 - f);
         }
@@ -298,9 +298,7 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
 {
     TR_ASSERT(tr_torrentHasMetadata(cp->tor));
 
-    tr_piece_index_t n;
-
-    n = cp->tor->info.pieceCount;
+    auto const n = cp->tor->info.pieceCount;
 
     Bitfield pieces(n);
 

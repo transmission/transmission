@@ -6,9 +6,9 @@
  *
  */
 
-#include <limits.h> /* USHRT_MAX */
-#include <stdio.h> /* fprintf() */
-#include <string.h> /* strchr(), memcmp(), memcpy() */
+#include <climits> /* USHRT_MAX */
+#include <cstdio> /* fprintf() */
+#include <cstring> /* strchr(), memcmp(), memcpy() */
 
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */

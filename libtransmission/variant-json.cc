@@ -7,12 +7,12 @@
  */
 
 #include <array>
-#include <ctype.h>
+#include <cctype>
 #include <deque>
-#include <errno.h> /* EILSEQ, EINVAL */
-#include <math.h> /* fabs() */
-#include <stdio.h>
-#include <string.h>
+#include <cerrno> /* EILSEQ, EINVAL */
+#include <cmath> /* fabs() */
+#include <cstdio>
+#include <cstring>
 
 #include <event2/buffer.h> /* evbuffer_add() */
 #include <event2/util.h> /* evutil_strtoll() */

@@ -635,16 +635,16 @@ void tr_torrentSetQueuePosition(tr_torrent*, int queuePosition);
 **/
 
 /** @brief Convenience function for moving a batch of torrents to the front of their queue(s) */
-void tr_torrentsQueueMoveTop(tr_torrent** torrents, int torrentCount);
+void tr_torrentsQueueMoveTop(tr_torrent* const* torrents, size_t torrentCount);
 
 /** @brief Convenience function for moving a batch of torrents ahead one step in their queue(s) */
-void tr_torrentsQueueMoveUp(tr_torrent** torrents, int torrentCount);
+void tr_torrentsQueueMoveUp(tr_torrent* const* torrents, size_t torrentCount);
 
 /** @brief Convenience function for moving a batch of torrents back one step in their queue(s) */
-void tr_torrentsQueueMoveDown(tr_torrent** torrents, int torrentCount);
+void tr_torrentsQueueMoveDown(tr_torrent* const* torrents, size_t torrentCount);
 
 /** @brief Convenience function for moving a batch of torrents to the back of their queue(s) */
-void tr_torrentsQueueMoveBottom(tr_torrent** torrents, int torrentCount);
+void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrentCount);
 
 /**
 **/

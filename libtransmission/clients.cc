@@ -13,9 +13,9 @@
 #include <iterator>
 #include <optional>
 #include <string_view>
-#include <ctype.h> /* isprint() */
-#include <stdlib.h> /* strtol() */
-#include <string.h>
+#include <cctype> /* isprint() */
+#include <cstdlib> /* strtol() */
+#include <cstring>
 #include <tuple>
 
 #include "transmission.h"

@@ -6,7 +6,7 @@
  *
  */
 
-#include <errno.h> /* EINVAL */
+#include <cerrno> /* EINVAL */
 
 #include "transmission.h"
 #include "file.h"

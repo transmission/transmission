@@ -2,11 +2,17 @@
 # Many of these checks are disabled only because the code hasn't been
 # cleaned up yet. Pull requests welcomed.
 Checks: >
+  misc-static-assert,
+  modernize-deprecated-headers,
   modernize-loop-convert,
   modernize-pass-by-value,
+  modernize-return-braced-init-list,
   modernize-use-default-member-init,
+  modernize-use-emplace,
+  modernize-use-equals-default,
   modernize-use-nullptr,
   modernize-use-override,
   modernize-use-using,
+  performance-*,
   readability-avoid-const-params-in-decls,
   readability-else-after-return
