@@ -11,9 +11,9 @@
 #include <cerrno>
 #include <cstdlib> /* strtol */
 #include <cstring> /* strcmp */
+#include <iterator>
 #include <string_view>
 #include <vector>
-#include <iterator>
 
 #ifndef ZLIB_CONST
 #define ZLIB_CONST
@@ -158,9 +158,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     {
         if (strcmp(str, "recently-active") == 0)
         {
-            time_t const now = tr_time();
-            time_t const window = RECENTLY_ACTIVE_SECONDS;
-            time_t const cutoff = now - window;
+            time_t const cutoff = tr_time() - RECENTLY_ACTIVE_SECONDS;
 
             torrents.reserve(std::size(session->torrents));
             std::copy_if(
@@ -179,7 +177,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             }
         }
     }
-    else /* all of them */
+    else // all of them
     {
         torrents.reserve(std::size(session->torrents));
         std::copy(std::begin(session->torrents), std::end(session->torrents), std::back_inserter(torrents));
@@ -188,11 +186,11 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     return torrents;
 }
 
-static void notifyBatchQueueChange(tr_session* session, tr_torrent* const* torrents, int n)
+static void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const& torrents)
 {
-    for (int i = 0; i < n; ++i)
+    for (auto* tor : torrents)
     {
-        notify(session, TR_RPC_TORRENT_CHANGED, torrents[i]);
+        notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 
     notify(session, TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, nullptr);
@@ -206,7 +204,7 @@ static char const* queueMoveTop(
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveTop(std::data(torrents), std::size(torrents));
-    notifyBatchQueueChange(session, std::data(torrents), std::size(torrents));
+    notifyBatchQueueChange(session, torrents);
     return nullptr;
 }
 
@@ -218,7 +216,7 @@ static char const* queueMoveUp(
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveUp(std::data(torrents), std::size(torrents));
-    notifyBatchQueueChange(session, std::data(torrents), std::size(torrents));
+    notifyBatchQueueChange(session, torrents);
     return nullptr;
 }
 
@@ -230,7 +228,7 @@ static char const* queueMoveDown(
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveDown(std::data(torrents), std::size(torrents));
-    notifyBatchQueueChange(session, std::data(torrents), std::size(torrents));
+    notifyBatchQueueChange(session, torrents);
     return nullptr;
 }
 
@@ -242,7 +240,7 @@ static char const* queueMoveBottom(
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveBottom(std::data(torrents), std::size(torrents));
-    notifyBatchQueueChange(session, std::data(torrents), std::size(torrents));
+    notifyBatchQueueChange(session, torrents);
     return nullptr;
 }
 
@@ -262,7 +260,6 @@ static char const* torrentStart(
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
-
     for (auto* tor : torrents)
     {
         if (!tor->isRunning)
@@ -283,7 +280,6 @@ static char const* torrentStartNow(
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
-
     for (auto* tor : torrents)
     {
         if (!tor->isRunning)
@@ -892,7 +888,7 @@ static char const* torrentGet(
     [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
+    tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     char const* strVal = nullptr;
     tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") ?

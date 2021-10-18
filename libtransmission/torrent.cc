@@ -19,6 +19,7 @@
 #include <string>
 #include <typeinfo>
 #include <unordered_map>
+#include <vector>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -3504,14 +3505,6 @@ char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t fileNum)
 ****
 ***/
 
-static int compareTorrentByQueuePosition(void const* va, void const* vb)
-{
-    tr_torrent const* a = *(tr_torrent const* const*)va;
-    tr_torrent const* b = *(tr_torrent const* const*)vb;
-
-    return a->queuePosition - b->queuePosition;
-}
-
 #ifdef TR_ENABLE_ASSERTS
 
 static bool queueIsSequenced(tr_session* session)
@@ -3592,56 +3585,52 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
     TR_ASSERT(queueIsSequenced(tor->session));
 }
 
+struct CompareTorrentByQueuePosition
+{
+    bool operator()(tr_torrent const* a, tr_torrent const* b) const
+    {
+        return a->queuePosition < b->queuePosition;
+    }
+};
+
 void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (size_t i = n - 1; i >= 0; --i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], 0);
+        tr_torrentSetQueuePosition(tor, 0);
     }
-
-    tr_free(torrents);
 }
 
 void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (size_t i = 0; i < n; ++i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition - 1);
+        tr_torrentSetQueuePosition(tor, tor->queuePosition - 1);
     }
-
-    tr_free(torrents);
 }
 
 void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (size_t i = n - 1; i >= 0; --i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition + 1);
+        tr_torrentSetQueuePosition(tor, tor->queuePosition + 1);
     }
-
-    tr_free(torrents);
 }
 
 void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (size_t i = 0; i < n; ++i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], INT_MAX);
+        tr_torrentSetQueuePosition(tor, INT_MAX);
     }
-
-    tr_free(torrents);
 }
 
 static void torrentSetQueued(tr_torrent* tor, bool queued)
