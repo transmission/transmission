@@ -8,13 +8,13 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <cstddef> // size_t
+#include <string_view>
+
+#include "tr-macros.h"
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
-typedef size_t tr_quark;
+using tr_quark = size_t;
 
 /*
  * Predefined Quarks.
@@ -46,6 +46,8 @@ enum
     TR_KEY_announce, /* metainfo */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
+    TR_KEY_anti_brute_force_enabled, /* rpc */
+    TR_KEY_anti_brute_force_threshold, /* rpc */
     TR_KEY_arguments, /* rpc */
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
@@ -116,6 +118,7 @@ enum
     TR_KEY_etaIdle,
     TR_KEY_failure_reason,
     TR_KEY_fields,
+    TR_KEY_file_count,
     TR_KEY_fileStats,
     TR_KEY_filename,
     TR_KEY_files,
@@ -255,6 +258,7 @@ enum
     TR_KEY_port_is_open,
     TR_KEY_preallocation,
     TR_KEY_prefetch_enabled,
+    TR_KEY_primary_mime_type,
     TR_KEY_priorities,
     TR_KEY_priority,
     TR_KEY_priority_high,
@@ -303,11 +307,14 @@ enum
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
     TR_KEY_rpc_version_minimum,
+    TR_KEY_rpc_version_semver,
     TR_KEY_rpc_whitelist,
     TR_KEY_rpc_whitelist_enabled,
     TR_KEY_scrape,
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrapeState,
+    TR_KEY_script_torrent_added_enabled,
+    TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
     TR_KEY_seconds_active,
@@ -429,12 +436,4 @@ char const* tr_quark_get_string(tr_quark quark, size_t* len);
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-#ifdef __cplusplus
-}
-#endif
+tr_quark tr_quark_new(std::string_view);

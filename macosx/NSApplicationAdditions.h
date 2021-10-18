@@ -24,8 +24,7 @@
 
 @interface NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnYosemiteOrBetter;
-- (BOOL) isOnMojaveOrBetter;
-- (BOOL) isDarkMode;
+@property(nonatomic, getter=isOnMojaveOrBetter, readonly) BOOL onMojaveOrBetter;
+@property(nonatomic, getter=isDarkMode, readonly) BOOL darkMode;
 
 @end

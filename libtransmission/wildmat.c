@@ -37,8 +37,7 @@
 **  on.
 */
 
-#include "transmission.h"
-#include "utils.h"
+#include <stdbool.h>
 
 #define ABORT -1
 
@@ -53,7 +52,7 @@
 /*
 **  Match text and p, return true, false, or ABORT.
 */
-static int
+int
 DoMatch (const char * text, const char * p)
 {
     register int	last;
@@ -106,15 +105,4 @@ DoMatch (const char * text, const char * p)
 	return true;
 #endif	/* MATCH_TAR_ATTERN */
     return *text == '\0';
-}
-
-
-/* User-level routine. returns whether or not 'text' and 'p' matched */
-bool
-tr_wildmat (const char * text, const char * p)
-{
-    if (p[0] == '*' && p[1] == '\0')
-	return true;
-
-    return DoMatch (text, p) == true;
 }

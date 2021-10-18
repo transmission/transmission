@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "BaseDialog.h"
-
+#include "Macros.h"
 #include "ui_MakeDialog.h"
 
 class QAbstractButton;
@@ -20,33 +20,32 @@ class Session;
 
 extern "C"
 {
-struct tr_metainfo_builder;
+    struct tr_metainfo_builder;
 }
 
 class MakeDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(MakeDialog)
 
 public:
     MakeDialog(Session&, QWidget* parent = nullptr);
-    virtual ~MakeDialog();
 
 protected:
     // QWidget
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
 
-private:
-    QString getSource() const;
-
 private slots:
     void onSourceChanged();
     void makeTorrent();
 
 private:
-    Session& mySession;
+    QString getSource() const;
 
-    Ui::MakeDialog ui;
+    Session& session_;
 
-    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> myBuilder;
+    Ui::MakeDialog ui_ = {};
+
+    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_;
 };

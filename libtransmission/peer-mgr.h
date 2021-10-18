@@ -20,6 +20,7 @@
 
 #include "net.h" /* tr_address */
 #include "peer-common.h"
+#include "peer-socket.h"
 #include "quark.h"
 
 /**
@@ -27,10 +28,14 @@
  * @{
  */
 
+class tr_peerIo;
+class tr_peerMsgs;
+class tr_swarm;
 struct UTPSocket;
+struct peer_atom;
+struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_torrent;
-typedef struct tr_peerMgr tr_peerMgr;
 
 /* added_f's bitwise-or'ed flags */
 enum
@@ -48,20 +53,14 @@ enum
     ADDED_F_CONNECTABLE = 16
 };
 
-typedef struct tr_pex
+struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
     uint8_t flags;
-}
-tr_pex;
+};
 
-struct peer_atom;
-struct tr_peerIo;
-struct tr_peerMsgs;
-struct tr_swarm;
-
-static inline bool tr_isPex(tr_pex const* pex)
+constexpr bool tr_isPex(tr_pex const* pex)
 {
     return pex && tr_address_is_valid(&pex->addr);
 }
@@ -80,29 +79,37 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-void tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, int numwant, tr_block_index_t* setme, int* numgot,
+void tr_peerMgrGetNextRequests(
+    tr_torrent* torrent,
+    tr_peer* peer,
+    int numwant,
+    tr_block_index_t* setme,
+    int* numgot,
     bool get_intervals);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
 void tr_peerMgrRebuildRequests(tr_torrent* torrent);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket socket);
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);
 
-tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+tr_pex* tr_peerMgrCompactToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* setme_pex_count);
 
-tr_pex* tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+tr_pex* tr_peerMgrCompact6ToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* pexCount);
 
-tr_pex* tr_peerMgrArrayToPex(void const* array, size_t arrayLen, size_t* setme_pex_count);
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
 
-/**
- * @param seedProbability [0..100] for likelihood that the peer is a seed; -1 for unknown
- */
-void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t seedProbability);
-
-void tr_peerMgrMarkAllAsSeeds(tr_torrent* tor);
+void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
 
 enum
 {
@@ -110,7 +117,12 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode, int max_peer_count);
+int tr_peerMgrGetPeers(
+    tr_torrent const* tor,
+    tr_pex** setme_pex,
+    uint8_t address_type,
+    uint8_t peer_list_mode,
+    int max_peer_count);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 

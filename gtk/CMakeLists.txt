@@ -1,5 +1,7 @@
 project(trgtk)
 
+add_compile_options(${C_WARNING_FLAGS})
+
 if(WITH_LIBAPPINDICATOR)
     add_definitions(-DHAVE_LIBAPPINDICATOR)
 endif()
@@ -66,28 +68,28 @@ if(ENABLE_NLS)
 endif()
 
 set(${PROJECT_NAME}_SOURCES
-    actions.c
-    conf.c
-    details.c
-    dialogs.c
-    favicon.c
-    file-list.c
-    filter.c
-    hig.c
-    icons.c
-    main.c
-    makemeta-ui.c
-    msgwin.c
-    notify.c
-    open-dialog.c
-    relocate.c
-    stats.c
-    torrent-cell-renderer.c
-    tr-core.c
-    tr-icon.c
-    tr-prefs.c
-    tr-window.c
-    util.c
+    actions.cc
+    conf.cc
+    details.cc
+    dialogs.cc
+    favicon.cc
+    file-list.cc
+    filter.cc
+    hig.cc
+    icons.cc
+    main.cc
+    makemeta-ui.cc
+    msgwin.cc
+    notify.cc
+    open-dialog.cc
+    relocate.cc
+    stats.cc
+    torrent-cell-renderer.cc
+    tr-core.cc
+    tr-icon.cc
+    tr-prefs.cc
+    tr-window.cc
+    util.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
 )
 
@@ -119,6 +121,9 @@ set(${PROJECT_NAME}_HEADERS
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+include_directories(
+    SYSTEM
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -165,6 +170,11 @@ target_link_libraries(${TR_NAME}-gtk
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+if(NOT MSVC)
+    # https://github.com/transmission/transmission/issues/1381 patches welcome
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+endif()
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")

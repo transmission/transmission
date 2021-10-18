@@ -22,28 +22,27 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, port_status_t) { //
     PORT_STATUS_CHECKING,
     PORT_STATUS_OPEN,
     PORT_STATUS_CLOSED,
     PORT_STATUS_ERROR
-} port_status_t;
+};
 
 @interface PortChecker : NSObject
 {
     id fDelegate;
     port_status_t fStatus;
 
-    NSURLConnection * fConnection;
-    NSMutableData * fPortProbeData;
+    NSURLConnection* fConnection;
+    NSMutableData* fPortProbeData;
 
-    NSTimer * fTimer;
+    NSTimer* fTimer;
 }
 
-- (id) initForPort: (NSInteger) portNumber delay: (BOOL) delay withDelegate: (id) delegate;
-- (void) cancelProbe;
+- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id)delegate;
+- (void)cancelProbe;
 
-- (port_status_t) status;
+@property(nonatomic, readonly) port_status_t status;
 
 @end

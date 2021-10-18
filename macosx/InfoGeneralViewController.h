@@ -24,32 +24,39 @@
 
 #import "InfoViewController.h"
 
-@interface InfoGeneralViewController : NSViewController <InfoViewController>
+@interface InfoGeneralViewController : NSViewController<InfoViewController>
 {
-    NSArray * fTorrents;
+    NSArray* fTorrents;
 
     BOOL fSet;
 
-    IBOutlet NSTextField * fPiecesField, * fHashField, * fSecureField,
-                        * fDataLocationField,
-                        * fCreatorField, * fDateCreatedField;
+    IBOutlet NSTextField* fPiecesField;
+    IBOutlet NSTextField* fHashField;
+    IBOutlet NSTextField* fSecureField;
+    IBOutlet NSTextField* fDataLocationField;
+    IBOutlet NSTextField* fCreatorField;
+    IBOutlet NSTextField* fDateCreatedField;
 
-    IBOutlet NSTextView * fCommentView;
+    IBOutlet NSTextView* fCommentView;
 
-    IBOutlet NSButton * fRevealDataButton;
+    IBOutlet NSButton* fRevealDataButton;
 
     //remove when we switch to auto layout on 10.7
-    IBOutlet NSTextField * fPiecesLabel, * fHashLabel, * fSecureLabel,
-                        * fCreatorLabel, * fDateCreatedLabel,
-                        * fCommentLabel,
-                        * fDataLocationLabel;
-    IBOutlet NSTextField * fInfoSectionLabel, * fWhereSectionLabel;
-    IBOutlet NSScrollView * fCommentScrollView;
+    IBOutlet NSTextField* fPiecesLabel;
+    IBOutlet NSTextField* fHashLabel;
+    IBOutlet NSTextField* fSecureLabel;
+    IBOutlet NSTextField* fCreatorLabel;
+    IBOutlet NSTextField* fDateCreatedLabel;
+    IBOutlet NSTextField* fCommentLabel;
+    IBOutlet NSTextField* fDataLocationLabel;
+    IBOutlet NSTextField* fInfoSectionLabel;
+    IBOutlet NSTextField* fWhereSectionLabel;
+    IBOutlet NSScrollView* fCommentScrollView;
 }
 
-- (void) setInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfo;
+- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)updateInfo;
 
-- (void) revealDataFile: (id) sender;
+- (void)revealDataFile:(id)sender;
 
 @end

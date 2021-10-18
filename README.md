@@ -1,7 +1,7 @@
 ## About
 
 Transmission is a fast, easy, and free BitTorrent client. It comes in several flavors:
-  * A native Mac OS X GUI application
+  * A native macOS GUI application
   * GTK+ and Qt GUI applications for Linux, BSD, etc.
   * A headless daemon for servers and routers
   * A web UI for remote controlling any of the above
@@ -30,7 +30,8 @@ For a more detailed description, and dependencies, visit: https://github.com/tra
     $ cd transmission-2.92
     $ mkdir build
     $ cd build
-    $ cmake ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
@@ -47,7 +48,8 @@ If you're new to building programs from source code, this is typically easier th
     $ git submodule update --init
     $ mkdir build
     $ cd build
-    $ cmake ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
@@ -57,7 +59,8 @@ If you're new to building programs from source code, this is typically easier th
     $ make clean
     $ git pull --rebase --prune
     $ git submodule update
-    $ cmake ..
+    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
 
@@ -65,7 +68,7 @@ If you're new to building programs from source code, this is typically easier th
 
 ### Code Style
 
-You would want to setup your editor to make use of uncrustify.cfg and .jsbeautifyrc configuration files located in the root of this repository.
+You would want to setup your editor to make use of the .clang-format file located in the root of this repository and the eslint/prettier rules in web/package.json.
 
 If for some reason you are unwilling or unable to do so, there is a shell script which you could run either directly or via docker-compose:
 
