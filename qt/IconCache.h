@@ -31,8 +31,16 @@ class IconCache
 public:
     static IconCache& get();
 
-    QIcon folderIcon() const { return folder_icon_; }
-    QIcon fileIcon() const { return file_icon_; }
+    QIcon folderIcon() const
+    {
+        return folder_icon_;
+    }
+
+    QIcon fileIcon() const
+    {
+        return file_icon_;
+    }
+
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
     QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 

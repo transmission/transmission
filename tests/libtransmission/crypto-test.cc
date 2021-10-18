@@ -22,7 +22,7 @@
 
 TEST(Crypto, torrentHash)
 {
-    tr_crypto a;
+    auto a = tr_crypto{};
 
     auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
     for (size_t i = 0; i < hash.size(); ++i)
@@ -68,15 +68,15 @@ TEST(Crypto, encryptDecrypt)
         hash[i] = uint8_t(i);
     }
 
-    auto a = tr_crypto {};
+    auto a = tr_crypto{};
     tr_cryptoConstruct(&a, hash.data(), false);
-    auto b = tr_crypto_ {};
+    auto b = tr_crypto_{};
     tr_cryptoConstruct_(&b, hash.data(), true);
     auto public_key_length = int{};
     EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
     EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
 
-    auto const input1 = std::string { "test1" };
+    auto const input1 = std::string{ "test1" };
     auto encrypted1 = std::array<char, 128>{};
     auto decrypted1 = std::array<char, 128>{};
 
@@ -86,7 +86,7 @@ TEST(Crypto, encryptDecrypt)
     tr_cryptoDecrypt_(&b, input1.size(), encrypted1.data(), decrypted1.data());
     EXPECT_EQ(input1, std::string(decrypted1.data(), input1.size()));
 
-    auto const input2 = std::string { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    auto const input2 = std::string{ "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
@@ -107,16 +107,16 @@ TEST(Crypto, sha1)
 
     EXPECT_TRUE(tr_sha1(hash1.data(), "test", 4, nullptr));
     EXPECT_TRUE(tr_sha1_(hash2.data(), "test", 4, nullptr));
-    EXPECT_EQ(0,
-        memcmp(hash1.data(), "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3",
-        hash1.size()));
+    EXPECT_EQ(
+        0,
+        memcmp(hash1.data(), "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", hash1.size()));
     EXPECT_EQ(0, memcmp(hash1.data(), hash2.data(), hash2.size()));
 
     EXPECT_TRUE(tr_sha1(hash1.data(), "1", 1, "22", 2, "333", 3, nullptr));
     EXPECT_TRUE(tr_sha1_(hash2.data(), "1", 1, "22", 2, "333", 3, nullptr));
-    EXPECT_EQ(0,
-        memcmp(hash1.data(), "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed",
-        hash1.size()));
+    EXPECT_EQ(
+        0,
+        memcmp(hash1.data(), "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", hash1.size()));
     EXPECT_EQ(0, memcmp(hash1.data(), hash2.data(), hash2.size()));
 }
 
@@ -130,7 +130,7 @@ TEST(Crypto, ssha1)
 
     auto const tests = std::array<LocalTest, 2>{
         LocalTest{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
-        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
+        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" },
     };
 
     auto constexpr HashCount = size_t{ 4 * 1024 };
@@ -221,7 +221,7 @@ TEST(Crypto, base64)
     EXPECT_EQ(strlen(out), len);
     EXPECT_TRUE(base64Eq("WU9ZTyE=", out));
     auto* in = static_cast<char*>(tr_base64_decode_str(out, &len));
-    EXPECT_EQ(decltype(len) { 5 }, len);
+    EXPECT_EQ(decltype(len){ 5 }, len);
     EXPECT_STREQ("YOYO!", in);
     tr_free(in);
     tr_free(out);

@@ -16,15 +16,32 @@
 
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
+#include "Session.h"
 #include "Utils.h"
 
-AboutDialog::AboutDialog(QWidget* parent) :
-    BaseDialog(parent)
+AboutDialog::AboutDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
 {
     ui_.setupUi(this);
 
     ui_.iconLabel->setPixmap(QApplication::windowIcon().pixmap(48));
-    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QStringLiteral(LONG_VERSION_STRING)));
+
+    if (session.isServer())
+    {
+        auto const title = QStringLiteral("<b style='font-size:x-large'>Transmission %1</b>")
+                               .arg(QStringLiteral(LONG_VERSION_STRING));
+        ui_.titleLabel->setText(title);
+    }
+    else
+    {
+        QString title = QStringLiteral(
+            "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
+                     .arg(tr("This GUI"))
+                     .arg(QStringLiteral(LONG_VERSION_STRING));
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Remote")).arg(session.sessionVersion());
+        ui_.titleLabel->setText(title);
+    }
 
     QPushButton const* b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
     connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
@@ -37,10 +54,12 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
 void AboutDialog::showCredits()
 {
-    QMessageBox::about(this, tr("Credits"), QString::fromUtf8(
-        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-        "Mitchell Livingston (OS X)\n"
-        "Mike Gelfand\n"));
+    QMessageBox::about(
+        this,
+        tr("Credits"),
+        QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+                          "Mitchell Livingston (OS X)\n"
+                          "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()

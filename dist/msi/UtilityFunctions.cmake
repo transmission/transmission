@@ -44,10 +44,22 @@ function(png2ico OUTPUT_FILE)
         set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE}")
     endif()
 
-    add_custom_command(
-        OUTPUT "${OUTPUT_FILE}"
-        COMMAND magick convert ${ARGN} "${OUTPUT_FILE}"
-        DEPENDS ${ARGN})
+    find_program(MAGICK_PROGRAM magick)
+    find_program(PWSH_PROGRAM pwsh powershell)
+
+    if(MAGICK_PROGRAM)
+        add_custom_command(
+            OUTPUT "${OUTPUT_FILE}"
+            COMMAND "${MAGICK_PROGRAM}" convert ${ARGN} "${OUTPUT_FILE}"
+            DEPENDS ${ARGN})
+    elseif(PWSH_PROGRAM)
+        add_custom_command(
+            OUTPUT "${OUTPUT_FILE}"
+            COMMAND "${PWSH_PROGRAM}" -Command "${CMAKE_CURRENT_LIST_DIR}/ConvertTo-Icon.ps1" "${OUTPUT_FILE}" ${ARGN}
+            DEPENDS ${ARGN})
+    else()
+        message(FATAL_ERROR "Unable to convert PNGs to ICO (no suitable program found)")
+    endif()
 
     list(APPEND ${OUTPUT_VAR} "${OUTPUT_FILE}")
     set(${OUTPUT_VAR} "${${OUTPUT_VAR}}" PARENT_SCOPE)

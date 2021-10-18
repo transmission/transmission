@@ -15,6 +15,7 @@
 #include "ui_AboutDialog.h"
 
 class LicenseDialog;
+class Session;
 
 class AboutDialog : public BaseDialog
 {
@@ -22,7 +23,7 @@ class AboutDialog : public BaseDialog
     TR_DISABLE_COPY_MOVE(AboutDialog)
 
 public:
-    explicit AboutDialog(QWidget* parent = nullptr);
+    explicit AboutDialog(Session& session, QWidget* parent = nullptr);
 
 private slots:
     void showCredits();

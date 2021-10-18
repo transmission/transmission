@@ -33,7 +33,7 @@ public:
     using Key = QString;
     using Keys = std::vector<Key>;
 
-    // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
+    // returns a cached pixmap, or a nullptr pixmap if there's no match in the cache
     QPixmap find(Key const& key);
 
     static Key getKey(QString const& display_name);

@@ -8,6 +8,9 @@ Lead Developers <dev@transmissionbt.com>
 
 Project Contributors
   John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
+  Hugo van Heuven, madebysofa (Main icon design)
+  Andreas Nilsson (GNOME adaptation of main icon)
+  Rodger Werner ("Big Sur" adaptation of main icon)
   Bruno Bierbaumer (Web client patches)
   Juliusz Chroboczek (DHT, network code, BitTorrent code improvements)
   Daniel Lee (Patches)
@@ -17,8 +20,6 @@ Project Contributors
   Malcolm Jarvis <mjarvis@transmissionbt.com> (Web client)
   Kevin Glowacz <kjg@transmissionbt.com> (Web client)
   Rashid Eissing (Mac OS X Transfers preferences icon)
-  Hugo van Heuven, madebysofa (Main icon design)
-  Andreas Nilsson (GNOME adaptation of main icon)
   Dean Ostetto (Mac OS X Turtle image)
   Rick Patrick (Mac OS X images)
   Jonas Rask (Mac OS X Globe icon)
