@@ -62,7 +62,7 @@ private slots:
     void refreshTorrents();
     void saveGeometry() const;
 #ifdef QT_DBUS_LIB
-    void onNotificationActionInvoked(quint32 id, QString);
+    void onNotificationActionInvoked(quint32 notification_id, QString action_key);
 #endif
 
 private:
