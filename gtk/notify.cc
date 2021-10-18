@@ -287,9 +287,6 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 
 void gtr_notify_torrent_added(TrCore* core, tr_torrent const* tor)
 {
-    GVariantBuilder actions_builder;
-    TrNotification* n;
-
     g_return_if_fail(G_IS_DBUS_PROXY(proxy));
 
     if (!gtr_pref_flag_get(TR_KEY_torrent_added_notification_enabled))
@@ -297,11 +294,14 @@ void gtr_notify_torrent_added(TrCore* core, tr_torrent const* tor)
         return;
     }
 
+    GVariantBuilder actions_builder;
     g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
     g_variant_builder_add(&actions_builder, "s", "start-now");
     g_variant_builder_add(&actions_builder, "s", _("Start Now"));
-    n = g_new0(TrNotification, 1);
-    n->core = g_object_ref(G_OBJECT(core));
+
+    TrNotification* const n = g_new0(TrNotification, 1);
+    g_object_ref(G_OBJECT(core));
+    n->core = core;
     n->torrent_id = tr_torrentId(tor);
     g_dbus_proxy_call(
         proxy,
