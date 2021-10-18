@@ -7,9 +7,16 @@
 
 #pragma once
 
+#include <string>
+
+#include <gtkmm.h>
+
 #define DIRECTORY_MIME_TYPE "folder"
 #define UNKNOWN_MIME_TYPE "unknown"
 
-char const* gtr_get_mime_type_from_filename(char const* file);
+Glib::ustring gtr_get_mime_type_from_filename(std::string const& file);
 
-GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget);
+Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(
+    Glib::ustring const& mime_type,
+    Gtk::IconSize icon_size,
+    Gtk::Widget& for_widget);
