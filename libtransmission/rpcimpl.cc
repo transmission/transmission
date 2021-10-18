@@ -777,6 +777,10 @@ static void initField(
         tr_variantInitInt(initme, st->sizeWhenDone);
         break;
 
+    case TR_KEY_source:
+        tr_variantDictAddStr(initme, key, inf->source);
+        break;
+
     case TR_KEY_startDate:
         tr_variantInitInt(initme, st->startDate);
         break;
