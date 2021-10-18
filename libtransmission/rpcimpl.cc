@@ -2858,16 +2858,13 @@ void tr_rpc_request_exec_uri(
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
-    char const* pch;
-    tr_variant top;
-    tr_variant* args;
-    char* request = tr_strndup(request_uri, request_uri_len);
+    char* const request = tr_strndup(request_uri, request_uri_len);
 
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 3);
-    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
+    tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    pch = strchr(request, '?');
-
+    char const* pch = strchr(request, '?');
     if (pch == nullptr)
     {
         pch = request;
