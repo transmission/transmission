@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="fActiveFilterButton" destination="3" id="30"/>
                 <outlet property="fDownloadFilterButton" destination="8" id="29"/>
+                <outlet property="fErrorFilterButton" destination="nvH-xy-86S" id="Rsj-yc-FIu"/>
                 <outlet property="fGroupsButton" destination="4" id="49"/>
                 <outlet property="fNoFilterButton" destination="9" id="27"/>
                 <outlet property="fPauseFilterButton" destination="6" id="28"/>
@@ -21,7 +22,7 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="2" userLabel="FilterBar" customClass="FilterBarView">
-            <rect key="frame" x="0.0" y="0.0" width="457" height="23"/>
+            <rect key="frame" x="0.0" y="0.0" width="501" height="23"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3" customClass="FilterButton">
@@ -108,7 +109,7 @@
                     </connections>
                 </button>
                 <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                    <rect key="frame" x="357" y="2" width="95" height="19"/>
+                    <rect key="frame" x="401" y="2" width="95" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                     <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" bezelStyle="round" id="11">
                         <font key="font" metaFont="smallSystem"/>
@@ -120,6 +121,17 @@
                         <outlet property="searchMenuTemplate" destination="22" id="48"/>
                     </connections>
                 </searchField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nvH-xy-86S" customClass="FilterButton">
+                    <rect key="frame" x="329" y="2" width="43" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="recessed" title="Error" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AtX-O4-Mqp">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                        <font key="font" metaFont="smallSystemBold"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="setFilter:" target="-2" id="Rm7-FG-rfe"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="139" y="150"/>
         </customView>

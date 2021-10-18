@@ -9,6 +9,7 @@
 #define FILTER_DOWNLOAD @"Download"
 #define FILTER_SEED @"Seed"
 #define FILTER_PAUSE @"Pause"
+#define FILTER_ERROR @"Error"
 
 #define FILTER_TYPE_NAME @"Name"
 #define FILTER_TYPE_TRACKER @"Tracker"
@@ -33,6 +34,7 @@
              active:(NSUInteger)active
         downloading:(NSUInteger)downloading
             seeding:(NSUInteger)seeding
-             paused:(NSUInteger)paused;
+             paused:(NSUInteger)paused
+              error:(NSUInteger)error;
 
 @end
