@@ -16,7 +16,10 @@ Param(
     [string] $RootDir,
 
     [Parameter()]
-    [string] $ScriptBaseUrl
+    [string] $ScriptBaseUrl,
+
+    [Parameter()]
+    [switch] $PackDebugSyms
 )
 
 Set-StrictMode -Version '6.0'
@@ -247,7 +250,7 @@ if ($Mode -eq 'Build') {
     Invoke-Build Curl
     Invoke-Build Qt
 
-    Invoke-Build Transmission -NoCache -MoreArguments @($SourceDir, $SourceDir)
+    Invoke-Build Transmission -NoCache -MoreArguments @($SourceDir, $SourceDir, $PackDebugSyms.IsPresent)
 }
 
 if ($Mode -eq 'Test') {

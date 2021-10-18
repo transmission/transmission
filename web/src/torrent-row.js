@@ -11,8 +11,21 @@ import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
 import { setTextContent } from './utils.js';
 
-class TorrentRendererHelper {
-  static getProgressInfo(controller, t) {
+const TorrentRendererHelper = {
+  formatDL: (t) => {
+    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
+  },
+  formatETA: (t) => {
+    const eta = t.getETA();
+    if (eta < 0 || eta >= 999 * 60 * 60) {
+      return '';
+    }
+    return `ETA: ${Formatter.timeInterval(eta)}`;
+  },
+  formatUL: (t) => {
+    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
+  },
+  getProgressInfo: (controller, t) => {
     const status = t.getStatus();
     const classList = ['torrent-progress-bar'];
     let percent = null;
@@ -46,29 +59,14 @@ class TorrentRendererHelper {
       classList,
       percent,
     };
-  }
+  },
 
-  static renderProgressbar(controller, t, progressbar) {
+  renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
     progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
-  }
-
-  static formatUL(t) {
-    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
-  }
-  static formatDL(t) {
-    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
-  }
-
-  static formatETA(t) {
-    const eta = t.getETA();
-    if (eta < 0 || eta >= 999 * 60 * 60) {
-      return '';
-    }
-    return `ETA: ${Formatter.timeInterval(eta)}`;
-  }
-}
+  },
+};
 
 ///
 

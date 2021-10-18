@@ -18,9 +18,9 @@ enum
     REFRESH_INTERVAL_MSEC = (15 * 1000)
 };
 
-StatsDialog::StatsDialog(Session& session, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session)
+StatsDialog::StatsDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
 {
     ui_.setupUi(this);
 

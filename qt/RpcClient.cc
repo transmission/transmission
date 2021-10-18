@@ -31,8 +31,8 @@ using ::trqt::variant_helpers::variantInit;
 namespace
 {
 
-char const constexpr* const RequestDataPropertyKey { "requestData" };
-char const constexpr* const RequestFutureinterfacePropertyKey { "requestReplyFutureInterface" };
+char const constexpr* const RequestDataPropertyKey{ "requestData" };
+char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
 bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
 
@@ -49,8 +49,8 @@ TrVariantPtr createVariant()
 
 } // namespace
 
-RpcClient::RpcClient(QObject* parent) :
-    QObject(parent)
+RpcClient::RpcClient(QObject* parent)
+    : QObject(parent)
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -132,8 +132,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     {
         QNetworkRequest request;
         request.setUrl(url_);
-        request.setRawHeader("User-Agent", (QApplication::applicationName() + QLatin1Char('/') + QString::fromUtf8(
-            LONG_VERSION_STRING)).toUtf8());
+        request.setRawHeader(
+            "User-Agent",
+            (QApplication::applicationName() + QLatin1Char('/') + QString::fromUtf8(LONG_VERSION_STRING)).toUtf8());
         request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
         if (!session_id_.isEmpty())
         {
@@ -157,7 +158,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 
     if (Verbose)
     {
-        qInfo() << "sending" << "POST" << qPrintable(url_.path());
+        qInfo() << "sending"
+                << "POST" << qPrintable(url_.path());
 
         for (QByteArray const& b : request_->rawHeaderList())
         {
@@ -231,8 +233,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
-    auto promise = reply->property(RequestFutureinterfacePropertyKey).
-        value<QFutureInterface<RpcResponse>>();
+    auto promise = reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
     if (Verbose)
     {

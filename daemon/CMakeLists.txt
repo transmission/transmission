@@ -4,6 +4,8 @@ if(WITH_SYSTEMD)
     add_definitions(-DUSE_SYSTEMD)
 endif()
 
+add_compile_options(${CXX_WARNING_FLAGS})
+
 include_directories(
     ${CMAKE_SOURCE_DIR}
 )
@@ -14,15 +16,15 @@ include_directories(
 )
 
 set(${PROJECT_NAME}_SOURCES
-    daemon.c
-    daemon-posix.c
-    daemon-win32.c
+    daemon.cc
+    daemon-posix.cc
+    daemon-win32.cc
 )
 
 if(WIN32)
-    set_source_files_properties(daemon-posix.c PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(daemon-posix.cc PROPERTIES HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(daemon-win32.c PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(daemon-win32.cc PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_HEADERS

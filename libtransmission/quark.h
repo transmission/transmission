@@ -8,12 +8,13 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <string_view>
+
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /* Quarks — a 2-way association between a string and a unique integer identifier */
-typedef size_t tr_quark;
+using tr_quark = size_t;
 
 /*
  * Predefined Quarks.
@@ -306,11 +307,14 @@ enum
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
     TR_KEY_rpc_version_minimum,
+    TR_KEY_rpc_version_semver,
     TR_KEY_rpc_whitelist,
     TR_KEY_rpc_whitelist_enabled,
     TR_KEY_scrape,
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrapeState,
+    TR_KEY_script_torrent_added_enabled,
+    TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
     TR_KEY_seconds_active,
@@ -433,10 +437,4 @@ char const* tr_quark_get_string(tr_quark quark, size_t* len);
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-TR_END_DECLS
+tr_quark tr_quark_new(std::string_view);
