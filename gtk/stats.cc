@@ -1,13 +1,14 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
 #include "hig.h"
 #include "stats.h"
 #include "tr-core.h"
@@ -19,173 +20,169 @@ enum
     TR_RESPONSE_RESET = 1
 };
 
-struct stat_ui
+class StatsDialog::Impl
 {
-    GtkLabel* one_up_lb;
-    GtkLabel* one_down_lb;
-    GtkLabel* one_ratio_lb;
-    GtkLabel* one_time_lb;
+public:
+    Impl(StatsDialog& dialog, Glib::RefPtr<TrCore> const& core);
+    ~Impl();
 
-    GtkLabel* all_up_lb;
-    GtkLabel* all_down_lb;
-    GtkLabel* all_ratio_lb;
-    GtkLabel* all_time_lb;
+private:
+    bool updateStats();
+    void dialogResponse(int response);
 
-    GtkLabel* all_sessions_lb;
+private:
+    StatsDialog& dialog_;
+    Glib::RefPtr<TrCore> const core_;
 
-    TrCore* core;
+    Gtk::Label* one_up_lb_;
+    Gtk::Label* one_down_lb_;
+    Gtk::Label* one_ratio_lb_;
+    Gtk::Label* one_time_lb_;
+
+    Gtk::Label* all_up_lb_;
+    Gtk::Label* all_down_lb_;
+    Gtk::Label* all_ratio_lb_;
+    Gtk::Label* all_time_lb_;
+
+    Gtk::Label* all_sessions_lb_;
+
+    sigc::connection update_stats_tag_;
 };
 
-static void setLabel(GtkLabel* l, char const* str)
+namespace
 {
-    gtr_label_set_text(l, str);
+
+void setLabel(Gtk::Label* l, Glib::ustring const& str)
+{
+    gtr_label_set_text(*l, str);
 }
 
-static void setLabelFromRatio(GtkLabel* l, double d)
+void setLabelFromRatio(Gtk::Label* l, double d)
 {
-    char buf[128];
-
-    tr_strlratio(buf, d, sizeof(buf));
-    setLabel(l, buf);
+    setLabel(l, tr_strlratio(d));
 }
 
-static gboolean updateStats(gpointer gdata)
+} // namespace
+
+bool StatsDialog::Impl::updateStats()
 {
-    char buf[128];
     tr_session_stats one;
     tr_session_stats all;
-    size_t const buflen = sizeof(buf);
-    auto* ui = static_cast<stat_ui*>(gdata);
 
-    tr_sessionGetStats(gtr_core_session(ui->core), &one);
-    tr_sessionGetCumulativeStats(gtr_core_session(ui->core), &all);
+    tr_sessionGetStats(core_->get_session(), &one);
+    tr_sessionGetCumulativeStats(core_->get_session(), &all);
 
-    setLabel(ui->one_up_lb, tr_strlsize(buf, one.uploadedBytes, buflen));
-    setLabel(ui->one_down_lb, tr_strlsize(buf, one.downloadedBytes, buflen));
-    setLabel(ui->one_time_lb, tr_strltime(buf, one.secondsActive, buflen));
-    setLabelFromRatio(ui->one_ratio_lb, one.ratio);
+    setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
+    setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
+    setLabel(one_time_lb_, tr_strltime(one.secondsActive));
+    setLabelFromRatio(one_ratio_lb_, one.ratio);
 
-    char const* const fmt = ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount);
-    g_snprintf(buf, buflen, fmt, (int)all.sessionCount);
-    setLabel(ui->all_sessions_lb, buf);
-    setLabel(ui->all_up_lb, tr_strlsize(buf, all.uploadedBytes, buflen));
-    setLabel(ui->all_down_lb, tr_strlsize(buf, all.downloadedBytes, buflen));
-    setLabel(ui->all_time_lb, tr_strltime(buf, all.secondsActive, buflen));
-    setLabelFromRatio(ui->all_ratio_lb, all.ratio);
+    setLabel(
+        all_sessions_lb_,
+        gtr_sprintf(ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount), (int)all.sessionCount));
 
-    return G_SOURCE_CONTINUE;
+    setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
+    setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
+    setLabel(all_time_lb_, tr_strltime(all.secondsActive));
+    setLabelFromRatio(all_ratio_lb_, all.ratio);
+
+    return true;
 }
 
-static void dialogDestroyed(gpointer p, GObject* dialog)
+StatsDialog::Impl::~Impl()
 {
-    TR_UNUSED(dialog);
-
-    g_source_remove(GPOINTER_TO_UINT(p));
+    update_stats_tag_.disconnect();
 }
 
-static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
+void StatsDialog::Impl::dialogResponse(int response)
 {
-    auto* ui = static_cast<stat_ui*>(gdata);
-
     if (response == TR_RESPONSE_RESET)
     {
-        char const* primary = _("Reset your statistics?");
-        char const* secondary = _(
-            "These statistics are for your information only. "
-            "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
-        auto const flags = GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL);
-        GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(dialog), flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", primary);
-        gtk_dialog_add_buttons(
-            GTK_DIALOG(w),
-            TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
-            TR_ARG_TUPLE(_("_Reset"), TR_RESPONSE_RESET),
-            nullptr);
-        gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", secondary);
+        Gtk::MessageDialog w(dialog_, _("Reset your statistics?"), false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, true);
+        w.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
+        w.add_button(_("_Reset"), TR_RESPONSE_RESET);
+        w.set_secondary_text(
+            _("These statistics are for your information only. "
+              "Resetting them doesn't affect the statistics logged by your BitTorrent trackers."));
 
-        if (gtk_dialog_run(GTK_DIALOG(w)) == TR_RESPONSE_RESET)
+        if (w.run() == TR_RESPONSE_RESET)
         {
-            tr_sessionClearStats(gtr_core_session(ui->core));
-            updateStats(ui);
+            tr_sessionClearStats(core_->get_session());
+            updateStats();
         }
-
-        gtk_widget_destroy(w);
     }
 
-    if (response == GTK_RESPONSE_CLOSE)
+    if (response == Gtk::RESPONSE_CLOSE)
     {
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        dialog_.hide();
     }
 }
 
-GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
+std::unique_ptr<StatsDialog> StatsDialog::create(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
 {
-    guint i;
-    GtkWidget* d;
-    GtkWidget* t;
-    GtkWidget* l;
+    return std::unique_ptr<StatsDialog>(new StatsDialog(parent, core));
+}
+
+StatsDialog::StatsDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core)
+    : Gtk::Dialog(_("Statistics"), parent)
+    , impl_(std::make_unique<Impl>(*this, core))
+{
+}
+
+StatsDialog::~StatsDialog() = default;
+
+StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<TrCore> const& core)
+    : dialog_(dialog)
+    , core_(core)
+{
     guint row = 0;
-    struct stat_ui* ui = g_new0(struct stat_ui, 1);
 
-    d = gtk_dialog_new_with_buttons(
-        _("Statistics"),
-        parent,
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        TR_ARG_TUPLE(_("_Reset"), TR_RESPONSE_RESET),
-        TR_ARG_TUPLE(_("_Close"), GTK_RESPONSE_CLOSE),
-        nullptr);
-    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
-    t = hig_workarea_create();
-    ui->core = core;
+    dialog_.add_button(_("_Reset"), TR_RESPONSE_RESET);
+    dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
+    dialog_.set_default_response(Gtk::RESPONSE_CLOSE);
 
-    hig_workarea_add_section_title(t, &row, _("Current Session"));
-    l = gtk_label_new(nullptr);
-    ui->one_up_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->one_up_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Uploaded:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->one_down_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->one_down_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Downloaded:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->one_ratio_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->one_ratio_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Ratio:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->one_time_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->one_time_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Duration:"), l, nullptr);
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Current Session"));
 
-    hig_workarea_add_section_divider(t, &row);
+    one_up_lb_ = Gtk::make_managed<Gtk::Label>();
+    one_up_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Uploaded:"), *one_up_lb_);
+    one_down_lb_ = Gtk::make_managed<Gtk::Label>();
+    one_down_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Downloaded:"), *one_down_lb_);
+    one_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
+    one_ratio_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Ratio:"), *one_ratio_lb_);
+    one_time_lb_ = Gtk::make_managed<Gtk::Label>();
+    one_time_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Duration:"), *one_time_lb_);
 
-    hig_workarea_add_section_title(t, &row, _("Total"));
-    l = gtk_label_new(_("Started %'d time"));
-    ui->all_sessions_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->all_sessions_lb, TRUE);
-    hig_workarea_add_label_w(t, row, l);
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Total"));
+
+    all_sessions_lb_ = Gtk::make_managed<Gtk::Label>(_("Started %'d time"));
+    all_sessions_lb_->set_single_line_mode(true);
+    t->add_label_w(row, *all_sessions_lb_);
     ++row;
-    l = gtk_label_new(nullptr);
-    ui->all_up_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->all_up_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Uploaded:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->all_down_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->all_down_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Downloaded:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->all_ratio_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->all_ratio_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Ratio:"), l, nullptr);
-    l = gtk_label_new(nullptr);
-    ui->all_time_lb = GTK_LABEL(l);
-    gtk_label_set_single_line_mode(ui->all_time_lb, TRUE);
-    hig_workarea_add_row(t, &row, _("Duration:"), l, nullptr);
 
-    gtr_dialog_set_content(GTK_DIALOG(d), t);
+    all_up_lb_ = Gtk::make_managed<Gtk::Label>();
+    all_up_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Uploaded:"), *all_up_lb_);
+    all_down_lb_ = Gtk::make_managed<Gtk::Label>();
+    all_down_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Downloaded:"), *all_down_lb_);
+    all_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
+    all_ratio_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Ratio:"), *all_ratio_lb_);
+    all_time_lb_ = Gtk::make_managed<Gtk::Label>();
+    all_time_lb_->set_single_line_mode(true);
+    t->add_row(row, _("Duration:"), *all_time_lb_);
 
-    updateStats(ui);
-    g_object_set_data_full(G_OBJECT(d), "data", ui, g_free);
-    g_signal_connect(d, "response", G_CALLBACK(dialogResponse), ui);
-    i = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, updateStats, ui);
-    g_object_weak_ref(G_OBJECT(d), dialogDestroyed, GUINT_TO_POINTER(i));
-    return d;
+    gtr_dialog_set_content(dialog_, *t);
+
+    updateStats();
+    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::dialogResponse));
+    update_stats_tag_ = Glib::signal_timeout().connect_seconds(
+        sigc::mem_fun(this, &Impl::updateStats),
+        SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 }

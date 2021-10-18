@@ -1,15 +1,17 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
+#include <string>
 #include <string.h>
+#include <unordered_map>
 
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 
@@ -19,137 +21,125 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-static TrCore* myCore = nullptr;
-static GtkActionGroup* myGroup = nullptr;
-
-static void action_cb(GtkAction* a, gpointer user_data)
+namespace
 {
-    gtr_actions_handler(gtk_action_get_name(a), user_data);
+
+TrCore* myCore = nullptr;
+
+void action_cb(Glib::RefPtr<Gtk::Action> const& a, void* user_data)
+{
+    gtr_actions_handler(a->get_name(), user_data);
 }
 
-static GtkRadioActionEntry sort_radio_entries[] = {
-    { "sort-by-activity", nullptr, N_("Sort by _Activity"), nullptr, nullptr, 0 },
-    { "sort-by-name", nullptr, N_("Sort by _Name"), nullptr, nullptr, 1 },
-    { "sort-by-progress", nullptr, N_("Sort by _Progress"), nullptr, nullptr, 2 },
-    { "sort-by-queue", nullptr, N_("Sort by _Queue"), nullptr, nullptr, 3 },
-    { "sort-by-ratio", nullptr, N_("Sort by Rati_o"), nullptr, nullptr, 4 },
-    { "sort-by-state", nullptr, N_("Sort by Stat_e"), nullptr, nullptr, 5 },
-    { "sort-by-age", nullptr, N_("Sort by A_ge"), nullptr, nullptr, 6 },
-    { "sort-by-time-left", nullptr, N_("Sort by Time _Left"), nullptr, nullptr, 7 },
-    { "sort-by-size", nullptr, N_("Sort by Si_ze"), nullptr, nullptr, 8 },
+struct ActionEntryBase
+{
+    char const* name;
+    char const* stock_id;
+    char const* label;
+    char const* accelerator;
+    char const* tooltip;
 };
 
-static void sort_changed_cb(GtkAction* action, GtkRadioAction* current, gpointer user_data)
-{
-    TR_UNUSED(action);
-    TR_UNUSED(user_data);
-
-    tr_quark const key = TR_KEY_sort_mode;
-    int const i = gtk_radio_action_get_current_value(current);
-    char const* val = sort_radio_entries[i].name;
-
-    gtr_core_set_pref(myCore, key, val);
-}
-
-static GtkToggleActionEntry show_toggle_entries[] = {
-    { "toggle-main-window", nullptr, N_("_Show Transmission"), nullptr, nullptr, G_CALLBACK(action_cb), TRUE },
-    { "toggle-message-log", nullptr, N_("Message _Log"), nullptr, nullptr, G_CALLBACK(action_cb), FALSE },
+ActionEntryBase sort_radio_entries[] = {
+    { "sort-by-activity", nullptr, N_("Sort by _Activity"), nullptr, nullptr },
+    { "sort-by-name", nullptr, N_("Sort by _Name"), nullptr, nullptr },
+    { "sort-by-progress", nullptr, N_("Sort by _Progress"), nullptr, nullptr },
+    { "sort-by-queue", nullptr, N_("Sort by _Queue"), nullptr, nullptr },
+    { "sort-by-ratio", nullptr, N_("Sort by Rati_o"), nullptr, nullptr },
+    { "sort-by-state", nullptr, N_("Sort by Stat_e"), nullptr, nullptr },
+    { "sort-by-age", nullptr, N_("Sort by A_ge"), nullptr, nullptr },
+    { "sort-by-time-left", nullptr, N_("Sort by Time _Left"), nullptr, nullptr },
+    { "sort-by-size", nullptr, N_("Sort by Si_ze"), nullptr, nullptr },
 };
 
-static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
+void sort_changed_cb(Glib::RefPtr<Gtk::RadioAction> const& action, void* /*user_data*/)
 {
-    TR_UNUSED(user_data);
-
-    char const* key = gtk_action_get_name(GTK_ACTION(action));
-    if (key != nullptr)
+    if (!action->get_active())
     {
-        gboolean const val = gtk_toggle_action_get_active(action);
-        gtr_core_set_pref_bool(myCore, tr_quark_new(key), val);
+        return;
     }
+
+    myCore->set_pref(TR_KEY_sort_mode, action->get_name());
 }
 
-static GtkToggleActionEntry pref_toggle_entries[] = {
-    { "alt-speed-enabled",
-      nullptr,
-      N_("Enable Alternative Speed _Limits"),
-      nullptr,
-      nullptr,
-      G_CALLBACK(toggle_pref_cb),
-      FALSE },
-    { "compact-view", nullptr, N_("_Compact View"), "<alt>C", nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "sort-reversed", nullptr, N_("Re_verse Sort Order"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-filterbar", nullptr, N_("_Filterbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-statusbar", nullptr, N_("_Statusbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
-    { "show-toolbar", nullptr, N_("_Toolbar"), nullptr, nullptr, G_CALLBACK(toggle_pref_cb), FALSE },
+struct : ActionEntryBase
+{
+    bool is_active;
+} show_toggle_entries[] = {
+    { "toggle-main-window", nullptr, N_("_Show Transmission"), nullptr, nullptr, true },
+    { "toggle-message-log", nullptr, N_("Message _Log"), nullptr, nullptr, false },
 };
 
-static GtkActionEntry entries[] = {
-    { "file-menu", nullptr, N_("_File"), nullptr, nullptr, nullptr },
-    { "torrent-menu", nullptr, N_("_Torrent"), nullptr, nullptr, nullptr },
-    { "view-menu", nullptr, N_("_View"), nullptr, nullptr, nullptr },
-    { "sort-menu", nullptr, N_("_Sort Torrents By"), nullptr, nullptr, nullptr },
-    { "queue-menu", nullptr, N_("_Queue"), nullptr, nullptr, nullptr },
-    { "edit-menu", nullptr, N_("_Edit"), nullptr, nullptr, nullptr },
-    { "help-menu", nullptr, N_("_Help"), nullptr, nullptr, nullptr },
-    { "copy-magnet-link-to-clipboard", "edit-copy", N_("Copy _Magnet Link to Clipboard"), "", nullptr, G_CALLBACK(action_cb) },
-    { "open-torrent-from-url", "document-open", N_("Open _URL…"), "<control>U", N_("Open URL…"), G_CALLBACK(action_cb) },
-    { "open-torrent-toolbar", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), G_CALLBACK(action_cb) },
-    { "open-torrent-menu", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), G_CALLBACK(action_cb) },
-    { "torrent-start", "media-playback-start", N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
-    { "torrent-start-now",
-      "media-playback-start",
-      N_("Start _Now"),
-      "<shift><control>S",
-      N_("Start torrent now"),
-      G_CALLBACK(action_cb) },
-    { "show-stats", nullptr, N_("_Statistics"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "donate", nullptr, N_("_Donate"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "torrent-verify", nullptr, N_("_Verify Local Data"), "<control>V", nullptr, G_CALLBACK(action_cb) },
-    { "torrent-stop", "media-playback-pause", N_("_Pause"), "<control>P", N_("Pause torrent"), G_CALLBACK(action_cb) },
-    { "pause-all-torrents",
-      "media-playback-pause",
-      N_("_Pause All"),
-      nullptr,
-      N_("Pause all torrents"),
-      G_CALLBACK(action_cb) },
-    { "start-all-torrents",
-      "media-playback-start",
-      N_("_Start All"),
-      nullptr,
-      N_("Start all torrents"),
-      G_CALLBACK(action_cb) },
-    { "relocate-torrent", nullptr, N_("Set _Location…"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", nullptr, G_CALLBACK(action_cb) },
-    { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", nullptr, G_CALLBACK(action_cb) },
-    { "new-torrent", "document-new", N_("_New…"), nullptr, N_("Create a torrent"), G_CALLBACK(action_cb) },
-    { "quit", "application-exit", N_("_Quit"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "select-all", "edit-select-all", N_("Select _All"), "<control>A", nullptr, G_CALLBACK(action_cb) },
-    { "deselect-all", nullptr, N_("Dese_lect All"), "<shift><control>A", nullptr, G_CALLBACK(action_cb) },
-    { "edit-preferences", "preferences-system", N_("_Preferences"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "show-torrent-properties",
-      "document-properties",
-      N_("_Properties"),
-      "<alt>Return",
-      N_("Torrent properties"),
-      G_CALLBACK(action_cb) },
-    { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", nullptr, G_CALLBACK(action_cb) },
-    { "show-about-dialog", "help-about", N_("_About"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "help", "help-browser", N_("_Contents"), "F1", nullptr, G_CALLBACK(action_cb) },
-    { "torrent-reannounce", "network-workgroup", N_("Ask Tracker for _More Peers"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "queue-move-top", "go-top", N_("Move to _Top"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "queue-move-up", "go-up", N_("Move _Up"), "<control>Up", nullptr, G_CALLBACK(action_cb) },
-    { "queue-move-down", "go-down", N_("Move _Down"), "<control>Down", nullptr, G_CALLBACK(action_cb) },
-    { "queue-move-bottom", "go-bottom", N_("Move to _Bottom"), nullptr, nullptr, G_CALLBACK(action_cb) },
-    { "present-main-window", nullptr, N_("Present Main Window"), nullptr, nullptr, G_CALLBACK(action_cb) },
+void toggle_pref_cb(Glib::RefPtr<Gtk::ToggleAction> const& action, void* /*user_data*/)
+{
+    auto const key = action->get_name();
+    bool const val = action->get_active();
+
+    myCore->set_pref(tr_quark_new({ key.c_str(), key.size() }), val);
+}
+
+struct : ActionEntryBase
+{
+    bool is_active;
+} pref_toggle_entries[] = {
+    { "alt-speed-enabled", nullptr, N_("Enable Alternative Speed _Limits"), nullptr, nullptr, false },
+    { "compact-view", nullptr, N_("_Compact View"), "<alt>C", nullptr, false },
+    { "sort-reversed", nullptr, N_("Re_verse Sort Order"), nullptr, nullptr, false },
+    { "show-filterbar", nullptr, N_("_Filterbar"), nullptr, nullptr, false },
+    { "show-statusbar", nullptr, N_("_Statusbar"), nullptr, nullptr, false },
+    { "show-toolbar", nullptr, N_("_Toolbar"), nullptr, nullptr, false },
 };
 
-typedef struct
+struct : ActionEntryBase
+{
+    bool is_actionable;
+} entries[] = {
+    { "file-menu", nullptr, N_("_File"), nullptr, nullptr, false },
+    { "torrent-menu", nullptr, N_("_Torrent"), nullptr, nullptr, false },
+    { "view-menu", nullptr, N_("_View"), nullptr, nullptr, false },
+    { "sort-menu", nullptr, N_("_Sort Torrents By"), nullptr, nullptr, false },
+    { "queue-menu", nullptr, N_("_Queue"), nullptr, nullptr, false },
+    { "edit-menu", nullptr, N_("_Edit"), nullptr, nullptr, false },
+    { "help-menu", nullptr, N_("_Help"), nullptr, nullptr, false },
+    { "copy-magnet-link-to-clipboard", "edit-copy", N_("Copy _Magnet Link to Clipboard"), "", nullptr, true },
+    { "open-torrent-from-url", "document-open", N_("Open _URL…"), "<control>U", N_("Open URL…"), true },
+    { "open-torrent-toolbar", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), true },
+    { "open-torrent-menu", "document-open", N_("_Open"), nullptr, N_("Open a torrent"), true },
+    { "torrent-start", "media-playback-start", N_("_Start"), "<control>S", N_("Start torrent"), true },
+    { "torrent-start-now", "media-playback-start", N_("Start _Now"), "<shift><control>S", N_("Start torrent now"), true },
+    { "show-stats", nullptr, N_("_Statistics"), nullptr, nullptr, true },
+    { "donate", nullptr, N_("_Donate"), nullptr, nullptr, true },
+    { "torrent-verify", nullptr, N_("_Verify Local Data"), "<control>V", nullptr, true },
+    { "torrent-stop", "media-playback-pause", N_("_Pause"), "<control>P", N_("Pause torrent"), true },
+    { "pause-all-torrents", "media-playback-pause", N_("_Pause All"), nullptr, N_("Pause all torrents"), true },
+    { "start-all-torrents", "media-playback-start", N_("_Start All"), nullptr, N_("Start all torrents"), true },
+    { "relocate-torrent", nullptr, N_("Set _Location…"), nullptr, nullptr, true },
+    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", nullptr, true },
+    { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", nullptr, true },
+    { "new-torrent", "document-new", N_("_New…"), nullptr, N_("Create a torrent"), true },
+    { "quit", "application-exit", N_("_Quit"), nullptr, nullptr, true },
+    { "select-all", "edit-select-all", N_("Select _All"), "<control>A", nullptr, true },
+    { "deselect-all", nullptr, N_("Dese_lect All"), "<shift><control>A", nullptr, true },
+    { "edit-preferences", "preferences-system", N_("_Preferences"), nullptr, nullptr, true },
+    { "show-torrent-properties", "document-properties", N_("_Properties"), "<alt>Return", N_("Torrent properties"), true },
+    { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", nullptr, true },
+    { "show-about-dialog", "help-about", N_("_About"), nullptr, nullptr, true },
+    { "help", "help-browser", N_("_Contents"), "F1", nullptr, true },
+    { "torrent-reannounce", "network-workgroup", N_("Ask Tracker for _More Peers"), nullptr, nullptr, true },
+    { "queue-move-top", "go-top", N_("Move to _Top"), nullptr, nullptr, true },
+    { "queue-move-up", "go-up", N_("Move _Up"), "<control>Up", nullptr, true },
+    { "queue-move-down", "go-down", N_("Move _Down"), "<control>Down", nullptr, true },
+    { "queue-move-bottom", "go-bottom", N_("Move to _Bottom"), nullptr, nullptr, true },
+    { "present-main-window", nullptr, N_("Present Main Window"), nullptr, nullptr, true },
+};
+
+struct BuiltinIconInfo
 {
     char const* filename;
     char const* name;
-} BuiltinIconInfo;
+};
 
-static BuiltinIconInfo const my_fallback_icons[] = {
+BuiltinIconInfo const my_fallback_icons[] = {
     { "logo-48", WINDOW_ICON }, //
     { "logo-24", TRAY_ICON }, //
     { "logo-48", NOTIFICATION_ICON }, //
@@ -160,177 +150,167 @@ static BuiltinIconInfo const my_fallback_icons[] = {
     { "ratio", "ratio" }, //
 };
 
-static void register_my_icons(void)
+void register_my_icons()
 {
-    GtkIconTheme* theme = gtk_icon_theme_get_default();
-    GtkIconFactory* factory = gtk_icon_factory_new();
+    auto const theme = Gtk::IconTheme::get_default();
+    auto const factory = Gtk::IconFactory::create();
 
-    gtk_icon_factory_add_default(factory);
+    factory->add_default();
 
-    for (size_t i = 0; i < G_N_ELEMENTS(my_fallback_icons); ++i)
+    for (auto const& icon : my_fallback_icons)
     {
-        char const* name = my_fallback_icons[i].name;
-
-        if (!gtk_icon_theme_has_icon(theme, name))
+        if (!theme->has_icon(icon.name))
         {
-            GdkPixbuf* p;
-            gchar* resource_path = g_strdup_printf(TR_RESOURCE_PATH "icons/%s.png", my_fallback_icons[i].filename);
-
-            p = gdk_pixbuf_new_from_resource(resource_path, nullptr);
-
-            g_free(resource_path);
+            auto const p = Gdk::Pixbuf::create_from_resource(gtr_sprintf(TR_RESOURCE_PATH "icons/%s.png", icon.filename));
 
             if (p != nullptr)
             {
-                int width;
-                GtkIconSet* icon_set;
-
-                width = gdk_pixbuf_get_width(p);
-                icon_set = gtk_icon_set_new_from_pixbuf(p);
-
-                gtk_icon_theme_add_builtin_icon(name, width, p);
-                gtk_icon_factory_add(factory, name, icon_set);
-
-                g_object_unref(p);
-                gtk_icon_set_unref(icon_set);
+                Gtk::IconTheme::add_builtin_icon(icon.name, p->get_width(), p);
+                factory->add(Gtk::StockID(icon.name), Gtk::IconSet::create(p));
             }
         }
     }
-
-    g_object_unref(G_OBJECT(factory));
 }
 
-static GtkUIManager* myUIManager = nullptr;
+Gtk::UIManager* myUIManager = nullptr;
 
-void gtr_actions_set_core(TrCore* core)
+} // namespace
+
+void gtr_actions_set_core(Glib::RefPtr<TrCore> const& core)
 {
-    myCore = core;
+    myCore = gtr_get_ptr(core);
 }
 
-void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
+void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* callback_user_data)
 {
-    int active = -1;
-    char const* match;
-    int const n_entries = G_N_ELEMENTS(entries);
-    GtkActionGroup* action_group;
-
-    myUIManager = ui_manager;
+    myUIManager = gtr_get_ptr(ui_manager);
 
     register_my_icons();
 
-    action_group = myGroup = gtk_action_group_new("Actions");
-    gtk_action_group_set_translation_domain(action_group, nullptr);
+    auto const action_group = Gtk::ActionGroup::create("Actions");
 
-    match = gtr_pref_string_get(TR_KEY_sort_mode);
+    auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
+    Gtk::RadioAction::Group sort_group;
 
-    for (size_t i = 0; active == -1 && i < G_N_ELEMENTS(sort_radio_entries); ++i)
+    for (auto const& entry : sort_radio_entries)
     {
-        if (g_strcmp0(sort_radio_entries[i].name, match) == 0)
+        auto const action = Gtk::RadioAction::create(sort_group, entry.name, _(entry.label));
+
+        if (entry.name == match)
         {
-            active = i;
+            action->set_active(true);
+        }
+
+        action_group->add(action, [action, callback_user_data]() { sort_changed_cb(action, callback_user_data); });
+    }
+
+    for (auto const& entry : show_toggle_entries)
+    {
+        auto const action = Gtk::ToggleAction::create(entry.name, _(entry.label), {}, entry.is_active);
+        action_group->add(action, [action, callback_user_data]() { action_cb(action, callback_user_data); });
+    }
+
+    for (auto& entry : pref_toggle_entries)
+    {
+        entry.is_active = gtr_pref_flag_get(tr_quark_new(entry.name));
+    }
+
+    for (auto const& entry : pref_toggle_entries)
+    {
+        auto const action = Gtk::ToggleAction::create(entry.name, _(entry.label), {}, entry.is_active);
+        action->signal_activate().connect([action, callback_user_data]() { toggle_pref_cb(action, callback_user_data); });
+        if (entry.accelerator != nullptr)
+        {
+            action_group->add(action, Gtk::AccelKey(entry.accelerator));
+        }
+        else
+        {
+            action_group->add(action);
         }
     }
 
-    gtk_action_group_add_radio_actions(
-        action_group,
-        sort_radio_entries,
-        G_N_ELEMENTS(sort_radio_entries),
-        active,
-        G_CALLBACK(sort_changed_cb),
-        nullptr);
-
-    gtk_action_group_add_toggle_actions(
-        action_group,
-        show_toggle_entries,
-        G_N_ELEMENTS(show_toggle_entries),
-        callback_user_data);
-
-    for (size_t i = 0; i < G_N_ELEMENTS(pref_toggle_entries); ++i)
+    for (auto const& entry : entries)
     {
-        pref_toggle_entries[i].is_active = gtr_pref_flag_get(tr_quark_new(pref_toggle_entries[i].name));
+        auto const action = Gtk::Action::create(
+            entry.name,
+            entry.stock_id != nullptr ? Gtk::StockID(entry.stock_id) : Gtk::StockID(),
+            _(entry.label),
+            entry.tooltip != nullptr ? _(entry.tooltip) : Glib::ustring());
+        if (entry.stock_id != nullptr && Gtk::IconTheme::get_default()->has_icon(entry.stock_id))
+        {
+            action->set_icon_name(entry.stock_id);
+        }
+        if (entry.is_actionable)
+        {
+            action->signal_activate().connect([action, callback_user_data]() { action_cb(action, callback_user_data); });
+        }
+        if (entry.accelerator != nullptr)
+        {
+            action_group->add(action, Gtk::AccelKey(entry.accelerator));
+        }
+        else
+        {
+            action_group->add(action);
+        }
     }
 
-    gtk_action_group_add_toggle_actions(
-        action_group,
-        pref_toggle_entries,
-        G_N_ELEMENTS(pref_toggle_entries),
-        callback_user_data);
-
-    gtk_action_group_add_actions(action_group, entries, n_entries, callback_user_data);
-
-    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
-    g_object_unref(G_OBJECT(action_group));
+    ui_manager->insert_action_group(action_group, 0);
 }
 
 /****
 *****
 ****/
 
-static GHashTable* key_to_action = nullptr;
-
-static void ensure_action_map_loaded(GtkUIManager* uim)
+namespace
 {
-    if (key_to_action != nullptr)
+
+std::unordered_map<Glib::ustring, Glib::RefPtr<Gtk::Action>> key_to_action;
+
+void ensure_action_map_loaded(Gtk::UIManager& uim)
+{
+    if (!key_to_action.empty())
     {
         return;
     }
 
-    key_to_action = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, nullptr);
-
-    for (GList* l = gtk_ui_manager_get_action_groups(uim); l != nullptr; l = l->next)
+    for (auto const& action_group : uim.get_action_groups())
     {
-        GtkActionGroup* action_group = GTK_ACTION_GROUP(l->data);
-        GList* actions = gtk_action_group_list_actions(action_group);
-
-        for (GList* ait = actions; ait != nullptr; ait = ait->next)
+        for (auto const& action : action_group->get_actions())
         {
-            GtkAction* action = GTK_ACTION(ait->data);
-            char const* name = gtk_action_get_name(action);
-            g_hash_table_insert(key_to_action, g_strdup(name), action);
+            key_to_action.emplace(action->get_name(), action);
         }
-
-        g_list_free(actions);
     }
 }
 
-static GtkAction* get_action(char const* name)
+Glib::RefPtr<Gtk::Action> get_action(Glib::ustring const& name)
 {
-    ensure_action_map_loaded(myUIManager);
-    return (GtkAction*)g_hash_table_lookup(key_to_action, name);
+    ensure_action_map_loaded(*myUIManager);
+    return key_to_action.at(name);
 }
 
-void gtr_action_activate(char const* name)
-{
-    GtkAction* action = get_action(name);
+} // namespace
 
-    g_assert(action != nullptr);
-    gtk_action_activate(action);
+void gtr_action_activate(Glib::ustring const& name)
+{
+    get_action(name)->activate();
 }
 
-void gtr_action_set_sensitive(char const* name, gboolean b)
+void gtr_action_set_sensitive(Glib::ustring const& name, bool b)
 {
-    GtkAction* action = get_action(name);
-
-    g_assert(action != nullptr);
-    g_object_set(action, "sensitive", b, nullptr);
+    get_action(name)->set_sensitive(b);
 }
 
-void gtr_action_set_important(char const* name, gboolean b)
+void gtr_action_set_important(Glib::ustring const& name, bool b)
 {
-    GtkAction* action = get_action(name);
-
-    g_assert(action != nullptr);
-    g_object_set(action, "is-important", b, nullptr);
+    get_action(name)->set_is_important(b);
 }
 
-void gtr_action_set_toggled(char const* name, gboolean b)
+void gtr_action_set_toggled(Glib::ustring const& name, bool b)
 {
-    GtkAction* action = get_action(name);
-
-    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), b);
+    dynamic_cast<Gtk::ToggleAction*>(gtr_get_ptr(get_action(name)))->set_active(b);
 }
 
-GtkWidget* gtr_action_get_widget(char const* path)
+Gtk::Widget* gtr_action_get_widget(Glib::ustring const& path)
 {
-    return gtk_ui_manager_get_widget(myUIManager, path);
+    return myUIManager->get_widget(path);
 }

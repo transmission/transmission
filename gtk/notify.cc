@@ -1,16 +1,19 @@
 /*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
+ * This file Copyright (C) 2008-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
-#include <gio/gio.h>
+#include <map>
 
-#include <glib/gi18n.h>
+#include <giomm.h>
+#include <glibmm/i18n.h>
+
 #include "conf.h"
 #include "notify.h"
+#include "tr-core.h"
 #include "tr-prefs.h"
 #include "util.h"
 
@@ -18,120 +21,101 @@
 #define NOTIFICATIONS_DBUS_CORE_OBJECT "/org/freedesktop/Notifications"
 #define NOTIFICATIONS_DBUS_CORE_INTERFACE "org.freedesktop.Notifications"
 
-static GDBusProxy* proxy = nullptr;
-static GHashTable* active_notifications = nullptr;
-static gboolean server_supports_actions = FALSE;
+using StringVariantType = Glib::Variant<Glib::ustring>;
+using StringListVariantType = Glib::Variant<std::vector<Glib::ustring>>;
+using UInt32VariantType = Glib::Variant<guint32>;
 
-typedef struct TrNotification
+namespace
 {
-    TrCore* core;
-    int torrent_id;
-} TrNotification;
 
-static void tr_notification_free(gpointer data)
+struct TrNotification
 {
-    auto* n = static_cast<TrNotification*>(data);
+    Glib::RefPtr<TrCore> core;
+    int torrent_id = 0;
+};
 
-    if (n->core != nullptr)
-    {
-        g_object_unref(G_OBJECT(n->core));
-    }
+Glib::RefPtr<Gio::DBus::Proxy> proxy;
+std::map<guint32, TrNotification> active_notifications;
+bool server_supports_actions = false;
 
-    g_free(n);
+template<typename... Ts>
+Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
+{
+    return Glib::VariantContainerBase::create_tuple(
+        { Glib::Variant<std::remove_cv_t<std::remove_reference_t<Ts>>>::create(std::forward<Ts>(args))... });
 }
 
-static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data)
+void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    TR_UNUSED(user_data);
+    auto result = proxy->call_finish(res);
 
-    char** caps;
-    GVariant* result;
-
-    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, nullptr);
-
-    if (result == nullptr || !g_variant_is_of_type(result, G_VARIANT_TYPE("(as)")))
+    if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(StringListVariantType::variant_type()))
     {
-        if (result != nullptr)
-        {
-            g_variant_unref(result);
-        }
-
         return;
     }
 
-    g_variant_get(result, "(^a&s)", &caps);
+    auto const caps = Glib::VariantBase::cast_dynamic<StringListVariantType>(result.get_child(0)).get();
 
-    for (int i = 0; caps[i] != nullptr; i++)
+    for (auto const& cap : caps)
     {
-        if (g_strcmp0(caps[i], "actions") == 0)
+        if (cap == "actions")
         {
-            server_supports_actions = TRUE;
+            server_supports_actions = true;
             break;
         }
     }
-
-    g_free(caps);
-    g_variant_unref(result);
 }
 
-static void g_signal_callback(
-    GDBusProxy const* dbus_proxy,
-    char const* sender_name,
-    char const* signal_name,
-    GVariant* params,
-    gconstpointer user_data)
+void g_signal_callback(
+    Glib::ustring const& /*sender_name*/,
+    Glib::ustring const& signal_name,
+    Glib::VariantContainerBase params)
 {
-    TR_UNUSED(dbus_proxy);
-    TR_UNUSED(sender_name);
-    TR_UNUSED(user_data);
+    g_return_if_fail(params.get_n_children() > 0 && params.get_child(0).is_of_type(UInt32VariantType::variant_type()));
 
-    g_return_if_fail(g_variant_is_of_type(params, G_VARIANT_TYPE("(u*)")));
+    auto const id = Glib::VariantBase::cast_dynamic<UInt32VariantType>(params.get_child(0)).get();
+    auto const n_it = active_notifications.find(id);
 
-    guint id;
-    g_variant_get(params, "(u*)", &id, nullptr);
-    auto* n = static_cast<TrNotification*>(g_hash_table_lookup(active_notifications, GUINT_TO_POINTER(id)));
-
-    if (n == nullptr)
+    if (n_it == active_notifications.end())
     {
         return;
     }
 
-    if (g_strcmp0(signal_name, "NotificationClosed") == 0)
+    auto const& n = n_it->second;
+
+    if (signal_name == "NotificationClosed")
     {
-        g_hash_table_remove(active_notifications, GUINT_TO_POINTER(id));
+        active_notifications.erase(n_it);
     }
-    else if (g_strcmp0(signal_name, "ActionInvoked") == 0 && g_variant_is_of_type(params, G_VARIANT_TYPE("(us)")))
+    else if (
+        signal_name == "ActionInvoked" && params.get_n_children() > 1 &&
+        params.get_child(1).is_of_type(StringVariantType::variant_type()))
     {
-        tr_torrent const* tor = gtr_core_find_torrent(n->core, n->torrent_id);
+        auto const* tor = n.core->find_torrent(n.torrent_id);
         if (tor == nullptr)
         {
             return;
         }
 
-        char* action = nullptr;
-        g_variant_get(params, "(u&s)", nullptr, &action);
+        auto const action = Glib::VariantBase::cast_dynamic<StringVariantType>(params.get_child(1)).get();
 
-        if (g_strcmp0(action, "folder") == 0)
+        if (action == "folder")
         {
-            gtr_core_open_folder(n->core, n->torrent_id);
+            n.core->open_folder(n.torrent_id);
         }
-        else if (g_strcmp0(action, "file") == 0)
+        else if (action == "file")
         {
-            tr_info const* inf = tr_torrentInfo(tor);
+            auto const* inf = tr_torrentInfo(tor);
             char const* dir = tr_torrentGetDownloadDir(tor);
-            char* path = g_build_filename(dir, inf->files[0].name, nullptr);
+            auto const path = Glib::build_filename(dir, inf->files[0].name);
             gtr_open_file(path);
-            g_free(path);
         }
     }
 }
 
-static void dbus_proxy_ready_callback(GObject* source, GAsyncResult* res, gpointer user_data)
+void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    TR_UNUSED(source);
-    TR_UNUSED(user_data);
-
-    proxy = g_dbus_proxy_new_for_bus_finish(res, nullptr);
+    proxy = Gio::DBus::Proxy::create_for_bus_finish(res);
 
     if (proxy == nullptr)
     {
@@ -139,73 +123,56 @@ static void dbus_proxy_ready_callback(GObject* source, GAsyncResult* res, gpoint
         return;
     }
 
-    g_signal_connect(proxy, "g-signal", G_CALLBACK(g_signal_callback), nullptr);
-    g_dbus_proxy_call(
-        proxy,
-        "GetCapabilities",
-        g_variant_new("()"),
-        G_DBUS_CALL_FLAGS_NONE,
-        -1,
-        nullptr,
-        get_capabilities_callback,
-        nullptr);
+    proxy->signal_signal().connect(&g_signal_callback);
+    proxy->call("GetCapabilities", &get_capabilities_callback);
 }
 
-void gtr_notify_init(void)
+} // namespace
+
+void gtr_notify_init()
 {
-    active_notifications = g_hash_table_new_full(g_direct_hash, g_direct_equal, nullptr, tr_notification_free);
-    g_dbus_proxy_new_for_bus(
-        G_BUS_TYPE_SESSION,
-        G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-        nullptr,
+    Gio::DBus::Proxy::create_for_bus(
+        Gio::DBus::BUS_TYPE_SESSION,
         NOTIFICATIONS_DBUS_NAME,
         NOTIFICATIONS_DBUS_CORE_OBJECT,
         NOTIFICATIONS_DBUS_CORE_INTERFACE,
-        nullptr,
-        dbus_proxy_ready_callback,
-        nullptr);
+        &dbus_proxy_ready_callback,
+        {},
+        Gio::DBus::PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES);
 }
 
-static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_data)
+namespace
 {
-    GVariant* result;
-    auto* n = static_cast<TrNotification*>(user_data);
 
-    result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, nullptr);
+void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& n)
+{
+    auto result = proxy->call_finish(res);
 
-    if (result == nullptr || !g_variant_is_of_type(result, G_VARIANT_TYPE("(u)")))
+    if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(UInt32VariantType::variant_type()))
     {
-        if (result != nullptr)
-        {
-            g_variant_unref(result);
-        }
-
-        tr_notification_free(n);
         return;
     }
 
-    guint id;
-    g_variant_get(result, "(u)", &id);
-    g_hash_table_insert(active_notifications, GUINT_TO_POINTER(id), n);
+    auto const id = Glib::VariantBase::cast_dynamic<UInt32VariantType>(result.get_child(0)).get();
 
-    g_variant_unref(result);
+    active_notifications.emplace(id, n);
 }
 
-void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
+} // namespace
+
+void gtr_notify_torrent_completed(Glib::RefPtr<TrCore> const& core, int torrent_id)
 {
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
-        char** argv = gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command);
-        g_spawn_async(
-            nullptr /*cwd*/,
-            argv,
-            nullptr /*envp*/,
-            G_SPAWN_SEARCH_PATH,
-            nullptr /*GSpawnChildSetupFunc*/,
-            nullptr /*user_data*/,
-            nullptr /*child_pid*/,
-            nullptr);
-        g_strfreev(argv);
+        auto const argv = gtr_pref_strv_get(TR_KEY_torrent_complete_sound_command);
+
+        try
+        {
+            Glib::spawn_async({}, argv, Glib::SPAWN_SEARCH_PATH);
+        }
+        catch (Glib::SpawnError const&)
+        {
+        }
     }
 
     if (!gtr_pref_flag_get(TR_KEY_torrent_complete_notification_enabled))
@@ -213,76 +180,65 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         return;
     }
 
-    g_return_if_fail(G_IS_DBUS_PROXY(proxy));
+    g_return_if_fail(proxy != nullptr);
 
-    tr_torrent const* const tor = gtr_core_find_torrent(core, torrent_id);
+    auto const* const tor = core->find_torrent(torrent_id);
 
-    TrNotification* const n = g_new0(TrNotification, 1);
-    g_object_ref(G_OBJECT(core));
-    n->core = core;
-    n->torrent_id = torrent_id;
+    auto const n = TrNotification{ core, torrent_id };
 
-    GVariantBuilder actions_builder;
-    g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
+    std::vector<Glib::ustring> actions;
     if (server_supports_actions)
     {
-        tr_info const* inf = tr_torrentInfo(tor);
+        auto const* inf = tr_torrentInfo(tor);
 
         if (inf->fileCount == 1)
         {
-            g_variant_builder_add(&actions_builder, "s", "file");
-            g_variant_builder_add(&actions_builder, "s", _("Open File"));
+            actions.push_back("file");
+            actions.push_back(_("Open File"));
         }
         else
         {
-            g_variant_builder_add(&actions_builder, "s", "folder");
-            g_variant_builder_add(&actions_builder, "s", _("Open Folder"));
+            actions.push_back("folder");
+            actions.push_back(_("Open Folder"));
         }
     }
 
-    GVariantBuilder hints_builder;
-    g_variant_builder_init(&hints_builder, G_VARIANT_TYPE("a{sv}"));
-    g_variant_builder_add(&hints_builder, "{sv}", "category", g_variant_new_string("transfer.complete"));
+    std::map<Glib::ustring, Glib::VariantBase> hints;
+    hints.emplace("category", StringVariantType::create("transfer.complete"));
 
-    g_dbus_proxy_call(
-        proxy,
+    proxy->call(
         "Notify",
-        g_variant_new(
-            "(susssasa{sv}i)",
-            "Transmission",
-            0,
-            "transmission",
-            _("Torrent Complete"),
-            tr_torrentName(tor),
-            &actions_builder,
-            &hints_builder,
-            -1),
-        G_DBUS_CALL_FLAGS_NONE,
-        -1,
-        nullptr,
-        notify_callback,
-        n);
+        [n](auto& res) { notify_callback(res, n); },
+        make_variant_tuple(
+            Glib::ustring("Transmission"),
+            0u,
+            Glib::ustring("transmission"),
+            Glib::ustring(_("Torrent Complete")),
+            Glib::ustring(tr_torrentName(tor)),
+            actions,
+            hints,
+            -1));
 }
 
-void gtr_notify_torrent_added(char const* name)
+void gtr_notify_torrent_added(Glib::ustring const& name)
 {
-    TrNotification* n;
-
-    g_return_if_fail(G_IS_DBUS_PROXY(proxy));
+    g_return_if_fail(proxy != nullptr);
 
     if (!gtr_pref_flag_get(TR_KEY_torrent_added_notification_enabled))
     {
         return;
     }
 
-    n = g_new0(TrNotification, 1);
-    g_dbus_proxy_call(
-        proxy,
+    proxy->call(
         "Notify",
-        g_variant_new("(susssasa{sv}i)", "Transmission", 0, "transmission", _("Torrent Added"), name, nullptr, nullptr, -1),
-        G_DBUS_CALL_FLAGS_NONE,
-        -1,
-        nullptr,
-        notify_callback,
-        n);
+        [](auto& res) { notify_callback(res, {}); },
+        make_variant_tuple(
+            Glib::ustring("Transmission"),
+            0u,
+            Glib::ustring("transmission"),
+            Glib::ustring(_("Torrent Added")),
+            name,
+            std::vector<Glib::ustring>(),
+            std::map<Glib::ustring, Glib::VariantBase>(),
+            -1));
 }
