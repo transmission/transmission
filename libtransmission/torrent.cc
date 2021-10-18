@@ -3592,12 +3592,12 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
     TR_ASSERT(queueIsSequenced(tor->session));
 }
 
-void tr_torrentsQueueMoveTop(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t n)
 {
     auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
-    for (int i = n - 1; i >= 0; --i)
+    for (size_t i = n - 1; i >= 0; --i)
     {
         tr_torrentSetQueuePosition(torrents[i], 0);
     }
@@ -3605,12 +3605,12 @@ void tr_torrentsQueueMoveTop(tr_torrent** torrents_in, int n)
     tr_free(torrents);
 }
 
-void tr_torrentsQueueMoveUp(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t n)
 {
     auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition - 1);
     }
@@ -3618,12 +3618,12 @@ void tr_torrentsQueueMoveUp(tr_torrent** torrents_in, int n)
     tr_free(torrents);
 }
 
-void tr_torrentsQueueMoveDown(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t n)
 {
     auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
-    for (int i = n - 1; i >= 0; --i)
+    for (size_t i = n - 1; i >= 0; --i)
     {
         tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition + 1);
     }
@@ -3631,12 +3631,12 @@ void tr_torrentsQueueMoveDown(tr_torrent** torrents_in, int n)
     tr_free(torrents);
 }
 
-void tr_torrentsQueueMoveBottom(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t n)
 {
     auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
     qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
 
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         tr_torrentSetQueuePosition(torrents[i], INT_MAX);
     }
