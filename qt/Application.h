@@ -38,7 +38,7 @@ public:
     Application(int& argc, char** argv);
 
     void raise() const;
-    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = QStringList()) const;
+    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
     QString const& intern(QString const& in)
     {

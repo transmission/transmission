@@ -649,10 +649,10 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
     static QRegularExpression const StartNowRegex(QLatin1String(R"rgx(start-now\((\d+)\))rgx"));
-    QRegularExpressionMatch match = StartNowRegex.match(action_key);
+    QRegularExpressionMatch const match = StartNowRegex.match(action_key);
     if (match.hasMatch())
     {
-        int torrent_id = match.captured(1).toInt();
+        int const torrent_id = match.captured(1).toInt();
         session_->startTorrentsNow({ torrent_id });
     }
 }
