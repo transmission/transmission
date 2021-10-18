@@ -1175,7 +1175,7 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 
     struct tr_device_info* info = nullptr;
 
-    if (dir != nullptr)
+    if (!tr_str_is_empty(dir))
     {
         info = tr_device_info_create(dir);
     }

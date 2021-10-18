@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,29 +8,36 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <memory>
 
-#define TORRENT_CELL_RENDERER_TYPE (torrent_cell_renderer_get_type())
+#include <glibmm.h>
+#include <gtkmm.h>
 
-#define TORRENT_CELL_RENDERER(o) (G_TYPE_CHECK_INSTANCE_CAST((o), TORRENT_CELL_RENDERER_TYPE, TorrentCellRenderer))
+struct tr_torrent;
 
-typedef struct TorrentCellRenderer TorrentCellRenderer;
-
-typedef struct TorrentCellRendererClass TorrentCellRendererClass;
-
-struct TorrentCellRenderer
+class TorrentCellRenderer : public Gtk::CellRenderer
 {
-    GtkCellRenderer parent;
+public:
+    TorrentCellRenderer();
+    ~TorrentCellRenderer() override;
 
-    /*< private >*/
-    struct TorrentCellRendererPrivate* priv;
+    Glib::PropertyProxy<void*> property_torrent();
+    Glib::PropertyProxy<double> property_piece_upload_speed();
+    Glib::PropertyProxy<double> property_piece_download_speed();
+    Glib::PropertyProxy<int> property_bar_height();
+    Glib::PropertyProxy<bool> property_compact();
+
+protected:
+    void get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const override;
+    void get_preferred_height_vfunc(Gtk::Widget& widget, int& minimum_height, int& natural_height) const override;
+    void render_vfunc(
+        Cairo::RefPtr<Cairo::Context> const& cr,
+        Gtk::Widget& widget,
+        Gdk::Rectangle const& background_area,
+        Gdk::Rectangle const& cell_area,
+        Gtk::CellRendererState flags) override;
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
 };
-
-struct TorrentCellRendererClass
-{
-    GtkCellRendererClass parent;
-};
-
-GType torrent_cell_renderer_get_type(void) G_GNUC_CONST;
-
-GtkCellRenderer* torrent_cell_renderer_new(void);
