@@ -414,7 +414,7 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "watch-dir"sv,
                                                               "watch-dir-enabled"sv,
                                                               "webseeds"sv,
-                                                              "webseedsSendingToUs" };
+                                                              "webseedsSendingToUs"sv };
 
 size_t constexpr quarks_are_sorted = ( //
     []() constexpr
