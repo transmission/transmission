@@ -5,236 +5,185 @@
  *
  */
 
-#include <glib.h>
-#include <gtk/gtk.h>
-#include <gio/gio.h>
+#include <array>
+#include <unordered_map>
+
+#include <glibmm.h>
+#include <giomm.h>
+
 #include "icons.h"
+#include "util.h"
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
-static char const* get_static_string(char const* s)
+namespace
 {
-    static GStringChunk* static_strings = nullptr;
 
-    if (s == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (static_strings == nullptr)
-    {
-        static_strings = g_string_chunk_new(1024);
-    }
-
-    return g_string_chunk_insert_const(static_strings, s);
-}
-
-typedef struct
+struct IconCache
 {
-    GtkIconTheme* icon_theme;
+    Glib::RefPtr<Gtk::IconTheme> icon_theme;
     int icon_size;
-    GHashTable* cache;
-} IconCache;
+    std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>> cache;
+};
 
-static IconCache* icon_cache[7] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+std::array<std::unique_ptr<IconCache>, 7> icon_cache;
 
-static GdkPixbuf* create_void_pixbuf(int width, int height)
+Glib::RefPtr<Gdk::Pixbuf> create_void_pixbuf(int width, int height)
 {
-    GdkPixbuf* p;
-
-    p = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, width, height);
-    gdk_pixbuf_fill(p, 0xFFFFFF00);
-
+    auto const p = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, width, height);
+    p->fill(0xFFFFFF00);
     return p;
 }
 
-static int get_size_in_pixels(GtkIconSize icon_size)
+int get_size_in_pixels(Gtk::IconSize icon_size)
 {
     int width = 0;
     int height = 0;
-    gtk_icon_size_lookup(icon_size, &width, &height);
-    return MAX(width, height);
+    Gtk::IconSize::lookup(icon_size, width, height);
+    return std::max(width, height);
 }
 
-static IconCache* icon_cache_new(GtkWidget* for_widget, GtkIconSize icon_size)
+std::unique_ptr<IconCache> icon_cache_new(Gtk::Widget& for_widget, Gtk::IconSize icon_size)
 {
-    g_return_val_if_fail(for_widget != nullptr, nullptr);
-
-    IconCache* icons = g_new0(IconCache, 1);
-    icons->icon_theme = gtk_icon_theme_get_for_screen(gtk_widget_get_screen(for_widget));
+    auto icons = std::make_unique<IconCache>();
+    icons->icon_theme = Gtk::IconTheme::get_for_screen(for_widget.get_screen());
     icons->icon_size = get_size_in_pixels(icon_size);
-    icons->cache = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, g_object_unref);
-
-    g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
-
+    icons->cache.emplace(VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
     return icons;
 }
 
-static char const* _icon_cache_get_icon_key(GIcon* icon)
+std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
 {
-    char const* key = nullptr;
+    std::string key;
 
-    if (G_IS_THEMED_ICON(icon))
+    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
-        char** icon_names;
-        char* name;
+        std::ostringstream names;
+        for (auto const& name : ticon->get_names())
+        {
+            names << name << ',';
+        }
 
-        g_object_get(icon, "names", &icon_names, nullptr);
-        name = g_strjoinv(",", icon_names);
-
-        key = get_static_string(name);
-
-        g_free(name);
-        g_strfreev(icon_names);
+        key = names.str();
     }
-    else if (G_IS_FILE_ICON(icon))
+    else if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
     {
-        GFile* file;
-        char* filename;
-
-        file = g_file_icon_get_file(G_FILE_ICON(icon));
-        filename = g_file_get_path(file);
-
-        key = get_static_string(filename);
-
-        g_free(filename);
-        g_object_unref(file);
+        key = ficon->get_file()->get_path();
     }
 
     return key;
 }
 
-static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconTheme* icon_theme)
+Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon& icon, int size, Gtk::IconTheme& icon_theme)
 {
-    char** icon_names = nullptr;
-    GtkIconInfo* icon_info;
-    GdkPixbuf* pixbuf;
-    GError* error = nullptr;
+    auto const icon_names = icon.get_names();
 
-    g_object_get(icon, "names", &icon_names, nullptr);
-
-    icon_info = gtk_icon_theme_choose_icon(icon_theme, (char const**)icon_names, size, {});
+    auto icon_info = icon_theme.choose_icon(icon_names, size);
 
     if (icon_info == nullptr)
     {
-        icon_info = gtk_icon_theme_lookup_icon(icon_theme, "text-x-generic", size, GTK_ICON_LOOKUP_USE_BUILTIN);
+        icon_info = icon_theme.lookup_icon("text-x-generic", size, Gtk::ICON_LOOKUP_USE_BUILTIN);
     }
 
-    pixbuf = gtk_icon_info_load_icon(icon_info, &error);
-
-    if (pixbuf == nullptr)
+    try
     {
-        if (error != nullptr && error->message != nullptr)
-        {
-            g_warning("could not load icon pixbuf: %s\n", error->message);
-        }
-
-        g_clear_error(&error);
+        return icon_info.load_icon();
     }
-
-#if GTK_CHECK_VERSION(3, 8, 0)
-    g_object_unref(icon_info);
-#else
-    gtk_icon_info_free(icon_info);
-#endif
-
-    g_strfreev(icon_names);
-
-    return pixbuf;
+    catch (Glib::Error const& e)
+    {
+        g_warning("could not load icon pixbuf: %s\n", e.what().c_str());
+        return {};
+    }
 }
 
-static GdkPixbuf* get_file_icon_pixbuf(GFileIcon* icon, int size)
+Glib::RefPtr<Gdk::Pixbuf> get_file_icon_pixbuf(Gio::FileIcon& icon, int size)
 {
-    GFile* file;
-    char* filename;
-    GdkPixbuf* pixbuf;
-
-    file = g_file_icon_get_file(icon);
-    filename = g_file_get_path(file);
-    pixbuf = gdk_pixbuf_new_from_file_at_size(filename, size, -1, nullptr);
-    g_free(filename);
-    g_object_unref(file);
-
-    return pixbuf;
+    try
+    {
+        return Gdk::Pixbuf::create_from_file(icon.get_file()->get_path(), size, -1, false);
+    }
+    catch (Glib::Error const& e)
+    {
+        return {};
+    }
 }
 
-static GdkPixbuf* _get_icon_pixbuf(GIcon* icon, int size, GtkIconTheme* theme)
+Glib::RefPtr<Gdk::Pixbuf> _get_icon_pixbuf(Glib::RefPtr<Gio::Icon> const& icon, int size, Gtk::IconTheme& theme)
 {
     if (icon == nullptr)
     {
-        return nullptr;
+        return {};
     }
 
-    if (G_IS_THEMED_ICON(icon))
+    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
-        return get_themed_icon_pixbuf(G_THEMED_ICON(icon), size, theme);
+        return get_themed_icon_pixbuf(*ticon, size, theme);
     }
 
-    if (G_IS_FILE_ICON(icon))
+    if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
     {
-        return get_file_icon_pixbuf(G_FILE_ICON(icon), size);
+        return get_file_icon_pixbuf(*ficon, size);
     }
 
-    return nullptr;
+    return {};
 }
 
-static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mime_type)
+Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::ustring const& mime_type)
 {
-    GIcon* icon = g_content_type_get_icon(mime_type);
-    char const* key = _icon_cache_get_icon_key(icon);
-    if (key == nullptr)
+    auto icon = Gio::content_type_get_icon(mime_type);
+    auto key = _icon_cache_get_icon_key(icon);
+    if (key.empty())
     {
         key = VOID_PIXBUF_KEY;
     }
 
-    g_return_val_if_fail(icons != nullptr, nullptr);
-    auto* pixbuf = static_cast<GdkPixbuf*>(g_hash_table_lookup(icons->cache, key));
-    if (pixbuf != nullptr)
+    if (auto pixbuf_it = icons.cache.find(key); pixbuf_it != icons.cache.end())
     {
-        g_object_ref(pixbuf);
-        g_object_unref(G_OBJECT(icon));
-        return pixbuf;
+        return pixbuf_it->second;
     }
 
-    pixbuf = _get_icon_pixbuf(icon, icons->icon_size, icons->icon_theme);
+    auto const pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *gtr_get_ptr(icons.icon_theme));
 
     if (pixbuf != nullptr)
     {
-        g_hash_table_insert(icons->cache, (gpointer)key, g_object_ref(pixbuf));
+        icons.cache.emplace(key, pixbuf);
     }
-
-    g_object_unref(G_OBJECT(icon));
 
     return pixbuf;
 }
 
-GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget)
+} // namespace
+
+Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(
+    Glib::ustring const& mime_type,
+    Gtk::IconSize icon_size,
+    Gtk::Widget& for_widget)
 {
     int n;
 
     switch (icon_size)
     {
-    case GTK_ICON_SIZE_MENU:
+    case Gtk::ICON_SIZE_MENU:
         n = 1;
         break;
 
-    case GTK_ICON_SIZE_SMALL_TOOLBAR:
+    case Gtk::ICON_SIZE_SMALL_TOOLBAR:
         n = 2;
         break;
 
-    case GTK_ICON_SIZE_LARGE_TOOLBAR:
+    case Gtk::ICON_SIZE_LARGE_TOOLBAR:
         n = 3;
         break;
 
-    case GTK_ICON_SIZE_BUTTON:
+    case Gtk::ICON_SIZE_BUTTON:
         n = 4;
         break;
 
-    case GTK_ICON_SIZE_DND:
+    case Gtk::ICON_SIZE_DND:
         n = 5;
         break;
 
-    case GTK_ICON_SIZE_DIALOG:
+    case Gtk::ICON_SIZE_DIALOG:
         n = 6;
         break;
 
@@ -248,13 +197,11 @@ GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, 
         icon_cache[n] = icon_cache_new(for_widget, icon_size);
     }
 
-    return icon_cache_get_mime_type_icon(icon_cache[n], mime_type);
+    return icon_cache_get_mime_type_icon(*icon_cache[n], mime_type);
 }
 
-char const* gtr_get_mime_type_from_filename(char const* file)
+Glib::ustring gtr_get_mime_type_from_filename(std::string const& file)
 {
-    char* tmp = g_content_type_guess(file, nullptr, 0, nullptr);
-    char const* ret = get_static_string(tmp);
-    g_free(tmp);
-    return ret;
+    bool result_uncertain;
+    return Gio::content_type_guess(file, {}, result_uncertain);
 }
