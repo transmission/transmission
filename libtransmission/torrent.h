@@ -183,8 +183,8 @@ struct tr_torrent
     uint32_t lastBlockSize;
     uint32_t lastPieceSize;
 
-    uint16_t blockCountInPiece;
-    uint16_t blockCountInLastPiece;
+    uint32_t blockCountInPiece;
+    uint32_t blockCountInLastPiece;
 
     struct tr_completion completion;
 
