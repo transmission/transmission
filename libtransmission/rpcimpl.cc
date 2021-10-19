@@ -2899,12 +2899,7 @@ void tr_rpc_request_exec_uri(
     tr_variantInitDict(&top, 3);
     args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    pch = strchr(request, '?');
-
-    if (pch == nullptr)
-    {
-        pch = request;
-    }
+    pch = request;
 
     while (pch != nullptr)
     {
