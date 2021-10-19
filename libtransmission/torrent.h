@@ -13,6 +13,7 @@
 #endif
 
 #include <string>
+#include <string_view>
 #include <unordered_set>
 #include <vector>
 
@@ -112,7 +113,7 @@ void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
     torrent's content than any other mime-type. */
-char const* tr_torrentPrimaryMimeType(tr_torrent const* tor);
+std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor);
 
 enum tr_verify_state
 {

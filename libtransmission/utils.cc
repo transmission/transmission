@@ -28,6 +28,7 @@
 #include <iterator> // std::back_inserter
 #include <set>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 #if defined(__GNUC__) && !__has_include(<charconv>)
@@ -68,6 +69,8 @@
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
+
+using namespace std::literals;
 
 time_t __tr_current_time = 0;
 
@@ -1893,7 +1896,7 @@ void tr_net_init(void)
 
 /// mime-type
 
-char const* tr_get_mime_type_for_filename(std::string_view filename)
+std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
     auto constexpr compare = [](mime_type_suffix const& entry, auto const& suffix)
     {
@@ -1916,9 +1919,13 @@ char const* tr_get_mime_type_for_filename(std::string_view filename)
         auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
-            return std::data(it->mime_type);
+            return it->mime_type;
         }
     }
 
-    return nullptr;
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+    // application/octet-stream is the default value.
+    // An unknown file type should use this type.
+    auto constexpr Fallback = "application/octet-stream"sv;
+    return Fallback;
 }
