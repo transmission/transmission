@@ -7,7 +7,6 @@
  */
 
 #include <string_view>
-#include <typeinfo>
 
 #ifdef _WIN32
 #include <windows.h>

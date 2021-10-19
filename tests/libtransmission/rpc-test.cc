@@ -17,7 +17,6 @@
 #include <array>
 #include <set>
 #include <string_view>
-#include <typeinfo>
 #include <vector>
 
 using namespace std::literals;

@@ -33,7 +33,6 @@
 #include <time.h>
 #include <vector>
 #include <string_view>
-#include <typeinfo>
 
 #include <giomm.h>
 #include <glib/gmessages.h>

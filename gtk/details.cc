@@ -13,7 +13,6 @@
 #include <stdio.h> /* sscanf() */
 #include <stdlib.h> /* abort() */
 #include <string_view>
-#include <typeinfo>
 #include <unordered_map>
 
 #include <glibmm/i18n.h>

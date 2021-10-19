@@ -28,7 +28,6 @@
 #include <iterator> // std::back_inserter
 #include <set>
 #include <string>
-#include <typeinfo>
 #include <vector>
 
 #if defined(__GNUC__) && !__has_include(<charconv>)

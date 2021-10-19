@@ -17,7 +17,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 

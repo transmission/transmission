@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 #include <string_view>
-#include <typeinfo>
 
 #include <event2/buffer.h>
 #include <event2/util.h>

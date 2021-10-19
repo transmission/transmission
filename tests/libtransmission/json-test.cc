@@ -8,18 +8,17 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include <clocale> // setlocale()
+#include <cstring> // strlen()
+#include <string>
+#include <string_view>
+
 #include "transmission.h"
 #include "utils.h" // tr_free()
 #include "variant.h"
 #include "variant-common.h"
 
 #include "gtest/gtest.h"
-
-#include <clocale> // setlocale()
-#include <cstring> // strlen()
-#include <string>
-#include <string_view>
-#include <typeinfo> //  sv for string_views
 
 using namespace std::literals;
 

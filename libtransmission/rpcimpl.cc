@@ -13,7 +13,6 @@
 #include <cstring> /* strcmp */
 #include <iterator>
 #include <string_view>
-#include <typeinfo>
 #include <vector>
 
 #ifndef ZLIB_CONST
