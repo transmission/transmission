@@ -24,7 +24,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
+auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "activeTorrentCount"sv,
                                                               "activity-date"sv,
                                                               "activityDate"sv,
@@ -345,6 +345,7 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "sizeWhenDone"sv,
                                                               "sort-mode"sv,
                                                               "sort-reversed"sv,
+                                                              "source"sv,
                                                               "speed"sv,
                                                               "speed-Bps"sv,
                                                               "speed-bytes"sv,

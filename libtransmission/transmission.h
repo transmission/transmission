@@ -1624,6 +1624,10 @@ struct tr_info
 
     char* comment;
     char* creator;
+
+    /* torrent's source. empty if not set. */
+    char* source;
+
     tr_file* files;
     tr_piece* pieces;
 
