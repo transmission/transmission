@@ -2377,7 +2377,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
                 args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
                 trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
-                tr_variantListAddStr(trackers, { std::data(url), std::size(url) });
+                tr_variantListAddStr(trackers, url.raw());
 
                 core_->exec(&top);
                 refresh();
