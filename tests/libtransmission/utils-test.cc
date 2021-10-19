@@ -401,9 +401,9 @@ TEST_F(UtilsTest, env)
 
 TEST_F(UtilsTest, mimeTypes)
 {
-    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.flac"));
-    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.FLAC"));
-    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename(".avi"));
-    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"));
-    EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
+    EXPECT_EQ("audio/x-flac"sv, tr_get_mime_type_for_filename("music.flac"sv));
+    EXPECT_EQ("audio/x-flac"sv, tr_get_mime_type_for_filename("music.FLAC"sv));
+    EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename(".avi"sv));
+    EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"sv));
+    EXPECT_EQ("application/octet-stream"sv, tr_get_mime_type_for_filename("music.ajoijfeisfe"sv));
 }
