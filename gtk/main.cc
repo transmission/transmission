@@ -32,6 +32,8 @@
 #include <string>
 #include <time.h>
 #include <vector>
+#include <string_view>
+#include <typeinfo>
 
 #include <giomm.h>
 #include <glib/gmessages.h>
@@ -59,6 +61,8 @@
 #include "tr-prefs.h"
 #include "tr-window.h"
 #include "util.h"
+
+using namespace std::literals;
 
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-gtk"
@@ -1350,7 +1354,7 @@ bool Application::call_rpc_for_selected_torrents(std::string const& method)
     auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, method.c_str());
+    tr_variantDictAddStr(&top, TR_KEY_method, method);
     args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
     sel_->selected_foreach(
@@ -1394,7 +1398,7 @@ void Application::start_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-start");
+    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-start"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }
@@ -1405,7 +1409,7 @@ void Application::pause_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-stop");
+    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-stop"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }
