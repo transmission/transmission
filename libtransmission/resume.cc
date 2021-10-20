@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <string_view>
 
 #include "transmission.h"
 #include "completion.h"
@@ -23,6 +24,8 @@
 #include "tr-assert.h"
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
+
+using namespace std::literals;
 
 namespace
 {
@@ -108,7 +111,7 @@ static void saveLabels(tr_variant* dict, tr_torrent const* tor)
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, label.c_str());
+        tr_variantListAddStr(list, label);
     }
 }
 
@@ -467,11 +470,11 @@ static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
 {
     if (b->hasAll())
     {
-        tr_variantInitStr(benc, "all", 3);
+        tr_variantInitStr(benc, "all"sv);
     }
     else if (b->hasNone())
     {
-        tr_variantInitStr(benc, "none", 4);
+        tr_variantInitStr(benc, "none"sv);
     }
     else
     {
@@ -553,7 +556,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     /* add the progress */
     if (tor->completeness == TR_SEED)
     {
-        tr_variantDictAddStr(prog, TR_KEY_have, "all");
+        tr_variantDictAddStr(prog, TR_KEY_have, "all"sv);
     }
 
     /* add the blocks bitfield */

@@ -10,7 +10,6 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* atoi */
 #include <string_view>
-#include <typeinfo>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>

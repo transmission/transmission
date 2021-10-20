@@ -17,7 +17,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -3226,24 +3225,23 @@ void tr_torrentSetLocation(
     tr_runInEventThread(tor->session, setLocation, data);
 }
 
-char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
+std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
 {
     tr_info const* inf = &tor->info;
 
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
-    // TODO: tr_get_mime_type_for_filename should return a std::string_view
-    auto size_per_mime_type = std::unordered_map<char const*, size_t>{};
+    auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
     for (tr_file const *it = inf->files, *end = it + inf->fileCount; it != end; ++it)
     {
-        char const* mime_type = tr_get_mime_type_for_filename(it->name);
+        auto const mime_type = tr_get_mime_type_for_filename(it->name);
         size_per_mime_type[mime_type] += it->length;
     }
 
     // now that we have the totals,
     // sort by number so that we can get the biggest
-    auto mime_type_per_size = std::map<size_t, char const*>{};
+    auto mime_type_per_size = std::map<size_t, std::string_view>{};
     for (auto it : size_per_mime_type)
     {
         mime_type_per_size.emplace(it.second, it.first);
@@ -3252,9 +3250,9 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     // application/octet-stream is the default value for all other cases.
     // An unknown file type should use this type.
-    char const* const fallback = "application/octet-stream";
+    auto constexpr Fallback = "application/octet-stream"sv;
 
-    return std::empty(mime_type_per_size) ? fallback : mime_type_per_size.rbegin()->second;
+    return std::empty(mime_type_per_size) ? Fallback : mime_type_per_size.rbegin()->second;
 }
 
 /***
