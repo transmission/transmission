@@ -41,48 +41,53 @@
 #include "utils.h"
 #include "webseed.h"
 
-enum
-{
-    /* how frequently to cull old atoms */
-    ATOM_PERIOD_MSEC = (60 * 1000),
-    /* how frequently to change which peers are choked */
-    RECHOKE_PERIOD_MSEC = (10 * 1000),
-    /* an optimistically unchoked peer is immune from rechoking
-       for this many calls to rechokeUploads(). */
-    OPTIMISTIC_UNCHOKE_MULTIPLIER = 4,
-    /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 500,
-    /* how frequently to age out old piece request lists */
-    REFILL_UPKEEP_PERIOD_MSEC = (10 * 1000),
-    /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = 500,
-    /* when many peers are available, keep idle ones this long */
-    MIN_UPLOAD_IDLE_SECS = (60),
-    /* when few peers are available, keep idle ones this long */
-    MAX_UPLOAD_IDLE_SECS = (60 * 5),
-    /* max number of peers to ask for per second overall.
-     * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 12,
-    /* number of bad pieces a peer is allowed to send before we ban them */
-    MAX_BAD_PIECES_PER_PEER = 5,
-    /* amount of time to keep a list of request pieces lying around
-       before it's considered too old and needs to be rebuilt */
-    PIECE_LIST_SHELF_LIFE_SECS = 60,
-    /* use for bitwise operations w/peer_atom.flags2 */
-    MYFLAG_BANNED = 1,
-    /* use for bitwise operations w/peer_atom.flags2 */
-    /* unreachable for now... but not banned.
-     * if they try to connect to us it's okay */
-    MYFLAG_UNREACHABLE = 2,
-    /* the minimum we'll wait before attempting to reconnect to a peer */
-    MINIMUM_RECONNECT_INTERVAL_SECS = 5,
-    /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 90,
-    /* */
-    NO_BLOCKS_CANCEL_HISTORY = 120,
-    /* */
-    CANCEL_HISTORY_SEC = 60
-};
+// how frequently to cull old atoms
+static auto constexpr ATOM_PERIOD_MSEC = int{ 60 * 1000 };
+
+// how frequently to change which peers are choked
+static auto constexpr RECHOKE_PERIOD_MSEC = int{ 10 * 1000 };
+
+// an optimistically unchoked peer is immune from rechoking
+// for this many calls to rechokeUploads().
+static auto constexpr OPTIMISTIC_UNCHOKE_MULTIPLIER = int{ 4 };
+
+// how frequently to reallocate bandwidth
+static auto constexpr BANDWIDTH_PERIOD_MSEC = int{ 500 };
+
+// how frequently to age out old piece request lists
+static auto constexpr REFILL_UPKEEP_PERIOD_MSEC = int{ 10 * 1000 };
+
+// how frequently to decide which peers live and die
+static auto constexpr RECONNECT_PERIOD_MSEC = int{ 500 };
+
+// when many peers are available, keep idle ones this long
+static auto constexpr MIN_UPLOAD_IDLE_SECS = int{ 60 };
+
+// when few peers are available, keep idle ones this long
+static auto constexpr MAX_UPLOAD_IDLE_SECS = int{ 60 * 5 };
+
+// max number of peers to ask for per second overall.
+// this throttle is to avoid overloading the router
+static auto constexpr MAX_CONNECTIONS_PER_SECOND = int{ 12 };
+
+// number of bad pieces a peer is allowed to send before we ban them
+static auto constexpr MAX_BAD_PIECES_PER_PEER = int{ 5 };
+
+// use for bitwise operations w/peer_atom.flags2
+static auto constexpr MYFLAG_BANNED = int{ 1 };
+
+// use for bitwise operations w/peer_atom.flags2
+// unreachable for now... but not banned.
+// if they try to connect to us it's okay
+static auto constexpr MYFLAG_UNREACHABLE = int{ 2 };
+
+// the minimum we'll wait before attempting to reconnect to a peer
+static auto constexpr MINIMUM_RECONNECT_INTERVAL_SECS = int{ 5 };
+
+// how long we'll let requests we've made linger before we cancel them
+static auto constexpr REQUEST_TTL_SECS = int{ 90 };
+
+static auto constexpr CANCEL_HISTORY_SEC = int{ 60 };
 
 /**
 ***
