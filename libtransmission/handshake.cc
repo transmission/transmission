@@ -38,24 +38,21 @@
 
 #define HANDSHAKE_NAME "\023BitTorrent protocol"
 
-enum
-{
-    /* BitTorrent Handshake Constants */
-    HANDSHAKE_NAME_LEN = 20,
-    HANDSHAKE_FLAGS_LEN = 8,
-    HANDSHAKE_SIZE = 68,
-    INCOMING_HANDSHAKE_LEN = 48,
-    /* Encryption Constants */
-    PadA_MAXLEN = 512,
-    PadB_MAXLEN = 512,
-    PadC_MAXLEN = 512,
-    PadD_MAXLEN = 512,
-    VC_LENGTH = 8,
-    CRYPTO_PROVIDE_PLAINTEXT = 1,
-    CRYPTO_PROVIDE_CRYPTO = 2,
-    /* how long to wait before giving up on a handshake */
-    HANDSHAKE_TIMEOUT_SEC = 30
-};
+// bittorrent handshake constants
+static auto constexpr HANDSHAKE_NAME_LEN = int{ 20 };
+static auto constexpr HANDSHAKE_FLAGS_LEN = int{ 8 };
+static auto constexpr HANDSHAKE_SIZE = int{ 68 };
+static auto constexpr INCOMING_HANDSHAKE_LEN = int{ 48 };
+
+// encryption constants
+static auto constexpr PadA_MAXLEN = int{ 512 };
+static auto constexpr PadB_MAXLEN = int{ 512 };
+static auto constexpr VC_LENGTH = int{ 8 };
+static auto constexpr CRYPTO_PROVIDE_PLAINTEXT = int{ 1 };
+static auto constexpr CRYPTO_PROVIDE_CRYPTO = int{ 2 };
+
+// how long to wait before giving up on a handshake
+static auto constexpr HANDSHAKE_TIMEOUT_SEC = int{ 30 };
 
 #ifdef ENABLE_LTEP
 #define HANDSHAKE_HAS_LTEP(bits) (((bits)[5] & 0x10) != 0)
