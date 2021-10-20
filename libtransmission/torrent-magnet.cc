@@ -32,7 +32,7 @@
 ***/
 
 /* don't ask for the same metadata piece more than this often */
-static auto constexpr MIN_REPEAT_INTERVAL_SECS = int{ 3 };
+static auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
 struct metadata_node
 {
@@ -369,7 +369,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     bool have_request = false;
     struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
-    if (m != nullptr && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
+    if (m != nullptr && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MinRepeatIntervalSecs < now)
     {
         int const piece = m->piecesNeeded[0].piece;
         tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);
