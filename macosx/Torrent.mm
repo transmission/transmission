@@ -1594,7 +1594,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     __block BOOL canChange = NO;
     [indexSet enumerateIndexesWithOptions:NSEnumerationConcurrent usingBlock:^(NSUInteger index, BOOL* stop) {
-        auto const progress = tr_torrentFileProgresss(fHandle, index);
+        auto const progress = tr_torrentFileProgress(fHandle, index);
         if (progress.bytes_completed < progress.bytes_total)
         {
             canChange = YES;
