@@ -11,7 +11,6 @@
 #include <cstring> // strlen()
 #include <iterator>
 #include <string_view>
-#include <typeinfo>
 #include <vector>
 
 #include "transmission.h"

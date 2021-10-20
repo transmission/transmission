@@ -10,7 +10,6 @@
 #include <array>
 #include <cstring> /* strlen() */
 #include <string_view>
-#include <typeinfo>
 
 #include <event2/buffer.h>
 
