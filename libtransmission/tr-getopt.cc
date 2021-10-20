@@ -22,22 +22,17 @@ int tr_optind = 1;
 
 static char const* getArgName(tr_option const* opt)
 {
-    char const* arg;
-
     if (!opt->has_arg)
     {
-        arg = "";
-    }
-    else if (opt->argName != nullptr)
-    {
-        arg = opt->argName;
-    }
-    else
-    {
-        arg = "<args>";
+        return "";
     }
 
-    return arg;
+    if (opt->argName != nullptr)
+    {
+        return opt->argName;
+    }
+
+    return "<args>";
 }
 
 static size_t get_next_line_len(std::string_view description, size_t maxlen)
@@ -95,8 +90,6 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
 static void maxWidth(struct tr_option const* o, size_t& longWidth, size_t& shortWidth, size_t& argWidth)
 {
-    char const* arg;
-
     if (o->longName != nullptr)
     {
         longWidth = std::max(longWidth, strlen(o->longName));
@@ -107,7 +100,8 @@ static void maxWidth(struct tr_option const* o, size_t& longWidth, size_t& short
         shortWidth = std::max(shortWidth, strlen(o->shortName));
     }
 
-    if ((arg = getArgName(o)) != nullptr)
+    char const* const arg = getArgName(o);
+    if (arg != nullptr)
     {
         argWidth = std::max(argWidth, strlen(arg));
     }
