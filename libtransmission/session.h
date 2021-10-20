@@ -52,7 +52,7 @@ struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
-struct tr_blocklistFile;
+struct BlocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 
@@ -370,7 +370,7 @@ public:
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::vector<tr_blocklistFile*> blocklists;
+    std::vector<BlocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 

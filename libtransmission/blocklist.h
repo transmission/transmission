@@ -18,23 +18,42 @@
 
 struct tr_address;
 
-struct tr_ipv4_range
-{
-    uint32_t begin;
-    uint32_t end;
-};
-
-struct tr_blocklistFile
+struct BlocklistFile
 {
 public:
-    tr_blocklistFile(char const* filename, bool isEnabled)
+    struct IPv4Range
+    {
+        uint32_t begin_;
+        uint32_t end_;
+
+        /// @brief Used for std::bsearch of an IPv4 address
+        static int compareAddressToRange(void const* va, void const* vb)
+        {
+            auto const* a = reinterpret_cast<uint32_t const*>(va);
+            auto const* b = reinterpret_cast<IPv4Range const*>(vb);
+
+            if (*a < b->begin_)
+            {
+                return -1;
+            }
+
+            if (*a > b->end_)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+    };
+
+    BlocklistFile(char const* filename, bool isEnabled)
         : is_enabled_(isEnabled)
         , fd_{ TR_BAD_SYS_FILE }
         , filename_(filename)
     {
     }
 
-    ~tr_blocklistFile();
+    ~BlocklistFile();
 
     void close();
 
@@ -57,12 +76,16 @@ public:
 private:
     void ensureLoaded();
     void load();
-    static bool parseLine(char const* line, struct tr_ipv4_range* range);
-    static bool compareAddressRangesByFirstAddress(tr_ipv4_range const& a, tr_ipv4_range const& b);
+    static bool parseLine(char const* line, IPv4Range* range);
+    static bool compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4Range const& b);
+
+    static bool parseLine1(std::string_view line, struct IPv4Range* range);
+    static bool parseLine2(std::string_view line, struct IPv4Range* range);
+    static bool parseLine3(char const* line, IPv4Range* range);
 
 #ifdef TR_ENABLE_ASSERTS
     /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
-    void assertValidRules(std::vector<tr_ipv4_range>& ranges);
+    void assertValidRules(std::vector<IPv4Range>& ranges);
 #endif
 
     bool is_enabled_;
@@ -70,5 +93,7 @@ private:
     size_t rule_count_ = 0;
     uint64_t byte_count_ = 0;
     std::string filename_;
-    tr_ipv4_range* rules_ = nullptr;
+
+    /// @brief Not a container, memory mapped file
+    IPv4Range* rules_ = nullptr;
 };

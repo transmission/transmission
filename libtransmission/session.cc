@@ -2368,7 +2368,7 @@ static void loadBlocklists(tr_session* session)
 
             if (!tr_sys_path_get_info(binname, 0, &binname_info)) /* create it */
             {
-                tr_blocklistFile b(binname, isEnabled);
+                BlocklistFile b(binname, isEnabled);
                 if (auto const n = b.setContent(path); n > 0)
                 {
                     load = binname;
@@ -2382,7 +2382,7 @@ static void loadBlocklists(tr_session* session)
                 tr_sys_path_remove(old);
                 tr_sys_path_rename(binname, old);
 
-                tr_blocklistFile b(binname, isEnabled);
+                BlocklistFile b(binname, isEnabled);
 
                 if (b.setContent(path) > 0)
                 {
@@ -2407,7 +2407,7 @@ static void loadBlocklists(tr_session* session)
         std::begin(loadme),
         std::end(loadme),
         std::back_inserter(session->blocklists),
-        [&isEnabled](auto const& path) { return new tr_blocklistFile(path.c_str(), isEnabled); });
+        [&isEnabled](auto const& path) { return new BlocklistFile(path.c_str(), isEnabled); });
 
     /* cleanup */
     tr_sys_dir_close(odir);
@@ -2433,11 +2433,7 @@ int tr_blocklistGetRuleCount(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     auto& src = session->blocklists;
-    return std::accumulate(
-        std::begin(src),
-        std::end(src),
-        0,
-        [](int sum, auto* cur) { return sum + cur->getRuleCount(); });
+    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto* cur) { return sum + cur->getRuleCount(); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
@@ -2476,7 +2472,6 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     auto const lock = session->unique_lock();
 
     // find (or add) the default blocklist
-    tr_blocklistFile* b;
     auto& src = session->blocklists;
     char const* const name = DEFAULT_BLOCKLIST_FILENAME;
     auto const it = std::find_if(
@@ -2484,10 +2479,11 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
         std::end(src),
         [&name](auto const* blocklist) { return tr_strvEndsWith(blocklist->getFilename(), name); });
 
+    BlocklistFile* b = nullptr;
     if (it == std::end(src))
     {
         auto path = tr_pathbuf{ session->config_dir, "/blocklists/"sv, name };
-        b = new tr_blocklistFile(path, session->useBlocklist());
+        b = new BlocklistFile(path, session->useBlocklist());
         src.push_back(b);
     }
     else
