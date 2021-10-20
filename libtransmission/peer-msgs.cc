@@ -42,8 +42,10 @@
 ***
 **/
 
-enum
+// these values are hardcoded by various BEPs as noted
+enum BitTorrentMessages
 {
+    // http://bittorrent.org/beps/bep_0003.html#peer-messages
     BT_CHOKE = 0,
     BT_UNCHOKE = 1,
     BT_INTERESTED = 2,
@@ -54,48 +56,70 @@ enum
     BT_PIECE = 7,
     BT_CANCEL = 8,
     BT_PORT = 9,
-    /* */
+
+    // https://www.bittorrent.org/beps/bep_0006.html
     BT_FEXT_SUGGEST = 13,
     BT_FEXT_HAVE_ALL = 14,
     BT_FEXT_HAVE_NONE = 15,
     BT_FEXT_REJECT = 16,
     BT_FEXT_ALLOWED_FAST = 17,
-    /* */
-    BT_LTEP = 20,
-    /* */
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // see also LtepMessageIds below
+    BT_LTEP = 20
+};
+
+enum LtepMessages
+{
     LTEP_HANDSHAKE = 0,
-    /* */
+};
+
+// http://bittorrent.org/beps/bep_0010.html
+// Client-defined extension message IDs that we tell peers about
+// in the LTEP handshake and will respond to when sent in an LTEP
+// message.
+enum LtepMessageIds
+{
+    // we support peer exchange (bep 11)
     UT_PEX_ID = 1,
+
+    // we support sending metadata files (bep 9)
+    // see also MetadataMsgType below
     UT_METADATA_ID = 3,
-    /* */
-    MIN_CHOKE_PERIOD_SEC = 10,
-    /* idle seconds before we send a keepalive */
-    KEEPALIVE_INTERVAL_SECS = 100,
-    /* */
-    PEX_INTERVAL_SECS = 90, /* sec between sendPex() calls */
-    /* */
-    REQQ = 512,
-    /* */
-    METADATA_REQQ = 64,
-    /* */
-    MAGIC_NUMBER = 21549,
-    /* used in lowering the outMessages queue period */
-    IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
-    HIGH_PRIORITY_INTERVAL_SECS = 2,
-    LOW_PRIORITY_INTERVAL_SECS = 10,
-    /* number of pieces we'll allow in our fast set */
-    MAX_FAST_SET_SIZE = 3,
-    /* how many blocks to keep prefetched per peer */
-    PREFETCH_SIZE = 18,
-    /* when we're making requests from another peer,
-       batch them together to send enough requests to
-       meet our bandwidth goals for the next N seconds */
-    REQUEST_BUF_SECS = 10,
-    /* defined in BEP #9 */
+};
+
+// http://bittorrent.org/beps/bep_0009.html
+enum MetadataMsgType
+{
     METADATA_MSG_TYPE_REQUEST = 0,
     METADATA_MSG_TYPE_DATA = 1,
     METADATA_MSG_TYPE_REJECT = 2
 };
+
+// seconds between sendPex() calls
+static auto constexpr PexIntervalSecs = int{ 90 };
+
+static auto constexpr MinChokePeriodSec = int{ 10 };
+
+// idle seconds before we send a keepalive
+static auto constexpr KeepaliveIntervalSecs = int{ 100 };
+
+static auto constexpr MetadataReqQ = int{ 64 };
+
+static auto constexpr ReqQ = int{ 512 };
+
+// used in lowering the outMessages queue period
+static auto constexpr ImmediatePriorityIntervalSecs = int{ 0 };
+static auto constexpr HighPriorityIntervalSecs = int{ 2 };
+static auto constexpr LowPriorityIntervalSecs = int{ 10 };
+
+// how many blocks to keep prefetched per peer
+static auto constexpr PrefetchSize = int{ 18 };
+
+// when we're making requests from another peer,
+// batch them together to send enough requests to
+// meet our bandwidth goals for the next N seconds
+static auto constexpr RequestBufSecs = int{ 10 };
 
 namespace
 {
@@ -198,7 +222,7 @@ class tr_peerMsgsImpl : public tr_peerMsgs
 public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
-        , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
+        , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
         , io{ io_in }
@@ -208,7 +232,7 @@ public:
         if (tr_torrentAllowsPex(torrent))
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
-            tr_timerAdd(pex_timer.get(), PEX_INTERVAL_SECS, 0);
+            tr_timerAdd(pex_timer.get(), PexIntervalSecs, 0);
         }
 
         if (tr_peerIoSupportsUTP(io))
@@ -341,7 +365,7 @@ public:
     void set_choke(bool peer_is_choked) override
     {
         time_t const now = tr_time();
-        time_t const fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
+        time_t const fibrillationTime = now - MinChokePeriodSec;
 
         if (chokeChangedAt > fibrillationTime)
         {
@@ -576,6 +600,8 @@ public:
 
     size_t metadata_size_hint = 0;
 #if 0
+    /* number of pieces we'll allow in our fast set */
+    static auto constexpr MAX_FAST_SET_SIZE = int{ 3 };
     size_t fastsetSize;
     tr_piece_index_t fastset[MAX_FAST_SET_SIZE];
 #endif
@@ -584,9 +610,9 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
-    struct peer_request peerAskedFor[REQQ] = {};
+    struct peer_request peerAskedFor[ReqQ] = {};
 
-    int peerAskedForMetadata[METADATA_REQQ] = {};
+    int peerAskedForMetadata[MetadataReqQ] = {};
     int peerAskedForMetadataCount = 0;
 
     tr_pex* pex = nullptr;
@@ -716,7 +742,7 @@ static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const
 
     dbgmsg(msgs, "requesting %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
@@ -731,7 +757,7 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
 
     dbgmsg(msgs, "cancelling %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
@@ -754,7 +780,7 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 
     dbgmsg(msgs, "sending Have %u", index);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, LOW_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, LowPriorityIntervalSecs);
 }
 
 #if 0
@@ -785,7 +811,7 @@ static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 
     dbgmsg(msgs, "sending %s...", choke ? "Choke" : "Unchoke");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
@@ -799,7 +825,7 @@ static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 
     dbgmsg(msgs, "sending HAVE_ALL...");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
@@ -813,7 +839,7 @@ static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
 
     dbgmsg(msgs, "sending HAVE_NONE...");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 /**
@@ -914,7 +940,7 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
     evbuffer_add_uint32(out, sizeof(uint8_t));
     evbuffer_add_uint8(out, b ? BT_INTERESTED : BT_NOT_INTERESTED);
 
-    pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
     dbgOutMessageLen(msgs);
 }
 
@@ -1027,15 +1053,40 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         tr_variantDictAddRaw(&val, TR_KEY_ipv6, ipv6, 16);
     }
 
+    // http://bittorrent.org/beps/bep_0009.html
+    // It also adds "metadata_size" to the handshake message (not the
+    // "m" dictionary) specifying an integer value of the number of
+    // bytes of the metadata.
     if (allow_metadata_xfer && tr_torrentHasMetadata(msgs->torrent) && msgs->torrent->infoDictLength > 0)
     {
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, msgs->torrent->infoDictLength);
     }
 
+    // http://bittorrent.org/beps/bep_0010.html
+    // Local TCP listen port. Allows each side to learn about the TCP
+    // port number of the other side. Note that there is no need for the
+    // receiving side of the connection to send this extension message,
+    // since its port number is already known.
     tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(msgs->session));
-    tr_variantDictAddInt(&val, TR_KEY_reqq, REQQ);
-    tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // An integer, the number of outstanding request messages this
+    // client supports without dropping any. The default in in
+    // libtorrent is 250.
+    tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // Client name and version (as a utf-8 string). This is a much more
+    // reliable way of identifying the client than relying on the
+    // peer id encoding.
     tr_variantDictAddQuark(&val, TR_KEY_v, version_quark);
+
+    // http://bittorrent.org/beps/bep_0021.html
+    // A peer that is a partial seed SHOULD include an extra header in
+    // the extension handshake 'upload_only'. Setting the value of this
+    // key to 1 indicates that this peer is not interested in downloading
+    // anything.
+    tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
 
     if (allow_metadata_xfer || allow_pex)
     {
@@ -1058,7 +1109,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     evbuffer_add_uint8(out, BT_LTEP);
     evbuffer_add_uint8(out, LTEP_HANDSHAKE);
     evbuffer_add_buffer(out, payload);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
     dbgOutMessageLen(msgs);
 
     /* cleanup */
@@ -1218,7 +1269,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     if (msg_type == METADATA_MSG_TYPE_REQUEST)
     {
         if (piece >= 0 && tr_torrentHasMetadata(msgs->torrent) && !tr_torrentIsPrivate(msgs->torrent) &&
-            msgs->peerAskedForMetadataCount < METADATA_REQQ)
+            msgs->peerAskedForMetadataCount < MetadataReqQ)
         {
             msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
         }
@@ -1239,7 +1290,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
             evbuffer_add_uint8(out, BT_LTEP);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             /* cleanup */
@@ -1427,7 +1478,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    for (int i = msgs->prefetchCount; i < msgs->pendingReqsToClient && i < PREFETCH_SIZE; ++i)
+    for (int i = msgs->prefetchCount; i < msgs->pendingReqsToClient && i < PrefetchSize; ++i)
     {
         struct peer_request const* req = msgs->peerAskedFor + i;
 
@@ -1460,7 +1511,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
     {
         dbgmsg(msgs, "rejecting request from choked peer");
     }
-    else if (msgs->pendingReqsToClient + 1 >= REQQ)
+    else if (msgs->pendingReqsToClient + 1 >= ReqQ)
     {
         dbgmsg(msgs, "rejecting request ... reqq is full");
     }
@@ -1976,7 +2027,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
         unsigned int rate_Bps;
         unsigned int irate_Bps;
         int const floor = 4;
-        int const seconds = REQUEST_BUF_SECS;
+        int const seconds = RequestBufSecs;
         uint64_t const now = tr_time_msec();
 
         /* Get the rate limit we should use.
@@ -2031,7 +2082,7 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         evbuffer_add_uint8(out, BT_LTEP);
         evbuffer_add_uint8(out, msgs->ut_metadata_id);
         evbuffer_add_buffer(out, payload);
-        pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+        pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
         dbgOutMessageLen(msgs);
 
         /* cleanup */
@@ -2089,7 +2140,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         tr_peerIoWriteBuf(msgs->io, msgs->outMessages, false);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
-        msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
+        msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
         bytesWritten += len;
     }
 
@@ -2123,7 +2174,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
             evbuffer_add(out, data, dataLen);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             evbuffer_free(payload);
@@ -2150,7 +2201,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_add_uint8(out, BT_LTEP);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             evbuffer_free(payload);
@@ -2247,11 +2298,11 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Keepalive
     **/
 
-    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KEEPALIVE_INTERVAL_SECS)
+    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {
         dbgmsg(msgs, "sending a keepalive message");
         evbuffer_add_uint32(msgs->outMessages, 0);
-        pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+        pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
     }
 
     return bytesWritten;
@@ -2306,7 +2357,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
     evbuffer_add_uint8(out, BT_BITFIELD);
     evbuffer_add(out, bytes.data(), std::size(bytes));
     dbgmsg(msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length(out));
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
@@ -2632,7 +2683,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             evbuffer_add_uint8(out, BT_LTEP);
             evbuffer_add_uint8(out, msgs->ut_pex_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgmsg(msgs, "sending a pex message; outMessage size is now %zu", evbuffer_get_length(out));
             dbgOutMessageLen(msgs);
 
@@ -2657,5 +2708,5 @@ static void pexPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short
     sendPex(msgs);
 
     TR_ASSERT(msgs->pex_timer);
-    tr_timerAdd(msgs->pex_timer.get(), PEX_INTERVAL_SECS, 0);
+    tr_timerAdd(msgs->pex_timer.get(), PexIntervalSecs, 0);
 }
