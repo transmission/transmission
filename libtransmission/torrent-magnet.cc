@@ -31,11 +31,8 @@
 ****
 ***/
 
-enum
-{
-    /* don't ask for the same metadata piece more than this often */
-    MIN_REPEAT_INTERVAL_SECS = 3
-};
+/* don't ask for the same metadata piece more than this often */
+static auto constexpr MIN_REPEAT_INTERVAL_SECS = int{ 3 };
 
 struct metadata_node
 {
