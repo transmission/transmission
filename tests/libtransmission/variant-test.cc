@@ -19,7 +19,6 @@
 #include <cctype> // isspace()
 #include <string>
 #include <string_view>
-#include <typeinfo>
 
 #include "gtest/gtest.h"
 

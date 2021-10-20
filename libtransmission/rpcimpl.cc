@@ -48,6 +48,8 @@
 
 #define RECENTLY_ACTIVE_SECONDS 60
 
+using namespace std::literals;
+
 #if 0
 #define dbgmsg(fmt, ...) fprintf(stderr, "%s:%d " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
 #else
@@ -376,7 +378,7 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
     tr_variantInitList(list, std::size(tor->labels));
     for (auto const& label : tor->labels)
     {
-        tr_variantListAddStr(list, label.c_str());
+        tr_variantListAddStr(list, label);
     }
 }
 
@@ -528,7 +530,7 @@ static void initField(
         break;
 
     case TR_KEY_comment:
-        tr_variantInitStr(initme, inf->comment != nullptr ? inf->comment : "", TR_BAD_SIZE);
+        tr_variantInitStr(initme, std::string_view{ inf->comment != nullptr ? inf->comment : "" });
         break;
 
     case TR_KEY_corruptEver:
@@ -536,7 +538,7 @@ static void initField(
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStr(initme, inf->creator != nullptr ? inf->creator : "", TR_BAD_SIZE);
+        tr_variantInitStr(initme, std::string_view{ inf->creator != nullptr ? inf->creator : "" });
         break;
 
     case TR_KEY_dateCreated:
@@ -552,7 +554,7 @@ static void initField(
         break;
 
     case TR_KEY_downloadDir:
-        tr_variantInitStr(initme, tr_torrentGetDownloadDir(tor), TR_BAD_SIZE);
+        tr_variantInitStr(initme, tr_torrentGetDownloadDir(tor));
         break;
 
     case TR_KEY_downloadedEver:
@@ -572,7 +574,7 @@ static void initField(
         break;
 
     case TR_KEY_errorString:
-        tr_variantInitStr(initme, st->errorString, TR_BAD_SIZE);
+        tr_variantInitStr(initme, st->errorString);
         break;
 
     case TR_KEY_eta:
@@ -594,7 +596,7 @@ static void initField(
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStr(initme, tor->info.hashString, TR_BAD_SIZE);
+        tr_variantInitStr(initme, tor->info.hashString);
         break;
 
     case TR_KEY_haveUnchecked:
@@ -647,7 +649,7 @@ static void initField(
 
     case TR_KEY_magnetLink:
         str = tr_torrentGetMagnetLink(tor);
-        tr_variantInitStr(initme, str, TR_BAD_SIZE);
+        tr_variantInitStr(initme, str);
         tr_free(str);
         break;
 
@@ -656,7 +658,7 @@ static void initField(
         break;
 
     case TR_KEY_name:
-        tr_variantInitStr(initme, tr_torrentName(tor), TR_BAD_SIZE);
+        tr_variantInitStr(initme, tr_torrentName(tor));
         break;
 
     case TR_KEY_percentDone:
@@ -702,12 +704,12 @@ static void initField(
         {
             auto const bytes = tr_torrentCreatePieceBitfield(tor);
             auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));
-            tr_variantInitStr(initme, enc != nullptr ? enc : "", TR_BAD_SIZE);
+            tr_variantInitStr(initme, enc != nullptr ? std::string_view{ enc } : ""sv);
             tr_free(enc);
         }
         else
         {
-            tr_variantInitStr(initme, "", 0);
+            tr_variantInitStr(initme, ""sv);
         }
 
         break;
@@ -721,7 +723,7 @@ static void initField(
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStr(initme, tr_torrentPrimaryMimeType(tor), TR_BAD_SIZE);
+        tr_variantInitStr(initme, tr_torrentPrimaryMimeType(tor));
         break;
 
     case TR_KEY_priorities:
@@ -809,7 +811,7 @@ static void initField(
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStr(initme, inf->torrent, TR_BAD_SIZE);
+        tr_variantInitStr(initme, inf->torrent);
         break;
 
     case TR_KEY_totalSize:
@@ -2216,18 +2218,18 @@ static char const* sessionStats(
     return nullptr;
 }
 
-static char const* getEncryptionModeString(tr_encryption_mode mode)
+static constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
 {
     switch (mode)
     {
     case TR_CLEAR_PREFERRED:
-        return "tolerated";
+        return "tolerated"sv;
 
     case TR_ENCRYPTION_REQUIRED:
-        return "required";
+        return "required"sv;
 
     default:
-        return "preferred";
+        return "preferred"sv;
     }
 }
 
@@ -2711,7 +2713,7 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 
     if (valueCount == 0)
     {
-        tr_variantInitStr(setme, std::data(str), std::size(str));
+        tr_variantInitStr(setme, str);
     }
     else if (valueCount == 1)
     {

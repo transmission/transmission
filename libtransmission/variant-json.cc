@@ -308,7 +308,7 @@ static void action_callback_POP(
     {
         auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
-        tr_variantInitStr(get_node(jsn), str, len);
+        tr_variantInitStr(get_node(jsn), { str, len });
         data->has_content = true;
     }
     else if (state->type == JSONSL_T_HKEY)
