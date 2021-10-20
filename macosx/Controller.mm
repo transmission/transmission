@@ -444,9 +444,14 @@ static void removeKeRangerRansomware()
         tr_variantDictAddBool(&settings, TR_KEY_seed_queue_enabled, [fDefaults boolForKey:@"QueueSeed"]);
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [fDefaults integerForKey:@"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [fDefaults boolForKey:@"AutoStartDownload"]);
-        tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [fDefaults boolForKey:@"DoneScriptEnabled"]);
-        tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [fDefaults stringForKey:@"DoneScriptPath"].UTF8String);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey:@"UTPGlobal"]);
+
+        tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [fDefaults boolForKey:@"DoneScriptEnabled"]);
+        NSString* prefs_string = [fDefaults stringForKey:@"DoneScriptPath"];
+        if (prefs_string != nil)
+        {
+            tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, prefs_string.UTF8String);
+        }
 
         // TODO: Add to GUI
         if ([fDefaults objectForKey:@"RPCHostWhitelist"])
