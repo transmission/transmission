@@ -38,10 +38,7 @@
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-enum
-{
-    THREADFUNC_MAX_SLEEP_MSEC = 200,
-};
+static auto constexpr THREADFUNC_MAX_SLEEP_MSEC = int{ 200 };
 
 #if 0
 #define dbgmsg(fmt, ...) fprintf(stderr, fmt "\n", __VA_ARGS__)
