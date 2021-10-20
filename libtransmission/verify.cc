@@ -26,10 +26,7 @@
 ****
 ***/
 
-enum
-{
-    MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
-};
+static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
@@ -118,7 +115,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             if (lastSleptAt != now)
             {
                 lastSleptAt = now;
-                tr_wait_msec(MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY);
+                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha = tr_sha1_init();
