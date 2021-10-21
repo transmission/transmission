@@ -155,7 +155,7 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 ****
 ***/
 
-static constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
+static void tr_torrentUnsetPeerId(tr_torrent* tor)
 {
     // triggers a rebuild next time tr_torrentGetPeerId() is called
     tor->peer_id.reset();
