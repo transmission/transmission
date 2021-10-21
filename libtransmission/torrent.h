@@ -319,6 +319,7 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
+// TODO(ckerr) this is confusingly-named. partial seeds return true here
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;
