@@ -82,10 +82,8 @@ static void clearMetainfo(tr_ctor* ctor)
 
 int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
-    int err;
-
     clearMetainfo(ctor);
-    err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
+    auto const err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
     ctor->isSet_metainfo = err == 0;
     return err;
 }
@@ -97,7 +95,8 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
-    int err;
+    auto err = int{};
+
     tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
 
     if (magnet_info == nullptr)
@@ -106,12 +105,10 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
     }
     else
     {
-        size_t len;
-        tr_variant tmp;
-        char* str;
-
+        auto tmp = tr_variant{};
+        auto len = size_t{};
         tr_magnetCreateMetainfo(magnet_info, &tmp);
-        str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
+        char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
         err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
 
         tr_free(str);
@@ -124,12 +121,10 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
-    uint8_t* metainfo;
-    size_t len;
-    int err;
+    auto len = size_t{};
+    auto* const metainfo = tr_loadFile(filename, &len, nullptr);
 
-    metainfo = tr_loadFile(filename, &len, nullptr);
-
+    auto err = int{};
     if (metainfo != nullptr && len != 0)
     {
         err = tr_ctorSetMetainfo(ctor, metainfo, len);
@@ -145,11 +140,11 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     /* if no `name' field was set, then set it from the filename */
     if (ctor->isSet_metainfo)
     {
-        tr_variant* info;
+        tr_variant* info = nullptr;
 
         if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
         {
-            char const* name;
+            char const* name = nullptr;
 
             if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, nullptr) &&
                 !tr_variantDictFindStr(info, TR_KEY_name, &name, nullptr))
@@ -176,21 +171,8 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
 int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 {
-    int err;
-    char const* filename;
-
-    filename = tr_sessionFindTorrentFile(ctor->session, hashString);
-
-    if (filename == nullptr)
-    {
-        err = EINVAL;
-    }
-    else
-    {
-        err = tr_ctorSetMetainfoFromFile(ctor, filename);
-    }
-
-    return err;
+    char const* const filename = tr_sessionFindTorrentFile(ctor->session, hashString);
+    return filename == nullptr ? EINVAL : tr_ctorSetMetainfoFromFile(ctor, filename);
 }
 
 /***
@@ -199,8 +181,8 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 
 void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
 {
-    tr_file_index_t** myfiles;
-    tr_file_index_t* mycount;
+    tr_file_index_t** myfiles = nullptr;
+    tr_file_index_t* mycount = nullptr;
 
     switch (priority)
     {
