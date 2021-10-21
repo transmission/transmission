@@ -1468,35 +1468,20 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     return total;
 }
 
-tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
+tr_file_progress tr_torrentFileProgress(tr_torrent const* torrent, tr_file_index_t file)
 {
-    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(torrent));
+    TR_ASSERT(file < torrent->info.fileCount);
 
-    tr_file_index_t const n = tor->info.fileCount;
-    tr_file_stat* files = tr_new0(tr_file_stat, n);
-    tr_file_stat* walk = files;
-    bool const isSeed = tor->completeness == TR_SEED;
+    tr_file_index_t const total = torrent->info.files[file].length;
 
-    for (tr_file_index_t i = 0; i < n; ++i)
+    if (torrent->completeness == TR_SEED || total == 0)
     {
-        uint64_t const length = tor->info.files[i].length;
-        uint64_t const b = isSeed ? length : countFileBytesCompleted(tor, i);
-        walk->bytesCompleted = b;
-        walk->progress = length > 0 ? (float)b / (float)length : 1.0F;
-        ++walk;
+        return { total, total, 1.0 };
     }
 
-    if (fileCount != nullptr)
-    {
-        *fileCount = n;
-    }
-
-    return files;
-}
-
-void tr_torrentFilesFree(tr_file_stat* files, [[maybe_unused]] tr_file_index_t fileCount)
-{
-    tr_free(files);
+    auto const have = countFileBytesCompleted(torrent, file);
+    return { have, total, have >= total ? 1.0 : have / double(total) };
 }
 
 /***
