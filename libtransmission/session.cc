@@ -83,27 +83,30 @@ static tr_port getRandomPort(tr_session* s)
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
    designates beta (Azureus-style) */
-void tr_peerIdInit(uint8_t* buf)
+tr_peer_id_t tr_peerIdInit()
 {
-    int total = 0;
-    // TODO: use a string_view
-    char const* pool = "0123456789abcdefghijklmnopqrstuvwxyz";
-    int const base = 36;
+    auto peer_id = tr_peer_id_t{};
+    auto* it = std::data(peer_id);
 
-    memcpy(buf, PEERID_PREFIX, 8);
+    // starts with -TRXXXX-
+    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
+    auto const* const end = it + std::size(peer_id);
+    it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 
-    tr_rand_buffer(buf + 8, 11);
-
-    for (int i = 8; i < 19; ++i)
+    // remainder is randomly-generated characters
+    auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
+    auto total = int{ 0 };
+    tr_rand_buffer(it, end - it);
+    while (it + 1 < end)
     {
-        int const val = buf[i] % base;
+        int const val = *it % std::size(Pool);
         total += val;
-        buf[i] = pool[val];
+        *it++ = Pool[val];
     }
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    *it = Pool[val];
 
-    int const val = total % base != 0 ? base - total % base : 0;
-    buf[19] = pool[val];
-    buf[20] = '\0';
+    return peer_id;
 }
 
 /***

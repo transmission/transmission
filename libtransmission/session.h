@@ -45,7 +45,7 @@ enum tr_auto_switch_state_t
     TR_AUTO_SWITCH_OFF,
 };
 
-void tr_peerIdInit(uint8_t* setme);
+tr_peer_id_t tr_peerIdInit();
 
 struct event_base;
 struct evdns_base;

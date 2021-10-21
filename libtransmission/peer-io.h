@@ -16,8 +16,6 @@
 ***
 **/
 
-#include <assert.h>
-
 #include <event2/buffer.h>
 
 #include "transmission.h"

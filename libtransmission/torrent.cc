@@ -157,8 +157,8 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
 static constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
 {
-    /* triggers a rebuild next time tr_torrentGetPeerId() is called */
-    *tor->peer_id = '\0';
+    // triggers a rebuild next time tr_torrentGetPeerId() is called
+    tor->peer_id.reset();
 }
 
 static int peerIdTTL(tr_torrent const* tor)
@@ -167,18 +167,18 @@ static int peerIdTTL(tr_torrent const* tor)
     return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peer_id_ttl_hours * 3600, tr_time());
 }
 
-unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
+tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 {
-    bool const needs_new_peer_id = (*tor->peer_id == '\0') || // doesn't have one
+    bool const needs_new_peer_id = !tor->peer_id || // doesn't have one
         (!tr_torrentIsPrivate(tor) && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
-        tr_peerIdInit(tor->peer_id);
+        tor->peer_id = tr_peerIdInit();
         tor->peer_id_creation_time = tr_time();
     }
 
-    return tor->peer_id;
+    return *tor->peer_id;
 }
 
 /***

@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <cerrno>
 #include <cstring> /* strcmp(), strlen(), strncmp() */
 
@@ -175,19 +176,17 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
     uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
     tr_torrent* const tor = torrent_hash == nullptr ? nullptr : tr_torrentFindFromHash(handshake->session, torrent_hash);
-    unsigned char const* const peer_id = tor == nullptr ? nullptr : tr_torrentGetPeerId(tor);
-    bool const success = peer_id != nullptr;
+    bool const success = tor != nullptr;
 
     if (success)
     {
         uint8_t* walk = buf;
 
-        memcpy(walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN);
-        walk += HANDSHAKE_NAME_LEN;
+        walk = std::copy_n(HANDSHAKE_NAME, HANDSHAKE_NAME_LEN, walk);
+
         memset(walk, 0, HANDSHAKE_FLAGS_LEN);
         HANDSHAKE_SET_LTEP(walk);
         HANDSHAKE_SET_FASTEXT(walk);
-
         /* Note that this doesn't depend on whether the torrent is private.
          * We don't accept DHT peers for a private torrent,
          * but we participate in the DHT regardless. */
@@ -195,13 +194,14 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         {
             HANDSHAKE_SET_DHT(walk);
         }
-
         walk += HANDSHAKE_FLAGS_LEN;
-        memcpy(walk, torrent_hash, SHA_DIGEST_LENGTH);
-        walk += SHA_DIGEST_LENGTH;
-        memcpy(walk, peer_id, PEER_ID_LEN);
 
-        TR_ASSERT(walk + PEER_ID_LEN - buf == HANDSHAKE_SIZE);
+        walk = std::copy_n(torrent_hash, SHA_DIGEST_LENGTH, walk);
+
+        auto const& peer_id = tr_torrentGetPeerId(tor);
+        walk = std::copy_n(std::data(peer_id), std::size(peer_id), walk);
+
+        TR_ASSERT(walk + std::size(peer_id) - buf == HANDSHAKE_SIZE);
     }
 
     return success;
@@ -261,7 +261,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     dbgmsg(handshake, "peer-id is [%*.*s]", TR_ARG_TUPLE(int(std::size(peer_id)), int(std::size(peer_id)), std::data(peer_id)));
 
     auto* const tor = tr_torrentFindFromHash(handshake->session, hash);
-    if (memcmp(std::data(peer_id), tr_torrentGetPeerId(tor), std::size(peer_id)) == 0)
+    if (peer_id == tr_torrentGetPeerId(tor))
     {
         dbgmsg(handshake, "streuth!  we've connected to ourselves.");
         return HANDSHAKE_PEER_IS_SELF;
@@ -708,8 +708,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto* const tor = tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(handshake->io));
-    bool const connected_to_self = tor != nullptr &&
-        memcmp(std::data(peer_id), tr_torrentGetPeerId(tor), std::size(peer_id)) == 0;
+    bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
@@ -1109,15 +1108,11 @@ static void tr_handshakeFree(tr_handshake* handshake)
 
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool isOK)
 {
-    bool success;
-
     dbgmsg(handshake, "handshakeDone: %s", isOK ? "connected" : "aborting");
     tr_peerIoSetIOFuncs(handshake->io, nullptr, nullptr, nullptr, nullptr);
 
-    success = fireDoneFunc(handshake, isOK);
-
+    bool const success = fireDoneFunc(handshake, isOK);
     tr_handshakeFree(handshake);
-
     return success ? READ_LATER : READ_ERR;
 }
 

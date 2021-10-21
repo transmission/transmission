@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -154,8 +155,7 @@ struct tr_torrent
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    // TODO(ckerr): use tr_peer_id_t
-    unsigned char peer_id[PEER_ID_LEN + 1];
+    std::optional<tr_peer_id_t> peer_id;
 
     time_t peer_id_creation_time;
 
@@ -426,7 +426,7 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
 
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
-unsigned char const* tr_torrentGetPeerId(tr_torrent* tor);
+tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 static inline uint64_t tr_torrentGetLeftUntilDone(tr_torrent const* tor)
 {

@@ -125,4 +125,8 @@
 
 auto inline constexpr PEER_ID_LEN = size_t{ 20 };
 
-using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
+// https://www.bittorrent.org/beps/bep_0003.html
+// A string of length 20 which this downloader uses as its id. Each
+// downloader generates its own id at random at the start of a new
+// download. This value will also almost certainly have to be escaped.
+using tr_peer_id_t = std::array<char, 20>;
