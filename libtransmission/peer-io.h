@@ -126,7 +126,6 @@ public:
     bool dhtSupported = false;
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
-    bool isEncrypted = false;
     bool utpSupported = false;
 };
 
