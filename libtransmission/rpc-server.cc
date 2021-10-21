@@ -763,13 +763,10 @@ static void handle_request(struct evhttp_request* req, void* arg)
     }
 }
 
-enum
-{
-    SERVER_START_RETRY_COUNT = 10,
-    SERVER_START_RETRY_DELAY_STEP = 3,
-    SERVER_START_RETRY_DELAY_INCREMENT = 5,
-    SERVER_START_RETRY_MAX_DELAY = 60
-};
+static auto constexpr ServerStartRetryCount = int{ 10 };
+static auto constexpr ServerStartRetryDelayIncrement = int{ 5 };
+static auto constexpr ServerStartRetryDelayStep = int{ 3 };
+static auto constexpr ServerStartRetryMaxDelay = int{ 60 };
 
 static void startServer(void* vserver);
 
@@ -780,8 +777,8 @@ static void rpc_server_on_start_retry([[maybe_unused]] evutil_socket_t fd, [[may
 
 static int rpc_server_start_retry(tr_rpc_server* server)
 {
-    int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1) * SERVER_START_RETRY_DELAY_INCREMENT;
-    retry_delay = std::min(retry_delay, int{ SERVER_START_RETRY_MAX_DELAY });
+    int retry_delay = (server->start_retry_counter / ServerStartRetryDelayStep + 1) * ServerStartRetryDelayIncrement;
+    retry_delay = std::min(retry_delay, int{ ServerStartRetryMaxDelay });
 
     if (server->start_retry_timer == nullptr)
     {
@@ -825,7 +822,7 @@ static void startServer(void* vserver)
     {
         evhttp_free(httpd);
 
-        if (server->start_retry_counter < SERVER_START_RETRY_COUNT)
+        if (server->start_retry_counter < ServerStartRetryCount)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
@@ -838,7 +835,7 @@ static void startServer(void* vserver)
             "Unable to bind to %s:%d after %d attempts, giving up",
             address,
             port,
-            SERVER_START_RETRY_COUNT);
+            ServerStartRetryCount);
     }
     else
     {

@@ -41,48 +41,53 @@
 #include "utils.h"
 #include "webseed.h"
 
-enum
-{
-    /* how frequently to cull old atoms */
-    ATOM_PERIOD_MSEC = (60 * 1000),
-    /* how frequently to change which peers are choked */
-    RECHOKE_PERIOD_MSEC = (10 * 1000),
-    /* an optimistically unchoked peer is immune from rechoking
-       for this many calls to rechokeUploads(). */
-    OPTIMISTIC_UNCHOKE_MULTIPLIER = 4,
-    /* how frequently to reallocate bandwidth */
-    BANDWIDTH_PERIOD_MSEC = 500,
-    /* how frequently to age out old piece request lists */
-    REFILL_UPKEEP_PERIOD_MSEC = (10 * 1000),
-    /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = 500,
-    /* when many peers are available, keep idle ones this long */
-    MIN_UPLOAD_IDLE_SECS = (60),
-    /* when few peers are available, keep idle ones this long */
-    MAX_UPLOAD_IDLE_SECS = (60 * 5),
-    /* max number of peers to ask for per second overall.
-     * this throttle is to avoid overloading the router */
-    MAX_CONNECTIONS_PER_SECOND = 12,
-    /* number of bad pieces a peer is allowed to send before we ban them */
-    MAX_BAD_PIECES_PER_PEER = 5,
-    /* amount of time to keep a list of request pieces lying around
-       before it's considered too old and needs to be rebuilt */
-    PIECE_LIST_SHELF_LIFE_SECS = 60,
-    /* use for bitwise operations w/peer_atom.flags2 */
-    MYFLAG_BANNED = 1,
-    /* use for bitwise operations w/peer_atom.flags2 */
-    /* unreachable for now... but not banned.
-     * if they try to connect to us it's okay */
-    MYFLAG_UNREACHABLE = 2,
-    /* the minimum we'll wait before attempting to reconnect to a peer */
-    MINIMUM_RECONNECT_INTERVAL_SECS = 5,
-    /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 90,
-    /* */
-    NO_BLOCKS_CANCEL_HISTORY = 120,
-    /* */
-    CANCEL_HISTORY_SEC = 60
-};
+// how frequently to cull old atoms
+static auto constexpr AtomPeriodMsec = int{ 60 * 1000 };
+
+// how frequently to change which peers are choked
+static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
+
+// an optimistically unchoked peer is immune from rechoking
+// for this many calls to rechokeUploads().
+static auto constexpr OptimisticUnchokeMultiplier = int{ 4 };
+
+// how frequently to reallocate bandwidth
+static auto constexpr BandwidthPeriodMsec = int{ 500 };
+
+// how frequently to age out old piece request lists
+static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
+
+// how frequently to decide which peers live and die
+static auto constexpr ReconnectPeriodMsec = int{ 500 };
+
+// when many peers are available, keep idle ones this long
+static auto constexpr MinUploadIdleSecs = int{ 60 };
+
+// when few peers are available, keep idle ones this long
+static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
+
+// max number of peers to ask for per second overall.
+// this throttle is to avoid overloading the router
+static auto constexpr MaxConnectionsPerSecond = int{ 12 };
+
+// number of bad pieces a peer is allowed to send before we ban them
+static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
+
+// use for bitwise operations w/peer_atom.flags2
+static auto constexpr MyflagBanned = int{ 1 };
+
+// use for bitwise operations w/peer_atom.flags2
+// unreachable for now... but not banned.
+// if they try to connect to us it's okay
+static auto constexpr MyflagUnreachable = int{ 2 };
+
+// the minimum we'll wait before attempting to reconnect to a peer
+static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
+
+// how long we'll let requests we've made linger before we cancel them
+static auto constexpr RequestTtlSecs = int{ 90 };
+
+static auto constexpr CancelHistorySec = int{ 60 };
 
 /**
 ***
@@ -1439,7 +1444,7 @@ static void refillUpkeep([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] s
     managerLock(mgr);
 
     time_t const now = tr_time();
-    time_t const too_old = now - REQUEST_TTL_SECS;
+    time_t const too_old = now - RequestTtlSecs;
 
     /* alloc the temporary "cancel" buffer */
     for (auto const* tor : mgr->session->torrents)
@@ -1513,7 +1518,7 @@ static void refillUpkeep([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] s
     }
 
     tr_free(cancel);
-    tr_timerAddMsec(mgr->refillUpkeepTimer, REFILL_UPKEEP_PERIOD_MSEC);
+    tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
     managerUnlock(mgr);
 }
 
@@ -1521,10 +1526,10 @@ static void addStrike(tr_swarm* s, tr_peer* peer)
 {
     tordbg(s, "increasing peer %s strike count to %d", tr_atomAddrStr(peer->atom), peer->strikes + 1);
 
-    if (++peer->strikes >= MAX_BAD_PIECES_PER_PEER)
+    if (++peer->strikes >= MaxBadPiecesPerPeer)
     {
         struct peer_atom* atom = peer->atom;
-        atom->flags2 |= MYFLAG_BANNED;
+        atom->flags2 |= MyflagBanned;
         peer->doPurge = true;
         tordbg(s, "banning peer %s", tr_atomAddrStr(atom));
     }
@@ -1971,7 +1976,7 @@ static bool myHandshakeDoneCB(
                 if (!readAnythingFromPeer)
                 {
                     tordbg(s, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr(atom), (int)atom->numFails);
-                    atom->flags2 |= MYFLAG_UNREACHABLE;
+                    atom->flags2 |= MyflagUnreachable;
                 }
             }
         }
@@ -1987,7 +1992,7 @@ static bool myHandshakeDoneCB(
         if (!tr_peerIoIsIncoming(io))
         {
             atom->flags |= ADDED_F_CONNECTABLE;
-            atom->flags2 &= ~MYFLAG_UNREACHABLE;
+            atom->flags2 &= ~MyflagUnreachable;
         }
 
         /* In principle, this flag specifies whether the peer groks uTP,
@@ -1997,7 +2002,7 @@ static bool myHandshakeDoneCB(
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
 
-        if ((atom->flags2 & MYFLAG_BANNED) != 0)
+        if ((atom->flags2 & MyflagBanned) != 0)
         {
             tordbg(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
         }
@@ -2286,7 +2291,7 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
         return false;
     }
 
-    if ((atom->flags2 & MYFLAG_BANNED) != 0)
+    if ((atom->flags2 & MyflagBanned) != 0)
     {
         return false;
     }
@@ -2391,22 +2396,22 @@ static void ensureMgrTimersExist(struct tr_peerMgr* m)
 {
     if (m->atomTimer == nullptr)
     {
-        m->atomTimer = createTimer(m->session, ATOM_PERIOD_MSEC, atomPulse, m);
+        m->atomTimer = createTimer(m->session, AtomPeriodMsec, atomPulse, m);
     }
 
     if (m->bandwidthTimer == nullptr)
     {
-        m->bandwidthTimer = createTimer(m->session, BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m);
+        m->bandwidthTimer = createTimer(m->session, BandwidthPeriodMsec, bandwidthPulse, m);
     }
 
     if (m->rechokeTimer == nullptr)
     {
-        m->rechokeTimer = createTimer(m->session, RECHOKE_PERIOD_MSEC, rechokePulse, m);
+        m->rechokeTimer = createTimer(m->session, RechokePeriodMsec, rechokePulse, m);
     }
 
     if (m->refillUpkeepTimer == nullptr)
     {
-        m->refillUpkeepTimer = createTimer(m->session, REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m);
+        m->refillUpkeepTimer = createTimer(m->session, RefillUpkeepPeriodMsec, refillUpkeep, m);
     }
 }
 
@@ -2744,10 +2749,10 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->isUploadingTo = msgs->is_active(TR_CLIENT_TO_PEER);
         stat->isSeed = tr_peerIsSeed(peer);
 
-        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CANCEL_HISTORY_SEC);
-        stat->blocksToClient = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
-        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
-        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CANCEL_HISTORY_SEC);
+        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
+        stat->blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
+        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
+        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
 
         stat->pendingReqsToPeer = peer->pendingReqsToPeer;
         stat->pendingReqsToClient = peer->pendingReqsToClient;
@@ -2893,7 +2898,7 @@ static void rechokeDownloads(tr_swarm* s)
     int maxPeers = 0;
     int rechoke_count = 0;
     struct tr_rechoke_info* rechoke = nullptr;
-    int const MIN_INTERESTING_PEERS = 5;
+    auto constexpr MinInterestingPeers = 5;
     int const peerCount = tr_ptrArraySize(&s->peers);
     time_t const now = tr_time();
 
@@ -2930,8 +2935,8 @@ static void rechokeDownloads(tr_swarm* s)
         for (int i = 0; i < peerCount; ++i)
         {
             auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, i));
-            auto const b = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
-            auto const c = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
+            auto const b = peer->blocksSentToClient.count(now, CancelHistorySec);
+            auto const c = peer->cancelsSentToPeer.count(now, CancelHistorySec);
 
             if (b == 0) /* ignore unresponsive peers, as described above */
             {
@@ -2962,7 +2967,7 @@ static void rechokeDownloads(tr_swarm* s)
         if (timeSinceCancel != 0)
         {
             int const maxIncrease = 15;
-            time_t const maxHistory = 2 * CANCEL_HISTORY_SEC;
+            time_t const maxHistory = 2 * CancelHistorySec;
             double const mult = std::min(timeSinceCancel, maxHistory) / (double)maxHistory;
             int const inc = maxIncrease * mult;
             maxPeers = s->maxPeers + inc;
@@ -2975,15 +2980,7 @@ static void rechokeDownloads(tr_swarm* s)
     }
 
     /* don't let the previous section's number tweaking go too far... */
-    if (maxPeers < MIN_INTERESTING_PEERS)
-    {
-        maxPeers = MIN_INTERESTING_PEERS;
-    }
-
-    if (maxPeers > s->tor->maxConnectedPeers)
-    {
-        maxPeers = s->tor->maxConnectedPeers;
-    }
+    maxPeers = std::clamp(maxPeers, MinInterestingPeers, int(s->tor->maxConnectedPeers));
 
     s->maxPeers = maxPeers;
 
@@ -3012,8 +3009,8 @@ static void rechokeDownloads(tr_swarm* s)
             else
             {
                 auto rechoke_state = tr_rechoke_state{};
-                auto const blocks = peer->blocksSentToClient.count(now, CANCEL_HISTORY_SEC);
-                auto const cancels = peer->cancelsSentToPeer.count(now, CANCEL_HISTORY_SEC);
+                auto const blocks = peer->blocksSentToClient.count(now, CancelHistorySec);
+                auto const cancels = peer->cancelsSentToPeer.count(now, CancelHistorySec);
 
                 if (blocks == 0 && cancels == 0)
                 {
@@ -3259,7 +3256,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
             auto* c = randPool[tr_rand_int_weak(n)];
             c->isChoked = false;
             s->optimistic = c->msgs;
-            s->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
+            s->optimisticUnchokeTimeScaler = OptimisticUnchokeMultiplier;
         }
     }
 
@@ -3293,7 +3290,7 @@ static void rechokePulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] s
         }
     }
 
-    tr_timerAddMsec(mgr->rechokeTimer, RECHOKE_PERIOD_MSEC);
+    tr_timerAddMsec(mgr->rechokeTimer, RechokePeriodMsec);
     managerUnlock(mgr);
 }
 
@@ -3329,8 +3326,8 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
          * if we have zero connections, strictness is 0% */
         float const strictness = peerCount >= relaxStrictnessIfFewerThanN ? 1.0 :
                                                                             peerCount / (float)relaxStrictnessIfFewerThanN;
-        int const lo = MIN_UPLOAD_IDLE_SECS;
-        int const hi = MAX_UPLOAD_IDLE_SECS;
+        int const lo = MinUploadIdleSecs;
+        int const hi = MaxUploadIdleSecs;
         int const limit = hi - (hi - lo) * strictness;
         int const idleTime = now - std::max(atom->time, atom->piece_data_time);
 
@@ -3374,14 +3371,14 @@ static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSi
 static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const now)
 {
     auto sec = int{};
-    bool const unreachable = (atom->flags2 & MYFLAG_UNREACHABLE) != 0;
+    bool const unreachable = (atom->flags2 & MyflagUnreachable) != 0;
 
     /* if we were recently connected to this peer and transferring piece
      * data, try to reconnect to them sooner rather that later -- we don't
      * want network troubles to get in the way of a good peer. */
-    if (!unreachable && now - atom->piece_data_time <= MINIMUM_RECONNECT_INTERVAL_SECS * 2)
+    if (!unreachable && now - atom->piece_data_time <= MinimumReconnectIntervalSecs * 2)
     {
-        sec = MINIMUM_RECONNECT_INTERVAL_SECS;
+        sec = MinimumReconnectIntervalSecs;
     }
     /* otherwise, the interval depends on how many times we've tried
      * and failed to connect to the peer */
@@ -3695,8 +3692,8 @@ static void reconnectPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]]
     }
 
     /* try to make new peer connections */
-    int const MAX_CONNECTIONS_PER_PULSE = (int)(MAX_CONNECTIONS_PER_SECOND * (RECONNECT_PERIOD_MSEC / 1000.0));
-    makeNewPeerConnections(mgr, MAX_CONNECTIONS_PER_PULSE);
+    int const MaxConnectionsPerPulse = (int)(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
+    makeNewPeerConnections(mgr, MaxConnectionsPerPulse);
 }
 
 /****
@@ -3748,8 +3745,8 @@ static void bandwidthPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]]
     pumpAllPeers(mgr);
 
     /* allocate bandwidth to the peers */
-    session->bandwidth->allocate(TR_UP, BANDWIDTH_PERIOD_MSEC);
-    session->bandwidth->allocate(TR_DOWN, BANDWIDTH_PERIOD_MSEC);
+    session->bandwidth->allocate(TR_UP, BandwidthPeriodMsec);
+    session->bandwidth->allocate(TR_DOWN, BandwidthPeriodMsec);
 
     /* torrent upkeep */
     for (auto* tor : session->torrents)
@@ -3781,7 +3778,7 @@ static void bandwidthPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]]
 
     reconnectPulse(0, 0, mgr);
 
-    tr_timerAddMsec(mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC);
+    tr_timerAddMsec(mgr->bandwidthTimer, BandwidthPeriodMsec);
     managerUnlock(mgr);
 }
 
@@ -3917,7 +3914,7 @@ static void atomPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] shor
         }
     }
 
-    tr_timerAddMsec(mgr->atomTimer, ATOM_PERIOD_MSEC);
+    tr_timerAddMsec(mgr->atomTimer, AtomPeriodMsec);
     managerUnlock(mgr);
 }
 
@@ -3955,7 +3952,7 @@ static bool isPeerCandidate(tr_torrent const* tor, struct peer_atom* atom, time_
     }
 
     /* not if they're banned... */
-    if ((atom->flags2 & MYFLAG_BANNED) != 0)
+    if ((atom->flags2 & MyflagBanned) != 0)
     {
         return false;
     }
@@ -4214,7 +4211,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
     if (io == nullptr)
     {
         tordbg(s, "peerIo not created; marking peer %s as unreachable", tr_atomAddrStr(atom));
-        atom->flags2 |= MYFLAG_UNREACHABLE;
+        atom->flags2 |= MyflagUnreachable;
         atom->numFails++;
     }
     else

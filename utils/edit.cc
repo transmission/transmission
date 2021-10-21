@@ -210,7 +210,7 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
                     char* newstr = replaceSubstr(str, in, out);
                     printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
                     tr_variantFree(node);
-                    tr_variantInitStr(node, newstr, TR_BAD_SIZE);
+                    tr_variantInitStr(node, newstr);
                     tr_free(newstr);
                     changed = true;
                 }

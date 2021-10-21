@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* strtol() */
 #include <string.h>
+#include <string_view>
 
 #include <unistd.h>
 
@@ -38,6 +39,8 @@
 #include "util.h"
 
 #define MY_CONFIG_NAME "transmission"
+
+using namespace std::literals;
 
 std::string gl_confdir;
 
@@ -71,12 +74,12 @@ static void tr_prefs_init_defaults(tr_variant* d)
     }
 
     tr_variantDictReserve(d, 31);
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir.c_str());
+    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
     tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
     tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
     tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, Glib::get_home_dir().c_str());
+    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, Glib::get_home_dir());
     tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
     tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
     tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
@@ -85,7 +88,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
     tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
     tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
-    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
+    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio"sv);
     tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
@@ -97,8 +100,8 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
     tr_variantDictAddInt(d, TR_KEY_details_window_height, 500);
     tr_variantDictAddInt(d, TR_KEY_details_window_width, 700);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, dir.c_str());
-    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name");
+    tr_variantDictAddStr(d, TR_KEY_download_dir, dir);
+    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name"sv);
     tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
     tr_variantDictAddBool(d, TR_KEY_compact_view, false);
 }
@@ -114,11 +117,11 @@ static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 
     tr_variantDictRemove(dict, key);
     list = tr_variantDictAddList(dict, key, 5);
-    tr_variantListAddStr(list, "canberra-gtk-play");
-    tr_variantListAddStr(list, "-i");
-    tr_variantListAddStr(list, "complete-download");
-    tr_variantListAddStr(list, "-d");
-    tr_variantListAddStr(list, "transmission torrent downloaded");
+    tr_variantListAddStr(list, "canberra-gtk-play"sv);
+    tr_variantListAddStr(list, "-i"sv);
+    tr_variantListAddStr(list, "complete-download"sv);
+    tr_variantListAddStr(list, "-d"sv);
+    tr_variantListAddStr(list, "transmission torrent downloaded"sv);
 }
 
 static tr_variant* getPrefs()
@@ -224,7 +227,7 @@ std::string gtr_pref_string_get(tr_quark const key)
 
 void gtr_pref_string_set(tr_quark const key, std::string const& value)
 {
-    tr_variantDictAddStr(getPrefs(), key, value.c_str());
+    tr_variantDictAddStr(getPrefs(), key, value);
 }
 
 /***
