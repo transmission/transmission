@@ -441,20 +441,17 @@ void tr_dhtUninit(tr_session* ss)
     }
     else
     {
-        enum
-        {
-            MAX_NODES = 300,
-            PORT_LEN = 2,
-            COMPACT_ADDR_LEN = 4,
-            COMPACT_LEN = (COMPACT_ADDR_LEN + PORT_LEN),
-            COMPACT6_ADDR_LEN = 16,
-            COMPACT6_LEN = (COMPACT6_ADDR_LEN + PORT_LEN),
-        };
+        auto constexpr MaxNodes = size_t{ 300 };
+        auto constexpr PortLen = size_t{ 2 };
+        auto constexpr CompactAddrLen = size_t{ 4 };
+        auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
+        auto constexpr Compact6AddrLen = size_t{ 16 };
+        auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
 
-        struct sockaddr_in sins[MAX_NODES];
-        struct sockaddr_in6 sins6[MAX_NODES];
-        int num = MAX_NODES;
-        int num6 = MAX_NODES;
+        struct sockaddr_in sins[MaxNodes];
+        struct sockaddr_in6 sins6[MaxNodes];
+        int num = MaxNodes;
+        int num6 = MaxNodes;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
         tr_logAddNamedInfo("DHT", "Saving %d (%d + %d) nodes", n, num, num6);
 
@@ -464,14 +461,14 @@ void tr_dhtUninit(tr_session* ss)
 
         if (num > 0)
         {
-            char compact[MAX_NODES * COMPACT_LEN];
+            char compact[MaxNodes * CompactLen];
             char* out = compact;
             for (struct sockaddr_in const* in = sins; in < sins + num; ++in)
             {
-                memcpy(out, &in->sin_addr, COMPACT_ADDR_LEN);
-                out += COMPACT_ADDR_LEN;
-                memcpy(out, &in->sin_port, PORT_LEN);
-                out += PORT_LEN;
+                memcpy(out, &in->sin_addr, CompactAddrLen);
+                out += CompactAddrLen;
+                memcpy(out, &in->sin_port, PortLen);
+                out += PortLen;
             }
 
             tr_variantDictAddRaw(&benc, TR_KEY_nodes, compact, out - compact);
@@ -479,14 +476,14 @@ void tr_dhtUninit(tr_session* ss)
 
         if (num6 > 0)
         {
-            char compact6[MAX_NODES * COMPACT6_LEN];
+            char compact6[MaxNodes * Compact6Len];
             char* out6 = compact6;
             for (struct sockaddr_in6 const* in = sins6; in < sins6 + num6; ++in)
             {
-                memcpy(out6, &in->sin6_addr, COMPACT6_ADDR_LEN);
-                out6 += COMPACT6_ADDR_LEN;
-                memcpy(out6, &in->sin6_port, PORT_LEN);
-                out6 += PORT_LEN;
+                memcpy(out6, &in->sin6_addr, Compact6AddrLen);
+                out6 += Compact6AddrLen;
+                memcpy(out6, &in->sin6_port, PortLen);
+                out6 += PortLen;
             }
 
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
