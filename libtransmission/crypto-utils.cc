@@ -128,11 +128,8 @@ char* tr_ssha1(char const* plain_text)
 {
     TR_ASSERT(plain_text != nullptr);
 
-    enum
-    {
-        saltval_len = 8,
-        salter_len = 64
-    };
+    auto constexpr SaltvalLen = int{ 8 };
+    auto constexpr SalterLen = int{ 64 };
 
     static char const* salter =
         "0123456789"
@@ -140,21 +137,21 @@ char* tr_ssha1(char const* plain_text)
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "./";
 
-    unsigned char salt[saltval_len];
+    unsigned char salt[SaltvalLen];
     uint8_t sha[SHA_DIGEST_LENGTH];
-    char buf[2 * SHA_DIGEST_LENGTH + saltval_len + 2];
+    char buf[2 * SHA_DIGEST_LENGTH + SaltvalLen + 2];
 
-    tr_rand_buffer(salt, saltval_len);
+    tr_rand_buffer(salt, SaltvalLen);
 
     for (auto& ch : salt)
     {
-        ch = salter[ch % salter_len];
+        ch = salter[ch % SalterLen];
     }
 
-    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, saltval_len, nullptr);
+    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, SaltvalLen, nullptr);
     tr_sha1_to_hex(&buf[1], sha);
-    memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, saltval_len);
-    buf[1 + 2 * SHA_DIGEST_LENGTH + saltval_len] = '\0';
+    memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, SaltvalLen);
+    buf[1 + 2 * SHA_DIGEST_LENGTH + SaltvalLen] = '\0';
     buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
 
     return tr_strdup(buf);
