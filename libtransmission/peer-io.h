@@ -116,9 +116,6 @@ public:
     // TODO: use std::shared_ptr instead of manual refcounting?
     int refCount = 1;
 
-    // TODO(ckerr): I think this can be moved to tr_handshake
-    uint8_t peerId[SHA_DIGEST_LENGTH] = {};
-
     short int pendingEvents = 0;
 
     tr_port const port;
@@ -130,8 +127,6 @@ public:
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
     bool isEncrypted = false;
-    // TODO(ckerr): I think this can be moved to tr_handshake
-    bool peerIdIsSet = false;
     bool utpSupported = false;
 };
 
@@ -240,20 +235,6 @@ constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 static inline int tr_peerIoGetAge(tr_peerIo const* io)
 {
     return tr_time() - io->timeCreated;
-}
-
-/**
-***
-**/
-
-void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id);
-
-constexpr uint8_t const* tr_peerIoGetPeersId(tr_peerIo const* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->peerIdIsSet);
-
-    return io->peerId;
 }
 
 /**

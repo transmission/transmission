@@ -2015,10 +2015,11 @@ static bool on_handshake_done(tr_handshake_result const& result)
             else
             {
                 auto client = tr_quark{ TR_KEY_NONE };
-                if (result.peerId != nullptr)
+                if (result.peer_id)
                 {
-                    char buf[128];
-                    client = tr_quark_new(tr_clientForId(buf, sizeof(buf), result.peerId));
+                    char buf[128] = {};
+                    tr_clientForId(buf, sizeof(buf), std::data(*result.peer_id));
+                    client = tr_quark_new(buf);
                 }
 
                 /* this steals its refcount too, which is balanced by our unref in peerDelete() */

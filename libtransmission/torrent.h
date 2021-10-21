@@ -154,6 +154,7 @@ struct tr_torrent
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
+    // TODO(ckerr): use tr_peer_id_t
     unsigned char peer_id[PEER_ID_LEN + 1];
 
     time_t peer_id_creation_time;

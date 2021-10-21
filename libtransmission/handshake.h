@@ -12,6 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <optional>
+
 #include "transmission.h"
 #include "net.h"
 
@@ -30,8 +32,8 @@ struct tr_handshake_result
     tr_peerIo* io;
     bool readAnythingFromPeer;
     bool isConnected;
-    uint8_t const* peerId;
     void* userData;
+    std::optional<tr_peer_id_t> peer_id;
 };
 
 /* returns true on success, false on error */

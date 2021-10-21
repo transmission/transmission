@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
+
 /***
 ****
 ***/
@@ -119,3 +122,7 @@
 
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
+
+auto inline constexpr PEER_ID_LEN = size_t{ 20 };
+
+using tr_peer_id_t = std::array<char, PEER_ID_LEN>;

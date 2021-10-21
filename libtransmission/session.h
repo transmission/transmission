@@ -45,11 +45,6 @@ enum tr_auto_switch_state_t
     TR_AUTO_SWITCH_OFF,
 };
 
-enum
-{
-    PEER_ID_LEN = 20
-};
-
 void tr_peerIdInit(uint8_t* setme);
 
 struct event_base;
