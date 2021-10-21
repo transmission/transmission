@@ -118,9 +118,10 @@ struct tr_handshake
     uint32_t crypto_select;
     uint32_t crypto_provide;
     uint8_t myReq1[SHA_DIGEST_LENGTH];
-    handshakeDoneCB doneCB;
-    void* doneUserData;
     struct event* timeout_timer;
+
+    tr_handshake_done_func done_func;
+    void* done_func_user_data;
 };
 
 /**
@@ -1089,15 +1090,14 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
 static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
 {
-    uint8_t const* peer_id = (isConnected && handshake->havePeerID) ? tr_peerIoGetPeersId(handshake->io) : nullptr;
-    bool const success = (*handshake->doneCB)(
-        handshake,
-        handshake->io,
-        handshake->haveReadAnythingFromPeer,
-        isConnected,
-        peer_id,
-        handshake->doneUserData);
-
+    auto result = tr_handshake_result{};
+    result.handshake = handshake;
+    result.io = handshake->io;
+    result.readAnythingFromPeer = handshake->haveReadAnythingFromPeer;
+    result.isConnected = isConnected;
+    result.userData = handshake->done_func_user_data;
+    result.peerId = (isConnected && handshake->havePeerID) ? tr_peerIoGetPeersId(handshake->io) : nullptr;
+    bool const success = (*handshake->done_func)(result);
     return success;
 }
 
@@ -1200,7 +1200,11 @@ static void handshakeTimeout([[maybe_unused]] evutil_socket_t s, [[maybe_unused]
     tr_handshakeAbort(static_cast<tr_handshake*>(handshake));
 }
 
-tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB, void* doneUserData)
+tr_handshake* tr_handshakeNew(
+    tr_peerIo* io,
+    tr_encryption_mode encryptionMode,
+    tr_handshake_done_func done_func,
+    void* done_func_user_data)
 {
     tr_handshake* handshake;
     tr_session* session = tr_peerIoGetSession(io);
@@ -1209,8 +1213,8 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto(io);
     handshake->encryptionMode = encryptionMode;
-    handshake->doneCB = doneCB;
-    handshake->doneUserData = doneUserData;
+    handshake->done_func = done_func;
+    handshake->done_func_user_data = done_func_user_data;
     handshake->session = session;
     handshake->timeout_timer = evtimer_new(session->event_base, handshakeTimeout, handshake);
     tr_timerAdd(handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);

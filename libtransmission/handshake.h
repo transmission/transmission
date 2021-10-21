@@ -24,17 +24,25 @@ class tr_peerIo;
            freed when the handshake is completed. */
 struct tr_handshake;
 
-/* returns true on success, false on error */
-using handshakeDoneCB = bool (*)(
-    struct tr_handshake* handshake,
-    tr_peerIo* io,
-    bool readAnythingFromPeer,
-    bool isConnected,
-    uint8_t const* peerId,
-    void* userData);
+struct tr_handshake_result
+{
+    struct tr_handshake* handshake;
+    tr_peerIo* io;
+    bool readAnythingFromPeer;
+    bool isConnected;
+    uint8_t const* peerId;
+    void* userData;
+};
 
-/** @brief instantiate a new handshake */
-tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB, void* doneUserData);
+/* returns true on success, false on error */
+using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
+
+/** @brief create a new handshake */
+tr_handshake* tr_handshakeNew(
+    tr_peerIo* io,
+    tr_encryption_mode encryption_mode,
+    tr_handshake_done_func when_done,
+    void* when_done_user_data);
 
 tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
