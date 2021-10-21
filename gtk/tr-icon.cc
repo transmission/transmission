@@ -6,67 +6,87 @@
  *
  */
 
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+#include <gtkmm.h>
+
 #ifdef HAVE_LIBAPPINDICATOR
 #include <libappindicator/app-indicator.h>
 #endif
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+
 #include "actions.h"
+#include "tr-core.h"
 #include "tr-icon.h"
 #include "util.h"
 
-static TR_DEFINE_QUARK(tr_core, core)
-
 #define ICON_NAME "transmission"
+
+class SystemTrayIcon::Impl
+{
+public:
+    Impl(Glib::RefPtr<TrCore> const& core);
+    ~Impl();
+
+    void refresh();
+
+private:
+    void activated();
+    void popup(guint button, guint when);
+
+private:
+    Glib::RefPtr<TrCore> const core_;
+
+    Gtk::Menu* menu_;
+
+#ifdef HAVE_LIBAPPINDICATOR
+    AppIndicator* indicator_;
+#else
+    Glib::RefPtr<Gtk::StatusIcon> icon_;
+#endif
+};
 
 #ifdef HAVE_LIBAPPINDICATOR
 
-void gtr_icon_refresh(gpointer vindicator)
+SystemTrayIcon::Impl::~Impl()
 {
-    TR_UNUSED(vindicator);
+    g_object_unref(indicator_);
+}
+
+void SystemTrayIcon::Impl::refresh()
+{
 }
 
 #else
 
-static void activated(GtkStatusIcon* self, gpointer user_data)
-{
-    TR_UNUSED(self);
-    TR_UNUSED(user_data);
+SystemTrayIcon::Impl::~Impl() = default;
 
+void SystemTrayIcon::Impl::activated()
+{
     gtr_action_activate("toggle-main-window");
 }
 
-static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data)
+void SystemTrayIcon::Impl::popup([[maybe_unused]] guint button, [[maybe_unused]] guint when)
 {
-    TR_UNUSED(data);
-
-    GtkWidget* w = gtr_action_get_widget("/icon-popup");
-
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_pointer(GTK_MENU(w), nullptr);
-
-    TR_UNUSED(self);
-    TR_UNUSED(button);
-    TR_UNUSED(when);
+    menu_->popup_at_pointer(nullptr);
 #else
-    gtk_menu_popup(GTK_MENU(w), nullptr, nullptr, gtk_status_icon_position_menu, self, button, when);
+    menu_->popup(button, when);
 #endif
 }
 
-void gtr_icon_refresh(gpointer vicon)
+void SystemTrayIcon::Impl::refresh()
 {
     double KBps;
     double limit;
     char up[64];
-    char upLimit[64];
+    Glib::ustring upLimit;
     char down[64];
-    char downLimit[64];
-    char tip[1024];
+    Glib::ustring downLimit;
     char const* idle = _("Idle");
-    GtkStatusIcon* icon = GTK_STATUS_ICON(vicon);
-    tr_session* session = gtr_core_session(static_cast<TrCore*>(g_object_get_qdata(G_OBJECT(icon), core_quark())));
+    auto* session = core_->get_session();
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
@@ -81,13 +101,11 @@ void gtr_icon_refresh(gpointer vicon)
     }
 
     /* up limit */
-    *upLimit = '\0';
-
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &limit))
     {
         char buf[64];
         tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        g_snprintf(upLimit, sizeof(upLimit), _(" (Limit: %s)"), buf);
+        upLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
     }
 
     /* down */
@@ -103,48 +121,43 @@ void gtr_icon_refresh(gpointer vicon)
     }
 
     /* down limit */
-    *downLimit = '\0';
-
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &limit))
     {
         char buf[64];
         tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        g_snprintf(downLimit, sizeof(downLimit), _(" (Limit: %s)"), buf);
+        downLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
     }
 
     /* %1$s: current upload speed
      * %2$s: current upload limit, if any
      * %3$s: current download speed
      * %4$s: current download limit, if any */
-    g_snprintf(tip, sizeof(tip), _("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
+    auto const tip = gtr_sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
 
-    gtk_status_icon_set_tooltip_text(GTK_STATUS_ICON(icon), tip);
+    icon_->set_tooltip_text(tip);
 }
 
 #endif
 
-static char const* getIconName(void)
+namespace
 {
-    char const* icon_name;
 
-    GtkIconTheme* theme = gtk_icon_theme_get_default();
+std::string getIconName()
+{
+    std::string icon_name;
+
+    auto theme = Gtk::IconTheme::get_default();
 
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!gtk_icon_theme_has_icon(theme, TRAY_ICON))
+    if (!theme->has_icon(TRAY_ICON))
     {
         icon_name = ICON_NAME;
     }
     else
     {
-        GtkIconInfo* icon_info = gtk_icon_theme_lookup_icon(theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN);
-        gboolean const icon_is_builtin = gtk_icon_info_get_filename(icon_info) == nullptr;
-
-#if GTK_CHECK_VERSION(3, 8, 0)
-        g_object_unref(icon_info);
-#else
-        gtk_icon_info_free(icon_info);
-#endif
+        auto const icon_info = theme->lookup_icon(TRAY_ICON, 48, Gtk::ICON_LOOKUP_USE_BUILTIN);
+        bool const icon_is_builtin = icon_info.get_filename().empty();
 
         icon_name = icon_is_builtin ? ICON_NAME : TRAY_ICON;
     }
@@ -152,28 +165,38 @@ static char const* getIconName(void)
     return icon_name;
 }
 
-gpointer gtr_icon_new(TrCore* core)
+} // namespace
+
+SystemTrayIcon::SystemTrayIcon(Glib::RefPtr<TrCore> const& core)
+    : impl_(std::make_unique<Impl>(core))
 {
+}
+
+SystemTrayIcon::~SystemTrayIcon() = default;
+
+void SystemTrayIcon::refresh()
+{
+    impl_->refresh();
+}
+
+SystemTrayIcon::Impl::Impl(Glib::RefPtr<TrCore> const& core)
+    : core_(core)
+{
+    auto const icon_name = getIconName();
+    menu_ = gtr_action_get_widget<Gtk::Menu>("/icon-popup");
+
 #ifdef HAVE_LIBAPPINDICATOR
 
-    GtkWidget* w;
-    char const* icon_name = getIconName();
-    AppIndicator* indicator = app_indicator_new(ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
-    app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-    w = gtr_action_get_widget("/icon-popup");
-    app_indicator_set_menu(indicator, GTK_MENU(w));
-    app_indicator_set_title(indicator, g_get_application_name());
-    g_object_set_qdata(G_OBJECT(indicator), core_quark(), core);
-    return indicator;
+    indicator_ = app_indicator_new(ICON_NAME, icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+    app_indicator_set_status(indicator_, APP_INDICATOR_STATUS_ACTIVE);
+    app_indicator_set_menu(indicator_, Glib::unwrap(menu_));
+    app_indicator_set_title(indicator_, Glib::get_application_name().c_str());
 
 #else
 
-    char const* icon_name = getIconName();
-    GtkStatusIcon* icon = gtk_status_icon_new_from_icon_name(icon_name);
-    g_signal_connect(icon, "activate", G_CALLBACK(activated), nullptr);
-    g_signal_connect(icon, "popup-menu", G_CALLBACK(popup), nullptr);
-    g_object_set_qdata(G_OBJECT(icon), core_quark(), core);
-    return icon;
+    icon_ = Gtk::StatusIcon::create(icon_name);
+    icon_->signal_activate().connect(sigc::mem_fun(this, &Impl::activated));
+    icon_->signal_popup_menu().connect(sigc::mem_fun(this, &Impl::popup));
 
 #endif
 }

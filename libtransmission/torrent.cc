@@ -17,8 +17,8 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <typeinfo>
 #include <unordered_map>
+#include <vector>
 
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
@@ -3240,24 +3240,23 @@ void tr_torrentSetLocation(
     tr_runInEventThread(tor->session, setLocation, data);
 }
 
-char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
+std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
 {
     tr_info const* inf = &tor->info;
 
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
-    // TODO: tr_get_mime_type_for_filename should return a std::string_view
-    auto size_per_mime_type = std::unordered_map<char const*, size_t>{};
+    auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
     for (tr_file const *it = inf->files, *end = it + inf->fileCount; it != end; ++it)
     {
-        char const* mime_type = tr_get_mime_type_for_filename(it->name);
+        auto const mime_type = tr_get_mime_type_for_filename(it->name);
         size_per_mime_type[mime_type] += it->length;
     }
 
     // now that we have the totals,
     // sort by number so that we can get the biggest
-    auto mime_type_per_size = std::map<size_t, char const*>{};
+    auto mime_type_per_size = std::map<size_t, std::string_view>{};
     for (auto it : size_per_mime_type)
     {
         mime_type_per_size.emplace(it.second, it.first);
@@ -3266,9 +3265,9 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     // application/octet-stream is the default value for all other cases.
     // An unknown file type should use this type.
-    char const* const fallback = "application/octet-stream";
+    auto constexpr Fallback = "application/octet-stream"sv;
 
-    return std::empty(mime_type_per_size) ? fallback : mime_type_per_size.rbegin()->second;
+    return std::empty(mime_type_per_size) ? Fallback : mime_type_per_size.rbegin()->second;
 }
 
 /***
@@ -3504,14 +3503,6 @@ char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t fileNum)
 ****
 ***/
 
-static int compareTorrentByQueuePosition(void const* va, void const* vb)
-{
-    tr_torrent const* a = *(tr_torrent const* const*)va;
-    tr_torrent const* b = *(tr_torrent const* const*)vb;
-
-    return a->queuePosition - b->queuePosition;
-}
-
 #ifdef TR_ENABLE_ASSERTS
 
 static bool queueIsSequenced(tr_session* session)
@@ -3592,56 +3583,52 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
     TR_ASSERT(queueIsSequenced(tor->session));
 }
 
-void tr_torrentsQueueMoveTop(tr_torrent** torrents_in, int n)
+struct CompareTorrentByQueuePosition
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (int i = n - 1; i >= 0; --i)
+    bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
-        tr_torrentSetQueuePosition(torrents[i], 0);
+        return a->queuePosition < b->queuePosition;
     }
+};
 
-    tr_free(torrents);
+void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t n)
+{
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
+    {
+        tr_torrentSetQueuePosition(tor, 0);
+    }
 }
 
-void tr_torrentsQueueMoveUp(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (int i = 0; i < n; ++i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition - 1);
+        tr_torrentSetQueuePosition(tor, tor->queuePosition - 1);
     }
-
-    tr_free(torrents);
 }
 
-void tr_torrentsQueueMoveDown(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (int i = n - 1; i >= 0; --i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], torrents[i]->queuePosition + 1);
+        tr_torrentSetQueuePosition(tor, tor->queuePosition + 1);
     }
-
-    tr_free(torrents);
 }
 
-void tr_torrentsQueueMoveBottom(tr_torrent** torrents_in, int n)
+void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t n)
 {
-    auto** torrents = static_cast<tr_torrent**>(tr_memdup(torrents_in, sizeof(tr_torrent*) * n));
-    qsort(torrents, n, sizeof(tr_torrent*), compareTorrentByQueuePosition);
-
-    for (int i = 0; i < n; ++i)
+    auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + n);
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    for (auto* tor : torrents)
     {
-        tr_torrentSetQueuePosition(torrents[i], INT_MAX);
+        tr_torrentSetQueuePosition(tor, INT_MAX);
     }
-
-    tr_free(torrents);
 }
 
 static void torrentSetQueued(tr_torrent* tor, bool queued)

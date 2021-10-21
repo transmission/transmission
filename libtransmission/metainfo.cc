@@ -10,7 +10,6 @@
 #include <array>
 #include <cstring> /* strlen() */
 #include <string_view>
-#include <typeinfo>
 
 #include <event2/buffer.h>
 
@@ -683,6 +682,19 @@ static char const* tr_metainfoParseImpl(
 
     inf->isPrivate = i != 0;
 
+    /* source */
+    len = 0;
+    if (!tr_variantDictFindStr(infoDict, TR_KEY_source, &str, &len))
+    {
+        if (!tr_variantDictFindStr(meta, TR_KEY_source, &str, &len))
+        {
+            str = "";
+        }
+    }
+
+    tr_free(inf->source);
+    inf->source = tr_utf8clean(std::string_view{ str, len });
+
     /* piece length */
     if (!isMagnet)
     {
@@ -788,6 +800,7 @@ void tr_metainfoFree(tr_info* inf)
     tr_free(inf->files);
     tr_free(inf->comment);
     tr_free(inf->creator);
+    tr_free(inf->source);
     tr_free(inf->torrent);
     tr_free(inf->originalName);
     tr_free(inf->name);

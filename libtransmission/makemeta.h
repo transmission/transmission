@@ -52,6 +52,7 @@ struct tr_metainfo_builder
     char* comment;
     char* outputFile;
     bool isPrivate;
+    char* source;
 
     /**
     ***  These are set inside tr_makeMetaInfo() so the client
@@ -115,4 +116,5 @@ void tr_makeMetaInfo(
     tr_tracker_info const* trackers,
     int trackerCount,
     char const* comment,
-    bool isPrivate);
+    bool isPrivate,
+    char const* source);

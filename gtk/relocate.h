@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,7 +8,27 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include "tr-core.h"
+#include <memory>
+#include <vector>
 
-GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torrentIds);
+#include <gtkmm.h>
+
+class TrCore;
+
+class RelocateDialog : public Gtk::Dialog
+{
+public:
+    ~RelocateDialog() override;
+
+    static std::unique_ptr<RelocateDialog> create(
+        Gtk::Window& parent,
+        Glib::RefPtr<TrCore> const& core,
+        std::vector<int> const& torrent_ids);
+
+protected:
+    RelocateDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};

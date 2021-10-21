@@ -1,187 +1,185 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
 
-#include <libtransmission/transmission.h>
+#include <algorithm>
 
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include <libtransmission/transmission.h>
 
 #include "conf.h" /* gtr_pref_string_get */
 #include "hig.h"
 #include "relocate.h"
+#include "tr-core.h"
 #include "util.h"
 
-#define DATA_KEY "gtr-relocate-data"
-
-static char* previousLocation = nullptr;
-
-struct relocate_dialog_data
+namespace
 {
-    int done;
-    bool do_move;
-    guint timer;
-    TrCore* core;
-    GSList* torrent_ids;
-    GtkWidget* message_dialog;
-    GtkWidget* chooser_dialog;
+
+std::string previousLocation;
+
+}
+
+class RelocateDialog::Impl
+{
+public:
+    Impl(RelocateDialog& dialog, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids);
+    ~Impl();
+
+private:
+    void onResponse(int response);
+    bool onTimer();
+
+    void startMovingNextTorrent();
+
+private:
+    RelocateDialog& dialog_;
+    Glib::RefPtr<TrCore> const core_;
+    std::vector<int> torrent_ids_;
+
+    int done_ = 0;
+    bool do_move_ = false;
+    sigc::connection timer_;
+    std::unique_ptr<Gtk::MessageDialog> message_dialog_;
+    Gtk::FileChooserButton* chooser_ = nullptr;
+    Gtk::RadioButton* move_tb_ = nullptr;
 };
 
-static void data_free(gpointer gdata)
+RelocateDialog::Impl::~Impl()
 {
-    auto* data = static_cast<relocate_dialog_data*>(gdata);
-    g_source_remove(data->timer);
-    g_slist_free(data->torrent_ids);
-    g_free(data);
+    timer_.disconnect();
 }
 
 /***
 ****
 ***/
 
-static void startMovingNextTorrent(struct relocate_dialog_data* data)
+void RelocateDialog::Impl::startMovingNextTorrent()
 {
-    char* str;
-    int const id = GPOINTER_TO_INT(data->torrent_ids->data);
-
-    tr_torrent* tor = gtr_core_find_torrent(data->core, id);
+    auto* const tor = core_->find_torrent(torrent_ids_.back());
 
     if (tor != nullptr)
     {
-        tr_torrentSetLocation(tor, previousLocation, data->do_move, nullptr, &data->done);
+        tr_torrentSetLocation(tor, previousLocation.c_str(), do_move_, nullptr, &done_);
     }
 
-    data->torrent_ids = g_slist_delete_link(data->torrent_ids, data->torrent_ids);
+    torrent_ids_.pop_back();
 
-    str = g_strdup_printf(_("Moving \"%s\""), tr_torrentName(tor));
-    gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(data->message_dialog), str);
-    g_free(str);
+    message_dialog_->set_message(gtr_sprintf(_("Moving \"%s\""), tr_torrentName(tor)), true);
 }
 
 /* every once in awhile, check to see if the move is done.
  * if so, delete the dialog */
-static gboolean onTimer(gpointer gdata)
+bool RelocateDialog::Impl::onTimer()
 {
-    auto* data = static_cast<relocate_dialog_data*>(gdata);
-    int const done = data->done;
-
-    if (done == TR_LOC_ERROR)
+    if (done_ == TR_LOC_ERROR)
     {
-        auto const flags = GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT);
-        GtkWidget* w = gtk_message_dialog_new(
-            GTK_WINDOW(data->message_dialog),
-            flags,
-            GTK_MESSAGE_ERROR,
-            GTK_BUTTONS_CLOSE,
-            "%s",
-            _("Couldn't move torrent"));
-        gtk_dialog_run(GTK_DIALOG(w));
-        gtk_widget_destroy(GTK_WIDGET(data->message_dialog));
+        Gtk::MessageDialog(*message_dialog_, _("Couldn't move torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true)
+            .run();
+        message_dialog_.reset();
     }
-    else if (done == TR_LOC_DONE)
+    else if (done_ == TR_LOC_DONE)
     {
-        if (data->torrent_ids != nullptr)
+        if (!torrent_ids_.empty())
         {
-            startMovingNextTorrent(data);
+            startMovingNextTorrent();
         }
         else
         {
-            gtk_widget_destroy(GTK_WIDGET(data->chooser_dialog));
+            dialog_.hide();
         }
     }
 
     return G_SOURCE_CONTINUE;
 }
 
-static void onResponse(GtkDialog* dialog, int response, gconstpointer user_data)
+void RelocateDialog::Impl::onResponse(int response)
 {
-    TR_UNUSED(user_data);
-
-    if (response == GTK_RESPONSE_APPLY)
+    if (response == Gtk::RESPONSE_APPLY)
     {
-        GtkWidget* w;
-        GObject* d = G_OBJECT(dialog);
-        auto* data = static_cast<relocate_dialog_data*>(g_object_get_data(d, DATA_KEY));
-        auto* chooser = static_cast<GtkFileChooser*>(g_object_get_data(d, "chooser"));
-        auto* move_tb = static_cast<GtkToggleButton*>(g_object_get_data(d, "move_rb"));
-        char* location = gtk_file_chooser_get_filename(chooser);
+        auto const location = chooser_->get_filename();
 
-        data->do_move = gtk_toggle_button_get_active(move_tb);
+        do_move_ = move_tb_->get_active();
 
         /* pop up a dialog saying that the work is in progress */
-        w = gtk_message_dialog_new(
-            GTK_WINDOW(dialog),
-            GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
-            GTK_MESSAGE_INFO,
-            GTK_BUTTONS_CLOSE,
-            nullptr);
-        gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("This may take a moment…"));
-        gtk_dialog_set_response_sensitive(GTK_DIALOG(w), GTK_RESPONSE_CLOSE, FALSE);
-        gtk_widget_show(w);
+        message_dialog_ = std::make_unique<Gtk::MessageDialog>(
+            dialog_,
+            Glib::ustring(),
+            false,
+            Gtk::MESSAGE_INFO,
+            Gtk::BUTTONS_CLOSE,
+            true);
+        message_dialog_->set_secondary_text(_("This may take a moment…"));
+        message_dialog_->set_response_sensitive(Gtk::RESPONSE_CLOSE, false);
+        message_dialog_->show();
 
         /* remember this location so that it can be the default next time */
-        g_free(previousLocation);
         previousLocation = location;
 
         /* start the move and periodically check its status */
-        data->message_dialog = w;
-        data->done = TR_LOC_DONE;
-        data->timer = gdk_threads_add_timeout_seconds(1, onTimer, data);
-        onTimer(data);
+        done_ = TR_LOC_DONE;
+        timer_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::onTimer), 1);
+        onTimer();
     }
     else
     {
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        dialog_.hide();
     }
 }
 
-GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torrent_ids)
+std::unique_ptr<RelocateDialog> RelocateDialog::create(
+    Gtk::Window& parent,
+    Glib::RefPtr<TrCore> const& core,
+    std::vector<int> const& torrent_ids)
+{
+    return std::unique_ptr<RelocateDialog>(new RelocateDialog(parent, core, torrent_ids));
+}
+
+RelocateDialog::RelocateDialog(Gtk::Window& parent, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids)
+    : Gtk::Dialog(_("Set Torrent Location"), parent, true)
+    , impl_(std::make_unique<Impl>(*this, core, torrent_ids))
+{
+}
+
+RelocateDialog::~RelocateDialog() = default;
+
+RelocateDialog::Impl::Impl(RelocateDialog& dialog, Glib::RefPtr<TrCore> const& core, std::vector<int> const& torrent_ids)
+    : dialog_(dialog)
+    , core_(core)
+    , torrent_ids_(torrent_ids)
 {
     guint row;
-    GtkWidget* w;
-    GtkWidget* d;
-    GtkWidget* t;
-    struct relocate_dialog_data* data;
 
-    d = gtk_dialog_new_with_buttons(
-        _("Set Torrent Location"),
-        parent,
-        GtkDialogFlags(GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
-        TR_ARG_TUPLE(_("_Cancel"), GTK_RESPONSE_CANCEL),
-        TR_ARG_TUPLE(_("_Apply"), GTK_RESPONSE_APPLY),
-        nullptr);
-    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
-    g_signal_connect(d, "response", G_CALLBACK(onResponse), nullptr);
+    dialog_.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
+    dialog_.add_button(_("_Apply"), Gtk::RESPONSE_APPLY);
+    dialog_.set_default_response(Gtk::RESPONSE_CANCEL);
+    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
 
     row = 0;
-    t = hig_workarea_create();
-    hig_workarea_add_section_title(t, &row, _("Location"));
+    auto* t = Gtk::make_managed<HigWorkarea>();
+    t->add_section_title(row, _("Location"));
 
-    if (previousLocation == nullptr)
+    if (previousLocation.empty())
     {
-        previousLocation = g_strdup(gtr_pref_string_get(TR_KEY_download_dir));
+        previousLocation = gtr_pref_string_get(TR_KEY_download_dir);
     }
 
-    w = gtk_file_chooser_button_new(_("Set Torrent Location"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(w), previousLocation);
-    g_object_set_data(G_OBJECT(d), "chooser", w);
-    hig_workarea_add_row(t, &row, _("Torrent _location:"), w, nullptr);
-    w = gtk_radio_button_new_with_mnemonic(nullptr, _("_Move from the current folder"));
-    g_object_set_data(G_OBJECT(d), "move_rb", w);
-    hig_workarea_add_wide_control(t, &row, w);
-    w = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(w), _("Local data is _already there"));
-    hig_workarea_add_wide_control(t, &row, w);
-    gtr_dialog_set_content(GTK_DIALOG(d), t);
+    chooser_ = Gtk::make_managed<Gtk::FileChooserButton>(_("Set Torrent Location"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    chooser_->set_current_folder(previousLocation);
+    t->add_row(row, _("Torrent _location:"), *chooser_);
 
-    data = g_new0(struct relocate_dialog_data, 1);
-    data->core = core;
-    data->torrent_ids = torrent_ids;
-    data->chooser_dialog = d;
-    g_object_set_data_full(G_OBJECT(d), DATA_KEY, data, data_free);
+    Gtk::RadioButton::Group group;
 
-    return d;
+    move_tb_ = Gtk::make_managed<Gtk::RadioButton>(group, _("_Move from the current folder"), true);
+    t->add_wide_control(row, *move_tb_);
+
+    t->add_wide_control(row, *Gtk::make_managed<Gtk::RadioButton>(group, _("Local data is _already there"), true));
+
+    gtr_dialog_set_content(dialog_, *t);
 }

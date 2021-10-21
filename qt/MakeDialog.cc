@@ -176,6 +176,14 @@ void MakeDialog::makeTorrent()
         comment = ui_.commentEdit->text();
     }
 
+    // source
+    QString source;
+
+    if (ui_.sourceCheck->isChecked())
+    {
+        source = ui_.sourceEdit->text();
+    }
+
     // start making the torrent
     tr_makeMetaInfo(
         builder_.get(),
@@ -183,7 +191,8 @@ void MakeDialog::makeTorrent()
         trackers.isEmpty() ? nullptr : trackers.data(),
         trackers.size(),
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
-        ui_.privateCheck->isChecked());
+        ui_.privateCheck->isChecked(),
+        source.isNull() ? nullptr : source.toUtf8().constData());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);
