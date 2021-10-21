@@ -199,7 +199,7 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         walk = std::copy_n(torrent_hash, SHA_DIGEST_LENGTH, walk);
 
         auto const& peer_id = tr_torrentGetPeerId(tor);
-        walk = std::copy_n(std::data(peer_id), std::size(peer_id), walk);
+        std::copy_n(std::data(peer_id), std::size(peer_id), walk);
 
         TR_ASSERT(walk + std::size(peer_id) - buf == HANDSHAKE_SIZE);
     }
