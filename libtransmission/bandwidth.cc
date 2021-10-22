@@ -123,8 +123,6 @@ void Bandwidth::allocateBandwidth(
     unsigned int period_msec,
     std::vector<tr_peerIo*>& peer_pool)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
@@ -181,10 +179,12 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
 void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
-    std::vector<tr_peerIo*> tmp;
-    std::vector<tr_peerIo*> low;
-    std::vector<tr_peerIo*> normal;
-    std::vector<tr_peerIo*> high;
+    TR_ASSERT(tr_isDirection(dir));
+
+    auto high = std::vector<tr_peerIo*>{};
+    auto low = std::vector<tr_peerIo*>{};
+    auto normal = std::vector<tr_peerIo*>{};
+    auto tmp = std::vector<tr_peerIo*>{};
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
