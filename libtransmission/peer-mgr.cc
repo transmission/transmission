@@ -11,6 +11,9 @@
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcpy, memcmp, strstr */
+#include <iterator>
+#include <numeric>
+#include <set>
 #include <vector>
 
 #include <event2/event.h>
@@ -167,6 +170,19 @@ enum piece_sort_state
     PIECES_SORTED_BY_WEIGHT
 };
 
+struct PeerCompare
+{
+    int compare(tr_peer const* a, tr_peer const* b) const // <=>
+    {
+        return tr_address_compare(&a->atom->addr, &b->atom->addr);
+    }
+
+    bool operator()(tr_peer const* a, tr_peer const* b) const // less than
+    {
+        return compare(a, b) < 0;
+    }
+};
+
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
 {
@@ -182,7 +198,7 @@ public:
 
     tr_ptrArray outgoingHandshakes = {}; /* tr_handshake */
     tr_ptrArray pool = {}; /* struct peer_atom */
-    tr_ptrArray peers = {}; /* tr_peerMsgs */
+    std::set<tr_peerMsgs*, PeerCompare> peers;
     tr_ptrArray webseeds = {}; /* tr_webseed */
 
     tr_peerMgr* const manager;
@@ -365,13 +381,6 @@ static tr_swarm* getExistingSwarm(tr_peerMgr* manager, uint8_t const* hash)
     return tor == nullptr ? nullptr : tor->swarm;
 }
 
-static int peerCompare(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_peer const*>(va);
-    auto const* const b = static_cast<tr_peer const*>(vb);
-    return tr_address_compare(tr_peerAddress(a), tr_peerAddress(b));
-}
-
 static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const* addr)
 {
     tr_swarm* swarm = (tr_swarm*)cswarm;
@@ -405,26 +414,17 @@ static void replicationNew(tr_swarm* s)
     TR_ASSERT(!replicationExists(s));
 
     tr_piece_index_t const piece_count = s->tor->info.pieceCount;
-    int const n = tr_ptrArraySize(&s->peers);
+    size_t const n = std::size(s->peers);
 
     s->pieceReplicationSize = piece_count;
-    s->pieceReplication = tr_new0(uint16_t, piece_count);
+    s->pieceReplication = tr_new0(uint16_t, n);
 
-    for (tr_piece_index_t piece_i = 0; piece_i < piece_count; ++piece_i)
+    for (size_t i = 0; i < n; ++i)
     {
-        uint16_t r = 0;
-
-        for (int peer_i = 0; peer_i < n; ++peer_i)
-        {
-            auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, peer_i));
-
-            if (peer->have.readBit(piece_i))
-            {
-                ++r;
-            }
-        }
-
-        s->pieceReplication[piece_i] = r;
+        s->pieceReplication[i] = std::count_if(
+            std::begin(s->peers),
+            std::end(s->peers),
+            [&i](auto const* peer) { return peer->have.readBit(i); });
     }
 }
 
@@ -436,12 +436,11 @@ static void swarmFree(void* vs)
     TR_ASSERT(!s->isRunning);
     TR_ASSERT(swarmIsLocked(s));
     TR_ASSERT(tr_ptrArrayEmpty(&s->outgoingHandshakes));
-    TR_ASSERT(tr_ptrArrayEmpty(&s->peers));
+    TR_ASSERT(std::empty(s->peers));
 
     tr_ptrArrayDestruct(&s->webseeds, [](void* peer) { delete static_cast<tr_peer*>(peer); });
     tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)tr_free);
     tr_ptrArrayDestruct(&s->outgoingHandshakes, nullptr);
-    tr_ptrArrayDestruct(&s->peers, nullptr);
     s->stats = {};
 
     replicationFree(s);
@@ -789,18 +788,11 @@ static void updateEndgame(tr_swarm* s)
     }
     else if (s->endgame == 0) /* only recalculate when endgame first begins */
     {
-        int numDownloading = 0;
-
         /* add the active bittorrent peers... */
-        for (int i = 0, n = tr_ptrArraySize(&s->peers); i < n; ++i)
-        {
-            auto const* const p = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, i));
-
-            if (p->pendingReqsToPeer > 0)
-            {
-                ++numDownloading;
-            }
-        }
+        int numDownloading = std::count_if(
+            std::begin(s->peers),
+            std::end(s->peers),
+            [](auto const* peer) { return peer->pendingReqsToPeer > 0; });
 
         /* add the active webseeds... */
         numDownloading += countActiveWebseeds(s);
@@ -1645,10 +1637,8 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     tr_swarm* const s = tor->swarm;
 
     /* walk through our peers */
-    for (int i = 0, n = tr_ptrArraySize(&s->peers); i < n; ++i)
+    for (auto* const peer : s->peers)
     {
-        auto* peer = static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i));
-
         // notify the peer that we now have this piece
         peer->on_piece_completed(p);
 
@@ -1895,14 +1885,9 @@ static struct peer_atom* ensureAtomExists(
     return a;
 }
 
-static int getMaxPeerCount(tr_torrent const* tor)
+static size_t getMaxPeerCount(tr_torrent const* tor)
 {
     return tor->maxConnectedPeers;
-}
-
-static int getPeerCount(tr_swarm const* s)
-{
-    return tr_ptrArraySize(&s->peers);
 }
 
 static void createBitTorrentPeer(tr_torrent* tor, tr_peerIo* io, struct peer_atom* atom, tr_quark client)
@@ -1917,11 +1902,11 @@ static void createBitTorrentPeer(tr_torrent* tor, tr_peerIo* io, struct peer_ato
     peer->client = client;
     atom->peer = peer;
 
-    tr_ptrArrayInsertSorted(&swarm->peers, peer, peerCompare);
+    swarm->peers.insert(peer);
     ++swarm->stats.peerCount;
     ++swarm->stats.peerFromCount[atom->fromFirst];
 
-    TR_ASSERT(swarm->stats.peerCount == tr_ptrArraySize(&swarm->peers));
+    TR_ASSERT(swarm->stats.peerCount == int(std::size(swarm->peers)));
     TR_ASSERT(swarm->stats.peerFromCount[atom->fromFirst] <= swarm->stats.peerCount);
 
     // TODO is this needed?
@@ -2000,7 +1985,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             tordbg(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
         }
-        else if (tr_peerIoIsIncoming(result.io) && getPeerCount(s) >= getMaxPeerCount(s->tor))
+        else if (tr_peerIoIsIncoming(result.io) && std::size(s->peers) >= getMaxPeerCount(s->tor))
         {
             /* too many peers already */
         }
@@ -2200,10 +2185,8 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
     tr_swarm* s = tor->swarm;
     uint32_t const byteCount = tr_torPieceCountBytes(tor, pieceIndex);
 
-    for (int i = 0, n = tr_ptrArraySize(&s->peers); i != n; ++i)
+    for (auto* const peer : s->peers)
     {
-        auto* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
-
         if (peer->blame.readBit(pieceIndex))
         {
             tordbg(
@@ -2313,14 +2296,9 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     struct peer_atom** atoms = nullptr;
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
-        atomCount = tr_ptrArraySize(&s->peers);
+        atomCount = std::size(s->peers);
         atoms = tr_new(struct peer_atom*, atomCount);
-
-        for (int i = 0; i < atomCount; ++i)
-        {
-            atoms[i] = peers[i]->atom;
-        }
+        std::transform(std::begin(s->peers), std::end(s->peers), atoms, [](auto* peer) { return peer->atom; });
     }
     else /* TR_PEERS_INTERESTING */
     {
@@ -2522,20 +2500,16 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 
     /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
-    int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-    tr_peer** const peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
-
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* const peer : tor->swarm->peers)
     {
-        tr_peerUpdateProgress(tor, peers[i]);
+        tr_peerUpdateProgress(tor, peer);
     }
 
     /* update the bittorrent peers' willingnes... */
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* const peer : tor->swarm->peers)
     {
-        auto* msgs = static_cast<tr_peerMsgs*>(peers[i]);
-        msgs->update_active(TR_UP);
-        msgs->update_active(TR_DOWN);
+        peer->update_active(TR_UP);
+        peer->update_active(TR_DOWN);
     }
 }
 
@@ -2545,14 +2519,13 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     TR_ASSERT(tab != nullptr);
     TR_ASSERT(tabCount > 0);
 
-    memset(tab, 0, tabCount);
+    std::fill_n(tab, tabCount, 0);
 
     if (tr_torrentHasMetadata(tor))
     {
-        int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
         float const interval = tor->info.pieceCount / (float)tabCount;
         bool const isSeed = tr_torrentGetCompleteness(tor) == TR_SEED;
+        auto& peers = tor->swarm->peers;
 
         for (tr_piece_index_t i = 0; i < tabCount; ++i)
         {
@@ -2562,15 +2535,12 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
             {
                 tab[i] = -1;
             }
-            else if (peerCount != 0)
+            else
             {
-                for (int j = 0; j < peerCount; ++j)
-                {
-                    if (peers[j]->have.readBit(piece))
-                    {
-                        ++tab[i];
-                    }
-                }
+                tab[i] = std::count_if(
+                    std::begin(peers),
+                    std::end(peers),
+                    [&piece](auto const* peer) { return peer->have.readBit(piece); });
             }
         }
     }
@@ -2637,17 +2607,14 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         return 0;
     }
 
-    size_t const peer_count = tr_ptrArraySize(&s->peers);
-
-    if (peer_count == 0)
+    if (std::empty(s->peers))
     {
         return 0;
     }
 
-    tr_peer const** const peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
-    for (size_t i = 0; i < peer_count; ++i)
+    for (auto const* const peer : s->peers)
     {
-        if (peers[i]->atom != nullptr && atomIsSeed(peers[i]->atom))
+        if (atomIsSeed(peer->atom))
         {
             return tr_torrentGetLeftUntilDone(tor);
         }
@@ -2706,116 +2673,120 @@ double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
     return ret;
 }
 
+static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
+{
+    auto stat = tr_peer_stat{};
+    auto const* atom = peer->atom;
+
+    tr_address_to_string_with_buf(&atom->addr, stat.addr, sizeof(stat.addr));
+    tr_strlcpy(stat.client, tr_quark_get_string(peer->client, nullptr), sizeof(stat.client));
+    stat.port = ntohs(peer->atom->port);
+    stat.from = atom->fromFirst;
+    stat.progress = peer->progress;
+    stat.isUTP = peer->is_utp_connection();
+    stat.isEncrypted = peer->is_encrypted();
+    stat.rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
+    stat.rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+    stat.peerIsChoked = peer->is_peer_choked();
+    stat.peerIsInterested = peer->is_peer_interested();
+    stat.clientIsChoked = peer->is_client_choked();
+    stat.clientIsInterested = peer->is_client_interested();
+    stat.isIncoming = peer->is_incoming_connection();
+    stat.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
+    stat.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
+    stat.isSeed = tr_peerIsSeed(peer);
+
+    stat.blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
+    stat.blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
+    stat.cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
+    stat.cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
+
+    stat.pendingReqsToPeer = peer->pendingReqsToPeer;
+    stat.pendingReqsToClient = peer->pendingReqsToClient;
+
+    char* pch = stat.flagStr;
+
+    if (stat.isUTP)
+    {
+        *pch++ = 'T';
+    }
+
+    if (peer->swarm->optimistic == peer)
+    {
+        *pch++ = 'O';
+    }
+
+    if (stat.isDownloadingFrom)
+    {
+        *pch++ = 'D';
+    }
+    else if (stat.clientIsInterested)
+    {
+        *pch++ = 'd';
+    }
+
+    if (stat.isUploadingTo)
+    {
+        *pch++ = 'U';
+    }
+    else if (stat.peerIsInterested)
+    {
+        *pch++ = 'u';
+    }
+
+    if (!stat.clientIsChoked && !stat.clientIsInterested)
+    {
+        *pch++ = 'K';
+    }
+
+    if (!stat.peerIsChoked && !stat.peerIsInterested)
+    {
+        *pch++ = '?';
+    }
+
+    if (stat.isEncrypted)
+    {
+        *pch++ = 'E';
+    }
+
+    if (stat.from == TR_PEER_FROM_DHT)
+    {
+        *pch++ = 'H';
+    }
+    else if (stat.from == TR_PEER_FROM_PEX)
+    {
+        *pch++ = 'X';
+    }
+
+    if (stat.isIncoming)
+    {
+        *pch++ = 'I';
+    }
+
+    *pch = '\0';
+
+    return stat;
+}
+
 struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
+    auto const now = tr_time();
+    auto const now_msec = tr_time_msec();
 
-    tr_swarm const* s = tor->swarm;
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
-    int size = tr_ptrArraySize(&s->peers);
-    tr_peer_stat* ret = tr_new0(tr_peer_stat, size);
-
-    for (int i = 0; i < size; ++i)
-    {
-        tr_peer* peer = peers[i];
-        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peer);
-        struct peer_atom const* atom = peer->atom;
-        tr_peer_stat* stat = ret + i;
-
-        tr_address_to_string_with_buf(&atom->addr, stat->addr, sizeof(stat->addr));
-        tr_strlcpy(stat->client, tr_quark_get_string(peer->client, nullptr), sizeof(stat->client));
-        stat->port = ntohs(peer->atom->port);
-        stat->from = atom->fromFirst;
-        stat->progress = peer->progress;
-        stat->isUTP = msgs->is_utp_connection();
-        stat->isEncrypted = msgs->is_encrypted();
-        stat->rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-        stat->rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
-        stat->peerIsChoked = msgs->is_peer_choked();
-        stat->peerIsInterested = msgs->is_peer_interested();
-        stat->clientIsChoked = msgs->is_client_choked();
-        stat->clientIsInterested = msgs->is_client_interested();
-        stat->isIncoming = msgs->is_incoming_connection();
-        stat->isDownloadingFrom = msgs->is_active(TR_PEER_TO_CLIENT);
-        stat->isUploadingTo = msgs->is_active(TR_CLIENT_TO_PEER);
-        stat->isSeed = tr_peerIsSeed(peer);
-
-        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
-        stat->blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
-        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
-        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
-
-        stat->pendingReqsToPeer = peer->pendingReqsToPeer;
-        stat->pendingReqsToClient = peer->pendingReqsToClient;
-
-        char* pch = stat->flagStr;
-
-        if (stat->isUTP)
-        {
-            *pch++ = 'T';
-        }
-
-        if (s->optimistic == msgs)
-        {
-            *pch++ = 'O';
-        }
-
-        if (stat->isDownloadingFrom)
-        {
-            *pch++ = 'D';
-        }
-        else if (stat->clientIsInterested)
-        {
-            *pch++ = 'd';
-        }
-
-        if (stat->isUploadingTo)
-        {
-            *pch++ = 'U';
-        }
-        else if (stat->peerIsInterested)
-        {
-            *pch++ = 'u';
-        }
-
-        if (!stat->clientIsChoked && !stat->clientIsInterested)
-        {
-            *pch++ = 'K';
-        }
-
-        if (!stat->peerIsChoked && !stat->peerIsInterested)
-        {
-            *pch++ = '?';
-        }
-
-        if (stat->isEncrypted)
-        {
-            *pch++ = 'E';
-        }
-
-        if (stat->from == TR_PEER_FROM_DHT)
-        {
-            *pch++ = 'H';
-        }
-        else if (stat->from == TR_PEER_FROM_PEX)
-        {
-            *pch++ = 'X';
-        }
-
-        if (stat->isIncoming)
-        {
-            *pch++ = 'I';
-        }
-
-        *pch = '\0';
-    }
+    auto& peers = tor->swarm->peers;
+    auto size = int(std::size(peers));
+    auto* stats = tr_new(tr_peer_stat, size);
+    std::transform(
+        std::begin(peers),
+        std::end(peers),
+        stats,
+        [&now, &now_msec](auto const* peer) { return getPeerStats(peer, now, now_msec); });
 
     *setmeCount = size;
-    return ret;
+    return stats;
 }
 
 /***
@@ -2828,12 +2799,9 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_torrentIsLocked(tor));
 
-    tr_swarm* s = tor->swarm;
-    int const peerCount = tr_ptrArraySize(&s->peers);
-
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* const peer : tor->swarm->peers)
     {
-        static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i))->set_interested(false);
+        peer->set_interested(false);
     }
 }
 
@@ -2871,30 +2839,32 @@ struct tr_rechoke_info
 {
     tr_peerMsgs* peer;
     int salt;
-    int rechoke_state;
+    tr_rechoke_state rechoke_state;
 };
 
-static constexpr int compare_rechoke_info(void const* va, void const* vb)
+struct RechokeCompare
 {
-    auto const* const a = static_cast<struct tr_rechoke_info const*>(va);
-    auto const* const b = static_cast<struct tr_rechoke_info const*>(vb);
-
-    if (a->rechoke_state != b->rechoke_state)
+    int compare(tr_rechoke_info const& a, tr_rechoke_info const& b) const // <=>
     {
-        return a->rechoke_state - b->rechoke_state;
+        if (a.rechoke_state != b.rechoke_state)
+        {
+            return a.rechoke_state - b.rechoke_state;
+        }
+
+        return a.salt - b.salt;
     }
 
-    return a->salt - b->salt;
-}
+    bool operator()(tr_rechoke_info const& a, tr_rechoke_info const& b) const // less than
+    {
+        return compare(a, b) < 0;
+    }
+};
 
 /* determines who we send "interested" messages to */
 static void rechokeDownloads(tr_swarm* s)
 {
     int maxPeers = 0;
-    int rechoke_count = 0;
-    struct tr_rechoke_info* rechoke = nullptr;
     auto constexpr MinInterestingPeers = 5;
-    int const peerCount = tr_ptrArraySize(&s->peers);
     time_t const now = tr_time();
 
     /* some cases where this function isn't necessary */
@@ -2910,9 +2880,6 @@ static void rechokeDownloads(tr_swarm* s)
 
     /* decide HOW MANY peers to be interested in */
     {
-        int blocks = 0;
-        int cancels = 0;
-
         /* Count up how many blocks & cancels each peer has.
          *
          * There are two situations where we send out cancels --
@@ -2927,9 +2894,10 @@ static void rechokeDownloads(tr_swarm* s)
          * peers in our calculations lest they confuse Transmission into
          * thinking it's hit its bandwidth cap.
          */
-        for (int i = 0; i < peerCount; ++i)
+        int blocks = 0;
+        int cancels = 0;
+        for (auto* const peer : s->peers)
         {
-            auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, i));
             auto const b = peer->blocksSentToClient.count(now, CancelHistorySec);
             auto const c = peer->cancelsSentToPeer.count(now, CancelHistorySec);
 
@@ -2978,9 +2946,11 @@ static void rechokeDownloads(tr_swarm* s)
     maxPeers = std::clamp(maxPeers, MinInterestingPeers, int(s->tor->maxConnectedPeers));
 
     s->maxPeers = maxPeers;
-
-    if (peerCount > 0)
+    auto rechoke = std::vector<tr_rechoke_info>{};
+    if (!std::empty(s->peers))
     {
+        rechoke.reserve(std::size(s->peers));
+
         tr_torrent const* const tor = s->tor;
         int const n = tor->info.pieceCount;
 
@@ -2993,10 +2963,8 @@ static void rechokeDownloads(tr_swarm* s)
         }
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
-        for (int i = 0; i < peerCount; ++i)
+        for (auto* const peer : s->peers)
         {
-            auto* const peer = static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, i));
-
             if (!isPeerInteresting(s->tor, piece_is_interesting, peer))
             {
                 peer->set_interested(false);
@@ -3028,37 +2996,23 @@ static void rechokeDownloads(tr_swarm* s)
                     rechoke_state = RECHOKE_STATE_BAD;
                 }
 
-                if (rechoke == nullptr)
-                {
-                    rechoke = tr_new(struct tr_rechoke_info, peerCount);
-                }
-
-                rechoke[rechoke_count].peer = peer;
-                rechoke[rechoke_count].rechoke_state = rechoke_state;
-                rechoke[rechoke_count].salt = tr_rand_int_weak(INT_MAX);
-                rechoke_count++;
+                rechoke.push_back({ peer, tr_rand_int_weak(INT_MAX), rechoke_state });
             }
         }
 
         tr_free(piece_is_interesting);
     }
 
-    if ((rechoke != nullptr) && (rechoke_count > 0))
-    {
-        qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
-    }
+    std::sort(std::begin(rechoke), std::end(rechoke), RechokeCompare{});
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
 
-    s->interestedCount = std::min(maxPeers, rechoke_count);
+    s->interestedCount = std::min(maxPeers, int(std::size(rechoke)));
 
-    for (int i = 0; i < rechoke_count; ++i)
+    for (int i = 0, n = std::size(rechoke); i < n; ++i)
     {
         rechoke[i].peer->set_interested(i < s->interestedCount);
     }
-
-    /* cleanup */
-    tr_free(rechoke);
 }
 
 /**
@@ -3146,8 +3100,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
     TR_ASSERT(swarmIsLocked(s));
 
-    int const peerCount = tr_ptrArraySize(&s->peers);
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
+    int const peerCount = std::size(s->peers);
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
     bool const chokeAll = !tr_torrentIsPieceTransferAllowed(s->tor, TR_CLIENT_TO_PEER);
@@ -3167,10 +3120,9 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     int size = 0;
 
     /* sort the peers by preference and rate */
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* const peer : s->peers)
     {
-        auto* const peer = dynamic_cast<tr_peerMsgs*>(peers[i]);
-        struct peer_atom* const atom = peer->atom;
+        auto* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
         {
@@ -3336,31 +3288,23 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     return false;
 }
 
-// TODO: return std::vector
-static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSize)
+static auto getPeersToClose(tr_swarm* s, time_t const now_sec)
 {
     TR_ASSERT(swarmIsLocked(s));
 
-    tr_peer** ret = nullptr;
-    auto outsize = int{};
-    auto peerCount = int{};
-    tr_peer** const peers = (tr_peer**)tr_ptrArrayPeek(&s->peers, &peerCount);
+    auto peers_to_close = std::vector<tr_peerMsgs*>{};
+    auto const n = std::size(s->peers);
+    peers_to_close.reserve(n);
 
-    for (int i = 0; i < peerCount; ++i)
+    for (auto* peer : s->peers)
     {
-        if (shouldPeerBeClosed(s, peers[i], peerCount, now_sec))
+        if (shouldPeerBeClosed(s, peer, n, now_sec))
         {
-            if (ret == nullptr)
-            {
-                ret = tr_new(tr_peer*, peerCount);
-            }
-
-            ret[outsize++] = peers[i];
+            peers_to_close.emplace_back(peer);
         }
     }
 
-    *setmeSize = outsize;
-    return ret;
+    return peers_to_close;
 }
 
 static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const now)
@@ -3423,7 +3367,7 @@ static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const n
     return sec;
 }
 
-static void removePeer(tr_swarm* s, tr_peer* peer)
+static void removePeer(tr_swarm* s, tr_peerMsgs* peer)
 {
     TR_ASSERT(swarmIsLocked(s));
 
@@ -3432,7 +3376,7 @@ static void removePeer(tr_swarm* s, tr_peer* peer)
 
     atom->time = tr_time();
 
-    tr_ptrArrayRemoveSortedPointer(&s->peers, peer, peerCompare);
+    s->peers.erase(peer);
     --s->stats.peerCount;
     --s->stats.peerFromCount[atom->fromFirst];
 
@@ -3441,13 +3385,13 @@ static void removePeer(tr_swarm* s, tr_peer* peer)
         tr_decrReplicationFromBitfield(s, &peer->have);
     }
 
-    TR_ASSERT(s->stats.peerCount == tr_ptrArraySize(&s->peers));
+    TR_ASSERT(s->stats.peerCount == int(std::size(s->peers)));
     TR_ASSERT(s->stats.peerFromCount[atom->fromFirst] >= 0);
 
     delete peer;
 }
 
-static void closePeer(tr_swarm* s, tr_peer* peer)
+static void closePeer(tr_swarm* s, tr_peerMsgs* peer)
 {
     TR_ASSERT(s != nullptr);
     TR_ASSERT(peer != nullptr);
@@ -3474,33 +3418,24 @@ static void closePeer(tr_swarm* s, tr_peer* peer)
 
 static void removeAllPeers(tr_swarm* s)
 {
-    while (!tr_ptrArrayEmpty(&s->peers))
-    {
-        removePeer(s, static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, 0)));
-    }
+    auto const tmp = s->peers;
+    std::for_each(std::begin(tmp), std::end(tmp), [&s](auto* peer) { removePeer(s, peer); });
 
+    TR_ASSERT(std::empty(s->peers));
     TR_ASSERT(s->stats.peerCount == 0);
 }
 
 static void closeBadPeers(tr_swarm* s, time_t const now_sec)
 {
-    if (!tr_ptrArrayEmpty(&s->peers))
+    for (auto* peer : getPeersToClose(s, now_sec))
     {
-        auto peerCount = int{};
-        tr_peer** const peers = getPeersToClose(s, now_sec, &peerCount);
-
-        for (int i = 0; i < peerCount; ++i)
-        {
-            closePeer(s, peers[i]);
-        }
-
-        tr_free(peers);
+        closePeer(s, peer);
     }
 }
 
 struct peer_liveliness
 {
-    tr_peer* peer;
+    tr_peerMsgs* peer;
     void* clientData;
     time_t pieceDataTime;
     time_t time;
@@ -3538,13 +3473,18 @@ static int comparePeerLiveliness(void const* va, void const* vb)
     return 0;
 }
 
-static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n, uint64_t now, tr_voidptr_compare_func compare)
+static void sortPeersByLivelinessImpl(
+    tr_peerMsgs** peers,
+    void** clientData,
+    size_t n,
+    uint64_t now,
+    tr_voidptr_compare_func compare)
 {
     // build a sortable array of peer + extra info
     struct peer_liveliness* lives = tr_new0(struct peer_liveliness, n);
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        tr_peer* p = peers[i];
+        auto* p = peers[i];
         struct peer_liveliness* const l = &lives[i];
 
         l->peer = p;
@@ -3563,7 +3503,7 @@ static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n,
     qsort(lives, n, sizeof(struct peer_liveliness), compare);
 
     // build the peer array
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         struct peer_liveliness* const l = &lives[i];
 
@@ -3579,46 +3519,39 @@ static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n,
     tr_free(lives);
 }
 
-static void sortPeersByLiveliness(tr_peer** peers, void** clientData, int n, uint64_t now)
+static void sortPeersByLiveliness(tr_peerMsgs** peers, void** clientData, size_t n, uint64_t now)
 {
     sortPeersByLivelinessImpl(peers, clientData, n, now, comparePeerLiveliness);
 }
 
 static void enforceTorrentPeerLimit(tr_swarm* s, uint64_t now)
 {
-    int n = tr_ptrArraySize(&s->peers);
+    int n = std::size(s->peers);
     int const max = tr_torrentGetPeerLimit(s->tor);
 
     if (n > max)
     {
-        void const* const base = tr_ptrArrayBase(&s->peers);
-        auto** const peers = static_cast<tr_peer**>(tr_memdup(base, n * sizeof(tr_peer*)));
-        sortPeersByLiveliness(peers, nullptr, n, now);
-
-        while (n > max)
-        {
-            closePeer(s, peers[--n]);
-        }
-
-        tr_free(peers);
+        auto peers = std::vector<tr_peerMsgs*>{ std::begin(s->peers), std::end(s->peers) };
+        sortPeersByLiveliness(std::data(peers), nullptr, std::size(peers), now);
+        std::for_each(std::begin(peers) + max, std::end(peers), [&s](auto* peer) { closePeer(s, peer); });
     }
 }
 
 static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
 {
     /* count the total number of peers */
-    int n = 0;
-    for (auto const* tor : session->torrents)
-    {
-        n += tr_ptrArraySize(&tor->swarm->peers);
-    }
+    size_t n = std::accumulate(
+        std::begin(session->torrents),
+        std::end(session->torrents),
+        size_t{},
+        [](size_t sum, auto const* tor) { return sum + std::size(tor->swarm->peers); });
 
     /* if there are too many, prune out the worst */
-    int const max = tr_sessionGetPeerLimit(session);
+    size_t const max = tr_sessionGetPeerLimit(session);
     if (n > max)
     {
-        tr_peer** peers = tr_new(tr_peer*, n);
-        tr_swarm** swarms = tr_new(tr_swarm*, n);
+        auto** peers = tr_new(tr_peerMsgs*, n);
+        auto** swarms = tr_new(tr_swarm*, n);
 
         /* populate the peer array */
         n = 0;
@@ -3626,9 +3559,9 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
         {
             tr_swarm* s = tor->swarm;
 
-            for (int i = 0, tn = tr_ptrArraySize(&s->peers); i < tn; ++i)
+            for (auto* const peer : s->peers)
             {
-                peers[n] = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
+                peers[n] = peer;
                 swarms[n] = s;
                 ++n;
             }
@@ -3699,13 +3632,11 @@ static void reconnectPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]]
 
 static void pumpAllPeers(tr_peerMgr* mgr)
 {
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents)
     {
-        tr_swarm* s = tor->swarm;
-
-        for (int j = 0, n = tr_ptrArraySize(&s->peers); j < n; ++j)
+        for (auto* const peer : tor->swarm->peers)
         {
-            static_cast<tr_peerMsgs*>(tr_ptrArrayNth(&s->peers, j))->pulse();
+            peer->pulse();
         }
     }
 }
@@ -4104,7 +4035,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     for (auto const* tor : session->torrents)
     {
         atomCount += tr_ptrArraySize(&tor->swarm->pool);
-        peerCount += tr_ptrArraySize(&tor->swarm->peers);
+        peerCount += std::size(tor->swarm->peers);
     }
 
     /* don't start any new handshakes if we're full up */
@@ -4135,7 +4066,7 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tr_torrentGetPeerLimit(tor) <= tr_ptrArraySize(&tor->swarm->peers))
+        if (tr_torrentGetPeerLimit(tor) <= std::size(tor->swarm->peers))
         {
             continue;
         }
