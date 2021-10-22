@@ -2018,7 +2018,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
                 if (result.peer_id)
                 {
                     char buf[128] = {};
-                    tr_clientForId(buf, sizeof(buf), std::data(*result.peer_id));
+                    tr_clientForId(buf, sizeof(buf), *result.peer_id);
                     client = tr_quark_new(buf);
                 }
 
