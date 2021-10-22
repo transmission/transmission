@@ -179,8 +179,6 @@ private:
             bits_[byte_offset] |= bit_value;
             setTrueCount(true_count_ + 1);
         }
-
-        TR_ASSERT(isValid());
     }
 
     /// @brief Clear the bit
@@ -199,8 +197,6 @@ private:
             TR_ASSERT(true_count_ > 0);
             setTrueCount(true_count_ - 1);
         }
-
-        TR_ASSERT(isValid());
     }
 
     /// @brief Ensure that the memory is properly deallocated and size becomes zero
