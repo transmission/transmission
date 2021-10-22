@@ -386,7 +386,9 @@ static void on_scrape_done(
     {
         char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
         char const* response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
+        char buf[512];
+        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
+        response->errmsg = buf;
     }
     else
     {
@@ -421,7 +423,7 @@ static void on_scrape_done(
             char const* str = nullptr;
             if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
             {
-                response->errmsg = tr_strndup(str, len);
+                response->errmsg = std::string{ str, len };
             }
 
             tr_variant* flags = nullptr;
