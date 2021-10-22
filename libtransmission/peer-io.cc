@@ -1028,26 +1028,6 @@ bool tr_peerIoHasTorrentHash(tr_peerIo const* io)
 ***
 **/
 
-void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    if (peer_id == nullptr)
-    {
-        memset(io->peerId, '\0', sizeof(io->peerId));
-        io->peerIdIsSet = false;
-    }
-    else
-    {
-        memcpy(io->peerId, peer_id, sizeof(io->peerId));
-        io->peerIdIsSet = true;
-    }
-}
-
-/**
-***
-**/
-
 static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now)
 {
     /* this is all kind of arbitrary, but what seems to work well is

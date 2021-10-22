@@ -15,7 +15,6 @@
 #include <string>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
-#include "session.h" /* PEER_ID_LEN */
 
 /***
 ****  SCRAPE
@@ -158,7 +157,7 @@ struct tr_announce_request
 
     /* the torrent's peer id.
      * this changes when a torrent is stopped -> restarted. */
-    char peer_id[PEER_ID_LEN];
+    tr_peer_id_t peer_id;
 
     /* the torrent's info_hash */
     uint8_t info_hash[SHA_DIGEST_LENGTH];

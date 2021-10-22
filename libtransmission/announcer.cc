@@ -935,7 +935,7 @@ static tr_announce_request* announce_request_new(
     req->url = tr_strdup(tier->currentTracker->announce);
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
     memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
-    memcpy(req->peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN);
+    req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
