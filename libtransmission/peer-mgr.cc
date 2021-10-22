@@ -1931,28 +1931,22 @@ static void createBitTorrentPeer(tr_torrent* tor, tr_peerIo* io, struct peer_ato
 }
 
 /* FIXME: this is kind of a mess. */
-static bool myHandshakeDoneCB(
-    tr_handshake* handshake,
-    tr_peerIo* io,
-    bool readAnythingFromPeer,
-    bool isConnected,
-    uint8_t const* peer_id,
-    void* vmanager)
+static bool on_handshake_done(tr_handshake_result const& result)
 {
-    TR_ASSERT(io != nullptr);
+    TR_ASSERT(result.io != nullptr);
 
-    bool ok = isConnected;
+    bool ok = result.isConnected;
     bool success = false;
-    auto* manager = static_cast<tr_peerMgr*>(vmanager);
-    tr_swarm* s = tr_peerIoHasTorrentHash(io) ? getExistingSwarm(manager, tr_peerIoGetTorrentHash(io)) : nullptr;
+    auto* manager = static_cast<tr_peerMgr*>(result.userData);
+    tr_swarm* s = tr_peerIoHasTorrentHash(result.io) ? getExistingSwarm(manager, tr_peerIoGetTorrentHash(result.io)) : nullptr;
 
-    if (tr_peerIoIsIncoming(io))
+    if (tr_peerIoIsIncoming(result.io))
     {
-        tr_ptrArrayRemoveSortedPointer(&manager->incomingHandshakes, handshake, handshakeCompare);
+        tr_ptrArrayRemoveSortedPointer(&manager->incomingHandshakes, result.handshake, handshakeCompare);
     }
     else if (s != nullptr)
     {
-        tr_ptrArrayRemoveSortedPointer(&s->outgoingHandshakes, handshake, handshakeCompare);
+        tr_ptrArrayRemoveSortedPointer(&s->outgoingHandshakes, result.handshake, handshakeCompare);
     }
 
     if (s != nullptr)
@@ -1961,7 +1955,7 @@ static bool myHandshakeDoneCB(
     }
 
     auto port = tr_port{};
-    tr_address const* const addr = tr_peerIoGetAddress(io, &port);
+    tr_address const* const addr = tr_peerIoGetAddress(result.io, &port);
 
     if (!ok || s == nullptr || !s->isRunning)
     {
@@ -1973,7 +1967,7 @@ static bool myHandshakeDoneCB(
             {
                 ++atom->numFails;
 
-                if (!readAnythingFromPeer)
+                if (!result.readAnythingFromPeer)
                 {
                     tordbg(s, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr(atom), (int)atom->numFails);
                     atom->flags2 |= MyflagUnreachable;
@@ -1989,7 +1983,7 @@ static bool myHandshakeDoneCB(
         atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
-        if (!tr_peerIoIsIncoming(io))
+        if (!tr_peerIoIsIncoming(result.io))
         {
             atom->flags |= ADDED_F_CONNECTABLE;
             atom->flags2 &= ~MyflagUnreachable;
@@ -1997,7 +1991,7 @@ static bool myHandshakeDoneCB(
 
         /* In principle, this flag specifies whether the peer groks uTP,
            not whether it's currently connected over uTP. */
-        if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
+        if (result.io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
@@ -2006,7 +2000,7 @@ static bool myHandshakeDoneCB(
         {
             tordbg(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
         }
-        else if (tr_peerIoIsIncoming(io) && getPeerCount(s) >= getMaxPeerCount(s->tor))
+        else if (tr_peerIoIsIncoming(result.io) && getPeerCount(s) >= getMaxPeerCount(s->tor))
         {
             /* too many peers already */
         }
@@ -2021,14 +2015,15 @@ static bool myHandshakeDoneCB(
             else
             {
                 auto client = tr_quark{ TR_KEY_NONE };
-                if (peer_id != nullptr)
+                if (result.peer_id)
                 {
-                    char buf[128];
-                    client = tr_quark_new(tr_clientForId(buf, sizeof(buf), peer_id));
+                    char buf[128] = {};
+                    tr_clientForId(buf, sizeof(buf), std::data(*result.peer_id));
+                    client = tr_quark_new(buf);
                 }
 
                 /* this steals its refcount too, which is balanced by our unref in peerDelete() */
-                tr_peerIo* stolen = tr_handshakeStealIO(handshake);
+                tr_peerIo* stolen = tr_handshakeStealIO(result.handshake);
                 tr_peerIoSetParent(stolen, s->tor->bandwidth);
                 createBitTorrentPeer(s->tor, stolen, atom, client);
 
@@ -2089,7 +2084,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
     else /* we don't have a connection to them yet... */
     {
         tr_peerIo* const io = tr_peerIoNewIncoming(session, session->bandwidth, addr, port, socket);
-        tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, myHandshakeDoneCB, manager);
+        tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
@@ -4216,7 +4211,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
     }
     else
     {
-        tr_handshake* handshake = tr_handshakeNew(io, mgr->session->encryptionMode, myHandshakeDoneCB, mgr);
+        tr_handshake* handshake = tr_handshakeNew(io, mgr->session->encryptionMode, on_handshake_done, mgr);
 
         TR_ASSERT(tr_peerIoGetTorrentHash(io));
 
