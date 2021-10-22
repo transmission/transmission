@@ -703,7 +703,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     handshake->peer_id = peer_id;
 
     char client[128] = {};
-    tr_clientForId(client, sizeof(client), std::data(peer_id));
+    tr_clientForId(client, sizeof(client), peer_id);
     dbgmsg(handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming(handshake->io));
 
     // if we've somehow connected to ourselves, don't keep the connection
