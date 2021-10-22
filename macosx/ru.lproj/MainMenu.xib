@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,17 +13,17 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Transmission" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+        <window title="Transmission" separatorStyle="line" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="71" y="712" width="515" height="248"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="350" height="5"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button id="2690">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2690">
                         <rect key="frame" x="36" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TurtleTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
@@ -35,7 +35,7 @@
                             <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
                         </connections>
                     </button>
-                    <button id="3420">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3420">
                         <rect key="frame" x="72" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
@@ -46,7 +46,7 @@
                             <action selector="clearCompleted:" target="206" id="3424"/>
                         </connections>
                     </button>
-                    <button id="3435">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
                         <rect key="frame" x="0.0" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="NSActionTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
@@ -57,7 +57,7 @@
                             <action selector="showGlobalPopover:" target="206" id="3439"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="2700">
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
                         <rect key="frame" x="118" y="5" width="279" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="999 из 999 раздач" usesSingleLineMode="YES" id="3049">
@@ -66,7 +66,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="3088">
+                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
                         <rect key="frame" x="0.0" y="24" width="515" height="224"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="cxH-Xd-aWF">
@@ -75,24 +75,22 @@
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="2" height="3"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
                                     <tableColumns>
                                         <tableColumn identifier="Color" editable="NO" width="29" minWidth="16" maxWidth="3000" id="3093">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Цвет">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="5086C601-9756-4479-9CF1-38C834527675" id="3146">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3146">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
-                                        <tableColumn identifier="Group" editable="NO" width="326" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
+                                        <tableColumn identifier="Group" editable="NO" width="296" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Группа">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -105,17 +103,15 @@
                                         </tableColumn>
                                         <tableColumn identifier="DL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3124">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="5086C601-9756-4479-9CF1-38C834527675" id="3138">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3138">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
                                         <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость скачивания">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -127,17 +123,15 @@
                                         </tableColumn>
                                         <tableColumn identifier="UL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3133">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="5086C601-9756-4479-9CF1-38C834527675" id="3139">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3139">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
                                         <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость раздачи">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -163,11 +157,11 @@
                                 </outlineView>
                             </subviews>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
                             <rect key="frame" x="-100" y="-100" width="451" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
                             <rect key="frame" x="453" y="0.0" width="15" height="173"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -177,6 +171,7 @@
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
             </connections>
+            <point key="canvasLocation" x="139" y="140"/>
         </window>
         <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
             <items>
@@ -977,165 +972,166 @@ CA
         </menu>
     </objects>
     <resources>
-        <image name="5086C601-9756-4479-9CF1-38C834527675" width="62" height="62">
-            <mutableData key="keyedArchiveRepresentation">
-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
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAAhAAAADGhySFIAAAAkAAABnGtvS1IAAAAkAAAB
-nG5iTk8AAAAkAAABnGlkAAAAAAAkAAABnGh1SFUAAAAkAAABnGNzQ1oAAAAkAAABnGRhREsAAAAkAAAB
-nHVrVUEAAAAkAAABnGFyAAAAAAAkAAABnGl0SVQAAAAkAAABnHJvUk8AAAAkAAABnG5sTkwAAAAkAAAB
-nGhlSUwAAAAkAAABnGVzRVMAAAAkAAABnGZpRkkAAAAkAAABnHpoVFcAAAAkAAABnHZpVk4AAAAkAAAB
-nHNrU0sAAAAkAAABnHpoQ04AAAAkAAABnHJ1UlUAAAAkAAABnGZyRlIAAAAkAAABnG1zAAAAAAAkAAAB
-nGNhRVMAAAAkAAABnHRoVEgAAAAkAAABnGRlREUAAAAkAAABnGVuVVMAAAAkAAABnHB0QlIAAAAkAAAB
-nHBsUEwAAAAkAAABnGVsR1IAAAAkAAABnHN2U0UAAAAkAAABnHRyVFIAAAAkAAABnGphSlAAAAAkAAAB
-nHB0UFQAAAAkAAABnABMAEUARAAgAEMAaQBuAGUAbQBhACAARABpAHMAcABsAGEAeXRleHQAAAAAQ29w
-eXJpZ2h0IEFwcGxlIEluYy4sIDIwMTQAAFhZWiAAAAAAAADzUgABAAAAARbPWFlaIAAAAAAAAHF0AAA6
-OQAAAp1YWVogAAAAAAAAYSsAALosAAAUrFhZWiAAAAAAAAAkNgAAC5sAALvjY3VydgAAAAAAAAQAAAAA
-BQAKAA8AFAAZAB4AIwAoAC0AMgA2ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUA
-mgCfAKMAqACtALIAtwC8AMEAxgDLANAA1QDbAOAA5QDrAPAA9gD7AQEBBwENARMBGQEfASUBKwEyATgB
-PgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0C
-JgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLBAssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08D
-WgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME
-4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8G
-wAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gflB/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI
-+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpUCmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4AL
-mAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8O
-mw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBhEH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegS
-BxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V
-4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQa
-KhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyjHMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e
-6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGhIc4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/Ak
-HyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcYJ0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p
-0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv
-/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2
-rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE9
-4D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHuQjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVF
-mkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnwSjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN
-3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxW
-qVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7Ng
-BWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp
-8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0
-cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pGeqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/
-hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqL
-MIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5GokhGSepLjk02TtpQglIqU9JVflcmWNJaflwqX
-dZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+ak
-VqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx
-1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blKucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/
-9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbO
-ts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3Zbe
-HN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7Zzu
-KO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+
-3P9t//9wYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAAKDnZjZ3QAAAAAAAAAAAADAQAAAgAAAFYB
-LgHrAp0DXgQpBQcF8QbpB9cI3wnhCvcMBQ0mDksPdBCgEdcTCxQ+FXoWrxfnGSoaYRuXHM8eBR81IGUh
-jiKyI9Ik7iYCJw4oDykLKgIq+SvtLOEt0y7DL7UwpDGQMn0zajRWNUA2KjcTN/w45TnMOrQ7nDyDPWo+
-Uj8+QCxBH0IWQxBECUUERf1G90fwSOhJ4ErYS85MxU28TrNPrVCqUalSqlOtVK9VsVazV7NYtFm0WrNb
-slyxXa9er1+yYLhhwWLMY9lk5mX0Zv9oC2kWaiJrK2w1bT9uSW9VcGVxd3KNc6Z0v3XYdvF4CXkgejd7
-TnxjfXh+in+XgKCBoYKfg5iEj4WGhnuHcYhmiVqKTotBjDWNKI4cjxKQC5EJkguTEJQYlSGWK5c0mD2Z
-RZpNm1WcW51jnmufdKCAoZCioaO1pMql36b0qAipHKovq0KsVa1nrniviLCWsaKyq7OztLq1v7bFt8m4
-zbnRutW72Lzbvd++5L/rwPXCA8MVxCjFPMZQx2PId8mKypzLr8zBzdHO4M/t0PXR+tL80/vU+NX11vHX
-7djo2ePa3tvY3NLdzd7I38XgxuHK4tLj3eTp5fXnAegM6RjqI+su7DntQ+5J70vwRPEy8hfy8vPH9Jn1
-a/Y89w733/iv+YD6Ufsh+/H8wf2R/mD/MP//AAAAVgEuAesCnQNeBC4FIAXzBukH6gjiCfELCgwlDUUO
-aA+PEMIR8xMtFF8VmRbUGA0ZTRqFG8Ac9h4rH18gjCG0ItYj9CUPJhwnJighKRgqCyr4K+Iszi26LqMv
-jDB2MWAySTMwNBc0/TXkNso3rziUOXo6XjtCPCY9CD3rPtE/uECjQZFCgkN3RGxFYkZWR0tIPkkxSiNL
-FUwHTPhN6k7cT9FQyFHCUr5Tu1S4VbVWsFerWKZZoVqaW5RcjV2HXoJff2B/YYJiimOTZJxlp2awZ7ho
-wGnIas9r1WzcbeRu7G/4cQZyF3MsdEJ1WHZud4N4l3mser970nzkffV/AoAKgQ6CDIMGg/6E9IXpht2H
-0YjFibiKq4uejJCNgo53j22QZ5FnkmqTcpR6lYOWi5eTmJuZopqpm7CctZ28nsKfy6DWoeSi9aQGpRim
-Kqc8qE6pX6pwq4CskK2grq+vvbDKsdWy37PotPC1+Lb/uAa5DboUuxq8IL0mviy/M8A9wUrCWcNsxH/F
-k8anx7rIzcngyvLMBM0WzibPNdBC0UzSU9NX1FrVXNZe11/YYNlg2mHbYdxh3WHeYd9j4GjhcOJ844rk
-muWr5rvnzOjd6e3q/OwM7RruJu8u8C/xJ/IX8v/z4fTB9aD2fvdc+Dr5GPn2+tP7sPyN/Wr+Rv8j//8A
-AABWAS4B6wKdA14EKQUHBfEG6QfXCN8J4Qr3DAUNJg5LD3QQoBHOEwoUPBVzFq8X7xkqGmMbmxzUHg0f
-PCBrIZciviPiJP4mESchKCopKSonKyEsGi0QLgkvAC/zMOcx2DLIM7Y0pjWVNoM3cThdOUs6NzsjPA48
-+D3jPtA/wECzQahCoEObRJVFjkaHR4BIeElwSmdLXkxUTUlOPk82UC9RKVImUyRUIlUhVh9XHFgZWRZa
-ElsMXAddAV39Xvlf92D4YftjAmQIZQ9mFmccaCFpJmoqay9sMm01bjlvP3BHcVFyX3NwdIB1kXahd7F4
-wHnPet1763z4fgJ/CoAMgQmCAYL0g+SE1IXChq+HnYiKiXWKYYtNjDiNI44Pjv2P7ZDikdyS2JPXlNiV
-2ZbYl9iY15nWmtSb05zRnc+ezZ/OoNGh1qLdo+ak8KX6pwSoDakVqh6rJqwurTSuOq8/sEOxRLJFs0S0
-QrVAtj23Org3uTO6L7srvCa9Ir4evxvAG8EewiTDLcQ3xULGTcdXyGLJbMp2y3/MiM2RzpjPntCh0aLS
-oNOc1JfVkdaL14TYfdl32m/baNxg3VneU99Q4FHhV+Ji43HkguWV5qjnu+jN6eDq8uwE7RTuJO8y8D3x
-RPJG80b0Q/U/9jv3Nvgx+Sv6Jvsg/Bn9E/4N/wb//wAAbmRpbgAAAAAAAAY2AACk0AAAVYcAAEyRAACe
-OwAAJgoAAAwOAABQDQAAVDkAAkKPAAIzMwACMKMAAwEAAAIAAAABAAQACQAQABgAIQArADcAQwBRAF8A
-bwB/AJAAogC1AMkA3QDzAQoBIQE6AVQBbwGKAacBxgHlAgYCKAJMAnECmALBAuwDGQNIA3oDrwPoBCQE
-YwSkBOgFLgV3BcIGDwZgBrMHCAdgB7sIGAh4CNoJPwmnChEKfgrtC18L0QxEDLcNKg2eDhUOjQ8ID4UQ
-BRCHEQwRkxIdEqkTNxPHFFcU5xV5FgsWoBc3F9AYbBkKGasaThr0G5wcRxzzHaAeTR76H6cgVSEFIbYi
-aiMhI9oklSVSJhMm1SeaKGApJyntKrMreSw/LQYtzy6bL2gwODELMd8ytjOQNGw1TDYyNx44EzkOOhA7
-FzwhPS8+Pz9TQGpBhEKhQ8FE40YHRypIS0lpSoVLoEy7TdhO91AZUT1SZVOPVLtV61ccWE9Zglq0W+Vd
-Fl5GX3dgq2HgYxlkU2WRZtFoE2lYaqBr7G07bo5v53FFcqd0DXV3duR4VHnHez18tn4yf7CBMYKyhDOF
-sYctiKaKHouYjROOkZARkZSTGpSili2Xu5lNmuOcf54jn9ChhaNBpQOmyaiSql+sMK4Dr9qxtLORtXG3
-Ubkwuwu84r61wIbCWMQsxgLH28m2y5XNds9a0ULTMNUo1zLZVduY3fvgduL85YfoF+qs7Ubv5PKH9S/3
-3PqO/UT//wAAAAEABAAJABAAFwAhACsANgBDAFAAXgBtAH0AjgCgALMAxgDbAPABBwEeATcBUAFrAYYB
-owHBAeACAQIjAkYCawKSArsC5gMTA0IDdQOqA+QEIQRhBKUE7AU0BX8FzQYdBm8GxAccB3YH0wgyCJQI
-+QlgCcoKNwqmCxkLjQwDDHoM8Q1pDeEOWw7XD1YP1xBbEOIRaxH3EoUTFhOpFD4U0xVpFf8WlxcxF80Y
-bBkOGbIaWBsCG64cXB0NHb8ech8lH9ggiiE9IfIiqCNhJB0k2yWbJl4nJCfrKLUpgCpMKxcr4yyuLXku
-Ri8UL+UwuDGOMmUzQDQcNPs13TbDN684oTmaOps7ojyuPb0+0D/mQP9CG0M6RFxFgUapR9FI+UoeSz9M
-X019Tp1PvlDiUglTMlReVY1WvlfzWSlaYlubXNNeCl9BYHhhsWLrZChlZ2apZ+1pNGp+a8ptGW5rb8Bx
-GXJ2c9d1PHakeA95fXrufGF92H9RgM2CTIPNhVCG0ohSidGLTozKjkiPx5FJks6UVZXel2uY+pqMnCGd
-u59ZoP6iq6Rephen1KmVq1qtIa7ssLmyirRetjS4Dbnnu7+9lL9lwTTDAMTNxpzIbcpAzBfN8M/M0avT
-jtV212fZZ9t63aff6+JB5KLnCul16+XuWvDS80/10PhW+t/9bf//AAAAAQAEAAkAEAAYACEAKwA3AEMA
-UQBfAG8AfwCQAKIAtQDJAN4A8wEKASIBOgFUAW4BigGnAcUB5QIFAicCSwJwApcCvwLqAxYDRQN3A6sD
-4gQdBFoEmgTcBSEFZwWwBfwGSgabBu8HRQedB/gIVQi1CRcJfAnjCk0KugsoC5gMCAx6DOwNXw3UDkwO
-xg9CD8EQQhDGEUwR1RJhEu8TfhQOFKAVMhXGFlwW9BePGCwYzBluGhMauxtlHBIcwB1wHiAe0B+BIDIg
-5iGbIlMjDiPLJIslTSYRJtknoihtKTkqBSrRK50saS03Lgcu2S+uMIUxXjI6Mxkz+jTeNcc2tTerOKg5
-rjq7O8w84T36PxZANUFYQn5Dp0TTRgNHM0hjSZBKukviTQlOMU9aUIdRt1LpVB5VV1aSV9BZEFpTW5Zc
-2F4aX1tgnGHeYyNkamW0ZwFoUGmiavdsT22rbwpwbXHVc0J0snYnd6B5HHqbfBx9on8qgLWCQ4PUhWiG
-/IiQiiGLsI09jsmQVpHmk3iVDJakmD6Z25t7nR6exKBvoh+j1qWVp1qpJar1rMiun7B5sle0N7YbuAK5
-7LvXvcG/p8GGw1/FMccByNDKoMxyzkfQH9H509bVttea2YHbbt1i31/hZ+N55ZPns+nY7ADuK/Ba8oz0
-wvb7+Tf7dv25//8AAHNmMzIAAAAAAAEMQgAABd7///MmAAAHkgAA/ZH///ui///9owAAA9wAAMBsbW1v
-ZAAAAAAAAAYQAACSJgL3DivJAi9IAAAAAAAAAAAAAAAAAAAAANIlJicoWiRjbGFzc25hbWVYJGNsYXNz
-ZXNfEBBOU0JpdG1hcEltYWdlUmVwoycpKlpOU0ltYWdlUmVwWE5TT2JqZWN00iUmLC1XTlNBcnJheaIs
-KtIlJi8wXk5TTXV0YWJsZUFycmF5oy8sKtMyMwo0NTZXTlNXaGl0ZVxOU0NvbG9yU3BhY2VEMCAwABAD
-gAzSJSY4OVdOU0NvbG9yojgq0iUmOzxXTlNJbWFnZaI7Kl8QD05TS2V5ZWRBcmNoaXZlctE/QFRyb290
-gAEACAARABoAIwAtADIANwBGAEwAVwBeAGUAcgB5AIEAgwCFAIoAjACOAJcAnACnAKkAqwCtALIAtQC3
-ALkAuwC9AMIA2QDbAN0hqSGuIbkhwiHVIdkh5CHtIfIh+iH9IgIiESIVIhwiJCIxIjYiOCI6Ij8iRyJK
-Ik8iVyJaImwibyJ0AAAAAAAAAgEAAAAAAAAAQQAAAAAAAAAAAAAAAAAAInY
-</mutableData>
-        </image>
         <image name="CleanupTemplate" width="18" height="18"/>
-        <image name="NSActionTemplate" width="14" height="14"/>
+        <image name="NSActionTemplate" width="15" height="15"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
         <image name="PriorityLowTemplate" width="12" height="12"/>
         <image name="PriorityNormalTemplate" width="12" height="12"/>
         <image name="TurtleTemplate" width="18" height="18"/>
+        <image name="imageCell:3146:image" width="62" height="62">
+            <mutableData key="keyedArchiveRepresentation">
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCkqMTQ3PUBVJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDAAACAA4ALWHs2MiwgNjJ90hsPHB5aTlMub2JqZWN0c6EdgASACtIbDyAjoiEigAWABoAJ0w8lJico
+FF8QFE5TVElGRlJlcHJlc2VudGF0aW9uXxAZTlNJbnRlcm5hbExheW91dERpcmVjdGlvboAIgAdPESDg
+TU0AKgAAB0KAOuBP8AQWDQeEQmFQuGQ2HQ+IRGJROKRWKMeMAAhRsAPuPRR/yGGAWSABfycADmVQiBOu
+CRaYTGZTOaTWbQpjTkAEaeR2PzcASQCgBdUUADqkSyB0CmU2nU+oQhi1MAEqrAB+VmmASuABbV8ADuxU
+qXVGzWe0WmFsS2AAmW8AP25UwB3UALS8AAeXuyS+1X/AYGaMLCAAoYcAP7FUwBY0ALDIAAfZO+4LLZfM
+Q1g5sAFPPACQ36bAHSABW6cAD/VZXM63XYJgbEAFTaaCRUDSAEAKzeAAgb/Wa/hcOobFgbPa2feKzfcC
+Dy3RcTpdOZM7rAB09kAPjuAB698APnxYnFwfGgIAAf1AAF+0AAj4AAL/MADL7cHqfn9fuHdD+P/AD/v9
+AMCP4bEDgAekFJqGkGpjAcCwi6ZmQoAAXwumK2GIAAGw6AEGhoikIQlEjXmXE4ABjFTtu6iacmMqqrow
+Y4ABrGyIRHEsdMvE5lgAGcgPC8cXJ0J8jRYfAARnGsboXHMdygv8eyYGshHyiipmK5AqAAfUvSRJSMxt
+KrnqXKMzr+ZU1JSlbxSuicNAAb05oQrgCAAFE8gAG0+PxNE/qgZFBMkykvH0ik3O88CDqEABq0eAAcUl
+P1AUqoElo2ISfH2kDboVRqTl/Ngc0pS1TJnF6dp6j1OKBRqil0o6kzKstT1smksxiJSsK0oE7K8sCxB3
+Utb2KiM4reJi4rmoC6gGu68r2HliWNaqGMIYTDMQxR/MYxzIFhQgfWpa1yoOzZgs6z7QqY3LTNQ1Qf3J
+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
+AAAL9AAAACBhYWdnAAAL9AAAACBkZXNjAAAAAAAAAAhEaXNwbGF5AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAAhAAAADGhySFIAAAAkAAABnGtvS1IAAAAkAAABnG5iTk8AAAAkAAABnGlkAAAAAAAk
+AAABnGh1SFUAAAAkAAABnGNzQ1oAAAAkAAABnGRhREsAAAAkAAABnHVrVUEAAAAkAAABnGFyAAAAAAAk
+AAABnGl0SVQAAAAkAAABnHJvUk8AAAAkAAABnG5sTkwAAAAkAAABnGhlSUwAAAAkAAABnGVzRVMAAAAk
+AAABnGZpRkkAAAAkAAABnHpoVFcAAAAkAAABnHZpVk4AAAAkAAABnHNrU0sAAAAkAAABnHpoQ04AAAAk
+AAABnHJ1UlUAAAAkAAABnGZyRlIAAAAkAAABnG1zAAAAAAAkAAABnGNhRVMAAAAkAAABnHRoVEgAAAAk
+AAABnGRlREUAAAAkAAABnGVuVVMAAAAkAAABnHB0QlIAAAAkAAABnHBsUEwAAAAkAAABnGVsR1IAAAAk
+AAABnHN2U0UAAAAkAAABnHRyVFIAAAAkAAABnGphSlAAAAAkAAABnHB0UFQAAAAkAAABnABMAEUARAAg
+AEMAaQBuAGUAbQBhACAARABpAHMAcABsAGEAeXRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIEluYy4sIDIw
+MTQAAFhZWiAAAAAAAADzUgABAAAAARbPWFlaIAAAAAAAAHF0AAA6OQAAAp1YWVogAAAAAAAAYSsAALos
+AAAUrFhZWiAAAAAAAAAkNgAAC5sAALvjY3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA2
+ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUAmgCfAKMAqACtALIAtwC8AMEAxgDL
+ANAA1QDbAOAA5QDrAPAA9gD7AQEBBwENARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGD
+AYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKE
+Ao4CmAKiAqwCtgLBAssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPT
+A+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3
+BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0
+B4YHmQesB78H0gflB/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnP
+CeUJ+woRCicKPQpUCmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyO
+DKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+z
+D88P7BAJECYQQxBhEH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxND
+E2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdB
+F2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2Mbihuy
+G9ocAhwqHFIcexyjHMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCY
+IMQg8CEcIUghdSGhIc4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3
+JicmVyaHJrcm6CcYJ0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvR
+LAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIq
+MmMymzLUMw0zRjN/M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkF
+OUI5fzm8Ofk6Njp0OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0Bk
+QKZA50EpQWpBrEHuQjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhL
+SJFI10kdSWNJqUnwSjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7
+UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4
+WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GND
+Y5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1g
+bbluEm5rbsRvHm94b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gR
+eG54zHkqeYl553pGeqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INX
+g7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82
+j56QBpBukNaRP5GokhGSepLjk02TtpQglIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuv
+nByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjE
+qTepqaocqo+rAqt1q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5
+tvC3aLfguFm40blKucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTO
+xUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG
+1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj
+4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn
+9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//9wYXJhAAAAAAADAAAAAmZm
+AADypwAADVkAABPQAAAKDnZjZ3QAAAAAAAAAAAADAQAAAgAAAFYBLgHrAp0DXgQpBQcF8QbpB9cI3wnh
+CvcMBQ0mDksPdBCgEdcTCxQ+FXoWrxfnGSoaYRuXHM8eBR81IGUhjiKyI9Ik7iYCJw4oDykLKgIq+Svt
+LOEt0y7DL7UwpDGQMn0zajRWNUA2KjcTN/w45TnMOrQ7nDyDPWo+Uj8+QCxBH0IWQxBECUUERf1G90fw
+SOhJ4ErYS85MxU28TrNPrVCqUalSqlOtVK9VsVazV7NYtFm0WrNbslyxXa9er1+yYLhhwWLMY9lk5mX0
+Zv9oC2kWaiJrK2w1bT9uSW9VcGVxd3KNc6Z0v3XYdvF4CXkgejd7TnxjfXh+in+XgKCBoYKfg5iEj4WG
+hnuHcYhmiVqKTotBjDWNKI4cjxKQC5EJkguTEJQYlSGWK5c0mD2ZRZpNm1WcW51jnmufdKCAoZCioaO1
+pMql36b0qAipHKovq0KsVa1nrniviLCWsaKyq7OztLq1v7bFt8m4zbnRutW72Lzbvd++5L/rwPXCA8MV
+xCjFPMZQx2PId8mKypzLr8zBzdHO4M/t0PXR+tL80/vU+NX11vHX7djo2ePa3tvY3NLdzd7I38XgxuHK
+4tLj3eTp5fXnAegM6RjqI+su7DntQ+5J70vwRPEy8hfy8vPH9Jn1a/Y89w733/iv+YD6Ufsh+/H8wf2R
+/mD/MP//AAAAVgEuAesCnQNeBC4FIAXzBukH6gjiCfELCgwlDUUOaA+PEMIR8xMtFF8VmRbUGA0ZTRqF
+G8Ac9h4rH18gjCG0ItYj9CUPJhwnJighKRgqCyr4K+Iszi26LqMvjDB2MWAySTMwNBc0/TXkNso3rziU
+OXo6XjtCPCY9CD3rPtE/uECjQZFCgkN3RGxFYkZWR0tIPkkxSiNLFUwHTPhN6k7cT9FQyFHCUr5Tu1S4
+VbVWsFerWKZZoVqaW5RcjV2HXoJff2B/YYJiimOTZJxlp2awZ7howGnIas9r1WzcbeRu7G/4cQZyF3Ms
+dEJ1WHZud4N4l3mser970nzkffV/AoAKgQ6CDIMGg/6E9IXpht2H0YjFibiKq4uejJCNgo53j22QZ5Fn
+kmqTcpR6lYOWi5eTmJuZopqpm7CctZ28nsKfy6DWoeSi9aQGpRimKqc8qE6pX6pwq4CskK2grq+vvbDK
+sdWy37PotPC1+Lb/uAa5DboUuxq8IL0mviy/M8A9wUrCWcNsxH/Fk8anx7rIzcngyvLMBM0WzibPNdBC
+0UzSU9NX1FrVXNZe11/YYNlg2mHbYdxh3WHeYd9j4GjhcOJ844rkmuWr5rvnzOjd6e3q/OwM7RruJu8u
+8C/xJ/IX8v/z4fTB9aD2fvdc+Dr5GPn2+tP7sPyN/Wr+Rv8j//8AAABWAS4B6wKdA14EKQUHBfEG6QfX
+CN8J4Qr3DAUNJg5LD3QQoBHOEwoUPBVzFq8X7xkqGmMbmxzUHg0fPCBrIZciviPiJP4mESchKCopKSon
+KyEsGi0QLgkvAC/zMOcx2DLIM7Y0pjWVNoM3cThdOUs6NzsjPA48+D3jPtA/wECzQahCoEObRJVFjkaH
+R4BIeElwSmdLXkxUTUlOPk82UC9RKVImUyRUIlUhVh9XHFgZWRZaElsMXAddAV39Xvlf92D4YftjAmQI
+ZQ9mFmccaCFpJmoqay9sMm01bjlvP3BHcVFyX3NwdIB1kXahd7F4wHnPet1763z4fgJ/CoAMgQmCAYL0
+g+SE1IXChq+HnYiKiXWKYYtNjDiNI44Pjv2P7ZDikdyS2JPXlNiV2ZbYl9iY15nWmtSb05zRnc+ezZ/O
+oNGh1qLdo+ak8KX6pwSoDakVqh6rJqwurTSuOq8/sEOxRLJFs0S0QrVAtj23Org3uTO6L7srvCa9Ir4e
+vxvAG8EewiTDLcQ3xULGTcdXyGLJbMp2y3/MiM2RzpjPntCh0aLSoNOc1JfVkdaL14TYfdl32m/baNxg
+3VneU99Q4FHhV+Ji43HkguWV5qjnu+jN6eDq8uwE7RTuJO8y8D3xRPJG80b0Q/U/9jv3Nvgx+Sv6Jvsg
+/Bn9E/4N/wb//wAAbmRpbgAAAAAAAAY2AACk0AAAVYcAAEyRAACeOwAAJgoAAAwOAABQDQAAVDkAAkKP
+AAIzMwACMKMAAwEAAAIAAAABAAQACQAQABgAIQArADcAQwBRAF8AbwB/AJAAogC1AMkA3QDzAQoBIQE6
+AVQBbwGKAacBxgHlAgYCKAJMAnECmALBAuwDGQNIA3oDrwPoBCQEYwSkBOgFLgV3BcIGDwZgBrMHCAdg
+B7sIGAh4CNoJPwmnChEKfgrtC18L0QxEDLcNKg2eDhUOjQ8ID4UQBRCHEQwRkxIdEqkTNxPHFFcU5xV5
+FgsWoBc3F9AYbBkKGasaThr0G5wcRxzzHaAeTR76H6cgVSEFIbYiaiMhI9oklSVSJhMm1SeaKGApJynt
+KrMreSw/LQYtzy6bL2gwODELMd8ytjOQNGw1TDYyNx44EzkOOhA7FzwhPS8+Pz9TQGpBhEKhQ8FE40YH
+RypIS0lpSoVLoEy7TdhO91AZUT1SZVOPVLtV61ccWE9Zglq0W+VdFl5GX3dgq2HgYxlkU2WRZtFoE2lY
+aqBr7G07bo5v53FFcqd0DXV3duR4VHnHez18tn4yf7CBMYKyhDOFsYctiKaKHouYjROOkZARkZSTGpSi
+li2Xu5lNmuOcf54jn9ChhaNBpQOmyaiSql+sMK4Dr9qxtLORtXG3Ubkwuwu84r61wIbCWMQsxgLH28m2
+y5XNds9a0ULTMNUo1zLZVduY3fvgduL85YfoF+qs7Ubv5PKH9S/33PqO/UT//wAAAAEABAAJABAAFwAh
+ACsANgBDAFAAXgBtAH0AjgCgALMAxgDbAPABBwEeATcBUAFrAYYBowHBAeACAQIjAkYCawKSArsC5gMT
+A0IDdQOqA+QEIQRhBKUE7AU0BX8FzQYdBm8GxAccB3YH0wgyCJQI+QlgCcoKNwqmCxkLjQwDDHoM8Q1p
+DeEOWw7XD1YP1xBbEOIRaxH3EoUTFhOpFD4U0xVpFf8WlxcxF80YbBkOGbIaWBsCG64cXB0NHb8ech8l
+H9ggiiE9IfIiqCNhJB0k2yWbJl4nJCfrKLUpgCpMKxcr4yyuLXkuRi8UL+UwuDGOMmUzQDQcNPs13TbD
+N684oTmaOps7ojyuPb0+0D/mQP9CG0M6RFxFgUapR9FI+UoeSz9MX019Tp1PvlDiUglTMlReVY1Wvlfz
+WSlaYlubXNNeCl9BYHhhsWLrZChlZ2apZ+1pNGp+a8ptGW5rb8BxGXJ2c9d1PHakeA95fXrufGF92H9R
+gM2CTIPNhVCG0ohSidGLTozKjkiPx5FJks6UVZXel2uY+pqMnCGdu59ZoP6iq6Rephen1KmVq1qtIa7s
+sLmyirRetjS4Dbnnu7+9lL9lwTTDAMTNxpzIbcpAzBfN8M/M0avTjtV212fZZ9t63aff6+JB5KLnCul1
+6+XuWvDS80/10PhW+t/9bf//AAAAAQAEAAkAEAAYACEAKwA3AEMAUQBfAG8AfwCQAKIAtQDJAN4A8wEK
+ASIBOgFUAW4BigGnAcUB5QIFAicCSwJwApcCvwLqAxYDRQN3A6sD4gQdBFoEmgTcBSEFZwWwBfwGSgab
+Bu8HRQedB/gIVQi1CRcJfAnjCk0KugsoC5gMCAx6DOwNXw3UDkwOxg9CD8EQQhDGEUwR1RJhEu8TfhQO
+FKAVMhXGFlwW9BePGCwYzBluGhMauxtlHBIcwB1wHiAe0B+BIDIg5iGbIlMjDiPLJIslTSYRJtknoiht
+KTkqBSrRK50saS03Lgcu2S+uMIUxXjI6Mxkz+jTeNcc2tTerOKg5rjq7O8w84T36PxZANUFYQn5Dp0TT
+RgNHM0hjSZBKukviTQlOMU9aUIdRt1LpVB5VV1aSV9BZEFpTW5Zc2F4aX1tgnGHeYyNkamW0ZwFoUGmi
+avdsT22rbwpwbXHVc0J0snYnd6B5HHqbfBx9on8qgLWCQ4PUhWiG/IiQiiGLsI09jsmQVpHmk3iVDJak
+mD6Z25t7nR6exKBvoh+j1qWVp1qpJar1rMiun7B5sle0N7YbuAK57LvXvcG/p8GGw1/FMccByNDKoMxy
+zkfQH9H509bVttea2YHbbt1i31/hZ+N55ZPns+nY7ADuK/Ba8oz0wvb7+Tf7dv25//8AAHNmMzIAAAAA
+AAEMQgAABd7///MmAAAHkgAA/ZH///ui///9owAAA9wAAMBsbW1vZAAAAAAAAAYQAACSJgL3DivJAi9I
+AAAAAAAAAAAAAAAAAAAAANIrLC0uWiRjbGFzc25hbWVYJGNsYXNzZXNfEBBOU0JpdG1hcEltYWdlUmVw
+oy0vMFpOU0ltYWdlUmVwWE5TT2JqZWN00issMjNXTlNBcnJheaIyMNIrLDU2Xk5TTXV0YWJsZUFycmF5
+ozUyMNM4OQ86OzxXTlNXaGl0ZVxOU0NvbG9yU3BhY2VEMCAwABADgAzSKyw+P1dOU0NvbG9yoj4w0iss
+QUJXTlNJbWFnZaJBMAAIABEAGgAkACkAMgA3AEkATABRAFMAYgBoAHUAfACLAJIAnwCmAK4AsACyALQA
+uQC7AL0AxgDLANYA2ADaANwA4QDkAOYA6ADqAPEBCAEkASYBKCIMIhEiHCIlIjgiPCJHIlAiVSJdImAi
+ZSJ0IngifyKHIpQimSKbIp0ioiKqIq0isiK6AAAAAAAAAgEAAAAAAAAAQwAAAAAAAAAAAAAAAAAAIr0
+</mutableData>
+        </image>
     </resources>
 </document>
