@@ -59,6 +59,12 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1830" customClass="InfoTabButtonBack">
+                        <rect key="frame" x="330" y="0.0" width="73" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="PKE-Ur-jFy"/>
+                        </constraints>
+                    </customView>
                     <matrix horizontalHuggingPriority="750" verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="927" customClass="InfoTabMatrix">
                         <rect key="frame" x="0.0" y="0.0" width="330" height="25"/>
                         <constraints>
@@ -104,8 +110,8 @@
                                 </buttonCell>
                             </column>
                             <column>
-                                <buttonCell type="square" bezelStyle="shadowlessSquare" image="InfoOptions" imagePosition="overlaps" alignment="left" state="on" tag="5" inset="2" id="1726" customClass="InfoTabButtonCell">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <buttonCell type="square" bezelStyle="shadowlessSquare" image="InfoOptions" imagePosition="overlaps" alignment="left" tag="5" inset="2" id="1726" customClass="InfoTabButtonCell">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                             </column>
@@ -114,12 +120,6 @@
                             <action selector="setTab:" target="-2" id="1107"/>
                         </connections>
                     </matrix>
-                    <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1830" customClass="InfoTabButtonBack">
-                        <rect key="frame" x="330" y="0.0" width="73" height="25"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="PKE-Ur-jFy"/>
-                        </constraints>
-                    </customView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="1830" firstAttribute="height" secondItem="927" secondAttribute="height" id="7kC-sv-Rac"/>
@@ -147,7 +147,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="556"/>
             </connections>
-            <point key="canvasLocation" x="326.5" y="153.5"/>
+            <point key="canvasLocation" x="195.5" y="155.5"/>
         </window>
     </objects>
     <resources>
