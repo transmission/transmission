@@ -785,12 +785,9 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
         tr_ptrArrayAppend(&tau->trackers, tracker);
         dbgmsg(tracker->key, "New tau_tracker created");
     }
-    else
-    {
-        tr_free(key);
-        tr_free(host);
-    }
 
+    tr_free(key);
+    tr_free(host);
     return tracker;
 }
 
