@@ -128,6 +128,7 @@ enum
  *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
  *     Returns number of runs.
  */
+// TODO: return std::vector
 static int calcRuns(tr_cache const* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
@@ -403,13 +404,9 @@ int tr_cacheFlushDone(tr_cache* cache)
 
     if (tr_ptrArraySize(&cache->blocks) > 0)
     {
-        int i;
-        int n;
-        struct run_info* runs;
-
-        runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        i = 0;
-        n = calcRuns(cache, runs);
+        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
+        int i = 0;
+        int const n = calcRuns(cache, runs);
 
         while (i < n && (runs[i].is_piece_done || runs[i].is_multi_piece))
         {
