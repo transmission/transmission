@@ -24,6 +24,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-udp.h"
 #include "utils.h"
@@ -317,7 +318,7 @@ static struct tau_announce_request* tau_announce_request_new(
     evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
     evbuffer_add_hton_32(buf, transaction_id);
     evbuffer_add(buf, in->info_hash, SHA_DIGEST_LENGTH);
-    evbuffer_add(buf, in->peer_id, PEER_ID_LEN);
+    evbuffer_add(buf, std::data(in->peer_id), std::size(in->peer_id));
     evbuffer_add_hton_64(buf, in->down);
     evbuffer_add_hton_64(buf, in->leftUntilComplete);
     evbuffer_add_hton_64(buf, in->up);
