@@ -24,11 +24,11 @@ TEST(Bitfield, countRange)
         int const bit_count = 100 + tr_rand_int_weak(1000);
 
         // generate a random bitfield
-        Bitfield bf(bit_count);
+        tr_bitfield bf(bit_count);
 
         for (int j = 0, n = tr_rand_int_weak(bit_count); j < n; ++j)
         {
-            bf.setBit(tr_rand_int_weak(bit_count));
+            bf.set(tr_rand_int_weak(bit_count));
         }
 
         int begin = tr_rand_int_weak(bit_count);
@@ -50,13 +50,13 @@ TEST(Bitfield, countRange)
         unsigned long count1 = {};
         for (auto j = begin; j < end; ++j)
         {
-            if (bf.readBit(j))
+            if (bf.test(j))
             {
                 ++count1;
             }
         }
 
-        auto const count2 = bf.countRange(begin, end);
+        auto const count2 = bf.count(begin, end);
         EXPECT_EQ(count1, count2);
     }
 }
@@ -76,30 +76,31 @@ TEST(Bitfield, ctorFromFlagArray)
         bool const have_all = true_count == n;
         bool const have_none = true_count == 0;
 
-        auto const bf = Bitfield(std::data(flags), std::size(flags));
+        auto bf = tr_bitfield(n);
+        bf.setFromFlags(std::data(flags), std::size(flags));
 
-        EXPECT_EQ(n, bf.getBitCount());
+        EXPECT_EQ(n, bf.size());
         EXPECT_EQ(have_all, bf.hasAll());
         EXPECT_EQ(have_none, bf.hasNone());
-        EXPECT_EQ(true_count, bf.countBits());
+        EXPECT_EQ(true_count, bf.count());
 
         for (size_t i = 0; i < std::size(flags); ++i)
         {
-            EXPECT_EQ(flags[i], bf.readBit(i));
+            EXPECT_EQ(flags[i], bf.test(i));
         }
     }
 }
 
-TEST(Bitfield, raw)
+TEST(Bitfield, setRaw)
 {
     auto constexpr TestByte = uint8_t{ 10 };
     auto constexpr TestByteTrueBits = 2;
 
     auto const raw = std::vector<uint8_t>(100, TestByte);
 
-    auto bf = Bitfield(std::size(raw) * 8);
-    bf.setFrom({ std::data(raw), std::size(raw) }, true);
-    EXPECT_EQ(TestByteTrueBits * std::size(raw), bf.countBits());
+    auto bf = tr_bitfield(std::size(raw) * 8);
+    bf.setRaw(std::data(raw), std::size(raw), true);
+    EXPECT_EQ(TestByteTrueBits * std::size(raw), bf.count());
 
     // The first byte of the bitfield corresponds to indices 0 - 7
     // from high bit to low bit, respectively. The next one 8-15, etc.
@@ -107,159 +108,158 @@ TEST(Bitfield, raw)
     auto test = uint8_t{};
     for (int i = 0; i < 8; ++i)
     {
-        if (bf.readBit(i))
+        if (bf.test(i))
         {
             test |= (1 << (7 - i));
         }
     }
     EXPECT_EQ(TestByte, test);
-
-    EXPECT_EQ(raw, bf.getRaw());
+    EXPECT_EQ(raw, bf.raw());
 }
 
 TEST(Bitfield, bitfields)
 {
     unsigned int bitcount = 500;
-    Bitfield field(bitcount);
+    tr_bitfield field(bitcount);
 
-    /* test Bitfield::setBit */
+    // test tr_bitfield::set()
     for (unsigned int i = 0; i < bitcount; i++)
     {
         if (i % 7 == 0)
         {
-            field.setBit(i);
+            field.set(i);
         }
     }
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        EXPECT_EQ(field.readBit(i), (i % 7 == 0));
+        EXPECT_EQ(field.test(i), (i % 7 == 0));
     }
 
-    /* test Bitfield::setBitRange */
-    field.setBitRange(0, bitcount);
+    /* test tr_bitfield::setRange */
+    field.setRange(0, bitcount);
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        EXPECT_TRUE(field.readBit(i));
+        EXPECT_TRUE(field.test(i));
     }
 
-    /* test Bitfield::clearBit */
+    /* test tr_bitfield::clearBit */
     for (unsigned int i = 0; i < bitcount; i++)
     {
         if (i % 7 != 0)
         {
-            field.clearBit(i);
+            field.unset(i);
         }
     }
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        EXPECT_EQ(field.readBit(i), (i % 7 == 0));
+        EXPECT_EQ(field.test(i), (i % 7 == 0));
     }
 
-    /* test Bitfield::clearBitRange in the middle of a boundary */
-    field.setBitRange(0, 64);
-    field.clearBitRange(4, 21);
+    /* test tr_bitfield::clearBitRange in the middle of a boundary */
+    field.setRange(0, 64);
+    field.unsetRange(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (i < 4 || i >= 21));
+        EXPECT_EQ(field.test(i), (i < 4 || i >= 21));
     }
 
-    /* test Bitfield::clearBitRange on the boundaries */
-    field.setBitRange(0, 64);
-    field.clearBitRange(8, 24);
+    /* test tr_bitfield::clearBitRange on the boundaries */
+    field.setRange(0, 64);
+    field.unsetRange(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (i < 8 || i >= 24));
+        EXPECT_EQ(field.test(i), (i < 8 || i >= 24));
     }
 
-    /* test Bitfield::clearBitRange when begin & end is on the same word */
-    field.setBitRange(0, 64);
-    field.clearBitRange(4, 5);
+    /* test tr_bitfield::clearBitRange when begin & end is on the same word */
+    field.setRange(0, 64);
+    field.unsetRange(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (i < 4 || i >= 5));
+        EXPECT_EQ(field.test(i), (i < 4 || i >= 5));
     }
 
-    /* test Bitfield::setBitRange */
-    field.clearBitRange(0, 64);
-    field.setBitRange(4, 21);
+    /* test tr_bitfield::setRange */
+    field.unsetRange(0, 64);
+    field.setRange(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (4 <= i && i < 21));
+        EXPECT_EQ(field.test(i), (4 <= i && i < 21));
     }
 
-    /* test Bitfield::setBitRange on the boundaries */
-    field.clearBitRange(0, 64);
-    field.setBitRange(8, 24);
+    /* test tr_bitfield::setRange on the boundaries */
+    field.unsetRange(0, 64);
+    field.setRange(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (8 <= i && i < 24));
+        EXPECT_EQ(field.test(i), (8 <= i && i < 24));
     }
 
-    /* test Bitfield::setBitRange when begin & end is on the same word */
-    field.clearBitRange(0, 64);
-    field.setBitRange(4, 5);
+    /* test tr_bitfield::setRange when begin & end is on the same word */
+    field.unsetRange(0, 64);
+    field.setRange(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        EXPECT_EQ(field.readBit(i), (4 <= i && i < 5));
+        EXPECT_EQ(field.test(i), (4 <= i && i < 5));
     }
 }
 
 TEST(Bitfield, hasAllNone)
 {
     {
-        Bitfield field(3);
+        tr_bitfield field(3);
 
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(field.hasNone());
 
-        field.setBit(0);
+        field.set(0);
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.clearBit(0);
-        field.setBit(1);
+        field.unset(0);
+        field.set(1);
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.clearBit(1);
-        field.setBit(2);
+        field.unset(1);
+        field.set(2);
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.setBit(0);
-        field.setBit(1);
+        field.set(0);
+        field.set(1);
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.setMode(Bitfield::OperationMode::None);
+        field.setHasNone();
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(field.hasNone());
 
-        field.setMode(Bitfield::OperationMode::All);
+        field.setHasAll();
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
     }
 
     {
-        Bitfield field(0);
+        tr_bitfield field(0);
 
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(!field.hasNone());
 
-        field.setMode(Bitfield::OperationMode::None);
+        field.setHasNone();
         EXPECT_TRUE(!field.hasAll());
         EXPECT_TRUE(field.hasNone());
 
-        field.setMode(Bitfield::OperationMode::All);
+        field.setHasAll();
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
     }
