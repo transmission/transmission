@@ -136,10 +136,7 @@ private:
     /// @brief Contains lookup table for how many set bits are there in 0..255
     static std::array<int8_t const, 256> true_bits_lookup_;
 
-    static constexpr size_t getStorageSize(size_t bit_count)
-    {
-        return 1 + ((bit_count + 7) >> 3);
-    }
+    static size_t getStorageSize(size_t bit_count);
 
     [[nodiscard]] size_t countArray() const;
     [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;

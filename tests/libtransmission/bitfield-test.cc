@@ -90,6 +90,33 @@ TEST(Bitfield, ctorFromFlagArray)
     }
 }
 
+TEST(Bitfield, raw)
+{
+    auto constexpr TestByte = uint8_t{ 10 };
+    auto constexpr TestByteTrueBits = 2;
+
+    auto const raw = std::vector<uint8_t>(100, TestByte);
+
+    auto bf = Bitfield(std::size(raw) * 8);
+    bf.setFrom({ std::data(raw), std::size(raw) }, true);
+    EXPECT_EQ(TestByteTrueBits * std::size(raw), bf.countBits());
+
+    // The first byte of the bitfield corresponds to indices 0 - 7
+    // from high bit to low bit, respectively. The next one 8-15, etc.
+    // Spare bits at the end are set to zero.
+    auto test = uint8_t{};
+    for (int i = 0; i < 8; ++i)
+    {
+        if (bf.readBit(i))
+        {
+            test |= (1 << (7 - i));
+        }
+    }
+    EXPECT_EQ(TestByte, test);
+
+    EXPECT_EQ(raw, bf.getRaw());
+}
+
 TEST(Bitfield, bitfields)
 {
     unsigned int bitcount = 500;
