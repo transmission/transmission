@@ -202,11 +202,14 @@ std::vector<uint8_t> Bitfield::getRaw() const
     return raw;
 }
 
-void Bitfield::ensureNthBitFits(size_t n)
+void Bitfield::ensureNthBitFits(size_t nth)
 {
     TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only reallocate storage in Normal mode");
 
-    size_t bytes_needed = getStorageSize(std::max(n, true_count_));
+    // NB: nth is zero-based, e.g. 0th bit is the first one.
+    // So we need to ensure nth + 1 bits are allocated before
+    // accessing the nth
+    size_t bytes_needed = getStorageSize(std::max(nth + 1, true_count_));
 
     if (std::size(bits_) < bytes_needed)
     {
