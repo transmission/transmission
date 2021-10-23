@@ -108,7 +108,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
     struct sockaddr* from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
-    tr_port port;
+    tr_port port = 0;
 
     if (!tr_sessionIsUTPEnabled(session))
     {
@@ -144,8 +144,8 @@ void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct
 
 static void reset_timer(tr_session* ss)
 {
-    int sec;
-    int usec;
+    int sec = 0;
+    int usec = 0;
 
     if (tr_sessionIsUTPEnabled(ss))
     {
