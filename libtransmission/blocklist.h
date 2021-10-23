@@ -21,6 +21,37 @@ struct tr_address;
 struct BlocklistFile
 {
 public:
+    BlocklistFile(char const* filename, bool isEnabled)
+        : is_enabled_(isEnabled)
+        , fd_{ TR_BAD_SYS_FILE }
+        , filename_(filename)
+    {
+    }
+
+    ~BlocklistFile();
+
+    void close();
+
+    [[nodiscard]] bool exists() const;
+
+    [[nodiscard]] char const* getFilename() const;
+
+    // TODO: This function should be const, but cannot be const due to it calling ensureLoaded()
+    size_t getRuleCount();
+
+    [[nodiscard]] constexpr bool isEnabled() const
+    {
+        return is_enabled_;
+    }
+
+    void setEnabled(bool isEnabled);
+
+    bool hasAddress(tr_address const& addr);
+
+    /// @brief Read the file of ranges, sort and merge, write to our own file, and reload from it
+    size_t setContent(char const* filename);
+
+private:
     struct IPv4Range
     {
         uint32_t begin_;
@@ -46,34 +77,6 @@ public:
         }
     };
 
-    BlocklistFile(char const* filename, bool isEnabled)
-        : is_enabled_(isEnabled)
-        , fd_{ TR_BAD_SYS_FILE }
-        , filename_(filename)
-    {
-    }
-
-    ~BlocklistFile();
-
-    void close();
-
-    [[nodiscard]] bool exists() const;
-
-    [[nodiscard]] char const* getFilename() const;
-
-    // TODO: This function should be const, but cannot be const due to it calling ensureLoaded()
-    size_t getRuleCount();
-
-    [[nodiscard]] bool isEnabled() const;
-
-    void setEnabled(bool isEnabled);
-
-    bool hasAddress(tr_address const& addr);
-
-    /// @brief Read the file of ranges, sort and merge, write to our own file, and reload from it
-    size_t setContent(char const* filename);
-
-private:
     void ensureLoaded();
     void load();
     static bool parseLine(char const* line, IPv4Range* range);
@@ -92,7 +95,7 @@ private:
     tr_sys_file_t fd_;
     size_t rule_count_ = 0;
     uint64_t byte_count_ = 0;
-    std::string filename_;
+    std::string const filename_;
 
     /// @brief Not a container, memory mapped file
     IPv4Range* rules_ = nullptr;

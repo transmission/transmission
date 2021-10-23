@@ -130,11 +130,6 @@ size_t BlocklistFile::getRuleCount()
     return rule_count_;
 }
 
-bool BlocklistFile::isEnabled() const
-{
-    return is_enabled_;
-}
-
 void BlocklistFile::setEnabled(bool isEnabled)
 {
     is_enabled_ = isEnabled;
