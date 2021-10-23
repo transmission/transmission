@@ -26,10 +26,7 @@
 ****
 ***/
 
-enum
-{
-    MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
-};
+static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
@@ -53,9 +50,6 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
     while (!*stopFlag && pieceIndex < tor->info.pieceCount)
     {
-        uint64_t leftInPiece;
-        uint64_t bytesThisPass;
-        uint64_t leftInFile;
         tr_file const* file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
@@ -75,16 +69,15 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         }
 
         /* figure out how much we can read this pass */
-        leftInPiece = tr_torPieceCountBytes(tor, pieceIndex) - piecePos;
-        leftInFile = file->length - filePos;
-        bytesThisPass = std::min(leftInFile, leftInPiece);
+        uint64_t leftInPiece = tr_torPieceCountBytes(tor, pieceIndex) - piecePos;
+        uint64_t leftInFile = file->length - filePos;
+        uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
         bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
 
         /* read a bit */
         if (fd != TR_BAD_SYS_FILE)
         {
-            uint64_t numRead;
-
+            auto numRead = uint64_t{};
             if (tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
             {
                 bytesThisPass = numRead;
@@ -102,12 +95,10 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* if we're finishing a piece... */
         if (leftInPiece == 0)
         {
-            time_t now;
-            bool hasPiece;
             uint8_t hash[SHA_DIGEST_LENGTH];
 
             tr_sha1_final(sha, hash);
-            hasPiece = memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
+            bool const hasPiece = memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
 
             if (hasPiece || hadPiece)
             {
@@ -116,7 +107,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             }
 
             tr_torrentSetPieceChecked(tor, pieceIndex);
-            now = tr_time();
+            time_t const now = tr_time();
             tor->anyDate = now;
 
             /* sleeping even just a few msec per second goes a long
@@ -124,7 +115,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             if (lastSleptAt != now)
             {
                 lastSleptAt = now;
-                tr_wait_msec(MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY);
+                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha = tr_sha1_init();

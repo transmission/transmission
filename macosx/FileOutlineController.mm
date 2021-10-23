@@ -213,8 +213,6 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (void)refresh
 {
-    [fTorrent updateFileStat];
-
     fOutline.needsDisplay = YES;
 }
 

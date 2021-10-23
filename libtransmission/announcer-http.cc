@@ -65,7 +65,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         req->url,
         strchr(req->url, '?') != nullptr ? '&' : '?',
         escaped_info_hash,
-        TR_ARG_TUPLE(PEER_ID_LEN, PEER_ID_LEN, req->peer_id),
+        TR_ARG_TUPLE(int(std::size(req->peer_id)), int(std::size(req->peer_id)), std::data(req->peer_id)),
         req->port,
         req->up,
         req->down,
@@ -386,7 +386,9 @@ static void on_scrape_done(
     {
         char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
         char const* response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
+        char buf[512];
+        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
+        response->errmsg = buf;
     }
     else
     {
@@ -421,7 +423,7 @@ static void on_scrape_done(
             char const* str = nullptr;
             if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
             {
-                response->errmsg = tr_strndup(str, len);
+                response->errmsg = std::string{ str, len };
             }
 
             tr_variant* flags = nullptr;
