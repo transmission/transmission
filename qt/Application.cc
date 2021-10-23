@@ -81,6 +81,14 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
+#ifdef QT_DBUS_LIB
+
+QString const DbusServiceName = QStringLiteral("org.freedesktop.Notifications");
+QString const DbusInterfaceName = QStringLiteral("org.freedesktop.Notifications");
+QString const DbusPath = QStringLiteral("/org/freedesktop/Notifications");
+
+#endif
+
 } // namespace
 
 Application::Application(int& argc, char** argv)
@@ -353,6 +361,21 @@ Application::Application(int& argc, char** argv)
     }
 
     InteropHelper::registerObject(this);
+
+#ifdef QT_DBUS_LIB
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (bus.isConnected())
+    {
+        bus.connect(
+            DbusServiceName,
+            DbusPath,
+            DbusInterfaceName,
+            QLatin1String("ActionInvoked"),
+            this,
+            SLOT(onNotificationActionInvoked(quint32, QString)));
+    }
+
+#endif
 }
 
 void Application::loadTranslations()
@@ -414,9 +437,10 @@ void Application::onTorrentsAdded(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        auto const title = tr("Torrent(s) Added", nullptr, static_cast<int>(ids.size()));
-        auto const body = getNames(ids).join(QStringLiteral("\n"));
-        notifyApp(title, body);
+        for (auto id : ids)
+        {
+            notifyTorrentAdded(model_->getTorrentFromId(id));
+        }
     }
 }
 
@@ -447,6 +471,13 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
     {
         session_->initTorrents(ids);
     }
+}
+
+void Application::notifyTorrentAdded(Torrent const* tor) const
+{
+    QStringList actions;
+    actions << QString(QLatin1String("start-now(%1)")).arg(tor->id()) << QObject::tr("Start Now");
+    notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
 /***
@@ -580,30 +611,21 @@ void Application::raise() const
     alert(window_.get());
 }
 
-bool Application::notifyApp(QString const& title, QString const& body) const
+bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
-
-    auto const dbus_service_name = QStringLiteral("org.freedesktop.Notifications");
-    auto const dbus_interface_name = QStringLiteral("org.freedesktop.Notifications");
-    auto const dbus_path = QStringLiteral("/org/freedesktop/Notifications");
-
     QDBusConnection bus = QDBusConnection::sessionBus();
 
     if (bus.isConnected())
     {
-        QDBusMessage m = QDBusMessage::createMethodCall(
-            dbus_service_name,
-            dbus_path,
-            dbus_interface_name,
-            QStringLiteral("Notify"));
+        QDBusMessage m = QDBusMessage::createMethodCall(DbusServiceName, DbusPath, DbusInterfaceName, QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
         args.append(QStringLiteral("transmission")); // icon
         args.append(title); // summary
         args.append(body); // body
-        args.append(QStringList()); // actions - unused for plain passive popups
+        args.append(actions);
         args.append(QVariantMap({
             std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
         })); // hints
@@ -622,6 +644,20 @@ bool Application::notifyApp(QString const& title, QString const& body) const
     window_->trayIcon().showMessage(title, body);
     return true;
 }
+
+#ifdef QT_DBUS_LIB
+void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
+{
+    static QRegularExpression const StartNowRegex(QLatin1String(R"rgx(start-now\((\d+)\))rgx"));
+    QRegularExpressionMatch const match = StartNowRegex.match(action_key);
+    if (match.hasMatch())
+    {
+        int const torrent_id = match.captured(1).toInt();
+        session_->startTorrentsNow({ torrent_id });
+    }
+}
+
+#endif
 
 FaviconCache& Application::faviconCache()
 {

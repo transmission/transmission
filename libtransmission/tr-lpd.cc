@@ -212,6 +212,7 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 *   - assemble search string "\r\nName: " and locate position
 *   - copy back value from end to next "\r\n"
 */
+// TODO: string_view
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
     TR_ASSERT(str != nullptr);
@@ -222,7 +223,6 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     auto constexpr MaxLength = int{ 30 };
 
     char sstr[MaxLength] = { 0 };
-    char const* pos;
 
     if (strlen(name) > MaxLength - strlen(CRLF ": "))
     {
@@ -232,8 +232,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     /* compose the string token to search for */
     tr_snprintf(sstr, MaxLength, CRLF "%s: ", name);
 
-    pos = strstr(str, sstr);
-
+    char const* const pos = strstr(str, sstr);
     if (pos == nullptr)
     {
         return false; /* search was not successful */

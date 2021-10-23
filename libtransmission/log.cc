@@ -103,10 +103,9 @@ bool tr_logGetQueueEnabled(void)
 
 tr_log_message* tr_logGetQueue(void)
 {
-    tr_log_message* ret;
     tr_lockLock(getMessageLock());
 
-    ret = myQueue;
+    auto* const ret = myQueue;
     myQueue = nullptr;
     myQueueTail = &myQueue;
     myQueueLength = 0;
@@ -117,11 +116,9 @@ tr_log_message* tr_logGetQueue(void)
 
 void tr_logFreeQueue(tr_log_message* list)
 {
-    tr_log_message* next;
-
     while (list != nullptr)
     {
-        next = list->next;
+        tr_log_message* next = list->next;
         tr_free(list->message);
         tr_free(list->name);
         tr_free(list);
@@ -211,14 +208,13 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 {
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
-    int buf_len;
     va_list ap;
     tr_lockLock(getMessageLock());
 
     /* build the text message */
     *buf = '\0';
     va_start(ap, fmt);
-    buf_len = evutil_vsnprintf(buf, sizeof(buf), fmt, ap);
+    int const buf_len = evutil_vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
     if (buf_len < 0)
@@ -247,8 +243,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
     {
         if (tr_logGetQueueEnabled())
         {
-            tr_log_message* newmsg;
-            newmsg = tr_new0(tr_log_message, 1);
+            auto* const newmsg = tr_new0(tr_log_message, 1);
             newmsg->level = level;
             newmsg->when = tr_time();
             newmsg->message = tr_strdup(buf);
@@ -272,10 +267,9 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
         }
         else
         {
-            tr_sys_file_t fp;
             char timestr[64];
 
-            fp = tr_logGetFile();
+            tr_sys_file_t fp = tr_logGetFile();
 
             if (fp == TR_BAD_SYS_FILE)
             {

@@ -39,12 +39,10 @@ static char* getFilename(tr_session const* session)
 
 static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
-    tr_variant top;
-    char* filename;
-    bool loaded = false;
+    auto top = tr_variant{};
 
-    filename = getFilename(session);
-    loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, nullptr);
+    char* filename = getFilename(session);
+    bool loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, nullptr);
     tr_free(filename);
 
     if (!loaded)
@@ -56,7 +54,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 
     if (loaded)
     {
-        int64_t i;
+        auto i = int64_t{};
 
         if (tr_variantDictFindInt(&top, TR_KEY_downloaded_bytes, &i))
         {
@@ -89,9 +87,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 
 static void saveCumulativeStats(tr_session const* session, tr_session_stats const* s)
 {
-    char* filename;
-    tr_variant top;
-
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 5);
     tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, s->downloadedBytes);
     tr_variantDictAddInt(&top, TR_KEY_files_added, s->filesAdded);
@@ -99,7 +95,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_session_count, s->sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
 
-    filename = getFilename(session);
+    char* const filename = getFilename(session);
     if (tr_logGetDeepEnabled())
     {
         tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename);
@@ -125,14 +121,14 @@ void tr_statsInit(tr_session* session)
     session->sessionStats = stats;
 }
 
-static struct tr_stats_handle* getStats(tr_session const* session)
+static tr_stats_handle* getStats(tr_session const* session)
 {
     return session != nullptr ? session->sessionStats : nullptr;
 }
 
 void tr_statsSaveDirty(tr_session* session)
 {
-    struct tr_stats_handle* h = getStats(session);
+    auto* const h = getStats(session);
 
     if (h != nullptr && h->isDirty)
     {
@@ -216,9 +212,9 @@ void tr_sessionClearStats(tr_session* session)
 
 void tr_statsAddUploaded(tr_session* session, uint32_t bytes)
 {
-    struct tr_stats_handle* s;
+    auto* const s = getStats(session);
 
-    if ((s = getStats(session)) != nullptr)
+    if (s != nullptr)
     {
         s->single.uploadedBytes += bytes;
         s->isDirty = true;
@@ -227,9 +223,9 @@ void tr_statsAddUploaded(tr_session* session, uint32_t bytes)
 
 void tr_statsAddDownloaded(tr_session* session, uint32_t bytes)
 {
-    struct tr_stats_handle* s;
+    auto* const s = getStats(session);
 
-    if ((s = getStats(session)) != nullptr)
+    if (s != nullptr)
     {
         s->single.downloadedBytes += bytes;
         s->isDirty = true;
@@ -238,9 +234,9 @@ void tr_statsAddDownloaded(tr_session* session, uint32_t bytes)
 
 void tr_statsFileCreated(tr_session* session)
 {
-    struct tr_stats_handle* s;
+    auto* const s = getStats(session);
 
-    if ((s = getStats(session)) != nullptr)
+    if (s != nullptr)
     {
         s->single.filesAdded++;
     }
