@@ -58,11 +58,10 @@ constexpr int8_t const trueBitCount[256] = {
 size_t tr_bitfield::recount() const
 {
     size_t ret = 0;
-    size_t i = this->alloc_count;
 
-    while (i > 0)
+    for (auto ch : this->bits)
     {
-        ret += trueBitCount[this->bits[--i]];
+        ret += trueBitCount[ch];
     }
 
     return ret;
@@ -79,13 +78,13 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
         return 0;
     }
 
-    if (first_byte >= this->alloc_count)
+    if (first_byte >= std::size(this->bits))
     {
         return 0;
     }
 
     TR_ASSERT(begin < end);
-    TR_ASSERT(this->bits != nullptr);
+    TR_ASSERT(!std::empty(this->bits));
 
     if (first_byte == last_byte)
     {
@@ -104,7 +103,7 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
     else
     {
         uint8_t val;
-        size_t const walk_end = std::min(this->alloc_count, last_byte);
+        size_t const walk_end = std::min(std::size(this->bits), last_byte);
 
         /* first byte */
         size_t const first_shift = begin - (first_byte * 8);
@@ -120,7 +119,7 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
         }
 
         /* last byte */
-        if (last_byte < this->alloc_count)
+        if (last_byte < std::size(this->bits))
         {
             size_t const last_shift = (last_byte + 1) * 8 - end;
             val = this->bits[last_byte];
@@ -161,7 +160,7 @@ bool tr_bitfield::test(size_t n) const
         return false;
     }
 
-    if (n >> 3U >= this->alloc_count)
+    if (n >> 3U >= std::size(this->bits))
     {
         return false;
     }
@@ -178,8 +177,7 @@ bool tr_bitfield::test(size_t n) const
 
 bool tr_bitfield::assertValid() const
 {
-    TR_ASSERT((this->alloc_count == 0) == (this->bits == nullptr));
-    TR_ASSERT(this->bits == nullptr || this->true_count == recount());
+    TR_ASSERT(std::empty(this->bits) || this->true_count == recount());
 
     return true;
 }
@@ -189,14 +187,15 @@ bool tr_bitfield::assertValid() const
 std::vector<uint8_t> tr_bitfield::raw() const
 {
     auto const n = getBytesNeeded(this->bit_count);
+
+    if (!std::empty(this->bits))
+    {
+        return this->bits;
+    }
+
     auto raw = std::vector<uint8_t>(n);
 
-    if (this->alloc_count != 0)
-    {
-        TR_ASSERT(this->alloc_count <= n);
-        std::copy_n(this->bits, this->alloc_count, std::begin(raw));
-    }
-    else if (hasAll())
+    if (hasAll())
     {
         setAllTrue(std::data(raw), std::size(raw));
     }
@@ -210,15 +209,13 @@ void tr_bitfield::ensureBitsAlloced(size_t n)
 
     size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, this->true_count)) : getBytesNeeded(n);
 
-    if (this->alloc_count < bytes_needed)
+    if (std::size(this->bits) < bytes_needed)
     {
-        this->bits = tr_renew(uint8_t, this->bits, bytes_needed);
-        std::fill_n(this->bits + this->alloc_count, bytes_needed - this->alloc_count, 0);
-        this->alloc_count = bytes_needed;
+        this->bits.resize(bytes_needed);
 
         if (has_all)
         {
-            setAllTrue(this->bits, this->true_count);
+            setAllTrue(std::data(this->bits), this->true_count);
         }
     }
 }
@@ -237,9 +234,7 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
 
 void tr_bitfield::freeArray()
 {
-    tr_free(this->bits);
-    this->bits = nullptr;
-    this->alloc_count = 0;
+    this->bits = std::vector<uint8_t>{};
 }
 
 void tr_bitfield::setTrueCount(size_t n)
@@ -289,11 +284,6 @@ tr_bitfield::tr_bitfield(size_t bit_count_in)
     TR_ASSERT(assertValid());
 }
 
-tr_bitfield::~tr_bitfield()
-{
-    tr_free(this->bits);
-}
-
 void tr_bitfield::setHasNone()
 {
     freeArray();
@@ -314,36 +304,14 @@ void tr_bitfield::setHasAll()
     TR_ASSERT(assertValid());
 }
 
-tr_bitfield& tr_bitfield::operator=(tr_bitfield const& that)
-{
-    if (that.hasAll())
-    {
-        setHasAll();
-    }
-    else if (that.hasNone())
-    {
-        setHasNone();
-    }
-    else
-    {
-        setRaw(that.bits, that.alloc_count, true);
-    }
-
-    return *this;
-}
-
 void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count, bool bounded)
 {
-    freeArray();
-    this->true_count = 0;
-
     if (bounded)
     {
         byte_count = std::min(byte_count, getBytesNeeded(this->bit_count));
     }
 
-    this->bits = static_cast<uint8_t*>(tr_memdup(raw, byte_count));
-    this->alloc_count = byte_count;
+    this->bits = std::vector<uint8_t>(raw, raw + byte_count);
 
     if (bounded)
     {
@@ -355,7 +323,7 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count, bool bounded)
 
         if (excess_bit_count != 0)
         {
-            this->bits[this->alloc_count - 1] &= 0xff << excess_bit_count;
+            this->bits.back() &= 0xff << excess_bit_count;
         }
     }
 
@@ -446,7 +414,7 @@ void tr_bitfield::setRange(size_t begin, size_t end, bool value)
 
             if (++sb < eb)
             {
-                std::fill_n(this->bits + sb, eb - sb, 0xff);
+                std::fill_n(std::begin(this->bits) + sb, eb - sb, 0xff);
             }
         }
 
@@ -468,7 +436,7 @@ void tr_bitfield::setRange(size_t begin, size_t end, bool value)
 
             if (++sb < eb)
             {
-                std::fill_n(this->bits + sb, eb - sb, 0);
+                std::fill_n(std::begin(this->bits) + sb, eb - sb, 0);
             }
         }
 

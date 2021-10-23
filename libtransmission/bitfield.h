@@ -24,8 +24,7 @@ class tr_bitfield
 {
 public:
     tr_bitfield(size_t bit_count);
-    ~tr_bitfield();
-    tr_bitfield& operator=(tr_bitfield const& that);
+    ~tr_bitfield() = default;
 
     void setHasAll();
     void setHasNone();
@@ -81,8 +80,7 @@ private:
     void incrementTrueCount(size_t inc);
     void decrementTrueCount(size_t dec);
 
-    uint8_t* bits = nullptr;
-    size_t alloc_count = 0;
+    std::vector<uint8_t> bits;
     size_t bit_count = 0;
     size_t true_count = 0;
 
