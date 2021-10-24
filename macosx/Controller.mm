@@ -4210,7 +4210,7 @@ static void removeKeRangerRansomware()
     ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
 
     NSButton* button = [[NSButton alloc] init];
-    button.bezelStyle = NSTexturedRoundedBezelStyle;
+    button.bezelStyle = NSBezelStyleTexturedRounded;
     button.stringValue = @"";
 
     item.view = button;
