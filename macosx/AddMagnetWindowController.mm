@@ -89,7 +89,8 @@
     }
     [fPriorityPopUp selectItemAtIndex:priorityIndex];
 
-    fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSOnState : NSOffState;
+    fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn
+                                                                                              : NSControlStateValueOff;
 
     if (fDestination)
     {
@@ -224,7 +225,7 @@
         alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            if (alert.suppressionButton.state == NSOnState)
+            if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningFolderDataSameName"];
             }
@@ -293,7 +294,7 @@
 {
     [fTorrent setGroupValue:fGroupValue determinationType:fGroupDeterminationType];
 
-    if (fStartCheck.state == NSOnState)
+    if (fStartCheck.state == NSControlStateValueOn)
     {
         [fTorrent startTransfer];
     }

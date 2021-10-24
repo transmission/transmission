@@ -296,7 +296,9 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
             indexSet = ((FileListNode*)item).indexes;
         }
 
-        [fTorrent setFileCheckState:[object intValue] != NSOffState ? NSOnState : NSOffState forIndexes:indexSet];
+        [fTorrent setFileCheckState:[object intValue] != NSControlStateValueOff ? NSControlStateValueOn
+                                                                                : NSControlStateValueOff
+                         forIndexes:indexSet];
         fOutline.needsDisplay = YES;
 
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
@@ -330,11 +332,11 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     {
         switch (cell.state)
         {
-        case NSOffState:
+        case NSControlStateValueOff:
             return NSLocalizedString(@"Don't Download", "files tab -> tooltip");
-        case NSOnState:
+        case NSControlStateValueOn:
             return NSLocalizedString(@"Download", "files tab -> tooltip");
-        case NSMixedState:
+        case NSControlStateValueMixed:
             return NSLocalizedString(@"Download Some", "files tab -> tooltip");
         }
     }
@@ -378,7 +380,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (void)setCheck:(id)sender
 {
-    NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
+    NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSControlStateValueOff : NSControlStateValueOn;
 
     NSIndexSet* indexSet = fOutline.selectedRowIndexes;
     NSMutableIndexSet* itemIndexes = [NSMutableIndexSet indexSet];
@@ -402,11 +404,11 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         [itemIndexes addIndexes:item.indexes];
     }
 
-    [fTorrent setFileCheckState:NSOnState forIndexes:itemIndexes];
+    [fTorrent setFileCheckState:NSControlStateValueOn forIndexes:itemIndexes];
 
     NSMutableIndexSet* remainingItemIndexes = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTorrent.fileCount)];
     [remainingItemIndexes removeIndexes:itemIndexes];
-    [fTorrent setFileCheckState:NSOffState forIndexes:remainingItemIndexes];
+    [fTorrent setFileCheckState:NSControlStateValueOff forIndexes:remainingItemIndexes];
 
     fOutline.needsDisplay = YES;
 }
@@ -414,14 +416,14 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 - (void)checkAll
 {
     NSIndexSet* indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTorrent.fileCount)];
-    [fTorrent setFileCheckState:NSOnState forIndexes:indexSet];
+    [fTorrent setFileCheckState:NSControlStateValueOn forIndexes:indexSet];
     fOutline.needsDisplay = YES;
 }
 
 - (void)uncheckAll
 {
     NSIndexSet* indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTorrent.fileCount)];
-    [fTorrent setFileCheckState:NSOffState forIndexes:indexSet];
+    [fTorrent setFileCheckState:NSControlStateValueOff forIndexes:indexSet];
     fOutline.needsDisplay = YES;
 }
 
@@ -538,7 +540,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
             [itemIndexes addIndexes:node.indexes];
         }
 
-        NSInteger state = (menuItem.tag == FILE_CHECK_TAG) ? NSOnState : NSOffState;
+        NSInteger state = (menuItem.tag == FILE_CHECK_TAG) ? NSControlStateValueOn : NSControlStateValueOff;
         return [fTorrent checkForFiles:itemIndexes] != state && [fTorrent canChangeDownloadCheckForFiles:itemIndexes];
     }
 
@@ -564,7 +566,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     {
         if (fOutline.numberOfSelectedRows == 0)
         {
-            menuItem.state = NSOffState;
+            menuItem.state = NSControlStateValueOff;
             return NO;
         }
 
@@ -602,7 +604,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
             }
         }
 
-        menuItem.state = current ? NSOnState : NSOffState;
+        menuItem.state = current ? NSControlStateValueOn : NSControlStateValueOff;
         return canChange;
     }
 

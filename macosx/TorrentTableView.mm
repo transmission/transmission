@@ -776,12 +776,12 @@
         BOOL const limit = [fMenuTorrent usesSpeedLimit:upload];
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
-        item.state = limit ? NSOnState : NSOffState;
+        item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%d KB/s)", "torrent action menu -> upload/download limit"),
                                                 [fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
-        item.state = !limit ? NSOnState : NSOffState;
+        item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == fRatioMenu)
     {
@@ -804,28 +804,28 @@
         tr_ratiolimit const mode = fMenuTorrent.ratioSetting;
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
-        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
                                                          fMenuTorrent.ratioLimit];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
-        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_GLOBAL_TAG];
-        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == fPriorityMenu)
     {
         tr_priority_t const priority = fMenuTorrent.priority;
 
         NSMenuItem* item = [menu itemWithTag:ACTION_MENU_PRIORITY_HIGH_TAG];
-        item.state = priority == TR_PRI_HIGH ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_PRIORITY_NORMAL_TAG];
-        item.state = priority == TR_PRI_NORMAL ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_PRIORITY_LOW_TAG];
-        item.state = priority == TR_PRI_LOW ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
     }
 }
 
@@ -849,7 +849,7 @@
 
 - (void)setGlobalLimit:(id)sender
 {
-    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSOnState;
+    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }

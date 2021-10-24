@@ -807,7 +807,7 @@ static void removeKeRangerRansomware()
 
             if (allowNeverAgain)
             {
-                [fDefaults setBool:(alert.suppressionButton.state != NSOnState) forKey:@"WarningDonate"];
+                [fDefaults setBool:(alert.suppressionButton.state != NSControlStateValueOn) forKey:@"WarningDonate"];
             }
         }
     }
@@ -1363,7 +1363,7 @@ static void removeKeRangerRansomware()
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Open invalid alert -> button")];
 
     [alert runModal];
-    if (alert.suppressionButton.state == NSOnState)
+    if (alert.suppressionButton.state == NSControlStateValueOn)
     {
         [fDefaults setBool:NO forKey:@"WarningInvalidOpen"];
     }
@@ -1387,7 +1387,7 @@ static void removeKeRangerRansomware()
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Magnet link failed -> button")];
 
     [alert runModal];
-    if (alert.suppressionButton.state == NSOnState)
+    if (alert.suppressionButton.state == NSControlStateValueOn)
     {
         [fDefaults setBool:NO forKey:@"WarningInvalidOpen"];
     }
@@ -4695,7 +4695,7 @@ static void removeKeRangerRansomware()
 
     if (action == @selector(toggleSpeedLimit:))
     {
-        menuItem.state = [fDefaults boolForKey:@"SpeedLimit"] ? NSOnState : NSOffState;
+        menuItem.state = [fDefaults boolForKey:@"SpeedLimit"] ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
 
@@ -4743,7 +4743,7 @@ static void removeKeRangerRansomware()
             sortType = SORT_ORDER;
         }
 
-        menuItem.state = [sortType isEqualToString:[fDefaults stringForKey:@"Sort"]] ? NSOnState : NSOffState;
+        menuItem.state = [sortType isEqualToString:[fDefaults stringForKey:@"Sort"]] ? NSControlStateValueOn : NSControlStateValueOff;
         return fWindow.visible;
     }
 
@@ -4761,25 +4761,26 @@ static void removeKeRangerRansomware()
             }
         }
 
-        menuItem.state = checked ? NSOnState : NSOffState;
+        menuItem.state = checked ? NSControlStateValueOn : NSControlStateValueOff;
         return canUseTable && fTableView.numberOfSelectedRows > 0;
     }
 
     if (action == @selector(toggleSmallView:))
     {
-        menuItem.state = [fDefaults boolForKey:@"SmallView"] ? NSOnState : NSOffState;
+        menuItem.state = [fDefaults boolForKey:@"SmallView"] ? NSControlStateValueOn : NSControlStateValueOff;
         return fWindow.visible;
     }
 
     if (action == @selector(togglePiecesBar:))
     {
-        menuItem.state = [fDefaults boolForKey:@"PiecesBar"] ? NSOnState : NSOffState;
+        menuItem.state = [fDefaults boolForKey:@"PiecesBar"] ? NSControlStateValueOn : NSControlStateValueOff;
         return fWindow.visible;
     }
 
     if (action == @selector(toggleAvailabilityBar:))
     {
-        menuItem.state = [fDefaults boolForKey:@"DisplayProgressBarAvailable"] ? NSOnState : NSOffState;
+        menuItem.state = [fDefaults boolForKey:@"DisplayProgressBarAvailable"] ? NSControlStateValueOn
+                                                                               : NSControlStateValueOff;
         return fWindow.visible;
     }
 
@@ -5072,14 +5073,15 @@ static void removeKeRangerRansomware()
     if (action == @selector(setSortReverse:))
     {
         BOOL const isReverse = menuItem.tag == SORT_DESC_TAG;
-        menuItem.state = (isReverse == [fDefaults boolForKey:@"SortReverse"]) ? NSOnState : NSOffState;
+        menuItem.state = (isReverse == [fDefaults boolForKey:@"SortReverse"]) ? NSControlStateValueOn
+                                                                              : NSControlStateValueOff;
         return ![[fDefaults stringForKey:@"Sort"] isEqualToString:SORT_ORDER];
     }
 
     //enable group sort item
     if (action == @selector(setSortByGroup:))
     {
-        menuItem.state = [fDefaults boolForKey:@"SortByGroup"] ? NSOnState : NSOffState;
+        menuItem.state = [fDefaults boolForKey:@"SortByGroup"] ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
 

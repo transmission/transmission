@@ -111,7 +111,7 @@
     {
         titleColor = statusColor = NSColor.whiteColor;
     }
-    else if ([node.torrent checkForFiles:node.indexes] == NSOffState)
+    else if ([node.torrent checkForFiles:node.indexes] == NSControlStateValueOff)
     {
         titleColor = statusColor = NSColor.disabledControlTextColor;
     }

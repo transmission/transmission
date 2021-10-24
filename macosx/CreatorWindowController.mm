@@ -203,7 +203,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     //set previously saved values
     if ([fDefaults objectForKey:@"CreatorPrivate"])
     {
-        fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSOnState : NSOffState;
+        fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSControlStateValueOn : NSControlStateValueOff;
     }
 
     if ([fDefaults objectForKey:@"CreatorSource"])
@@ -211,7 +211,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         fSource.stringValue = [fDefaults stringForKey:@"CreatorSource"];
     }
 
-    fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSOnState : NSOffState;
+    fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (void)dealloc
@@ -294,7 +294,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         [self.window endEditingFor:fTrackerTable];
     }
 
-    BOOL const isPrivate = fPrivateCheck.state == NSOnState;
+    BOOL const isPrivate = fPrivateCheck.state == NSControlStateValueOn;
     if (fTrackers.count == 0 && [fDefaults boolForKey:isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
     {
         NSAlert* alert = [[NSAlert alloc] init];
@@ -317,10 +317,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
         alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            if (alert.suppressionButton.state == NSOnState)
+            if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorBlankAddress"]; //set regardless of private/public
-                if (fPrivateCheck.state == NSOnState)
+                if (fPrivateCheck.state == NSControlStateValueOn)
                 {
                     [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorPrivateBlankAddress"];
                 }
@@ -576,10 +576,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     //store values
     [fDefaults setObject:fTrackers forKey:@"CreatorTrackers"];
-    [fDefaults setBool:fPrivateCheck.state == NSOnState forKey:@"CreatorPrivate"];
+    [fDefaults setBool:fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
     [fDefaults setObject: [fSource stringValue] forKey: @"CreatorSource"];
-    [fDefaults setBool:fOpenCheck.state == NSOnState forKey:@"CreatorOpen"];
-    fOpenWhenCreated = fOpenCheck.state == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
+    [fDefaults setBool:fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
+    fOpenWhenCreated = fOpenCheck.state == NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL:fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
 
     self.window.restorable = NO;
@@ -591,7 +591,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         trackerInfo,
         fTrackers.count,
         fCommentView.string.UTF8String,
-        fPrivateCheck.state == NSOnState,
+        fPrivateCheck.state == NSControlStateValueOn,
         fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 

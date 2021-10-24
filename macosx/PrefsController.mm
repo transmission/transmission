@@ -428,7 +428,7 @@
 
 - (void)setRandomPortOnStart:(id)sender
 {
-    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton*)sender).state == NSOnState);
+    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton*)sender).state == NSControlStateValueOn);
 }
 
 - (void)setNat:(id)sender
@@ -974,7 +974,7 @@
 
 - (void)setShowAddMagnetWindow:(id)sender
 {
-    [fDefaults setBool:(fShowMagnetAddWindowCheck.state == NSOnState) forKey:@"MagnetOpenAsk"];
+    [fDefaults setBool:(fShowMagnetAddWindowCheck.state == NSControlStateValueOn) forKey:@"MagnetOpenAsk"];
 }
 
 - (void)updateShowAddMagnetWindowField
@@ -982,7 +982,7 @@
     if (![fDefaults boolForKey:@"DownloadLocationConstant"])
     {
         //always show the add window for magnet links when the download location is the same as the torrent file
-        fShowMagnetAddWindowCheck.state = NSOnState;
+        fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         fShowMagnetAddWindowCheck.enabled = NO;
     }
     else
