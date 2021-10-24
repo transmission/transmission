@@ -55,9 +55,11 @@ private:
 
     FreeSpaceLabel* freespace_label_ = nullptr;
 
+#if 0
     Gtk::Label* port_label_ = nullptr;
     Gtk::Button* port_button_ = nullptr;
     Gtk::SpinButton* port_spin_ = nullptr;
+#endif
 };
 
 /**
