@@ -436,7 +436,7 @@
         }
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 controlImage = [NSImage imageNamed:[@"ResumeNoWait" stringByAppendingString:controlImageSuffix]];
             }
@@ -913,7 +913,7 @@
             return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 return NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
             }

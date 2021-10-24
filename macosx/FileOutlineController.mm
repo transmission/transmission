@@ -287,7 +287,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     if ([identifier isEqualToString:@"Check"])
     {
         NSIndexSet* indexSet;
-        if (NSEvent.modifierFlags & NSAlternateKeyMask)
+        if (NSEvent.modifierFlags & NSEventModifierFlagOption)
         {
             indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTorrent.fileCount)];
         }

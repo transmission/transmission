@@ -593,7 +593,9 @@
 {
     unichar const firstChar = [event.charactersIgnoringModifiers characterAtIndex:0];
 
-    if (firstChar == 'f' && event.modifierFlags & NSAlternateKeyMask && event.modifierFlags & NSCommandKeyMask)
+    if (firstChar == 'f' &&
+        event.modifierFlags & NSEventModifierFlagOption &&
+        event.modifierFlags & NSEventModifierFlagCommand)
     {
         [fController focusFilterField];
     }
@@ -688,7 +690,7 @@
     }
     else
     {
-        if (NSEvent.modifierFlags & NSAlternateKeyMask)
+        if (NSEvent.modifierFlags & NSEventModifierFlagOption)
         {
             [fController resumeTorrentsNoWait:@[ torrent ]];
         }
