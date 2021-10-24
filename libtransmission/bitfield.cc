@@ -59,7 +59,7 @@ size_t tr_bitfield::recount() const
 {
     size_t ret = 0;
 
-    for (auto ch : this->bits)
+    for (auto ch : bits_)
     {
         ret += trueBitCount[ch];
     }
@@ -73,23 +73,23 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
     size_t const first_byte = begin >> 3U;
     size_t const last_byte = (end - 1) >> 3U;
 
-    if (this->bit_count == 0)
+    if (bit_count_ == 0)
     {
         return 0;
     }
 
-    if (first_byte >= std::size(this->bits))
+    if (first_byte >= std::size(bits_))
     {
         return 0;
     }
 
     TR_ASSERT(begin < end);
-    TR_ASSERT(!std::empty(this->bits));
+    TR_ASSERT(!std::empty(bits_));
 
     if (first_byte == last_byte)
     {
         int i;
-        uint8_t val = this->bits[first_byte];
+        uint8_t val = bits_[first_byte];
 
         i = begin - (first_byte * 8);
         val <<= i;
@@ -103,11 +103,11 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
     else
     {
         uint8_t val;
-        size_t const walk_end = std::min(std::size(this->bits), last_byte);
+        size_t const walk_end = std::min(std::size(bits_), last_byte);
 
         /* first byte */
         size_t const first_shift = begin - (first_byte * 8);
-        val = this->bits[first_byte];
+        val = bits_[first_byte];
         val <<= first_shift;
         val >>= first_shift;
         ret += trueBitCount[val];
@@ -115,14 +115,14 @@ size_t tr_bitfield::recount(size_t begin, size_t end) const
         /* middle bytes */
         for (size_t i = first_byte + 1; i < walk_end; ++i)
         {
-            ret += trueBitCount[this->bits[i]];
+            ret += trueBitCount[bits_[i]];
         }
 
         /* last byte */
-        if (last_byte < std::size(this->bits))
+        if (last_byte < std::size(bits_))
         {
             size_t const last_shift = (last_byte + 1) * 8 - end;
-            val = this->bits[last_byte];
+            val = bits_[last_byte];
             val >>= last_shift;
             val <<= last_shift;
             ret += trueBitCount[val];
@@ -160,12 +160,12 @@ bool tr_bitfield::test(size_t n) const
         return false;
     }
 
-    if (n >> 3U >= std::size(this->bits))
+    if (n >> 3U >= std::size(bits_))
     {
         return false;
     }
 
-    bool ret = (this->bits[n >> 3U] << (n & 7U) & 0x80) != 0;
+    bool ret = (bits_[n >> 3U] << (n & 7U) & 0x80) != 0;
     return ret;
 }
 
@@ -177,7 +177,7 @@ bool tr_bitfield::test(size_t n) const
 
 bool tr_bitfield::assertValid() const
 {
-    TR_ASSERT(std::empty(this->bits) || this->true_count == recount());
+    TR_ASSERT(std::empty(bits_) || true_count_ == recount());
 
     return true;
 }
@@ -186,11 +186,11 @@ bool tr_bitfield::assertValid() const
 
 std::vector<uint8_t> tr_bitfield::raw() const
 {
-    auto const n = getBytesNeeded(this->bit_count);
+    auto const n = getBytesNeeded(bit_count_);
 
-    if (!std::empty(this->bits))
+    if (!std::empty(bits_))
     {
-        return this->bits;
+        return bits_;
     }
 
     auto raw = std::vector<uint8_t>(n);
@@ -207,15 +207,15 @@ void tr_bitfield::ensureBitsAlloced(size_t n)
 {
     bool const has_all = hasAll();
 
-    size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, this->true_count)) : getBytesNeeded(n);
+    size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, true_count_)) : getBytesNeeded(n);
 
-    if (std::size(this->bits) < bytes_needed)
+    if (std::size(bits_) < bytes_needed)
     {
-        this->bits.resize(bytes_needed);
+        bits_.resize(bytes_needed);
 
         if (has_all)
         {
-            setAllTrue(std::data(this->bits), this->true_count);
+            setAllTrue(std::data(bits_), true_count_);
         }
     }
 }
@@ -234,16 +234,16 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
 
 void tr_bitfield::freeArray()
 {
-    this->bits = std::vector<uint8_t>{};
+    bits_ = std::vector<uint8_t>{};
 }
 
 void tr_bitfield::setTrueCount(size_t n)
 {
-    TR_ASSERT(this->bit_count == 0 || n <= this->bit_count);
+    TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
 
-    this->true_count = n;
-    this->have_all_hint = n == this->bit_count;
-    this->have_none_hint = n == 0;
+    true_count_ = n;
+    have_all_hint_ = n == bit_count_;
+    have_none_hint_ = n == 0;
 
     if (hasAll() || hasNone())
     {
@@ -260,26 +260,26 @@ void tr_bitfield::rebuildTrueCount()
 
 void tr_bitfield::incrementTrueCount(size_t inc)
 {
-    TR_ASSERT(this->bit_count == 0 || inc <= this->bit_count);
-    TR_ASSERT(this->bit_count == 0 || this->true_count <= this->bit_count - inc);
+    TR_ASSERT(bit_count_ == 0 || inc <= bit_count_);
+    TR_ASSERT(bit_count_ == 0 || true_count_ <= bit_count_ - inc);
 
-    setTrueCount(this->true_count + inc);
+    setTrueCount(true_count_ + inc);
 }
 
 void tr_bitfield::decrementTrueCount(size_t dec)
 {
-    TR_ASSERT(this->bit_count == 0 || dec <= this->bit_count);
-    TR_ASSERT(this->bit_count == 0 || this->true_count >= dec);
+    TR_ASSERT(bit_count_ == 0 || dec <= bit_count_);
+    TR_ASSERT(bit_count_ == 0 || true_count_ >= dec);
 
-    setTrueCount(this->true_count - dec);
+    setTrueCount(true_count_ - dec);
 }
 
 /****
 *****
 ****/
 
-tr_bitfield::tr_bitfield(size_t bit_count_in)
-    : bit_count{ bit_count_in }
+tr_bitfield::tr_bitfield(size_t bit_count)
+    : bit_count_{ bit_count }
 {
     TR_ASSERT(assertValid());
 }
@@ -287,9 +287,9 @@ tr_bitfield::tr_bitfield(size_t bit_count_in)
 void tr_bitfield::setHasNone()
 {
     freeArray();
-    this->true_count = 0;
-    this->have_all_hint = false;
-    this->have_none_hint = true;
+    true_count_ = 0;
+    have_all_hint_ = false;
+    have_none_hint_ = true;
 
     TR_ASSERT(assertValid());
 }
@@ -297,9 +297,9 @@ void tr_bitfield::setHasNone()
 void tr_bitfield::setHasAll()
 {
     freeArray();
-    this->true_count = this->bit_count;
-    this->have_all_hint = true;
-    this->have_none_hint = false;
+    true_count_ = bit_count_;
+    have_all_hint_ = true;
+    have_none_hint_ = false;
 
     TR_ASSERT(assertValid());
 }
@@ -308,22 +308,22 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count, bool bounded)
 {
     if (bounded)
     {
-        byte_count = std::min(byte_count, getBytesNeeded(this->bit_count));
+        byte_count = std::min(byte_count, getBytesNeeded(bit_count_));
     }
 
-    this->bits = std::vector<uint8_t>(raw, raw + byte_count);
+    bits_ = std::vector<uint8_t>(raw, raw + byte_count);
 
     if (bounded)
     {
         /* ensure the excess bits are set to '0' */
-        int const excess_bit_count = byte_count * 8 - this->bit_count;
+        int const excess_bit_count = byte_count * 8 - bit_count_;
 
         TR_ASSERT(excess_bit_count >= 0);
         TR_ASSERT(excess_bit_count <= 7);
 
         if (excess_bit_count != 0)
         {
-            this->bits.back() &= 0xff << excess_bit_count;
+            bits_.back() &= 0xff << excess_bit_count;
         }
     }
 
@@ -342,7 +342,7 @@ void tr_bitfield::setFromFlags(bool const* flags, size_t n)
         if (flags[i])
         {
             ++trueCount;
-            this->bits[i >> 3U] |= (0x80 >> (i & 7U));
+            bits_[i >> 3U] |= (0x80 >> (i & 7U));
         }
     }
 
@@ -363,12 +363,12 @@ void tr_bitfield::set(size_t nth, bool value)
 
     if (value)
     {
-        this->bits[nth >> 3U] |= 0x80 >> (nth & 7U);
+        bits_[nth >> 3U] |= 0x80 >> (nth & 7U);
         incrementTrueCount(1);
     }
     else
     {
-        this->bits[nth >> 3U] &= 0xff7f >> (nth & 7U);
+        bits_[nth >> 3U] &= 0xff7f >> (nth & 7U);
         decrementTrueCount(1);
     }
 }
@@ -385,7 +385,7 @@ void tr_bitfield::setRange(size_t begin, size_t end, bool value)
     }
 
     // bounds check
-    if (--end >= this->bit_count || begin > end)
+    if (--end >= bit_count_ || begin > end)
     {
         return;
     }
@@ -405,16 +405,16 @@ void tr_bitfield::setRange(size_t begin, size_t end, bool value)
 
         if (sb == eb)
         {
-            this->bits[sb] |= sm & em;
+            bits_[sb] |= sm & em;
         }
         else
         {
-            this->bits[sb] |= sm;
-            this->bits[eb] |= em;
+            bits_[sb] |= sm;
+            bits_[eb] |= em;
 
             if (++sb < eb)
             {
-                std::fill_n(std::begin(this->bits) + sb, eb - sb, 0xff);
+                std::fill_n(std::begin(bits_) + sb, eb - sb, 0xff);
             }
         }
 
@@ -427,16 +427,16 @@ void tr_bitfield::setRange(size_t begin, size_t end, bool value)
 
         if (sb == eb)
         {
-            this->bits[sb] &= sm | em;
+            bits_[sb] &= sm | em;
         }
         else
         {
-            this->bits[sb] &= sm;
-            this->bits[eb] &= em;
+            bits_[sb] &= sm;
+            bits_[eb] &= em;
 
             if (++sb < eb)
             {
-                std::fill_n(std::begin(this->bits) + sb, eb - sb, 0);
+                std::fill_n(std::begin(bits_) + sb, eb - sb, 0);
             }
         }
 

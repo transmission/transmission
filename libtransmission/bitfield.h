@@ -40,27 +40,33 @@ public:
     }
 
     void setFromFlags(bool const* bytes, size_t n);
+
     void setRaw(uint8_t const* bits, size_t byte_count, bool bounded);
+
     std::vector<uint8_t> raw() const;
 
     bool hasAll() const
     {
-        return this->have_all_hint || (this->bit_count > 0 && this->bit_count == this->true_count);
+        return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
+
     bool hasNone() const
     {
-        return this->have_none_hint || (this->bit_count > 0 && this->true_count == 0);
+        return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
+
     bool test(size_t bit) const;
+
     size_t count() const
     {
-        return this->true_count;
+        return true_count_;
     }
+
     size_t count(size_t begin, size_t end) const;
 
     size_t size() const
     {
-        return this->bit_count;
+        return bit_count_;
     }
 
 #ifdef TR_ENABLE_ASSERTS
@@ -80,12 +86,12 @@ private:
     void incrementTrueCount(size_t inc);
     void decrementTrueCount(size_t dec);
 
-    std::vector<uint8_t> bits;
-    size_t bit_count = 0;
-    size_t true_count = 0;
+    std::vector<uint8_t> bits_;
+    size_t bit_count_ = 0;
+    size_t true_count_ = 0;
 
     /* Special cases for when full or empty but we don't know the bitCount.
        This occurs when a magnet link's peers send have all / have none */
-    bool have_all_hint = false;
-    bool have_none_hint = false;
+    bool have_all_hint_ = false;
+    bool have_none_hint_ = false;
 };
