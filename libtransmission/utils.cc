@@ -1598,7 +1598,13 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+static void formatter_init(
+    formatter_units& units,
+    uint64_t kilo,
+    char const* kb,
+    char const* mb,
+    char const* gb,
+    char const* tb)
 {
     uint64_t value = kilo;
     units[TR_FMT_KB].name = tr_strdup(kb);
