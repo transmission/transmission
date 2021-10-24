@@ -428,7 +428,7 @@
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"There was a problem creating the file \"%@\".", "Save log alert panel -> message"),
                                      panel.URL.path.lastPathComponent];
-                alert.alertStyle = NSWarningAlertStyle;
+                alert.alertStyle = NSAlertStyleWarning;
 
                 [alert runModal];
             }

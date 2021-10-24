@@ -88,7 +88,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             alert.informativeText = NSLocalizedString(
                 @"There must be at least one file in a folder to create a torrent file.",
                 "Create torrent -> no files -> warning");
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
             [alert runModal];
 
@@ -100,7 +100,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
             alert.messageText = NSLocalizedString(@"The total file size is zero bytes.", "Create torrent -> zero size -> title");
             alert.informativeText = NSLocalizedString(@"A torrent file cannot be created for files with no size.", "Create torrent -> zero size -> warning");
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
             [alert runModal];
 
@@ -536,7 +536,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                                 "Create this directory or choose a different one to create the torrent file.",
                                                                "Create torrent -> directory doesn't exist warning -> warning"),
                                                            fLocation.URLByDeletingLastPathComponent.path];
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
 
         [alert beginSheetModalForWindow:self.window completionHandler:nil];
         return;
@@ -559,7 +559,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                                "Create torrent -> file already exists warning -> warning"),
                                                            pathComponents[count - 1],
                                                            pathComponents[count - 2]];
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
 
         [alert beginSheetModalForWindow:self.window completionHandler:nil];
         return;
@@ -627,7 +627,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
             alert.messageText = [NSString stringWithFormat:NSLocalizedString(@"Creation of \"%@\" failed.", "Create torrent -> failed -> title"),
                                                            fLocation.lastPathComponent];
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
             if (fInfo->result == TR_MAKEMETA_IO_READ)
             {

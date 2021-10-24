@@ -215,7 +215,7 @@
             @"If you are attempting to use already existing data,"
              " the root data directory should be inside the destination directory.",
             "Add torrent -> same name -> message");
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
         [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle:NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
         alert.showsSuppressionButton = YES;
