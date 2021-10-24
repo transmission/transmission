@@ -81,20 +81,13 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
-#ifdef QT_DBUS_LIB
-
-QString const DbusServiceName = QStringLiteral("org.freedesktop.Notifications");
-QString const DbusInterfaceName = QStringLiteral("org.freedesktop.Notifications");
-QString const DbusPath = QStringLiteral("/org/freedesktop/Notifications");
-
-#endif
-
 } // namespace
 
 Application::Application(int& argc, char** argv)
     : QApplication(argc, argv)
     , config_name_{ QStringLiteral("transmission") }
     , display_name_{ QStringLiteral("transmission-qt") }
+    , start_now_regex_{ QRegularExpression(QStringLiteral(R"rgx(start-now\((\d+)\))rgx")) }
 {
     setApplicationName(config_name_);
     loadTranslations();
@@ -367,9 +360,9 @@ Application::Application(int& argc, char** argv)
     if (bus.isConnected())
     {
         bus.connect(
-            DbusServiceName,
-            DbusPath,
-            DbusInterfaceName,
+            fdo_notifications_service_name_,
+            fdo_notifications_path_,
+            fdo_notifications_interface_name_,
             QLatin1String("ActionInvoked"),
             this,
             SLOT(onNotificationActionInvoked(quint32, QString)));
@@ -618,7 +611,11 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 
     if (bus.isConnected())
     {
-        QDBusMessage m = QDBusMessage::createMethodCall(DbusServiceName, DbusPath, DbusInterfaceName, QStringLiteral("Notify"));
+        QDBusMessage m = QDBusMessage::createMethodCall(
+            fdo_notifications_service_name_,
+            fdo_notifications_path_,
+            fdo_notifications_interface_name_,
+            QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
@@ -648,15 +645,13 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 #ifdef QT_DBUS_LIB
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
-    static QRegularExpression const StartNowRegex(QLatin1String(R"rgx(start-now\((\d+)\))rgx"));
-    QRegularExpressionMatch const match = StartNowRegex.match(action_key);
+    auto const match = start_now_regex_.match(action_key);
     if (match.hasMatch())
     {
         int const torrent_id = match.captured(1).toInt();
         session_->startTorrentsNow({ torrent_id });
     }
 }
-
 #endif
 
 FaviconCache& Application::faviconCache()
