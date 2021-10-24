@@ -352,19 +352,19 @@ static void saveStringFunc(tr_variant const* v, void* vevbuf)
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);
