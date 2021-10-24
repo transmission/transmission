@@ -901,7 +901,7 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
     return setSize;
 }
 
-static void updateFastSet([[maybe_unused]] tr_peerMsgs* msgs)
+static void updateFastSet(tr_peerMsgs*)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
@@ -2302,7 +2302,7 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError([[maybe_unused]] tr_peerIo* io, short what, void* vmsgs)
+static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -2673,7 +2673,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     }
 }
 
-static void pexPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vmsgs)
+static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 

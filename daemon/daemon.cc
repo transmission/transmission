@@ -42,11 +42,11 @@ using namespace std::literals;
 
 #else
 
-static void sd_notify([[maybe_unused]] int status, [[maybe_unused]] char const* str)
+static void sd_notify(int /*status*/, char const* /*str*/)
 {
 }
 
-static void sd_notifyf([[maybe_unused]] int status, [[maybe_unused]] char const* fmt, ...)
+static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 {
 }
 
@@ -379,17 +379,17 @@ static void reportStatus(void)
     }
 }
 
-static void periodicUpdate([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, [[maybe_unused]] void* context)
+static void periodicUpdate(evutil_socket_t /*fd*/, short /*what*/, void* /*context*/)
 {
     pumpLogMessages(logfile);
     reportStatus();
 }
 
 static tr_rpc_callback_status on_rpc_callback(
-    [[maybe_unused]] tr_session* session,
+    tr_session* /*session*/,
     tr_rpc_callback_type type,
-    [[maybe_unused]] struct tr_torrent* tor,
-    [[maybe_unused]] void* user_data)
+    tr_torrent* /*tor*/,
+    void* /*user_data*/)
 {
     if (type == TR_RPC_SESSION_CLOSE)
     {
@@ -614,7 +614,7 @@ struct daemon_data
     bool paused;
 };
 
-static void daemon_reconfigure([[maybe_unused]] void* arg)
+static void daemon_reconfigure(void* /*arg*/)
 {
     if (mySession == nullptr)
     {
@@ -643,7 +643,7 @@ static void daemon_reconfigure([[maybe_unused]] void* arg)
     }
 }
 
-static void daemon_stop([[maybe_unused]] void* arg)
+static void daemon_stop(void* /*arg*/)
 {
     event_base_loopexit(ev_base, nullptr);
 }

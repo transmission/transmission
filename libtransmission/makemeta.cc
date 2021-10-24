@@ -531,7 +531,7 @@ static tr_lock* getQueueLock(void)
     return lock;
 }
 
-static void makeMetaWorkerFunc([[maybe_unused]] void* user_data)
+static void makeMetaWorkerFunc(void* /*user_data*/)
 {
     for (;;)
     {
