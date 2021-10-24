@@ -488,7 +488,7 @@ void DetailsDialog::refreshUI()
                 have_verified += v;
                 size_when_done += t->sizeWhenDone();
                 left_until_done += t->leftUntilDone();
-                available += t->sizeWhenDone() - t->leftUntilDone() + t->haveUnverified() + t->desiredAvailable();
+                available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
             }
         }
 
