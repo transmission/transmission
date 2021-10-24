@@ -315,7 +315,7 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }
 
-        pieces.setFromFlags(flags, n);
+        pieces.setFromBools(flags, n);
         tr_free(flags);
     }
 

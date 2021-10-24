@@ -12,22 +12,34 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
 
 #include "tr-assert.h"
 
-/** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
+/**
+ * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
+ *
+ * This is for tracking what pieces a peer has.
+ *
+ * Also treats "have all" and "have none" as special cases:
+ * - This reduces overhead. No need to allocate an array or do lookups
+ *   if you know all bits have the same value
+ * - This makes peers that send 'have all' or 'have none' useful even 
+ *   if you don't know how many pieces there are, e.g. when you have a
+ *   magnet link and haven't finished getting its metainfo yet.
+ */
 class tr_bitfield
 {
 public:
-    tr_bitfield(size_t bit_count);
+    explicit tr_bitfield(size_t bit_count);
     ~tr_bitfield() = default;
 
     void setHasAll();
     void setHasNone();
+
+    // set one or more bits
     void set(size_t bit, bool value = true);
     void setRange(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
@@ -38,33 +50,37 @@ public:
     {
         setRange(begin, end, false);
     }
+    void setFromBools(bool const* bytes, size_t n);
 
-    void setFromFlags(bool const* bytes, size_t n);
-
+    // "raw" here is in BEP0003 format: "The first byte of the bitfield
+    // corresponds to indices 0 - 7 from high bit to low bit, respectively.
+    // The next one 8-15, etc. Spare bits at the end are set to zero.
     void setRaw(uint8_t const* bits, size_t byte_count, bool bounded);
-
     std::vector<uint8_t> raw() const;
 
-    bool hasAll() const
+    [[nodiscard]] bool hasAll() const
     {
         return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
 
-    bool hasNone() const
+    [[nodiscard]] bool hasNone() const
     {
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    bool test(size_t bit) const;
+    [[nodiscard]] bool test(size_t bit) const
+    {
+        return hasAll() || (!hasNone() && testFlag(bit));
+    }
 
-    size_t count() const
+    [[nodiscard]] size_t count() const
     {
         return true_count_;
     }
 
-    size_t count(size_t begin, size_t end) const;
+    [[nodiscard]] size_t count(size_t begin, size_t end) const;
 
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return bit_count_;
     }
@@ -74,11 +90,13 @@ public:
 #endif
 
 private:
-    size_t recount() const;
-    size_t recount(size_t begin, size_t end) const;
+    std::vector<uint8_t> flags_;
+    [[nodiscard]] size_t countFlags() const;
+    [[nodiscard]] size_t countFlags(size_t begin, size_t end) const;
+    [[nodiscard]] bool testFlag(size_t bit) const;
 
     void ensureBitsAlloced(size_t n);
-    bool ensureNthBitAlloced(size_t nth);
+    [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
     void freeArray();
 
     void setTrueCount(size_t n);
@@ -86,7 +104,6 @@ private:
     void incrementTrueCount(size_t inc);
     void decrementTrueCount(size_t dec);
 
-    std::vector<uint8_t> bits_;
     size_t bit_count_ = 0;
     size_t true_count_ = 0;
 

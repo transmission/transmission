@@ -77,7 +77,7 @@ TEST(Bitfield, ctorFromFlagArray)
         bool const have_none = true_count == 0;
 
         auto bf = tr_bitfield(n);
-        bf.setFromFlags(std::data(flags), std::size(flags));
+        bf.setFromBools(std::data(flags), std::size(flags));
 
         EXPECT_EQ(n, bf.size());
         EXPECT_EQ(have_all, bf.hasAll());
