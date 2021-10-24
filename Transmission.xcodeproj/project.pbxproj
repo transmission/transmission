@@ -56,7 +56,6 @@
 		A20162D013DE49E500E15488 /* miniupnpctypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CF13DE49E500E15488 /* miniupnpctypes.h */; };
 		A2074F4C12BEA8CE00F70985 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F4B12BEA8CE00F70985 /* buffer.c */; };
 		A2074F5912BEA8E000F70985 /* bufferevent_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5012BEA8E000F70985 /* bufferevent_filter.c */; };
-		A2074F5A12BEA8E000F70985 /* bufferevent_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5112BEA8E000F70985 /* bufferevent_openssl.c */; };
 		A2074F5B12BEA8E000F70985 /* bufferevent_pair.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5212BEA8E000F70985 /* bufferevent_pair.c */; };
 		A2074F5D12BEA8E000F70985 /* bufferevent_sock.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5412BEA8E000F70985 /* bufferevent_sock.c */; };
 		A2074F5E12BEA8E000F70985 /* bufferevent.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5512BEA8E000F70985 /* bufferevent.c */; };
@@ -107,10 +106,6 @@
 		A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
-		A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
@@ -270,7 +265,6 @@
 		A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.mm */; };
 		A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.mm */; };
 		A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
@@ -329,7 +323,7 @@
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
 		BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.cc */; };
 		C1033E071A3279B800EF44D8 /* crypto-utils-fallback.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */; };
-		C1033E081A3279B800EF44D8 /* crypto-utils-openssl.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1033E041A3279B800EF44D8 /* crypto-utils-openssl.cc */; };
+		C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */; };
 		C1033E091A3279B800EF44D8 /* crypto-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1033E051A3279B800EF44D8 /* crypto-utils.cc */; };
 		C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C1033E061A3279B800EF44D8 /* crypto-utils.h */; };
 		C1077A4E183EB29600634C22 /* error.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4A183EB29600634C22 /* error.cc */; };
@@ -343,11 +337,6 @@
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
 		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
 		C1305EBE186A13B100F03351 /* file.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.cc */; };
-		C139E3B122BE70FB0007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
-		C139E3B222BE71030007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
-		C139E3B322BE71180007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
-		C139E3B422BE71250007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
-		C139E3B522BE712C0007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
 		C1425B351EE9C5F5001DB85F /* tr-assert.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.cc */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
@@ -562,7 +551,6 @@
 		A202FF610DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2074F4B12BEA8CE00F70985 /* buffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
 		A2074F5012BEA8E000F70985 /* bufferevent_filter.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferevent_filter.c; sourceTree = "<group>"; };
-		A2074F5112BEA8E000F70985 /* bufferevent_openssl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferevent_openssl.c; sourceTree = "<group>"; };
 		A2074F5212BEA8E000F70985 /* bufferevent_pair.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferevent_pair.c; sourceTree = "<group>"; };
 		A2074F5412BEA8E000F70985 /* bufferevent_sock.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferevent_sock.c; sourceTree = "<group>"; };
 		A2074F5512BEA8E000F70985 /* bufferevent.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferevent.c; sourceTree = "<group>"; };
@@ -777,7 +765,6 @@
 		A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TrackerTableView.mm; sourceTree = "<group>"; };
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A27653A714369C5C009D3CCF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = "third-party/openssl/lib/libcrypto.dylib"; sourceTree = "<group>"; };
 		A279E3D011C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A279E3D111C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A279E3D211C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
@@ -991,7 +978,7 @@
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = clients.cc; sourceTree = "<group>"; };
 		C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-fallback.cc"; sourceTree = "<group>"; };
-		C1033E041A3279B800EF44D8 /* crypto-utils-openssl.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-openssl.cc"; sourceTree = "<group>"; };
+		C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils-ccrypto.cc"; sourceTree = "<group>"; };
 		C1033E051A3279B800EF44D8 /* crypto-utils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "crypto-utils.cc"; sourceTree = "<group>"; };
 		C1033E061A3279B800EF44D8 /* crypto-utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "crypto-utils.h"; sourceTree = "<group>"; };
 		C1077A4A183EB29600634C22 /* error.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cc; sourceTree = "<group>"; };
@@ -1005,7 +992,6 @@
 		C12F19771E1AE3C30005E93F /* upnperrors.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = upnperrors.c; sourceTree = "<group>"; };
 		C12F197A1E1AE4460005E93F /* upnperrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = upnperrors.h; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file.cc; sourceTree = "<group>"; };
-		C139E3B022BE70FA0007870C /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = "third-party/openssl/lib/libssl.dylib"; sourceTree = "<group>"; };
 		C1425B321EE9C5EA001DB85F /* tr-assert.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-assert.cc"; sourceTree = "<group>"; };
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-assert.h"; sourceTree = "<group>"; };
 		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-macros.h"; sourceTree = "<group>"; };
@@ -1048,9 +1034,7 @@
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
-				C139E3B322BE71180007870C /* libssl.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1065,9 +1049,7 @@
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
-				C139E3B122BE70FB0007870C /* libssl.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
@@ -1099,9 +1081,7 @@
 				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
-				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
 				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
-				C139E3B222BE71030007870C /* libssl.dylib in Frameworks */,
 				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1140,9 +1120,7 @@
 			files = (
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
-				C139E3B422BE71250007870C /* libssl.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1154,9 +1132,7 @@
 			files = (
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
-				C139E3B522BE712C0007870C /* libssl.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1420,7 +1396,7 @@
 				A29DF8B70DB2544C00D04E5A /* resume.h */,
 				A29DF8B80DB2544C00D04E5A /* torrent.h */,
 				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */,
-				C1033E041A3279B800EF44D8 /* crypto-utils-openssl.cc */,
+				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
 				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
 				C1033E061A3279B800EF44D8 /* crypto-utils.h */,
 				4D36BA600CA2F00800A63CA5 /* crypto.cc */,
@@ -1531,7 +1507,6 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				A27653A714369C5C009D3CCF /* libcrypto.dylib */,
 				A2290D2D1442B23200B95A09 /* libcurl.4.dylib */,
 				A296EF3411E5605E004A2781 /* libiconv.dylib */,
 				A2B6141B1395ADE9000E0975 /* libz.dylib */,
@@ -1617,7 +1592,6 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C139E3B022BE70FA0007870C /* libssl.dylib */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
 				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
@@ -1695,7 +1669,6 @@
 			children = (
 				A2074F4B12BEA8CE00F70985 /* buffer.c */,
 				A2074F5012BEA8E000F70985 /* bufferevent_filter.c */,
-				A2074F5112BEA8E000F70985 /* bufferevent_openssl.c */,
 				A2074F5212BEA8E000F70985 /* bufferevent_pair.c */,
 				A20750B712BEB66900F70985 /* bufferevent_ratelim.c */,
 				A2074F5412BEA8E000F70985 /* bufferevent_sock.c */,
@@ -2474,7 +2447,7 @@
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.cc in Sources */,
-				C1033E081A3279B800EF44D8 /* crypto-utils-openssl.cc in Sources */,
+				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
@@ -2641,7 +2614,6 @@
 			files = (
 				A2074F4C12BEA8CE00F70985 /* buffer.c in Sources */,
 				A2074F5912BEA8E000F70985 /* bufferevent_filter.c in Sources */,
-				A2074F5A12BEA8E000F70985 /* bufferevent_openssl.c in Sources */,
 				A2074F5B12BEA8E000F70985 /* bufferevent_pair.c in Sources */,
 				A2074F5D12BEA8E000F70985 /* bufferevent_sock.c in Sources */,
 				A2074F5E12BEA8E000F70985 /* bufferevent.c in Sources */,
@@ -3005,7 +2977,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/openssl/include",
 					"third-party/libevent/include",
 				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
@@ -3032,7 +3003,6 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_STRLCAT",
@@ -3169,7 +3139,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"third-party/curl/include",
-					"third-party/openssl/include",
 				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
@@ -3180,7 +3149,6 @@
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
-					"third-party/openssl/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3235,7 +3203,6 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_STRLCAT",
@@ -3335,7 +3302,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"third-party/curl/include",
-					"third-party/openssl/include",
 				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
@@ -3346,7 +3312,6 @@
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
-					"third-party/openssl/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-DNDEBUG";
@@ -3427,7 +3392,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					"third-party/curl/include",
-					"third-party/openssl/include",
 				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
@@ -3438,7 +3402,6 @@
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
-					"third-party/openssl/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3503,7 +3466,6 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_STRLCAT",
@@ -3559,7 +3521,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/openssl/include",
 					"third-party/libevent/include",
 				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
@@ -3683,7 +3644,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/openssl/include",
 					"third-party/libevent/include",
 				);
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
