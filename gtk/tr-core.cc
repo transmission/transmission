@@ -178,7 +178,7 @@ TorrentModelColumns::TorrentModelColumns()
     add(trackers);
     add(error);
     add(active_peer_count);
-};
+}
 
 TorrentModelColumns const torrent_cols;
 
@@ -1209,7 +1209,6 @@ bool TrCore::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, 
             if (gtr_is_hex_hashcode(str))
             {
                 auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
-                tried = true;
                 loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
             }
         }
