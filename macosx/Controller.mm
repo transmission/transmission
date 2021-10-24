@@ -4521,7 +4521,7 @@ static void removeKeRangerRansomware()
         NSButton* itemButton = (NSButton*)item.view;
         itemButton.target = self;
         itemButton.action = @selector(showToolbarShare:);
-        [itemButton sendActionOn:NSLeftMouseDownMask];
+        [itemButton sendActionOn:NSEventMaskLeftMouseDown];
 
         return item;
     }

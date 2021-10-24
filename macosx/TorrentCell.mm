@@ -162,7 +162,7 @@
 
     [(TorrentTableView*)controlView removeTrackingAreas];
 
-    while (event.type != NSLeftMouseUp)
+    while (event.type != NSEventTypeLeftMouseUp)
     {
         point = [controlView convertPoint:event.locationInWindow fromView:nil];
 
@@ -186,12 +186,14 @@
         }
 
         //send events to where necessary
-        if (event.type == NSMouseEntered || event.type == NSMouseExited)
+        if (event.type == NSEventTypeMouseEntered || event.type == NSEventTypeMouseExited)
         {
             [NSApp sendEvent:event];
         }
-        event = [controlView.window
-            nextEventMatchingMask:(NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
+        event = [controlView.window nextEventMatchingMask:(NSEventMaskLeftMouseUp |
+                                                           NSEventMaskLeftMouseDragged |
+                                                           NSEventMaskMouseEntered |
+                                                           NSEventMaskMouseExited)];
     }
 
     fTracking = NO;
