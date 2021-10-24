@@ -194,7 +194,7 @@
                                                fTorrent.name];
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             [self setDestinationPath:panel.URLs[0].path determinationType:TorrentDeterminationUserSpecified];
         }

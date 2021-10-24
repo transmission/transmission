@@ -1331,7 +1331,7 @@ static void removeKeRangerRansomware()
     panel.allowedFileTypes = @[ @"org.bittorrent.torrent", @"torrent" ];
 
     [panel beginSheetModalForWindow:fWindow completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSMutableArray* filenames = [NSMutableArray arrayWithCapacity:panel.URLs.count];
             for (NSURL* url in panel.URLs)
@@ -1929,7 +1929,7 @@ static void removeKeRangerRansomware()
     }
 
     [panel beginSheetModalForWindow:fWindow completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             for (Torrent* torrent in torrents)
             {
@@ -1963,7 +1963,7 @@ static void removeKeRangerRansomware()
 
         [panel beginSheetModalForWindow:fWindow completionHandler:^(NSInteger result) {
             //copy torrent to new location with name of data file
-            if (result == NSFileHandlingPanelOKButton)
+            if (result == NSModalResponseOK)
             {
                 [torrent copyTorrentFileTo:panel.URL.path];
             }

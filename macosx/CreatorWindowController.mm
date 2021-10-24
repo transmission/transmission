@@ -278,7 +278,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     panel.nameFieldStringValue = fLocation.lastPathComponent;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             fLocation = panel.URL;
             [self updateLocationField];

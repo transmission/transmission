@@ -222,7 +222,7 @@
 
     [panel beginSheetModalForWindow:fCustomLocationPopUp.window completionHandler:^(NSInteger result) {
         NSInteger const index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* path = panel.URLs[0].path;
             [GroupsController.groups setCustomDownloadLocation:path forIndex:index];

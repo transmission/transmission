@@ -404,7 +404,7 @@
     panel.nameFieldStringValue = NSLocalizedString(@"untitled", "Save log panel -> default file name");
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             //make the array sorted by date
             NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"Index" ascending:YES];

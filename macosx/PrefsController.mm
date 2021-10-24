@@ -892,7 +892,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             [fFolderPopUp selectItemAtIndex:DOWNLOAD_FOLDER];
 
@@ -923,7 +923,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* folder = panel.URLs[0].path;
             [fDefaults setObject:folder forKey:@"IncompleteDownloadFolder"];
@@ -946,7 +946,7 @@
     panel.canCreateDirectories = NO;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* filePath = panel.URLs[0].path;
 
@@ -1039,7 +1039,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
             [watcherQueue removeAllPaths];
