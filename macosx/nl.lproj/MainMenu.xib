@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,17 +13,17 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Transmission" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+        <window title="Transmission" separatorStyle="line" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="71" y="712" width="515" height="248"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="350" height="5"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button id="2690">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2690">
                         <rect key="frame" x="36" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TurtleTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
@@ -35,7 +35,7 @@
                             <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
                         </connections>
                     </button>
-                    <button id="3420">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3420">
                         <rect key="frame" x="72" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
@@ -46,7 +46,7 @@
                             <action selector="clearCompleted:" target="206" id="3424"/>
                         </connections>
                     </button>
-                    <button id="3435">
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
                         <rect key="frame" x="0.0" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="NSActionTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
@@ -57,7 +57,7 @@
                             <action selector="showGlobalPopover:" target="206" id="3439"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="2700">
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
                         <rect key="frame" x="118" y="5" width="279" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="999 van 999 transfers" id="3049">
@@ -66,7 +66,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="3088">
+                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
                         <rect key="frame" x="0.0" y="24" width="515" height="224"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="URk-7X-LQR">
@@ -75,24 +75,22 @@
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="2" height="3"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
                                     <tableColumns>
                                         <tableColumn identifier="Color" editable="NO" width="29" minWidth="16" maxWidth="3000" id="3093">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Kleur">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="287E68F5-3D43-4B24-BF8C-098EEABDB9F2" id="3146">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3146">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
-                                        <tableColumn identifier="Group" editable="NO" width="326" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
+                                        <tableColumn identifier="Group" editable="NO" width="296" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Groep">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -105,17 +103,15 @@
                                         </tableColumn>
                                         <tableColumn identifier="DL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3124">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="287E68F5-3D43-4B24-BF8C-098EEABDB9F2" id="3138">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3138">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
                                         <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="DL snelheid">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -127,17 +123,15 @@
                                         </tableColumn>
                                         <tableColumn identifier="UL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3133">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="287E68F5-3D43-4B24-BF8C-098EEABDB9F2" id="3139">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3139">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
                                         <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="UL snelheid">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -163,11 +157,11 @@
                                 </outlineView>
                             </subviews>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
                             <rect key="frame" x="-100" y="-100" width="451" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
                             <rect key="frame" x="453" y="0.0" width="15" height="173"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -177,6 +171,7 @@
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
             </connections>
+            <point key="canvasLocation" x="139" y="140"/>
         </window>
         <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
             <items>
@@ -976,89 +971,90 @@ CA
         </menu>
     </objects>
     <resources>
-        <image name="287E68F5-3D43-4B24-BF8C-098EEABDB9F2" width="62" height="62">
-            <mutableData key="keyedArchiveRepresentation">
-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
-lQCaAJ8AowCoAK0AsgC3ALwAwQDGAMsA0ADVANsA4ADlAOsA8AD2APsBAQEHAQ0BEwEZAR8BJQErATIB
-OAE+AUUBTAFSAVkBYAFnAW4BdQF8AYMBiwGSAZoBoQGpAbEBuQHBAckB0QHZAeEB6QHyAfoCAwIMAhQC
-HQImAi8COAJBAksCVAJdAmcCcQJ6AoQCjgKYAqICrAK2AsECywLVAuAC6wL1AwADCwMWAyEDLQM4A0MD
-TwNaA2YDcgN+A4oDlgOiA64DugPHA9MD4APsA/kEBgQTBCAELQQ7BEgEVQRjBHEEfgSMBJoEqAS2BMQE
-0wThBPAE/gUNBRwFKwU6BUkFWAVnBXcFhgWWBaYFtQXFBdUF5QX2BgYGFgYnBjcGSAZZBmoGewaMBp0G
-rwbABtEG4wb1BwcHGQcrBz0HTwdhB3QHhgeZB6wHvwfSB+UH+AgLCB8IMghGCFoIbgiCCJYIqgi+CNII
-5wj7CRAJJQk6CU8JZAl5CY8JpAm6Cc8J5Qn7ChEKJwo9ClQKagqBCpgKrgrFCtwK8wsLCyILOQtRC2kL
-gAuYC7ALyAvhC/kMEgwqDEMMXAx1DI4MpwzADNkM8w0NDSYNQA1aDXQNjg2pDcMN3g34DhMOLg5JDmQO
-fw6bDrYO0g7uDwkPJQ9BD14Peg+WD7MPzw/sEAkQJhBDEGEQfhCbELkQ1xD1ERMRMRFPEW0RjBGqEckR
-6BIHEiYSRRJkEoQSoxLDEuMTAxMjE0MTYxODE6QTxRPlFAYUJxRJFGoUixStFM4U8BUSFTQVVhV4FZsV
-vRXgFgMWJhZJFmwWjxayFtYW+hcdF0EXZReJF64X0hf3GBsYQBhlGIoYrxjVGPoZIBlFGWsZkRm3Gd0a
-BBoqGlEadxqeGsUa7BsUGzsbYxuKG7Ib2hwCHCocUhx7HKMczBz1HR4dRx1wHZkdwx3sHhYeQB5qHpQe
-vh7pHxMfPh9pH5Qfvx/qIBUgQSBsIJggxCDwIRwhSCF1IaEhziH7IiciVSKCIq8i3SMKIzgjZiOUI8Ij
-8CQfJE0kfCSrJNolCSU4JWgllyXHJfcmJyZXJocmtyboJxgnSSd6J6sn3CgNKD8ocSiiKNQpBik4KWsp
-nSnQKgIqNSpoKpsqzysCKzYraSudK9EsBSw5LG4soizXLQwtQS12Last4S4WLkwugi63Lu4vJC9aL5Ev
-xy/+MDUwbDCkMNsxEjFKMYIxujHyMioyYzKbMtQzDTNGM38zuDPxNCs0ZTSeNNg1EzVNNYc1wjX9Njc2
-cjauNuk3JDdgN5w31zgUOFA4jDjIOQU5Qjl/Obw5+To2OnQ6sjrvOy07azuqO+g8JzxlPKQ84z0iPWE9
-oT3gPiA+YD6gPuA/IT9hP6I/4kAjQGRApkDnQSlBakGsQe5CMEJyQrVC90M6Q31DwEQDREdEikTORRJF
-VUWaRd5GIkZnRqtG8Ec1R3tHwEgFSEtIkUjXSR1JY0mpSfBKN0p9SsRLDEtTS5pL4kwqTHJMuk0CTUpN
-k03cTiVObk63TwBPSU+TT91QJ1BxULtRBlFQUZtR5lIxUnxSx1MTU19TqlP2VEJUj1TbVShVdVXCVg9W
-XFapVvdXRFeSV+BYL1h9WMtZGllpWbhaB1pWWqZa9VtFW5Vb5Vw1XIZc1l0nXXhdyV4aXmxevV8PX2Ff
-s2AFYFdgqmD8YU9homH1YklinGLwY0Njl2PrZEBklGTpZT1lkmXnZj1mkmboZz1nk2fpaD9olmjsaUNp
-mmnxakhqn2r3a09rp2v/bFdsr20IbWBtuW4SbmtuxG8eb3hv0XArcIZw4HE6cZVx8HJLcqZzAXNdc7h0
-FHRwdMx1KHWFdeF2Pnabdvh3VnezeBF4bnjMeSp5iXnnekZ6pXsEe2N7wnwhfIF84X1BfaF+AX5ifsJ/
-I3+Ef+WAR4CogQqBa4HNgjCCkoL0g1eDuoQdhICE44VHhauGDoZyhteHO4efiASIaYjOiTOJmYn+imSK
-yoswi5aL/IxjjMqNMY2Yjf+OZo7OjzaPnpAGkG6Q1pE/kaiSEZJ6kuOTTZO2lCCUipT0lV+VyZY0lp+X
-Cpd1l+CYTJi4mSSZkJn8mmia1ZtCm6+cHJyJnPedZJ3SnkCerp8dn4uf+qBpoNihR6G2oiailqMGo3aj
-5qRWpMelOKWpphqmi6b9p26n4KhSqMSpN6mpqhyqj6sCq3Wr6axcrNCtRK24ri2uoa8Wr4uwALB1sOqx
-YLHWskuywrM4s660JbSctRO1irYBtnm28Ldot+C4WbjRuUq5wro7urW7LrunvCG8m70VvY++Cr6Evv+/
-er/1wHDA7MFnwePCX8Lbw1jD1MRRxM7FS8XIxkbGw8dBx7/IPci8yTrJuco4yrfLNsu2zDXMtc01zbXO
-Ns62zzfPuNA50LrRPNG+0j/SwdNE08bUSdTL1U7V0dZV1tjXXNfg2GTY6Nls2fHadtr724DcBdyK3RDd
-lt4c3qLfKd+v4DbgveFE4cziU+Lb42Pj6+Rz5PzlhOYN5pbnH+ep6DLovOlG6dDqW+rl63Dr++yG7RHt
-nO4o7rTvQO/M8Fjw5fFy8f/yjPMZ86f0NPTC9VD13vZt9vv3ivgZ+Kj5OPnH+lf65/t3/Af8mP0p/br+
-S/7c/23//3BhcmEAAAAAAAMAAAACZmYAAPKnAAANWQAAE9AAAAoOdmNndAAAAAAAAAABAAEAAAAAAAAA
-AQAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAQAAbmRpbgAAAAAAAAA2AACnQAAAVYAAAEzAAACewAAAJYAA
-AAzAAABQAAAAVEAAAjMzAAIzMwACMzMAAAAAAAAAAHNmMzIAAAAAAAEMcgAABfj///MdAAAHugAA/XL/
-//ud///9pAAAA9kAAMBxbW1vZAAAAAAAAAYQAACgBwAAAADJJx4AAAAAAAAAAAAAAAAAAAAAANIlJico
-WiRjbGFzc25hbWVYJGNsYXNzZXNfEBBOU0JpdG1hcEltYWdlUmVwoycpKlpOU0ltYWdlUmVwWE5TT2Jq
-ZWN00iUmLC1XTlNBcnJheaIsKtIlJi8wXk5TTXV0YWJsZUFycmF5oy8sKtMyMwo0NTZXTlNXaGl0ZVxO
-U0NvbG9yU3BhY2VEMCAwABADgAzSJSY4OVdOU0NvbG9yojgq0iUmOzxXTlNJbWFnZaI7Kl8QD05TS2V5
-ZWRBcmNoaXZlctE/QFRyb290gAEACAARABoAIwAtADIANwBGAEwAVwBeAGUAcgB5AIEAgwCFAIoAjACO
-AJcAnACnAKkAqwCtALIAtQC3ALkAuwC9AMIA2QDbAN0Prw+0D78PyA/bD98P6g/zD/gQABADEAgQFxAb
-ECIQKhA3EDwQPhBAEEUQTRBQEFUQXRBgEHIQdRB6AAAAAAAAAgEAAAAAAAAAQQAAAAAAAAAAAAAAAAAA
-EHw
-</mutableData>
-        </image>
         <image name="CleanupTemplate" width="18" height="18"/>
-        <image name="NSActionTemplate" width="14" height="14"/>
+        <image name="NSActionTemplate" width="15" height="15"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
         <image name="PriorityLowTemplate" width="12" height="12"/>
         <image name="PriorityNormalTemplate" width="12" height="12"/>
         <image name="TurtleTemplate" width="18" height="18"/>
+        <image name="imageCell:3146:image" width="62" height="62">
+            <mutableData key="keyedArchiveRepresentation">
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCkqMTQ3PUBVJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDAAACAA4ALWHs2MiwgNjJ90hsPHB5aTlMub2JqZWN0c6EdgASACtIbDyAjoiEigAWABoAJ0w8lJico
+FF8QFE5TVElGRlJlcHJlc2VudGF0aW9uXxAZTlNJbnRlcm5hbExheW91dERpcmVjdGlvboAIgAdPEQ7m
+TU0AKgAAAUiAOyBP8AQWDQeEQmFQuGQ2HQ+IRGJROKRWLReMRCBOyCRmPR+QSGRSOSSWGRuOyaVSuWS2
+XS+DyiYTOaTWbTcATKcTueT2fRqBz+hUOiTadUWkUmlR+j0unU+oQqm1GqVWkVOrVmtTisVuvV+WV2wW
+OyUyg2W0WmMWK1W23Qi2W+5Wq43O7WO63e9Vq83u/VG+3/BUrA4PDUPC4fFTzE4vHTXG4/JS7I5PLSbK
+5fNSHM5vPWuz5/RS3O6PTQ/S6fVVLQ6vXRnU6/XbHZarabXTbfcaJ172U7vgQ3euvf8HjQjh8Xj8vk8v
+nQbm8/ndHpcfqdXg9fsbvtdva93va/weHV+PyafzefR+n1Z/2e3N+/4Zf5fPJ/X7Y/8fnF/v+MO/z/sH
+AMBL/AkCr3A8ELvBUFrnBsHLfCEIrbCcKLSgIAARAQAAAwAAAAEAPgAAAQEAAwAAAAEAPgAAAQIAAwAA
+AAQAAAIaAQMAAwAAAAEABQAAAQYAAwAAAAEAAgAAAQoAAwAAAAEAAQAAAREABAAAAAEAAAAIARIAAwAA
+AAEAAQAAARUAAwAAAAEABAAAARYAAwAAAAEAPgAAARcABAAAAAEAAAFAARwAAwAAAAEAAQAAASgAAwAA
+AAEAAgAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAQAAAIih3MABwAADLwAAAIqAAAAAAAI
+AAgACAAIAAEAAQABAAEAAAy8YXBwbAIQAABtbnRyUkdCIFhZWiAH3gABAAgACQA1ABdhY3NwQVBQTAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFkZXNjAAABUAAAAGJkc2NtAAABtAAAAaRjcHJ0AAADWAAA
+ACN3dHB0AAADfAAAABRyWFlaAAADkAAAABRnWFlaAAADpAAAABRiWFlaAAADuAAAABRyVFJDAAADzAAA
+CAxhYXJnAAAL2AAAACB2Y2d0AAAL+AAAADBuZGluAAAMKAAAAD5jaGFkAAAMaAAAACxtbW9kAAAMlAAA
+AChiVFJDAAADzAAACAxnVFJDAAADzAAACAxhYWJnAAAL2AAAACBhYWdnAAAL2AAAACBkZXNjAAAAAAAA
+AAhEaXNwbGF5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAAhAAAADGhySFIAAAAIAAABnGtv
+S1IAAAAIAAABnG5iTk8AAAAIAAABnGlkAAAAAAAIAAABnGh1SFUAAAAIAAABnGNzQ1oAAAAIAAABnGRh
+REsAAAAIAAABnHVrVUEAAAAIAAABnGFyAAAAAAAIAAABnGl0SVQAAAAIAAABnHJvUk8AAAAIAAABnG5s
+TkwAAAAIAAABnGhlSUwAAAAIAAABnGVzRVMAAAAIAAABnGZpRkkAAAAIAAABnHpoVFcAAAAIAAABnHZp
+Vk4AAAAIAAABnHNrU0sAAAAIAAABnHpoQ04AAAAIAAABnHJ1UlUAAAAIAAABnGZyRlIAAAAIAAABnG1z
+AAAAAAAIAAABnGNhRVMAAAAIAAABnHRoVEgAAAAIAAABnGRlREUAAAAIAAABnGVuVVMAAAAIAAABnHB0
+QlIAAAAIAAABnHBsUEwAAAAIAAABnGVsR1IAAAAIAAABnHN2U0UAAAAIAAABnHRyVFIAAAAIAAABnGph
+SlAAAAAIAAABnHB0UFQAAAAIAAABnABpAE0AYQBjdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUgSW5jLiwg
+MjAxNAAAWFlaIAAAAAAAAPMWAAEAAAABFspYWVogAAAAAAAAccAAADmKAAABZ1hZWiAAAAAAAABhIwAA
+ueYAABP2WFlaIAAAAAAAACPyAAAMkAAAvdBjdXJ2AAAAAAAABAAAAAAFAAoADwAUABkAHgAjACgALQAy
+ADYAOwBAAEUASgBPAFQAWQBeAGMAaABtAHIAdwB8AIEAhgCLAJAAlQCaAJ8AowCoAK0AsgC3ALwAwQDG
+AMsA0ADVANsA4ADlAOsA8AD2APsBAQEHAQ0BEwEZAR8BJQErATIBOAE+AUUBTAFSAVkBYAFnAW4BdQF8
+AYMBiwGSAZoBoQGpAbEBuQHBAckB0QHZAeEB6QHyAfoCAwIMAhQCHQImAi8COAJBAksCVAJdAmcCcQJ6
+AoQCjgKYAqICrAK2AsECywLVAuAC6wL1AwADCwMWAyEDLQM4A0MDTwNaA2YDcgN+A4oDlgOiA64DugPH
+A9MD4APsA/kEBgQTBCAELQQ7BEgEVQRjBHEEfgSMBJoEqAS2BMQE0wThBPAE/gUNBRwFKwU6BUkFWAVn
+BXcFhgWWBaYFtQXFBdUF5QX2BgYGFgYnBjcGSAZZBmoGewaMBp0GrwbABtEG4wb1BwcHGQcrBz0HTwdh
+B3QHhgeZB6wHvwfSB+UH+AgLCB8IMghGCFoIbgiCCJYIqgi+CNII5wj7CRAJJQk6CU8JZAl5CY8JpAm6
+Cc8J5Qn7ChEKJwo9ClQKagqBCpgKrgrFCtwK8wsLCyILOQtRC2kLgAuYC7ALyAvhC/kMEgwqDEMMXAx1
+DI4MpwzADNkM8w0NDSYNQA1aDXQNjg2pDcMN3g34DhMOLg5JDmQOfw6bDrYO0g7uDwkPJQ9BD14Peg+W
+D7MPzw/sEAkQJhBDEGEQfhCbELkQ1xD1ERMRMRFPEW0RjBGqEckR6BIHEiYSRRJkEoQSoxLDEuMTAxMj
+E0MTYxODE6QTxRPlFAYUJxRJFGoUixStFM4U8BUSFTQVVhV4FZsVvRXgFgMWJhZJFmwWjxayFtYW+hcd
+F0EXZReJF64X0hf3GBsYQBhlGIoYrxjVGPoZIBlFGWsZkRm3Gd0aBBoqGlEadxqeGsUa7BsUGzsbYxuK
+G7Ib2hwCHCocUhx7HKMczBz1HR4dRx1wHZkdwx3sHhYeQB5qHpQevh7pHxMfPh9pH5Qfvx/qIBUgQSBs
+IJggxCDwIRwhSCF1IaEhziH7IiciVSKCIq8i3SMKIzgjZiOUI8Ij8CQfJE0kfCSrJNolCSU4JWgllyXH
+JfcmJyZXJocmtyboJxgnSSd6J6sn3CgNKD8ocSiiKNQpBik4KWspnSnQKgIqNSpoKpsqzysCKzYraSud
+K9EsBSw5LG4soizXLQwtQS12Last4S4WLkwugi63Lu4vJC9aL5Evxy/+MDUwbDCkMNsxEjFKMYIxujHy
+MioyYzKbMtQzDTNGM38zuDPxNCs0ZTSeNNg1EzVNNYc1wjX9Njc2cjauNuk3JDdgN5w31zgUOFA4jDjI
+OQU5Qjl/Obw5+To2OnQ6sjrvOy07azuqO+g8JzxlPKQ84z0iPWE9oT3gPiA+YD6gPuA/IT9hP6I/4kAj
+QGRApkDnQSlBakGsQe5CMEJyQrVC90M6Q31DwEQDREdEikTORRJFVUWaRd5GIkZnRqtG8Ec1R3tHwEgF
+SEtIkUjXSR1JY0mpSfBKN0p9SsRLDEtTS5pL4kwqTHJMuk0CTUpNk03cTiVObk63TwBPSU+TT91QJ1Bx
+ULtRBlFQUZtR5lIxUnxSx1MTU19TqlP2VEJUj1TbVShVdVXCVg9WXFapVvdXRFeSV+BYL1h9WMtZGllp
+WbhaB1pWWqZa9VtFW5Vb5Vw1XIZc1l0nXXhdyV4aXmxevV8PX2Ffs2AFYFdgqmD8YU9homH1YklinGLw
+Y0Njl2PrZEBklGTpZT1lkmXnZj1mkmboZz1nk2fpaD9olmjsaUNpmmnxakhqn2r3a09rp2v/bFdsr20I
+bWBtuW4SbmtuxG8eb3hv0XArcIZw4HE6cZVx8HJLcqZzAXNdc7h0FHRwdMx1KHWFdeF2Pnabdvh3Vnez
+eBF4bnjMeSp5iXnnekZ6pXsEe2N7wnwhfIF84X1BfaF+AX5ifsJ/I3+Ef+WAR4CogQqBa4HNgjCCkoL0
+g1eDuoQdhICE44VHhauGDoZyhteHO4efiASIaYjOiTOJmYn+imSKyoswi5aL/IxjjMqNMY2Yjf+OZo7O
+jzaPnpAGkG6Q1pE/kaiSEZJ6kuOTTZO2lCCUipT0lV+VyZY0lp+XCpd1l+CYTJi4mSSZkJn8mmia1ZtC
+m6+cHJyJnPedZJ3SnkCerp8dn4uf+qBpoNihR6G2oiailqMGo3aj5qRWpMelOKWpphqmi6b9p26n4KhS
+qMSpN6mpqhyqj6sCq3Wr6axcrNCtRK24ri2uoa8Wr4uwALB1sOqxYLHWskuywrM4s660JbSctRO1irYB
+tnm28Ldot+C4WbjRuUq5wro7urW7LrunvCG8m70VvY++Cr6Evv+/er/1wHDA7MFnwePCX8Lbw1jD1MRR
+xM7FS8XIxkbGw8dBx7/IPci8yTrJuco4yrfLNsu2zDXMtc01zbXONs62zzfPuNA50LrRPNG+0j/SwdNE
+08bUSdTL1U7V0dZV1tjXXNfg2GTY6Nls2fHadtr724DcBdyK3RDdlt4c3qLfKd+v4DbgveFE4cziU+Lb
+42Pj6+Rz5PzlhOYN5pbnH+ep6DLovOlG6dDqW+rl63Dr++yG7RHtnO4o7rTvQO/M8Fjw5fFy8f/yjPMZ
+86f0NPTC9VD13vZt9vv3ivgZ+Kj5OPnH+lf65/t3/Af8mP0p/br+S/7c/23//3BhcmEAAAAAAAMAAAAC
+ZmYAAPKnAAANWQAAE9AAAAoOdmNndAAAAAAAAAABAAEAAAAAAAAAAQAAAAEAAAAAAAAAAQAAAAEAAAAA
+AAAAAQAAbmRpbgAAAAAAAAA2AACnQAAAVYAAAEzAAACewAAAJYAAAAzAAABQAAAAVEAAAjMzAAIzMwAC
+MzMAAAAAAAAAAHNmMzIAAAAAAAEMcgAABfj///MdAAAHugAA/XL///ud///9pAAAA9kAAMBxbW1vZAAA
+AAAAAAYQAACgBwAAAADJJx4AAAAAAAAAAAAAAAAAAAAAANIrLC0uWiRjbGFzc25hbWVYJGNsYXNzZXNf
+EBBOU0JpdG1hcEltYWdlUmVwoy0vMFpOU0ltYWdlUmVwWE5TT2JqZWN00issMjNXTlNBcnJheaIyMNIr
+LDU2Xk5TTXV0YWJsZUFycmF5ozUyMNM4OQ86OzxXTlNXaGl0ZVxOU0NvbG9yU3BhY2VEMCAwABADgAzS
+Kyw+P1dOU0NvbG9yoj4w0issQUJXTlNJbWFnZaJBMAAIABEAGgAkACkAMgA3AEkATABRAFMAYgBoAHUA
+fACLAJIAnwCmAK4AsACyALQAuQC7AL0AxgDLANYA2ADaANwA4QDkAOYA6ADqAPEBCAEkASYBKBASEBcQ
+IhArED4QQhBNEFYQWxBjEGYQaxB6EH4QhRCNEJoQnxChEKMQqBCwELMQuBDAAAAAAAAAAgEAAAAAAAAA
+QwAAAAAAAAAAAAAAAAAAEMM
+</mutableData>
+        </image>
     </resources>
 </document>

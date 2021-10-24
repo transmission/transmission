@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,9 +8,22 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include "tr-core.h"
+#include <memory>
 
-GtkWidget* gtr_file_list_new(TrCore*, int torrent_id);
-void gtr_file_list_clear(GtkWidget*);
-void gtr_file_list_set_torrent(GtkWidget*, int torrent_id);
+#include <gtkmm.h>
+
+class TrCore;
+
+class FileList : public Gtk::ScrolledWindow
+{
+public:
+    FileList(Glib::RefPtr<TrCore> const& core, int torrent_id);
+    ~FileList() override;
+
+    void clear();
+    void set_torrent(int torrent_id);
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+};

@@ -37,9 +37,9 @@ protected:
     {
         tr_torrentRemove(tor, false, nullptr);
         auto const test = [this, expected_torrent_count]()
-            {
-                return tr_sessionCountTorrents(session_) == expected_torrent_count;
-            };
+        {
+            return tr_sessionCountTorrents(session_) == expected_torrent_count;
+        };
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
@@ -121,17 +121,18 @@ protected:
 
     int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
     {
-        auto const on_rename_done = [] (
-            tr_torrent* /*tor*/, char const* /*oldpath*/,
-            char const* /*newname*/, int error,
-            void* user_data) noexcept
+        auto const on_rename_done =
+            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* user_data) noexcept
         {
             *static_cast<int*>(user_data) = error;
         };
 
         int error = -1;
         tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);
-        auto test = [&error]() { return error != -1; };
+        auto test = [&error]()
+        {
+            return error != -1;
+        };
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
         return error;
     }
@@ -144,7 +145,8 @@ TEST_F(RenameTest, singleFilenameTorrent)
 
     // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
     auto* ctor = tr_ctorNew(session_);
-    auto* tor = createTorrentFromBase64Metainfo(ctor,
+    auto* tor = createTorrentFromBase64Metainfo(
+        ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
         "ZWkxMzU4NTQ5MDk4ZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDY6bGVuZ3RoaTE0ZTQ6bmFtZTE1"
         "OmhlbGxvLXdvcmxkLnR4dDEyOnBpZWNlIGxlbmd0aGkzMjc2OGU2OnBpZWNlczIwOukboJcrkFUY"
@@ -212,7 +214,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     sync();
     loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
-    EXPECT_NE(decltype(loaded) { 0 }, (loaded & TR_FR_NAME));
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_NAME));
 
     /***
     ****  ...and rename it back again
@@ -242,23 +244,22 @@ TEST_F(RenameTest, multifileTorrent)
 {
     char* str;
     auto constexpr TotalSize = size_t{ 67 };
-    auto const expected_files = std::array<std::string, 4>
-    {
+    auto const expected_files = std::array<std::string, 4>{
         "Felidae/Felinae/Acinonyx/Cheetah/Chester",
         "Felidae/Felinae/Felis/catus/Kyphi",
         "Felidae/Felinae/Felis/catus/Saffron",
-        "Felidae/Pantherinae/Panthera/Tiger/Tony"
+        "Felidae/Pantherinae/Panthera/Tiger/Tony",
     };
-    auto const expected_contents = std::array<std::string, 4>
-    {
+    auto const expected_contents = std::array<std::string, 4>{
         "It ain't easy bein' cheesy.\n",
         "Inquisitive\n",
         "Tough\n",
-        "They’re Grrrrreat!\n"
+        "They’re Grrrrreat!\n",
     };
 
     auto* ctor = tr_ctorNew(session_);
-    auto* tor = createTorrentFromBase64Metainfo(ctor,
+    auto* tor = createTorrentFromBase64Metainfo(
+        ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
         "ZWkxMzU4NTU1NDIwZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDU6ZmlsZXNsZDY6bGVuZ3RoaTI4"
         "ZTQ6cGF0aGw3OkZlbGluYWU4OkFjaW5vbnl4NzpDaGVldGFoNzpDaGVzdGVyZWVkNjpsZW5ndGhp"
@@ -331,7 +332,7 @@ TEST_F(RenameTest, multifileTorrent)
     tr_free(files[1].name);
     tor->info.files[1].name = tr_strdup("gabba gabba hey");
     auto const loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
-    EXPECT_NE(decltype(loaded) { 0 }, (loaded & TR_FR_FILENAMES));
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
     EXPECT_EQ(expected_files[0], files[0].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", files[1].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Saffron", files[2].name);
@@ -431,7 +432,8 @@ TEST_F(RenameTest, multifileTorrent)
     **/
 
     ctor = tr_ctorNew(session_);
-    tor = createTorrentFromBase64Metainfo(ctor,
+    tor = createTorrentFromBase64Metainfo(
+        ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
         "ZWkxMzU4NTU1NDIwZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDU6ZmlsZXNsZDY6bGVuZ3RoaTI4"
         "ZTQ6cGF0aGw3OkZlbGluYWU4OkFjaW5vbnl4NzpDaGVldGFoNzpDaGVzdGVyZWVkNjpsZW5ndGhp"
@@ -474,17 +476,17 @@ TEST_F(RenameTest, multifileTorrent)
 
 TEST_F(RenameTest, partialFile)
 {
-    auto constexpr PieceCount = uint32_t { 33 };
-    auto constexpr PieceSize = uint32_t { 32768 };
-    auto const length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
-    auto const total_size = uint64_t(length[0]) + length[1] + length[2];
+    auto constexpr PieceCount = uint32_t{ 33 };
+    auto constexpr PieceSize = uint32_t{ 32768 };
+    auto constexpr Length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
+    auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
 
     /***
     ****  create our test torrent with an incomplete .part file
     ***/
 
     auto* tor = zeroTorrentInit();
-    EXPECT_EQ(total_size, tor->info.totalSize);
+    EXPECT_EQ(TotalSize, tor->info.totalSize);
     EXPECT_EQ(PieceSize, tor->info.pieceSize);
     EXPECT_EQ(PieceCount, tor->info.pieceCount);
     EXPECT_STREQ("files-filled-with-zeroes/1048576", tor->info.files[0].name);
@@ -492,13 +494,11 @@ TEST_F(RenameTest, partialFile)
     EXPECT_STREQ("files-filled-with-zeroes/512", tor->info.files[2].name);
 
     zeroTorrentPopulate(tor, false);
-    auto* fst = tr_torrentFiles(tor, nullptr);
-    EXPECT_EQ(length[0] - PieceSize, fst[0].bytesCompleted);
-    EXPECT_EQ(length[1], fst[1].bytesCompleted);
-    EXPECT_EQ(length[2], fst[2].bytesCompleted);
-    tr_torrentFilesFree(fst, tor->info.fileCount);
+    EXPECT_EQ(Length[0], tr_torrentFileProgress(tor, 0).bytes_completed + PieceSize);
+    EXPECT_EQ(Length[1], tr_torrentFileProgress(tor, 1).bytes_completed);
+    EXPECT_EQ(Length[2], tr_torrentFileProgress(tor, 2).bytes_completed);
     auto const* st = tr_torrentStat(tor);
-    EXPECT_EQ(total_size, st->sizeWhenDone);
+    EXPECT_EQ(TotalSize, st->sizeWhenDone);
     EXPECT_EQ(PieceSize, st->leftUntilDone);
 
     /***

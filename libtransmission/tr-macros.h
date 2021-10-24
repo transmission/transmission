@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
+
 /***
 ****
 ***/
@@ -35,28 +38,18 @@
 #endif
 
 #ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) \
-    (__GNUC__ > (major) || \
-    (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define TR_GNUC_CHECK_VERSION(major, minor) 0
 #endif
 
 #ifdef __UCLIBC__
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) \
-    (__UCLIBC_MAJOR__ > (major) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
+    (__UCLIBC_MAJOR__ > (major) || (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
+     (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
 #else
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) 0
 #endif
-
-/***
-****
-***/
-
-// http://cnicholson.net/2009/02/stupid-c-tricks-adventures-in-assert/
-#define TR_UNUSED(x) do { ((void)sizeof(x)); } while(0)
 
 /***
 ****
@@ -73,14 +66,6 @@
 /***
 ****
 ***/
-
-#if __has_attribute(__noreturn__) || TR_GNUC_CHECK_VERSION(2, 5)
-#define TR_NORETURN __attribute__((__noreturn__))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
 
 #if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
 #define TR_DEPRECATED __attribute__((__deprecated__))
@@ -120,39 +105,6 @@
 #define TR_GNUC_MALLOC
 #endif
 
-#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
-#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
-#else
-#define TR_GNUC_FALLTHROUGH
-#endif
-
-/***
-****
-***/
-
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(__cplusplus) || defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert) || TR_GNUC_CHECK_VERSION(4, 6)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) do { ((void)sizeof(x)); } while(0)
-#endif
-
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
-
 /***
 ****
 ***/
@@ -168,11 +120,13 @@
 
 #define TR_BAD_SIZE ((size_t)-1)
 
-/* Guard C code in headers, while including them from C++ */
-#ifdef  __cplusplus
-#define TR_BEGIN_DECLS  extern "C" {
-#define TR_END_DECLS    }
-#else
-#define TR_BEGIN_DECLS
-#define TR_END_DECLS
-#endif
+// Mostly to enforce better formatting
+#define TR_ARG_TUPLE(...) __VA_ARGS__
+
+auto inline constexpr PEER_ID_LEN = size_t{ 20 };
+
+// https://www.bittorrent.org/beps/bep_0003.html
+// A string of length 20 which this downloader uses as its id. Each
+// downloader generates its own id at random at the start of a new
+// download. This value will also almost certainly have to be escaped.
+using tr_peer_id_t = std::array<char, 20>;

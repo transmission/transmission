@@ -34,39 +34,32 @@ https.get(url, (res) => {
         }
       }
 
-      const max_suffix_len = suffixes
-        .reduce((acc, [suffix]) => Math.max(acc, suffix.length), 0);
-
       const mime_type_lines = suffixes
-        .map(([suffix, mime_type]) => `    { "${suffix}", "${mime_type}" }`)
+        .map(([suffix, mime_type]) => `      { "${suffix}", "${mime_type}" }`)
         .sort()
         .join(',\n');
-      fs.writeFileSync('mime-types.c', `${copyright}
-
-#include "mime-types.h"
-
-struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
-{
-${mime_type_lines}
-};
-`);
       fs.writeFileSync('mime-types.h', `${copyright}
 
 #pragma once
 
-#define MIME_TYPE_SUFFIX_MAXLEN ${max_suffix_len}
-#define MIME_TYPE_SUFFIX_COUNT ${suffixes.length}
+#include <array>
+#include <string_view>
 
 struct mime_type_suffix
 {
-    char const* suffix;
-    char const* mime_type;
+    std::string_view suffix;
+    std::string_view mime_type;
 };
 
-extern struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT];
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>
+{{
+${mime_type_lines}
+}};
+
 `);
     } catch (e) {
       console.error(e.message);
     }
   });
 });
+

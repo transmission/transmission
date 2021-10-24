@@ -23,19 +23,15 @@
 
 TEST(Session, peerId)
 {
-    auto const peer_id_prefix = std::string { PEERID_PREFIX };
+    auto const peer_id_prefix = std::string{ PEERID_PREFIX };
 
     for (int i = 0; i < 100000; ++i)
     {
         // get a new peer-id
-        auto buf = std::array<uint8_t, PEER_ID_LEN + 1>{};
-        tr_peerIdInit(buf.data());
-
-        // confirm that it has the right length
-        EXPECT_EQ(PEER_ID_LEN, strlen(reinterpret_cast<char const*>(buf.data())));
+        auto const buf = tr_peerIdInit();
 
         // confirm that it begins with peer_id_prefix
-        auto const peer_id = std::string(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
+        auto const peer_id = std::string_view(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
         EXPECT_EQ(peer_id_prefix, peer_id.substr(0, peer_id_prefix.size()));
 
         // confirm that its total is evenly divisible by 36
@@ -53,6 +49,11 @@ TEST(Session, peerId)
 
 TEST(Session, sessionId)
 {
+#ifdef __sun
+    // FIXME: File locking doesn't work as expected
+    GTEST_SKIP();
+#endif
+
     EXPECT_FALSE(tr_session_id_is_local(nullptr));
     EXPECT_FALSE(tr_session_id_is_local(""));
     EXPECT_FALSE(tr_session_id_is_local("test"));

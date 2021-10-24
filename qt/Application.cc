@@ -44,8 +44,7 @@
 namespace
 {
 
-std::array<tr_option, 8> const Opts =
-{
+std::array<tr_option, 8> const Opts = {
     tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
     { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
     { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
@@ -59,7 +58,7 @@ std::array<tr_option, 8> const Opts =
 char const* getUsage()
 {
     return "Usage:\n"
-        "  transmission [OPTIONS...] [torrent files]";
+           "  transmission [OPTIONS...] [torrent files]";
 }
 
 enum
@@ -82,12 +81,20 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
+#ifdef QT_DBUS_LIB
+
+QString const DbusServiceName = QStringLiteral("org.freedesktop.Notifications");
+QString const DbusInterfaceName = QStringLiteral("org.freedesktop.Notifications");
+QString const DbusPath = QStringLiteral("/org/freedesktop/Notifications");
+
+#endif
+
 } // namespace
 
-Application::Application(int& argc, char** argv) :
-    QApplication(argc, argv),
-    config_name_{QStringLiteral("transmission")},
-    display_name_{QStringLiteral("transmission-qt")}
+Application::Application(int& argc, char** argv)
+    : QApplication(argc, argv)
+    , config_name_{ QStringLiteral("transmission") }
+    , display_name_{ QStringLiteral("transmission-qt") }
 {
     setApplicationName(config_name_);
     loadTranslations();
@@ -329,10 +336,15 @@ Application::Application(int& argc, char** argv) :
 
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
-            tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, window_.get());
-        dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
-            "Any content you share is your sole responsibility."));
+        auto* dialog = new QMessageBox(
+            QMessageBox::Information,
+            QString(),
+            tr("<b>Transmission is a file sharing program.</b>"),
+            QMessageBox::Ok | QMessageBox::Cancel,
+            window_.get());
+        dialog->setInformativeText(
+            tr("When you run a torrent, its data will be made available to others by means of upload. "
+               "Any content you share is your sole responsibility."));
         dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
         dialog->setDefaultButton(QMessageBox::Ok);
         dialog->setModal(true);
@@ -349,6 +361,21 @@ Application::Application(int& argc, char** argv) :
     }
 
     InteropHelper::registerObject(this);
+
+#ifdef QT_DBUS_LIB
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (bus.isConnected())
+    {
+        bus.connect(
+            DbusServiceName,
+            DbusPath,
+            DbusInterfaceName,
+            QLatin1String("ActionInvoked"),
+            this,
+            SLOT(onNotificationActionInvoked(quint32, QString)));
+    }
+
+#endif
 }
 
 void Application::loadTranslations()
@@ -410,9 +437,10 @@ void Application::onTorrentsAdded(torrent_ids_t const& ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        auto const title = tr("Torrent(s) Added", nullptr, static_cast<int>(ids.size()));
-        auto const body = getNames(ids).join(QStringLiteral("\n"));
-        notifyApp(title, body);
+        for (auto id : ids)
+        {
+            notifyTorrentAdded(model_->getTorrentFromId(id));
+        }
     }
 }
 
@@ -430,7 +458,9 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         beep();
 #else
-        QProcess::execute(prefs_->getString(Prefs::COMPLETE_SOUND_COMMAND));
+        auto args = prefs_->get<QStringList>(Prefs::COMPLETE_SOUND_COMMAND);
+        auto const command = args.takeFirst();
+        QProcess::execute(command, args);
 #endif
     }
 }
@@ -441,6 +471,13 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
     {
         session_->initTorrents(ids);
     }
+}
+
+void Application::notifyTorrentAdded(Torrent const* tor) const
+{
+    QStringList actions;
+    actions << QString(QLatin1String("start-now(%1)")).arg(tor->id()) << QObject::tr("Start Now");
+    notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
 /***
@@ -485,8 +522,7 @@ void Application::refreshPref(int key) const
 
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
-        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH),
-            prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
+        watch_dir_->setPath(prefs_->getString(Prefs::DIR_WATCH), prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
         break;
 
     default:
@@ -575,29 +611,23 @@ void Application::raise() const
     alert(window_.get());
 }
 
-bool Application::notifyApp(QString const& title, QString const& body) const
+bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
-
-    auto const dbus_service_name = QStringLiteral("org.freedesktop.Notifications");
-    auto const dbus_interface_name = QStringLiteral("org.freedesktop.Notifications");
-    auto const dbus_path = QStringLiteral("/org/freedesktop/Notifications");
-
     QDBusConnection bus = QDBusConnection::sessionBus();
 
     if (bus.isConnected())
     {
-        QDBusMessage m =
-            QDBusMessage::createMethodCall(dbus_service_name, dbus_path, dbus_interface_name, QStringLiteral("Notify"));
+        QDBusMessage m = QDBusMessage::createMethodCall(DbusServiceName, DbusPath, DbusInterfaceName, QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
         args.append(QStringLiteral("transmission")); // icon
         args.append(title); // summary
         args.append(body); // body
-        args.append(QStringList()); // actions - unused for plain passive popups
+        args.append(actions);
         args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))
+            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
         })); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
@@ -614,6 +644,20 @@ bool Application::notifyApp(QString const& title, QString const& body) const
     window_->trayIcon().showMessage(title, body);
     return true;
 }
+
+#ifdef QT_DBUS_LIB
+void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
+{
+    static QRegularExpression const StartNowRegex(QLatin1String(R"rgx(start-now\((\d+)\))rgx"));
+    QRegularExpressionMatch const match = StartNowRegex.match(action_key);
+    if (match.hasMatch())
+    {
+        int const torrent_id = match.captured(1).toInt();
+        session_->startTorrentsNow({ torrent_id });
+    }
+}
+
+#endif
 
 FaviconCache& Application::faviconCache()
 {

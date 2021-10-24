@@ -16,7 +16,10 @@
 #include <algorithm>
 #include <array>
 #include <set>
+#include <string_view>
 #include <vector>
+
+using namespace std::literals;
 
 namespace libtransmission
 {
@@ -33,19 +36,13 @@ TEST_F(RpcTest, list)
     char const* str;
     tr_variant top;
 
-    tr_rpc_parse_list_str(&top, "12", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "12"sv);
     EXPECT_TRUE(tr_variantIsInt(&top));
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "12", 1);
-    EXPECT_TRUE(tr_variantIsInt(&top));
-    EXPECT_TRUE(tr_variantGetInt(&top, &i));
-    EXPECT_EQ(1, i);
-    tr_variantFree(&top);
-
-    tr_rpc_parse_list_str(&top, "6,7", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
     EXPECT_EQ(2, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
@@ -54,14 +51,14 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(7, i);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "asdf", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "asdf"sv);
     EXPECT_TRUE(tr_variantIsString(&top));
     EXPECT_TRUE(tr_variantGetStr(&top, &str, &len));
     EXPECT_EQ(4, len);
     EXPECT_STREQ("asdf", str);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "1,3-5", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
     EXPECT_EQ(4, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
@@ -81,7 +78,7 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [] (tr_session* /*session*/, tr_variant* response, void* setme) noexcept
+    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
     {
         *static_cast<tr_variant*>(setme) = *response;
         tr_variantInitBool(response, false);
@@ -102,7 +99,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 52>{
+    auto const expected_keys = std::array<tr_quark, 55>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -139,6 +136,9 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_rename_partial_files,
         TR_KEY_rpc_version,
         TR_KEY_rpc_version_minimum,
+        TR_KEY_rpc_version_semver,
+        TR_KEY_script_torrent_added_enabled,
+        TR_KEY_script_torrent_added_filename,
         TR_KEY_script_torrent_done_enabled,
         TR_KEY_script_torrent_done_filename,
         TR_KEY_seed_queue_enabled,
@@ -154,7 +154,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_trash_original_torrent_files,
         TR_KEY_units,
         TR_KEY_utp_enabled,
-        TR_KEY_version
+        TR_KEY_version,
     };
 
     // what we got
@@ -168,16 +168,22 @@ TEST_F(RpcTest, sessionGet)
     }
 
     auto missing_keys = std::vector<tr_quark>{};
-    std::set_difference(std::begin(expected_keys), std::end(expected_keys),
-        std::begin(actual_keys), std::end(actual_keys),
+    std::set_difference(
+        std::begin(expected_keys),
+        std::end(expected_keys),
+        std::begin(actual_keys),
+        std::end(actual_keys),
         std::inserter(missing_keys, std::begin(missing_keys)));
-    EXPECT_EQ(decltype(missing_keys) {}, missing_keys);
+    EXPECT_EQ(decltype(missing_keys){}, missing_keys);
 
     auto unexpected_keys = std::vector<tr_quark>{};
-    std::set_difference(std::begin(actual_keys), std::end(actual_keys),
-        std::begin(expected_keys), std::end(expected_keys),
+    std::set_difference(
+        std::begin(actual_keys),
+        std::end(actual_keys),
+        std::begin(expected_keys),
+        std::end(expected_keys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
-    EXPECT_EQ(decltype(unexpected_keys) {}, unexpected_keys);
+    EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
     tr_variantFree(&response);

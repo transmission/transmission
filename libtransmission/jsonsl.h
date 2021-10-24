@@ -995,7 +995,7 @@ size_t jsonsl_util_unescape_ex(const char *in,
  * Convenience macro to avoid passing too many parameters
  */
 #define jsonsl_util_unescape(in, out, len, toEscape, err) \
-    jsonsl_util_unescape_ex(in, out, len, toEscape, NULL, err, NULL)
+    jsonsl_util_unescape_ex(in, out, len, toEscape, nullptr, err, nullptr)
 
 #endif /* JSONSL_NO_JPR */
 

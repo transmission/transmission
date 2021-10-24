@@ -27,12 +27,16 @@ auto const Options = std::array<tr_option, 8>{
     { 0, nullptr, nullptr, nullptr, false, nullptr }
 };
 
-} // anonymous namespace
+} // namespace
 
 class GetoptTest : public ::testing::Test
 {
 protected:
-    void runTest(int argc, char const* const* argv, int expected_n, int const* expected_c,
+    void runTest( //
+        int argc,
+        char const* const* argv,
+        int expected_n,
+        int const* expected_c,
         char const* const* expected_args) const
     {
         auto n = int{};
@@ -135,8 +139,9 @@ TEST_F(GetoptTest, missingArg)
 
 TEST_F(GetoptTest, lotsOfOptions)
 {
-    auto const args =
-        std::array<char const*, 6>{ "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
+    auto const args = std::array<char const*, 6>{
+        "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo"
+    };
     auto constexpr ExpectedN = 4;
     auto const expected_c = std::array<int, ExpectedN>{ 's', 'c', 'p', 't' };
     auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "4", "hello world", nullptr, "foo" };
