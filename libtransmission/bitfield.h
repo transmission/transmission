@@ -21,14 +21,23 @@
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
  *
- * This is for tracking what pieces a peer has.
+ * This is for tracking the pieces a peer has. Its functionality is like
+ * a bitset or vector<bool> with some added use cases:
  *
- * Also treats "have all" and "have none" as special cases:
- * - This reduces overhead. No need to allocate an array or do lookups
- *   if you know all bits have the same value
- * - This makes peers that send 'have all' or 'have none' useful even 
- *   if you don't know how many pieces there are, e.g. when you have a
- *   magnet link and haven't finished getting its metainfo yet.
+ * - It needs to be able to read/write the left-to-right bitfield format
+ *   specified in the bittorrent spec. This is what raw() and getRaw()
+ *   are for.
+ *
+ * - "Have all" is a special case where we know the peer has all the
+ *   pieces and don't need to check the bit array. This is useful since
+ *   (a) it's very common (i.e. seeds) and saves memory and work of
+ *   allocating a bit array and doing lookups, and (b) if we have a
+ *   magnet link and haven't gotten the metainfo yet, we may not know
+ *   how many pieces there are -- but we can still know "this peer has
+ *   all of them".
+ *
+ * - "Have none" is another special case that has the same advantages
+ *   and motivations as "Have all".
  */
 class tr_bitfield
 {
