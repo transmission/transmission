@@ -375,7 +375,7 @@
 
     //text color
     NSColor *titleColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         titleColor = statusColor = NSColor.whiteColor;
     }
@@ -518,7 +518,8 @@
             PRIORITY_ICON_WIDTH,
             PRIORITY_ICON_HEIGHT);
 
-        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.labelColor;
+        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor
+                                                                                     : NSColor.labelColor;
 
         NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
             imageWithColor:priorityColor];

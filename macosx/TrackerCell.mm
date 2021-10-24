@@ -104,7 +104,7 @@ NSMutableSet* fTrackerIconLoading;
 
     //set table colors
     NSColor *nameColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         nameColor = statusColor = NSColor.whiteColor;
     }

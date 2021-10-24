@@ -107,7 +107,7 @@
 
     NSColor *titleColor, *statusColor;
     FileListNode* node = self.objectValue;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         titleColor = statusColor = NSColor.whiteColor;
     }

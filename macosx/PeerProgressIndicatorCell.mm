@@ -45,7 +45,7 @@
         if (!fAttributes)
         {
             NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
-            paragraphStyle.alignment = NSRightTextAlignment;
+            paragraphStyle.alignment = NSTextAlignmentRight;
 
             fAttributes = @{
                 NSFontAttributeName : [NSFont systemFontOfSize:11.0],
