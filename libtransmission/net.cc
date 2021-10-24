@@ -249,11 +249,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     auto ret = tr_peer_socket{};
 
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
-    tr_socket_t s;
     struct sockaddr_storage sock;
-    socklen_t addrlen;
-    tr_address const* source_addr;
-    socklen_t sourcelen;
     struct sockaddr_storage source_sock;
     char err_buf[512];
 
@@ -262,8 +258,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         return ret;
     }
 
-    s = tr_fdSocketCreate(session, domains[addr->type], SOCK_STREAM);
-
+    auto const s = tr_fdSocketCreate(session, domains[addr->type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return ret;
@@ -289,12 +284,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         return ret;
     }
 
-    addrlen = setup_sockaddr(addr, port, &sock);
+    socklen_t const addrlen = setup_sockaddr(addr, port, &sock);
 
     /* set source address */
-    source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
+    tr_address const* const source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
     TR_ASSERT(source_addr != nullptr);
-    sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
+    socklen_t const sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
@@ -368,12 +363,8 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
-    tr_socket_t fd;
-    int addrlen;
-    int optval;
 
-    fd = socket(domains[addr->type], SOCK_STREAM, 0);
-
+    tr_socket_t const fd = socket(domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *errOut = sockerrno;
@@ -387,7 +378,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         return TR_BAD_SOCKET;
     }
 
-    optval = 1;
+    int optval = 1;
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
@@ -404,7 +395,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    addrlen = setup_sockaddr(addr, htons(port), &sock);
+    int const addrlen = setup_sockaddr(addr, htons(port), &sock);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
@@ -412,28 +403,12 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
         if (!suppressMsgs)
         {
-            char const* fmt;
-            char const* hint;
+            char const* const hint = err == EADDRINUSE ? _("Is another copy of Transmission already running?") : nullptr;
+
+            char const* const fmt = hint == nullptr ? _("Couldn't bind port %d on %s: %s") :
+                                                      _("Couldn't bind port %d on %s: %s (%s)");
+
             char err_buf[512];
-
-            if (err == EADDRINUSE)
-            {
-                hint = _("Is another copy of Transmission already running?");
-            }
-            else
-            {
-                hint = nullptr;
-            }
-
-            if (hint == nullptr)
-            {
-                fmt = _("Couldn't bind port %d on %s: %s");
-            }
-            else
-            {
-                fmt = _("Couldn't bind port %d on %s: %s (%s)");
-            }
-
             tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err_buf, sizeof(err_buf), err), hint);
         }
 
@@ -475,7 +450,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs)
 {
-    int unused;
+    int unused = 0;
     return tr_netBindTCPImpl(addr, port, suppressMsgs, &unused);
 }
 
@@ -486,7 +461,7 @@ bool tr_net_hasIPv6(tr_port port)
 
     if (!alreadyDone)
     {
-        int err;
+        int err = 0;
         tr_socket_t fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
@@ -540,38 +515,20 @@ void tr_netClose(tr_session* session, tr_socket_t s)
    address. */
 static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
 {
-    tr_socket_t s;
-    int rc;
-    int save;
-
-    s = socket(dst->sa_family, SOCK_DGRAM, 0);
-
+    tr_socket_t const s = socket(dst->sa_family, SOCK_DGRAM, 0);
     if (s == TR_BAD_SOCKET)
     {
-        goto FAIL;
+        return -1;
     }
 
-    /* Since it's a UDP socket, this doesn't actually send any packets. */
-    rc = connect(s, dst, dst_len);
-
-    if (rc == -1)
+    // since it's a UDP socket, this doesn't actually send any packets
+    if (connect(s, dst, dst_len) == 0 && getsockname(s, src, src_len) == 0)
     {
-        goto FAIL;
+        evutil_closesocket(s);
+        return 0;
     }
 
-    rc = getsockname(s, src, src_len);
-
-    if (rc == -1)
-    {
-        goto FAIL;
-    }
-
-    evutil_closesocket(s);
-
-    return rc;
-
-FAIL:
-    save = errno;
+    int save = errno;
     evutil_closesocket(s);
     errno = save;
     return -1;
@@ -610,9 +567,8 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
     socklen_t sslen = sizeof(ss);
     struct sockaddr_in sin;
     struct sockaddr_in6 sin6;
-    struct sockaddr const* sa;
-    socklen_t salen;
-    int rc;
+    struct sockaddr const* sa = nullptr;
+    socklen_t salen = 0;
 
     switch (af)
     {
@@ -640,7 +596,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen);
+    int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen);
 
     if (rc < 0)
     {
