@@ -166,7 +166,7 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -567,7 +567,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -650,7 +650,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -1950,7 +1950,7 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 

@@ -1043,7 +1043,7 @@ bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
 
 } // unnamed namespace
 
-bool tr_sys_file_preallocate(tr_sys_file_t handle, [[maybe_unused]] uint64_t size, int flags, tr_error** error)
+bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 

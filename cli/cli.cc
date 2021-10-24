@@ -138,10 +138,10 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 static bool waitingOnWeb;
 
 static void onTorrentFileDownloaded(
-    [[maybe_unused]] tr_session* session,
-    [[maybe_unused]] bool did_connect,
-    [[maybe_unused]] bool did_timeout,
-    [[maybe_unused]] long response_code,
+    tr_session* /*session*/,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
+    long /*response_code*/,
     void const* response,
     size_t response_byte_count,
     void* vctor)
