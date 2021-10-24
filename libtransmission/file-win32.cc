@@ -1208,10 +1208,10 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 }
 
 bool tr_sys_file_advise(
-    tr_sys_file_t /*handle*/,
+    [[maybe_unused]] tr_sys_file_t handle,
     uint64_t /*offset*/,
-    uint64_t /*size*/,
-    tr_sys_file_advice_t /*advice*/,
+    [[maybe_unused]] uint64_t size,
+    [[maybe_unused]] tr_sys_file_advice_t advice,
     tr_error** /*error*/)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
