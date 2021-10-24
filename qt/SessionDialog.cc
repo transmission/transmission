@@ -26,6 +26,11 @@ void SessionDialog::accept()
     BaseDialog::accept();
 }
 
+void SessionDialog::toggled(bool /*unused*/) const
+{
+    resensitize();
+}
+
 void SessionDialog::resensitize() const
 {
     bool const is_remote = ui_.remoteSessionRadio->isChecked();
@@ -54,10 +59,10 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
     ui_.setupUi(this);
 
     ui_.localSessionRadio->setChecked(!prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
-    connect(ui_.localSessionRadio, &QAbstractButton::toggle, this, &SessionDialog::resensitize);
+    connect(ui_.localSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::toggled);
 
     ui_.remoteSessionRadio->setChecked(prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
-    connect(ui_.remoteSessionRadio, &QAbstractButton::toggle, this, &SessionDialog::resensitize);
+    connect(ui_.remoteSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::toggled);
 
     ui_.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
     remote_widgets_ << ui_.hostLabel << ui_.hostEdit;
@@ -66,7 +71,7 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
     remote_widgets_ << ui_.portLabel << ui_.portSpin;
 
     ui_.authCheck->setChecked(prefs.get<bool>(Prefs::SESSION_REMOTE_AUTH));
-    connect(ui_.authCheck, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
+    connect(ui_.authCheck, &QAbstractButton::toggled, this, &SessionDialog::toggled);
     remote_widgets_ << ui_.authCheck;
 
     ui_.usernameEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME));
