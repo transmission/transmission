@@ -178,7 +178,7 @@ TorrentModelColumns::TorrentModelColumns()
     add(trackers);
     add(error);
     add(active_peer_count);
-};
+}
 
 TorrentModelColumns const torrent_cols;
 
