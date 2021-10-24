@@ -1319,9 +1319,7 @@ void tr_peerMgrGetNextRequests(
         /* if the peer has this piece that we want... */
         if (have->readBit(p->index))
         {
-            auto first = tr_block_index_t{};
-            auto last = tr_block_index_t{};
-            tr_torGetPieceBlockRange(tor, p->index, &first, &last);
+            auto const [first, last] = tr_torGetPieceBlockRange(tor, p->index);
 
             for (tr_block_index_t b = first; b <= last && (got < numwant || (get_intervals && setme[2 * got - 1] == b - 1));
                  ++b)
@@ -1569,11 +1567,8 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
 
     /* request the blocks that we don't have in this piece */
     {
-        tr_block_index_t first;
-        tr_block_index_t last;
         tr_torrent const* tor = t->tor;
-
-        tr_torGetPieceBlockRange(t->tor, pieceIndex, &first, &last);
+        auto const [first, last] = tr_torGetPieceBlockRange(t->tor, pieceIndex);
 
         for (tr_block_index_t b = first; b <= last; ++b)
         {
