@@ -34,7 +34,6 @@ class tr_bitfield
 {
 public:
     explicit tr_bitfield(size_t bit_count);
-    ~tr_bitfield() = default;
 
     void setHasAll();
     void setHasNone();
@@ -58,12 +57,12 @@ public:
     void setRaw(uint8_t const* bits, size_t byte_count, bool bounded);
     std::vector<uint8_t> raw() const;
 
-    [[nodiscard]] bool hasAll() const
+    [[nodiscard]] constexpr bool hasAll() const
     {
         return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
 
-    [[nodiscard]] bool hasNone() const
+    [[nodiscard]] constexpr bool hasNone() const
     {
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
@@ -73,14 +72,14 @@ public:
         return hasAll() || (!hasNone() && testFlag(bit));
     }
 
-    [[nodiscard]] size_t count() const
+    [[nodiscard]] constexpr size_t count() const
     {
         return true_count_;
     }
 
     [[nodiscard]] size_t count(size_t begin, size_t end) const;
 
-    [[nodiscard]] size_t size() const
+    [[nodiscard]] constexpr size_t size() const
     {
         return bit_count_;
     }
