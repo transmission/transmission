@@ -166,7 +166,7 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -567,7 +567,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -650,7 +650,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -1473,7 +1473,7 @@ static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    t->minutes->setMode(Bitfield::OperationMode::None);
+    t->minutes->setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1489,7 +1489,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             for (time_t i = begin; i < end; ++i)
             {
-                t->minutes->setBit((i + day * MinutesPerDay) % MinutesPerWeek);
+                t->minutes->set((i + day * MinutesPerDay) % MinutesPerWeek);
             }
         }
     }
@@ -1541,7 +1541,7 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
         minute_of_the_week = MinutesPerWeek - 1;
     }
 
-    return t->minutes->readBit(minute_of_the_week);
+    return t->minutes->test(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1573,7 +1573,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    turtle->minutes = new Bitfield(MinutesPerWeek);
+    turtle->minutes = new tr_bitfield(MinutesPerWeek);
 
     turtleUpdateTable(turtle);
 
@@ -1950,7 +1950,7 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 

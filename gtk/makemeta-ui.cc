@@ -32,7 +32,7 @@ public:
         tr_metainfo_builder& builder,
         std::string const& target,
         Glib::RefPtr<TrCore> const& core);
-    ~MakeProgressDialog();
+    ~MakeProgressDialog() override;
 
 private:
     bool onProgressDialogRefresh();

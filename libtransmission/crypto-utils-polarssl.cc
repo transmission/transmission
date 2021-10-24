@@ -83,7 +83,7 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 ****
 ***/
 
-static int my_rand([[maybe_unused]] void* context, unsigned char* buffer, size_t buffer_size)
+static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
     for (size_t i = 0; i < buffer_size; ++i)
     {

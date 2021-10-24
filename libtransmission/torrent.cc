@@ -526,7 +526,7 @@ static constexpr void tr_torrentClearError(tr_torrent* tor)
     tor->errorTracker[0] = '\0';
 }
 
-static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, [[maybe_unused]] void* user_data)
+static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
 {
     switch (event->messageType)
     {
@@ -1454,7 +1454,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     // the middle blocks
     if (first + 1 < last)
     {
-        uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
+        uint64_t u = tor->completion.blockBitfield->count(first + 1, last);
         u *= tor->blockSize;
         total += u;
     }
@@ -1502,7 +1502,7 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
     return tr_peerMgrPeerStats(tor, peerCount);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, [[maybe_unused]] int peerCount)
+void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
 {
     tr_free(peers);
 }
