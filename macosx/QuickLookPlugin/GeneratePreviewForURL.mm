@@ -20,7 +20,7 @@ NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableD
         NSRect const iconFrame = NSMakeRect(0.0, 0.0, width, width);
         NSImage* renderedIcon = [[NSImage alloc] initWithSize:iconFrame.size];
         [renderedIcon lockFocus];
-        [icon drawInRect:iconFrame fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0];
+        [icon drawInRect:iconFrame fromRect:NSZeroRect operation:NSCompositingOperationCopy fraction:1.0];
         [renderedIcon unlockFocus];
 
         NSData* iconData = [renderedIcon TIFFRepresentation];

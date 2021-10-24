@@ -361,7 +361,7 @@
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
         NSImage* icon = (minimal && error) ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
+        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES hints:nil];
     }
 
     //error badge
@@ -369,7 +369,7 @@
     {
         NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
         NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
-        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                          hints:nil];
     }
 
@@ -451,7 +451,7 @@
         }
 
         NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
-        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                            hints:nil];
         minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
 
@@ -471,7 +471,7 @@
         }
 
         NSImage* revealImage = [NSImage imageNamed:revealImageString];
-        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositeSourceOver
+        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
                        fraction:1.0
                  respectFlipped:YES
                           hints:nil];
@@ -497,7 +497,7 @@
         {
             NSImage* actionImage = [NSImage imageNamed:actionImageString];
             [actionImage drawInRect:[self actionButtonRectForBounds:cellFrame] fromRect:NSZeroRect
-                          operation:NSCompositeSourceOver
+                          operation:NSCompositingOperationSourceOver
                            fraction:1.0
                      respectFlipped:YES
                               hints:nil];
@@ -522,7 +522,7 @@
 
         NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
             imageWithColor:priorityColor];
-        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0
+        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
                    respectFlipped:YES
                             hints:nil];
     }
@@ -699,7 +699,7 @@
     if (torrent.magnet)
     {
         [[NSColor colorWithCalibratedWhite:1.0 alpha:[fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
-        NSRectFillUsingOperation(barRect, NSCompositeSourceOver);
+        NSRectFillUsingOperation(barRect, NSCompositingOperationSourceOver);
         return;
     }
 
@@ -748,7 +748,7 @@
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
     //actually draw image
-    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositeSourceOver
+    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
               fraction:([fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0)respectFlipped:YES
                  hints:nil];
 }
