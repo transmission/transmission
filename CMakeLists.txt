@@ -304,26 +304,14 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-if(WIN32)
-    tr_add_external_auto_library(EVENT2 libevent event
-        CMAKE_ARGS
-            "-DEVENT__DISABLE_OPENSSL:BOOL=ON"
-            "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
-            "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
-else()
-    set(EVENT2_CONFIGURE_FLAGS)
-    if(APPLE)
-        if(CRYPTO_PKG STREQUAL "openssl")
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
-        else()
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
-        endif()
-    endif()
-    tr_add_external_auto_library(EVENT2 libevent event
-        BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" "--disable-samples" ${EVENT2_CONFIGURE_FLAGS})
-endif()
+tr_add_external_auto_library(EVENT2 libevent event
+    CMAKE_ARGS
+        -DEVENT__DISABLE_OPENSSL:BOOL=ON
+        -DEVENT__DISABLE_BENCHMARK:BOOL=ON
+        -DEVENT__DISABLE_TESTS:BOOL=ON
+        -DEVENT__DISABLE_REGRESS:BOOL=ON
+        -DEVENT__DISABLE_SAMPLES:BOOL=ON
+        -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
