@@ -31,7 +31,6 @@ public slots:
 
 private slots:
     void resensitize() const;
-    void toggled(bool) const;
 
 private:
     Session& session_;
