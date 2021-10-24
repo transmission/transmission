@@ -143,7 +143,7 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
     return 0;
 }
 
-static void tr_watchdir_win32_on_first_scan([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short type, void* context)
+static void tr_watchdir_win32_on_first_scan(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
 
