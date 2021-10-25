@@ -21,17 +21,17 @@ static void tr_cpReset(tr_completion* cp)
     cp->sizeNow = 0;
     cp->sizeWhenDoneIsDirty = true;
     cp->haveValidIsDirty = true;
-    cp->blockBitfield->setMode(Bitfield::OperationMode::None);
+    cp->blockBitfield->setHasNone();
 }
 
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
 {
     cp->tor = tor;
-    cp->blockBitfield = new Bitfield(tor->blockCount);
+    cp->blockBitfield = new tr_bitfield(tor->blockCount);
     tr_cpReset(cp);
 }
 
-void tr_cpBlockInit(tr_completion* cp, Bitfield const& b)
+void tr_cpBlockInit(tr_completion* cp, tr_bitfield const& b)
 {
     tr_cpReset(cp);
 
@@ -39,11 +39,11 @@ void tr_cpBlockInit(tr_completion* cp, Bitfield const& b)
     *(cp->blockBitfield) = b;
 
     // set sizeNow
-    cp->sizeNow = cp->blockBitfield->countBits();
+    cp->sizeNow = cp->blockBitfield->count();
     TR_ASSERT(cp->sizeNow <= cp->tor->blockCount);
     cp->sizeNow *= cp->tor->blockSize;
 
-    if (b.readBit(cp->tor->blockCount - 1))
+    if (b.test(cp->tor->blockCount - 1))
     {
         cp->sizeNow -= (cp->tor->blockSize - cp->tor->lastBlockSize);
     }
@@ -89,7 +89,7 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
     cp->haveValidIsDirty = true;
     cp->sizeWhenDoneIsDirty = true;
-    cp->blockBitfield->clearBitRange(first, last + 1);
+    cp->blockBitfield->unsetRange(first, last + 1);
 }
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
@@ -109,7 +109,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
     {
         tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
 
-        cp->blockBitfield->setBit(block);
+        cp->blockBitfield->set(block);
         cp->sizeNow += tr_torBlockCountBytes(tor, block);
 
         cp->haveValidIsDirty = true;
@@ -173,10 +173,10 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                 {
                     auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, p);
 
-                    n = cp->blockBitfield->countRange(first, last + 1);
+                    n = cp->blockBitfield->count(first, last + 1);
                     n *= cp->tor->blockSize;
 
-                    if (last == cp->tor->blockCount - 1 && cp->blockBitfield->readBit(last))
+                    if (last == cp->tor->blockCount - 1 && cp->blockBitfield->test(last))
                     {
                         n -= cp->tor->blockSize - cp->tor->lastBlockSize;
                     }
@@ -221,7 +221,7 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
         {
             tr_piece_index_t const piece = (tr_piece_index_t)i * interval;
             auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
-            tab[i] = cp->blockBitfield->countRange(first, last + 1) / (float)(last + 1 - first);
+            tab[i] = cp->blockBitfield->count(first, last + 1) / (float)(last + 1 - first);
         }
     }
 }
@@ -234,7 +234,7 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const* cp, tr_piece_index_t piece
     }
 
     auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
-    return (last + 1 - first) - cp->blockBitfield->countRange(first, last + 1);
+    return (last + 1 - first) - cp->blockBitfield->count(first, last + 1);
 }
 
 size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
@@ -253,11 +253,11 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
         /* nb: we don't pass the usual l+1 here to Bitfield::countRange().
            It's faster to handle the last block separately because its size
            needs to be checked separately. */
-        haveBytes = cp->blockBitfield->countRange(first, last);
+        haveBytes = cp->blockBitfield->count(first, last);
         haveBytes *= cp->tor->blockSize;
     }
 
-    if (cp->blockBitfield->readBit(last)) /* handle the last block */
+    if (cp->blockBitfield->test(last)) /* handle the last block */
     {
         haveBytes += tr_torBlockCountBytes(cp->tor, last);
     }
@@ -274,7 +274,7 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t i)
     }
 
     auto const [first, last] = tr_torGetFileBlockRange(cp->tor, i);
-    return cp->blockBitfield->countRange(first, last + 1) == (last + 1 - first);
+    return cp->blockBitfield->count(first, last + 1) == (last + 1 - first);
 }
 
 std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
@@ -283,11 +283,11 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
 
     auto const n = cp->tor->info.pieceCount;
 
-    Bitfield pieces(n);
+    auto pieces = tr_bitfield{ n };
 
     if (tr_cpHasAll(cp))
     {
-        pieces.setMode(Bitfield::OperationMode::All);
+        pieces.setHasAll();
     }
     else if (!tr_cpHasNone(cp))
     {
@@ -298,11 +298,11 @@ std::vector<uint8_t> tr_cpCreatePieceBitfield(tr_completion const* cp)
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }
 
-        pieces = Bitfield(flags, n);
+        pieces.setFromBools(flags, n);
         tr_free(flags);
     }
 
-    return pieces.getRaw();
+    return pieces.raw();
 }
 
 double tr_cpPercentComplete(tr_completion const* cp)

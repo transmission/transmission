@@ -44,6 +44,11 @@
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.mm */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.mm */; };
+		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -106,10 +111,6 @@
 		A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
-		A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
-		A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
-		A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
-		A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A22B00AF116A9E90003315FC /* connecthostport.h */; };
 		A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */ = {isa = PBXBuildFile; fileRef = A22B00AE116A9E90003315FC /* connecthostport.c */; };
@@ -215,7 +216,6 @@
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.cc */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
-		A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AB883C16A399A6008FAD50 /* VDKQueue.m */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */; };
 		A2AF23C816B44FA0003BC59E /* log.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2AF23C616B44FA0003BC59E /* log.cc */; };
@@ -533,6 +533,7 @@
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Torrent.mm; sourceTree = "<group>"; };
+		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoWindowController.h; sourceTree = "<group>"; };
@@ -639,7 +640,6 @@
 		A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ShareToolbarItem.mm; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileNameCell.mm; sourceTree = "<group>"; };
-		A2290D2D1442B23200B95A09 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
 		A22B00AE116A9E90003315FC /* connecthostport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = connecthostport.c; sourceTree = "<group>"; };
 		A22B00AF116A9E90003315FC /* connecthostport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = connecthostport.h; sourceTree = "<group>"; };
 		A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSMutableArrayAdditions.h; sourceTree = "<group>"; };
@@ -1034,7 +1034,7 @@
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				558699542570759E00F77A43 /* libcurl.tbd in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1049,7 +1049,7 @@
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
@@ -1081,7 +1081,7 @@
 				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
-				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
+				55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */,
 				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1120,7 +1120,7 @@
 			files = (
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				558699602570759F00F77A43 /* libcurl.tbd in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1132,7 +1132,7 @@
 			files = (
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1507,7 +1507,6 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				A2290D2D1442B23200B95A09 /* libcurl.4.dylib */,
 				A296EF3411E5605E004A2781 /* libiconv.dylib */,
 				A2B6141B1395ADE9000E0975 /* libz.dylib */,
 			);
@@ -1592,6 +1591,7 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				55869925257074EC00F77A43 /* libcurl.tbd */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
 				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
@@ -3137,9 +3137,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
-				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3147,9 +3144,6 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"third-party/curl/lib",
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -3300,9 +3294,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
-				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3310,9 +3301,6 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"third-party/curl/lib",
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-DNDEBUG";
 				SDKROOT = macosx;
@@ -3390,9 +3378,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
-				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3400,9 +3385,6 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"third-party/curl/lib",
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;

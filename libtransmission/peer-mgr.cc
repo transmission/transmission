@@ -418,7 +418,7 @@ static void replicationNew(tr_swarm* s)
         {
             auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, peer_i));
 
-            if (peer->have.readBit(piece_i))
+            if (peer->have.test(piece_i))
             {
                 ++r;
             }
@@ -1189,7 +1189,7 @@ static void tr_incrReplicationOfPiece(tr_swarm* s, size_t const index)
 /**
  * Increases the replication count of pieces present in the bitfield
  */
-static void tr_incrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
+static void tr_incrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
 {
     TR_ASSERT(replicationExists(s));
 
@@ -1197,7 +1197,7 @@ static void tr_incrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
 
     for (size_t i = 0, n = s->tor->info.pieceCount; i < n; ++i)
     {
-        if (b->readBit(i))
+        if (b->test(i))
         {
             ++rep[i];
         }
@@ -1226,7 +1226,7 @@ static void tr_incrReplication(tr_swarm* s)
 /**
  * Decrease the replication count of pieces present in the bitset.
  */
-static void tr_decrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
+static void tr_decrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
 {
     TR_ASSERT(replicationExists(s));
     TR_ASSERT(s->pieceReplicationSize == s->tor->info.pieceCount);
@@ -1242,7 +1242,7 @@ static void tr_decrReplicationFromBitfield(tr_swarm* s, Bitfield const* b)
     {
         for (size_t i = 0; i < s->pieceReplicationSize; ++i)
         {
-            if (b->readBit(i))
+            if (b->test(i))
             {
                 --s->pieceReplication[i];
             }
@@ -1278,7 +1278,7 @@ void tr_peerMgrGetNextRequests(
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(numwant > 0);
 
-    Bitfield const* const have = &peer->have;
+    tr_bitfield const* const have = &peer->have;
 
     /* walk through the pieces and find blocks that should be requested */
     tr_swarm* const s = tor->swarm;
@@ -1317,7 +1317,7 @@ void tr_peerMgrGetNextRequests(
         struct weighted_piece* p = pieces + i;
 
         /* if the peer has this piece that we want... */
-        if (have->readBit(p->index))
+        if (have->test(p->index))
         {
             auto const [first, last] = tr_torGetPieceBlockRange(tor, p->index);
 
@@ -1645,7 +1645,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 
         if (!pieceCameFromPeers)
         {
-            pieceCameFromPeers = peer->blame.readBit(p);
+            pieceCameFromPeers = peer->blame.test(p);
         }
     }
 
@@ -2195,7 +2195,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
     {
         auto* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, i));
 
-        if (peer->blame.readBit(pieceIndex))
+        if (peer->blame.test(pieceIndex))
         {
             tordbg(
                 s,
@@ -2465,7 +2465,7 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 
 void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 {
-    Bitfield const* have = &peer->have;
+    auto const* have = &peer->have;
 
     if (have->hasAll())
     {
@@ -2477,7 +2477,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     }
     else
     {
-        float const true_count = have->countBits();
+        float const true_count = have->count();
 
         if (tr_torrentHasMetadata(tor))
         {
@@ -2485,20 +2485,12 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
         }
         else /* without pieceCount, this result is only a best guess... */
         {
-            peer->progress = true_count / static_cast<float>(have->getBitCount() + 1);
+            peer->progress = true_count / static_cast<float>(have->size() + 1);
         }
     }
 
     /* clamp the progress range */
-    if (peer->progress < 0.0F)
-    {
-        peer->progress = 0.0F;
-    }
-
-    if (peer->progress > 1.0F)
-    {
-        peer->progress = 1.0F;
-    }
+    peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
 
     if (peer->atom != nullptr && peer->progress >= 1.0F)
     {
@@ -2557,7 +2549,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
             {
                 for (int j = 0; j < peerCount; ++j)
                 {
-                    if (peers[j]->have.readBit(piece))
+                    if (peers[j]->have.test(piece))
                     {
                         ++tab[i];
                     }
@@ -2842,7 +2834,7 @@ static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_
 
     for (tr_piece_index_t i = 0; i < tor->info.pieceCount; ++i)
     {
-        if (piece_is_interesting[i] && peer->have.readBit(i))
+        if (piece_is_interesting[i] && peer->have.test(i))
         {
             return true;
         }

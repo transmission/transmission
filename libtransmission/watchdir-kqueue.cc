@@ -6,8 +6,7 @@
  *
  */
 
-#include <errno.h>
-#include <string.h> /* strcmp() */
+#include <cerrno> /* errno */
 #include <string>
 #include <unordered_set>
 
