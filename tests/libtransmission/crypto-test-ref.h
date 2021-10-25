@@ -68,9 +68,9 @@
 
 #include "crypto.h"
 #include "crypto-utils.h"
-#include "crypto.c"
-#include "crypto-utils.c"
-#include "crypto-utils-openssl.c"
+#include "crypto.cc"
+#include "crypto-utils.cc"
+#include "crypto-utils-openssl.cc"
 
 #undef KEY_LEN_
 

@@ -72,7 +72,7 @@ static void send_signal_to_pipe(int sig)
     errno = old_errno;
 }
 
-static void* signal_handler_thread_main([[maybe_unused]] void* arg)
+static void* signal_handler_thread_main(void* /*arg*/)
 {
     int sig;
 

@@ -12,6 +12,7 @@
 #include <unordered_set>
 
 #include <QApplication>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
 
@@ -89,6 +90,13 @@ private:
     QString const display_name_ = QStringLiteral("transmission-qt");
 
     std::unordered_set<QString> interned_strings_;
+
+#ifdef QT_DBUS_LIB
+    QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
+    QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QRegularExpression const start_now_regex_;
+#endif
 };
 
 #define trApp static_cast<Application*>(Application::instance())

@@ -448,7 +448,7 @@ static struct tr_disk_space getxfsquota(char* device)
 
 #endif /* _WIN32 */
 
-static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] struct tr_device_info const* info)
+static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] tr_device_info const* info)
 {
     struct tr_disk_space ret = { -1, -1 };
 
