@@ -483,58 +483,47 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     TR_ASSERT(path2 != nullptr);
 
     bool ret = false;
-    wchar_t* wide_path1 = nullptr;
-    wchar_t* wide_path2 = nullptr;
-    HANDLE handle1 = INVALID_HANDLE_VALUE;
-    HANDLE handle2 = INVALID_HANDLE_VALUE;
-    BY_HANDLE_FILE_INFORMATION fi1, fi2;
+    bool fail = true;
 
-    wide_path1 = path_to_native_path(path1);
+    wchar_t* wide_path1 = path_to_native_path(path1);
+    wchar_t* wide_path2 = path_to_native_path(path2);
 
-    if (wide_path1 == nullptr)
+    if (wide_path1 != nullptr && wide_path2 != nullptr)
     {
-        goto fail;
+        HANDLE handle1 = CreateFileW(wide_path1, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+        HANDLE handle2 = CreateFileW(wide_path2, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+
+        if (handle1 != INVALID_HANDLE_VALUE && handle2 != INVALID_HANDLE_VALUE)
+        {
+            //TODO: Use GetFileInformationByHandleEx on >= Server 2012
+
+            BY_HANDLE_FILE_INFORMATION fi1, fi2;
+            if (GetFileInformationByHandle(handle1, &fi1) && GetFileInformationByHandle(handle2, &fi2))
+            {
+                ret =
+                    fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber &&
+                    fi1.nFileIndexHigh == fi2.nFileIndexHigh &&
+                    fi1.nFileIndexLow == fi2.nFileIndexLow;
+
+                fail = false;
+            }
+        }
+
+        if (handle2 != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(handle2);
+        }
+
+        if (handle1 != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(handle1);
+        }
     }
 
-    wide_path2 = path_to_native_path(path2);
-
-    if (wide_path2 == nullptr)
+    if (fail)
     {
-        goto fail;
+        set_system_error_if_file_found(error, GetLastError());
     }
-
-    handle1 = CreateFileW(wide_path1, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-
-    if (handle1 == INVALID_HANDLE_VALUE)
-    {
-        goto fail;
-    }
-
-    handle2 = CreateFileW(wide_path2, 0, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-
-    if (handle2 == INVALID_HANDLE_VALUE)
-    {
-        goto fail;
-    }
-
-    /* TODO: Use GetFileInformationByHandleEx on >= Server 2012 */
-
-    if (!GetFileInformationByHandle(handle1, &fi1) || !GetFileInformationByHandle(handle2, &fi2))
-    {
-        goto fail;
-    }
-
-    ret = fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber && fi1.nFileIndexHigh == fi2.nFileIndexHigh &&
-        fi1.nFileIndexLow == fi2.nFileIndexLow;
-
-    goto cleanup;
-
-fail:
-    set_system_error_if_file_found(error, GetLastError());
-
-cleanup:
-    CloseHandle(handle2);
-    CloseHandle(handle1);
 
     tr_free(wide_path2);
     tr_free(wide_path1);
@@ -547,70 +536,48 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     TR_ASSERT(path != nullptr);
 
     char* ret = nullptr;
-    wchar_t* wide_path;
-    wchar_t* wide_ret = nullptr;
-    HANDLE handle = INVALID_HANDLE_VALUE;
-    DWORD wide_ret_size;
+    wchar_t* wide_path = path_to_native_path(path);
 
-    wide_path = path_to_native_path(path);
-
-    if (wide_path == nullptr)
+    if (wide_path != nullptr)
     {
-        goto fail;
-    }
+        HANDLE handle = CreateFileW(
+            wide_path,
+            FILE_READ_EA,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            nullptr,
+            OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS,
+            nullptr);
 
-    handle = CreateFileW(
-        wide_path,
-        FILE_READ_EA,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
-        nullptr);
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+            DWORD wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0);
 
-    if (handle == INVALID_HANDLE_VALUE)
-    {
-        goto fail;
-    }
+            if (wide_ret_size != 0)
+            {
+                wchar_t* wide_ret = tr_new(wchar_t, wide_ret_size);
 
-    wide_ret_size = GetFinalPathNameByHandleW(handle, nullptr, 0, 0);
+                if (GetFinalPathNameByHandleW(handle, wide_ret, wide_ret_size, 0) == wide_ret_size - 1)
+                {
+                    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
+                    ret = native_path_to_path(wide_ret);
+                }
 
-    if (wide_ret_size == 0)
-    {
-        goto fail;
-    }
+                tr_free(wide_ret);
+            }
+        }
 
-    wide_ret = tr_new(wchar_t, wide_ret_size);
-
-    if (GetFinalPathNameByHandleW(handle, wide_ret, wide_ret_size, 0) != wide_ret_size - 1)
-    {
-        goto fail;
-    }
-
-    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
-
-    ret = native_path_to_path(wide_ret);
-
-    if (ret != nullptr)
-    {
-        goto cleanup;
-    }
-
-fail:
-    set_system_error(error, GetLastError());
-
-    tr_free(ret);
-    ret = nullptr;
-
-cleanup:
-    tr_free(wide_ret);
-    tr_free(wide_path);
-
-    if (handle != INVALID_HANDLE_VALUE)
-    {
         CloseHandle(handle);
     }
 
+    if (ret == nullptr)
+    {
+        set_system_error(error, GetLastError());
+        tr_free(ret);
+        ret = nullptr;
+    }
+
+    tr_free(wide_path);
     return ret;
 }
 
@@ -768,22 +735,20 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (wide_src_path == nullptr || wide_dst_path == nullptr)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        goto out;
-    }
-
-    auto cancel = BOOL{ FALSE };
-    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
-    if (CopyFileExW(wide_src_path, wide_dst_path, nullptr, nullptr, &cancel, flags) == 0)
-    {
-        set_system_error(error, GetLastError());
-        goto out;
     }
     else
     {
-        ret = true;
+        auto cancel = BOOL{ FALSE };
+        DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
+
+        ret = CopyFileExW(wide_src_path, wide_dst_path, nullptr, nullptr, &cancel, flags);
+
+        if (!ret)
+        {
+            set_system_error(error, GetLastError());
+        }
     }
 
-out:
     tr_free(wide_src_path);
     tr_free(wide_dst_path);
 
@@ -1251,7 +1216,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     if (size > MAXSIZE_T)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        return false;
+        return nullptr;
     }
 
     void* ret = nullptr;
