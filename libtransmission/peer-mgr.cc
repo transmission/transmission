@@ -2396,7 +2396,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         auto* peer = peers[i];
         for (size_t j = 0; j < n_pieces; ++j)
         {
-            if (peer->have.readBit(j))
+            if (peer->have.test(j))
             {
                 have[j] = true;
             }
