@@ -1434,9 +1434,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
         return 0;
     }
 
-    auto first = tr_block_index_t{};
-    auto last = tr_block_index_t{};
-    tr_torGetFileBlockRange(tor, index, &first, &last);
+    auto const [first, last] = tr_torGetFileBlockRange(tor, index);
 
     if (first == last)
     {
@@ -2539,35 +2537,31 @@ uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t 
     return ret;
 }
 
-void tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file, tr_block_index_t* first, tr_block_index_t* last)
+tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file)
 {
     tr_file const* f = &tor->info.files[file];
+
     uint64_t offset = f->offset;
-
-    *first = offset / tor->blockSize;
-
+    tr_block_index_t const first = offset / tor->blockSize;
     if (f->length == 0)
     {
-        *last = *first;
+        return { first, first };
     }
-    else
-    {
-        offset += f->length - 1;
-        *last = offset / tor->blockSize;
-    }
+
+    offset += f->length - 1;
+    tr_block_index_t const last = offset / tor->blockSize;
+    return { first, last };
 }
 
-void tr_torGetPieceBlockRange(
-    tr_torrent const* tor,
-    tr_piece_index_t const piece,
-    tr_block_index_t* first,
-    tr_block_index_t* last)
+tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
 {
     uint64_t offset = tor->info.pieceSize;
     offset *= piece;
-    *first = offset / tor->blockSize;
+    tr_block_index_t const first = offset / tor->blockSize;
     offset += tr_torPieceCountBytes(tor, piece) - 1;
-    *last = offset / tor->blockSize;
+    tr_block_index_t const last = offset / tor->blockSize;
+
+    return { first, last };
 }
 
 /***

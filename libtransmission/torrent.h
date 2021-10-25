@@ -81,17 +81,15 @@ void tr_torrentGetBlockLocation(
     uint32_t* offset,
     uint32_t* length);
 
-void tr_torGetFileBlockRange(
-    tr_torrent const* tor,
-    tr_file_index_t const file,
-    tr_block_index_t* first,
-    tr_block_index_t* last);
+struct tr_block_range
+{
+    tr_block_index_t first;
+    tr_block_index_t last;
+};
 
-void tr_torGetPieceBlockRange(
-    tr_torrent const* tor,
-    tr_piece_index_t const piece,
-    tr_block_index_t* first,
-    tr_block_index_t* last);
+tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file);
+
+tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
