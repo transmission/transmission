@@ -89,6 +89,8 @@ void tr_peerMgrGetNextRequests(
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
+size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
+
 void tr_peerMgrRebuildRequests(tr_torrent* torrent);
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);

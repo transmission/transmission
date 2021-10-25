@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory> // std::unique_ptr
+#include <optional>
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -579,7 +580,7 @@ public:
     bool clientSentLtepHandshake = false;
     bool peerSentLtepHandshake = false;
 
-    int desiredRequestCount = 0;
+    size_t desired_request_count = 0;
 
     int prefetchCount = 0;
 
@@ -628,9 +629,8 @@ public:
     struct tr_incoming incoming = {};
 
     /* if the peer supports the Extension Protocol in BEP 10 and
-       supplied a reqq argument, it's stored here. Otherwise, the
-       value is zero and should be ignored. */
-    int64_t reqq = 0;
+       supplied a reqq argument, it's stored here. */
+    std::optional<size_t> reqq;
 
     UniqueTimer pex_timer;
 
@@ -2001,16 +2001,13 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
     /* there are lots of reasons we might not want to request any blocks... */
     if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked_ || !msgs->client_is_interested_)
     {
-        msgs->desiredRequestCount = 0;
+        msgs->desired_request_count = 0;
     }
     else
     {
-        int const floor = 4;
-        int const seconds = RequestBufSecs;
-        uint64_t const now = tr_time_msec();
-
         /* Get the rate limit we should use.
-         * FIXME: this needs to consider all the other peers as well... */
+         * TODO: this needs to consider all the other peers as well... */
+        uint64_t const now = tr_time_msec();
         auto rate_Bps = tr_peerGetPieceSpeed_Bps(msgs, now, TR_PEER_TO_CLIENT);
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
@@ -2027,14 +2024,11 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 
         /* use this desired rate to figure out how
          * many requests we should send to this peer */
-        int const estimatedBlocksInPeriod = (rate_Bps * seconds) / torrent->blockSize;
-        msgs->desiredRequestCount = std::max(floor, estimatedBlocksInPeriod);
-
-        /* honor the peer's maximum request count, if specified */
-        if ((msgs->reqq > 0) && (msgs->desiredRequestCount > msgs->reqq))
-        {
-            msgs->desiredRequestCount = msgs->reqq;
-        }
+        size_t constexpr Floor = 4;
+        size_t constexpr Seconds = RequestBufSecs;
+        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize;
+        size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
+        msgs->desired_request_count = std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
 }
 
@@ -2070,25 +2064,36 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 
 static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
-    if (tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT) && msgs->desiredRequestCount > 0 &&
-        msgs->pendingReqsToPeer <= msgs->desiredRequestCount * 0.66)
+    if (!tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT))
     {
-        TR_ASSERT(msgs->is_client_interested());
-        TR_ASSERT(!msgs->is_client_choked());
-
-        int const numwant = msgs->desiredRequestCount - msgs->pendingReqsToPeer;
-
-        auto* const blocks = tr_new(tr_block_index_t, numwant);
-        auto n = int{};
-        tr_peerMgrGetNextRequests(msgs->torrent, msgs, numwant, blocks, &n, false);
-
-        for (int i = 0; i < n; ++i)
-        {
-            protocolSendRequest(msgs, blockToReq(msgs->torrent, blocks[i]));
-        }
-
-        tr_free(blocks);
+        return;
     }
+
+    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(msgs->torrent, msgs);
+    if (n_active >= msgs->desired_request_count)
+    {
+        return;
+    }
+
+    auto const n_wanted = msgs->desired_request_count - n_active;
+    if (n_wanted == 0)
+    {
+        return;
+    }
+
+    TR_ASSERT(msgs->is_client_interested());
+    TR_ASSERT(!msgs->is_client_choked());
+
+    auto* const blocks = tr_new(tr_block_index_t, n_wanted);
+    auto n = int{};
+    tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted, blocks, &n, false);
+
+    for (int i = 0; i < n; ++i)
+    {
+        protocolSendRequest(msgs, blockToReq(msgs->torrent, blocks[i]));
+    }
+
+    tr_free(blocks);
 }
 
 static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
