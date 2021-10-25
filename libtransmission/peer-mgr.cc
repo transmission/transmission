@@ -68,7 +68,7 @@ static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
 // max number of peers to ask for per second overall.
 // this throttle is to avoid overloading the router
-static auto constexpr MaxConnectionsPerSecond = int{ 12 };
+static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 
 // number of bad pieces a peer is allowed to send before we ban them
 static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
@@ -1319,9 +1319,7 @@ void tr_peerMgrGetNextRequests(
         /* if the peer has this piece that we want... */
         if (have->test(p->index))
         {
-            auto first = tr_block_index_t{};
-            auto last = tr_block_index_t{};
-            tr_torGetPieceBlockRange(tor, p->index, &first, &last);
+            auto const [first, last] = tr_torGetPieceBlockRange(tor, p->index);
 
             for (tr_block_index_t b = first; b <= last && (got < numwant || (get_intervals && setme[2 * got - 1] == b - 1));
                  ++b)
@@ -1569,11 +1567,8 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
 
     /* request the blocks that we don't have in this piece */
     {
-        tr_block_index_t first;
-        tr_block_index_t last;
         tr_torrent const* tor = t->tor;
-
-        tr_torGetPieceBlockRange(t->tor, pieceIndex, &first, &last);
+        auto const [first, last] = tr_torGetPieceBlockRange(t->tor, pieceIndex);
 
         for (tr_block_index_t b = first; b <= last; ++b)
         {
@@ -3637,7 +3632,7 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
     }
 }
 
-static void makeNewPeerConnections(tr_peerMgr* mgr, int max);
+static void makeNewPeerConnections(tr_peerMgr* mgr, size_t max);
 
 static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
@@ -4021,36 +4016,6 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
     return score;
 }
 
-#ifdef TR_ENABLE_ASSERTS
-
-static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, int n, int k)
-{
-    uint64_t worstFirstScore = 0;
-    int const x = std::min(n, k) - 1;
-
-    for (int i = 0; i < x; i++)
-    {
-        if (worstFirstScore < candidates[i].score)
-        {
-            worstFirstScore = candidates[i].score;
-        }
-    }
-
-    for (int i = 0; i < x; i++)
-    {
-        TR_ASSERT(candidates[i].score <= worstFirstScore);
-    }
-
-    for (int i = x + 1; i < n; i++)
-    {
-        TR_ASSERT(candidates[i].score >= worstFirstScore);
-    }
-
-    return true;
-}
-
-#endif /* TR_ENABLE_ASSERTS */
-
 static bool calculateAllSeeds(tr_swarm* swarm)
 {
     int nAtoms = 0;
@@ -4079,7 +4044,7 @@ static bool swarmIsAllSeeds(tr_swarm* swarm)
 }
 
 /** @return an array of all the atoms we might want to connect to */
-static struct peer_candidate* getPeerCandidates(tr_session* session, int* candidateCount, int max)
+static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
 {
     time_t const now = tr_time();
     uint64_t const now_msec = tr_time_msec();
@@ -4098,13 +4063,11 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     /* don't start any new handshakes if we're full up */
     if (maxCandidates <= peerCount)
     {
-        *candidateCount = 0;
-        return nullptr;
+        return {};
     }
 
-    /* allocate an array of candidates */
-    peer_candidate* const candidates = tr_new(peer_candidate, atomCount);
-    peer_candidate* walk = candidates;
+    auto candidates = std::vector<peer_candidate>{};
+    candidates.reserve(atomCount);
 
     /* populate the candidate array */
     for (auto* tor : session->torrents)
@@ -4144,26 +4107,22 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
             if (isPeerCandidate(tor, atom, now))
             {
                 uint8_t const salt = tr_rand_int_weak(1024);
-                walk->tor = tor;
-                walk->atom = atom;
-                walk->score = getPeerCandidateScore(tor, atom, salt);
-                ++walk;
+                candidates.push_back({ getPeerCandidateScore(tor, atom, salt), tor, atom });
             }
         }
     }
 
-    auto const n_candidates = walk - candidates;
-    *candidateCount = n_candidates;
-    if (n_candidates > max)
+    // only keep the best `max` candidates
+    if (std::size(candidates) > max)
     {
         std::partial_sort(
-            candidates,
-            candidates + max,
-            candidates + n_candidates,
+            std::begin(candidates),
+            std::begin(candidates) + max,
+            std::end(candidates),
             [](auto const& a, auto const& b) { return a.score < b.score; });
+        candidates.resize(max);
     }
 
-    TR_ASSERT(checkBestScoresComeFirst(candidates, *candidateCount, max));
     return candidates;
 }
 
@@ -4212,7 +4171,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
     atom->time = now;
 }
 
-static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* c)
+static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
 {
 #if 0
 
@@ -4222,18 +4181,13 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
 
 #endif
 
-    initiateConnection(mgr, c->tor->swarm, c->atom);
+    initiateConnection(mgr, c.tor->swarm, c.atom);
 }
 
-static void makeNewPeerConnections(struct tr_peerMgr* mgr, int max)
+static void makeNewPeerConnections(struct tr_peerMgr* mgr, size_t max)
 {
-    auto n = int{};
-    struct peer_candidate* candidates = getPeerCandidates(mgr->session, &n, max);
-
-    for (int i = 0; i < n && i < max; ++i)
+    for (auto& candidate : getPeerCandidates(mgr->session, max))
     {
-        initiateCandidateConnection(mgr, &candidates[i]);
+        initiateCandidateConnection(mgr, candidate);
     }
-
-    tr_free(candidates);
 }
