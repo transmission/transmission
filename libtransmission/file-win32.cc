@@ -765,14 +765,16 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     wchar_t* wide_src_path = path_to_native_path(src_path);
     wchar_t* wide_dst_path = path_to_native_path(dst_path);
 
+    //these should be declared before goto
+    auto cancel = BOOL{ FALSE };
+    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
+   
     if (wide_src_path == nullptr || wide_dst_path == nullptr)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         goto out;
     }
 
-    auto cancel = BOOL{ FALSE };
-    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
     if (CopyFileExW(wide_src_path, wide_dst_path, nullptr, nullptr, &cancel, flags) == 0)
     {
         set_system_error(error, GetLastError());
@@ -1251,7 +1253,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     if (size > MAXSIZE_T)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        return false;
+        return nullptr;
     }
 
     void* ret = nullptr;
