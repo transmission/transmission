@@ -1579,7 +1579,7 @@ uint64_t tr_ntohll(uint64_t x)
 struct formatter_unit
 {
     char* name;
-    size_t value;
+    uint64_t value;
 };
 
 using formatter_units = std::array<formatter_unit, 4>;
@@ -1598,9 +1598,15 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(formatter_units& units, size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+static void formatter_init(
+    formatter_units& units,
+    uint64_t kilo,
+    char const* kb,
+    char const* mb,
+    char const* gb,
+    char const* tb)
 {
-    size_t value = kilo;
+    uint64_t value = kilo;
     units[TR_FMT_KB].name = tr_strdup(kb);
     units[TR_FMT_KB].value = value;
 
@@ -1617,7 +1623,7 @@ static void formatter_init(formatter_units& units, size_t kilo, char const* kb, 
     units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(formatter_units const& u, char* buf, size_t bytes, size_t buflen)
+static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
 {
     formatter_unit const* unit = nullptr;
 
@@ -1661,12 +1667,12 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, size_t 
 
 static formatter_units size_units;
 
-void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     formatter_init(size_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen)
+char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen)
 {
     return formatter_get_size_str(size_units, buf, bytes, buflen);
 }
