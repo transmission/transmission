@@ -37,6 +37,7 @@ set(PROJECT_FILES
   net.cc
   peer-io.cc
   peer-mgr.cc
+  peer-mgr-active-requests.cc
   peer-msgs.cc
   platform.cc
   platform-quota.cc
@@ -161,6 +162,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-common.h
     peer-io.h
     peer-mgr.h
+    peer-mgr-active-requests.h
     peer-msgs.h
     peer-socket.h
     platform.h

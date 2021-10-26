@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <libutp/utp.h>
 
+#define LIBTRANSMISSION_PEER_MODULE
+
 #include "transmission.h"
 #include "announcer.h"
 #include "bandwidth.h"
@@ -32,6 +34,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
+#include "peer-mgr-active-requests.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
 #include "session.h"
@@ -161,167 +164,6 @@ enum piece_sort_state
     PIECES_SORTED_BY_WEIGHT
 };
 
-// tracking for the active requests we have --
-// e.g. the requests we've sent and are awaiting a response.
-class ClientRequests
-{
-public:
-    // add an active request to `peer` for `block`
-    bool add(tr_block_index_t block, tr_peer* peer, time_t when)
-    {
-        bool const added = blocks_[block].emplace(peer, when).second;
-        return added;
-    }
-
-    // remove a request to `peer` for `block`
-    bool remove(tr_block_index_t block, tr_peer const* peer)
-    {
-        auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-        auto const it = blocks_.find(block);
-        auto const removed = it != std::end(blocks_) && it->second.erase(key) != 0;
-
-        if (removed && std::empty(it->second))
-        {
-            blocks_.erase(it);
-        }
-
-        return removed;
-    }
-
-    // remove requests to `peer` and return the associated blocks
-    auto remove(tr_peer const* peer)
-    {
-        auto removed = std::vector<tr_block_index_t>{};
-        removed.reserve(blocks_.size());
-
-        auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-        for (auto const& it : blocks_)
-        {
-            if (it.second.count(key))
-            {
-                removed.push_back(it.first);
-            }
-        }
-
-        for (auto block : removed)
-        {
-            remove(block, peer);
-        }
-
-        return removed;
-    }
-
-    // remove requests for `block` and return the associated peers
-    auto remove(tr_block_index_t block)
-    {
-        auto removed = std::vector<tr_peer*>{};
-
-        auto it = blocks_.find(block);
-        if (it != std::end(blocks_))
-        {
-            removed.resize(std::size(it->second));
-            std::transform(
-                std::begin(it->second),
-                std::end(it->second),
-                std::begin(removed),
-                [](auto const& sent) { return sent.peer; });
-            blocks_.erase(block);
-        }
-
-        return removed;
-    }
-
-    // return true if there's an active request to `peer` for `block`
-    [[nodiscard]] bool has(tr_block_index_t block, tr_peer const* peer) const
-    {
-        auto const it = blocks_.find(block);
-        return it != std::end(blocks_) && it->second.count(peer_at{ const_cast<tr_peer*>(peer), 0 });
-    }
-
-    // count how many peers we're asking for `block`
-    [[nodiscard]] size_t count(tr_block_index_t block) const
-    {
-        return blocks_.count(block);
-    }
-
-    // count how many active block requests we have to `peer`
-    [[nodiscard]] size_t count(tr_peer const* peer) const
-    {
-        auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-        auto const test = [&key](auto const& reqs)
-        {
-            return reqs.second.count(key) != 0;
-        };
-        return std::count_if(std::begin(blocks_), std::end(blocks_), test);
-    }
-
-    // return the total number of active requests
-    [[nodiscard]] size_t size() const
-    {
-        return std::accumulate(
-            std::begin(blocks_),
-            std::end(blocks_),
-            size_t{},
-            [](size_t sum, auto it) { return sum + std::size(it.second); });
-    }
-
-    struct block_and_peer
-    {
-        tr_block_index_t block;
-        tr_peer* peer;
-    };
-
-    // returns the active requests sent before `when`
-    [[nodiscard]] std::vector<block_and_peer> sentBefore(time_t when) const
-    {
-        auto sent_before = std::vector<block_and_peer>{};
-        sent_before.reserve(std::size(blocks_));
-
-        for (auto& perblock : blocks_)
-        {
-            for (auto& sent : perblock.second)
-            {
-                if (sent.when < when)
-                {
-                    sent_before.push_back(block_and_peer{ perblock.first, sent.peer });
-                }
-            }
-        }
-
-        return sent_before;
-    }
-
-private:
-    struct peer_at
-    {
-        tr_peer* peer;
-        time_t when;
-
-        peer_at(tr_peer* p, time_t w)
-            : peer{ p }
-            , when{ w }
-        {
-        }
-
-        int compare(peer_at const& that) const // <=>
-        {
-            if (peer != that.peer)
-            {
-                return peer < that.peer ? -1 : 1;
-            }
-
-            return 0;
-        }
-
-        bool operator<(peer_at const& that) const
-        {
-            return compare(that) < 0;
-        }
-    };
-
-    std::map<tr_block_index_t, std::set<peer_at>> blocks_;
-};
-
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
 {
@@ -352,7 +194,7 @@ public:
     bool needsCompletenessCheck = true;
     bool endgame = false;
 
-    ClientRequests requests;
+    ActiveRequests active_requests;
 
     struct weighted_piece* pieces = nullptr;
     int pieceCount = 0;
@@ -710,10 +552,10 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 ***
 *** There are two data structures associated with managing block requests:
 ***
-*** 1. tr_swarm::requests, an array of "struct block_request" which keeps
-***    track of which blocks have been requested, and when, and by which peers.
-***    This is list is used for (a) cancelling requests that have been pending
-***    for too long and (b) avoiding duplicate requests before endgame.
+*** 1. tr_swarm::active_requests, an opaque class that tracks what requests
+***    we currently have, i.e. which blocks and from which peers.
+***    This is used for (a) cancelling requests that have been waiting
+***    for too long and (b) avoiding duplicate requests.
 ***
 *** 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
 ***    pieces that we want to request. It's used to decide which blocks to
@@ -723,29 +565,6 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 /**
 *** struct block_request
 **/
-
-static void requestListAdd(tr_swarm* s, tr_block_index_t block, tr_peer* peer)
-{
-    s->requests.add(block, peer, tr_time());
-
-    /*
-    if (peer != nullptr)
-    {
-        ++peer->pendingReqsToPeer;
-        TR_ASSERT(peer->pendingReqsToPeer >= 0);
-    }
-    */
-}
-
-/*
-static void decrementPendingReqCount(tr_peer* peer)
-{
-    if ((peer != nullptr) && (peer->pendingReqsToPeer > 0))
-    {
-        --peer->pendingReqsToPeer;
-    }
-}
-*/
 
 static int countActiveWebseeds(tr_swarm* s)
 {
@@ -771,7 +590,7 @@ static void updateEndgame(tr_swarm* s)
 {
     /* we consider ourselves to be in endgame if the number of bytes
        we've got requested is >= the number of bytes left to download */
-    s->endgame = uint64_t(std::size(s->requests)) * s->tor->blockSize >= tr_torrentGetLeftUntilDone(s->tor);
+    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->blockSize >= tr_torrentGetLeftUntilDone(s->tor);
 }
 
 /****
@@ -1123,13 +942,13 @@ void tr_peerMgrGetNextRequests(
                 }
 
                 // don't send the same request to the same peer twice
-                if (s->requests.has(b, peer))
+                if (s->active_requests.has(b, peer))
                 {
                     continue;
                 }
 
                 // don't request from too many peers
-                size_t const n_peers = s->requests.count(b);
+                size_t const n_peers = s->active_requests.count(b);
                 size_t const max_peers = s->endgame ? 2 : 1;
                 if (n_peers > max_peers)
                 {
@@ -1157,7 +976,7 @@ void tr_peerMgrGetNextRequests(
                 }
 
                 /* update our own tables */
-                requestListAdd(s, b, peer);
+                s->active_requests.add(b, peer, tr_time());
                 ++p->requestCount;
             }
         }
@@ -1204,19 +1023,19 @@ void tr_peerMgrGetNextRequests(
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_block_index_t block)
 {
-    return tor->swarm->requests.has(block, peer);
+    return tor->swarm->active_requests.has(block, peer);
 }
 
 size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* tor, tr_peer const* peer)
 {
-    return tor->swarm->requests.count(peer);
+    return tor->swarm->active_requests.count(peer);
 }
 
 static void tr_swarmCancelOldRequests(tr_swarm* swarm)
 {
     time_t const now = tr_time();
     time_t const oldest = now - RequestTtlSecs;
-    for (auto const [block, peer] : swarm->requests.sentBefore(oldest))
+    for (auto const [block, peer] : swarm->active_requests.sentBefore(oldest))
     {
         auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
         if (msgs != nullptr)
@@ -1225,7 +1044,7 @@ static void tr_swarmCancelOldRequests(tr_swarm* swarm)
             msgs->cancel_block_request(block);
         }
 
-        swarm->requests.remove(block, peer);
+        swarm->active_requests.remove(block, peer);
         pieceListRemoveRequest(swarm, block);
     }
 }
@@ -1310,7 +1129,7 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
    either way we need to remove all its requests */
 static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 {
-    for (auto const& block : s->requests.remove(peer))
+    for (auto const& block : s->active_requests.remove(peer))
     {
         pieceListRemoveRequest(s, block);
     }
@@ -1320,7 +1139,7 @@ static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_pe
 {
     auto const now = tr_time();
 
-    for (auto* peer : s->requests.remove(block))
+    for (auto* peer : s->active_requests.remove(block))
     {
         auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
         if ((msgs != nullptr) && (msgs != no_notify))
@@ -1423,7 +1242,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
             if (b < s->tor->blockCount)
             {
-                s->requests.remove(b, peer);
+                s->active_requests.remove(b, peer);
                 pieceListRemoveRequest(s, b);
             }
             else
@@ -2415,7 +2234,7 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
         stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
         stat->cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
 
-        stat->pendingReqsToPeer = tor->swarm->requests.count(peer);
+        stat->pendingReqsToPeer = tor->swarm->active_requests.count(peer);
         stat->pendingReqsToClient = peer->pendingReqsToClient;
 
         char* pch = stat->flagStr;
