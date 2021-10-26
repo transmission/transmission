@@ -200,12 +200,10 @@ static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos, tr_voidp
 
 int tr_ptrArrayInsertSorted(tr_ptrArray* t, void* ptr, tr_voidptr_compare_func compare)
 {
-    int pos;
-    int ret;
     assertArrayIsSortedAndUnique(t, compare);
 
-    pos = tr_ptrArrayLowerBound(t, ptr, compare, nullptr);
-    ret = tr_ptrArrayInsert(t, ptr, pos);
+    int const pos = tr_ptrArrayLowerBound(t, ptr, compare, nullptr);
+    int const ret = tr_ptrArrayInsert(t, ptr, pos);
 
     assertIndexIsSortedAndUnique(t, ret, compare);
     return ret;
@@ -220,13 +218,12 @@ void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_
 
 static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
 {
-    int pos;
-    bool match;
     void* ret = nullptr;
 
     assertArrayIsSortedAndUnique(t, compare);
 
-    pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
+    bool match = false;
+    int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
 
     if (match)
     {
