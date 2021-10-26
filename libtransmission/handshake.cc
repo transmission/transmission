@@ -287,14 +287,14 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 /* 1 A->B: Diffie Hellman Ya, PadA */
 static void sendYa(tr_handshake* handshake)
 {
+    int len;
+    char outbuf[KEY_LEN + PadA_MAXLEN];
+    char* walk = outbuf;
+
     /* add our public key (Ya) */
-    int len = 0;
     uint8_t const* const public_key = tr_cryptoGetMyPublicKey(handshake->crypto, &len);
     TR_ASSERT(len == KEY_LEN);
     TR_ASSERT(public_key != nullptr);
-
-    char outbuf[KEY_LEN + PadA_MAXLEN];
-    char* walk = outbuf;
     memcpy(walk, public_key, len);
     walk += len;
 
@@ -512,6 +512,8 @@ static ReadState readVC(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    uint16_t pad_d_len;
+    uint32_t crypto_select;
     static size_t const needlen = sizeof(uint32_t) + sizeof(uint16_t);
 
     if (evbuffer_get_length(inbuf) < needlen)
@@ -519,7 +521,6 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
         return READ_LATER;
     }
 
-    auto crypto_select = uint32_t{};
     tr_peerIoReadUint32(handshake->io, inbuf, &crypto_select);
     handshake->crypto_select = crypto_select;
     dbgmsg(handshake, "crypto select is %d", (int)crypto_select);
@@ -530,7 +531,6 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
         return tr_handshakeDone(handshake, false);
     }
 
-    auto pad_d_len = uint16_t{};
     tr_peerIoReadUint16(handshake->io, inbuf, &pad_d_len);
     dbgmsg(handshake, "pad_d_len is %d", (int)pad_d_len);
 
@@ -573,6 +573,11 @@ static ReadState readPadD(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    uint8_t pstrlen;
+    uint8_t pstr[20];
+    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
+    uint8_t hash[SHA_DIGEST_LENGTH];
+
     dbgmsg(handshake, "payload: need %d, got %zu", INCOMING_HANDSHAKE_LEN, evbuffer_get_length(inbuf));
 
     if (evbuffer_get_length(inbuf) < INCOMING_HANDSHAKE_LEN)
@@ -582,7 +587,8 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     handshake->haveReadAnythingFromPeer = true;
 
-    uint8_t pstrlen = evbuffer_pullup(inbuf, 1)[0]; /* peek, don't read. We may be handing inbuf to AWAITING_YA */
+    pstrlen = evbuffer_pullup(inbuf, 1)[0]; /* peek, don't read. We may be handing inbuf to AWAITING_YA */
+
     if (pstrlen == 19) /* unencrypted */
     {
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_NONE);
@@ -617,7 +623,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* pstr (BitTorrent) */
     TR_ASSERT(pstrlen == 19);
-    uint8_t pstr[20];
     tr_peerIoReadBytes(handshake->io, inbuf, pstr, pstrlen);
     pstr[pstrlen] = '\0';
 
@@ -627,7 +632,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* reserved bytes */
-    uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     tr_peerIoReadBytes(handshake->io, inbuf, reserved, sizeof(reserved));
 
     /**
@@ -639,7 +643,6 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
 
     /* torrent hash */
-    uint8_t hash[SHA_DIGEST_LENGTH];
     tr_peerIoReadBytes(handshake->io, inbuf, hash, sizeof(hash));
 
     if (tr_peerIoIsIncoming(handshake->io))
@@ -709,6 +712,11 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    uint8_t ya[KEY_LEN];
+    uint8_t* walk;
+    uint8_t outbuf[KEY_LEN + PadB_MAXLEN];
+    int len;
+
     dbgmsg(handshake, "in readYa... need %d, have %zu", KEY_LEN, evbuffer_get_length(inbuf));
 
     if (evbuffer_get_length(inbuf) < KEY_LEN)
@@ -717,8 +725,8 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* read the incoming peer's public key */
-    uint8_t ya[KEY_LEN];
     evbuffer_remove(inbuf, ya, KEY_LEN);
+
     if (!tr_cryptoComputeSecret(handshake->crypto, ya))
     {
         return tr_handshakeDone(handshake, false);
@@ -728,9 +736,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* send our public key to the peer */
     dbgmsg(handshake, "sending B->A: Diffie Hellman Yb, PadB");
-    uint8_t outbuf[KEY_LEN + PadB_MAXLEN];
-    uint8_t* walk = outbuf;
-    auto len = int{};
+    walk = outbuf;
     uint8_t const* const myKey = tr_cryptoGetMyPublicKey(handshake->crypto, &len);
     memcpy(walk, myKey, len);
     walk += len;
@@ -838,6 +844,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 
 static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
+    uint16_t ia_len;
     size_t const needlen = handshake->pad_c_len + sizeof(uint16_t);
 
     if (evbuffer_get_length(inbuf) < needlen)
@@ -851,7 +858,6 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_free(padc);
 
     /* read ia_len */
-    auto ia_len = uint16_t{};
     tr_peerIoReadUint16(handshake->io, inbuf, &ia_len);
     dbgmsg(handshake, "ia_len is %d", (int)ia_len);
     handshake->ia_len = ia_len;
