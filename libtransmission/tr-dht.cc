@@ -748,7 +748,7 @@ void tr_dhtUpkeep(tr_session* session)
             auto const rc = tr_dhtAnnounce(tor, AF_INET, true);
 
             tor->dhtAnnounceAt = now +
-                ((rc == AnnounceResult::OK) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
+                ((rc == AnnounceResult::FAILED) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }
 
         if (tor->dhtAnnounce6At <= now)
@@ -756,7 +756,7 @@ void tr_dhtUpkeep(tr_session* session)
             auto const rc = tr_dhtAnnounce(tor, AF_INET6, true);
 
             tor->dhtAnnounce6At = now +
-                ((rc == AnnounceResult::OK) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
+                ((rc == AnnounceResult::FAILED) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }
     }
 }
