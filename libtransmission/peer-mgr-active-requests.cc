@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <numeric>
@@ -64,6 +65,7 @@ ActiveRequests::~ActiveRequests() = default;
 
 bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 {
+    // std::cout << __FILE__ << ':' << __LINE__ << " marking block " << block << " as requested from " << peer << " at " << when << std::endl;
     bool const added = impl_->blocks_[block].emplace(peer, when).second;
     return added;
 }
@@ -71,6 +73,7 @@ bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 // remove a request to `peer` for `block`
 bool ActiveRequests::remove(tr_block_index_t block, tr_peer const* peer)
 {
+    // std::cout << __FILE__ << ':' << __LINE__ << " unmarking block " << block << " request from " << peer << std::endl;
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     auto const it = impl_->blocks_.find(block);
     auto const removed = it != std::end(impl_->blocks_) && it->second.erase(key) != 0;
@@ -109,6 +112,7 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 // remove requests for `block` and return the associated peers
 std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 {
+    // std::cout << __FILE__ << ':' << __LINE__ << " removing all requests for block " << block << std::endl;
     auto removed = std::vector<tr_peer*>{};
 
     auto it = impl_->blocks_.find(block);
@@ -136,7 +140,9 @@ bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
 // count how many peers we're asking for `block`
 size_t ActiveRequests::count(tr_block_index_t block) const
 {
-    return impl_->blocks_.count(block);
+    auto const n = impl_->blocks_.count(block);
+    // std::cout << __FILE__ << ':' << __LINE__ << " number of active requests for " << block << ": " << n << std::endl;
+    return n;
 }
 
 // count how many active block requests we have to `peer`

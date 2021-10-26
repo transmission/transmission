@@ -362,29 +362,18 @@ static void on_idle(tr_webseed* w)
 
     if (tor != nullptr && tor->isRunning && !tr_torrentIsSeed(tor) && want > 0)
     {
-        tr_block_index_t* const blocks = tr_new(tr_block_index_t, want * 2);
-        auto got = int{};
-        tr_peerMgrGetNextRequests(tor, w, want, blocks, &got, true);
+        auto n_tasks = size_t{};
 
-        w->idle_connections -= std::min(w->idle_connections, got);
-
-        if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL && got == want)
+        for (auto const range : tr_peerMgrGetNextRequests(tor, w, want))
         {
-            w->retry_tickcount = 0;
-        }
-
-        for (int i = 0; i < got; ++i)
-        {
-            tr_block_index_t const b = blocks[i * 2];
-            tr_block_index_t const be = blocks[i * 2 + 1];
-
-            auto* const task = tr_new0(struct tr_webseed_task, 1);
+            auto const [first, last] = range;
+            auto* const task = tr_new0(tr_webseed_task, 1);
             task->session = tor->session;
             task->webseed = w;
-            task->block = b;
-            task->piece_index = tr_torBlockPiece(tor, b);
-            task->piece_offset = tor->blockSize * b - tor->info.pieceSize * task->piece_index;
-            task->length = (be - b) * tor->blockSize + tr_torBlockCountBytes(tor, be);
+            task->block = first;
+            task->piece_index = tr_torBlockPiece(tor, first);
+            task->piece_offset = tor->blockSize * first - tor->info.pieceSize * task->piece_index;
+            task->length = (last - first) * tor->blockSize + tr_torBlockCountBytes(tor, last);
             task->blocks_done = 0;
             task->response_code = 0;
             task->block_size = tor->blockSize;
@@ -392,9 +381,16 @@ static void on_idle(tr_webseed* w)
             evbuffer_add_cb(task->content, on_content_changed, task);
             w->tasks.insert(task);
             task_request_next_chunk(task);
+
+            --w->idle_connections;
+            ++n_tasks;
+            tr_peerMgrClientSentRequests(tor, w, range);
         }
 
-        tr_free(blocks);
+        if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL && n_tasks > 0)
+        {
+            w->retry_tickcount = 0;
+        }
     }
 }
 

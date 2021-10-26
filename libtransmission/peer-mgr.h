@@ -21,6 +21,7 @@
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
+#include "torrent.h" // tr_block_range FIXME: move to transmission.h or types.h
 #include "quark.h"
 
 /**
@@ -79,15 +80,11 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-void tr_peerMgrGetNextRequests(
-    tr_torrent* torrent,
-    tr_peer* peer,
-    int numwant,
-    tr_block_index_t* setme,
-    int* numgot,
-    bool get_intervals);
+std::vector<tr_block_range> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
+
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range range);
 
 size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 

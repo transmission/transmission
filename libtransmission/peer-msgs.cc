@@ -11,6 +11,7 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <memory> // std::unique_ptr
 #include <optional>
 
@@ -2024,7 +2025,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 
         /* use this desired rate to figure out how
          * many requests we should send to this peer */
-        size_t constexpr Floor = 4;
+        size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
         size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize;
         size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
@@ -2084,16 +2085,17 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
     TR_ASSERT(msgs->is_client_interested());
     TR_ASSERT(!msgs->is_client_choked());
 
-    auto* const blocks = tr_new(tr_block_index_t, n_wanted);
-    auto n = int{};
-    tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted, blocks, &n, false);
-
-    for (int i = 0; i < n; ++i)
+    // std::cout << __FILE__ << ':' << __LINE__ << " wants " << n_wanted << " blocks to request" << std::endl;
+    for (auto const range : tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted))
     {
-        protocolSendRequest(msgs, blockToReq(msgs->torrent, blocks[i]));
-    }
+        for (tr_block_index_t block = range.first; block <= range.last; ++block)
+        {
+            protocolSendRequest(msgs, blockToReq(msgs->torrent, block));
+        }
 
-    tr_free(blocks);
+        // std::cout << __FILE__ << ':' << __LINE__ << " peer " << (void*)msgs << " requested " << range.last + 1 - range.first << " blocks" << std::endl;
+        tr_peerMgrClientSentRequests(msgs->torrent, msgs, range);
+    }
 }
 
 static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)

@@ -11,6 +11,7 @@
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcpy, memcmp, strstr */
+#include <iostream>
 #include <set>
 #include <vector>
 
@@ -35,6 +36,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-mgr-active-requests.h"
+#include "peer-mgr-wishlist.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
 #include "session.h"
@@ -150,20 +152,6 @@ static char const* tr_atomAddrStr(struct peer_atom const* atom)
     return atom != nullptr ? tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port) : "[no atom]";
 }
 
-struct weighted_piece
-{
-    tr_piece_index_t index;
-    int16_t salt;
-    int16_t requestCount;
-};
-
-enum piece_sort_state
-{
-    PIECES_UNSORTED,
-    PIECES_SORTED_BY_INDEX,
-    PIECES_SORTED_BY_WEIGHT
-};
-
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
 {
@@ -195,10 +183,7 @@ public:
     bool endgame = false;
 
     ActiveRequests active_requests;
-
-    struct weighted_piece* pieces = nullptr;
-    int pieceCount = 0;
-    enum piece_sort_state pieceSortState = PIECES_UNSORTED;
+    Wishlist wishlist;
 
     int interestedCount = 0;
     int maxPeers = 0;
@@ -386,8 +371,6 @@ static void swarmFree(void* vs)
     tr_ptrArrayDestruct(&s->outgoingHandshakes, nullptr);
     tr_ptrArrayDestruct(&s->peers, nullptr);
     s->stats = {};
-
-    tr_free(s->pieces);
 
     delete s;
 }
@@ -586,6 +569,18 @@ static int countActiveWebseeds(tr_swarm* s)
     return activeCount;
 }
 
+// TODO: if we keep this, add equivalent API to ActiveRequest
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range range)
+{
+    // std::cout << __FILE__ << ':' << __LINE__ << " tr_peerMgrClientSentRequests [" << range.first << "..." << range.last << ']' << std::endl;
+    auto const now = tr_time();
+
+    for (tr_block_index_t block = range.first; block <= range.last; ++block)
+    {
+        torrent->swarm->active_requests.add(block, peer, now);
+    }
+}
+
 static void updateEndgame(tr_swarm* s)
 {
     /* we consider ourselves to be in endgame if the number of bytes
@@ -593,433 +588,19 @@ static void updateEndgame(tr_swarm* s)
     s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->blockSize >= tr_torrentGetLeftUntilDone(s->tor);
 }
 
+std::vector<tr_block_range> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
+{
+    auto* const swarm = torrent->swarm;
+    updateEndgame(swarm);
+    std::cerr << __FILE__ << ':' << __LINE__ << " endgame " << swarm->endgame << std::endl;
+    return swarm->wishlist.next(torrent, peer, numwant, swarm->active_requests, swarm->endgame);
+}
+
 /****
 *****
 *****  Piece List Manipulation / Accessors
 *****
 ****/
-
-static constexpr void invalidatePieceSorting(tr_swarm* s)
-{
-    s->pieceSortState = PIECES_UNSORTED;
-}
-
-static tr_torrent const* weightTorrent;
-
-static void setComparePieceByWeightTorrent(tr_swarm* s)
-{
-    weightTorrent = s->tor;
-}
-
-/* we try to create a "weight" s.t. high-priority pieces come before others,
- * and that partially-complete pieces come before empty ones. */
-static int comparePieceByWeight(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct weighted_piece const*>(va);
-    auto const* const b = static_cast<struct weighted_piece const*>(vb);
-    tr_torrent const* const tor = weightTorrent;
-
-    /* primary key: weight */
-    int missing = tr_torrentMissingBlocksInPiece(tor, a->index);
-    int pending = a->requestCount;
-    int ia = missing > pending ? missing - pending : tor->blockCountInPiece + pending;
-    missing = tr_torrentMissingBlocksInPiece(tor, b->index);
-    pending = b->requestCount;
-    int ib = missing > pending ? missing - pending : tor->blockCountInPiece + pending;
-    if (ia != ib)
-    {
-        return ia < ib ? -1 : 1;
-    }
-
-    /* secondary key: higher priorities go first */
-    ia = tor->info.pieces[a->index].priority;
-    ib = tor->info.pieces[b->index].priority;
-    if (ia != ib)
-    {
-        return ia > ib ? -1 : 1;
-    }
-
-    /* tertiary key: random */
-    return a->salt - b->salt;
-}
-
-static int comparePieceByIndex(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct weighted_piece const*>(va);
-    auto const* const b = static_cast<struct weighted_piece const*>(vb);
-
-    if (a->index < b->index)
-    {
-        return -1;
-    }
-
-    if (a->index > b->index)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-static void pieceListSort(tr_swarm* s, enum piece_sort_state state)
-{
-    TR_ASSERT(state == PIECES_SORTED_BY_INDEX || state == PIECES_SORTED_BY_WEIGHT);
-
-    if ((s->pieceCount > 0) && (s->pieces != nullptr))
-    {
-        if (state == PIECES_SORTED_BY_WEIGHT)
-        {
-            setComparePieceByWeightTorrent(s);
-            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight);
-        }
-        else
-        {
-            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByIndex);
-        }
-    }
-
-    s->pieceSortState = state;
-}
-
-/**
- * These functions are useful for testing, but too expensive for nightly builds.
- * let's leave it disabled but add an easy hook to compile it back in
- */
-#if 1
-
-#define assertWeightedPiecesAreSorted(t)
-
-#else
-
-static void assertWeightedPiecesAreSorted(Torrent* t)
-{
-    if (t->endgame == 0)
-    {
-        setComparePieceByWeightTorrent(t);
-
-        for (int i = 0; i < t->pieceCount - 1; ++i)
-        {
-            TR_ASSERT(comparePieceByWeight(&t->pieces[i], &t->pieces[i + 1]) <= 0);
-        }
-    }
-}
-
-#endif
-
-static constexpr weighted_piece* pieceListLookup(tr_swarm* s, tr_piece_index_t index)
-{
-    for (int i = 0; i < s->pieceCount; ++i)
-    {
-        if (s->pieces[i].index == index)
-        {
-            return &s->pieces[i];
-        }
-    }
-
-    return nullptr;
-}
-
-static void pieceListRebuild(tr_swarm* s)
-{
-    if (!tr_torrentIsSeed(s->tor))
-    {
-        tr_torrent const* const tor = s->tor;
-        tr_info const* const inf = tr_torrentInfo(tor);
-
-        /* build the new list */
-        auto poolCount = tr_piece_index_t{};
-        auto* const pool = tr_new(tr_piece_index_t, inf->pieceCount);
-        for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
-        {
-            if (!inf->pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i))
-            {
-                pool[poolCount++] = i;
-            }
-        }
-
-        int const pieceCount = poolCount;
-        auto* const pieces = tr_new0(weighted_piece, pieceCount);
-
-        for (tr_piece_index_t i = 0; i < poolCount; ++i)
-        {
-            struct weighted_piece* piece = pieces + i;
-            piece->index = pool[i];
-            piece->requestCount = 0;
-            piece->salt = tr_rand_int_weak(4096);
-        }
-
-        /* if we already had a list of pieces, merge it into
-         * the new list so we don't lose its requestCounts */
-        if (s->pieces != nullptr)
-        {
-            struct weighted_piece const* o = s->pieces;
-            struct weighted_piece const* const oend = o + s->pieceCount;
-            struct weighted_piece* n = pieces;
-            struct weighted_piece const* const nend = n + pieceCount;
-
-            pieceListSort(s, PIECES_SORTED_BY_INDEX);
-
-            while (o != oend && n != nend)
-            {
-                if (o->index < n->index)
-                {
-                    ++o;
-                }
-                else if (o->index > n->index)
-                {
-                    ++n;
-                }
-                else
-                {
-                    *n++ = *o++;
-                }
-            }
-
-            tr_free(s->pieces);
-        }
-
-        s->pieces = pieces;
-        s->pieceCount = pieceCount;
-
-        pieceListSort(s, PIECES_SORTED_BY_WEIGHT);
-
-        /* cleanup */
-        tr_free(pool);
-    }
-}
-
-static void pieceListRemovePiece(tr_swarm* s, tr_piece_index_t piece)
-{
-    weighted_piece const* const p = pieceListLookup(s, piece);
-    if (p != nullptr)
-    {
-        int const pos = p - s->pieces;
-
-        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount);
-        --s->pieceCount;
-
-        if (s->pieceCount == 0)
-        {
-            tr_free(s->pieces);
-            s->pieces = nullptr;
-        }
-    }
-}
-
-static void pieceListResortPiece(tr_swarm* s, struct weighted_piece* p)
-{
-    if (p == nullptr)
-    {
-        return;
-    }
-
-    /* is the torrent already sorted? */
-    int pos = p - s->pieces;
-    setComparePieceByWeightTorrent(s);
-
-    bool isSorted = true;
-
-    if (isSorted && pos > 0 && comparePieceByWeight(p - 1, p) > 0)
-    {
-        isSorted = false;
-    }
-
-    if (isSorted && pos < s->pieceCount - 1 && comparePieceByWeight(p, p + 1) > 0)
-    {
-        isSorted = false;
-    }
-
-    if (s->pieceSortState != PIECES_SORTED_BY_WEIGHT)
-    {
-        pieceListSort(s, PIECES_SORTED_BY_WEIGHT);
-        isSorted = true;
-    }
-
-    /* if it's not sorted, move it around */
-    if (!isSorted)
-    {
-        struct weighted_piece const tmp = *p;
-
-        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount);
-        --s->pieceCount;
-
-        auto exact = bool{};
-        pos = tr_lowerBound(&tmp, s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight, &exact);
-
-        memmove(&s->pieces[pos + 1], &s->pieces[pos], sizeof(struct weighted_piece) * (s->pieceCount - pos));
-        ++s->pieceCount;
-
-        s->pieces[pos] = tmp;
-    }
-
-    assertWeightedPiecesAreSorted(s);
-}
-
-static void pieceListRemoveRequest(tr_swarm* s, tr_block_index_t block)
-{
-    tr_piece_index_t const index = tr_torBlockPiece(s->tor, block);
-
-    weighted_piece* const p = pieceListLookup(s, index);
-    if (p != nullptr && p->requestCount > 0)
-    {
-        --p->requestCount;
-        pieceListResortPiece(s, p);
-    }
-}
-
-/**
-***
-**/
-
-void tr_peerMgrRebuildRequests(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    pieceListRebuild(tor->swarm);
-}
-
-void tr_peerMgrGetNextRequests(
-    tr_torrent* tor,
-    tr_peer* peer,
-    int numwant,
-    tr_block_index_t* setme,
-    int* numgot,
-    bool get_intervals)
-{
-    /* sanity clause */
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(numwant > 0);
-
-    tr_bitfield const* const have = &peer->have;
-
-    /* walk through the pieces and find blocks that should be requested */
-    tr_swarm* const s = tor->swarm;
-
-    /* prep the pieces list */
-    if (s->pieces == nullptr)
-    {
-        pieceListRebuild(s);
-    }
-
-    if (s->pieceSortState != PIECES_SORTED_BY_WEIGHT)
-    {
-        pieceListSort(s, PIECES_SORTED_BY_WEIGHT);
-    }
-
-    assertWeightedPiecesAreSorted(s);
-
-    updateEndgame(s);
-
-    // TODO(ckerr) this safeguard is here to silence a false nullptr dereference
-    // warning. The better fix is to refactor the `pieces` array to be a std
-    // container but that's out-of-scope for a "fix all the warnings" PR
-    if (s->pieces == nullptr)
-    {
-        *numgot = 0;
-        return;
-    }
-
-    struct weighted_piece* pieces = s->pieces;
-    int got = 0;
-    int checkedPieceCount = 0;
-
-    for (int i = 0; i < s->pieceCount && got < numwant; ++i, ++checkedPieceCount)
-    {
-        struct weighted_piece* p = pieces + i;
-
-        /* if the peer has this piece that we want... */
-        if (have->test(p->index))
-        {
-            auto const [first, last] = tr_torGetPieceBlockRange(tor, p->index);
-
-            for (tr_block_index_t b = first; b <= last && (got < numwant || (get_intervals && setme[2 * got - 1] == b - 1));
-                 ++b)
-            {
-                // don't request blocks we've already got
-                if (tr_torrentBlockIsComplete(tor, b))
-                {
-                    continue;
-                }
-
-                // don't send the same request to the same peer twice
-                if (s->active_requests.has(b, peer))
-                {
-                    continue;
-                }
-
-                // don't request from too many peers
-                size_t const n_peers = s->active_requests.count(b);
-                size_t const max_peers = s->endgame ? 2 : 1;
-                if (n_peers > max_peers)
-                {
-                    continue;
-                }
-
-                /* update the caller's table */
-                if (!get_intervals)
-                {
-                    setme[got++] = b;
-                }
-                /* if intervals are requested two array entries are necessarry:
-                   one for the interval's starting block and one for its end block */
-                else if (got != 0 && setme[2 * got - 1] == b - 1 && b != first)
-                {
-                    /* expand the last interval */
-                    ++setme[2 * got - 1];
-                }
-                else
-                {
-                    /* begin a new interval */
-                    setme[2 * got] = b;
-                    setme[2 * got + 1] = b;
-                    ++got;
-                }
-
-                /* update our own tables */
-                s->active_requests.add(b, peer, tr_time());
-                ++p->requestCount;
-            }
-        }
-    }
-
-    /* In most cases we've just changed the weights of a small number of pieces.
-     * So rather than qsort()ing the entire array, it's faster to apply an
-     * adaptive insertion sort algorithm. */
-    if (got > 0)
-    {
-        /* not enough requests || last piece modified */
-        if (checkedPieceCount == s->pieceCount)
-        {
-            --checkedPieceCount;
-        }
-
-        setComparePieceByWeightTorrent(s);
-
-        for (int i = checkedPieceCount - 1; i >= 0; --i)
-        {
-            auto exact = bool{};
-
-            /* relative position! */
-            int const newpos = tr_lowerBound(
-                &s->pieces[i],
-                &s->pieces[i + 1],
-                s->pieceCount - (i + 1),
-                sizeof(struct weighted_piece),
-                comparePieceByWeight,
-                &exact);
-
-            if (newpos > 0)
-            {
-                struct weighted_piece const piece = s->pieces[i];
-                memmove(&s->pieces[i], &s->pieces[i + 1], sizeof(struct weighted_piece) * newpos);
-                s->pieces[i + newpos] = piece;
-            }
-        }
-    }
-
-    assertWeightedPiecesAreSorted(t);
-    *numgot = got;
-}
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_block_index_t block)
 {
@@ -1045,7 +626,7 @@ static void tr_swarmCancelOldRequests(tr_swarm* swarm)
         }
 
         swarm->active_requests.remove(block, peer);
-        pieceListRemoveRequest(swarm, block);
+        // pieceListRemoveRequest(swarm, block); // FIXME(wishlist)
     }
 }
 
@@ -1129,10 +710,14 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
    either way we need to remove all its requests */
 static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 {
-    for (auto const& block : s->active_requests.remove(peer))
-    {
-        pieceListRemoveRequest(s, block);
-    }
+    s->active_requests.remove(peer);
+
+    // FIXME(wishlist)
+}
+
+void tr_peerMgrRebuildRequests(tr_torrent* /*torrent*/)
+{
+    // FIXME(wishlist)
 }
 
 static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_peer* no_notify)
@@ -1148,7 +733,7 @@ static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_pe
             msgs->cancel_block_request(block);
         }
 
-        pieceListRemoveRequest(s, block);
+        // pieceListRemoveRequest(s, block); // FIXME(wishlist)
     }
 }
 
@@ -1177,7 +762,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     }
 
     /* bookkeeping */
-    pieceListRemovePiece(s, p);
+    // pieceListRemovePiece(s, p); // FIXME(wishlist)
     s->needsCompletenessCheck = true;
 }
 
@@ -1243,7 +828,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             if (b < s->tor->blockCount)
             {
                 s->active_requests.remove(b, peer);
-                pieceListRemoveRequest(s, b);
+                // pieceListRemoveRequest(s, b); FIXME(wishlist)
             }
             else
             {
@@ -1280,7 +865,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_block_index_t const block = _tr_block(tor, p, e->offset);
             cancelAllRequestsForBlock(s, block, peer);
             peer->blocksSentToClient.add(tr_time(), 1);
-            pieceListResortPiece(s, pieceListLookup(s, p));
+            // pieceListResortPiece(s, pieceListLookup(s, p)); // FIXME(wishlist)
             tr_torrentGotBlock(tor, block);
             break;
         }
@@ -1909,7 +1494,6 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
 
     s->isRunning = true;
     s->maxPeers = tor->maxConnectedPeers;
-    s->pieceSortState = PIECES_UNSORTED;
 
     // rechoke soon
     tr_timerAddMsec(s->manager->rechokeTimer, 100);
@@ -1920,8 +1504,6 @@ static void removeAllPeers(tr_swarm*);
 static void stopSwarm(tr_swarm* swarm)
 {
     swarm->isRunning = false;
-
-    invalidatePieceSorting(swarm);
 
     removeAllPeers(swarm);
 
