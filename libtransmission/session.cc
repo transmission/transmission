@@ -459,8 +459,14 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_seeding_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+    tr_variantDictAddBool(
+        d,
+        TR_KEY_script_torrent_done_seeding_enabled,
+        tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+    tr_variantDictAddStr(
+        d,
+        TR_KEY_script_torrent_done_seeding_filename,
+        tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
