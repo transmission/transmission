@@ -54,6 +54,7 @@ class ActiveRequests::Impl
 {
 public:
     std::map<tr_block_index_t, std::set<peer_at>> blocks_;
+    size_t size_ = 0;
 };
 
 ActiveRequests::ActiveRequests()
@@ -67,6 +68,12 @@ bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 {
     // std::cout << __FILE__ << ':' << __LINE__ << " marking block " << block << " as requested from " << peer << " at " << when << std::endl;
     bool const added = impl_->blocks_[block].emplace(peer, when).second;
+
+    if (added)
+    {
+        ++impl_->size_;
+    }
+
     return added;
 }
 
@@ -78,9 +85,14 @@ bool ActiveRequests::remove(tr_block_index_t block, tr_peer const* peer)
     auto const it = impl_->blocks_.find(block);
     auto const removed = it != std::end(impl_->blocks_) && it->second.erase(key) != 0;
 
-    if (removed && std::empty(it->second))
+    if (removed)
     {
-        impl_->blocks_.erase(it);
+        --impl_->size_;
+
+        if (std::empty(it->second))
+        {
+            impl_->blocks_.erase(it);
+        }
     }
 
     return removed;
@@ -118,13 +130,15 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
     auto it = impl_->blocks_.find(block);
     if (it != std::end(impl_->blocks_))
     {
-        removed.resize(std::size(it->second));
+        auto const n = std::size(it->second);
+        removed.resize(n);
         std::transform(
             std::begin(it->second),
             std::end(it->second),
             std::begin(removed),
             [](auto const& sent) { return sent.peer; });
         impl_->blocks_.erase(block);
+        impl_->size_ -= n;
     }
 
     return removed;
@@ -159,11 +173,7 @@ size_t ActiveRequests::count(tr_peer const* peer) const
 // return the total number of active requests
 size_t ActiveRequests::size() const
 {
-    return std::accumulate(
-        std::begin(impl_->blocks_),
-        std::end(impl_->blocks_),
-        size_t{},
-        [](size_t sum, auto it) { return sum + std::size(it.second); });
+    return impl_->size_;
 }
 
 // returns the active requests sent before `when`

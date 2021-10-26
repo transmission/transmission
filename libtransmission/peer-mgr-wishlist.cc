@@ -74,7 +74,7 @@ struct Candidate
     }
 };
 
-std::vector<Candidate> getAllCandidates(tr_torrent* tor)
+std::vector<Candidate> getCandidates(tr_torrent* tor)
 {
     auto const* const inf = tr_torrentInfo(tor);
 
@@ -179,16 +179,12 @@ std::vector<tr_block_range> Wishlist::next(
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(numwant > 0);
 
-    auto candidates = getAllCandidates(tor);
-    auto constexpr MaxSorted = 20;
-    if (std::size(candidates) > MaxSorted)
-    {
-        std::partial_sort(std::begin(candidates), std::begin(candidates) + MaxSorted, std::end(candidates));
-    }
-    else
-    {
-        std::sort(std::begin(candidates), std::end(candidates));
-    }
+    // Until we're in endgame, we usually won't need allt he candidates.
+    // Just do a partial sort to avoid unnecessary comparisons.
+    auto candidates = getCandidates(tor);
+    auto constexpr MaxSorted = size_t{ 20 };
+    auto const middle = std::min(std::size(candidates), MaxSorted);
+    std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
     // std::cerr << __FILE__ << ':' << __LINE__ << " got " << std::size(candidates) << " candidates" << std::endl;
     for (auto const& candidate : candidates)
