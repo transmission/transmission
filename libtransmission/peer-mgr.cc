@@ -592,7 +592,7 @@ std::vector<tr_block_range> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_pe
 {
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    std::cerr << __FILE__ << ':' << __LINE__ << " endgame " << swarm->endgame << std::endl;
+    // std::cout << __FILE__ << ':' << __LINE__ << " endgame " << swarm->endgame << std::endl;
     return swarm->wishlist.next(torrent, peer, numwant, swarm->active_requests, swarm->endgame);
 }
 

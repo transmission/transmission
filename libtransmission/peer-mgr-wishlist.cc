@@ -79,14 +79,22 @@ std::vector<Candidate> getAllCandidates(tr_torrent* tor)
     auto const* const inf = tr_torrentInfo(tor);
 
     // count up how many pieces we still want
-    auto wanted_pieces = std::vector<tr_piece_index_t>{};
+    auto wanted_pieces = std::vector<std::pair<tr_piece_index_t, size_t>>{};
     wanted_pieces.reserve(inf->pieceCount);
     for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
     {
-        if (!inf->pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i))
+        if (inf->pieces[i].dnd)
         {
-            wanted_pieces.push_back(i);
+            continue;
         }
+
+        auto const n_missing = tr_torrentMissingBlocksInPiece(tor, i);
+        if (n_missing == 0)
+        {
+            continue;
+        }
+
+        wanted_pieces.emplace_back(i, n_missing);
     }
 
     // transform them into candidates
@@ -97,11 +105,12 @@ std::vector<Candidate> getAllCandidates(tr_torrent* tor)
     candidates.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
+        auto const [piece, n_missing] = wanted_pieces[i];
         candidates.emplace_back(
-            wanted_pieces[i],
-            tr_torrentMissingBlocksInPiece(tor, i),
+            piece,
+            n_missing,
             0, // FIXME: number of pending requests in piece
-            inf->pieces[i].priority,
+            inf->pieces[piece].priority,
             saltbuf[i]);
     }
 
@@ -171,7 +180,16 @@ std::vector<tr_block_range> Wishlist::next(
     TR_ASSERT(numwant > 0);
 
     auto candidates = getAllCandidates(tor);
-    std::sort(std::begin(candidates), std::end(candidates));
+    auto constexpr MaxSorted = 20;
+    if (std::size(candidates) > MaxSorted)
+    {
+        std::partial_sort(std::begin(candidates), std::begin(candidates) + MaxSorted, std::end(candidates));
+    }
+    else
+    {
+        std::sort(std::begin(candidates), std::end(candidates));
+    }
+
     // std::cerr << __FILE__ << ':' << __LINE__ << " got " << std::size(candidates) << " candidates" << std::endl;
     for (auto const& candidate : candidates)
     {
