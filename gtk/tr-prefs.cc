@@ -282,6 +282,14 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
         t->add_row_w(row, *l, *w);
     }
 
+    {
+        auto* l = new_check_button(_("Call scrip_t when torrent seeding is completed:"), TR_KEY_script_torrent_done_seeding_enabled, core_);
+        auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_seeding_filename, core_);
+        w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_seeding_enabled));
+        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
+        t->add_row_w(row, *l, *w);
+    }
+
     return t;
 }
 

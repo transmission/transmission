@@ -703,6 +703,7 @@ enum TrScript
 {
     TR_SCRIPT_ON_TORRENT_ADDED,
     TR_SCRIPT_ON_TORRENT_DONE,
+    TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
 
     TR_SCRIPT_N_TYPES
 };
@@ -714,18 +715,6 @@ char const* tr_sessionGetScript(tr_session const*, TrScript);
 void tr_sessionSetScriptEnabled(tr_session*, TrScript, bool enabled);
 
 bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
-
-/**
-***
-**/
-
-bool tr_sessionIsTorrentDoneSeedingScriptEnabled(tr_session const *);
-
-void tr_sessionSetTorrentDoneSeedingScriptEnabled(tr_session *, bool isEnabled);
-
-char const* tr_sessionGetTorrentDoneSeedingScript(tr_session const *);
-
-void tr_sessionSetTorrentDoneSeedingScript(tr_session *, char const *scriptFilename);
 
 /** @} */
 

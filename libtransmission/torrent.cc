@@ -453,6 +453,18 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
         difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
+static void torrentCallScript(tr_torrent const* tor, char const* script);
+
+static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+{
+    auto* session = tor->session;
+
+    if (tr_sessionIsScriptEnabled(session, type))
+    {
+        torrentCallScript(tor, tr_sessionGetScript(session, type));
+    }
+}
+
 /***
 ****
 ***/
@@ -466,7 +478,8 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         return;
     }
 
-    /* if we're seeding and reach our seed ratio limit, stop the torrent */
+    /* if we're seeding and reach our seed ratio limit, stop the torrent and maybe invoke
+     done seeding script */
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddTorInfo(tor, "%s", "Seed ratio reached; pausing torrent");
@@ -478,8 +491,10 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         {
             (*tor->ratio_limit_hit_func)(tor, tor->ratio_limit_hit_func_user_data);
         }
+        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     }
-    /* if we're seeding and reach our inactiviy limit, stop the torrent */
+    /* if we're seeding and reach our inactiviy limit, stop the torrent and maybe invoke
+     done seeding script */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
         tr_logAddTorInfo(tor, "%s", "Seeding idle limit reached; pausing torrent");
@@ -835,18 +850,6 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     }
 
     return disappeared;
-}
-
-static void torrentCallScript(tr_torrent const* tor, char const* script);
-
-static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
-{
-    auto* session = tor->session;
-
-    if (tr_sessionIsScriptEnabled(session, type))
-    {
-        torrentCallScript(tor, tr_sessionGetScript(session, type));
-    }
 }
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)

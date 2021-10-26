@@ -2103,14 +2103,14 @@ static char const* sessionSet(
         tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_seeding_filename, &str, NULL))
+    if (tr_variantDictFindStr(args_in, TR_KEY_script_torrent_done_seeding_filename, &str, nullptr))
     {
-        tr_sessionSetTorrentDoneSeedingScript(session, str);
+        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE_SEEDING, str);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_done_seeding_enabled, &boolVal))
     {
-        tr_sessionSetTorrentDoneSeedingScriptEnabled(session, boolVal);
+        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE_SEEDING, boolVal);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &boolVal))
@@ -2418,11 +2418,11 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_script_torrent_done_seeding_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetTorrentDoneSeedingScript(s));
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_script_torrent_done_seeding_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsTorrentDoneSeedingScriptEnabled(s));
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_queue_stalled_enabled:
