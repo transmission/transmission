@@ -422,9 +422,7 @@ int tr_cacheFlushDone(tr_cache* cache)
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 {
-    auto first = tr_block_index_t{};
-    auto last = tr_block_index_t{};
-    tr_torGetFileBlockRange(torrent, i, &first, &last);
+    auto const [first, last] = tr_torGetFileBlockRange(torrent, i);
 
     int pos = findBlockPos(cache, torrent, first);
     dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);

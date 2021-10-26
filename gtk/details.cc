@@ -32,15 +32,6 @@
 
 using namespace std::literals;
 
-namespace
-{
-
-auto const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
-auto const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
-auto const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
-
-} // namespace
-
 class DetailsDialog::Impl
 {
 public:
@@ -159,6 +150,10 @@ private:
     std::vector<int> ids_;
     Glib::RefPtr<TrCore> const core_;
     sigc::connection periodic_refresh_tag_;
+
+    Glib::Quark const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
+    Glib::Quark const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
+    Glib::Quark const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
 };
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const

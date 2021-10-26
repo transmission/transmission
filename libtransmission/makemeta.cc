@@ -61,8 +61,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
 
     if (odir != TR_BAD_SYS_DIR)
     {
-        char const* name;
-
+        char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (name[0] != '.') /* skip dotfiles */
@@ -143,7 +142,6 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         return nullptr;
     }
 
-    struct FileList* files;
     tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
 
     ret->top = real_top;
@@ -155,6 +153,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     /* build a list of files containing top file and,
        if it's a directory, all of its children */
+    FileList* files = nullptr;
     {
         char* dir = tr_sys_path_dirname(ret->top, nullptr);
         char* base = tr_sys_path_basename(ret->top, nullptr);
@@ -354,14 +353,11 @@ static void getFileInfo(
     tr_variant* uninitialized_length,
     tr_variant* uninitialized_path)
 {
-    size_t offset;
-
     /* get the file size */
     tr_variantInitInt(uninitialized_length, file->size);
 
     /* how much of file->filename to walk past */
-    offset = strlen(topFile);
-
+    size_t offset = strlen(topFile);
     if (offset > 0 && topFile[offset - 1] != TR_PATH_DELIMITER)
     {
         ++offset; /* +1 for the path delimiter */
@@ -374,7 +370,7 @@ static void getFileInfo(
     {
         char* filename = tr_strdup(file->filename + offset);
         char* walk = filename;
-        char const* token;
+        char const* token = nullptr;
 
         while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != nullptr)
         {
@@ -390,9 +386,6 @@ static void getFileInfo(
 
 static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 {
-    char* base;
-    uint8_t* pch;
-
     tr_variantDictReserve(dict, 5);
 
     if (builder->isFolder) /* root node is a directory */
@@ -412,8 +405,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    base = tr_sys_path_basename(builder->top, nullptr);
-
+    char* const base = tr_sys_path_basename(builder->top, nullptr);
     if (base != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
@@ -422,7 +414,8 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    if ((pch = getHashInfo(builder)) != nullptr)
+    uint8_t* const pch = getHashInfo(builder);
+    if (pch != nullptr)
     {
         tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
         tr_free(pch);
@@ -538,7 +531,7 @@ static tr_lock* getQueueLock(void)
     return lock;
 }
 
-static void makeMetaWorkerFunc([[maybe_unused]] void* user_data)
+static void makeMetaWorkerFunc(void* /*user_data*/)
 {
     for (;;)
     {
@@ -577,8 +570,6 @@ void tr_makeMetaInfo(
     bool isPrivate,
     char const* source)
 {
-    tr_lock* lock;
-
     /* free any variables from a previous run */
     for (int i = 0; i < builder->trackerCount; ++i)
     {
@@ -618,7 +609,7 @@ void tr_makeMetaInfo(
     }
 
     /* enqueue the builder */
-    lock = getQueueLock();
+    tr_lock* lock = getQueueLock();
     tr_lockLock(lock);
     builder->nextBuilder = queue;
     queue = builder;

@@ -40,11 +40,7 @@ export class RemoveDialog extends EventTarget {
   _onConfirm() {
     const { remote, torrents, trash } = this.options;
     if (torrents.length > 0) {
-      if (trash) {
-        remote.removeTorrentsAndData(torrents);
-      } else {
-        remote.removeTorrents(torrents);
-      }
+      remote.removeTorrents(torrents, trash);
     }
 
     this.close();

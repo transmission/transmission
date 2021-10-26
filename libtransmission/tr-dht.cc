@@ -79,14 +79,12 @@ struct bootstrap_closure
 
 static bool bootstrap_done(tr_session* session, int af)
 {
-    int status;
-
     if (af == 0)
     {
         return bootstrap_done(session, AF_INET) && bootstrap_done(session, AF_INET6);
     }
 
-    status = tr_dhtStatus(session, af, nullptr);
+    int const status = tr_dhtStatus(session, af, nullptr);
     return status == TR_DHT_STOPPED || status >= TR_DHT_FIREWALLED;
 }
 
@@ -116,9 +114,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 {
     struct addrinfo hints;
     struct addrinfo* info;
-    struct addrinfo* infop;
     char pp[10];
-    int rc;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_DGRAM;
@@ -126,7 +122,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     /* No, just passing p + 1 to gai won't work. */
     tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
-    rc = getaddrinfo(name, pp, &hints, &info);
+    int const rc = getaddrinfo(name, pp, &hints, &info);
 
     if (rc != 0)
     {
@@ -134,8 +130,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
         return;
     }
 
-    infop = info;
-
+    addrinfo* infop = info;
     while (infop != nullptr)
     {
         dht_ping_node(infop->ai_addr, infop->ai_addrlen);
@@ -222,10 +217,9 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        char* bootstrap_file;
         tr_sys_file_t f = TR_BAD_SYS_FILE;
 
-        bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", nullptr);
+        char* const bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", nullptr);
 
         if (bootstrap_file != nullptr)
         {
@@ -315,9 +309,7 @@ static void dht_bootstrap(void* closure)
 int tr_dhtInit(tr_session* ss)
 {
     tr_variant benc;
-    int rc;
     bool have_id = false;
-    char* dat_file;
     uint8_t* nodes = nullptr;
     uint8_t* nodes6 = nullptr;
     uint8_t const* raw;
@@ -337,8 +329,8 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
-    rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, nullptr) ? 0 : -1;
+    char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
+    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, nullptr) ? 0 : -1;
     tr_free(dat_file);
 
     if (rc == 0)
@@ -643,32 +635,18 @@ char const* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(
-    [[maybe_unused]] void* ignore,
-    int event,
-    unsigned char const* info_hash,
-    void const* data,
-    size_t data_len)
+static void callback(void* /*ignore*/, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
-        tr_torrent* tor;
         tr_sessionLock(session_);
-        tor = tr_torrentFindFromHash(session_, info_hash);
 
+        tr_torrent* const tor = tr_torrentFindFromHash(session_, info_hash);
         if (tor != nullptr && tr_torrentAllowsDHT(tor))
         {
-            size_t n;
-            tr_pex* pex;
-
-            if (event == DHT_EVENT_VALUES)
-            {
-                pex = tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n);
-            }
-            else
-            {
-                pex = tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0, &n);
-            }
+            size_t n = 0;
+            tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
+                                                            tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0, &n);
 
             tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n);
 
@@ -700,8 +678,6 @@ static void callback(
 
 static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 {
-    int rc;
-    int status;
     int numnodes;
     int ret = 0;
 
@@ -710,7 +686,7 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return -1;
     }
 
-    status = tr_dhtStatus(tor->session, af, &numnodes);
+    int const status = tr_dhtStatus(tor->session, af, &numnodes);
 
     if (status == TR_DHT_STOPPED)
     {
@@ -720,8 +696,7 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
     if (status >= TR_DHT_POOR)
     {
-        rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
-
+        int const rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
         if (rc >= 0)
         {
             tr_logAddTorInfo(
@@ -829,7 +804,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
-static void timer_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* session)
+static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* session)
 {
     tr_dhtCallback(nullptr, 0, nullptr, 0, session);
 }
@@ -840,7 +815,7 @@ static void timer_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] 
    free to add support to your private copy as long as you don't
    redistribute it. */
 
-int dht_blacklisted([[maybe_unused]] struct sockaddr const* sa, [[maybe_unused]] int salen)
+int dht_blacklisted(sockaddr const* /*sa*/, int /*salen*/)
 {
     return 0;
 }
