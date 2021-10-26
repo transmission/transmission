@@ -493,8 +493,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         }
         callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     }
-    /* if we're seeding and reach our inactiviy limit, stop the torrent and maybe invoke
-     done seeding script */
+    /* if we're seeding and reach our inactiviy limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
         tr_logAddTorInfo(tor, "%s", "Seeding idle limit reached; pausing torrent");
