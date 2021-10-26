@@ -255,7 +255,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
 
-    tr_dh_secret* const ret = tr_dh_secret_new(handle->key_length);
+    tr_dh_secret* ret = tr_dh_secret_new(handle->key_length);
 
     auto my_secret_key_length = word32{};
     if (check_result(API(DhAgree)(
