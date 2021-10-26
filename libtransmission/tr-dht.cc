@@ -112,7 +112,7 @@ static int bootstrap_af(tr_session* session)
 
 static void bootstrap_from_name(char const* name, tr_port port, int af)
 {
-    addrinfo hints = {};
+    auto hints = addrinfo{};
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_family = af;
 
@@ -122,7 +122,6 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
     addrinfo* info = nullptr;
     int const rc = getaddrinfo(name, pp, &hints, &info);
-
     if (rc != 0)
     {
         tr_logAddNamedError("DHT", "%s:%s: %s", name, pp, gai_strerror(rc));

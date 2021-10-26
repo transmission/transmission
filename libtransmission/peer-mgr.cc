@@ -68,7 +68,7 @@ static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
 // max number of peers to ask for per second overall.
 // this throttle is to avoid overloading the router
-static auto constexpr MaxConnectionsPerSecond = int{ 12 };
+static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 
 // number of bad pieces a peer is allowed to send before we ban them
 static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
@@ -203,13 +203,6 @@ public:
     struct weighted_piece* pieces = nullptr;
     int pieceCount = 0;
     enum piece_sort_state pieceSortState = PIECES_UNSORTED;
-
-    /* An array of pieceCount items stating how many peers have each piece.
-       This is used to help us for downloading pieces "rarest first."
-       This may be nullptr if we don't have metainfo yet, or if we're not
-       downloading and don't care about rarity */
-    uint16_t* pieceReplication = nullptr;
-    size_t pieceReplicationSize = 0;
 
     int interestedCount = 0;
     int maxPeers = 0;
@@ -374,58 +367,18 @@ static int peerCompare(void const* va, void const* vb)
 
 static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const* addr)
 {
-    tr_swarm* swarm = (tr_swarm*)cswarm;
+    auto* swarm = const_cast<tr_swarm*>(cswarm);
     return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, addr, comparePeerAtomToAddress));
 }
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 {
-    tr_swarm* s = (tr_swarm*)cs;
+    auto* s = const_cast<tr_swarm*>(cs);
 
     TR_ASSERT(swarmIsLocked(s));
 
     return atom->peer != nullptr || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) != nullptr ||
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
-}
-
-static constexpr bool replicationExists(tr_swarm const* s)
-{
-    return s->pieceReplication != nullptr;
-}
-
-static void replicationFree(tr_swarm* s)
-{
-    tr_free(s->pieceReplication);
-    s->pieceReplication = nullptr;
-    s->pieceReplicationSize = 0;
-}
-
-static void replicationNew(tr_swarm* s)
-{
-    TR_ASSERT(!replicationExists(s));
-
-    tr_piece_index_t const piece_count = s->tor->info.pieceCount;
-    int const n = tr_ptrArraySize(&s->peers);
-
-    s->pieceReplicationSize = piece_count;
-    s->pieceReplication = tr_new0(uint16_t, piece_count);
-
-    for (tr_piece_index_t piece_i = 0; piece_i < piece_count; ++piece_i)
-    {
-        uint16_t r = 0;
-
-        for (int peer_i = 0; peer_i < n; ++peer_i)
-        {
-            auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, peer_i));
-
-            if (peer->have.test(piece_i))
-            {
-                ++r;
-            }
-        }
-
-        s->pieceReplication[piece_i] = r;
-    }
 }
 
 static void swarmFree(void* vs)
@@ -443,8 +396,6 @@ static void swarmFree(void* vs)
     tr_ptrArrayDestruct(&s->outgoingHandshakes, nullptr);
     tr_ptrArrayDestruct(&s->peers, nullptr);
     s->stats = {};
-
-    replicationFree(s);
 
     tr_free(s->requests);
     tr_free(s->pieces);
@@ -823,17 +774,9 @@ static constexpr void invalidatePieceSorting(tr_swarm* s)
 
 static tr_torrent const* weightTorrent;
 
-static uint16_t const* weightReplication;
-
 static void setComparePieceByWeightTorrent(tr_swarm* s)
 {
-    if (!replicationExists(s))
-    {
-        replicationNew(s);
-    }
-
     weightTorrent = s->tor;
-    weightReplication = s->pieceReplication;
 }
 
 /* we try to create a "weight" s.t. high-priority pieces come before others,
@@ -843,7 +786,6 @@ static int comparePieceByWeight(void const* va, void const* vb)
     auto const* const a = static_cast<struct weighted_piece const*>(va);
     auto const* const b = static_cast<struct weighted_piece const*>(vb);
     tr_torrent const* const tor = weightTorrent;
-    uint16_t const* const rep = weightReplication;
 
     /* primary key: weight */
     int missing = tr_torrentMissingBlocksInPiece(tor, a->index);
@@ -852,58 +794,21 @@ static int comparePieceByWeight(void const* va, void const* vb)
     missing = tr_torrentMissingBlocksInPiece(tor, b->index);
     pending = b->requestCount;
     int ib = missing > pending ? missing - pending : tor->blockCountInPiece + pending;
-
-    if (ia < ib)
+    if (ia != ib)
     {
-        return -1;
-    }
-
-    if (ia > ib)
-    {
-        return 1;
+        return ia < ib ? -1 : 1;
     }
 
     /* secondary key: higher priorities go first */
     ia = tor->info.pieces[a->index].priority;
     ib = tor->info.pieces[b->index].priority;
-
-    if (ia > ib)
+    if (ia != ib)
     {
-        return -1;
+        return ia > ib ? -1 : 1;
     }
 
-    if (ia < ib)
-    {
-        return 1;
-    }
-
-    /* tertiary key: rarest first. */
-    ia = rep[a->index];
-    ib = rep[b->index];
-
-    if (ia < ib)
-    {
-        return -1;
-    }
-
-    if (ia > ib)
-    {
-        return 1;
-    }
-
-    /* quaternary key: random */
-    if (a->salt < b->salt)
-    {
-        return -1;
-    }
-
-    if (a->salt > b->salt)
-    {
-        return 1;
-    }
-
-    /* okay, they're equal */
-    return 0;
+    /* tertiary key: random */
+    return a->salt - b->salt;
 }
 
 static int comparePieceByIndex(void const* va, void const* vb)
@@ -951,7 +856,6 @@ static void pieceListSort(tr_swarm* s, enum piece_sort_state state)
 #if 1
 
 #define assertWeightedPiecesAreSorted(t)
-#define assertReplicationCountIsExact(t)
 
 #else
 
@@ -965,36 +869,6 @@ static void assertWeightedPiecesAreSorted(Torrent* t)
         {
             TR_ASSERT(comparePieceByWeight(&t->pieces[i], &t->pieces[i + 1]) <= 0);
         }
-    }
-}
-
-static void assertReplicationCountIsExact(Torrent* t)
-{
-    /* This assert might fail due to errors of implementations in other
-     * clients. It happens when receiving duplicate bitfields/HaveAll/HaveNone
-     * from a client. If a such a behavior is noticed,
-     * a bug report should be filled to the faulty client. */
-
-    uint16_t const* rep = t->pieceReplication;
-    size_t const piece_count = t->pieceReplicationSize;
-    tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&t->peers);
-    int const peer_count = tr_ptrArraySize(&t->peers);
-
-    TR_ASSERT(piece_count == t->tor->info.pieceCount);
-
-    for (size_t piece_i = 0; piece_i < piece_count; ++piece_i)
-    {
-        uint16_t r = 0;
-
-        for (int peer_i = 0; peer_i < peer_count; ++peer_i)
-        {
-            if (tr_bitsetHas(&peers[peer_i]->have, piece_i))
-            {
-                ++r;
-            }
-        }
-
-        TR_ASSERT(rep[piece_i] == r);
     }
 }
 
@@ -1161,100 +1035,6 @@ static void pieceListRemoveRequest(tr_swarm* s, tr_block_index_t block)
     }
 }
 
-/****
-*****
-*****  Replication count (for rarest first policy)
-*****
-****/
-
-/**
- * Increase the replication count of this piece and sort it if the
- * piece list is already sorted
- */
-static void tr_incrReplicationOfPiece(tr_swarm* s, size_t const index)
-{
-    TR_ASSERT(replicationExists(s));
-    TR_ASSERT(s->pieceReplicationSize == s->tor->info.pieceCount);
-
-    /* One more replication of this piece is present in the swarm */
-    ++s->pieceReplication[index];
-
-    /* we only resort the piece if the list is already sorted */
-    if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-    {
-        pieceListResortPiece(s, pieceListLookup(s, index));
-    }
-}
-
-/**
- * Increases the replication count of pieces present in the bitfield
- */
-static void tr_incrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
-{
-    TR_ASSERT(replicationExists(s));
-
-    uint16_t* rep = s->pieceReplication;
-
-    for (size_t i = 0, n = s->tor->info.pieceCount; i < n; ++i)
-    {
-        if (b->test(i))
-        {
-            ++rep[i];
-        }
-    }
-
-    if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-    {
-        invalidatePieceSorting(s);
-    }
-}
-
-/**
- * Increase the replication count of every piece
- */
-static void tr_incrReplication(tr_swarm* s)
-{
-    TR_ASSERT(replicationExists(s));
-    TR_ASSERT(s->pieceReplicationSize == s->tor->info.pieceCount);
-
-    for (size_t i = 0; i < s->pieceReplicationSize; ++i)
-    {
-        ++s->pieceReplication[i];
-    }
-}
-
-/**
- * Decrease the replication count of pieces present in the bitset.
- */
-static void tr_decrReplicationFromBitfield(tr_swarm* s, tr_bitfield const* b)
-{
-    TR_ASSERT(replicationExists(s));
-    TR_ASSERT(s->pieceReplicationSize == s->tor->info.pieceCount);
-
-    if (b->hasAll())
-    {
-        for (size_t i = 0; i < s->pieceReplicationSize; ++i)
-        {
-            --s->pieceReplication[i];
-        }
-    }
-    else if (!b->hasNone())
-    {
-        for (size_t i = 0; i < s->pieceReplicationSize; ++i)
-        {
-            if (b->test(i))
-            {
-                --s->pieceReplication[i];
-            }
-        }
-
-        if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-        {
-            invalidatePieceSorting(s);
-        }
-    }
-}
-
 /**
 ***
 **/
@@ -1294,7 +1074,6 @@ void tr_peerMgrGetNextRequests(
         pieceListSort(s, PIECES_SORTED_BY_WEIGHT);
     }
 
-    assertReplicationCountIsExact(s);
     assertWeightedPiecesAreSorted(s);
 
     updateEndgame(s);
@@ -1708,36 +1487,10 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         }
 
     case TR_PEER_CLIENT_GOT_HAVE:
-        if (replicationExists(s))
-        {
-            tr_incrReplicationOfPiece(s, e->pieceIndex);
-            assertReplicationCountIsExact(s);
-        }
-
-        break;
-
     case TR_PEER_CLIENT_GOT_HAVE_ALL:
-        if (replicationExists(s))
-        {
-            tr_incrReplication(s);
-            assertReplicationCountIsExact(s);
-        }
-
-        break;
-
     case TR_PEER_CLIENT_GOT_HAVE_NONE:
-        /* noop */
-        break;
-
     case TR_PEER_CLIENT_GOT_BITFIELD:
-        TR_ASSERT(e->bitfield != nullptr);
-
-        if (replicationExists(s))
-        {
-            tr_incrReplicationFromBitfield(s, e->bitfield);
-            assertReplicationCountIsExact(s);
-        }
-
+        /* noop */
         break;
 
     case TR_PEER_CLIENT_GOT_REJ:
@@ -2424,7 +2177,6 @@ static void stopSwarm(tr_swarm* swarm)
 {
     swarm->isRunning = false;
 
-    replicationFree(swarm);
     invalidatePieceSorting(swarm);
 
     removeAllPeers(swarm);
@@ -2489,10 +2241,9 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
         }
     }
 
-    /* clamp the progress range */
     peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
 
-    if (peer->atom != nullptr && peer->progress >= 1.0F)
+    if (peer->atom != nullptr && peer->progress >= 1.0f)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }
@@ -2606,29 +2357,27 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    /* common shortcuts... */
+    // common shortcuts...
 
     if (!tor->isRunning || tor->isStopping || tr_torrentIsSeed(tor) || !tr_torrentHasMetadata(tor))
     {
         return 0;
     }
 
-    tr_swarm const* s = tor->swarm;
-
+    tr_swarm const* const s = tor->swarm;
     if (s == nullptr || !s->isRunning)
     {
         return 0;
     }
 
-    size_t const peer_count = tr_ptrArraySize(&s->peers);
-
-    if (peer_count == 0)
+    size_t const n_peers = tr_ptrArraySize(&s->peers);
+    if (n_peers == 0)
     {
         return 0;
     }
 
     tr_peer const** const peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
-    for (size_t i = 0; i < peer_count; ++i)
+    for (size_t i = 0; i < n_peers; ++i)
     {
         if (peers[i]->atom != nullptr && atomIsSeed(peers[i]->atom))
         {
@@ -2636,34 +2385,43 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         }
     }
 
-    if (s->pieceReplication == nullptr || s->pieceReplicationSize == 0)
+    // do it the hard way
+
+    auto desired_available = uint64_t{};
+    auto const n_pieces = tor->info.pieceCount;
+    auto have = std::vector<bool>(n_pieces);
+
+    for (size_t i = 0; i < n_peers; ++i)
     {
-        return 0;
-    }
-
-    /* do it the hard way */
-
-    uint64_t desiredAvailable = 0;
-
-    for (size_t i = 0, n = std::min(size_t{ tor->info.pieceCount }, s->pieceReplicationSize); i < n; ++i)
-    {
-        if (!tor->info.pieces[i].dnd && s->pieceReplication[i] > 0)
+        auto* peer = peers[i];
+        for (size_t j = 0; j < n_pieces; ++j)
         {
-            desiredAvailable += tr_torrentMissingBytesInPiece(tor, i);
+            if (peer->have.test(j))
+            {
+                have[j] = true;
+            }
         }
     }
 
-    TR_ASSERT(desiredAvailable <= tor->info.totalSize);
-    return desiredAvailable;
+    for (size_t i = 0; i < n_pieces; ++i)
+    {
+        if (!tor->info.pieces[i].dnd && have.at(i))
+        {
+            desired_available += tr_torrentMissingBytesInPiece(tor, i);
+        }
+    }
+
+    TR_ASSERT(desired_available <= tor->info.totalSize);
+    return desired_available;
 }
 
 double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    uint64_t const now = tr_time_msec();
+    auto const now = tr_time_msec();
 
-    tr_swarm* s = tor->swarm;
+    tr_swarm* const s = tor->swarm;
     TR_ASSERT(s->manager != nullptr);
 
     unsigned int n = tr_ptrArraySize(&s->webseeds);
@@ -3419,11 +3177,6 @@ static void removePeer(tr_swarm* s, tr_peer* peer)
     --s->stats.peerCount;
     --s->stats.peerFromCount[atom->fromFirst];
 
-    if (replicationExists(s))
-    {
-        tr_decrReplicationFromBitfield(s, &peer->have);
-    }
-
     TR_ASSERT(s->stats.peerCount == tr_ptrArraySize(&s->peers));
     TR_ASSERT(s->stats.peerFromCount[atom->fromFirst] >= 0);
 
@@ -3632,7 +3385,7 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
     }
 }
 
-static void makeNewPeerConnections(tr_peerMgr* mgr, int max);
+static void makeNewPeerConnections(tr_peerMgr* mgr, size_t max);
 
 static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
@@ -4016,36 +3769,6 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
     return score;
 }
 
-#ifdef TR_ENABLE_ASSERTS
-
-static bool checkBestScoresComeFirst(struct peer_candidate const* candidates, int n, int k)
-{
-    uint64_t worstFirstScore = 0;
-    int const x = std::min(n, k) - 1;
-
-    for (int i = 0; i < x; i++)
-    {
-        if (worstFirstScore < candidates[i].score)
-        {
-            worstFirstScore = candidates[i].score;
-        }
-    }
-
-    for (int i = 0; i < x; i++)
-    {
-        TR_ASSERT(candidates[i].score <= worstFirstScore);
-    }
-
-    for (int i = x + 1; i < n; i++)
-    {
-        TR_ASSERT(candidates[i].score >= worstFirstScore);
-    }
-
-    return true;
-}
-
-#endif /* TR_ENABLE_ASSERTS */
-
 static bool calculateAllSeeds(tr_swarm* swarm)
 {
     int nAtoms = 0;
@@ -4074,7 +3797,7 @@ static bool swarmIsAllSeeds(tr_swarm* swarm)
 }
 
 /** @return an array of all the atoms we might want to connect to */
-static struct peer_candidate* getPeerCandidates(tr_session* session, int* candidateCount, int max)
+static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
 {
     time_t const now = tr_time();
     uint64_t const now_msec = tr_time_msec();
@@ -4093,13 +3816,11 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
     /* don't start any new handshakes if we're full up */
     if (maxCandidates <= peerCount)
     {
-        *candidateCount = 0;
-        return nullptr;
+        return {};
     }
 
-    /* allocate an array of candidates */
-    peer_candidate* const candidates = tr_new(peer_candidate, atomCount);
-    peer_candidate* walk = candidates;
+    auto candidates = std::vector<peer_candidate>{};
+    candidates.reserve(atomCount);
 
     /* populate the candidate array */
     for (auto* tor : session->torrents)
@@ -4139,26 +3860,22 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
             if (isPeerCandidate(tor, atom, now))
             {
                 uint8_t const salt = tr_rand_int_weak(1024);
-                walk->tor = tor;
-                walk->atom = atom;
-                walk->score = getPeerCandidateScore(tor, atom, salt);
-                ++walk;
+                candidates.push_back({ getPeerCandidateScore(tor, atom, salt), tor, atom });
             }
         }
     }
 
-    auto const n_candidates = walk - candidates;
-    *candidateCount = n_candidates;
-    if (n_candidates > max)
+    // only keep the best `max` candidates
+    if (std::size(candidates) > max)
     {
         std::partial_sort(
-            candidates,
-            candidates + max,
-            candidates + n_candidates,
+            std::begin(candidates),
+            std::begin(candidates) + max,
+            std::end(candidates),
             [](auto const& a, auto const& b) { return a.score < b.score; });
+        candidates.resize(max);
     }
 
-    TR_ASSERT(checkBestScoresComeFirst(candidates, *candidateCount, max));
     return candidates;
 }
 
@@ -4207,7 +3924,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
     atom->time = now;
 }
 
-static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* c)
+static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
 {
 #if 0
 
@@ -4217,18 +3934,13 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
 
 #endif
 
-    initiateConnection(mgr, c->tor->swarm, c->atom);
+    initiateConnection(mgr, c.tor->swarm, c.atom);
 }
 
-static void makeNewPeerConnections(struct tr_peerMgr* mgr, int max)
+static void makeNewPeerConnections(struct tr_peerMgr* mgr, size_t max)
 {
-    auto n = int{};
-    struct peer_candidate* candidates = getPeerCandidates(mgr->session, &n, max);
-
-    for (int i = 0; i < n && i < max; ++i)
+    for (auto& candidate : getPeerCandidates(mgr->session, max))
     {
-        initiateCandidateConnection(mgr, &candidates[i]);
+        initiateCandidateConnection(mgr, candidate);
     }
-
-    tr_free(candidates);
 }
