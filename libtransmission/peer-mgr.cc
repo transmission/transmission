@@ -224,13 +224,11 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
 {
 }
 
-static void peerDeclinedAllRequests(tr_swarm*, tr_peer const*);
-
 tr_peer::~tr_peer()
 {
     if (swarm != nullptr)
     {
-        peerDeclinedAllRequests(swarm, this);
+        swarm->active_requests.remove(this);
     }
 
     if (atom != nullptr)
@@ -612,21 +610,33 @@ size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* tor, tr_peer const*
     return tor->swarm->active_requests.count(peer);
 }
 
+static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
+{
+    auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
+    if (msgs != nullptr && msgs != muted)
+    {
+        peer->cancelsSentToPeer.add(tr_time(), 1);
+        msgs->cancel_block_request(block);
+    }
+}
+
+static void cancelAllRequestsForBlock(tr_swarm* swarm, tr_block_index_t block, tr_peer* no_notify)
+{
+    for (auto* peer : swarm->active_requests.remove(block))
+    {
+        maybeSendCancelRequest(peer, block, no_notify);
+    }
+}
+
 static void tr_swarmCancelOldRequests(tr_swarm* swarm)
 {
-    time_t const now = tr_time();
-    time_t const oldest = now - RequestTtlSecs;
+    auto const now = tr_time();
+    auto const oldest = now - RequestTtlSecs;
+
     for (auto const [block, peer] : swarm->active_requests.sentBefore(oldest))
     {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if (msgs != nullptr)
-        {
-            peer->cancelsSentToPeer.add(now, 1);
-            msgs->cancel_block_request(block);
-        }
-
+        maybeSendCancelRequest(peer, block, nullptr);
         swarm->active_requests.remove(block, peer);
-        // pieceListRemoveRequest(swarm, block); // FIXME(wishlist)
     }
 }
 
@@ -706,37 +716,6 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
 #endif
 }
 
-/* peer choked us, or maybe it disconnected.
-   either way we need to remove all its requests */
-static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
-{
-    s->active_requests.remove(peer);
-
-    // FIXME(wishlist)
-}
-
-void tr_peerMgrRebuildRequests(tr_torrent* /*torrent*/)
-{
-    // FIXME(wishlist)
-}
-
-static void cancelAllRequestsForBlock(tr_swarm* s, tr_block_index_t block, tr_peer* no_notify)
-{
-    auto const now = tr_time();
-
-    for (auto* peer : s->active_requests.remove(block))
-    {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if ((msgs != nullptr) && (msgs != no_notify))
-        {
-            msgs->cancelsSentToPeer.add(now, 1);
-            msgs->cancel_block_request(block);
-        }
-
-        // pieceListRemoveRequest(s, block); // FIXME(wishlist)
-    }
-}
-
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
     bool pieceCameFromPeers = false;
@@ -762,7 +741,6 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     }
 
     /* bookkeeping */
-    // pieceListRemovePiece(s, p); // FIXME(wishlist)
     s->needsCompletenessCheck = true;
 }
 
@@ -822,24 +800,11 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         break;
 
     case TR_PEER_CLIENT_GOT_REJ:
-        {
-            tr_block_index_t b = _tr_block(s->tor, e->pieceIndex, e->offset);
-
-            if (b < s->tor->blockCount)
-            {
-                s->active_requests.remove(b, peer);
-                // pieceListRemoveRequest(s, b); FIXME(wishlist)
-            }
-            else
-            {
-                tordbg(s, "Peer %s sent an out-of-range reject message", tr_atomAddrStr(peer->atom));
-            }
-
-            break;
-        }
+        s->active_requests.remove(_tr_block(s->tor, e->pieceIndex, e->offset), peer);
+        break;
 
     case TR_PEER_CLIENT_GOT_CHOKE:
-        peerDeclinedAllRequests(s, peer);
+        s->active_requests.remove(peer);
         break;
 
     case TR_PEER_CLIENT_GOT_PORT:
@@ -865,7 +830,6 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_block_index_t const block = _tr_block(tor, p, e->offset);
             cancelAllRequestsForBlock(s, block, peer);
             peer->blocksSentToClient.add(tr_time(), 1);
-            // pieceListResortPiece(s, pieceListLookup(s, p)); // FIXME(wishlist)
             tr_torrentGotBlock(tor, block);
             break;
         }

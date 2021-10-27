@@ -2263,7 +2263,6 @@ void tr_torrentSetFilePriorities(
     }
 
     tr_torrentSetDirty(tor);
-    tr_peerMgrRebuildRequests(tor);
 
     tr_torrentUnlock(tor);
 }
@@ -2375,7 +2374,6 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
     tr_torrentInitFileDLs(tor, files, fileCount, doDownload);
     tr_torrentSetDirty(tor);
     tr_torrentRecheckCompleteness(tor);
-    tr_peerMgrRebuildRequests(tor);
 
     tr_torrentUnlock(tor);
 }
