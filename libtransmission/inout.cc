@@ -184,11 +184,14 @@ void tr_ioFindFileLocation(
         bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile));
     TR_ASSERT(file != nullptr);
 
-    *fileIndex = file - tor->info.files;
-    *fileOffset = offset - file->offset;
-    TR_ASSERT(*fileIndex < tor->info.fileCount);
-    TR_ASSERT(*fileOffset < file->length);
-    TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
+    if (file != nullptr)
+    {
+        *fileIndex = file - tor->info.files;
+        *fileOffset = offset - file->offset;
+        TR_ASSERT(*fileIndex < tor->info.fileCount);
+        TR_ASSERT(*fileOffset < file->length);
+        TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
+    }
 }
 
 /* returns 0 on success, or an errno on failure */
