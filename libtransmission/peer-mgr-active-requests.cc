@@ -77,11 +77,15 @@ public:
         TR_ASSERT(it != std::end(count_));
         TR_ASSERT(it->second > 0);
         TR_ASSERT(size_ > 0);
-        if (--it->second == 0)
+
+        if (it != std::end(count_))
         {
-            count_.erase(it);
+            if (--it->second == 0)
+            {
+                count_.erase(it);
+            }
+            --size_;
         }
-        --size_;
     }
 
     std::unordered_map<tr_peer const*, size_t> count_;
