@@ -203,18 +203,10 @@ export class Remote {
     );
   }
 
-  removeTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-remove',
-      torrent_ids,
-      callback,
-      context
-    );
-  }
-  removeTorrentsAndData(torrents) {
+  removeTorrents(torrents, trash) {
     const o = {
       arguments: {
-        'delete-local-data': true,
+        'delete-local-data': trash,
         ids: [],
       },
       method: 'torrent-remove',

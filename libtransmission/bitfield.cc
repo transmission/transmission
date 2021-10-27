@@ -88,10 +88,9 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
 
     if (first_byte == last_byte)
     {
-        int i;
         uint8_t val = flags_[first_byte];
 
-        i = begin - (first_byte * 8);
+        int i = begin - (first_byte * 8);
         val <<= i;
         val >>= i;
         i = (last_byte + 1) * 8 - end;
@@ -102,12 +101,11 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
     }
     else
     {
-        uint8_t val;
         size_t const walk_end = std::min(std::size(flags_), last_byte);
 
         /* first byte */
         size_t const first_shift = begin - (first_byte * 8);
-        val = flags_[first_byte];
+        uint8_t val = flags_[first_byte];
         val <<= first_shift;
         val >>= first_shift;
         ret += trueBitCount[val];

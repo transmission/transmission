@@ -44,8 +44,7 @@ static void ensureKeyExists(tr_crypto* crypto)
 {
     if (crypto->dh == nullptr)
     {
-        size_t public_key_length;
-
+        size_t public_key_length = 0;
         crypto->dh = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
         tr_dh_make_key(crypto->dh, DH_PRIVKEY_LEN, crypto->myPublicKey, &public_key_length);
 

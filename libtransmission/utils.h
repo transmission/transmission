@@ -372,7 +372,7 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
@@ -380,7 +380,7 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
 
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
-extern size_t tr_size_K;
+extern uint64_t tr_size_K; /* unused? */
 
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
@@ -395,7 +395,7 @@ static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
+char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 
