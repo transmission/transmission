@@ -2108,6 +2108,7 @@ static std::string buildTrackersString(tr_torrent const* tor)
             buf << ',';
         }
     }
+    tr_torrentTrackersFree(stats, n);
 
     return buf.str();
 }
