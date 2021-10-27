@@ -514,7 +514,7 @@ static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 
 static constexpr bool atomIsSeed(struct peer_atom const* atom)
 {
-    return (atom->flags & ADDED_F_SEED_FLAG) != 0;
+    return (atom != nullptr) && ((atom->flags & ADDED_F_SEED_FLAG) != 0);
 }
 
 static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
@@ -2324,17 +2324,7 @@ void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool 
 
 bool tr_peerIsSeed(tr_peer const* peer)
 {
-    if (peer->progress >= 1.0)
-    {
-        return true;
-    }
-
-    if (peer->atom != nullptr && atomIsSeed(peer->atom))
-    {
-        return true;
-    }
-
-    return false;
+    return (peer != nullptr) && ((peer->progress >= 1.0) || atomIsSeed(peer->atom));
 }
 
 /* count how many bytes we want that connected peers have */
