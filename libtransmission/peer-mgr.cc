@@ -1215,86 +1215,71 @@ bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_blo
 /* cancel requests that are too old */
 static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
-    int cancel_buflen = 0;
-    struct block_request* cancel = nullptr;
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     managerLock(mgr);
 
+    /* prune requests that are too old */
     time_t const now = tr_time();
     time_t const too_old = now - RequestTtlSecs;
-
-    /* alloc the temporary "cancel" buffer */
-    for (auto const* tor : mgr->session->torrents)
-    {
-        cancel_buflen = std::max(cancel_buflen, tor->swarm->requestCount);
-    }
-
-    if (cancel_buflen > 0)
-    {
-        cancel = tr_new(struct block_request, cancel_buflen);
-    }
-
-    /* prune requests that are too old */
+    auto cancel = std::vector<block_request>{};
     for (auto* tor : mgr->session->torrents)
     {
         tr_swarm* s = tor->swarm;
         int const n = s->requestCount;
-
-        if (n > 0)
+        if (n <= 0) // no requests to cull
         {
-            int keepCount = 0;
-            int cancelCount = 0;
+            continue;
+        }
 
-            for (int i = 0; i < n; ++i)
+        int keepCount = 0;
+        cancel.clear();
+        cancel.reserve(n);
+
+        for (int i = 0; i < n; ++i)
+        {
+            struct block_request const* const request = &s->requests[i];
+            auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(request->peer);
+
+            if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
             {
-                struct block_request const* const request = &s->requests[i];
-                auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(request->peer);
+                TR_ASSERT(cancel != nullptr);
+                TR_ASSERT(cancelCount < cancel_buflen);
 
-                if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
-                {
-                    TR_ASSERT(cancel != nullptr);
-                    TR_ASSERT(cancelCount < cancel_buflen);
-
-                    cancel[cancelCount++] = *request;
-                }
-                else
-                {
-                    if (i != keepCount)
-                    {
-                        s->requests[keepCount] = *request;
-                    }
-
-                    ++keepCount;
-                }
+                cancel.push_back(*request);
             }
-
-            /* prune out the ones we aren't keeping */
-            s->requestCount = keepCount;
-
-            /* send cancel messages for all the "cancel" ones */
-            for (int i = 0; i < cancelCount; ++i)
+            else
             {
-                struct block_request const* const request = &cancel[i];
-                auto* msgs = dynamic_cast<tr_peerMsgs*>(request->peer);
-                if (msgs != nullptr)
+                if (i != keepCount)
                 {
-                    request->peer->cancelsSentToPeer.add(now, 1);
-                    msgs->cancel_block_request(request->block);
-                    decrementPendingReqCount(request);
+                    s->requests[keepCount] = *request;
                 }
-            }
 
-            /* decrement the pending request counts for the timed-out blocks */
-            for (int i = 0; i < cancelCount; ++i)
+                ++keepCount;
+            }
+        }
+
+        /* prune out the ones we aren't keeping */
+        s->requestCount = keepCount;
+
+        /* send cancel messages for all the "cancel" ones */
+        for (auto& request : cancel)
+        {
+            auto* msgs = dynamic_cast<tr_peerMsgs*>(request.peer);
+            if (msgs != nullptr)
             {
-                struct block_request const* const request = &cancel[i];
-
-                pieceListRemoveRequest(s, request->block);
+                request.peer->cancelsSentToPeer.add(now, 1);
+                msgs->cancel_block_request(request.block);
+                decrementPendingReqCount(&request);
             }
+        }
+
+        /* decrement the pending request counts for the timed-out blocks */
+        for (auto& request : cancel)
+        {
+            pieceListRemoveRequest(s, request.block);
         }
     }
 
-    tr_free(cancel);
     tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
     managerUnlock(mgr);
 }
