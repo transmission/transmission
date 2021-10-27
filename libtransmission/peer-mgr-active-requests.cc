@@ -11,6 +11,7 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <unordered_map>
 #include <set>
 #include <vector>
 
@@ -53,7 +54,41 @@ struct peer_at
 class ActiveRequests::Impl
 {
 public:
+    size_t size() const
+    {
+        return size_;
+    }
+
+    size_t count(tr_peer const* peer) const
+    {
+        auto const it = count_.find(peer);
+        return it != std::end(count_) ? it->second : size_t{};
+    }
+
+    void incCount(tr_peer const* peer)
+    {
+        ++count_[peer];
+        ++size_;
+    }
+
+    void decCount(tr_peer const* peer)
+    {
+        auto it = count_.find(peer);
+        TR_ASSERT(it != std::end(count_));
+        TR_ASSERT(it->second > 0);
+        TR_ASSERT(size_ > 0);
+        if (--it->second == 0)
+        {
+            count_.erase(it);
+        }
+        --size_;
+    }
+
+    std::unordered_map<tr_peer const*, size_t> count_;
+
     std::map<tr_block_index_t, std::set<peer_at>> blocks_;
+
+private:
     size_t size_ = 0;
 };
 
@@ -71,7 +106,7 @@ bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 
     if (added)
     {
-        ++impl_->size_;
+        impl_->incCount(peer);
     }
 
     return added;
@@ -81,13 +116,13 @@ bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 bool ActiveRequests::remove(tr_block_index_t block, tr_peer const* peer)
 {
     // std::cout << __FILE__ << ':' << __LINE__ << " unmarking block " << block << " request from " << peer << std::endl;
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     auto const it = impl_->blocks_.find(block);
+    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     auto const removed = it != std::end(impl_->blocks_) && it->second.erase(key) != 0;
 
     if (removed)
     {
-        --impl_->size_;
+        impl_->decCount(peer);
 
         if (std::empty(it->second))
         {
@@ -138,7 +173,11 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
             std::begin(removed),
             [](auto const& sent) { return sent.peer; });
         impl_->blocks_.erase(block);
-        impl_->size_ -= n;
+    }
+
+    for (auto* peer : removed)
+    {
+        impl_->decCount(peer);
     }
 
     return removed;
@@ -162,18 +201,13 @@ size_t ActiveRequests::count(tr_block_index_t block) const
 // count how many active block requests we have to `peer`
 size_t ActiveRequests::count(tr_peer const* peer) const
 {
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    auto const test = [&key](auto const& reqs)
-    {
-        return reqs.second.count(key) != 0;
-    };
-    return std::count_if(std::begin(impl_->blocks_), std::end(impl_->blocks_), test);
+    return impl_->count(peer);
 }
 
 // return the total number of active requests
 size_t ActiveRequests::size() const
 {
-    return impl_->size_;
+    return impl_->size();
 }
 
 // returns the active requests sent before `when`
