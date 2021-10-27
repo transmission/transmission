@@ -551,7 +551,6 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_ERROR:
-        tr_logAddTorErr(tor, _("Tracker error: \"%s\""), event->text);
         tor->error = TR_STAT_TRACKER_ERROR;
         tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
