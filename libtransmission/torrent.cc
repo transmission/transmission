@@ -2138,9 +2138,9 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
+        tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
         tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
         tr_strdup_printf("TR_TORRENT_TRACKERS=%s", buildTrackersString(tor).c_str()),
-        tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
         nullptr,
     };
 
