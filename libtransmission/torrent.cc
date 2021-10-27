@@ -17,7 +17,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -156,10 +155,10 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 ****
 ***/
 
-static constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
+static void tr_torrentUnsetPeerId(tr_torrent* tor)
 {
-    /* triggers a rebuild next time tr_torrentGetPeerId() is called */
-    *tor->peer_id = '\0';
+    // triggers a rebuild next time tr_torrentGetPeerId() is called
+    tor->peer_id.reset();
 }
 
 static int peerIdTTL(tr_torrent const* tor)
@@ -168,18 +167,18 @@ static int peerIdTTL(tr_torrent const* tor)
     return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peer_id_ttl_hours * 3600, tr_time());
 }
 
-unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
+tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 {
-    bool const needs_new_peer_id = (*tor->peer_id == '\0') || // doesn't have one
+    bool const needs_new_peer_id = !tor->peer_id || // doesn't have one
         (!tr_torrentIsPrivate(tor) && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
-        tr_peerIdInit(tor->peer_id);
+        tor->peer_id = tr_peerIdInit();
         tor->peer_id_creation_time = tr_time();
     }
 
-    return tor->peer_id;
+    return *tor->peer_id;
 }
 
 /***
@@ -527,7 +526,7 @@ static constexpr void tr_torrentClearError(tr_torrent* tor)
     tor->errorTracker[0] = '\0';
 }
 
-static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, [[maybe_unused]] void* user_data)
+static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
 {
     switch (event->messageType)
     {
@@ -1435,9 +1434,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
         return 0;
     }
 
-    auto first = tr_block_index_t{};
-    auto last = tr_block_index_t{};
-    tr_torGetFileBlockRange(tor, index, &first, &last);
+    auto const [first, last] = tr_torGetFileBlockRange(tor, index);
 
     if (first == last)
     {
@@ -1455,7 +1452,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     // the middle blocks
     if (first + 1 < last)
     {
-        uint64_t u = tor->completion.blockBitfield->countRange(first + 1, last);
+        uint64_t u = tor->completion.blockBitfield->count(first + 1, last);
         u *= tor->blockSize;
         total += u;
     }
@@ -1469,35 +1466,20 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     return total;
 }
 
-tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
+tr_file_progress tr_torrentFileProgress(tr_torrent const* torrent, tr_file_index_t file)
 {
-    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(torrent));
+    TR_ASSERT(file < torrent->info.fileCount);
 
-    tr_file_index_t const n = tor->info.fileCount;
-    tr_file_stat* files = tr_new0(tr_file_stat, n);
-    tr_file_stat* walk = files;
-    bool const isSeed = tor->completeness == TR_SEED;
+    tr_file_index_t const total = torrent->info.files[file].length;
 
-    for (tr_file_index_t i = 0; i < n; ++i)
+    if (torrent->completeness == TR_SEED || total == 0)
     {
-        uint64_t const length = tor->info.files[i].length;
-        uint64_t const b = isSeed ? length : countFileBytesCompleted(tor, i);
-        walk->bytesCompleted = b;
-        walk->progress = length > 0 ? (float)b / (float)length : 1.0F;
-        ++walk;
+        return { total, total, 1.0 };
     }
 
-    if (fileCount != nullptr)
-    {
-        *fileCount = n;
-    }
-
-    return files;
-}
-
-void tr_torrentFilesFree(tr_file_stat* files, [[maybe_unused]] tr_file_index_t fileCount)
-{
-    tr_free(files);
+    auto const have = countFileBytesCompleted(torrent, file);
+    return { have, total, have >= total ? 1.0 : have / double(total) };
 }
 
 /***
@@ -1518,7 +1500,7 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
     return tr_peerMgrPeerStats(tor, peerCount);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, [[maybe_unused]] int peerCount)
+void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
 {
     tr_free(peers);
 }
@@ -2555,35 +2537,31 @@ uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t 
     return ret;
 }
 
-void tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file, tr_block_index_t* first, tr_block_index_t* last)
+tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file)
 {
     tr_file const* f = &tor->info.files[file];
+
     uint64_t offset = f->offset;
-
-    *first = offset / tor->blockSize;
-
+    tr_block_index_t const first = offset / tor->blockSize;
     if (f->length == 0)
     {
-        *last = *first;
+        return { first, first };
     }
-    else
-    {
-        offset += f->length - 1;
-        *last = offset / tor->blockSize;
-    }
+
+    offset += f->length - 1;
+    tr_block_index_t const last = offset / tor->blockSize;
+    return { first, last };
 }
 
-void tr_torGetPieceBlockRange(
-    tr_torrent const* tor,
-    tr_piece_index_t const piece,
-    tr_block_index_t* first,
-    tr_block_index_t* last)
+tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
 {
     uint64_t offset = tor->info.pieceSize;
     offset *= piece;
-    *first = offset / tor->blockSize;
+    tr_block_index_t const first = offset / tor->blockSize;
     offset += tr_torPieceCountBytes(tor, piece) - 1;
-    *last = offset / tor->blockSize;
+    tr_block_index_t const last = offset / tor->blockSize;
+
+    return { first, last };
 }
 
 /***
@@ -3241,24 +3219,23 @@ void tr_torrentSetLocation(
     tr_runInEventThread(tor->session, setLocation, data);
 }
 
-char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
+std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
 {
     tr_info const* inf = &tor->info;
 
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
-    // TODO: tr_get_mime_type_for_filename should return a std::string_view
-    auto size_per_mime_type = std::unordered_map<char const*, size_t>{};
+    auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
     for (tr_file const *it = inf->files, *end = it + inf->fileCount; it != end; ++it)
     {
-        char const* mime_type = tr_get_mime_type_for_filename(it->name);
+        auto const mime_type = tr_get_mime_type_for_filename(it->name);
         size_per_mime_type[mime_type] += it->length;
     }
 
     // now that we have the totals,
     // sort by number so that we can get the biggest
-    auto mime_type_per_size = std::map<size_t, char const*>{};
+    auto mime_type_per_size = std::map<size_t, std::string_view>{};
     for (auto it : size_per_mime_type)
     {
         mime_type_per_size.emplace(it.second, it.first);
@@ -3267,9 +3244,9 @@ char const* tr_torrentPrimaryMimeType(tr_torrent const* tor)
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     // application/octet-stream is the default value for all other cases.
     // An unknown file type should use this type.
-    char const* const fallback = "application/octet-stream";
+    auto constexpr Fallback = "application/octet-stream"sv;
 
-    return std::empty(mime_type_per_size) ? fallback : mime_type_per_size.rbegin()->second;
+    return std::empty(mime_type_per_size) ? Fallback : mime_type_per_size.rbegin()->second;
 }
 
 /***

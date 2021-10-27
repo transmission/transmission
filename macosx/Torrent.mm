@@ -158,7 +158,6 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     NSString* fHashString;
 
-    tr_file_stat* fFileStat;
     NSArray* fFileList;
     NSArray* fFlatFileList;
 
@@ -293,11 +292,6 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-
-    if (fFileStat)
-    {
-        tr_torrentFilesFree(fFileStat, self.fileCount);
-    }
 }
 
 - (NSString*)description
@@ -1561,26 +1555,11 @@ bool trashDataFile(char const* filename, tr_error** error)
     return fInfo->fileCount;
 }
 
-- (void)updateFileStat
-{
-    if (fFileStat)
-    {
-        tr_torrentFilesFree(fFileStat, self.fileCount);
-    }
-
-    fFileStat = tr_torrentFiles(fHandle, NULL);
-}
-
 - (CGFloat)fileProgress:(FileListNode*)node
 {
     if (self.fileCount == 1 || self.complete)
     {
         return self.progress;
-    }
-
-    if (!fFileStat)
-    {
-        [self updateFileStat];
     }
 
     // #5501
@@ -1589,17 +1568,11 @@ bool trashDataFile(char const* filename, tr_error** error)
         return 1.0;
     }
 
-    NSIndexSet* indexSet = node.indexes;
-
-    if (indexSet.count == 1)
-    {
-        return fFileStat[indexSet.firstIndex].progress;
-    }
-
     uint64_t have = 0;
+    NSIndexSet* indexSet = node.indexes;
     for (NSInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
-        have += fFileStat[index].bytesCompleted;
+        have += tr_torrentFileProgress(fHandle, index).bytes_completed;
     }
 
     return (CGFloat)have / node.size;
@@ -1619,14 +1592,10 @@ bool trashDataFile(char const* filename, tr_error** error)
         return NO;
     }
 
-    if (!fFileStat)
-    {
-        [self updateFileStat];
-    }
-
     __block BOOL canChange = NO;
     [indexSet enumerateIndexesWithOptions:NSEnumerationConcurrent usingBlock:^(NSUInteger index, BOOL* stop) {
-        if (fFileStat[index].progress < 1.0)
+        auto const progress = tr_torrentFileProgress(fHandle, index);
+        if (progress.bytes_completed < progress.bytes_total)
         {
             canChange = YES;
             *stop = YES;

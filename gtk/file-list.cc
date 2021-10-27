@@ -131,8 +131,6 @@ struct RefreshData
 {
     int sort_column_id;
     bool resort_needed;
-
-    tr_file_stat* refresh_file_stat;
     tr_torrent* tor;
 };
 
@@ -156,8 +154,9 @@ bool refreshFilesForeach(
         auto const* inf = tr_torrentInfo(tor);
         int const enabled = inf->files[index].dnd ? 0 : 1;
         int const priority = inf->files[index].priority;
-        uint64_t const have = refresh_data.refresh_file_stat[index].bytesCompleted;
-        int const prog = size != 0 ? (int)(100.0 * have / size) : 1;
+        auto const progress = tr_torrentFileProgress(tor, index);
+        uint64_t const have = progress.bytes_completed;
+        int const prog = std::clamp(int(100 * progress.progress), 0, 100);
 
         if (priority != old_priority || enabled != old_enabled || have != old_have || prog != old_prog)
         {
@@ -276,15 +275,9 @@ void FileList::Impl::refresh()
     {
         Gtk::SortType order;
         int sort_column_id;
-        tr_file_index_t fileCount;
-        RefreshData refresh_data;
         store_->get_sort_column_id(sort_column_id, order);
 
-        refresh_data.sort_column_id = sort_column_id;
-        refresh_data.resort_needed = false;
-        refresh_data.refresh_file_stat = tr_torrentFiles(tor, &fileCount);
-        refresh_data.tor = tor;
-
+        RefreshData refresh_data{ sort_column_id, false, tor };
         gtr_tree_model_foreach_postorder(
             store_,
             [this, &refresh_data](Gtk::TreeModel::iterator const& iter)
@@ -294,8 +287,6 @@ void FileList::Impl::refresh()
         {
             store_->set_sort_column(sort_column_id, order);
         }
-
-        tr_torrentFilesFree(refresh_data.refresh_file_stat, fileCount);
     }
 }
 

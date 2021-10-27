@@ -257,10 +257,10 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             }
 
             buf = end;
+            auto const sv = std::string_view{ reinterpret_cast<char const*>(str), str_len };
 
             if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
             {
-                auto const sv = std::string_view{ reinterpret_cast<char const*>(str), str_len };
                 key = tr_quark_new(sv);
             }
             else
@@ -268,7 +268,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
                 tr_variant* const v = get_node(stack, key, top, &err);
                 if (v != nullptr)
                 {
-                    tr_variantInitStr(v, str, str_len);
+                    tr_variantInitStr(v, sv);
                 }
             }
         }
@@ -352,19 +352,19 @@ static void saveStringFunc(tr_variant const* v, void* vevbuf)
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc([[maybe_unused]] tr_variant const* val, void* vevbuf)
+static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
 {
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);

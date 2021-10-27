@@ -72,9 +72,6 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    int oldStatus;
-    int newStatus;
-    tr_port public_peer_port;
     tr_port const private_peer_port = s->session->private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
@@ -88,8 +85,9 @@ static void natPulse(tr_shared* s, bool do_check)
         s->upnp = tr_upnpInit();
     }
 
-    oldStatus = tr_sharedTraversalStatus(s);
+    auto const old_status = tr_sharedTraversalStatus(s);
 
+    auto public_peer_port = tr_port{};
     s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port);
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
@@ -99,15 +97,15 @@ static void natPulse(tr_shared* s, bool do_check)
 
     s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check);
 
-    newStatus = tr_sharedTraversalStatus(s);
+    auto const new_status = tr_sharedTraversalStatus(s);
 
-    if (newStatus != oldStatus)
+    if (new_status != old_status)
     {
         tr_logAddNamedInfo(
             getKey(),
             _("State changed from \"%1$s\" to \"%2$s\""),
-            getNatStateStr(oldStatus),
-            getNatStateStr(newStatus));
+            getNatStateStr(old_status),
+            getNatStateStr(new_status));
     }
 }
 
@@ -143,7 +141,7 @@ static void set_evtimer_from_status(tr_shared* s)
     }
 }
 
-static void onTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vshared)
+static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vshared)
 {
     auto* s = static_cast<tr_shared*>(vshared);
 

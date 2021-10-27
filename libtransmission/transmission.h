@@ -1536,15 +1536,14 @@ void tr_torrentTrackersFree(tr_tracker_stat* trackerStats, int trackerCount);
  */
 double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
 
-struct tr_file_stat
+struct tr_file_progress
 {
-    uint64_t bytesCompleted;
-    float progress;
+    uint64_t bytes_completed;
+    uint64_t bytes_total;
+    double progress;
 };
 
-tr_file_stat* tr_torrentFiles(tr_torrent const* torrent, tr_file_index_t* fileCount);
-
-void tr_torrentFilesFree(tr_file_stat* files, tr_file_index_t fileCount);
+tr_file_progress tr_torrentFileProgress(tr_torrent const* torrent, tr_file_index_t file);
 
 /***********************************************************************
  * tr_torrentAvailability
@@ -1624,6 +1623,10 @@ struct tr_info
 
     char* comment;
     char* creator;
+
+    /* torrent's source. empty if not set. */
+    char* source;
+
     tr_file* files;
     tr_piece* pieces;
 

@@ -173,25 +173,19 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     str->str.str = tr_quark_get_string(quark, &str->len);
 }
 
-static void tr_variant_string_set_string(struct tr_variant_string* str, char const* bytes, size_t len)
+static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
 {
     tr_variant_string_clear(str);
 
-    if (bytes == nullptr)
-    {
-        len = 0;
-    }
-    else if (len == TR_BAD_SIZE)
-    {
-        len = strlen(bytes);
-    }
+    auto const* const bytes = std::data(in);
+    auto const len = std::size(in);
 
     if (len < sizeof(str->str.buf))
     {
         str->type = TR_STRING_TYPE_BUF;
         if (len > 0)
         {
-            memcpy(str->str.buf, bytes, len);
+            std::copy_n(bytes, len, str->str.buf);
         }
 
         str->str.buf[len] = '\0';
@@ -200,7 +194,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
     else
     {
         auto* tmp = tr_new(char, len + 1);
-        memcpy(tmp, bytes, len);
+        std::copy_n(bytes, len, tmp);
         tmp[len] = '\0';
         str->type = TR_STRING_TYPE_HEAP;
         str->str.str = tmp;
@@ -445,7 +439,7 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const**
 void tr_variantInitRaw(tr_variant* v, void const* src, size_t byteCount)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&v->val.s, static_cast<char const*>(src), byteCount);
+    tr_variant_string_set_string(&v->val.s, { static_cast<char const*>(src), byteCount });
 }
 
 void tr_variantInitQuark(tr_variant* v, tr_quark const q)
@@ -454,10 +448,10 @@ void tr_variantInitQuark(tr_variant* v, tr_quark const q)
     tr_variant_string_set_quark(&v->val.s, q);
 }
 
-void tr_variantInitStr(tr_variant* v, void const* str, size_t len)
+void tr_variantInitStr(tr_variant* v, std::string_view str)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&v->val.s, static_cast<char const*>(str), len);
+    tr_variant_string_set_string(&v->val.s, str);
 }
 
 void tr_variantInitBool(tr_variant* v, bool value)
@@ -559,10 +553,10 @@ tr_variant* tr_variantListAddBool(tr_variant* list, bool val)
     return child;
 }
 
-tr_variant* tr_variantListAddStr(tr_variant* list, char const* val)
+tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view str)
 {
     tr_variant* child = tr_variantListAdd(list);
-    tr_variantInitStr(child, val, TR_BAD_SIZE);
+    tr_variantInitStr(child, str);
     return child;
 }
 
@@ -661,10 +655,10 @@ tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark const key, tr_quar
     return child;
 }
 
-tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, char const* val)
+tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::string_view str)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
-    tr_variantInitStr(child, val, TR_BAD_SIZE);
+    tr_variantInitStr(child, str);
     return child;
 }
 
@@ -891,16 +885,16 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
 *****
 ****/
 
-static void freeDummyFunc([[maybe_unused]] tr_variant const* v, [[maybe_unused]] void* buf)
+static void freeDummyFunc(tr_variant const* /*v*/, void* /*buf*/)
 {
 }
 
-static void freeStringFunc(tr_variant const* v, [[maybe_unused]] void* user_data)
+static void freeStringFunc(tr_variant const* v, void* /*user_data*/)
 {
     tr_variant_string_clear(&((tr_variant*)v)->val.s);
 }
 
-static void freeContainerEndFunc(tr_variant const* v, [[maybe_unused]] void* user_data)
+static void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
 {
     tr_free(v->val.l.vals);
 }

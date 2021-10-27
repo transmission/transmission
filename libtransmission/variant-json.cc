@@ -76,11 +76,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     return node;
 }
 
-static void error_handler(
-    jsonsl_t jsn,
-    jsonsl_error_t error,
-    [[maybe_unused]] struct jsonsl_state_st* state,
-    jsonsl_char_t const* buf)
+static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -109,9 +105,9 @@ static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 
 static void action_callback_PUSH(
     jsonsl_t jsn,
-    [[maybe_unused]] jsonsl_action_t action,
+    jsonsl_action_t /*action*/,
     struct jsonsl_state_st* state,
-    [[maybe_unused]] jsonsl_char_t const* buf)
+    jsonsl_char_t const* /*buf*/)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -298,9 +294,9 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
 
 static void action_callback_POP(
     jsonsl_t jsn,
-    [[maybe_unused]] jsonsl_action_t action,
+    jsonsl_action_t /*action*/,
     struct jsonsl_state_st* state,
-    [[maybe_unused]] jsonsl_char_t const* buf)
+    jsonsl_char_t const* /*buf*/)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -308,7 +304,7 @@ static void action_callback_POP(
     {
         auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
-        tr_variantInitStr(get_node(jsn), str, len);
+        tr_variantInitStr(get_node(jsn), { str, len });
         data->has_content = true;
     }
     else if (state->type == JSONSL_T_HKEY)

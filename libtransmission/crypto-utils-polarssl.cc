@@ -83,7 +83,7 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 ****
 ***/
 
-static int my_rand([[maybe_unused]] void* context, unsigned char* buffer, size_t buffer_size)
+static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
     for (size_t i = 0; i < buffer_size; ++i)
     {
@@ -245,17 +245,15 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     auto* handle = static_cast<api_dhm_context*>(raw_handle);
-    struct tr_dh_secret* ret;
-    size_t secret_key_length;
 
     if (!check_result(API(dhm_read_public)(handle, other_public_key, other_public_key_length)))
     {
         return nullptr;
     }
 
-    ret = tr_dh_secret_new(handle->len);
+    tr_dh_secret* const ret = tr_dh_secret_new(handle->len);
 
-    secret_key_length = handle->len;
+    size_t secret_key_length = handle->len;
 
 #if API_VERSION_NUMBER >= 0x02000000
 
@@ -285,11 +283,10 @@ bool tr_rand_buffer(void* buffer, size_t length)
 {
     TR_ASSERT(buffer != nullptr);
 
-    bool ret;
     tr_lock* rng_lock = get_rng_lock();
 
     tr_lockLock(rng_lock);
-    ret = check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
+    bool const ret = check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
     tr_lockUnlock(rng_lock);
 
     return ret;

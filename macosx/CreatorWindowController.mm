@@ -206,6 +206,11 @@ NSMutableSet* creatorWindowControllerSet = nil;
         fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSOnState : NSOffState;
     }
 
+    if ([fDefaults objectForKey:@"CreatorSource"])
+    {
+        fSource.stringValue = [fDefaults stringForKey:@"CreatorSource"];
+    }
+
     fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSOnState : NSOffState;
 }
 
@@ -241,6 +246,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [state encodeObject:fTrackers forKey:@"TRCreatorTrackers"];
     [state encodeInteger:fOpenCheck.state forKey:@"TRCreatorOpenCheck"];
     [state encodeInteger:fPrivateCheck.state forKey:@"TRCreatorPrivateCheck"];
+    [state encodeObject:fSource.stringValue forKey:@"TRCreatorSource"];
     [state encodeObject:fCommentView.string forKey:@"TRCreatorPrivateComment"];
 }
 
@@ -254,6 +260,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     fOpenCheck.state = [coder decodeIntegerForKey:@"TRCreatorOpenCheck"];
     fPrivateCheck.state = [coder decodeIntegerForKey:@"TRCreatorPrivateCheck"];
+    fSource.stringValue = [coder decodeObjectForKey:@"TRCreatorSource"];
     fCommentView.string = [coder decodeObjectForKey:@"TRCreatorPrivateComment"];
 }
 
@@ -570,6 +577,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     //store values
     [fDefaults setObject:fTrackers forKey:@"CreatorTrackers"];
     [fDefaults setBool:fPrivateCheck.state == NSOnState forKey:@"CreatorPrivate"];
+    [fDefaults setObject: [fSource stringValue] forKey: @"CreatorSource"];
     [fDefaults setBool:fOpenCheck.state == NSOnState forKey:@"CreatorOpen"];
     fOpenWhenCreated = fOpenCheck.state == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL:fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
@@ -583,7 +591,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
         trackerInfo,
         fTrackers.count,
         fCommentView.string.UTF8String,
-        fPrivateCheck.state == NSOnState);
+        fPrivateCheck.state == NSOnState,
+        fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 
     fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil repeats:YES];

@@ -38,10 +38,7 @@
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-enum
-{
-    THREADFUNC_MAX_SLEEP_MSEC = 200,
-};
+static auto constexpr ThreadfuncMaxSleepMsec = int{ 200 };
 
 #if 0
 #define dbgmsg(fmt, ...) fprintf(stderr, fmt "\n", __VA_ARGS__)
@@ -129,7 +126,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, [[maybe_unused]] curlsocktype purpose)
+static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
 {
     auto* task = static_cast<struct tr_web_task*>(vtask);
     bool const isScrape = strstr(task->url, "scrape") != nullptr;
@@ -152,7 +149,7 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, [[maybe_unused]] curls
 
 #endif
 
-static CURLcode ssl_context_func([[maybe_unused]] CURL* curl, void* ssl_ctx, [[maybe_unused]] void* user_data)
+static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
@@ -488,7 +485,7 @@ static void tr_webThreadFunc(void* vsession)
 
         if (msec < 0)
         {
-            msec = THREADFUNC_MAX_SLEEP_MSEC;
+            msec = ThreadfuncMaxSleepMsec;
         }
 
         if (session->isClosed)
@@ -498,9 +495,9 @@ static void tr_webThreadFunc(void* vsession)
 
         if (msec > 0)
         {
-            if (msec > THREADFUNC_MAX_SLEEP_MSEC)
+            if (msec > ThreadfuncMaxSleepMsec)
             {
-                msec = THREADFUNC_MAX_SLEEP_MSEC;
+                msec = ThreadfuncMaxSleepMsec;
             }
 
             auto numfds = int{};
@@ -513,7 +510,7 @@ static void tr_webThreadFunc(void* vsession)
                     /* curl_multi_wait() returns immediately if there are
                      * no fds to wait for, so we need an explicit wait here
                      * to emulate select() behavior */
-                    tr_wait_msec(std::min(msec, THREADFUNC_MAX_SLEEP_MSEC / 2L));
+                    tr_wait_msec(std::min(msec, ThreadfuncMaxSleepMsec / 2L));
                 }
             }
             else

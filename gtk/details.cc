@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdio.h> /* sscanf() */
 #include <stdlib.h> /* abort() */
+#include <string_view>
 #include <unordered_map>
 
 #include <glibmm/i18n.h>
@@ -29,14 +30,7 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-namespace
-{
-
-auto const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
-auto const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
-auto const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
-
-} // namespace
+using namespace std::literals;
 
 class DetailsDialog::Impl
 {
@@ -156,6 +150,10 @@ private:
     std::vector<int> ids_;
     Glib::RefPtr<TrCore> const core_;
     sigc::connection periodic_refresh_tag_;
+
+    Glib::Quark const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
+    Glib::Quark const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
+    Glib::Quark const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
 };
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
@@ -393,7 +391,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
+    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set"sv);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddBool(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -412,7 +410,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
+    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set"sv);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddInt(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -431,7 +429,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
+    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set"sv);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddReal(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -2369,11 +2367,11 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
                 tr_variant* trackers;
 
                 tr_variantInitDict(&top, 2);
-                tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
+                tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set"sv);
                 args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
                 trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
-                tr_variantListAddStr(trackers, url.c_str());
+                tr_variantListAddStr(trackers, url.raw());
 
                 core_->exec(&top);
                 refresh();
@@ -2439,7 +2437,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         tr_variant* trackers;
 
         tr_variantInitDict(&top, 2);
-        tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
+        tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set"sv);
         args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
         tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
         trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
