@@ -568,7 +568,7 @@ static int countActiveWebseeds(tr_swarm* s)
 }
 
 // TODO: if we keep this, add equivalent API to ActiveRequest
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range range)
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range_t range)
 {
     // std::cout << __FILE__ << ':' << __LINE__ << " tr_peerMgrClientSentRequests [" << range.first << "..." << range.last << ']' << std::endl;
     auto const now = tr_time();
@@ -586,12 +586,67 @@ static void updateEndgame(tr_swarm* s)
     s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->blockSize >= tr_torrentGetLeftUntilDone(s->tor);
 }
 
-std::vector<tr_block_range> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
+std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
 {
+    class PeerInfoImpl : public Wishlist::PeerInfo
+    {
+    public:
+        PeerInfoImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
+            : torrent_{ torrent_in }
+            , swarm_{ torrent_in->swarm }
+            , peer_{ peer_in }
+        {
+        }
+
+        bool clientCanRequestBlock(tr_block_index_t block) const override
+        {
+            return !tr_torrentBlockIsComplete(torrent_, block) && !swarm_->active_requests.has(block, peer_);
+        }
+
+        bool clientCanRequestPiece(tr_piece_index_t piece) const override
+        {
+            return !torrent_->info.pieces[piece].dnd && peer_->have.test(piece);
+        }
+
+        bool isEndgame() const override
+        {
+            return swarm_->endgame;
+        }
+
+        size_t countActiveRequests(tr_block_index_t block) const override
+        {
+            return swarm_->active_requests.count(block);
+        }
+
+        size_t countMissingBlocks(tr_piece_index_t piece) const override
+        {
+            return tr_torrentMissingBlocksInPiece(torrent_, piece);
+        }
+
+        tr_block_range_t blockRange(tr_piece_index_t piece) const override
+        {
+            return tr_torGetPieceBlockRange(torrent_, piece);
+        }
+
+        tr_piece_index_t countAllPieces() const override
+        {
+            return torrent_->info.pieceCount;
+        }
+
+        tr_priority_t priority(tr_piece_index_t piece) const override
+        {
+            return torrent_->info.pieces[piece].priority;
+        }
+
+    private:
+        tr_torrent const* const torrent_;
+        tr_swarm const* const swarm_;
+        tr_peer const* const peer_;
+    };
+
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    // std::cout << __FILE__ << ':' << __LINE__ << " endgame " << swarm->endgame << std::endl;
-    return swarm->wishlist.next(torrent, peer, numwant, swarm->active_requests, swarm->endgame);
+    return swarm->wishlist.next(PeerInfoImpl(torrent, peer), numwant);
 }
 
 /****

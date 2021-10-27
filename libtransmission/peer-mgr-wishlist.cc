@@ -65,21 +65,20 @@ struct Candidate
     }
 };
 
-std::vector<Candidate> getCandidates(tr_torrent* tor)
+std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
 {
-    auto const* const inf = tr_torrentInfo(tor);
-
     // count up the pieces that we still want
     auto wanted_pieces = std::vector<std::pair<tr_piece_index_t, size_t>>{};
-    wanted_pieces.reserve(inf->pieceCount);
-    for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
+    auto const n_pieces = peer_info.countAllPieces();
+    wanted_pieces.reserve(n_pieces);
+    for (tr_piece_index_t i = 0; i < n_pieces; ++i)
     {
-        if (inf->pieces[i].dnd)
+        if (!peer_info.clientCanRequestPiece(i))
         {
             continue;
         }
 
-        size_t const n_missing = tr_torrentMissingBlocksInPiece(tor, i);
+        size_t const n_missing = peer_info.countMissingBlocks(i);
         if (n_missing == 0)
         {
             continue;
@@ -97,13 +96,13 @@ std::vector<Candidate> getCandidates(tr_torrent* tor)
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, inf->pieces[piece].priority, saltbuf[i]);
+        candidates.emplace_back(piece, n_missing, peer_info.priority(piece), saltbuf[i]);
     }
 
     return candidates;
 }
 
-static std::vector<tr_block_range> makeRanges(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+static std::vector<tr_block_range_t> makeRanges(tr_block_index_t const* sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
@@ -118,8 +117,8 @@ static std::vector<tr_block_range> makeRanges(tr_block_index_t const* sorted_blo
     std::cout << std::endl;
 #endif
 
-    auto ranges = std::vector<tr_block_range>{};
-    auto cur = tr_block_range{ sorted_blocks[0], sorted_blocks[0] };
+    auto ranges = std::vector<tr_block_range_t>{};
+    auto cur = tr_block_range_t{ sorted_blocks[0], sorted_blocks[0] };
     for (size_t i = 1; i < n_blocks; ++i)
     {
         if (cur.last + 1 == sorted_blocks[i])
@@ -129,7 +128,7 @@ static std::vector<tr_block_range> makeRanges(tr_block_index_t const* sorted_blo
         else
         {
             ranges.push_back(cur);
-            cur = tr_block_range{ sorted_blocks[i], sorted_blocks[i] };
+            cur = tr_block_range_t{ sorted_blocks[i], sorted_blocks[i] };
         }
     }
     ranges.push_back(cur);
@@ -151,71 +150,50 @@ static std::vector<tr_block_range> makeRanges(tr_block_index_t const* sorted_blo
 
 } // namespace
 
-std::vector<tr_block_range> Wishlist::next(
-    tr_torrent* tor,
-    tr_peer* peer,
-    size_t numwant,
-    ActiveRequests& active_requests,
-    bool is_endgame)
+std::vector<tr_block_range_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
     size_t n_blocks = 0;
-    auto ranges = std::vector<tr_block_range>{};
+    auto ranges = std::vector<tr_block_range_t>{};
 
     // sanity clause
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(numwant > 0);
+    TR_ASSERT(n_wanted_blocks > 0);
 
-    // Until we're in endgame, we usually won't need allt he candidates.
-    // Just do a partial sort to avoid unnecessary comparisons.
-    auto candidates = getCandidates(tor);
-    auto constexpr MaxSorted = size_t{ 20 };
-    auto const middle = std::min(std::size(candidates), MaxSorted);
+    // We usually won't need all the candidates until endgame,
+    // so do a partial sort to avoid unnecessary comparisons.
+    auto candidates = getCandidates(peer_info);
+    auto constexpr MaxSortedPieces = size_t{ 30 };
+    auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
     // std::cerr << __FILE__ << ':' << __LINE__ << " got " << std::size(candidates) << " candidates" << std::endl;
     for (auto const& candidate : candidates)
     {
         // do we have enough?
-        if (n_blocks >= numwant)
+        if (n_blocks >= n_wanted_blocks)
         {
             break;
         }
 
-        // does the peer have this piece?
-        auto const piece = candidate.piece;
-        if (!peer->have.test(piece))
-        {
-            // std::cout << __FILE__ << ':' << __LINE__ << " skipping piece " << piece << " because peer does not have it" << std::endl;
-            continue;
-        }
-
         // walk the blocks in this piece
-        auto const [first, last] = tr_torGetPieceBlockRange(tor, piece);
+        auto const [first, last] = peer_info.blockRange(candidate.piece);
         // std::cout << __FILE__ << ':' << __LINE__ << " piece " << piece << " block range is [" << first << "..." << last << ']' << std::endl;
         auto blocks = std::vector<tr_block_index_t>{};
         blocks.reserve(last + 1 - first);
-        for (tr_block_index_t block = first; block <= last && n_blocks + std::size(blocks) < numwant; ++block)
+        for (tr_block_index_t block = first; block <= last && n_blocks + std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
-            if (tr_torrentBlockIsComplete(tor, block))
+            if (!peer_info.clientCanRequestBlock(block))
             {
                 // std::cout << __FILE__ << ':' << __LINE__ << " skipping " << block << " because we have it" << std::endl;
                 continue;
             }
 
             // don't request from too many peers
-            size_t const n_peers = active_requests.count(block);
-            size_t const max_peers = is_endgame ? 2 : 1;
+            size_t const n_peers = peer_info.countActiveRequests(block);
+            size_t const max_peers = peer_info.isEndgame() ? 2 : 1;
             if (n_peers >= max_peers)
             {
                 // std::cout << __FILE__ << ':' << __LINE__ << " skipping " << block << " because we it already has enough active requests" << std::endl;
-                continue;
-            }
-
-            // don't send the same request to the same peer twice
-            if (active_requests.has(block, peer))
-            {
-                // std::cout << __FILE__ << ':' << __LINE__ << " skipping " << block << " because we already requested it from this peer" << std::endl;
                 continue;
             }
 
@@ -236,14 +214,14 @@ std::vector<tr_block_range> Wishlist::next(
             std::end(tmp),
             size_t{},
             [](size_t sum, auto range) { return sum + range.last + 1 - range.first; });
-        if (n_blocks >= numwant)
+        if (n_blocks >= n_wanted_blocks)
         {
             break;
         }
     }
 
 #if 0
-    std::cout << __FILE__ << ':' << __LINE__ << " returning " << std::size(ranges) << " ranges for " << n_blocks << " blocks; wanted " << numwant << std::endl;
+    std::cout << __FILE__ << ':' << __LINE__ << " returning " << std::size(ranges) << " ranges for " << n_blocks << " blocks; wanted " << n_wanted_blocks << std::endl;
     std::cout << __FILE__ << ':' << __LINE__ << " next() returning ranges: ";
     for (auto const range : ranges)
     {

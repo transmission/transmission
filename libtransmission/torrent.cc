@@ -2535,7 +2535,7 @@ uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t 
     return ret;
 }
 
-tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file)
+tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file)
 {
     tr_file const* f = &tor->info.files[file];
 
@@ -2551,7 +2551,7 @@ tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t co
     return { first, last };
 }
 
-tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
+tr_block_range_t tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
 {
     uint64_t offset = tor->info.pieceSize;
     offset *= piece;

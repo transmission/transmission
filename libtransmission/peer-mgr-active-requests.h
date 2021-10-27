@@ -20,8 +20,10 @@
 #include "transmission.h" // tr_block_index_t
 #include "peer-common.h" // tr_peer*
 
-// bookkeeping for the active requests we have --
-// e.g. the requests we've sent and are awaiting a response.
+/**
+ * Bookkeeping for the active requests we have --
+ *  e.g. the requests we've sent and are awaiting a response.
+ */
 class ActiveRequests
 {
 public:
