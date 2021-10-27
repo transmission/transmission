@@ -26,10 +26,7 @@
 ****
 ***/
 
-enum
-{
-    MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
-};
+static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
@@ -118,7 +115,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             if (lastSleptAt != now)
             {
                 lastSleptAt = now;
-                tr_wait_msec(MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY);
+                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha = tr_sha1_init();
@@ -215,7 +212,7 @@ static tr_lock* getVerifyLock(void)
     return lock;
 }
 
-static void verifyThreadFunc([[maybe_unused]] void* user_data)
+static void verifyThreadFunc(void* /*user_data*/)
 {
     for (;;)
     {
@@ -320,7 +317,7 @@ void tr_verifyRemove(tr_torrent* tor)
     tr_lockUnlock(lock);
 }
 
-void tr_verifyClose([[maybe_unused]] tr_session* session)
+void tr_verifyClose(tr_session* /*session*/)
 {
     tr_lockLock(getVerifyLock());
 

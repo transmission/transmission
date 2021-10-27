@@ -466,7 +466,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ***/
 
 // TODO: Refactor this into a constructor for tr_variant
-static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
+static void bitfieldToBenc(tr_bitfield const* b, tr_variant* benc)
 {
     if (b->hasAll())
     {
@@ -478,7 +478,7 @@ static void bitfieldToBenc(Bitfield const* b, tr_variant* benc)
     }
     else
     {
-        auto const raw = b->getRaw();
+        auto const raw = b->raw();
         tr_variantInitRaw(benc, raw.data(), std::size(raw));
     }
 }
@@ -645,7 +645,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        Bitfield blocks(tor->blockCount);
+        auto blocks = tr_bitfield{ tor->blockCount };
 
         auto rawlen = size_t{};
         char const* err = nullptr;
@@ -663,22 +663,22 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
             else if (buflen == 3 && memcmp(buf, "all", 3) == 0)
             {
-                blocks.setMode(Bitfield::OperationMode::All);
+                blocks.setHasAll();
             }
             else if (buflen == 4 && memcmp(buf, "none", 4) == 0)
             {
-                blocks.setMode(Bitfield::OperationMode::None);
+                blocks.setHasNone();
             }
             else
             {
-                blocks.setFrom(Span{ buf, buflen }, true);
+                blocks.setRaw(buf, buflen, true);
             }
         }
         else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
         {
             if (strcmp(str, "all") == 0)
             {
-                blocks.setMode(Bitfield::OperationMode::All);
+                blocks.setHasAll();
             }
             else
             {
@@ -687,7 +687,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks.setFrom(Span{ raw, rawlen }, true);
+            blocks.setRaw(raw, rawlen, true);
         }
         else
         {

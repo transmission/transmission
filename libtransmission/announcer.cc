@@ -48,28 +48,25 @@ static void tier_build_log_name(struct tr_tier const* tier, char* buf, size_t bu
         } \
     } while (0)
 
-enum
-{
-    /* unless the tracker says otherwise, rescrape this frequently */
-    DEFAULT_SCRAPE_INTERVAL_SEC = (60 * 30),
-    /* unless the tracker says otherwise, this is the announce interval */
-    DEFAULT_ANNOUNCE_INTERVAL_SEC = (60 * 10),
-    /* unless the tracker says otherwise, this is the announce min_interval */
-    DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = (60 * 2),
-    /* the value of the 'numwant' argument passed in tracker requests. */
-    NUMWANT = 80,
+/* unless the tracker says otherwise, rescrape this frequently */
+static auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
+/* unless the tracker says otherwise, this is the announce interval */
+static auto constexpr DefaultAnnounceIntervalSec = int{ 60 * 10 };
+/* unless the tracker says otherwise, this is the announce min_interval */
+static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
+/* the value of the 'numwant' argument passed in tracker requests. */
+static auto constexpr Numwant = int{ 80 };
 
-    /* how often to announce & scrape */
-    UPKEEP_INTERVAL_MSEC = 500,
-    MAX_ANNOUNCES_PER_UPKEEP = 20,
-    MAX_SCRAPES_PER_UPKEEP = 20,
+/* how often to announce & scrape */
+static auto constexpr UpkeepIntervalMsec = int{ 500 };
+static auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
+static auto constexpr MaxScrapesPerUpkeep = int{ 20 };
 
-    /* this is how often to call the UDP tracker upkeep */
-    TAU_UPKEEP_INTERVAL_SECS = 5,
+/* this is how often to call the UDP tracker upkeep */
+static auto constexpr TauUpkeepIntervalSecs = int{ 5 };
 
-    /* how many infohashes to remove when we get a scrape-too-long error */
-    TR_MULTISCRAPE_STEP = 5
-};
+/* how many infohashes to remove when we get a scrape-too-long error */
+static auto constexpr TrMultiscrapeStep = int{ 5 };
 
 /***
 ****
@@ -182,7 +179,7 @@ void tr_announcerInit(tr_session* session)
     a->key = tr_rand_int(INT_MAX);
     a->session = session;
     a->upkeepTimer = evtimer_new(session->event_base, onUpkeepTimer, a);
-    tr_timerAddMsec(a->upkeepTimer, UPKEEP_INTERVAL_MSEC);
+    tr_timerAddMsec(a->upkeepTimer, UpkeepIntervalMsec);
 
     session->announcer = a;
 }
@@ -350,9 +347,9 @@ static void tierConstruct(tr_tier* tier, tr_torrent* tor)
 
     tier->key = nextKey++;
     tier->currentTrackerIndex = -1;
-    tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
-    tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
-    tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
+    tier->scrapeIntervalSec = DefaultScrapeIntervalSec;
+    tier->announceIntervalSec = DefaultAnnounceIntervalSec;
+    tier->announceMinIntervalSec = DefaultAnnounceMinIntervalSec;
     tier->scrapeAt = get_next_scrape_time(tor->session, tier, 0);
     tier->tor = tor;
 }
@@ -380,9 +377,9 @@ static void tierIncrementTracker(tr_tier* tier)
     tier->currentTracker = &tier->trackers[i];
 
     /* reset some of the tier's fields */
-    tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
-    tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
-    tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
+    tier->scrapeIntervalSec = DefaultScrapeIntervalSec;
+    tier->announceIntervalSec = DefaultAnnounceIntervalSec;
+    tier->announceMinIntervalSec = DefaultAnnounceMinIntervalSec;
     tier->isAnnouncing = false;
     tier->isScraping = false;
     tier->lastAnnounceStartTime = 0;
@@ -938,13 +935,13 @@ static tr_announce_request* announce_request_new(
     req->url = tr_strdup(tier->currentTracker->announce);
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
     memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
-    memcpy(req->peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN);
+    req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req->leftUntilComplete = tr_torrentHasMetadata(tor) ? tor->info.totalSize - tr_torrentHaveTotal(tor) : INT64_MAX;
     req->event = event;
-    req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
+    req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;
     req->partial_seed = tr_torrentGetCompleteness(tor) == TR_PARTIAL_SEED;
     tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
@@ -1031,8 +1028,6 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     }
 
     /* set the error message */
-    dbgmsg(tier, "%s", err);
-    tr_logAddTorInfo(tier->tor, "%s", err);
     tr_strlcpy(tier->lastAnnounceStr, err, sizeof(tier->lastAnnounceStr));
 
     /* switch to the next tracker */
@@ -1040,8 +1035,8 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 
     /* schedule a reannounce */
     int const interval = getRetryInterval(tier->currentTracker);
-    dbgmsg(tier, "Retrying announce in %d seconds.", interval);
-    tr_logAddTorInfo(tier->tor, "Retrying announce in %d seconds.", interval);
+    dbgmsg(tier, "Announce error: %s (Retrying in %d seconds)", err, interval);
+    tr_logAddTorInfo(tier->tor, "Announce error: %s (Retrying in %d seconds)", err, interval);
     tier_announce_event_push(tier, e, tr_time() + interval);
 }
 
@@ -1330,8 +1325,6 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     }
 
     /* set the error message */
-    dbgmsg(tier, "Scrape error: %s", errmsg);
-    tr_logAddTorInfo(tier->tor, "Scrape error: %s", errmsg);
     tr_strlcpy(tier->lastScrapeStr, errmsg, sizeof(tier->lastScrapeStr));
 
     /* switch to the next tracker */
@@ -1339,8 +1332,8 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
 
     /* schedule a rescrape */
     int const interval = getRetryInterval(tier->currentTracker);
-    dbgmsg(tier, "Retrying scrape in %zu seconds.", (size_t)interval);
-    tr_logAddTorInfo(tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
+    dbgmsg(tier, "Scrape error: %s (Retrying in %zu seconds)", errmsg, (size_t)interval);
+    tr_logAddTorInfo(tier->tor, "Scrape error: %s (Retrying in %zu seconds)", errmsg, (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time(session, tier, interval);
 }
@@ -1420,7 +1413,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 else
                 {
                     tier->lastScrapeSucceeded = true;
-                    tier->scrapeIntervalSec = std::max(int{ DEFAULT_SCRAPE_INTERVAL_SEC }, response->min_request_interval);
+                    tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
                     tier->scrapeAt = get_next_scrape_time(session, tier, tier->scrapeIntervalSec);
                     tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
@@ -1469,7 +1462,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                error out, lower the value once for that batch, not N times. */
             if (*multiscrape_max >= response->row_count)
             {
-                int const n = std::max(1, int{ *multiscrape_max - TR_MULTISCRAPE_STEP });
+                int const n = std::max(1, int{ *multiscrape_max - TrMultiscrapeStep });
                 if (*multiscrape_max != n)
                 {
                     char* scheme = nullptr;
@@ -1518,7 +1511,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
 {
     size_t request_count = 0;
     time_t const now = tr_time();
-    tr_scrape_request requests[MAX_SCRAPES_PER_UPKEEP] = {};
+    tr_scrape_request requests[MaxScrapesPerUpkeep] = {};
 
     /* batch as many info_hashes into a request as we can */
     for (auto* tier : tiers)
@@ -1551,7 +1544,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         }
 
         /* otherwise, if there's room for another request, build a new one */
-        if (!found && request_count < MAX_SCRAPES_PER_UPKEEP)
+        if (!found && request_count < MaxScrapesPerUpkeep)
         {
             tr_scrape_request* req = &requests[request_count++];
             req->url = scrape_info->url.c_str();
@@ -1679,14 +1672,14 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     /* Second, announce what we can. If there aren't enough slots
      * available, use compareAnnounceTiers to prioritize. */
-    if (announce_me.size() > MAX_ANNOUNCES_PER_UPKEEP)
+    if (announce_me.size() > MaxAnnouncesPerUpkeep)
     {
         std::partial_sort(
             std::begin(announce_me),
-            std::begin(announce_me) + MAX_ANNOUNCES_PER_UPKEEP,
+            std::begin(announce_me) + MaxAnnouncesPerUpkeep,
             std::end(announce_me),
             [](auto const* a, auto const* b) { return compareAnnounceTiers(a, b) < 0; });
-        announce_me.resize(MAX_ANNOUNCES_PER_UPKEEP);
+        announce_me.resize(MaxAnnouncesPerUpkeep);
     }
 
     for (auto*& tier : announce_me)
@@ -1696,7 +1689,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     }
 }
 
-static void onUpkeepTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vannouncer)
+static void onUpkeepTimer(evutil_socket_t /*fd*/, short /*what*/, void* vannouncer)
 {
     auto* announcer = static_cast<tr_announcer*>(vannouncer);
     tr_session* session = announcer->session;
@@ -1717,12 +1710,12 @@ static void onUpkeepTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] 
     /* TAU upkeep */
     if (announcer->tauUpkeepAt <= now)
     {
-        announcer->tauUpkeepAt = now + TAU_UPKEEP_INTERVAL_SECS;
+        announcer->tauUpkeepAt = now + TauUpkeepIntervalSecs;
         tr_tracker_udp_upkeep(session);
     }
 
     /* set up the next timer */
-    tr_timerAddMsec(announcer->upkeepTimer, UPKEEP_INTERVAL_MSEC);
+    tr_timerAddMsec(announcer->upkeepTimer, UpkeepIntervalMsec);
 
     tr_sessionUnlock(session);
 }
@@ -1844,7 +1837,7 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     return ret;
 }
 
-void tr_announcerStatsFree(tr_tracker_stat* trackers, [[maybe_unused]] int trackerCount)
+void tr_announcerStatsFree(tr_tracker_stat* trackers, int /*trackerCount*/)
 {
     tr_free(trackers);
 }
@@ -1899,7 +1892,7 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     }
 }
 
-void tr_announcerResetTorrent([[maybe_unused]] tr_announcer* announcer, tr_torrent* tor)
+void tr_announcerResetTorrent(tr_announcer* /*announcer*/, tr_torrent* tor)
 {
     TR_ASSERT(tor->tiers != nullptr);
 

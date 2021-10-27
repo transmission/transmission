@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -80,17 +81,15 @@ void tr_torrentGetBlockLocation(
     uint32_t* offset,
     uint32_t* length);
 
-void tr_torGetFileBlockRange(
-    tr_torrent const* tor,
-    tr_file_index_t const file,
-    tr_block_index_t* first,
-    tr_block_index_t* last);
+struct tr_block_range
+{
+    tr_block_index_t first;
+    tr_block_index_t last;
+};
 
-void tr_torGetPieceBlockRange(
-    tr_torrent const* tor,
-    tr_piece_index_t const piece,
-    tr_block_index_t* first,
-    tr_block_index_t* last);
+tr_block_range tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file);
+
+tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
@@ -154,7 +153,7 @@ struct tr_torrent
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    unsigned char peer_id[PEER_ID_LEN + 1];
+    std::optional<tr_peer_id_t> peer_id;
 
     time_t peer_id_creation_time;
 
@@ -319,6 +318,7 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
+// TODO(ckerr) this is confusingly-named. partial seeds return true here
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;
@@ -425,7 +425,7 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
 
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
-unsigned char const* tr_torrentGetPeerId(tr_torrent* tor);
+tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 static inline uint64_t tr_torrentGetLeftUntilDone(tr_torrent const* tor)
 {

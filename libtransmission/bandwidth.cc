@@ -123,8 +123,6 @@ void Bandwidth::allocateBandwidth(
     unsigned int period_msec,
     std::vector<tr_peerIo*>& peer_pool)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
@@ -181,10 +179,12 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
 void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
-    std::vector<tr_peerIo*> tmp;
-    std::vector<tr_peerIo*> low;
-    std::vector<tr_peerIo*> normal;
-    std::vector<tr_peerIo*> high;
+    TR_ASSERT(tr_isDirection(dir));
+
+    auto high = std::vector<tr_peerIo*>{};
+    auto low = std::vector<tr_peerIo*>{};
+    auto normal = std::vector<tr_peerIo*>{};
+    auto tmp = std::vector<tr_peerIo*>{};
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
@@ -250,18 +250,14 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_
          * clamp down harder on the bytes available */
         if (byte_count > 0)
         {
-            double current;
-            double desired;
-            double r;
-
             if (now == 0)
             {
                 now = tr_time_msec();
             }
 
-            current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
-            desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
-            r = desired >= 1 ? current / desired : 0;
+            auto const current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
+            auto const desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
+            auto const r = desired >= 1 ? double(current) / desired : 0;
 
             if (r > 1.0)
             {

@@ -63,17 +63,14 @@
 #include "version.h"
 #include "web.h"
 
-enum
-{
 #ifdef TR_LIGHTWEIGHT
-    DEFAULT_CACHE_SIZE_MB = 2,
-    DEFAULT_PREFETCH_ENABLED = false,
+static auto constexpr DefaultCacheSizeMB = int{ 2 };
+static auto constexpr DefaultPrefetchEnabled = bool{ false };
 #else
-    DEFAULT_CACHE_SIZE_MB = 4,
-    DEFAULT_PREFETCH_ENABLED = true,
+static auto constexpr DefaultCacheSizeMB = int{ 4 };
+static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
-    SAVE_INTERVAL_SECS = 360
-};
+static auto constexpr SaveIntervalSecs = int{ 360 };
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
@@ -86,27 +83,30 @@ static tr_port getRandomPort(tr_session* s)
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
    designates beta (Azureus-style) */
-void tr_peerIdInit(uint8_t* buf)
+tr_peer_id_t tr_peerIdInit()
 {
-    int total = 0;
-    // TODO: use a string_view
-    char const* pool = "0123456789abcdefghijklmnopqrstuvwxyz";
-    int const base = 36;
+    auto peer_id = tr_peer_id_t{};
+    auto* it = std::data(peer_id);
 
-    memcpy(buf, PEERID_PREFIX, 8);
+    // starts with -TRXXXX-
+    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
+    auto const* const end = it + std::size(peer_id);
+    it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 
-    tr_rand_buffer(buf + 8, 11);
-
-    for (int i = 8; i < 19; ++i)
+    // remainder is randomly-generated characters
+    auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
+    auto total = int{ 0 };
+    tr_rand_buffer(it, end - it);
+    while (it + 1 < end)
     {
-        int const val = buf[i] % base;
+        int const val = *it % std::size(Pool);
         total += val;
-        buf[i] = pool[val];
+        *it++ = Pool[val];
     }
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    *it = Pool[val];
 
-    int const val = total % base != 0 ? base - total % base : 0;
-    buf[19] = pool[val];
-    buf[20] = '\0';
+    return peer_id;
 }
 
 /***
@@ -166,7 +166,7 @@ static void free_incoming_peer_port(tr_session* session)
     session->bind_ipv6 = nullptr;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -334,7 +334,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictReserve(d, 69);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
-    tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DEFAULT_CACHE_SIZE_MB);
+    tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
@@ -359,7 +359,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_preallocation, TR_PREALLOCATE_SPARSE);
-    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DEFAULT_PREFETCH_ENABLED);
+    tr_variantDictAddBool(d, TR_KEY_prefetch_enabled, DefaultPrefetchEnabled);
     tr_variantDictAddInt(d, TR_KEY_peer_id_ttl_hours, 6);
     tr_variantDictAddBool(d, TR_KEY_queue_stalled_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, 30);
@@ -567,7 +567,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -583,7 +583,7 @@ static void onSaveTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] sh
 
     tr_statsSaveDirty(session);
 
-    tr_timerAdd(session->saveTimer, SAVE_INTERVAL_SECS, 0);
+    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
 }
 
 /***
@@ -650,7 +650,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -754,7 +754,7 @@ static void tr_sessionInitImpl(void* vdata)
     TR_ASSERT(tr_isSession(session));
 
     session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
-    tr_timerAdd(session->saveTimer, SAVE_INTERVAL_SECS, 0);
+    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
 
     tr_announcerInit(session);
 
@@ -1467,16 +1467,13 @@ static void updateBandwidth(tr_session* session, tr_direction dir)
     session->bandwidth->setDesiredSpeedBytesPerSecond(dir, limit_Bps);
 }
 
-enum
-{
-    MINUTES_PER_HOUR = 60,
-    MINUTES_PER_DAY = MINUTES_PER_HOUR * 24,
-    MINUTES_PER_WEEK = MINUTES_PER_DAY * 7
-};
+static auto constexpr MinutesPerHour = int{ 60 };
+static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
+static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
 static void turtleUpdateTable(struct tr_turtle_info* t)
 {
-    t->minutes->setMode(Bitfield::OperationMode::None);
+    t->minutes->setHasNone();
 
     for (int day = 0; day < 7; ++day)
     {
@@ -1487,12 +1484,12 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 
             if (end <= begin)
             {
-                end += MINUTES_PER_DAY;
+                end += MinutesPerDay;
             }
 
             for (time_t i = begin; i < end; ++i)
             {
-                t->minutes->setBit((i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
+                t->minutes->set((i + day * MinutesPerDay) % MinutesPerWeek);
             }
         }
     }
@@ -1537,14 +1534,14 @@ static bool getInTurtleTime(struct tr_turtle_info const* t)
     struct tm tm;
     tr_localtime_r(&now, &tm);
 
-    size_t minute_of_the_week = tm.tm_wday * MINUTES_PER_DAY + tm.tm_hour * MINUTES_PER_HOUR + tm.tm_min;
+    size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
 
-    if (minute_of_the_week >= MINUTES_PER_WEEK) /* leap minutes? */
+    if (minute_of_the_week >= MinutesPerWeek) /* leap minutes? */
     {
-        minute_of_the_week = MINUTES_PER_WEEK - 1;
+        minute_of_the_week = MinutesPerWeek - 1;
     }
 
-    return t->minutes->readBit(minute_of_the_week);
+    return t->minutes->test(minute_of_the_week);
 }
 
 static constexpr tr_auto_switch_state_t autoSwitchState(bool enabled)
@@ -1576,7 +1573,7 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
     turtle->changedByUser = false;
     turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
-    turtle->minutes = new Bitfield(MINUTES_PER_WEEK);
+    turtle->minutes = new tr_bitfield(MinutesPerWeek);
 
     turtleUpdateTable(turtle);
 
@@ -1953,7 +1950,7 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -2252,6 +2249,8 @@ static void toggle_utp(void* vsession)
     session->isUTPEnabled = !session->isUTPEnabled;
 
     tr_udpSetSocketBuffers(session);
+
+    tr_udpSetSocketTOS(session);
 
     /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
        explanation. */

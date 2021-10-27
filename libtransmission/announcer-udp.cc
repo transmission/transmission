@@ -24,6 +24,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-udp.h"
 #include "utils.h"
@@ -97,10 +98,7 @@ static uint64_t evbuffer_read_ntoh_64(struct evbuffer* buf)
 
 using tau_connection_t = uint64_t;
 
-enum
-{
-    TAU_CONNECTION_TTL_SECS = 60
-};
+static auto constexpr TauConnectionTtlSecs = int{ 60 };
 
 using tau_transaction_t = uint32_t;
 
@@ -145,10 +143,7 @@ static bool is_tau_response_message(tau_action_t action, size_t msglen)
     return false;
 }
 
-enum
-{
-    TAU_REQUEST_TTL = 60
-};
+static auto constexpr TauRequestTtl = int{ 60 };
 
 /****
 *****
@@ -323,7 +318,7 @@ static struct tau_announce_request* tau_announce_request_new(
     evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
     evbuffer_add_hton_32(buf, transaction_id);
     evbuffer_add(buf, in->info_hash, SHA_DIGEST_LENGTH);
-    evbuffer_add(buf, in->peer_id, PEER_ID_LEN);
+    evbuffer_add(buf, std::data(in->peer_id), std::size(in->peer_id));
     evbuffer_add_hton_64(buf, in->down);
     evbuffer_add_hton_64(buf, in->leftUntilComplete);
     evbuffer_add_hton_64(buf, in->up);
@@ -588,7 +583,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     if (action == TAU_ACTION_CONNECT)
     {
         tracker->connection_id = evbuffer_read_ntoh_64(buf);
-        tracker->connection_expiration_time = now + TAU_CONNECTION_TTL_SECS;
+        tracker->connection_expiration_time = now + TauConnectionTtlSecs;
         dbgmsg(tracker->key, "Got a new connection ID from tracker: %" PRIu64, tracker->connection_id);
     }
     else
@@ -611,7 +606,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     time_t const now = time(nullptr);
     bool const cancel_all = tracker->close_at != 0 && (tracker->close_at <= now);
 
-    if (tracker->connecting_at != 0 && tracker->connecting_at + TAU_REQUEST_TTL < now)
+    if (tracker->connecting_at != 0 && tracker->connecting_at + TauRequestTtl < now)
     {
         on_tracker_connection_response(tracker, TAU_ACTION_ERROR, nullptr);
     }
@@ -622,7 +617,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     {
         auto* req = static_cast<struct tau_announce_request*>(tr_ptrArrayNth(reqs, i));
 
-        if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
+        if (cancel_all || req->created_at + TauRequestTtl < now)
         {
             dbgmsg(tracker->key, "timeout announce req %p", (void*)req);
             tau_announce_request_fail(req, false, true, nullptr);
@@ -639,7 +634,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     {
         auto* const req = static_cast<struct tau_scrape_request*>(tr_ptrArrayNth(reqs, i));
 
-        if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
+        if (cancel_all || req->created_at + TauRequestTtl < now)
         {
             dbgmsg(tracker->key, "timeout scrape req %p", (void*)req);
             tau_scrape_request_fail(req, false, true, nullptr);
@@ -790,12 +785,9 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
         tr_ptrArrayAppend(&tau->trackers, tracker);
         dbgmsg(tracker->key, "New tau_tracker created");
     }
-    else
-    {
-        tr_free(key);
-        tr_free(host);
-    }
 
+    tr_free(key);
+    tr_free(host);
     return tracker;
 }
 

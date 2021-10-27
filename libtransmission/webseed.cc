@@ -67,7 +67,7 @@ public:
         , bandwidth(tor->bandwidth)
     {
         // init parent bits
-        have.setMode(Bitfield::OperationMode::All);
+        have.setHasAll();
         tr_peerUpdateProgress(tor, this);
 
         file_urls.resize(tr_torrentInfo(tor)->fileCount);
@@ -400,11 +400,11 @@ static void on_idle(tr_webseed* w)
 
 static void web_response_func(
     tr_session* session,
-    [[maybe_unused]] bool did_connect,
-    [[maybe_unused]] bool did_timeout,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     long response_code,
-    [[maybe_unused]] void const* response,
-    [[maybe_unused]] size_t response_byte_count,
+    void const* /*response*/,
+    size_t /*response_byte_count*/,
     void* vtask)
 {
     auto* t = static_cast<struct tr_webseed_task*>(vtask);
@@ -545,7 +545,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 namespace
 {
 
-void webseed_timer_func([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vw)
+void webseed_timer_func(evutil_socket_t /*fd*/, short /*what*/, void* vw)
 {
     auto* w = static_cast<tr_webseed*>(vw);
 

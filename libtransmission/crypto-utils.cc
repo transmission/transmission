@@ -48,9 +48,8 @@ void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size)
 
 bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
 {
-    tr_sha1_ctx_t sha;
-
-    if ((sha = tr_sha1_init()) == nullptr)
+    tr_sha1_ctx_t sha = tr_sha1_init();
+    if (sha == nullptr)
     {
         return false;
     }
@@ -58,10 +57,9 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
     if (tr_sha1_update(sha, data1, data1_length))
     {
         va_list vl;
-        void const* data;
-
         va_start(vl, data1_length);
 
+        void const* data = nullptr;
         while ((data = va_arg(vl, void const*)) != nullptr)
         {
             int const data_length = va_arg(vl, int);
@@ -94,8 +92,7 @@ int tr_rand_int(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
-    unsigned int noise;
-
+    unsigned int noise = 0;
     if (tr_rand_buffer(&noise, sizeof(noise)))
     {
         return noise % upper_bound;
@@ -128,11 +125,8 @@ char* tr_ssha1(char const* plain_text)
 {
     TR_ASSERT(plain_text != nullptr);
 
-    enum
-    {
-        saltval_len = 8,
-        salter_len = 64
-    };
+    auto constexpr SaltvalLen = int{ 8 };
+    auto constexpr SalterLen = int{ 64 };
 
     static char const* salter =
         "0123456789"
@@ -140,21 +134,21 @@ char* tr_ssha1(char const* plain_text)
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "./";
 
-    unsigned char salt[saltval_len];
+    unsigned char salt[SaltvalLen];
     uint8_t sha[SHA_DIGEST_LENGTH];
-    char buf[2 * SHA_DIGEST_LENGTH + saltval_len + 2];
+    char buf[2 * SHA_DIGEST_LENGTH + SaltvalLen + 2];
 
-    tr_rand_buffer(salt, saltval_len);
+    tr_rand_buffer(salt, SaltvalLen);
 
     for (auto& ch : salt)
     {
-        ch = salter[ch % salter_len];
+        ch = salter[ch % SalterLen];
     }
 
-    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, saltval_len, nullptr);
+    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, SaltvalLen, nullptr);
     tr_sha1_to_hex(&buf[1], sha);
-    memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, saltval_len);
-    buf[1 + 2 * SHA_DIGEST_LENGTH + saltval_len] = '\0';
+    memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, SaltvalLen);
+    buf[1 + 2 * SHA_DIGEST_LENGTH + SaltvalLen] = '\0';
     buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
 
     return tr_strdup(buf);
@@ -194,7 +188,7 @@ bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
 
 void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length)
 {
-    char* ret;
+    char* ret = nullptr;
 
     if (input != nullptr)
     {
@@ -226,10 +220,6 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 
         ret = tr_strdup("");
     }
-    else
-    {
-        ret = nullptr;
-    }
 
     if (output_length != nullptr)
     {
@@ -246,7 +236,7 @@ void* tr_base64_encode_str(char const* input, size_t* output_length)
 
 void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length)
 {
-    char* ret;
+    char* ret = nullptr;
 
     if (input != nullptr)
     {
@@ -271,10 +261,6 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
         }
 
         ret = tr_strdup("");
-    }
-    else
-    {
-        ret = nullptr;
     }
 
     if (output_length != nullptr)
