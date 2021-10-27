@@ -26,28 +26,19 @@ struct Candidate
 {
     tr_piece_index_t piece;
     size_t n_blocks_missing;
-    size_t n_blocks_requested;
     tr_priority_t priority;
     uint8_t salt;
-    Candidate(tr_piece_index_t p, size_t mis, size_t req, tr_priority_t pri, uint8_t s)
-        : piece{ p }
-        , n_blocks_missing{ mis }
-        , n_blocks_requested{ req }
-        , priority{ pri }
-        , salt{ s }
+
+    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, uint8_t salt_in)
+        : piece{ piece_in }
+        , n_blocks_missing{ missing_in }
+        , priority{ priority_in }
+        , salt{ salt_in }
     {
     }
 
     int compare(Candidate const& that) const // <=>
     {
-        // prever to not over-request
-        bool this_overreq = n_blocks_requested > n_blocks_missing;
-        bool that_overreq = that.n_blocks_requested > that.n_blocks_missing;
-        if (this_overreq != that_overreq)
-        {
-            return this_overreq ? 1 : -1;
-        }
-
         // prefer pieces closer to completion
         if (n_blocks_missing != that.n_blocks_missing)
         {
@@ -78,7 +69,7 @@ std::vector<Candidate> getCandidates(tr_torrent* tor)
 {
     auto const* const inf = tr_torrentInfo(tor);
 
-    // count up how many pieces we still want
+    // count up the pieces that we still want
     auto wanted_pieces = std::vector<std::pair<tr_piece_index_t, size_t>>{};
     wanted_pieces.reserve(inf->pieceCount);
     for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
@@ -88,7 +79,7 @@ std::vector<Candidate> getCandidates(tr_torrent* tor)
             continue;
         }
 
-        auto const n_missing = tr_torrentMissingBlocksInPiece(tor, i);
+        size_t const n_missing = tr_torrentMissingBlocksInPiece(tor, i);
         if (n_missing == 0)
         {
             continue;
@@ -106,12 +97,7 @@ std::vector<Candidate> getCandidates(tr_torrent* tor)
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(
-            piece,
-            n_missing,
-            0, // FIXME: number of pending requests in piece
-            inf->pieces[piece].priority,
-            saltbuf[i]);
+        candidates.emplace_back(piece, n_missing, inf->pieces[piece].priority, saltbuf[i]);
     }
 
     return candidates;
