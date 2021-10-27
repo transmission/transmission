@@ -215,7 +215,7 @@ tr_dh_ctx_t tr_dh_new(
     TR_ASSERT(generator_num != nullptr);
 
     auto handle = std::make_unique<tr_dh_ctx>();
-    CCStatus status;
+    auto status = CCStatus{};
 
     handle->p = CCBigNumPtr(CCBigNumFromData(&status, prime_num, prime_num_length));
     if (!check_pointer(handle->p.get(), &status))
@@ -243,7 +243,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(public_key != nullptr);
 
     auto& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    CCStatus status;
+    auto status = CCStatus{};
 
     handle.private_key = CCBigNumPtr(CCBigNumCreateRandom(&status, private_key_length * 8, private_key_length * 8, 0));
     if (!check_pointer(handle.private_key.get(), &status))
@@ -286,7 +286,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     auto const& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    CCStatus status;
+    auto status = CCStatus{};
 
     auto const other_key = CCBigNumPtr(CCBigNumFromData(&status, other_public_key, other_public_key_length));
     if (!check_pointer(other_key.get(), &status))
