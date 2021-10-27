@@ -1242,9 +1242,6 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
             if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
             {
-                TR_ASSERT(cancel != nullptr);
-                TR_ASSERT(cancelCount < cancel_buflen);
-
                 cancel.push_back(*request);
             }
             else
