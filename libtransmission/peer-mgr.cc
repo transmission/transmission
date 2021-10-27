@@ -2522,23 +2522,18 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
+    tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&tor->swarm->peers);
     int const size = tr_ptrArraySize(&tor->swarm->peers);
-    int n_ret = 0;
     tr_peer_stat* ret = tr_new0(tr_peer_stat, size);
 
     time_t const now = tr_time();
     uint64_t const now_msec = tr_time_msec();
     for (int i = 0; i < size; ++i)
     {
-        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peers[i]);
-        if (msgs != nullptr)
-        {
-            ret[n_ret++] = getPeerStats(msgs, now, now_msec);
-        }
+        ret[i] = getPeerStats(peers[i], now, now_msec);
     }
 
-    *setmeCount = n_ret;
+    *setmeCount = size;
     return ret;
 }
 
@@ -2871,7 +2866,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     TR_ASSERT(swarmIsLocked(s));
 
     int const peerCount = tr_ptrArraySize(&s->peers);
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
+    tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&s->peers);
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
     bool const chokeAll = !tr_torrentIsPieceTransferAllowed(s->tor, TR_CLIENT_TO_PEER);
@@ -2893,7 +2888,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (int i = 0; i < peerCount; ++i)
     {
-        auto* const peer = dynamic_cast<tr_peerMsgs*>(peers[i]);
+        auto* const peer = peers[i];
         struct peer_atom* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
