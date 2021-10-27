@@ -2090,6 +2090,28 @@ static std::string buildLabelsString(tr_torrent const* tor)
     return buf.str();
 }
 
+static std::string buildTrackersString(tr_torrent const* tor)
+{
+    auto buf = std::stringstream{};
+
+    int n = 0;
+    tr_tracker_stat* stats = tr_torrentTrackers(tor, &n);
+    for (int i = 0; i < n;)
+    {
+        tr_tracker_stat const* s = &stats[i];
+
+        buf << s->host;
+
+        if (++i < n)
+        {
+            buf << ',';
+        }
+    }
+    tr_torrentTrackersFree(stats, n);
+
+    return buf.str();
+}
+
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
     if (tr_str_is_empty(script))
@@ -2116,8 +2138,9 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
-        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
         tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
+        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+        tr_strdup_printf("TR_TORRENT_TRACKERS=%s", buildTrackersString(tor).c_str()),
         nullptr,
     };
 
