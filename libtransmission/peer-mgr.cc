@@ -2447,115 +2447,123 @@ double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
     return ret;
 }
 
+static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
+{
+    auto stats = tr_peer_stat{};
+    auto const* const atom = peer->atom;
+
+    tr_address_to_string_with_buf(&atom->addr, stats.addr, sizeof(stats.addr));
+    tr_strlcpy(stats.client, tr_quark_get_string(peer->client, nullptr), sizeof(stats.client));
+    stats.port = ntohs(peer->atom->port);
+    stats.from = atom->fromFirst;
+    stats.progress = peer->progress;
+    stats.isUTP = peer->is_utp_connection();
+    stats.isEncrypted = peer->is_encrypted();
+    stats.rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
+    stats.rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+    stats.peerIsChoked = peer->is_peer_choked();
+    stats.peerIsInterested = peer->is_peer_interested();
+    stats.clientIsChoked = peer->is_client_choked();
+    stats.clientIsInterested = peer->is_client_interested();
+    stats.isIncoming = peer->is_incoming_connection();
+    stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
+    stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
+    stats.isSeed = tr_peerIsSeed(peer);
+
+    stats.blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
+    stats.blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
+    stats.cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
+    stats.cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
+
+    stats.pendingReqsToPeer = peer->pendingReqsToPeer;
+    stats.pendingReqsToClient = peer->pendingReqsToClient;
+
+    char* pch = stats.flagStr;
+
+    if (stats.isUTP)
+    {
+        *pch++ = 'T';
+    }
+
+    if (peer->swarm->optimistic == peer)
+    {
+        *pch++ = 'O';
+    }
+
+    if (stats.isDownloadingFrom)
+    {
+        *pch++ = 'D';
+    }
+    else if (stats.clientIsInterested)
+    {
+        *pch++ = 'd';
+    }
+
+    if (stats.isUploadingTo)
+    {
+        *pch++ = 'U';
+    }
+    else if (stats.peerIsInterested)
+    {
+        *pch++ = 'u';
+    }
+
+    if (!stats.clientIsChoked && !stats.clientIsInterested)
+    {
+        *pch++ = 'K';
+    }
+
+    if (!stats.peerIsChoked && !stats.peerIsInterested)
+    {
+        *pch++ = '?';
+    }
+
+    if (stats.isEncrypted)
+    {
+        *pch++ = 'E';
+    }
+
+    if (stats.from == TR_PEER_FROM_DHT)
+    {
+        *pch++ = 'H';
+    }
+    else if (stats.from == TR_PEER_FROM_PEX)
+    {
+        *pch++ = 'X';
+    }
+
+    if (stats.isIncoming)
+    {
+        *pch++ = 'I';
+    }
+
+    *pch = '\0';
+
+    return stats;
+}
+
 struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
-
-    tr_swarm const* s = tor->swarm;
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
-    int size = tr_ptrArraySize(&s->peers);
+    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
+    int const size = tr_ptrArraySize(&tor->swarm->peers);
+    int n_ret = 0;
     tr_peer_stat* ret = tr_new0(tr_peer_stat, size);
 
+    time_t const now = tr_time();
+    uint64_t const now_msec = tr_time_msec();
     for (int i = 0; i < size; ++i)
     {
-        tr_peer* peer = peers[i];
-        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peer);
-        struct peer_atom const* atom = peer->atom;
-        tr_peer_stat* stat = ret + i;
-
-        tr_address_to_string_with_buf(&atom->addr, stat->addr, sizeof(stat->addr));
-        tr_strlcpy(stat->client, tr_quark_get_string(peer->client, nullptr), sizeof(stat->client));
-        stat->port = ntohs(peer->atom->port);
-        stat->from = atom->fromFirst;
-        stat->progress = peer->progress;
-        stat->isUTP = msgs->is_utp_connection();
-        stat->isEncrypted = msgs->is_encrypted();
-        stat->rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-        stat->rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
-        stat->peerIsChoked = msgs->is_peer_choked();
-        stat->peerIsInterested = msgs->is_peer_interested();
-        stat->clientIsChoked = msgs->is_client_choked();
-        stat->clientIsInterested = msgs->is_client_interested();
-        stat->isIncoming = msgs->is_incoming_connection();
-        stat->isDownloadingFrom = msgs->is_active(TR_PEER_TO_CLIENT);
-        stat->isUploadingTo = msgs->is_active(TR_CLIENT_TO_PEER);
-        stat->isSeed = tr_peerIsSeed(peer);
-
-        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
-        stat->blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
-        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
-        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
-
-        stat->pendingReqsToPeer = peer->pendingReqsToPeer;
-        stat->pendingReqsToClient = peer->pendingReqsToClient;
-
-        char* pch = stat->flagStr;
-
-        if (stat->isUTP)
+        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peers[i]);
+        if (msgs != nullptr)
         {
-            *pch++ = 'T';
+            ret[n_ret++] = getPeerStats(msgs, now, now_msec);
         }
-
-        if (s->optimistic == msgs)
-        {
-            *pch++ = 'O';
-        }
-
-        if (stat->isDownloadingFrom)
-        {
-            *pch++ = 'D';
-        }
-        else if (stat->clientIsInterested)
-        {
-            *pch++ = 'd';
-        }
-
-        if (stat->isUploadingTo)
-        {
-            *pch++ = 'U';
-        }
-        else if (stat->peerIsInterested)
-        {
-            *pch++ = 'u';
-        }
-
-        if (!stat->clientIsChoked && !stat->clientIsInterested)
-        {
-            *pch++ = 'K';
-        }
-
-        if (!stat->peerIsChoked && !stat->peerIsInterested)
-        {
-            *pch++ = '?';
-        }
-
-        if (stat->isEncrypted)
-        {
-            *pch++ = 'E';
-        }
-
-        if (stat->from == TR_PEER_FROM_DHT)
-        {
-            *pch++ = 'H';
-        }
-        else if (stat->from == TR_PEER_FROM_PEX)
-        {
-            *pch++ = 'X';
-        }
-
-        if (stat->isIncoming)
-        {
-            *pch++ = 'I';
-        }
-
-        *pch = '\0';
     }
 
-    *setmeCount = size;
+    *setmeCount = n_ret;
     return ret;
 }
 
