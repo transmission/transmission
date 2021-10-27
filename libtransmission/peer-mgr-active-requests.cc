@@ -11,6 +11,7 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <utility>
 #include <unordered_map>
 #include <set>
 #include <vector>
@@ -215,9 +216,9 @@ size_t ActiveRequests::size() const
 }
 
 // returns the active requests sent before `when`
-std::vector<ActiveRequests::block_and_peer> ActiveRequests::sentBefore(time_t when) const
+std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(time_t when) const
 {
-    auto sent_before = std::vector<block_and_peer>{};
+    auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
     sent_before.reserve(std::size(impl_->blocks_));
 
     for (auto& perblock : impl_->blocks_)
@@ -226,7 +227,7 @@ std::vector<ActiveRequests::block_and_peer> ActiveRequests::sentBefore(time_t wh
         {
             if (sent.when < when)
             {
-                sent_before.push_back(block_and_peer{ perblock.first, sent.peer });
+                sent_before.emplace_back(perblock.first, sent.peer);
             }
         }
     }

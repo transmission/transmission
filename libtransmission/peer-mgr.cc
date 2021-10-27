@@ -688,7 +688,7 @@ static void tr_swarmCancelOldRequests(tr_swarm* swarm)
     auto const now = tr_time();
     auto const oldest = now - RequestTtlSecs;
 
-    for (auto const [block, peer] : swarm->active_requests.sentBefore(oldest))
+    for (auto const& [block, peer] : swarm->active_requests.sentBefore(oldest))
     {
         maybeSendCancelRequest(peer, block, nullptr);
         swarm->active_requests.remove(block, peer);

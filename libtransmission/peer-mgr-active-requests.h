@@ -15,6 +15,7 @@
 #include <cstddef> // size_t
 #include <ctime> // time_t
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "transmission.h" // tr_block_index_t
@@ -54,14 +55,8 @@ public:
     // return the total number of active requests
     [[nodiscard]] size_t size() const;
 
-    struct block_and_peer
-    {
-        tr_block_index_t block;
-        tr_peer* peer;
-    };
-
     // returns the active requests sent before `when`
-    [[nodiscard]] std::vector<block_and_peer> sentBefore(time_t when) const;
+    [[nodiscard]] std::vector<std::pair<tr_block_index_t, tr_peer*>> sentBefore(time_t when) const;
 
 private:
     class Impl;
