@@ -250,18 +250,14 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_
          * clamp down harder on the bytes available */
         if (byte_count > 0)
         {
-            double current;
-            double desired;
-            double r;
-
             if (now == 0)
             {
                 now = tr_time_msec();
             }
 
-            current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
-            desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
-            r = desired >= 1 ? current / desired : 0;
+            auto const current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
+            auto const desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
+            auto const r = desired >= 1 ? double(current) / desired : 0;
 
             if (r > 1.0)
             {

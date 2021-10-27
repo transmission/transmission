@@ -37,7 +37,7 @@ tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
-tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl)
+tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
 tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
 tr_auto_option(WITH_LIBAPPINDICATOR "Use libappindicator in GTK+ client" AUTO)
@@ -150,6 +150,17 @@ endif()
 find_package(ICONV)
 
 set(CRYPTO_PKG "")
+if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
+    tr_get_required_flag(WITH_CRYPTO CCRYPTO_IS_REQUIRED)
+    find_path(CCRYPTO_INCLUDE_DIR NAMES CommonCrypto/CommonCrypto.h ${CCRYPTO_IS_REQUIRED})
+    mark_as_advanced(CCRYPTO_INCLUDE_DIR)
+    tr_fixup_list_option(WITH_CRYPTO "ccrypto" CCRYPTO_INCLUDE_DIR "AUTO" CCRYPTO_IS_REQUIRED)
+    if(WITH_CRYPTO STREQUAL "ccrypto")
+        set(CRYPTO_PKG "ccrypto")
+        set(CRYPTO_INCLUDE_DIRS)
+        set(CRYPTO_LIBRARIES)
+    endif()
+endif()
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
     find_package(OpenSSL ${OPENSSL_MINIMUM} ${OPENSSL_IS_REQUIRED})
@@ -293,26 +304,14 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-if(WIN32)
-    tr_add_external_auto_library(EVENT2 libevent event
-        CMAKE_ARGS
-            "-DEVENT__DISABLE_OPENSSL:BOOL=ON"
-            "-DEVENT__DISABLE_SAMPLES:BOOL=ON"
-            "-DEVENT__LIBRARY_TYPE:STRING=STATIC")
-else()
-    set(EVENT2_CONFIGURE_FLAGS)
-    if(APPLE)
-        if(CRYPTO_PKG STREQUAL "openssl")
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
-        else()
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
-        endif()
-    endif()
-    tr_add_external_auto_library(EVENT2 libevent event
-        BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" "--disable-samples" ${EVENT2_CONFIGURE_FLAGS})
-endif()
+tr_add_external_auto_library(EVENT2 libevent event
+    CMAKE_ARGS
+        -DEVENT__DISABLE_OPENSSL:BOOL=ON
+        -DEVENT__DISABLE_BENCHMARK:BOOL=ON
+        -DEVENT__DISABLE_TESTS:BOOL=ON
+        -DEVENT__DISABLE_REGRESS:BOOL=ON
+        -DEVENT__DISABLE_SAMPLES:BOOL=ON
+        -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)

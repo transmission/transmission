@@ -225,9 +225,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 {
     if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {
-        struct UPNPDev* devlist;
-
-        devlist = tr_upnpDiscover(2000);
+        auto* const devlist = tr_upnpDiscover(2000);
 
         errno = 0;
 

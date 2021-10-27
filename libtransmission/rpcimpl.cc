@@ -201,8 +201,8 @@ static void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*>
 static char const* queueMoveTop(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveTop(std::data(torrents), std::size(torrents));
@@ -213,8 +213,8 @@ static char const* queueMoveTop(
 static char const* queueMoveUp(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveUp(std::data(torrents), std::size(torrents));
@@ -225,8 +225,8 @@ static char const* queueMoveUp(
 static char const* queueMoveDown(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveDown(std::data(torrents), std::size(torrents));
@@ -237,8 +237,8 @@ static char const* queueMoveDown(
 static char const* queueMoveBottom(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveBottom(std::data(torrents), std::size(torrents));
@@ -257,8 +257,8 @@ struct CompareTorrentByQueuePosition
 static char const* torrentStart(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
@@ -277,8 +277,8 @@ static char const* torrentStart(
 static char const* torrentStartNow(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
@@ -297,8 +297,8 @@ static char const* torrentStartNow(
 static char const* torrentStop(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -315,8 +315,8 @@ static char const* torrentStop(
 static char const* torrentRemove(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto delete_flag = bool{ false };
     tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
@@ -339,8 +339,8 @@ static char const* torrentRemove(
 static char const* torrentReannounce(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -357,8 +357,8 @@ static char const* torrentReannounce(
 static char const* torrentVerify(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -873,11 +873,7 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
     }
 }
 
-static char const* torrentGet(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
@@ -1281,8 +1277,8 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
 static char const* torrentSet(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     char const* errmsg = nullptr;
 
@@ -1412,8 +1408,8 @@ static char const* torrentSet(
 static char const* torrentSetLocation(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     char const* location = nullptr;
 
@@ -1458,7 +1454,7 @@ static void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char con
 static char const* torrentRenamePath(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
+    tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
     char const* errmsg = nullptr;
@@ -1487,9 +1483,9 @@ static char const* torrentRenamePath(
 ***/
 
 static void portTested(
-    [[maybe_unused]] tr_session* session,
-    [[maybe_unused]] bool did_connect,
-    [[maybe_unused]] bool did_timeout,
+    tr_session* /*session*/,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     long response_code,
     void const* response,
     size_t response_byte_count,
@@ -1519,8 +1515,8 @@ static void portTested(
 
 static char const* portTest(
     tr_session* session,
-    [[maybe_unused]] tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
+    tr_variant* /*args_in*/,
+    tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
     int const port = tr_sessionGetPeerPort(session);
@@ -1536,8 +1532,8 @@ static char const* portTest(
 
 static void gotNewBlocklist(
     tr_session* session,
-    [[maybe_unused]] bool did_connect,
-    [[maybe_unused]] bool did_timeout,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     long response_code,
     void const* response,
     size_t response_byte_count,
@@ -1643,8 +1639,8 @@ static void gotNewBlocklist(
 
 static char const* blocklistUpdate(
     tr_session* session,
-    [[maybe_unused]] tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
+    tr_variant* /*args_in*/,
+    tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
     tr_webRun(session, session->blocklist_url, gotNewBlocklist, idle_data);
@@ -1704,9 +1700,9 @@ struct add_torrent_idle_data
 };
 
 static void gotMetadataFromURL(
-    [[maybe_unused]] tr_session* session,
-    [[maybe_unused]] bool did_connect,
-    [[maybe_unused]] bool did_timeout,
+    tr_session* /*session*/,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     long response_code,
     void const* response,
     size_t response_byte_count,
@@ -1769,11 +1765,7 @@ static auto fileListFromList(tr_variant* list)
     return files;
 }
 
-static char const* torrentAdd(
-    tr_session* session,
-    tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    struct tr_rpc_idle_data* idle_data)
+static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* idle_data)
 {
     TR_ASSERT(idle_data != nullptr);
 
@@ -1899,8 +1891,8 @@ static char const* torrentAdd(
 static char const* sessionSet(
     tr_session* session,
     tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     char const* download_dir = nullptr;
     char const* incomplete_dir = nullptr;
@@ -2169,9 +2161,9 @@ static char const* sessionSet(
 
 static char const* sessionStats(
     tr_session* session,
-    [[maybe_unused]] tr_variant* args_in,
+    tr_variant* /*args_in*/,
     tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_rpc_idle_data* /*idle_data*/)
 {
     auto currentStats = tr_session_stats{};
     auto cumulativeStats = tr_session_stats{};
@@ -2449,11 +2441,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
     }
 }
 
-static char const* sessionGet(
-    tr_session* s,
-    tr_variant* args_in,
-    tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
 {
     tr_variant* fields = nullptr;
     if (tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
@@ -2490,10 +2478,10 @@ static char const* sessionGet(
 }
 
 static char const* freeSpace(
-    [[maybe_unused]] tr_session* session,
+    tr_session* /*session*/,
     tr_variant* args_in,
     tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_rpc_idle_data* /*idle_data*/)
 {
     char const* path = nullptr;
     if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, nullptr))
@@ -2530,9 +2518,9 @@ static char const* freeSpace(
 
 static char const* sessionClose(
     tr_session* session,
-    [[maybe_unused]] tr_variant* args_in,
-    [[maybe_unused]] tr_variant* args_out,
-    [[maybe_unused]] struct tr_rpc_idle_data* idle_data)
+    tr_variant* /*args_in*/,
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     notify(session, TR_RPC_SESSION_CLOSE, nullptr);
     return nullptr;
@@ -2574,10 +2562,7 @@ static struct method
     { "queue-move-bottom", true, queueMoveBottom },
 };
 
-static void noop_response_callback(
-    [[maybe_unused]] tr_session* session,
-    [[maybe_unused]] tr_variant* response,
-    [[maybe_unused]] void* user_data)
+static void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)
 {
 }
 

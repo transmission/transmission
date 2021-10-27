@@ -86,9 +86,7 @@ static void logVal(char const* func, int ret)
 
 struct tr_natpmp* tr_natpmpInit(void)
 {
-    struct tr_natpmp* nat;
-
-    nat = tr_new0(struct tr_natpmp, 1);
+    auto* const nat = tr_new0(struct tr_natpmp, 1);
     nat->state = TR_NATPMP_DISCOVER;
     nat->public_port = 0;
     nat->private_port = 0;
@@ -117,8 +115,6 @@ static void setCommandTime(struct tr_natpmp* nat)
 
 tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
 {
-    tr_port_forwarding ret;
-
     if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
         int val = initnatpmp(&nat->natpmp, 0, 0);
@@ -237,24 +233,18 @@ tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, b
         return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
     case TR_NATPMP_DISCOVER:
-        ret = TR_PORT_UNMAPPED;
-        break;
+        return TR_PORT_UNMAPPED;
 
     case TR_NATPMP_RECV_PUB:
     case TR_NATPMP_SEND_MAP:
     case TR_NATPMP_RECV_MAP:
-        ret = TR_PORT_MAPPING;
-        break;
+        return TR_PORT_MAPPING;
 
     case TR_NATPMP_SEND_UNMAP:
     case TR_NATPMP_RECV_UNMAP:
-        ret = TR_PORT_UNMAPPING;
-        break;
+        return TR_PORT_UNMAPPING;
 
     default:
-        ret = TR_PORT_ERROR;
-        break;
+        return TR_PORT_ERROR;
     }
-
-    return ret;
 }

@@ -212,6 +212,7 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 *   - assemble search string "\r\nName: " and locate position
 *   - copy back value from end to next "\r\n"
 */
+// TODO: string_view
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
     TR_ASSERT(str != nullptr);
@@ -222,7 +223,6 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     auto constexpr MaxLength = int{ 30 };
 
     char sstr[MaxLength] = { 0 };
-    char const* pos;
 
     if (strlen(name) > MaxLength - strlen(CRLF ": "))
     {
@@ -232,8 +232,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     /* compose the string token to search for */
     tr_snprintf(sstr, MaxLength, CRLF "%s: ", name);
 
-    pos = strstr(str, sstr);
-
+    char const* const pos = strstr(str, sstr);
     if (pos == nullptr)
     {
         return false; /* search was not successful */
@@ -271,7 +270,7 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_session* ss, [[maybe_unused]] tr_address* tr_addr)
+int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
 {
     /* if this check fails (i.e. the definition of hashString changed), update
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
@@ -658,7 +657,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-static void on_upkeep_timer([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, [[maybe_unused]] void* user_data)
+static void on_upkeep_timer(evutil_socket_t /*s*/, short /*type*/, void* /*user_data*/)
 {
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UpkeepIntervalSecs);
@@ -669,7 +668,7 @@ static void on_upkeep_timer([[maybe_unused]] evutil_socket_t s, [[maybe_unused]]
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback([[maybe_unused]] evutil_socket_t s, short type, [[maybe_unused]] void* user_data)
+static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*/)
 {
     TR_ASSERT(tr_isSession(session));
 

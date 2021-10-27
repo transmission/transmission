@@ -1693,7 +1693,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     }
 }
 
-static void onUpkeepTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vannouncer)
+static void onUpkeepTimer(evutil_socket_t /*fd*/, short /*what*/, void* vannouncer)
 {
     auto* announcer = static_cast<tr_announcer*>(vannouncer);
     tr_session* session = announcer->session;
@@ -1841,7 +1841,7 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     return ret;
 }
 
-void tr_announcerStatsFree(tr_tracker_stat* trackers, [[maybe_unused]] int trackerCount)
+void tr_announcerStatsFree(tr_tracker_stat* trackers, int /*trackerCount*/)
 {
     tr_free(trackers);
 }
@@ -1896,7 +1896,7 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     }
 }
 
-void tr_announcerResetTorrent([[maybe_unused]] tr_announcer* announcer, tr_torrent* tor)
+void tr_announcerResetTorrent(tr_announcer* /*announcer*/, tr_torrent* tor)
 {
     TR_ASSERT(tor->tiers != nullptr);
 

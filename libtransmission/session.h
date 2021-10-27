@@ -31,13 +31,6 @@
 #include "utils.h"
 #include "variant.h"
 
-enum tr_tristate_t
-{
-    TR_NET_OK,
-    TR_NET_ERROR,
-    TR_NET_WAIT
-};
-
 enum tr_auto_switch_state_t
 {
     TR_AUTO_SWITCH_UNUSED,
@@ -94,7 +87,7 @@ struct tr_turtle_info
      * limits on or off at that given minute in the week. */
     // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
     // TODO: remove * and own the value
-    Bitfield* minutes;
+    tr_bitfield* minutes = nullptr;
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;

@@ -96,9 +96,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         data.tor = tor;
         data.buf = evbuffer_new();
 
-        tr_block_index_t first;
-        tr_block_index_t last;
-        tr_torGetPieceBlockRange(tor, data.pieceIndex, &first, &last);
+        auto const [first, last] = tr_torGetPieceBlockRange(tor, data.pieceIndex);
 
         for (tr_block_index_t block_index = first; block_index <= last; ++block_index)
         {

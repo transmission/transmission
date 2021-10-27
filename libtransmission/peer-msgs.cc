@@ -505,7 +505,7 @@ public:
         publish(e);
     }
 
-    void publishClientGotBitfield(Bitfield* bitfield)
+    void publishClientGotBitfield(tr_bitfield* bitfield)
     {
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -901,7 +901,7 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
     return setSize;
 }
 
-static void updateFastSet([[maybe_unused]] tr_peerMsgs* msgs)
+static void updateFastSet(tr_peerMsgs*)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
@@ -1701,9 +1701,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!msgs->have.readBit(ui32))
+        if (!msgs->have.test(ui32))
         {
-            msgs->have.setBit(ui32);
+            msgs->have.set(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
@@ -1715,7 +1715,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setFrom(Span{ tmp, msglen }, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
@@ -1809,8 +1809,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setMode(Bitfield::OperationMode::All);
-            TR_ASSERT(msgs->have.hasAll());
+            msgs->have.setHasAll();
             msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
         }
@@ -1827,7 +1826,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setMode(Bitfield::OperationMode::None);
+            msgs->have.setHasNone();
             msgs->publishClientGotHaveNone();
             updatePeerProgress(msgs);
         }
@@ -1923,7 +1922,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return err;
     }
 
-    msgs->blame.setBit(req->index);
+    msgs->blame.set(req->index);
     msgs->publishGotBlock(req);
     return 0;
 }
@@ -2302,7 +2301,7 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError([[maybe_unused]] tr_peerIo* io, short what, void* vmsgs)
+static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -2673,7 +2672,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     }
 }
 
-static void pexPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vmsgs)
+static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 

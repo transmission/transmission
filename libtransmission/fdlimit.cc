@@ -92,7 +92,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         while (success && length > 0)
         {
             uint64_t const thisPass = std::min(length, uint64_t{ sizeof(buf) });
-            uint64_t bytes_written;
+            uint64_t bytes_written = 0;
             success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
             length -= bytes_written;
         }
@@ -147,6 +147,7 @@ static void cached_file_close(struct tr_cached_file* o)
  * errno values include ENOENT if the parent folder doesn't exist,
  * plus the errno values set by tr_sys_dir_create () and tr_sys_file_open ().
  */
+// TODO: remove goto
 static int cached_file_open(
     struct tr_cached_file* o,
     char const* filename,
@@ -154,10 +155,10 @@ static int cached_file_open(
     tr_preallocation_mode allocation,
     uint64_t file_size)
 {
-    int flags;
-    tr_sys_path_info info;
-    bool already_existed;
-    bool resize_needed;
+    int flags = 0;
+    tr_sys_path_info info = {};
+    bool already_existed = false;
+    bool resize_needed = false;
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
     tr_error* error = nullptr;
 
@@ -380,11 +381,10 @@ static void ensureSessionFdInfoExists(tr_session* session)
 
     if (session->fdInfo == nullptr)
     {
-        struct tr_fdInfo* i;
         int const FILE_CACHE_SIZE = 32;
 
         /* Create the local file cache */
-        i = tr_new0(struct tr_fdInfo, 1);
+        auto* const i = tr_new0(struct tr_fdInfo, 1);
         fileset_construct(&i->fileset, FILE_CACHE_SIZE);
         session->fdInfo = i;
     }
@@ -418,9 +418,8 @@ static struct tr_fileset* get_fileset(tr_session* session)
 
 void tr_fdFileClose(tr_session* s, tr_torrent const* tor, tr_file_index_t i)
 {
-    struct tr_cached_file* o;
-
-    if ((o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i)) != nullptr)
+    tr_cached_file* const o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i);
+    if (o != nullptr)
     {
         /* flush writable files so that their mtimes will be
          * up-to-date when this function returns to the caller... */
@@ -521,10 +520,9 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
     TR_ASSERT(tr_isSession(session));
 
     tr_socket_t s = TR_BAD_SOCKET;
-    struct tr_fdInfo* gFd;
 
     ensureSessionFdInfoExists(session);
-    gFd = session->fdInfo;
+    tr_fdInfo* gFd = session->fdInfo;
 
     if (gFd->peerCount < session->peerLimit)
     {
@@ -579,16 +577,12 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
     TR_ASSERT(addr != nullptr);
     TR_ASSERT(port != nullptr);
 
-    tr_socket_t fd;
-    socklen_t len;
-    struct tr_fdInfo* gFd;
-    struct sockaddr_storage sock;
-
     ensureSessionFdInfoExists(s);
-    gFd = s->fdInfo;
+    tr_fdInfo* const gFd = s->fdInfo;
 
-    len = sizeof(struct sockaddr_storage);
-    fd = accept(sockfd, (struct sockaddr*)&sock, &len);
+    struct sockaddr_storage sock;
+    socklen_t len = sizeof(struct sockaddr_storage);
+    tr_socket_t fd = accept(sockfd, (struct sockaddr*)&sock, &len);
 
     if (fd != TR_BAD_SOCKET)
     {
