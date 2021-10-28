@@ -465,8 +465,6 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-#include <iostream>
-
 static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
 {
     if (b->hasAll())
@@ -486,19 +484,16 @@ static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
 
 static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
 {
-    if (rawlen == 3 && memcmp(raw, "all", 3) == 0)
-    {
-        bitfield.setHasAll();
-    }
-    else if (rawlen == 4 && memcmp(raw, "none", 4) == 0)
+    if (raw == nullptr || rawlen == 0 || (rawlen == 4 && memcmp(raw, "none", 4) == 0))
     {
         bitfield.setHasNone();
     }
+    else if (rawlen == 3 && memcmp(raw, "all", 3) == 0)
+    {
+        bitfield.setHasAll();
+    }
     else
     {
-        std::cout << "bitfield size is " << std::size(bitfield) << std::endl;
-        std::cout << "first raw byte is " << *raw << std::endl;
-        std::cout << "rawlen len is " << rawlen << std::endl;
         bitfield.setRaw(raw, rawlen, true);
     }
 }
