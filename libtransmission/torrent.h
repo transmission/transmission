@@ -143,16 +143,17 @@ struct tr_torrent
     char errorString[128];
     char errorTracker[128];
 
-    // dnd
+    /// DND
 
-    tr_bitfield dnd_pieces = tr_bitfield{ 0 };
+    tr_bitfield dnd_pieces_ = tr_bitfield{ 0 };
 
-    bool isPieceDND(tr_piece_index_t piece) const
+    bool pieceIsDnd(tr_piece_index_t piece) const
     {
-        return dnd_pieces.test(piece);
+        return dnd_pieces_.test(piece);
     }
 
-    // priorities
+    /// PRIORITIES
+
     // since 'TR_PRI_NORMAL' is by far the most common, save some
     // space by treating anything not in the map as normal
     std::unordered_map<tr_piece_index_t, tr_priority_t> piece_priorities_;
@@ -179,7 +180,7 @@ struct tr_torrent
         return it->second;
     }
 
-    // checksums
+    /// CHECKSUMS
 
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
@@ -221,7 +222,7 @@ struct tr_torrent
         }
     }
 
-    //
+    ///
 
     uint8_t obfuscatedHash[SHA_DIGEST_LENGTH];
 

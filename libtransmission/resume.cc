@@ -505,7 +505,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    size_t n = inf->fileCount;
+    size_t const n = inf->fileCount;
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
     for (auto const *file = inf->files, *end = file + inf->fileCount; file != end; ++file)
     {
@@ -526,8 +526,8 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 }
 
 /*
- * This has gone through a couple of iterations to try and get it right.
- * So the code has added complexity to support older approaches.
+ * Transmisison has iterated through a few strategies here, so the
+ * code has some added complexity to support older approaches.
  *
  * Current approach: 'progress' is a dict with two entries:
  * - 'pieces' a bitfield for whether each piece has been checked.

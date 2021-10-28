@@ -46,6 +46,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_sha1_ctx_t sha = tr_sha1_init();
 
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
+    tor->verify_progress = 0;
 
     while (!*stopFlag && pieceIndex < tor->info.pieceCount)
     {

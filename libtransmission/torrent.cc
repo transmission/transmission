@@ -863,7 +863,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = tr_sessionCountTorrents(session);
 
-    tor->dnd_pieces = tr_bitfield{ tor->info.pieceCount };
+    tor->dnd_pieces_ = tr_bitfield{ tor->info.pieceCount };
+    tor->checked_pieces_ = tr_bitfield{ tor->info.pieceCount };
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
 
@@ -2339,17 +2340,19 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
         lastPieceDND = tor->info.files[i].dnd;
     }
 
+    // update dnd_pieces_
+
     if (firstPiece == lastPiece)
     {
-        tor->dnd_pieces.set(firstPiece, firstPieceDND && lastPieceDND);
+        tor->dnd_pieces_.set(firstPiece, firstPieceDND && lastPieceDND);
     }
     else
     {
-        tor->dnd_pieces.set(firstPiece, firstPieceDND);
-        tor->dnd_pieces.set(lastPiece, lastPieceDND);
+        tor->dnd_pieces_.set(firstPiece, firstPieceDND);
+        tor->dnd_pieces_.set(lastPiece, lastPieceDND);
         for (tr_piece_index_t pp = firstPiece + 1; pp < lastPiece; ++pp)
         {
-            tor->dnd_pieces.set(pp, dnd);
+            tor->dnd_pieces_.set(pp, dnd);
         }
     }
 }
@@ -2593,40 +2596,6 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
     }
 
     return mtime;
-}
-
-bool tr_torrentPieceNeedsCheck(tr_torrent const* /*tor*/, tr_piece_index_t /*p*/)
-{
-    // FIXME(working)
-#if 0
-    tr_info const* const inf = tr_torrentInfo(tor);
-    if (inf == nullptr)
-    {
-        return false;
-    }
-
-    /* if we've never checked this piece, then it needs to be checked */
-    if (inf->pieces[p].timeChecked == 0)
-    {
-        return true;
-    }
-
-    /* If we think we've completed one of the files in this piece,
-     * but it's been modified since we last checked it,
-     * then it needs to be rechecked */
-    auto f = tr_file_index_t{};
-    auto unused = uint64_t{};
-    tr_ioFindFileLocation(tor, p, 0, &f, &unused);
-
-    for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
-    {
-        if (tr_cpFileIsComplete(&tor->completion, i) && (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked))
-        {
-            return true;
-        }
-    }
-#endif
-    return false;
 }
 
 /***

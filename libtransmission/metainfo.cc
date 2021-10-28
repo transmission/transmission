@@ -21,7 +21,6 @@
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
-#include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
