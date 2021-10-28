@@ -514,7 +514,7 @@ static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
 
 static constexpr bool atomIsSeed(struct peer_atom const* atom)
 {
-    return (atom->flags & ADDED_F_SEED_FLAG) != 0;
+    return (atom != nullptr) && ((atom->flags & ADDED_F_SEED_FLAG) != 0);
 }
 
 static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
@@ -1215,86 +1215,68 @@ bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_blo
 /* cancel requests that are too old */
 static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
-    int cancel_buflen = 0;
-    struct block_request* cancel = nullptr;
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     managerLock(mgr);
 
+    /* prune requests that are too old */
     time_t const now = tr_time();
     time_t const too_old = now - RequestTtlSecs;
-
-    /* alloc the temporary "cancel" buffer */
-    for (auto const* tor : mgr->session->torrents)
-    {
-        cancel_buflen = std::max(cancel_buflen, tor->swarm->requestCount);
-    }
-
-    if (cancel_buflen > 0)
-    {
-        cancel = tr_new(struct block_request, cancel_buflen);
-    }
-
-    /* prune requests that are too old */
+    auto cancel = std::vector<block_request>{};
     for (auto* tor : mgr->session->torrents)
     {
         tr_swarm* s = tor->swarm;
         int const n = s->requestCount;
-
-        if (n > 0)
+        if (n <= 0) // no requests to cull
         {
-            int keepCount = 0;
-            int cancelCount = 0;
+            continue;
+        }
 
-            for (int i = 0; i < n; ++i)
+        int keepCount = 0;
+        cancel.clear();
+        cancel.reserve(n);
+
+        for (int i = 0; i < n; ++i)
+        {
+            struct block_request const* const request = &s->requests[i];
+            auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(request->peer);
+
+            if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
             {
-                struct block_request const* const request = &s->requests[i];
-                auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(request->peer);
-
-                if (msgs != nullptr && request->sentAt <= too_old && !msgs->is_reading_block(request->block))
-                {
-                    TR_ASSERT(cancel != nullptr);
-                    TR_ASSERT(cancelCount < cancel_buflen);
-
-                    cancel[cancelCount++] = *request;
-                }
-                else
-                {
-                    if (i != keepCount)
-                    {
-                        s->requests[keepCount] = *request;
-                    }
-
-                    ++keepCount;
-                }
+                cancel.push_back(*request);
             }
-
-            /* prune out the ones we aren't keeping */
-            s->requestCount = keepCount;
-
-            /* send cancel messages for all the "cancel" ones */
-            for (int i = 0; i < cancelCount; ++i)
+            else
             {
-                struct block_request const* const request = &cancel[i];
-                auto* msgs = dynamic_cast<tr_peerMsgs*>(request->peer);
-                if (msgs != nullptr)
+                if (i != keepCount)
                 {
-                    request->peer->cancelsSentToPeer.add(now, 1);
-                    msgs->cancel_block_request(request->block);
-                    decrementPendingReqCount(request);
+                    s->requests[keepCount] = *request;
                 }
-            }
 
-            /* decrement the pending request counts for the timed-out blocks */
-            for (int i = 0; i < cancelCount; ++i)
+                ++keepCount;
+            }
+        }
+
+        /* prune out the ones we aren't keeping */
+        s->requestCount = keepCount;
+
+        /* send cancel messages for all the "cancel" ones */
+        for (auto& request : cancel)
+        {
+            auto* msgs = dynamic_cast<tr_peerMsgs*>(request.peer);
+            if (msgs != nullptr)
             {
-                struct block_request const* const request = &cancel[i];
-
-                pieceListRemoveRequest(s, request->block);
+                request.peer->cancelsSentToPeer.add(now, 1);
+                msgs->cancel_block_request(request.block);
+                decrementPendingReqCount(&request);
             }
+        }
+
+        /* decrement the pending request counts for the timed-out blocks */
+        for (auto& request : cancel)
+        {
+            pieceListRemoveRequest(s, request.block);
         }
     }
 
-    tr_free(cancel);
     tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
     managerUnlock(mgr);
 }
@@ -2339,17 +2321,7 @@ void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool 
 
 bool tr_peerIsSeed(tr_peer const* peer)
 {
-    if (peer->progress >= 1.0)
-    {
-        return true;
-    }
-
-    if (peer->atom != nullptr && atomIsSeed(peer->atom))
-    {
-        return true;
-    }
-
-    return false;
+    return (peer != nullptr) && ((peer->progress >= 1.0) || atomIsSeed(peer->atom));
 }
 
 /* count how many bytes we want that connected peers have */
@@ -2447,112 +2419,115 @@ double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
     return ret;
 }
 
+static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
+{
+    auto stats = tr_peer_stat{};
+    auto const* const atom = peer->atom;
+
+    tr_address_to_string_with_buf(&atom->addr, stats.addr, sizeof(stats.addr));
+    tr_strlcpy(stats.client, tr_quark_get_string(peer->client, nullptr), sizeof(stats.client));
+    stats.port = ntohs(peer->atom->port);
+    stats.from = atom->fromFirst;
+    stats.progress = peer->progress;
+    stats.isUTP = peer->is_utp_connection();
+    stats.isEncrypted = peer->is_encrypted();
+    stats.rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
+    stats.rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+    stats.peerIsChoked = peer->is_peer_choked();
+    stats.peerIsInterested = peer->is_peer_interested();
+    stats.clientIsChoked = peer->is_client_choked();
+    stats.clientIsInterested = peer->is_client_interested();
+    stats.isIncoming = peer->is_incoming_connection();
+    stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
+    stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
+    stats.isSeed = tr_peerIsSeed(peer);
+
+    stats.blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
+    stats.blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
+    stats.cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
+    stats.cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
+
+    stats.pendingReqsToPeer = peer->pendingReqsToPeer;
+    stats.pendingReqsToClient = peer->pendingReqsToClient;
+
+    char* pch = stats.flagStr;
+
+    if (stats.isUTP)
+    {
+        *pch++ = 'T';
+    }
+
+    if (peer->swarm->optimistic == peer)
+    {
+        *pch++ = 'O';
+    }
+
+    if (stats.isDownloadingFrom)
+    {
+        *pch++ = 'D';
+    }
+    else if (stats.clientIsInterested)
+    {
+        *pch++ = 'd';
+    }
+
+    if (stats.isUploadingTo)
+    {
+        *pch++ = 'U';
+    }
+    else if (stats.peerIsInterested)
+    {
+        *pch++ = 'u';
+    }
+
+    if (!stats.clientIsChoked && !stats.clientIsInterested)
+    {
+        *pch++ = 'K';
+    }
+
+    if (!stats.peerIsChoked && !stats.peerIsInterested)
+    {
+        *pch++ = '?';
+    }
+
+    if (stats.isEncrypted)
+    {
+        *pch++ = 'E';
+    }
+
+    if (stats.from == TR_PEER_FROM_DHT)
+    {
+        *pch++ = 'H';
+    }
+    else if (stats.from == TR_PEER_FROM_PEX)
+    {
+        *pch++ = 'X';
+    }
+
+    if (stats.isIncoming)
+    {
+        *pch++ = 'I';
+    }
+
+    *pch = '\0';
+
+    return stats;
+}
+
 struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
-
-    tr_swarm const* s = tor->swarm;
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
-    int size = tr_ptrArraySize(&s->peers);
+    tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&tor->swarm->peers);
+    int const size = tr_ptrArraySize(&tor->swarm->peers);
     tr_peer_stat* ret = tr_new0(tr_peer_stat, size);
 
+    time_t const now = tr_time();
+    uint64_t const now_msec = tr_time_msec();
     for (int i = 0; i < size; ++i)
     {
-        tr_peer* peer = peers[i];
-        auto const* const msgs = dynamic_cast<tr_peerMsgs const*>(peer);
-        struct peer_atom const* atom = peer->atom;
-        tr_peer_stat* stat = ret + i;
-
-        tr_address_to_string_with_buf(&atom->addr, stat->addr, sizeof(stat->addr));
-        tr_strlcpy(stat->client, tr_quark_get_string(peer->client, nullptr), sizeof(stat->client));
-        stat->port = ntohs(peer->atom->port);
-        stat->from = atom->fromFirst;
-        stat->progress = peer->progress;
-        stat->isUTP = msgs->is_utp_connection();
-        stat->isEncrypted = msgs->is_encrypted();
-        stat->rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-        stat->rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
-        stat->peerIsChoked = msgs->is_peer_choked();
-        stat->peerIsInterested = msgs->is_peer_interested();
-        stat->clientIsChoked = msgs->is_client_choked();
-        stat->clientIsInterested = msgs->is_client_interested();
-        stat->isIncoming = msgs->is_incoming_connection();
-        stat->isDownloadingFrom = msgs->is_active(TR_PEER_TO_CLIENT);
-        stat->isUploadingTo = msgs->is_active(TR_CLIENT_TO_PEER);
-        stat->isSeed = tr_peerIsSeed(peer);
-
-        stat->blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
-        stat->blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
-        stat->cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
-        stat->cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
-
-        stat->pendingReqsToPeer = peer->pendingReqsToPeer;
-        stat->pendingReqsToClient = peer->pendingReqsToClient;
-
-        char* pch = stat->flagStr;
-
-        if (stat->isUTP)
-        {
-            *pch++ = 'T';
-        }
-
-        if (s->optimistic == msgs)
-        {
-            *pch++ = 'O';
-        }
-
-        if (stat->isDownloadingFrom)
-        {
-            *pch++ = 'D';
-        }
-        else if (stat->clientIsInterested)
-        {
-            *pch++ = 'd';
-        }
-
-        if (stat->isUploadingTo)
-        {
-            *pch++ = 'U';
-        }
-        else if (stat->peerIsInterested)
-        {
-            *pch++ = 'u';
-        }
-
-        if (!stat->clientIsChoked && !stat->clientIsInterested)
-        {
-            *pch++ = 'K';
-        }
-
-        if (!stat->peerIsChoked && !stat->peerIsInterested)
-        {
-            *pch++ = '?';
-        }
-
-        if (stat->isEncrypted)
-        {
-            *pch++ = 'E';
-        }
-
-        if (stat->from == TR_PEER_FROM_DHT)
-        {
-            *pch++ = 'H';
-        }
-        else if (stat->from == TR_PEER_FROM_PEX)
-        {
-            *pch++ = 'X';
-        }
-
-        if (stat->isIncoming)
-        {
-            *pch++ = 'I';
-        }
-
-        *pch = '\0';
+        ret[i] = getPeerStats(peers[i], now, now_msec);
     }
 
     *setmeCount = size;
@@ -2888,7 +2863,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     TR_ASSERT(swarmIsLocked(s));
 
     int const peerCount = tr_ptrArraySize(&s->peers);
-    tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
+    tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&s->peers);
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
     bool const chokeAll = !tr_torrentIsPieceTransferAllowed(s->tor, TR_CLIENT_TO_PEER);
@@ -2910,7 +2885,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (int i = 0; i < peerCount; ++i)
     {
-        auto* const peer = dynamic_cast<tr_peerMsgs*>(peers[i]);
+        auto* const peer = peers[i];
         struct peer_atom* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
