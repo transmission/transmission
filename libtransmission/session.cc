@@ -576,9 +576,18 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
         tr_logAddError("Error while flushing completed pieces from cache");
     }
 
+    auto n_saved = size_t{};
     for (auto* tor : session->torrents)
     {
-        tr_torrentSave(tor);
+        if (tr_torrentSave(tor))
+        {
+            ++n_saved;
+        }
+    }
+
+    if (n_saved != 0)
+    {
+        tr_logAddInfo(_("Saved state of %zu torrents to disk"), n_saved);
     }
 
     tr_statsSaveDirty(session);

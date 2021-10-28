@@ -11,6 +11,7 @@
 #include <cstddef> // size_t
 #include <inttypes.h> // int64_t
 
+#include "transmission.h"
 #include "tr-macros.h"
 #include "quark.h"
 
@@ -105,7 +106,7 @@ enum tr_variant_fmt
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
 };
 
-int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
+int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename, tr_log_level log_level = TR_LOG_INFO);
 
 char* tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt, size_t* len);
 

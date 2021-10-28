@@ -1140,7 +1140,7 @@ static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file
     return err;
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
+int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename, tr_log_level log_level)
 {
     /* follow symlinks to find the "real" file, to make sure the temporary
      * we build with tr_sys_file_open_temp() is created on the right partition */
@@ -1158,7 +1158,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
     int err = 0;
     if (fd != TR_BAD_SYS_FILE)
     {
-        err = writeVariantToFd(v, fmt, fd, &error);
+        err = writeVariantToFd(variant, fmt, fd, &error);
         tr_sys_file_close(fd, nullptr);
 
         if (err)
@@ -1173,7 +1173,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 
             if (tr_sys_path_rename(tmp, filename, &error))
             {
-                tr_logAddInfo(_("Saved \"%s\""), filename);
+                tr_logAdd(log_level, _("Saved \"%s\""), filename);
             }
             else
             {

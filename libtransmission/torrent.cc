@@ -1851,15 +1851,18 @@ void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* 
     tr_runInEventThread(tor->session, verifyTorrent, data);
 }
 
-void tr_torrentSave(tr_torrent* tor)
+bool tr_torrentSave(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->isDirty)
+    if (!tor->isDirty)
     {
-        tor->isDirty = false;
-        tr_torrentSaveResume(tor);
+        return false;
     }
+
+    tor->isDirty = false;
+    tr_torrentSaveResume(tor);
+    return true;
 }
 
 static void stopTorrent(void* vtor)

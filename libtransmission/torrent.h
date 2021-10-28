@@ -94,7 +94,7 @@ void tr_torrentSetChecked(tr_torrent* tor, time_t when);
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
-void tr_torrentSave(tr_torrent* tor);
+bool tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
 
