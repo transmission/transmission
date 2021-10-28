@@ -465,6 +465,8 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
+#include <iostream>
+
 static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
 {
     if (b->hasAll())
@@ -494,6 +496,9 @@ static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawl
     }
     else
     {
+        std::cout << "bitfield size is " << std::size(bitfield) << std::endl;
+        std::cout << "first raw byte is " << *raw << std::endl;
+        std::cout << "rawlen len is " << rawlen << std::endl;
         bitfield.setRaw(raw, rawlen, true);
     }
 }
@@ -569,11 +574,6 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             {
                 mtimes.push_back(t);
             }
-            if (std::size(mtimes) != tor->info.fileCount)
-            {
-                tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(tor->info.fileCount));
-                mtimes.resize(tor->info.fileCount);
-            }
         }
 
         // try to load the piece-checked bitfield
@@ -614,8 +614,17 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                     }
                 }
 
-                f->mtime = time_checked;
+                mtimes.push_back(time_checked);
             }
+        }
+
+        if (std::size(mtimes) != tor->info.fileCount)
+        {
+            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(tor->info.fileCount));
+            // if resizing grows the vector, we'll get 0 mtimes for the
+            // new items which is exactly what we want since the pieces
+            // in an unknown state should be treated as untested
+            mtimes.resize(tor->info.fileCount);
         }
 
         tor->initCheckedPieces(checked, std::data(mtimes));
