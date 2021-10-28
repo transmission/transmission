@@ -265,7 +265,7 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
     auto buffer = std::vector<uint8_t>(tor->blockSize);
     auto bytes_left = size_t{ tr_torPieceCountBytes(tor, piece) };
     auto offset = uint32_t{};
-    auto sha = tr_sha1_ctx_t{};
+    auto sha = tr_sha1_init();
 
     tr_ioPrefetch(tor, piece, offset, bytes_left);
 
