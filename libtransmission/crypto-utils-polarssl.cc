@@ -281,6 +281,11 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
     tr_lock* rng_lock = get_rng_lock();
