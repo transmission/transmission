@@ -551,7 +551,6 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_ERROR:
-        tr_logAddTorErr(tor, _("Tracker error: \"%s\""), event->text);
         tor->error = TR_STAT_TRACKER_ERROR;
         tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
@@ -607,24 +606,23 @@ static constexpr bool pieceHasFile(tr_piece_index_t piece, tr_file const* file)
     return file->firstPiece <= piece && piece <= file->lastPiece;
 }
 
-static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_index_t piece, tr_file_index_t file_hint)
+static tr_priority_t calculatePiecePriority(tr_info const& info, tr_piece_index_t piece, tr_file_index_t file_hint)
 {
     // safeguard against a bad arg
-    tr_info const* const inf = tr_torrentInfo(tor);
-    file_hint = std::min(file_hint, inf->fileCount - 1);
+    file_hint = std::min(file_hint, info.fileCount - 1);
 
     // find the first file with data in this piece
     tr_file_index_t first = file_hint;
-    while (first > 0 && pieceHasFile(piece, &inf->files[first - 1]))
+    while (first > 0 && pieceHasFile(piece, &info.files[first - 1]))
     {
         --first;
     }
 
     // the priority is the max of all the file priorities in the piece
     tr_priority_t priority = TR_PRI_LOW;
-    for (tr_file_index_t i = first; i < inf->fileCount; ++i)
+    for (tr_file_index_t i = first; i < info.fileCount; ++i)
     {
-        tr_file const* file = &inf->files[i];
+        tr_file const* file = &info.files[i];
 
         if (!pieceHasFile(piece, file))
         {
@@ -704,7 +702,7 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
 
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
     {
-        inf->pieces[p].priority = calculatePiecePriority(tor, p, firstFiles[p]);
+        inf->pieces[p].priority = calculatePiecePriority(*inf, p, firstFiles[p]);
     }
 
     tr_free(firstFiles);
@@ -2091,6 +2089,28 @@ static std::string buildLabelsString(tr_torrent const* tor)
     return buf.str();
 }
 
+static std::string buildTrackersString(tr_torrent const* tor)
+{
+    auto buf = std::stringstream{};
+
+    int n = 0;
+    tr_tracker_stat* stats = tr_torrentTrackers(tor, &n);
+    for (int i = 0; i < n;)
+    {
+        tr_tracker_stat const* s = &stats[i];
+
+        buf << s->host;
+
+        if (++i < n)
+        {
+            buf << ',';
+        }
+    }
+    tr_torrentTrackersFree(stats, n);
+
+    return buf.str();
+}
+
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
     if (tr_str_is_empty(script))
@@ -2117,8 +2137,9 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
-        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
         tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
+        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+        tr_strdup_printf("TR_TORRENT_TRACKERS=%s", buildTrackersString(tor).c_str()),
         nullptr,
     };
 
@@ -2234,13 +2255,14 @@ void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_p
     TR_ASSERT(fileIndex < tor->info.fileCount);
     TR_ASSERT(tr_isPriority(priority));
 
-    tr_file* file = &tor->info.files[fileIndex];
+    auto& info = tor->info;
+    tr_file* file = &info.files[fileIndex];
 
     file->priority = priority;
 
     for (tr_piece_index_t i = file->firstPiece; i <= file->lastPiece; ++i)
     {
-        tor->info.pieces[i].priority = calculatePiecePriority(tor, i, fileIndex);
+        info.pieces[i].priority = calculatePiecePriority(info, i, fileIndex);
     }
 }
 
