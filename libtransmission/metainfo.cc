@@ -711,12 +711,8 @@ static char const* tr_metainfoParseImpl(
         }
 
         inf->pieceCount = len / SHA_DIGEST_LENGTH;
-        inf->pieces = tr_new0(tr_piece, inf->pieceCount);
-
-        for (tr_piece_index_t pi = 0; pi < inf->pieceCount; ++pi)
-        {
-            memcpy(inf->pieces[pi].hash, &raw[pi * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
-        }
+        inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
+        std::copy_n(raw, len, (uint8_t*)(inf->pieces));
     }
 
     /* files */

@@ -28,6 +28,7 @@
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 class tr_swarm;
+struct tr_torrent;
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 
@@ -95,10 +96,6 @@ tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t 
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
-void tr_torrentSetPieceChecked(tr_torrent* tor, tr_piece_index_t piece);
-
-void tr_torrentSetChecked(tr_torrent* tor, time_t when);
-
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
@@ -111,6 +108,8 @@ void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
 void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
+
+time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
 
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
     torrent's content than any other mime-type. */
@@ -129,13 +128,6 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 
 struct tr_incomplete_metadata;
 
-/** @brief a part of tr_info that represents a single piece of the torrent's content */
-struct tr_piece
-{
-    time_t timeChecked; /* the last time we tested this piece */
-    uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
-};
-
 /** @brief Torrent object */
 struct tr_torrent
 {
@@ -144,9 +136,14 @@ struct tr_torrent
 
     int magicNumber;
 
+    std::optional<double> verify_progress;
+    std::vector<tr_sha1_digest_t> piece_checksums;
+
     tr_stat_errtype error;
     char errorString[128];
     char errorTracker[128];
+
+    // dnd
 
     tr_bitfield dnd_pieces = tr_bitfield{ 0 };
 
@@ -155,7 +152,22 @@ struct tr_torrent
         return dnd_pieces.test(piece);
     }
 
+    // priorities
+    // since 'TR_PRI_NORMAL' is by far the most common, save some
+    // space by treating anything not in the map as normal
     std::unordered_map<tr_piece_index_t, tr_priority_t> piece_priorities_;
+
+    void setPiecePriority(tr_piece_index_t piece, tr_priority_t priority)
+    {
+        if (priority == TR_PRI_NORMAL)
+        {
+            piece_priorities_.erase(piece);
+        }
+        else
+        {
+            piece_priorities_[piece] = priority;
+        }
+    }
 
     tr_priority_t piecePriority(tr_piece_index_t piece) const
     {
@@ -166,6 +178,50 @@ struct tr_torrent
         }
         return it->second;
     }
+
+    // checksums
+
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
+
+    bool checkPiece(tr_piece_index_t piece);
+
+    bool ensurePieceIsChecked(tr_piece_index_t piece)
+    {
+        TR_ASSERT(piece < info.pieceCount);
+
+        if (checked_pieces_.test(piece))
+        {
+            return true;
+        }
+
+        bool const checked = checkPiece(piece);
+        this->anyDate = tr_time();
+        this->setDirty();
+
+        checked_pieces_.set(piece, checked);
+        return checked;
+    }
+
+    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount*/)
+    {
+        TR_ASSERT(std::size(checked) == info.pieceCount);
+        checked_pieces_ = checked;
+
+        for (size_t i = 0; i < info.fileCount; ++i)
+        {
+            auto const mtime = mtimes[i];
+
+            info.files[i].mtime = mtime;
+
+            // if a file has changed, mark its pieces as unchecked
+            if (mtime != tr_torrentGetFileMTime(this, i))
+            {
+                checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
+            }
+        }
+    }
+
+    //
 
     uint8_t obfuscatedHash[SHA_DIGEST_LENGTH];
 
@@ -271,6 +327,12 @@ struct tr_torrent
     bool isDeleting;
     bool startAfterVerify;
     bool isDirty;
+
+    void setDirty()
+    {
+        this->isDirty = true;
+    }
+
     bool isQueued;
 
     bool prefetchMagnetMetadata;
@@ -439,17 +501,10 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent*, tr_direction, unsigned int Bps);
 unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const*, tr_direction);
 
 /**
- * @return true if this piece needs to be tested
- */
-bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t pieceIndex);
-
-/**
  * @brief Test a piece against its info dict checksum
  * @return true if the piece's passes the checksum test
  */
 bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
-
-time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
 
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
