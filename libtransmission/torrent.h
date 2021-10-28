@@ -15,10 +15,12 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "bandwidth.h" /* tr_bandwidth */
+#include "bitfield.h"
 #include "completion.h" /* tr_completion */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
@@ -127,6 +129,13 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 
 struct tr_incomplete_metadata;
 
+/** @brief a part of tr_info that represents a single piece of the torrent's content */
+struct tr_piece
+{
+    time_t timeChecked; /* the last time we tested this piece */
+    uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
+};
+
 /** @brief Torrent object */
 struct tr_torrent
 {
@@ -138,6 +147,25 @@ struct tr_torrent
     tr_stat_errtype error;
     char errorString[128];
     char errorTracker[128];
+
+    tr_bitfield dnd_pieces = tr_bitfield{ 0 };
+
+    bool isPieceDND(tr_piece_index_t piece) const
+    {
+        return dnd_pieces.test(piece);
+    }
+
+    std::unordered_map<tr_piece_index_t, tr_priority_t> piece_priorities_;
+
+    tr_priority_t piecePriority(tr_piece_index_t piece) const
+    {
+        auto const it = piece_priorities_.find(piece);
+        if (it == std::end(piece_priorities_))
+        {
+            return TR_PRI_NORMAL;
+        }
+        return it->second;
+    }
 
     uint8_t obfuscatedHash[SHA_DIGEST_LENGTH];
 

@@ -700,9 +700,14 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
 
 #endif
 
+    tor->piece_priorities_ = std::unordered_map<tr_piece_index_t, tr_priority_t>{};
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
     {
-        inf->pieces[p].priority = calculatePiecePriority(*inf, p, firstFiles[p]);
+        auto const priority = calculatePiecePriority(*inf, p, firstFiles[p]);
+        if (priority != TR_PRI_NORMAL)
+        {
+            tor->piece_priorities_[p] = priority;
+        }
     }
 
     tr_free(firstFiles);
@@ -861,6 +866,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = tr_sessionCountTorrents(session);
+
+    tor->dnd_pieces = tr_bitfield{ tor->info.pieceCount };
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
 
@@ -2262,7 +2269,16 @@ void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_p
 
     for (tr_piece_index_t i = file->firstPiece; i <= file->lastPiece; ++i)
     {
-        info.pieces[i].priority = calculatePiecePriority(info, i, fileIndex);
+        auto const piece_priority = calculatePiecePriority(info, i, fileIndex);
+
+        if (piece_priority == TR_PRI_NORMAL)
+        {
+            tor->piece_priorities_.erase(i);
+        }
+        else
+        {
+            tor->piece_priorities_[i] = piece_priority;
+        }
     }
 }
 
@@ -2355,16 +2371,15 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
 
     if (firstPiece == lastPiece)
     {
-        tor->info.pieces[firstPiece].dnd = firstPieceDND && lastPieceDND;
+        tor->dnd_pieces.set(firstPiece, firstPieceDND && lastPieceDND);
     }
     else
     {
-        tor->info.pieces[firstPiece].dnd = firstPieceDND;
-        tor->info.pieces[lastPiece].dnd = lastPieceDND;
-
+        tor->dnd_pieces.set(firstPiece, firstPieceDND);
+        tor->dnd_pieces.set(lastPiece, lastPieceDND);
         for (tr_piece_index_t pp = firstPiece + 1; pp < lastPiece; ++pp)
         {
-            tor->info.pieces[pp].dnd = dnd;
+            tor->dnd_pieces.set(pp, dnd);
         }
     }
 }

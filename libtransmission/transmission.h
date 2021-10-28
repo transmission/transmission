@@ -37,6 +37,7 @@ using tr_port = uint16_t;
 struct tr_ctor;
 struct tr_error;
 struct tr_info;
+struct tr_piece;
 struct tr_session;
 struct tr_torrent;
 struct tr_variant;
@@ -1592,15 +1593,6 @@ struct tr_file
     tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
     tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     uint64_t offset; /* file begins at the torrent's nth byte */
-};
-
-/** @brief a part of tr_info that represents a single piece of the torrent's content */
-struct tr_piece
-{
-    time_t timeChecked; /* the last time we tested this piece */
-    uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
-    int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    bool dnd; /* "do not download" flag */
 };
 
 /** @brief information about a torrent that comes from its metainfo file */
