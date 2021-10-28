@@ -8,12 +8,12 @@
 
 #include <algorithm>
 #include <iostream>
-#include <map>
+#include <functional>
 #include <memory>
 #include <numeric>
 #include <utility>
 #include <unordered_map>
-#include <set>
+#include <unordered_set>
 #include <vector>
 
 #define LIBTRANSMISSION_PEER_MODULE
@@ -44,9 +44,22 @@ struct peer_at
         return 0;
     }
 
+    bool operator==(peer_at const& that) const
+    {
+        return compare(that) == 0;
+    }
+
     bool operator<(peer_at const& that) const
     {
         return compare(that) < 0;
+    }
+};
+
+struct PeerAtHash
+{
+    std::size_t operator()(peer_at const& pa) const noexcept
+    {
+        return std::hash<tr_peer*>{}(pa.peer);
     }
 };
 
@@ -91,7 +104,7 @@ public:
 
     std::unordered_map<tr_peer const*, size_t> count_;
 
-    std::map<tr_block_index_t, std::set<peer_at>> blocks_;
+    std::unordered_map<tr_block_index_t, std::unordered_set<peer_at, PeerAtHash>> blocks_;
 
 private:
     size_t size_ = 0;
