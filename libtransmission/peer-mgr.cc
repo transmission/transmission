@@ -3184,14 +3184,16 @@ static void closePeer(tr_peer* peer)
     removePeer(peer);
 }
 
-static void removeAllPeers(tr_swarm* s)
+static void removeAllPeers(tr_swarm* swarm)
 {
-    while (!tr_ptrArrayEmpty(&s->peers))
+    size_t const n = tr_ptrArraySize(&swarm->peers);
+    auto** base = (tr_peer**)tr_ptrArrayBase(&swarm->peers);
+    for (auto* peer : std::vector<tr_peer*>{ base, base + n })
     {
-        removePeer(static_cast<tr_peer*>(tr_ptrArrayNth(&s->peers, 0)));
+        removePeer(peer);
     }
 
-    TR_ASSERT(s->stats.peerCount == 0);
+    TR_ASSERT(swarm->stats.peerCount == 0);
 }
 
 static void closeBadPeers(tr_swarm* s, time_t const now_sec)
