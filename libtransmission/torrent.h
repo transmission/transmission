@@ -210,12 +210,12 @@ struct tr_torrent
 
         for (size_t i = 0; i < info.fileCount; ++i)
         {
-            auto const mtime = mtimes[i];
+            auto const mtime = tr_torrentGetFileMTime(this, i);
 
             info.files[i].mtime = mtime;
 
             // if a file has changed, mark its pieces as unchecked
-            if (mtime != tr_torrentGetFileMTime(this, i))
+            if (mtime != mtimes[i])
             {
                 checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
             }
