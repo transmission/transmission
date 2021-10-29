@@ -605,7 +605,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                     {
                         int64_t piece_time = 0;
                         tr_variantGetInt(tr_variantListChild(b, i + 1), &piece_time);
-                        time_checked = std::min(time_checked, piece_time);
+                        time_checked = std::min(time_checked, time_t(piece_time));
                     }
                 }
 
