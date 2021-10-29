@@ -2129,8 +2129,6 @@ static void sessionLoadTorrents(void* vdata)
                 {
                     torrents.push_back(tor);
                 }
-
-                tr_free(path);
             }
         }
 
