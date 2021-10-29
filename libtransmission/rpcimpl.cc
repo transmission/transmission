@@ -879,7 +879,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     char const* strVal = nullptr;
-    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") ?
+    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") == 0 ?
         TR_FORMAT_TABLE :
         TR_FORMAT_OBJECT;
 
