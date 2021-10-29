@@ -2116,11 +2116,12 @@ static void sessionLoadTorrents(void* vdata)
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
+        char path[TR_PATH_MAX] = {};
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (tr_str_has_suffix(name, ".torrent"))
             {
-                char* const path = tr_buildPath(dirname, name, nullptr);
+                tr_buildPathInBuf(path, sizeof(path), dirname, name, nullptr);
                 tr_ctorSetMetainfoFromFile(data->ctor, path);
 
                 tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr, nullptr);

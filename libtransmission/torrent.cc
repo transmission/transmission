@@ -3312,7 +3312,8 @@ static void find_file_in_dir(
     char const** subpath,
     tr_sys_path_info* file_info)
 {
-    char* filename = tr_buildPath(search_dir, name, nullptr);
+    char filename[TR_PATH_MAX] = {};
+    tr_buildPathInBuf(filename, sizeof(filename), search_dir, name, nullptr);
 
     if (tr_sys_path_get_info(filename, 0, file_info, nullptr))
     {

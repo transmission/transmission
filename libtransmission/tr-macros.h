@@ -117,6 +117,9 @@
 
 #define TR_ADDRSTRLEN 64
 
+// PATH_MAX is bullshit
+auto inline constexpr TR_PATH_MAX = size_t{ 4096 };
+
 #define TR_BAD_SIZE ((size_t)-1)
 
 // Mostly to enforce better formatting

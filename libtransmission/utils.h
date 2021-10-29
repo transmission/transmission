@@ -80,6 +80,8 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
+bool tr_buildPathInBuf(char* buf, size_t buflen, char const* first_element, ...);
+
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
