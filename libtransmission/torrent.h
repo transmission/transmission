@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -163,6 +163,12 @@ struct tr_torrent
         if (priority == TR_PRI_NORMAL)
         {
             piece_priorities_.erase(piece);
+
+            if (std::empty(piece_priorities_))
+            {
+                // ensure we release piece_priorities_' internal memory
+                piece_priorities_ = decltype(piece_priorities_){};
+            }
         }
         else
         {
