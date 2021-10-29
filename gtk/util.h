@@ -154,7 +154,7 @@ inline T gtr_str_strip(T const& text)
 {
     auto const new_begin = text.find_first_not_of("\t\n\v\f\r ");
     auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
-    return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin);
+    return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
 
 namespace gtr_detail
