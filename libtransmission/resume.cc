@@ -467,13 +467,13 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 
 static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
 {
-    if (b->hasAll())
-    {
-        tr_variantInitStr(benc, "all"sv);
-    }
-    else if (b->hasNone())
+    if (b->hasNone() || std::size(*b) == 0)
     {
         tr_variantInitStr(benc, "none"sv);
+    }
+    else if (b->hasAll())
+    {
+        tr_variantInitStr(benc, "all"sv);
     }
     else
     {
