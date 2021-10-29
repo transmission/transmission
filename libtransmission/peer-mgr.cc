@@ -801,8 +801,8 @@ static int comparePieceByWeight(void const* va, void const* vb)
     }
 
     /* secondary key: higher priorities go first */
-    ia = tor->info.pieces[a->index].priority;
-    ib = tor->info.pieces[b->index].priority;
+    ia = tor->piecePriority(a->index);
+    ib = tor->piecePriority(b->index);
     if (ia != ib)
     {
         return ia > ib ? -1 : 1;
@@ -900,7 +900,7 @@ static void pieceListRebuild(tr_swarm* s)
         auto* const pool = tr_new(tr_piece_index_t, inf->pieceCount);
         for (tr_piece_index_t i = 0; i < inf->pieceCount; ++i)
         {
-            if (!inf->pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i))
+            if (!tor->pieceIsDnd(i) && !tr_torrentPieceIsComplete(tor, i))
             {
                 pool[poolCount++] = i;
             }
@@ -2378,7 +2378,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (size_t i = 0; i < n_pieces; ++i)
     {
-        if (!tor->info.pieces[i].dnd && have.at(i))
+        if (!tor->pieceIsDnd(i) && have.at(i))
         {
             desired_available += tr_torrentMissingBytesInPiece(tor, i);
         }
@@ -2706,7 +2706,7 @@ static void rechokeDownloads(tr_swarm* s)
 
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = !tor->info.pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i);
+            piece_is_interesting[i] = !tor->pieceIsDnd(i) && !tr_torrentPieceIsComplete(tor, i);
         }
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */

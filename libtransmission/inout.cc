@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <cstdlib> /* bsearch() */
 #include <cstring> /* memcmp() */
+#include <optional>
 
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock() */
@@ -256,49 +257,39 @@ int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uin
 *****
 ****/
 
-static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_t* setme)
+static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
-    TR_ASSERT(pieceIndex < tor->info.pieceCount);
-    TR_ASSERT(setme != nullptr);
+    TR_ASSERT(piece < tor->info.pieceCount);
 
-    uint32_t offset = 0;
-    bool success = true;
-    size_t const buflen = tor->blockSize;
-    void* const buffer = tr_malloc(buflen);
+    auto bytes_left = size_t{ tr_torPieceCountBytes(tor, piece) };
+    auto offset = uint32_t{};
+    tr_ioPrefetch(tor, piece, offset, bytes_left);
 
-    TR_ASSERT(buffer != nullptr);
-    TR_ASSERT(buflen > 0);
-
-    tr_sha1_ctx_t sha = tr_sha1_init();
-    size_t bytesLeft = tr_torPieceCountBytes(tor, pieceIndex);
-
-    tr_ioPrefetch(tor, pieceIndex, offset, bytesLeft);
-
-    while (bytesLeft != 0)
+    auto sha = tr_sha1_init();
+    auto buffer = std::vector<uint8_t>(tor->blockSize);
+    while (bytes_left != 0)
     {
-        size_t const len = std::min(bytesLeft, buflen);
-        success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, static_cast<uint8_t*>(buffer)) == 0;
-
+        size_t const len = std::min(bytes_left, std::size(buffer));
+        auto const success = tr_cacheReadBlock(tor->session->cache, tor, piece, offset, len, std::data(buffer)) == 0;
         if (!success)
         {
-            break;
+            tr_sha1_final(sha, nullptr);
+            return {};
         }
 
-        tr_sha1_update(sha, buffer, len);
+        tr_sha1_update(sha, std::data(buffer), len);
         offset += len;
-        bytesLeft -= len;
+        bytes_left -= len;
     }
 
-    tr_sha1_final(sha, success ? setme : nullptr);
-
-    tr_free(buffer);
-    return success;
+    auto digest = tr_sha1_digest_t{};
+    tr_sha1_final(sha, std::data(digest));
+    return digest;
 }
 
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
 {
-    uint8_t hash[SHA_DIGEST_LENGTH];
-
-    return recalculateHash(tor, piece, hash) && memcmp(hash, tor->info.pieces[piece].hash, SHA_DIGEST_LENGTH) == 0;
+    auto const hash = recalculateHash(tor, piece);
+    return hash && *hash == tor->info.pieces[piece];
 }

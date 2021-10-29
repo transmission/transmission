@@ -700,9 +700,10 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
 
 #endif
 
+    tor->piece_priorities_.clear();
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
     {
-        inf->pieces[p].priority = calculatePiecePriority(*inf, p, firstFiles[p]);
+        tor->setPiecePriority(p, calculatePiecePriority(*inf, p, firstFiles[p]));
     }
 
     tr_free(firstFiles);
@@ -861,6 +862,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = tr_sessionCountTorrents(session);
+
+    tor->dnd_pieces_ = tr_bitfield{ tor->info.pieceCount };
+    tor->checked_pieces_ = tr_bitfield{ tor->info.pieceCount };
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
 
@@ -1234,24 +1238,7 @@ static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
 
 static double getVerifyProgress(tr_torrent const* tor)
 {
-    double d = 0;
-
-    if (tr_torrentHasMetadata(tor))
-    {
-        tr_piece_index_t checked = 0;
-
-        for (tr_piece_index_t i = 0; i < tor->info.pieceCount; ++i)
-        {
-            if (tor->info.pieces[i].timeChecked != 0)
-            {
-                ++checked;
-            }
-        }
-
-        d = checked / (double)tor->info.pieceCount;
-    }
-
-    return d;
+    return tor->verify_progress ? *tor->verify_progress : 0.0;
 }
 
 tr_stat const* tr_torrentStat(tr_torrent* tor)
@@ -2262,7 +2249,7 @@ void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_p
 
     for (tr_piece_index_t i = file->firstPiece; i <= file->lastPiece; ++i)
     {
-        info.pieces[i].priority = calculatePiecePriority(info, i, fileIndex);
+        tor->setPiecePriority(i, calculatePiecePriority(info, i, fileIndex));
     }
 }
 
@@ -2353,18 +2340,19 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
         lastPieceDND = tor->info.files[i].dnd;
     }
 
+    // update dnd_pieces_
+
     if (firstPiece == lastPiece)
     {
-        tor->info.pieces[firstPiece].dnd = firstPieceDND && lastPieceDND;
+        tor->dnd_pieces_.set(firstPiece, firstPieceDND && lastPieceDND);
     }
     else
     {
-        tor->info.pieces[firstPiece].dnd = firstPieceDND;
-        tor->info.pieces[lastPiece].dnd = lastPieceDND;
-
+        tor->dnd_pieces_.set(firstPiece, firstPieceDND);
+        tor->dnd_pieces_.set(lastPiece, lastPieceDND);
         for (tr_piece_index_t pp = firstPiece + 1; pp < lastPiece; ++pp)
         {
-            tor->info.pieces[pp].dnd = dnd;
+            tor->dnd_pieces_.set(pp, dnd);
         }
     }
 }
@@ -2590,34 +2578,11 @@ tr_block_range tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t 
 ****
 ***/
 
-void tr_torrentSetPieceChecked(tr_torrent* tor, tr_piece_index_t pieceIndex)
+// TODO: should be const after tr_ioTestPiece() is const
+bool tr_torrent::checkPiece(tr_piece_index_t piece)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(pieceIndex < tor->info.pieceCount);
-
-    tor->info.pieces[pieceIndex].timeChecked = tr_time();
-}
-
-void tr_torrentSetChecked(tr_torrent* tor, time_t when)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    for (tr_piece_index_t i = 0; i < tor->info.pieceCount; ++i)
-    {
-        tor->info.pieces[i].timeChecked = when;
-    }
-}
-
-bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
-{
-    bool const pass = tr_ioTestPiece(tor, pieceIndex);
-
-    tr_deeplog_tor(tor, "[LAZY] tr_torrentCheckPiece tested piece %zu, pass==%d", (size_t)pieceIndex, (int)pass);
-    tr_torrentSetHasPiece(tor, pieceIndex, pass);
-    tr_torrentSetPieceChecked(tor, pieceIndex);
-    tor->anyDate = tr_time();
-    tr_torrentSetDirty(tor);
-
+    bool const pass = tr_ioTestPiece(this, piece);
+    tr_logAddTorDbg(this, "[LAZY] tr_torrent.checkPiece tested piece %zu, pass==%d", size_t(piece), int(pass));
     return pass;
 }
 
@@ -2631,38 +2596,6 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
     }
 
     return mtime;
-}
-
-bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
-{
-    tr_info const* const inf = tr_torrentInfo(tor);
-    if (inf == nullptr)
-    {
-        return false;
-    }
-
-    /* if we've never checked this piece, then it needs to be checked */
-    if (inf->pieces[p].timeChecked == 0)
-    {
-        return true;
-    }
-
-    /* If we think we've completed one of the files in this piece,
-     * but it's been modified since we last checked it,
-     * then it needs to be rechecked */
-    auto f = tr_file_index_t{};
-    auto unused = uint64_t{};
-    tr_ioFindFileLocation(tor, p, 0, &f, &unused);
-
-    for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
-    {
-        if (tr_cpFileIsComplete(&tor->completion, i) && (tr_torrentGetFileMTime(tor, i) > inf->pieces[p].timeChecked))
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /***
@@ -3277,8 +3210,8 @@ std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
 
 static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
 {
-    tr_info const* inf = &tor->info;
-    tr_file const* f = &inf->files[fileIndex];
+    tr_info const* const inf = &tor->info;
+    tr_file* const f = &inf->files[fileIndex];
     time_t const now = tr_time();
 
     /* close the file so that we can reopen in read-only mode as needed */
@@ -3287,10 +3220,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
-    for (tr_piece_index_t i = f->firstPiece; i <= f->lastPiece; ++i)
-    {
-        inf->pieces[i].timeChecked = now;
-    }
+    f->mtime = now;
 
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
@@ -3351,9 +3281,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
         if (tr_torrentPieceIsComplete(tor, p))
         {
-            tr_logAddTorDbg(tor, "[LAZY] checking just-completed piece %zu", (size_t)p);
-
-            if (tr_torrentCheckPiece(tor, p))
+            if (tor->checkPiece(p))
             {
                 tr_torrentPieceCompleted(tor, p);
             }

@@ -2216,10 +2216,9 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_commit_space(out, iovec, 1);
 
             /* check the piece if it needs checking... */
-            if (!err && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))
+            if (!err)
             {
-                err = !tr_torrentCheckPiece(msgs->torrent, req.index);
-
+                err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
                     tr_torrentSetLocalError(
