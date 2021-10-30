@@ -34,12 +34,11 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 } // unnamed namespace
 
-static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
+static void getResumeFilename(char* buf, size_t buflen, tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
     char* base = tr_metainfoGetBasename(tr_torrentInfo(tor), format);
-    char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.resume", tr_getResumeDir(tor->session), base);
+    tr_buildBuf(buf, buflen, tr_getResumeDir(tor->session), TR_PATH_DELIMITER, base, ".resume");
     tr_free(base);
-    return filename;
 }
 
 /***
@@ -727,7 +726,8 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
+    char filename[TR_PATH_MAX] = {};
+    getResumeFilename(filename, sizeof(filename), tor, TR_METAINFO_BASENAME_HASH);
     int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
     if (err != 0)
     {
@@ -756,22 +756,22 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         *didRenameToHashOnlyName = false;
     }
 
-    char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
+    char filename[TR_PATH_MAX] = {};
+    getResumeFilename(filename, sizeof(filename), tor, TR_METAINFO_BASENAME_HASH);
 
     if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, &error))
     {
         tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename, error->message);
         tr_error_clear(&error);
 
-        char* old_filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+        char old_filename[TR_PATH_MAX] = {};
+        getResumeFilename(old_filename, sizeof(old_filename), tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
 
         if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, old_filename, &error))
         {
             tr_logAddTorDbg(tor, "Couldn't read \"%s\" either: %s", old_filename, error->message);
             tr_error_free(error);
 
-            tr_free(old_filename);
-            tr_free(filename);
             return fieldsLoaded;
         }
 
@@ -784,8 +784,6 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
                 *didRenameToHashOnlyName = true;
             }
         }
-
-        tr_free(old_filename);
     }
 
     tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename);
@@ -943,7 +941,6 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     tor->isDirty = wasDirty;
 
     tr_variantFree(&top);
-    tr_free(filename);
     return fieldsLoaded;
 }
 
