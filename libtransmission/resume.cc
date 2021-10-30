@@ -733,7 +733,6 @@ void tr_torrentSaveResume(tr_torrent* tor)
     {
         tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
     }
-    tr_free(filename);
 
     tr_variantFree(&top);
 }
