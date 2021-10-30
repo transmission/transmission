@@ -31,13 +31,6 @@
 #include "utils.h"
 #include "variant.h"
 
-enum tr_tristate_t
-{
-    TR_NET_OK,
-    TR_NET_ERROR,
-    TR_NET_WAIT
-};
-
 enum tr_auto_switch_state_t
 {
     TR_AUTO_SWITCH_UNUSED,
@@ -139,7 +132,8 @@ struct tr_session
 
     uint8_t peer_id_ttl_hours;
 
-    tr_variant removedTorrents;
+    // torrent id, time removed
+    std::vector<std::pair<int, time_t>> removed_torrents;
 
     bool stalledEnabled;
     bool queueEnabled[2];

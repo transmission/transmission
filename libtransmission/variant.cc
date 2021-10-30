@@ -478,7 +478,7 @@ void tr_variantInitList(tr_variant* v, size_t reserve_count)
     tr_variantListReserve(v, reserve_count);
 }
 
-static void containerReserve(tr_variant* v, size_t count)
+static tr_variant* containerReserve(tr_variant* v, size_t count)
 {
     TR_ASSERT(tr_variantIsContainer(v));
 
@@ -497,6 +497,8 @@ static void containerReserve(tr_variant* v, size_t count)
         v->val.l.vals = tr_renew(tr_variant, v->val.l.vals, n);
         v->val.l.alloc = n;
     }
+
+    return v->val.l.vals + v->val.l.count;
 }
 
 void tr_variantListReserve(tr_variant* list, size_t count)
@@ -523,9 +525,8 @@ tr_variant* tr_variantListAdd(tr_variant* list)
 {
     TR_ASSERT(tr_variantIsList(list));
 
-    containerReserve(list, 1);
-
-    tr_variant* child = &list->val.l.vals[list->val.l.count++];
+    tr_variant* child = containerReserve(list, 1);
+    ++list->val.l.count;
     child->key = 0;
     tr_variantInit(child, TR_VARIANT_TYPE_INT);
 
@@ -592,11 +593,10 @@ tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark const key)
 {
     TR_ASSERT(tr_variantIsDict(dict));
 
-    containerReserve(dict, 1);
-
-    tr_variant* val = dict->val.l.vals + dict->val.l.count++;
-    tr_variantInit(val, TR_VARIANT_TYPE_INT);
+    tr_variant* val = containerReserve(dict, 1);
+    ++dict->val.l.count;
     val->key = key;
+    tr_variantInit(val, TR_VARIANT_TYPE_INT);
 
     return val;
 }

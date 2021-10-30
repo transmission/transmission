@@ -616,7 +616,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
     session->bandwidth = new Bandwidth(nullptr);
-    tr_variantInitList(&session->removedTorrents, 0);
+    session->removed_torrents.clear();
 
     /* nice to start logging at the very beginning */
     auto i = int64_t{};
@@ -2069,7 +2069,6 @@ void tr_sessionClose(tr_session* session)
     }
 
     /* free the session memory */
-    tr_variantFree(&session->removedTorrents);
     delete session->bandwidth;
     delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
@@ -2249,6 +2248,8 @@ static void toggle_utp(void* vsession)
     session->isUTPEnabled = !session->isUTPEnabled;
 
     tr_udpSetSocketBuffers(session);
+
+    tr_udpSetSocketTOS(session);
 
     /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
        explanation. */

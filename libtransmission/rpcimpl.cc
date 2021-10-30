@@ -879,30 +879,23 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     char const* strVal = nullptr;
-    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") ?
+    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") == 0 ?
         TR_FORMAT_TABLE :
         TR_FORMAT_OBJECT;
 
     if (tr_variantDictFindStr(args_in, TR_KEY_ids, &strVal, nullptr) && strcmp(strVal, "recently-active") == 0)
     {
-        int n = 0;
         time_t const now = tr_time();
         int const interval = RECENTLY_ACTIVE_SECONDS;
-        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, 0);
 
-        tr_variant* d = nullptr;
-        while ((d = tr_variantListChild(&session->removedTorrents, n)) != nullptr)
+        auto const& removed = session->removed_torrents;
+        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
+        for (auto const& [id, time_removed] : removed)
         {
-            auto date = int64_t{};
-            auto id = int64_t{};
-
-            if (tr_variantDictFindInt(d, TR_KEY_date, &date) && date >= now - interval &&
-                tr_variantDictFindInt(d, TR_KEY_id, &id))
+            if (time_removed >= now - interval)
             {
                 tr_variantListAddInt(removed_out, id);
             }
-
-            ++n;
         }
     }
 

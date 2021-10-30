@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 
 /***
 ****
@@ -112,8 +113,6 @@
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
-#define SHA_DIGEST_LENGTH 20
-
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64
@@ -123,10 +122,16 @@
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
 
-auto inline constexpr PEER_ID_LEN = size_t{ 20 };
-
 // https://www.bittorrent.org/beps/bep_0003.html
 // A string of length 20 which this downloader uses as its id. Each
 // downloader generates its own id at random at the start of a new
 // download. This value will also almost certainly have to be escaped.
-using tr_peer_id_t = std::array<char, 20>;
+auto inline constexpr PEER_ID_LEN = size_t{ 20 };
+using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
+
+#define SHA_DIGEST_LENGTH 20
+
+// TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
+// TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
+// TODO #3: this should be an array of std::byte
+using tr_sha1_digest_t = std::array<uint8_t, 20>;

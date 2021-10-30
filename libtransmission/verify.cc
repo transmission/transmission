@@ -46,7 +46,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_sha1_ctx_t sha = tr_sha1_init();
 
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
-    tr_torrentSetChecked(tor, 0);
+    tor->verify_progress = 0;
 
     while (!*stopFlag && pieceIndex < tor->info.pieceCount)
     {
@@ -95,10 +95,9 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* if we're finishing a piece... */
         if (leftInPiece == 0)
         {
-            uint8_t hash[SHA_DIGEST_LENGTH];
-
-            tr_sha1_final(sha, hash);
-            bool const hasPiece = memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
+            auto hash = tr_sha1_digest_t{};
+            tr_sha1_final(sha, std::data(hash));
+            bool const hasPiece = hash == tor->info.pieces[pieceIndex];
 
             if (hasPiece || hadPiece)
             {
@@ -106,7 +105,6 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
                 changed |= hasPiece != hadPiece;
             }
 
-            tr_torrentSetPieceChecked(tor, pieceIndex);
             time_t const now = tr_time();
             tor->anyDate = now;
 
@@ -119,7 +117,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             }
 
             sha = tr_sha1_init();
-            pieceIndex++;
+            ++pieceIndex;
+            tor->verify_progress = pieceIndex / double(tor->info.pieceCount);
             piecePos = 0;
         }
 
@@ -143,6 +142,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         tr_sys_file_close(fd, nullptr);
     }
 
+    tor->verify_progress.reset();
     tr_sha1_final(sha, nullptr);
     free(buffer);
 

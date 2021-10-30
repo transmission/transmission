@@ -442,7 +442,7 @@ void OptionsDialog::onTimeout()
     if (left_in_piece == 0)
     {
         QByteArray const result(verify_hash_.result());
-        bool const matches = memcmp(result.constData(), info_.pieces[verify_piece_index_].hash, SHA_DIGEST_LENGTH) == 0;
+        bool const matches = memcmp(result.constData(), std::data(info_.pieces[verify_piece_index_]), SHA_DIGEST_LENGTH) == 0;
         verify_flags_[verify_piece_index_] = matches;
         verify_piece_pos_ = 0;
         ++verify_piece_index_;

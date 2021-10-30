@@ -59,7 +59,7 @@ static void log_cyassl_error(int error_code, char const* file, int line)
 #elif API_VERSION_HEX >= 0x03000002
         char const* error_message = CTaoCryptGetErrorString(error_code);
 #else
-        char error_message[CYASSL_MAX_ERROR_SZ];
+        char error_message[CYASSL_MAX_ERROR_SZ] = {};
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
@@ -211,8 +211,6 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
     TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
-    word32 my_private_key_length;
-    word32 my_public_key_length;
     tr_lock* rng_lock = get_rng_lock();
 
     if (handle->private_key == nullptr)
@@ -222,6 +220,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
 
     tr_lockLock(rng_lock);
 
+    auto my_private_key_length = word32{};
+    auto my_public_key_length = word32{};
     if (!check_result(API(DhGenerateKeyPair)(
             &handle->dh,
             get_rng(),
@@ -254,11 +254,10 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
-    struct tr_dh_secret* ret;
-    word32 my_secret_key_length;
 
-    ret = tr_dh_secret_new(handle->key_length);
+    tr_dh_secret* ret = tr_dh_secret_new(handle->key_length);
 
+    auto my_secret_key_length = word32{};
     if (check_result(API(DhAgree)(
             &handle->dh,
             ret->key,
@@ -287,11 +286,10 @@ bool tr_rand_buffer(void* buffer, size_t length)
 {
     TR_ASSERT(buffer != nullptr);
 
-    bool ret;
     tr_lock* rng_lock = get_rng_lock();
 
     tr_lockLock(rng_lock);
-    ret = check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
+    bool const ret = check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
     tr_lockUnlock(rng_lock);
 
     return ret;

@@ -140,7 +140,7 @@ bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
     {
         TR_ASSERT(handle != nullptr);
 
-        unsigned int hash_length;
+        unsigned int hash_length = 0;
 
         ret = check_result(EVP_DigestFinal_ex(handle, hash, &hash_length));
 
@@ -258,11 +258,9 @@ tr_dh_ctx_t tr_dh_new(
     TR_ASSERT(generator_num != nullptr);
 
     DH* handle = DH_new();
-    BIGNUM* p;
-    BIGNUM* g;
 
-    p = BN_bin2bn(prime_num, prime_num_length, nullptr);
-    g = BN_bin2bn(generator_num, generator_num_length, nullptr);
+    BIGNUM* const p = BN_bin2bn(prime_num, prime_num_length, nullptr);
+    BIGNUM* const g = BN_bin2bn(generator_num, generator_num_length, nullptr);
 
     if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, nullptr, g) == 0)
     {
@@ -293,9 +291,6 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<DH*>(raw_handle);
-    int dh_size;
-    int my_public_key_length;
-    BIGNUM const* my_public_key;
 
     DH_set_length(handle, private_key_length * 8);
 
@@ -304,10 +299,11 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
         return false;
     }
 
+    BIGNUM const* my_public_key = nullptr;
     DH_get0_key(handle, &my_public_key, nullptr);
 
-    my_public_key_length = BN_bn2bin(my_public_key, public_key);
-    dh_size = DH_size(handle);
+    int const my_public_key_length = BN_bn2bin(my_public_key, public_key);
+    int const dh_size = DH_size(handle);
 
     tr_dh_align_key(public_key, my_public_key_length, dh_size);
 
@@ -326,20 +322,15 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(handle != nullptr);
     TR_ASSERT(other_public_key != nullptr);
 
-    struct tr_dh_secret* ret;
-    int dh_size;
-    int secret_key_length;
-    BIGNUM* other_key;
-
-    if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr)))
+    BIGNUM* const other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr);
+    if (!check_pointer(other_key))
     {
         return nullptr;
     }
 
-    dh_size = DH_size(handle);
-    ret = tr_dh_secret_new(dh_size);
-
-    secret_key_length = DH_compute_key(ret->key, other_key, handle);
+    int const dh_size = DH_size(handle);
+    tr_dh_secret* ret = tr_dh_secret_new(dh_size);
+    int const secret_key_length = DH_compute_key(ret->key, other_key, handle);
 
     if (check_result_neq(secret_key_length, -1))
     {
