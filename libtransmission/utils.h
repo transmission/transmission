@@ -81,17 +81,20 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
-constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, char ch)
+namespace tr_utils_impl
+{
+
+constexpr void tr_buildBufImpl(char*& buf, size_t& buflen, char ch)
 {
     if (buflen >= 2)
     {
         *buf++ = ch;
     }
     *buf = '\0';
-    return { buf, buflen - 1 };
+    --buflen;
 }
 
-constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, std::string_view name)
+constexpr void tr_buildBufImpl(char*& buf, size_t& buflen, std::string_view name)
 {
     auto const len = std::min(buflen - 1, std::size(name));
     for (size_t i = 0; i < len; ++i)
@@ -99,29 +102,16 @@ constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, std::st
         *buf++ = name[i];
     }
     *buf = '\0';
-    return { buf, buflen - len };
+    buflen -= len;
 }
 
-constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, char const* name)
-{
-    if (buf == nullptr || buflen == 0)
-    {
-        return { buf, buflen };
-    }
+} // namespace tr_utils_impl
 
-    return tr_buildBuf(buf, buflen, std::string_view(name));
-}
-
-constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen)
+template<typename... Args>
+std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, Args... args)
 {
+    (tr_utils_impl::tr_buildBufImpl(buf, buflen, args), ...);
     return { buf, buflen };
-}
-
-template<typename T, typename... Args>
-constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, T t, Args... args)
-{
-    std::tie(buf, buflen) = tr_buildBuf(buf, buflen, t);
-    return tr_buildBuf(buf, buflen, args...);
 }
 
 /**

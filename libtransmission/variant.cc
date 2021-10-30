@@ -45,6 +45,8 @@
 #include "variant.h"
 #include "variant-common.h"
 
+using namespace std::literals;
+
 /* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
  * https://trac.transmissionbt.com/ticket/6006 */
 #if defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(0, 9, 34)
@@ -1151,7 +1153,8 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
     }
 
     /* if the file already exists, try to move it out of the way & keep it as a backup */
-    char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
+    char tmp[TR_PATH_MAX] = {};
+    tr_buildBuf(tmp, sizeof(tmp), filename, ".tmp.XXXXXX"sv);
     tr_error* error = nullptr;
     tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
 
@@ -1191,7 +1194,6 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
         tr_error_free(error);
     }
 
-    tr_free(tmp);
     tr_free(real_filename);
     return err;
 }

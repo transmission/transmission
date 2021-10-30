@@ -2117,11 +2117,12 @@ static void sessionLoadTorrents(void* vdata)
     {
         char const* name = nullptr;
         char path[TR_PATH_MAX] = {};
+        auto const dirname_sv = std::string_view{ dirname };
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (tr_str_has_suffix(name, ".torrent"))
             {
-                tr_buildBuf(path, sizeof(path), dirname, '/', name);
+                tr_buildBuf(path, sizeof(path), dirname_sv, '/', std::string_view{name});
                 tr_ctorSetMetainfoFromFile(data->ctor, path);
 
                 tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr, nullptr);
