@@ -80,18 +80,15 @@ static char const* getdev(char const* path)
 {
 #ifdef HAVE_GETMNTENT
 
-    FILE* fp;
-
 #ifdef __sun
 
-    struct mnttab mnt;
-    fp = fopen(_PATH_MOUNTED, "r");
-
+    FILE* const fp = fopen(_PATH_MOUNTED, "r");
     if (fp == nullptr)
     {
         return nullptr;
     }
 
+    struct mnttab mnt;
     while (getmntent(fp, &mnt) != -1)
     {
         if (tr_strcmp0(path, mnt.mnt_mountp) == 0)
@@ -105,15 +102,13 @@ static char const* getdev(char const* path)
 
 #else
 
-    struct mntent const* mnt;
-
-    fp = setmntent(_PATH_MOUNTED, "r");
-
+    FILE* const fp = setmntent(_PATH_MOUNTED, "r");
     if (fp == nullptr)
     {
         return nullptr;
     }
 
+    struct mntent const* mnt = nullptr;
     while ((mnt = getmntent(fp)) != nullptr)
     {
         if (tr_strcmp0(path, mnt->mnt_dir) == 0)
@@ -129,11 +124,8 @@ static char const* getdev(char const* path)
 
 #else /* BSD derived systems */
 
-    int n;
-    struct statfs* mnt;
-
-    n = getmntinfo(&mnt, MNT_WAIT);
-
+    struct statfs* mnt = nullptr;
+    int const n = getmntinfo(&mnt, MNT_WAIT);
     if (n == 0)
     {
         return nullptr;
@@ -156,18 +148,15 @@ static char const* getfstype(char const* device)
 {
 #ifdef HAVE_GETMNTENT
 
-    FILE* fp;
-
 #ifdef __sun
 
-    struct mnttab mnt;
-    fp = fopen(_PATH_MOUNTED, "r");
-
+    FILE* const fp = fopen(_PATH_MOUNTED, "r");
     if (fp == nullptr)
     {
         return nullptr;
     }
 
+    struct mnttab mnt;
     while (getmntent(fp, &mnt) != -1)
     {
         if (tr_strcmp0(device, mnt.mnt_mountp) == 0)
@@ -181,15 +170,13 @@ static char const* getfstype(char const* device)
 
 #else
 
-    struct mntent const* mnt;
-
-    fp = setmntent(_PATH_MOUNTED, "r");
-
+    FILE* const fp = setmntent(_PATH_MOUNTED, "r");
     if (fp == nullptr)
     {
         return nullptr;
     }
 
+    struct mntent const* mnt = nullptr;
     while ((mnt = getmntent(fp)) != nullptr)
     {
         if (tr_strcmp0(device, mnt->mnt_fsname) == 0)
@@ -205,11 +192,8 @@ static char const* getfstype(char const* device)
 
 #else /* BSD derived systems */
 
-    int n;
-    struct statfs* mnt;
-
-    n = getmntinfo(&mnt, MNT_WAIT);
-
+    struct statfs* mnt = nullptr;
+    int const n = getmntinfo(&mnt, MNT_WAIT);
     if (n == 0)
     {
         return nullptr;
@@ -230,11 +214,9 @@ static char const* getfstype(char const* device)
 
 static char const* getblkdev(char const* path)
 {
-    char* c;
-    char* dir;
-    char const* device;
+    char const* device = nullptr;
 
-    dir = tr_strdup(path);
+    char* const dir = tr_strdup(path);
 
     for (;;)
     {
@@ -245,8 +227,7 @@ static char const* getblkdev(char const* path)
             break;
         }
 
-        c = strrchr(dir, '/');
-
+        char* c = strrchr(dir, '/');
         if (c != nullptr)
         {
             *c = '\0';
@@ -274,9 +255,6 @@ struct tr_disk_space getquota(char const* device)
     struct quotakey qk;
     struct quotaval qv;
     struct tr_disk_space disk_space = { -1, -1 };
-    int64_t limit;
-    int64_t freespace;
-    int64_t spaceused;
 
     qh = quota_open(device);
 
@@ -295,6 +273,7 @@ struct tr_disk_space getquota(char const* device)
         return disk_space;
     }
 
+    int64_t limit;
     if (qv.qv_softlimit > 0)
     {
         limit = qv.qv_softlimit;
@@ -309,10 +288,10 @@ struct tr_disk_space getquota(char const* device)
         return disk_space;
     }
 
-    spaceused = qv.qv_usage;
+    int64_t const spaceused = qv.qv_usage;
     quota_close(qh);
 
-    freespace = limit - spaceused;
+    int64_t const freespace = limit - spaceused;
     disk_space.free = freespace < 0 ? 0 : freespace;
     disk_space.total = limit;
     return disk_space;
@@ -327,10 +306,7 @@ static struct tr_disk_space getquota(char const* device)
 #else
     struct dqblk dq;
 #endif
-    int64_t limit;
-    int64_t freespace;
     struct tr_disk_space disk_space = { -1, -1 };
-    int64_t spaceused;
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
@@ -364,6 +340,7 @@ static struct tr_disk_space getquota(char const* device)
     }
 #endif
 
+    int64_t limit = 0;
     if (dq.dqb_bsoftlimit > 0)
     {
         /* Use soft limit first */
@@ -380,18 +357,18 @@ static struct tr_disk_space getquota(char const* device)
     }
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-    spaceused = (int64_t)dq.dqb_curblocks >> 1;
+    int64_t const spaceused = (int64_t)dq.dqb_curblocks >> 1;
 #elif defined(__APPLE__)
-    spaceused = (int64_t)dq.dqb_curbytes;
+    int64_t const spaceused = (int64_t)dq.dqb_curbytes;
 #elif defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(1, 0, 18)
-    spaceused = (int64_t)btodb(dq.dqb_curblocks);
+    int64_t const spaceused = (int64_t)btodb(dq.dqb_curblocks);
 #elif defined(__sun) || (defined(_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2)
-    spaceused = (int64_t)dq.dqb_curblocks >> 1;
+    int64_t const spaceused = (int64_t)dq.dqb_curblocks >> 1;
 #else
-    spaceused = btodb(dq.dqb_curspace);
+    int64_t const spaceused = btodb(dq.dqb_curspace);
 #endif
 
-    freespace = limit - spaceused;
+    int64_t const freespace = limit - spaceused;
 
 #ifdef __APPLE__
     disk_space.free = freespace < 0 ? 0 : freespace;
@@ -410,13 +387,12 @@ static struct tr_disk_space getquota(char const* device)
 
 static struct tr_disk_space getxfsquota(char* device)
 {
-    int64_t limit;
-    int64_t freespace;
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
 
     if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
     {
+        int64_t limit = 0;
         if (dq.d_blk_softlimit > 0)
         {
             /* Use soft limit first */
@@ -432,7 +408,7 @@ static struct tr_disk_space getxfsquota(char* device)
             return disk_space;
         }
 
-        freespace = limit - (dq.d_bcount >> 1);
+        int64_t freespace = limit - (dq.d_bcount >> 1);
         freespace = freespace < 0 ? 0 : (freespace * 1024);
         limit = limit * 1024;
         disk_space.free = freespace;
@@ -475,10 +451,8 @@ static struct tr_disk_space tr_getDiskSpace(char const* path)
 #ifdef _WIN32
 
     struct tr_disk_space ret = { -1, -1 };
-    wchar_t* wide_path;
 
-    wide_path = tr_win32_utf8_to_native(path, -1);
-
+    wchar_t* const wide_path = tr_win32_utf8_to_native(path, -1);
     if (wide_path != nullptr)
     {
         ULARGE_INTEGER freeBytesAvailable;
@@ -513,9 +487,7 @@ static struct tr_disk_space tr_getDiskSpace(char const* path)
 
 struct tr_device_info* tr_device_info_create(char const* path)
 {
-    struct tr_device_info* info;
-
-    info = tr_new0(struct tr_device_info, 1);
+    auto* const info = tr_new0(struct tr_device_info, 1);
     info->path = tr_strdup(path);
 
 #ifndef _WIN32

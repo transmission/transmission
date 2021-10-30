@@ -1910,9 +1910,7 @@ static void closeTorrent(void* vtor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_variant* d = tr_variantListAddDict(&tor->session->removedTorrents, 2);
-    tr_variantDictAddInt(d, TR_KEY_id, tor->uniqueId);
-    tr_variantDictAddInt(d, TR_KEY_date, tr_time());
+    tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 
     tr_logAddTorInfo(tor, "%s", _("Removing torrent"));
 
@@ -3188,20 +3186,20 @@ std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
         size_per_mime_type[mime_type] += it->length;
     }
 
-    // now that we have the totals,
-    // sort by number so that we can get the biggest
-    auto mime_type_per_size = std::map<size_t, std::string_view>{};
-    for (auto it : size_per_mime_type)
+    if (std::empty(size_per_mime_type))
     {
-        mime_type_per_size.emplace(it.second, it.first);
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        // application/octet-stream is the default value for all other cases.
+        // An unknown file type should use this type.
+        auto constexpr Fallback = "application/octet-stream"sv;
+        return Fallback;
     }
 
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-    // application/octet-stream is the default value for all other cases.
-    // An unknown file type should use this type.
-    auto constexpr Fallback = "application/octet-stream"sv;
-
-    return std::empty(mime_type_per_size) ? Fallback : mime_type_per_size.rbegin()->second;
+    auto const it = std::max_element(
+        std::begin(size_per_mime_type),
+        std::end(size_per_mime_type),
+        [](auto const& a, auto const& b) { return a.second < b.second; });
+    return it->first;
 }
 
 /***
