@@ -24,7 +24,7 @@
 
 static void handle_sigchld(int /*i*/)
 {
-    int rc;
+    int rc = 0;
 
     do
     {
@@ -84,8 +84,8 @@ FAIL:
 
 static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
 {
-    int child_errno;
-    ssize_t count;
+    int child_errno = 0;
+    ssize_t count = 0;
 
     static_assert(sizeof(child_errno) == sizeof(errno), "");
 
