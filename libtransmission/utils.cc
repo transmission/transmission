@@ -336,42 +336,6 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     return buf;
 }
 
-bool tr_buildPathInBuf(char* buf, size_t buflen, char const* first_element, ...)
-{
-    /* build the string piece by piece */
-    char* pch = buf;
-    char* const end = buf + buflen;
-    va_list vl;
-    va_start(vl, first_element);
-    for (char const* element = first_element; element != nullptr;)
-    {
-        size_t const elementLen = strlen(element);
-        TR_ASSERT(pch + elementLen + 1 < end);
-        if (elementLen + 1 > size_t(end - pch))
-        {
-            va_end(vl);
-            return false;
-        }
-        pch = std::copy_n(element, elementLen, pch);
-        *pch++ = TR_PATH_DELIMITER;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-
-    // if nonempty, eat the unwanted trailing slash
-    if (pch != buf)
-    {
-        --pch;
-    }
-
-    // zero-terminate the string
-    *pch++ = '\0';
-
-    /* sanity checks & return */
-    TR_ASSERT(pch <= end);
-    return true;
-}
-
 char* tr_buildPath(char const* first_element, ...)
 {
 

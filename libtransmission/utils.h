@@ -13,6 +13,7 @@
 #include <stddef.h> /* size_t */
 #include <string_view>
 #include <time.h> /* time_t */
+#include <tuple>
 #include <vector>
 
 #include "tr-macros.h"
@@ -80,7 +81,48 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
-bool tr_buildPathInBuf(char* buf, size_t buflen, char const* first_element, ...);
+constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, char ch)
+{
+    if (buflen >= 2)
+    {
+        *buf++ = ch;
+    }
+    *buf = '\0';
+    return { buf, buflen - 1 };
+}
+
+constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, std::string_view name)
+{
+    auto const len = std::min(buflen - 1, std::size(name));
+    for (size_t i = 0; i < len; ++i)
+    {
+        *buf++ = name[i];
+    }
+    *buf = '\0';
+    return { buf, buflen - len };
+}
+
+constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, char const* name)
+{
+    if (buf == nullptr || buflen == 0)
+    {
+        return { buf, buflen };
+    }
+
+    return tr_buildBuf(buf, buflen, std::string_view(name));
+}
+
+constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen)
+{
+    return { buf, buflen };
+}
+
+template<typename T, typename... Args>
+constexpr std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, T t, Args... args)
+{
+    std::tie(buf, buflen) = tr_buildBuf(buf, buflen, t);
+    return tr_buildBuf(buf, buflen, args...);
+}
 
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.

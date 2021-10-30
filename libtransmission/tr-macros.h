@@ -117,7 +117,8 @@
 
 #define TR_ADDRSTRLEN 64
 
-// PATH_MAX is bullshit
+// the system's PATH_MAX is almost always too small.
+// Real paths can be up to 1024 bytes on macOS, 4096 on Linux
 auto inline constexpr TR_PATH_MAX = size_t{ 4096 };
 
 #define TR_BAD_SIZE ((size_t)-1)

@@ -3198,7 +3198,7 @@ std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
     auto const it = std::max_element(
         std::begin(size_per_mime_type),
         std::end(size_per_mime_type),
-        [](auto const& a, auto const& b){ return a.second < b.second; });
+        [](auto const& a, auto const& b) { return a.second < b.second; });
     return it->first;
 }
 
@@ -3305,59 +3305,54 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-static void find_file_in_dir(
-    char const* name,
-    char const* search_dir,
-    char const** base,
-    char const** subpath,
-    tr_sys_path_info* file_info)
-{
-    char filename[TR_PATH_MAX] = {};
-    tr_buildPathInBuf(filename, sizeof(filename), search_dir, name, nullptr);
-
-    if (tr_sys_path_get_info(filename, 0, file_info, nullptr))
-    {
-        *base = search_dir;
-        *subpath = name;
-    }
-}
-
 bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(fileNum < tor->info.fileCount);
 
-    char* part = nullptr;
+    char const* b = nullptr;
     char const* s = nullptr;
     auto file_info = tr_sys_path_info{};
 
     tr_file const* const file = &tor->info.files[fileNum];
 
     /* look in the download dir... */
-    char const* b = nullptr;
-    find_file_in_dir(file->name, tor->downloadDir, &b, &s, &file_info);
+    char filename[TR_PATH_MAX] = {};
+    tr_buildBuf(filename, sizeof(filename), tor->downloadDir, '/', file->name);
+    if (tr_sys_path_get_info(filename, 0, &file_info, nullptr))
+    {
+        b = tor->downloadDir;
+        s = file->name;
+    }
 
-    /* look in the incomplete dir... */
     if (b == nullptr && tor->incompleteDir != nullptr)
     {
-        find_file_in_dir(file->name, tor->incompleteDir, &b, &s, &file_info);
+        tr_buildBuf(filename, sizeof(filename), tor->incompleteDir, '/', file->name);
+        if (tr_sys_path_get_info(filename, 0, &file_info, nullptr))
+        {
+            b = tor->incompleteDir;
+            s = file->name;
+        }
     }
 
-    if (b == nullptr)
+    if (b == nullptr && tor->downloadDir != nullptr)
     {
-        part = tr_torrentBuildPartial(tor, fileNum);
+        tr_buildBuf(filename, sizeof(filename), tor->downloadDir, '/', file->name, ".part"sv);
+        if (tr_sys_path_get_info(filename, 0, &file_info, nullptr))
+        {
+            b = tor->incompleteDir;
+            s = filename + strlen(tor->downloadDir) + 1;
+        }
     }
 
-    /* look for a .part file in the incomplete dir... */
     if (b == nullptr && tor->incompleteDir != nullptr)
     {
-        find_file_in_dir(part, tor->incompleteDir, &b, &s, &file_info);
-    }
-
-    /* look for a .part file in the download dir... */
-    if (b == nullptr)
-    {
-        find_file_in_dir(part, tor->downloadDir, &b, &s, &file_info);
+        tr_buildBuf(filename, sizeof(filename), tor->incompleteDir, '/', file->name, ".part"sv);
+        if (tr_sys_path_get_info(filename, 0, &file_info, nullptr))
+        {
+            b = tor->incompleteDir;
+            s = filename + strlen(tor->incompleteDir) + 1;
+        }
     }
 
     /* return the results */
@@ -3377,7 +3372,6 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     }
 
     /* cleanup */
-    tr_free(part);
     return b != nullptr;
 }
 
