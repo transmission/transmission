@@ -1910,9 +1910,7 @@ static void closeTorrent(void* vtor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_variant* d = tr_variantListAddDict(&tor->session->removedTorrents, 2);
-    tr_variantDictAddInt(d, TR_KEY_id, tor->uniqueId);
-    tr_variantDictAddInt(d, TR_KEY_date, tr_time());
+    tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 
     tr_logAddTorInfo(tor, "%s", _("Removing torrent"));
 
