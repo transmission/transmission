@@ -463,6 +463,8 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     return false;
 }
 
+#include <iostream> // FIXME do not commit
+
 tr_quark tr_quark_new(std::string_view str)
 {
     tr_quark ret = TR_KEY_NONE;
@@ -471,6 +473,7 @@ tr_quark tr_quark_new(std::string_view str)
     {
         ret = TR_N_KEYS + std::size(my_runtime);
         my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
+        std::cerr << "newly interned: [" << str << ']' << std::endl;
     }
 
     return ret;

@@ -214,19 +214,41 @@ struct tr_torrent
         TR_ASSERT(std::size(checked) == info.pieceCount);
         checked_pieces_ = checked;
 
+        auto filename = std::string{};
         for (size_t i = 0; i < info.fileCount; ++i)
         {
-            auto const mtime = tr_torrentGetFileMTime(this, i);
+            auto const found = this->findFile(filename, i);
+            auto const mtime = found ? found->mtime : 0;
 
             info.files[i].mtime = mtime;
 
             // if a file has changed, mark its pieces as unchecked
-            if (mtime != mtimes[i])
+            if (mtime == 0 || mtime != mtimes[i])
             {
                 checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
             }
         }
     }
+
+    /// FINDING FILES
+
+    struct tr_found_file_t
+    {
+        std::string& filename;    // /home/foo/Downloads/torrent/01-file-one.txt
+        std::string_view base;    // /home/foo/Downloads
+        std::string_view subpath; // /torrent/01-file-one.txt
+        time_t mtime;
+
+        tr_found_file_t(std::string& f, std::string_view b, time_t mt)
+            : filename{ f }
+            , base{ b }
+            , subpath{ f.c_str() + std::size(b) + 1 }
+            , mtime{ mt }
+        {
+        }
+    };
+
+    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
     ///
 
