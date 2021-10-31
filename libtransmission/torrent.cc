@@ -2586,18 +2586,6 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
     return pass;
 }
 
-time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
-{
-    auto mtime = time_t{};
-
-    if (!tr_fdFileGetCachedMTime(tor->session, tor->uniqueId, i, &mtime))
-    {
-        tr_torrentFindFile2(tor, i, nullptr, nullptr, &mtime);
-    }
-
-    return mtime;
-}
-
 /***
 ****
 ***/
@@ -3435,17 +3423,9 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
 
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 {
-    char* ret = nullptr;
-
-    char const* base = nullptr;
-    char* subpath = nullptr;
-    if (tr_torrentFindFile2(tor, fileNum, &base, &subpath, nullptr))
-    {
-        ret = tr_buildPath(base, subpath, nullptr);
-        tr_free(subpath);
-    }
-
-    return ret;
+    auto filename = std::string{};
+    auto const found = tor->findFile(filename, fileNum);
+    return found ? tr_strdup(filename.c_str()) : nullptr;
 }
 
 /* Decide whether we should be looking for files in downloadDir or incompleteDir. */

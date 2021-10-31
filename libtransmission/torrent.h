@@ -109,8 +109,6 @@ void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
-time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
-
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
     torrent's content than any other mime-type. */
 std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor);
