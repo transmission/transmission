@@ -69,6 +69,7 @@ endif()
 
 set(${PROJECT_NAME}_SOURCES
     actions.cc
+    application.cc
     conf.cc
     details.cc
     dialogs.cc
@@ -95,6 +96,7 @@ set(${PROJECT_NAME}_SOURCES
 
 set(${PROJECT_NAME}_HEADERS
     actions.h
+    application.h
     conf.h
     details.h
     dialogs.h
