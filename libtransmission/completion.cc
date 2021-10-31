@@ -113,7 +113,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
         cp->sizeNow += tr_torBlockCountBytes(tor, block);
 
         cp->haveValidIsDirty = true;
-        cp->sizeWhenDoneIsDirty = cp->sizeWhenDoneIsDirty || tor->info.pieces[piece].dnd;
+        cp->sizeWhenDoneIsDirty = cp->sizeWhenDoneIsDirty || tor->pieceIsDnd(piece);
     }
 }
 
@@ -165,7 +165,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                 uint64_t n = 0;
                 uint64_t const pieceSize = tr_torPieceCountBytes(tor, p);
 
-                if (!inf->pieces[p].dnd)
+                if (!tor->pieceIsDnd(p))
                 {
                     n = pieceSize;
                 }
