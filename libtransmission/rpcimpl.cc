@@ -2728,15 +2728,8 @@ void tr_rpc_request_exec_uri(
             bool isArg = key != "method" && key != "tag";
             tr_variant* parent = isArg ? args : &top;
 
-<<<<<<< HEAD:libtransmission/rpcimpl.c
-            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key,
-                (size_t)(delim - pch))), delim + 1,
-                next != NULL ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
-            tr_free(key);
-=======
             auto const val = std::string_view{ delim + 1, next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1) };
             tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
->>>>>>> upstream/master:libtransmission/rpcimpl.cc
         }
 
         pch = next != nullptr ? next + 1 : nullptr;
