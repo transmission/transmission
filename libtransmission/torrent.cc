@@ -3295,21 +3295,9 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-#if 0
-std::optional<tr_found_file_t>
-
-      struct tr_found_file_t
-      {
-          std::string& filename;
-          std::string_view base;
-          std::string_view subpath;
-          time_t mtime;
-      };
-#endif
-
 std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& filename, tr_file_index_t i) const
 {
-    TR_ASSERT(i < tor->info.fileCount);
+    TR_ASSERT(i < this->info.fileCount);
     tr_file const& file = info.files[i];
     auto file_info = tr_sys_path_info{};
 
@@ -3353,74 +3341,33 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 // TODO: clients that call this should call tr_torrent::findFile() instead
 bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(fileNum < tor->info.fileCount);
-
-    char const* b = nullptr;
-    char const* s = nullptr;
-    auto file_info = tr_sys_path_info{};
-
-    tr_file const* const file = &tor->info.files[fileNum];
-
-    /* look in the download dir... */
     auto filename = std::string{};
-    tr_buildBuf(filename, tor->downloadDir, "/", file->name);
-    if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
+    auto const found = tor->findFile(filename, fileNum);
+
+    if (!found)
     {
-        b = tor->downloadDir;
-        s = file->name;
+        return false;
     }
 
-    if (b == nullptr && tor->incompleteDir != nullptr)
-    {
-        tr_buildBuf(filename, tor->incompleteDir, "/"sv, file->name);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
-        {
-            b = tor->incompleteDir;
-            s = file->name;
-        }
-    }
-
-    if (b == nullptr && tor->downloadDir != nullptr)
-    {
-        tr_buildBuf(filename, tor->downloadDir, "/"sv, file->name, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
-        {
-            b = tor->incompleteDir;
-            s = filename.c_str() + strlen(tor->downloadDir) + 1;
-        }
-    }
-
-    if (b == nullptr && tor->incompleteDir != nullptr)
-    {
-        tr_buildBuf(filename, tor->incompleteDir, "/"sv, file->name, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
-        {
-            b = tor->incompleteDir;
-            s = filename.c_str() + strlen(tor->incompleteDir) + 1;
-        }
-    }
-
-    /* return the results */
     if (base != nullptr)
     {
-        *base = b;
+        *base = std::data(found->base);
     }
 
     if (subpath != nullptr)
     {
-        *subpath = tr_strdup(s);
+        *subpath = tr_strndup(std::data(found->subpath), std::size(found->subpath));
     }
 
     if (mtime != nullptr)
     {
-        *mtime = file_info.last_modified_at;
+        *mtime = found->mtime;
     }
 
-    /* cleanup */
-    return b != nullptr;
+    return true;
 }
 
+// TODO: clients that call this should call tr_torrent::findFile() instead
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 {
     auto filename = std::string{};
