@@ -658,7 +658,7 @@ void MainWindow::openFolder()
     QString path(tor->getPath());
     FileList const& files = tor->files();
 
-    if (files.isEmpty())
+    if (files.empty())
     {
         return;
     }

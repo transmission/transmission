@@ -25,11 +25,9 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 {
     QVariant var;
 
-    int const row = index.row();
-
-    if (0 <= row && row < rows_.size())
+    if (index.isValid() && index.row() < rowCount())
     {
-        TrackerInfo const& tracker_info = rows_.at(row);
+        TrackerInfo const& tracker_info = rows_.at(index.row());
 
         switch (role)
         {
@@ -83,7 +81,7 @@ struct CompareTrackers
 void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t const& ids)
 {
     // build a list of the TrackerInfos
-    QVector<TrackerInfo> trackers;
+    std::vector<TrackerInfo> trackers;
 
     for (int const id : ids)
     {
@@ -98,7 +96,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
                 TrackerInfo tracker_info;
                 tracker_info.st = st;
                 tracker_info.torrent_id = id;
-                trackers.append(tracker_info);
+                trackers.push_back(tracker_info);
             }
         }
     }
@@ -108,8 +106,8 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
     std::sort(trackers.begin(), trackers.end(), comp);
 
     // merge 'em with the existing list
-    int old_index = 0;
-    int new_index = 0;
+    unsigned int old_index = 0;
+    unsigned int new_index = 0;
 
     while (old_index < rows_.size() || new_index < trackers.size())
     {
@@ -120,7 +118,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
         {
             // add this new row
             beginInsertRows(QModelIndex(), old_index, old_index);
-            rows_.insert(old_index, trackers.at(new_index));
+            rows_.insert(rows_.begin() + old_index, trackers.at(new_index));
             endInsertRows();
             ++old_index;
             ++new_index;
@@ -129,7 +127,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
         {
             // remove this old row
             beginRemoveRows(QModelIndex(), old_index, old_index);
-            rows_.remove(old_index);
+            rows_.erase(rows_.begin() + old_index);
             endRemoveRows();
         }
         else // update existing row
