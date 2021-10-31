@@ -83,8 +83,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    auto const& strut = QApplication::globalStrut();
-    QSize const fake_content_size(qMax(100, strut.width()), qMax(100, strut.height()));
+    QSize const fake_content_size(100, 100);
     QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
     int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
