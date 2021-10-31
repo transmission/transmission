@@ -830,7 +830,7 @@ bool tr_urlIsValidTracker(char const* url)
 
     size_t const url_len = strlen(url);
 
-    return isValidURLChars(url, url_len) && tr_urlParse({ url, url_len }) &&
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, nullptr, nullptr, nullptr, nullptr) &&
         (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
 }
 
@@ -846,7 +846,7 @@ bool tr_urlIsValid(char const* url, size_t url_len)
         url_len = strlen(url);
     }
 
-    return isValidURLChars(url, url_len) && tr_urlParse({ url, url_len }) &&
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, nullptr, nullptr, nullptr, nullptr) &&
         (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
          memcmp(url, "sftp://", 7) == 0);
 }
@@ -857,86 +857,49 @@ bool tr_addressIsIP(char const* str)
     return tr_address_from_string(&tmp, str);
 }
 
-static int parsePort(std::string_view port)
+static int parse_port(char const* port, size_t port_len)
 {
-    auto tmp = std::array<char, 16>{};
-
-    if (std::size(port) >= std::size(tmp))
-    {
-        return -1;
-    }
-
-    std::copy(std::begin(port), std::end(port), std::begin(tmp));
+    char* const tmp = tr_strndup(port, port_len);
     char* end = nullptr;
-    long port_num = strtol(std::data(tmp), &end, 10);
+    long port_num = strtol(tmp, &end, 10);
+
     if (*end != '\0' || port_num <= 0 || port_num >= 65536)
     {
         port_num = -1;
     }
 
-    return int(port_num);
+    tr_free(tmp);
+
+    return (int)port_num;
 }
 
-static std::string_view getPortForScheme(std::string_view scheme)
+static int get_port_for_scheme(char const* scheme, size_t scheme_len)
 {
-    auto constexpr KnownSchemes = std::array<std::pair<std::string_view, std::string_view>, 5>{{
-        { "udp"sv, "80"sv },
-        { "ftp"sv, "21"sv },
-        { "sftp"sv, "22"sv },
-        { "http"sv, "80"sv },
-        { "https"sv, "443"sv },
-    }};
-
-    for (auto const& [known_scheme, port] : KnownSchemes)
+    struct known_scheme
     {
-        if (scheme == known_scheme)
+        char const* name;
+        int port;
+    };
+
+    static struct known_scheme const known_schemes[] = {
+        { "udp", 80 }, //
+        { "ftp", 21 }, //
+        { "sftp", 22 }, //
+        { "http", 80 }, //
+        { "https", 443 }, //
+        { nullptr, 0 }, //
+    };
+
+    for (struct known_scheme const* s = known_schemes; s->name != nullptr; ++s)
+    {
+        if (scheme_len == strlen(s->name) && memcmp(scheme, s->name, scheme_len) == 0)
         {
-            return port;
+            return s->port;
         }
     }
 
-    return "-1"sv;
+    return -1;
 }
-
-std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
-{
-    // scheme
-    auto key = "://"sv;
-    auto pos = url.find(key);
-    if (pos == std::string_view::npos || pos == 0)
-    {
-        return {};
-    }
-    auto const scheme = url.substr(0, pos);
-    url.remove_prefix(pos + std::size(key));
-
-    // authority
-    key = "/"sv;
-    pos = url.find(key);
-    if (pos == 0)
-    {
-        return {};
-    }
-    auto const authority = url.substr(0, pos);
-    url.remove_prefix(std::size(authority));
-    auto const path = std::empty(url) ? "/"sv : url;
-
-    // host
-    key = ":"sv;
-    pos = authority.find(key);
-    auto const host = pos == std::string_view::npos ? authority : authority.substr(0, pos);
-    if (std::empty(host))
-    {
-        return {};
-    }
-
-    // port
-    auto const portstr = pos == std::string_view::npos ? getPortForScheme(scheme) : authority.substr(pos + std::size(key));
-    auto const port = parsePort(portstr);
-
-    return tr_parsed_url_t{ scheme, host, path, portstr, port };
-}
-
 
 bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
 {
@@ -1004,8 +967,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 
     if (setme_port != nullptr)
     {
-        auto const tmp = port_len > 0 ? std::string_view{ host_end + 1, port_len } : getPortForScheme({ scheme, scheme_len });
-        *setme_port = parsePort(tmp);
+        *setme_port = port_len > 0 ? parse_port(host_end + 1, port_len) : get_port_for_scheme(scheme, scheme_len);
     }
 
     if (setme_path != nullptr)

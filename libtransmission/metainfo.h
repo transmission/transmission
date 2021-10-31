@@ -40,4 +40,4 @@ void tr_metainfoMigrateFile(
     enum tr_metainfo_basename_format new_format);
 
 /** @brief Private function that's exposed here only for unit tests */
-bool tr_metainfo_sanitize_path_component(char* buf, char const* str, size_t len, bool* is_adjusted);
+char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted);

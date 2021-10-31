@@ -234,8 +234,8 @@ struct tr_torrent
 
     struct tr_found_file_t
     {
-        std::string& filename;    // /home/foo/Downloads/torrent/01-file-one.txt
-        std::string_view base;    // /home/foo/Downloads
+        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
+        std::string_view base; // /home/foo/Downloads
         std::string_view subpath; // /torrent/01-file-one.txt
         time_t mtime;
 

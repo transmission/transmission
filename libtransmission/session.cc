@@ -2099,8 +2099,6 @@ struct sessionLoadTorrentsData
     bool done;
 };
 
-#include <iostream>
-
 static void sessionLoadTorrents(void* vdata)
 {
     auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);

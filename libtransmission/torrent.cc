@@ -3362,6 +3362,7 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
     return {};
 }
 
+// TODO: clients that call this should call tr_torrent::findFile() instead
 bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
 {
     TR_ASSERT(tr_isTorrent(tor));

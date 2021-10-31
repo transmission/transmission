@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include <cinttypes>
-#include <cstdarg>
-#include <cstddef>
-#include <ctime>
-#include <optional>
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stddef.h> /* size_t */
 #include <string_view>
-#include <tuple>
+#include <time.h> /* time_t */
 #include <type_traits>
 #include <vector>
 
@@ -83,8 +81,7 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
-template<typename... T,
-         typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string& tr_buildBuf(std::string& setme, T... args)
 {
     setme.clear();
@@ -284,18 +281,6 @@ bool tr_urlIsValidTracker(char const* url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid(char const* url, size_t url_len);
-
-struct tr_parsed_url_t
-{
-    std::string_view scheme;
-    std::string_view host;
-    std::string_view path;
-    std::string_view portstr;
-    int port = -1;
-};
-
-std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
-
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */

@@ -100,11 +100,11 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf, e
 ****
 ***/
 
-bool tr_metainfo_sanitize_path_component(char* ret, char const* str, size_t len, bool* is_adjusted)
+char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted)
 {
     if (len == 0 || (len == 1 && str[0] == '.'))
     {
-        return false;
+        return nullptr;
     }
 
     *is_adjusted = false;
@@ -116,6 +116,7 @@ bool tr_metainfo_sanitize_path_component(char* ret, char const* str, size_t len,
         "COM8"sv, "COM9"sv, "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv,
     };
 
+    char* const ret = tr_new(char, len + 2);
     memcpy(ret, str, len);
     ret[len] = '\0';
 
@@ -159,7 +160,8 @@ bool tr_metainfo_sanitize_path_component(char* ret, char const* str, size_t len,
 
     if (start_pos == end_pos)
     {
-        return false;
+        tr_free(ret);
+        return nullptr;
     }
 
     if (start_pos != 0 || end_pos != len)
@@ -170,7 +172,7 @@ bool tr_metainfo_sanitize_path_component(char* ret, char const* str, size_t len,
         *is_adjusted = true;
     }
 
-    return true;
+    return ret;
 }
 
 static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_variant* path, struct evbuffer* buf)
@@ -188,7 +190,6 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
         root_len = strlen(root);
         evbuffer_add(buf, root, root_len);
 
-        char final_str[TR_PATH_MAX] = {};
         for (int i = 0, n = tr_variantListSize(path); i < n; i++)
         {
             size_t len = 0;
@@ -200,7 +201,8 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
             }
 
             bool is_component_adjusted = false;
-            if (!tr_metainfo_sanitize_path_component(final_str, str, len, &is_component_adjusted))
+            char* final_str = tr_metainfo_sanitize_path_component(str, len, &is_component_adjusted);
+            if (final_str == nullptr)
             {
                 continue;
             }
@@ -209,6 +211,8 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
 
             evbuffer_add(buf, TR_PATH_DELIMITER_STR, 1);
             evbuffer_add(buf, final_str, strlen(final_str));
+
+            tr_free(final_str);
         }
     }
 
@@ -239,8 +243,8 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     inf->totalSize = 0;
 
     bool is_root_adjusted = false;
-    char root_name[TR_PATH_MAX] = {};
-    if (!tr_metainfo_sanitize_path_component(root_name, inf->name, strlen(inf->name), &is_root_adjusted))
+    char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
+    if (root_name == nullptr)
     {
         return "path";
     }
@@ -308,6 +312,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         result = "length";
     }
 
+    tr_free(root_name);
     return result;
 }
 

@@ -6,9 +6,6 @@
  *
  */
 
-#warning do not commit this
-#include <iostream>
-
 #include <algorithm>
 #include <array>
 #include <climits> /* INT_MAX */
@@ -35,8 +32,6 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
-
-using namespace std::literals;
 
 struct tr_tier;
 
@@ -230,23 +225,29 @@ struct tr_tracker
 };
 
 /* format: host+':'+ port */
-static std::string getKey(char const* url)
+static char* getKey(char const* url)
 {
-    auto key = std::string{};
-    auto const parsed = tr_urlParse(url);
-    tr_buildBuf(key, parsed->scheme, "://"sv, parsed->host, ":"sv, parsed->portstr);
-    return key;
+    char* scheme = nullptr;
+    char* host = nullptr;
+    int port = 0;
+
+    tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, nullptr);
+    char* const ret = tr_strdup_printf(
+        "%s://%s:%d",
+        scheme != nullptr ? scheme : "invalid",
+        host != nullptr ? host : "invalid",
+        port);
+
+    tr_free(host);
+    tr_free(scheme);
+    return ret;
 }
 
 static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf)
 {
-    auto const key = getKey(inf->announce);
-
     memset(tracker, 0, sizeof(tr_tracker));
-    tracker->key = tr_strndup(key.c_str(), std::size(key));
-    std::cout << "url: " << tracker->key << " (" << __FILE__ << ':' << __LINE__ << ')' << std::endl ;
+    tracker->key = getKey(inf->announce);
     tracker->announce = tr_strdup(inf->announce);
-    std::cout << "url: " << tracker->announce << " (" << __FILE__ << ':' << __LINE__ << ')' << std::endl ;
     tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, inf->scrape);
     tracker->id = inf->id;
     tracker->seederCount = -1;
@@ -535,9 +536,9 @@ struct ann_tracker_info
 {
     tr_tracker_info info;
 
-    std::string_view scheme;
-    std::string_view host;
-    std::string_view path;
+    char* scheme;
+    char* host;
+    char* path;
     int port;
 };
 
@@ -553,7 +554,7 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
         return a->info.tier - b->info.tier;
     }
 
-    return -a->scheme.compare(b->scheme);
+    return -strcmp(a->scheme, b->scheme);
 }
 
 /**
@@ -561,43 +562,57 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
  */
 static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_count, int* setme_count)
 {
-    auto tmp = std::vector<ann_tracker_info>{};
-    tmp.reserve(input_count);
+    int n = 0;
+    struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
 
     /* build a list of valid trackers */
     for (int i = 0; i < input_count; ++i)
     {
-        auto const url = tr_urlParse(input[i].announce);
-        if (url)
+        if (tr_urlIsValidTracker(input[i].announce))
         {
+            int port = 0;
+            char* scheme = nullptr;
+            char* host = nullptr;
+            char* path = nullptr;
+            tr_urlParse(input[i].announce, TR_BAD_SIZE, &scheme, &host, &port, &path);
+
             /* weed out one common source of duplicates:
              * "http://tracker/announce" +
              * "http://tracker:80/announce"
              */
-            bool const is_duplicate = std::any_of(
-                    std::begin(tmp),
-                    std::end(tmp),
-                    [&url](auto const& item){ return item.port == url->port && item.scheme == url->scheme && item.host == url->host && item.path == url->path; });
+            bool is_duplicate = false;
+            for (int j = 0; !is_duplicate && j < n; ++j)
+            {
+                is_duplicate = tmp[j].port == port && strcmp(tmp[j].scheme, scheme) == 0 && strcmp(tmp[j].host, host) == 0 &&
+                    strcmp(tmp[j].path, path) == 0;
+            }
+
             if (is_duplicate)
             {
+                tr_free(path);
+                tr_free(host);
+                tr_free(scheme);
                 continue;
             }
 
-            tmp.push_back({ input[i], url->scheme, url->host, url->path, url->port });
+            tmp[n].info = input[i];
+            tmp[n].scheme = scheme;
+            tmp[n].host = host;
+            tmp[n].port = port;
+            tmp[n].path = path;
+            n++;
         }
     }
 
     /* if two announce URLs differ only by scheme, put them in the same tier.
      * (note: this can leave gaps in the `tier' values, but since the calling
      * function doesn't care, there's no point in removing the gaps...) */
-    for (int i = 0, n = std::size(tmp); i < n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         for (int j = i + 1; j < n; ++j)
         {
-            if (tmp[i].info.tier != tmp[j].info.tier &&
-                tmp[i].port == tmp[j].port &&
-                tmp[i].host == tmp[j].host &&
-                tmp[i].path == tmp[j].path)
+            if (tmp[i].info.tier != tmp[j].info.tier && tmp[i].port == tmp[j].port &&
+                tr_strcmp0(tmp[i].host, tmp[j].host) == 0 && tr_strcmp0(tmp[i].path, tmp[j].path) == 0)
             {
                 tmp[j].info.tier = tmp[i].info.tier;
             }
@@ -607,12 +622,27 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
     /* sort them, for two reasons:
      * (1) unjumble the tiers from the previous step
      * (2) move the UDP trackers to the front of each tier */
-    qsort(std::data(tmp), std::size(tmp), sizeof(struct ann_tracker_info), filter_trackers_compare_func);
+    qsort(tmp, n, sizeof(struct ann_tracker_info), filter_trackers_compare_func);
 
     /* build the output */
-    *setme_count = std::size(tmp);
+    *setme_count = n;
     struct tr_tracker_info* const ret = tr_new0(tr_tracker_info, n);
-    std::transform(std::begin(tmp), std::end(tmp), ret, [](auto const& item){ return item.info; });
+
+    for (int i = 0; i < n; ++i)
+    {
+        ret[i] = tmp[i].info;
+    }
+
+    /* cleanup */
+    for (int i = 0; i < n; ++i)
+    {
+        tr_free(tmp[i].path);
+        tr_free(tmp[i].host);
+        tr_free(tmp[i].scheme);
+    }
+
+    tr_free(tmp);
+
     return ret;
 }
 
@@ -903,9 +933,7 @@ static tr_announce_request* announce_request_new(
     tr_announce_request* req = tr_new0(tr_announce_request, 1);
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
     req->url = tr_strdup(tier->currentTracker->announce);
-    std::cout << "url: " << req->url << " (" << __FILE__ << ':' << __LINE__ << ')' << std::endl ;
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
-    std::cout << "url: " << req->tracker_id_str << " (" << __FILE__ << ':' << __LINE__ << ')' << std::endl ;
     memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
     req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
@@ -1113,7 +1141,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 {
                     tr_free(tracker->tracker_id_str);
                     tracker->tracker_id_str = tr_strdup(response->tracker_id_str);
-                    std::cout << "url: " << tracker->tracker_id_str << " (" << __FILE__ << ':' << __LINE__ << ')' << std::endl ;
                 }
             }
 
@@ -1438,12 +1465,17 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 int const n = std::max(1, int{ *multiscrape_max - TrMultiscrapeStep });
                 if (*multiscrape_max != n)
                 {
-                    auto const parsed = tr_urlParse(url);
-                    if (parsed)
+                    char* scheme = nullptr;
+                    char* host = nullptr;
+                    auto port = int{};
+                    if (tr_urlParse(std::data(url), std::size(url), &scheme, &host, &port, nullptr))
                     {
-                        auto sanitized_url = std::string{};
-                        tr_buildBuf(sanitized_url, parsed->scheme, "://"sv, parsed->host, ":"sv, parsed->portstr);
-                        tr_logAddNamedInfo(sanitized_url.c_str(), "Reducing multiscrape max to %d", n);
+                        /* don't log the full URL, since that might have a personal announce id */
+                        char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
+                        tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
+                        tr_free(sanitized_url);
+                        tr_free(host);
+                        tr_free(scheme);
                     }
 
                     *multiscrape_max = n;
