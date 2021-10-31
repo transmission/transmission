@@ -19,7 +19,7 @@
                   <ProgId Id="Transmission.QtClient" Description="Transmission Qt Client Class" />
                 </ProgId>
               </Class>
-            </AppId>                                
+            </AppId>
           </TypeLib>
         </File>
 
@@ -85,39 +85,63 @@
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\bin">
 
-      <Component Id="dll.qt5.core">
-        <File DiskId="1" KeyPath="yes" Name="Qt5Core.dll" />
+      <Component Id="dll.qt.core">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Core.dll" />
       </Component>
-      <Component Id="dll.qt5.dbus">
-        <File DiskId="1" KeyPath="yes" Name="Qt5DBus.dll" />
+      <Component Id="dll.qt.dbus">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)DBus.dll" />
       </Component>
-      <Component Id="dll.qt5.gui">
-        <File DiskId="1" KeyPath="yes" Name="Qt5Gui.dll" />
+      <Component Id="dll.qt.gui">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Gui.dll" />
       </Component>
-      <Component Id="dll.qt5.network">
-        <File DiskId="1" KeyPath="yes" Name="Qt5Network.dll" />
+      <Component Id="dll.qt.network">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Network.dll" />
       </Component>
-      <Component Id="dll.qt5.widgets">
-        <File DiskId="1" KeyPath="yes" Name="Qt5Widgets.dll" />
+      <Component Id="dll.qt.widgets">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Widgets.dll" />
       </Component>
-      <Component Id="dll.qt5.winextras">
-        <File DiskId="1" KeyPath="yes" Name="Qt5WinExtras.dll" />
+      <?if $(var.QtMajorVer) = 5 ?>
+      <Component Id="dll.qt.winextras">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)WinExtras.dll" />
       </Component>
+      <?endif ?>
 
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\plugins">
 
+      <?if $(var.QtMajorVer) = 6 ?>
+      <Directory Id="QTIMAGEFORMATSDIR" Name="imageformats">
+        <Component Id="dll.qt.plugins.imageformats.gif">
+          <File DiskId="1" KeyPath="yes" Name="qgif.dll" />
+        </Component>
+        <Component Id="dll.qt.plugins.imageformats.ico">
+          <File DiskId="1" KeyPath="yes" Name="qico.dll" />
+        </Component>
+        <Component Id="dll.qt.plugins.imageformats.jpeg">
+          <File DiskId="1" KeyPath="yes" Name="qjpeg.dll" />
+        </Component>
+      </Directory>
+      <?endif ?>
+
       <Directory Id="QTPLATFORMDIR" Name="platforms">
-        <Component Id="dll.qt5.plugins.platforms.windows">
+        <Component Id="dll.qt.plugins.platforms.windows">
           <File DiskId="1" KeyPath="yes" Name="qwindows.dll" />
         </Component>
       </Directory>
 
       <Directory Id="QTSTYLESDIR" Name="styles">
-        <Component Id="dll.qt5.plugins.styles.windowsvista">
+        <Component Id="dll.qt.plugins.styles.windowsvista">
           <File DiskId="1" KeyPath="yes" Name="qwindowsvistastyle.dll" />
         </Component>
       </Directory>
+
+      <?if $(var.QtMajorVer) = 6 ?>
+      <Directory Id="QTTLSDIR" Name="tls">
+        <Component Id="dll.qt.plugins.tls.openssl">
+          <File DiskId="1" KeyPath="yes" Name="qopensslbackend.dll" />
+        </Component>
+      </Directory>
+      <?endif ?>
 
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.ThirdPartyDir)\bin">
@@ -133,14 +157,24 @@
     <ComponentGroup Id="QtClientComponents">
       <ComponentRef Id="exe.transmission.qt" />
       <ComponentRef Id="conf.qt" />
-      <ComponentRef Id="dll.qt5.core" />
-      <ComponentRef Id="dll.qt5.dbus" />
-      <ComponentRef Id="dll.qt5.gui" />
-      <ComponentRef Id="dll.qt5.network" />
-      <ComponentRef Id="dll.qt5.widgets" />
-      <ComponentRef Id="dll.qt5.winextras" />
-      <ComponentRef Id="dll.qt5.plugins.platforms.windows" />
-      <ComponentRef Id="dll.qt5.plugins.styles.windowsvista" />
+      <ComponentRef Id="dll.qt.core" />
+      <ComponentRef Id="dll.qt.dbus" />
+      <ComponentRef Id="dll.qt.gui" />
+      <ComponentRef Id="dll.qt.network" />
+      <ComponentRef Id="dll.qt.widgets" />
+      <?if $(var.QtMajorVer) = 5 ?>
+      <ComponentRef Id="dll.qt.winextras" />
+      <?endif ?>
+      <?if $(var.QtMajorVer) = 6 ?>
+      <ComponentRef Id="dll.qt.plugins.imageformats.gif" />
+      <ComponentRef Id="dll.qt.plugins.imageformats.ico" />
+      <ComponentRef Id="dll.qt.plugins.imageformats.jpeg" />
+      <?endif ?>
+      <ComponentRef Id="dll.qt.plugins.platforms.windows" />
+      <ComponentRef Id="dll.qt.plugins.styles.windowsvista" />
+      <?if $(var.QtMajorVer) = 6 ?>
+      <ComponentRef Id="dll.qt.plugins.tls.openssl" />
+      <?endif ?>
       <ComponentRef Id="dll.dbus" />
       <ComponentGroupRef Id="QtClientTranslationsComponents" />
       <ComponentGroupRef Id="QtTranslationsComponents" />
