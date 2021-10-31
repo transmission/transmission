@@ -245,7 +245,9 @@ typedef NS_ENUM(unsigned int, statusTag) {
             statusLabel = STATUS_RATIO_TOTAL;
         }
 
-        menuItem.state = [statusLabel isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"]] ? NSOnState : NSOffState;
+        menuItem.state = [statusLabel isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"]]
+                             ? NSControlStateValueOn
+                             : NSControlStateValueOff;
         return YES;
     }
 

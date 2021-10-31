@@ -162,7 +162,7 @@
 
     [(TorrentTableView*)controlView removeTrackingAreas];
 
-    while (event.type != NSLeftMouseUp)
+    while (event.type != NSEventTypeLeftMouseUp)
     {
         point = [controlView convertPoint:event.locationInWindow fromView:nil];
 
@@ -186,12 +186,14 @@
         }
 
         //send events to where necessary
-        if (event.type == NSMouseEntered || event.type == NSMouseExited)
+        if (event.type == NSEventTypeMouseEntered || event.type == NSEventTypeMouseExited)
         {
             [NSApp sendEvent:event];
         }
-        event = [controlView.window
-            nextEventMatchingMask:(NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
+        event = [controlView.window nextEventMatchingMask:(NSEventMaskLeftMouseUp |
+                                                           NSEventMaskLeftMouseDragged |
+                                                           NSEventMaskMouseEntered |
+                                                           NSEventMaskMouseExited)];
     }
 
     fTracking = NO;
@@ -359,7 +361,7 @@
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
         NSImage* icon = (minimal && error) ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
+        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES hints:nil];
     }
 
     //error badge
@@ -367,13 +369,13 @@
     {
         NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
         NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
-        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                          hints:nil];
     }
 
     //text color
     NSColor *titleColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         titleColor = statusColor = NSColor.whiteColor;
     }
@@ -434,7 +436,7 @@
         }
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 controlImage = [NSImage imageNamed:[@"ResumeNoWait" stringByAppendingString:controlImageSuffix]];
             }
@@ -449,7 +451,7 @@
         }
 
         NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
-        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                            hints:nil];
         minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
 
@@ -469,7 +471,7 @@
         }
 
         NSImage* revealImage = [NSImage imageNamed:revealImageString];
-        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositeSourceOver
+        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
                        fraction:1.0
                  respectFlipped:YES
                           hints:nil];
@@ -495,7 +497,7 @@
         {
             NSImage* actionImage = [NSImage imageNamed:actionImageString];
             [actionImage drawInRect:[self actionButtonRectForBounds:cellFrame] fromRect:NSZeroRect
-                          operation:NSCompositeSourceOver
+                          operation:NSCompositingOperationSourceOver
                            fraction:1.0
                      respectFlipped:YES
                               hints:nil];
@@ -516,11 +518,12 @@
             PRIORITY_ICON_WIDTH,
             PRIORITY_ICON_HEIGHT);
 
-        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.labelColor;
+        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor
+                                                                                     : NSColor.labelColor;
 
         NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
             imageWithColor:priorityColor];
-        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0
+        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
                    respectFlipped:YES
                             hints:nil];
     }
@@ -697,7 +700,7 @@
     if (torrent.magnet)
     {
         [[NSColor colorWithCalibratedWhite:1.0 alpha:[fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
-        NSRectFillUsingOperation(barRect, NSCompositeSourceOver);
+        NSRectFillUsingOperation(barRect, NSCompositingOperationSourceOver);
         return;
     }
 
@@ -746,7 +749,7 @@
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
     //actually draw image
-    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositeSourceOver
+    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
               fraction:([fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0)respectFlipped:YES
                  hints:nil];
 }
@@ -911,7 +914,7 @@
             return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 return NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
             }

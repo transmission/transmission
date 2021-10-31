@@ -33,7 +33,7 @@
     [color set];
 
     NSSize const size = coloredImage.size;
-    NSRectFillUsingOperation(NSMakeRect(0.0, 0.0, size.width, size.height), NSCompositeSourceAtop);
+    NSRectFillUsingOperation(NSMakeRect(0.0, 0.0, size.width, size.height), NSCompositingOperationSourceAtop);
 
     [coloredImage unlockFocus];
 
