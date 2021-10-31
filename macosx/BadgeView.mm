@@ -66,7 +66,7 @@
 
 - (void)drawRect:(NSRect)rect
 {
-    [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
     if (fQuitting)
     {
@@ -118,7 +118,7 @@
     badgeRect.origin.x = 0.0;
     badgeRect.origin.y = height;
 
-    [badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    [badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
     //make sure text fits on the badge
     CGFloat fontSize = 26.0;

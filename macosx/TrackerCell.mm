@@ -97,14 +97,14 @@ NSMutableSet* fTrackerIconLoading;
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     //icon
-    [self.favIcon drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositeSourceOver
+    [self.favIcon drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
                     fraction:1.0
               respectFlipped:YES
                        hints:nil];
 
     //set table colors
     NSColor *nameColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         nameColor = statusColor = NSColor.whiteColor;
     }

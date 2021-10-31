@@ -1251,7 +1251,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     if (size > MAXSIZE_T)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        return false;
+        return nullptr;
     }
 
     void* ret = nullptr;

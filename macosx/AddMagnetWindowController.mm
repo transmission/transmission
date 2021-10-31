@@ -89,7 +89,8 @@
     }
     [fPriorityPopUp selectItemAtIndex:priorityIndex];
 
-    fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSOnState : NSOffState;
+    fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn
+                                                                                              : NSControlStateValueOff;
 
     if (fDestination)
     {
@@ -193,7 +194,7 @@
                                                fTorrent.name];
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             [self setDestinationPath:panel.URLs[0].path determinationType:TorrentDeterminationUserSpecified];
         }
@@ -218,13 +219,13 @@
             @"If you are attempting to use already existing data,"
              " the root data directory should be inside the destination directory.",
             "Add torrent -> same name -> message");
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
         [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle:NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
         alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            if (alert.suppressionButton.state == NSOnState)
+            if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningFolderDataSameName"];
             }
@@ -293,7 +294,7 @@
 {
     [fTorrent setGroupValue:fGroupValue determinationType:fGroupDeterminationType];
 
-    if (fStartCheck.state == NSOnState)
+    if (fStartCheck.state == NSControlStateValueOn)
     {
         [fTorrent startTransfer];
     }
