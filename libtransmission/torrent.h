@@ -22,6 +22,7 @@
 #include "bandwidth.h" /* tr_bandwidth */
 #include "bitfield.h"
 #include "completion.h" /* tr_completion */
+#include "file.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -216,7 +217,7 @@ struct tr_torrent
         for (size_t i = 0; i < info.fileCount; ++i)
         {
             auto const found = this->findFile(filename, i);
-            auto const mtime = found ? found->mtime : 0;
+            auto const mtime = found ? found->last_modified_at : 0;
 
             info.files[i].mtime = mtime;
 
@@ -230,18 +231,17 @@ struct tr_torrent
 
     /// FINDING FILES
 
-    struct tr_found_file_t
+    struct tr_found_file_t : public tr_sys_path_info
     {
         std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
         std::string_view base; // /home/foo/Downloads
         std::string_view subpath; // /torrent/01-file-one.txt
-        time_t mtime;
 
-        tr_found_file_t(std::string& f, std::string_view b, time_t mt)
-            : filename{ f }
+        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
+            : tr_sys_path_info{ info }
+            , filename{ f }
             , base{ b }
             , subpath{ f.c_str() + std::size(b) + 1 }
-            , mtime{ mt }
         {
         }
     };

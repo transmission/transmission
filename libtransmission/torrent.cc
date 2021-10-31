@@ -3308,13 +3308,13 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
         tr_buildBuf(filename, base, "/"sv, file.name);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
-            return tr_found_file_t{ filename, base, file_info.last_modified_at };
+            return tr_found_file_t{ file_info, filename, base };
         }
 
-        tr_buildBuf(filename, base, "/"sv, file.name, ".part");
+        tr_buildBuf(filename, base, "/"sv, file.name, ".part"sv);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
-            return tr_found_file_t{ filename, base, file_info.last_modified_at };
+            return tr_found_file_t{ file_info, filename, base };
         }
     }
 
@@ -3325,13 +3325,13 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
         tr_buildBuf(filename, base, "/"sv, file.name);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
-            return tr_found_file_t{ filename, base, file_info.last_modified_at };
+            return tr_found_file_t{ file_info, filename, base };
         }
 
-        tr_buildBuf(filename, base, "/"sv, file.name, ".part");
+        tr_buildBuf(filename, base, "/"sv, file.name, ".part"sv);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
-            return tr_found_file_t{ filename, base, file_info.last_modified_at };
+            return tr_found_file_t{ file_info, filename, base };
         }
     }
 
@@ -3361,7 +3361,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
 
     if (mtime != nullptr)
     {
-        *mtime = found->mtime;
+        *mtime = found->last_modified_at;
     }
 
     return true;

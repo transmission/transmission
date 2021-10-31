@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string>
 #include <string_view>
 #include <time.h> /* time_t */
 #include <type_traits>
