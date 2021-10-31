@@ -30,10 +30,10 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include "application.h"
-#include "conf.h"
-#include "notify.h"
-#include "util.h"
+#include "Application.h"
+#include "Notify.h"
+#include "Prefs.h"
+#include "Utils.h"
 
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-gtk"
