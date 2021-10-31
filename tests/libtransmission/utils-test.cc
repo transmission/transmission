@@ -239,6 +239,14 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    auto parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("1"sv, parsed->host);
+    EXPECT_EQ("/"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org/some/path";
     scheme = nullptr;
     host = nullptr;
@@ -252,6 +260,14 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org:8080/some/path";
     scheme = nullptr;
     host = nullptr;
@@ -264,6 +280,14 @@ TEST_F(UtilsTest, url)
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
+
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("8080"sv, parsed->portstr);
+    EXPECT_EQ(8080, parsed->port);
 }
 
 TEST_F(UtilsTest, trHttpUnescape)

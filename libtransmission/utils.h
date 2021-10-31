@@ -9,6 +9,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <optional>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
 #include <string_view>
@@ -267,6 +268,17 @@ bool tr_urlIsValidTracker(char const* url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid(char const* url, size_t url_len);
+
+struct tr_parsed_url_t
+{
+    std::string_view scheme;
+    std::string_view host;
+    std::string_view path;
+    std::string_view portstr;
+    int port = -1;
+};
+
+std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
