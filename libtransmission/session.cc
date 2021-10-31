@@ -2099,6 +2099,8 @@ struct sessionLoadTorrentsData
     bool done;
 };
 
+#include <iostream>
+
 static void sessionLoadTorrents(void* vdata)
 {
     auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
@@ -2116,14 +2118,14 @@ static void sessionLoadTorrents(void* vdata)
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
-        char path[TR_PATH_MAX] = {};
         auto const dirname_sv = std::string_view{ dirname };
+        auto path = std::string{};
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (tr_str_has_suffix(name, ".torrent"))
             {
-                tr_buildBuf(path, sizeof(path), dirname_sv, '/', name);
-                tr_ctorSetMetainfoFromFile(data->ctor, path);
+                tr_buildBuf(path, dirname_sv, "/", name);
+                tr_ctorSetMetainfoFromFile(data->ctor, path.c_str());
 
                 tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr, nullptr);
                 if (tor != nullptr)

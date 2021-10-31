@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stddef.h> /* size_t */
+#include <cinttypes>
+#include <cstdarg>
+#include <cstddef>
+#include <ctime>
+#include <optional>
 #include <string_view>
-#include <time.h> /* time_t */
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "tr-macros.h"
@@ -81,37 +83,18 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
-namespace tr_utils_impl
+template<typename... T,
+         typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string& tr_buildBuf(std::string& setme, T... args)
 {
-
-constexpr void tr_buildBufImpl(char*& buf, size_t& buflen, char ch)
-{
-    if (buflen >= 2)
+    setme.clear();
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
     {
-        *buf++ = ch;
+        setme.reserve(n);
     }
-    *buf = '\0';
-    --buflen;
-}
-
-constexpr void tr_buildBufImpl(char*& buf, size_t& buflen, std::string_view name)
-{
-    auto const len = std::min(buflen - 1, std::size(name));
-    for (size_t i = 0; i < len; ++i)
-    {
-        *buf++ = name[i];
-    }
-    *buf = '\0';
-    buflen -= len;
-}
-
-} // namespace tr_utils_impl
-
-template<typename... Args>
-std::pair<char*, size_t> tr_buildBuf(char* buf, size_t buflen, Args... args)
-{
-    (tr_utils_impl::tr_buildBufImpl(buf, buflen, args), ...);
-    return { buf, buflen };
+    ((setme += args), ...);
+    return setme;
 }
 
 /**
@@ -301,6 +284,18 @@ bool tr_urlIsValidTracker(char const* url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid(char const* url, size_t url_len);
+
+struct tr_parsed_url_t
+{
+    std::string_view scheme;
+    std::string_view host;
+    std::string_view path;
+    std::string_view portstr;
+    int port = -1;
+};
+
+std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
+
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */

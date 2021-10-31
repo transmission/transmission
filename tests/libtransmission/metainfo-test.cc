@@ -154,16 +154,14 @@ TEST(Metainfo, sanitize)
     for (auto const& test : tests)
     {
         bool is_adjusted;
-        char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);
+        char buf[TR_PATH_MAX] = {};
+        auto const ok = tr_metainfo_sanitize_path_component(buf, test.str, test.len, &is_adjusted);
 
-        EXPECT_STREQ(test.expected_result, result);
-
-        if (test.expected_result != nullptr)
+        if (ok)
         {
+            EXPECT_STREQ(test.expected_result, buf);
             EXPECT_EQ(test.expected_is_adjusted, is_adjusted);
         }
-
-        tr_free(result);
     }
 }
 
