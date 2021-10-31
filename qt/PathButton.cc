@@ -155,7 +155,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(path_);
+        icon = icon_provider.icon(QFileInfo(path_));
     }
 
     if (icon.isNull())
