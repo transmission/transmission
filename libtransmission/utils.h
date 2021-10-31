@@ -11,8 +11,10 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string>
 #include <string_view>
 #include <time.h> /* time_t */
+#include <type_traits>
 #include <vector>
 
 #include "tr-macros.h"
@@ -79,6 +81,19 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 /** @brief build a filename from a series of elements using the
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string& tr_buildBuf(std::string& setme, T... args)
+{
+    setme.clear();
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
 
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
