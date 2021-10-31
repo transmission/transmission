@@ -10,24 +10,26 @@
 #include "Application.h"
 #include "InteropObject.h"
 
-InteropObject::InteropObject(QObject* parent) :
-    QObject(parent)
+InteropObject::InteropObject(QObject* parent)
+    : QObject(parent)
 {
 }
 
-bool InteropObject::PresentWindow()
+// NOLINTNEXTLINE(readability-identifier-naming)
+bool InteropObject::PresentWindow() const
 {
-    qApp->raise();
+    trApp->raise();
     return true;
 }
 
-bool InteropObject::AddMetainfo(QString const& metainfo)
+// NOLINTNEXTLINE(readability-identifier-naming)
+bool InteropObject::AddMetainfo(QString const& metainfo) const
 {
     AddData addme(metainfo);
 
     if (addme.type != addme.NONE)
     {
-        qApp->addTorrent(addme);
+        trApp->addTorrent(addme);
     }
 
     return true;

@@ -14,34 +14,31 @@
 
 #define TR_NAME "Transmission"
 
+#include <array>
+#include <cstring> // memcmp()
+#include <list>
+#include <map>
+#include <string>
+#include <unordered_set>
+#include <vector>
+
+#include <event2/util.h> // evutil_ascii_strcasecmp()
+
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
 
-typedef enum
-{
-    TR_NET_OK,
-    TR_NET_ERROR,
-    TR_NET_WAIT
-}
-tr_tristate_t;
-
-typedef enum
+enum tr_auto_switch_state_t
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-}
-tr_auto_switch_state_t;
-
-enum
-{
-    PEER_ID_LEN = 20
 };
 
-void tr_peerIdInit(uint8_t* setme);
+tr_peer_id_t tr_peerIdInit();
 
 struct event_base;
 struct evdns_base;
@@ -50,6 +47,7 @@ struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
+struct tr_blocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 struct tr_device_info;
@@ -87,10 +85,28 @@ struct tr_turtle_info
     /* bitfield of all the minutes in a week.
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
-    tr_bitfield minutes;
+    // Changed to non-owning pointer temporarily till tr_turtle_info becomes C++-constructible and destructible
+    // TODO: remove * and own the value
+    tr_bitfield* minutes = nullptr;
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
+};
+
+struct CompareHash
+{
+    bool operator()(uint8_t const* const a, uint8_t const* const b) const
+    {
+        return std::memcmp(a, b, SHA_DIGEST_LENGTH) < 0;
+    }
+};
+
+struct CompareHashString
+{
+    bool operator()(char const* const a, char const* const b) const
+    {
+        return evutil_ascii_strcasecmp(a, b) < 0;
+    }
 };
 
 /** @brief handle to an active libtransmission session */
@@ -103,7 +119,6 @@ struct tr_session
     bool isLPDEnabled;
     bool isBlocklistEnabled;
     bool isPrefetchEnabled;
-    bool isTorrentDoneScriptEnabled;
     bool isClosing;
     bool isClosed;
     bool isIncompleteFileNamingEnabled;
@@ -113,10 +128,12 @@ struct tr_session
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled;
 
     uint8_t peer_id_ttl_hours;
 
-    tr_variant removedTorrents;
+    // torrent id, time removed
+    std::vector<std::pair<int, time_t>> removed_torrents;
 
     bool stalledEnabled;
     bool queueEnabled[2];
@@ -174,10 +191,12 @@ struct tr_session
     int peerSocketTOS;
     char* peer_congestion_algorithm;
 
-    int torrentCount;
-    tr_torrent* torrentList;
+    std::unordered_set<tr_torrent*> torrents;
+    std::map<int, tr_torrent*> torrentsById;
+    std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
+    std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
 
-    char* torrentDoneScript;
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
 
     char* configDir;
     char* resumeDir;
@@ -188,7 +207,7 @@ struct tr_session
 
     struct tr_device_info* downloadDir;
 
-    struct tr_list* blocklists;
+    std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
@@ -214,17 +233,19 @@ struct tr_session
     struct event* saveTimer;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth bandwidth;
+    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    Bandwidth* bandwidth;
 
     float desiredRatio;
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* public_ipv4;
-    struct tr_bindinfo* public_ipv6;
+    struct tr_bindinfo* bind_ipv4;
+    struct tr_bindinfo* bind_ipv6;
 };
 
-static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
+constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
 {
     return session->public_peer_port;
 }
@@ -251,29 +272,29 @@ struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
 int tr_sessionCountTorrents(tr_session const* session);
 
-tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n);
+std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
 
 enum
 {
     SESSION_MAGIC_NUMBER = 3845,
 };
 
-static inline bool tr_isSession(tr_session const* session)
+constexpr bool tr_isSession(tr_session const* session)
 {
-    return session != NULL && session->magicNumber == SESSION_MAGIC_NUMBER;
+    return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
 }
 
-static inline bool tr_isPreallocationMode(tr_preallocation_mode m)
+constexpr bool tr_isPreallocationMode(tr_preallocation_mode m)
 {
     return m == TR_PREALLOCATE_NONE || m == TR_PREALLOCATE_SPARSE || m == TR_PREALLOCATE_FULL;
 }
 
-static inline bool tr_isEncryptionMode(tr_encryption_mode m)
+constexpr bool tr_isEncryptionMode(tr_encryption_mode m)
 {
     return m == TR_CLEAR_PREFERRED || m == TR_ENCRYPTION_PREFERRED || m == TR_ENCRYPTION_REQUIRED;
 }
 
-static inline bool tr_isPriority(tr_priority_t p)
+constexpr bool tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
 }
@@ -308,15 +329,13 @@ static inline int toMemMB(uint64_t B)
 **/
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
-unsigned int tr_sessionGetAltSpeed_Bps(tr_session const*, tr_direction);
-unsigned int tr_sessionGetRawSpeed_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
-
-void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
-void tr_sessionSetAltSpeed_Bps(tr_session*, tr_direction, unsigned int Bps);
 
 bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
-void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
+std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
+
+void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
+void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);

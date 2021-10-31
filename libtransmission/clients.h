@@ -12,8 +12,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "tr-macros.h"
+
 /**
  * @brief parse a peer-id into a human-readable client name and version number
  * @ingroup utils
  */
-char* tr_clientForId(char* buf, size_t buflen, void const* peer_id);
+char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id);

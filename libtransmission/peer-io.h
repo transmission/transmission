@@ -16,7 +16,7 @@
 ***
 **/
 
-#include <assert.h>
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "bandwidth.h"
@@ -25,147 +25,176 @@
 #include "peer-socket.h"
 #include "utils.h" /* tr_time() */
 
+class tr_peerIo;
+struct Bandwidth;
 struct evbuffer;
-struct tr_bandwidth;
 struct tr_datatype;
-struct tr_peerIo;
 
 /**
  * @addtogroup networked_io Networked IO
  * @{
  */
 
-typedef enum
+enum ReadState
 {
     READ_NOW,
     READ_LATER,
     READ_ERR
-}
-ReadState;
+};
 
-typedef enum
+enum tr_encryption_type
 {
     /* these match the values in MSE's crypto_select */
     PEER_ENCRYPTION_NONE = (1 << 0),
     PEER_ENCRYPTION_RC4 = (1 << 1)
-}
-tr_encryption_type;
+};
 
-typedef ReadState (* tr_can_read_cb)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
 
-typedef void (* tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
 
-typedef void (* tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
+using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
 
-typedef struct tr_peerIo
+auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
+
+class tr_peerIo
 {
-    bool isEncrypted;
-    bool isIncoming;
-    bool peerIdIsSet;
-    bool extendedProtocolSupported;
-    bool fastExtensionSupported;
-    bool dhtSupported;
-    bool utpSupported;
+public:
+    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_seed_in)
+        : addr{ addr_in }
+        , session{ session_in }
+        , inbuf{ evbuffer_new() }
+        , outbuf{ evbuffer_new() }
+        , port{ port_in }
+        , isSeed{ is_seed_in }
+    {
+    }
 
-    tr_priority_t priority;
+    ~tr_peerIo()
+    {
+        evbuffer_free(outbuf);
+        evbuffer_free(inbuf);
+    }
 
-    short int pendingEvents;
+    tr_crypto crypto = {};
 
-    int magicNumber;
+    tr_address const addr;
 
-    tr_encryption_type encryption_type;
-    bool isSeed;
+    // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
+    // like this one isn't being used just for assertions, but also in
+    // didWriteWrapper() to see if the tr_peerIo got freed during the
+    // notify-consumed events. Fix this before removing this field.
+    int magic_number = PEER_IO_MAGIC_NUMBER;
 
-    tr_port port;
-    struct tr_peer_socket socket;
+    struct tr_peer_socket socket = {};
 
-    int refCount;
+    time_t const timeCreated = tr_time();
 
-    uint8_t peerId[SHA_DIGEST_LENGTH];
-    time_t timeCreated;
+    tr_session* const session;
 
-    tr_session* session;
+    tr_can_read_cb canRead = nullptr;
+    tr_did_write_cb didWrite = nullptr;
+    tr_net_error_cb gotError = nullptr;
+    void* userData = nullptr;
 
-    tr_address addr;
+    // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
+    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
+    Bandwidth* bandwidth = nullptr;
 
-    tr_can_read_cb canRead;
-    tr_did_write_cb didWrite;
-    tr_net_error_cb gotError;
-    void* userData;
+    evbuffer* const inbuf;
+    evbuffer* const outbuf;
+    struct tr_datatype* outbuf_datatypes = nullptr;
 
-    struct tr_bandwidth bandwidth;
-    tr_crypto crypto;
+    struct event* event_read = nullptr;
+    struct event* event_write = nullptr;
 
-    struct evbuffer* inbuf;
-    struct evbuffer* outbuf;
-    struct tr_datatype* outbuf_datatypes;
+    // TODO(ckerr): this could be narrowed to 1 byte
+    tr_encryption_type encryption_type = PEER_ENCRYPTION_NONE;
 
-    struct event* event_read;
-    struct event* event_write;
-}
-tr_peerIo;
+    // TODO: use std::shared_ptr instead of manual refcounting?
+    int refCount = 1;
+
+    short int pendingEvents = 0;
+
+    tr_port const port;
+
+    tr_priority_t priority = TR_PRI_NORMAL;
+
+    bool const isSeed;
+    bool dhtSupported = false;
+    bool extendedProtocolSupported = false;
+    bool fastExtensionSupported = false;
+    bool utpSupported = false;
+};
 
 /**
 ***
 **/
 
-tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    uint8_t const* torrentHash, bool isSeed, bool utp);
+tr_peerIo* tr_peerIoNewOutgoing(
+    tr_session* session,
+    Bandwidth* parent,
+    struct tr_address const* addr,
+    tr_port port,
+    uint8_t const* torrentHash,
+    bool isSeed,
+    bool utp);
 
-tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    struct tr_peer_socket socket);
+tr_peerIo* tr_peerIoNewIncoming(
+    tr_session* session,
+    Bandwidth* parent,
+    struct tr_address const* addr,
+    tr_port port,
+    struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoRef(io) tr_peerIoRefImpl(__FILE__, __LINE__, (io))
 
 void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
-#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io));
+#define tr_peerIoUnref(io) tr_peerIoUnrefImpl(__FILE__, __LINE__, (io))
 
-#define PEER_IO_MAGIC_NUMBER 206745
-
-static inline bool tr_isPeerIo(tr_peerIo const* io)
+constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != NULL && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_isBandwidth(&io->bandwidth) &&
-        tr_address_is_valid(&io->addr);
+    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
 }
 
 /**
 ***
 **/
 
-static inline void tr_peerIoEnableFEXT(tr_peerIo* io, bool flag)
+constexpr void tr_peerIoEnableFEXT(tr_peerIo* io, bool flag)
 {
     io->fastExtensionSupported = flag;
 }
 
-static inline bool tr_peerIoSupportsFEXT(tr_peerIo const* io)
+constexpr bool tr_peerIoSupportsFEXT(tr_peerIo const* io)
 {
     return io->fastExtensionSupported;
 }
 
-static inline void tr_peerIoEnableLTEP(tr_peerIo* io, bool flag)
+constexpr void tr_peerIoEnableLTEP(tr_peerIo* io, bool flag)
 {
     io->extendedProtocolSupported = flag;
 }
 
-static inline bool tr_peerIoSupportsLTEP(tr_peerIo const* io)
+constexpr bool tr_peerIoSupportsLTEP(tr_peerIo const* io)
 {
     return io->extendedProtocolSupported;
 }
 
-static inline void tr_peerIoEnableDHT(tr_peerIo* io, bool flag)
+constexpr void tr_peerIoEnableDHT(tr_peerIo* io, bool flag)
 {
     io->dhtSupported = flag;
 }
 
-static inline bool tr_peerIoSupportsDHT(tr_peerIo const* io)
+constexpr bool tr_peerIoSupportsDHT(tr_peerIo const* io)
 {
     return io->dhtSupported;
 }
 
-static inline bool tr_peerIoSupportsUTP(tr_peerIo const* io)
+constexpr bool tr_peerIoSupportsUTP(tr_peerIo const* io)
 {
     return io->utpSupported;
 }
@@ -174,17 +203,15 @@ static inline bool tr_peerIoSupportsUTP(tr_peerIo const* io)
 ***
 **/
 
-static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
+constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->session != NULL);
+    TR_ASSERT(io->session != nullptr);
 
     return io->session;
 }
 
-char const* tr_peerIoAddrStr(struct tr_address const* addr, tr_port port);
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io);
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 
@@ -196,28 +223,15 @@ void tr_peerIoSetTorrentHash(tr_peerIo* io, uint8_t const* hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
 
-static inline bool tr_peerIoIsIncoming(tr_peerIo const* io)
+constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
-    return io->isIncoming;
+    return io->crypto.isIncoming;
 }
 
+// TODO: remove this func; let caller get the current time instead
 static inline int tr_peerIoGetAge(tr_peerIo const* io)
 {
     return tr_time() - io->timeCreated;
-}
-
-/**
-***
-**/
-
-void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id);
-
-static inline uint8_t const* tr_peerIoGetPeersId(tr_peerIo const* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->peerIdIsSet);
-
-    return io->peerId;
 }
 
 /**
@@ -240,16 +254,16 @@ void tr_peerIoWriteBuf(tr_peerIo* io, struct evbuffer* buf, bool isPieceData);
 ***
 **/
 
-static inline tr_crypto* tr_peerIoGetCrypto(tr_peerIo* io)
+constexpr tr_crypto* tr_peerIoGetCrypto(tr_peerIo* io)
 {
     return &io->crypto;
 }
 
 void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
 
-static inline bool tr_peerIoIsEncrypted(tr_peerIo const* io)
+constexpr bool tr_peerIoIsEncrypted(tr_peerIo const* io)
 {
-    return io != NULL && io->encryption_type == PEER_ENCRYPTION_RC4;
+    return io != nullptr && io->encryption_type == PEER_ENCRYPTION_RC4;
 }
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);
@@ -293,23 +307,23 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
-static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
+static inline void tr_peerIoSetParent(tr_peerIo* io, Bandwidth* parent)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_bandwidthSetParent(&io->bandwidth, parent);
+    io->bandwidth->setParent(parent);
 }
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
 static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
 {
-    return tr_bandwidthClamp(&io->bandwidth, dir, 1024) > 0;
+    return io->bandwidth->clamp(dir, 1024) > 0;
 }
 
 static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
 {
-    return tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, dir);
+    return io->bandwidth->getPieceSpeedBytesPerSecond(now, dir);
 }
 
 /**
@@ -326,7 +340,7 @@ int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io);
 ***
 **/
 
-static inline struct evbuffer* tr_peerIoGetReadBuffer(tr_peerIo* io)
+constexpr struct evbuffer* tr_peerIoGetReadBuffer(tr_peerIo* io)
 {
     return io->inbuf;
 }

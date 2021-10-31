@@ -12,6 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "tr-macros.h"
+
 enum
 {
     TR_FR_DOWNLOADED = (1 << 0),

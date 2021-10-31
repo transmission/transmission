@@ -14,10 +14,11 @@
 
 #include "tr-macros.h"
 
-bool TR_NORETURN tr_assert_report(char const* file, int line, char const* message_fmt, ...) TR_GNUC_PRINTF(3, 4);
+[[noreturn]] bool tr_assert_report(char const* file, int line, char const* message_fmt, ...) TR_GNUC_PRINTF(3, 4);
 
 #define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, "%s", #x)))
 #define TR_ASSERT_MSG(x, ...) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, __VA_ARGS__)))
+#define TR_UNREACHABLE() tr_assert_report(__FILE__, __LINE__, "Unreachable code")
 
 #define TR_ENABLE_ASSERTS
 
@@ -25,6 +26,7 @@ bool TR_NORETURN tr_assert_report(char const* file, int line, char const* messag
 
 #define TR_ASSERT(x) ((void)0)
 #define TR_ASSERT_MSG(x, ...) ((void)0)
+#define TR_UNREACHABLE() ((void)0)
 
 #undef TR_ENABLE_ASSERTS
 

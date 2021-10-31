@@ -12,32 +12,44 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <optional>
+
 #include "transmission.h"
 #include "net.h"
 
 /** @addtogroup peers Peers
     @{ */
 
-struct tr_peerIo;
+class tr_peerIo;
 
 /** @brief opaque struct holding hanshake state information.
            freed when the handshake is completed. */
-typedef struct tr_handshake tr_handshake;
+struct tr_handshake;
+
+struct tr_handshake_result
+{
+    struct tr_handshake* handshake;
+    tr_peerIo* io;
+    bool readAnythingFromPeer;
+    bool isConnected;
+    void* userData;
+    std::optional<tr_peer_id_t> peer_id;
+};
 
 /* returns true on success, false on error */
-typedef bool (* handshakeDoneCB)(struct tr_handshake* handshake, struct tr_peerIo* io, bool readAnythingFromPeer,
-    bool isConnected, uint8_t const* peerId, void* userData);
+using tr_handshake_done_func = bool (*)(tr_handshake_result const& result);
 
-/** @brief instantiate a new handshake */
-tr_handshake* tr_handshakeNew(struct tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB,
-    void* doneUserData);
+/** @brief create a new handshake */
+tr_handshake* tr_handshakeNew(
+    tr_peerIo* io,
+    tr_encryption_mode encryption_mode,
+    tr_handshake_done_func when_done,
+    void* when_done_user_data);
 
 tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
 void tr_handshakeAbort(tr_handshake* handshake);
 
-struct tr_peerIo* tr_handshakeGetIO(tr_handshake* handshake);
-
-struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
+tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
 
 /** @} */

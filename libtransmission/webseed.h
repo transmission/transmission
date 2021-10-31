@@ -12,8 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-typedef struct tr_webseed tr_webseed;
+#include <string_view>
 
 #include "peer-common.h"
 
-tr_webseed* tr_webseedNew(struct tr_torrent* torrent, char const* url, tr_peer_callback callback, void* callback_data);
+tr_peer* tr_webseedNew(struct tr_torrent* torrent, std::string_view, tr_peer_callback callback, void* callback_data);

@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
+
 /***
 ****
 ***/
@@ -35,32 +39,17 @@
 #endif
 
 #ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) \
-    (__GNUC__ > (major) || \
-    (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define TR_GNUC_CHECK_VERSION(major, minor) 0
 #endif
 
 #ifdef __UCLIBC__
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) \
-    (__UCLIBC_MAJOR__ > (major) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
+    (__UCLIBC_MAJOR__ > (major) || (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
+     (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
 #else
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) 0
-#endif
-
-/***
-****
-***/
-
-#ifndef UNUSED
-#if __has_attribute(__unused__) || TR_GNUC_CHECK_VERSION(2, 7)
-#define UNUSED __attribute__((__unused__))
-#else
-#define UNUSED
-#endif
 #endif
 
 /***
@@ -78,14 +67,6 @@
 /***
 ****
 ***/
-
-#if __has_attribute(__noreturn__) || TR_GNUC_CHECK_VERSION(2, 5)
-#define TR_NORETURN __attribute__((__noreturn__))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
 
 #if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
 #define TR_DEPRECATED __attribute__((__deprecated__))
@@ -125,42 +106,6 @@
 #define TR_GNUC_MALLOC
 #endif
 
-#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
-#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
-#else
-#define TR_GNUC_FALLTHROUGH
-#endif
-
-/***
-****
-***/
-
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) \
-    { \
-        typedef char __tr_static_check__ [(x) ? 1 : -1] UNUSED; \
-    }
-#endif
-
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
-
 /***
 ****
 ***/
@@ -168,8 +113,25 @@
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
-#define SHA_DIGEST_LENGTH 20
-
 #define TR_INET6_ADDRSTRLEN 46
 
+#define TR_ADDRSTRLEN 64
+
 #define TR_BAD_SIZE ((size_t)-1)
+
+// Mostly to enforce better formatting
+#define TR_ARG_TUPLE(...) __VA_ARGS__
+
+// https://www.bittorrent.org/beps/bep_0003.html
+// A string of length 20 which this downloader uses as its id. Each
+// downloader generates its own id at random at the start of a new
+// download. This value will also almost certainly have to be escaped.
+auto inline constexpr PEER_ID_LEN = size_t{ 20 };
+using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
+
+#define SHA_DIGEST_LENGTH 20
+
+// TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
+// TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
+// TODO #3: this should be an array of std::byte
+using tr_sha1_digest_t = std::array<uint8_t, 20>;

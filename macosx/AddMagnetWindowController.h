@@ -29,38 +29,43 @@
 
 @interface AddMagnetWindowController : NSWindowController
 {
-    IBOutlet NSImageView * fLocationImageView;
-    IBOutlet NSTextField * fNameField, * fLocationField;
-    IBOutlet NSButton * fStartCheck;
-    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
+    IBOutlet NSImageView* fLocationImageView;
+    IBOutlet NSTextField* fNameField;
+    IBOutlet NSTextField* fLocationField;
+    IBOutlet NSButton* fStartCheck;
+    IBOutlet NSPopUpButton* fGroupPopUp;
+    IBOutlet NSPopUpButton* fPriorityPopUp;
 
     //remove these when switching to auto layout
-    IBOutlet NSTextField * fMagnetLinkLabel;
-    IBOutlet NSTextField * fDownloadToLabel, * fGroupLabel, * fPriorityLabel;
-    IBOutlet NSButton * fChangeDestinationButton;
-    IBOutlet NSBox * fDownloadToBox;
-    IBOutlet NSButton * fAddButton, * fCancelButton;
+    IBOutlet NSTextField* fMagnetLinkLabel;
+    IBOutlet NSTextField* fDownloadToLabel;
+    IBOutlet NSTextField* fGroupLabel;
+    IBOutlet NSTextField* fPriorityLabel;
+    IBOutlet NSButton* fChangeDestinationButton;
+    IBOutlet NSBox* fDownloadToBox;
+    IBOutlet NSButton* fAddButton;
+    IBOutlet NSButton* fCancelButton;
 
-    Controller * fController;
+    Controller* fController;
 
-    Torrent * fTorrent;
-    NSString * fDestination;
+    Torrent* fTorrent;
+    NSString* fDestination;
 
     NSInteger fGroupValue;
     TorrentDeterminationType fGroupDeterminationType;
 }
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
+- (instancetype)initWithTorrent:(Torrent*)torrent destination:(NSString*)path controller:(Controller*)controller;
 
-- (Torrent *) torrent;
+@property(nonatomic, readonly) Torrent* torrent;
 
-- (void) setDestination: (id) sender;
+- (void)setDestination:(id)sender;
 
-- (void) add: (id) sender;
-- (void) cancelAdd: (id) sender;
+- (void)add:(id)sender;
+- (void)cancelAdd:(id)sender;
 
-- (void) changePriority: (id) sender;
+- (void)changePriority:(id)sender;
 
-- (void) updateGroupMenu: (NSNotification *) notification;
+- (void)updateGroupMenu:(NSNotification*)notification;
 
 @end

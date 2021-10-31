@@ -15,10 +15,7 @@
 #include <windows.h>
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
 
 struct tr_error;
 
@@ -30,11 +27,11 @@ struct tr_error;
 #ifndef _WIN32
 
 /** @brief Platform-specific file descriptor type. */
-typedef int tr_sys_file_t;
+using tr_sys_file_t = int;
 /** @brief Platform-specific invalid file descriptor constant. */
 #define TR_BAD_SYS_FILE (-1)
 /** @brief Platform-specific directory descriptor type. */
-typedef void* tr_sys_dir_t;
+using tr_sys_dir_t = void*;
 /** @brief Platform-specific end-of-line sequence. */
 #define TR_NATIVE_EOL_STR "\n"
 /** @brief Platform-specific end-of-line sequence length. */
@@ -42,26 +39,26 @@ typedef void* tr_sys_dir_t;
 
 #else
 
-typedef HANDLE tr_sys_file_t;
+using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
-typedef struct tr_sys_dir_win32* tr_sys_dir_t;
+struct tr_sys_dir_win32;
+using tr_sys_dir_t = tr_sys_dir_win32*;
 #define TR_NATIVE_EOL_STR "\r\n"
 #define TR_NATIVE_EOL_STR_SIZE 2
 
 #endif
 
 /** @brief Platform-specific invalid directory descriptor constant. */
-#define TR_BAD_SYS_DIR ((tr_sys_dir_t)NULL)
+#define TR_BAD_SYS_DIR ((tr_sys_dir_t) nullptr)
 
-typedef enum
+enum tr_std_sys_file_t
 {
     TR_STD_SYS_FILE_IN,
     TR_STD_SYS_FILE_OUT,
     TR_STD_SYS_FILE_ERR
-}
-tr_std_sys_file_t;
+};
 
-typedef enum
+enum tr_sys_file_open_flags_t
 {
     TR_SYS_FILE_READ = (1 << 0),
     TR_SYS_FILE_WRITE = (1 << 1),
@@ -70,66 +67,57 @@ typedef enum
     TR_SYS_FILE_APPEND = (1 << 4),
     TR_SYS_FILE_TRUNCATE = (1 << 5),
     TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-}
-tr_sys_file_open_flags_t;
+};
 
-typedef enum
+enum tr_seek_origin_t
 {
     TR_SEEK_SET,
     TR_SEEK_CUR,
     TR_SEEK_END
-}
-tr_seek_origin_t;
+};
 
-typedef enum
+enum tr_sys_file_lock_flags_t
 {
     TR_SYS_FILE_LOCK_SH = (1 << 0),
     TR_SYS_FILE_LOCK_EX = (1 << 1),
     TR_SYS_FILE_LOCK_NB = (1 << 2),
     TR_SYS_FILE_LOCK_UN = (1 << 3)
-}
-tr_sys_file_lock_flags_t;
+};
 
-typedef enum
+enum tr_sys_path_get_info_flags_t
 {
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
-}
-tr_sys_path_get_info_flags_t;
+};
 
-typedef enum
+enum tr_sys_file_advice_t
 {
     TR_SYS_FILE_ADVICE_WILL_NEED,
     TR_SYS_FILE_ADVICE_DONT_NEED
-}
-tr_sys_file_advice_t;
+};
 
-typedef enum
+enum tr_sys_file_preallocate_flags_t
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
-}
-tr_sys_file_preallocate_flags_t;
+};
 
-typedef enum
+enum tr_sys_dir_create_flags_t
 {
     TR_SYS_DIR_CREATE_PARENTS = (1 << 0)
-}
-tr_sys_dir_create_flags_t;
+};
 
-typedef enum
+enum tr_sys_path_type_t
 {
     TR_SYS_PATH_IS_FILE,
     TR_SYS_PATH_IS_DIRECTORY,
     TR_SYS_PATH_IS_OTHER
-}
-tr_sys_path_type_t;
+};
 
-typedef struct tr_sys_path_info
+struct tr_sys_path_info
 {
-    tr_sys_path_type_t type;
-    uint64_t size;
-    time_t last_modified_at;
-}
-tr_sys_path_info;
+    tr_sys_path_type_t type = {};
+    uint64_t size = 0;
+    time_t last_modified_at = 0;
+};
 
 /**
  * @name Platform-specific wrapper functions
@@ -146,13 +134,26 @@ tr_sys_path_info;
 /* Path-related wrappers */
 
 /**
+ * @brief Portability wrapper for various in-kernel file copy functions, with a
+ *        fallback to a userspace read/write loop.
+ *
+ * @param[in]  src_path  Path to source file.
+ * @param[in]  dst_path  Path to destination file.
+ * @param[out] error     Pointer to error object. Optional, pass `nullptr` if
+ *                       you are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_error** error);
+
+/**
  * @brief Portability wrapper for `stat()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
  * @param[out] info  Result buffer.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -162,12 +163,12 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, s
  * @brief Portability wrapper for `access()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return `True` if path exists, `false` otherwise. Note that `false` will also
  *         be returned in case of error; if you need to distinguish the two,
- *         check if `error` is `NULL` afterwards.
+ *         check if `error` is `nullptr` afterwards.
  */
 bool tr_sys_path_exists(char const* path, struct tr_error** error);
 
@@ -185,14 +186,14 @@ bool tr_sys_path_is_relative(char const* path);
 /**
  * @brief Test to see if the two filenames point to the same file.
  *
- * @param[in]  path1  Path to first file or directory.
- * @param[in]  path2  Path to second file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[in]  path1 Path to first file or directory.
+ * @param[in]  path2 Path to second file or directory.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if
+ *                   you are not interested in error details.
  *
  * @return `True` if two paths point to the same file or directory, `false`
  *         otherwise. Note that `false` will also be returned in case of error;
- *         if you need to distinguish the two, check if `error` is `NULL`
+ *         if you need to distinguish the two, check if `error` is `nullptr`
  *         afterwards.
  */
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error);
@@ -201,12 +202,12 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error**
  * @brief Portability wrapper for `realpath()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing full path (with symbolic
  *         links, `.` and `..` resolved) on success (use @ref tr_free to free it
- *         when no longer needed), `NULL` otherwise (with `error` set
+ *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
 char* tr_sys_path_resolve(char const* path, struct tr_error** error);
@@ -215,12 +216,12 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error);
  * @brief Portability wrapper for `basename()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing base name (last path
  *         component; parent path removed) on success (use @ref tr_free to free
- *         it when no longer needed), `NULL` otherwise (with `error` set
+ *         it when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
 char* tr_sys_path_basename(char const* path, struct tr_error** error);
@@ -229,12 +230,12 @@ char* tr_sys_path_basename(char const* path, struct tr_error** error);
  * @brief Portability wrapper for `dirname()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing directory (parent path;
  *         last path component removed) on success (use @ref tr_free to free it
- *         when no longer needed), `NULL` otherwise (with `error` set
+ *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
 char* tr_sys_path_dirname(char const* path, struct tr_error** error);
@@ -244,7 +245,7 @@ char* tr_sys_path_dirname(char const* path, struct tr_error** error);
  *
  * @param[in]  src_path Path to source file or directory.
  * @param[in]  dst_path Path to destination file or directory.
- * @param[out] error    Pointer to error object. Optional, pass `NULL` if you
+ * @param[out] error    Pointer to error object. Optional, pass `nullptr` if you
  *                      are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
@@ -257,8 +258,8 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_er
  * @brief Portability wrapper for `remove()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
- *                   not interested in error details.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  *         Directory removal will only succeed if it is empty (contains no other
@@ -281,7 +282,7 @@ char* tr_sys_path_native_separators(char* path);
  * @brief Get handle to one of standard I/O files.
  *
  * @param[in]  std_file Standard file identifier.
- * @param[out] error    Pointer to error object. Optional, pass `NULL` if you
+ * @param[out] error    Pointer to error object. Optional, pass `nullptr` if you
  *                      are not interested in error details.
  *
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
@@ -297,8 +298,8 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, struct tr_error** 
  * @param[in]  flags       Combination of @ref tr_sys_file_open_flags_t values.
  * @param[in]  permissions Permissions to create file with (in case
                            @ref TR_SYS_FILE_CREATE is used). Not used on Windows.
- * @param[out] error       Pointer to error object. Optional, pass `NULL` if you
- *                         are not interested in error details.
+ * @param[out] error       Pointer to error object. Optional, pass `nullptr` if
+ *                         you are not interested in error details.
  *
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
  *         `error` set accordingly).
@@ -313,7 +314,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, str
  *                              characters are replaced with actual random
  *                              characters used to form a unique path to
  *                              temporary file.
- * @param[out]    error         Pointer to error object. Optional, pass `NULL`
+ * @param[out]    error         Pointer to error object. Optional, pass `nullptr`
  *                              if you are not interested in error details.
  *
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
@@ -325,8 +326,8 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, struct tr_error** error
  * @brief Portability wrapper for `close()`.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -337,8 +338,8 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error);
  *
  * @param[in]  handle Valid file descriptor.
  * @param[out] info   Result buffer.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -351,13 +352,17 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct t
  * @param[in]  offset     Relative file offset in bytes to seek to.
  * @param[in]  origin     Offset origin.
  * @param[out] new_offset New offset in bytes from beginning of file. Optional,
- *                        pass `NULL` if you are not interested.
- * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
- *                        are not interested in error details.
+ *                        pass `nullptr` if you are not interested.
+ * @param[out] error      Pointer to error object. Optional, pass `nullptr` if
+ *                        you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset,
+bool tr_sys_file_seek(
+    tr_sys_file_t handle,
+    int64_t offset,
+    tr_seek_origin_t origin,
+    uint64_t* new_offset,
     struct tr_error** error);
 
 /**
@@ -366,10 +371,10 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
  * @param[in]  handle     Valid file descriptor.
  * @param[out] buffer     Buffer to store read data to.
  * @param[in]  size       Number of bytes to read.
- * @param[out] bytes_read Number of bytes actually read. Optional, pass `NULL`
+ * @param[out] bytes_read Number of bytes actually read. Optional, pass `nullptr`
  *                        if you are not interested.
- * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
- *                        are not interested in error details.
+ * @param[out] error      Pointer to error object. Optional, pass `nullptr` if
+ *                        you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -383,14 +388,19 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
  * @param[out] buffer     Buffer to store read data to.
  * @param[in]  size       Number of bytes to read.
  * @param[in]  offset     File offset in bytes to start reading from.
- * @param[out] bytes_read Number of bytes actually read. Optional, pass `NULL`
+ * @param[out] bytes_read Number of bytes actually read. Optional, pass `nullptr`
  *                        if you are not interested.
- * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
- *                        are not interested in error details.
+ * @param[out] error      Pointer to error object. Optional, pass `nullptr` if
+ *                        you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+bool tr_sys_file_read_at(
+    tr_sys_file_t handle,
+    void* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_read,
     struct tr_error** error);
 
 /**
@@ -400,13 +410,17 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
  * @param[in]  buffer        Buffer to get data being written from.
  * @param[in]  size          Number of bytes to write.
  * @param[out] bytes_written Number of bytes actually written. Optional, pass
- *                           `NULL` if you are not interested.
- * @param[out] error         Pointer to error object. Optional, pass `NULL` if
+ *                           `nullptr` if you are not interested.
+ * @param[out] error         Pointer to error object. Optional, pass `nullptr` if
  *                           you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written,
+bool tr_sys_file_write(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
@@ -418,21 +432,26 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
  * @param[in]  size          Number of bytes to write.
  * @param[in]  offset        File offset in bytes to start writing from.
  * @param[out] bytes_written Number of bytes actually written. Optional, pass
- *                           `NULL` if you are not interested.
- * @param[out] error         Pointer to error object. Optional, pass `NULL` if you
- *                           are not interested in error details.
+ *                           `nullptr` if you are not interested.
+ * @param[out] error         Pointer to error object. Optional, pass `nullptr`
+ *                          if you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(
+    tr_sys_file_t handle,
+    void const* buffer,
+    uint64_t size,
+    uint64_t offset,
+    uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `fsync()`.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -443,8 +462,8 @@ bool tr_sys_file_flush(tr_sys_file_t handle, struct tr_error** error);
  *
  * @param[in]  handle Valid file descriptor.
  * @param[in]  size   Number of bytes to truncate (or extend) file to.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -456,12 +475,16 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, struct tr_error**
  * @param[in]  handle Valid file descriptor.
  * @param[in]  offset Offset in file to prefetch from.
  * @param[in]  size   Number of bytes to prefetch.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice,
+bool tr_sys_file_advise(
+    tr_sys_file_t handle,
+    uint64_t offset,
+    uint64_t size,
+    tr_sys_file_advice_t advice,
     struct tr_error** error);
 
 /**
@@ -470,8 +493,8 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
  * @param[in]  handle Valid file descriptor.
  * @param[in]  size   Number of bytes to preallocate file to.
  * @param[in]  flags  Combination of @ref tr_sys_file_preallocate_flags_t values.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -483,10 +506,10 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, str
  * @param[in]  handle Valid file descriptor.
  * @param[in]  offset Offset in file to map from.
  * @param[in]  size   Number of bytes to map.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
- * @return Pointer to mapped file data on success, `NULL` otherwise (with
+ * @return Pointer to mapped file data on success, `nullptr` otherwise (with
  *         `error` set accordingly).
  */
 void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, struct tr_error** error);
@@ -496,8 +519,8 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
  *
  * @param[in]  address Pointer to mapped file data.
  * @param[in]  size    Size of mapped data in bytes.
- * @param[out] error   Pointer to error object. Optional, pass `NULL` if you are
- *                     not interested in error details.
+ * @param[out] error   Pointer to error object. Optional, pass `nullptr` if you
+ *                     are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -511,7 +534,7 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, struct tr_error** err
  *
  * @param[in]  handle    Valid file descriptor.
  * @param[in]  operation Combination of @ref tr_sys_file_lock_flags_t values.
- * @param[out] error     Pointer to error object. Optional, pass `NULL` if you
+ * @param[out] error     Pointer to error object. Optional, pass `nullptr` if you
  *                       are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
@@ -533,12 +556,12 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** err
  * @param[out] buffer      Buffer to store read zero-terminated string to.
  * @param[in]  buffer_size Buffer size in bytes, taking '\0' character into
  *                         account.
- * @param[out] error       Pointer to error object. Optional, pass `NULL` if you
- *                         are not interested in error details.
+ * @param[out] error       Pointer to error object. Optional, pass `nullptr` if
+ *                         you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  *         Note that `false` will also be returned in case of end of file; if
- *         you need to distinguish the two, check if `error` is `NULL`
+ *         you need to distinguish the two, check if `error` is `nullptr`
  *         afterwards.
  */
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, struct tr_error** error);
@@ -554,8 +577,8 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
  *
  * @param[in]  handle Valid file descriptor.
  * @param[in]  buffer Zero-terminated string to write.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -572,8 +595,8 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_
  *
  * @param[in]  handle Valid file descriptor.
  * @param[in]  format String format to write.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  * @param[in]  ...    Format arguments.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
@@ -585,12 +608,12 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_e
 /**
  * @brief Portability wrapper for `getcwd()`.
  *
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you are
  *                   not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing path to current
  *         directory (use @ref tr_free to free it when no longer needed) on
- *         success, `NULL` otherwise (with `error` set accordingly).
+ *         success, `nullptr` otherwise (with `error` set accordingly).
  */
 char* tr_sys_dir_get_current(struct tr_error** error);
 
@@ -601,8 +624,8 @@ char* tr_sys_dir_get_current(struct tr_error** error);
  * @param[in]  flags       Combination of @ref tr_sys_dir_create_flags_t values.
  * @param[in]  permissions Permissions to create directory with. Not used on
                            Windows.
- * @param[out] error       Pointer to error object. Optional, pass `NULL` if you
- *                         are not interested in error details.
+ * @param[out] error       Pointer to error object. Optional, pass `nullptr` if
+ *                         you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -616,7 +639,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_e
  *                              'X' characters are replaced with actual random
  *                              characters used to form a unique path to
  *                              temporary directory.
- * @param[out]    error         Pointer to error object. Optional, pass `NULL`
+ * @param[out]    error         Pointer to error object. Optional, pass `nullptr`
  *                              if you are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
@@ -627,7 +650,7 @@ bool tr_sys_dir_create_temp(char* path_template, struct tr_error** error);
  * @brief Portability wrapper for `opendir()`.
  *
  * @param[in]  path  Path to directory.
- * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you are
  *                   not interested in error details.
  *
  * @return Opened directory descriptor on success, `TR_BAD_SYS_DIR` otherwise
@@ -639,14 +662,14 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error);
  * @brief Portability wrapper for `readdir()`.
  *
  * @param[in]  handle Valid directory descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return Pointer to next directory entry name (stored internally, DO NOT pass
- *         it to @ref tr_free) on success, `NULL` otherwise (with `error` set
- *         accordingly). Note that `NULL` will also be returned in case of end
+ *         it to @ref tr_free) on success, `nullptr` otherwise (with `error` set
+ *         accordingly). Note that `nullptr` will also be returned in case of end
  *         of directory; if you need to distinguish the two, check if `error`
- *         is `NULL` afterwards.
+ *         is `nullptr` afterwards.
  */
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error);
 
@@ -654,8 +677,8 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error);
  * @brief Portability wrapper for `closedir()`.
  *
  * @param[in]  handle Valid directory descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
- *                    not interested in error details.
+ * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
+ *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
@@ -663,7 +686,3 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error);
 
 /** @} */
 /** @} */
-
-#ifdef __cplusplus
-}
-#endif

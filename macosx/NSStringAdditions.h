@@ -24,25 +24,24 @@
 
 @interface NSString (NSStringAdditions)
 
-+ (NSString *) ellipsis;
-- (NSString *) stringByAppendingEllipsis;
+@property(nonatomic, class, readonly) NSString* ellipsis;
+- (NSString*)stringByAppendingEllipsis;
 
-+ (NSString *) formattedUInteger: (NSUInteger) value;
++ (NSString*)formattedUInteger:(NSUInteger)value;
 
-+ (NSString *) stringForFileSize: (uint64_t) size;
-+ (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize;
++ (NSString*)stringForFileSize:(uint64_t)size;
++ (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize;
 
-+ (NSString *) stringForSpeed: (CGFloat) speed;
-+ (NSString *) stringForSpeedAbbrev: (CGFloat) speed;
-+ (NSString *) stringForRatio: (CGFloat) ratio;
++ (NSString*)stringForSpeed:(CGFloat)speed;
++ (NSString*)stringForSpeedAbbrev:(CGFloat)speed;
++ (NSString*)stringForRatio:(CGFloat)ratio;
 
-+ (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals;
++ (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals;
 
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds;
-+ (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
+// simple compare method for strings with numbers (works for IP addresses)
+- (NSComparisonResult)compareNumeric:(NSString*)string;
 
-- (NSComparisonResult) compareNumeric: (NSString *) string; //simple compare method for strings with numbers (works for IP addresses)
-
-- (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators; //like componentsSeparatedByCharactersInSet:, but excludes blank values
+// like componentsSeparatedByCharactersInSet:, but excludes blank values
+- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
 @end
