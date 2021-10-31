@@ -145,7 +145,7 @@ tr_session* fLib = NULL;
         @"This will clear the global statistics displayed by Transmission."
          " Individual transfer statistics will not be affected.",
         "Stats reset -> message");
-    alert.alertStyle = NSWarningAlertStyle;
+    alert.alertStyle = NSAlertStyleWarning;
     [alert addButtonWithTitle:NSLocalizedString(@"Reset", "Stats reset -> button")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Stats reset -> button")];
     alert.showsSuppressionButton = YES;
@@ -153,7 +153,7 @@ tr_session* fLib = NULL;
     [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
         [alert.window orderOut:nil];
 
-        if (alert.suppressionButton.state == NSOnState)
+        if (alert.suppressionButton.state == NSControlStateValueOn)
         {
             [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningResetStats"];
         }

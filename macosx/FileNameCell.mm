@@ -101,17 +101,17 @@
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     //icon
-    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0
+    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
             respectFlipped:YES
                      hints:nil];
 
     NSColor *titleColor, *statusColor;
     FileListNode* node = self.objectValue;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         titleColor = statusColor = NSColor.whiteColor;
     }
-    else if ([node.torrent checkForFiles:node.indexes] == NSOffState)
+    else if ([node.torrent checkForFiles:node.indexes] == NSControlStateValueOff)
     {
         titleColor = statusColor = NSColor.disabledControlTextColor;
     }

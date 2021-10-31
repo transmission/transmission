@@ -72,7 +72,7 @@
 
     //place icon
     [icon drawInRect:NSMakeRect(PADDING, (NSHeight(badgeRect) - ICON_WIDTH) * 0.5, ICON_WIDTH, ICON_WIDTH) fromRect:NSZeroRect
-           operation:NSCompositeSourceOver
+           operation:NSCompositingOperationSourceOver
             fraction:1.0];
 
     //place main text
@@ -104,7 +104,7 @@
         NSSize const imageSize = fBadge.size;
         [fBadge drawAtPoint:NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5, (NSHeight(frame) - imageSize.height) * 0.5)
                    fromRect:NSZeroRect
-                  operation:NSCompositeSourceOver
+                  operation:NSCompositingOperationSourceOver
                    fraction:1.0];
     }
 }
