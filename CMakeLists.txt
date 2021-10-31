@@ -114,7 +114,7 @@ set(GTK_MINIMUM             3.4.0)
 set(GLIB_MINIMUM            2.50.1)
 set(GIO_MINIMUM             2.26.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
-set(QT5_MINIMUM             5.2)
+set(QT5_MINIMUM             5.6)
 
 if(WIN32)
     foreach(L C CXX)
