@@ -258,7 +258,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     handshake->peer_id = peer_id;
 
     /* peer id */
-    dbgmsg(handshake, "peer-id is [%*.*s]", TR_ARG_TUPLE(int(std::size(peer_id)), int(std::size(peer_id)), std::data(peer_id)));
+    dbgmsg(handshake, "peer-id is [%" TR_PRIsv "]", TR_PRIsv_ARG(peer_id));
 
     auto* const tor = tr_torrentFindFromHash(handshake->session, hash);
     if (peer_id == tr_torrentGetPeerId(tor))

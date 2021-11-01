@@ -53,7 +53,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "%s"
         "%c"
         "info_hash=%s"
-        "&peer_id=%*.*s"
+        "&peer_id=%" TR_PRIsv
         "&port=%d"
         "&uploaded=%" PRIu64 //
         "&downloaded=%" PRIu64 //
@@ -65,7 +65,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         req->url,
         strchr(req->url, '?') != nullptr ? '&' : '?',
         escaped_info_hash,
-        TR_ARG_TUPLE(int(std::size(req->peer_id)), int(std::size(req->peer_id)), std::data(req->peer_id)),
+        TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
         req->down,
