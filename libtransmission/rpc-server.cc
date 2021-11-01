@@ -211,7 +211,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 
                 auto test = tr_variant{};
                 auto have_source = bool{ false };
-                if (tr_urlIsValid(body.c_str(), body_len))
+                if (tr_urlIsValid({ body.c_str(), body_len }))
                 {
                     tr_variantDictAddRaw(args, TR_KEY_filename, body.c_str(), body_len);
                     have_source = true;
