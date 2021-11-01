@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstddef> // size_t
+#include <optional>
 #include <string_view>
 
 #include "tr-macros.h"
@@ -425,7 +426,7 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme);
+std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
