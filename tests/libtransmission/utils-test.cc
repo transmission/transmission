@@ -296,6 +296,19 @@ TEST_F(UtilsTest, url)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
+
+    EXPECT_FALSE(tr_urlIsValid("hello world"sv));
+    EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
+    EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
+    EXPECT_FALSE(tr_urlIsValid(""sv));
+    EXPECT_FALSE(tr_urlIsValid("com"sv));
+    EXPECT_FALSE(tr_urlIsValid("www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("zzz://www.example.com"sv)); // syntactically valid, but unsupported scheme
+    EXPECT_TRUE(tr_urlIsValid("https://www.example.com"sv));
+
+    EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
 }
 
 TEST_F(UtilsTest, trHttpUnescape)

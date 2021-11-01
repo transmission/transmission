@@ -281,10 +281,10 @@ void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GN
 bool tr_addressIsIP(char const* address);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(char const* url);
+bool tr_urlIsValidTracker(std::string_view url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(char const* url, size_t url_len);
+bool tr_urlIsValid(std::string_view url);
 
 struct tr_parsed_url_t
 {
