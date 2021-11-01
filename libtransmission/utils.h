@@ -256,6 +256,8 @@ char const* tr_strerror(int errnum);
     @return the stripped string */
 char* tr_strstrip(char* str);
 
+std::string_view tr_strvstrip(std::string_view str);
+
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
