@@ -810,63 +810,6 @@ void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
 ****
 ***/
 
-static bool isValidURLChars(char const* url, size_t url_len)
-{
-    static char const rfc2396_valid_chars
-        [] = "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
-             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
-             "0123456789" /* digit */
-             "-_.!~*'()" /* mark */
-             ";/?:@&=+$," /* reserved */
-             "<>#%<\"" /* delims */
-             "{}|\\^[]`"; /* unwise */
-
-    if (url == nullptr)
-    {
-        return false;
-    }
-
-    for (char const *c = url, *end = url + url_len; c < end && *c != '\0'; ++c)
-    {
-        if (memchr(rfc2396_valid_chars, *c, sizeof(rfc2396_valid_chars) - 1) == nullptr)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool tr_urlIsValidTracker(char const* url)
-{
-    if (url == nullptr)
-    {
-        return false;
-    }
-
-    size_t const url_len = strlen(url);
-
-    return isValidURLChars(url, url_len) && tr_urlParse({ url, url_len }) &&
-        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
-}
-
-bool tr_urlIsValid(char const* url, size_t url_len)
-{
-    if (url == nullptr)
-    {
-        return false;
-    }
-
-    if (url_len == TR_BAD_SIZE)
-    {
-        url_len = strlen(url);
-    }
-
-    return isValidURLChars(url, url_len) && tr_urlParse({ url, url_len }) &&
-        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
-         memcmp(url, "sftp://", 7) == 0);
-}
-
 bool tr_addressIsIP(char const* str)
 {
     tr_address tmp;
@@ -914,8 +857,30 @@ static std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
+static bool urlCharsAreValid(std::string_view url)
+{
+    // rfc2396
+    auto constexpr ValidChars = std::string_view{
+        "abcdefghijklmnopqrstuvwxyz" // lowalpha
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // upalpha
+        "0123456789" // digit
+        "-_.!~*'()" // mark
+        ";/?:@&=+$," // reserved
+        "<>#%<\"" // delims
+        "{}|\\^[]`" // unwise
+    };
+
+    return !std::empty(url) &&
+        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return ValidChars.find(ch) != ValidChars.npos; });
+}
+
 std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
 {
+    if (!urlCharsAreValid(url))
+    {
+        return {};
+    }
+
     // scheme
     auto key = "://"sv;
     auto pos = url.find(key);
@@ -951,6 +916,20 @@ std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
     auto const port = parsePort(portstr);
 
     return tr_parsed_url_t{ scheme, host, path, portstr, port };
+}
+
+bool tr_urlIsValidTracker(std::string_view url)
+{
+    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
+    auto const parsed = tr_urlParse(url);
+    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+}
+
+bool tr_urlIsValid(std::string_view url)
+{
+    auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
+    auto const parsed = tr_urlParse(url);
+    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
 
 bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
