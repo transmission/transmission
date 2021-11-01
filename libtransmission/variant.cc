@@ -365,10 +365,19 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
     }
 
     auto sv = std::string_view{};
-    if (tr_variantGetStrView(v, &sv) && (sv == "true"sv || sv == "false"sv))
+    if (tr_variantGetStrView(v, &sv))
     {
-        *setme = sv == "true"sv;
-        return true;
+        if (sv == "true"sv)
+        {
+            *setme = true;
+            return true;
+        }
+
+        if (sv == "false"sv)
+        {
+            *setme = false;
+            return true;
+        }
     }
 
     return false;

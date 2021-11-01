@@ -47,6 +47,43 @@ protected:
 #define STACK_SMASH_DEPTH (100 * 1000)
 #endif
 
+TEST_F(VariantTest, getType)
+{
+    auto i = int64_t{};
+    auto b = bool{};
+    auto d = double{};
+    auto sv = std::string_view{};
+    auto v = tr_variant{};
+
+    tr_variantInitInt(&v, 30);
+    EXPECT_TRUE(tr_variantGetInt(&v, &i));
+    EXPECT_EQ(30, i);
+    EXPECT_TRUE(tr_variantGetReal(&v, &d));
+    EXPECT_EQ(30, int(d));
+    EXPECT_FALSE(tr_variantGetBool(&v, &b));
+    EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
+
+    auto strkey = "foo"sv;
+    tr_variantInitStr(&v, strkey);
+    EXPECT_FALSE(tr_variantGetBool(&v, &b));
+    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
+    EXPECT_EQ(strkey, sv);
+
+    strkey = "true"sv;
+    tr_variantInitStr(&v, strkey);
+    EXPECT_TRUE(tr_variantGetBool(&v, &b));
+    EXPECT_TRUE(b);
+    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
+    EXPECT_EQ(strkey, sv);
+
+    strkey = "false"sv;
+    tr_variantInitStr(&v, strkey);
+    EXPECT_TRUE(tr_variantGetBool(&v, &b));
+    EXPECT_FALSE(b);
+    EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
+    EXPECT_EQ(strkey, sv);
+}
+
 TEST_F(VariantTest, parseInt)
 {
     auto const in = std::string{ "i64e" };
