@@ -2443,20 +2443,17 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
 
         for (size_t i = 0; i < field_count; ++i)
         {
-            char const* field_name = nullptr;
-            auto field_name_len = size_t{};
-            if (!tr_variantGetStr(tr_variantListChild(fields, i), &field_name, &field_name_len))
+            auto field_name = std::string_view{};
+            if (tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
             {
                 continue;
             }
 
-            auto field_id = tr_quark{};
-            if (!tr_quark_lookup(field_name, field_name_len, &field_id))
+            auto const field_id = tr_quark_lookup(field_name);
+            if (field_id)
             {
-                continue;
+                addSessionField(s, args_out, *field_id);
             }
-
-            addSessionField(s, args_out, field_id);
         }
     }
     else

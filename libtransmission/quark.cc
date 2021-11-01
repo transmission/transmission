@@ -431,24 +431,20 @@ size_t constexpr quarks_are_sorted = ( //
     })();
 
 static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their string value");
+static_assert(std::size(my_static) == TR_N_KEYS);
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
+std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 {
-    auto constexpr n_static = std::size(my_static);
-    static_assert(n_static == TR_N_KEYS);
-
-    /* is it in our static array? */
-    auto const key = std::string_view{ static_cast<char const*>(str), len };
+    // is it in our static array?
     auto constexpr sbegin = std::begin(my_static), send = std::end(my_static);
     auto const sit = std::lower_bound(sbegin, send, key);
     if (sit != send && *sit == key)
     {
-        *setme = std::distance(sbegin, sit);
-        return true;
+        return std::distance(sbegin, sit);
     }
 
     /* was it added during runtime? */
@@ -456,23 +452,22 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     auto const rit = std::find(rbegin, rend, key);
     if (rit != rend)
     {
-        *setme = TR_N_KEYS + std::distance(rbegin, rit);
-        return true;
+        return TR_N_KEYS + std::distance(rbegin, rit);
     }
 
-    return false;
+    return {};
 }
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    tr_quark ret = TR_KEY_NONE;
-
-    if (!tr_quark_lookup(std::data(str), std::size(str), &ret))
+    auto const prior = tr_quark_lookup(str);
+    if (prior)
     {
-        ret = TR_N_KEYS + std::size(my_runtime);
-        my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
+        return *prior;
     }
 
+    auto const ret = TR_N_KEYS + std::size(my_runtime);
+    my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
     return ret;
 }
 
