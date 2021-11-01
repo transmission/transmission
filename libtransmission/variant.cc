@@ -55,6 +55,8 @@
 ***
 **/
 
+using namespace std::literals;
+
 struct locale_context
 {
 #ifdef HAVE_USELOCALE
@@ -301,21 +303,38 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
     return success;
 }
 
+bool tr_variantGetStrView(tr_variant const* v, std::string_view* setme)
+{
+    if (!tr_variantIsString(v))
+    {
+        return false;
+    }
+
+    char const* const str = tr_variant_string_get_string(&v->val.s);
+    size_t const len = v->val.s.len;
+    *setme = std::string_view{ str, len };
+    return true;
+}
+
 bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
 {
-    bool const success = tr_variantIsString(v);
-
-    if (success)
+    auto sv = std::string_view{};
+    if (!tr_variantGetStrView(v, &sv))
     {
-        *setme = getStr(v);
+        return false;
+    }
+
+    if (setme != nullptr)
+    {
+        *setme = std::data(sv);
     }
 
     if (len != nullptr)
     {
-        *len = success ? v->val.s.len : 0;
+        *len = std::size(sv);
     }
 
-    return success;
+    return true;
 }
 
 bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
@@ -333,28 +352,26 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* v, bool* setme)
 {
-    bool success = false;
-
     if (tr_variantIsBool(v))
     {
         *setme = v->val.b;
-        success = true;
+        return true;
     }
 
-    if ((!success) && tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
+    if (tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
     {
         *setme = v->val.i != 0;
-        success = true;
+        return true;
     }
 
-    char const* str = nullptr;
-    if ((!success) && tr_variantGetStr(v, &str, nullptr) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+    auto sv = std::string_view{};
+    if (tr_variantGetStrView(v, &sv) && (sv == "true"sv || sv == "false"sv))
     {
-        *setme = strcmp(str, "true") == 0;
-        success = true;
+        *setme = sv == "true"sv;
+        return true;
     }
 
-    return success;
+    return false;
 }
 
 bool tr_variantGetReal(tr_variant const* v, double* setme)
@@ -408,6 +425,12 @@ bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme)
 {
     tr_variant const* child = tr_variantDictFind(dict, key);
     return tr_variantGetReal(child, setme);
+}
+
+bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme)
+{
+    tr_variant const* const child = tr_variantDictFind(dict, key);
+    return tr_variantGetStrView(child, setme);
 }
 
 bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len)
@@ -948,10 +971,9 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         }
         else if (tr_variantIsString(val))
         {
-            size_t len = 0;
-            char const* str = nullptr;
-            (void)tr_variantGetStr(val, &str, &len);
-            tr_variantListAddRaw(target, str, len);
+            auto sv = std::string_view{};
+            (void)tr_variantGetStrView(val, &sv);
+            tr_variantListAddRaw(target, std::data(sv), std::size(sv));
         }
         else if (tr_variantIsDict(val))
         {
@@ -1035,10 +1057,9 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsString(val))
             {
-                size_t len = 0;
-                char const* str = nullptr;
-                (void)tr_variantGetStr(val, &str, &len);
-                tr_variantDictAddRaw(target, key, str, len);
+                auto sv = std::string_view{};
+                (void)tr_variantGetStrView(val, &sv);
+                tr_variantDictAddRaw(target, key, std::data(sv), std::size(sv));
             }
             else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))
             {
