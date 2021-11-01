@@ -68,6 +68,14 @@ TEST_F(UtilsTest, trStrstrip)
     EXPECT_EQ(in, out);
     EXPECT_STREQ("test", out);
     tr_free(in);
+
+    EXPECT_EQ(""sv, tr_strvstrip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strvstrip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("test"sv));
 }
 
 TEST_F(UtilsTest, trBuildpath)

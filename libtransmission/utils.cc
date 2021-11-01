@@ -591,6 +591,22 @@ char* tr_strsep(char** str, char const* delims)
 #endif
 }
 
+std::string_view tr_strvstrip(std::string_view str)
+{
+    auto constexpr test = [](auto ch)
+    {
+        return isspace(ch);
+    };
+
+    auto const it = std::find_if_not(std::begin(str), std::end(str), test);
+    str.remove_prefix(std::distance(std::begin(str), it));
+
+    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
+    str.remove_suffix(std::distance(std::rbegin(str), rit));
+
+    return str;
+}
+
 char* tr_strstrip(char* str)
 {
     if (str != nullptr)
