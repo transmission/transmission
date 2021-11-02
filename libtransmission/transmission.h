@@ -1438,7 +1438,8 @@ struct tr_tracker_stat
     /* whether or not we've ever scraped to this tracker */
     bool hasScraped;
 
-    /* human-readable string identifying the tracker */
+    /* human-readable string identifying the tracker.
+     * 'host' is a slight misnomer; the current format ist `$host:$port` */
     char const* host;
 
     /* the full announce URL */

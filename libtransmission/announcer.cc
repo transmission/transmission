@@ -12,9 +12,9 @@
 #include <cstdio>
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
-#include <map>
 #include <set>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <event2/buffer.h>
@@ -154,7 +154,7 @@ struct tr_scrape_info
 struct tr_announcer
 {
     std::set<tr_announce_request*, StopsCompare> stops;
-    std::map<tr_quark, tr_scrape_info> scrape_info;
+    std::unordered_map<tr_quark, tr_scrape_info> scrape_info;
 
     tr_session* session;
     struct event* upkeepTimer;
@@ -162,7 +162,7 @@ struct tr_announcer
     time_t tauUpkeepAt;
 };
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, tr_quark url)
+static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_quark url)
 {
     struct tr_scrape_info* info = nullptr;
 
@@ -232,16 +232,10 @@ struct tr_tracker
 };
 
 /* format: host+':'+ port */
-tr_quark tr_announcerGetKey(std::string_view url)
+tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed)
 {
-    auto const parsed = tr_urlParse(tr_strvstrip(url));
-    if (!parsed)
-    {
-        return TR_KEY_NONE;
-    }
-
     std::string buf;
-    tr_buildBuf(buf, parsed->host, ":"sv, parsed->portstr);
+    tr_buildBuf(buf, parsed.host, ":"sv, parsed.portstr);
     return tr_quark_new(buf);
 }
 
@@ -1355,6 +1349,42 @@ static tr_tier* find_tier(tr_torrent* tor, tr_quark scrape_url)
     return nullptr;
 }
 
+static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response const* response)
+{
+    if (!multiscrape_too_big(response->errmsg))
+    {
+        return;
+    }
+
+    auto const& url = response->scrape_url;
+    struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+    if (scrape_info == nullptr)
+    {
+        return;
+    }
+
+    // Lower the max only if it hasn't already lowered for a similar
+    // error. So if N parallel multiscrapes all have the same `max`
+    // and error out, lower the value once for that batch, not N times.
+    int& multiscrape_max = scrape_info->multiscrape_max;
+    if (multiscrape_max < response->row_count)
+    {
+        return;
+    }
+
+    int const n = std::max(1, int{ multiscrape_max - TrMultiscrapeStep });
+    if (multiscrape_max != n)
+    {
+        // don't log the full URL, since that might have a personal announce id
+        // (note: we know 'parsed' will be successful since this url has a scrape_info)
+        auto const parsed = *tr_urlParse(tr_quark_get_string_view(url));
+        auto clean_url = std::string{};
+        tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
+        tr_logAddNamedInfo(clean_url.c_str(), "Reducing multiscrape max to %d", n);
+        multiscrape_max = n;
+    }
+}
+
 static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 {
     time_t const now = tr_time();
@@ -1448,37 +1478,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         }
     }
 
-    /* Maybe reduce the number of torrents in a multiscrape req */
-    if (multiscrape_too_big(response->errmsg))
-    {
-        auto const& url = response->scrape_url;
-        struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
-        if (scrape_info != nullptr)
-        {
-            int* multiscrape_max = &scrape_info->multiscrape_max;
-
-            /* Lower the max only if it hasn't already lowered for a similar error.
-               For example if N parallel multiscrapes all have the same `max` and
-               error out, lower the value once for that batch, not N times. */
-            if (*multiscrape_max >= response->row_count)
-            {
-                int const n = std::max(1, int{ *multiscrape_max - TrMultiscrapeStep });
-                if (*multiscrape_max != n)
-                {
-                    auto parsed = tr_urlParse(tr_quark_get_string_view(url));
-                    if (parsed)
-                    {
-                        // don't log the full URL, since that might have a personal announce id
-                        auto clean_url = std::string{};
-                        tr_buildBuf(clean_url, parsed->scheme, "://"sv, parsed->host, ":"sv, parsed->portstr);
-                        tr_logAddNamedInfo(clean_url.c_str(), "Reducing multiscrape max to %d", n);
-                    }
-
-                    *multiscrape_max = n;
-                }
-            }
-        }
-    }
+    checkMultiscrapeMax(announcer, response);
 }
 
 static void scrape_request_delegate(

@@ -759,32 +759,33 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 
 /* Finds the tau_tracker struct that corresponds to this url.
    If it doesn't exist yet, create one. */
-static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau, tr_quark announce_url)
+static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark announce_url)
 {
-    /* see if we've already got a tracker that matches this host + port */
+    // build a lookup key for this tracker
     auto const announce_sv = tr_quark_get_string_view(announce_url);
-    auto const key = tr_announcerGetKey(announce_sv);
+    auto parsed = tr_urlParse(announce_sv);
+    TR_ASSERT(parsed);
+    if (!parsed)
+    {
+        return nullptr;
+    }
 
-    tau_tracker* tracker = nullptr;
-    for (int i = 0, n = tr_ptrArraySize(&tau->trackers); tracker == nullptr && i < n; ++i)
+    // see if we already have it
+    // TODO: replace tr_ptrArray
+    auto const key = tr_announcerGetKey(*parsed);
+    for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         auto* tmp = static_cast<struct tau_tracker*>(tr_ptrArrayNth(&tau->trackers, i));
-
         if (tmp->key == key)
         {
-            tracker = tmp;
+            return tmp;
         }
     }
 
-    /* if we don't have a match, build a new tracker */
-    if (tracker == nullptr)
-    {
-        auto parsed = tr_urlParse(announce_sv);
-        tracker = new tau_tracker{ tau->session, key, tr_quark_new(parsed->host), parsed->port };
-        tr_ptrArrayAppend(&tau->trackers, tracker);
-        dbgmsg(tracker->key, "New tau_tracker created");
-    }
-
+    // we don't have it -- build a new one
+    auto* const tracker = new tau_tracker{ tau->session, key, tr_quark_new(parsed->host), parsed->port };
+    tr_ptrArrayAppend(&tau->trackers, tracker);
+    dbgmsg(tracker->key, "New tau_tracker created");
     return tracker;
 }
 
@@ -951,9 +952,14 @@ void tr_tracker_udp_announce(
     tr_announce_response_func response_func,
     void* user_data)
 {
-    struct tr_announcer_udp* tau = announcer_udp_get(session);
-    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->announce_url);
-    struct tau_announce_request* r = tau_announce_request_new(request, response_func, user_data);
+    tr_announcer_udp* tau = announcer_udp_get(session);
+    tau_tracker* tracker = tau_session_get_tracker(tau, request->announce_url);
+    if (tracker == nullptr)
+    {
+        return;
+    }
+
+    tau_announce_request* r = tau_announce_request_new(request, response_func, user_data);
     tr_ptrArrayAppend(&tracker->announces, r);
     tau_tracker_upkeep_ex(tracker, false);
 }
@@ -964,9 +970,14 @@ void tr_tracker_udp_scrape(
     tr_scrape_response_func response_func,
     void* user_data)
 {
-    struct tr_announcer_udp* tau = announcer_udp_get(session);
-    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->scrape_url);
-    struct tau_scrape_request* r = tau_scrape_request_new(request, response_func, user_data);
+    tr_announcer_udp* tau = announcer_udp_get(session);
+    tau_tracker* tracker = tau_session_get_tracker(tau, request->scrape_url);
+    if (tracker == nullptr)
+    {
+        return;
+    }
+
+    tau_scrape_request* r = tau_scrape_request_new(request, response_func, user_data);
     tr_ptrArrayAppend(&tracker->scrapes, r);
     tau_tracker_upkeep_ex(tracker, false);
 }

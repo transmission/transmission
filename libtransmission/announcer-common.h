@@ -16,6 +16,7 @@
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "quark.h"
+#include "utils.h"
 
 /***
 ****  SCRAPE
@@ -236,4 +237,15 @@ void tr_tracker_udp_announce(
 
 void tr_tracker_udp_start_shutdown(tr_session* session);
 
-tr_quark tr_announcerGetKey(std::string_view url);
+tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed);
+
+inline tr_quark tr_announcerGetKey(std::string_view url)
+{
+    auto const parsed = tr_urlParse(url);
+    return parsed ? tr_announcerGetKey(*parsed) : TR_KEY_NONE;
+}
+
+inline tr_quark tr_announcerGetKey(tr_quark url)
+{
+    return tr_announcerGetKey(tr_quark_get_string_view(url));
+}

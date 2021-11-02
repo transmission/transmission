@@ -876,6 +876,8 @@ static bool urlCharsAreValid(std::string_view url)
 
 std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
 {
+    url = tr_strvstrip(url);
+
     if (!urlCharsAreValid(url))
     {
         return {};
