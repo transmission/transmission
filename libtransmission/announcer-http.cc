@@ -41,16 +41,16 @@ static char const* get_event_string(tr_announce_request const* req)
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    evbuffer* const buf = evbuffer_new();
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
+    auto const announce_sv = tr_quark_get_string_view(req->announce_url);
 
+    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
     tr_http_escape_sha1(escaped_info_hash, req->info_hash);
 
+    auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
-
     evbuffer_add_printf(
         buf,
-        "%s"
+        "%" TR_PRIsv
         "%c"
         "info_hash=%s"
         "&peer_id=%" TR_PRIsv
@@ -62,8 +62,8 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&key=%x"
         "&compact=1"
         "&supportcrypto=1",
-        req->url,
-        strchr(req->url, '?') != nullptr ? '&' : '?',
+        TR_PRIsv_ARG(announce_sv),
+        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
         escaped_info_hash,
         TR_PRIsv_ARG(req->peer_id),
         req->port,
@@ -323,8 +323,6 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    char* const url = announce_url_new(session, request);
-
     auto* const d = tr_new0(announce_data, 1);
     d->response.seeders = -1;
     d->response.leechers = -1;
@@ -334,9 +332,9 @@ void tr_tracker_http_announce(
     memcpy(d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH);
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
+    char* const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%s\"", url);
     tr_webRun(session, url, on_announce_done, d);
-
     tr_free(url);
 }
 
@@ -380,7 +378,9 @@ static void on_scrape_done(
     tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url.c_str());
+
+    auto const scrape_url_sv = tr_quark_get_string_view(response->scrape_url);
+    dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
     {
@@ -447,6 +447,7 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
+                        // TODO(ckerr): ugh, interning info dict hashes is awful
                         if (memcmp(tr_quark_get_string(key), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
@@ -484,11 +485,12 @@ static void on_scrape_done(
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    struct evbuffer* const buf = evbuffer_new();
+    auto const sv = tr_quark_get_string_view(req->scrape_url);
 
-    evbuffer_add_printf(buf, "%s", req->url);
-    char delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
+    auto* const buf = evbuffer_new();
+    evbuffer_add(buf, std::data(sv), std::size(sv));
 
+    char delimiter = sv.find('?') == sv.npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
@@ -509,7 +511,7 @@ void tr_tracker_http_scrape(
     char* url = scrape_url_new(request);
 
     auto* d = new scrape_data{};
-    d->response.url = request->url;
+    d->response.scrape_url = request->scrape_url;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;

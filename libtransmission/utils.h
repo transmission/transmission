@@ -193,11 +193,12 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_renew(struct_type, mem, n_structs) \
+    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -286,6 +287,7 @@ bool tr_urlIsValidTracker(std::string_view url);
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid(std::string_view url);
 
+// TODO: move this to types.h
 struct tr_parsed_url_t
 {
     std::string_view scheme;
@@ -296,6 +298,10 @@ struct tr_parsed_url_t
 };
 
 std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
+
+// like tr_urlParse(), but with the added constraint that 'scheme'
+// must be one we that Transmission supports for announce and scrape
+std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
