@@ -525,14 +525,12 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 
 struct AnnTrackerInfo
 {
-    AnnTrackerInfo(tr_quark key_in, tr_tracker_info info_in, tr_parsed_url_t url_in)
-        : key{ key_in }
-        , info{ info_in }
+    AnnTrackerInfo(tr_tracker_info info_in, tr_parsed_url_t url_in)
+        : info{ info_in }
         , url{ url_in }
     {
     }
 
-    tr_quark key;
     tr_tracker_info info;
     tr_parsed_url_t url;
 
@@ -554,8 +552,6 @@ struct AnnTrackerInfo
     }
 };
 
-#include <iostream>
-
 /**
  * Massages the incoming list of trackers into something we can use.
  */
@@ -567,7 +563,6 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
     // build a list of valid trackers
     for (auto const *walk = input, *const end = walk + input_count; walk != end; ++walk)
     {
-        std::cerr << "tracker in: [" << walk->announce << ']' << std::endl;
         auto const parsed = tr_urlParseTracker(walk->announce);
         if (!parsed)
         {
@@ -576,13 +571,13 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
 
         // weed out implicit-vs-explicit port duplicates e.g.
         // "http://tracker/announce" + "http://tracker:80/announce"
-        auto const key = tr_announcerGetKey(*parsed);
-        if (!std::any_of(std::begin(tmp), std::end(tmp), [&key](auto const& item) { return item.key == key; }))
+        auto const is_same = [&parsed](auto const& item){ return item.url.scheme == parsed->scheme && item.url.host == parsed->host && item.url.port == parsed->port && item.url.path == parsed->path; };
+        if (std::any_of(std::begin(tmp), std::end(tmp), is_same))
         {
             continue;
         }
 
-        tmp.emplace_back(key, *walk, *parsed);
+        tmp.emplace_back(*walk, *parsed);
     }
 
     // if two announce URLs differ only by scheme, put them in the same tier.
@@ -613,11 +608,6 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
     *setme_count = n;
     auto* const ret = tr_new0(tr_tracker_info, n);
     std::transform(std::begin(tmp), std::end(tmp), ret, [](auto const& item) { return item.info; });
-
-    for (auto const *walk = ret, *end = ret + n; walk != end; ++walk)
-    {
-        std::cerr << "tracker in: [" << walk->announce << ']' << std::endl;
-    }
     return ret;
 }
 
