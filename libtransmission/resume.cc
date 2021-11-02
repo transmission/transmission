@@ -892,14 +892,17 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         fieldsLoaded |= loadPeers(&top, tor);
     }
 
-    if ((fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
-    {
-        fieldsLoaded |= loadFilePriorities(&top, tor);
-    }
-
     if ((fieldsToLoad & TR_FR_PROGRESS) != 0)
     {
         fieldsLoaded |= loadProgress(&top, tor);
+    }
+
+    // Only load file priorities if we are actually downloading.
+    // If we're a seed or partial seed, loading it is a waste of time.
+    // NB: this is why loadProgress() comes before loadFilePriorities()
+    if (!tr_torrentIsSeed(tor) && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
+    {
+        fieldsLoaded |= loadFilePriorities(&top, tor);
     }
 
     if ((fieldsToLoad & TR_FR_DND) != 0)
