@@ -115,7 +115,12 @@ struct StopsCompare
         }
 
         // tertiary key: the tracker's announce url
-        return tr_strcmp0(a->url, b->url);
+        if (a->announce_url != b->announce_url)
+        {
+            return a->announce_url < b->announce_url ? -1 : 1;
+        }
+
+        return 0;
     }
 
     bool operator()(tr_announce_request const* a, tr_announce_request const* b) const
@@ -157,15 +162,14 @@ struct tr_announcer
     time_t tauUpkeepAt;
 };
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, std::string_view url)
+static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, tr_quark url)
 {
     struct tr_scrape_info* info = nullptr;
 
-    if (!std::empty(url))
+    if (url != TR_KEY_NONE)
     {
-        auto key = tr_quark_new(url);
         auto& scrapes = announcer->scrape_info;
-        auto const it = scrapes.try_emplace(key, key, TR_MULTISCRAPE_MAX);
+        auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
         info = &it.first->second;
     }
 
@@ -228,7 +232,7 @@ struct tr_tracker
 };
 
 /* format: host+':'+ port */
-tr_quark getKey(std::string_view url)
+tr_quark tr_announcerGetKey(std::string_view url)
 {
     auto const parsed = tr_urlParse(tr_strvstrip(url));
     if (!parsed)
@@ -244,9 +248,9 @@ tr_quark getKey(std::string_view url)
 static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf)
 {
     memset(tracker, 0, sizeof(tr_tracker));
-    tracker->key = getKey(inf->announce);
+    tracker->key = tr_announcerGetKey(inf->announce);
     tracker->announce_url = tr_quark_new(tr_strvstrip(inf->announce));
-    tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, inf->scrape);
+    tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, tr_quark_new(inf->scrape));
     tracker->id = inf->id;
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
@@ -928,7 +932,7 @@ static tr_announce_request* announce_request_new(
 {
     tr_announce_request* req = tr_new0(tr_announce_request, 1);
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
-    req->url = tr_strdup(tr_quark_get_string(tier->currentTracker->announce_url));
+    req->announce_url = tier->currentTracker->announce_url;
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
     memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
     req->peer_id = tr_torrentGetPeerId(tor);
@@ -1223,7 +1227,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 static void announce_request_free(tr_announce_request* req)
 {
     tr_free(req->tracker_id_str);
-    tr_free(req->url);
     tr_free(req);
 }
 
@@ -1245,17 +1248,18 @@ static void announce_request_delegate(
 
 #endif
 
-    if (strncmp(request->url, "http", 4) == 0)
+    auto const announce_sv = tr_quark_get_string_view(request->announce_url);
+    if (announce_sv.find("http"sv) == 0)
     {
         tr_tracker_http_announce(session, request, callback, callback_data);
     }
-    else if (strncmp(request->url, "udp://", 6) == 0)
+    else if (announce_sv.find("udp://"sv) == 0)
     {
         tr_tracker_udp_announce(session, request, callback, callback_data);
     }
     else
     {
-        tr_logAddError("Unsupported url: %s", request->url);
+        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
     }
 
     announce_request_free(request);
@@ -1334,7 +1338,7 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     tier->scrapeAt = get_next_scrape_time(session, tier, interval);
 }
 
-static tr_tier* find_tier(tr_torrent* tor, std::string const& scrape)
+static tr_tier* find_tier(tr_torrent* tor, tr_quark scrape_url)
 {
     struct tr_torrent_tiers* tt = tor->tiers;
 
@@ -1342,8 +1346,7 @@ static tr_tier* find_tier(tr_torrent* tor, std::string const& scrape)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
-        if (tracker != nullptr && tracker->scrape_info != nullptr &&
-            tr_quark_get_string_view(tracker->scrape_info->scrape_url) == scrape)
+        if (tracker != nullptr && tracker->scrape_info != nullptr && tracker->scrape_info->scrape_url == scrape_url)
         {
             return &tt->tiers[i];
         }
@@ -1365,7 +1368,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
         if (tor != nullptr)
         {
-            tr_tier* tier = find_tier(tor, response->url);
+            tr_tier* tier = find_tier(tor, response->scrape_url);
 
             if (tier != nullptr)
             {
@@ -1380,7 +1383,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     "downloaders:%d "
                     "min_request_interval:%d "
                     "err:%s ",
-                    response->url.c_str(),
+                    tr_quark_get_string(response->scrape_url),
                     (int)response->did_connect,
                     (int)response->did_timeout,
                     row->seeders,
@@ -1448,7 +1451,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     /* Maybe reduce the number of torrents in a multiscrape req */
     if (multiscrape_too_big(response->errmsg))
     {
-        auto const& url = response->url;
+        auto const& url = response->scrape_url;
         struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
         if (scrape_info != nullptr)
         {
@@ -1462,17 +1465,13 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 int const n = std::max(1, int{ *multiscrape_max - TrMultiscrapeStep });
                 if (*multiscrape_max != n)
                 {
-                    char* scheme = nullptr;
-                    char* host = nullptr;
-                    auto port = int{};
-                    if (tr_urlParse(std::data(url), std::size(url), &scheme, &host, &port, nullptr))
+                    auto parsed = tr_urlParse(tr_quark_get_string_view(url));
+                    if (parsed)
                     {
-                        /* don't log the full URL, since that might have a personal announce id */
-                        char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
-                        tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
-                        tr_free(sanitized_url);
-                        tr_free(host);
-                        tr_free(scheme);
+                        // don't log the full URL, since that might have a personal announce id
+                        auto clean_url = std::string{};
+                        tr_buildBuf(clean_url, parsed->scheme, "://"sv, parsed->host, ":"sv, parsed->portstr);
+                        tr_logAddNamedInfo(clean_url.c_str(), "Reducing multiscrape max to %d", n);
                     }
 
                     *multiscrape_max = n;
@@ -1490,17 +1489,19 @@ static void scrape_request_delegate(
 {
     tr_session* session = announcer->session;
 
-    if (strncmp(request->url, "http", 4) == 0)
+    auto const scrape_sv = tr_quark_get_string_view(request->scrape_url);
+
+    if (scrape_sv.find("http"sv) == 0)
     {
         tr_tracker_http_scrape(session, request, callback, callback_data);
     }
-    else if (strncmp(request->url, "udp://", 6) == 0)
+    else if (scrape_sv.find("udp://"sv) == 0)
     {
         tr_tracker_udp_scrape(session, request, callback, callback_data);
     }
     else
     {
-        tr_logAddError("Unsupported url: %s", request->url);
+        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(scrape_sv));
     }
 }
 
@@ -1529,7 +1530,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            if (tr_quark_get_string_view(scrape_info->scrape_url) != req->url)
+            if (scrape_info->scrape_url != req->scrape_url)
             {
                 continue;
             }
@@ -1544,7 +1545,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         if (!found && request_count < MaxScrapesPerUpkeep)
         {
             tr_scrape_request* req = &requests[request_count++];
-            req->url = tr_quark_get_string(scrape_info->scrape_url);
+            req->scrape_url = scrape_info->scrape_url;
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
             memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);

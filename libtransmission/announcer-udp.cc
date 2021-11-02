@@ -29,7 +29,7 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define dbgmsg(name, ...) tr_logAddDeepNamed((name).c_str(), __VA_ARGS__)
+#define dbgmsg(key, ...) tr_logAddDeepNamed(tr_quark_get_string(key), __VA_ARGS__)
 
 /****
 *****
@@ -190,7 +190,7 @@ static struct tau_scrape_request* tau_scrape_request_new(
     req->transaction_id = transaction_id;
     req->callback = callback;
     req->user_data = user_data;
-    req->response.url = in->url;
+    req->response.scrape_url = in->scrape_url;
     req->response.row_count = in->info_hash_count;
     req->payload.assign(payload_begin, payload_end);
 
@@ -416,8 +416,8 @@ struct tau_tracker
 {
     tr_session* const session;
 
-    std::string const key;
-    std::string const host;
+    tr_quark const key;
+    tr_quark const host;
     int const port;
 
     struct evdns_getaddrinfo_request* dns_request = nullptr;
@@ -434,10 +434,10 @@ struct tau_tracker
     tr_ptrArray announces = {};
     tr_ptrArray scrapes = {};
 
-    tau_tracker(tr_session* session_in, std::string key_in, std::string host_in, int port_in)
+    tau_tracker(tr_session* session_in, tr_quark key_in, tr_quark host_in, int port_in)
         : session{ session_in }
-        , key{ std::move(key_in) }
-        , host{ std::move(host_in) }
+        , key{ key_in }
+        , host{ host_in }
         , port{ port_in }
     {
     }
@@ -681,7 +681,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tracker->host.c_str(),
+            tr_quark_get_string(tracker->host),
             nullptr,
             &hints,
             tau_tracker_on_dns,
@@ -759,13 +759,11 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 
 /* Finds the tau_tracker struct that corresponds to this url.
    If it doesn't exist yet, create one. */
-static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau, char const* url)
+static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau, tr_quark announce_url)
 {
     /* see if we've already got a tracker that matches this host + port */
-    auto port = int{};
-    char* host = nullptr;
-    tr_urlParse(url, TR_BAD_SIZE, nullptr, &host, &port, nullptr);
-    char* const key = tr_strdup_printf("%s:%d", host, port);
+    auto const announce_sv = tr_quark_get_string_view(announce_url);
+    auto const key = tr_announcerGetKey(announce_sv);
 
     tau_tracker* tracker = nullptr;
     for (int i = 0, n = tr_ptrArraySize(&tau->trackers); tracker == nullptr && i < n; ++i)
@@ -781,13 +779,12 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
     /* if we don't have a match, build a new tracker */
     if (tracker == nullptr)
     {
-        tracker = new tau_tracker{ tau->session, key, host, port };
+        auto parsed = tr_urlParse(announce_sv);
+        tracker = new tau_tracker{ tau->session, key, tr_quark_new(parsed->host), parsed->port };
         tr_ptrArrayAppend(&tau->trackers, tracker);
         dbgmsg(tracker->key, "New tau_tracker created");
     }
 
-    tr_free(key);
-    tr_free(host);
     return tracker;
 }
 
@@ -955,7 +952,7 @@ void tr_tracker_udp_announce(
     void* user_data)
 {
     struct tr_announcer_udp* tau = announcer_udp_get(session);
-    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->url);
+    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->announce_url);
     struct tau_announce_request* r = tau_announce_request_new(request, response_func, user_data);
     tr_ptrArrayAppend(&tracker->announces, r);
     tau_tracker_upkeep_ex(tracker, false);
@@ -968,7 +965,7 @@ void tr_tracker_udp_scrape(
     void* user_data)
 {
     struct tr_announcer_udp* tau = announcer_udp_get(session);
-    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->url);
+    struct tau_tracker* tracker = tau_session_get_tracker(tau, request->scrape_url);
     struct tau_scrape_request* r = tau_scrape_request_new(request, response_func, user_data);
     tr_ptrArrayAppend(&tracker->scrapes, r);
     tau_tracker_upkeep_ex(tracker, false);
