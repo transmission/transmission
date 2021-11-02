@@ -119,7 +119,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     auto torrents = std::vector<tr_torrent*>{};
 
     auto id = int64_t{};
-    char const* str = nullptr;
+    auto sv = std::string_view{};
     tr_variant* ids = nullptr;
 
     if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
@@ -136,9 +136,9 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             {
                 tor = tr_torrentFindFromId(session, id);
             }
-            else if (tr_variantGetStr(node, &str, nullptr))
+            else if (tr_variantGetStrView(node, &sv))
             {
-                tor = tr_torrentFindFromHashString(session, str);
+                tor = tr_torrentFindFromHashString(session, sv);
             }
 
             if (tor != nullptr)
@@ -150,15 +150,14 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
         tr_torrent* const tor = tr_torrentFindFromId(session, id);
-
         if (tor != nullptr)
         {
             torrents.push_back(tor);
         }
     }
-    else if (tr_variantDictFindStr(args, TR_KEY_ids, &str, nullptr))
+    else if (tr_variantDictFindStrView(args, TR_KEY_ids, &sv))
     {
-        if (strcmp(str, "recently-active") == 0)
+        if (sv == "recently-active"sv)
         {
             time_t const cutoff = tr_time() - RECENTLY_ACTIVE_SECONDS;
 
@@ -171,8 +170,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
         }
         else
         {
-            tr_torrent* const tor = tr_torrentFindFromHashString(session, str);
-
+            tr_torrent* const tor = tr_torrentFindFromHashString(session, sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);

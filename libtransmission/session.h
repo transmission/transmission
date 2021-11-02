@@ -19,6 +19,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 #include <vector>
 
@@ -101,11 +102,30 @@ struct CompareHash
     }
 };
 
-struct CompareHashString
+struct CaseInsensitiveStringCompare // case-insensitive string compare
 {
-    bool operator()(char const* const a, char const* const b) const
+    int compare(std::string_view a, std::string_view b) const // <=>
     {
-        return evutil_ascii_strcasecmp(a, b) < 0;
+        auto const alen = std::size(a);
+        auto const blen = std::size(b);
+
+        auto i = evutil_ascii_strncasecmp(std::data(a), std::data(b), std::min(alen, blen));
+        if (i != 0)
+        {
+            return i;
+        }
+
+        if (alen != blen)
+        {
+            return alen < blen ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    bool operator()(std::string_view a, std::string_view b) const // less than
+    {
+        return compare(a, b) < 0;
     }
 };
 
@@ -194,7 +214,7 @@ struct tr_session
     std::unordered_set<tr_torrent*> torrents;
     std::map<int, tr_torrent*> torrentsById;
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
-    std::map<char const*, tr_torrent*, CompareHashString> torrentsByHashString;
+    std::map<std::string_view, tr_torrent*, CaseInsensitiveStringCompare> torrentsByHashString;
 
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
 
