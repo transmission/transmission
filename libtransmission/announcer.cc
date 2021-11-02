@@ -571,7 +571,11 @@ static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_
 
         // weed out implicit-vs-explicit port duplicates e.g.
         // "http://tracker/announce" + "http://tracker:80/announce"
-        auto const is_same = [&parsed](auto const& item){ return item.url.scheme == parsed->scheme && item.url.host == parsed->host && item.url.port == parsed->port && item.url.path == parsed->path; };
+        auto const is_same = [&parsed](auto const& item)
+        {
+            return item.url.scheme == parsed->scheme && item.url.host == parsed->host && item.url.port == parsed->port &&
+                item.url.path == parsed->path;
+        };
         if (std::any_of(std::begin(tmp), std::end(tmp), is_same))
         {
             continue;

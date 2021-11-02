@@ -197,7 +197,8 @@ void* tr_memdup(void const* src, size_t byteCount);
 
 #define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_renew(struct_type, mem, n_structs) (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
+#define tr_renew(struct_type, mem, n_structs) \
+    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
