@@ -323,8 +323,6 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    char* const url = announce_url_new(session, request);
-
     auto* const d = tr_new0(announce_data, 1);
     d->response.seeders = -1;
     d->response.leechers = -1;
@@ -334,9 +332,9 @@ void tr_tracker_http_announce(
     memcpy(d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH);
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
+    char* const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%s\"", url);
     tr_webRun(session, url, on_announce_done, d);
-
     tr_free(url);
 }
 
