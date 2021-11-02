@@ -286,6 +286,7 @@ bool tr_urlIsValidTracker(std::string_view url);
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid(std::string_view url);
 
+// TODO: move this to types.h
 struct tr_parsed_url_t
 {
     std::string_view scheme;
@@ -296,6 +297,10 @@ struct tr_parsed_url_t
 };
 
 std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
+
+// like tr_urlParse(), but with the added constraint that 'scheme'
+// must be one we that Transmission supports for announce and scrape
+std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */

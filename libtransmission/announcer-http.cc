@@ -487,12 +487,12 @@ static void on_scrape_done(
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    struct evbuffer* const buf = evbuffer_new();
-
     auto const sv = tr_quark_get_string_view(req->scrape_url);
-    evbuffer_add(buf, std::data(sv), std::size(sv));
-    char delimiter = sv.find('?') == sv.npos ? '?' : '&';
 
+    auto* const buf = evbuffer_new();
+    evbuffer_add(buf, std::data(sv), std::size(sv));
+
+    char delimiter = sv.find('?') == sv.npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];

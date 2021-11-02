@@ -241,7 +241,7 @@ tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed);
 
 inline tr_quark tr_announcerGetKey(std::string_view url)
 {
-    auto const parsed = tr_urlParse(url);
+    auto const parsed = tr_urlParseTracker(url);
     return parsed ? tr_announcerGetKey(*parsed) : TR_KEY_NONE;
 }
 

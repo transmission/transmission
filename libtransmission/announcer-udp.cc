@@ -763,7 +763,7 @@ static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark anno
 {
     // build a lookup key for this tracker
     auto const announce_sv = tr_quark_get_string_view(announce_url);
-    auto parsed = tr_urlParse(announce_sv);
+    auto parsed = tr_urlParseTracker(announce_sv);
     TR_ASSERT(parsed);
     if (!parsed)
     {

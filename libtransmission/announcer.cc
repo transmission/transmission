@@ -137,7 +137,7 @@ struct StopsCompare
 
 struct tr_scrape_info
 {
-    tr_quark scrape_url;
+    tr_quark const scrape_url;
 
     int multiscrape_max;
 
@@ -229,7 +229,7 @@ struct tr_tracker
     uint32_t id;
 };
 
-/* format: host+':'+ port */
+// format: `${host}:${port}`
 tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed)
 {
     std::string buf;
@@ -523,117 +523,101 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 ****
 ***/
 
-struct ann_tracker_info
+struct AnnTrackerInfo
 {
-    tr_tracker_info info;
-
-    char* scheme;
-    char* host;
-    char* path;
-    int port;
-};
-
-/* primary key: tier
- * secondary key: udp comes before http */
-static int filter_trackers_compare_func(void const* va, void const* vb)
-{
-    auto* a = static_cast<struct ann_tracker_info const*>(va);
-    auto* b = static_cast<struct ann_tracker_info const*>(vb);
-
-    if (a->info.tier != b->info.tier)
+    AnnTrackerInfo(tr_quark key_in, tr_tracker_info info_in, tr_parsed_url_t url_in)
+        : key{ key_in }
+        , info{ info_in }
+        , url{ url_in }
     {
-        return a->info.tier - b->info.tier;
     }
 
-    return -strcmp(a->scheme, b->scheme);
-}
+    tr_quark key;
+    tr_tracker_info info;
+    tr_parsed_url_t url;
+
+    /* primary key: tier
+     * secondary key: udp comes before http */
+    int compare(AnnTrackerInfo const& that) const // <=>
+    {
+        if (this->info.tier != that.info.tier)
+        {
+            return this->info.tier - that.info.tier;
+        }
+
+        return -this->url.scheme.compare(that.url.scheme);
+    }
+
+    bool operator<(AnnTrackerInfo const& that) const // less than
+    {
+        return this->compare(that) < 0;
+    }
+};
+
+#include <iostream>
 
 /**
  * Massages the incoming list of trackers into something we can use.
  */
 static tr_tracker_info* filter_trackers(tr_tracker_info const* input, int input_count, int* setme_count)
 {
-    int n = 0;
-    struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
+    auto tmp = std::vector<AnnTrackerInfo>{};
+    tmp.reserve(input_count);
 
-    /* build a list of valid trackers */
-    for (int i = 0; i < input_count; ++i)
+    // build a list of valid trackers
+    for (auto const *walk = input, *const end = walk + input_count; walk != end; ++walk)
     {
-        if (tr_urlIsValidTracker(input[i].announce))
+        std::cerr << "tracker in: [" << walk->announce << ']' << std::endl;
+        auto const parsed = tr_urlParseTracker(walk->announce);
+        if (!parsed)
         {
-            int port = 0;
-            char* scheme = nullptr;
-            char* host = nullptr;
-            char* path = nullptr;
-            tr_urlParse(input[i].announce, TR_BAD_SIZE, &scheme, &host, &port, &path);
-
-            /* weed out one common source of duplicates:
-             * "http://tracker/announce" +
-             * "http://tracker:80/announce"
-             */
-            bool is_duplicate = false;
-            for (int j = 0; !is_duplicate && j < n; ++j)
-            {
-                is_duplicate = tmp[j].port == port && strcmp(tmp[j].scheme, scheme) == 0 && strcmp(tmp[j].host, host) == 0 &&
-                    strcmp(tmp[j].path, path) == 0;
-            }
-
-            if (is_duplicate)
-            {
-                tr_free(path);
-                tr_free(host);
-                tr_free(scheme);
-                continue;
-            }
-
-            tmp[n].info = input[i];
-            tmp[n].scheme = scheme;
-            tmp[n].host = host;
-            tmp[n].port = port;
-            tmp[n].path = path;
-            n++;
+            continue;
         }
+
+        // weed out implicit-vs-explicit port duplicates e.g.
+        // "http://tracker/announce" + "http://tracker:80/announce"
+        auto const key = tr_announcerGetKey(*parsed);
+        if (!std::any_of(std::begin(tmp), std::end(tmp), [&key](auto const& item) { return item.key == key; }))
+        {
+            continue;
+        }
+
+        tmp.emplace_back(key, *walk, *parsed);
     }
 
-    /* if two announce URLs differ only by scheme, put them in the same tier.
-     * (note: this can leave gaps in the `tier' values, but since the calling
-     * function doesn't care, there's no point in removing the gaps...) */
-    for (int i = 0; i < n; ++i)
+    // if two announce URLs differ only by scheme, put them in the same tier.
+    // (note: this can leave gaps in the `tier' values, but since the calling
+    // function doesn't care, there's no point in removing the gaps...)
+    for (size_t i = 0, n = std::size(tmp); i < n; ++i)
     {
-        for (int j = i + 1; j < n; ++j)
+        for (size_t j = i + 1; j < n; ++j)
         {
-            if (tmp[i].info.tier != tmp[j].info.tier && tmp[i].port == tmp[j].port &&
-                tr_strcmp0(tmp[i].host, tmp[j].host) == 0 && tr_strcmp0(tmp[i].path, tmp[j].path) == 0)
+            auto const& a = tmp[i];
+            auto& b = tmp[j];
+
+            if ((a.info.tier != b.info.tier) && (a.url.port == b.url.port) && (a.url.host == b.url.host) &&
+                (a.url.path == b.url.path))
             {
-                tmp[j].info.tier = tmp[i].info.tier;
+                b.info.tier = a.info.tier;
             }
         }
     }
 
-    /* sort them, for two reasons:
-     * (1) unjumble the tiers from the previous step
-     * (2) move the UDP trackers to the front of each tier */
-    qsort(tmp, n, sizeof(struct ann_tracker_info), filter_trackers_compare_func);
+    // sort them, for two reasons:
+    // 1. unjumble the tiers from the previous step
+    // 2. move the UDP trackers to the front of each tier
+    std::sort(std::begin(tmp), std::end(tmp));
 
-    /* build the output */
+    // build the output
+    auto const n = std::size(tmp);
     *setme_count = n;
-    struct tr_tracker_info* const ret = tr_new0(tr_tracker_info, n);
+    auto* const ret = tr_new0(tr_tracker_info, n);
+    std::transform(std::begin(tmp), std::end(tmp), ret, [](auto const& item) { return item.info; });
 
-    for (int i = 0; i < n; ++i)
+    for (auto const *walk = ret, *end = ret + n; walk != end; ++walk)
     {
-        ret[i] = tmp[i].info;
+        std::cerr << "tracker in: [" << walk->announce << ']' << std::endl;
     }
-
-    /* cleanup */
-    for (int i = 0; i < n; ++i)
-    {
-        tr_free(tmp[i].path);
-        tr_free(tmp[i].host);
-        tr_free(tmp[i].scheme);
-    }
-
-    tr_free(tmp);
-
     return ret;
 }
 
@@ -1240,7 +1224,7 @@ static void announce_request_delegate(
 #endif
 
     auto const announce_sv = tr_quark_get_string_view(request->announce_url);
-    if (announce_sv.find("http"sv) == 0)
+    if (announce_sv.find("http://"sv) == 0 || announce_sv.find("https://"sv) == 0)
     {
         tr_tracker_http_announce(session, request, callback, callback_data);
     }
@@ -1491,7 +1475,7 @@ static void scrape_request_delegate(
 
     auto const scrape_sv = tr_quark_get_string_view(request->scrape_url);
 
-    if (scrape_sv.find("http"sv) == 0)
+    if (scrape_sv.find("http://"sv) == 0 || scrape_sv.find("https://"sv) == 0)
     {
         tr_tracker_http_scrape(session, request, callback, callback_data);
     }
