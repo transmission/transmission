@@ -164,16 +164,14 @@ struct tr_announcer
 
 static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_quark url)
 {
-    struct tr_scrape_info* info = nullptr;
-
-    if (url != TR_KEY_NONE)
+    if (url == TR_KEY_NONE)
     {
-        auto& scrapes = announcer->scrape_info;
-        auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-        info = &it.first->second;
+        return nullptr;
     }
 
-    return info;
+    auto& scrapes = announcer->scrape_info;
+    auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+    return &it.first->second;
 }
 
 static void onUpkeepTimer(evutil_socket_t fd, short what, void* vannouncer);
@@ -355,12 +353,11 @@ static void tierDestruct(tr_tier* tier)
 
 static void tier_build_log_name(tr_tier const* tier, char* buf, size_t buflen)
 {
-    tr_snprintf(
-        buf,
-        buflen,
-        "[%s---%s]",
-        (tier != nullptr && tier->tor != nullptr) ? tr_torrentName(tier->tor) : "?",
-        (tier != nullptr && tier->currentTracker != nullptr) ? tr_quark_get_string(tier->currentTracker->key) : "?");
+    auto const* const name = tier != nullptr && tier->tor != nullptr ? tr_torrentName(tier->tor) : "?";
+    auto const key_sv = tier != nullptr && tier->currentTracker != nullptr ?
+        tr_quark_get_string_view(tier->currentTracker->key) :
+        "?"sv;
+    tr_snprintf(buf, buflen, "[%s---%" TR_PRIsv "]", name, TR_PRIsv_ARG(key_sv));
 }
 
 static void tierIncrementTracker(tr_tier* tier)
@@ -1402,9 +1399,12 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
             if (tier != nullptr)
             {
+                auto const scrape_url_sv = tr_quark_get_string_view(response->scrape_url);
+
                 dbgmsg(
                     tier,
-                    "scraped url:%s -- "
+                    "scraped url:%" TR_PRIsv
+                    " -- "
                     "did_connect:%d "
                     "did_timeout:%d "
                     "seeders:%d "
@@ -1413,7 +1413,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     "downloaders:%d "
                     "min_request_interval:%d "
                     "err:%s ",
-                    tr_quark_get_string(response->scrape_url),
+                    TR_PRIsv_ARG(scrape_url_sv),
                     (int)response->did_connect,
                     (int)response->did_timeout,
                     row->seeders,

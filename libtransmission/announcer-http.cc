@@ -380,14 +380,16 @@ static void on_scrape_done(
     tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got scrape response for \"%s\"", tr_quark_get_string(response->scrape_url));
+
+    auto const scrape_url_sv = tr_quark_get_string_view(response->scrape_url);
+    dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
     {
-        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
+        char const* fmt = _("Tracker '%" TR_PRIsv "' gave HTTP response code %1$ld (%2$s)");
         char const* response_str = tr_webGetResponseStr(response_code);
         char buf[512];
-        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
+        tr_snprintf(buf, sizeof(buf), fmt, TR_PRIsv_ARG(scrape_url_sv), response_code, response_str);
         response->errmsg = buf;
     }
     else
@@ -447,6 +449,7 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
+                        // TODO(ckerr): ugh, interning info dict hashes is awful
                         if (memcmp(tr_quark_get_string(key), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
