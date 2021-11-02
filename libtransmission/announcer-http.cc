@@ -447,7 +447,7 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
-                        if (memcmp(tr_quark_get_string(key, nullptr), row->info_hash, SHA_DIGEST_LENGTH) == 0)
+                        if (memcmp(tr_quark_get_string(key), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {

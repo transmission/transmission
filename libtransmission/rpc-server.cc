@@ -1097,7 +1097,7 @@ void tr_rpcClose(tr_rpc_server** ps)
 
 static void missing_settings_key(tr_quark const q)
 {
-    char const* str = tr_quark_get_string(q, nullptr);
+    char const* str = tr_quark_get_string(q);
     tr_logAddNamedError(MY_NAME, _("Couldn't find settings key \"%s\""), str);
 }
 

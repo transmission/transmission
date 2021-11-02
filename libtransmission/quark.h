@@ -431,7 +431,14 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len);
+char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+
+/**
+ * Get the string view that corresponds to the specified quark.
+ *
+ * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
+ */
+std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already

@@ -800,7 +800,7 @@ private:
         auto tmp = std::vector<ByKey>(n);
         for (size_t i = 0; i < n; ++i)
         {
-            tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
+            tmp[i] = { tr_quark_get_string(children[i].key), i };
         }
 
         std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
@@ -1097,7 +1097,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, nullptr));
+                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key));
             }
         }
     }
