@@ -386,10 +386,10 @@ static void on_scrape_done(
 
     if (response_code != HTTP_OK)
     {
-        char const* fmt = _("Tracker '%" TR_PRIsv "' gave HTTP response code %1$ld (%2$s)");
+        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
         char const* response_str = tr_webGetResponseStr(response_code);
         char buf[512];
-        tr_snprintf(buf, sizeof(buf), fmt, TR_PRIsv_ARG(scrape_url_sv), response_code, response_str);
+        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
         response->errmsg = buf;
     }
     else
