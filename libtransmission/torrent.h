@@ -23,6 +23,7 @@
 #include "bitfield.h"
 #include "completion.h" /* tr_completion */
 #include "file.h"
+#include "quark.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -140,7 +141,7 @@ struct tr_torrent
 
     tr_stat_errtype error;
     char errorString[128];
-    char errorTracker[128];
+    tr_quark error_announce_url;
 
     /// DND
 

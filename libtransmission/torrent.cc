@@ -507,7 +507,7 @@ void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...)
 
     va_start(ap, fmt);
     tor->error = TR_STAT_LOCAL_ERROR;
-    tor->errorTracker[0] = '\0';
+    tor->error_announce_url = TR_KEY_NONE;
     evutil_vsnprintf(tor->errorString, sizeof(tor->errorString), fmt, ap);
     va_end(ap);
 
@@ -522,8 +522,8 @@ void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...)
 static constexpr void tr_torrentClearError(tr_torrent* tor)
 {
     tor->error = TR_STAT_OK;
+    tor->error_announce_url = TR_KEY_NONE;
     tor->errorString[0] = '\0';
-    tor->errorTracker[0] = '\0';
 }
 
 static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
@@ -546,13 +546,13 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     case TR_TRACKER_WARNING:
         tr_logAddTorErr(tor, _("Tracker warning: \"%s\""), event->text);
         tor->error = TR_STAT_TRACKER_WARNING;
-        tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
+        tor->error_announce_url = event->announce_url;
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
         break;
 
     case TR_TRACKER_ERROR:
         tor->error = TR_STAT_TRACKER_ERROR;
-        tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
+        tor->error_announce_url = event->announce_url;
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
         break;
 
@@ -2671,7 +2671,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 
             for (int i = 0; clear && i < trackerCount; ++i)
             {
-                if (strcmp(trackers[i].announce, tor->errorTracker) == 0)
+                if (strcmp(trackers[i].announce, tr_quark_get_string(tor->error_announce_url)) == 0)
                 {
                     clear = false;
                 }
