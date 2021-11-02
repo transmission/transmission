@@ -13,6 +13,7 @@
 #endif
 
 #include "transmission.h"
+#include "quark.h"
 
 struct tr_announcer;
 struct tr_torrent_tiers;
@@ -40,7 +41,7 @@ struct tr_tracker_event
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
     char const* text;
-    char const* tracker;
+    tr_quark announce_url;
 
     /* for TR_TRACKER_PEERS */
     struct tr_pex const* pex;

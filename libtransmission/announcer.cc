@@ -33,6 +33,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 struct tr_tier;
 
 static void tier_build_log_name(struct tr_tier const* tier, char* buf, size_t buflen);
@@ -130,12 +132,12 @@ struct StopsCompare
 
 struct tr_scrape_info
 {
-    std::string const url;
+    tr_quark scrape_url;
 
     int multiscrape_max;
 
-    tr_scrape_info(std::string url_in, int const multiscrape_max_in)
-        : url{ std::move(url_in) }
+    tr_scrape_info(tr_quark scrape_url_in, int const multiscrape_max_in)
+        : scrape_url{ scrape_url_in }
         , multiscrape_max{ multiscrape_max_in }
     {
     }
@@ -147,7 +149,7 @@ struct tr_scrape_info
 struct tr_announcer
 {
     std::set<tr_announce_request*, StopsCompare> stops;
-    std::map<std::string, tr_scrape_info> scrape_info;
+    std::map<tr_quark, tr_scrape_info> scrape_info;
 
     tr_session* session;
     struct event* upkeepTimer;
@@ -155,14 +157,15 @@ struct tr_announcer
     time_t tauUpkeepAt;
 };
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, std::string const& url)
+static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, std::string_view url)
 {
     struct tr_scrape_info* info = nullptr;
 
     if (!std::empty(url))
     {
+        auto key = tr_quark_new(url);
         auto& scrapes = announcer->scrape_info;
-        auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+        auto const it = scrapes.try_emplace(key, key, TR_MULTISCRAPE_MAX);
         info = &it.first->second;
     }
 
@@ -208,8 +211,8 @@ void tr_announcerClose(tr_session* session)
 /* a row in tr_tier's list of trackers */
 struct tr_tracker
 {
-    char* key;
-    char* announce;
+    tr_quark key;
+    tr_quark announce_url;
     struct tr_scrape_info* scrape_info;
 
     char* tracker_id_str;
@@ -225,29 +228,24 @@ struct tr_tracker
 };
 
 /* format: host+':'+ port */
-static char* getKey(char const* url)
+tr_quark getKey(std::string_view url)
 {
-    char* scheme = nullptr;
-    char* host = nullptr;
-    int port = 0;
+    auto const parsed = tr_urlParse(tr_strvstrip(url));
+    if (!parsed)
+    {
+        return TR_KEY_NONE;
+    }
 
-    tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, nullptr);
-    char* const ret = tr_strdup_printf(
-        "%s://%s:%d",
-        scheme != nullptr ? scheme : "invalid",
-        host != nullptr ? host : "invalid",
-        port);
-
-    tr_free(host);
-    tr_free(scheme);
-    return ret;
+    std::string buf;
+    tr_buildBuf(buf, parsed->host, ":"sv, parsed->portstr);
+    return tr_quark_new(buf);
 }
 
 static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tracker_info const* inf)
 {
     memset(tracker, 0, sizeof(tr_tracker));
     tracker->key = getKey(inf->announce);
-    tracker->announce = tr_strdup(inf->announce);
+    tracker->announce_url = tr_quark_new(tr_strvstrip(inf->announce));
     tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, inf->scrape);
     tracker->id = inf->id;
     tracker->seederCount = -1;
@@ -258,8 +256,6 @@ static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tr
 static void trackerDestruct(tr_tracker* tracker)
 {
     tr_free(tracker->tracker_id_str);
-    tr_free(tracker->announce);
-    tr_free(tracker->key);
 }
 
 /***
@@ -366,7 +362,7 @@ static void tier_build_log_name(tr_tier const* tier, char* buf, size_t buflen)
         buflen,
         "[%s---%s]",
         (tier != nullptr && tier->tor != nullptr) ? tr_torrentName(tier->tor) : "?",
-        (tier != nullptr && tier->currentTracker != nullptr) ? tier->currentTracker->key : "?");
+        (tier != nullptr && tier->currentTracker != nullptr) ? tr_quark_get_string(tier->currentTracker->key) : "?");
 }
 
 static void tierIncrementTracker(tr_tier* tier)
@@ -476,7 +472,7 @@ static void publishMessage(tr_tier* tier, char const* msg, TrackerEventType type
 
         if (tier->currentTracker != nullptr)
         {
-            event.tracker = tier->currentTracker->announce;
+            event.announce_url = tier->currentTracker->announce_url;
         }
 
         (*tiers->callback)(tier->tor, &event, tiers->callbackData);
@@ -932,7 +928,7 @@ static tr_announce_request* announce_request_new(
 {
     tr_announce_request* req = tr_new0(tr_announce_request, 1);
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
-    req->url = tr_strdup(tier->currentTracker->announce);
+    req->url = tr_strdup(tr_quark_get_string(tier->currentTracker->announce_url));
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
     memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
     req->peer_id = tr_torrentGetPeerId(tor);
@@ -1346,7 +1342,8 @@ static tr_tier* find_tier(tr_torrent* tor, std::string const& scrape)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
-        if (tracker != nullptr && tracker->scrape_info != nullptr && tracker->scrape_info->url == scrape)
+        if (tracker != nullptr && tracker->scrape_info != nullptr &&
+            tr_quark_get_string_view(tracker->scrape_info->scrape_url) == scrape)
         {
             return &tt->tiers[i];
         }
@@ -1532,7 +1529,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            if (scrape_info->url != req->url)
+            if (tr_quark_get_string_view(scrape_info->scrape_url) != req->url)
             {
                 continue;
             }
@@ -1547,7 +1544,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         if (!found && request_count < MaxScrapesPerUpkeep)
         {
             tr_scrape_request* req = &requests[request_count++];
-            req->url = scrape_info->url.c_str();
+            req->url = tr_quark_get_string(scrape_info->scrape_url);
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
             memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
@@ -1748,21 +1745,12 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
             tr_tracker_stat* st = &ret[out++];
 
             st->id = tracker->id;
-            tr_strlcpy(st->host, tracker->key, sizeof(st->host));
-            tr_strlcpy(st->announce, tracker->announce, sizeof(st->announce));
+            st->host = tr_quark_get_string(tracker->key);
+            st->announce = tr_quark_get_string(tracker->announce_url);
             st->tier = i;
             st->isBackup = tracker != tier->currentTracker;
             st->lastScrapeStartTime = tier->lastScrapeStartTime;
-
-            if (tracker->scrape_info != nullptr)
-            {
-                tr_strlcpy(st->scrape, tracker->scrape_info->url.c_str(), sizeof(st->scrape));
-            }
-            else
-            {
-                st->scrape[0] = '\0';
-            }
-
+            st->scrape = tracker->scrape_info == nullptr ? "" : tr_quark_get_string(tracker->scrape_info->scrape_url);
             st->seederCount = tracker->seederCount;
             st->leecherCount = tracker->leecherCount;
             st->downloadCount = tracker->downloadCount;
@@ -1850,7 +1838,7 @@ static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_
 {
     /* sanity clause */
     TR_ASSERT(trackerIndex < tgt->tracker_count);
-    TR_ASSERT(tr_strcmp0(tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
+    TR_ASSERT(tgt->trackers[trackerIndex].announce_url == src->currentTracker->announce_url);
 
     tr_tier const keep = *tgt;
 
@@ -1883,7 +1871,7 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if (tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0)
+            if (src->currentTracker->announce_url == tt->tiers[i].trackers[j].announce_url)
             {
                 found = true;
                 copy_tier_attributes_impl(&tt->tiers[i], j, src);

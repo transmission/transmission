@@ -1439,13 +1439,13 @@ struct tr_tracker_stat
     bool hasScraped;
 
     /* human-readable string identifying the tracker */
-    char host[1024];
+    char const* host;
 
     /* the full announce URL */
-    char announce[1024];
+    char const* announce;
 
     /* the full scrape URL */
-    char scrape[1024];
+    char const* scrape;
 
     /* Transmission uses one tracker per tier,
      * and the others are kept as backups */
