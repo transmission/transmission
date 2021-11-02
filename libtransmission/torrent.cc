@@ -86,10 +86,10 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashstr)
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string)
 {
     auto& src = session->torrentsByHashString;
-    auto it = src.find(hashstr);
+    auto it = src.find(hash_string);
     return it == std::end(src) ? nullptr : it->second;
 }
 

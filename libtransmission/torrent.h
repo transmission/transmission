@@ -64,7 +64,7 @@ void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool ha
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashString);
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
 
