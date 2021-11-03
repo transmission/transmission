@@ -115,7 +115,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
     NSAlert* alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Blocklist -> button")];
     alert.messageText = NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message");
-    alert.alertStyle = NSWarningAlertStyle;
+    alert.alertStyle = NSAlertStyleWarning;
 
     alert.informativeText = error;
 

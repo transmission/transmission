@@ -404,7 +404,7 @@
     panel.nameFieldStringValue = NSLocalizedString(@"untitled", "Save log panel -> default file name");
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             //make the array sorted by date
             NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"Index" ascending:YES];
@@ -428,7 +428,7 @@
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"There was a problem creating the file \"%@\".", "Save log alert panel -> message"),
                                      panel.URL.path.lastPathComponent];
-                alert.alertStyle = NSWarningAlertStyle;
+                alert.alertStyle = NSAlertStyleWarning;
 
                 [alert runModal];
             }

@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
+# The value of this variable should be set prior to the first project() command invocation.
+# See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
+if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 project(transmission)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
-
-if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
-endif()
 
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
@@ -403,19 +406,10 @@ endif()
 
 ## Compiler standard version
 
-if(CMAKE_VERSION VERSION_LESS "3.1")
-    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
-    elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-    endif()
-else()
-    set(CMAKE_C_STANDARD 11)
-    set(CMAKE_C_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ### Compiler Warnings
 
@@ -624,8 +618,6 @@ endif()
 
 if(RUN_CLANG_TIDY STREQUAL "AUTO")
     if (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
-        set(RUN_CLANG_TIDY OFF)
-    elseif(CMAKE_VERSION VERSION_LESS "3.7.2")
         set(RUN_CLANG_TIDY OFF)
     else()
         set(RUN_CLANG_TIDY ON)
