@@ -470,7 +470,7 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
     tr_strstrip(url);
     size_t const len = strlen(url);
 
-    if (tr_urlIsValid(url, len))
+    if (tr_urlIsValid(url))
     {
         if (inf->fileCount > 1 && len > 0 && url[len - 1] != '/')
         {

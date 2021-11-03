@@ -34,7 +34,10 @@
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
 {
-    if ((self = ([super initWithContentRect:window.frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])))
+    if ((self = ([super initWithContentRect:window.frame
+                                  styleMask:NSWindowStyleMaskBorderless
+                                    backing:NSBackingStoreBuffered
+                                      defer:NO])))
     {
         fLib = lib;
 

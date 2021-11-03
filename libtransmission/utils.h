@@ -9,10 +9,13 @@
 #pragma once
 
 #include <inttypes.h>
+#include <optional>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string>
 #include <string_view>
 #include <time.h> /* time_t */
+#include <type_traits>
 #include <vector>
 
 #include "tr-macros.h"
@@ -79,6 +82,19 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 /** @brief build a filename from a series of elements using the
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string& tr_buildBuf(std::string& setme, T... args)
+{
+    setme.clear();
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
 
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
@@ -177,11 +193,12 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_renew(struct_type, mem, n_structs) \
+    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -240,6 +257,8 @@ char const* tr_strerror(int errnum);
     @return the stripped string */
 char* tr_strstrip(char* str);
 
+std::string_view tr_strvstrip(std::string_view str);
+
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
@@ -263,10 +282,26 @@ void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GN
 bool tr_addressIsIP(char const* address);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(char const* url);
+bool tr_urlIsValidTracker(std::string_view url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(char const* url, size_t url_len);
+bool tr_urlIsValid(std::string_view url);
+
+// TODO: move this to types.h
+struct tr_parsed_url_t
+{
+    std::string_view scheme;
+    std::string_view host;
+    std::string_view path;
+    std::string_view portstr;
+    int port = -1;
+};
+
+std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
+
+// like tr_urlParse(), but with the added constraint that 'scheme'
+// must be one we that Transmission supports for announce and scrape
+std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */

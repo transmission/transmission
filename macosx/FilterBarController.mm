@@ -97,7 +97,7 @@
         }
         currentFilterButton = fNoFilterButton;
     }
-    currentFilterButton.state = NSOnState;
+    currentFilterButton.state = NSControlStateValueOn;
 
     //set filter search type
     NSString* filterSearchType = [NSUserDefaults.standardUserDefaults stringForKey:@"FilterSearchType"];
@@ -167,8 +167,8 @@
 
     if (sender != prevFilterButton)
     {
-        prevFilterButton.state = NSOffState;
-        [sender setState:NSOnState];
+        prevFilterButton.state = NSControlStateValueOff;
+        [sender setState:NSControlStateValueOn];
 
         NSString* filterType;
         if (sender == fActiveFilterButton)
@@ -196,7 +196,7 @@
     }
     else
     {
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"ApplyFilter" object:nil];
@@ -366,13 +366,15 @@
             state = [filterType isEqualToString:FILTER_TYPE_NAME];
         }
 
-        menuItem.state = state ? NSOnState : NSOffState;
+        menuItem.state = state ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
 
     if (action == @selector(setGroupFilter:))
     {
-        menuItem.state = menuItem.tag == [NSUserDefaults.standardUserDefaults integerForKey:@"FilterGroup"] ? NSOnState : NSOffState;
+        menuItem.state = menuItem.tag == [NSUserDefaults.standardUserDefaults integerForKey:@"FilterGroup"]
+                ? NSControlStateValueOn
+                : NSControlStateValueOff;
         return YES;
     }
 

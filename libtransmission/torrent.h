@@ -22,6 +22,8 @@
 #include "bandwidth.h" /* tr_bandwidth */
 #include "bitfield.h"
 #include "completion.h" /* tr_completion */
+#include "file.h"
+#include "quark.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -63,7 +65,7 @@ void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool ha
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashString);
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
 
@@ -109,8 +111,6 @@ void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
-time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
-
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
     torrent's content than any other mime-type. */
 std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor);
@@ -141,7 +141,7 @@ struct tr_torrent
 
     tr_stat_errtype error;
     char errorString[128];
-    char errorTracker[128];
+    tr_quark error_announce_url;
 
     /// DND
 
@@ -214,19 +214,40 @@ struct tr_torrent
         TR_ASSERT(std::size(checked) == info.pieceCount);
         checked_pieces_ = checked;
 
+        auto filename = std::string{};
         for (size_t i = 0; i < info.fileCount; ++i)
         {
-            auto const mtime = tr_torrentGetFileMTime(this, i);
+            auto const found = this->findFile(filename, i);
+            auto const mtime = found ? found->last_modified_at : 0;
 
             info.files[i].mtime = mtime;
 
             // if a file has changed, mark its pieces as unchecked
-            if (mtime != mtimes[i])
+            if (mtime == 0 || mtime != mtimes[i])
             {
                 checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
             }
         }
     }
+
+    /// FINDING FILES
+
+    struct tr_found_file_t : public tr_sys_path_info
+    {
+        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
+        std::string_view base; // /home/foo/Downloads
+        std::string_view subpath; // /torrent/01-file-one.txt
+
+        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
+            : tr_sys_path_info{ info }
+            , filename{ f }
+            , base{ b }
+            , subpath{ f.c_str() + std::size(b) + 1 }
+        {
+        }
+    };
+
+    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
     ///
 
@@ -415,7 +436,7 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
-// TODO(ckerr) this is confusingly-named. partial seeds return true here
+// TODO: rename this to tr_torrentIsDone()? both seed and partial seed return true
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;

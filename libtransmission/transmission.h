@@ -1438,14 +1438,15 @@ struct tr_tracker_stat
     /* whether or not we've ever scraped to this tracker */
     bool hasScraped;
 
-    /* human-readable string identifying the tracker */
-    char host[1024];
+    /* human-readable string identifying the tracker.
+     * 'host' is a slight misnomer; the current format ist `$host:$port` */
+    char const* host;
 
     /* the full announce URL */
-    char announce[1024];
+    char const* announce;
 
     /* the full scrape URL */
-    char scrape[1024];
+    char const* scrape;
 
     /* Transmission uses one tracker per tier,
      * and the others are kept as backups */

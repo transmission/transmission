@@ -35,7 +35,7 @@
     if ((self = [super init]))
     {
         self.trackingMode = NSSegmentSwitchTrackingSelectAny;
-        self.controlSize = NSMiniControlSize;
+        self.controlSize = NSControlSizeMini;
         self.segmentCount = 3;
 
         for (NSInteger i = 0; i < self.segmentCount; i++)
@@ -131,7 +131,7 @@
 
         if (count == 0)
         {
-            //if ([self backgroundStyle] != NSBackgroundStyleDark)
+            //if ([self backgroundStyle] != NSBackgroundStyleEmphasized)
             {
                 NSImage* image = [[NSImage imageNamed:@"PriorityNormalTemplate"] imageWithColor:NSColor.lightGrayColor];
                 [images addObject:image];
@@ -140,7 +140,7 @@
         }
         else
         {
-            NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.darkGrayColor;
+            NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.darkGrayColor;
 
             totalWidth = 0.0;
             if ([priorities containsObject:@(TR_PRI_LOW)])
@@ -179,7 +179,7 @@
                 imageSize.width,
                 imageSize.height);
 
-            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                          hints:nil];
 
             currentWidth += imageSize.width - IMAGE_OVERLAP;
