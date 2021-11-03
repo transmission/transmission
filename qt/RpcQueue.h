@@ -94,7 +94,7 @@ private:
         };
     }
 
-    // closure without return value ("auxiliary"), takes response and returns nothing -- internally we reuse the last future
+    // closure without return value ("auxiliary"), takes response and returns nothing
     template<
         typename Func,
         typename std::enable_if<std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>>::type* = nullptr>
@@ -103,7 +103,7 @@ private:
         return [func](RpcResponseFuture const& r)
         {
             func(r.result());
-            return r;
+            return createFinishedFuture();
         };
     }
 
@@ -111,10 +111,10 @@ private:
     template<typename Func, typename std::enable_if<std::is_same_v<typename std::invoke_result_t<Func>, void>>::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func) const
     {
-        return [func](RpcResponseFuture const& r)
+        return [func](RpcResponseFuture const&)
         {
             func();
-            return r;
+            return createFinishedFuture();
         };
     }
 
@@ -138,6 +138,14 @@ private:
         {
             func();
         };
+    }
+
+    static RpcResponseFuture createFinishedFuture()
+    {
+        QFutureInterface<RpcResponse> promise;
+        promise.reportStarted();
+        promise.reportFinished();
+        return promise.future();
     }
 
     Tag const tag_;

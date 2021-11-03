@@ -70,7 +70,7 @@ QSize FilterBarComboBox::calculateSize(QSize const& text_size, QSize const& coun
     content_size.rwidth() += hmargin + text_size.width();
     content_size.rwidth() += hmargin + count_size.width();
 
-    return style()->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this).expandedTo(QApplication::globalStrut());
+    return style()->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this);
 }
 
 void FilterBarComboBox::paintEvent(QPaintEvent* e)

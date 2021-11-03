@@ -24,7 +24,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QResizeEvent>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QStyle>
 #include <QTreeWidgetItem>
@@ -1294,7 +1294,7 @@ void DetailsDialog::onAddTrackerClicked()
         QSet<QString> urls;
         torrent_ids_t ids;
 
-        for (auto const& line : text.split(QRegExp(QStringLiteral("[\r\n]+"))))
+        for (auto const& line : text.split(QRegularExpression(QStringLiteral("[\r\n]+"))))
         {
             QString const url = line.trimmed();
             if (!line.isEmpty() && QUrl(url).isValid())

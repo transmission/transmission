@@ -11,6 +11,7 @@
 #include <array>
 #include <bitset>
 #include <ctime> // time_t
+#include <vector>
 
 #include <QIcon>
 #include <QMetaType>
@@ -58,7 +59,7 @@ struct Peer
     double progress;
 };
 
-using PeerList = QVector<Peer>;
+using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
@@ -91,7 +92,7 @@ struct TrackerStat
     QString last_scrape_result;
 };
 
-using TrackerStatsList = QVector<TrackerStat>;
+using TrackerStatsList = std::vector<TrackerStat>;
 
 struct TorrentFile
 {
@@ -103,7 +104,7 @@ struct TorrentFile
     uint64_t have = 0;
 };
 
-using FileList = QVector<TorrentFile>;
+using FileList = std::vector<TorrentFile>;
 
 class TorrentHash
 {

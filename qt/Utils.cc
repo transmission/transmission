@@ -10,11 +10,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <shellapi.h>
-#endif
-
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QColor>
@@ -30,10 +25,6 @@
 #include <QObject>
 #include <QPixmapCache>
 #include <QStyle>
-
-#ifdef _WIN32
-#include <QtWin>
-#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
