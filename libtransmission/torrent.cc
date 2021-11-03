@@ -655,8 +655,21 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
         offset += inf->files[f].length;
         initFilePieces(inf, f);
     }
+}
+
+static void tr_torrentInitPiecePriorities(tr_torrent* tor)
+{
+    tor->piece_priorities_.clear();
+
+    // throw away file prorities once we're done downloading,
+    // they just waste time & space
+    if (tr_torrentIsSeed(tor))
+    {
+        return;
+    }
 
     /* build the array of first-file hints to give calculatePiecePriority */
+    tr_info* inf = &tor->info;
     tr_file_index_t* firstFiles = tr_new(tr_file_index_t, inf->pieceCount);
     tr_file_index_t f = 0;
 
@@ -670,37 +683,6 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
         firstFiles[p] = f;
     }
 
-#if 0
-
-    /* test to confirm the first-file hints are correct */
-    for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
-    {
-        tr_file_index_t f = firstFiles[p];
-
-        TR_ASSERT(inf->files[f].firstPiece <= p);
-        TR_ASSERT(inf->files[f].lastPiece >= p);
-
-        if (f > 0)
-        {
-            TR_ASSERT(inf->files[f - 1].lastPiece < p);
-        }
-
-        f = 0;
-
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i, ++f)
-        {
-            if (pieceHasFile(p, &inf->files[i]))
-            {
-                break;
-            }
-        }
-
-        TR_ASSERT((int)f == firstFiles[p]);
-    }
-
-#endif
-
-    tor->piece_priorities_.clear();
     for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
     {
         tor->setPiecePriority(p, calculatePiecePriority(*inf, p, firstFiles[p]));
@@ -791,8 +773,8 @@ static void torrentInitFromInfo(tr_torrent* tor)
     tr_cpConstruct(&tor->completion, tor);
 
     tr_torrentInitFilePieces(tor);
-
     tor->completeness = tr_cpGetStatus(&tor->completion);
+    tr_torrentInitPiecePriorities(tor);
 }
 
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
