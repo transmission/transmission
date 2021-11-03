@@ -606,7 +606,7 @@ std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_
 
         bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return !torrent_->info.pieces[piece].dnd && peer_->have.test(piece);
+            return !torrent_->pieceIsDnd(piece) && peer_->have.test(piece);
         }
 
         bool isEndgame() const override
@@ -636,7 +636,7 @@ std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_
 
         tr_priority_t priority(tr_piece_index_t piece) const override
         {
-            return torrent_->info.pieces[piece].priority;
+            return torrent_->piecePriority(piece);
         }
 
     private:
