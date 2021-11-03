@@ -23,6 +23,7 @@
 #include "bitfield.h"
 #include "completion.h" /* tr_completion */
 #include "file.h"
+#include "quark.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -140,7 +141,7 @@ struct tr_torrent
 
     tr_stat_errtype error;
     char errorString[128];
-    char errorTracker[128];
+    tr_quark error_announce_url;
 
     /// DND
 
@@ -435,7 +436,7 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
-// TODO(ckerr) this is confusingly-named. partial seeds return true here
+// TODO: rename this to tr_torrentIsDone()? both seed and partial seed return true
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;

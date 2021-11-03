@@ -876,6 +876,8 @@ static bool urlCharsAreValid(std::string_view url)
 
 std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
 {
+    url = tr_strvstrip(url);
+
     if (!urlCharsAreValid(url))
     {
         return {};
@@ -918,11 +920,21 @@ std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
     return tr_parsed_url_t{ scheme, host, path, portstr, port };
 }
 
-bool tr_urlIsValidTracker(std::string_view url)
+static bool tr_isValidTrackerScheme(std::string_view scheme)
 {
     auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
+    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
+}
+
+std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url)
+{
     auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_parsed_url_t>{};
+}
+
+bool tr_urlIsValidTracker(std::string_view url)
+{
+    return !!tr_urlParseTracker(url);
 }
 
 bool tr_urlIsValid(std::string_view url)
