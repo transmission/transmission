@@ -673,7 +673,7 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
             tr_logGetTimeStr(timestr, sizeof(timestr)),
             tr_torrentName(msgs->torrent),
             tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
-            tr_quark_get_string(msgs->client, nullptr));
+            tr_quark_get_string(msgs->client));
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);
@@ -2223,10 +2223,9 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_commit_space(out, iovec, 1);
 
             /* check the piece if it needs checking... */
-            if (!err && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))
+            if (!err)
             {
-                err = !tr_torrentCheckPiece(msgs->torrent, req.index);
-
+                err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
                     tr_torrentSetLocalError(

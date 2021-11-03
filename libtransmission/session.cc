@@ -625,7 +625,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
     session->bandwidth = new Bandwidth(nullptr);
-    tr_variantInitList(&session->removedTorrents, 0);
+    session->removed_torrents.clear();
 
     /* nice to start logging at the very beginning */
     auto i = int64_t{};
@@ -2078,7 +2078,6 @@ void tr_sessionClose(tr_session* session)
     }
 
     /* free the session memory */
-    tr_variantFree(&session->removedTorrents);
     delete session->bandwidth;
     delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
@@ -2126,20 +2125,20 @@ static void sessionLoadTorrents(void* vdata)
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
+        auto const dirname_sv = std::string_view{ dirname };
+        auto path = std::string{};
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (tr_str_has_suffix(name, ".torrent"))
             {
-                char* const path = tr_buildPath(dirname, name, nullptr);
-                tr_ctorSetMetainfoFromFile(data->ctor, path);
+                tr_buildBuf(path, dirname_sv, "/", name);
+                tr_ctorSetMetainfoFromFile(data->ctor, path.c_str());
 
                 tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr, nullptr);
                 if (tor != nullptr)
                 {
                     torrents.push_back(tor);
                 }
-
-                tr_free(path);
             }
         }
 

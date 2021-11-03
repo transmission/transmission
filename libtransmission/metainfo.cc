@@ -14,6 +14,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1 */
 #include "file.h"
 #include "log.h"
@@ -469,7 +470,7 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
     tr_strstrip(url);
     size_t const len = strlen(url);
 
-    if (tr_urlIsValid(url, len))
+    if (tr_urlIsValid(url))
     {
         if (inf->fileCount > 1 && len > 0 && url[len - 1] != '/')
         {
@@ -709,12 +710,8 @@ static char const* tr_metainfoParseImpl(
         }
 
         inf->pieceCount = len / SHA_DIGEST_LENGTH;
-        inf->pieces = tr_new0(tr_piece, inf->pieceCount);
-
-        for (tr_piece_index_t pi = 0; pi < inf->pieceCount; ++pi)
-        {
-            memcpy(inf->pieces[pi].hash, &raw[pi * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
-        }
+        inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
+        std::copy_n(raw, len, (uint8_t*)(inf->pieces));
     }
 
     /* files */

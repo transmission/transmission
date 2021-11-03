@@ -119,7 +119,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     auto torrents = std::vector<tr_torrent*>{};
 
     auto id = int64_t{};
-    char const* str = nullptr;
+    auto sv = std::string_view{};
     tr_variant* ids = nullptr;
 
     if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
@@ -136,9 +136,9 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             {
                 tor = tr_torrentFindFromId(session, id);
             }
-            else if (tr_variantGetStr(node, &str, nullptr))
+            else if (tr_variantGetStrView(node, &sv))
             {
-                tor = tr_torrentFindFromHashString(session, str);
+                tor = tr_torrentFindFromHashString(session, sv);
             }
 
             if (tor != nullptr)
@@ -150,15 +150,14 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
         tr_torrent* const tor = tr_torrentFindFromId(session, id);
-
         if (tor != nullptr)
         {
             torrents.push_back(tor);
         }
     }
-    else if (tr_variantDictFindStr(args, TR_KEY_ids, &str, nullptr))
+    else if (tr_variantDictFindStrView(args, TR_KEY_ids, &sv))
     {
-        if (strcmp(str, "recently-active") == 0)
+        if (sv == "recently-active"sv)
         {
             time_t const cutoff = tr_time() - RECENTLY_ACTIVE_SECONDS;
 
@@ -171,8 +170,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
         }
         else
         {
-            tr_torrent* const tor = tr_torrentFindFromHashString(session, str);
-
+            tr_torrent* const tor = tr_torrentFindFromHashString(session, sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);
@@ -879,30 +877,23 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     char const* strVal = nullptr;
-    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") ?
+    tr_format const format = tr_variantDictFindStr(args_in, TR_KEY_format, &strVal, nullptr) && strcmp(strVal, "table") == 0 ?
         TR_FORMAT_TABLE :
         TR_FORMAT_OBJECT;
 
     if (tr_variantDictFindStr(args_in, TR_KEY_ids, &strVal, nullptr) && strcmp(strVal, "recently-active") == 0)
     {
-        int n = 0;
         time_t const now = tr_time();
         int const interval = RECENTLY_ACTIVE_SECONDS;
-        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, 0);
 
-        tr_variant* d = nullptr;
-        while ((d = tr_variantListChild(&session->removedTorrents, n)) != nullptr)
+        auto const& removed = session->removed_torrents;
+        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
+        for (auto const& [id, time_removed] : removed)
         {
-            auto date = int64_t{};
-            auto id = int64_t{};
-
-            if (tr_variantDictFindInt(d, TR_KEY_date, &date) && date >= now - interval &&
-                tr_variantDictFindInt(d, TR_KEY_id, &id))
+            if (time_removed >= now - interval)
             {
                 tr_variantListAddInt(removed_out, id);
             }
-
-            ++n;
         }
     }
 
@@ -2450,20 +2441,17 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
 
         for (size_t i = 0; i < field_count; ++i)
         {
-            char const* field_name = nullptr;
-            auto field_name_len = size_t{};
-            if (!tr_variantGetStr(tr_variantListChild(fields, i), &field_name, &field_name_len))
+            auto field_name = std::string_view{};
+            if (tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
             {
                 continue;
             }
 
-            auto field_id = tr_quark{};
-            if (!tr_quark_lookup(field_name, field_name_len, &field_id))
+            auto const field_id = tr_quark_lookup(field_name);
+            if (field_id)
             {
-                continue;
+                addSessionField(s, args_out, *field_id);
             }
-
-            addSessionField(s, args_out, field_id);
         }
     }
     else

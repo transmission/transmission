@@ -107,7 +107,10 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 QString FaviconCache::getDisplayName(Key const& key)
 {
     auto name = key;
-    name[0] = name.at(0).toTitleCase();
+    if (!name.isEmpty())
+    {
+        name.front() = name.front().toTitleCase();
+    }
     return name;
 }
 

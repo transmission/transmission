@@ -52,6 +52,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
     u_int            _subscriptionFlags;
 }
 
+- (instancetype) init NS_UNAVAILABLE;
 - (instancetype) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags NS_DESIGNATED_INITIALIZER;
 
 @property (atomic, copy) NSString *path;

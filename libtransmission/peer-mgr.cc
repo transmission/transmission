@@ -1741,7 +1741,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (size_t i = 0; i < n_pieces; ++i)
     {
-        if (!tor->info.pieces[i].dnd && have.at(i))
+        if (!tor->pieceIsDnd(i) && have.at(i))
         {
             desired_available += tr_torrentMissingBytesInPiece(tor, i);
         }
@@ -1789,7 +1789,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     auto const* const atom = peer->atom;
 
     tr_address_to_string_with_buf(&atom->addr, stats.addr, sizeof(stats.addr));
-    tr_strlcpy(stats.client, tr_quark_get_string(peer->client, nullptr), sizeof(stats.client));
+    tr_strlcpy(stats.client, tr_quark_get_string(peer->client), sizeof(stats.client));
     stats.port = ntohs(peer->atom->port);
     stats.from = atom->fromFirst;
     stats.progress = peer->progress;
@@ -2069,7 +2069,7 @@ static void rechokeDownloads(tr_swarm* s)
 
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = !tor->info.pieces[i].dnd && !tr_torrentPieceIsComplete(tor, i);
+            piece_is_interesting[i] = !tor->pieceIsDnd(i) && !tr_torrentPieceIsComplete(tor, i);
         }
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */

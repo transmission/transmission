@@ -68,6 +68,14 @@ TEST_F(UtilsTest, trStrstrip)
     EXPECT_EQ(in, out);
     EXPECT_STREQ("test", out);
     tr_free(in);
+
+    EXPECT_EQ(""sv, tr_strvstrip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strvstrip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("test"sv));
 }
 
 TEST_F(UtilsTest, trBuildpath)
@@ -239,6 +247,14 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    auto parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("1"sv, parsed->host);
+    EXPECT_EQ("/"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org/some/path";
     scheme = nullptr;
     host = nullptr;
@@ -252,6 +268,14 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org:8080/some/path";
     scheme = nullptr;
     host = nullptr;
@@ -264,6 +288,27 @@ TEST_F(UtilsTest, url)
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
+
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("8080"sv, parsed->portstr);
+    EXPECT_EQ(8080, parsed->port);
+
+    EXPECT_FALSE(tr_urlIsValid("hello world"sv));
+    EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
+    EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
+    EXPECT_FALSE(tr_urlIsValid(""sv));
+    EXPECT_FALSE(tr_urlIsValid("com"sv));
+    EXPECT_FALSE(tr_urlIsValid("www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("zzz://www.example.com"sv)); // syntactically valid, but unsupported scheme
+    EXPECT_TRUE(tr_urlIsValid("https://www.example.com"sv));
+
+    EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
 }
 
 TEST_F(UtilsTest, trHttpUnescape)

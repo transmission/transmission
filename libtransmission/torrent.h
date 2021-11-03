@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -15,17 +15,22 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "bandwidth.h" /* tr_bandwidth */
+#include "bitfield.h"
 #include "completion.h" /* tr_completion */
+#include "file.h"
+#include "quark.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 class tr_swarm;
+struct tr_torrent;
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 
@@ -60,7 +65,7 @@ void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool ha
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* hashString);
+tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
 
@@ -86,10 +91,6 @@ tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t 
 tr_block_range_t tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
-
-void tr_torrentSetPieceChecked(tr_torrent* tor, tr_piece_index_t piece);
-
-void tr_torrentSetChecked(tr_torrent* tor, time_t when);
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
@@ -129,9 +130,120 @@ struct tr_torrent
 
     int magicNumber;
 
+    std::optional<double> verify_progress;
+    std::vector<tr_sha1_digest_t> piece_checksums;
+
     tr_stat_errtype error;
     char errorString[128];
-    char errorTracker[128];
+    tr_quark error_announce_url;
+
+    /// DND
+
+    tr_bitfield dnd_pieces_ = tr_bitfield{ 0 };
+
+    bool pieceIsDnd(tr_piece_index_t piece) const
+    {
+        return dnd_pieces_.test(piece);
+    }
+
+    /// PRIORITIES
+
+    // since 'TR_PRI_NORMAL' is by far the most common, save some
+    // space by treating anything not in the map as normal
+    std::unordered_map<tr_piece_index_t, tr_priority_t> piece_priorities_;
+
+    void setPiecePriority(tr_piece_index_t piece, tr_priority_t priority)
+    {
+        if (priority == TR_PRI_NORMAL)
+        {
+            piece_priorities_.erase(piece);
+
+            if (std::empty(piece_priorities_))
+            {
+                // ensure we release piece_priorities_' internal memory
+                piece_priorities_ = decltype(piece_priorities_){};
+            }
+        }
+        else
+        {
+            piece_priorities_[piece] = priority;
+        }
+    }
+
+    tr_priority_t piecePriority(tr_piece_index_t piece) const
+    {
+        auto const it = piece_priorities_.find(piece);
+        if (it == std::end(piece_priorities_))
+        {
+            return TR_PRI_NORMAL;
+        }
+        return it->second;
+    }
+
+    /// CHECKSUMS
+
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
+
+    bool checkPiece(tr_piece_index_t piece);
+
+    bool ensurePieceIsChecked(tr_piece_index_t piece)
+    {
+        TR_ASSERT(piece < info.pieceCount);
+
+        if (checked_pieces_.test(piece))
+        {
+            return true;
+        }
+
+        bool const checked = checkPiece(piece);
+        this->anyDate = tr_time();
+        this->setDirty();
+
+        checked_pieces_.set(piece, checked);
+        return checked;
+    }
+
+    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount*/)
+    {
+        TR_ASSERT(std::size(checked) == info.pieceCount);
+        checked_pieces_ = checked;
+
+        auto filename = std::string{};
+        for (size_t i = 0; i < info.fileCount; ++i)
+        {
+            auto const found = this->findFile(filename, i);
+            auto const mtime = found ? found->last_modified_at : 0;
+
+            info.files[i].mtime = mtime;
+
+            // if a file has changed, mark its pieces as unchecked
+            if (mtime == 0 || mtime != mtimes[i])
+            {
+                checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
+            }
+        }
+    }
+
+    /// FINDING FILES
+
+    struct tr_found_file_t : public tr_sys_path_info
+    {
+        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
+        std::string_view base; // /home/foo/Downloads
+        std::string_view subpath; // /torrent/01-file-one.txt
+
+        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
+            : tr_sys_path_info{ info }
+            , filename{ f }
+            , base{ b }
+            , subpath{ f.c_str() + std::size(b) + 1 }
+        {
+        }
+    };
+
+    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
+
+    ///
 
     uint8_t obfuscatedHash[SHA_DIGEST_LENGTH];
 
@@ -237,6 +349,12 @@ struct tr_torrent
     bool isDeleting;
     bool startAfterVerify;
     bool isDirty;
+
+    void setDirty()
+    {
+        this->isDirty = true;
+    }
+
     bool isQueued;
 
     bool prefetchMagnetMetadata;
@@ -312,7 +430,7 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
-// TODO(ckerr) this is confusingly-named. partial seeds return true here
+// TODO: rename this to tr_torrentIsDone()? both seed and partial seed return true
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;
@@ -405,17 +523,10 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent*, tr_direction, unsigned int Bps);
 unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const*, tr_direction);
 
 /**
- * @return true if this piece needs to be tested
- */
-bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t pieceIndex);
-
-/**
  * @brief Test a piece against its info dict checksum
  * @return true if the piece's passes the checksum test
  */
 bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
-
-time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i);
 
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 

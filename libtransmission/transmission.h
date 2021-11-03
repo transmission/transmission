@@ -1444,14 +1444,15 @@ struct tr_tracker_stat
     /* whether or not we've ever scraped to this tracker */
     bool hasScraped;
 
-    /* human-readable string identifying the tracker */
-    char host[1024];
+    /* human-readable string identifying the tracker.
+     * 'host' is a slight misnomer; the current format ist `$host:$port` */
+    char const* host;
 
     /* the full announce URL */
-    char announce[1024];
+    char const* announce;
 
     /* the full scrape URL */
-    char scrape[1024];
+    char const* scrape;
 
     /* Transmission uses one tracker per tier,
      * and the others are kept as backups */
@@ -1590,23 +1591,15 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
 /** @brief a part of tr_info that represents a single file of the torrent's content */
 struct tr_file
 {
+    time_t mtime;
     uint64_t length; /* Length of the file, in bytes */
+    uint64_t offset; /* file begins at the torrent's nth byte */
     char* name; /* Path to the file */
+    tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
+    tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
     bool dnd; /* "do not download" flag */
     bool is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
-    tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
-    tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
-    uint64_t offset; /* file begins at the torrent's nth byte */
-};
-
-/** @brief a part of tr_info that represents a single piece of the torrent's content */
-struct tr_piece
-{
-    time_t timeChecked; /* the last time we tested this piece */
-    uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
-    int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    bool dnd; /* "do not download" flag */
 };
 
 /** @brief information about a torrent that comes from its metainfo file */
@@ -1634,7 +1627,7 @@ struct tr_info
     char* source;
 
     tr_file* files;
-    tr_piece* pieces;
+    tr_sha1_digest_t* pieces;
 
     /* these trackers are sorted by tier */
     tr_tracker_info* trackers;

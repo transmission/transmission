@@ -428,7 +428,7 @@
 
 - (void)setRandomPortOnStart:(id)sender
 {
-    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton*)sender).state == NSOnState);
+    tr_sessionSetPeerPortRandomOnStart(fHandle, ((NSButton*)sender).state == NSControlStateValueOn);
 }
 
 - (void)setNat:(id)sender
@@ -892,7 +892,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             [fFolderPopUp selectItemAtIndex:DOWNLOAD_FOLDER];
 
@@ -923,7 +923,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* folder = panel.URLs[0].path;
             [fDefaults setObject:folder forKey:@"IncompleteDownloadFolder"];
@@ -946,7 +946,7 @@
     panel.canCreateDirectories = NO;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* filePath = panel.URLs[0].path;
 
@@ -974,7 +974,7 @@
 
 - (void)setShowAddMagnetWindow:(id)sender
 {
-    [fDefaults setBool:(fShowMagnetAddWindowCheck.state == NSOnState) forKey:@"MagnetOpenAsk"];
+    [fDefaults setBool:(fShowMagnetAddWindowCheck.state == NSControlStateValueOn) forKey:@"MagnetOpenAsk"];
 }
 
 - (void)updateShowAddMagnetWindowField
@@ -982,7 +982,7 @@
     if (![fDefaults boolForKey:@"DownloadLocationConstant"])
     {
         //always show the add window for magnet links when the download location is the same as the torrent file
-        fShowMagnetAddWindowCheck.state = NSOnState;
+        fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         fShowMagnetAddWindowCheck.enabled = NO;
     }
     else
@@ -1039,7 +1039,7 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             VDKQueue* watcherQueue = ((Controller*)NSApp.delegate).fileWatcherQueue;
             [watcherQueue removeAllPaths];
