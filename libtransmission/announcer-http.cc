@@ -329,7 +329,7 @@ void tr_tracker_http_announce(
     d->response.downloads = -1;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
-    memcpy(d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH);
+    d->response.info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     char* const url = announce_url_new(session, request);
@@ -448,7 +448,10 @@ static void on_scrape_done(
                         struct tr_scrape_response_row* row = &response->rows[j];
 
                         // TODO(ckerr): ugh, interning info dict hashes is awful
-                        if (memcmp(tr_quark_get_string(key), row->info_hash, SHA_DIGEST_LENGTH) == 0)
+                        auto const& hash = row->info_hash;
+                        auto const key_sv = tr_quark_get_string_view(key);
+                        if (std::size(hash) == std::size(key_sv) &&
+                            memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {
@@ -518,7 +521,7 @@ void tr_tracker_http_scrape(
 
     for (int i = 0; i < d->response.row_count; ++i)
     {
-        memcpy(d->response.rows[i].info_hash, request->info_hash[i], SHA_DIGEST_LENGTH);
+        d->response.rows[i].info_hash = request->info_hash[i];
         d->response.rows[i].seeders = -1;
         d->response.rows[i].leechers = -1;
         d->response.rows[i].downloads = -1;

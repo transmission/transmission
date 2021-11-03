@@ -79,6 +79,13 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
+tr_sha1_digest_t tr_torrentGetInfoHash(tr_torrent const* torrent)
+{
+    auto digest = tr_sha1_digest_t{};
+    std::copy_n(reinterpret_cast<std::byte const*>(torrent->info.hash), SHA_DIGEST_LENGTH, std::begin(digest));
+    return digest;
+}
+
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
     auto& src = session->torrentsById;
@@ -98,6 +105,11 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
     auto& src = session->torrentsByHash;
     auto it = src.find(hash);
     return it == std::end(src) ? nullptr : it->second;
+}
+
+tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& info_dict_hash)
+{
+    return tr_torrentFindFromHash(session, reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
