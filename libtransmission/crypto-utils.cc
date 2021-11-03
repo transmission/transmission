@@ -7,8 +7,8 @@
  */
 
 #include <cstdarg>
-#include <cstdlib> /* abs(), srand(), rand() */
 #include <cstring> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
+#include <random> /* random_device, mt19937, uniform_int_distribution*/
 
 #include <arc4.h>
 
@@ -106,15 +106,12 @@ int tr_rand_int_weak(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
-    static bool init = false;
+    thread_local auto random_engine = std::mt19937{ std::random_device{}() };
+    using distribution_type = std::uniform_int_distribution<>;
+    thread_local distribution_type distribution;
 
-    if (!init)
-    {
-        srand(tr_time_msec());
-        init = true;
-    }
-
-    return rand() % upper_bound;
+    // Upper bound is inclusive in std::uniform_int_distribution.
+    return distribution(random_engine, distribution_type::param_type{ 0, upper_bound - 1 });
 }
 
 /***
