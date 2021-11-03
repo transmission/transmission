@@ -79,7 +79,7 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-tr_sha1_digest_t tr_torrentGetInfoHash(tr_torrent const* torrent)
+tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent)
 {
     auto digest = tr_sha1_digest_t{};
     std::copy_n(reinterpret_cast<std::byte const*>(torrent->info.hash), SHA_DIGEST_LENGTH, std::begin(digest));
