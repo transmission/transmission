@@ -222,7 +222,7 @@
 
     [panel beginSheetModalForWindow:fCustomLocationPopUp.window completionHandler:^(NSInteger result) {
         NSInteger const index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* path = panel.URLs[0].path;
             [GroupsController.groups setCustomDownloadLocation:path forIndex:index];
@@ -245,7 +245,7 @@
 - (IBAction)toggleUseCustomDownloadLocation:(id)sender
 {
     NSInteger index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-    if (fCustomLocationEnableCheck.state == NSOnState)
+    if (fCustomLocationEnableCheck.state == NSControlStateValueOn)
     {
         if ([GroupsController.groups customDownloadLocationForIndex:index])
         {
@@ -261,7 +261,7 @@
         [GroupsController.groups setUsesCustomDownloadLocation:NO forIndex:index];
     }
 
-    fCustomLocationPopUp.enabled = (fCustomLocationEnableCheck.state == NSOnState);
+    fCustomLocationPopUp.enabled = (fCustomLocationEnableCheck.state == NSControlStateValueOn);
 }
 
 #pragma mark -
@@ -270,7 +270,7 @@
 - (IBAction)toggleUseAutoAssignRules:(id)sender
 {
     NSInteger index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-    if (fAutoAssignRulesEnableCheck.state == NSOnState)
+    if (fAutoAssignRulesEnableCheck.state == NSControlStateValueOn)
     {
         if ([GroupsController.groups autoAssignRulesForIndex:index])
         {
@@ -286,7 +286,7 @@
         [GroupsController.groups setUsesAutoAssignRules:NO forIndex:index];
     }
 
-    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
+    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSControlStateValueOn;
 }
 
 - (IBAction)orderFrontRulesSheet:(id)sender
@@ -334,7 +334,7 @@
     [GroupsController.groups setAutoAssignRules:predicate forIndex:index];
 
     fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex:index];
-    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
+    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSControlStateValueOn;
 }
 
 - (void)ruleEditorRowsDidChange:(NSNotification*)notification
@@ -370,7 +370,7 @@
 
         fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex:index];
         fAutoAssignRulesEnableCheck.enabled = YES;
-        fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSOnState);
+        fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSControlStateValueOn);
     }
     else
     {

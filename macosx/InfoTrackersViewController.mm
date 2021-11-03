@@ -433,7 +433,7 @@
         alert.showsSuppressionButton = YES;
 
         NSInteger result = [alert runModal];
-        if (alert.suppressionButton.state == NSOnState)
+        if (alert.suppressionButton.state == NSControlStateValueOn)
         {
             [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningRemoveTrackers"];
         }

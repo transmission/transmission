@@ -445,20 +445,6 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
     return o->fd;
 }
 
-bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, time_t* mtime)
-{
-    struct tr_cached_file const* o = fileset_lookup(get_fileset(s), torrent_id, i);
-    auto info = tr_sys_path_info{};
-    bool const success = o != nullptr && tr_sys_file_get_info(o->fd, &info, nullptr);
-
-    if (success)
-    {
-        *mtime = info.last_modified_at;
-    }
-
-    return success;
-}
-
 void tr_fdTorrentClose(tr_session* session, int torrent_id)
 {
     TR_ASSERT(tr_sessionIsLocked(session));

@@ -139,7 +139,7 @@
             iconSize.width,
             iconSize.height);
 
-        [fIcon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+        [fIcon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
     }
 
     [tabImage unlockFocus];
