@@ -95,9 +95,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* if we're finishing a piece... */
         if (leftInPiece == 0)
         {
-            auto hash = tr_sha1_digest_t{};
-            tr_sha1_final(sha, std::data(hash));
-            bool const hasPiece = hash == tor->info.pieces[pieceIndex];
+            auto hash = tr_sha1_final(sha);
+            auto const hasPiece = hash && *hash == tor->info.pieces[pieceIndex];
 
             if (hasPiece || hadPiece)
             {
@@ -143,7 +142,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     }
 
     tor->verify_progress.reset();
-    tr_sha1_final(sha, nullptr);
+    tr_sha1_final(sha);
     free(buffer);
 
     /* stopwatch */
