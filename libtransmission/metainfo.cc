@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cstring> /* strlen() */
+#include <iterator>
 #include <string_view>
 
 #include <event2/buffer.h>
