@@ -17,6 +17,8 @@
 #include "utils.h" /* tr_new0 */
 #include "variant.h"
 
+using namespace std::literals;
+
 struct optional_args
 {
     bool isSet_paused;
@@ -144,15 +146,15 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
         if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
         {
-            char const* name = nullptr;
+            auto name = std::string_view{};
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, nullptr) &&
-                !tr_variantDictFindStr(info, TR_KEY_name, &name, nullptr))
+            if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) &&
+                !tr_variantDictFindStrView(info, TR_KEY_name, &name))
             {
-                name = nullptr;
+                name = ""sv;
             }
 
-            if (tr_str_is_empty(name))
+            if (std::empty(name))
             {
                 char* base = tr_sys_path_basename(filename, nullptr);
 

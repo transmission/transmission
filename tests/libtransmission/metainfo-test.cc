@@ -93,11 +93,6 @@ TEST(Metainfo, bucket)
 
     for (auto const& test : tests)
     {
-        std::cerr << "test ";
-        for (auto ch : test.benc)
-            std::cerr << ch;
-        std::cerr << std::endl;
-
         auto* ctor = tr_ctorNew(nullptr);
         int const err = tr_ctorSetMetainfo(ctor, std::data(test.benc), std::size(test.benc));
         EXPECT_EQ(test.expected_benc_err, err);

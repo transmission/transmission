@@ -339,17 +339,12 @@ static void saveRealFunc(tr_variant const* val, void* vevbuf)
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
-    auto len = size_t{};
-    char const* str = nullptr;
-    if (!tr_variantGetStr(v, &str, &len))
-    {
-        len = 0;
-        str = nullptr;
-    }
+    auto sv = std::string_view{};
+    (void)!tr_variantGetStrView(v, &sv);
 
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%zu:", len);
-    evbuffer_add(evbuf, str, len);
+    evbuffer_add_printf(evbuf, "%zu:", std::size(sv));
+    evbuffer_add(evbuf, std::data(sv), std::size(sv));
 }
 
 static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
