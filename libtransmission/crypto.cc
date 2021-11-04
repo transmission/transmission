@@ -188,3 +188,12 @@ bool tr_cryptoHasTorrentHash(tr_crypto const* crypto)
 
     return crypto->torrentHashIsSet;
 }
+
+///
+
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle)
+{
+    auto digest = tr_sha1_digest_t{};
+    auto const success = tr_sha1_final(handle, reinterpret_cast<uint8_t*>(std::data(digest)));
+    return success ? digest : std::optional<tr_sha1_digest_t>{};
+}
