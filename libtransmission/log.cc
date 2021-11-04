@@ -246,7 +246,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
             auto* const newmsg = tr_new0(tr_log_message, 1);
             newmsg->level = level;
             newmsg->when = tr_time();
-            newmsg->message = tr_strdup(buf);
+            newmsg->message = tr_strndup(buf, buf_len);
             newmsg->file = file;
             newmsg->line = line;
             newmsg->name = tr_strdup(name);
