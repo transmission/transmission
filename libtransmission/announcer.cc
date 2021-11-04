@@ -97,33 +97,44 @@ namespace
 
 struct StopsCompare
 {
-    int compare(tr_announce_request const* a, tr_announce_request const* b) const
+    int compare(tr_announce_request const* a, tr_announce_request const* b) const // <=>
     {
         // primary key: volume of data transferred
-        auto ax = a->up + a->down;
-        auto bx = b->up + b->down;
-        if (ax != bx)
+        auto const ax = a->up + a->down;
+        auto const bx = b->up + b->down;
+        if (ax < bx)
         {
-            return ax > bx ? -1 : 1;
+            return -1;
+        }
+        if (ax > bx)
+        {
+            return 1;
         }
 
         // secondary key: the torrent's info_hash
-        auto const i = memcmp(a->info_hash, b->info_hash, SHA_DIGEST_LENGTH);
-        if (i != 0)
+        if (a->info_hash < b->info_hash)
         {
-            return i;
+            return -1;
+        }
+        if (a->info_hash > b->info_hash)
+        {
+            return 1;
         }
 
         // tertiary key: the tracker's announce url
-        if (a->announce_url != b->announce_url)
+        if (a->announce_url < b->announce_url)
         {
-            return a->announce_url < b->announce_url ? -1 : 1;
+            return -1;
+        }
+        if (a->announce_url > b->announce_url)
+        {
+            return 1;
         }
 
         return 0;
     }
 
-    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const
+    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const // less than
     {
         return compare(a, b) < 0;
     }
@@ -426,7 +437,7 @@ static void tiersFree(tr_torrent_tiers* tt)
     tr_free(tt);
 }
 
-static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int tierId)
+static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_hash, int tierId)
 {
     tr_tier* tier = nullptr;
 
@@ -903,7 +914,7 @@ static tr_announce_request* announce_request_new(
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
     req->announce_url = tier->currentTracker->announce_url;
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
-    memcpy(req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
+    req->info_hash = tr_torrentInfoHash(tor);
     req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
@@ -1495,7 +1506,6 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
     for (auto* tier : tiers)
     {
         struct tr_scrape_info* const scrape_info = tier->currentTracker->scrape_info;
-        uint8_t const* hash = tier->tor->info.hash;
         bool found = false;
 
         TR_ASSERT(scrape_info != nullptr);
@@ -1515,7 +1525,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
+            req->info_hash[req->info_hash_count++] = tr_torrentInfoHash(tier->tor);
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
             found = true;
@@ -1528,7 +1538,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
             req->scrape_url = scrape_info->scrape_url;
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
-            memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
+            req->info_hash[req->info_hash_count++] = tr_torrentInfoHash(tier->tor);
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
         }

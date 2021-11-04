@@ -62,4 +62,6 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
+void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
+
 char* tr_http_unescape(char const* str, size_t len);
