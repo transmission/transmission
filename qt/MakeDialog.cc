@@ -8,6 +8,8 @@
 
 #include "MakeDialog.h"
 
+#include <vector>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
@@ -144,7 +146,7 @@ void MakeDialog::makeTorrent()
 
     // get the tiers
     int tier = 0;
-    QVector<tr_tracker_info> trackers;
+    std::vector<tr_tracker_info> trackers;
 
     for (QString const& line : ui_.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
@@ -159,7 +161,7 @@ void MakeDialog::makeTorrent()
             auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
-            trackers.append(tmp);
+            trackers.push_back(tmp);
         }
     }
 
@@ -188,7 +190,7 @@ void MakeDialog::makeTorrent()
     tr_makeMetaInfo(
         builder_.get(),
         target.toUtf8().constData(),
-        trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.empty() ? nullptr : trackers.data(),
         trackers.size(),
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
         ui_.privateCheck->isChecked(),

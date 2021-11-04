@@ -24,7 +24,11 @@
 
 #ifdef _WIN32
 #include <QPixmapCache>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QImage>
+#else
 #include <QtWin>
+#endif
 #endif
 
 #include <libtransmission/transmission.h>
@@ -149,7 +153,11 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, unsigned int i
         {
             if (shell_file_info.hIcon != nullptr)
             {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+                pixmap = QPixmap::fromImage(QImage::fromHICON(shell_file_info.hIcon));
+#else
                 pixmap = QtWin::fromHICON(shell_file_info.hIcon);
+#endif
                 ::DestroyIcon(shell_file_info.hIcon);
             }
         }

@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <string_view>
 #include <optional>
+#include <string_view>
+#include <vector>
 
 #include <QString>
-#include <QVector>
 
 #include <libtransmission/variant.h>
 
@@ -158,18 +158,18 @@ bool change(T& setme, tr_variant const* variant)
 }
 
 template<typename T>
-bool change(QVector<T>& setme, tr_variant const* value)
+bool change(std::vector<T>& setme, tr_variant const* value)
 {
     bool changed = false;
 
-    int const n = tr_variantListSize(value);
+    auto const n = tr_variantListSize(value);
     if (setme.size() != n)
     {
         setme.resize(n);
         changed = true;
     }
 
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         changed = change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i)) || changed;
     }

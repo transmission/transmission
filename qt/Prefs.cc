@@ -14,7 +14,11 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringDecoder>
+#else
 #include <QTextCodec>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -180,10 +184,20 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
 
 bool isValidUtf8(QByteArray const& byteArray)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+    auto decoder = QStringDecoder(QStringConverter::Utf8, QStringConverter::Flag::Stateless);
+    auto const text = QString(decoder.decode(byteArray));
+    return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
+
+#else
+
     auto const* const codec = QTextCodec::codecForName("UTF-8");
     auto state = QTextCodec::ConverterState{};
     auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
+
+#endif
 }
 
 } // namespace
@@ -310,7 +324,11 @@ Prefs::Prefs(QString config_dir)
                 auto const value = getValue<time_t>(b);
                 if (value)
                 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+                    values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
+#else
                     values_[i].setValue(QDateTime::fromTime_t(*value));
+#endif
                 }
             }
             break;
@@ -391,7 +409,11 @@ Prefs::~Prefs()
             break;
 
         case QVariant::DateTime:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+            dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
+#else
             dictAdd(&current_settings, key, val.toDateTime().toTime_t());
+#endif
             break;
 
         default:
