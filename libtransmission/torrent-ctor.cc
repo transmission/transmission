@@ -26,7 +26,7 @@ struct optional_args
 {
     std::optional<bool> paused;
     std::optional<uint16_t> peer_limit;
-    std::optional<std::string> download_dir;
+    std::string download_dir;
 };
 
 /** Opaque class used when instantiating torrents.
@@ -34,19 +34,17 @@ struct optional_args
 struct tr_ctor
 {
     tr_session const* const session;
-    bool saveInOurTorrentsDir;
-    bool doDelete;
+    bool saveInOurTorrentsDir = false;
+    std::optional<bool> delete_source;
 
-    tr_priority_t bandwidthPriority;
-    bool isSet_metainfo;
-    bool isSet_delete;
-    tr_variant metainfo;
-    std::optional<std::string> source_file;
+    tr_priority_t priority = TR_PRI_NORMAL;
+    bool isSet_metainfo = false;
+    tr_variant metainfo = {};
+    std::string source_file;
 
-    struct optional_args optionalArgs[2];
+    struct optional_args optional_args[2];
 
-    char* cookies;
-    std::optional<std::string> incomplete_dir;
+    std::string incomplete_dir;
 
     std::vector<tr_file_index_t> want;
     std::vector<tr_file_index_t> not_want;
@@ -54,7 +52,7 @@ struct tr_ctor
     std::vector<tr_file_index_t> normal;
     std::vector<tr_file_index_t> high;
 
-    tr_ctor(tr_session const* session_in)
+    explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
     {
     }
@@ -64,21 +62,9 @@ struct tr_ctor
 ****
 ***/
 
-static void setOptionalStringFromCStr(std::optional<std::string>& setme, char const* str)
-{
-    if (tr_str_is_empty(str))
-    {
-        setme.reset();
-    }
-    else
-    {
-        setme = str;
-    }
-}
-
 static void setSourceFile(tr_ctor* ctor, char const* source_file)
 {
-    setOptionalStringFromCStr(ctor->source_file, source_file);
+    ctor->source_file.assign(source_file ? source_file : "");
 }
 
 static void clearMetainfo(tr_ctor* ctor)
@@ -102,31 +88,26 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->source_file ? ctor->source_file->c_str() : nullptr;
+    return ctor->source_file.c_str();
 }
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
-    auto err = int{};
-
     tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
-
     if (magnet_info == nullptr)
     {
-        err = -1;
+        return -1;
     }
-    else
-    {
-        auto tmp = tr_variant{};
-        auto len = size_t{};
-        tr_magnetCreateMetainfo(magnet_info, &tmp);
-        char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-        err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
 
-        tr_free(str);
-        tr_variantFree(&tmp);
-        tr_magnetFree(magnet_info);
-    }
+    auto tmp = tr_variant{};
+    auto len = size_t{};
+    tr_magnetCreateMetainfo(magnet_info, &tmp);
+    char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
+    auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
+
+    tr_free(str);
+    tr_variantFree(&tmp);
+    tr_magnetFree(magnet_info);
 
     return err;
 }
@@ -243,26 +224,21 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 ****
 ***/
 
-void tr_ctorSetDeleteSource(tr_ctor* ctor, bool deleteSource)
+void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source)
 {
-    ctor->doDelete = deleteSource;
-    ctor->isSet_delete = true;
+    ctor->delete_source = delete_source;
 }
 
 bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 {
-    bool ret = true;
-
-    if (!ctor->isSet_delete)
+    auto const& delete_source = ctor->delete_source;
+    if (!delete_source)
     {
-        ret = false;
-    }
-    else if (setme != nullptr)
-    {
-        *setme = ctor->doDelete;
+        return false;
     }
 
-    return ret;
+    *setme = *delete_source;
+    return true;
 }
 
 /***
@@ -284,7 +260,7 @@ void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    ctor->optionalArgs[mode].paused = paused;
+    ctor->optional_args[mode].paused = paused;
 }
 
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peer_limit)
@@ -292,7 +268,7 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peer_limit)
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    ctor->optionalArgs[mode].peer_limit = peer_limit;
+    ctor->optional_args[mode].peer_limit = peer_limit;
 }
 
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
@@ -300,17 +276,17 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    setOptionalStringFromCStr(ctor->optionalArgs[mode].download_dir, directory);
+    ctor->optional_args[mode].download_dir.assign(directory ? directory : "");
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
-    setOptionalStringFromCStr(ctor->incomplete_dir, directory);
+    ctor->incomplete_dir.assign(directory ? directory : "");
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
 {
-    auto const& peer_limit = ctor->optionalArgs[mode].peer_limit;
+    auto const& peer_limit = ctor->optional_args[mode].peer_limit;
     if (!peer_limit)
     {
         return false;
@@ -322,7 +298,7 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
 
 bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
 {
-    auto const& paused = ctor->optionalArgs[mode].paused;
+    auto const& paused = ctor->optional_args[mode].paused;
     if (!paused)
     {
         return false;
@@ -334,24 +310,25 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
 
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme)
 {
-    auto const& download_dir = ctor->optionalArgs[mode].download_dir;
-    if (!download_dir)
+    auto const& str = ctor->optional_args[mode].download_dir;
+    if (std::empty(str))
     {
         return false;
     }
 
-    *setme = download_dir->c_str();
+    *setme = str.c_str();
     return true;
 }
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
 {
-    if (!ctor->incomplete_dir)
+    auto const& str = ctor->incomplete_dir;
+    if (std::empty(str))
     {
         return false;
     }
 
-    *setme = ctor->incomplete_dir->c_str();
+    *setme = str.c_str();
     return true;
 }
 
@@ -373,7 +350,7 @@ bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)
 {
-    return (tr_session*)ctor->session;
+    return const_cast<tr_session*>(ctor->session);
 }
 
 /***
@@ -389,13 +366,13 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 {
     if (isPriority(priority))
     {
-        ctor->bandwidthPriority = priority;
+        ctor->priority = priority;
     }
 }
 
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 {
-    return ctor->bandwidthPriority;
+    return ctor->priority;
 }
 
 /***
@@ -405,8 +382,6 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 tr_ctor* tr_ctorNew(tr_session const* session)
 {
     auto* const ctor = new tr_ctor{ session };
-
-    ctor->bandwidthPriority = TR_PRI_NORMAL;
 
     if (session != nullptr)
     {
