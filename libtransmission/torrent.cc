@@ -785,8 +785,6 @@ static void torrentInitFromInfo(tr_torrent* tor)
     tr_cpConstruct(&tor->completion, tor);
 
     tr_torrentInitFilePieces(tor);
-    tor->completeness = tr_cpGetStatus(&tor->completion);
-    tr_torrentInitPiecePriorities(tor);
 }
 
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
@@ -909,6 +907,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_ctorInitTorrentPriorities(ctor, tor);
     tr_ctorInitTorrentWanted(ctor, tor);
+    tr_torrentInitPiecePriorities(tor);
 
     refreshCurrentDir(tor);
 
