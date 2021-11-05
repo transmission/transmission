@@ -17,10 +17,9 @@
 
 #include <algorithm> // std::sort
 #include <cerrno>
+#include <stack>
 #include <cstdlib> /* strtod() */
 #include <cstring>
-#include <deque>
-#include <stack>
 #include <vector>
 
 #ifdef _WIN32
@@ -756,23 +755,9 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 class WalkNode
 {
 public:
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
+    explicit WalkNode(tr_variant const* v_in)
     {
-        if (sort_dicts && tr_variantIsDict(v_in))
-        {
-            sortByKey();
-        }
-    }
-
-    ~WalkNode()
-    {
-        if (!std::empty(sorted))
-        {
-            auto tmp = sorted_indices_t{};
-            std::swap(sorted, tmp);
-            pool.push_back(std::move(tmp));
-        }
+        assign(v_in);
     }
 
     tr_variant const* nextChild()
@@ -793,59 +778,109 @@ public:
 
     bool is_visited = false;
 
-    // Shallow bitwise copy of the variant passed to the constructor
-    tr_variant const v = {};
+    // shallow bitwise copy of the variant passed to the constructor
+    tr_variant v = {};
 
-private:
-    void sortByKey()
+protected:
+
+    friend class VariantWalker;
+
+    void assign(tr_variant const* v_in)
     {
-        auto const n = v.val.l.count;
+        is_visited = false;
+        v = *v_in;
+        child_index = 0;
+        sorted.clear();
+    }
 
-        struct ByKey
+    struct ByKey
+    {
+        std::string_view key;
+        size_t idx;
+    };
+
+    void sort(std::vector<ByKey>& sortbuf)
+    {
+        if (!tr_variantIsDict(&v))
         {
-            char const* key;
-            size_t idx;
-        };
+            return;
+        }
 
+        auto const n = v.val.l.count;
         auto const* children = v.val.l.vals;
-        auto tmp = std::vector<ByKey>(n);
+
+        sortbuf.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            tmp[i] = { tr_quark_get_string(children[i].key), i };
+            sortbuf[i] = { tr_quark_get_string(children[i].key), i };
         }
 
-        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
+        std::sort(std::begin(sortbuf), std::end(sortbuf), [](ByKey const& a, ByKey const& b) { return a.key < b.key; });
 
         //  keep the sorted indices
-
-        if (!std::empty(pool))
-        {
-            sorted = std::move(pool.back());
-            pool.pop_back();
-        }
 
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            sorted[i] = tmp[i].idx;
+            sorted[i] = sortbuf[i].idx;
         }
     }
 
     // When walking `v`'s children, this is the index of the next child
     size_t child_index = 0;
 
-    using sorted_indices_t = std::vector<size_t>;
-
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    sorted_indices_t sorted;
-
-    // Keep a pool of sorted_indices_t so that we can reuse them when
-    // iterating through a tree
-    static std::deque<sorted_indices_t> pool;
+    std::vector<size_t> sorted;
 };
 
-std::deque<std::vector<size_t>> WalkNode::pool{};
+class VariantWalker
+{
+public:
+    void emplace(tr_variant const* v_in, bool sort_dicts)
+    {
+        if (size == std::size(stack))
+        {
+            stack.emplace_back(v_in);
+        }
+        else
+        {
+            stack[size].assign(v_in);
+        }
+
+        ++size;
+
+        if (sort_dicts)
+        {
+            top().sort(sortbuf);
+        }
+    }
+
+    void pop()
+    {
+        TR_ASSERT(size > 0);
+        if (size > 0)
+        {
+            --size;
+        }
+    }
+
+    bool empty() const
+    {
+        return size == 0;
+    }
+
+    WalkNode& top()
+    {
+        TR_ASSERT(size > 0);
+        return stack[size - 1];
+    }
+
+private:
+    size_t size = 0;
+    std::vector<WalkNode> stack;
+    std::vector<WalkNode::ByKey> sortbuf;
+};
 
 /**
  * This function's previous recursive implementation was
@@ -854,7 +889,7 @@ std::deque<std::vector<size_t>> WalkNode::pool{};
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    auto stack = std::stack<WalkNode>{};
+    auto stack = VariantWalker{};
     stack.emplace(v_in, sort_dicts);
 
     while (!stack.empty())
