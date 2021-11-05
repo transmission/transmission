@@ -76,43 +76,35 @@ BlocklistDownloader* fBLDownloader = nil;
 {
     [fViewController setFinished];
 
-    [fDownload cancel];
+    [fSession invalidateAndCancel];
 
     [BlocklistScheduler.scheduler updateSchedule];
 
     fBLDownloader = nil;
 }
 
-//using the actual filename is the best bet
-- (void)download:(NSURLDownload*)download decideDestinationWithSuggestedFilename:(NSString*)filename
-{
-    [fDownload setDestination:[NSTemporaryDirectory() stringByAppendingPathComponent:filename] allowOverwrite:NO];
-}
-
-- (void)download:(NSURLDownload*)download didCreateDestination:(NSString*)path
-{
-    fDestination = path;
-}
-
-- (void)download:(NSURLDownload*)download didReceiveResponse:(NSURLResponse*)response
+- (void)URLSession:(NSURLSession *)session 
+      downloadTask:(NSURLSessionDownloadTask *)downloadTask 
+      didWriteData:(int64_t)bytesWritten 
+ totalBytesWritten:(int64_t)totalBytesWritten 
+totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     fState = BLOCKLIST_DL_DOWNLOADING;
 
-    fCurrentSize = 0;
-    fExpectedSize = response.expectedContentLength;
+    fCurrentSize = totalBytesWritten;
+    fExpectedSize = totalBytesExpectedToWrite;
 
     [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
 }
 
-- (void)download:(NSURLDownload*)download didReceiveDataOfLength:(NSUInteger)length
+- (void)URLSession:(NSURLSession *)session 
+              task:(NSURLSessionTask *)task 
+didCompleteWithError:(NSError *)error
 {
-    fCurrentSize += length;
-    [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
-}
-
-- (void)download:(NSURLDownload*)download didFailWithError:(NSError*)error
-{
-    [fViewController setFailed:error.localizedDescription];
+    if (error)
+    {
+        [fViewController setFailed:error.localizedDescription];
+    }
 
     [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
     [BlocklistScheduler.scheduler updateSchedule];
@@ -120,13 +112,16 @@ BlocklistDownloader* fBLDownloader = nil;
     fBLDownloader = nil;
 }
 
-- (void)downloadDidFinish:(NSURLDownload*)download
+- (void)URLSession:(NSURLSession *)session 
+      downloadTask:(NSURLSessionDownloadTask *)downloadTask 
+didFinishDownloadingToURL:(NSURL *)location
 {
     fState = BLOCKLIST_DL_PROCESSING;
 
     [fViewController setStatusProcessing];
 
-    NSAssert(fDestination != nil, @"the blocklist file destination has not been specified");
+    fDestination = [NSTemporaryDirectory() stringByAppendingPathComponent:location.lastPathComponent];
+    [NSFileManager.defaultManager moveItemAtPath:location.path toPath:fDestination error:nil];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self decompressBlocklist];
@@ -135,7 +130,7 @@ BlocklistDownloader* fBLDownloader = nil;
             int const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, fDestination.UTF8String);
 
             //delete downloaded file
-            [NSFileManager.defaultManager removeItemAtPath:fDestination error:NULL];
+            [NSFileManager.defaultManager removeItemAtPath:fDestination error:nil];
 
             if (count > 0)
             {
@@ -159,11 +154,6 @@ BlocklistDownloader* fBLDownloader = nil;
     });
 }
 
-- (BOOL)download:(NSURLDownload*)download shouldDecodeSourceDataOfMIMEType:(NSString*)encodingType
-{
-    return YES;
-}
-
 @end
 
 @implementation BlocklistDownloader (Private)
@@ -171,6 +161,10 @@ BlocklistDownloader* fBLDownloader = nil;
 - (void)startDownload
 {
     fState = BLOCKLIST_DL_START;
+
+    fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration
+                                             delegate:self
+                                        delegateQueue:nil];
 
     [BlocklistScheduler.scheduler cancelSchedule];
 
@@ -184,12 +178,12 @@ BlocklistDownloader* fBLDownloader = nil;
         urlString = [@"http://" stringByAppendingString:urlString];
     }
 
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-
-    fDownload = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    NSURLSessionDownloadTask* task = [fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
+    [task resume];
 }
 
-//.gz, .tar.gz, .tgz, and .bgz will be decompressed by NSURLDownload for us. However, we have to do .zip files manually.
+//.gz, .tar.gz, .tgz, and .bgz will be decompressed by NSURLSessionDownloadTask for us.
+// However, we have to do .zip files manually.
 - (void)decompressBlocklist
 {
     if ([fDestination.pathExtension.lowercaseString isEqualToString:@"zip"])
@@ -251,7 +245,7 @@ BlocklistDownloader* fBLDownloader = nil;
                 NSString* newBlocklistPath = [workingDirectory stringByAppendingPathComponent:actualFilename];
 
                 //Finally, delete the ZIP file; we're done with it, and we'll return the unzipped blocklist
-                [NSFileManager.defaultManager removeItemAtPath:fDestination error:NULL];
+                [NSFileManager.defaultManager removeItemAtPath:fDestination error:nil];
 
                 fDestination = newBlocklistPath;
             }
