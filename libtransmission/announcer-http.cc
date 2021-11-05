@@ -245,19 +245,17 @@ static void on_announce_done(
         if (variant_loaded && tr_variantIsDict(&benc))
         {
             auto i = int64_t{};
-            auto len = size_t{};
+            auto sv = std::string_view{};
             tr_variant* tmp = nullptr;
-            char const* str = nullptr;
-            uint8_t const* raw = nullptr;
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_failure_reason, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strndup(str, len);
+                response->errmsg = tr_strvdup(sv);
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_warning_message, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strndup(str, len);
+                response->warning = tr_strvdup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
@@ -270,9 +268,9 @@ static void on_announce_done(
                 response->min_interval = i;
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_tracker_id, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strndup(str, len);
+                response->tracker_id_str = tr_strvdup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -290,16 +288,16 @@ static void on_announce_done(
                 response->downloads = i;
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers6, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
             {
-                dbgmsg(data->log_name, "got a peers6 length of %zu", len);
-                response->pex6 = tr_peerMgrCompact6ToPex(raw, len, nullptr, 0, &response->pex6_count);
+                dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
+                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex6_count);
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
             {
-                dbgmsg(data->log_name, "got a compact peers length of %zu", len);
-                response->pex = tr_peerMgrCompactToPex(raw, len, nullptr, 0, &response->pex_count);
+                dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
+                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex_count);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
@@ -419,11 +417,10 @@ static void on_scrape_done(
 
         if (variant_loaded)
         {
-            auto len = size_t{};
-            char const* str = nullptr;
-            if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
+            auto sv = std::string_view{};
+            if (tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = std::string{ str, len };
+                response->errmsg = sv;
             }
 
             tr_variant* flags = nullptr;

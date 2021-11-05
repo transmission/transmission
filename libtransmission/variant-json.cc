@@ -532,13 +532,12 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     struct evbuffer_iovec vec[1];
     auto* data = static_cast<struct jsonWalk*>(vdata);
 
-    char const* str = nullptr;
-    size_t len = 0;
-    (void)tr_variantGetStr(val, &str, &len);
-    auto const* it = reinterpret_cast<unsigned char const*>(str);
-    unsigned char const* const end = it + len;
+    auto sv = std::string_view{};
+    (void)!tr_variantGetStrView(val, &sv);
+    auto const* it = reinterpret_cast<unsigned char const*>(std::data(sv));
+    auto const* const end = it + std::size(sv);
 
-    evbuffer_reserve_space(data->out, len * 4, vec, 1);
+    evbuffer_reserve_space(data->out, std::size(sv) * 4, vec, 1);
     auto* out = static_cast<char*>(vec[0].iov_base);
     char const* const outend = out + vec[0].iov_len;
 

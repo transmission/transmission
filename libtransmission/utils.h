@@ -208,6 +208,8 @@ void* tr_memdup(void const* src, size_t byteCount);
  */
 char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 
+char* tr_strvdup(std::string_view) TR_GNUC_MALLOC;
+
 /**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
