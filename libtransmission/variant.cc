@@ -17,9 +17,10 @@
 
 #include <algorithm> // std::sort
 #include <cerrno>
-#include <stack>
 #include <cstdlib> /* strtod() */
 #include <cstring>
+#include <deque>
+#include <stack>
 #include <vector>
 
 #ifdef _WIN32
@@ -764,6 +765,16 @@ public:
         }
     }
 
+    ~WalkNode()
+    {
+        if (!std::empty(sorted))
+        {
+            auto tmp = sorted_indices_t{};
+            std::swap(sorted, tmp);
+            pool.push_back(std::move(tmp));
+        }
+    }
+
     tr_variant const* nextChild()
     {
         if (!tr_variantIsContainer(&v) || (child_index >= v.val.l.count))
@@ -807,6 +818,12 @@ private:
 
         //  keep the sorted indices
 
+        if (!std::empty(pool))
+        {
+            sorted = std::move(pool.back());
+            pool.pop_back();
+        }
+
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
@@ -817,10 +834,18 @@ private:
     // When walking `v`'s children, this is the index of the next child
     size_t child_index = 0;
 
+    using sorted_indices_t = std::vector<size_t>;
+
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
+    sorted_indices_t sorted;
+
+    // Keep a pool of sorted_indices_t so that we can reuse them when
+    // iterating through a tree
+    static std::deque<sorted_indices_t> pool;
 };
+
+std::deque<std::vector<size_t>> WalkNode::pool{};
 
 /**
  * This function's previous recursive implementation was
