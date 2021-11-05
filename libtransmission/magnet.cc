@@ -38,8 +38,6 @@ static int constexpr base32Lookup[] = {
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static int const base32LookupLen = TR_N_ELEMENTS(base32Lookup);
-
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     TR_ASSERT(inlen == 32);
@@ -55,7 +53,7 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
         int lookup = in[i] - '0';
 
         /* Skip chars outside the lookup table */
-        if (lookup < 0 || lookup >= base32LookupLen)
+        if (lookup < 0) /* Assume char type never will be unsigned, so don't check upper limit */
         {
             continue;
         }
@@ -135,7 +133,7 @@ static bool tr_isBase32(char const* in, size_t const inlen)
     {
         int lookup = in[i] - '0';
 
-        if (lookup < 0 || lookup >= base32LookupLen)
+        if (lookup < 0) /* Assume char type never will be unsigned, so don't check upper limit */
         {
             return false;
         }
