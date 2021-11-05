@@ -300,9 +300,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    struct optional_args* args = &ctor->optionalArgs[mode];
-
-    setOptionalStringFromCStr(ctor->download_dir, directory);
+    setOptionalStringFromCStr(ctor->optionalArgs[mode].download_dir, directory);
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
@@ -312,37 +310,37 @@ void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
 {
-    optional_args const& args = ctor->optionalArgs[mode];
-    if (!args.peer_limit)
+    auto const& peer_limit = ctor->optionalArgs[mode].peer_limit;
+    if (!peer_limit)
     {
         return false;
     }
 
-    *setme = *args.peer_limit;
+    *setme = *peer_limit;
     return true;
 }
 
 bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
 {
-    optional_args const& args = ctor->optionalArgs[mode];
-    if (!args.paused)
+    auto const& paused = ctor->optionalArgs[mode].paused;
+    if (!paused)
     {
         return false;
     }
 
-    *setme = *args.paused;
+    *setme = *paused;
     return true;
 }
 
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme)
 {
-    optional_args const& args = ctor->optionalArgs[mode];
-    if (!args.download_dir)
+    auto const& download_dir = ctor->optionalArgs[mode].download_dir;
+    if (!download_dir)
     {
         return false;
     }
 
-    *setme = args.download_dir->c_str();
+    *setme = download_dir->c_str();
     return true;
 }
 
