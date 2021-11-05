@@ -7,6 +7,9 @@
  */
 
 #include <cerrno> /* EINVAL */
+#include <optional>
+#include <string>
+#include <vector>
 
 #include "transmission.h"
 #include "file.h"
@@ -17,22 +20,20 @@
 #include "utils.h" /* tr_new0 */
 #include "variant.h"
 
+using namespace std::literals;
+
 struct optional_args
 {
-    bool isSet_paused;
-    bool isSet_connected;
-    bool isSet_downloadDir;
-
-    bool isPaused;
-    uint16_t peerLimit;
-    char* downloadDir;
+    std::optional<bool> paused;
+    std::optional<uint16_t> peer_limit;
+    std::optional<std::string> download_dir;
 };
 
 /** Opaque class used when instantiating torrents.
  * @ingroup tr_ctor */
 struct tr_ctor
 {
-    tr_session const* session;
+    tr_session const* const session;
     bool saveInOurTorrentsDir;
     bool doDelete;
 
@@ -40,33 +41,44 @@ struct tr_ctor
     bool isSet_metainfo;
     bool isSet_delete;
     tr_variant metainfo;
-    char* sourceFile;
+    std::optional<std::string> source_file;
 
     struct optional_args optionalArgs[2];
 
     char* cookies;
-    char* incompleteDir;
+    std::optional<std::string> incomplete_dir;
 
-    tr_file_index_t* want;
-    tr_file_index_t wantSize;
-    tr_file_index_t* notWant;
-    tr_file_index_t notWantSize;
-    tr_file_index_t* low;
-    tr_file_index_t lowSize;
-    tr_file_index_t* normal;
-    tr_file_index_t normalSize;
-    tr_file_index_t* high;
-    tr_file_index_t highSize;
+    std::vector<tr_file_index_t> want;
+    std::vector<tr_file_index_t> not_want;
+    std::vector<tr_file_index_t> low;
+    std::vector<tr_file_index_t> normal;
+    std::vector<tr_file_index_t> high;
+
+    tr_ctor(tr_session const* session_in)
+        : session{ session_in }
+    {
+    }
 };
 
 /***
 ****
 ***/
 
-static void setSourceFile(tr_ctor* ctor, char const* sourceFile)
+static void setOptionalStringFromCStr(std::optional<std::string>& setme, char const* str)
 {
-    tr_free(ctor->sourceFile);
-    ctor->sourceFile = tr_strdup(sourceFile);
+    if (tr_str_is_empty(str))
+    {
+        setme.reset();
+    }
+    else
+    {
+        setme = str;
+    }
+}
+
+static void setSourceFile(tr_ctor* ctor, char const* source_file)
+{
+    setOptionalStringFromCStr(ctor->source_file, source_file);
 }
 
 static void clearMetainfo(tr_ctor* ctor)
@@ -90,7 +102,7 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->sourceFile;
+    return ctor->source_file ? ctor->source_file->c_str() : nullptr;
 }
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
@@ -144,15 +156,15 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
         if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
         {
-            char const* name = nullptr;
+            auto name = std::string_view{};
 
-            if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, nullptr) &&
-                !tr_variantDictFindStr(info, TR_KEY_name, &name, nullptr))
+            if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) &&
+                !tr_variantDictFindStrView(info, TR_KEY_name, &name))
             {
-                name = nullptr;
+                name = ""sv;
             }
 
-            if (tr_str_is_empty(name))
+            if (std::empty(name))
             {
                 char* base = tr_sys_path_basename(filename, nullptr);
 
@@ -181,71 +193,50 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 
 void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
 {
-    tr_file_index_t** myfiles = nullptr;
-    tr_file_index_t* mycount = nullptr;
-
     switch (priority)
     {
     case TR_PRI_LOW:
-        myfiles = &ctor->low;
-        mycount = &ctor->lowSize;
+        ctor->low.assign(files, files + fileCount);
         break;
 
     case TR_PRI_HIGH:
-        myfiles = &ctor->high;
-        mycount = &ctor->highSize;
+        ctor->high.assign(files, files + fileCount);
         break;
 
-    default /*TR_PRI_NORMAL*/:
-        myfiles = &ctor->normal;
-        mycount = &ctor->normalSize;
+    default: // TR_PRI_NORMAL
+        ctor->normal.assign(files, files + fileCount);
         break;
     }
-
-    tr_free(*myfiles);
-    *myfiles = static_cast<tr_file_index_t*>(tr_memdup(files, sizeof(tr_file_index_t) * fileCount));
-    *mycount = fileCount;
 }
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    for (tr_file_index_t i = 0; i < ctor->lowSize; ++i)
+    for (auto file_index : ctor->low)
     {
-        tr_torrentInitFilePriority(tor, ctor->low[i], TR_PRI_LOW);
+        tr_torrentInitFilePriority(tor, file_index, TR_PRI_LOW);
     }
 
-    for (tr_file_index_t i = 0; i < ctor->normalSize; ++i)
+    for (auto file_index : ctor->normal)
     {
-        tr_torrentInitFilePriority(tor, ctor->normal[i], TR_PRI_NORMAL);
+        tr_torrentInitFilePriority(tor, file_index, TR_PRI_NORMAL);
     }
 
-    for (tr_file_index_t i = 0; i < ctor->highSize; ++i)
+    for (auto file_index : ctor->high)
     {
-        tr_torrentInitFilePriority(tor, ctor->high[i], TR_PRI_HIGH);
+        tr_torrentInitFilePriority(tor, file_index, TR_PRI_HIGH);
     }
 }
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
 {
-    tr_file_index_t** myfiles = wanted ? &ctor->want : &ctor->notWant;
-    tr_file_index_t* mycount = wanted ? &ctor->wantSize : &ctor->notWantSize;
-
-    tr_free(*myfiles);
-    *myfiles = static_cast<tr_file_index_t*>(tr_memdup(files, sizeof(tr_file_index_t) * fileCount));
-    *mycount = fileCount;
+    auto& indices = wanted ? ctor->want : ctor->not_want;
+    indices.assign(files, files + fileCount);
 }
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    if (ctor->notWantSize != 0)
-    {
-        tr_torrentInitFileDLs(tor, ctor->notWant, ctor->notWantSize, false);
-    }
-
-    if (ctor->wantSize != 0)
-    {
-        tr_torrentInitFileDLs(tor, ctor->want, ctor->wantSize, true);
-    }
+    tr_torrentInitFileDLs(tor, std::data(ctor->not_want), std::size(ctor->not_want), false);
+    tr_torrentInitFileDLs(tor, std::data(ctor->want), std::size(ctor->want), true);
 }
 
 /***
@@ -288,24 +279,20 @@ bool tr_ctorGetSave(tr_ctor const* ctor)
     return ctor != nullptr && ctor->saveInOurTorrentsDir;
 }
 
-void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
+void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    struct optional_args* args = &ctor->optionalArgs[mode];
-    args->isSet_paused = true;
-    args->isPaused = isPaused;
+    ctor->optionalArgs[mode].paused = paused;
 }
 
-void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
+void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peer_limit)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    struct optional_args* args = &ctor->optionalArgs[mode];
-    args->isSet_connected = true;
-    args->peerLimit = peerLimit;
+    ctor->optionalArgs[mode].peer_limit = peer_limit;
 }
 
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
@@ -314,88 +301,60 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     struct optional_args* args = &ctor->optionalArgs[mode];
-    tr_free(args->downloadDir);
-    args->downloadDir = nullptr;
-    args->isSet_downloadDir = false;
 
-    if (!tr_str_is_empty(directory))
-    {
-        args->isSet_downloadDir = true;
-        args->downloadDir = tr_strdup(directory);
-    }
+    setOptionalStringFromCStr(ctor->download_dir, directory);
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
-    tr_free(ctor->incompleteDir);
-    ctor->incompleteDir = tr_strdup(directory);
+    setOptionalStringFromCStr(ctor->incomplete_dir, directory);
 }
 
-bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount)
+bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
 {
-    bool ret = true;
-    struct optional_args const* args = &ctor->optionalArgs[mode];
-
-    if (!args->isSet_connected)
+    optional_args const& args = ctor->optionalArgs[mode];
+    if (!args.peer_limit)
     {
-        ret = false;
-    }
-    else if (setmeCount != nullptr)
-    {
-        *setmeCount = args->peerLimit;
+        return false;
     }
 
-    return ret;
+    *setme = *args.peer_limit;
+    return true;
 }
 
-bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused)
+bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
 {
-    bool ret = true;
-    struct optional_args const* args = &ctor->optionalArgs[mode];
-
-    if (!args->isSet_paused)
+    optional_args const& args = ctor->optionalArgs[mode];
+    if (!args.paused)
     {
-        ret = false;
-    }
-    else if (setmeIsPaused != nullptr)
-    {
-        *setmeIsPaused = args->isPaused;
+        return false;
     }
 
-    return ret;
+    *setme = *args.paused;
+    return true;
 }
 
-bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeDownloadDir)
+bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setme)
 {
-    bool ret = true;
-    struct optional_args const* args = &ctor->optionalArgs[mode];
-
-    if (!args->isSet_downloadDir)
+    optional_args const& args = ctor->optionalArgs[mode];
+    if (!args.download_dir)
     {
-        ret = false;
-    }
-    else if (setmeDownloadDir != nullptr)
-    {
-        *setmeDownloadDir = args->downloadDir;
+        return false;
     }
 
-    return ret;
+    *setme = args.download_dir->c_str();
+    return true;
 }
 
-bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir)
+bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
 {
-    bool ret = true;
-
-    if (ctor->incompleteDir == nullptr)
+    if (!ctor->incomplete_dir)
     {
-        ret = false;
-    }
-    else
-    {
-        *setmeIncompleteDir = ctor->incompleteDir;
+        return false;
     }
 
-    return ret;
+    *setme = ctor->incomplete_dir->c_str();
+    return true;
 }
 
 bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
@@ -447,9 +406,8 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 
 tr_ctor* tr_ctorNew(tr_session const* session)
 {
-    tr_ctor* ctor = tr_new0(struct tr_ctor, 1);
+    auto* const ctor = new tr_ctor{ session };
 
-    ctor->session = session;
     ctor->bandwidthPriority = TR_PRI_NORMAL;
 
     if (session != nullptr)
@@ -467,13 +425,5 @@ tr_ctor* tr_ctorNew(tr_session const* session)
 void tr_ctorFree(tr_ctor* ctor)
 {
     clearMetainfo(ctor);
-    tr_free(ctor->optionalArgs[1].downloadDir);
-    tr_free(ctor->optionalArgs[0].downloadDir);
-    tr_free(ctor->incompleteDir);
-    tr_free(ctor->want);
-    tr_free(ctor->notWant);
-    tr_free(ctor->low);
-    tr_free(ctor->high);
-    tr_free(ctor->normal);
-    tr_free(ctor);
+    delete ctor;
 }
