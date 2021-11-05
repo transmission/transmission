@@ -294,7 +294,7 @@
 		BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
+		BEFC1C1A0C07756200B0BB3C /* daemon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.cc */; };
 		BEFC1D050C07825A00B0BB3C /* remote.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C140C07756200B0BB3C /* remote.cc */; };
 		BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1E290C07861A00B0BB3C /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF00C07861A00B0BB3C /* version.h */; };
@@ -359,6 +359,10 @@
 		C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5761C3223CC00D62832 /* watchdir.h */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
+		ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */; };
+		ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */; };
+		ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */; };
+		ED8A16422735A8AA000D61F9 /* peer-mgr-wishlist.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */; };
 		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 /* End PBXBuildFile section */
@@ -512,6 +516,10 @@
 		4D36BA660CA2F00800A63CA5 /* peer-io.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-io.h"; sourceTree = "<group>"; };
 		4D36BA680CA2F00800A63CA5 /* peer-mgr.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr.cc"; sourceTree = "<group>"; };
 		4D36BA690CA2F00800A63CA5 /* peer-mgr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-mgr.h"; sourceTree = "<group>"; };
+		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
+		ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr-active-requests.cc"; sourceTree = "<group>"; };
+		ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-wishlist.h"; sourceTree = "<group>"; };
+		ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr-wishlist.cc"; sourceTree = "<group>"; };
 		4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-msgs.cc"; sourceTree = "<group>"; };
 		4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-msgs.h"; sourceTree = "<group>"; };
 		4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ptrarray.h; sourceTree = "<group>"; };
@@ -1407,6 +1415,10 @@
 				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
 				4D36BA680CA2F00800A63CA5 /* peer-mgr.cc */,
 				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
+				ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */,
+				ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */,
+				ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */,
+				ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */,
 				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */,
 				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
 				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
@@ -1832,6 +1844,7 @@
 				C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */,
+				ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
@@ -1858,6 +1871,7 @@
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
+				ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */,
 				4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */,
 				4D80185A10BBC0B0008A4AF2 /* magnet.h in Headers */,
 				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
@@ -2409,6 +2423,7 @@
 				A2AAB65F0DE0CF6200E04DDA /* rpcimpl.cc in Sources */,
 				BEFC1E2D0C07861A00B0BB3C /* upnp.cc in Sources */,
 				A2AAB65C0DE0CF6200E04DDA /* rpc-server.cc in Sources */,
+				ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.cc in Sources */,
@@ -2434,6 +2449,7 @@
 				C10C644D1D9AF328003C1B4C /* session-id.cc in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.cc in Sources */,
 				C1077A50183EB29600634C22 /* file-posix.cc in Sources */,
+				ED8A16422735A8AA000D61F9 /* peer-mgr-wishlist.cc in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.cc in Sources */,
 				A25D2CBD0CF4C73E0096A262 /* stats.cc in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.cc in Sources */,
