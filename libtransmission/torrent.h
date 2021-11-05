@@ -99,7 +99,7 @@ void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_p
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
-bool tr_torrentSave(tr_torrent* tor);
+void tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
 

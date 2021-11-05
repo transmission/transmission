@@ -719,7 +719,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveLabels(&top, tor);
 
     char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename, TR_LOG_DEBUG);
+    int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
     if (err != 0)
     {
         tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
