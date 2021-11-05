@@ -1561,8 +1561,8 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
     QMimeData const* mime = event->mimeData();
 
     if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls() ||
-        mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-        Utils::isMagnetLink(mime->text()) || Utils::isHexHashcode(mime->text()))
+        mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || Utils::isMagnetLink(mime->text()) ||
+        Utils::isHexHashcode(mime->text()))
     {
         event->acceptProposedAction();
     }
