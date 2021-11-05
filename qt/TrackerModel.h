@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include <vector>
+
 #include <QAbstractListModel>
-#include <QVector>
 
 #include "Macros.h"
 #include "Torrent.h"
@@ -46,7 +47,7 @@ public:
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
-    using rows_t = QVector<TrackerInfo>;
+    using rows_t = std::vector<TrackerInfo>;
 
     rows_t rows_;
 };

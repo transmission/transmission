@@ -755,13 +755,9 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 class WalkNode
 {
 public:
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
+    explicit WalkNode(tr_variant const* v_in)
     {
-        if (sort_dicts && tr_variantIsDict(v_in))
-        {
-            sortByKey();
-        }
+        assign(v_in);
     }
 
     tr_variant const* nextChild()
@@ -782,35 +778,50 @@ public:
 
     bool is_visited = false;
 
-    // Shallow bitwise copy of the variant passed to the constructor
-    tr_variant const v = {};
+    // shallow bitwise copy of the variant passed to the constructor
+    tr_variant v = {};
 
-private:
-    void sortByKey()
+protected:
+    friend class VariantWalker;
+
+    void assign(tr_variant const* v_in)
     {
-        auto const n = v.val.l.count;
+        is_visited = false;
+        v = *v_in;
+        child_index = 0;
+        sorted.clear();
+    }
 
-        struct ByKey
-        {
-            char const* key;
-            size_t idx;
-        };
+    struct ByKey
+    {
+        std::string_view key;
+        size_t idx;
+    };
 
-        auto const* children = v.val.l.vals;
-        auto tmp = std::vector<ByKey>(n);
-        for (size_t i = 0; i < n; ++i)
+    void sort(std::vector<ByKey>& sortbuf)
+    {
+        if (!tr_variantIsDict(&v))
         {
-            tmp[i] = { tr_quark_get_string(children[i].key), i };
+            return;
         }
 
-        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
+        auto const n = v.val.l.count;
+        auto const* children = v.val.l.vals;
+
+        sortbuf.resize(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            sortbuf[i] = { tr_quark_get_string(children[i].key), i };
+        }
+
+        std::sort(std::begin(sortbuf), std::end(sortbuf), [](ByKey const& a, ByKey const& b) { return a.key < b.key; });
 
         //  keep the sorted indices
 
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            sorted[i] = tmp[i].idx;
+            sorted[i] = sortbuf[i].idx;
         }
     }
 
@@ -822,6 +833,54 @@ private:
     std::vector<size_t> sorted;
 };
 
+class VariantWalker
+{
+public:
+    void emplace(tr_variant const* v_in, bool sort_dicts)
+    {
+        if (size == std::size(stack))
+        {
+            stack.emplace_back(v_in);
+        }
+        else
+        {
+            stack[size].assign(v_in);
+        }
+
+        ++size;
+
+        if (sort_dicts)
+        {
+            top().sort(sortbuf);
+        }
+    }
+
+    void pop()
+    {
+        TR_ASSERT(size > 0);
+        if (size > 0)
+        {
+            --size;
+        }
+    }
+
+    bool empty() const
+    {
+        return size == 0;
+    }
+
+    WalkNode& top()
+    {
+        TR_ASSERT(size > 0);
+        return stack[size - 1];
+    }
+
+private:
+    size_t size = 0;
+    std::vector<WalkNode> stack;
+    std::vector<WalkNode::ByKey> sortbuf;
+};
+
 /**
  * This function's previous recursive implementation was
  * easier to read, but was vulnerable to a smash-stacking
@@ -829,7 +888,7 @@ private:
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    auto stack = std::stack<WalkNode>{};
+    auto stack = VariantWalker{};
     stack.emplace(v_in, sort_dicts);
 
     while (!stack.empty())

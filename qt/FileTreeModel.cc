@@ -53,7 +53,7 @@ public:
     {
         int new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
-        token_ += path_.midRef(new_slash_index + 1, slash_index_ - new_slash_index);
+        token_.append(&path_.data()[new_slash_index + 1], slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
         return token_;
     }
@@ -82,7 +82,7 @@ public:
         }
 
         token_.truncate(0);
-        token_ += path_.midRef(slash_index_, new_slash_index - slash_index_);
+        token_.append(&path_.data()[slash_index_], new_slash_index - slash_index_);
         slash_index_ = new_slash_index + 1;
         return token_;
     }
@@ -171,7 +171,7 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
 
     if (index.column() == COL_WANTED)
     {
-        i |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+        i |= Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate;
     }
 
     return Qt::ItemFlags(i);

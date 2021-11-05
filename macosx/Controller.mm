@@ -23,9 +23,10 @@
 #import <IOKit/IOMessage.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import <Carbon/Carbon.h>
-#import <libkern/OSAtomic.h>
 
 #import <Sparkle/Sparkle.h>
+
+#include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -982,7 +983,7 @@ static void removeKeRangerRansomware()
         NSString* message = [NSString
             stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
                              suggestedName,
-                             [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                             [download.request.URL.absoluteString stringByRemovingPercentEncoding]];
 
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
@@ -1007,7 +1008,7 @@ static void removeKeRangerRansomware()
 {
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
-                         [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+                         [download.request.URL.absoluteString stringByRemovingPercentEncoding],
                          error.localizedDescription];
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -2673,7 +2674,6 @@ static void removeKeRangerRansomware()
 
 - (void)applyFilter
 {
-    __block int32_t active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString* filterType = [fDefaults stringForKey:@"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString:FILTER_ACTIVE])
@@ -2707,6 +2707,12 @@ static void removeKeRangerRansomware()
     }
     BOOL const filterTracker = searchStrings && [[fDefaults stringForKey:@"FilterSearchType"] isEqualToString:FILTER_TYPE_TRACKER];
 
+    std::atomic<int32_t> active{0}, downloading{0}, seeding{0}, paused{0};
+    // Pointers to be captured by Obj-C Block as const*
+    auto* activeRef = &active;
+    auto* downloadingRef = &downloading;
+    auto* seedingRef = &seeding;
+    auto* pausedRef = &paused;
     //filter & get counts of each type
     NSIndexSet* indexesOfNonFilteredTorrents = [fTorrents
         indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
@@ -2716,12 +2722,12 @@ static void removeKeRangerRansomware()
                 BOOL const isActive = !torrent.stalled;
                 if (isActive)
                 {
-                    OSAtomicIncrement32(&active);
+                    std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);
                 }
 
                 if (torrent.seeding)
                 {
-                    OSAtomicIncrement32(&seeding);
+                    std::atomic_fetch_add_explicit(seedingRef, 1, std::memory_order_relaxed);
                     if (filterStatus && !((filterActive && isActive) || filterSeed))
                     {
                         return NO;
@@ -2729,7 +2735,7 @@ static void removeKeRangerRansomware()
                 }
                 else
                 {
-                    OSAtomicIncrement32(&downloading);
+                    std::atomic_fetch_add_explicit(downloadingRef, 1, std::memory_order_relaxed);
                     if (filterStatus && !((filterActive && isActive) || filterDownload))
                     {
                         return NO;
@@ -2738,7 +2744,7 @@ static void removeKeRangerRansomware()
             }
             else
             {
-                OSAtomicIncrement32(&paused);
+                std::atomic_fetch_add_explicit(pausedRef, 1, std::memory_order_relaxed);
                 if (filterStatus && !filterPause)
                 {
                     return NO;
@@ -2804,7 +2810,11 @@ static void removeKeRangerRansomware()
     //set button tooltips
     if (fFilterBar)
     {
-        [fFilterBar setCountAll:fTorrents.count active:active downloading:downloading seeding:seeding paused:paused];
+        [fFilterBar setCountAll:fTorrents.count
+                         active:active.load()
+                    downloading:downloading.load()
+                        seeding:seeding.load()
+                         paused:paused.load()];
     }
 
     //if either the previous or current lists are blank, set its value to the other

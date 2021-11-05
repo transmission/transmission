@@ -16,6 +16,9 @@
 #include <array>
 #include <cerrno>
 #include <cstring>
+#include <string_view>
+
+using namespace std::literals;
 
 TEST(Metainfo, magnetLink)
 {
@@ -61,7 +64,7 @@ TEST(Metainfo, bucket)
     {
         int expected_benc_err;
         int expected_parse_result;
-        void const* benc;
+        std::string_view benc;
     };
 
     auto const tests = std::array<LocalTest, 9>{
@@ -91,7 +94,7 @@ TEST(Metainfo, bucket)
     for (auto const& test : tests)
     {
         auto* ctor = tr_ctorNew(nullptr);
-        int const err = tr_ctorSetMetainfo(ctor, test.benc, strlen(static_cast<char const*>(test.benc)));
+        int const err = tr_ctorSetMetainfo(ctor, std::data(test.benc), std::size(test.benc));
         EXPECT_EQ(test.expected_benc_err, err);
 
         if (err == 0)
@@ -108,62 +111,57 @@ TEST(Metainfo, sanitize)
 {
     struct LocalTest
     {
-        char const* str;
-        size_t len;
-        char const* expected_result;
+        std::string_view input;
+        std::string_view expected_output;
         bool expected_is_adjusted;
     };
 
     auto const tests = std::array<LocalTest, 29>{
         // skipped
-        LocalTest{ "", 0, nullptr, false },
-        { ".", 1, nullptr, false },
-        { "..", 2, nullptr, true },
-        { ".....", 5, nullptr, false },
-        { "  ", 2, nullptr, false },
-        { " . ", 3, nullptr, false },
-        { ". . .", 5, nullptr, false },
+        LocalTest{ ""sv, ""sv, false },
+        { "."sv, ""sv, true },
+        { ".."sv, ""sv, true },
+        { "....."sv, ""sv, true },
+        { "  "sv, ""sv, true },
+        { " . "sv, ""sv, true },
+        { ". . ."sv, ""sv, true },
         // replaced with '_'
-        { "/", 1, "_", true },
-        { "////", 4, "____", true },
-        { "\\\\", 2, "__", true },
-        { "/../", 4, "_.._", true },
-        { "foo<bar:baz/boo", 15, "foo_bar_baz_boo", true },
-        { "t\0e\x01s\tt\ri\nn\fg", 13, "t_e_s_t_i_n_g", true },
+        { "/"sv, "_"sv, true },
+        { "////"sv, "____"sv, true },
+        { "\\\\"sv, "__"sv, true },
+        { "/../"sv, "_.._"sv, true },
+        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv, true },
+        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv, true },
         // appended with '_'
-        { "con", 3, "con_", true },
-        { "cOm4", 4, "cOm4_", true },
-        { "LPt9.txt", 8, "LPt9_.txt", true },
-        { "NUL.tar.gz", 10, "NUL_.tar.gz", true },
+        { "con"sv, "con_"sv, true },
+        { "cOm4"sv, "cOm4_"sv, true },
+        { "LPt9.txt"sv, "LPt9_.txt"sv, true },
+        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv, true },
         // trimmed
-        { " foo", 4, "foo", true },
-        { "foo ", 4, "foo", true },
-        { " foo ", 5, "foo", true },
-        { "foo.", 4, "foo", true },
-        { "foo...", 6, "foo", true },
-        { " foo... ", 8, "foo", true },
+        { " foo"sv, "foo"sv, true },
+        { "foo "sv, "foo"sv, true },
+        { " foo "sv, "foo"sv, true },
+        { "foo."sv, "foo"sv, true },
+        { "foo..."sv, "foo"sv, true },
+        { " foo... "sv, "foo"sv, true },
         // unmodified
-        { "foo", 3, "foo", false },
-        { ".foo", 4, ".foo", false },
-        { "..foo", 5, "..foo", false },
-        { "foo.bar.baz", 11, "foo.bar.baz", false },
-        { "null", 4, "null", false },
-        { "compass", 7, "compass", false },
+        { "foo"sv, "foo"sv, false },
+        { ".foo"sv, ".foo"sv, false },
+        { "..foo"sv, "..foo"sv, false },
+        { "foo.bar.baz"sv, "foo.bar.baz"sv, false },
+        { "null"sv, "null"sv, false },
+        { "compass"sv, "compass"sv, false },
     };
 
+    auto out = std::string{};
+    auto is_adjusted = bool{};
     for (auto const& test : tests)
     {
-        bool is_adjusted;
-        char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);
-
-        EXPECT_STREQ(test.expected_result, result);
-
-        if (test.expected_result != nullptr)
-        {
-            EXPECT_EQ(test.expected_is_adjusted, is_adjusted);
-        }
-
-        tr_free(result);
+        out.clear();
+        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input, &is_adjusted);
+        EXPECT_EQ(!std::empty(out), success);
+        EXPECT_EQ(test.expected_output, out);
+        EXPECT_EQ(test.expected_is_adjusted, is_adjusted);
     }
 }
 

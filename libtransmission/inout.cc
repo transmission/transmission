@@ -283,9 +283,7 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
         bytes_left -= len;
     }
 
-    auto digest = tr_sha1_digest_t{};
-    tr_sha1_final(sha, std::data(digest));
-    return digest;
+    return tr_sha1_final(sha);
 }
 
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
