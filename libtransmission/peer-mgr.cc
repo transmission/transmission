@@ -852,6 +852,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
     case TR_PEER_CLIENT_GOT_HAVE_ALL:
     case TR_PEER_CLIENT_GOT_HAVE_NONE:
     case TR_PEER_CLIENT_GOT_BITFIELD:
+        /* TODO: if we don't need these, should these events be removed? */
         /* noop */
         break;
 
