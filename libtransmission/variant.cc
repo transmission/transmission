@@ -782,7 +782,6 @@ public:
     tr_variant v = {};
 
 protected:
-
     friend class VariantWalker;
 
     void assign(tr_variant const* v_in)
