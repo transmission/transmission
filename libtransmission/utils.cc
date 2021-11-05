@@ -415,31 +415,24 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
     return ret;
 }
 
-char* tr_strdup(void const* in)
+char* tr_strvdup(std::string_view in)
 {
-    return tr_strndup(in, in != nullptr ? strlen(static_cast<char const*>(in)) : 0);
+    auto const n = std::size(in);
+    auto* const ret = tr_new(char, n + 1);
+    std::copy(std::begin(in), std::end(in), ret);
+    ret[n] = '\0';
+    return ret;
 }
 
-char* tr_strndup(void const* in, size_t len)
+char* tr_strndup(void const* vin, size_t len)
 {
-    char* out = nullptr;
+    auto const* const in = static_cast<char const*>(vin);
+    return in == nullptr ? nullptr : tr_strvdup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
+}
 
-    if (len == TR_BAD_SIZE)
-    {
-        out = tr_strdup(in);
-    }
-    else if (in != nullptr)
-    {
-        out = static_cast<char*>(tr_malloc(len + 1));
-
-        if (out != nullptr)
-        {
-            memcpy(out, in, len);
-            out[len] = '\0';
-        }
-    }
-
-    return out;
+char* tr_strdup(void const* in)
+{
+    return tr_strndup(in, TR_BAD_SIZE);
 }
 
 char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle, size_t needlelen)

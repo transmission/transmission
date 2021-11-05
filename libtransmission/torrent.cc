@@ -2936,7 +2936,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     /* go from the bottom up */
     for (auto const& file : files)
     {
-        char* walk = tr_strdup(file.c_str());
+        char* walk = tr_strvdup(file);
 
         while (tr_sys_path_exists(walk, nullptr) && !tr_sys_path_is_same(tmpdir, walk, nullptr))
         {

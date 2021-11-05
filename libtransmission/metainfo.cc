@@ -282,7 +282,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     return errstr;
 }
 
-static char* tr_convertAnnounceToScrape(char const* announce)
+static char* tr_convertAnnounceToScrape(std::string_view url)
 {
     char* scrape = nullptr;
 
@@ -293,33 +293,26 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
 
-    char const* s = strrchr(announce, '/');
-
-    if (s != nullptr && strncmp(s + 1, "announce", 8) == 0)
+    auto constexpr oldval = "/announce"sv;
+    auto pos = url.rfind(oldval.front());
+    if (pos != url.npos && url.find(oldval, pos) == pos)
     {
-        char const* prefix = announce;
-        size_t const prefix_len = s + 1 - announce;
-        char const* suffix = s + 1 + 8;
-        size_t const suffix_len = strlen(suffix);
-        size_t const alloc_len = prefix_len + 6 + suffix_len + 1;
-
-        scrape = tr_new(char, alloc_len);
-
-        char* walk = scrape;
-        memcpy(walk, prefix, prefix_len);
-        walk += prefix_len;
-        memcpy(walk, "scrape", 6);
-        walk += 6;
-        memcpy(walk, suffix, suffix_len);
-        walk += suffix_len;
-        *walk++ = '\0';
-
-        TR_ASSERT((size_t)(walk - scrape) == alloc_len);
+        auto constexpr newval = "/scrape"sv;
+        auto const prefix = url.substr(0, pos);
+        auto const suffix = url.substr(pos + std::size(oldval));
+        auto const n = std::size(prefix) + std::size(newval) + std::size(suffix);
+        scrape = tr_new(char, n + 1);
+        auto* walk = scrape;
+        walk = std::copy(std::begin(prefix), std::end(prefix), walk);
+        walk = std::copy(std::begin(newval), std::end(newval), walk);
+        walk = std::copy(std::begin(suffix), std::end(suffix), walk);
+        *walk = '\0';
+        TR_ASSERT(scrape + n == walk);
     }
-    /* Some torrents with UDP announce URLs don't have /announce. */
-    else if (strncmp(announce, "udp:", 4) == 0)
+    // some torrents with UDP announce URLs don't have /announce
+    else if (url.find("udp:"sv) == 0)
     {
-        scrape = tr_strdup(announce);
+        scrape = tr_strvdup(url);
     }
 
     return scrape;
@@ -327,13 +320,12 @@ static char* tr_convertAnnounceToScrape(char const* announce)
 
 static char const* getannounce(tr_info* inf, tr_variant* meta)
 {
-    size_t len = 0;
-    char const* str = nullptr;
     tr_tracker_info* trackers = nullptr;
     int trackerCount = 0;
-    tr_variant* tiers = nullptr;
+    auto url = std::string_view{};
 
     /* Announce-list */
+    tr_variant* tiers = nullptr;
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         int const numTiers = tr_variantListSize(tiers);
@@ -355,19 +347,15 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
 
             for (int j = 0; j < tierSize; j++)
             {
-                if (tr_variantGetStr(tr_variantListChild(tier, j), &str, &len))
+                if (tr_variantGetStrView(tr_variantListChild(tier, j), &url))
                 {
-                    char* url = tr_strstrip(tr_strndup(str, len));
+                    url = tr_strvstrip(url);
 
-                    if (!tr_urlIsValidTracker(url))
-                    {
-                        tr_free(url);
-                    }
-                    else
+                    if (tr_urlIsValidTracker(url))
                     {
                         tr_tracker_info* t = trackers + trackerCount;
                         t->tier = validTiers;
-                        t->announce = url;
+                        t->announce = tr_strvdup(url);
                         t->scrape = tr_convertAnnounceToScrape(url);
                         t->id = trackerCount;
 
@@ -392,19 +380,15 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     }
 
     /* Regular announce value */
-    if (trackerCount == 0 && tr_variantDictFindStr(meta, TR_KEY_announce, &str, &len))
+    if (trackerCount == 0 && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        char* url = tr_strstrip(tr_strndup(str, len));
+        url = tr_strvstrip(url);
 
-        if (!tr_urlIsValidTracker(url))
-        {
-            tr_free(url);
-        }
-        else
+        if (tr_urlIsValidTracker(url))
         {
             trackers = tr_new0(tr_tracker_info, 1);
             trackers[trackerCount].tier = 0;
-            trackers[trackerCount].announce = url;
+            trackers[trackerCount].announce = tr_strvdup(url);
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
@@ -428,34 +412,27 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
  * mktorrent and very old versions of utorrent, that don't add the
  * trailing slash for multifile torrents if omitted by the end user.
  */
-static char* fix_webseed_url(tr_info const* inf, char const* url_in)
+static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 {
-    char* ret = nullptr;
+    url = tr_strvstrip(url);
 
-    char* const url = tr_strdup(url_in);
-    tr_strstrip(url);
-    size_t const len = strlen(url);
-
-    if (tr_urlIsValid(url))
+    if (!tr_urlIsValid(url))
     {
-        if (inf->fileCount > 1 && len > 0 && url[len - 1] != '/')
-        {
-            ret = tr_strdup_printf("%*.*s/", TR_ARG_TUPLE((int)len, (int)len, url));
-        }
-        else
-        {
-            ret = tr_strndup(url, len);
-        }
+        return nullptr;
     }
 
-    tr_free(url);
-    return ret;
+    if (inf->fileCount > 1 && !std::empty(url) && url.back() != '/')
+    {
+        return tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
+    }
+
+    return tr_strvdup(url);
 }
 
 static void geturllist(tr_info* inf, tr_variant* meta)
 {
     tr_variant* urls = nullptr;
-    char const* url = nullptr;
+    auto url = std::string_view{};
 
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
@@ -466,10 +443,9 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
         for (int i = 0; i < n; i++)
         {
-            if (tr_variantGetStr(tr_variantListChild(urls, i), &url, nullptr))
+            if (tr_variantGetStrView(tr_variantListChild(urls, i), &url))
             {
-                char* fixed_url = fix_webseed_url(inf, url);
-
+                char* const fixed_url = fix_webseed_url(inf, url);
                 if (fixed_url != nullptr)
                 {
                     inf->webseeds[inf->webseedCount++] = fixed_url;
@@ -477,10 +453,9 @@ static void geturllist(tr_info* inf, tr_variant* meta)
             }
         }
     }
-    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url, nullptr)) /* handle single items in webseeds */
+    else if (tr_variantDictFindStrView(meta, TR_KEY_url_list, &url)) /* handle single items in webseeds */
     {
-        char* fixed_url = fix_webseed_url(inf, url);
-
+        char* const fixed_url = fix_webseed_url(inf, url);
         if (fixed_url != nullptr)
         {
             inf->webseedCount = 1;
@@ -498,9 +473,7 @@ static char const* tr_metainfoParseImpl(
     tr_variant const* meta_in)
 {
     int64_t i = 0;
-    size_t len = 0;
-    char const* str = nullptr;
-    uint8_t const* raw = nullptr;
+    auto sv = std::string_view{};
     tr_variant* const meta = const_cast<tr_variant*>(meta_in);
     bool isMagnet = false;
 
@@ -523,27 +496,27 @@ static char const* tr_metainfoParseImpl(
         {
             isMagnet = true;
 
-            /* get the info-hash */
-            if (!tr_variantDictFindRaw(d, TR_KEY_info_hash, &raw, &len))
+            // get the info-hash
+            if (!tr_variantDictFindStrView(d, TR_KEY_info_hash, &sv))
             {
                 return "info_hash";
             }
 
-            if (len != SHA_DIGEST_LENGTH)
+            if (std::size(sv) != SHA_DIGEST_LENGTH)
             {
                 return "info_hash";
             }
 
-            memcpy(inf->hash, raw, len);
+            std::copy(std::begin(sv), std::end(sv), inf->hash);
             tr_sha1_to_hex(inf->hashString, inf->hash);
 
-            /* maybe get the display name */
-            if (tr_variantDictFindStr(d, TR_KEY_display_name, &str, &len))
+            // maybe get the display name
+            if (tr_variantDictFindStrView(d, TR_KEY_display_name, &sv))
             {
                 tr_free(inf->name);
                 tr_free(inf->originalName);
-                inf->name = tr_strndup(str, len);
-                inf->originalName = tr_strndup(str, len);
+                inf->name = tr_strvdup(sv);
+                inf->originalName = tr_strvdup(sv);
             }
 
             if (inf->name == nullptr)
@@ -556,7 +529,7 @@ static char const* tr_metainfoParseImpl(
                 inf->originalName = tr_strdup(inf->hashString);
             }
         }
-        else /* not a magnet link and has no info dict... */
+        else // not a magnet link and has no info dict...
         {
             return "info";
         }
@@ -579,55 +552,45 @@ static char const* tr_metainfoParseImpl(
     /* name */
     if (!isMagnet)
     {
-        len = 0;
-
-        if (!tr_variantDictFindStr(infoDict, TR_KEY_name_utf_8, &str, &len) &&
-            !tr_variantDictFindStr(infoDict, TR_KEY_name, &str, &len))
+        if (!tr_variantDictFindStrView(infoDict, TR_KEY_name_utf_8, &sv) &&
+            !tr_variantDictFindStrView(infoDict, TR_KEY_name, &sv))
         {
-            str = "";
+            sv = ""sv;
         }
 
-        if (tr_str_is_empty(str))
+        if (std::empty(sv))
         {
             return "name";
         }
 
         tr_free(inf->name);
         tr_free(inf->originalName);
-        inf->name = tr_utf8clean(std::string_view{ str, len });
+        inf->name = tr_utf8clean(sv);
         inf->originalName = tr_strdup(inf->name);
     }
 
     /* comment */
-    len = 0;
-
-    if (!tr_variantDictFindStr(meta, TR_KEY_comment_utf_8, &str, &len) &&
-        !tr_variantDictFindStr(meta, TR_KEY_comment, &str, &len))
+    if (!tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) && !tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
-        str = "";
+        sv = ""sv;
     }
 
     tr_free(inf->comment);
-    inf->comment = tr_utf8clean(std::string_view{ str, len });
+    inf->comment = tr_utf8clean(sv);
 
     /* created by */
-    len = 0;
-
-    if (!tr_variantDictFindStr(meta, TR_KEY_created_by_utf_8, &str, &len) &&
-        !tr_variantDictFindStr(meta, TR_KEY_created_by, &str, &len))
+    if (!tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) &&
+        !tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
-        str = "";
+        sv = ""sv;
     }
 
     tr_free(inf->creator);
-    inf->creator = tr_utf8clean(std::string_view{ str, len });
+    inf->creator = tr_utf8clean(sv);
 
     /* creation date */
-    if (!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i))
-    {
-        i = 0;
-    }
-
+    i = 0;
+    (void)!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i);
     inf->dateCreated = i;
 
     /* private */
@@ -639,17 +602,13 @@ static char const* tr_metainfoParseImpl(
     inf->isPrivate = i != 0;
 
     /* source */
-    len = 0;
-    if (!tr_variantDictFindStr(infoDict, TR_KEY_source, &str, &len))
+    if (!tr_variantDictFindStrView(infoDict, TR_KEY_source, &sv) && !tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
-        if (!tr_variantDictFindStr(meta, TR_KEY_source, &str, &len))
-        {
-            str = "";
-        }
+        sv = ""sv;
     }
 
     tr_free(inf->source);
-    inf->source = tr_utf8clean(std::string_view{ str, len });
+    inf->source = tr_utf8clean(sv);
 
     /* piece length */
     if (!isMagnet)
@@ -662,31 +621,30 @@ static char const* tr_metainfoParseImpl(
         inf->pieceSize = i;
     }
 
-    /* pieces */
+    /* pieces and files */
     if (!isMagnet)
     {
-        if (!tr_variantDictFindRaw(infoDict, TR_KEY_pieces, &raw, &len))
+        if (!tr_variantDictFindStrView(infoDict, TR_KEY_pieces, &sv))
         {
             return "pieces";
         }
 
-        if (len % SHA_DIGEST_LENGTH != 0)
+        if (std::size(sv) % SHA_DIGEST_LENGTH != 0)
         {
             return "pieces";
         }
 
-        inf->pieceCount = len / SHA_DIGEST_LENGTH;
+        inf->pieceCount = std::size(sv) / SHA_DIGEST_LENGTH;
         inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
-        std::copy_n(raw, len, (uint8_t*)(inf->pieces));
-    }
+        std::copy_n(std::data(sv), std::size(sv), (uint8_t*)(inf->pieces));
 
-    /* files */
-    if (!isMagnet)
-    {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) !=
-            nullptr)
+        auto const* const errstr = parseFiles(
+            inf,
+            tr_variantDictFind(infoDict, TR_KEY_files),
+            tr_variantDictFind(infoDict, TR_KEY_length));
+        if (errstr != nullptr)
         {
-            return str;
+            return errstr;
         }
 
         if (inf->fileCount == 0 || inf->totalSize == 0)
@@ -701,9 +659,10 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* get announce or announce-list */
-    if ((str = getannounce(inf, meta)) != nullptr)
+    auto const* const errstr = getannounce(inf, meta);
+    if (errstr != nullptr)
     {
-        return str;
+        return errstr;
     }
 
     /* get the url-list */
