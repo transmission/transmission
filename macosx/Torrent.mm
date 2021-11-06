@@ -574,30 +574,28 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 + (BOOL)trashFile:(NSString*)path error:(NSError**)error
 {
-    //attempt to move to trash
-    if (![NSWorkspace.sharedWorkspace performFileOperation:NSWorkspaceRecycleOperation source:path.stringByDeletingLastPathComponent
-                                               destination:@""
-                                                     files:@[ path.lastPathComponent ]
-                                                       tag:nil])
+    // Attempt to move to trash
+    if ([NSFileManager.defaultManager trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:nil error:nil])
     {
-        //if cannot trash, just delete it (will work if it's on a remote volume)
-        NSError* localError;
-        if (![NSFileManager.defaultManager removeItemAtPath:path error:&localError])
-        {
-            NSLog(@"old Could not trash %@: %@", path, localError.localizedDescription);
-            if (error != nil)
-            {
-                *error = localError;
-            }
-            return NO;
-        }
-        else
-        {
-            NSLog(@"old removed %@", path);
-        }
+        NSLog(@"Old moved to Trash %@", path);
+        return YES;
     }
 
-    return YES;
+    // If cannot trash, just delete it (will work if it's on a remote volume)
+    NSError* localError;
+    if ([NSFileManager.defaultManager removeItemAtPath:path error:&localError])
+    {
+        NSLog(@"Old removed %@", path);
+        return YES;
+    }
+
+    NSLog(@"Old could not be trashed or removed %@: %@", path, localError.localizedDescription);
+    if (error != nil)
+    {
+        *error = localError;
+    }
+
+    return NO;
 }
 
 - (void)moveTorrentDataFileTo:(NSString*)folder
