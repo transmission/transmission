@@ -17,6 +17,11 @@ class FreeSpaceLabel : public Gtk::Label
 {
 public:
     FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
+    FreeSpaceLabel(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::RefPtr<Session> const& core,
+        std::string_view dir = {});
     ~FreeSpaceLabel() override;
 
     TR_DISABLE_COPY_MOVE(FreeSpaceLabel)

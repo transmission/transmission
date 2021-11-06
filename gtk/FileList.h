@@ -17,6 +17,12 @@ class FileList : public Gtk::ScrolledWindow
 {
 public:
     FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
+    FileList(
+        BaseObjectType* cast_item,
+        Glib::RefPtr<Gtk::Builder> const& builder,
+        Glib::ustring const& view_name,
+        Glib::RefPtr<Session> const& core,
+        tr_torrent_id_t torrent_id);
     ~FileList() override;
 
     TR_DISABLE_COPY_MOVE(FileList)

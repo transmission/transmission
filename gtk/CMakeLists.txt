@@ -21,8 +21,10 @@ endif()
 find_program(APPSTREAM appstreamcli)
 
 set(${PROJECT_NAME}_UI_FILES
+    OptionsDialog.ui
     RelocateDialog.ui
     StatsDialog.ui
+    TorrentUrlChooserDialog.ui
 )
 
 add_custom_command(
