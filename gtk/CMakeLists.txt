@@ -21,6 +21,7 @@ endif()
 find_program(APPSTREAM appstreamcli)
 
 set(${PROJECT_NAME}_UI_FILES
+    RelocateDialog.ui
     StatsDialog.ui
 )
 
