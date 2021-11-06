@@ -229,6 +229,22 @@ struct fmt::formatter<Glib::ustring> : formatter<std::string>
     }
 };
 
+template<typename T, typename... ArgTs>
+T* gtr_get_widget(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
+{
+    T* widget = nullptr;
+    builder->get_widget(name, widget, std::forward<ArgTs>(args)...);
+    return widget;
+}
+
+template<typename T, typename... ArgTs>
+T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustring const& name, ArgTs&&... args)
+{
+    T* widget = nullptr;
+    builder->get_widget_derived(name, widget, std::forward<ArgTs>(args)...);
+    return widget;
+}
+
 namespace Glib
 {
 

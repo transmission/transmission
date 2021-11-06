@@ -24,7 +24,6 @@
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
-#include "HigWorkarea.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
