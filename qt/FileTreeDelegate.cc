@@ -49,7 +49,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
     if (column == FileTreeModel::COL_PROGRESS)
     {
         QStyleOptionProgressBar p;
-        p.state = option.state | QStyle::State_Small;
+        p.state = option.state | QStyle::State_Horizontal | QStyle::State_Small;
         p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
         p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));

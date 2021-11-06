@@ -107,7 +107,7 @@
         {
             NSInteger const filesCheckState = [torrent
                 checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, torrent.fileCount)]];
-            fCheckAllButton.enabled = filesCheckState != NSOnState; //if anything is unchecked
+            fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
             fUncheckAllButton.enabled = !torrent.allDownloaded; //if there are any checked files that aren't finished
         }
     }

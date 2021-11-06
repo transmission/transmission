@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <QFileInfo>
 #include <QPushButton>
 
@@ -186,8 +188,8 @@ void OptionsDialog::reload()
 
     if (have_info_)
     {
-        priorities_.insert(0, info_.fileCount, TR_PRI_NORMAL);
-        wanted_.insert(0, info_.fileCount, true);
+        priorities_.assign(info_.fileCount, TR_PRI_NORMAL);
+        wanted_.assign(info_.fileCount, true);
 
         for (tr_file_index_t i = 0; i < info_.fileCount; ++i)
         {
@@ -198,7 +200,7 @@ void OptionsDialog::reload()
             file.size = info_.files[i].length;
             file.have = 0;
             file.filename = QString::fromUtf8(info_.files[i].name);
-            files_.append(file);
+            files_.push_back(file);
         }
     }
 
@@ -273,7 +275,7 @@ void OptionsDialog::onAccepted()
     dictAdd(&args, TR_KEY_bandwidthPriority, priority);
 
     // files-unwanted
-    int count = wanted_.count(false);
+    auto count = std::count(wanted_.begin(), wanted_.end(), false);
 
     if (count > 0)
     {
@@ -289,7 +291,7 @@ void OptionsDialog::onAccepted()
     }
 
     // priority-low
-    count = priorities_.count(TR_PRI_LOW);
+    count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_LOW);
 
     if (count > 0)
     {
@@ -305,7 +307,7 @@ void OptionsDialog::onAccepted()
     }
 
     // priority-high
-    count = priorities_.count(TR_PRI_HIGH);
+    count = std::count(priorities_.begin(), priorities_.end(), TR_PRI_HIGH);
 
     if (count > 0)
     {
@@ -380,7 +382,7 @@ void OptionsDialog::clearVerify()
 void OptionsDialog::onVerify()
 {
     clearVerify();
-    verify_flags_.insert(0, info_.pieceCount, false);
+    verify_flags_.assign(info_.pieceCount, false);
     verify_timer_.setSingleShot(false);
     verify_timer_.start(0);
 }
@@ -402,7 +404,7 @@ uint64_t getPieceSize(tr_info const* info, tr_piece_index_t piece_index)
 
 void OptionsDialog::onTimeout()
 {
-    if (files_.isEmpty())
+    if (files_.empty())
     {
         verify_timer_.stop();
         return;
@@ -456,7 +458,7 @@ void OptionsDialog::onTimeout()
             {
                 TorrentFile& f(files_[i.key()]);
                 f.have += i.value();
-                changed_files.append(f);
+                changed_files.push_back(f);
             }
         }
 

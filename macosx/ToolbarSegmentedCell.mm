@@ -27,7 +27,7 @@
 //when the toolbar is set to small size, don't make the group items small
 - (NSControlSize)controlSize
 {
-    return NSRegularControlSize;
+    return NSControlSizeRegular;
 }
 
 @end

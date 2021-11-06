@@ -117,26 +117,23 @@ static void saveLabels(tr_variant* dict, tr_torrent const* tor)
 
 static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
 {
-    auto ret = uint64_t{};
-
     tr_variant* list = nullptr;
-    if (tr_variantDictFindList(dict, TR_KEY_labels, &list))
+    if (!tr_variantDictFindList(dict, TR_KEY_labels, &list))
     {
-        int const n = tr_variantListSize(list);
-        for (int i = 0; i < n; ++i)
-        {
-            char const* str = nullptr;
-            auto str_len = size_t{};
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr && str_len != 0)
-            {
-                tor->labels.emplace(str, str_len);
-            }
-        }
-
-        ret = TR_FR_LABELS;
+        return 0;
     }
 
-    return ret;
+    int const n = tr_variantListSize(list);
+    for (int i = 0; i < n; ++i)
+    {
+        auto sv = std::string_view{};
+        if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
+        {
+            tor->labels.emplace(sv);
+        }
+    }
+
+    return TR_FR_LABELS;
 }
 
 /***
@@ -389,21 +386,19 @@ static void saveName(tr_variant* dict, tr_torrent const* tor)
 
 static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 {
-    auto ret = uint64_t{};
-
-    char const* name = nullptr;
-    if (tr_variantDictFindStr(dict, TR_KEY_name, &name, nullptr))
+    auto name = std::string_view{};
+    if (!tr_variantDictFindStrView(dict, TR_KEY_name, &name))
     {
-        ret = TR_FR_NAME;
-
-        if (tr_strcmp0(tr_torrentName(tor), name) != 0)
-        {
-            tr_free(tor->info.name);
-            tor->info.name = tr_strdup(name);
-        }
+        return 0;
     }
 
-    return ret;
+    if (name != tr_torrentName(tor))
+    {
+        tr_free(tor->info.name);
+        tor->info.name = tr_strvdup(name);
+    }
+
+    return TR_FR_NAME;
 }
 
 /***
@@ -435,30 +430,26 @@ static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 
 static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 {
-    auto ret = uint64_t{};
-
     tr_variant* list = nullptr;
-    if (tr_variantDictFindList(dict, TR_KEY_files, &list))
+    if (!tr_variantDictFindList(dict, TR_KEY_files, &list))
     {
-        size_t const n = tr_variantListSize(list);
-        tr_file* files = tor->info.files;
-
-        for (size_t i = 0; i < tor->info.fileCount && i < n; ++i)
-        {
-            char const* str = nullptr;
-            auto str_len = size_t{};
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != nullptr && str_len != 0)
-            {
-                tr_free(files[i].name);
-                files[i].name = tr_strndup(str, str_len);
-                files[i].is_renamed = true;
-            }
-        }
-
-        ret = TR_FR_FILENAMES;
+        return 0;
     }
 
-    return ret;
+    size_t const n = tr_variantListSize(list);
+    tr_file* files = tor->info.files;
+    for (size_t i = 0; i < tor->info.fileCount && i < n; ++i)
+    {
+        auto sv = std::string_view{};
+        if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
+        {
+            tr_free(files[i].name);
+            files[i].name = tr_strvdup(sv);
+            files[i].is_renamed = true;
+        }
+    }
+
+    return TR_FR_FILENAMES;
 }
 
 /***
@@ -628,7 +619,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
         auto blocks = tr_bitfield{ tor->blockCount };
         char const* err = nullptr;
-        char const* str = nullptr;
+        auto sv = std::string_view{};
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
         if (b != nullptr)
         {
@@ -644,9 +635,9 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                 rawToBitfield(blocks, buf, buflen);
             }
         }
-        else if (tr_variantDictFindStr(prog, TR_KEY_have, &str, nullptr))
+        else if (tr_variantDictFindStrView(prog, TR_KEY_have, &sv))
         {
-            if (strcmp(str, "all") == 0)
+            if (sv == "all"sv)
             {
                 blocks.setHasAll();
             }
@@ -746,9 +737,8 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     auto const wasDirty = tor->isDirty;
     auto fieldsLoaded = uint64_t{};
     auto i = int64_t{};
-    auto len = size_t{};
     auto top = tr_variant{};
-    char const* str = nullptr;
+    auto sv = std::string_view{};
     tr_error* error = nullptr;
 
     if (didRenameToHashOnlyName != nullptr)
@@ -797,11 +787,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) != 0 &&
-        tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len) && !tr_str_is_empty(str))
+        tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free(tor->downloadDir);
-        tor->downloadDir = tr_strndup(str, len);
+        tor->downloadDir = tr_strvdup(sv);
 
         if (is_current_dir)
         {
@@ -812,11 +802,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) != 0 &&
-        tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len) && !tr_str_is_empty(str))
+        tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free(tor->incompleteDir);
-        tor->incompleteDir = tr_strndup(str, len);
+        tor->incompleteDir = tr_strvdup(sv);
 
         if (is_current_dir)
         {
@@ -892,14 +882,17 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         fieldsLoaded |= loadPeers(&top, tor);
     }
 
-    if ((fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
-    {
-        fieldsLoaded |= loadFilePriorities(&top, tor);
-    }
-
     if ((fieldsToLoad & TR_FR_PROGRESS) != 0)
     {
         fieldsLoaded |= loadProgress(&top, tor);
+    }
+
+    // Only load file priorities if we are actually downloading.
+    // If we're a seed or partial seed, loading it is a waste of time.
+    // NB: this is why loadProgress() comes before loadFilePriorities()
+    if ((tr_cpLeftUntilDone(&tor->completion) != 0) && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
+    {
+        fieldsLoaded |= loadFilePriorities(&top, tor);
     }
 
     if ((fieldsToLoad & TR_FR_DND) != 0)

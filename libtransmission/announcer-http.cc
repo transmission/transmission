@@ -41,19 +41,19 @@ static char const* get_event_string(tr_announce_request const* req)
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    evbuffer* const buf = evbuffer_new();
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
+    auto const announce_sv = tr_quark_get_string_view(req->announce_url);
 
+    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
     tr_http_escape_sha1(escaped_info_hash, req->info_hash);
 
+    auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
-
     evbuffer_add_printf(
         buf,
-        "%s"
+        "%" TR_PRIsv
         "%c"
         "info_hash=%s"
-        "&peer_id=%*.*s"
+        "&peer_id=%" TR_PRIsv
         "&port=%d"
         "&uploaded=%" PRIu64 //
         "&downloaded=%" PRIu64 //
@@ -62,10 +62,10 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&key=%x"
         "&compact=1"
         "&supportcrypto=1",
-        req->url,
-        strchr(req->url, '?') != nullptr ? '&' : '?',
+        TR_PRIsv_ARG(announce_sv),
+        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
         escaped_info_hash,
-        TR_ARG_TUPLE(int(std::size(req->peer_id)), int(std::size(req->peer_id)), std::data(req->peer_id)),
+        TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
         req->down,
@@ -245,19 +245,17 @@ static void on_announce_done(
         if (variant_loaded && tr_variantIsDict(&benc))
         {
             auto i = int64_t{};
-            auto len = size_t{};
+            auto sv = std::string_view{};
             tr_variant* tmp = nullptr;
-            char const* str = nullptr;
-            uint8_t const* raw = nullptr;
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_failure_reason, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strndup(str, len);
+                response->errmsg = tr_strvdup(sv);
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_warning_message, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strndup(str, len);
+                response->warning = tr_strvdup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
@@ -270,9 +268,9 @@ static void on_announce_done(
                 response->min_interval = i;
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_tracker_id, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strndup(str, len);
+                response->tracker_id_str = tr_strvdup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -290,16 +288,16 @@ static void on_announce_done(
                 response->downloads = i;
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers6, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
             {
-                dbgmsg(data->log_name, "got a peers6 length of %zu", len);
-                response->pex6 = tr_peerMgrCompact6ToPex(raw, len, nullptr, 0, &response->pex6_count);
+                dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
+                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex6_count);
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
             {
-                dbgmsg(data->log_name, "got a compact peers length of %zu", len);
-                response->pex = tr_peerMgrCompactToPex(raw, len, nullptr, 0, &response->pex_count);
+                dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
+                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex_count);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
@@ -323,20 +321,18 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    char* const url = announce_url_new(session, request);
-
     auto* const d = tr_new0(announce_data, 1);
     d->response.seeders = -1;
     d->response.leechers = -1;
     d->response.downloads = -1;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
-    memcpy(d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH);
+    d->response.info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
+    char* const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%s\"", url);
     tr_webRun(session, url, on_announce_done, d);
-
     tr_free(url);
 }
 
@@ -380,7 +376,9 @@ static void on_scrape_done(
     tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url.c_str());
+
+    auto const scrape_url_sv = tr_quark_get_string_view(response->scrape_url);
+    dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
     {
@@ -419,11 +417,10 @@ static void on_scrape_done(
 
         if (variant_loaded)
         {
-            auto len = size_t{};
-            char const* str = nullptr;
-            if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
+            auto sv = std::string_view{};
+            if (tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = std::string{ str, len };
+                response->errmsg = sv;
             }
 
             tr_variant* flags = nullptr;
@@ -447,7 +444,11 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
-                        if (memcmp(tr_quark_get_string(key, nullptr), row->info_hash, SHA_DIGEST_LENGTH) == 0)
+                        // TODO(ckerr): ugh, interning info dict hashes is awful
+                        auto const& hash = row->info_hash;
+                        auto const key_sv = tr_quark_get_string_view(key);
+                        if (std::size(hash) == std::size(key_sv) &&
+                            memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {
@@ -484,11 +485,12 @@ static void on_scrape_done(
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    struct evbuffer* const buf = evbuffer_new();
+    auto const sv = tr_quark_get_string_view(req->scrape_url);
 
-    evbuffer_add_printf(buf, "%s", req->url);
-    char delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
+    auto* const buf = evbuffer_new();
+    evbuffer_add(buf, std::data(sv), std::size(sv));
 
+    char delimiter = sv.find('?') == sv.npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
@@ -509,14 +511,14 @@ void tr_tracker_http_scrape(
     char* url = scrape_url_new(request);
 
     auto* d = new scrape_data{};
-    d->response.url = request->url;
+    d->response.scrape_url = request->scrape_url;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;
 
     for (int i = 0; i < d->response.row_count; ++i)
     {
-        memcpy(d->response.rows[i].info_hash, request->info_hash[i], SHA_DIGEST_LENGTH);
+        d->response.rows[i].info_hash = request->info_hash[i];
         d->response.rows[i].seeders = -1;
         d->response.rows[i].leechers = -1;
         d->response.rows[i].downloads = -1;

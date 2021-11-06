@@ -257,13 +257,13 @@ bool trashDataFile(char const* filename, tr_error** error)
         {
             switch (ratioSetting.intValue)
             {
-            case NSOnState:
+            case NSControlStateValueOn:
                 self.ratioSetting = TR_RATIOLIMIT_SINGLE;
                 break;
-            case NSOffState:
+            case NSControlStateValueOff:
                 self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
                 break;
-            case NSMixedState:
+            case NSControlStateValueMixed:
                 self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
                 break;
             }
@@ -691,7 +691,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             alert.suppressionButton.title = NSLocalizedString(@"Do not check disk space again", "Torrent disk space alert -> button");
 
             NSInteger const result = [alert runModal];
-            if (alert.suppressionButton.state == NSOnState)
+            if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [fDefaults setBool:NO forKey:@"WarningRemainingSpace"];
             }
@@ -1620,10 +1620,10 @@ bool trashDataFile(char const* filename, tr_error** error)
 
         if (onState && offState)
         {
-            return NSMixedState;
+            return NSControlStateValueMixed;
         }
     }
-    return onState ? NSOnState : NSOffState;
+    return onState ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (void)setFileCheckState:(NSInteger)state forIndexes:(NSIndexSet*)indexSet
@@ -1635,7 +1635,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         files[i] = index;
     }
 
-    tr_torrentSetFileDLs(fHandle, files, count, state != NSOffState);
+    tr_torrentSetFileDLs(fHandle, files, count, state != NSControlStateValueOff);
     free(files);
 
     [self update];

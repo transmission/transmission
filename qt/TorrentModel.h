@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <QAbstractListModel>
-#include <QVector>
 
 #include "Macros.h"
 #include "Torrent.h"
@@ -46,7 +45,7 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    using torrents_t = QVector<Torrent*>;
+    using torrents_t = std::vector<Torrent*>;
 
     torrents_t const& torrents() const
     {

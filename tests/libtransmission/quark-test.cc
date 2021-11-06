@@ -33,10 +33,9 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
     for (int i = 0; i < TR_N_KEYS; i++)
     {
         auto const str = quarkGetString(i);
-
-        tr_quark q;
-        EXPECT_TRUE(tr_quark_lookup(str.data(), str.size(), &q));
-        EXPECT_EQ(i, q);
+        auto const q = tr_quark_lookup(str);
+        EXPECT_TRUE(q);
+        EXPECT_EQ(i, *q);
     }
 }
 

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cstring> /* strlen() */
+#include <iterator>
 #include <string_view>
 
 #include <event2/buffer.h>
@@ -100,85 +101,65 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf, e
 ****
 ***/
 
-char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted)
+bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view in, bool* is_adjusted)
 {
-    if (len == 0 || (len == 1 && str[0] == '.'))
-    {
-        return nullptr;
-    }
-
+    auto const original_out_len = std::size(out);
+    auto const original_in = in;
     *is_adjusted = false;
 
-    /* https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file */
-    char const* const reserved_chars = "<>:\"/\\|?*";
+    // remove leading spaces
+    auto constexpr leading_test = [](auto ch)
+    {
+        return isspace(ch);
+    };
+    auto const it = std::find_if_not(std::begin(in), std::end(in), leading_test);
+    in.remove_prefix(std::distance(std::begin(in), it));
+
+    // remove trailing spaces and '.'
+    auto constexpr trailing_test = [](auto ch)
+    {
+        return isspace(ch) || ch == '.';
+    };
+    auto const rit = std::find_if_not(std::rbegin(in), std::rend(in), trailing_test);
+    in.remove_suffix(std::distance(std::rbegin(in), rit));
+
+    // munge banned characters
+    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+    auto constexpr ensure_legal_char = [](auto ch)
+    {
+        auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
+        auto const banned = Banned.find(ch) != Banned.npos || (unsigned char)ch < 0x20;
+        return banned ? '_' : ch;
+    };
+    auto const old_out_len = std::size(out);
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), ensure_legal_char);
+
+    // munge banned filenames
+    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
     auto constexpr ReservedNames = std::array<std::string_view, 22>{
         "CON"sv,  "PRN"sv,  "AUX"sv,  "NUL"sv,  "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv,
         "COM8"sv, "COM9"sv, "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv,
     };
-
-    char* const ret = tr_new(char, len + 2);
-    memcpy(ret, str, len);
-    ret[len] = '\0';
-
-    for (size_t i = 0; i < len; ++i)
+    for (auto const& name : ReservedNames)
     {
-        if (strchr(reserved_chars, ret[i]) != nullptr || (unsigned char)ret[i] < 0x20)
-        {
-            ret[i] = '_';
-            *is_adjusted = true;
-        }
-    }
-
-    for (auto const& reserved_name : ReservedNames)
-    {
-        size_t const reserved_name_len = std::size(reserved_name);
-        if (evutil_ascii_strncasecmp(ret, std::data(reserved_name), reserved_name_len) != 0 ||
-            (ret[reserved_name_len] != '\0' && ret[reserved_name_len] != '.'))
+        size_t const name_len = std::size(name);
+        if (evutil_ascii_strncasecmp(out.c_str() + old_out_len, std::data(name), name_len) != 0 ||
+            (out[old_out_len + name_len] != '\0' && out[old_out_len + name_len] != '.'))
         {
             continue;
         }
 
-        memmove(&ret[reserved_name_len + 1], &ret[reserved_name_len], len - reserved_name_len + 1);
-        ret[reserved_name_len] = '_';
-        *is_adjusted = true;
-        ++len;
+        out.insert(std::begin(out) + old_out_len + name_len, '_');
         break;
     }
 
-    size_t start_pos = 0;
-    size_t end_pos = len;
-
-    while (start_pos < len && ret[start_pos] == ' ')
-    {
-        ++start_pos;
-    }
-
-    while (end_pos > start_pos && (ret[end_pos - 1] == ' ' || ret[end_pos - 1] == '.'))
-    {
-        --end_pos;
-    }
-
-    if (start_pos == end_pos)
-    {
-        tr_free(ret);
-        return nullptr;
-    }
-
-    if (start_pos != 0 || end_pos != len)
-    {
-        len = end_pos - start_pos;
-        memmove(ret, &ret[start_pos], len);
-        ret[len] = '\0';
-        *is_adjusted = true;
-    }
-
-    return ret;
+    *is_adjusted = original_in != std::string_view{ out.c_str() + original_out_len };
+    return std::size(out) > original_out_len;
 }
 
-static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_variant* path, struct evbuffer* buf)
+static bool getfile(char** setme, bool* is_adjusted, std::string_view root, tr_variant* path, std::string& buf)
 {
     bool success = false;
-    size_t root_len = 0;
 
     *setme = nullptr;
     *is_adjusted = false;
@@ -186,52 +167,40 @@ static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_varian
     if (tr_variantIsList(path))
     {
         success = true;
-        evbuffer_drain(buf, evbuffer_get_length(buf));
-        root_len = strlen(root);
-        evbuffer_add(buf, root, root_len);
+
+        buf = root;
 
         for (int i = 0, n = tr_variantListSize(path); i < n; i++)
         {
-            size_t len = 0;
-            char const* str = nullptr;
-            if (!tr_variantGetStr(tr_variantListChild(path, i), &str, &len))
+            auto raw = std::string_view{};
+            if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
             {
                 success = false;
                 break;
             }
 
-            bool is_component_adjusted = false;
-            char* final_str = tr_metainfo_sanitize_path_component(str, len, &is_component_adjusted);
-            if (final_str == nullptr)
+            auto is_component_adjusted = bool{};
+            auto const pos = std::size(buf);
+            if (!tr_metainfoAppendSanitizedPathComponent(buf, raw, &is_component_adjusted))
             {
                 continue;
             }
 
-            *is_adjusted = *is_adjusted || is_component_adjusted;
+            buf.insert(std::begin(buf) + pos, TR_PATH_DELIMITER);
 
-            evbuffer_add(buf, TR_PATH_DELIMITER_STR, 1);
-            evbuffer_add(buf, final_str, strlen(final_str));
-
-            tr_free(final_str);
+            *is_adjusted |= is_component_adjusted;
         }
     }
 
-    if (success && evbuffer_get_length(buf) <= root_len)
+    if (success && std::size(buf) <= std::size(root))
     {
         success = false;
     }
 
     if (success)
     {
-        char const* const buf_data = (char*)evbuffer_pullup(buf, -1);
-        size_t const buf_len = evbuffer_get_length(buf);
-
-        *setme = tr_utf8clean(std::string_view{ buf_data, buf_len });
-
-        if (!*is_adjusted)
-        {
-            *is_adjusted = buf_len != strlen(*setme) || strncmp(buf_data, *setme, buf_len) != 0;
-        }
+        *setme = tr_utf8clean(buf);
+        *is_adjusted |= buf != *setme;
     }
 
     return success;
@@ -243,18 +212,18 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     inf->totalSize = 0;
 
     bool is_root_adjusted = false;
-    char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
-    if (root_name == nullptr)
+    auto root_name = std::string{};
+    if (!tr_metainfoAppendSanitizedPathComponent(root_name, inf->name, &is_root_adjusted))
     {
         return "path";
     }
 
-    char const* result = nullptr;
+    char const* errstr = nullptr;
 
     if (tr_variantIsList(files)) /* multi-file mode */
     {
-        evbuffer* const buf = evbuffer_new();
-        result = nullptr;
+        auto buf = std::string{};
+        errstr = nullptr;
 
         inf->isFolder = true;
         inf->fileCount = tr_variantListSize(files);
@@ -266,27 +235,27 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
             if (!tr_variantIsDict(file))
             {
-                result = "files";
+                errstr = "files";
                 break;
             }
 
             tr_variant* path = nullptr;
             if (!tr_variantDictFindList(file, TR_KEY_path_utf_8, &path) && !tr_variantDictFindList(file, TR_KEY_path, &path))
             {
-                result = "path";
+                errstr = "path";
                 break;
             }
 
             bool is_file_adjusted = false;
             if (!getfile(&inf->files[i].name, &is_file_adjusted, root_name, path, buf))
             {
-                result = "path";
+                errstr = "path";
                 break;
             }
 
             if (!tr_variantDictFindInt(file, TR_KEY_length, &len))
             {
-                result = "length";
+                errstr = "length";
                 break;
             }
 
@@ -294,29 +263,26 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
             inf->files[i].is_renamed = is_root_adjusted || is_file_adjusted;
             inf->totalSize += len;
         }
-
-        evbuffer_free(buf);
     }
     else if (tr_variantGetInt(length, &len)) /* single-file mode */
     {
         inf->isFolder = false;
         inf->fileCount = 1;
         inf->files = tr_new0(tr_file, 1);
-        inf->files[0].name = tr_strdup(root_name);
+        inf->files[0].name = tr_strndup(root_name.c_str(), std::size(root_name));
         inf->files[0].length = len;
         inf->files[0].is_renamed = is_root_adjusted;
         inf->totalSize += len;
     }
     else
     {
-        result = "length";
+        errstr = "length";
     }
 
-    tr_free(root_name);
-    return result;
+    return errstr;
 }
 
-static char* tr_convertAnnounceToScrape(char const* announce)
+static char* tr_convertAnnounceToScrape(std::string_view url)
 {
     char* scrape = nullptr;
 
@@ -327,33 +293,26 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
 
-    char const* s = strrchr(announce, '/');
-
-    if (s != nullptr && strncmp(s + 1, "announce", 8) == 0)
+    auto constexpr oldval = "/announce"sv;
+    auto pos = url.rfind(oldval.front());
+    if (pos != url.npos && url.find(oldval, pos) == pos)
     {
-        char const* prefix = announce;
-        size_t const prefix_len = s + 1 - announce;
-        char const* suffix = s + 1 + 8;
-        size_t const suffix_len = strlen(suffix);
-        size_t const alloc_len = prefix_len + 6 + suffix_len + 1;
-
-        scrape = tr_new(char, alloc_len);
-
-        char* walk = scrape;
-        memcpy(walk, prefix, prefix_len);
-        walk += prefix_len;
-        memcpy(walk, "scrape", 6);
-        walk += 6;
-        memcpy(walk, suffix, suffix_len);
-        walk += suffix_len;
-        *walk++ = '\0';
-
-        TR_ASSERT((size_t)(walk - scrape) == alloc_len);
+        auto constexpr newval = "/scrape"sv;
+        auto const prefix = url.substr(0, pos);
+        auto const suffix = url.substr(pos + std::size(oldval));
+        auto const n = std::size(prefix) + std::size(newval) + std::size(suffix);
+        scrape = tr_new(char, n + 1);
+        auto* walk = scrape;
+        walk = std::copy(std::begin(prefix), std::end(prefix), walk);
+        walk = std::copy(std::begin(newval), std::end(newval), walk);
+        walk = std::copy(std::begin(suffix), std::end(suffix), walk);
+        *walk = '\0';
+        TR_ASSERT(scrape + n == walk);
     }
-    /* Some torrents with UDP announce URLs don't have /announce. */
-    else if (strncmp(announce, "udp:", 4) == 0)
+    // some torrents with UDP announce URLs don't have /announce
+    else if (url.find("udp:"sv) == 0)
     {
-        scrape = tr_strdup(announce);
+        scrape = tr_strvdup(url);
     }
 
     return scrape;
@@ -361,13 +320,12 @@ static char* tr_convertAnnounceToScrape(char const* announce)
 
 static char const* getannounce(tr_info* inf, tr_variant* meta)
 {
-    size_t len = 0;
-    char const* str = nullptr;
     tr_tracker_info* trackers = nullptr;
     int trackerCount = 0;
-    tr_variant* tiers = nullptr;
+    auto url = std::string_view{};
 
     /* Announce-list */
+    tr_variant* tiers = nullptr;
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         int const numTiers = tr_variantListSize(tiers);
@@ -389,19 +347,15 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
 
             for (int j = 0; j < tierSize; j++)
             {
-                if (tr_variantGetStr(tr_variantListChild(tier, j), &str, &len))
+                if (tr_variantGetStrView(tr_variantListChild(tier, j), &url))
                 {
-                    char* url = tr_strstrip(tr_strndup(str, len));
+                    url = tr_strvstrip(url);
 
-                    if (!tr_urlIsValidTracker(url))
-                    {
-                        tr_free(url);
-                    }
-                    else
+                    if (tr_urlIsValidTracker(url))
                     {
                         tr_tracker_info* t = trackers + trackerCount;
                         t->tier = validTiers;
-                        t->announce = url;
+                        t->announce = tr_strvdup(url);
                         t->scrape = tr_convertAnnounceToScrape(url);
                         t->id = trackerCount;
 
@@ -426,19 +380,15 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     }
 
     /* Regular announce value */
-    if (trackerCount == 0 && tr_variantDictFindStr(meta, TR_KEY_announce, &str, &len))
+    if (trackerCount == 0 && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        char* url = tr_strstrip(tr_strndup(str, len));
+        url = tr_strvstrip(url);
 
-        if (!tr_urlIsValidTracker(url))
-        {
-            tr_free(url);
-        }
-        else
+        if (tr_urlIsValidTracker(url))
         {
             trackers = tr_new0(tr_tracker_info, 1);
             trackers[trackerCount].tier = 0;
-            trackers[trackerCount].announce = url;
+            trackers[trackerCount].announce = tr_strvdup(url);
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
@@ -462,34 +412,27 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
  * mktorrent and very old versions of utorrent, that don't add the
  * trailing slash for multifile torrents if omitted by the end user.
  */
-static char* fix_webseed_url(tr_info const* inf, char const* url_in)
+static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 {
-    char* ret = nullptr;
+    url = tr_strvstrip(url);
 
-    char* const url = tr_strdup(url_in);
-    tr_strstrip(url);
-    size_t const len = strlen(url);
-
-    if (tr_urlIsValid(url, len))
+    if (!tr_urlIsValid(url))
     {
-        if (inf->fileCount > 1 && len > 0 && url[len - 1] != '/')
-        {
-            ret = tr_strdup_printf("%*.*s/", TR_ARG_TUPLE((int)len, (int)len, url));
-        }
-        else
-        {
-            ret = tr_strndup(url, len);
-        }
+        return nullptr;
     }
 
-    tr_free(url);
-    return ret;
+    if (inf->fileCount > 1 && !std::empty(url) && url.back() != '/')
+    {
+        return tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
+    }
+
+    return tr_strvdup(url);
 }
 
 static void geturllist(tr_info* inf, tr_variant* meta)
 {
     tr_variant* urls = nullptr;
-    char const* url = nullptr;
+    auto url = std::string_view{};
 
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
@@ -500,10 +443,9 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
         for (int i = 0; i < n; i++)
         {
-            if (tr_variantGetStr(tr_variantListChild(urls, i), &url, nullptr))
+            if (tr_variantGetStrView(tr_variantListChild(urls, i), &url))
             {
-                char* fixed_url = fix_webseed_url(inf, url);
-
+                char* const fixed_url = fix_webseed_url(inf, url);
                 if (fixed_url != nullptr)
                 {
                     inf->webseeds[inf->webseedCount++] = fixed_url;
@@ -511,10 +453,9 @@ static void geturllist(tr_info* inf, tr_variant* meta)
             }
         }
     }
-    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url, nullptr)) /* handle single items in webseeds */
+    else if (tr_variantDictFindStrView(meta, TR_KEY_url_list, &url)) /* handle single items in webseeds */
     {
-        char* fixed_url = fix_webseed_url(inf, url);
-
+        char* const fixed_url = fix_webseed_url(inf, url);
         if (fixed_url != nullptr)
         {
             inf->webseedCount = 1;
@@ -532,9 +473,7 @@ static char const* tr_metainfoParseImpl(
     tr_variant const* meta_in)
 {
     int64_t i = 0;
-    size_t len = 0;
-    char const* str = nullptr;
-    uint8_t const* raw = nullptr;
+    auto sv = std::string_view{};
     tr_variant* const meta = const_cast<tr_variant*>(meta_in);
     bool isMagnet = false;
 
@@ -557,27 +496,27 @@ static char const* tr_metainfoParseImpl(
         {
             isMagnet = true;
 
-            /* get the info-hash */
-            if (!tr_variantDictFindRaw(d, TR_KEY_info_hash, &raw, &len))
+            // get the info-hash
+            if (!tr_variantDictFindStrView(d, TR_KEY_info_hash, &sv))
             {
                 return "info_hash";
             }
 
-            if (len != SHA_DIGEST_LENGTH)
+            if (std::size(sv) != SHA_DIGEST_LENGTH)
             {
                 return "info_hash";
             }
 
-            memcpy(inf->hash, raw, len);
+            std::copy(std::begin(sv), std::end(sv), inf->hash);
             tr_sha1_to_hex(inf->hashString, inf->hash);
 
-            /* maybe get the display name */
-            if (tr_variantDictFindStr(d, TR_KEY_display_name, &str, &len))
+            // maybe get the display name
+            if (tr_variantDictFindStrView(d, TR_KEY_display_name, &sv))
             {
                 tr_free(inf->name);
                 tr_free(inf->originalName);
-                inf->name = tr_strndup(str, len);
-                inf->originalName = tr_strndup(str, len);
+                inf->name = tr_strvdup(sv);
+                inf->originalName = tr_strvdup(sv);
             }
 
             if (inf->name == nullptr)
@@ -590,7 +529,7 @@ static char const* tr_metainfoParseImpl(
                 inf->originalName = tr_strdup(inf->hashString);
             }
         }
-        else /* not a magnet link and has no info dict... */
+        else // not a magnet link and has no info dict...
         {
             return "info";
         }
@@ -613,55 +552,45 @@ static char const* tr_metainfoParseImpl(
     /* name */
     if (!isMagnet)
     {
-        len = 0;
-
-        if (!tr_variantDictFindStr(infoDict, TR_KEY_name_utf_8, &str, &len) &&
-            !tr_variantDictFindStr(infoDict, TR_KEY_name, &str, &len))
+        if (!tr_variantDictFindStrView(infoDict, TR_KEY_name_utf_8, &sv) &&
+            !tr_variantDictFindStrView(infoDict, TR_KEY_name, &sv))
         {
-            str = "";
+            sv = ""sv;
         }
 
-        if (tr_str_is_empty(str))
+        if (std::empty(sv))
         {
             return "name";
         }
 
         tr_free(inf->name);
         tr_free(inf->originalName);
-        inf->name = tr_utf8clean(std::string_view{ str, len });
+        inf->name = tr_utf8clean(sv);
         inf->originalName = tr_strdup(inf->name);
     }
 
     /* comment */
-    len = 0;
-
-    if (!tr_variantDictFindStr(meta, TR_KEY_comment_utf_8, &str, &len) &&
-        !tr_variantDictFindStr(meta, TR_KEY_comment, &str, &len))
+    if (!tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) && !tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
-        str = "";
+        sv = ""sv;
     }
 
     tr_free(inf->comment);
-    inf->comment = tr_utf8clean(std::string_view{ str, len });
+    inf->comment = tr_utf8clean(sv);
 
     /* created by */
-    len = 0;
-
-    if (!tr_variantDictFindStr(meta, TR_KEY_created_by_utf_8, &str, &len) &&
-        !tr_variantDictFindStr(meta, TR_KEY_created_by, &str, &len))
+    if (!tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) &&
+        !tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
-        str = "";
+        sv = ""sv;
     }
 
     tr_free(inf->creator);
-    inf->creator = tr_utf8clean(std::string_view{ str, len });
+    inf->creator = tr_utf8clean(sv);
 
     /* creation date */
-    if (!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i))
-    {
-        i = 0;
-    }
-
+    i = 0;
+    (void)!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i);
     inf->dateCreated = i;
 
     /* private */
@@ -673,17 +602,13 @@ static char const* tr_metainfoParseImpl(
     inf->isPrivate = i != 0;
 
     /* source */
-    len = 0;
-    if (!tr_variantDictFindStr(infoDict, TR_KEY_source, &str, &len))
+    if (!tr_variantDictFindStrView(infoDict, TR_KEY_source, &sv) && !tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
-        if (!tr_variantDictFindStr(meta, TR_KEY_source, &str, &len))
-        {
-            str = "";
-        }
+        sv = ""sv;
     }
 
     tr_free(inf->source);
-    inf->source = tr_utf8clean(std::string_view{ str, len });
+    inf->source = tr_utf8clean(sv);
 
     /* piece length */
     if (!isMagnet)
@@ -696,31 +621,30 @@ static char const* tr_metainfoParseImpl(
         inf->pieceSize = i;
     }
 
-    /* pieces */
+    /* pieces and files */
     if (!isMagnet)
     {
-        if (!tr_variantDictFindRaw(infoDict, TR_KEY_pieces, &raw, &len))
+        if (!tr_variantDictFindStrView(infoDict, TR_KEY_pieces, &sv))
         {
             return "pieces";
         }
 
-        if (len % SHA_DIGEST_LENGTH != 0)
+        if (std::size(sv) % SHA_DIGEST_LENGTH != 0)
         {
             return "pieces";
         }
 
-        inf->pieceCount = len / SHA_DIGEST_LENGTH;
+        inf->pieceCount = std::size(sv) / SHA_DIGEST_LENGTH;
         inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
-        std::copy_n(raw, len, (uint8_t*)(inf->pieces));
-    }
+        std::copy_n(std::data(sv), std::size(sv), (uint8_t*)(inf->pieces));
 
-    /* files */
-    if (!isMagnet)
-    {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) !=
-            nullptr)
+        auto const* const errstr = parseFiles(
+            inf,
+            tr_variantDictFind(infoDict, TR_KEY_files),
+            tr_variantDictFind(infoDict, TR_KEY_length));
+        if (errstr != nullptr)
         {
-            return str;
+            return errstr;
         }
 
         if (inf->fileCount == 0 || inf->totalSize == 0)
@@ -735,9 +659,10 @@ static char const* tr_metainfoParseImpl(
     }
 
     /* get announce or announce-list */
-    if ((str = getannounce(inf, meta)) != nullptr)
+    auto const* const errstr = getannounce(inf, meta);
+    if (errstr != nullptr)
     {
-        return str;
+        return errstr;
     }
 
     /* get the url-list */

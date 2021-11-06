@@ -672,7 +672,7 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
             tr_logGetTimeStr(timestr, sizeof(timestr)),
             tr_torrentName(msgs->torrent),
             tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
-            tr_quark_get_string(msgs->client, nullptr));
+            tr_quark_get_string(msgs->client));
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);

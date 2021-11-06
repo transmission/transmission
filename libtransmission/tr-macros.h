@@ -122,6 +122,9 @@
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
 
+#define TR_PRIsv "*.*s"
+#define TR_PRIsv_ARG(sv) TR_ARG_TUPLE(int(std::size(sv)), int(std::size(sv)), std::data(sv))
+
 // https://www.bittorrent.org/beps/bep_0003.html
 // A string of length 20 which this downloader uses as its id. Each
 // downloader generates its own id at random at the start of a new
@@ -133,5 +136,5 @@ using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
 
 // TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
 // TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
-// TODO #3: this should be an array of std::byte
-using tr_sha1_digest_t = std::array<uint8_t, 20>;
+auto inline constexpr TR_SHA1_DIGEST_LEN = size_t{ 20 };
+using tr_sha1_digest_t = std::array<std::byte, TR_SHA1_DIGEST_LEN>;

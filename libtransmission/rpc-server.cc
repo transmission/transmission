@@ -211,7 +211,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 
                 auto test = tr_variant{};
                 auto have_source = bool{ false };
-                if (tr_urlIsValid(body.c_str(), body_len))
+                if (tr_urlIsValid({ body.c_str(), body_len }))
                 {
                     tr_variantDictAddRaw(args, TR_KEY_filename, body.c_str(), body_len);
                     have_source = true;
@@ -1097,7 +1097,7 @@ void tr_rpcClose(tr_rpc_server** ps)
 
 static void missing_settings_key(tr_quark const q)
 {
-    char const* str = tr_quark_get_string(q, nullptr);
+    char const* str = tr_quark_get_string(q);
     tr_logAddNamedError(MY_NAME, _("Couldn't find settings key \"%s\""), str);
 }
 
@@ -1107,6 +1107,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     auto boolVal = bool{};
     auto i = int64_t{};
     char const* str = nullptr;
+    auto url = std::string_view{};
 
     tr_rpc_server* const s = new tr_rpc_server{};
     s->session = session;
@@ -1134,21 +1135,18 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_url;
-    auto url_len = size_t{};
-    if (!tr_variantDictFindStr(settings, key, &str, &url_len))
+    // auto url_len = size_t{};
+    if (!tr_variantDictFindStrView(settings, key, &url))
     {
         missing_settings_key(key);
     }
+    else if (std::empty(url) || url.back() != '/')
+    {
+        s->url = tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
+    }
     else
     {
-        if (url_len == 0 || str[url_len - 1] != '/')
-        {
-            s->url = tr_strdup_printf("%s/", str);
-        }
-        else
-        {
-            s->url = tr_strdup(str);
-        }
+        s->url = tr_strvdup(url);
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

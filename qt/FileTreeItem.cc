@@ -114,7 +114,7 @@ QVariant FileTreeItem::data(int column, int role) const
     case Qt::TextAlignmentRole:
         if (column == FileTreeModel::COL_SIZE)
         {
-            value = Qt::AlignRight + Qt::AlignVCenter;
+            value = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
         }
 
         break;
