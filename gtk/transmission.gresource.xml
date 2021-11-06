@@ -8,5 +8,6 @@
     <file alias="icons/scalable/apps/transmission.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission.svg</file>
     <file compressed="true">transmission-ui.css</file>
     <file compressed="true" preprocess="xml-stripblanks">transmission-ui.xml</file>
+    <file compressed="true" preprocess="xml-stripblanks">StatsDialog.ui</file>
   </gresource>
 </gresources>
