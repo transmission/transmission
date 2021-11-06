@@ -68,13 +68,9 @@ void SystemTrayIcon::Impl::activated()
     gtr_action_activate("toggle-main-window");
 }
 
-void SystemTrayIcon::Impl::popup([[maybe_unused]] guint button, [[maybe_unused]] guint when)
+void SystemTrayIcon::Impl::popup(guint /*button*/, guint /*when*/)
 {
-#if GTK_CHECK_VERSION(3, 22, 0)
     menu_->popup_at_pointer(nullptr);
-#else
-    menu_->popup(button, when);
-#endif
 }
 
 void SystemTrayIcon::Impl::refresh()
