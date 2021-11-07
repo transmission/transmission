@@ -14,6 +14,6 @@ class Session;
 
 void gtr_notify_init();
 
-void gtr_notify_torrent_added(Glib::RefPtr<TrCore> const& core, int torrent_id);
+void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id);
 
 void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent_id);

@@ -239,7 +239,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
             -1));
 }
 
-void gtr_notify_torrent_added(Glib::RefPtr<TrCore> const& core, int torrent_id)
+void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
 {
     g_return_if_fail(proxy != nullptr);
 
