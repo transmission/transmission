@@ -1794,7 +1794,6 @@ Gtk::Widget* DetailsDialog::Impl::peer_page_new()
     auto m = Gtk::TreeModelSort::create(peer_store_);
     m->set_sort_column(peer_cols.progress, Gtk::SORT_DESCENDING);
     peer_view_ = Gtk::make_managed<Gtk::TreeView>(m);
-    peer_view_->set_rules_hint(true);
     peer_view_->set_has_tooltip(true);
 
     peer_view_->signal_query_tooltip().connect(sigc::mem_fun(this, &Impl::onPeerViewQueryTooltip));
