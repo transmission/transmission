@@ -1238,7 +1238,7 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
-    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "transmission-lock" : "";
+    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = key;
     (*iter)[peer_cols.torrent_name] = torrentName;
 }
@@ -1653,7 +1653,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             r->property_xalign() = 0.0F;
             r->property_yalign() = 0.5F;
             c = Gtk::make_managed<Gtk::TreeViewColumn>(Glib::ustring(), *r);
-            c->add_attribute(r->property_stock_id(), *col);
+            c->add_attribute(r->property_icon_name(), *col);
             c->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
             c->set_fixed_width(20);
         }

@@ -133,43 +133,9 @@ struct : ActionEntryBase
     { "present-main-window", nullptr, N_("Present Main Window"), nullptr, nullptr, true },
 };
 
-struct BuiltinIconInfo
-{
-    char const* filename;
-    char const* name;
-};
-
-BuiltinIconInfo const my_fallback_icons[] = {
-    { "logo-48", WINDOW_ICON }, //
-    { "logo-24", TRAY_ICON }, //
-    { "logo-48", NOTIFICATION_ICON }, //
-    { "lock", "transmission-lock" }, //
-    { "utilities", "utilities" }, //
-    { "turtle-blue", "alt-speed-on" }, //
-    { "turtle-grey", "alt-speed-off" }, //
-    { "ratio", "ratio" }, //
-};
-
 void register_my_icons()
 {
-    auto const theme = Gtk::IconTheme::get_default();
-    auto const factory = Gtk::IconFactory::create();
-
-    factory->add_default();
-
-    for (auto const& icon : my_fallback_icons)
-    {
-        if (!theme->has_icon(icon.name))
-        {
-            auto const p = Gdk::Pixbuf::create_from_resource(gtr_sprintf(TR_RESOURCE_PATH "icons/%s.png", icon.filename));
-
-            if (p != nullptr)
-            {
-                Gtk::IconTheme::add_builtin_icon(icon.name, p->get_width(), p);
-                factory->add(Gtk::StockID(icon.name), Gtk::IconSet::create(p));
-            }
-        }
-    }
+    Gtk::IconTheme::get_default()->add_resource_path(TR_RESOURCE_PATH "icons");
 }
 
 Gtk::UIManager* myUIManager = nullptr;
@@ -233,7 +199,6 @@ void gtr_actions_init(Glib::RefPtr<Gtk::UIManager> const& ui_manager, void* call
     {
         auto const action = Gtk::Action::create(
             entry.name,
-            entry.stock_id != nullptr ? Gtk::StockID(entry.stock_id) : Gtk::StockID(),
             _(entry.label),
             entry.tooltip != nullptr ? _(entry.tooltip) : Glib::ustring());
         if (entry.stock_id != nullptr && Gtk::IconTheme::get_default()->has_icon(entry.stock_id))

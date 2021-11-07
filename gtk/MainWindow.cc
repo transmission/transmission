@@ -235,7 +235,7 @@ void MainWindow::Impl::syncAltSpeedButton()
                          gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     alt_speed_button_->set_active(b);
-    alt_speed_image_->set(Gtk::StockID(stock), Gtk::IconSize(-1));
+    alt_speed_image_->set_from_icon_name(stock, Gtk::BuiltinIconSize::ICON_SIZE_MENU);
     alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_tooltip_text(str);

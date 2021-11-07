@@ -461,7 +461,9 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     toolbar->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(Gtk::StockID("document-save-as"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("document-save-as", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("Save _As"));
         item->set_use_underline(true);
@@ -470,7 +472,9 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     }
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(Gtk::StockID("edit-clear"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("edit-clear", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("Clear"));
         item->set_use_underline(true);
@@ -481,7 +485,9 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     toolbar->insert(*Gtk::make_managed<Gtk::SeparatorToolItem>(), -1);
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToggleToolButton>(Gtk::StockID("media-playback-pause"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("media-playback-pause", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToggleToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("P_ause"));
         item->set_use_underline(true);
