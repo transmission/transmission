@@ -237,7 +237,11 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
         return false;
     }
 
-    *setme = *delete_source;
+    if (setme != nullptr)
+    {
+        *setme = *delete_source;
+    }
+
     return true;
 }
 
@@ -292,7 +296,11 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
         return false;
     }
 
-    *setme = *peer_limit;
+    if (setme != nullptr)
+    {
+        *setme = *peer_limit;
+    }
+
     return true;
 }
 
@@ -304,7 +312,11 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
         return false;
     }
 
-    *setme = *paused;
+    if (setme != nullptr)
+    {
+        *setme = *paused;
+    }
+
     return true;
 }
 
@@ -316,7 +328,11 @@ bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** s
         return false;
     }
 
-    *setme = str.c_str();
+    if (setme != nullptr)
+    {
+        *setme = str.c_str();
+    }
+
     return true;
 }
 
@@ -328,24 +344,27 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
         return false;
     }
 
-    *setme = str.c_str();
+    if (setme != nullptr)
+    {
+        *setme = str.c_str();
+    }
+
     return true;
 }
 
 bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
 {
-    bool ret = true;
-
     if (!ctor->isSet_metainfo)
     {
-        ret = false;
+        return false;
     }
-    else if (setme != nullptr)
+
+    if (setme != nullptr)
     {
         *setme = &ctor->metainfo;
     }
 
-    return ret;
+    return true;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)
