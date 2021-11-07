@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
+#include <thread>
 #include <time.h>
 #include <vector>
 #include <string_view>
@@ -916,12 +917,13 @@ void Application::Impl::on_app_exit()
     /* since tr_sessionClose () is a blocking function,
      * delegate its call to another thread here... when it's done,
      * punt the GUI teardown back to the GTK+ thread */
-    Glib::Thread::create(
+    std::thread(
         [this, session = core_->close()]()
         {
             tr_sessionClose(session);
             Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::on_session_closed));
-        });
+        })
+        .detach();
 }
 
 void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::vector<std::string>& files)
