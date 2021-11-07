@@ -112,6 +112,11 @@ public:
     void update();
 
     /**
+     * Attempts to start a torrent immediately.
+     */
+    void start_now(int id);
+
+    /**
     ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
     **/
 

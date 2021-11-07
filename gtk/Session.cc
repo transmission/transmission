@@ -1441,6 +1441,19 @@ void Session::update()
     impl_->update();
 }
 
+void Session::start_now(int id)
+{
+    tr_variant top;
+    tr_variantInitDict(&top, 2);
+    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-start-now");
+
+    auto args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
+    tr_variantListAddInt(ids, id);
+    exec(&top);
+    tr_variantFree(&top);
+}
+
 void Session::Impl::update()
 {
     /* update the model */

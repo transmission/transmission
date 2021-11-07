@@ -11,8 +11,6 @@
 #include <giomm.h>
 #include <glibmm/i18n.h>
 
-#include <libtransmission/rpcimpl.h>
-
 #include "Notify.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -68,19 +66,6 @@ void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
     }
 }
 
-void torrent_start_now(tr_session* session, int id)
-{
-    tr_variant top;
-    tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-start-now");
-
-    auto args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
-    auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
-    tr_variantListAddInt(ids, id);
-    tr_rpc_request_exec_json(session, &top, nullptr, nullptr);
-    tr_variantFree(&top);
-}
-
 void g_signal_callback(
     Glib::ustring const& /*sender_name*/,
     Glib::ustring const& signal_name,
@@ -127,7 +112,7 @@ void g_signal_callback(
         }
         else if (action == "start-now")
         {
-            torrent_start_now(n.core->get_session(), n.torrent_id);
+            n.core->start_now(n.torrent_id);
         }
     }
 }
