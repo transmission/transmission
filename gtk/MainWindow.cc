@@ -557,13 +557,13 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
 
     /* upload */
     ul_lb_ = Gtk::make_managed<Gtk::Label>();
-    ul_lb_->set_margin_left(GUI_PAD);
+    ul_lb_->set_margin_start(GUI_PAD);
     ul_lb_->set_single_line_mode(true);
     status_->add(*ul_lb_);
 
     /* ratio */
     stats_lb_ = Gtk::make_managed<Gtk::Label>();
-    stats_lb_->set_margin_left(GUI_PAD_BIG);
+    stats_lb_->set_margin_start(GUI_PAD_BIG);
     stats_lb_->set_single_line_mode(true);
     status_->add(*stats_lb_);
 
