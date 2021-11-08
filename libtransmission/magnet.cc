@@ -110,13 +110,20 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 static auto constexpr MaxTrackers = std::size_t{ 64 };
 static auto constexpr MaxWebseeds = std::size_t{ 64 };
 
+#include <iostream>
+
 tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " magnet link [" << magnet_link << ']' << std::endl;
+
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
         return nullptr;
     }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " parsed->scheme [" << parsed->scheme << ']' << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " parsed->query [" << parsed->query << ']' << std::endl;
 
     bool got_checksum = false;
     size_t trCount = 0;
@@ -126,8 +133,11 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     char* displayName = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " iterating" << std::endl;
     for (auto const [key, value] : tr_url_query_view{ parsed->query })
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " key [" << key << ']' << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " value [" << value << ']' << std::endl;
         if (key == "dn"sv)
         {
             displayName = tr_http_unescape(std::data(value), std::size(value));

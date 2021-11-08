@@ -295,9 +295,13 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
 
 } // namespace
 
+#include <iostream>
+
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " url in [" << url << ']' << std::endl;
     url = tr_strvstrip(url);
+    std::cerr << __FILE__ << ':' << __LINE__ << " stripped [" << url << ']' << std::endl;
 
     if (!urlCharsAreValid(url))
     {
@@ -306,16 +310,20 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 
     auto parsed = tr_url_parsed_t{};
     parsed.full = url;
+    std::cerr << __FILE__ << ':' << __LINE__ << " parsed.full [" << parsed.full << ']' << std::endl;
 
     // scheme
     auto key = ":"sv;
     auto pos = url.find(key);
+    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     if (pos == std::string_view::npos || pos == 0)
     {
         return {};
     }
     parsed.scheme = url.substr(0, pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " parsed.scheme [" << parsed.scheme << ']' << std::endl;
     url.remove_prefix(pos + std::size(key));
+    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
 
     // authority
     // The authority component is preceded by a double slash ("//") and is
@@ -323,6 +331,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // sign ("#") character, or by the end of the URI.
     key = "//"sv;
     pos = url.find(key);
+    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     if (pos == 0)
     {
         url.remove_prefix(pos + std::size(key));
@@ -348,22 +357,29 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     //  The path is terminated by the first question mark ("?") or
     //  number sign ("#") character, or by the end of the URI.
     pos = url.find_first_of("?#");
+    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     parsed.path = url.substr(0, pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << parsed.path << ']' << std::endl;
     url = pos == url.npos ? ""sv : url.substr(pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
 
     // query
     if (url.find('?') == 0)
     {
         url.remove_prefix(1);
         pos = url.find('#');
+        std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
         parsed.query = url.substr(0, pos);
+        std::cerr << __FILE__ << ':' << __LINE__ << " parsed.query [" << parsed.query << ']' << std::endl;
         url = pos == url.npos ? ""sv : url.substr(pos);
+        std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
     }
 
     // fragment
     if (url.find('#') == 0)
     {
         parsed.fragment = url.substr(1);
+        std::cerr << __FILE__ << ':' << __LINE__ << " fragment [" << parsed.fragment << ']' << std::endl;
     }
 
     return parsed;

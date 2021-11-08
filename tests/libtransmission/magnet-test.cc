@@ -17,6 +17,8 @@
 
 using namespace std::literals;
 
+#include <iostream>
+
 TEST(Magnet, magnetParse)
 {
     auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
@@ -42,6 +44,8 @@ TEST(Magnet, magnetParse)
 
     for (auto const& uri : { UriHex, UriBase32 })
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " uri [" << uri << ']' << std::endl;
+
         auto* info = tr_magnetParse(uri);
         EXPECT_NE(nullptr, info);
         EXPECT_EQ(2, info->trackerCount);
