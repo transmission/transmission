@@ -77,11 +77,15 @@ struct tr_url_query_view
         {
             std::cerr << __FILE__ << ':' << __LINE__ << " this [" << this->keyval.first << "][" << this->keyval.second << "]["
                       << this->remain << "]" << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << " this [" << that.keyval.first << "][" << that.keyval.second << "]["
+            std::cerr << __FILE__ << ':' << __LINE__ << " that [" << that.keyval.first << "][" << that.keyval.second << "]["
                       << that.remain << "]" << std::endl;
-            auto const equal = this->keyval == that.keyval && this->remain == that.remain;
-            std::cerr << __FILE__ << ':' << __LINE__ << " equal " << equal << std::endl;
-            return equal;
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(this->remain) << ' ' << std::size(this->remain) << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(that.remain) << ' ' << std::size(that.remain) << std::endl;
+            auto const b = this->remain == that.remain;
+            std::cerr << __FILE__ << ':' << __LINE__ << " b " << b << std::endl;
+            auto const a = this->keyval == that.keyval;
+            std::cerr << __FILE__ << ':' << __LINE__ << " a " << a << std::endl;
+            return a && b;
         }
 
         bool operator!=(iterator const& that) const
