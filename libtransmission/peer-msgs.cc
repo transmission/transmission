@@ -18,6 +18,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "cache.h"
 #include "completion.h"
 #include "file.h"
@@ -25,9 +26,10 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
+#include "ptrarray.h"
 #include "session.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "utils.h"

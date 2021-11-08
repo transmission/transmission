@@ -14,7 +14,8 @@
 
 #include "tr-macros.h"
 #include "transmission.h"
-#include "variant.h"
+
+struct tr_variant;
 
 struct tr_magnet_info
 {
@@ -30,8 +31,6 @@ struct tr_magnet_info
 };
 
 tr_magnet_info* tr_magnetParse(char const* uri);
-
-struct tr_variant;
 
 void tr_magnetCreateMetainfo(tr_magnet_info const*, tr_variant*);
 

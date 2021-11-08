@@ -14,17 +14,19 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1 */
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
+#include "web-utils.h"
 
 /****
 *****

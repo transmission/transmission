@@ -30,6 +30,7 @@
 #include <event2/util.h> /* evutil_vsnprintf() */
 
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "cache.h"
@@ -48,14 +49,15 @@
 #include "resume.h"
 #include "session.h"
 #include "subprocess.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
 #include "version.h"
+#include "web-utils.h"
 
 /***
 ****

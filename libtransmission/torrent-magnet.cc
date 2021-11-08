@@ -12,18 +12,19 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1() */
 #include "file.h"
 #include "log.h"
 #include "magnet.h"
 #include "metainfo.h"
 #include "resume.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
-#include "web.h"
+#include "web-utils.h"
 
 #define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
 

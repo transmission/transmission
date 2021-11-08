@@ -43,8 +43,6 @@ struct tr_variant;
 
 using tr_priority_t = int8_t;
 
-using tr_voidptr_compare_func = int (*)(void const* lhs, void const* rhs);
-
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 enum tr_preallocation_mode

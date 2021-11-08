@@ -12,7 +12,6 @@
 
 #include "file.h" /* tr_sys_file_t */
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_PRINTF, TR_GNUC_NONNULL */
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 

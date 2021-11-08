@@ -14,6 +14,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "bandwidth.h"
 #include "cache.h"
 #include "inout.h" /* tr_ioFindFileLocation() */
@@ -21,6 +22,7 @@
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
+#include "web-utils.h"
 #include "web.h"
 #include "webseed.h"
 

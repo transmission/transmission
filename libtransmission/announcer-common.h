@@ -17,7 +17,7 @@
 
 #include "transmission.h"
 #include "quark.h"
-#include "utils.h"
+#include "web-utils.h"
 
 /***
 ****  SCRAPE
@@ -238,7 +238,7 @@ void tr_tracker_udp_announce(
 
 void tr_tracker_udp_start_shutdown(tr_session* session);
 
-tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed);
+tr_quark tr_announcerGetKey(tr_url_parsed_t const& parsed);
 
 inline tr_quark tr_announcerGetKey(std::string_view url)
 {

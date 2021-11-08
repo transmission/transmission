@@ -17,6 +17,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
 
 #include "FreeSpaceLabel.h"
 #include "HigWorkarea.h"

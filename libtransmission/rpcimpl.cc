@@ -42,6 +42,7 @@
 #include "variant.h"
 #include "version.h"
 #include "web.h"
+#include "web-utils.h"
 
 #define RPC_VERSION 17
 #define RPC_VERSION_MIN 14

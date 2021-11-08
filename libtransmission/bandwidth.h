@@ -17,7 +17,6 @@
 
 #include "transmission.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new(), tr_free() */
 
 class tr_peerIo;
 

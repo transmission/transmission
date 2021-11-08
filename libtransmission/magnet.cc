@@ -14,8 +14,9 @@
 #include "magnet.h"
 #include "tr-assert.h"
 #include "utils.h"
+#include "utils.h"
 #include "variant.h"
-#include "web.h"
+#include "web-utils.h"
 
 /***
 ****
