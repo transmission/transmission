@@ -62,6 +62,49 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ(8080, parsed->port);
 }
 
+TEST_F(WebUtilsTest, urlNextQueryPair)
+{
+    auto const url = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
+
+    auto walk = tr_urlNextQueryPair(url);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("a"sv, walk->key);
+    EXPECT_EQ("1"sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("b"sv, walk->key);
+    EXPECT_EQ("two"sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("c"sv, walk->key);
+    EXPECT_EQ("si"sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("d_has_no_val"sv, walk->key);
+    EXPECT_EQ(""sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("e"sv, walk->key);
+    EXPECT_EQ(""sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("f"sv, walk->key);
+    EXPECT_EQ(""sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_TRUE(walk);
+    EXPECT_EQ("g"sv, walk->key);
+    EXPECT_EQ("gee"sv, walk->value);
+
+    walk = tr_urlNextQueryPair(walk->remain);
+    EXPECT_FALSE(walk);
+}
+
 TEST_F(WebUtilsTest, urlIsValid)
 {
     EXPECT_FALSE(tr_urlIsValid("hello world"sv));

@@ -44,10 +44,10 @@ struct tr_url_query_walk_t
 {
     std::string_view key;
     std::string_view value;
-    std::string_view query_remain;
+    std::string_view remain;
 };
 
-tr_url_query_walk_t tr_urlNextQueryPair(std::string_view query_remain);
+std::optional<tr_url_query_walk_t> tr_urlNextQueryPair(std::string_view query_remain);
 
 void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 

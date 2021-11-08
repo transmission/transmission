@@ -358,3 +358,26 @@ bool tr_urlIsValid(std::string_view url)
     auto const parsed = tr_urlParse(url);
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
+
+std::optional<tr_url_query_walk_t> tr_urlNextQueryPair(std::string_view query_remain)
+{
+    auto in = query_remain;
+
+    // get the next pair
+    auto key = "&"sv;
+    auto pos = in.find(key);
+    auto const pair = in.substr(0, pos);
+    in = pos == in.npos ? ""sv : in.substr(pos + std::size(key));
+    if (std::empty(pair))
+    {
+        return {};
+    }
+
+    // split it into key and value
+    key = "="sv;
+    pos = pair.find(key);
+    auto const key_sv = pair.substr(0, pos);
+    auto const value_sv = pos == pair.npos ? ""sv : pair.substr(pos + std::size(key));
+
+    return tr_url_query_walk_t{ key_sv, value_sv, in };
+}
