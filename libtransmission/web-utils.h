@@ -60,26 +60,18 @@ struct tr_url_query_view
         {
             std::string_view key;
             std::string_view value;
-
-            bool operator==(keyval_t const& that) const
-            {
-                return this->key == that.key && this->value == that.value;
-            }
-
-            bool operator!=(keyval_t const& that) const
-            {
-                return !(*this == that);
-            }
         };
 
         keyval_t keyval;
         std::string_view remain;
 
         iterator& operator++();
+
         keyval_t const& operator*() const
         {
             return keyval;
         }
+
         keyval_t const* operator->() const
         {
             return &keyval;
@@ -87,7 +79,8 @@ struct tr_url_query_view
 
         bool operator==(iterator const& that) const
         {
-            return this->keyval == that.keyval && this->remain == that.remain;
+            return this->keyval.key == that.keyval.key && this->keyval.value == that.keyval.value &&
+                this->remain == that.remain;
         }
 
         bool operator!=(iterator const& that) const
@@ -113,3 +106,5 @@ void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
 char* tr_http_unescape(char const* str, size_t len);
 
 char const* tr_webGetResponseStr(long response_code);
+
+std::string tr_urlPercentDecode(std::string_view);

@@ -140,17 +140,17 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
         std::cerr << __FILE__ << ':' << __LINE__ << " value [" << value << ']' << std::endl;
         if (key == "dn"sv)
         {
-            displayName = tr_http_unescape(std::data(value), std::size(value));
+            displayName = tr_strvdup(tr_urlPercentDecode(value));
         }
         else if ((key == "tr"sv || key.find("tr.") == 0) && (trCount < MaxTrackers))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            tr[trCount++] = tr_http_unescape(std::data(value), std::size(value));
+            tr[trCount++] = tr_strvdup(tr_urlPercentDecode(value));
         }
         else if ((key == "ws"sv) && (wsCount < MaxWebseeds))
         {
             std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-            ws[wsCount++] = tr_http_unescape(std::data(value), std::size(value));
+            ws[wsCount++] = tr_strvdup(tr_urlPercentDecode(value));
             std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
         else if (key == "xt"sv)

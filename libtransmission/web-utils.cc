@@ -7,6 +7,8 @@
  */
 
 #include <algorithm>
+#include <array>
+#include <cctype>
 #include <cstddef>
 #include <optional>
 #include <string_view>
@@ -415,18 +417,24 @@ tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
 {
     // find the next key/value delimiter
     auto pos = remain.find('&');
+    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     auto const pair = remain.substr(0, pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " pair [" << pair << ']' << std::endl;
     remain = pos == remain.npos ? ""sv : remain.substr(pos + 1);
+    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << remain << ']' << std::endl;
     if (std::empty(pair))
     {
         keyval.key = keyval.value = remain = ""sv;
+        std::cerr << __FILE__ << ':' << __LINE__ << " all empty" << std::endl;
         return *this;
     }
 
     // split it into key and value
     pos = pair.find('=');
     keyval.key = pair.substr(0, pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " key [" << keyval.key << ']' << std::endl;
     keyval.value = pos == pair.npos ? ""sv : pair.substr(pos + 1);
+    std::cerr << __FILE__ << ':' << __LINE__ << " value [" << keyval.value << ']' << std::endl;
     return *this;
 }
 
@@ -436,4 +444,38 @@ tr_url_query_view::iterator tr_url_query_view::begin() const
     it.remain = query;
     ++it;
     return it;
+}
+
+std::string tr_urlPercentDecode(std::string_view in)
+{
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode in [" << in << ']' << std::endl;
+    auto out = std::string{};
+    out.reserve(std::size(in));
+
+    for (;;)
+    {
+        auto pos = in.find('%');
+        out += in.substr(0, pos);
+        if (pos == in.npos)
+        {
+            break;
+        }
+
+        in.remove_prefix(pos);
+        if (std::size(in) >= 3 && in[0] == '%' && std::isxdigit(in[1]) && std::isxdigit(in[2]))
+        {
+            auto hexstr = std::array<char, 3>{ in[1], in[2], '\0' };
+            auto const hex = strtoul(std::data(hexstr), nullptr, 16);
+            out += char(hex);
+            in.remove_prefix(3);
+        }
+        else
+        {
+            out += in.front();
+            in.remove_prefix(1);
+        }
+    }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode out [" << out << ']' << std::endl;
+    return out;
 }
