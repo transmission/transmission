@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
+# The value of this variable should be set prior to the first project() command invocation.
+# See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
+if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+endif()
+
 project(transmission)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -26,13 +33,15 @@ tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_NLS           "Enable native language support" ON)
         option(INSTALL_DOC          "Build/install documentation" ON)
         option(INSTALL_LIB          "Install the library" OFF)
+tr_auto_option(RUN_CLANG_TIDY       "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT       "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
-tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl)
+tr_auto_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
+tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
 tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
 tr_auto_option(WITH_LIBAPPINDICATOR "Use libappindicator in GTK+ client" AUTO)
@@ -105,11 +114,11 @@ set(OPENSSL_MINIMUM         0.9.7)
 set(CYASSL_MINIMUM          3.0)
 set(POLARSSL_MINIMUM        1.2)
 set(ZLIB_MINIMUM            1.2.3)
-set(GTK_MINIMUM             3.4.0)
-set(GLIB_MINIMUM            2.32.0)
+set(GTK_MINIMUM             3.24.0)
+set(GLIB_MINIMUM            2.50.1)
 set(GIO_MINIMUM             2.26.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
-set(QT5_MINIMUM             5.2)
+set(QT_MINIMUM              5.6)
 
 if(WIN32)
     foreach(L C CXX)
@@ -145,6 +154,17 @@ endif()
 find_package(ICONV)
 
 set(CRYPTO_PKG "")
+if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
+    tr_get_required_flag(WITH_CRYPTO CCRYPTO_IS_REQUIRED)
+    find_path(CCRYPTO_INCLUDE_DIR NAMES CommonCrypto/CommonCrypto.h ${CCRYPTO_IS_REQUIRED})
+    mark_as_advanced(CCRYPTO_INCLUDE_DIR)
+    tr_fixup_list_option(WITH_CRYPTO "ccrypto" CCRYPTO_INCLUDE_DIR "AUTO" CCRYPTO_IS_REQUIRED)
+    if(WITH_CRYPTO STREQUAL "ccrypto")
+        set(CRYPTO_PKG "ccrypto")
+        set(CRYPTO_INCLUDE_DIRS)
+        set(CRYPTO_LIBRARIES)
+    endif()
+endif()
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
     find_package(OpenSSL ${OPENSSL_MINIMUM} ${OPENSSL_IS_REQUIRED})
@@ -188,11 +208,9 @@ if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
     pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtk+-3.0>=${GTK_MINIMUM}
-        glib-2.0>=${GLIB_MINIMUM}
-        gio-2.0>=${GIO_MINIMUM}
-        gmodule-2.0>=${GLIB_MINIMUM}
-        gthread-2.0>=${GLIB_MINIMUM})
+        gtkmm-3.0>=${GTK_MINIMUM}
+        glibmm-2.4>=${GLIB_MINIMUM}
+        giomm-2.4>=${GIO_MINIMUM})
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
@@ -216,34 +234,44 @@ if(ENABLE_QT)
     set(ENABLE_QT_COM_INTEROP OFF)
     set(ENABLE_QT_DBUS_INTEROP OFF)
 
-    set(QT5_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
-    set(QT5_OPTIONAL_MODULES DBus AxContainer AxServer)
+    set(QT_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
+    set(QT_OPTIONAL_MODULES DBus AxContainer AxServer)
+    set(MISSING_QT_MODULE)
 
-    if(WIN32)
-        list(APPEND QT5_REQUIRED_MODULES WinExtras)
+    set(Qt_NAMES Qt6 Qt5)
+    if(NOT USE_QT_VERSION STREQUAL "AUTO")
+        set(Qt_NAMES Qt${USE_QT_VERSION})
     endif()
 
-    foreach(M ${QT5_REQUIRED_MODULES})
-        find_package(Qt5${M} ${QT5_MINIMUM} QUIET)
-        if(Qt5${M}_FOUND)
-            if(NOT M STREQUAL "LinguistTools")
-                list(APPEND QT_TARGETS Qt5::${M})
-            endif()
-        else()
-            set(QT_TARGETS)
-            break()
+    find_package(Qt NAMES ${Qt_NAMES} ${QT_MINIMUM} QUIET)
+    if(Qt_FOUND)
+        if(WIN32 AND Qt_VERSION_MAJOR EQUAL 5)
+            list(APPEND QT_REQUIRED_MODULES WinExtras)
         endif()
-    endforeach()
+
+        foreach(M ${QT_REQUIRED_MODULES})
+            find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
+            if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
+                if(NOT M STREQUAL "LinguistTools")
+                    list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
+                endif()
+            else()
+                set(QT_TARGETS)
+                set(MISSING_QT_MODULE "${M}")
+                break()
+            endif()
+        endforeach()
+    endif()
 
     if(QT_TARGETS)
-        foreach(M ${QT5_OPTIONAL_MODULES})
-            find_package(Qt5${M} ${QT5_MINIMUM} QUIET)
-            if(Qt5${M}_FOUND)
-                list(APPEND QT_TARGETS Qt5::${M})
+        foreach(M ${QT_OPTIONAL_MODULES})
+            find_package(Qt${Qt_VERSION_MAJOR}${M} ${QT_MINIMUM} QUIET)
+            if(Qt${Qt_VERSION_MAJOR}${M}_FOUND)
+                list(APPEND QT_TARGETS Qt${Qt_VERSION_MAJOR}::${M})
             endif()
         endforeach()
 
-        if(Qt5AxContainer_FOUND AND Qt5AxServer_FOUND)
+        if(Qt${Qt_VERSION_MAJOR}AxContainer_FOUND AND Qt${Qt_VERSION_MAJOR}AxServer_FOUND)
             set(ENABLE_QT_COM_INTEROP ON)
 
             find_program(MIDL_EXECUTABLE midl)
@@ -252,7 +280,7 @@ if(ENABLE_QT)
             endif()
         endif()
 
-        if(Qt5DBus_FOUND)
+        if(Qt${Qt_VERSION_MAJOR}DBus_FOUND)
             set(ENABLE_QT_DBUS_INTEROP ON)
         endif()
     endif()
@@ -260,7 +288,7 @@ if(ENABLE_QT)
     set(QT_FOUND ON)
     if(NOT QT_TARGETS OR NOT (ENABLE_QT_COM_INTEROP OR ENABLE_QT_DBUS_INTEROP))
         if(QT_IS_REQUIRED)
-            message(FATAL_ERROR "Unable to find required Qt libraries.")
+            message(FATAL_ERROR "Unable to find required Qt libraries (Qt${Qt_VERSION_MAJOR}${MISSING_QT_MODULE})")
         endif()
         set(QT_FOUND OFF)
     endif()
@@ -290,22 +318,14 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-if(WIN32)
-    tr_add_external_auto_library(EVENT2 libevent event)
-else()
-    set(EVENT2_CONFIGURE_FLAGS)
-    if(APPLE)
-        if(CRYPTO_PKG STREQUAL "openssl")
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
-        else()
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
-        endif()
-    endif()
-    tr_add_external_auto_library(EVENT2 libevent event
-        BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl" ${EVENT2_CONFIGURE_FLAGS})
-endif()
+tr_add_external_auto_library(EVENT2 libevent event
+    CMAKE_ARGS
+        -DEVENT__DISABLE_OPENSSL:BOOL=ON
+        -DEVENT__DISABLE_BENCHMARK:BOOL=ON
+        -DEVENT__DISABLE_TESTS:BOOL=ON
+        -DEVENT__DISABLE_REGRESS:BOOL=ON
+        -DEVENT__DISABLE_SAMPLES:BOOL=ON
+        -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
@@ -340,6 +360,8 @@ if(ENABLE_UTP)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64)
+
+add_subdirectory(third-party/arc4)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
@@ -384,19 +406,10 @@ endif()
 
 ## Compiler standard version
 
-if(CMAKE_VERSION VERSION_LESS "3.1")
-    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
-    elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-    endif()
-else()
-    set(CMAKE_C_STANDARD 11)
-    set(CMAKE_C_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ### Compiler Warnings
 
@@ -431,7 +444,6 @@ else()
         -Wint-in-bool-context
         -Wlogical-op
         -Wmissing-format-attribute
-        -Wnested-externs
         -Wnull-dereference
         -Wpointer-arith
         -Wredundant-decls
@@ -446,7 +458,6 @@ else()
         -Wshadow
         -Wsign-compare
         -Wsometimes-uninitialized
-        -Wstrict-prototypes
         -Wstring-conversion
         -Wsuggest-destructor-override
         -Wsuggest-override
@@ -530,6 +541,8 @@ endforeach()
 set(NEEDED_FUNCTIONS
     _configthreadlocale
     canonicalize_file_name
+    copy_file_range
+    copyfile
     daemon
     fallocate64
     flock
@@ -546,6 +559,7 @@ set(NEEDED_FUNCTIONS
     posix_fallocate
     pread
     pwrite
+    sendfile64
     statvfs
     strcasestr
     strlcpy
@@ -602,7 +616,15 @@ else()
     endif()
 endif()
 
-if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
+if(RUN_CLANG_TIDY STREQUAL "AUTO")
+    if (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
+        set(RUN_CLANG_TIDY OFF)
+    else()
+        set(RUN_CLANG_TIDY ON)
+    endif()
+endif()
+
+if(RUN_CLANG_TIDY)
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
     if (CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
@@ -669,7 +691,6 @@ set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLink
 ## Code Formatting
 
 if(GIT_FOUND)
-    message(STATUS "Looking for uncrustify")
     execute_process(COMMAND
         "${GIT_EXECUTABLE}" rev-parse --show-toplevel
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -683,11 +704,11 @@ if(GIT_FOUND)
             COPYONLY
         )
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
     endif()

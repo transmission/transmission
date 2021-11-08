@@ -114,7 +114,7 @@ QVariant FileTreeItem::data(int column, int role) const
     case Qt::TextAlignmentRole:
         if (column == FileTreeModel::COL_SIZE)
         {
-            value = Qt::AlignRight + Qt::AlignVCenter;
+            value = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
         }
 
         break;
@@ -172,9 +172,7 @@ QVariant FileTreeItem::data(int column, int role) const
             else
             {
                 auto const& icon_cache = IconCache::get();
-                value = childCount() > 0 ?
-                    icon_cache.folderIcon() :
-                    icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
+                value = childCount() > 0 ? icon_cache.folderIcon() : icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
             }
         }
 

@@ -31,11 +31,11 @@ char const* const PriorityKey = "priority";
 
 }
 
-FileTreeView::FileTreeView(QWidget* parent, bool is_editable) :
-    QTreeView(parent),
-    model_(new FileTreeModel(this, is_editable)),
-    proxy_(new QSortFilterProxyModel(this)),
-    delegate_(new FileTreeDelegate(this))
+FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
+    : QTreeView(parent)
+    , model_(new FileTreeModel(this, is_editable))
+    , proxy_(new QSortFilterProxyModel(this))
+    , delegate_(new FileTreeDelegate(this))
 {
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
@@ -93,8 +93,8 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         case FileTreeModel::COL_SIZE:
             for (int s = Formatter::get().B; s <= Formatter::get().TB; ++s)
             {
-                item_texts << QStringLiteral("999.9 ") + Formatter::get().unitStr(Formatter::MEM,
-                    static_cast<Formatter::Size>(s));
+                item_texts
+                    << (QStringLiteral("999.9 ") + Formatter::get().unitStr(Formatter::MEM, static_cast<Formatter::Size>(s)));
             }
 
             break;
@@ -108,8 +108,8 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
             break;
 
         case FileTreeModel::COL_PRIORITY:
-            item_texts << FileTreeItem::tr("Low") << FileTreeItem::tr("Normal") << FileTreeItem::tr("High") <<
-                FileTreeItem::tr("Mixed");
+            item_texts << FileTreeItem::tr("Low") << FileTreeItem::tr("Normal") << FileTreeItem::tr("High")
+                       << FileTreeItem::tr("Mixed");
             break;
         }
 
@@ -346,7 +346,8 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
     uncheck_selected_action_->setEnabled(have_checked);
     only_check_selected_action_->setEnabled(have_selection);
     priority_menu_->setEnabled(have_selection);
-    open_action_->setEnabled(have_single_selection && selected_rows.first().data(FileTreeModel::FileIndexRole).toInt() >= 0 &&
+    open_action_->setEnabled(
+        have_single_selection && selected_rows.first().data(FileTreeModel::FileIndexRole).toInt() >= 0 &&
         selected_rows.first().data(FileTreeModel::CompleteRole).toBool());
     rename_action_->setEnabled(have_single_selection);
 }

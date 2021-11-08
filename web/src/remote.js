@@ -203,18 +203,10 @@ export class Remote {
     );
   }
 
-  removeTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-remove',
-      torrent_ids,
-      callback,
-      context
-    );
-  }
-  removeTorrentsAndData(torrents) {
+  removeTorrents(torrents, trash) {
     const o = {
       arguments: {
-        'delete-local-data': true,
+        'delete-local-data': trash,
         ids: [],
       },
       method: 'torrent-remove',
@@ -246,7 +238,7 @@ export class Remote {
     );
   }
   addTorrentByUrl(url, options) {
-    if (url.match(/^[\da-f]{40}$/i)) {
+    if (/^[\da-f]{40}$/i.test(url)) {
       url = `magnet:?xt=urn:btih:${url}`;
     }
     const o = {

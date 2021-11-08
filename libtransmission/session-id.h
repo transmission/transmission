@@ -10,9 +10,7 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
-typedef struct tr_session_id* tr_session_id_t;
+using tr_session_id_t = struct tr_session_id*;
 
 /**
  * Create new session identifier object.
@@ -50,5 +48,3 @@ char const* tr_session_id_get_current(tr_session_id_t session_id);
  * @return `True` if session is valid and local, `false` otherwise.
  */
 bool tr_session_id_is_local(char const* session_id);
-
-TR_END_DECLS

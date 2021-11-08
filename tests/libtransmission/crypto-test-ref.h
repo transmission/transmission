@@ -16,7 +16,6 @@
 #define KEY_LEN KEY_LEN_
 
 #define tr_sha1_ctx_t tr_sha1_ctx_t_
-#define tr_rc4_ctx_t tr_rc4_ctx_t_
 #define tr_dh_ctx_t tr_dh_ctx_t_
 #define tr_dh_secret_t tr_dh_secret_t_
 #define tr_ssl_ctx_t tr_ssl_ctx_t_
@@ -39,10 +38,6 @@
 #define tr_sha1_init tr_sha1_init_
 #define tr_sha1_update tr_sha1_update_
 #define tr_sha1_final tr_sha1_final_
-#define tr_rc4_new tr_rc4_new_
-#define tr_rc4_free tr_rc4_free_
-#define tr_rc4_set_key tr_rc4_set_key_
-#define tr_rc4_process tr_rc4_process_
 #define tr_dh_new tr_dh_new_
 #define tr_dh_free tr_dh_free_
 #define tr_dh_make_key tr_dh_make_key_
@@ -73,14 +68,13 @@
 
 #include "crypto.h"
 #include "crypto-utils.h"
-#include "crypto.c"
-#include "crypto-utils.c"
-#include "crypto-utils-openssl.c"
+#include "crypto.cc"
+#include "crypto-utils.cc"
+#include "crypto-utils-openssl.cc"
 
 #undef KEY_LEN_
 
 #undef tr_sha1_ctx_t
-#undef tr_rc4_ctx_t
 #undef tr_dh_ctx_t
 #undef tr_dh_secret_t
 #undef tr_ssl_ctx_t
@@ -103,10 +97,6 @@
 #undef tr_sha1_init
 #undef tr_sha1_update
 #undef tr_sha1_final
-#undef tr_rc4_new
-#undef tr_rc4_free
-#undef tr_rc4_set_key
-#undef tr_rc4_process
 #undef tr_dh_new
 #undef tr_dh_free
 #undef tr_dh_make_key
@@ -137,7 +127,6 @@
 #define KEY_LEN_ KEY_LEN
 
 #define tr_sha1_ctx_t_ tr_sha1_ctx_t
-#define tr_rc4_ctx_t_ tr_rc4_ctx_t
 #define tr_dh_ctx_t_ tr_dh_ctx_t
 #define tr_dh_secret_t_ tr_dh_secret_t
 #define tr_ssl_ctx_t_ tr_ssl_ctx_t
@@ -160,10 +149,6 @@
 #define tr_sha1_init_ tr_sha1_init
 #define tr_sha1_update_ tr_sha1_update
 #define tr_sha1_final_ tr_sha1_final
-#define tr_rc4_new_ tr_rc4_new
-#define tr_rc4_free_ tr_rc4_free
-#define tr_rc4_set_key_ tr_rc4_set_key
-#define tr_rc4_process_ tr_rc4_process
 #define tr_dh_new_ tr_dh_new
 #define tr_dh_free_ tr_dh_free
 #define tr_dh_make_key_ tr_dh_make_key

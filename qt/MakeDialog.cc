@@ -8,6 +8,8 @@
 
 #include "MakeDialog.h"
 
+#include <vector>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
@@ -48,10 +50,10 @@ private:
 
 } // namespace
 
-MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(builder)
+MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , builder_(builder)
 {
     ui_.setupUi(this);
 
@@ -68,7 +70,8 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     switch (ui_.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(QString::fromUtf8(builder_.outputFile),
+        session_.addNewlyCreatedTorrent(
+            QString::fromUtf8(builder_.outputFile),
             QFileInfo(QString::fromUtf8(builder_.top)).dir().path());
         break;
 
@@ -113,13 +116,11 @@ void MakeProgressDialog::onProgress()
     }
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
-        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
+        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
-        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
+        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
 
     ui_.progressLabel->setText(str);
@@ -145,7 +146,7 @@ void MakeDialog::makeTorrent()
 
     // get the tiers
     int tier = 0;
-    QVector<tr_tracker_info> trackers;
+    std::vector<tr_tracker_info> trackers;
 
     for (QString const& line : ui_.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
@@ -157,10 +158,10 @@ void MakeDialog::makeTorrent()
         }
         else
         {
-            tr_tracker_info tmp;
+            auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
-            trackers.append(tmp);
+            trackers.push_back(tmp);
         }
     }
 
@@ -177,9 +178,23 @@ void MakeDialog::makeTorrent()
         comment = ui_.commentEdit->text();
     }
 
+    // source
+    QString source;
+
+    if (ui_.sourceCheck->isChecked())
+    {
+        source = ui_.sourceEdit->text();
+    }
+
     // start making the torrent
-    tr_makeMetaInfo(builder_.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
-        trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui_.privateCheck->isChecked());
+    tr_makeMetaInfo(
+        builder_.get(),
+        target.toUtf8().constData(),
+        trackers.empty() ? nullptr : trackers.data(),
+        trackers.size(),
+        comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
+        ui_.privateCheck->isChecked(),
+        source.isNull() ? nullptr : source.toUtf8().constData());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);
@@ -222,19 +237,19 @@ void MakeDialog::onSourceChanged()
         QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
         text = tr("%1 in %2; %3 @ %4")
-            .arg(Formatter::get().sizeToString(builder_->totalSize))
-            .arg(files)
-            .arg(pieces)
-            .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize)));
+                   .arg(Formatter::get().sizeToString(builder_->totalSize))
+                   .arg(files)
+                   .arg(pieces)
+                   .arg(Formatter::get().sizeToString(static_cast<uint64_t>(builder_->pieceSize)));
     }
 
     ui_.sourceSizeLabel->setText(text);
 }
 
-MakeDialog::MakeDialog(Session& session, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(nullptr, &tr_metaInfoBuilderFree)
+MakeDialog::MakeDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , builder_(nullptr, &tr_metaInfoBuilderFree)
 {
     ui_.setupUi(this);
 

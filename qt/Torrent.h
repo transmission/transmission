@@ -11,6 +11,7 @@
 #include <array>
 #include <bitset>
 #include <ctime> // time_t
+#include <vector>
 
 #include <QIcon>
 #include <QMetaType>
@@ -36,7 +37,7 @@ class Prefs;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 struct Peer
@@ -58,7 +59,7 @@ struct Peer
     double progress;
 };
 
-using PeerList = QVector<Peer>;
+using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
@@ -91,7 +92,7 @@ struct TrackerStat
     QString last_scrape_result;
 };
 
-using TrackerStatsList = QVector<TrackerStat>;
+using TrackerStatsList = std::vector<TrackerStat>;
 
 struct TorrentFile
 {
@@ -103,7 +104,7 @@ struct TorrentFile
     uint64_t have = 0;
 };
 
-using FileList = QVector<TorrentFile>;
+using FileList = std::vector<TorrentFile>;
 
 class TorrentHash
 {
@@ -111,7 +112,9 @@ private:
     std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
 
 public:
-    TorrentHash() {}
+    TorrentHash()
+    {
+    }
 
     explicit TorrentHash(char const* str)
     {
@@ -123,17 +126,17 @@ public:
         tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }
 
-    bool operator ==(TorrentHash const& that) const
+    bool operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    bool operator !=(TorrentHash const& that) const
+    bool operator!=(TorrentHash const& that) const
     {
         return data_ != that.data_;
     }
 
-    bool operator <(TorrentHash const& that) const
+    bool operator<(TorrentHash const& that) const
     {
         return data_ < that.data_;
     }

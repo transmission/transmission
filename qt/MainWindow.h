@@ -14,6 +14,7 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
+#include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
@@ -28,7 +29,6 @@
 class QAction;
 class QIcon;
 class QMenu;
-class QStringList;
 
 class AboutDialog;
 class AddData;
@@ -45,7 +45,7 @@ class TorrentModel;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class MainWindow : public QMainWindow

@@ -14,9 +14,7 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
-typedef void (* VariantWalkFunc)(tr_variant const* val, void* user_data);
+using VariantWalkFunc = void (*)(tr_variant const* val, void* user_data);
 
 struct VariantWalkFuncs
 {
@@ -44,9 +42,11 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
 int tr_bencParseInt(void const* buf, void const* bufend, uint8_t const** setme_end, int64_t* setme_val);
 
 /** @brief Private function that's exposed here only for unit tests */
-int tr_bencParseStr(void const* buf, void const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
+int tr_bencParseStr(
+    void const* buf,
+    void const* bufend,
+    uint8_t const** setme_end,
+    uint8_t const** setme_str,
     size_t* setme_strlen);
 
 int tr_variantParseBenc(void const* buf, void const* end, tr_variant* top, char const** setme_end);
-
-TR_END_DECLS

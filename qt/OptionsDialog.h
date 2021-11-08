@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include <vector>
+
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QMap>
 #include <QString>
 #include <QTimer>
-#include <QVector>
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
@@ -27,7 +28,7 @@ class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class OptionsDialog : public BaseDialog
@@ -68,9 +69,9 @@ private:
     QPushButton* verify_button_ = {};
     QTimer edit_timer_;
     QTimer verify_timer_;
-    QVector<bool> verify_flags_;
-    QVector<bool> wanted_;
-    QVector<int> priorities_;
+    std::vector<bool> verify_flags_;
+    std::vector<bool> wanted_;
+    std::vector<int> priorities_;
     Session& session_;
     Ui::OptionsDialog ui_ = {};
     mybins_t verify_bins_;

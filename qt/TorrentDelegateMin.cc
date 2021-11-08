@@ -58,8 +58,14 @@ public:
     QRect status_rect;
     QRect bar_rect;
 
-    ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
-        Qt::LayoutDirection direction, QPoint const& top_left, int width);
+    ItemLayout(
+        QString name_text,
+        QString status_text,
+        QIcon const& emblem_icon,
+        QFont const& base_font,
+        Qt::LayoutDirection direction,
+        QPoint const& top_left,
+        int width);
 
     [[nodiscard]] QSize size() const
     {
@@ -86,12 +92,18 @@ private:
     }
 };
 
-ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
-    Qt::LayoutDirection direction, QPoint const& top_left, int width) :
-    name_font(base_font),
-    status_font(base_font),
-    name_text_(std::move(name_text)),
-    status_text_(std::move(status_text))
+ItemLayout::ItemLayout(
+    QString name_text,
+    QString status_text,
+    QIcon const& emblem_icon,
+    QFont const& base_font,
+    Qt::LayoutDirection direction,
+    QPoint const& top_left,
+    int width)
+    : name_font(base_font)
+    , status_font(base_font)
+    , name_text_(std::move(name_text))
+    , status_text_(std::move(status_text))
 {
     auto const* style = QApplication::style();
     int const icon_size = style->pixelMetric(QStyle::PM_SmallIconSize);
@@ -108,19 +120,26 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& embl
     bar_style.maximum = 100;
     bar_style.progress = 100;
     bar_style.textVisible = true;
-    QSize const bar_size(bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
+    QSize const bar_size(
+        bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
-    QRect base_rect(top_left,
+    QRect base_rect(
+        top_left,
         QSize(width, std::max({ icon_size, name_size.height(), status_size.height(), bar_size.height() })));
 
     icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(icon_size, icon_size), base_rect);
-    emblem_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignBottom, emblem_icon.actualSize(icon_rect.size() / 2,
-        QIcon::Normal, QIcon::On), icon_rect);
+    emblem_rect = QStyle::alignedRect(
+        direction,
+        Qt::AlignRight | Qt::AlignBottom,
+        emblem_icon.actualSize(icon_rect.size() / 2, QIcon::Normal, QIcon::On),
+        icon_rect);
     bar_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, bar_size, base_rect);
     Utils::narrowRect(base_rect, icon_rect.width() + GUI_PAD, bar_rect.width() + GUI_PAD, direction);
-    status_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, QSize(status_size.width(),
-        base_rect.height()),
+    status_rect = QStyle::alignedRect(
+        direction,
+        Qt::AlignRight | Qt::AlignVCenter,
+        QSize(status_size.width(), base_rect.height()),
         base_rect);
     Utils::narrowRect(base_rect, 0, status_rect.width() + GUI_PAD, direction);
     name_rect = base_rect;
@@ -132,8 +151,14 @@ QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent c
 {
     auto const is_magnet = bool(!tor.hasMetadata());
     auto const m = QSize(margin(*QApplication::style()));
-    auto const layout = ItemLayout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
-        option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
+    auto const layout = ItemLayout(
+        is_magnet ? progressString(tor) : tor.name(),
+        shortStatusString(tor),
+        QIcon(),
+        option.font,
+        option.direction,
+        QPoint(0, 0),
+        option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
 
@@ -211,7 +236,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
         cr = QPalette::Text;
     }
 
-    QStyle::State progress_bar_state(option.state);
+    QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
 
     if (is_paused)
     {
@@ -226,8 +251,14 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     // layout
     QSize const m(margin(*style));
     QRect const content_rect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), emblem_icon, option.font,
-        option.direction, content_rect.topLeft(), content_rect.width());
+    ItemLayout const layout(
+        is_magnet ? progressString(tor) : tor.name(),
+        shortStatusString(tor),
+        emblem_icon,
+        option.font,
+        option.direction,
+        content_rect.topLeft(),
+        content_rect.width());
 
     // render
     if (tor.hasError() && !is_item_selected)

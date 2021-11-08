@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <QAbstractListModel>
-#include <QVector>
 
 #include "Macros.h"
 #include "Torrent.h"
@@ -23,7 +22,7 @@ class Speed;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class TorrentModel : public QAbstractListModel
@@ -46,8 +45,12 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    using torrents_t = QVector<Torrent*>;
-    torrents_t const& torrents() const { return torrents_; }
+    using torrents_t = std::vector<Torrent*>;
+
+    torrents_t const& torrents() const
+    {
+        return torrents_;
+    }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
