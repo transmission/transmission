@@ -34,219 +34,6 @@ bool tr_addressIsIP(char const* str)
     return tr_address_from_string(&tmp, str);
 }
 
-static int parsePort(std::string_view port)
-{
-    auto tmp = std::array<char, 16>{};
-
-    if (std::size(port) >= std::size(tmp))
-    {
-        return -1;
-    }
-
-    std::copy(std::begin(port), std::end(port), std::begin(tmp));
-    char* end = nullptr;
-    long port_num = strtol(std::data(tmp), &end, 10);
-    if (*end != '\0' || port_num <= 0 || port_num >= 65536)
-    {
-        port_num = -1;
-    }
-
-    return int(port_num);
-}
-
-static std::string_view getPortForScheme(std::string_view scheme)
-{
-    auto constexpr KnownSchemes = std::array<std::pair<std::string_view, std::string_view>, 5>{ {
-        { "udp"sv, "80"sv },
-        { "ftp"sv, "21"sv },
-        { "sftp"sv, "22"sv },
-        { "http"sv, "80"sv },
-        { "https"sv, "443"sv },
-    } };
-
-    for (auto const& [known_scheme, port] : KnownSchemes)
-    {
-        if (scheme == known_scheme)
-        {
-            return port;
-        }
-    }
-
-    return "-1"sv;
-}
-
-static bool urlCharsAreValid(std::string_view url)
-{
-    // rfc2396
-    auto constexpr ValidChars = std::string_view{
-        "abcdefghijklmnopqrstuvwxyz" // lowalpha
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // upalpha
-        "0123456789" // digit
-        "-_.!~*'()" // mark
-        ";/?:@&=+$," // reserved
-        "<>#%<\"" // delims
-        "{}|\\^[]`" // unwise
-    };
-
-    return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return ValidChars.find(ch) != ValidChars.npos; });
-}
-
-std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
-{
-    url = tr_strvstrip(url);
-
-    if (!urlCharsAreValid(url))
-    {
-        return {};
-    }
-
-    // scheme
-    auto key = "://"sv;
-    auto pos = url.find(key);
-    if (pos == std::string_view::npos || pos == 0)
-    {
-        return {};
-    }
-    auto const scheme = url.substr(0, pos);
-    url.remove_prefix(pos + std::size(key));
-
-    // authority
-    key = "/"sv;
-    pos = url.find(key);
-    if (pos == 0)
-    {
-        return {};
-    }
-    auto const authority = url.substr(0, pos);
-    url.remove_prefix(std::size(authority));
-    auto const path = std::empty(url) ? "/"sv : url;
-
-    // host
-    key = ":"sv;
-    pos = authority.find(key);
-    auto const host = pos == std::string_view::npos ? authority : authority.substr(0, pos);
-    if (std::empty(host))
-    {
-        return {};
-    }
-
-    // port
-    auto const portstr = pos == std::string_view::npos ? getPortForScheme(scheme) : authority.substr(pos + std::size(key));
-    auto const port = parsePort(portstr);
-
-    return tr_url_parsed_t{ scheme, host, path, portstr, port };
-}
-
-static bool tr_isValidTrackerScheme(std::string_view scheme)
-{
-    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
-    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
-}
-
-std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
-{
-    auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_url_parsed_t>{};
-}
-
-bool tr_urlIsValidTracker(std::string_view url)
-{
-    return !!tr_urlParseTracker(url);
-}
-
-bool tr_urlIsValid(std::string_view url)
-{
-    auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
-    auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
-}
-
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-{
-    if (url_len == TR_BAD_SIZE)
-    {
-        url_len = strlen(url);
-    }
-
-    char const* scheme = url;
-    char const* scheme_end = tr_memmem(scheme, url_len, "://", 3);
-
-    if (scheme_end == nullptr)
-    {
-        return false;
-    }
-
-    size_t const scheme_len = scheme_end - scheme;
-
-    if (scheme_len == 0)
-    {
-        return false;
-    }
-
-    url += scheme_len + 3;
-    url_len -= scheme_len + 3;
-
-    char const* authority = url;
-    auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
-
-    if (authority_end == nullptr)
-    {
-        authority_end = authority + url_len;
-    }
-
-    size_t const authority_len = authority_end - authority;
-
-    if (authority_len == 0)
-    {
-        return false;
-    }
-
-    url += authority_len;
-    url_len -= authority_len;
-
-    auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
-
-    size_t const host_len = host_end != nullptr ? (size_t)(host_end - authority) : authority_len;
-
-    if (host_len == 0)
-    {
-        return false;
-    }
-
-    size_t const port_len = host_end != nullptr ? authority_end - host_end - 1 : 0;
-
-    if (setme_scheme != nullptr)
-    {
-        *setme_scheme = tr_strndup(scheme, scheme_len);
-    }
-
-    if (setme_host != nullptr)
-    {
-        *setme_host = tr_strndup(authority, host_len);
-    }
-
-    if (setme_port != nullptr)
-    {
-        auto const tmp = port_len > 0 ? std::string_view{ host_end + 1, port_len } : getPortForScheme({ scheme, scheme_len });
-        *setme_port = parsePort(tmp);
-    }
-
-    if (setme_path != nullptr)
-    {
-        if (url[0] == '\0')
-        {
-            *setme_path = tr_strdup("/");
-        }
-        else
-        {
-            *setme_path = tr_strndup(url, url_len);
-        }
-    }
-
-    return true;
-}
-
 char const* tr_webGetResponseStr(long code)
 {
     switch (code)
@@ -436,4 +223,224 @@ void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
     auto digest = tr_sha1_digest_t{};
     std::copy_n(reinterpret_cast<std::byte const*>(sha1_digest), std::size(digest), std::begin(digest));
     tr_http_escape_sha1(out, digest);
+}
+
+//// URLs
+
+namespace
+{
+
+int parsePort(std::string_view port)
+{
+    auto tmp = std::array<char, 16>{};
+
+    if (std::size(port) >= std::size(tmp))
+    {
+        return -1;
+    }
+
+    std::copy(std::begin(port), std::end(port), std::begin(tmp));
+    char* end = nullptr;
+    long port_num = strtol(std::data(tmp), &end, 10);
+    if (*end != '\0' || port_num <= 0 || port_num >= 65536)
+    {
+        port_num = -1;
+    }
+
+    return int(port_num);
+}
+
+constexpr std::string_view getPortForScheme(std::string_view scheme)
+{
+    auto constexpr KnownSchemes = std::array<std::pair<std::string_view, std::string_view>, 5>{ {
+        { "ftp"sv, "21"sv },
+        { "http"sv, "80"sv },
+        { "https"sv, "443"sv },
+        { "sftp"sv, "22"sv },
+        { "udp"sv, "80"sv },
+    } };
+
+    for (auto const& [known_scheme, port] : KnownSchemes)
+    {
+        if (scheme == known_scheme)
+        {
+            return port;
+        }
+    }
+
+    return "-1"sv;
+}
+
+bool urlCharsAreValid(std::string_view url)
+{
+    // rfc2396
+    auto constexpr ValidChars = std::string_view{
+        "abcdefghijklmnopqrstuvwxyz" // lowalpha
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // upalpha
+        "0123456789" // digit
+        "-_.!~*'()" // mark
+        ";/?:@&=+$," // reserved
+        "<>#%<\"" // delims
+        "{}|\\^[]`" // unwise
+    };
+
+    return !std::empty(url) &&
+        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return ValidChars.find(ch) != ValidChars.npos; });
+}
+
+bool tr_isValidTrackerScheme(std::string_view scheme)
+{
+    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
+    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
+}
+
+} // namespace
+
+std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
+{
+    url = tr_strvstrip(url);
+
+    if (!urlCharsAreValid(url))
+    {
+        return {};
+    }
+
+    // scheme
+    auto key = "://"sv;
+    auto pos = url.find(key);
+    if (pos == std::string_view::npos || pos == 0)
+    {
+        return {};
+    }
+    auto const scheme = url.substr(0, pos);
+    url.remove_prefix(pos + std::size(key));
+
+    // authority
+    key = "/"sv;
+    pos = url.find(key);
+    if (pos == 0)
+    {
+        return {};
+    }
+    auto const authority = url.substr(0, pos);
+    url.remove_prefix(std::size(authority));
+    auto const path = std::empty(url) ? "/"sv : url;
+
+    // host
+    key = ":"sv;
+    pos = authority.find(key);
+    auto const host = pos == std::string_view::npos ? authority : authority.substr(0, pos);
+    if (std::empty(host))
+    {
+        return {};
+    }
+
+    // port
+    auto const portstr = pos == std::string_view::npos ? getPortForScheme(scheme) : authority.substr(pos + std::size(key));
+    auto const port = parsePort(portstr);
+
+    return tr_url_parsed_t{ scheme, host, path, portstr, port };
+}
+
+std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
+{
+    auto const parsed = tr_urlParse(url);
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_url_parsed_t>{};
+}
+
+bool tr_urlIsValidTracker(std::string_view url)
+{
+    return !!tr_urlParseTracker(url);
+}
+
+bool tr_urlIsValid(std::string_view url)
+{
+    auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
+    auto const parsed = tr_urlParse(url);
+    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+}
+
+bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
+{
+    if (url_len == TR_BAD_SIZE)
+    {
+        url_len = strlen(url);
+    }
+
+    char const* scheme = url;
+    char const* scheme_end = tr_memmem(scheme, url_len, "://", 3);
+
+    if (scheme_end == nullptr)
+    {
+        return false;
+    }
+
+    size_t const scheme_len = scheme_end - scheme;
+
+    if (scheme_len == 0)
+    {
+        return false;
+    }
+
+    url += scheme_len + 3;
+    url_len -= scheme_len + 3;
+
+    char const* authority = url;
+    auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
+
+    if (authority_end == nullptr)
+    {
+        authority_end = authority + url_len;
+    }
+
+    size_t const authority_len = authority_end - authority;
+
+    if (authority_len == 0)
+    {
+        return false;
+    }
+
+    url += authority_len;
+    url_len -= authority_len;
+
+    auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
+
+    size_t const host_len = host_end != nullptr ? (size_t)(host_end - authority) : authority_len;
+
+    if (host_len == 0)
+    {
+        return false;
+    }
+
+    size_t const port_len = host_end != nullptr ? authority_end - host_end - 1 : 0;
+
+    if (setme_scheme != nullptr)
+    {
+        *setme_scheme = tr_strndup(scheme, scheme_len);
+    }
+
+    if (setme_host != nullptr)
+    {
+        *setme_host = tr_strndup(authority, host_len);
+    }
+
+    if (setme_port != nullptr)
+    {
+        auto const tmp = port_len > 0 ? std::string_view{ host_end + 1, port_len } : getPortForScheme({ scheme, scheme_len });
+        *setme_port = parsePort(tmp);
+    }
+
+    if (setme_path != nullptr)
+    {
+        if (url[0] == '\0')
+        {
+            *setme_path = tr_strdup("/");
+        }
+        else
+        {
+            *setme_path = tr_strndup(url, url_len);
+        }
+    }
+
+    return true;
 }
