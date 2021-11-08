@@ -16,6 +16,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
+#include <unordered_set>
 #include <vector>
 
 #ifndef _WIN32

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstring> /* strlen() */
 #include <set>
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/event.h>

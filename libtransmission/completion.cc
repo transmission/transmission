@@ -6,6 +6,8 @@
  *
  */
 
+#include <vector>
+
 #include "transmission.h"
 #include "completion.h"
 #include "torrent.h"

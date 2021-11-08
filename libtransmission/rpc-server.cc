@@ -11,6 +11,7 @@
 #include <cstring> /* memcpy */
 #include <list>
 #include <string>
+#include <vector>
 
 #include <zlib.h>
 
