@@ -863,14 +863,6 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len);
 /** @brief Set the constructor's metainfo from a local .torrent file */
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);
 
-/**
- * @brief Set the metainfo from an existing file in tr_getTorrentDir().
- *
- * This is used by the Mac client on startup to pick and choose which
- * torrents to load
- */
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString);
-
 /** @brief Set how many peers this torrent can connect to. (Default: 50) */
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
 

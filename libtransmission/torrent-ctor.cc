@@ -14,7 +14,7 @@
 #include "transmission.h"
 #include "file.h"
 #include "magnet.h"
-#include "session.h" /* tr_sessionFindTorrentFile() */
+#include "session.h"
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "tr-assert.h"
 #include "utils.h" /* tr_new0 */
@@ -160,12 +160,6 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
     tr_free(metainfo);
     return err;
-}
-
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
-{
-    char const* const filename = tr_sessionFindTorrentFile(ctor->session, hashString);
-    return filename == nullptr ? EINVAL : tr_ctorSetMetainfoFromFile(ctor, filename);
 }
 
 /***

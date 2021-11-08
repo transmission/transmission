@@ -30,7 +30,6 @@
 #include "net.h"
 #include "tr-macros.h"
 #include "utils.h"
-#include "variant.h"
 
 enum tr_auto_switch_state_t
 {
@@ -247,8 +246,6 @@ struct tr_session
     struct tr_announcer* announcer;
     struct tr_announcer_udp* announcer_udp;
 
-    tr_variant* metainfoLookup;
-
     struct event* nowTimer;
     struct event* saveTimer;
 
@@ -273,10 +270,6 @@ constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
 bool tr_sessionAllowsDHT(tr_session const* session);
 
 bool tr_sessionAllowsLPD(tr_session const* session);
-
-char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString);
-
-void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename);
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 
