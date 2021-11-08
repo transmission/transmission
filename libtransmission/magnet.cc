@@ -149,7 +149,9 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
         }
         else if ((key == "ws"sv) && (wsCount < MaxWebseeds))
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             ws[wsCount++] = tr_http_unescape(std::data(value), std::size(value));
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
         else if (key == "xt"sv)
         {
@@ -171,33 +173,51 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
         }
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_magnet_info* info = nullptr;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (got_checksum)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info = tr_new0(tr_magnet_info, 1);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->displayName = displayName;
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->trackerCount = trCount;
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->trackers = static_cast<char**>(tr_memdup(tr, sizeof(char*) * trCount));
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->webseedCount = wsCount;
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->webseeds = static_cast<char**>(tr_memdup(ws, sizeof(char*) * wsCount));
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         for (size_t i = 0; i < trCount; i++)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_free(tr[i]);
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
 
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         for (size_t i = 0; i < wsCount; i++)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_free(ws[i]);
+            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
 
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_free(displayName);
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return info;
 }
 

@@ -47,15 +47,26 @@ TEST(Magnet, magnetParse)
         std::cerr << __FILE__ << ':' << __LINE__ << " uri [" << uri << ']' << std::endl;
 
         auto* info = tr_magnetParse(uri);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_NE(nullptr, info);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_EQ(2, info->trackerCount);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_STREQ("http://tracker.openbittorrent.com/announce", info->trackers[0]);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_STREQ("http://tracker.opentracker.org/announce", info->trackers[1]);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_EQ(1, info->webseedCount);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_STREQ("http://server.webseed.org/path/to/file", info->webseeds[0]);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_STREQ("Display Name", info->displayName);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_EQ(std::size(ExpectedHash), sizeof(info->hash));
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_EQ(0, memcmp(info->hash, std::data(ExpectedHash), std::size(ExpectedHash)));
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_magnetFree(info);
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 }
