@@ -18,6 +18,8 @@
 #include "variant.h"
 #include "web-utils.h"
 
+using namespace std::literals;
+
 /***
 ****
 ***/
@@ -105,101 +107,72 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
-#define MAX_TRACKERS 64
-#define MAX_WEBSEEDS 64
+static auto constexpr MaxTrackers = std::size_t{ 64 };
+static auto constexpr MaxWebseeds = std::size_t{ 64 };
 
-tr_magnet_info* tr_magnetParse(char const* uri)
+tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
 {
+    auto const parsed = tr_urlParse(magnet_link);
+    if (!parsed || parsed->scheme != "magnet"sv)
+    {
+        return nullptr;
+    }
+
     bool got_checksum = false;
-    int trCount = 0;
-    int wsCount = 0;
-    char* tr[MAX_TRACKERS];
-    char* ws[MAX_WEBSEEDS];
+    size_t trCount = 0;
+    size_t wsCount = 0;
+    char* tr[MaxTrackers];
+    char* ws[MaxWebseeds];
     char* displayName = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
-    tr_magnet_info* info = nullptr;
 
-    if (uri != nullptr && strncmp(uri, "magnet:?", 8) == 0)
+    // TODO: not in love with this looping mechanism
+    auto query = parsed->query;
+    for (;;)
     {
-        for (char const* walk = uri + 8; !tr_str_is_empty(walk);)
+        auto const walk = tr_urlNextQueryPair(query);
+        if (!walk)
         {
-            char const* key = walk;
-            char const* delim = strchr(key, '=');
-            char const* val = delim == nullptr ? nullptr : delim + 1;
-            char const* next = strchr(delim == nullptr ? key : val, '&');
+            break;
+        }
 
-            auto keylen = size_t{};
-            if (delim != nullptr)
-            {
-                keylen = (size_t)(delim - key);
-            }
-            else if (next != nullptr)
-            {
-                keylen = (size_t)(next - key);
-            }
-            else
-            {
-                keylen = strlen(key);
-            }
+        auto const [key, value, remain] = *walk;
+        query = remain;
 
-            auto vallen = size_t{};
-            if (val == nullptr)
+        if (key == "dn"sv)
+        {
+            displayName = tr_http_unescape(std::data(value), std::size(value));
+        }
+        else if ((key == "tr"sv || key.find("tr.") == 0) && (trCount < MaxTrackers))
+        {
+            // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
+            tr[trCount++] = tr_http_unescape(std::data(value), std::size(value));
+        }
+        else if ((key == "ws"sv) && (wsCount < MaxWebseeds))
+        {
+            ws[wsCount++] = tr_http_unescape(std::data(value), std::size(value));
+        }
+        else if (key == "xt"sv)
+        {
+            auto constexpr ValPrefix = "urn:btih:"sv;
+            if (value.find(ValPrefix) == 0)
             {
-                vallen = 0;
-            }
-            else if (next != nullptr)
-            {
-                vallen = (size_t)(next - val);
-            }
-            else
-            {
-                vallen = strlen(val);
-            }
-
-            if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != nullptr && strncmp(val, "urn:btih:", 9) == 0)
-            {
-                char const* hash = val + 9;
-                size_t const hashlen = vallen - 9;
-
-                if (hashlen == 40)
+                auto const hash = value.substr(std::size(ValPrefix));
+                if (std::size(hash) == 40)
                 {
-                    tr_hex_to_sha1(sha1, hash);
+                    tr_hex_to_sha1(sha1, std::data(hash));
                     got_checksum = true;
                 }
-                else if (hashlen == 32)
+                else if (std::size(hash) == 32)
                 {
-                    base32_to_sha1(sha1, hash, hashlen);
+                    base32_to_sha1(sha1, std::data(hash), std::size(hash));
                     got_checksum = true;
                 }
             }
-
-            if (displayName == nullptr && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
-            {
-                displayName = tr_http_unescape(val, vallen);
-            }
-
-            if (vallen > 0 && trCount < MAX_TRACKERS)
-            {
-                auto i = int{};
-
-                if (keylen == 2 && memcmp(key, "tr", 2) == 0)
-                {
-                    tr[trCount++] = tr_http_unescape(val, vallen);
-                }
-                else if (sscanf(key, "tr.%d=", &i) == 1 && i >= 0) /* ticket #3341 and #5134 */
-                {
-                    tr[trCount++] = tr_http_unescape(val, vallen);
-                }
-            }
-
-            if (vallen > 0 && keylen == 2 && memcmp(key, "ws", 2) == 0 && wsCount < MAX_WEBSEEDS)
-            {
-                ws[wsCount++] = tr_http_unescape(val, vallen);
-            }
-
-            walk = next != nullptr ? next + 1 : nullptr;
         }
     }
+
+    tr_magnet_info* info = nullptr;
 
     if (got_checksum)
     {
@@ -213,12 +186,12 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     }
     else
     {
-        for (int i = 0; i < trCount; i++)
+        for (size_t i = 0; i < trCount; i++)
         {
             tr_free(tr[i]);
         }
 
-        for (int i = 0; i < wsCount; i++)
+        for (size_t i = 0; i < wsCount; i++)
         {
             tr_free(ws[i]);
         }

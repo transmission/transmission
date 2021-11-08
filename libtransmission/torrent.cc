@@ -114,11 +114,11 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& 
     return tr_torrentFindFromHash(session, reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
 }
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
+tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     tr_torrent* tor = nullptr;
 
-    tr_magnet_info* const info = tr_magnetParse(magnet);
+    tr_magnet_info* const info = magnet_link ? tr_magnetParse(magnet_link) : nullptr;
     if (info != nullptr)
     {
         tor = tr_torrentFindFromHash(session, info->hash);
