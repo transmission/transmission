@@ -12,6 +12,7 @@
 #include <unordered_set>
 
 #include <QApplication>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
 
@@ -27,6 +28,7 @@ class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
+class Torrent;
 
 class Application : public QApplication
 {
@@ -37,7 +39,7 @@ public:
     Application(int& argc, char** argv);
 
     void raise() const;
-    bool notifyApp(QString const& title, QString const& body) const;
+    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
     QString const& intern(QString const& in)
     {
@@ -60,12 +62,16 @@ private slots:
     void refreshPref(int key) const;
     void refreshTorrents();
     void saveGeometry() const;
+#ifdef QT_DBUS_LIB
+    void onNotificationActionInvoked(quint32 notification_id, QString action_key);
+#endif
 
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
+    void notifyTorrentAdded(Torrent const*) const;
 
     std::unique_ptr<Prefs> prefs_;
     std::unique_ptr<Session> session_;
@@ -84,6 +90,13 @@ private:
     QString const display_name_ = QStringLiteral("transmission-qt");
 
     std::unordered_set<QString> interned_strings_;
+
+#ifdef QT_DBUS_LIB
+    QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
+    QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QRegularExpression const start_now_regex_;
+#endif
 };
 
 #define trApp static_cast<Application*>(Application::instance())

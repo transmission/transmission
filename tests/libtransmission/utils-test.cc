@@ -6,6 +6,8 @@
  *
  */
 
+#include <string_view>
+
 #ifdef _WIN32
 #include <windows.h>
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
@@ -25,11 +27,13 @@
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
 #include <string>
 
 using ::libtransmission::test::makeString;
-
 using UtilsTest = ::testing::Test;
+using namespace std::literals;
 
 TEST_F(UtilsTest, trStripPositionalArgs)
 {
@@ -64,29 +68,14 @@ TEST_F(UtilsTest, trStrstrip)
     EXPECT_EQ(in, out);
     EXPECT_STREQ("test", out);
     tr_free(in);
-}
 
-TEST_F(UtilsTest, trStrjoin)
-{
-    auto const in1 = std::array<char const*, 2>{ "one", "two" };
-    auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
-    EXPECT_EQ("one, two", out);
-
-    auto const in2 = std::array<char const*, 1>{ "hello" };
-    out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
-    EXPECT_EQ("hello", out);
-
-    auto const in3 = std::array<char const*, 5>{ "a", "b", "ccc", "d", "eeeee" };
-    out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
-    EXPECT_EQ("a b ccc d eeeee", out);
-
-    auto const in4 = std::array<char const*, 3>{ "7", "ate", "9" };
-    out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
-    EXPECT_EQ("7ate9", out);
-
-    char const** in5 = nullptr;
-    out = makeString(tr_strjoin(in5, 0, "a"));
-    EXPECT_EQ("", out);
+    EXPECT_EQ(""sv, tr_strvstrip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strvstrip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strvstrip("test"sv));
 }
 
 TEST_F(UtilsTest, trBuildpath)
@@ -100,35 +89,35 @@ TEST_F(UtilsTest, trBuildpath)
 
 TEST_F(UtilsTest, trUtf8clean)
 {
-    auto const* in = "hello world";
-    auto out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
+    auto in = "hello world"sv;
+    auto out = makeString(tr_utf8clean(in));
     EXPECT_EQ(in, out);
 
-    in = "hello world";
-    out = makeString(tr_utf8clean(in, 5));
-    EXPECT_EQ("hello", out);
+    in = "hello world"sv;
+    out = makeString(tr_utf8clean(in.substr(0, 5)));
+    EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
-    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
-    out = makeString(tr_utf8clean(in, 17));
-    EXPECT_TRUE(out.size() == 17 || out.size() == 33);
+    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
+    out = makeString(tr_utf8clean(in));
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
     // same string, but utf-8 clean
-    in = "Трудно быть Богом";
-    out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
+    in = "Трудно быть Богом"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
     EXPECT_EQ(in, out);
 
-    in = "\xF4\x00\x81\x82";
-    out = makeString(tr_utf8clean(in, 4));
+    in = "\xF4\x00\x81\x82"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 1 || out.size() == 2);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
-    in = "\xF4\x33\x81\x82";
-    out = makeString(tr_utf8clean(in, 4));
+    in = "\xF4\x33\x81\x82"sv;
+    out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
@@ -136,38 +125,31 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
-    auto count = int{};
-    auto* numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
-    EXPECT_EQ(15, count);
-    EXPECT_EQ(1, numbers[0]);
-    EXPECT_EQ(6, numbers[5]);
-    EXPECT_EQ(10, numbers[9]);
-    EXPECT_EQ(13, numbers[10]);
-    EXPECT_EQ(16, numbers[11]);
-    EXPECT_EQ(19, numbers[14]);
-    tr_free(numbers);
-
-    numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
-    EXPECT_EQ(7, count);
-    EXPECT_NE(nullptr, numbers);
-    for (int i = 0; i < count; ++i)
+    auto const tostring = [](std::vector<int> const& v)
     {
-        EXPECT_EQ(i + 1, numbers[i]);
-    }
+        std::stringstream ss;
+        for (auto const& i : v)
+        {
+            ss << i << ' ';
+        }
+        return ss.str();
+    };
 
-    tr_free(numbers);
+    auto numbers = tr_parseNumberRange("1-10,13,16-19"sv);
+    EXPECT_EQ(std::string("1 2 3 4 5 6 7 8 9 10 13 16 17 18 19 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-5,3-7,2-6"sv);
+    EXPECT_EQ(std::string("1 2 3 4 5 6 7 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-Hello"sv);
+    auto const empty_string = std::string{};
+    EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
-    EXPECT_EQ(0, count);
-    EXPECT_EQ(nullptr, numbers);
+    numbers = tr_parseNumberRange("1-"sv);
+    EXPECT_EQ(empty_string, tostring(numbers));
+
+    numbers = tr_parseNumberRange("Hello"sv);
+    EXPECT_EQ(empty_string, tostring(numbers));
 }
 
 namespace
@@ -194,31 +176,6 @@ TEST_F(UtilsTest, lowerbound)
         auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
         EXPECT_EQ(expected_pos[i - 1], pos);
         EXPECT_EQ(expected_exact[i - 1], exact);
-    }
-}
-
-TEST_F(UtilsTest, trQuickfindfirstk)
-{
-    auto const run_test = [](size_t const k, size_t const n, int* buf, int range)
-    {
-        // populate buf with random ints
-        std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
-
-        // find the best k
-        tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
-
-        // confirm that the smallest K ints are in the first slots K slots in buf
-        auto const* highest_low = std::max_element(buf, buf + k);
-        auto const* lowest_high = std::min_element(buf + k, buf + n);
-        EXPECT_LE(highest_low, lowest_high);
-    };
-
-    auto constexpr K = size_t{ 10 };
-    auto constexpr NumTrials = size_t{ 1000 };
-    auto buf = std::array<int, 100>{};
-    for (auto i = 0; i != NumTrials; ++i)
-    {
-        run_test(K, buf.size(), buf.data(), 100);
     }
 }
 
@@ -278,9 +235,9 @@ TEST_F(UtilsTest, url)
 {
     auto const* url = "http://1";
     int port;
-    char* scheme;
-    char* host;
-    char* path;
+    char* scheme = nullptr;
+    char* host = nullptr;
+    char* path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("1", host);
@@ -290,7 +247,18 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    auto parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("1"sv, parsed->host);
+    EXPECT_EQ("/"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);
@@ -300,7 +268,18 @@ TEST_F(UtilsTest, url)
     tr_free(path);
     tr_free(host);
 
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("80"sv, parsed->portstr);
+    EXPECT_EQ(80, parsed->port);
+
     url = "http://www.some-tracker.org:8080/some/path";
+    scheme = nullptr;
+    host = nullptr;
+    path = nullptr;
     EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
     EXPECT_STREQ("http", scheme);
     EXPECT_STREQ("www.some-tracker.org", host);
@@ -309,6 +288,27 @@ TEST_F(UtilsTest, url)
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
+
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ("8080"sv, parsed->portstr);
+    EXPECT_EQ(8080, parsed->port);
+
+    EXPECT_FALSE(tr_urlIsValid("hello world"sv));
+    EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
+    EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
+    EXPECT_FALSE(tr_urlIsValid(""sv));
+    EXPECT_FALSE(tr_urlIsValid("com"sv));
+    EXPECT_FALSE(tr_urlIsValid("www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValid("zzz://www.example.com"sv)); // syntactically valid, but unsupported scheme
+    EXPECT_TRUE(tr_urlIsValid("https://www.example.com"sv));
+
+    EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
+    EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
 }
 
 TEST_F(UtilsTest, trHttpUnescape)
@@ -445,9 +445,9 @@ TEST_F(UtilsTest, env)
 
 TEST_F(UtilsTest, mimeTypes)
 {
-    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.flac"));
-    EXPECT_STREQ("audio/x-flac", tr_get_mime_type_for_filename("music.FLAC"));
-    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename(".avi"));
-    EXPECT_STREQ("video/x-msvideo", tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"));
-    EXPECT_EQ(nullptr, tr_get_mime_type_for_filename("music.ajoijfeisfe"));
+    EXPECT_EQ("audio/x-flac"sv, tr_get_mime_type_for_filename("music.flac"sv));
+    EXPECT_EQ("audio/x-flac"sv, tr_get_mime_type_for_filename("music.FLAC"sv));
+    EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename(".avi"sv));
+    EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"sv));
+    EXPECT_EQ("application/octet-stream"sv, tr_get_mime_type_for_filename("music.ajoijfeisfe"sv));
 }

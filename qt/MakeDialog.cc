@@ -8,6 +8,8 @@
 
 #include "MakeDialog.h"
 
+#include <vector>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
@@ -144,7 +146,7 @@ void MakeDialog::makeTorrent()
 
     // get the tiers
     int tier = 0;
-    QVector<tr_tracker_info> trackers;
+    std::vector<tr_tracker_info> trackers;
 
     for (QString const& line : ui_.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
@@ -156,10 +158,10 @@ void MakeDialog::makeTorrent()
         }
         else
         {
-            tr_tracker_info tmp;
+            auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
-            trackers.append(tmp);
+            trackers.push_back(tmp);
         }
     }
 
@@ -176,14 +178,23 @@ void MakeDialog::makeTorrent()
         comment = ui_.commentEdit->text();
     }
 
+    // source
+    QString source;
+
+    if (ui_.sourceCheck->isChecked())
+    {
+        source = ui_.sourceEdit->text();
+    }
+
     // start making the torrent
     tr_makeMetaInfo(
         builder_.get(),
         target.toUtf8().constData(),
-        trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.empty() ? nullptr : trackers.data(),
         trackers.size(),
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
-        ui_.privateCheck->isChecked());
+        ui_.privateCheck->isChecked(),
+        source.isNull() ? nullptr : source.toUtf8().constData());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);

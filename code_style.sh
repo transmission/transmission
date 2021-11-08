@@ -22,6 +22,7 @@ cfile_includes=(
   '*.m'
 )
 cfile_excludes=(
+  'build/*'
   'libtransmission/ConvertUTF.*'
   'libtransmission/jsonsl.*'
   'libtransmission/wildmat.*'
@@ -29,6 +30,7 @@ cfile_excludes=(
   'macosx/VDKQueue/*'
   'third-party/*'
   'web/*'
+  '.git/*'
 )
 
 get_find_path_args() {
@@ -48,13 +50,13 @@ if ! find_cfiles -exec clang-format $clang_format_args '{}' '+'; then
 fi
 
 # enforce east const
-matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' '{}' '+')"
+matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' '{}' '+')"
 if [ -n "$matches" ]; then
   echo "$matches"
   exitcode=1
 fi
 if [ -n "$fix" ]; then
-  find_cfiles -exec perl -pi -e 's/((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' '{}' '+'
+  find_cfiles -exec perl -pi -e 's/((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' '{}' '+'
 fi
 
 # format JS

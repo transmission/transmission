@@ -28,10 +28,14 @@
  * @{
  */
 
+class tr_peerIo;
+class tr_peerMsgs;
+class tr_swarm;
 struct UTPSocket;
+struct peer_atom;
+struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_torrent;
-typedef struct tr_peerMgr tr_peerMgr;
 
 /* added_f's bitwise-or'ed flags */
 enum
@@ -49,19 +53,14 @@ enum
     ADDED_F_CONNECTABLE = 16
 };
 
-typedef struct tr_pex
+struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
     uint8_t flags;
-} tr_pex;
+};
 
-struct peer_atom;
-struct tr_peerIo;
-struct tr_peerMsgs;
-struct tr_swarm;
-
-static inline bool tr_isPex(tr_pex const* pex)
+constexpr bool tr_isPex(tr_pex const* pex)
 {
     return pex && tr_address_is_valid(&pex->addr);
 }
@@ -108,10 +107,9 @@ tr_pex* tr_peerMgrCompact6ToPex(
     size_t added_f_len,
     size_t* pexCount);
 
-/**
- * @param seedProbability [0..100] for likelihood that the peer is a seed; -1 for unknown
- */
-void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t seedProbability);
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
+
+void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
 
 enum
 {

@@ -51,8 +51,6 @@ tr_sys_file_t tr_fdFileCheckout(
 
 tr_sys_file_t tr_fdFileGetCached(tr_session* session, int torrent_id, tr_file_index_t file_num, bool doWrite);
 
-bool tr_fdFileGetCachedMTime(tr_session* session, int torrent_id, tr_file_index_t file_num, time_t* mtime);
-
 /**
  * Closes a file that's being held by our file repository.
  *

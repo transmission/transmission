@@ -193,7 +193,6 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) NSArray* fileList;
 @property(nonatomic, readonly) NSArray* flatFileList;
 @property(nonatomic, readonly) NSInteger fileCount;
-- (void)updateFileStat;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat)fileProgress:(FileListNode*)node;

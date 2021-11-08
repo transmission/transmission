@@ -14,7 +14,7 @@
 
 #include "variant.h"
 
-typedef struct tr_rpc_server tr_rpc_server;
+struct tr_rpc_server;
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings);
 

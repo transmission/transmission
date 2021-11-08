@@ -8,6 +8,11 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include <clocale> // setlocale()
+#include <cstring> // strlen()
+#include <string>
+#include <string_view>
+
 #include "transmission.h"
 #include "utils.h" // tr_free()
 #include "variant.h"
@@ -15,9 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include <clocale> // setlocale()
-#include <cstring> // strlen()
-#include <string>
+using namespace std::literals;
 
 class JSONTest : public ::testing::TestWithParam<char const*>
 {
@@ -50,29 +53,29 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     char const* str = {};
-    auto key = tr_quark_new("string", 6);
+    auto key = tr_quark_new("string"sv);
     EXPECT_TRUE(tr_variantDictFindStr(&top, key, &str, nullptr));
     EXPECT_STREQ("hello world", str);
 
-    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("escaped", 7), &str, nullptr));
+    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("escaped"sv), &str, nullptr));
     EXPECT_STREQ("bell \b formfeed \f linefeed \n carriage return \r tab \t", str);
 
     auto i = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
+    EXPECT_TRUE(tr_variantDictFindInt(&top, tr_quark_new("int"sv), &i));
     EXPECT_EQ(5, i);
 
     auto d = double{};
-    EXPECT_TRUE(tr_variantDictFindReal(&top, tr_quark_new("float", 5), &d));
+    EXPECT_TRUE(tr_variantDictFindReal(&top, tr_quark_new("float"sv), &d));
     EXPECT_EQ(65, int(d * 10));
 
     auto f = bool{};
-    EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("true", 4), &f));
+    EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("true"sv), &f));
     EXPECT_TRUE(f);
 
-    EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("false", 5), &f));
+    EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("false"sv), &f));
     EXPECT_FALSE(f);
 
-    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("null", 4), &str, nullptr));
+    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("null"sv), &str, nullptr));
     EXPECT_STREQ("", str);
 
     if (err == 0)
@@ -88,7 +91,7 @@ TEST_P(JSONTest, testUtf8)
     char const* str;
     char* json;
     int err;
-    tr_quark const key = tr_quark_new("key", 3);
+    tr_quark const key = tr_quark_new("key"sv);
 
     err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
@@ -175,18 +178,18 @@ TEST_P(JSONTest, test1)
     int64_t i;
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
-    auto* headers = tr_variantDictFind(&top, tr_quark_new("headers", 7));
+    auto* headers = tr_variantDictFind(&top, tr_quark_new("headers"sv));
     EXPECT_NE(nullptr, headers);
     EXPECT_TRUE(tr_variantIsDict(headers));
-    EXPECT_TRUE(tr_variantDictFindStr(headers, tr_quark_new("type", 4), &str, nullptr));
+    EXPECT_TRUE(tr_variantDictFindStr(headers, tr_quark_new("type"sv), &str, nullptr));
     EXPECT_STREQ("request", str);
     EXPECT_TRUE(tr_variantDictFindInt(headers, TR_KEY_tag, &i));
     EXPECT_EQ(666, i);
-    auto* body = tr_variantDictFind(&top, tr_quark_new("body", 4));
+    auto* body = tr_variantDictFind(&top, tr_quark_new("body"sv));
     EXPECT_NE(nullptr, body);
     EXPECT_TRUE(tr_variantDictFindStr(body, TR_KEY_name, &str, nullptr));
     EXPECT_STREQ("torrent-info", str);
-    auto* args = tr_variantDictFind(body, tr_quark_new("arguments", 9));
+    auto* args = tr_variantDictFind(body, tr_quark_new("arguments"sv));
     EXPECT_NE(nullptr, args);
     EXPECT_TRUE(tr_variantIsDict(args));
     auto* ids = tr_variantDictFind(args, TR_KEY_ids);
@@ -242,7 +245,7 @@ TEST_P(JSONTest, unescape)
     EXPECT_EQ(0, err);
 
     char const* str;
-    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("string-1", 8), &str, nullptr));
+    EXPECT_TRUE(tr_variantDictFindStr(&top, tr_quark_new("string-1"sv), &str, nullptr));
     EXPECT_STREQ("/usr/lib", str);
 
     tr_variantFree(&top);

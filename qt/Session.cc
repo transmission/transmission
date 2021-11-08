@@ -581,7 +581,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // changing fields needed by the details dialog
-        static auto constexpr DetailStatKeys = std::array<tr_quark, 17>{
+        static auto constexpr DetailStatKeys = std::array<tr_quark, 18>{
             TR_KEY_activityDate, //
             TR_KEY_bandwidthPriority, //
             TR_KEY_corruptEver, //
@@ -590,6 +590,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_downloadLimit, //
             TR_KEY_downloadLimited, //
             TR_KEY_fileStats, //
+            TR_KEY_haveUnchecked, //
             TR_KEY_honorsSessionLimits, //
             TR_KEY_peer_limit, //
             TR_KEY_peers, //
@@ -1042,7 +1043,8 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         dictAdd(args, TR_KEY_filename, add_me.url.toString());
         break;
 
-    case AddData::FILENAME: /* fall-through */
+    case AddData::FILENAME:
+        [[fallthrough]];
     case AddData::METAINFO:
         dictAdd(args, TR_KEY_metainfo, add_me.toBase64());
         break;

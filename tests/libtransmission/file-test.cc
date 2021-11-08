@@ -51,11 +51,9 @@ protected:
         return test_dir;
     }
 
-    bool createSymlink(char const* dst_path, char const* src_path, bool dst_is_dir)
+    bool createSymlink(char const* dst_path, char const* src_path, [[maybe_unused]] bool dst_is_dir)
     {
 #ifndef _WIN32
-
-        TR_UNUSED(dst_is_dir);
 
         return symlink(src_path, dst_path) != -1;
 
@@ -138,7 +136,7 @@ protected:
         return true;
     }
 
-    bool validatePermissions(char const* path, unsigned int permissions)
+    bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
     {
 #ifndef _WIN32
 
@@ -146,9 +144,6 @@ protected:
         return stat(path, &sb) != -1 && (sb.st_mode & 0777) == permissions;
 
 #else
-
-        TR_UNUSED(path);
-        TR_UNUSED(permissions);
 
         /* No UNIX permissions on Windows */
         return true;
@@ -999,11 +994,11 @@ TEST_F(FileTest, fileOpen)
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error* err = nullptr;
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error_clear(&err);
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error_clear(&err);
@@ -1012,11 +1007,11 @@ TEST_F(FileTest, fileOpen)
     tr_sys_dir_create(path1, 0, 0777, nullptr);
 #ifdef _WIN32
     // this works on *NIX
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 #endif
-    EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 

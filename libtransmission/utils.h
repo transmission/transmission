@@ -9,13 +9,16 @@
 #pragma once
 
 #include <inttypes.h>
+#include <optional>
 #include <stdarg.h>
 #include <stddef.h> /* size_t */
+#include <string>
+#include <string_view>
 #include <time.h> /* time_t */
+#include <type_traits>
+#include <vector>
 
 #include "tr-macros.h"
-
-TR_BEGIN_DECLS
 
 /***
 ****
@@ -26,6 +29,8 @@ struct event;
 struct timeval;
 
 struct tr_error;
+
+struct tr_disk_space;
 
 /**
  * @addtogroup utils Utilities
@@ -60,7 +65,7 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
-char const* tr_get_mime_type_for_filename(char const* filename);
+std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
@@ -78,11 +83,24 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
 
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string& tr_buildBuf(std::string& setme, T... args)
+{
+    setme.clear();
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
+
 /**
- * @brief Get available disk space (in bytes) for the specified folder.
- * @return zero or positive integer on success, -1 in case of error.
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-int64_t tr_getDirFreeSpace(char const* path);
+struct tr_disk_space tr_getDirSpace(char const* path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
@@ -109,9 +127,8 @@ void tr_wait_msec(long int delay_milliseconds);
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
  * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of
- * @param len the length of the string to copy. If -1, the entire string is used.
  */
-char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
+char* tr_utf8clean(std::string_view str) TR_GNUC_MALLOC;
 
 #ifdef _WIN32
 
@@ -162,10 +179,10 @@ void* tr_malloc0(size_t size);
 /** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
 void* tr_realloc(void* p, size_t size);
 
-/** @brief Portability wrapper around free() in which `NULL' is a safe argument */
+/** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
-/** @brief Free pointers in a NULL-terminated array (the array itself is not freed) */
+/** @brief Free pointers in a nullptr-terminated array (the array itself is not freed) */
 void tr_free_ptrv(void* const* p);
 
 /**
@@ -176,11 +193,12 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_renew(struct_type, mem, n_structs) \
+    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -190,6 +208,8 @@ void* tr_memdup(void const* src, size_t byteCount);
  */
 char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 
+char* tr_strvdup(std::string_view) TR_GNUC_MALLOC;
+
 /**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -198,13 +218,13 @@ char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 char* tr_strdup(void const* in);
 
 /**
- * @brief like strcmp() but gracefully handles NULL strings
+ * @brief like strcmp() but gracefully handles nullptr strings
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
-static inline bool tr_str_is_empty(char const* value)
+constexpr bool tr_str_is_empty(char const* value)
 {
-    return value == NULL || *value == '\0';
+    return value == nullptr || *value == '\0';
 }
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
@@ -217,9 +237,6 @@ int tr_lowerBound(
     size_t size,
     tr_voidptr_compare_func compar,
     bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
-
-/** @brief moves the best k items to the first slots in the array. O(n) */
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
@@ -234,13 +251,15 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
 int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
-/** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
+/** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
 /** @brief strips leading and trailing whitspace from a string
     @return the stripped string */
 char* tr_strstrip(char* str);
+
+std::string_view tr_strvstrip(std::string_view str);
 
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
@@ -254,14 +273,9 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
-/** @brief Concatenates array of strings with delimiter in between elements */
-char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
-
 /***
 ****
 ***/
-
-int compareInt(void const* va, void const* vb);
 
 void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
@@ -270,10 +284,26 @@ void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GN
 bool tr_addressIsIP(char const* address);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(char const* url);
+bool tr_urlIsValidTracker(std::string_view url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(char const* url, size_t url_len);
+bool tr_urlIsValid(std::string_view url);
+
+// TODO: move this to types.h
+struct tr_parsed_url_t
+{
+    std::string_view scheme;
+    std::string_view host;
+    std::string_view path;
+    std::string_view portstr;
+    int port = -1;
+};
+
+std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
+
+// like tr_urlParse(), but with the added constraint that 'scheme'
+// must be one we that Transmission supports for announce and scrape
+std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
@@ -288,11 +318,11 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
  * @return a newly-allocated array of integers that must be freed with tr_free(),
- *         or NULL if a fragment of the string can't be parsed.
+ *         or nullptr if a fragment of the string can't be parsed.
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-int* tr_parseNumberRange(char const* str, size_t str_len, int* setmeCount) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
@@ -347,7 +377,7 @@ void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeo
 extern time_t __tr_current_time;
 
 /**
- * @brief very inexpensive form of time(NULL)
+ * @brief very inexpensive form of time(nullptr)
  * @return the current epoch time in seconds
  *
  * This function returns a second counter that is updated once per second.
@@ -362,7 +392,7 @@ static inline time_t tr_time(void)
 }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
-static inline void tr_timeUpdate(time_t now)
+constexpr void tr_timeUpdate(time_t now)
 {
     __tr_current_time = now;
 }
@@ -379,7 +409,7 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
@@ -387,7 +417,7 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
 
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
-extern size_t tr_size_K;
+extern uint64_t tr_size_K; /* unused? */
 
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
@@ -402,7 +432,7 @@ static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
+char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 
@@ -424,7 +454,3 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ***/
 
 void tr_net_init(void);
-
-/** @} */
-
-TR_END_DECLS

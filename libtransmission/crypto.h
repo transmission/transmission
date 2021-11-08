@@ -20,8 +20,6 @@
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
-TR_BEGIN_DECLS
-
 /**
 *** @addtogroup peers
 *** @{
@@ -33,17 +31,17 @@ enum
 };
 
 /** @brief Holds state information for encrypted peer communications */
-typedef struct
+struct tr_crypto
 {
-    tr_rc4_ctx_t dec_key;
-    tr_rc4_ctx_t enc_key;
+    struct arc4_context* dec_key;
+    struct arc4_context* enc_key;
     tr_dh_ctx_t dh;
     uint8_t myPublicKey[KEY_LEN];
     tr_dh_secret_t mySecret;
     uint8_t torrentHash[SHA_DIGEST_LENGTH];
     bool isIncoming;
     bool torrentHashIsSet;
-} tr_crypto;
+};
 
 /** @brief construct a new tr_crypto object */
 void tr_cryptoConstruct(tr_crypto* crypto, uint8_t const* torrentHash, bool isIncoming);
@@ -78,7 +76,5 @@ bool tr_cryptoSecretKeySha1(
     uint8_t* hash);
 
 /* @} */
-
-TR_END_DECLS
 
 #endif // TR_ENCRYPTION_H

@@ -23,13 +23,10 @@
 ****
 ***/
 
-extern "C"
-{
-    extern struct timeval tr_watchdir_generic_interval;
-    extern unsigned int tr_watchdir_retry_limit;
-    extern struct timeval tr_watchdir_retry_start_interval;
-    extern struct timeval tr_watchdir_retry_max_interval;
-}
+extern struct timeval tr_watchdir_generic_interval;
+extern size_t tr_watchdir_retry_limit;
+extern struct timeval tr_watchdir_retry_start_interval;
+extern struct timeval tr_watchdir_retry_max_interval;
 
 namespace
 {
@@ -363,6 +360,8 @@ TEST_P(WatchDirTest, retry)
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
     EXPECT_EQ(test_file, wd_data.name);
+
+    tr_watchdir_free(wd);
 }
 
 INSTANTIATE_TEST_SUITE_P( //

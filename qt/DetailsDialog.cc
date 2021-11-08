@@ -24,6 +24,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QResizeEvent>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QStyle>
 #include <QTreeWidgetItem>
@@ -475,28 +476,19 @@ void DetailsDialog::refreshUI()
     else
     {
         uint64_t left_until_done = 0;
-        int64_t have_total = 0;
         int64_t have_verified = 0;
         int64_t have_unverified = 0;
-        int64_t verified_pieces = 0;
 
         for (Torrent const* const t : torrents)
         {
             if (t->hasMetadata())
             {
-                have_total += t->haveTotal();
                 have_unverified += t->haveUnverified();
                 uint64_t const v = t->haveVerified();
                 have_verified += v;
-
-                if (t->pieceSize())
-                {
-                    verified_pieces += v / t->pieceSize();
-                }
-
                 size_when_done += t->sizeWhenDone();
                 left_until_done += t->leftUntilDone();
-                available += t->sizeWhenDone() - t->leftUntilDone() + t->desiredAvailable();
+                available += t->sizeWhenDone() - t->leftUntilDone() + t->haveUnverified() + t->desiredAvailable();
             }
         }
 
@@ -1289,37 +1281,42 @@ void DetailsDialog::onTrackerSelectionChanged()
 void DetailsDialog::onAddTrackerClicked()
 {
     bool ok = false;
-    QString const
-        url = QInputDialog::getText(this, tr("Add URL "), tr("Add tracker announce URL:"), QLineEdit::Normal, QString(), &ok);
 
-    if (!ok)
+    QString const text = QInputDialog::getMultiLineText(
+        this,
+        tr("Add URL(s) "),
+        tr("Add tracker announce URLs, one per line:"),
+        {},
+        &ok);
+
+    if (ok)
     {
-        // user pressed "cancel" -- noop
-    }
-    else if (!QUrl(url).isValid())
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(url));
-    }
-    else
-    {
+        QSet<QString> urls;
         torrent_ids_t ids;
 
-        for (int const id : ids_)
+        for (auto const& line : text.split(QRegularExpression(QStringLiteral("[\r\n]+"))))
         {
-            if (tracker_model_->find(id, url) == -1)
+            QString const url = line.trimmed();
+            if (!line.isEmpty() && QUrl(url).isValid())
             {
-                ids.insert(id);
+                for (auto const& id : ids_)
+                {
+                    if (tracker_model_->find(id, url) == -1 && !urls.contains(url))
+                    {
+                        ids.insert(id);
+                        urls.insert(url);
+                    }
+                }
             }
         }
 
-        if (ids.empty()) // all the torrents already have this tracker
+        if (urls.isEmpty())
         {
-            QMessageBox::warning(this, tr("Error"), tr("Tracker already exists."));
+            QMessageBox::warning(this, tr("Error"), tr("No new URLs found."));
         }
         else
         {
-            auto const urls = QStringList{ url };
-            torrentSet(ids, TR_KEY_trackerAdd, urls);
+            torrentSet(ids, TR_KEY_trackerAdd, urls.values());
         }
     }
 }

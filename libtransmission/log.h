@@ -14,8 +14,6 @@
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF, TR_GNUC_NONNULL */
 
-TR_BEGIN_DECLS
-
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
 tr_log_level tr_logGetLevel(void);
@@ -47,7 +45,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 #define tr_logAddTorInfo(tor, ...) tr_logAddTor(TR_LOG_INFO, tor, __VA_ARGS__)
 #define tr_logAddTorDbg(tor, ...) tr_logAddTor(TR_LOG_DEBUG, tor, __VA_ARGS__)
 
-#define tr_logAdd(level, ...) tr_logAddNamed(level, NULL, __VA_ARGS__)
+#define tr_logAdd(level, ...) tr_logAddNamed(level, nullptr, __VA_ARGS__)
 
 #define tr_logAddError(...) tr_logAdd(TR_LOG_ERROR, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAdd(TR_LOG_INFO, __VA_ARGS__)
@@ -74,5 +72,3 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 char* tr_logGetTimeStr(char* buf, size_t buflen) TR_GNUC_NONNULL(1);
 
 /** @} */
-
-TR_END_DECLS

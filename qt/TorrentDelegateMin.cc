@@ -236,7 +236,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
         cr = QPalette::Text;
     }
 
-    QStyle::State progress_bar_state(option.state);
+    QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
 
     if (is_paused)
     {

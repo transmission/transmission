@@ -8,12 +8,14 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <optional>
+#include <string_view>
+
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 /* Quarks — a 2-way association between a string and a unique integer identifier */
-typedef size_t tr_quark;
+using tr_quark = size_t;
 
 /*
  * Predefined Quarks.
@@ -306,11 +308,14 @@ enum
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
     TR_KEY_rpc_version_minimum,
+    TR_KEY_rpc_version_semver,
     TR_KEY_rpc_whitelist,
     TR_KEY_rpc_whitelist_enabled,
     TR_KEY_scrape,
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrapeState,
+    TR_KEY_script_torrent_added_enabled,
+    TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
     TR_KEY_seconds_active,
@@ -342,6 +347,7 @@ enum
     TR_KEY_sizeWhenDone,
     TR_KEY_sort_mode,
     TR_KEY_sort_reversed,
+    TR_KEY_source,
     TR_KEY_speed,
     TR_KEY_speed_Bps,
     TR_KEY_speed_bytes,
@@ -420,22 +426,23 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme);
+std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len);
+char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+
+/**
+ * Get the string view that corresponds to the specified quark.
+ *
+ * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
+ */
+std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-TR_END_DECLS
+tr_quark tr_quark_new(std::string_view);

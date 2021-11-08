@@ -28,6 +28,7 @@ add_executable(libtransmission-test
 
 target_compile_definitions(libtransmission-test
     PRIVATE
+        -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 
 target_include_directories(libtransmission-test

@@ -32,7 +32,7 @@ WatchDir::WatchDir(TorrentModel const& model)
 int WatchDir::metainfoTest(QString const& filename) const
 {
     int ret;
-    tr_info inf;
+    auto inf = tr_info{};
     tr_ctor* ctor = tr_ctorNew(nullptr);
 
     // parse

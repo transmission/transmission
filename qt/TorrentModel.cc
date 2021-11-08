@@ -92,7 +92,7 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
 
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    Torrent const* t = torrents_.value(index.row(), nullptr);
+    auto const* const t = (index.isValid() && index.row() < rowCount()) ? torrents_.at(index.row()) : nullptr;
 
     if (t != nullptr)
     {
@@ -182,7 +182,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
         keys.reserve(tr_variantListSize(first_child));
         while (tr_variantGetStr(tr_variantListChild(first_child, i++), &str, &len))
         {
-            keys.push_back(tr_quark_new(str, len));
+            keys.push_back(tr_quark_new(std::string_view(str, len)));
         }
     }
     else if (first_child != nullptr)
@@ -449,7 +449,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
     {
         for (auto const& tor : torrents)
         {
-            auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
+            auto const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex(), row, row);
@@ -468,8 +468,7 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
         auto const& span = *it;
 
         beginRemoveRows(QModelIndex(), span.first, span.second);
-        auto const n = span.second + 1 - span.first;
-        torrents_.remove(span.first, n);
+        torrents_.erase(torrents_.begin() + span.first, torrents_.begin() + span.second + 1);
         endRemoveRows();
     }
 
