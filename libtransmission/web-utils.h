@@ -12,6 +12,8 @@
 #include <optional>
 #include <string_view>
 
+struct evbuffer;
+
 #include "transmission.h"
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
@@ -46,11 +48,6 @@ struct tr_url_query_walk_t
 };
 
 tr_url_query_walk_t tr_urlNextQueryPair(std::string_view query_remain);
-
-/** @brief parse a URL into its component parts
-    @return True on success or false if an error occurred */
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-    TR_GNUC_NONNULL(1);
 
 void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 

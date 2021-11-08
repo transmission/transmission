@@ -7,8 +7,7 @@
  */
 
 #include <algorithm>
-#include <cstdlib>
-#include <cstring>
+#include <cstddef>
 #include <optional>
 #include <string_view>
 
@@ -358,89 +357,4 @@ bool tr_urlIsValid(std::string_view url)
     auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
     auto const parsed = tr_urlParse(url);
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
-}
-
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-{
-    if (url_len == TR_BAD_SIZE)
-    {
-        url_len = strlen(url);
-    }
-
-    char const* scheme = url;
-    char const* scheme_end = tr_memmem(scheme, url_len, "://", 3);
-
-    if (scheme_end == nullptr)
-    {
-        return false;
-    }
-
-    size_t const scheme_len = scheme_end - scheme;
-
-    if (scheme_len == 0)
-    {
-        return false;
-    }
-
-    url += scheme_len + 3;
-    url_len -= scheme_len + 3;
-
-    char const* authority = url;
-    auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
-
-    if (authority_end == nullptr)
-    {
-        authority_end = authority + url_len;
-    }
-
-    size_t const authority_len = authority_end - authority;
-
-    if (authority_len == 0)
-    {
-        return false;
-    }
-
-    url += authority_len;
-    url_len -= authority_len;
-
-    auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
-
-    size_t const host_len = host_end != nullptr ? (size_t)(host_end - authority) : authority_len;
-
-    if (host_len == 0)
-    {
-        return false;
-    }
-
-    size_t const port_len = host_end != nullptr ? authority_end - host_end - 1 : 0;
-
-    if (setme_scheme != nullptr)
-    {
-        *setme_scheme = tr_strndup(scheme, scheme_len);
-    }
-
-    if (setme_host != nullptr)
-    {
-        *setme_host = tr_strndup(authority, host_len);
-    }
-
-    if (setme_port != nullptr)
-    {
-        auto const tmp = port_len > 0 ? std::string_view{ host_end + 1, port_len } : getPortForScheme({ scheme, scheme_len });
-        *setme_port = parsePort(tmp);
-    }
-
-    if (setme_path != nullptr)
-    {
-        if (url[0] == '\0')
-        {
-            *setme_path = tr_strdup("/");
-        }
-        else
-        {
-            *setme_path = tr_strndup(url, url_len);
-        }
-    }
-
-    return true;
 }

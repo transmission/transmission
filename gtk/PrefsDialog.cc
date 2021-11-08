@@ -430,8 +430,7 @@ void onBlocklistUpdate(Gtk::Button* w, std::shared_ptr<blocklist_data> const& da
 void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
 {
     auto const url = e->get_chars(0, -1);
-    bool const is_url_valid = tr_urlParse(url.c_str(), TR_BAD_SIZE, nullptr, nullptr, nullptr, nullptr);
-    button->set_sensitive(is_url_valid);
+    button->set_sensitive(tr_urlIsValid(url.c_str()));
 }
 
 void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, Glib::RefPtr<Session> const& core)

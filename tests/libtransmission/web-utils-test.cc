@@ -35,19 +35,6 @@ using namespace std::literals;
 TEST_F(WebUtilsTest, urlParse)
 {
     auto const* url = "http://1";
-    int port;
-    char* scheme = nullptr;
-    char* host = nullptr;
-    char* path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("1", host);
-    EXPECT_STREQ("/", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
     auto parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
@@ -57,18 +44,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ(80, parsed->port);
 
     url = "http://www.some-tracker.org/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
     parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
@@ -78,18 +53,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ(80, parsed->port);
 
     url = "http://www.some-tracker.org:8080/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(8080, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
     parsed = tr_urlParse(url);
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
@@ -97,7 +60,10 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
+}
 
+TEST_F(WebUtilsTest, urlIsValid)
+{
     EXPECT_FALSE(tr_urlIsValid("hello world"sv));
     EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
     EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
