@@ -387,25 +387,29 @@ bool tr_urlIsValid(std::string_view url)
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
 
-std::optional<tr_url_query_walk_t> tr_urlNextQueryPair(std::string_view query_remain)
+tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
 {
-    auto in = query_remain;
-
-    // get the next pair
-    auto key = "&"sv;
-    auto pos = in.find(key);
-    auto const pair = in.substr(0, pos);
-    in = pos == in.npos ? ""sv : in.substr(pos + std::size(key));
+    // find the next key/value delimiter
+    auto pos = remain.find('&');
+    auto const pair = remain.substr(0, pos);
+    remain = pos == remain.npos ? ""sv : remain.substr(pos + 1);
     if (std::empty(pair))
     {
-        return {};
+        keyval.key = keyval.value = remain = ""sv;
+        return *this;
     }
 
     // split it into key and value
-    key = "="sv;
-    pos = pair.find(key);
-    auto const key_sv = pair.substr(0, pos);
-    auto const value_sv = pos == pair.npos ? ""sv : pair.substr(pos + std::size(key));
+    pos = pair.find('=');
+    keyval.key = pair.substr(0, pos);
+    keyval.value = pos == pair.npos ? ""sv : pair.substr(pos + 1);
+    return *this;
+}
 
-    return tr_url_query_walk_t{ key_sv, value_sv, in };
+tr_url_query_view::iterator tr_url_query_view::begin() const
+{
+    auto it = iterator{};
+    it.remain = query;
+    ++it;
+    return it;
 }

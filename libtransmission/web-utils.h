@@ -14,7 +14,7 @@
 
 struct evbuffer;
 
-#include "transmission.h"
+#include "transmission.h" // tr_sha1_digest_t
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -44,15 +44,66 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
 // must be one we that Transmission supports for announce and scrape
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
 
-struct tr_url_query_walk_t
+// example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
+struct tr_url_query_view
 {
-    std::string_view key;
-    std::string_view value;
-    std::string_view remain;
+    std::string_view const query;
+
+    explicit tr_url_query_view(std::string_view query_in)
+        : query{ query_in }
+    {
+    }
+
+    struct iterator
+    {
+        struct keyval_t
+        {
+            std::string_view key;
+            std::string_view value;
+
+            bool operator==(keyval_t const& that) const
+            {
+                return this->key == that.key && this->value == that.value;
+            }
+
+            bool operator!=(keyval_t const& that) const
+            {
+                return !(*this == that);
+            }
+        };
+
+        keyval_t keyval;
+        std::string_view remain;
+
+        iterator& operator++();
+        keyval_t const& operator*() const
+        {
+            return keyval;
+        }
+        keyval_t const* operator->() const
+        {
+            return &keyval;
+        }
+
+        bool operator==(iterator const& that) const
+        {
+            return this->keyval == that.keyval && this->remain == that.remain;
+        }
+
+        bool operator!=(iterator const& that) const
+        {
+            return !(*this == that);
+        }
+    };
+
+    iterator begin() const;
+    iterator end() const
+    {
+        return iterator{};
+    }
 };
 
-std::optional<tr_url_query_walk_t> tr_urlNextQueryPair(std::string_view query_remain);
-
+// TODO: replace evbuffer* with std::string&
 void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);

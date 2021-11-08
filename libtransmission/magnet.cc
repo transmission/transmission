@@ -126,19 +126,8 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     char* displayName = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
 
-    // TODO: not in love with this looping mechanism
-    auto query = parsed->query;
-    for (;;)
+    for (auto const [key, value] : tr_url_query_view{ parsed->query })
     {
-        auto const walk = tr_urlNextQueryPair(query);
-        if (!walk)
-        {
-            break;
-        }
-
-        auto const [key, value, remain] = *walk;
-        query = remain;
-
         if (key == "dn"sv)
         {
             displayName = tr_http_unescape(std::data(value), std::size(value));

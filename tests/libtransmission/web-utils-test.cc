@@ -96,45 +96,47 @@ TEST_F(WebUtilsTest, urlParse)
 
 TEST_F(WebUtilsTest, urlNextQueryPair)
 {
-    auto const url = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
+    auto constexpr Query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
+    auto const query_view = tr_url_query_view{ Query };
+    auto const end = std::end(query_view);
 
-    auto walk = tr_urlNextQueryPair(url);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("a"sv, walk->key);
-    EXPECT_EQ("1"sv, walk->value);
+    auto it = std::begin(query_view);
+    EXPECT_NE(end, it);
+    EXPECT_EQ("a"sv, it->key);
+    EXPECT_EQ("1"sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("b"sv, walk->key);
-    EXPECT_EQ("two"sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("b"sv, it->key);
+    EXPECT_EQ("two"sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("c"sv, walk->key);
-    EXPECT_EQ("si"sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("c"sv, it->key);
+    EXPECT_EQ("si"sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("d_has_no_val"sv, walk->key);
-    EXPECT_EQ(""sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("d_has_no_val"sv, it->key);
+    EXPECT_EQ(""sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("e"sv, walk->key);
-    EXPECT_EQ(""sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("e"sv, it->key);
+    EXPECT_EQ(""sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("f"sv, walk->key);
-    EXPECT_EQ(""sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("f"sv, it->key);
+    EXPECT_EQ(""sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_TRUE(walk);
-    EXPECT_EQ("g"sv, walk->key);
-    EXPECT_EQ("gee"sv, walk->value);
+    ++it;
+    EXPECT_NE(end, it);
+    EXPECT_EQ("g"sv, it->key);
+    EXPECT_EQ("gee"sv, it->value);
 
-    walk = tr_urlNextQueryPair(walk->remain);
-    EXPECT_FALSE(walk);
+    ++it;
+    EXPECT_EQ(end, it);
 }
 
 TEST_F(WebUtilsTest, urlIsValid)
