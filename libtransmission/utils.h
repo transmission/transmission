@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
+#include <cstdarg>
+#include <cstddef>
+#include <ctime>
 #include <optional>
-#include <stdarg.h>
-#include <stddef.h> /* size_t */
 #include <string>
 #include <string_view>
-#include <time.h> /* time_t */
 #include <type_traits>
 #include <vector>
 
@@ -193,12 +193,12 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
+#define tr_new(struct_type, n_structs) (static_cast<(struct_type*)>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
+#define tr_new0(struct_type, n_structs) (static_cast<(struct_type)*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
 #define tr_renew(struct_type, mem, n_structs) \
-    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
+    (static_cast<(struct_type)*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -228,15 +228,6 @@ constexpr bool tr_str_is_empty(char const* value)
 }
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
-
-/** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
