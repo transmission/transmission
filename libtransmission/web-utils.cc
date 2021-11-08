@@ -186,11 +186,21 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
     }
 }
 
+#include <iostream>
+
 char* tr_http_unescape(char const* str, size_t len)
 {
-    char* tmp = curl_unescape(str, len);
-    char* ret = tr_strdup(tmp);
+    int ilen = int(len);
+    auto* curl = curl_easy_init();
+    std::cerr << __FILE__ << ':' << __LINE__ << " [" << std::string_view{ str, len } << ']' << std::endl;
+    char* tmp = curl_easy_unescape(curl, str, ilen, &ilen);
+    std::cerr << __FILE__ << ':' << __LINE__ << " [" << tmp << ']' << std::endl;
+    char* ret = tr_strndup(tmp, len);
+    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
     curl_free(tmp);
+    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
+    curl_easy_cleanup(curl);
+    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
     return ret;
 }
 
@@ -294,8 +304,6 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
 }
 
 } // namespace
-
-#include <iostream>
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
