@@ -315,7 +315,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
-                        tr_sessionSetTorrentFile(tor->session, tor->info.hashString, tor->info.torrent);
                         tr_torrentGotNewInfoDict(tor);
                         tr_torrentSetDirty(tor);
                     }

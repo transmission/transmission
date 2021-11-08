@@ -162,12 +162,6 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     return err;
 }
 
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
-{
-    char const* const filename = tr_sessionFindTorrentFile(ctor->session, hashString);
-    return filename == nullptr ? EINVAL : tr_ctorSetMetainfoFromFile(ctor, filename);
-}
-
 /***
 ****
 ***/

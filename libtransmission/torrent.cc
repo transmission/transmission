@@ -953,8 +953,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             {
                 tr_torrentSetLocalError(tor, "Unable to save torrent file: %s", tr_strerror(err));
             }
-
-            tr_sessionSetTorrentFile(tor->session, tor->info.hashString, path);
         }
     }
 
