@@ -12,6 +12,8 @@
 #include <optional>
 #include <string_view>
 
+#include <iostream> // NOMERGE
+
 struct evbuffer;
 
 #include "transmission.h" // tr_sha1_digest_t
@@ -56,31 +58,30 @@ struct tr_url_query_view
 
     struct iterator
     {
-        struct keyval_t
-        {
-            std::string_view key;
-            std::string_view value;
-        };
-
-        keyval_t keyval;
+        std::pair<std::string_view, std::string_view> keyval;
         std::string_view remain;
 
         iterator& operator++();
 
-        keyval_t const& operator*() const
+        constexpr auto const& operator*() const
         {
             return keyval;
         }
 
-        keyval_t const* operator->() const
+        constexpr auto const* operator->() const
         {
             return &keyval;
         }
 
         bool operator==(iterator const& that) const
         {
-            return this->keyval.key == that.keyval.key && this->keyval.value == that.keyval.value &&
-                this->remain == that.remain;
+            std::cerr << __FILE__ << ':' << __LINE__ << " this [" << this->keyval.first << "][" << this->keyval.second << "]["
+                      << this->remain << "]" << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << " this [" << that.keyval.first << "][" << that.keyval.second << "]["
+                      << that.remain << "]" << std::endl;
+            auto const equal = this->keyval == that.keyval && this->remain == that.remain;
+            std::cerr << __FILE__ << ':' << __LINE__ << " equal " << equal << std::endl;
+            return equal;
         }
 
         bool operator!=(iterator const& that) const
@@ -90,7 +91,8 @@ struct tr_url_query_view
     };
 
     iterator begin() const;
-    iterator end() const
+
+    constexpr iterator end() const
     {
         return iterator{};
     }

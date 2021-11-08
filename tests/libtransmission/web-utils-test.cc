@@ -102,38 +102,38 @@ TEST_F(WebUtilsTest, urlNextQueryPair)
 
     auto it = std::begin(query_view);
     EXPECT_NE(end, it);
-    EXPECT_EQ("a"sv, it->key);
-    EXPECT_EQ("1"sv, it->value);
+    EXPECT_EQ("a"sv, it->first);
+    EXPECT_EQ("1"sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("b"sv, it->key);
-    EXPECT_EQ("two"sv, it->value);
+    EXPECT_EQ("b"sv, it->first);
+    EXPECT_EQ("two"sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("c"sv, it->key);
-    EXPECT_EQ("si"sv, it->value);
+    EXPECT_EQ("c"sv, it->first);
+    EXPECT_EQ("si"sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("d_has_no_val"sv, it->key);
-    EXPECT_EQ(""sv, it->value);
+    EXPECT_EQ("d_has_no_val"sv, it->first);
+    EXPECT_EQ(""sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("e"sv, it->key);
-    EXPECT_EQ(""sv, it->value);
+    EXPECT_EQ("e"sv, it->first);
+    EXPECT_EQ(""sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("f"sv, it->key);
-    EXPECT_EQ(""sv, it->value);
+    EXPECT_EQ("f"sv, it->first);
+    EXPECT_EQ(""sv, it->second);
 
     ++it;
     EXPECT_NE(end, it);
-    EXPECT_EQ("g"sv, it->key);
-    EXPECT_EQ("gee"sv, it->value);
+    EXPECT_EQ("g"sv, it->first);
+    EXPECT_EQ("gee"sv, it->second);
 
     ++it;
     EXPECT_EQ(end, it);
@@ -153,6 +153,31 @@ TEST_F(WebUtilsTest, urlIsValid)
 
     EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
     EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
+}
+
+TEST_F(WebUtilsTest, urlPercentDecode)
+{
+    auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 13>{ {
+        { "%-2"sv, "%-2"sv },
+        { "%6 1"sv, "%6 1"sv },
+        { "%6"sv, "%6"sv },
+        { "%6%a"sv, "%6%a"sv },
+        { "%61 "sv, "a "sv },
+        { "%61"sv, "a"sv },
+        { "%61a"sv, "aa"sv },
+        { "%61b"sv, "ab"sv },
+        { "%6a"sv, "j"sv },
+        { "%FF"sv, "\xff"sv },
+        { "%FF%00%ff"sv, "\xff\x00\xff"sv },
+        { "%FG"sv, "%FG"sv },
+        { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2"sv,
+          "http://www.example.com/~user/?test=1&test1=2"sv },
+    } };
+
+    for (auto const& test : Tests)
+    {
+        EXPECT_EQ(test.second, tr_urlPercentDecode(test.first));
+    }
 }
 
 TEST_F(WebUtilsTest, httpUnescape)

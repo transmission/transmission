@@ -424,17 +424,17 @@ tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
     std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << remain << ']' << std::endl;
     if (std::empty(pair))
     {
-        keyval.key = keyval.value = remain = ""sv;
+        keyval.first = keyval.second = remain = ""sv;
         std::cerr << __FILE__ << ':' << __LINE__ << " all empty" << std::endl;
         return *this;
     }
 
     // split it into key and value
     pos = pair.find('=');
-    keyval.key = pair.substr(0, pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " key [" << keyval.key << ']' << std::endl;
-    keyval.value = pos == pair.npos ? ""sv : pair.substr(pos + 1);
-    std::cerr << __FILE__ << ':' << __LINE__ << " value [" << keyval.value << ']' << std::endl;
+    keyval.first = pair.substr(0, pos);
+    std::cerr << __FILE__ << ':' << __LINE__ << " key [" << keyval.first << ']' << std::endl;
+    keyval.second = pos == pair.npos ? ""sv : pair.substr(pos + 1);
+    std::cerr << __FILE__ << ':' << __LINE__ << " value [" << keyval.second << ']' << std::endl;
     return *this;
 }
 
@@ -476,6 +476,6 @@ std::string tr_urlPercentDecode(std::string_view in)
         }
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode out [" << out << ']' << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode out [" << out << "]" << std::endl;
     return out;
 }

@@ -134,7 +134,7 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     uint8_t sha1[SHA_DIGEST_LENGTH];
 
     std::cerr << __FILE__ << ':' << __LINE__ << " iterating" << std::endl;
-    for (auto const [key, value] : tr_url_query_view{ parsed->query })
+    for (auto const& [key, value] : tr_url_query_view{ parsed->query })
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " key [" << key << ']' << std::endl;
         std::cerr << __FILE__ << ':' << __LINE__ << " value [" << value << ']' << std::endl;
