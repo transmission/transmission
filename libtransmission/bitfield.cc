@@ -292,18 +292,13 @@ void tr_bitfield::setHasAll()
     TR_ASSERT(assertValid());
 }
 
-void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count, bool bounded)
+void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
 {
-    if (bounded)
-    {
-        byte_count = std::min(byte_count, getBytesNeeded(bit_count_));
-    }
-
     flags_ = std::vector<uint8_t>(raw, raw + byte_count);
 
-    if (bounded)
+    // ensure any excess bits at the end of the array are set to '0'.
+    if (byte_count == getBytesNeeded(bit_count_))
     {
-        /* ensure the excess bits are set to '0' */
         int const excess_bit_count = byte_count * 8 - bit_count_;
 
         TR_ASSERT(excess_bit_count >= 0);
