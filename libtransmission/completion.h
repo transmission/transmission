@@ -12,6 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <vector>
+
 #include "transmission.h"
 #include "bitfield.h"
 

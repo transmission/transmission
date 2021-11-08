@@ -14,6 +14,7 @@
 
 #include <array>
 #include <unordered_set>
+#include <vector>
 
 #include "transmission.h"
 #include "tr-assert.h"
