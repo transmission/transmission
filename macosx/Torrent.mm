@@ -1875,12 +1875,6 @@ bool trashDataFile(char const* filename, tr_error** error)
             result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String));
         }
 
-        //backup - shouldn't be needed after upgrade to 1.70
-        if (result != TR_PARSE_OK && hashString)
-        {
-            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromHash(ctor, hashString.UTF8String));
-        }
-
         if (result == TR_PARSE_OK)
         {
             fHandle = tr_torrentNew(ctor, NULL, NULL);
