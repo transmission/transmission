@@ -28,9 +28,13 @@ bool tr_urlIsValid(std::string_view url);
 struct tr_url_parsed_t
 {
     std::string_view scheme;
+    std::string_view authority;
     std::string_view host;
     std::string_view path;
     std::string_view portstr;
+    std::string_view query;
+    std::string_view fragment;
+    std::string_view full;
     int port = -1;
 };
 

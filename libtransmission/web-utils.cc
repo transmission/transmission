@@ -304,41 +304,69 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         return {};
     }
 
+    auto parsed = tr_url_parsed_t{};
+    parsed.full = url;
+
     // scheme
-    auto key = "://"sv;
+    auto key = ":"sv;
     auto pos = url.find(key);
     if (pos == std::string_view::npos || pos == 0)
     {
         return {};
     }
-    auto const scheme = url.substr(0, pos);
+    parsed.scheme = url.substr(0, pos);
     url.remove_prefix(pos + std::size(key));
 
     // authority
-    key = "/"sv;
+    // The authority component is preceded by a double slash ("//") and is
+    // terminated by the next slash ("/"), question mark ("?"), or number
+    // sign ("#") character, or by the end of the URI.
+    key = "//"sv;
     pos = url.find(key);
     if (pos == 0)
     {
-        return {};
-    }
-    auto const authority = url.substr(0, pos);
-    url.remove_prefix(std::size(authority));
-    auto const path = std::empty(url) ? "/"sv : url;
+        url.remove_prefix(pos + std::size(key));
+        pos = url.find_first_of("/?#");
+        parsed.authority = url.substr(0, pos);
+        url = pos == url.npos ? ""sv : url.substr(pos);
 
-    // host
-    key = ":"sv;
-    pos = authority.find(key);
-    auto const host = pos == std::string_view::npos ? authority : authority.substr(0, pos);
-    if (std::empty(host))
+        // host
+        key = ":"sv;
+        pos = parsed.authority.find(key);
+        parsed.host = pos == std::string_view::npos ? parsed.authority : parsed.authority.substr(0, pos);
+        if (std::empty(parsed.host))
+        {
+            return {};
+        }
+
+        // port
+        parsed.portstr = pos == std::string_view::npos ? getPortForScheme(parsed.scheme) :
+                                                         parsed.authority.substr(pos + std::size(key));
+        parsed.port = parsePort(parsed.portstr);
+    }
+
+    //  The path is terminated by the first question mark ("?") or
+    //  number sign ("#") character, or by the end of the URI.
+    pos = url.find_first_of("?#");
+    parsed.path = url.substr(0, pos);
+    url = pos == url.npos ? ""sv : url.substr(pos);
+
+    // query
+    if (url.find('?') == 0)
     {
-        return {};
+        url.remove_prefix(1);
+        pos = url.find('#');
+        parsed.query = url.substr(0, pos);
+        url = pos == url.npos ? ""sv : url.substr(pos);
     }
 
-    // port
-    auto const portstr = pos == std::string_view::npos ? getPortForScheme(scheme) : authority.substr(pos + std::size(key));
-    auto const port = parsePort(portstr);
+    // fragment
+    if (url.find('#') == 0)
+    {
+        parsed.fragment = url.substr(1);
+    }
 
-    return tr_url_parsed_t{ scheme, host, path, portstr, port };
+    return parsed;
 }
 
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
