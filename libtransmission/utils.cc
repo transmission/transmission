@@ -600,32 +600,6 @@ std::string_view tr_strvStrip(std::string_view str)
     return str;
 }
 
-char* tr_strstrip(char* str)
-{
-    if (str != nullptr)
-    {
-        size_t len = strlen(str);
-
-        while (len != 0 && isspace(str[len - 1]))
-        {
-            --len;
-        }
-
-        size_t pos = 0;
-
-        while (pos < len && isspace(str[pos]))
-        {
-            ++pos;
-        }
-
-        len -= pos;
-        memmove(str, str + pos, len);
-        str[len] = '\0';
-    }
-
-    return str;
-}
-
 bool tr_str_has_suffix(char const* str, char const* suffix)
 {
     if (str == nullptr)

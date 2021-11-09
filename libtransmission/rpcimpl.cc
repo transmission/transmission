@@ -1820,7 +1820,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     }
     else
     {
-        char* fname = tr_strstrip(tr_strdup(filename));
+        char* fname = tr_strdup(filename);
 
         if (fname == nullptr)
         {

@@ -244,10 +244,6 @@ int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
-/** @brief strips leading and trailing whitspace from a string
-    @return the stripped string */
-char* tr_strstrip(char* str);
-
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 

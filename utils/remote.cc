@@ -674,7 +674,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static void addLabels(tr_variant* args, char const* arg)
+static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
 {
     tr_variant* labels;
     if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
@@ -682,19 +682,16 @@ static void addLabels(tr_variant* args, char const* arg)
         labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
     }
 
-    char* argcpy = tr_strdup(arg);
-    char* const tmp = argcpy; /* save copied string start pointer to free later */
-    char* token;
-    while ((token = tr_strsep(&argcpy, ",")) != nullptr)
+    for (;;)
     {
-        tr_strstrip(token);
-        if (!tr_str_is_empty(token))
+        auto const label = tr_strvSep(&comma_delimited_labels, ',');
+        if (std::empty(label))
         {
-            tr_variantListAddStr(labels, token);
+            break;
         }
-    }
 
-    tr_free(tmp);
+        tr_variantListAddStr(labels, label);
+    }
 }
 
 static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
@@ -2759,7 +2756,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             switch (c)
             {
             case 'L':
-                addLabels(args, optarg);
+                addLabels(args, optarg ? optarg : "");
                 break;
 
             case 712:

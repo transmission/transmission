@@ -139,28 +139,6 @@ TEST_F(UtilsTest, trStrvDup)
     tr_free(str);
 }
 
-TEST_F(UtilsTest, trStrstrip)
-{
-    auto* in = tr_strdup("   test    ");
-    auto* out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
-
-    in = tr_strdup(" test test ");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test test", out);
-    tr_free(in);
-
-    /* strstrip */
-    in = tr_strdup("test");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
-}
-
 TEST_F(UtilsTest, trBuildpath)
 {
     auto out = makeString(tr_buildPath("foo", "bar", nullptr));
