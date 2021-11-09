@@ -253,7 +253,7 @@ static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tr
 {
     memset(tracker, 0, sizeof(tr_tracker));
     tracker->key = tr_announcerGetKey(inf->announce);
-    tracker->announce_url = tr_quark_new(tr_strvstrip(inf->announce));
+    tracker->announce_url = tr_quark_new(tr_strvStrip(inf->announce));
     tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, tr_quark_new(inf->scrape));
     tracker->id = inf->id;
     tracker->seederCount = -1;

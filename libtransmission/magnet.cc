@@ -126,16 +126,16 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     {
         if (key == "dn"sv)
         {
-            display_name = tr_strvdup(tr_urlPercentDecode(value));
+            display_name = tr_strvDup(tr_urlPercentDecode(value));
         }
         else if (key == "tr"sv || key.find("tr.") == 0)
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            tr.push_back(tr_strvdup(tr_urlPercentDecode(value)));
+            tr.push_back(tr_strvDup(tr_urlPercentDecode(value)));
         }
         else if (key == "ws"sv)
         {
-            ws.push_back(tr_strvdup(tr_urlPercentDecode(value)));
+            ws.push_back(tr_strvDup(tr_urlPercentDecode(value)));
         }
         else if (key == "xt"sv)
         {

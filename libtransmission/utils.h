@@ -208,8 +208,6 @@ void* tr_memdup(void const* src, size_t byteCount);
  */
 char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 
-char* tr_strvdup(std::string_view) TR_GNUC_MALLOC;
-
 /**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -250,8 +248,6 @@ char const* tr_strerror(int errnum);
     @return the stripped string */
 char* tr_strstrip(char* str);
 
-std::string_view tr_strvstrip(std::string_view str);
-
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
@@ -263,6 +259,44 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
+
+/***
+****  std::string_view utils
+***/
+
+template<typename T>
+constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+{
+    return sv.find(key) != sv.npos;
+}
+
+constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
+}
+
+constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
+{
+    auto pos = sv->find(delim);
+    auto const ret = sv->substr(0, pos);
+    sv->remove_prefix(pos != sv->npos ? pos + 1 : std::size(*sv));
+    return ret;
+}
+
+constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+{
+    *token = tr_strvSep(sv, delim);
+    return !std::empty(*token);
+}
+
+std::string_view tr_strvStrip(std::string_view sv);
+
+char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 
 /***
 ****

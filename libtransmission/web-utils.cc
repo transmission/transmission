@@ -289,7 +289,7 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
-    url = tr_strvstrip(url);
+    url = tr_strvStrip(url);
 
     if (!urlCharsAreValid(url))
     {

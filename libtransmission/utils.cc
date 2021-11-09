@@ -415,7 +415,7 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
     return ret;
 }
 
-char* tr_strvdup(std::string_view in)
+char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
     auto* const ret = tr_new(char, n + 1);
@@ -427,7 +427,7 @@ char* tr_strvdup(std::string_view in)
 char* tr_strndup(void const* vin, size_t len)
 {
     auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvdup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
+    return in == nullptr ? nullptr : tr_strvDup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
 }
 
 char* tr_strdup(void const* in)
@@ -584,7 +584,7 @@ char* tr_strsep(char** str, char const* delims)
 #endif
 }
 
-std::string_view tr_strvstrip(std::string_view str)
+std::string_view tr_strvStrip(std::string_view str)
 {
     auto constexpr test = [](auto ch)
     {
