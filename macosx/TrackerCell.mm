@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> //tr_addressIsIP()
+#include <libtransmission/web-utils.h> //tr_addressIsIP()
 
 #import "TrackerCell.h"
 #import "TrackerNode.h"
