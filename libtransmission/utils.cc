@@ -738,16 +738,19 @@ static char* strip_non_utf8(char const* in, size_t inlen)
 
 static char* to_utf8(char const* in, size_t inlen)
 {
-    char* ret = nullptr;
-
 #ifdef HAVE_ICONV
-
-    char const* encodings[] = { "CURRENT", "ISO-8859-15" };
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (size_t i = 0; ret == nullptr && i < TR_N_ELEMENTS(encodings); ++i)
+    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
+    for (auto const* test_encoding : Encodings)
     {
+        iconv_t cd = iconv_open("UTF-8", test_encoding);
+        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        {
+            continue;
+        }
+
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         auto const* inbuf = in;
 #else
@@ -756,18 +759,13 @@ static char* to_utf8(char const* in, size_t inlen)
         char* outbuf = out;
         size_t inbytesleft = inlen;
         size_t outbytesleft = buflen;
-        char const* test_encoding = encodings[i];
-
-        iconv_t cd = iconv_open("UTF-8", test_encoding);
-
-        if (cd != (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+        iconv_close(cd);
+        if (rv != size_t(-1))
         {
-            if (iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft) != (size_t)-1)
-            {
-                ret = tr_strndup(out, buflen - outbytesleft);
-            }
-
-            iconv_close(cd);
+            char* const ret = tr_strndup(out, buflen - outbytesleft);
+            tr_free(out);
+            return ret;
         }
     }
 
@@ -775,12 +773,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #endif
 
-    if (ret == nullptr)
-    {
-        ret = strip_non_utf8(in, inlen);
-    }
-
-    return ret;
+    return strip_non_utf8(in, inlen);
 }
 
 char* tr_utf8clean(std::string_view str)
@@ -788,6 +781,24 @@ char* tr_utf8clean(std::string_view str)
     char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
                                                                                   to_utf8(std::data(str), std::size(str));
     TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
+    return ret;
+}
+
+static bool tr_strvUtf8Validate(std::string_view sv)
+{
+    return tr_utf8_validate(std::data(sv), std::size(sv), nullptr);
+}
+
+std::string tr_strvUtf8Clean(std::string_view sv)
+{
+    if (tr_strvUtf8Validate(sv))
+    {
+        return std::string{ sv };
+    }
+
+    auto* const tmp = to_utf8(std::data(sv), std::size(sv));
+    auto ret = std::string{ tmp ? tmp : "" };
+    tr_free(tmp);
     return ret;
 }
 

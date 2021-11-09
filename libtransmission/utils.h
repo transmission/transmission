@@ -290,6 +290,8 @@ std::string_view tr_strvStrip(std::string_view sv);
 
 char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 
+std::string tr_strvUtf8Clean(std::string_view sv);
+
 /***
 ****
 ***/
