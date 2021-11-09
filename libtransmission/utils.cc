@@ -546,44 +546,6 @@ int tr_strcmp0(char const* str1, char const* str2)
 *****
 ****/
 
-/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch */
-char* tr_strsep(char** str, char const* delims)
-{
-#ifdef HAVE_STRSEP
-
-    return strsep(str, delims);
-
-#else
-
-    char* token;
-
-    if (*str == nullptr) /* no more tokens */
-    {
-        return nullptr;
-    }
-
-    token = *str;
-
-    while (**str != '\0')
-    {
-        if (strchr(delims, **str) != nullptr)
-        {
-            **str = '\0';
-            (*str)++;
-            return token;
-        }
-
-        (*str)++;
-    }
-
-    /* there is not another token */
-    *str = nullptr;
-
-    return token;
-
-#endif
-}
-
 std::string_view tr_strvStrip(std::string_view str)
 {
     auto constexpr test = [](auto ch)

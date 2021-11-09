@@ -253,9 +253,6 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 /** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
 char const* tr_strcasestr(char const* haystack, char const* needle);
 
-/** @brief Portability wrapper for strsep() that uses the system implementation if available */
-char* tr_strsep(char** str, char const* delim);
-
 /***
 ****  std::string_view utils
 ***/
@@ -282,6 +279,11 @@ constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
     auto const ret = sv->substr(0, pos);
     sv->remove_prefix(pos != sv->npos ? pos + 1 : std::size(*sv));
     return ret;
+}
+
+constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return !std::empty((*token = tr_strvSep(sv, delim)));
 }
 
 std::string_view tr_strvStrip(std::string_view sv);
