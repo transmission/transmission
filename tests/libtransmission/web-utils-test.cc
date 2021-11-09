@@ -22,7 +22,6 @@
 
 using namespace std::literals;
 
-using ::libtransmission::test::makeString;
 using WebUtilsTest = ::testing::Test;
 using namespace std::literals;
 

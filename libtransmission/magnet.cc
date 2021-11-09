@@ -114,16 +114,11 @@ static auto constexpr MaxWebseeds = std::size_t{ 64 };
 
 tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " magnet link [" << magnet_link << ']' << std::endl;
-
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
         return nullptr;
     }
-
-    std::cerr << __FILE__ << ':' << __LINE__ << " parsed->scheme [" << parsed->scheme << ']' << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << " parsed->query [" << parsed->query << ']' << std::endl;
 
     bool got_checksum = false;
     size_t trCount = 0;
@@ -133,11 +128,8 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     char* displayName = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " iterating" << std::endl;
     for (auto const& [key, value] : tr_url_query_view{ parsed->query })
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " key [" << key << ']' << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " value [" << value << ']' << std::endl;
         if (key == "dn"sv)
         {
             displayName = tr_strvdup(tr_urlPercentDecode(value));
@@ -149,9 +141,7 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
         }
         else if ((key == "ws"sv) && (wsCount < MaxWebseeds))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             ws[wsCount++] = tr_strvdup(tr_urlPercentDecode(value));
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
         else if (key == "xt"sv)
         {
@@ -173,51 +163,33 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
         }
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     tr_magnet_info* info = nullptr;
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     if (got_checksum)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info = tr_new0(tr_magnet_info, 1);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->displayName = displayName;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->trackerCount = trCount;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->trackers = static_cast<char**>(tr_memdup(tr, sizeof(char*) * trCount));
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->webseedCount = wsCount;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         info->webseeds = static_cast<char**>(tr_memdup(ws, sizeof(char*) * wsCount));
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         for (size_t i = 0; i < trCount; i++)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_free(tr[i]);
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         for (size_t i = 0; i < wsCount; i++)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             tr_free(ws[i]);
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_free(displayName);
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return info;
 }
 

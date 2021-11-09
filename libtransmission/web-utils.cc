@@ -188,8 +188,6 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
     }
 }
 
-#include <iostream>
-
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
@@ -293,9 +291,7 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " url in [" << url << ']' << std::endl;
     url = tr_strvstrip(url);
-    std::cerr << __FILE__ << ':' << __LINE__ << " stripped [" << url << ']' << std::endl;
 
     if (!urlCharsAreValid(url))
     {
@@ -304,20 +300,16 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 
     auto parsed = tr_url_parsed_t{};
     parsed.full = url;
-    std::cerr << __FILE__ << ':' << __LINE__ << " parsed.full [" << parsed.full << ']' << std::endl;
 
     // scheme
     auto key = ":"sv;
     auto pos = url.find(key);
-    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     if (pos == std::string_view::npos || pos == 0)
     {
         return {};
     }
     parsed.scheme = url.substr(0, pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " parsed.scheme [" << parsed.scheme << ']' << std::endl;
     url.remove_prefix(pos + std::size(key));
-    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
 
     // authority
     // The authority component is preceded by a double slash ("//") and is
@@ -325,7 +317,6 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // sign ("#") character, or by the end of the URI.
     key = "//"sv;
     pos = url.find(key);
-    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     if (pos == 0)
     {
         url.remove_prefix(pos + std::size(key));
@@ -351,29 +342,22 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     //  The path is terminated by the first question mark ("?") or
     //  number sign ("#") character, or by the end of the URI.
     pos = url.find_first_of("?#");
-    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     parsed.path = url.substr(0, pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " path [" << parsed.path << ']' << std::endl;
     url = pos == url.npos ? ""sv : url.substr(pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
 
     // query
     if (url.find('?') == 0)
     {
         url.remove_prefix(1);
         pos = url.find('#');
-        std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
         parsed.query = url.substr(0, pos);
-        std::cerr << __FILE__ << ':' << __LINE__ << " parsed.query [" << parsed.query << ']' << std::endl;
         url = pos == url.npos ? ""sv : url.substr(pos);
-        std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << url << ']' << std::endl;
     }
 
     // fragment
     if (url.find('#') == 0)
     {
         parsed.fragment = url.substr(1);
-        std::cerr << __FILE__ << ':' << __LINE__ << " fragment [" << parsed.fragment << ']' << std::endl;
     }
 
     return parsed;
@@ -401,24 +385,18 @@ tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
 {
     // find the next key/value delimiter
     auto pos = remain.find('&');
-    std::cerr << __FILE__ << ':' << __LINE__ << " pos [" << pos << ']' << std::endl;
     auto const pair = remain.substr(0, pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " pair [" << pair << ']' << std::endl;
     remain = pos == remain.npos ? ""sv : remain.substr(pos + 1);
-    std::cerr << __FILE__ << ':' << __LINE__ << " remain [" << remain << ']' << std::endl;
     if (std::empty(pair))
     {
         keyval.first = keyval.second = remain = ""sv;
-        std::cerr << __FILE__ << ':' << __LINE__ << " all empty" << std::endl;
         return *this;
     }
 
     // split it into key and value
     pos = pair.find('=');
     keyval.first = pair.substr(0, pos);
-    std::cerr << __FILE__ << ':' << __LINE__ << " key [" << keyval.first << ']' << std::endl;
     keyval.second = pos == pair.npos ? ""sv : pair.substr(pos + 1);
-    std::cerr << __FILE__ << ':' << __LINE__ << " value [" << keyval.second << ']' << std::endl;
     return *this;
 }
 
@@ -432,7 +410,6 @@ tr_url_query_view::iterator tr_url_query_view::begin() const
 
 std::string tr_urlPercentDecode(std::string_view in)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode in [" << in << ']' << std::endl;
     auto out = std::string{};
     out.reserve(std::size(in));
 
@@ -460,6 +437,5 @@ std::string tr_urlPercentDecode(std::string_view in)
         }
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_urlPercentDecode out [" << out << "]" << std::endl;
     return out;
 }
