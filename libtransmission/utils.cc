@@ -1161,24 +1161,20 @@ static bool parseNumberSection(std::string_view str, number_range& range)
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
+    auto range = number_range{};
 
     for (;;)
     {
-        auto const delim = str.find(',');
-        auto range = number_range{};
-        if (!parseNumberSection(str.substr(0, delim), range))
+        auto const token = tr_strvSep(&str, ',');
+        if (!parseNumberSection(token, range))
         {
             break;
         }
+
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-        if (delim == std::string_view::npos)
-        {
-            break;
-        }
-        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };

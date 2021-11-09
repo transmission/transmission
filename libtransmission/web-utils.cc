@@ -175,7 +175,7 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
 
     for (auto& ch : str)
     {
-        if ((UnescapedChars.find(ch) != std::string_view::npos) || (ReservedChars.find(ch) && !escape_reserved))
+        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
         {
             evbuffer_add_printf(out, "%c", ch);
         }
@@ -276,7 +276,7 @@ bool urlCharsAreValid(std::string_view url)
     };
 
     return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return ValidChars.find(ch) != ValidChars.npos; });
+        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strvContains(ValidChars, ch); });
 }
 
 bool tr_isValidTrackerScheme(std::string_view scheme)
@@ -300,46 +300,33 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     parsed.full = url;
 
     // scheme
-    auto key = ":"sv;
-    auto pos = url.find(key);
-    if (pos == std::string_view::npos || pos == 0)
+    parsed.scheme = tr_strvSep(&url, ':');
+    if (std::empty(parsed.scheme))
     {
         return {};
     }
-    parsed.scheme = url.substr(0, pos);
-    url.remove_prefix(pos + std::size(key));
 
     // authority
     // The authority component is preceded by a double slash ("//") and is
     // terminated by the next slash ("/"), question mark ("?"), or number
     // sign ("#") character, or by the end of the URI.
-    key = "//"sv;
-    pos = url.find(key);
-    if (pos == 0)
+    auto key = "//"sv;
+    if (tr_strvStartsWith(url, key))
     {
-        url.remove_prefix(pos + std::size(key));
-        pos = url.find_first_of("/?#");
+        url.remove_prefix(std::size(key));
+        auto pos = url.find_first_of("/?#");
         parsed.authority = url.substr(0, pos);
         url = pos == url.npos ? ""sv : url.substr(pos);
 
-        // host
-        key = ":"sv;
-        pos = parsed.authority.find(key);
-        parsed.host = pos == std::string_view::npos ? parsed.authority : parsed.authority.substr(0, pos);
-        if (std::empty(parsed.host))
-        {
-            return {};
-        }
-
-        // port
-        parsed.portstr = pos == std::string_view::npos ? getPortForScheme(parsed.scheme) :
-                                                         parsed.authority.substr(pos + std::size(key));
+        auto remain = parsed.authority;
+        parsed.host = tr_strvSep(&remain, ':');
+        parsed.portstr = !std::empty(remain) ? remain : getPortForScheme(parsed.scheme);
         parsed.port = parsePort(parsed.portstr);
     }
 
     //  The path is terminated by the first question mark ("?") or
     //  number sign ("#") character, or by the end of the URI.
-    pos = url.find_first_of("?#");
+    auto pos = url.find_first_of("?#");
     parsed.path = url.substr(0, pos);
     url = pos == url.npos ? ""sv : url.substr(pos);
 
@@ -381,20 +368,9 @@ bool tr_urlIsValid(std::string_view url)
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
 {
-    // find the next key/value delimiter
-    auto pos = remain.find('&');
-    auto const pair = remain.substr(0, pos);
-    remain = pos == remain.npos ? ""sv : remain.substr(pos + 1);
-    if (std::empty(pair))
-    {
-        keyval.first = keyval.second = remain = ""sv;
-        return *this;
-    }
-
-    // split it into key and value
-    pos = pair.find('=');
-    keyval.first = pair.substr(0, pos);
-    keyval.second = pos == pair.npos ? ""sv : pair.substr(pos + 1);
+    auto pair = tr_strvSep(&remain, '&');
+    keyval.first = tr_strvSep(&pair, '=');
+    keyval.second = pair;
     return *this;
 }
 

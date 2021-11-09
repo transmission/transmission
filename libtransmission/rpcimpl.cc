@@ -968,7 +968,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
             return "labels cannot be empty";
         }
 
-        if (label.find(',') != label.npos)
+        if (tr_strvContains(label, ','))
         {
             return "labels cannot contain comma (,) character";
         }

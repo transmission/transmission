@@ -288,12 +288,6 @@ constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
     return ret;
 }
 
-constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
-{
-    *token = tr_strvSep(sv, delim);
-    return !std::empty(*token);
-}
-
 std::string_view tr_strvStrip(std::string_view sv);
 
 char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;

@@ -99,36 +99,24 @@ TEST_F(UtilsTest, trStrvEndsWith)
 
 TEST_F(UtilsTest, trStrvSep)
 {
-    auto sv = "token1,token2,token3"sv;
-    auto token = std::string_view{};
     auto constexpr Delim = ',';
 
-    EXPECT_TRUE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ("token2,token3"sv, sv);
-    EXPECT_EQ("token1"sv, token);
-    EXPECT_TRUE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ("token3"sv, sv);
-    EXPECT_EQ("token2"sv, token);
-    EXPECT_TRUE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ(""sv, sv);
-    EXPECT_EQ("token3"sv, token);
-    EXPECT_FALSE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ(""sv, sv);
-    EXPECT_EQ(""sv, token);
+    auto sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token3"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
 
     sv = " token1,token2"sv;
-    EXPECT_TRUE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ("token2"sv, sv);
-    EXPECT_EQ(" token1"sv, token);
+    EXPECT_EQ(" token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
 
     sv = "token1;token2"sv;
-    EXPECT_TRUE(tr_strvSep(&sv, &token, Delim));
-    EXPECT_EQ(""sv, sv);
-    EXPECT_EQ("token1;token2"sv, token);
-    EXPECT_FALSE(tr_strvSep(&sv, &token, Delim));
+    EXPECT_EQ("token1;token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
 
     sv = ""sv;
-    EXPECT_FALSE(tr_strvSep(&sv, &token, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
 }
 
 TEST_F(UtilsTest, trStrvStrip)
