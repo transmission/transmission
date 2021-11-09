@@ -250,18 +250,6 @@ TEST_F(UtilsTest, trMemmem)
     EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
 }
 
-TEST_F(UtilsTest, trBinaryHex)
-{
-    auto const hex_in = std::string{ "fb5ef5507427b17e04b69cef31fa3379b456735a" };
-
-    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
-
-    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH * 2 + 1>{};
-    tr_binary_to_hex(binary.data(), hex_out.data(), 20);
-    EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
-}
-
 TEST_F(UtilsTest, array)
 {
     auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };

@@ -294,9 +294,6 @@ char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 ****
 ***/
 
-void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
 double tr_getRatio(uint64_t numerator, uint64_t denominator);
