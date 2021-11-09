@@ -13,31 +13,34 @@
 #include "gtest/gtest.h"
 
 #include <array>
+#include <string_view>
+
+using namespace std::literals;
 
 TEST(Magnet, magnetParse)
 {
-    auto const expected_hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
+    auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
         210, 53,  64, 16, 163, 202, 74,  222, 91,  116, //
         39,  187, 9,  58, 98,  163, 137, 159, 243, 129, //
     };
 
-    char const* const uri_hex =
+    auto constexpr UriHex =
         "magnet:?xt=urn:btih:"
         "d2354010a3ca4ade5b7427bb093a62a3899ff381"
         "&dn=Display%20Name"
         "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
-        "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
+        "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"sv;
 
-    char const* const uri_base32 =
+    auto constexpr UriBase32 =
         "magnet:?xt=urn:btih:"
         "2I2UAEFDZJFN4W3UE65QSOTCUOEZ744B"
         "&dn=Display%20Name"
         "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
-        "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
+        "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"sv;
 
-    for (auto const& uri : { uri_hex, uri_base32 })
+    for (auto const& uri : { UriHex, UriBase32 })
     {
         auto* info = tr_magnetParse(uri);
         EXPECT_NE(nullptr, info);
@@ -47,8 +50,8 @@ TEST(Magnet, magnetParse)
         EXPECT_EQ(1, info->webseedCount);
         EXPECT_STREQ("http://server.webseed.org/path/to/file", info->webseeds[0]);
         EXPECT_STREQ("Display Name", info->displayName);
-        EXPECT_EQ(expected_hash.size(), sizeof(info->hash));
-        EXPECT_EQ(0, memcmp(info->hash, expected_hash.data(), expected_hash.size()));
+        EXPECT_EQ(std::size(ExpectedHash), sizeof(info->hash));
+        EXPECT_EQ(0, memcmp(info->hash, std::data(ExpectedHash), std::size(ExpectedHash)));
         tr_magnetFree(info);
     }
 }

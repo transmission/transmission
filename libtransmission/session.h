@@ -23,13 +23,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strcasecmp()
+#include <event2/util.h> // evutil_ascii_strncasecmp()
 
 #include "bandwidth.h"
-#include "bitfield.h"
 #include "net.h"
 #include "tr-macros.h"
-#include "utils.h"
+#include "utils.h" // tr_speed_K
 
 enum tr_auto_switch_state_t
 {
@@ -43,14 +42,15 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
+class tr_bitfield;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
 struct tr_blocklistFile;
 struct tr_cache;
-struct tr_fdInfo;
 struct tr_device_info;
+struct tr_fdInfo;
 
 struct tr_turtle_info
 {

@@ -16,6 +16,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
+#include <unordered_set>
 #include <vector>
 
 #ifndef _WIN32
@@ -30,32 +31,33 @@
 
 // #define TR_SHOW_DEPRECATED
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
-#include "error.h"
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
+#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
-#include "session.h"
 #include "session-id.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
+#include "tr-lpd.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
-#include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"

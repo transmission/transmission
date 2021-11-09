@@ -18,7 +18,6 @@
 
 #include "crypto-utils.h"
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
 /**
 *** @addtogroup peers

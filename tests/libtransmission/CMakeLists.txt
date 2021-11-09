@@ -24,7 +24,8 @@ add_executable(libtransmission-test
     test-fixtures.h
     utils-test.cc
     variant-test.cc
-    watchdir-test.cc)
+    watchdir-test.cc
+    web-utils-test.cc)
 
 target_compile_definitions(libtransmission-test
     PRIVATE

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstring>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 #include "completion.h"

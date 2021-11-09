@@ -93,7 +93,7 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
-    tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
+    tr_magnet_info* magnet_info = magnet_link ? tr_magnetParse(magnet_link) : nullptr;
     if (magnet_info == nullptr)
     {
         return -1;

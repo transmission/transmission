@@ -15,11 +15,12 @@
 #endif
 
 #include "transmission.h"
+
 #include "ConvertUTF.h" // tr_utf8_validate()
-#include "platform.h"
 #include "crypto-utils.h" // tr_rand_int_weak()
+#include "platform.h"
+#include "ptrarray.h"
 #include "utils.h"
-#include "web.h" // tr_http_unescape()
 
 #include "test-fixtures.h"
 
@@ -229,93 +230,6 @@ TEST_F(UtilsTest, array)
     {
         EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
     }
-}
-
-TEST_F(UtilsTest, url)
-{
-    auto const* url = "http://1";
-    int port;
-    char* scheme = nullptr;
-    char* host = nullptr;
-    char* path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("1", host);
-    EXPECT_STREQ("/", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    auto parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("1"sv, parsed->host);
-    EXPECT_EQ("/"sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
-    EXPECT_EQ(80, parsed->port);
-
-    url = "http://www.some-tracker.org/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
-    EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
-    EXPECT_EQ(80, parsed->port);
-
-    url = "http://www.some-tracker.org:8080/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(8080, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
-    EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("8080"sv, parsed->portstr);
-    EXPECT_EQ(8080, parsed->port);
-
-    EXPECT_FALSE(tr_urlIsValid("hello world"sv));
-    EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
-    EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
-    EXPECT_FALSE(tr_urlIsValid(""sv));
-    EXPECT_FALSE(tr_urlIsValid("com"sv));
-    EXPECT_FALSE(tr_urlIsValid("www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValid("://www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValid("zzz://www.example.com"sv)); // syntactically valid, but unsupported scheme
-    EXPECT_TRUE(tr_urlIsValid("https://www.example.com"sv));
-
-    EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
-}
-
-TEST_F(UtilsTest, trHttpUnescape)
-{
-    auto const url = std::string{ "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = makeString(tr_http_unescape(url.data(), url.size()));
-    EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 
 TEST_F(UtilsTest, truncd)

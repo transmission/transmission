@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <list>
-#include <map>
 #include <string>
 
 #ifndef _XOPEN_SOURCE

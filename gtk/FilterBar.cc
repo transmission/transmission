@@ -15,6 +15,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h" /* gtr_get_favicon() */
 #include "FilterBar.h"
