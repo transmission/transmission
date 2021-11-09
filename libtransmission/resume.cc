@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstring>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 #include "completion.h"
@@ -485,7 +486,7 @@ static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawl
     }
     else
     {
-        bitfield.setRaw(raw, rawlen, true);
+        bitfield.setRaw(raw, rawlen);
     }
 }
 
@@ -648,7 +649,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks.setRaw(raw, rawlen, true);
+            blocks.setRaw(raw, rawlen);
         }
         else
         {

@@ -24,7 +24,8 @@
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
-#include "web.h" /* tr_http_escape() */
+#include "web.h"
+#include "web-utils.h"
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 

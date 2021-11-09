@@ -32,6 +32,7 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -241,7 +242,7 @@ struct tr_tracker
 };
 
 // format: `${host}:${port}`
-tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed)
+tr_quark tr_announcerGetKey(tr_url_parsed_t const& parsed)
 {
     std::string buf;
     tr_buildBuf(buf, parsed.host, ":"sv, parsed.portstr);
@@ -536,14 +537,14 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 
 struct AnnTrackerInfo
 {
-    AnnTrackerInfo(tr_tracker_info info_in, tr_parsed_url_t url_in)
+    AnnTrackerInfo(tr_tracker_info info_in, tr_url_parsed_t url_in)
         : info{ info_in }
         , url{ url_in }
     {
     }
 
     tr_tracker_info info;
-    tr_parsed_url_t url;
+    tr_url_parsed_t url;
 
     /* primary key: tier
      * secondary key: udp comes before http */

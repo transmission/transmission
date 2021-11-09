@@ -12,9 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
+#include <string_view>
+
 #include "transmission.h"
-#include "variant.h"
+
+struct tr_variant;
 
 struct tr_magnet_info
 {
@@ -29,9 +31,7 @@ struct tr_magnet_info
     char** webseeds;
 };
 
-tr_magnet_info* tr_magnetParse(char const* uri);
-
-struct tr_variant;
+tr_magnet_info* tr_magnetParse(std::string_view magnet_link);
 
 void tr_magnetCreateMetainfo(tr_magnet_info const*, tr_variant*);
 

@@ -30,6 +30,8 @@ struct tr_ptrArray
     int n_alloc;
 };
 
+using tr_voidptr_compare_func = int (*)(void const* lhs, void const* rhs);
+
 using PtrArrayCompareFunc = tr_voidptr_compare_func;
 
 using PtrArrayForeachFunc = void (*)(void*);
@@ -120,5 +122,14 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
 /** @brief Find a pointer from an array sorted by the specified sort function
     @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
+
+/** @brief similar to bsearch() but returns the index of the lower bound */
+int tr_lowerBound(
+    void const* key,
+    void const* base,
+    size_t nmemb,
+    size_t size,
+    tr_voidptr_compare_func compar,
+    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /* @} */

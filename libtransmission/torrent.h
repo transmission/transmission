@@ -19,20 +19,20 @@
 #include <unordered_set>
 #include <vector>
 
-#include "bandwidth.h" /* tr_bandwidth */
+#include "bandwidth.h"
 #include "bitfield.h"
-#include "completion.h" /* tr_completion */
+#include "completion.h"
 #include "file.h"
 #include "quark.h"
-#include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_PRINTF */
 
 class tr_swarm;
+struct tr_magnet_info;
+struct tr_session;
 struct tr_torrent;
 struct tr_torrent_tiers;
-struct tr_magnet_info;
 
 /**
 ***  Package-visible ctor API

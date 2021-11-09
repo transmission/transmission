@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
+#include <cstdarg>
+#include <cstddef>
+#include <ctime>
 #include <optional>
-#include <stdarg.h>
-#include <stddef.h> /* size_t */
 #include <string>
 #include <string_view>
-#include <time.h> /* time_t */
 #include <type_traits>
 #include <vector>
 
@@ -229,15 +229,6 @@ constexpr bool tr_str_is_empty(char const* value)
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
-/** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
-
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
  * @return a newly-allocated string that can be freed with tr_free()
@@ -279,36 +270,6 @@ char* tr_strsep(char** str, char const* delim);
 
 void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-
-/** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
-bool tr_addressIsIP(char const* address);
-
-/** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(std::string_view url);
-
-/** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(std::string_view url);
-
-// TODO: move this to types.h
-struct tr_parsed_url_t
-{
-    std::string_view scheme;
-    std::string_view host;
-    std::string_view path;
-    std::string_view portstr;
-    int port = -1;
-};
-
-std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url);
-
-// like tr_urlParse(), but with the added constraint that 'scheme'
-// must be one we that Transmission supports for announce and scrape
-std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url);
-
-/** @brief parse a URL into its component parts
-    @return True on success or false if an error occurred */
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-    TR_GNUC_NONNULL(1);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */

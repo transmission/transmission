@@ -15,7 +15,7 @@
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
+#include "utils.h" // tr_binary_to_hex(), tr_hex_to_binary()
 
 /**
 *** @addtogroup utils Utilities

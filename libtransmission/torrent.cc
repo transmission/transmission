@@ -30,6 +30,7 @@
 #include <event2/util.h> /* evutil_vsnprintf() */
 
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "cache.h"
@@ -48,14 +49,15 @@
 #include "resume.h"
 #include "session.h"
 #include "subprocess.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
 #include "version.h"
+#include "web-utils.h"
 
 /***
 ****
@@ -112,11 +114,11 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& 
     return tr_torrentFindFromHash(session, reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
 }
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
+tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     tr_torrent* tor = nullptr;
 
-    tr_magnet_info* const info = tr_magnetParse(magnet);
+    tr_magnet_info* const info = magnet_link ? tr_magnetParse(magnet_link) : nullptr;
     if (info != nullptr)
     {
         tor = tr_torrentFindFromHash(session, info->hash);
@@ -953,8 +955,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             {
                 tr_torrentSetLocalError(tor, "Unable to save torrent file: %s", tr_strerror(err));
             }
-
-            tr_sessionSetTorrentFile(tor->session, tor->info.hashString, path);
         }
     }
 
