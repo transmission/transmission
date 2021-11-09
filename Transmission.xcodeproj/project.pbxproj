@@ -346,6 +346,8 @@
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
 		C1639A7C1A55F57200E42033 /* cdecode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7A1A55F57200E42033 /* cdecode.h */; };
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
+		C17740D5273A002C00E455D2 /* web-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = C17740D3273A002C00E455D2 /* web-utils.cc */; };
+		C17740D6273A002C00E455D2 /* web-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C17740D4273A002C00E455D2 /* web-utils.h */; };
 		C1A7517526ED048C0038B90A /* libarc4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1A7516426ED03140038B90A /* libarc4.a */; };
 		C1A751E526ED09A30038B90A /* arc4.c in Sources */ = {isa = PBXBuildFile; fileRef = C1A751E326ED09A30038B90A /* arc4.c */; };
 		C1A751E626ED09A30038B90A /* arc4.h in Headers */ = {isa = PBXBuildFile; fileRef = C1A751E426ED09A30038B90A /* arc4.h */; };
@@ -1001,6 +1003,8 @@
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = src/cencode.c; sourceTree = "<group>"; };
 		C1639A7A1A55F57200E42033 /* cdecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cdecode.h; path = include/b64/cdecode.h; sourceTree = "<group>"; };
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = include/b64/cencode.h; sourceTree = "<group>"; };
+		C17740D3273A002C00E455D2 /* web-utils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "web-utils.cc"; sourceTree = "<group>"; };
+		C17740D4273A002C00E455D2 /* web-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "web-utils.h"; sourceTree = "<group>"; };
 		C1A7516426ED03140038B90A /* libarc4.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libarc4.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1A751E326ED09A30038B90A /* arc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arc4.c; path = "third-party/arc4/src/arc4.c"; sourceTree = SOURCE_ROOT; };
 		C1A751E426ED09A30038B90A /* arc4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arc4.h; path = "third-party/arc4/src/arc4.h"; sourceTree = SOURCE_ROOT; };
@@ -1362,6 +1366,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				C17740D3273A002C00E455D2 /* web-utils.cc */,
+				C17740D4273A002C00E455D2 /* web-utils.h */,
 				CAB35C62252F6F5E00552A55 /* mime-types.h */,
 				C1077A4A183EB29600634C22 /* error.cc */,
 				C1077A4B183EB29600634C22 /* error.h */,
@@ -1846,6 +1852,7 @@
 				C11DEA171FCD31C0009E22B9 /* subprocess.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
 				C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */,
+				C17740D6273A002C00E455D2 /* web-utils.h in Headers */,
 				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
 				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
@@ -2457,6 +2464,7 @@
 				C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.cc in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.cc in Sources */,
+				C17740D5273A002C00E455D2 /* web-utils.cc in Sources */,
 				C1425B351EE9C5F5001DB85F /* tr-assert.cc in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.cc in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.cc in Sources */,
