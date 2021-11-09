@@ -1061,16 +1061,10 @@ static bool parseNumberSection(std::string_view str, number_range& range)
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
+    auto token = std::string_view{};
     auto range = number_range{};
-
-    for (;;)
+    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
     {
-        auto const token = tr_strvSep(&str, ',');
-        if (!parseNumberSection(token, range))
-        {
-            break;
-        }
-
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);

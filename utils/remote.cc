@@ -682,14 +682,9 @@ static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
         labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
     }
 
-    for (;;)
+    auto label = std::string_view{};
+    while (tr_strvSep(&comma_delimited_labels, &label, ','))
     {
-        auto const label = tr_strvSep(&comma_delimited_labels, ',');
-        if (std::empty(label))
-        {
-            break;
-        }
-
         tr_variantListAddStr(labels, label);
     }
 }
