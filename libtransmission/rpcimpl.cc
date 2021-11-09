@@ -21,8 +21,6 @@
 #endif
 #include <zlib.h>
 
-#include <event2/buffer.h>
-
 #include "transmission.h"
 #include "completion.h"
 #include "crypto-utils.h"

@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strcasecmp()
+#include <event2/util.h> // evutil_ascii_strncasecmp()
 
 #include "bandwidth.h"
 #include "net.h"

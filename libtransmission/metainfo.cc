@@ -12,8 +12,6 @@
 #include <iterator>
 #include <string_view>
 
-#include <event2/buffer.h>
-
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */

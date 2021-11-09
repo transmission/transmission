@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <cstring> /* strchr() */
 #include <cstdio> /* sscanf() */
 
@@ -107,11 +108,6 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
-static auto constexpr MaxTrackers = std::size_t{ 64 };
-static auto constexpr MaxWebseeds = std::size_t{ 64 };
-
-#include <iostream>
-
 tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
 {
     auto const parsed = tr_urlParse(magnet_link);
@@ -121,27 +117,25 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
     }
 
     bool got_checksum = false;
-    size_t trCount = 0;
-    size_t wsCount = 0;
-    char* tr[MaxTrackers];
-    char* ws[MaxWebseeds];
-    char* displayName = nullptr;
+    auto tr = std::vector<char*>{};
+    auto ws = std::vector<char*>{};
+    char* display_name = nullptr;
     uint8_t sha1[SHA_DIGEST_LENGTH];
 
     for (auto const& [key, value] : tr_url_query_view{ parsed->query })
     {
         if (key == "dn"sv)
         {
-            displayName = tr_strvdup(tr_urlPercentDecode(value));
+            display_name = tr_strvdup(tr_urlPercentDecode(value));
         }
-        else if ((key == "tr"sv || key.find("tr.") == 0) && (trCount < MaxTrackers))
+        else if (key == "tr"sv || key.find("tr.") == 0)
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            tr[trCount++] = tr_strvdup(tr_urlPercentDecode(value));
+            tr.push_back(tr_strvdup(tr_urlPercentDecode(value)));
         }
-        else if ((key == "ws"sv) && (wsCount < MaxWebseeds))
+        else if (key == "ws"sv)
         {
-            ws[wsCount++] = tr_strvdup(tr_urlPercentDecode(value));
+            ws.push_back(tr_strvdup(tr_urlPercentDecode(value)));
         }
         else if (key == "xt"sv)
         {
@@ -149,47 +143,39 @@ tr_magnet_info* tr_magnetParse(std::string_view magnet_link)
             if (value.find(ValPrefix) == 0)
             {
                 auto const hash = value.substr(std::size(ValPrefix));
-                if (std::size(hash) == 40)
+                switch (std::size(hash))
                 {
+                case 40:
                     tr_hex_to_sha1(sha1, std::data(hash));
                     got_checksum = true;
-                }
-                else if (std::size(hash) == 32)
-                {
+                    break;
+
+                case 32:
                     base32_to_sha1(sha1, std::data(hash), std::size(hash));
                     got_checksum = true;
+                    break;
+
+                default:
+                    break;
                 }
             }
         }
     }
 
-    tr_magnet_info* info = nullptr;
-
-    if (got_checksum)
+    if (!got_checksum)
     {
-        info = tr_new0(tr_magnet_info, 1);
-        info->displayName = displayName;
-        info->trackerCount = trCount;
-        info->trackers = static_cast<char**>(tr_memdup(tr, sizeof(char*) * trCount));
-        info->webseedCount = wsCount;
-        info->webseeds = static_cast<char**>(tr_memdup(ws, sizeof(char*) * wsCount));
-        memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
-    }
-    else
-    {
-        for (size_t i = 0; i < trCount; i++)
-        {
-            tr_free(tr[i]);
-        }
-
-        for (size_t i = 0; i < wsCount; i++)
-        {
-            tr_free(ws[i]);
-        }
-
-        tr_free(displayName);
+        std::for_each(std::begin(tr), std::end(tr), tr_free);
+        std::for_each(std::begin(ws), std::end(ws), tr_free);
+        return nullptr;
     }
 
+    auto* const info = tr_new0(tr_magnet_info, 1);
+    info->displayName = display_name;
+    info->trackerCount = std::size(tr);
+    info->trackers = reinterpret_cast<char**>(tr_memdup(std::data(tr), std::size(tr) * sizeof(char*)));
+    info->webseedCount = std::size(ws);
+    info->webseeds = reinterpret_cast<char**>(tr_memdup(std::data(ws), std::size(ws) * sizeof(char*)));
+    std::copy_n(sha1, SHA_DIGEST_LENGTH, info->hash);
     return info;
 }
 
@@ -197,20 +183,10 @@ void tr_magnetFree(tr_magnet_info* info)
 {
     if (info != nullptr)
     {
-        for (int i = 0; i < info->trackerCount; ++i)
-        {
-            tr_free(info->trackers[i]);
-        }
-
+        std::for_each(info->trackers, info->trackers + info->trackerCount, tr_free);
+        std::for_each(info->webseeds, info->webseeds + info->webseedCount, tr_free);
         tr_free(info->trackers);
-
-        for (int i = 0; i < info->webseedCount; ++i)
-        {
-            tr_free(info->webseeds[i]);
-        }
-
         tr_free(info->webseeds);
-
         tr_free(info->displayName);
         tr_free(info);
     }

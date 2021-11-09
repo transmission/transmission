@@ -13,8 +13,6 @@
 #include <optional>
 #include <string_view>
 
-#include <curl/curl.h>
-
 #include <event2/buffer.h>
 
 #include "transmission.h"
