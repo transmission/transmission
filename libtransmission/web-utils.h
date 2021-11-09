@@ -58,8 +58,8 @@ struct tr_url_query_view
 
     struct iterator
     {
-        std::pair<std::string_view, std::string_view> keyval;
-        std::string_view remain;
+        std::pair<std::string_view, std::string_view> keyval = std::make_pair(std::string_view{ "" }, std::string_view{ "" });
+        std::string_view remain = std::string_view{ "" };
 
         iterator& operator++();
 
@@ -79,8 +79,10 @@ struct tr_url_query_view
                       << this->remain << "]" << std::endl;
             std::cerr << __FILE__ << ':' << __LINE__ << " that [" << that.keyval.first << "][" << that.keyval.second << "]["
                       << that.remain << "]" << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(this->remain) << ' ' << std::size(this->remain) << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(that.remain) << ' ' << std::size(that.remain) << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(this->remain) << ' ' << std::size(this->remain)
+                      << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << (void*)std::data(that.remain) << ' ' << std::size(that.remain)
+                      << std::endl;
             auto const b = this->remain == that.remain;
             std::cerr << __FILE__ << ':' << __LINE__ << " b " << b << std::endl;
             auto const a = this->keyval == that.keyval;
