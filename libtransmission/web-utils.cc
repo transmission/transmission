@@ -190,22 +190,6 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
 
 #include <iostream>
 
-char* tr_http_unescape(char const* str, size_t len)
-{
-    int ilen = int(len);
-    auto* curl = curl_easy_init();
-    std::cerr << __FILE__ << ':' << __LINE__ << " [" << std::string_view{ str, len } << ']' << std::endl;
-    char* tmp = curl_easy_unescape(curl, str, ilen, &ilen);
-    std::cerr << __FILE__ << ':' << __LINE__ << " [" << tmp << ']' << std::endl;
-    char* ret = tr_strndup(tmp, len);
-    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
-    curl_free(tmp);
-    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
-    curl_easy_cleanup(curl);
-    std::cerr << __FILE__ << ':' << __LINE__ << " [" << ret << ']' << std::endl;
-    return ret;
-}
-
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||

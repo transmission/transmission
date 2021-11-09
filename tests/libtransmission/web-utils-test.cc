@@ -179,10 +179,3 @@ TEST_F(WebUtilsTest, urlPercentDecode)
         EXPECT_EQ(test.second, tr_urlPercentDecode(test.first));
     }
 }
-
-TEST_F(WebUtilsTest, httpUnescape)
-{
-    auto const url = std::string{ "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = makeString(tr_http_unescape(url.data(), url.size()));
-    EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
-}

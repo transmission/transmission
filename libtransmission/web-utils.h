@@ -111,8 +111,6 @@ void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 
 void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
 
-char* tr_http_unescape(char const* str, size_t len);
-
 char const* tr_webGetResponseStr(long response_code);
 
 std::string tr_urlPercentDecode(std::string_view);
