@@ -415,7 +415,7 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
     return ret;
 }
 
-char* tr_strvdup(std::string_view in)
+char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
     auto* const ret = tr_new(char, n + 1);
@@ -427,7 +427,7 @@ char* tr_strvdup(std::string_view in)
 char* tr_strndup(void const* vin, size_t len)
 {
     auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvdup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
+    return in == nullptr ? nullptr : tr_strvDup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
 }
 
 char* tr_strdup(void const* in)
@@ -546,45 +546,7 @@ int tr_strcmp0(char const* str1, char const* str2)
 *****
 ****/
 
-/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch */
-char* tr_strsep(char** str, char const* delims)
-{
-#ifdef HAVE_STRSEP
-
-    return strsep(str, delims);
-
-#else
-
-    char* token;
-
-    if (*str == nullptr) /* no more tokens */
-    {
-        return nullptr;
-    }
-
-    token = *str;
-
-    while (**str != '\0')
-    {
-        if (strchr(delims, **str) != nullptr)
-        {
-            **str = '\0';
-            (*str)++;
-            return token;
-        }
-
-        (*str)++;
-    }
-
-    /* there is not another token */
-    *str = nullptr;
-
-    return token;
-
-#endif
-}
-
-std::string_view tr_strvstrip(std::string_view str)
+std::string_view tr_strvStrip(std::string_view str)
 {
     auto constexpr test = [](auto ch)
     {
@@ -596,32 +558,6 @@ std::string_view tr_strvstrip(std::string_view str)
 
     auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
     str.remove_suffix(std::distance(std::rbegin(str), rit));
-
-    return str;
-}
-
-char* tr_strstrip(char* str)
-{
-    if (str != nullptr)
-    {
-        size_t len = strlen(str);
-
-        while (len != 0 && isspace(str[len - 1]))
-        {
-            --len;
-        }
-
-        size_t pos = 0;
-
-        while (pos < len && isspace(str[pos]))
-        {
-            ++pos;
-        }
-
-        len -= pos;
-        memmove(str, str + pos, len);
-        str[len] = '\0';
-    }
 
     return str;
 }
@@ -763,42 +699,6 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return TR_RATIO_NA;
 }
 
-void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
-{
-    static char const hex[] = "0123456789abcdef";
-
-    auto const* input = static_cast<uint8_t const*>(vinput);
-    auto* output = static_cast<char*>(voutput);
-
-    /* go from back to front to allow for in-place conversion */
-    input += byte_length;
-    output += byte_length * 2;
-
-    *output = '\0';
-
-    while (byte_length-- > 0)
-    {
-        unsigned int const val = *(--input);
-        *(--output) = hex[val & 0xf];
-        *(--output) = hex[val >> 4];
-    }
-}
-
-void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
-{
-    static char const hex[] = "0123456789abcdef";
-
-    auto const* input = static_cast<uint8_t const*>(vinput);
-    auto* output = static_cast<uint8_t*>(voutput);
-
-    for (size_t i = 0; i < byte_length; ++i)
-    {
-        int const hi = strchr(hex, tolower(*input++)) - hex;
-        int const lo = strchr(hex, tolower(*input++)) - hex;
-        *output++ = (uint8_t)((hi << 4) | lo);
-    }
-}
-
 /***
 ****
 ***/
@@ -838,16 +738,19 @@ static char* strip_non_utf8(char const* in, size_t inlen)
 
 static char* to_utf8(char const* in, size_t inlen)
 {
-    char* ret = nullptr;
-
 #ifdef HAVE_ICONV
-
-    char const* encodings[] = { "CURRENT", "ISO-8859-15" };
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (size_t i = 0; ret == nullptr && i < TR_N_ELEMENTS(encodings); ++i)
+    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
+    for (auto const* test_encoding : Encodings)
     {
+        iconv_t cd = iconv_open("UTF-8", test_encoding);
+        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        {
+            continue;
+        }
+
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         auto const* inbuf = in;
 #else
@@ -856,18 +759,13 @@ static char* to_utf8(char const* in, size_t inlen)
         char* outbuf = out;
         size_t inbytesleft = inlen;
         size_t outbytesleft = buflen;
-        char const* test_encoding = encodings[i];
-
-        iconv_t cd = iconv_open("UTF-8", test_encoding);
-
-        if (cd != (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+        iconv_close(cd);
+        if (rv != size_t(-1))
         {
-            if (iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft) != (size_t)-1)
-            {
-                ret = tr_strndup(out, buflen - outbytesleft);
-            }
-
-            iconv_close(cd);
+            char* const ret = tr_strndup(out, buflen - outbytesleft);
+            tr_free(out);
+            return ret;
         }
     }
 
@@ -875,12 +773,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #endif
 
-    if (ret == nullptr)
-    {
-        ret = strip_non_utf8(in, inlen);
-    }
-
-    return ret;
+    return strip_non_utf8(in, inlen);
 }
 
 char* tr_utf8clean(std::string_view str)
@@ -888,6 +781,24 @@ char* tr_utf8clean(std::string_view str)
     char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
                                                                                   to_utf8(std::data(str), std::size(str));
     TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
+    return ret;
+}
+
+static bool tr_strvUtf8Validate(std::string_view sv)
+{
+    return tr_utf8_validate(std::data(sv), std::size(sv), nullptr);
+}
+
+std::string tr_strvUtf8Clean(std::string_view sv)
+{
+    if (tr_strvUtf8Validate(sv))
+    {
+        return std::string{ sv };
+    }
+
+    auto* const tmp = to_utf8(std::data(sv), std::size(sv));
+    auto ret = std::string{ tmp ? tmp : "" };
+    tr_free(tmp);
     return ret;
 }
 
@@ -1161,24 +1072,14 @@ static bool parseNumberSection(std::string_view str, number_range& range)
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
-
-    for (;;)
+    auto token = std::string_view{};
+    auto range = number_range{};
+    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
     {
-        auto const delim = str.find(',');
-        auto range = number_range{};
-        if (!parseNumberSection(str.substr(0, delim), range))
-        {
-            break;
-        }
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-        if (delim == std::string_view::npos)
-        {
-            break;
-        }
-        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };

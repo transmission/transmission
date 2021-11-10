@@ -1149,7 +1149,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        s->url = tr_strvdup(url);
+        s->url = tr_strvDup(url);
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

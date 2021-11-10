@@ -49,34 +49,94 @@ TEST_F(UtilsTest, trStripPositionalArgs)
     EXPECT_STREQ(expected, out);
 }
 
-TEST_F(UtilsTest, trStrstrip)
+TEST_F(UtilsTest, trStrvContains)
 {
-    auto* in = tr_strdup("   test    ");
-    auto* out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
+    EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));
+    EXPECT_FALSE(tr_strvContains("test"sv, "testt"sv));
+    EXPECT_FALSE(tr_strvContains("test"sv, "this is a test"sv));
+    EXPECT_TRUE(tr_strvContains(" test "sv, "tes"sv));
+    EXPECT_TRUE(tr_strvContains(" test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("a test is this"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains(""sv, ""sv));
+}
 
-    in = tr_strdup(" test test ");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test test", out);
-    tr_free(in);
+TEST_F(UtilsTest, trStrvStartsWith)
+{
+    EXPECT_FALSE(tr_strvStartsWith(""sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, " his is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "his is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "string"sv));
+    EXPECT_TRUE(tr_strvStartsWith(""sv, ""sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this "sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this is"sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this"sv));
+}
 
-    /* strstrip */
-    in = tr_strdup("test");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
+TEST_F(UtilsTest, trStrvEndsWith)
+{
+    EXPECT_FALSE(tr_strvEndsWith(""sv, "string"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "alphabet"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "strin"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this is"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strvEndsWith("tring"sv, "string"sv));
+    EXPECT_TRUE(tr_strvEndsWith(""sv, ""sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, " string"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "a string"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "g"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "string"sv));
+}
 
-    EXPECT_EQ(""sv, tr_strvstrip("              "sv));
-    EXPECT_EQ("test test"sv, tr_strvstrip("    test test     "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("   test     "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("   test "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip(" test       "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip(" test "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("test"sv));
+TEST_F(UtilsTest, trStrvSep)
+{
+    auto constexpr Delim = ',';
+
+    auto sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token3"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+
+    sv = " token1,token2"sv;
+    EXPECT_EQ(" token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+
+    sv = "token1;token2"sv;
+    EXPECT_EQ("token1;token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+
+    sv = ""sv;
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+}
+
+TEST_F(UtilsTest, trStrvStrip)
+{
+    EXPECT_EQ(""sv, tr_strvStrip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strvStrip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
+}
+
+TEST_F(UtilsTest, trStrvDup)
+{
+    auto constexpr Key = "this is a test"sv;
+    char* str = tr_strvDup(Key);
+    EXPECT_NE(nullptr, str);
+    EXPECT_EQ(Key, str);
+    tr_free(str);
 }
 
 TEST_F(UtilsTest, trBuildpath)
@@ -124,7 +184,48 @@ TEST_F(UtilsTest, trUtf8clean)
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 }
 
-TEST_F(UtilsTest, numbers)
+TEST_F(UtilsTest, trStrvUtf8Clean)
+{
+    auto in = "hello world"sv;
+    auto out = tr_strvUtf8Clean(in);
+    EXPECT_EQ(in, out);
+
+    in = "hello world"sv;
+    out = tr_strvUtf8Clean(in.substr(0, 5));
+    EXPECT_EQ("hello"sv, out);
+
+    // this version is not utf-8 (but cp866)
+    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+
+    // same string, but utf-8 clean
+    in = "Трудно быть Богом"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_EQ(in, out);
+
+    // https://trac.transmissionbt.com/ticket/6064
+    // TODO: It seems like that bug was not fixed so much as we just let
+    // strlen() solve the problem for us; however, it's probably better to
+    // wait until https://github.com/transmission/transmission/issues/612
+    // is resolved before revisiting this.
+    in = "\xF4\x00\x81\x82"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 1 || out.size() == 2);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+
+    in = "\xF4\x33\x81\x82"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+}
+
+TEST_F(UtilsTest, trParseNumberRange)
 {
     auto const tostring = [](std::vector<int> const& v)
     {
@@ -188,18 +289,6 @@ TEST_F(UtilsTest, trMemmem)
     EXPECT_EQ(haystack, tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
     EXPECT_EQ(haystack.substr(2), tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
     EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
-}
-
-TEST_F(UtilsTest, trBinaryHex)
-{
-    auto const hex_in = std::string{ "fb5ef5507427b17e04b69cef31fa3379b456735a" };
-
-    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
-
-    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH * 2 + 1>{};
-    tr_binary_to_hex(binary.data(), hex_out.data(), 20);
-    EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
 }
 
 TEST_F(UtilsTest, array)
