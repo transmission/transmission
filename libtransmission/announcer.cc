@@ -1231,11 +1231,12 @@ static void announce_request_delegate(
 #endif
 
     auto const announce_sv = tr_quark_get_string_view(request->announce_url);
-    if (announce_sv.find("http://"sv) == 0 || announce_sv.find("https://"sv) == 0)
+
+    if (tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
     {
         tr_tracker_http_announce(session, request, callback, callback_data);
     }
-    else if (announce_sv.find("udp://"sv) == 0)
+    else if (tr_strvStartsWith(announce_sv, "udp://"sv))
     {
         tr_tracker_udp_announce(session, request, callback, callback_data);
     }
@@ -1289,7 +1290,7 @@ static constexpr bool multiscrape_too_big(std::string_view errmsg)
 
     for (auto const& tle : TooLongErrors)
     {
-        if (errmsg.find(tle) != std::string_view::npos)
+        if (tr_strvContains(errmsg, tle))
         {
             return true;
         }
@@ -1483,11 +1484,11 @@ static void scrape_request_delegate(
 
     auto const scrape_sv = tr_quark_get_string_view(request->scrape_url);
 
-    if (scrape_sv.find("http://"sv) == 0 || scrape_sv.find("https://"sv) == 0)
+    if (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
     {
         tr_tracker_http_scrape(session, request, callback, callback_data);
     }
-    else if (scrape_sv.find("udp://"sv) == 0)
+    else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
     {
         tr_tracker_udp_scrape(session, request, callback, callback_data);
     }

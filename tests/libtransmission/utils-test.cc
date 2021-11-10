@@ -208,9 +208,9 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
-    // TODO: It seems like that bug was not fixed so much as we just let
-    // strlen() solve the problem for us; however, it's probably better to
-    // wait until https://github.com/transmission/transmission/issues/612
+    // TODO(anyone): It seems like that bug was not fixed so much as we just
+    // let strlen() solve the problem for us; however, it's probably better
+    // to wait until https://github.com/transmission/transmission/issues/612
     // is resolved before revisiting this.
     in = "\xF4\x00\x81\x82"sv;
     out = tr_strvUtf8Clean(in);
