@@ -13,7 +13,7 @@
 
 #include "transmission.h"
 #include "file.h"
-#include "magnet.h"
+#include "magnet-metainfo.h"
 #include "session.h"
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "tr-assert.h"
@@ -93,21 +93,19 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
-    tr_magnet_info* magnet_info = magnet_link ? tr_magnetParse(magnet_link) : nullptr;
-    if (magnet_info == nullptr)
+    auto mm = tr_magnet_metainfo{};
+    if (!mm.parseMagnet(magnet_link ? magnet_link : ""))
     {
         return -1;
     }
 
     auto tmp = tr_variant{};
+    mm.toVariant(&tmp);
     auto len = size_t{};
-    tr_magnetCreateMetainfo(magnet_info, &tmp);
     char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
     auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
-
     tr_free(str);
     tr_variantFree(&tmp);
-    tr_magnetFree(magnet_info);
 
     return err;
 }

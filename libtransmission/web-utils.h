@@ -90,7 +90,9 @@ struct tr_url_query_view
     }
 };
 
-// TODO: replace evbuffer* with std::string&
+void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved);
+
+// TODO: remove evbuffer version
 void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);

@@ -186,6 +186,26 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
     }
 }
 
+void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved)
+{
+    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
+    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
+
+    for (auto& ch : str)
+    {
+        if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
+        {
+            appendme += ch;
+        }
+        else
+        {
+            char buf[16];
+            tr_snprintf(buf, sizeof(buf), "%%%02X", (unsigned)(ch & 0xFF));
+            appendme += buf;
+        }
+    }
+}
+
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
@@ -331,7 +351,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     url = pos == url.npos ? ""sv : url.substr(pos);
 
     // query
-    if (url.find('?') == 0)
+    if (tr_strvStartsWith(url, '?'))
     {
         url.remove_prefix(1);
         pos = url.find('#');
@@ -340,7 +360,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     }
 
     // fragment
-    if (url.find('#') == 0)
+    if (tr_strvStartsWith(url, '#'))
     {
         parsed.fragment = url.substr(1);
     }

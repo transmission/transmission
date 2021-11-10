@@ -263,6 +263,11 @@ constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
     return sv.find(key) != sv.npos;
 }
 
+constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.front() == key;
+}
+
 constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
@@ -271,6 +276,11 @@ constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c
 constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.back() == key;
 }
 
 constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)

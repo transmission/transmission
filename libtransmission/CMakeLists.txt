@@ -30,7 +30,7 @@ set(PROJECT_FILES
   handshake.cc
   inout.cc
   log.cc
-  magnet.cc
+  magnet-metainfo.cc
   makemeta.cc
   metainfo.cc
   natpmp.cc
@@ -155,7 +155,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     handshake.h
     history.h
     inout.h
-    magnet.h
+    magnet-metainfo.h
     metainfo.h
     mime-types.h
     natpmp_local.h
