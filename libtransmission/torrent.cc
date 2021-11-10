@@ -2790,7 +2790,7 @@ static constexpr bool isJunkFile(std::string_view base)
 
 #ifdef __APPLE__
     // check for resource forks. <http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith("._"sv))
+    if (tr_strvStartsWith(base, "._"sv))
     {
         return true;
     }
