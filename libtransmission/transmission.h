@@ -33,6 +33,7 @@ using tr_piece_index_t = uint32_t;
  * if we ever need to grow past that, change this to uint64_t ;) */
 using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
+using tr_tracker_tier_t = uint32_t;
 
 struct tr_ctor;
 struct tr_error;

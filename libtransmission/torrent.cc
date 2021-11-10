@@ -41,7 +41,7 @@
 #include "file.h"
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
-#include "magnet.h"
+#include "magnet-metainfo.h"
 #include "metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
@@ -116,16 +116,8 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& 
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
-    tr_torrent* tor = nullptr;
-
-    tr_magnet_info* const info = magnet_link ? tr_magnetParse(magnet_link) : nullptr;
-    if (info != nullptr)
-    {
-        tor = tr_torrentFindFromHash(session, info->hash);
-        tr_magnetFree(info);
-    }
-
-    return tor;
+    auto mm = tr_magnet_metainfo{};
+    return mm.parseMagnet(magnet_link ? magnet_link : "") ? tr_torrentFindFromHash(session, mm.info_hash) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
@@ -2798,7 +2790,7 @@ static constexpr bool isJunkFile(std::string_view base)
 
 #ifdef __APPLE__
     // check for resource forks. <http://support.apple.com/kb/TA20578>
-    if (base.find("._") == 0)
+    if (tr_strvStartsWith("._"sv))
     {
         return true;
     }
