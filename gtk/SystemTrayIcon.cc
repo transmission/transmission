@@ -6,6 +6,8 @@
  *
  */
 
+// _AppIndicatorClass::{fallback,unfallback} use deprecated GtkStatusIcon
+#undef GTK_DISABLE_DEPRECATED
 // We're using deprecated Gtk::StatusItem ourselves as well
 #undef GTKMM_DISABLE_DEPRECATED
 
