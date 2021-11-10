@@ -10,7 +10,7 @@ add_executable(libtransmission-test
     getopt-test.cc
     history-test.cc
     json-test.cc
-    magnet-test.cc
+    magnet-metainfo-test.cc
     makemeta-test.cc
     metainfo-test.cc
     move-test.cc

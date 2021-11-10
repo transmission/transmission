@@ -16,7 +16,7 @@
 #include "crypto-utils.h" /* tr_sha1() */
 #include "file.h"
 #include "log.h"
-#include "magnet.h"
+#include "magnet-metainfo.h"
 #include "metainfo.h"
 #include "resume.h"
 #include "torrent-magnet.h"

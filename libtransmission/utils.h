@@ -208,8 +208,6 @@ void* tr_memdup(void const* src, size_t byteCount);
  */
 char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 
-char* tr_strvdup(std::string_view) TR_GNUC_MALLOC;
-
 /**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
@@ -246,12 +244,6 @@ int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
-/** @brief strips leading and trailing whitspace from a string
-    @return the stripped string */
-char* tr_strstrip(char* str);
-
-std::string_view tr_strvstrip(std::string_view str);
-
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
@@ -261,15 +253,58 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 /** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
 char const* tr_strcasestr(char const* haystack, char const* needle);
 
-/** @brief Portability wrapper for strsep() that uses the system implementation if available */
-char* tr_strsep(char** str, char const* delim);
+/***
+****  std::string_view utils
+***/
+
+template<typename T>
+constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+{
+    return sv.find(key) != sv.npos;
+}
+
+constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.front() == key;
+}
+
+constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.back() == key;
+}
+
+constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
+{
+    auto pos = sv->find(delim);
+    auto const ret = sv->substr(0, pos);
+    sv->remove_prefix(pos != sv->npos ? pos + 1 : std::size(*sv));
+    return ret;
+}
+
+constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return !std::empty((*token = tr_strvSep(sv, delim)));
+}
+
+std::string_view tr_strvStrip(std::string_view sv);
+
+char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
+
+std::string tr_strvUtf8Clean(std::string_view sv);
 
 /***
 ****
 ***/
-
-void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */

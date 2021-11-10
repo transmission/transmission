@@ -396,7 +396,7 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
     if (name != tr_torrentName(tor))
     {
         tr_free(tor->info.name);
-        tor->info.name = tr_strvdup(name);
+        tor->info.name = tr_strvDup(name);
     }
 
     return TR_FR_NAME;
@@ -445,7 +445,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
             tr_free(files[i].name);
-            files[i].name = tr_strvdup(sv);
+            files[i].name = tr_strvDup(sv);
             files[i].is_renamed = true;
         }
     }
@@ -792,7 +792,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     {
         bool const is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free(tor->downloadDir);
-        tor->downloadDir = tr_strvdup(sv);
+        tor->downloadDir = tr_strvDup(sv);
 
         if (is_current_dir)
         {
@@ -807,7 +807,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     {
         bool const is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free(tor->incompleteDir);
-        tor->incompleteDir = tr_strvdup(sv);
+        tor->incompleteDir = tr_strvDup(sv);
 
         if (is_current_dir)
         {
