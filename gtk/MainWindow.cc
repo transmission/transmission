@@ -162,7 +162,7 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
     view->signal_popup_menu().connect_notify([this]() { on_popup_menu(nullptr); });
     view->signal_button_press_event().connect(
         [this, view](GdkEventButton* event)
-        { return on_tree_view_button_pressed(view, event, sigc::mem_fun(this, &Impl::on_popup_menu)); },
+        { return on_tree_view_button_pressed(view, event, sigc::mem_fun(*this, &Impl::on_popup_menu)); },
         false);
     view->signal_button_release_event().connect([view](GdkEventButton* event)
                                                 { return on_tree_view_button_released(view, event); });
@@ -516,7 +516,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     alt_speed_button_ = Gtk::make_managed<Gtk::ToggleButton>();
     alt_speed_button_->set_image(*alt_speed_image_);
     alt_speed_button_->set_relief(Gtk::RELIEF_NONE);
-    alt_speed_button_->signal_toggled().connect(sigc::mem_fun(this, &Impl::alt_speed_toggled_cb));
+    alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
     status_->add(*alt_speed_button_);
 
     /* spacer */
@@ -590,7 +590,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     prefsChanged(TR_KEY_statusbar_stats);
     prefsChanged(TR_KEY_show_toolbar);
     prefsChanged(TR_KEY_alt_speed_enabled);
-    pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::prefsChanged));
+    pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::prefsChanged));
 
     tr_sessionSetAltSpeedFunc(
         core_->get_session(),

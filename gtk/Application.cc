@@ -329,7 +329,7 @@ void Application::Impl::refresh_actions_soon()
 {
     if (!is_closing_ && !refresh_actions_tag_.connected())
     {
-        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::refresh_actions));
+        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::refresh_actions));
     }
 }
 
@@ -568,7 +568,7 @@ void Application::Impl::on_startup()
 
     /* create main window now to be a parent to any error dialogs */
     wind_ = MainWindow::create(app_, actions, core_);
-    wind_->signal_size_allocate().connect(sigc::mem_fun(this, &Impl::on_main_window_size_allocated));
+    wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
     app_.hold();
     app_setup();
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
@@ -675,10 +675,10 @@ void Application::Impl::app_setup()
     gtr_actions_set_core(core_);
 
     /* set up core handlers */
-    core_->signal_busy().connect(sigc::mem_fun(this, &Impl::on_core_busy));
-    core_->signal_add_error().connect(sigc::mem_fun(this, &Impl::on_core_error));
-    core_->signal_add_prompt().connect(sigc::mem_fun(this, &Impl::on_add_torrent));
-    core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_prefs_changed));
+    core_->signal_busy().connect(sigc::mem_fun(*this, &Impl::on_core_busy));
+    core_->signal_add_error().connect(sigc::mem_fun(*this, &Impl::on_core_error));
+    core_->signal_add_prompt().connect(sigc::mem_fun(*this, &Impl::on_add_torrent));
+    core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_prefs_changed));
 
     /* add torrents from command-line and saved state */
     core_->load(start_paused_);
@@ -692,7 +692,7 @@ void Application::Impl::app_setup()
 
     /* start model update timer */
     timer_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::update_model_loop),
+        sigc::mem_fun(*this, &Impl::update_model_loop),
         MAIN_WINDOW_REFRESH_INTERVAL_SECONDS);
     update_model_once();
 
@@ -831,17 +831,17 @@ void Application::Impl::main_window_setup()
     // cbdata->wind = wind;
     sel_ = wind_->get_selection();
 
-    sel_->signal_changed().connect(sigc::mem_fun(this, &Impl::refresh_actions_soon));
+    sel_->signal_changed().connect(sigc::mem_fun(*this, &Impl::refresh_actions_soon));
     refresh_actions_soon();
     auto const model = core_->get_model();
-    model->signal_row_changed().connect(sigc::mem_fun(this, &Impl::rowChangedCB));
-    wind_->signal_delete_event().connect(sigc::mem_fun(this, &Impl::winclose));
+    model->signal_row_changed().connect(sigc::mem_fun(*this, &Impl::rowChangedCB));
+    wind_->signal_delete_event().connect(sigc::mem_fun(*this, &Impl::winclose));
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
-    wind_->signal_drag_data_received().connect(sigc::mem_fun(this, &Impl::on_drag_data_received));
+    wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
 }
 
 bool Application::Impl::on_session_closed()
@@ -926,7 +926,7 @@ void Application::Impl::on_app_exit()
         [this, session = core_->close()]()
         {
             tr_sessionClose(session);
-            Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::on_session_closed));
+            Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::on_session_closed));
         })
         .detach();
 }
@@ -1003,7 +1003,7 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     w->signal_hide().connect([w]() mutable { w.reset(); });
-    w->signal_focus_in_event().connect(sigc::mem_fun(this, &Impl::on_main_window_focus_in));
+    w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
 
     if (wind_ != nullptr)
     {
@@ -1244,7 +1244,7 @@ void Application::Impl::update_model_soon()
 {
     if (!update_model_soon_tag_.connected())
     {
-        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::update_model_once));
+        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_model_once));
     }
 }
 
@@ -1514,7 +1514,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         {
             gtr_action_set_toggled("toggle-message-log", true);
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect(sigc::mem_fun(this, &Impl::on_message_window_closed));
+            msgwin_->signal_hide().connect(sigc::mem_fun(*this, &Impl::on_message_window_closed));
         }
         else
         {

@@ -191,8 +191,8 @@ SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const
 #else
 
     icon_ = Gtk::StatusIcon::create(icon_name);
-    icon_->signal_activate().connect(sigc::mem_fun(this, &Impl::activated));
-    icon_->signal_popup_menu().connect(sigc::mem_fun(this, &Impl::popup));
+    icon_->signal_activate().connect(sigc::mem_fun(*this, &Impl::activated));
+    icon_->signal_popup_menu().connect(sigc::mem_fun(*this, &Impl::popup));
 
 #endif
 }

@@ -713,7 +713,7 @@ void Session::Impl::watchdir_monitor_file(Glib::RefPtr<Gio::File> const& file)
 
             if (!monitor_idle_tag_.connected())
             {
-                monitor_idle_tag_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::watchdir_idle), 1);
+                monitor_idle_tag_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::watchdir_idle), 1);
             }
         }
     }
@@ -769,7 +769,7 @@ void Session::Impl::watchdir_update()
 
         monitor_ = m;
         monitor_dir_ = dir;
-        monitor_tag_ = m->signal_changed().connect(sigc::mem_fun(this, &Impl::on_file_changed_in_watchdir));
+        monitor_tag_ = m->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_file_changed_in_watchdir));
     }
 }
 

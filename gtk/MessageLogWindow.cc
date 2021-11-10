@@ -467,7 +467,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
         item->set_is_important(true);
         item->set_label(_("Save _As"));
         item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(this, &Impl::onSaveRequest));
+        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onSaveRequest));
         toolbar->insert(*item, -1);
     }
 
@@ -478,7 +478,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
         item->set_is_important(true);
         item->set_label(_("Clear"));
         item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(this, &Impl::onClearRequest));
+        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onClearRequest));
         toolbar->insert(*item, -1);
     }
 
@@ -528,7 +528,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     sort_ = Gtk::TreeModelSort::create(filter_);
     sort_->set_sort_column(message_log_cols.sequence, Gtk::SORT_ASCENDING);
     maxLevel_ = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
-    filter_->set_visible_func(sigc::mem_fun(this, &Impl::isRowVisible));
+    filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
     view_ = Gtk::make_managed<Gtk::TreeView>(sort_);
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
@@ -544,7 +544,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     window_.add(*vbox);
 
     refresh_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::onRefresh),
+        sigc::mem_fun(*this, &Impl::onRefresh),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();

@@ -204,7 +204,7 @@ MakeProgressDialog::MakeProgressDialog(
     add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
     add_button(_("_Add"), Gtk::RESPONSE_ACCEPT);
-    signal_response().connect(sigc::mem_fun(this, &MakeProgressDialog::onProgressDialogResponse));
+    signal_response().connect(sigc::mem_fun(*this, &MakeProgressDialog::onProgressDialogResponse));
 
     auto* fr = Gtk::make_managed<Gtk::Frame>();
     fr->set_border_width(GUI_PAD_BIG);
@@ -222,7 +222,7 @@ MakeProgressDialog::MakeProgressDialog(
     v->pack_start(*progress_bar_, false, false, 0);
 
     progress_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &MakeProgressDialog::onProgressDialogRefresh),
+        sigc::mem_fun(*this, &MakeProgressDialog::onProgressDialogRefresh),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
     onProgressDialogRefresh();
 
@@ -436,7 +436,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
 
     dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
     dialog_.add_button(_("_New"), Gtk::RESPONSE_ACCEPT);
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
     auto* t = Gtk::make_managed<HigWorkarea>();
 
@@ -513,5 +513,5 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
 
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();
-    dialog_.signal_drag_data_received().connect(sigc::mem_fun(this, &Impl::on_drag_data_received));
+    dialog_.signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
 }
