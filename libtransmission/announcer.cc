@@ -32,6 +32,7 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -241,7 +242,7 @@ struct tr_tracker
 };
 
 // format: `${host}:${port}`
-tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed)
+tr_quark tr_announcerGetKey(tr_url_parsed_t const& parsed)
 {
     std::string buf;
     tr_buildBuf(buf, parsed.host, ":"sv, parsed.portstr);
@@ -252,7 +253,7 @@ static void trackerConstruct(tr_announcer* announcer, tr_tracker* tracker, tr_tr
 {
     memset(tracker, 0, sizeof(tr_tracker));
     tracker->key = tr_announcerGetKey(inf->announce);
-    tracker->announce_url = tr_quark_new(tr_strvstrip(inf->announce));
+    tracker->announce_url = tr_quark_new(tr_strvStrip(inf->announce));
     tracker->scrape_info = inf->scrape == nullptr ? nullptr : tr_announcerGetScrapeInfo(announcer, tr_quark_new(inf->scrape));
     tracker->id = inf->id;
     tracker->seederCount = -1;
@@ -536,14 +537,14 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 
 struct AnnTrackerInfo
 {
-    AnnTrackerInfo(tr_tracker_info info_in, tr_parsed_url_t url_in)
+    AnnTrackerInfo(tr_tracker_info info_in, tr_url_parsed_t url_in)
         : info{ info_in }
         , url{ url_in }
     {
     }
 
     tr_tracker_info info;
-    tr_parsed_url_t url;
+    tr_url_parsed_t url;
 
     /* primary key: tier
      * secondary key: udp comes before http */
@@ -1230,11 +1231,12 @@ static void announce_request_delegate(
 #endif
 
     auto const announce_sv = tr_quark_get_string_view(request->announce_url);
-    if (announce_sv.find("http://"sv) == 0 || announce_sv.find("https://"sv) == 0)
+
+    if (tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
     {
         tr_tracker_http_announce(session, request, callback, callback_data);
     }
-    else if (announce_sv.find("udp://"sv) == 0)
+    else if (tr_strvStartsWith(announce_sv, "udp://"sv))
     {
         tr_tracker_udp_announce(session, request, callback, callback_data);
     }
@@ -1288,7 +1290,7 @@ static constexpr bool multiscrape_too_big(std::string_view errmsg)
 
     for (auto const& tle : TooLongErrors)
     {
-        if (errmsg.find(tle) != std::string_view::npos)
+        if (tr_strvContains(errmsg, tle))
         {
             return true;
         }
@@ -1482,11 +1484,11 @@ static void scrape_request_delegate(
 
     auto const scrape_sv = tr_quark_get_string_view(request->scrape_url);
 
-    if (scrape_sv.find("http://"sv) == 0 || scrape_sv.find("https://"sv) == 0)
+    if (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
     {
         tr_tracker_http_scrape(session, request, callback, callback_data);
     }
-    else if (scrape_sv.find("udp://"sv) == 0)
+    else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
     {
         tr_tracker_udp_scrape(session, request, callback, callback_data);
     }

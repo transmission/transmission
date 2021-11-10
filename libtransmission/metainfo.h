@@ -12,9 +12,12 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+#include <string_view>
+
 #include "transmission.h"
-#include "variant.h"
-#include "tr-macros.h"
+
+struct tr_variant;
 
 enum tr_metainfo_basename_format
 {

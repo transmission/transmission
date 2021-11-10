@@ -13,8 +13,8 @@
 
 #include "transmission.h"
 #include "file.h"
-#include "magnet.h"
-#include "session.h" /* tr_sessionFindTorrentFile() */
+#include "magnet-metainfo.h"
+#include "session.h"
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "tr-assert.h"
 #include "utils.h" /* tr_new0 */
@@ -93,21 +93,19 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
-    tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
-    if (magnet_info == nullptr)
+    auto mm = tr_magnet_metainfo{};
+    if (!mm.parseMagnet(magnet_link ? magnet_link : ""))
     {
         return -1;
     }
 
     auto tmp = tr_variant{};
+    mm.toVariant(&tmp);
     auto len = size_t{};
-    tr_magnetCreateMetainfo(magnet_info, &tmp);
     char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
     auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
-
     tr_free(str);
     tr_variantFree(&tmp);
-    tr_magnetFree(magnet_info);
 
     return err;
 }
@@ -160,12 +158,6 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
     tr_free(metainfo);
     return err;
-}
-
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
-{
-    char const* const filename = tr_sessionFindTorrentFile(ctor->session, hashString);
-    return filename == nullptr ? EINVAL : tr_ctorSetMetainfoFromFile(ctor, filename);
 }
 
 /***
@@ -237,7 +229,11 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
         return false;
     }
 
-    *setme = *delete_source;
+    if (setme != nullptr)
+    {
+        *setme = *delete_source;
+    }
+
     return true;
 }
 
@@ -292,7 +288,11 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
         return false;
     }
 
-    *setme = *peer_limit;
+    if (setme != nullptr)
+    {
+        *setme = *peer_limit;
+    }
+
     return true;
 }
 
@@ -304,7 +304,11 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme)
         return false;
     }
 
-    *setme = *paused;
+    if (setme != nullptr)
+    {
+        *setme = *paused;
+    }
+
     return true;
 }
 
@@ -316,7 +320,11 @@ bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** s
         return false;
     }
 
-    *setme = str.c_str();
+    if (setme != nullptr)
+    {
+        *setme = str.c_str();
+    }
+
     return true;
 }
 
@@ -328,24 +336,27 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
         return false;
     }
 
-    *setme = str.c_str();
+    if (setme != nullptr)
+    {
+        *setme = str.c_str();
+    }
+
     return true;
 }
 
 bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
 {
-    bool ret = true;
-
     if (!ctor->isSet_metainfo)
     {
-        ret = false;
+        return false;
     }
-    else if (setme != nullptr)
+
+    if (setme != nullptr)
     {
         *setme = &ctor->metainfo;
     }
 
-    return ret;
+    return true;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)

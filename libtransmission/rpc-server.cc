@@ -11,6 +11,7 @@
 #include <cstring> /* memcpy */
 #include <list>
 #include <string>
+#include <vector>
 
 #include <zlib.h>
 
@@ -20,21 +21,23 @@
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_ssha1_matches() */
+
 #include "crypto-utils.h" /* tr_rand_buffer() */
+#include "crypto.h" /* tr_ssha1_matches() */
 #include "error.h"
 #include "fdlimit.h"
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
-#include "rpcimpl.h"
 #include "rpc-server.h"
-#include "session.h"
+#include "rpcimpl.h"
 #include "session-id.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 #include "web.h"
 
 /* session-id is used to make cross-site request forgery attacks difficult.
@@ -1146,7 +1149,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        s->url = tr_strvdup(url);
+        s->url = tr_strvDup(url);
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

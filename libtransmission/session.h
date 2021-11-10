@@ -23,14 +23,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strcasecmp()
+#include <event2/util.h> // evutil_ascii_strncasecmp()
 
 #include "bandwidth.h"
-#include "bitfield.h"
 #include "net.h"
 #include "tr-macros.h"
-#include "utils.h"
-#include "variant.h"
+#include "utils.h" // tr_speed_K
 
 enum tr_auto_switch_state_t
 {
@@ -44,14 +42,15 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
+class tr_bitfield;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
 struct tr_blocklistFile;
 struct tr_cache;
-struct tr_fdInfo;
 struct tr_device_info;
+struct tr_fdInfo;
 
 struct tr_turtle_info
 {
@@ -247,8 +246,6 @@ struct tr_session
     struct tr_announcer* announcer;
     struct tr_announcer_udp* announcer_udp;
 
-    tr_variant* metainfoLookup;
-
     struct event* nowTimer;
     struct event* saveTimer;
 
@@ -273,10 +270,6 @@ constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
 bool tr_sessionAllowsDHT(tr_session const* session);
 
 bool tr_sessionAllowsLPD(tr_session const* session);
-
-char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString);
-
-void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename);
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 

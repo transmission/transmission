@@ -11,6 +11,7 @@
 #include <cstdlib> /* bsearch() */
 #include <cstring> /* memcmp() */
 #include <optional>
+#include <vector>
 
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock() */

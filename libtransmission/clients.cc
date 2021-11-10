@@ -10,13 +10,14 @@
 
 #include <algorithm>
 #include <array>
-#include <iterator>
-#include <optional>
-#include <string_view>
 #include <cctype> /* isprint() */
 #include <cstdlib> /* strtol() */
 #include <cstring>
+#include <iterator>
+#include <optional>
+#include <string_view>
 #include <tuple>
+#include <vector>
 
 #include "transmission.h"
 #include "clients.h"

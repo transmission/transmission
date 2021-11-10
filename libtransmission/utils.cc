@@ -415,7 +415,7 @@ char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
     return ret;
 }
 
-char* tr_strvdup(std::string_view in)
+char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
     auto* const ret = tr_new(char, n + 1);
@@ -427,7 +427,7 @@ char* tr_strvdup(std::string_view in)
 char* tr_strndup(void const* vin, size_t len)
 {
     auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvdup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
+    return in == nullptr ? nullptr : tr_strvDup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
 }
 
 char* tr_strdup(void const* in)
@@ -546,45 +546,7 @@ int tr_strcmp0(char const* str1, char const* str2)
 *****
 ****/
 
-/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch */
-char* tr_strsep(char** str, char const* delims)
-{
-#ifdef HAVE_STRSEP
-
-    return strsep(str, delims);
-
-#else
-
-    char* token;
-
-    if (*str == nullptr) /* no more tokens */
-    {
-        return nullptr;
-    }
-
-    token = *str;
-
-    while (**str != '\0')
-    {
-        if (strchr(delims, **str) != nullptr)
-        {
-            **str = '\0';
-            (*str)++;
-            return token;
-        }
-
-        (*str)++;
-    }
-
-    /* there is not another token */
-    *str = nullptr;
-
-    return token;
-
-#endif
-}
-
-std::string_view tr_strvstrip(std::string_view str)
+std::string_view tr_strvStrip(std::string_view str)
 {
     auto constexpr test = [](auto ch)
     {
@@ -596,32 +558,6 @@ std::string_view tr_strvstrip(std::string_view str)
 
     auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
     str.remove_suffix(std::distance(std::rbegin(str), rit));
-
-    return str;
-}
-
-char* tr_strstrip(char* str)
-{
-    if (str != nullptr)
-    {
-        size_t len = strlen(str);
-
-        while (len != 0 && isspace(str[len - 1]))
-        {
-            --len;
-        }
-
-        size_t pos = 0;
-
-        while (pos < len && isspace(str[pos]))
-        {
-            ++pos;
-        }
-
-        len -= pos;
-        memmove(str, str + pos, len);
-        str[len] = '\0';
-    }
 
     return str;
 }
@@ -763,265 +699,6 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return TR_RATIO_NA;
 }
 
-void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
-{
-    static char const hex[] = "0123456789abcdef";
-
-    auto const* input = static_cast<uint8_t const*>(vinput);
-    auto* output = static_cast<char*>(voutput);
-
-    /* go from back to front to allow for in-place conversion */
-    input += byte_length;
-    output += byte_length * 2;
-
-    *output = '\0';
-
-    while (byte_length-- > 0)
-    {
-        unsigned int const val = *(--input);
-        *(--output) = hex[val & 0xf];
-        *(--output) = hex[val >> 4];
-    }
-}
-
-void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
-{
-    static char const hex[] = "0123456789abcdef";
-
-    auto const* input = static_cast<uint8_t const*>(vinput);
-    auto* output = static_cast<uint8_t*>(voutput);
-
-    for (size_t i = 0; i < byte_length; ++i)
-    {
-        int const hi = strchr(hex, tolower(*input++)) - hex;
-        int const lo = strchr(hex, tolower(*input++)) - hex;
-        *output++ = (uint8_t)((hi << 4) | lo);
-    }
-}
-
-/***
-****
-***/
-
-bool tr_addressIsIP(char const* str)
-{
-    tr_address tmp;
-    return tr_address_from_string(&tmp, str);
-}
-
-static int parsePort(std::string_view port)
-{
-    auto tmp = std::array<char, 16>{};
-
-    if (std::size(port) >= std::size(tmp))
-    {
-        return -1;
-    }
-
-    std::copy(std::begin(port), std::end(port), std::begin(tmp));
-    char* end = nullptr;
-    long port_num = strtol(std::data(tmp), &end, 10);
-    if (*end != '\0' || port_num <= 0 || port_num >= 65536)
-    {
-        port_num = -1;
-    }
-
-    return int(port_num);
-}
-
-static std::string_view getPortForScheme(std::string_view scheme)
-{
-    auto constexpr KnownSchemes = std::array<std::pair<std::string_view, std::string_view>, 5>{ {
-        { "udp"sv, "80"sv },
-        { "ftp"sv, "21"sv },
-        { "sftp"sv, "22"sv },
-        { "http"sv, "80"sv },
-        { "https"sv, "443"sv },
-    } };
-
-    for (auto const& [known_scheme, port] : KnownSchemes)
-    {
-        if (scheme == known_scheme)
-        {
-            return port;
-        }
-    }
-
-    return "-1"sv;
-}
-
-static bool urlCharsAreValid(std::string_view url)
-{
-    // rfc2396
-    auto constexpr ValidChars = std::string_view{
-        "abcdefghijklmnopqrstuvwxyz" // lowalpha
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // upalpha
-        "0123456789" // digit
-        "-_.!~*'()" // mark
-        ";/?:@&=+$," // reserved
-        "<>#%<\"" // delims
-        "{}|\\^[]`" // unwise
-    };
-
-    return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return ValidChars.find(ch) != ValidChars.npos; });
-}
-
-std::optional<tr_parsed_url_t> tr_urlParse(std::string_view url)
-{
-    url = tr_strvstrip(url);
-
-    if (!urlCharsAreValid(url))
-    {
-        return {};
-    }
-
-    // scheme
-    auto key = "://"sv;
-    auto pos = url.find(key);
-    if (pos == std::string_view::npos || pos == 0)
-    {
-        return {};
-    }
-    auto const scheme = url.substr(0, pos);
-    url.remove_prefix(pos + std::size(key));
-
-    // authority
-    key = "/"sv;
-    pos = url.find(key);
-    if (pos == 0)
-    {
-        return {};
-    }
-    auto const authority = url.substr(0, pos);
-    url.remove_prefix(std::size(authority));
-    auto const path = std::empty(url) ? "/"sv : url;
-
-    // host
-    key = ":"sv;
-    pos = authority.find(key);
-    auto const host = pos == std::string_view::npos ? authority : authority.substr(0, pos);
-    if (std::empty(host))
-    {
-        return {};
-    }
-
-    // port
-    auto const portstr = pos == std::string_view::npos ? getPortForScheme(scheme) : authority.substr(pos + std::size(key));
-    auto const port = parsePort(portstr);
-
-    return tr_parsed_url_t{ scheme, host, path, portstr, port };
-}
-
-static bool tr_isValidTrackerScheme(std::string_view scheme)
-{
-    auto constexpr Schemes = std::array<std::string_view, 3>{ "http"sv, "https"sv, "udp"sv };
-    return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
-}
-
-std::optional<tr_parsed_url_t> tr_urlParseTracker(std::string_view url)
-{
-    auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_parsed_url_t>{};
-}
-
-bool tr_urlIsValidTracker(std::string_view url)
-{
-    return !!tr_urlParseTracker(url);
-}
-
-bool tr_urlIsValid(std::string_view url)
-{
-    auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
-    auto const parsed = tr_urlParse(url);
-    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
-}
-
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-{
-    if (url_len == TR_BAD_SIZE)
-    {
-        url_len = strlen(url);
-    }
-
-    char const* scheme = url;
-    char const* scheme_end = tr_memmem(scheme, url_len, "://", 3);
-
-    if (scheme_end == nullptr)
-    {
-        return false;
-    }
-
-    size_t const scheme_len = scheme_end - scheme;
-
-    if (scheme_len == 0)
-    {
-        return false;
-    }
-
-    url += scheme_len + 3;
-    url_len -= scheme_len + 3;
-
-    char const* authority = url;
-    auto const* authority_end = static_cast<char const*>(memchr(authority, '/', url_len));
-
-    if (authority_end == nullptr)
-    {
-        authority_end = authority + url_len;
-    }
-
-    size_t const authority_len = authority_end - authority;
-
-    if (authority_len == 0)
-    {
-        return false;
-    }
-
-    url += authority_len;
-    url_len -= authority_len;
-
-    auto const* host_end = static_cast<char const*>(memchr(authority, ':', authority_len));
-
-    size_t const host_len = host_end != nullptr ? (size_t)(host_end - authority) : authority_len;
-
-    if (host_len == 0)
-    {
-        return false;
-    }
-
-    size_t const port_len = host_end != nullptr ? authority_end - host_end - 1 : 0;
-
-    if (setme_scheme != nullptr)
-    {
-        *setme_scheme = tr_strndup(scheme, scheme_len);
-    }
-
-    if (setme_host != nullptr)
-    {
-        *setme_host = tr_strndup(authority, host_len);
-    }
-
-    if (setme_port != nullptr)
-    {
-        auto const tmp = port_len > 0 ? std::string_view{ host_end + 1, port_len } : getPortForScheme({ scheme, scheme_len });
-        *setme_port = parsePort(tmp);
-    }
-
-    if (setme_path != nullptr)
-    {
-        if (url[0] == '\0')
-        {
-            *setme_path = tr_strdup("/");
-        }
-        else
-        {
-            *setme_path = tr_strndup(url, url_len);
-        }
-    }
-
-    return true;
-}
-
 /***
 ****
 ***/
@@ -1034,44 +711,6 @@ void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeo
         a + sizeof_element * index_to_remove,
         a + sizeof_element * (index_to_remove + 1),
         sizeof_element * (--nmemb - index_to_remove));
-}
-
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match)
-{
-    size_t first = 0;
-    auto const* cbase = static_cast<char const*>(base);
-    bool exact = false;
-
-    while (nmemb != 0)
-    {
-        size_t const half = nmemb / 2;
-        size_t const middle = first + half;
-        int const c = (*compar)(key, cbase + size * middle);
-
-        if (c <= 0)
-        {
-            if (c == 0)
-            {
-                exact = true;
-            }
-
-            nmemb = half;
-        }
-        else
-        {
-            first = middle + 1;
-            nmemb = nmemb - half - 1;
-        }
-    }
-
-    *exact_match = exact;
-    return first;
 }
 
 /***
@@ -1099,16 +738,19 @@ static char* strip_non_utf8(char const* in, size_t inlen)
 
 static char* to_utf8(char const* in, size_t inlen)
 {
-    char* ret = nullptr;
-
 #ifdef HAVE_ICONV
-
-    char const* encodings[] = { "CURRENT", "ISO-8859-15" };
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (size_t i = 0; ret == nullptr && i < TR_N_ELEMENTS(encodings); ++i)
+    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
+    for (auto const* test_encoding : Encodings)
     {
+        iconv_t cd = iconv_open("UTF-8", test_encoding);
+        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        {
+            continue;
+        }
+
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         auto const* inbuf = in;
 #else
@@ -1117,18 +759,13 @@ static char* to_utf8(char const* in, size_t inlen)
         char* outbuf = out;
         size_t inbytesleft = inlen;
         size_t outbytesleft = buflen;
-        char const* test_encoding = encodings[i];
-
-        iconv_t cd = iconv_open("UTF-8", test_encoding);
-
-        if (cd != (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+        iconv_close(cd);
+        if (rv != size_t(-1))
         {
-            if (iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft) != (size_t)-1)
-            {
-                ret = tr_strndup(out, buflen - outbytesleft);
-            }
-
-            iconv_close(cd);
+            char* const ret = tr_strndup(out, buflen - outbytesleft);
+            tr_free(out);
+            return ret;
         }
     }
 
@@ -1136,12 +773,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #endif
 
-    if (ret == nullptr)
-    {
-        ret = strip_non_utf8(in, inlen);
-    }
-
-    return ret;
+    return strip_non_utf8(in, inlen);
 }
 
 char* tr_utf8clean(std::string_view str)
@@ -1149,6 +781,24 @@ char* tr_utf8clean(std::string_view str)
     char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
                                                                                   to_utf8(std::data(str), std::size(str));
     TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
+    return ret;
+}
+
+static bool tr_strvUtf8Validate(std::string_view sv)
+{
+    return tr_utf8_validate(std::data(sv), std::size(sv), nullptr);
+}
+
+std::string tr_strvUtf8Clean(std::string_view sv)
+{
+    if (tr_strvUtf8Validate(sv))
+    {
+        return std::string{ sv };
+    }
+
+    auto* const tmp = to_utf8(std::data(sv), std::size(sv));
+    auto ret = std::string{ tmp ? tmp : "" };
+    tr_free(tmp);
     return ret;
 }
 
@@ -1422,24 +1072,14 @@ static bool parseNumberSection(std::string_view str, number_range& range)
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
     auto values = std::set<int>{};
-
-    for (;;)
+    auto token = std::string_view{};
+    auto range = number_range{};
+    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
     {
-        auto const delim = str.find(',');
-        auto range = number_range{};
-        if (!parseNumberSection(str.substr(0, delim), range))
-        {
-            break;
-        }
         for (auto i = range.low; i <= range.high; ++i)
         {
             values.insert(i);
         }
-        if (delim == std::string_view::npos)
-        {
-            break;
-        }
-        str.remove_prefix(delim + 1);
     }
 
     return { std::begin(values), std::end(values) };

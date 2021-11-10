@@ -15,11 +15,12 @@
 #endif
 
 #include "transmission.h"
+
 #include "ConvertUTF.h" // tr_utf8_validate()
-#include "platform.h"
 #include "crypto-utils.h" // tr_rand_int_weak()
+#include "platform.h"
+#include "ptrarray.h"
 #include "utils.h"
-#include "web.h" // tr_http_unescape()
 
 #include "test-fixtures.h"
 
@@ -48,34 +49,94 @@ TEST_F(UtilsTest, trStripPositionalArgs)
     EXPECT_STREQ(expected, out);
 }
 
-TEST_F(UtilsTest, trStrstrip)
+TEST_F(UtilsTest, trStrvContains)
 {
-    auto* in = tr_strdup("   test    ");
-    auto* out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
+    EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));
+    EXPECT_FALSE(tr_strvContains("test"sv, "testt"sv));
+    EXPECT_FALSE(tr_strvContains("test"sv, "this is a test"sv));
+    EXPECT_TRUE(tr_strvContains(" test "sv, "tes"sv));
+    EXPECT_TRUE(tr_strvContains(" test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("a test is this"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains(""sv, ""sv));
+}
 
-    in = tr_strdup(" test test ");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test test", out);
-    tr_free(in);
+TEST_F(UtilsTest, trStrvStartsWith)
+{
+    EXPECT_FALSE(tr_strvStartsWith(""sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, " his is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "his is a string"sv));
+    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "string"sv));
+    EXPECT_TRUE(tr_strvStartsWith(""sv, ""sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this "sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this is"sv));
+    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this"sv));
+}
 
-    /* strstrip */
-    in = tr_strdup("test");
-    out = tr_strstrip(in);
-    EXPECT_EQ(in, out);
-    EXPECT_STREQ("test", out);
-    tr_free(in);
+TEST_F(UtilsTest, trStrvEndsWith)
+{
+    EXPECT_FALSE(tr_strvEndsWith(""sv, "string"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "alphabet"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "strin"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this is"sv));
+    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strvEndsWith("tring"sv, "string"sv));
+    EXPECT_TRUE(tr_strvEndsWith(""sv, ""sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, " string"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "a string"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "g"sv));
+    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "string"sv));
+}
 
-    EXPECT_EQ(""sv, tr_strvstrip("              "sv));
-    EXPECT_EQ("test test"sv, tr_strvstrip("    test test     "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("   test     "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("   test "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip(" test       "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip(" test "sv));
-    EXPECT_EQ("test"sv, tr_strvstrip("test"sv));
+TEST_F(UtilsTest, trStrvSep)
+{
+    auto constexpr Delim = ',';
+
+    auto sv = "token1,token2,token3"sv;
+    EXPECT_EQ("token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token3"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+
+    sv = " token1,token2"sv;
+    EXPECT_EQ(" token1"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+
+    sv = "token1;token2"sv;
+    EXPECT_EQ("token1;token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+
+    sv = ""sv;
+    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+}
+
+TEST_F(UtilsTest, trStrvStrip)
+{
+    EXPECT_EQ(""sv, tr_strvStrip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strvStrip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
+}
+
+TEST_F(UtilsTest, trStrvDup)
+{
+    auto constexpr Key = "this is a test"sv;
+    char* str = tr_strvDup(Key);
+    EXPECT_NE(nullptr, str);
+    EXPECT_EQ(Key, str);
+    tr_free(str);
 }
 
 TEST_F(UtilsTest, trBuildpath)
@@ -123,7 +184,48 @@ TEST_F(UtilsTest, trUtf8clean)
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 }
 
-TEST_F(UtilsTest, numbers)
+TEST_F(UtilsTest, trStrvUtf8Clean)
+{
+    auto in = "hello world"sv;
+    auto out = tr_strvUtf8Clean(in);
+    EXPECT_EQ(in, out);
+
+    in = "hello world"sv;
+    out = tr_strvUtf8Clean(in.substr(0, 5));
+    EXPECT_EQ("hello"sv, out);
+
+    // this version is not utf-8 (but cp866)
+    in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+
+    // same string, but utf-8 clean
+    in = "Трудно быть Богом"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_EQ(in, out);
+
+    // https://trac.transmissionbt.com/ticket/6064
+    // TODO(anyone): It seems like that bug was not fixed so much as we just
+    // let strlen() solve the problem for us; however, it's probably better
+    // to wait until https://github.com/transmission/transmission/issues/612
+    // is resolved before revisiting this.
+    in = "\xF4\x00\x81\x82"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 1 || out.size() == 2);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+
+    in = "\xF4\x33\x81\x82"sv;
+    out = tr_strvUtf8Clean(in);
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+}
+
+TEST_F(UtilsTest, trParseNumberRange)
 {
     auto const tostring = [](std::vector<int> const& v)
     {
@@ -189,18 +291,6 @@ TEST_F(UtilsTest, trMemmem)
     EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
 }
 
-TEST_F(UtilsTest, trBinaryHex)
-{
-    auto const hex_in = std::string{ "fb5ef5507427b17e04b69cef31fa3379b456735a" };
-
-    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
-
-    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH * 2 + 1>{};
-    tr_binary_to_hex(binary.data(), hex_out.data(), 20);
-    EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
-}
-
 TEST_F(UtilsTest, array)
 {
     auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -229,93 +319,6 @@ TEST_F(UtilsTest, array)
     {
         EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
     }
-}
-
-TEST_F(UtilsTest, url)
-{
-    auto const* url = "http://1";
-    int port;
-    char* scheme = nullptr;
-    char* host = nullptr;
-    char* path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("1", host);
-    EXPECT_STREQ("/", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    auto parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("1"sv, parsed->host);
-    EXPECT_EQ("/"sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
-    EXPECT_EQ(80, parsed->port);
-
-    url = "http://www.some-tracker.org/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(80, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
-    EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
-    EXPECT_EQ(80, parsed->port);
-
-    url = "http://www.some-tracker.org:8080/some/path";
-    scheme = nullptr;
-    host = nullptr;
-    path = nullptr;
-    EXPECT_TRUE(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    EXPECT_STREQ("http", scheme);
-    EXPECT_STREQ("www.some-tracker.org", host);
-    EXPECT_STREQ("/some/path", path);
-    EXPECT_EQ(8080, port);
-    tr_free(scheme);
-    tr_free(path);
-    tr_free(host);
-
-    parsed = tr_urlParse(url);
-    EXPECT_TRUE(parsed);
-    EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
-    EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("8080"sv, parsed->portstr);
-    EXPECT_EQ(8080, parsed->port);
-
-    EXPECT_FALSE(tr_urlIsValid("hello world"sv));
-    EXPECT_FALSE(tr_urlIsValid("http://www.💩.com/announce/"sv));
-    EXPECT_TRUE(tr_urlIsValid("http://www.example.com/announce/"sv));
-    EXPECT_FALSE(tr_urlIsValid(""sv));
-    EXPECT_FALSE(tr_urlIsValid("com"sv));
-    EXPECT_FALSE(tr_urlIsValid("www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValid("://www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValid("zzz://www.example.com"sv)); // syntactically valid, but unsupported scheme
-    EXPECT_TRUE(tr_urlIsValid("https://www.example.com"sv));
-
-    EXPECT_TRUE(tr_urlIsValid("sftp://www.example.com"sv));
-    EXPECT_FALSE(tr_urlIsValidTracker("sftp://www.example.com"sv)); // unsupported tracker scheme
-}
-
-TEST_F(UtilsTest, trHttpUnescape)
-{
-    auto const url = std::string{ "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = makeString(tr_http_unescape(url.data(), url.size()));
-    EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 
 TEST_F(UtilsTest, truncd)

@@ -18,6 +18,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "cache.h"
 #include "completion.h"
 #include "file.h"
@@ -25,9 +26,10 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
+#include "ptrarray.h"
 #include "session.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "utils.h"
@@ -1715,7 +1717,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen);
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);

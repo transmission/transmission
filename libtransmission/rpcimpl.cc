@@ -21,8 +21,6 @@
 #endif
 #include <zlib.h>
 
-#include <event2/buffer.h>
-
 #include "transmission.h"
 #include "completion.h"
 #include "crypto-utils.h"
@@ -42,6 +40,7 @@
 #include "variant.h"
 #include "version.h"
 #include "web.h"
+#include "web-utils.h"
 
 #define RPC_VERSION 17
 #define RPC_VERSION_MIN 14
@@ -963,13 +962,13 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
             continue;
         }
 
-        label = tr_strvstrip(label);
+        label = tr_strvStrip(label);
         if (std::empty(label))
         {
             return "labels cannot be empty";
         }
 
-        if (label.find(',') != label.npos)
+        if (tr_strvContains(label, ','))
         {
             return "labels cannot contain comma (,) character";
         }
@@ -1116,7 +1115,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         if (tr_variantGetStrView(val, &announce) && tr_urlIsValidTracker(announce) && !hasAnnounceUrl(trackers, n, announce))
         {
             trackers[n].tier = ++tier; /* add a new tier */
-            trackers[n].announce = tr_strvdup(announce);
+            trackers[n].announce = tr_strvDup(announce);
             ++n;
             changed = true;
         }
@@ -1159,7 +1158,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
             pos >= 0)
         {
             tr_free(trackers[pos].announce);
-            trackers[pos].announce = tr_strvdup(newval);
+            trackers[pos].announce = tr_strvDup(newval);
             changed = true;
         }
     }
@@ -1821,7 +1820,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     }
     else
     {
-        char* fname = tr_strstrip(tr_strdup(filename));
+        char* fname = tr_strdup(filename);
 
         if (fname == nullptr)
         {

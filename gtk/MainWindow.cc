@@ -108,12 +108,7 @@ namespace
 void on_popup_menu(GdkEventButton* event)
 {
     auto* menu = gtr_action_get_widget<Gtk::Menu>("/main-window-popup");
-
-#if GTK_CHECK_VERSION(3, 22, 0)
     menu->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
-#else
-    menu->popup(event != nullptr ? event->button : 0, event != nullptr ? event->time : 0);
-#endif
 }
 
 bool tree_view_search_equal_func(
@@ -215,11 +210,7 @@ MainWindow::Impl::~Impl()
 
 void MainWindow::Impl::onYinYangClicked(Gtk::Button* button)
 {
-#if GTK_CHECK_VERSION(3, 22, 0)
     status_menu_->popup_at_widget(button, Gdk::GRAVITY_NORTH_EAST, Gdk::GRAVITY_SOUTH_EAST, nullptr);
-#else
-    status_menu_->popup(0, gtk_get_current_event_time());
-#endif
 }
 
 void MainWindow::Impl::status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val)
@@ -435,11 +426,7 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 
     (gtr_pref_flag_get(TR_KEY_ratio_limit_enabled) ? ratio_on_item_ : ratio_off_item_)->set_active(true);
 
-#if GTK_CHECK_VERSION(3, 22, 0)
     options_menu_->popup_at_widget(button, Gdk::GRAVITY_NORTH_WEST, Gdk::GRAVITY_SOUTH_WEST, nullptr);
-#else
-    options_menu_->popup(0, gtk_get_current_event_time());
-#endif
 }
 
 /***
