@@ -19,6 +19,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/web-utils.h>
 
 #include "Actions.h"
 #include "DetailsDialog.h"

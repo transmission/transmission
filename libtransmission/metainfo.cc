@@ -12,8 +12,6 @@
 #include <iterator>
 #include <string_view>
 
-#include <event2/buffer.h>
-
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */
@@ -25,6 +23,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -128,7 +127,7 @@ bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view 
     auto constexpr ensure_legal_char = [](auto ch)
     {
         auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
-        auto const banned = Banned.find(ch) != Banned.npos || (unsigned char)ch < 0x20;
+        auto const banned = tr_strvContains(Banned, ch) || (unsigned char)ch < 0x20;
         return banned ? '_' : ch;
     };
     auto const old_out_len = std::size(out);
@@ -312,7 +311,7 @@ static char* tr_convertAnnounceToScrape(std::string_view url)
     // some torrents with UDP announce URLs don't have /announce
     else if (url.find("udp:"sv) == 0)
     {
-        scrape = tr_strvdup(url);
+        scrape = tr_strvDup(url);
     }
 
     return scrape;
@@ -349,13 +348,13 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
             {
                 if (tr_variantGetStrView(tr_variantListChild(tier, j), &url))
                 {
-                    url = tr_strvstrip(url);
+                    url = tr_strvStrip(url);
 
                     if (tr_urlIsValidTracker(url))
                     {
                         tr_tracker_info* t = trackers + trackerCount;
                         t->tier = validTiers;
-                        t->announce = tr_strvdup(url);
+                        t->announce = tr_strvDup(url);
                         t->scrape = tr_convertAnnounceToScrape(url);
                         t->id = trackerCount;
 
@@ -382,13 +381,13 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     /* Regular announce value */
     if (trackerCount == 0 && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        url = tr_strvstrip(url);
+        url = tr_strvStrip(url);
 
         if (tr_urlIsValidTracker(url))
         {
             trackers = tr_new0(tr_tracker_info, 1);
             trackers[trackerCount].tier = 0;
-            trackers[trackerCount].announce = tr_strvdup(url);
+            trackers[trackerCount].announce = tr_strvDup(url);
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
@@ -414,7 +413,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
  */
 static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 {
-    url = tr_strvstrip(url);
+    url = tr_strvStrip(url);
 
     if (!tr_urlIsValid(url))
     {
@@ -426,7 +425,7 @@ static char* fix_webseed_url(tr_info const* inf, std::string_view url)
         return tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
     }
 
-    return tr_strvdup(url);
+    return tr_strvDup(url);
 }
 
 static void geturllist(tr_info* inf, tr_variant* meta)
@@ -515,8 +514,8 @@ static char const* tr_metainfoParseImpl(
             {
                 tr_free(inf->name);
                 tr_free(inf->originalName);
-                inf->name = tr_strvdup(sv);
-                inf->originalName = tr_strvdup(sv);
+                inf->name = tr_strvDup(sv);
+                inf->originalName = tr_strvDup(sv);
             }
 
             if (inf->name == nullptr)

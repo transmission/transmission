@@ -12,9 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "variant.h"
-
 struct tr_rpc_server;
+struct tr_variant;
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings);
 

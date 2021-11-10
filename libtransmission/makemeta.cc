@@ -14,17 +14,19 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1 */
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
+#include "web-utils.h"
 
 /****
 *****
@@ -366,21 +368,15 @@ static void getFileInfo(
     /* build the path list */
     tr_variantInitList(uninitialized_path, 0);
 
-    if (strlen(file->filename) > offset)
+    auto filename = std::string_view{ file->filename };
+    if (std::size(filename) > offset)
     {
-        char* filename = tr_strdup(file->filename + offset);
-        char* walk = filename;
-        char const* token = nullptr;
-
-        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != nullptr)
+        filename.remove_prefix(offset);
+        auto token = std::string_view{};
+        while (tr_strvSep(&filename, &token, TR_PATH_DELIMITER))
         {
-            if (!tr_str_is_empty(token))
-            {
-                tr_variantListAddStr(uninitialized_path, token);
-            }
+            tr_variantListAddStr(uninitialized_path, token);
         }
-
-        tr_free(filename);
     }
 }
 

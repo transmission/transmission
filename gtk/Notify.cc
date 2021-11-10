@@ -110,6 +110,10 @@ void g_signal_callback(
             auto const path = Glib::build_filename(dir, inf->files[0].name);
             gtr_open_file(path);
         }
+        else if (action == "start-now")
+        {
+            n.core->start_now(n.torrent_id);
+        }
     }
 }
 
@@ -220,7 +224,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
             -1));
 }
 
-void gtr_notify_torrent_added(Glib::ustring const& name)
+void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
 {
     g_return_if_fail(proxy != nullptr);
 
@@ -229,16 +233,27 @@ void gtr_notify_torrent_added(Glib::ustring const& name)
         return;
     }
 
+    auto const* const tor = core->find_torrent(torrent_id);
+
+    std::vector<Glib::ustring> actions;
+    if (server_supports_actions)
+    {
+        actions.push_back("start-now");
+        actions.push_back(_("Start Now"));
+    }
+
+    auto const n = TrNotification{ core, torrent_id };
+
     proxy->call(
         "Notify",
-        [](auto& res) { notify_callback(res, {}); },
+        [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
             0u,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
-            name,
-            std::vector<Glib::ustring>(),
+            Glib::ustring(tr_torrentName(tor)),
+            actions,
             std::map<Glib::ustring, Glib::VariantBase>(),
             -1));
 }

@@ -21,7 +21,8 @@
  *****************************************************************************/
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_urlIsValidTracker()
+#include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h> // tr_urlIsValidTracker()
 
 #import "CreatorWindowController.h"
 #import "Controller.h"

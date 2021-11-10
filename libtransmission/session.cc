@@ -16,6 +16,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
+#include <unordered_set>
 #include <vector>
 
 #ifndef _WIN32
@@ -30,32 +31,33 @@
 
 // #define TR_SHOW_DEPRECATED
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
-#include "error.h"
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
+#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
-#include "session.h"
 #include "session-id.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
+#include "tr-lpd.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
-#include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -2074,12 +2076,6 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
-    if (session->metainfoLookup != nullptr)
-    {
-        tr_variantFree(session->metainfoLookup);
-        tr_free(session->metainfoLookup);
-    }
-
     tr_device_info_free(session->downloadDir);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
@@ -2574,82 +2570,6 @@ void tr_blocklistSetURL(tr_session* session, char const* url)
 char const* tr_blocklistGetURL(tr_session const* session)
 {
     return session->blocklist_url;
-}
-
-/***
-****
-***/
-
-static void metainfoLookupInit(tr_session* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_variant* lookup = tr_new0(tr_variant, 1);
-    tr_variantInitDict(lookup, 0);
-
-    int n = 0;
-
-    tr_sys_path_info info;
-    char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname, nullptr) :
-        TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
-    {
-        tr_ctor* ctor = tr_ctorNew(session);
-        tr_ctorSetSave(ctor, false); /* since we already have them */
-
-        /* walk through the directory and find the mappings */
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
-        {
-            if (tr_str_has_suffix(name, ".torrent"))
-            {
-                tr_info inf;
-                char* path = tr_buildPath(dirname, name, nullptr);
-                tr_ctorSetMetainfoFromFile(ctor, path);
-
-                if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
-                {
-                    ++n;
-                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString), path);
-                }
-
-                tr_free(path);
-            }
-        }
-
-        tr_sys_dir_close(odir, nullptr);
-        tr_ctorFree(ctor);
-    }
-
-    session->metainfoLookup = lookup;
-    tr_logAddDebug("Found %d torrents in \"%s\"", n, dirname);
-}
-
-char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString)
-{
-    if (session->metainfoLookup == nullptr)
-    {
-        metainfoLookupInit((tr_session*)session);
-    }
-
-    char const* filename = nullptr;
-    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString), &filename, nullptr);
-    return filename;
-}
-
-void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename)
-{
-    /* since we walk session->configDir/torrents/ to build the lookup table,
-     * and tr_sessionSetTorrentFile() is just to tell us there's a new file
-     * in that same directory, we don't need to do anything here if the
-     * lookup table hasn't been built yet */
-    if (session->metainfoLookup != nullptr)
-    {
-        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString), filename);
-    }
 }
 
 /***

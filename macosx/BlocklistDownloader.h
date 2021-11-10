@@ -30,9 +30,9 @@ typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
     BLOCKLIST_DL_PROCESSING
 };
 
-@interface BlocklistDownloader : NSObject<NSURLDownloadDelegate>
+@interface BlocklistDownloader : NSObject<NSURLSessionDownloadDelegate>
 {
-    NSURLDownload* fDownload;
+    NSURLSession* fSession;
 
     BlocklistDownloaderViewController* fViewController;
 
