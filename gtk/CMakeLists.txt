@@ -144,7 +144,6 @@ add_definitions(
     -DG_DISABLE_DEPRECATED
     -DGDK_PIXBUF_DISABLE_DEPRECATED
     -DGDK_DISABLE_DEPRECATED
-    # FIXME: migrate from GtkUIManager to GtkBuilder in 2.90
     # -DGTK_DISABLE_DEPRECATED
     -DPANGO_DISABLE_DEPRECATED
     # FIXME: these break libnotify's headers

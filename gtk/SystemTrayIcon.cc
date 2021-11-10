@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -8,7 +8,6 @@
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <gtkmm.h>
 
 #ifdef HAVE_LIBAPPINDICATOR
 #include <libappindicator/app-indicator.h>
@@ -27,7 +26,7 @@
 class SystemTrayIcon::Impl
 {
 public:
-    Impl(Glib::RefPtr<Session> const& core);
+    Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     void refresh();
@@ -163,8 +162,8 @@ std::string getIconName()
 
 } // namespace
 
-SystemTrayIcon::SystemTrayIcon(Glib::RefPtr<Session> const& core)
-    : impl_(std::make_unique<Impl>(core))
+SystemTrayIcon::SystemTrayIcon(Gtk::Window& main_window, Glib::RefPtr<Session> const& core)
+    : impl_(std::make_unique<Impl>(main_window, core))
 {
 }
 
@@ -175,11 +174,12 @@ void SystemTrayIcon::refresh()
     impl_->refresh();
 }
 
-SystemTrayIcon::Impl::Impl(Glib::RefPtr<Session> const& core)
+SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const& core)
     : core_(core)
 {
     auto const icon_name = getIconName();
-    menu_ = gtr_action_get_widget<Gtk::Menu>("/icon-popup");
+    menu_ = Gtk::make_managed<Gtk::Menu>(gtr_action_get_object<Gio::Menu>("icon-popup"));
+    menu_->attach_to_widget(main_window);
 
 #ifdef HAVE_LIBAPPINDICATOR
 

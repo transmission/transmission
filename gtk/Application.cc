@@ -172,7 +172,7 @@ private:
     bool is_iconified_ = false;
     bool is_closing_ = false;
 
-    Glib::RefPtr<Gtk::UIManager> ui_manager_;
+    Glib::RefPtr<Gtk::Builder> ui_builder_;
 
     unsigned int activation_count_ = 0;
     sigc::connection timer_;
@@ -561,13 +561,13 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_manager_ = Gtk::UIManager::create();
-    gtr_actions_init(ui_manager_, this);
-    ui_manager_->add_ui_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
-    ui_manager_->ensure_update();
+    ui_builder_ = Gtk::Builder::create_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
+    auto const actions = gtr_actions_init(ui_builder_, this);
+
+    app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
 
     /* create main window now to be a parent to any error dialogs */
-    wind_ = MainWindow::create(app_, ui_manager_, core_);
+    wind_ = MainWindow::create(app_, actions, core_);
     wind_->signal_size_allocate().connect(sigc::mem_fun(this, &Impl::on_main_window_size_allocated));
     app_.hold();
     app_setup();
@@ -700,6 +700,7 @@ void Application::Impl::app_setup()
     if (!is_iconified_)
     {
         wind_->show();
+        gtr_action_set_toggled("toggle-main-window", true);
     }
     else
     {
@@ -743,6 +744,8 @@ void Application::Impl::placeWindowFromPrefs()
 
 void Application::Impl::presentMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", true);
+
     if (is_iconified_)
     {
         is_iconified_ = false;
@@ -762,6 +765,8 @@ void Application::Impl::presentMainWindow()
 
 void Application::Impl::hideMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", false);
+
     wind_->set_skip_taskbar_hint(true);
     gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
@@ -1044,7 +1049,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
 
             if (show && icon_ == nullptr)
             {
-                icon_ = std::make_unique<SystemTrayIcon>(core_);
+                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
             }
             else if (!show && icon_ != nullptr)
             {
@@ -1407,7 +1412,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
-    else if (action_name == "open-torrent-menu" || action_name == "open-torrent-toolbar")
+    else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
         w->signal_hide().connect([w]() mutable { w.reset(); });
@@ -1507,6 +1512,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     {
         if (msgwin_ == nullptr)
         {
+            gtr_action_set_toggled("toggle-message-log", true);
             msgwin_ = MessageLogWindow::create(*wind_, core_);
             msgwin_->signal_hide().connect(sigc::mem_fun(this, &Impl::on_message_window_closed));
         }
