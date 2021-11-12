@@ -2524,7 +2524,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
         [&name](auto const* blocklist) { return tr_stringEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
     if (it == std::end(src))
     {
-        auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);
+        auto path = tr_strvPath(session->configDir, "blocklists"sv, name);
         b = tr_blocklistFileNew(path.c_str(), session->isBlocklistEnabled);
         src.push_back(b);
     }
