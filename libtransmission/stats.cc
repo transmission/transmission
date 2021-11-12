@@ -93,15 +93,14 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_session_count, s->sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
 
-    char* const filename = getFilename(session);
+    auto const filename = getFilename(session);
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename);
+        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename.c_str());
     }
 
-    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
+    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename.c_str());
 
-    tr_free(filename);
     tr_variantFree(&top);
 }
 

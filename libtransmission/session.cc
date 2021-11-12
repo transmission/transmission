@@ -2454,7 +2454,6 @@ static void loadBlocklists(tr_session* session)
 
     /* cleanup */
     tr_sys_dir_close(odir, nullptr);
-    tr_free(dirname);
 }
 
 static void closeBlocklists(tr_session* session)

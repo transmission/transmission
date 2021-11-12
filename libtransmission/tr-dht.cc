@@ -62,6 +62,8 @@
 #include "utils.h"
 #include "variant.h"
 
+using namespace std::literals;
+
 static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
@@ -311,10 +313,9 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
+    auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
     auto benc = tr_variant{};
-    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, nullptr) ? 0 : -1;
-    tr_free(dat_file);
+    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str(), nullptr) ? 0 : -1;
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
@@ -465,10 +466,9 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
-        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
+        auto const dat_file = tr_strvPath(ss->configDir, "dht.dat");
+        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str());
         tr_variantFree(&benc);
-        tr_free(dat_file);
     }
 
     dht_uninit();
