@@ -521,11 +521,10 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        char* expected = tr_buildPath(tor->currentDir, strings[i], nullptr);
+        auto const expected = tr_strvPath(tor->currentDir, strings[i]);
         char* path = tr_torrentFindFile(tor, i);
-        EXPECT_STREQ(expected, path);
+        EXPECT_EQ(expected, path);
         tr_free(path);
-        tr_free(expected);
     }
 
     torrentRemoveAndWait(tor, 0);
