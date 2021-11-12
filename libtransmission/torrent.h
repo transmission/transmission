@@ -288,7 +288,7 @@ struct tr_torrent
     char* incompleteDir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    size_t infoDictLength;
+    uint64_t infoDictLength;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *

@@ -471,7 +471,7 @@ static char const* tr_metainfoParseImpl(
     tr_session const* session,
     tr_info* inf,
     std::vector<tr_sha1_digest_t>* pieces,
-    size_t* infoDictLength,
+    uint64_t* infoDictLength,
     tr_variant const* meta_in)
 {
     int64_t i = 0;
