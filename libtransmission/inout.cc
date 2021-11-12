@@ -290,5 +290,5 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
 {
     auto const hash = recalculateHash(tor, piece);
-    return hash && *hash == tor->info.pieces[piece];
+    return hash && *hash == tor->pieceHash(piece);
 }

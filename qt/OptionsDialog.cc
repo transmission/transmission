@@ -16,6 +16,7 @@
 #include <libtransmission/variant.h>
 
 #include "AddData.h"
+#include "FileTreeModel.h"
 #include "FreeSpaceLabel.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
@@ -34,7 +35,6 @@ using ::trqt::variant_helpers::listAdd;
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
     : BaseDialog(parent)
     , add_(std::move(addme))
-    , verify_button_(new QPushButton(tr("&Verify Local Data"), this))
     , session_(session)
     , is_local_(session_.isLocal())
 {
@@ -100,14 +100,10 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     connect(ui_.destinationEdit, &QLineEdit::editingFinished, this, &OptionsDialog::onDestinationChanged);
 
     ui_.filesView->setEditable(false);
-
     ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
     ui_.priorityCombo->setCurrentIndex(1); // Normal
-
-    ui_.dialogButtons->addButton(verify_button_, QDialogButtonBox::ActionRole);
-    connect(verify_button_, &QAbstractButton::clicked, this, &OptionsDialog::onVerify);
 
     ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
     ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
@@ -117,8 +113,6 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 
     connect(ui_.filesView, &FileTreeView::priorityChanged, this, &OptionsDialog::onPriorityChanged);
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &OptionsDialog::onWantedChanged);
-
-    connect(&verify_timer_, &QTimer::timeout, this, &OptionsDialog::onTimeout);
 
     connect(&session_, &Session::sessionUpdated, this, &OptionsDialog::onSessionUpdated);
 
@@ -149,7 +143,6 @@ void OptionsDialog::clearInfo()
 void OptionsDialog::reload()
 {
     clearInfo();
-    clearVerify();
 
     tr_ctor* ctor = tr_ctorNew(nullptr);
 
@@ -183,7 +176,6 @@ void OptionsDialog::reload()
     bool const have_files_to_show = have_info_ && info_.fileCount > 0;
 
     ui_.filesView->setVisible(have_files_to_show);
-    verify_button_->setEnabled(have_files_to_show);
     layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
     if (have_info_)
@@ -205,6 +197,7 @@ void OptionsDialog::reload()
     }
 
     ui_.filesView->update(files_);
+    ui_.filesView->hideColumn(FileTreeModel::COL_PROGRESS);
 }
 
 void OptionsDialog::updateWidgetsLocality()
@@ -212,11 +205,6 @@ void OptionsDialog::updateWidgetsLocality()
     ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationEdit);
     ui_.destinationStack->setFixedHeight(ui_.destinationStack->currentWidget()->sizeHint().height());
     ui_.destinationLabel->setBuddy(ui_.destinationStack->currentWidget());
-
-    // hide the % done when non-local, since we've no way of knowing
-    (ui_.filesView->*(is_local_ ? &QTreeView::showColumn : &QTreeView::hideColumn))(2);
-
-    verify_button_->setVisible(is_local_);
 }
 
 void OptionsDialog::onSessionUpdated()
@@ -351,156 +339,5 @@ void OptionsDialog::onDestinationChanged()
     else
     {
         ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
-    }
-}
-
-/***
-****
-****  VERIFY
-****
-***/
-
-void OptionsDialog::clearVerify()
-{
-    verify_hash_.reset();
-    verify_file_.close();
-    verify_file_pos_ = 0;
-    verify_flags_.clear();
-    verify_file_index_ = 0;
-    verify_piece_index_ = 0;
-    verify_piece_pos_ = 0;
-    verify_timer_.stop();
-
-    for (TorrentFile& f : files_)
-    {
-        f.have = 0;
-    }
-
-    ui_.filesView->update(files_);
-}
-
-void OptionsDialog::onVerify()
-{
-    clearVerify();
-    verify_flags_.assign(info_.pieceCount, false);
-    verify_timer_.setSingleShot(false);
-    verify_timer_.start(0);
-}
-
-namespace
-{
-
-uint64_t getPieceSize(tr_info const* info, tr_piece_index_t piece_index)
-{
-    if (piece_index != info->pieceCount - 1)
-    {
-        return info->pieceSize;
-    }
-
-    return info->totalSize % info->pieceSize;
-}
-
-} // namespace
-
-void OptionsDialog::onTimeout()
-{
-    if (files_.empty())
-    {
-        verify_timer_.stop();
-        return;
-    }
-
-    tr_file const* file = &info_.files[verify_file_index_];
-
-    if (verify_file_pos_ == 0 && !verify_file_.isOpen())
-    {
-        QFileInfo const file_info(local_destination_, QString::fromUtf8(file->name));
-        verify_file_.setFileName(file_info.absoluteFilePath());
-        verify_file_.open(QIODevice::ReadOnly);
-    }
-
-    int64_t left_in_piece = getPieceSize(&info_, verify_piece_index_) - verify_piece_pos_;
-    int64_t left_in_file = file->length - verify_file_pos_;
-    int64_t bytes_this_pass = qMin(left_in_file, left_in_piece);
-    bytes_this_pass = qMin(bytes_this_pass, static_cast<int64_t>(sizeof(verify_buf_)));
-
-    if (verify_file_.isOpen() && verify_file_.seek(verify_file_pos_))
-    {
-        int64_t num_read = verify_file_.read(verify_buf_, bytes_this_pass);
-
-        if (num_read == bytes_this_pass)
-        {
-            verify_hash_.addData(verify_buf_, num_read);
-        }
-    }
-
-    left_in_piece -= bytes_this_pass;
-    left_in_file -= bytes_this_pass;
-    verify_piece_pos_ += bytes_this_pass;
-    verify_file_pos_ += bytes_this_pass;
-
-    verify_bins_[verify_file_index_] += bytes_this_pass;
-
-    if (left_in_piece == 0)
-    {
-        QByteArray const result(verify_hash_.result());
-        bool const matches = memcmp(result.constData(), std::data(info_.pieces[verify_piece_index_]), SHA_DIGEST_LENGTH) == 0;
-        verify_flags_[verify_piece_index_] = matches;
-        verify_piece_pos_ = 0;
-        ++verify_piece_index_;
-        verify_hash_.reset();
-
-        FileList changed_files;
-
-        if (matches)
-        {
-            for (auto i = verify_bins_.begin(), end = verify_bins_.end(); i != end; ++i)
-            {
-                TorrentFile& f(files_[i.key()]);
-                f.have += i.value();
-                changed_files.push_back(f);
-            }
-        }
-
-        ui_.filesView->update(changed_files);
-        verify_bins_.clear();
-    }
-
-    if (left_in_file == 0)
-    {
-        verify_file_.close();
-        ++verify_file_index_;
-        verify_file_pos_ = 0;
-    }
-
-    bool done = verify_piece_index_ >= info_.pieceCount;
-
-    if (done)
-    {
-        uint64_t have = 0;
-
-        for (TorrentFile const& f : files_)
-        {
-            have += f.have;
-        }
-
-        if (have == 0) // everything failed
-        {
-            // did the user accidentally specify the child directory instead of the parent?
-            QStringList const tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));
-
-            if (!tokens.empty() && local_destination_.dirName() == tokens.at(0))
-            {
-                // move up one directory and try again
-                local_destination_.cdUp();
-                onVerify();
-                done = false;
-            }
-        }
-    }
-
-    if (done)
-    {
-        verify_timer_.stop();
     }
 }
