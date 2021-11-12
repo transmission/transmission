@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
+ * This file Copyright (C) 2007-2021 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -10,12 +10,14 @@
 
 #include <memory>
 
+#include <gtkmm.h>
+
 class Session;
 
 class SystemTrayIcon
 {
 public:
-    SystemTrayIcon(Glib::RefPtr<Session> const& core);
+    SystemTrayIcon(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~SystemTrayIcon();
 
     void refresh();

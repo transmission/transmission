@@ -64,7 +64,7 @@ FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& c
     , core_(core)
     , dir_(dir)
 {
-    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::on_freespace_timer), 3);
+    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::on_freespace_timer), 3);
     on_freespace_timer();
 }
 

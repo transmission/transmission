@@ -80,7 +80,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon& icon, int size
 
     auto icon_info = icon_theme.choose_icon(icon_names, size);
 
-    if (icon_info == nullptr)
+    if (!bool{ icon_info })
     {
         icon_info = icon_theme.lookup_icon("text-x-generic", size, Gtk::ICON_LOOKUP_USE_BUILTIN);
     }
