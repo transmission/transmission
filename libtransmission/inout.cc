@@ -228,9 +228,8 @@ static int readOrWritePiece(
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
-            char* path = tr_buildPath(tor->downloadDir, file->name, nullptr);
-            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path);
-            tr_free(path);
+            auto const path = tr_strvPath(tor->downloadDir, file->name);
+            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path.c_str());
         }
     }
 
