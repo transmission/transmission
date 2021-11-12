@@ -76,7 +76,7 @@ protected:
     auto createWatchDir(std::string const& path, tr_watchdir_cb cb, void* cb_data)
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
-        return tr_watchdir_new(path, cb, cb_data, ev_base_.get(), force_generic);
+        return tr_watchdir_new(path.c_str(), cb, cb_data, ev_base_.get(), force_generic);
     }
 
     std::string createFile(std::string const& parent_dir, std::string const& name)
