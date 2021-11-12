@@ -257,6 +257,29 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 ****  std::string_view utils
 ***/
 
+#include <iostream>
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string tr_strvPath(T... args)
+{
+    auto setme = std::string{};
+    auto const n_args = sizeof...(args);
+    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
+
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    auto const foo = [](std::string& setme, std::string_view a)
+    {
+        setme += a;
+        setme += TR_PATH_DELIMITER;
+    };
+    (foo(setme, args), ...);
+    setme.resize(setme.size() - 1);
+    return setme;
+}
+
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string tr_strvJoin(T... args)
 {
