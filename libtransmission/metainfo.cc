@@ -8,9 +8,10 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring> /* strlen() */
+#include <cstring>
 #include <iterator>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
@@ -465,10 +466,11 @@ static void geturllist(tr_info* inf, tr_variant* meta)
         }
     }
 }
+
 static char const* tr_metainfoParseImpl(
     tr_session const* session,
     tr_info* inf,
-    bool* hasInfoDict,
+    std::vector<tr_sha1_digest_t>* pieces,
     size_t* infoDictLength,
     tr_variant const* meta_in)
 {
@@ -482,11 +484,6 @@ static char const* tr_metainfoParseImpl(
      * dictionary, given the definition of the info key above. */
     tr_variant* infoDict = nullptr;
     bool b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
-
-    if (hasInfoDict != nullptr)
-    {
-        *hasInfoDict = b;
-    }
 
     if (!b)
     {
@@ -634,9 +631,10 @@ static char const* tr_metainfoParseImpl(
             return "pieces";
         }
 
-        inf->pieceCount = std::size(sv) / SHA_DIGEST_LENGTH;
-        inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
-        std::copy_n(std::data(sv), std::size(sv), (uint8_t*)(inf->pieces));
+        auto const n_pieces = std::size(sv) / SHA_DIGEST_LENGTH;
+        inf->pieceCount = n_pieces;
+        pieces->resize(n_pieces);
+        std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<uint8_t*>(std::data(*pieces)));
 
         auto const* const errstr = parseFiles(
             inf,
@@ -679,7 +677,7 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
 {
     auto out = tr_metainfo_parsed{};
 
-    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.has_info_dict, &out.info_dict_length, meta_in);
+    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.pieces, &out.info_dict_length, meta_in);
     if (bad_tag != nullptr)
     {
         tr_error_set(error, TR_ERROR_EINVAL, _("Error parsing metainfo: %s"), bad_tag);
@@ -688,25 +686,6 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
     }
 
     return out;
-}
-
-bool tr_metainfoParse(
-    tr_session const* session,
-    tr_variant const* meta_in,
-    tr_info* inf,
-    bool* hasInfoDict,
-    size_t* infoDictLength)
-{
-    char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
-    bool const success = badTag == nullptr;
-
-    if (badTag != nullptr)
-    {
-        tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
-        tr_metainfoFree(inf);
-    }
-
-    return success;
 }
 
 void tr_metainfoFree(tr_info* inf)
@@ -722,7 +701,6 @@ void tr_metainfoFree(tr_info* inf)
     }
 
     tr_free(inf->webseeds);
-    tr_free(inf->pieces);
     tr_free(inf->files);
     tr_free(inf->comment);
     tr_free(inf->creator);

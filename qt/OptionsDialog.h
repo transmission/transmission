@@ -10,7 +10,6 @@
 
 #include <vector>
 
-#include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QMap>
@@ -44,8 +43,6 @@ private slots:
     void onAccepted();
     void onPriorityChanged(QSet<int> const& file_indices, int);
     void onWantedChanged(QSet<int> const& file_indices, bool);
-    void onVerify();
-    void onTimeout();
 
     void onSourceChanged();
     void onDestinationChanged();
@@ -58,29 +55,17 @@ private:
     void reload();
     void updateWidgetsLocality();
     void clearInfo();
-    void clearVerify();
 
     AddData add_;
     FileList files_;
-    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
 
     QDir local_destination_;
-    QFile verify_file_;
-    QPushButton* verify_button_ = {};
     QTimer edit_timer_;
-    QTimer verify_timer_;
-    std::vector<bool> verify_flags_;
     std::vector<bool> wanted_;
     std::vector<int> priorities_;
     Session& session_;
     Ui::OptionsDialog ui_ = {};
-    mybins_t verify_bins_;
     tr_info info_ = {};
-    uint64_t verify_file_pos_ = {};
-    uint32_t verify_piece_index_ = {};
-    uint32_t verify_piece_pos_ = {};
-    int verify_file_index_ = {};
-    char verify_buf_[2048 * 4] = {};
     bool have_info_ = {};
     bool is_local_ = {};
 };

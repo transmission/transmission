@@ -1612,7 +1612,6 @@ struct tr_info
     char* source;
 
     tr_file* files;
-    tr_sha1_digest_t* pieces;
 
     /* these trackers are sorted by tier */
     tr_tracker_info* trackers;

@@ -30,6 +30,7 @@
 
 class tr_swarm;
 struct tr_magnet_info;
+struct tr_metainfo_parsed;
 struct tr_session;
 struct tr_torrent;
 struct tr_torrent_tiers;
@@ -141,7 +142,14 @@ struct tr_torrent
     int magicNumber;
 
     std::optional<double> verify_progress;
-    std::vector<tr_sha1_digest_t> piece_checksums;
+
+    tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
+    {
+        TR_ASSERT(i < std::size(this->piece_checksums_));
+        return this->piece_checksums_[i];
+    }
+
+    void takeMetainfo(tr_metainfo_parsed&& parsed);
 
     tr_stat_errtype error;
     char errorString[128];
@@ -395,6 +403,9 @@ struct tr_torrent
     bool finishedSeedingByIdle;
 
     tr_labels_t labels;
+
+private:
+    mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
 
 /* what piece index is this block in? */

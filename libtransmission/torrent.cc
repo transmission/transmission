@@ -1036,8 +1036,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
     }
 
     auto* tor = new tr_torrent{};
-    std::swap(tor->info, parsed->info);
-    tor->infoDictLength = parsed->info_dict_length;
+    tor->takeMetainfo(std::move(*parsed));
     torrentInit(tor, ctor);
     return tor;
 }
@@ -3715,4 +3714,11 @@ void tr_torrentRenamePath(
     data->callback_user_data = callback_user_data;
 
     tr_runInEventThread(tor->session, torrentRenamePath, data);
+}
+
+void tr_torrent::takeMetainfo(tr_metainfo_parsed&& parsed)
+{
+    std::swap(this->info, parsed.info);
+    std::swap(this->piece_checksums_, parsed.pieces);
+    std::swap(this->infoDictLength, parsed.info_dict_length);
 }

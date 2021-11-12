@@ -32,15 +32,15 @@ enum tr_metainfo_basename_format
 struct tr_metainfo_parsed
 {
     tr_info info = {};
-    bool has_info_dict = false;
     uint64_t info_dict_length = 0;
+    std::vector<tr_sha1_digest_t> pieces;
 
     tr_metainfo_parsed() = default;
 
     tr_metainfo_parsed(tr_metainfo_parsed&& that)
     {
         std::swap(this->info, that.info);
-        std::swap(this->has_info_dict, that.has_info_dict);
+        std::swap(this->pieces, that.pieces);
         std::swap(this->info_dict_length, that.info_dict_length);
     }
 
@@ -55,15 +55,6 @@ struct tr_metainfo_parsed
 };
 
 std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_error** error);
-
-#if 0
-bool tr_metainfoParse(
-    tr_session const* session,
-    tr_variant const* variant,
-    tr_info* setmeInfo,
-    bool* setmeHasInfoDict,
-    size_t* setmeInfoDictLength);
-#endif
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 
