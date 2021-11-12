@@ -45,6 +45,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 /***
 ****  THREADS
 ***/
@@ -388,15 +390,14 @@ char const* tr_getDefaultDownloadDir(void)
         /* figure out where to look for user-dirs.dirs */
         char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
 
-        char* const config_file = !tr_str_is_empty(config_home) ?
-            tr_buildPath(config_home, "user-dirs.dirs", nullptr) :
-            tr_buildPath(getHomeDir(), ".config", "user-dirs.dirs", nullptr);
+        auto const config_file = !tr_str_is_empty(config_home) ? tr_strvPath(config_home, "user-dirs.dirs") :
+                                                                 tr_strvPath(getHomeDir(), ".config", "user-dirs.dirs");
 
         tr_free(config_home);
 
         /* read in user-dirs.dirs and look for the download dir entry */
         size_t content_len = 0;
-        char* const content = (char*)tr_loadFile(config_file, &content_len, nullptr);
+        char* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
 
         if (content != nullptr && content_len > 0)
         {
@@ -447,7 +448,6 @@ char const* tr_getDefaultDownloadDir(void)
         }
 
         tr_free(content);
-        tr_free(config_file);
     }
 
     return user_dir;
@@ -459,10 +459,9 @@ char const* tr_getDefaultDownloadDir(void)
 
 static bool isWebClientDir(char const* path)
 {
-    char* tmp = tr_buildPath(path, "index.html", nullptr);
-    bool const ret = tr_sys_path_exists(tmp, nullptr);
-    tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp);
-    tr_free(tmp);
+    auto tmp = tr_strvPath(path, "index.html");
+    bool const ret = tr_sys_path_exists(tmp.c_str(), nullptr);
+    tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp.c_str());
 
     return ret;
 }
@@ -579,9 +578,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             }
             else
             {
-                char* dhome = tr_buildPath(getHomeDir(), ".local", "share", nullptr);
-                candidates.emplace_back(dhome);
-                tr_free(dhome);
+                candidates.emplace_back(tr_strvPath(getHomeDir(), ".local"sv, "share"sv));
             }
             tr_free(tmp);
 
