@@ -12,9 +12,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#define TR_PATH_DELIMITER '/'
-#define TR_PATH_DELIMITER_STR "/"
-
 /**
  * @addtogroup tr_session Session
  * @{

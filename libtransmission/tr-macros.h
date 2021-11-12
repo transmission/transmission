@@ -110,6 +110,9 @@
 ****
 ***/
 
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
+
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
