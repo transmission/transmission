@@ -215,14 +215,9 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        tr_sys_file_t f = TR_BAD_SYS_FILE;
+        auto const bootstrap_file = tr_strvPath(cl->session->configDir, "dht.bootstrap");
 
-        char* const bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", nullptr);
-
-        if (bootstrap_file != nullptr)
-        {
-            f = tr_sys_file_open(bootstrap_file, TR_SYS_FILE_READ, 0, nullptr);
-        }
+        tr_sys_file_t const f = tr_sys_file_open(bootstrap_file.c_str(), TR_SYS_FILE_READ, 0, nullptr);
 
         if (f != TR_BAD_SYS_FILE)
         {
@@ -262,8 +257,6 @@ static void dht_bootstrap(void* closure)
 
             tr_sys_file_close(f, nullptr);
         }
-
-        tr_free(bootstrap_file);
     }
 
     if (!bootstrap_done(cl->session, 0))
