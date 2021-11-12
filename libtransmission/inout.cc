@@ -91,23 +91,21 @@ static int readOrWriteBytes(
         if (err == 0)
         {
             /* open (and maybe create) the file */
-            char* filename = tr_buildPath(base, subpath, nullptr);
+            auto const filename = tr_strvPath(base, subpath);
             tr_preallocation_mode const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE :
                                                                              tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc, file->length);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file->length);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
-                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror(err));
+                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
             }
             else if (doWrite)
             {
                 /* make a note that we just created a file */
                 tr_statsFileCreated(tor->session);
             }
-
-            tr_free(filename);
         }
 
         tr_free(subpath);
