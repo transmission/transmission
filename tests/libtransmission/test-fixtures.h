@@ -300,19 +300,18 @@ private:
         ensureFormattersInited();
 
         // download dir
-        size_t len;
-        char const* str;
+        auto sv = std::string_view{};
         auto q = TR_KEY_download_dir;
-        auto const download_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), TR_ARG_TUPLE((int)len, (int)len, str))) :
+        auto const download_dir = tr_variantDictFindStrView(settings, q, &sv) ?
+            makeString(tr_strdup_printf("%s/%" TR_PRIsv, sandboxDir().data(), TR_PRIsv_ARG(sv))) :
             makeString(tr_buildPath(sandboxDir().data(), "Downloads", nullptr));
         tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
         tr_variantDictAddStr(settings, q, download_dir.data());
 
         // incomplete dir
         q = TR_KEY_incomplete_dir;
-        auto const incomplete_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), TR_ARG_TUPLE((int)len, (int)len, str))) :
+        auto const incomplete_dir = tr_variantDictFindStrView(settings, q, &sv) ?
+            makeString(tr_strdup_printf("%s/%" TR_PRIsv, sandboxDir().data(), TR_PRIsv_ARG(sv))) :
             makeString(tr_buildPath(sandboxDir().data(), "Incomplete", nullptr));
         tr_variantDictAddStr(settings, q, incomplete_dir.data());
 

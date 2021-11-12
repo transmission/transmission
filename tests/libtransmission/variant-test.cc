@@ -451,20 +451,15 @@ TEST_F(VariantTest, merge)
     EXPECT_EQ(3, i);
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i4, &i));
     EXPECT_EQ(-35, i);
-    size_t len;
-    char const* s;
-    EXPECT_TRUE(tr_variantDictFindStr(&dest, s5, &s, &len));
-    EXPECT_EQ(size_t{ 3 }, len);
-    EXPECT_STREQ("abc", s);
-    EXPECT_TRUE(tr_variantDictFindStr(&dest, s6, &s, &len));
-    EXPECT_EQ(size_t{ 3 }, len);
-    EXPECT_STREQ("xyz", s);
-    EXPECT_TRUE(tr_variantDictFindStr(&dest, s7, &s, &len));
-    EXPECT_EQ(size_t{ 9 }, len);
-    EXPECT_STREQ("127.0.0.1", s);
-    EXPECT_TRUE(tr_variantDictFindStr(&dest, s8, &s, &len));
-    EXPECT_EQ(size_t{ 3 }, len);
-    EXPECT_STREQ("ghi", s);
+    auto sv = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s5, &sv));
+    EXPECT_EQ("abc"sv, sv);
+    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s6, &sv));
+    EXPECT_EQ("xyz"sv, sv);
+    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s7, &sv));
+    EXPECT_EQ("127.0.0.1"sv, sv);
+    EXPECT_TRUE(tr_variantDictFindStrView(&dest, s8, &sv));
+    EXPECT_EQ("ghi"sv, sv);
 
     tr_variantFree(&dest);
     tr_variantFree(&src);
@@ -554,18 +549,16 @@ TEST_F(VariantTest, dictFindType)
     tr_variantDictAddStr(&top, key_str, ExpectedStr.data());
 
     // look up the keys as strings
-    char const* str = {};
-    auto len = size_t{};
     auto sv = std::string_view{};
-    EXPECT_FALSE(tr_variantDictFindStr(&top, key_bool, &str, &len));
-    EXPECT_FALSE(tr_variantDictFindStr(&top, key_real, &str, &len));
-    EXPECT_FALSE(tr_variantDictFindStr(&top, key_int, &str, &len));
-    EXPECT_TRUE(tr_variantDictFindStr(&top, key_str, &str, &len));
-    EXPECT_EQ(ExpectedStr, std::string(str, len));
+    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_bool, &sv));
+    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_real, &sv));
+    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_int, &sv));
+    EXPECT_TRUE(tr_variantDictFindStrView(&top, key_str, &sv));
+    EXPECT_EQ(ExpectedStr, sv);
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key_str, &sv));
     EXPECT_EQ(ExpectedStr, sv);
     EXPECT_FALSE(tr_variantDictFindStrView(&top, key_unknown, &sv));
-    EXPECT_FALSE(tr_variantDictFindStr(&top, key_unknown, &str, &len));
+    EXPECT_FALSE(tr_variantDictFindStrView(&top, key_unknown, &sv));
 
     // look up the keys as bools
     auto b = bool{};
