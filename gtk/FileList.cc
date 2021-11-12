@@ -828,8 +828,8 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
     /* create the view */
     view_ = Gtk::make_managed<Gtk::TreeView>();
     view_->set_border_width(GUI_PAD_BIG);
-    view_->signal_button_press_event().connect(sigc::mem_fun(this, &Impl::onViewButtonPressed), false);
-    view_->signal_row_activated().connect(sigc::mem_fun(this, &Impl::onRowActivated));
+    view_->signal_button_press_event().connect(sigc::mem_fun(*this, &Impl::onViewButtonPressed), false);
+    view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
                                                  { return on_tree_view_button_released(view_, event); });
 
@@ -856,7 +856,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         text_rend->property_editable() = true;
         text_rend->property_ellipsize() = Pango::ELLIPSIZE_END;
         text_rend->property_font_desc() = pango_font_description;
-        text_rend->signal_edited().connect(sigc::mem_fun(this, &Impl::cell_edited_callback));
+        text_rend->signal_edited().connect(sigc::mem_fun(*this, &Impl::cell_edited_callback));
         col->pack_start(*text_rend, true);
         col->add_attribute(text_rend->property_text(), file_cols.label);
         col->set_sort_column(file_cols.label);
