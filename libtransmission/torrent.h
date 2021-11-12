@@ -19,20 +19,20 @@
 #include <unordered_set>
 #include <vector>
 
-#include "bandwidth.h" /* tr_bandwidth */
+#include "bandwidth.h"
 #include "bitfield.h"
-#include "completion.h" /* tr_completion */
+#include "completion.h"
 #include "file.h"
 #include "quark.h"
-#include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_PRINTF */
 
 class tr_swarm;
+struct tr_magnet_info;
+struct tr_session;
 struct tr_torrent;
 struct tr_torrent_tiers;
-struct tr_magnet_info;
 
 /**
 ***  Package-visible ctor API
@@ -64,6 +64,10 @@ void tr_torrentRecheckCompleteness(tr_torrent*);
 void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool has);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
+
+tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
+
+tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& info_dict_hah);
 
 tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string);
 

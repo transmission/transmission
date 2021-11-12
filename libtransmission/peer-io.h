@@ -23,7 +23,7 @@
 #include "crypto.h"
 #include "net.h" /* tr_address */
 #include "peer-socket.h"
-#include "utils.h" /* tr_time() */
+#include "utils.h" // tr_time()
 
 class tr_peerIo;
 struct Bandwidth;

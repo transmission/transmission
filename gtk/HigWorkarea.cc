@@ -45,11 +45,7 @@ void HigWorkarea::add_section_title(guint& row, Glib::ustring const& section_tit
 void HigWorkarea::add_wide_control(guint& row, Gtk::Widget& w)
 {
     w.set_hexpand(true);
-#if GTK_CHECK_VERSION(3, 12, 0)
     w.set_margin_start(18);
-#else
-    w.set_margin_left(18);
-#endif
     attach(w, 0, row, 2, 1);
     ++row;
 }
@@ -71,11 +67,7 @@ Gtk::CheckButton* HigWorkarea::add_wide_checkbutton(guint& row, Glib::ustring co
 
 void HigWorkarea::add_label_w(guint row, Gtk::Widget& w)
 {
-#if GTK_CHECK_VERSION(3, 12, 0)
     w.set_margin_start(18);
-#else
-    w.set_margin_left(18);
-#endif
 
     if (auto* label = dynamic_cast<Gtk::Label*>(&w); label != nullptr)
     {

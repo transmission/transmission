@@ -30,7 +30,7 @@ set(PROJECT_FILES
   handshake.cc
   inout.cc
   log.cc
-  magnet.cc
+  magnet-metainfo.cc
   makemeta.cc
   metainfo.cc
   natpmp.cc
@@ -73,6 +73,7 @@ set(PROJECT_FILES
   watchdir-kqueue.cc
   watchdir-win32.cc
   web.cc
+  web-utils.cc
   webseed.cc
 )
 
@@ -118,8 +119,9 @@ else()
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
-    error.h
+    ${PROJECT_BINARY_DIR}/version.h
     error-types.h
+    error.h
     file.h
     log.h
     makemeta.h
@@ -133,11 +135,12 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     utils.h
     variant.h
     watchdir.h
+    web-utils.h
     web.h
-    ${PROJECT_BINARY_DIR}/version.h
 )
 
 set(${PROJECT_NAME}_PRIVATE_HEADERS
+    ConvertUTF.h
     announcer-common.h
     announcer.h
     bandwidth.h
@@ -146,14 +149,13 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     cache.h
     clients.h
     completion.h
-    ConvertUTF.h
-    crypto.h
     crypto-utils.h
+    crypto.h
     fdlimit.h
     handshake.h
     history.h
     inout.h
-    magnet.h
+    magnet-metainfo.h
     metainfo.h
     mime-types.h
     natpmp_local.h
@@ -163,22 +165,22 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-mgr.h
     peer-msgs.h
     peer-socket.h
-    platform.h
     platform-quota.h
+    platform.h
     port-forwarding.h
     ptrarray.h
     resume.h
     rpc-server.h
     session.h
-    subprocess.h
     stats.h
-    torrent.h
+    subprocess.h
     torrent-magnet.h
+    torrent.h
     tr-dht.h
-    trevent.h
     tr-lpd.h
     tr-udp.h
     tr-utp.h
+    trevent.h
     upnp.h
     variant-common.h
     verify.h

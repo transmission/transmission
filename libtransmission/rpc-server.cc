@@ -11,6 +11,7 @@
 #include <cstring> /* memcpy */
 #include <list>
 #include <string>
+#include <vector>
 
 #include <zlib.h>
 
@@ -20,21 +21,23 @@
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_ssha1_matches() */
+
 #include "crypto-utils.h" /* tr_rand_buffer() */
+#include "crypto.h" /* tr_ssha1_matches() */
 #include "error.h"
 #include "fdlimit.h"
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
-#include "rpcimpl.h"
 #include "rpc-server.h"
-#include "session.h"
+#include "rpcimpl.h"
 #include "session-id.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 #include "web.h"
 
 /* session-id is used to make cross-site request forgery attacks difficult.
@@ -1107,6 +1110,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     auto boolVal = bool{};
     auto i = int64_t{};
     char const* str = nullptr;
+    auto url = std::string_view{};
 
     tr_rpc_server* const s = new tr_rpc_server{};
     s->session = session;
@@ -1134,21 +1138,18 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_url;
-    auto url_len = size_t{};
-    if (!tr_variantDictFindStr(settings, key, &str, &url_len))
+    // auto url_len = size_t{};
+    if (!tr_variantDictFindStrView(settings, key, &url))
     {
         missing_settings_key(key);
     }
+    else if (std::empty(url) || url.back() != '/')
+    {
+        s->url = tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
+    }
     else
     {
-        if (url_len == 0 || str[url_len - 1] != '/')
-        {
-            s->url = tr_strdup_printf("%s/", str);
-        }
-        else
-        {
-            s->url = tr_strdup(str);
-        }
+        s->url = tr_strvDup(url);
     }
 
     key = TR_KEY_rpc_whitelist_enabled;

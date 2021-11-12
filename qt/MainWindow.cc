@@ -658,7 +658,7 @@ void MainWindow::openFolder()
     QString path(tor->getPath());
     FileList const& files = tor->files();
 
-    if (files.isEmpty())
+    if (files.empty())
     {
         return;
     }
@@ -1216,27 +1216,9 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::COMPACT_VIEW:
         {
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
-
-            QItemSelectionModel* selection_model(ui_.listView->selectionModel());
-            QItemSelection const selection(selection_model->selection());
-            QModelIndex const current_index(selection_model->currentIndex());
-
-#endif
-
             b = prefs_.getBool(key);
             ui_.action_CompactView->setChecked(b);
             ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
-
-            selectionModel->clear();
-            ui_.listView->reset(); // force the rows to resize
-            selectionModel->select(selection, QItemSelectionModel::Select);
-            selectionModel->setCurrentIndex(current_index, QItemSelectionModel::NoUpdate);
-
-#endif
-
             break;
         }
 

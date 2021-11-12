@@ -15,6 +15,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h" /* gtr_get_favicon() */
 #include "FilterBar.h"
@@ -773,19 +774,11 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     show_lb_->set_mnemonic_widget(*activity_);
     widget_.pack_start(*show_lb_, false, false, 0);
     widget_.pack_start(*activity_, true, true, 0);
-#if GTK_CHECK_VERSION(3, 12, 0)
     activity_->set_margin_end(GUI_PAD);
-#else
-    activity_->set_margin_right(GUI_PAD);
-#endif
 
     /* add the tracker combobox */
     widget_.pack_start(*tracker_, true, true, 0);
-#if GTK_CHECK_VERSION(3, 12, 0)
     tracker_->set_margin_end(GUI_PAD);
-#else
-    tracker_->set_margin_right(GUI_PAD);
-#endif
 
     /* add the entry field */
     entry_ = Gtk::make_managed<Gtk::Entry>();

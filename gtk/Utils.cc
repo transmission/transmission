@@ -19,7 +19,7 @@
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/web.h> /* tr_webResponseStr() */
+#include <libtransmission/web-utils.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
 #include "HigWorkarea.h"

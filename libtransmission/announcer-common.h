@@ -12,11 +12,12 @@
 #error only the libtransmission announcer module should #include this header.
 #endif
 
+#include <array>
 #include <string>
 
-#include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "transmission.h"
 #include "quark.h"
-#include "utils.h"
+#include "web-utils.h"
 
 /***
 ****  SCRAPE
@@ -42,7 +43,7 @@ struct tr_scrape_request
     char log_name[128];
 
     /* info hashes of the torrents to scrape */
-    uint8_t info_hash[TR_MULTISCRAPE_MAX][SHA_DIGEST_LENGTH];
+    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
 
     /* how many hashes to use in the info_hash field */
     int info_hash_count;
@@ -51,7 +52,7 @@ struct tr_scrape_request
 struct tr_scrape_response_row
 {
     /* the torrent's info_hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash;
 
     /* how many peers are seeding this torrent */
     int seeders;
@@ -162,7 +163,7 @@ struct tr_announce_request
     tr_peer_id_t peer_id;
 
     /* the torrent's info_hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash;
 
     /* the name to use when deep logging is enabled */
     char log_name[128];
@@ -173,7 +174,7 @@ struct tr_pex;
 struct tr_announce_response
 {
     /* the torrent's info hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash;
 
     /* whether or not we managed to connect to the tracker */
     bool did_connect;
@@ -237,12 +238,17 @@ void tr_tracker_udp_announce(
 
 void tr_tracker_udp_start_shutdown(tr_session* session);
 
-tr_quark tr_announcerGetKey(tr_parsed_url_t const& parsed);
+tr_quark tr_announcerGetKey(tr_url_parsed_t const& parsed);
 
 inline tr_quark tr_announcerGetKey(std::string_view url)
 {
     auto const parsed = tr_urlParseTracker(url);
-    return parsed ? tr_announcerGetKey(*parsed) : TR_KEY_NONE;
+    if (!parsed)
+    {
+        return TR_KEY_NONE;
+    }
+
+    return tr_announcerGetKey(*parsed);
 }
 
 inline tr_quark tr_announcerGetKey(tr_quark url)

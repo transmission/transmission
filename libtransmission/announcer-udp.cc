@@ -177,7 +177,7 @@ static struct tau_scrape_request* tau_scrape_request_new(
     evbuffer_add_hton_32(buf, transaction_id);
     for (int i = 0; i < in->info_hash_count; ++i)
     {
-        evbuffer_add(buf, in->info_hash[i], SHA_DIGEST_LENGTH);
+        evbuffer_add(buf, std::data(in->info_hash[i]), std::size(in->info_hash[i]));
     }
     auto const* const payload_begin = evbuffer_pullup(buf, -1);
     auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
@@ -199,7 +199,7 @@ static struct tau_scrape_request* tau_scrape_request_new(
         req->response.rows[i].seeders = -1;
         req->response.rows[i].leechers = -1;
         req->response.rows[i].downloads = -1;
-        memcpy(req->response.rows[i].info_hash, in->info_hash[i], SHA_DIGEST_LENGTH);
+        req->response.rows[i].info_hash = in->info_hash[i];
     }
 
     /* cleanup */
@@ -317,7 +317,7 @@ static struct tau_announce_request* tau_announce_request_new(
     auto* buf = evbuffer_new();
     evbuffer_add_hton_32(buf, TAU_ACTION_ANNOUNCE);
     evbuffer_add_hton_32(buf, transaction_id);
-    evbuffer_add(buf, in->info_hash, SHA_DIGEST_LENGTH);
+    evbuffer_add(buf, std::data(in->info_hash), std::size(in->info_hash));
     evbuffer_add(buf, std::data(in->peer_id), std::size(in->peer_id));
     evbuffer_add_hton_64(buf, in->down);
     evbuffer_add_hton_64(buf, in->leftUntilComplete);
@@ -340,7 +340,7 @@ static struct tau_announce_request* tau_announce_request_new(
     req->response.seeders = -1;
     req->response.leechers = -1;
     req->response.downloads = -1;
-    memcpy(req->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH);
+    req->response.info_hash = in->info_hash;
 
     evbuffer_free(buf);
     return req;

@@ -30,6 +30,7 @@
 #include <event2/util.h> /* evutil_vsnprintf() */
 
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "cache.h"
@@ -40,7 +41,7 @@
 #include "file.h"
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
-#include "magnet.h"
+#include "magnet-metainfo.h"
 #include "metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
@@ -48,14 +49,15 @@
 #include "resume.h"
 #include "session.h"
 #include "subprocess.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
 #include "version.h"
+#include "web-utils.h"
 
 /***
 ****
@@ -79,6 +81,13 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
+tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent)
+{
+    auto digest = tr_sha1_digest_t{};
+    std::copy_n(reinterpret_cast<std::byte const*>(torrent->info.hash), SHA_DIGEST_LENGTH, std::begin(digest));
+    return digest;
+}
+
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
     auto& src = session->torrentsById;
@@ -100,18 +109,15 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
     return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet)
+tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& info_dict_hash)
 {
-    tr_torrent* tor = nullptr;
+    return tr_torrentFindFromHash(session, reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
+}
 
-    tr_magnet_info* const info = tr_magnetParse(magnet);
-    if (info != nullptr)
-    {
-        tor = tr_torrentFindFromHash(session, info->hash);
-        tr_magnetFree(info);
-    }
-
-    return tor;
+tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
+{
+    auto mm = tr_magnet_metainfo{};
+    return mm.parseMagnet(magnet_link ? magnet_link : "") ? tr_torrentFindFromHash(session, mm.info_hash) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
@@ -773,8 +779,6 @@ static void torrentInitFromInfo(tr_torrent* tor)
     tr_cpConstruct(&tor->completion, tor);
 
     tr_torrentInitFilePieces(tor);
-    tor->completeness = tr_cpGetStatus(&tor->completion);
-    tr_torrentInitPiecePriorities(tor);
 }
 
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
@@ -897,6 +901,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_ctorInitTorrentPriorities(ctor, tor);
     tr_ctorInitTorrentWanted(ctor, tor);
+    tr_torrentInitPiecePriorities(tor);
 
     refreshCurrentDir(tor);
 
@@ -942,8 +947,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             {
                 tr_torrentSetLocalError(tor, "Unable to save torrent file: %s", tr_strerror(err));
             }
-
-            tr_sessionSetTorrentFile(tor->session, tor->info.hashString, path);
         }
     }
 
@@ -2787,7 +2790,7 @@ static constexpr bool isJunkFile(std::string_view base)
 
 #ifdef __APPLE__
     // check for resource forks. <http://support.apple.com/kb/TA20578>
-    if (base.find("._") == 0)
+    if (tr_strvStartsWith(base, "._"sv))
     {
         return true;
     }
@@ -2925,7 +2928,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     /* go from the bottom up */
     for (auto const& file : files)
     {
-        char* walk = tr_strdup(file.c_str());
+        char* walk = tr_strvDup(file);
 
         while (tr_sys_path_exists(walk, nullptr) && !tr_sys_path_is_same(tmpdir, walk, nullptr))
         {

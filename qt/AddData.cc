@@ -9,8 +9,10 @@
 #include <QDir>
 #include <QFile>
 
-#include <libtransmission/crypto-utils.h> // tr_base64_encode()
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/crypto-utils.h> // tr_base64_encode()
+#include <libtransmission/utils.h>
 
 #include "AddData.h"
 #include "Utils.h"

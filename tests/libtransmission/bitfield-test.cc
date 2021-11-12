@@ -99,7 +99,7 @@ TEST(Bitfield, setRaw)
     auto const raw = std::vector<uint8_t>(100, TestByte);
 
     auto bf = tr_bitfield(std::size(raw) * 8);
-    bf.setRaw(std::data(raw), std::size(raw), true);
+    bf.setRaw(std::data(raw), std::size(raw));
     EXPECT_EQ(TestByteTrueBits * std::size(raw), bf.count());
 
     // The first byte of the bitfield corresponds to indices 0 - 7

@@ -12,18 +12,19 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1() */
 #include "file.h"
 #include "log.h"
-#include "magnet.h"
+#include "magnet-metainfo.h"
 #include "metainfo.h"
 #include "resume.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
-#include "web.h"
+#include "web-utils.h"
 
 #define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
 
@@ -315,7 +316,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
-                        tr_sessionSetTorrentFile(tor->session, tor->info.hashString, tor->info.torrent);
                         tr_torrentGotNewInfoDict(tor);
                         tr_torrentSetDirty(tor);
                     }

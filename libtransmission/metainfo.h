@@ -12,9 +12,12 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+#include <string_view>
+
 #include "transmission.h"
-#include "variant.h"
-#include "tr-macros.h"
+
+struct tr_variant;
 
 enum tr_metainfo_basename_format
 {
@@ -40,4 +43,4 @@ void tr_metainfoMigrateFile(
     enum tr_metainfo_basename_format new_format);
 
 /** @brief Private function that's exposed here only for unit tests */
-char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted);
+bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view in, bool* is_adjusted);

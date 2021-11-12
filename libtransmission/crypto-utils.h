@@ -9,12 +9,12 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
+#include <optional>
 #include <inttypes.h>
 #include <stddef.h>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
 /**
 *** @addtogroup utils Utilities
@@ -52,7 +52,9 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length);
 /**
  * @brief Finalize and export SHA1 hash, free hasher context.
  */
-bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash);
+bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* setme);
+
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle);
 
 /**
  * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
@@ -175,18 +177,12 @@ void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 /**
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_sha1_to_hex(void* hex, void const* sha1)
-{
-    tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);
-}
+void tr_sha1_to_hex(void* hex, void const* sha1);
 
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
-static inline void tr_hex_to_sha1(void* sha1, void const* hex)
-{
-    tr_hex_to_binary(hex, sha1, SHA_DIGEST_LENGTH);
-}
+void tr_hex_to_sha1(void* sha1, void const* hex);
 
 /** @} */
 
