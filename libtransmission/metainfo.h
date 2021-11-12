@@ -12,11 +12,15 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
+struct tr_error;
 struct tr_variant;
 
 enum tr_metainfo_basename_format
@@ -25,12 +29,41 @@ enum tr_metainfo_basename_format
     TR_METAINFO_BASENAME_HASH
 };
 
+struct tr_metainfo_parsed
+{
+    tr_info info = {};
+    bool has_info_dict = false;
+    uint64_t info_dict_length = 0;
+
+    tr_metainfo_parsed() = default;
+
+    tr_metainfo_parsed(tr_metainfo_parsed&& that)
+    {
+        std::swap(this->info, that.info);
+        std::swap(this->has_info_dict, that.has_info_dict);
+        std::swap(this->info_dict_length, that.info_dict_length);
+    }
+
+    tr_metainfo_parsed(tr_metainfo_parsed const&) = delete;
+
+    tr_metainfo_parsed& operator=(tr_metainfo_parsed const&) = delete;
+
+    ~tr_metainfo_parsed()
+    {
+        tr_metainfoFree(&info);
+    }
+};
+
+std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_error** error);
+
+#if 0
 bool tr_metainfoParse(
     tr_session const* session,
     tr_variant const* variant,
     tr_info* setmeInfo,
     bool* setmeHasInfoDict,
     size_t* setmeInfoDictLength);
+#endif
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 

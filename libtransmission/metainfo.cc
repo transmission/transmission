@@ -15,6 +15,8 @@
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */
+#include "error.h"
+#include "error-types.h"
 #include "file.h"
 #include "log.h"
 #include "metainfo.h"
@@ -463,7 +465,6 @@ static void geturllist(tr_info* inf, tr_variant* meta)
         }
     }
 }
-
 static char const* tr_metainfoParseImpl(
     tr_session const* session,
     tr_info* inf,
@@ -672,6 +673,21 @@ static char const* tr_metainfoParseImpl(
     inf->torrent = session != nullptr ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : nullptr;
 
     return nullptr;
+}
+
+std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_error** error)
+{
+    auto out = tr_metainfo_parsed{};
+
+    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.has_info_dict, &out.info_dict_length, meta_in);
+    if (bad_tag != nullptr)
+    {
+        tr_error_set(error, TR_ERROR_EINVAL, _("Error parsing metainfo: %s"), bad_tag);
+        tr_metainfoFree(&out.info);
+        return {};
+    }
+
+    return out;
 }
 
 bool tr_metainfoParse(
