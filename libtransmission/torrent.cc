@@ -978,114 +978,66 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionUnlock(session);
 }
 
-static tr_parse_result torrentParseImpl(
-    tr_ctor const* ctor,
-    tr_info* setmeInfo,
-    bool* setmeHasInfo,
-    size_t* dictLength,
-    int* setme_duplicate_id)
+tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
 {
-    tr_session* session = tr_ctorGetSession(ctor);
-    tr_parse_result result = TR_PARSE_OK;
-
-    tr_info tmp;
-    if (setmeInfo == nullptr)
-    {
-        setmeInfo = &tmp;
-    }
-
-    *setmeInfo = {};
-
     tr_variant const* metainfo = nullptr;
     if (!tr_ctorGetMetainfo(ctor, &metainfo))
     {
         return TR_PARSE_ERR;
     }
 
-    auto hasInfo = bool{};
-    bool const didParse = tr_metainfoParse(session, metainfo, setmeInfo, &hasInfo, dictLength);
-    bool const doFree = didParse && (setmeInfo == &tmp);
-
-    if (!didParse)
+    auto parsed = tr_metainfoParse(tr_ctorGetSession(ctor), metainfo, nullptr);
+    if (!parsed)
     {
-        result = TR_PARSE_ERR;
+        return TR_PARSE_ERR;
     }
 
-    if (didParse && hasInfo && tr_getBlockSize(setmeInfo->pieceSize) == 0)
+    if (setmeInfo != nullptr)
     {
-        result = TR_PARSE_ERR;
+        std::swap(*setmeInfo, parsed->info);
     }
 
-    if (didParse && session != nullptr && result == TR_PARSE_OK)
-    {
-        tr_torrent const* const tor = tr_torrentFindFromHash(session, setmeInfo->hash);
-
-        if (tor != nullptr)
-        {
-            result = TR_PARSE_DUPLICATE;
-
-            if (setme_duplicate_id != nullptr)
-            {
-                *setme_duplicate_id = tr_torrentId(tor);
-            }
-        }
-    }
-
-    if (doFree)
-    {
-        tr_metainfoFree(setmeInfo);
-    }
-
-    if (setmeHasInfo != nullptr)
-    {
-        *setmeHasInfo = hasInfo;
-    }
-
-    return result;
-}
-
-tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
-{
-    return torrentParseImpl(ctor, setmeInfo, nullptr, nullptr, nullptr);
+    return TR_PARSE_OK;
 }
 
 tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_duplicate_id)
 {
-    tr_torrent* tor = nullptr;
-
     TR_ASSERT(ctor != nullptr);
-    TR_ASSERT(tr_isSession(tr_ctorGetSession(ctor)));
+    auto* const session = tr_ctorGetSession(ctor);
+    TR_ASSERT(tr_isSession(session));
 
-    auto tmpInfo = tr_info{};
-    auto hasInfo = bool{};
-    auto len = size_t{};
-    tr_parse_result const r = torrentParseImpl(ctor, &tmpInfo, &hasInfo, &len, setme_duplicate_id);
-
-    if (r == TR_PARSE_OK)
+    tr_variant const* metainfo = nullptr;
+    tr_ctorGetMetainfo(ctor, &metainfo);
+    auto parsed = tr_metainfoParse(session, metainfo, nullptr);
+    if (!parsed)
     {
-        tor = new tr_torrent{};
-        tor->info = tmpInfo;
-
-        if (hasInfo)
+        if (setme_error != nullptr)
         {
-            tor->infoDictLength = len;
+            *setme_error = TR_PARSE_ERR;
         }
 
-        torrentInit(tor, ctor);
+        return nullptr;
     }
-    else
+
+    tr_torrent const* const dupe = tr_torrentFindFromHash(session, parsed->info.hash);
+    if (dupe != nullptr)
     {
-        if (r == TR_PARSE_DUPLICATE)
+        if (setme_duplicate_id != nullptr)
         {
-            tr_metainfoFree(&tmpInfo);
+            *setme_duplicate_id = tr_torrentId(dupe);
         }
 
         if (setme_error != nullptr)
         {
-            *setme_error = r;
+            *setme_error = TR_PARSE_DUPLICATE;
         }
+
+        return nullptr;
     }
 
+    auto* tor = new tr_torrent{};
+    tor->takeMetainfo(std::move(*parsed));
+    torrentInit(tor, ctor);
     return tor;
 }
 
@@ -2644,21 +2596,13 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
         }
 
         /* try to parse it back again, to make sure it's good */
-        auto tmpInfo = tr_info{};
-        auto hasInfo = bool{};
-        if (tr_metainfoParse(tor->session, &metainfo, &tmpInfo, &hasInfo, &tor->infoDictLength))
+        auto parsed = tr_metainfoParse(tor->session, &metainfo, nullptr);
+        if (parsed)
         {
             /* it's good, so keep these new trackers and free the old ones */
-            tr_info swap;
-            swap.trackers = tor->info.trackers;
-            swap.trackerCount = tor->info.trackerCount;
-            tor->info.trackers = tmpInfo.trackers;
-            tor->info.trackerCount = tmpInfo.trackerCount;
-            tmpInfo.trackers = swap.trackers;
-            tmpInfo.trackerCount = swap.trackerCount;
+            std::swap(tor->info.trackers, parsed->info.trackers);
+            std::swap(tor->info.trackerCount, parsed->info.trackerCount);
             tr_torrentMarkEdited(tor);
-
-            tr_metainfoFree(&tmpInfo);
             tr_variantToFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
         }
 
@@ -3750,4 +3694,11 @@ void tr_torrentRenamePath(
     data->callback_user_data = callback_user_data;
 
     tr_runInEventThread(tor->session, torrentRenamePath, data);
+}
+
+void tr_torrent::takeMetainfo(tr_metainfo_parsed&& parsed)
+{
+    std::swap(this->info, parsed.info);
+    std::swap(this->piece_checksums_, parsed.pieces);
+    std::swap(this->infoDictLength, parsed.info_dict_length);
 }

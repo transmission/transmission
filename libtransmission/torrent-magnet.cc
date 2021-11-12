@@ -296,23 +296,18 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     dbgmsg(tor, "Saving completed metadata to \"%s\"", path);
                     tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
 
-                    auto hasInfo = bool{};
-                    auto info = tr_info{};
-                    auto infoDictLength = size_t{};
-                    success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
-
-                    if (success && tr_getBlockSize(info.pieceSize) == 0)
+                    auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
+                    if (info && tr_getBlockSize(info->info.pieceSize) == 0)
                     {
                         tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
-                        tr_metainfoFree(&info);
                         success = false;
                     }
 
                     if (success)
                     {
                         /* keep the new info */
-                        tor->info = info;
-                        tor->infoDictLength = infoDictLength;
+                        std::swap(tor->info, info->info);
+                        std::swap(tor->infoDictLength, info->info_dict_length);
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
