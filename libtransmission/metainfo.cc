@@ -685,7 +685,7 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
         return {};
     }
 
-    return out;
+    return std::optional<tr_metainfo_parsed>{ std::move(out) };
 }
 
 void tr_metainfoFree(tr_info* inf)
