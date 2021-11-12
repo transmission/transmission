@@ -12,6 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string>
+
 /**
  * @addtogroup tr_session Session
  * @{
@@ -35,7 +37,7 @@ char const* tr_getTorrentDir(tr_session const*);
 char const* tr_getWebClientDir(tr_session const*);
 
 /** @brief return the directory where session id lock files are stored */
-char* tr_getSessionIdDir(void);
+std::string tr_getSessionIdDir();
 
 /** @} */
 

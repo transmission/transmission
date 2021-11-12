@@ -636,18 +636,18 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     return s;
 }
 
-char* tr_getSessionIdDir(void)
+std::string tr_getSessionIdDir()
 {
 #ifndef _WIN32
 
-    return tr_strdup("/tmp");
+    return std::string{ "/tmp"sv };
 
 #else
 
     char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
-    char* result = tr_buildPath(program_data_dir, "Transmission", nullptr);
+    auto const result = tr_strvPath(program_data_dir, "Transmission");
     tr_free(program_data_dir);
-    tr_sys_dir_create(result, 0, 0, nullptr);
+    tr_sys_dir_create(result.c_str(), 0, 0, nullptr);
     return result;
 
 #endif
