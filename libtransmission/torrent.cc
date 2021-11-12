@@ -2812,19 +2812,17 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
     {
         if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
         {
-            char* const filename = tr_buildPath(folder, name, nullptr);
+            auto const filename = tr_strvPath(folder, name);
 
             auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
+            if (tr_sys_path_get_info(filename.c_str(), 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
             {
-                removeEmptyFoldersAndJunkFiles(filename);
+                removeEmptyFoldersAndJunkFiles(filename.c_str());
             }
             else if (isJunkFile(name))
             {
-                tr_sys_path_remove(filename, nullptr);
+                tr_sys_path_remove(filename.c_str(), nullptr);
             }
-
-            tr_free(filename);
         }
     }
 
@@ -2863,38 +2861,30 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ****  Move the local data to a new tmpdir
     ***/
 
-    char* base = tr_strdup_printf("%s__XXXXXX", tr_torrentName(tor));
-    char* tmpdir = tr_buildPath(top, base, nullptr);
-    tr_sys_dir_create_temp(tmpdir, nullptr);
-    tr_free(base);
+    auto tmpdir = tr_strvPath(top, TR_PATH_DELIMITER_STR, tr_torrentName(tor), "__XXXXXX");
+    tr_sys_dir_create_temp(std::data(tmpdir), nullptr);
 
     for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
     {
         /* try to find the file, looking in the partial and download dirs */
-        char* filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
+        auto filename = tr_strvPath(top, tor->info.files[f].name);
 
-        if (!tr_sys_path_exists(filename, nullptr))
+        if (!tr_sys_path_exists(filename.c_str(), nullptr))
         {
-            char* partial = tr_torrentBuildPartial(tor, f);
-            tr_free(filename);
-            filename = tr_buildPath(top, partial, nullptr);
-            tr_free(partial);
+            filename += ".part"sv;
 
-            if (!tr_sys_path_exists(filename, nullptr))
+            if (!tr_sys_path_exists(filename.c_str(), nullptr))
             {
-                tr_free(filename);
-                filename = nullptr;
+                filename.clear();
             }
         }
 
         /* if we found the file, move it */
-        if (filename != nullptr)
+        if (!std::empty(filename))
         {
-            char* target = tr_buildPath(tmpdir, tor->info.files[f].name, nullptr);
-            tr_moveFile(filename, target, nullptr);
+            auto target = tr_strvPath(tmpdir, tor->info.files[f].name);
+            tr_moveFile(filename.c_str(), target.c_str(), nullptr);
             files.emplace_back(target);
-            tr_free(filename);
-            tr_free(target);
         }
     }
 
@@ -2908,7 +2898,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
-    tr_sys_dir_t const odir = tr_sys_dir_open(tmpdir, nullptr);
+    tr_sys_dir_t const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr);
     if (odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
@@ -2916,9 +2906,8 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
         {
             if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
             {
-                char* file = tr_buildPath(tmpdir, name, nullptr);
-                (*func)(file, nullptr);
-                tr_free(file);
+                auto const file = tr_strvPath(tmpdir, name);
+                (*func)(file.c_str(), nullptr);
             }
         }
 
@@ -2930,7 +2919,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     {
         char* walk = tr_strvDup(file);
 
-        while (tr_sys_path_exists(walk, nullptr) && !tr_sys_path_is_same(tmpdir, walk, nullptr))
+        while (tr_sys_path_exists(walk, nullptr) && !tr_sys_path_is_same(tmpdir.c_str(), walk, nullptr))
         {
             char* tmp = tr_sys_path_dirname(walk, nullptr);
             (*func)(walk, nullptr);
@@ -2951,10 +2940,8 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
     {
         /* get the directory that this file goes in... */
-        char* const filename = tr_buildPath(top, tor->info.files[f].name, nullptr);
-        char* dir = tr_sys_path_dirname(filename, nullptr);
-        tr_free(filename);
-
+        auto const filename = tr_strvPath(top, tor->info.files[f].name);
+        char* dir = tr_sys_path_dirname(filename.c_str(), nullptr);
         if (dir == nullptr)
         {
             continue;
@@ -2989,8 +2976,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     }
 
     /* cleanup */
-    tr_sys_path_remove(tmpdir, nullptr);
-    tr_free(tmpdir);
+    tr_sys_path_remove(tmpdir.c_str(), nullptr);
 }
 
 static void tr_torrentDeleteLocalData(tr_torrent* tor, tr_fileFunc func)
@@ -3056,27 +3042,30 @@ static void setLocation(void* vdata)
             char* sub = nullptr;
             if (tr_torrentFindFile2(tor, i, &oldbase, &sub, nullptr))
             {
-                char* oldpath = tr_buildPath(oldbase, sub, nullptr);
-                char* newpath = tr_buildPath(location, sub, nullptr);
+                auto const oldpath = tr_strvPath(oldbase, sub);
+                auto const newpath = tr_strvPath(location, sub);
 
-                tr_logAddDebug("Found file #%d: %s", (int)i, oldpath);
+                tr_logAddDebug("Found file #%d: %s", (int)i, oldpath.c_str());
 
-                if (do_move && !tr_sys_path_is_same(oldpath, newpath, nullptr))
+                if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str(), nullptr))
                 {
                     tr_error* error = nullptr;
 
-                    tr_logAddTorInfo(tor, "moving \"%s\" to \"%s\"", oldpath, newpath);
+                    tr_logAddTorInfo(tor, "moving \"%s\" to \"%s\"", oldpath.c_str(), newpath.c_str());
 
-                    if (!tr_moveFile(oldpath, newpath, &error))
+                    if (!tr_moveFile(oldpath.c_str(), newpath.c_str(), &error))
                     {
                         err = true;
-                        tr_logAddTorErr(tor, "error moving \"%s\" to \"%s\": %s", oldpath, newpath, error->message);
+                        tr_logAddTorErr(
+                            tor,
+                            "error moving \"%s\" to \"%s\": %s",
+                            oldpath.c_str(),
+                            newpath.c_str(),
+                            error->message);
                         tr_error_free(error);
                     }
                 }
 
-                tr_free(newpath);
-                tr_free(oldpath);
                 tr_free(sub);
             }
 
@@ -3204,18 +3193,15 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
     {
         if (strcmp(sub, f->name) != 0)
         {
-            char* oldpath = tr_buildPath(base, sub, nullptr);
-            char* newpath = tr_buildPath(base, f->name, nullptr);
+            auto const oldpath = tr_strvPath(base, sub);
+            auto const newpath = tr_strvPath(base, f->name);
             tr_error* error = nullptr;
 
-            if (!tr_sys_path_rename(oldpath, newpath, &error))
+            if (!tr_sys_path_rename(oldpath.c_str(), newpath.c_str(), &error))
             {
-                tr_logAddTorErr(tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, error->message);
+                tr_logAddTorErr(tor, "Error moving \"%s\" to \"%s\": %s", oldpath.c_str(), newpath.c_str(), error->message);
                 tr_error_free(error);
             }
-
-            tr_free(newpath);
-            tr_free(oldpath);
         }
 
         tr_free(sub);
@@ -3579,24 +3565,21 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     char const* const base = !tr_torrentIsSeed(tor) && tor->incompleteDir != nullptr ? tor->incompleteDir : tor->downloadDir;
 
-    char* src = tr_buildPath(base, oldpath, nullptr);
+    auto src = tr_strvPath(base, oldpath);
 
-    if (!tr_sys_path_exists(src, nullptr)) /* check for it as a partial */
+    if (!tr_sys_path_exists(src.c_str(), nullptr)) /* check for it as a partial */
     {
-        char* tmp = tr_strdup_printf("%s.part", src);
-        tr_free(src);
-        src = tmp;
+        src += ".part"sv;
     }
 
-    if (tr_sys_path_exists(src, nullptr))
+    if (tr_sys_path_exists(src.c_str(), nullptr))
     {
-        char* parent = tr_sys_path_dirname(src, nullptr);
-        char* const tgt = tr_str_has_suffix(src, ".part") ?
-            tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.part", parent, newname) :
-            tr_buildPath(parent, newname, nullptr);
+        char* const parent = tr_sys_path_dirname(src.c_str(), nullptr);
+        auto const tgt = tr_strvEndsWith(src, ".part"sv) ? tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, ".part"sv) :
+                                                           tr_strvPath(parent, newname);
 
         auto tmp = errno;
-        bool const tgt_exists = tr_sys_path_exists(tgt, nullptr);
+        bool const tgt_exists = tr_sys_path_exists(tgt.c_str(), nullptr);
         errno = tmp;
 
         if (!tgt_exists)
@@ -3605,7 +3588,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src, tgt, &error))
+            if (!tr_sys_path_rename(src.c_str(), tgt.c_str(), &error))
             {
                 err = error->code;
                 tr_error_free(error);
@@ -3614,11 +3597,8 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
             errno = tmp;
         }
 
-        tr_free(tgt);
         tr_free(parent);
     }
-
-    tr_free(src);
 
     return err;
 }
