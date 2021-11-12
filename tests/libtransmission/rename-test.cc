@@ -45,22 +45,22 @@ protected:
 
     void createSingleFileTorrentContents(char const* top)
     {
-        auto const path = makeString(tr_buildPath(top, "hello-world.txt", nullptr));
+        auto const path = tr_strvPath(top, "hello-world.txt");
         createFileWithContents(path, "hello, world!\n");
     }
 
     void createMultifileTorrentContents(char const* top)
     {
-        auto path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", nullptr));
+        auto path = tr_strvPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester");
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
 
-        path = makeString(tr_buildPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", nullptr));
+        path = tr_strvPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony");
         createFileWithContents(path, "They’re Grrrrreat!\n");
 
-        path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", nullptr));
+        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi");
         createFileWithContents(path, "Inquisitive\n");
 
-        path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron", nullptr));
+        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron");
         createFileWithContents(path, "Tough\n");
 
         sync();
@@ -196,7 +196,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  Now try a rename that should succeed
     ***/
 
-    auto tmpstr = makeString(tr_buildPath(tor->currentDir, "hello-world.txt", nullptr));
+    auto tmpstr = tr_strvPath(tor->currentDir, "hello-world.txt");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tor->info.name, "foobar"));
@@ -205,7 +205,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tor->info.files[0].name); // confirm the file's name is now 'foobar' in our struct
     EXPECT_STREQ(nullptr, strstr(tor->info.torrent, "foobar")); // confirm the name in the .torrent file hasn't changed
-    tmpstr = makeString(tr_buildPath(tor->currentDir, "foobar", nullptr));
+    tmpstr = tr_strvPath(tor->currentDir, "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
@@ -220,7 +220,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  ...and rename it back again
     ***/
 
-    tmpstr = makeString(tr_buildPath(tor->currentDir, "foobar", nullptr));
+    tmpstr = tr_strvPath(tor->currentDir, "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
