@@ -280,8 +280,8 @@
 		BE11835B0CE160C50002D0F3 /* miniwget.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183510CE160C50002D0F3 /* miniwget.h */; };
 		BE11835C0CE160C50002D0F3 /* minisoap.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183520CE160C50002D0F3 /* minisoap.h */; };
 		BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183530CE160C50002D0F3 /* upnpreplyparse.h */; };
-		BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183540CE160C50002D0F3 /* upnpcommands.h */; };
-		BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183550CE160C50002D0F3 /* miniupnpc.h */; };
+		BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183540CE160C50002D0F3 /* upnpcommands.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183550CE160C50002D0F3 /* miniupnpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183560CE160C50002D0F3 /* minissdpc.h */; };
 		BE1183690CE160D50002D0F3 /* igd_desc_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = BE1183610CE160D50002D0F3 /* igd_desc_parse.c */; };
 		BE11836A0CE160D50002D0F3 /* minixml.c in Sources */ = {isa = PBXBuildFile; fileRef = BE1183620CE160D50002D0F3 /* minixml.c */; };
@@ -294,7 +294,7 @@
 		BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
+		BEFC1C1A0C07756200B0BB3C /* daemon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.cc */; };
 		BEFC1D050C07825A00B0BB3C /* remote.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C140C07756200B0BB3C /* remote.cc */; };
 		BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1E290C07861A00B0BB3C /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF00C07861A00B0BB3C /* version.h */; };
@@ -520,8 +520,8 @@
 		4D3EA0A908AE13C600EA10C2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-magnet.cc"; sourceTree = "<group>"; };
 		4D8017E910BBC073008A4AF2 /* torrent-magnet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-magnet.h"; sourceTree = "<group>"; };
-		4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = magnet-metainfo.cc; sourceTree = "<group>"; };
-		4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magnet-metainfo.h; sourceTree = "<group>"; };
+		4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "magnet-metainfo.cc"; sourceTree = "<group>"; };
+		4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "magnet-metainfo.h"; sourceTree = "<group>"; };
 		4DB74F070E8CD75100AEB1A8 /* wildmat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = wildmat.c; sourceTree = "<group>"; };
 		4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
 		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
@@ -1912,6 +1912,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */,
+				BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */,
 				BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */,
 				BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */,
 				BE11835A0CE160C50002D0F3 /* minixml.h in Headers */,
@@ -1919,9 +1921,7 @@
 				BE11835C0CE160C50002D0F3 /* minisoap.h in Headers */,
 				C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */,
 				BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */,
-				BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */,
 				C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */,
-				BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */,
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
 				A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */,
@@ -2205,7 +2205,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
@@ -2984,9 +2983,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"third-party/libevent/include",
-				);
+				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 			};
@@ -3004,9 +3001,7 @@
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
 					"third-party/libutp",
-					"third-party/miniupnpc",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3022,6 +3017,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = Debug;
 		};
@@ -3198,9 +3194,7 @@
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
 					"third-party/libutp",
-					"third-party/miniupnpc",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3216,6 +3210,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = Release;
 		};
@@ -3449,9 +3444,7 @@
 					"third-party/dht",
 					"third-party/libb64/include",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
 					"third-party/libutp",
-					"third-party/miniupnpc",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3467,6 +3460,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = "Release - Debug";
 		};
@@ -3510,9 +3504,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"third-party/libevent/include",
-				);
+				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 			};
@@ -3633,9 +3625,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"third-party/libevent/include",
-				);
+				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 			};
