@@ -27,6 +27,7 @@
 
 #include "bandwidth.h"
 #include "net.h"
+#include "platform-quota.h"
 #include "tr-macros.h"
 #include "utils.h" // tr_speed_K
 
@@ -49,7 +50,6 @@ struct tr_announcer_udp;
 struct tr_bindsockets;
 struct tr_blocklistFile;
 struct tr_cache;
-struct tr_device_info;
 struct tr_fdInfo;
 
 struct tr_turtle_info
@@ -131,6 +131,39 @@ struct CaseInsensitiveStringCompare // case-insensitive string compare
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+    /// directories
+
+    std::string const& downloadDir() const
+    {
+        return download_dir_.path;
+    }
+
+    void setDownloadDir(std::string_view path)
+    {
+        download_dir_ = tr_device_info_create(path);
+    }
+
+    std::string const& incompleteDir() const
+    {
+        return incomplete_dir_;
+    }
+    void setIncompleteDir(std::string_view path)
+    {
+        incomplete_dir_ = path;
+    }
+    void useIncompleteDir(bool enabled)
+    {
+        incomplete_dir_enabled_ = enabled;
+    }
+    bool useIncompleteDir() const
+    {
+        return incomplete_dir_enabled_;
+    }
+
+    int64_t freeSpace(std::string_view path) const;
+
+    /// fields
+
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
@@ -143,7 +176,6 @@ struct tr_session
     bool isIncompleteFileNamingEnabled;
     bool isRatioLimited;
     bool isIdleLimited;
-    bool isIncompleteDirEnabled;
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
@@ -220,11 +252,8 @@ struct tr_session
     char* configDir;
     char* resumeDir;
     char* torrentDir;
-    char* incompleteDir;
 
     char* blocklist_url;
-
-    struct tr_device_info* downloadDir;
 
     std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
@@ -260,6 +289,11 @@ struct tr_session
 
     struct tr_bindinfo* bind_ipv4;
     struct tr_bindinfo* bind_ipv6;
+
+private:
+    tr_device_info download_dir_;
+    std::string incomplete_dir_;
+    bool incomplete_dir_enabled_;
 };
 
 constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)

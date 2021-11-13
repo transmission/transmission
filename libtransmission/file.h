@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <string_view>
 #include <inttypes.h>
 #include <time.h>
 
@@ -181,7 +182,7 @@ bool tr_sys_path_exists(char const* path, struct tr_error** error);
  *
  * @return `True` if path is relative, `false` otherwise
  */
-bool tr_sys_path_is_relative(char const* path);
+bool tr_sys_path_is_relative(std::string_view path);
 
 /**
  * @brief Test to see if the two filenames point to the same file.

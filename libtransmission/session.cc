@@ -45,7 +45,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform-quota.h" /* tr_device_info_free() */
+#include "platform-quota.h"
 #include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
@@ -418,7 +418,7 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
+    tr_variantDictAddStr(d, TR_KEY_download_dir, s->downloadDir());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -792,6 +792,7 @@ static void sessionSetImpl(void* vdata)
     TR_ASSERT(tr_variantIsDict(settings));
     TR_ASSERT(tr_amInEventThread(session));
 
+    auto sv = std::string_view{};
     auto b = tr_bindinfo{};
     auto boolVal = bool{};
     auto d = double{};
@@ -931,19 +932,19 @@ static void sessionSetImpl(void* vdata)
         session->preallocationMode = tr_preallocation_mode(i);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
     {
-        tr_sessionSetDownloadDir(session, strVal);
+        session->setDownloadDir(sv);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_incomplete_dir, &sv))
     {
-        tr_sessionSetIncompleteDir(session, strVal);
+        session->setIncompleteDir(sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
     {
-        tr_sessionSetIncompleteDirEnabled(session, boolVal);
+        session->useIncompleteDir(boolVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
@@ -1170,39 +1171,31 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
 ****
 ***/
 
-void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
+int64_t tr_session::freeSpace(std::string_view path) const
+{
+    return path == this->downloadDir() ? tr_device_info_get_disk_space(this->download_dir_).free : tr_getDirSpace(path).free;
+}
+
+void tr_sessionSetDownloadDir(tr_session* session, char const* path)
 {
     TR_ASSERT(tr_isSession(session));
 
-    struct tr_device_info* info = nullptr;
-
-    if (!tr_str_is_empty(dir))
+    if (path != nullptr)
     {
-        info = tr_device_info_create(dir);
+        session->setDownloadDir(path);
     }
-
-    tr_device_info_free(session->downloadDir);
-    session->downloadDir = info;
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    char const* dir = nullptr;
-
-    if (session != nullptr && session->downloadDir != nullptr)
-    {
-        dir = session->downloadDir->path;
-    }
-
-    return dir;
+    return session->downloadDir().c_str();
 }
 
 int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 {
-    return tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0 ? tr_device_info_get_disk_space(session->downloadDir).free :
-                                                                     tr_getDirSpace(dir).free;
+    return dir != nullptr ? session->freeSpace(dir) : -1;
 }
 
 /***
@@ -1231,33 +1224,28 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->incompleteDir != dir)
-    {
-        tr_free(session->incompleteDir);
-
-        session->incompleteDir = tr_strdup(dir);
-    }
+    session->setIncompleteDir(dir ? dir : ""sv);
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->incompleteDir;
+    return session->incompleteDir().c_str();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isIncompleteDirEnabled = b;
+    session->useIncompleteDir(b);
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isIncompleteDirEnabled;
+    return session->useIncompleteDir();
 }
 
 /***
@@ -2075,11 +2063,9 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
-    tr_device_info_free(session->downloadDir);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
-    tr_free(session->incompleteDir);
     tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
     delete session;

@@ -100,7 +100,7 @@ std::string& tr_buildBuf(std::string& setme, T... args)
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-struct tr_disk_space tr_getDirSpace(char const* path);
+tr_disk_space tr_getDirSpace(std::string_view path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds

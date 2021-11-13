@@ -381,18 +381,15 @@ char* tr_buildPath(char const* first_element, ...)
     return buf;
 }
 
-tr_disk_space tr_getDirSpace(char const* dir)
+tr_disk_space tr_getDirSpace(std::string_view dir)
 {
-    if (tr_str_is_empty(dir))
+    if (std::empty(dir))
     {
         errno = EINVAL;
         return { -1, -1 };
     }
 
-    auto* const info = tr_device_info_create(dir);
-    auto const disk_space = tr_device_info_get_disk_space(info);
-    tr_device_info_free(info);
-    return disk_space;
+    return tr_device_info_get_disk_space(tr_device_info_create(dir));
 }
 
 /****

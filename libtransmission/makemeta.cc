@@ -47,7 +47,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     }
 
     auto buf = tr_strvPath(dir, base);
-    tr_sys_path_native_separators(std::data(buf));
+    (void)tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
     tr_error* error = nullptr;

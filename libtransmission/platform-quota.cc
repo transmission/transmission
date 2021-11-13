@@ -70,6 +70,8 @@
 #include "utils.h"
 #include "platform-quota.h"
 
+using namespace std::literals;
+
 /***
 ****
 ***/
@@ -424,21 +426,21 @@ static struct tr_disk_space getxfsquota(char* device)
 
 #endif /* _WIN32 */
 
-static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] tr_device_info const* info)
+static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] tr_device_info const& info)
 {
     struct tr_disk_space ret = { -1, -1 };
 
 #ifndef _WIN32
 
-    if (info->fstype != nullptr && evutil_ascii_strcasecmp(info->fstype, "xfs") == 0)
+    if (evutil_ascii_strcasecmp(info.fstype.c_str(), "xfs") == 0)
     {
 #ifdef HAVE_XQM
-        ret = getxfsquota(info->device);
+        ret = getxfsquota(info.device.c_str());
 #endif
     }
     else
     {
-        ret = getquota(info->device);
+        ret = getquota(info.device.c_str());
     }
 
 #endif /* _WIN32 */
@@ -485,48 +487,35 @@ static struct tr_disk_space tr_getDiskSpace(char const* path)
 #endif
 }
 
-struct tr_device_info* tr_device_info_create(char const* path)
+tr_device_info tr_device_info_create(std::string_view path)
 {
-    auto* const info = tr_new0(struct tr_device_info, 1);
-    info->path = tr_strdup(path);
+    auto out = tr_device_info{};
+    out.path = path;
 
 #ifndef _WIN32
-    info->device = tr_strdup(getblkdev(path));
-    info->fstype = tr_strdup(getfstype(path));
+
+    auto const* const blkdev = getblkdev(out.path.c_str());
+    auto const* const fstype = getfstype(out.path.c_str());
+    out.device = blkdev ? blkdev : ""sv;
+    out.fstype = fstype ? fstype : ""sv;
+
 #endif
 
-    return info;
+    return out;
 }
 
-void tr_device_info_free(struct tr_device_info* info)
+tr_disk_space tr_device_info_get_disk_space(tr_device_info const& info)
 {
-    if (info != nullptr)
-    {
-        tr_free(info->fstype);
-        tr_free(info->device);
-        tr_free(info->path);
-        tr_free(info);
-    }
-}
-
-struct tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const* info)
-{
-    struct tr_disk_space space;
-
-    if (info == nullptr || info->path == nullptr)
+    if (std::empty(info.path))
     {
         errno = EINVAL;
-        space.free = -1;
-        space.total = -1;
+        return { -1, -1 };
     }
-    else
-    {
-        space = tr_getQuotaSpace(info);
 
-        if (space.free < 0 || space.total < 0)
-        {
-            space = tr_getDiskSpace(info->path);
-        }
+    auto space = tr_getQuotaSpace(info);
+    if (space.free < 0 || space.total < 0)
+    {
+        space = tr_getDiskSpace(info.path.c_str());
     }
 
     return space;
