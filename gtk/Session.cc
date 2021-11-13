@@ -91,7 +91,7 @@ public:
     void add_torrent(tr_torrent* tor, bool do_notify);
     bool add_from_url(Glib::ustring const& uri);
 
-    void send_rpc_request(tr_variant const* request, int tag, std::function<void(tr_variant*)> const& response_func);
+    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant*)> const& response_func);
 
     void commit_prefs_change(tr_quark key);
 
@@ -1631,35 +1631,30 @@ void Session::set_pref(tr_quark const key, double newval)
 namespace
 {
 
-int nextTag = 1;
+int64_t nextTag = 1;
 
 typedef void (*server_response_func)(Session* core, tr_variant* response, gpointer user_data);
 
-struct pending_request_data
-{
-    void* impl;
-    std::function<void(tr_variant*)> response_func;
-};
-
-std::map<int, pending_request_data*> pendingRequests;
+std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant* response)
 {
-    int64_t intVal;
+    int64_t tag;
 
-    if (tr_variantDictFindInt(response, TR_KEY_tag, &intVal))
+    if (tr_variantDictFindInt(response, TR_KEY_tag, &tag))
     {
-        int const tag = (int)intVal;
-        auto const data_it = pendingRequests.find(tag);
-
-        if (data_it != pendingRequests.end())
+        if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
-            if (auto const& data = data_it->second; data->response_func)
+            if (auto const& response_func = data_it->second; response_func)
             {
-                data->response_func(response);
+                response_func(response);
             }
 
             pendingRequests.erase(data_it);
+        }
+        else
+        {
+            g_warning("Pending RPC request for tag %" PRId64 " not found", tag);
         }
     }
 
@@ -1670,7 +1665,7 @@ bool core_read_rpc_response_idle(tr_variant* response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
 {
-    tr_variant* response_copy = new tr_variant(*response);
+    tr_variant* response_copy = new tr_variant(std::move(*response));
 
     tr_variantInitBool(response, false);
 
@@ -1679,7 +1674,10 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void*
 
 } // namespace
 
-void Session::Impl::send_rpc_request(tr_variant const* request, int tag, std::function<void(tr_variant*)> const& response_func)
+void Session::Impl::send_rpc_request(
+    tr_variant const* request,
+    int64_t tag,
+    std::function<void(tr_variant*)> const& response_func)
 {
     if (session_ == nullptr)
     {
@@ -1688,10 +1686,7 @@ void Session::Impl::send_rpc_request(tr_variant const* request, int tag, std::fu
     else
     {
         /* remember this request */
-        auto* const data = new pending_request_data();
-        data->impl = this;
-        data->response_func = response_func;
-        pendingRequests.emplace(tag, data);
+        pendingRequests.emplace(tag, response_func);
 
         /* make the request */
 #ifdef DEBUG_RPC
@@ -1703,7 +1698,7 @@ void Session::Impl::send_rpc_request(tr_variant const* request, int tag, std::fu
         }
 #endif
 
-        tr_rpc_request_exec_json(session_, request, core_read_rpc_response, GINT_TO_POINTER(tag));
+        tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);
     }
 }
 
@@ -1713,8 +1708,7 @@ void Session::Impl::send_rpc_request(tr_variant const* request, int tag, std::fu
 
 void Session::port_test()
 {
-    int const tag = nextTag;
-    ++nextTag;
+    auto const tag = nextTag++;
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
