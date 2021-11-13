@@ -301,6 +301,17 @@ TEST_F(UtilsTest, lowerbound)
     }
 }
 
+TEST_F(UtilsTest, trStrlower)
+{
+    EXPECT_EQ(""sv, tr_strlower(""sv));
+    EXPECT_EQ("apple"sv, tr_strlower("APPLE"sv));
+    EXPECT_EQ("apple"sv, tr_strlower("Apple"sv));
+    EXPECT_EQ("apple"sv, tr_strlower("aPPLe"sv));
+    EXPECT_EQ("apple"sv, tr_strlower("applE"sv));
+    EXPECT_EQ("hello"sv, tr_strlower("HELLO"sv));
+    EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
+}
+
 TEST_F(UtilsTest, trMemmem)
 {
     auto const haystack = std::string{ "abcabcabcabc" };

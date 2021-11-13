@@ -256,58 +256,40 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-#ifdef TR_LIGHTWEIGHT
-#define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
-#else
-#define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
-#endif
-
-static int parse_tos(char const* tos)
+static int parse_tos(std::string_view tos_in)
 {
-    if (evutil_ascii_strcasecmp(tos, "") == 0)
+    auto tos = tr_strlower(tr_strvStrip(tos_in));
+
+    if (tos == ""sv || tos == "default"sv)
     {
         return 0;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "default") == 0)
-    {
-        return 0;
-    }
-
-    if (evutil_ascii_strcasecmp(tos, "lowcost") == 0)
+    if (tos == "lowcost"sv || tos == "mincost"sv)
     {
         return TR_IPTOS_LOWCOST;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "mincost") == 0)
-    {
-        return TR_IPTOS_LOWCOST;
-    }
-
-    if (evutil_ascii_strcasecmp(tos, "throughput") == 0)
+    if (tos == "throughput"sv)
     {
         return TR_IPTOS_THRUPUT;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "reliability") == 0)
+    if (tos == "reliability"sv)
     {
         return TR_IPTOS_RELIABLE;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "lowdelay") == 0)
+    if (tos == "lowdelay"sv)
     {
         return TR_IPTOS_LOWDELAY;
     }
 
-    char* p = nullptr;
-    int const value = strtol(tos, &p, 0);
-    return p == nullptr || p == tos ? 0 : value;
+    return std::stoi(tos);
 }
 
-static char const* format_tos(int value)
+static std::string format_tos(int value)
 {
-    static char buf[8];
-
     switch (value)
     {
     case 0:
@@ -326,10 +308,15 @@ static char const* format_tos(int value)
         return "lowdelay";
 
     default:
-        tr_snprintf(buf, 8, "%d", value);
-        return buf;
+        return std::to_string(value);
     }
 }
+
+#ifdef TR_LIGHTWEIGHT
+#define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
+#else
+#define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
+#endif
 
 void tr_sessionGetDefaultSettings(tr_variant* d)
 {
@@ -851,9 +838,9 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_socket_tos, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
     {
-        session->peerSocketTOS = parse_tos(strVal);
+        session->peerSocketTOS = parse_tos(sv);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_peer_congestion_algorithm, &strVal, nullptr))
