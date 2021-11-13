@@ -99,7 +99,7 @@ private:
     Gtk::TreeViewColumn* column_ = nullptr;
     Glib::RefPtr<Session> const core_;
     sigc::connection pref_handler_id_;
-    Gtk::Menu* popup_menu_;
+    Gtk::Menu* popup_menu_ = nullptr;
 };
 
 /***
