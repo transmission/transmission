@@ -321,11 +321,9 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
     return ret;
 }
 
-bool tr_sys_path_is_relative(char const* path)
+bool tr_sys_path_is_relative(std::string_view path)
 {
-    TR_ASSERT(path != nullptr);
-
-    return path[0] != '/';
+    return std::empty(path) || path.front() != '/';
 }
 
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
