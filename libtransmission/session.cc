@@ -1111,22 +1111,22 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_added_enabled, &boolVal))
     {
-        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
+        session->useScript(TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_added_filename, &sv))
     {
-        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, strVal);
+        session->setScript(TR_SCRIPT_ON_TORRENT_ADDED, sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
+        session->useScript(TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_done_filename, &sv))
     {
-        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, strVal);
+        session->setScript(TR_SCRIPT_ON_TORRENT_DONE, sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
@@ -2675,7 +2675,7 @@ void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->scripts_enabled[type] = enabled;
+    session->useScript(type, enabled);
 }
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
@@ -2683,7 +2683,7 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->scripts_enabled[type];
+    return session->useScript(type);
 }
 
 void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
@@ -2691,7 +2691,7 @@ void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->scripts[type].assign(script ? script : "");
+    session->setScript(type, script ? script : "");
 }
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type)
@@ -2699,7 +2699,7 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->scripts[type].c_str();
+    return session->script(type).c_str();
 }
 
 /***

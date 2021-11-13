@@ -161,6 +161,26 @@ public:
         incomplete_dir_enabled_ = enabled;
     }
 
+    void useScript(TrScript i, bool enabled)
+    {
+        scripts_enabled_[i] = enabled;
+    }
+
+    bool useScript(TrScript i) const
+    {
+        return scripts_enabled_[i];
+    }
+
+    void setScript(TrScript i, std::string_view path)
+    {
+        scripts_[i] = path;
+    }
+
+    std::string const& script(TrScript i) const
+    {
+        return scripts_[i];
+    }
+
 public:
     bool isPortRandom;
     bool isPexEnabled;
@@ -177,7 +197,6 @@ public:
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled;
 
     uint8_t peer_id_ttl_hours;
 
@@ -245,8 +264,6 @@ public:
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
     std::map<std::string_view, tr_torrent*, CaseInsensitiveStringCompare> torrentsByHashString;
 
-    std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
-
     char* configDir;
     char* resumeDir;
     char* torrentDir;
@@ -289,9 +306,11 @@ public:
     struct tr_bindinfo* bind_ipv6;
 
 private:
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string incomplete_dir_;
     std::string download_dir_;
 
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool incomplete_dir_enabled_ = false;
 };
 
