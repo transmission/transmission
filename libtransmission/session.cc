@@ -2103,7 +2103,7 @@ static void sessionLoadTorrents(void* vdata)
         {
             if (tr_str_has_suffix(name, ".torrent"))
             {
-                tr_buildBuf(path, dirname_sv, "/", name);
+                tr_buildBuf(path, dirname_sv, "/"sv, name);
                 tr_ctorSetMetainfoFromFile(data->ctor, path.c_str());
 
                 tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr, nullptr);

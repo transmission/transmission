@@ -257,8 +257,6 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 ****  std::string_view utils
 ***/
 
-#include <iostream>
-
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string tr_strvPath(T... args)
 {
