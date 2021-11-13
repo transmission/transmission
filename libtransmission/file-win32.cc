@@ -118,7 +118,7 @@ static constexpr bool is_slash(char c)
 
 static constexpr bool is_unc_path(std::string_view path)
 {
-    a return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
+    return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
 }
 
 static bool is_valid_path(char const* path)
