@@ -116,9 +116,9 @@ static constexpr bool is_slash(char c)
     return c == '\\' || c == '/';
 }
 
-static constexpr bool is_unc_path(char const* path)
+static constexpr bool is_unc_path(std::string_view path)
 {
-    return is_slash(path[0]) && path[1] == path[0];
+    return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
 }
 
 static bool is_valid_path(char const* path)
@@ -458,7 +458,7 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
     return ret;
 }
 
-bool tr_sys_path_is_relative(char const* path)
+bool tr_sys_path_is_relative(std::string_view path)
 {
     TR_ASSERT(path != nullptr);
 
@@ -468,8 +468,14 @@ bool tr_sys_path_is_relative(char const* path)
         return false;
     }
 
-    /* Local path: `X:` or `X:\...`. */
-    if (isalpha(path[0]) && path[1] == ':' && (path[2] == '\0' || is_slash(path[2])))
+    /* Local path: `X:` */
+    if (std::size(path) == 2 && isalpha(path[0]) && path[1] == ':')
+    {
+        return false;
+    }
+
+    /* Local path: `X:\...`. */
+    if (std::size(path) > 2 && isalpha(path[0]) && path[1] == ':' && is_slash(path[2]))
     {
         return false;
     }
