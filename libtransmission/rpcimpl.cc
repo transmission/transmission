@@ -1856,15 +1856,14 @@ static char const* sessionSet(
     tr_rpc_idle_data* /*idle_data*/)
 {
     auto download_dir = std::string_view{};
-    char const* incomplete_dir = nullptr;
+    auto incomplete_dir = std::string_view{};
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_incomplete_dir, &incomplete_dir, nullptr) &&
-        tr_sys_path_is_relative(incomplete_dir))
+    if (tr_variantDictFindStrView(args_in, TR_KEY_incomplete_dir, &incomplete_dir) && tr_sys_path_is_relative(incomplete_dir))
     {
         return "incomplete torrents directory path is not absolute";
     }
@@ -1950,14 +1949,14 @@ static char const* sessionSet(
         tr_sessionSetQueueEnabled(session, TR_DOWN, boolVal);
     }
 
-    if (incomplete_dir != nullptr)
+    if (!std::empty(incomplete_dir))
     {
-        tr_sessionSetIncompleteDir(session, incomplete_dir);
+        session->setIncompleteDir(incomplete_dir);
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_incomplete_dir_enabled, &boolVal))
     {
-        tr_sessionSetIncompleteDirEnabled(session, boolVal);
+        session->useIncompleteDir(boolVal);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit_global, &i))

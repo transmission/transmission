@@ -937,14 +937,14 @@ static void sessionSetImpl(void* vdata)
         session->setDownloadDir(sv);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_incomplete_dir, &sv))
     {
-        tr_sessionSetIncompleteDir(session, strVal);
+        session->setIncompleteDir(sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
     {
-        tr_sessionSetIncompleteDirEnabled(session, boolVal);
+        session->useIncompleteDir(boolVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
@@ -1211,33 +1211,28 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->incompleteDir != dir)
-    {
-        tr_free(session->incompleteDir);
-
-        session->incompleteDir = tr_strdup(dir);
-    }
+    session->setIncompleteDir(dir ? dir : "");
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->incompleteDir;
+    return session->incompleteDir().c_str();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isIncompleteDirEnabled = b;
+    session->useIncompleteDir(b);
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isIncompleteDirEnabled;
+    return session->useIncompleteDir();
 }
 
 /***
@@ -2058,7 +2053,6 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
-    tr_free(session->incompleteDir);
     tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
     delete session;
