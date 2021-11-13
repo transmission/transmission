@@ -994,7 +994,8 @@ tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
 
     if (setmeInfo != nullptr)
     {
-        std::swap(*setmeInfo, parsed->info);
+        *setmeInfo = parsed->info;
+        parsed->info = {};
     }
 
     return TR_PARSE_OK;
