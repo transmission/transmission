@@ -150,6 +150,11 @@ static bool is_valid_path(char const* path)
 
 static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
 {
+    if (path == null)
+    {
+        return nullptr;
+    }
+
     /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
        (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
 
