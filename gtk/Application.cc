@@ -35,6 +35,7 @@
 
 #include <giomm.h>
 #include <glib/gmessages.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
