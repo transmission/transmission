@@ -150,7 +150,7 @@ static bool is_valid_path(char const* path)
 
 static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
 {
-    if (path == null)
+    if (path == nullptr)
     {
         return nullptr;
     }
