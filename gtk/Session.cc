@@ -1739,8 +1739,7 @@ void Session::port_test()
 
 void Session::blocklist_update()
 {
-    int const tag = nextTag;
-    ++nextTag;
+    auto const tag = nextTag++;
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
@@ -1776,8 +1775,7 @@ void Session::blocklist_update()
 
 void Session::exec(tr_variant const* top)
 {
-    int const tag = nextTag;
-    ++nextTag;
+    auto const tag = nextTag++;
 
     impl_->send_rpc_request(top, tag, {});
 }
