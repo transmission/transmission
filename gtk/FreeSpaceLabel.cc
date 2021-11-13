@@ -43,7 +43,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
         return false;
     }
 
-    auto const bytes = tr_sessionGetDirFreeSpace(session, dir_.c_str());
+    auto const bytes = tr_dirSpace(dir_).free;
     auto const text = bytes < 0 ? _("Error") : gtr_sprintf(_("%s free"), tr_strlsize(bytes));
     auto const markup = gtr_sprintf("<i>%s</i>", text);
     label_.set_markup(markup);
