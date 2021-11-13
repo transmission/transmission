@@ -18,6 +18,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "platform-quota.h"
 #include "tr-macros.h"
 
 /***
@@ -27,10 +28,7 @@
 struct evbuffer;
 struct event;
 struct timeval;
-
 struct tr_error;
-
-struct tr_disk_space;
 
 /**
  * @addtogroup utils Utilities

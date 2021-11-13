@@ -8,6 +8,8 @@
 
 #include <glibmm/i18n.h>
 
+#include <libtransmission/utils.h>
+
 #include "FreeSpaceLabel.h"
 #include "Session.h"
 #include "Utils.h"

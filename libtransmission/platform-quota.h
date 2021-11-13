@@ -8,10 +8,6 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
-
 #include <cstdint>
 #include <string>
 #include <string_view>
