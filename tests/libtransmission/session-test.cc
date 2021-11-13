@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "version.h"
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 #include <algorithm>
 #include <array>
@@ -21,7 +21,67 @@
 #include <cstring>
 #include <string>
 
-TEST(Session, peerId)
+using namespace std::literals;
+
+namespace libtransmission
+{
+
+namespace test
+{
+
+TEST_F(SessionTest, properties)
+{
+    auto* const session = session_;
+
+    // download dir
+
+    for (auto const& sv : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setDownloadDir(sv);
+        EXPECT_EQ(sv, session->downloadDir());
+        EXPECT_EQ(sv, tr_sessionGetDownloadDir(session));
+
+        tr_sessionSetDownloadDir(session, std::string(sv).c_str());
+        EXPECT_EQ(sv, session->downloadDir());
+        EXPECT_EQ(sv, tr_sessionGetDownloadDir(session));
+    }
+
+    tr_sessionSetDownloadDir(session, nullptr);
+    EXPECT_EQ(""sv, session->downloadDir());
+    EXPECT_EQ(""sv, tr_sessionGetDownloadDir(session));
+
+    // incomplete dir
+
+    for (auto const& sv : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setIncompleteDir(sv);
+        EXPECT_EQ(sv, session->incompleteDir());
+        EXPECT_EQ(sv, tr_sessionGetIncompleteDir(session));
+
+        tr_sessionSetIncompleteDir(session, std::string(sv).c_str());
+        EXPECT_EQ(sv, session->incompleteDir());
+        EXPECT_EQ(sv, tr_sessionGetIncompleteDir(session));
+    }
+
+    tr_sessionSetIncompleteDir(session, nullptr);
+    EXPECT_EQ(""sv, session->incompleteDir());
+    EXPECT_EQ(""sv, tr_sessionGetIncompleteDir(session));
+
+    // incomplete dir enabled
+
+    for (auto const b : { true, false })
+    {
+        session->useIncompleteDir(b);
+        EXPECT_EQ(b, session->useIncompleteDir());
+        EXPECT_EQ(b, tr_sessionIsIncompleteDirEnabled(session));
+
+        tr_sessionSetIncompleteDirEnabled(session, b);
+        EXPECT_EQ(b, session->useIncompleteDir());
+        EXPECT_EQ(b, tr_sessionIsIncompleteDirEnabled(session));
+    }
+}
+
+TEST_F(SessionTest, peerId)
 {
     auto const peer_id_prefix = std::string{ PEERID_PREFIX };
 
@@ -47,7 +107,7 @@ TEST(Session, peerId)
     }
 }
 
-TEST(Session, sessionId)
+TEST_F(SessionTest, sessionId)
 {
 #ifdef __sun
     // FIXME: File locking doesn't work as expected
@@ -124,3 +184,7 @@ TEST(Session, sessionId)
     tr_free(const_cast<char*>(session_id_str_2));
     tr_free(const_cast<char*>(session_id_str_1));
 }
+
+} // namespace test
+
+} // namespace libtransmission

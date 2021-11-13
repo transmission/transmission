@@ -141,6 +141,26 @@ public:
         download_dir_ = dir;
     }
 
+    std::string const& incompleteDir() const
+    {
+        return incomplete_dir_;
+    }
+
+    void setIncompleteDir(std::string_view dir)
+    {
+        incomplete_dir_ = dir;
+    }
+
+    bool useIncompleteDir() const
+    {
+        return incomplete_dir_enabled_;
+    }
+
+    void useIncompleteDir(bool enabled)
+    {
+        incomplete_dir_enabled_ = enabled;
+    }
+
 public:
     bool isPortRandom;
     bool isPexEnabled;
@@ -151,10 +171,9 @@ public:
     bool isPrefetchEnabled;
     bool isClosing;
     bool isClosed;
-    bool isIncompleteFileNamingEnabled;
     bool isRatioLimited;
     bool isIdleLimited;
-    bool isIncompleteDirEnabled;
+    bool isIncompleteFileNamingEnabled;
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
@@ -231,7 +250,6 @@ public:
     char* configDir;
     char* resumeDir;
     char* torrentDir;
-    char* incompleteDir;
 
     char* blocklist_url;
 
@@ -271,7 +289,10 @@ public:
     struct tr_bindinfo* bind_ipv6;
 
 private:
+    std::string incomplete_dir_;
     std::string download_dir_;
+
+    bool incomplete_dir_enabled_ = false;
 };
 
 constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
