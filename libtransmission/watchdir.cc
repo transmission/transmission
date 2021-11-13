@@ -54,23 +54,22 @@ struct tr_watchdir
 
 static bool is_regular_file(char const* dir, char const* name)
 {
-    char* const path = tr_buildPath(dir, name, nullptr);
+    auto const path = tr_strvPath(dir, name);
     auto path_info = tr_sys_path_info{};
     tr_error* error = nullptr;
 
-    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+    bool const ret = tr_sys_path_get_info(path.c_str(), 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
     if (error != nullptr)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
-            log_error("Failed to get type of \"%s\" (%d): %s", path, error->code, error->message);
+            log_error("Failed to get type of \"%s\" (%d): %s", path.c_str(), error->code, error->message);
         }
 
         tr_error_free(error);
     }
 
-    tr_free(path);
     return ret;
 }
 

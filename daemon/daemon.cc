@@ -231,9 +231,9 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
         return TR_WATCHDIR_IGNORE;
     }
 
-    char* filename = tr_buildPath(tr_watchdir_get_path(dir), name, nullptr);
+    auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
     tr_ctor* ctor = tr_ctorNew(session);
-    int err = tr_ctorSetMetainfoFromFile(ctor, filename);
+    int err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
 
     if (err == 0)
     {
@@ -256,7 +256,7 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
 
                 tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
 
-                if (!tr_sys_path_remove(filename, &error))
+                if (!tr_sys_path_remove(filename.c_str(), &error))
                 {
                     tr_logAddError("Error deleting .torrent file: %s", error->message);
                     tr_error_free(error);
@@ -264,9 +264,8 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
             }
             else
             {
-                char* new_filename = tr_strdup_printf("%s.added", filename);
-                tr_sys_path_rename(filename, new_filename, nullptr);
-                tr_free(new_filename);
+                auto const new_filename = filename + ".added";
+                tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
             }
         }
     }
@@ -276,7 +275,6 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     }
 
     tr_ctorFree(ctor);
-    tr_free(filename);
 
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }

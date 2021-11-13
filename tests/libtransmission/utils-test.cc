@@ -49,6 +49,14 @@ TEST_F(UtilsTest, trStripPositionalArgs)
     EXPECT_STREQ(expected, out);
 }
 
+TEST_F(UtilsTest, trStrvJoin)
+{
+    EXPECT_EQ(""sv, tr_strvJoin(""sv));
+    EXPECT_EQ("test"sv, tr_strvJoin("test"sv));
+    EXPECT_EQ("foo/bar"sv, tr_strvJoin("foo"sv, "/", std::string{ "bar" }));
+    EXPECT_EQ("abcde"sv, tr_strvJoin("a", "b", "c", "d", "e"));
+}
+
 TEST_F(UtilsTest, trStrvContains)
 {
     EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));
@@ -146,6 +154,18 @@ TEST_F(UtilsTest, trBuildpath)
 
     out = makeString(tr_buildPath("", "foo", "bar", nullptr));
     EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
+}
+
+TEST_F(UtilsTest, trStrvPath)
+{
+    EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("foo", "bar"));
+    EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("", "foo", "bar"));
+
+    EXPECT_EQ("", tr_strvPath(""sv));
+    EXPECT_EQ("foo"sv, tr_strvPath("foo"sv));
+    EXPECT_EQ(
+        "foo" TR_PATH_DELIMITER_STR "bar" TR_PATH_DELIMITER_STR "baz" TR_PATH_DELIMITER_STR "mum"sv,
+        tr_strvPath("foo"sv, "bar", std::string{ "baz" }, "mum"sv));
 }
 
 TEST_F(UtilsTest, trUtf8clean)

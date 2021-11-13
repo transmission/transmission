@@ -41,7 +41,7 @@
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new(), tr_free() */
+#include "utils.h"
 #include "variant.h"
 #include "variant-common.h"
 

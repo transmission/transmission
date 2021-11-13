@@ -433,12 +433,11 @@ static void tr_webThreadFunc(void* vsession)
         tr_logAddNamedInfo("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
 
-    char* const str = tr_buildPath(session->configDir, "cookies.txt", nullptr);
-    if (tr_sys_path_exists(str, nullptr))
+    auto const str = tr_strvPath(session->configDir, "cookies.txt");
+    if (tr_sys_path_exists(str.c_str(), nullptr))
     {
-        web->cookie_filename = tr_strdup(str);
+        web->cookie_filename = tr_strvDup(str);
     }
-    tr_free(str);
 
     auto* const multi = curl_multi_init();
     session->web = web;

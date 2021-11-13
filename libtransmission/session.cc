@@ -65,6 +65,8 @@
 #include "version.h"
 #include "web.h"
 
+using namespace std::literals;
+
 #ifdef TR_LIGHTWEIGHT
 static auto constexpr DefaultCacheSizeMB = int{ 2 };
 static auto constexpr DefaultPrefetchEnabled = bool{ false };
@@ -500,10 +502,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    char* const filename = tr_buildPath(configDir, "settings.json", nullptr);
+    auto const filename = tr_strvPath(configDir, "settings.json"sv);
     auto success = bool{};
     tr_error* error = nullptr;
-    if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename, &error))
+    if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -516,7 +518,6 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     }
 
     /* cleanup */
-    tr_free(filename);
     return success;
 }
 
@@ -525,7 +526,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variant settings;
-    char* filename = tr_buildPath(configDir, "settings.json", nullptr);
+    auto const filename = tr_strvPath(configDir, "settings.json"sv);
 
     tr_variantInitDict(&settings, 0);
 
@@ -533,7 +534,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename, nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);
@@ -553,10 +554,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
+    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename.c_str());
 
     /* cleanup */
-    tr_free(filename);
     tr_variantFree(&settings);
 }
 
@@ -747,9 +747,8 @@ static void tr_sessionInitImpl(void* vdata)
     **/
 
     {
-        char* filename = tr_buildPath(session->configDir, "blocklists", nullptr);
-        tr_sys_dir_create(filename, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-        tr_free(filename);
+        auto const filename = tr_strvPath(session->configDir, "blocklists"sv);
+        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
         loadBlocklists(session);
     }
 
@@ -2374,83 +2373,76 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->isBlocklistEnabled;
 
     /* walk the blocklist directory... */
-    char* const dirname = tr_buildPath(session->configDir, "blocklists", nullptr);
-    auto const odir = tr_sys_dir_open(dirname, nullptr);
+    auto const dirname = tr_strvPath(session->configDir, "blocklists"sv);
+    auto const odir = tr_sys_dir_open(dirname.c_str(), nullptr);
 
     if (odir == TR_BAD_SYS_DIR)
     {
-        tr_free(dirname);
         return;
     }
 
     char const* name = nullptr;
     while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
     {
-        char* load = nullptr;
+        auto load = std::string{};
 
         if (name[0] == '.') /* ignore dotfiles */
         {
             continue;
         }
 
-        char* const path = tr_buildPath(dirname, name, nullptr);
+        auto const path = tr_strvPath(dirname, name);
 
-        if (tr_stringEndsWith(path, ".bin"))
+        if (tr_strvEndsWith(path, ".bin"sv))
         {
-            load = tr_strdup(path);
+            load = path;
         }
         else
         {
             tr_sys_path_info path_info;
             tr_sys_path_info binname_info;
 
-            char* const binname = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, name);
+            auto const binname = tr_strvJoin(dirname, TR_PATH_DELIMITER_STR, name, ".bin"sv);
 
-            if (!tr_sys_path_get_info(binname, 0, &binname_info, nullptr)) /* create it */
+            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info, nullptr)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
-                int const n = tr_blocklistFileSetContent(b, path);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                int const n = tr_blocklistFileSetContent(b, path.c_str());
 
                 if (n > 0)
                 {
-                    load = tr_strdup(binname);
+                    load = binname;
                 }
 
                 tr_blocklistFileFree(b);
             }
             else if (
-                tr_sys_path_get_info(path, 0, &path_info, nullptr) &&
+                tr_sys_path_get_info(path.c_str(), 0, &path_info, nullptr) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
-                char* const old = tr_strdup_printf("%s.old", binname);
-                tr_sys_path_remove(old, nullptr);
-                tr_sys_path_rename(binname, old, nullptr);
-                auto* const b = tr_blocklistFileNew(binname, isEnabled);
+                auto const old = binname + ".old";
+                tr_sys_path_remove(old.c_str(), nullptr);
+                tr_sys_path_rename(binname.c_str(), old.c_str(), nullptr);
+                auto* const b = tr_blocklistFileNew(binname.c_str(), isEnabled);
 
-                if (tr_blocklistFileSetContent(b, path) > 0)
+                if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
                 {
-                    tr_sys_path_remove(old, nullptr);
+                    tr_sys_path_remove(old.c_str(), nullptr);
                 }
                 else
                 {
-                    tr_sys_path_remove(binname, nullptr);
-                    tr_sys_path_rename(old, binname, nullptr);
+                    tr_sys_path_remove(binname.c_str(), nullptr);
+                    tr_sys_path_rename(old.c_str(), binname.c_str(), nullptr);
                 }
 
                 tr_blocklistFileFree(b);
-                tr_free(old);
             }
-
-            tr_free(binname);
         }
 
-        if (load != nullptr)
+        if (!std::empty(load))
         {
             loadme.emplace(load);
-            tr_free(load);
         }
-
-        tr_free(path);
     }
 
     session->blocklists.clear();
@@ -2462,7 +2454,6 @@ static void loadBlocklists(tr_session* session)
 
     /* cleanup */
     tr_sys_dir_close(odir, nullptr);
-    tr_free(dirname);
 }
 
 static void closeBlocklists(tr_session* session)
@@ -2533,10 +2524,9 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
         [&name](auto const* blocklist) { return tr_stringEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
     if (it == std::end(src))
     {
-        char* path = tr_buildPath(session->configDir, "blocklists", name, nullptr);
-        b = tr_blocklistFileNew(path, session->isBlocklistEnabled);
+        auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);
+        b = tr_blocklistFileNew(path.c_str(), session->isBlocklistEnabled);
         src.push_back(b);
-        tr_free(path);
     }
     else
     {
