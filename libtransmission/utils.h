@@ -18,6 +18,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "platform-quota.h"
 #include "tr-macros.h"
 
 /***
@@ -27,10 +28,7 @@
 struct evbuffer;
 struct event;
 struct timeval;
-
 struct tr_error;
-
-struct tr_disk_space;
 
 /**
  * @addtogroup utils Utilities
@@ -100,7 +98,7 @@ std::string& tr_buildBuf(std::string& setme, T... args)
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-struct tr_disk_space tr_getDirSpace(char const* path);
+tr_disk_space tr_dirSpace(std::string_view path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds

@@ -237,12 +237,6 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* downloadDir);
 char const* tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
- * @brief Get available disk space (in bytes) for the specified directory.
- * @return zero or positive integer on success, -1 in case of error.
- */
-int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir);
-
-/**
  * @brief Set the torrent's bandwidth priority.
  */
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);

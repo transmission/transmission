@@ -1855,10 +1855,10 @@ static char const* sessionSet(
     tr_variant* /*args_out*/,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    char const* download_dir = nullptr;
+    auto download_dir = std::string_view{};
     char const* incomplete_dir = nullptr;
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, nullptr) && tr_sys_path_is_relative(download_dir))
+    if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
@@ -1925,9 +1925,9 @@ static char const* sessionSet(
         tr_blocklistSetURL(session, str);
     }
 
-    if (download_dir != nullptr)
+    if (!std::empty(download_dir))
     {
-        tr_sessionSetDownloadDir(session, download_dir);
+        session->setDownloadDir(download_dir);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_queue_stalled_minutes, &i))
@@ -2234,7 +2234,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_device_info_get_disk_space(s->downloadDir).free);
+        tr_variantDictAddInt(d, key, tr_dirSpace(s->downloadDir()).free);
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2456,7 +2456,7 @@ static char const* freeSpace(
     /* get the free space */
     auto const old_errno = errno;
     errno = 0;
-    auto const dir_space = tr_getDirSpace(path);
+    auto const dir_space = tr_dirSpace(path);
     char const* const err = dir_space.free < 0 || dir_space.total < 0 ? tr_strerror(errno) : nullptr;
     errno = old_errno;
 

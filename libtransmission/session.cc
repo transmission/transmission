@@ -796,6 +796,7 @@ static void sessionSetImpl(void* vdata)
     auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
+    auto sv = std::string_view{};
     char const* strVal = nullptr;
     tr_turtle_info* const turtle = &session->turtle;
 
@@ -931,9 +932,9 @@ static void sessionSetImpl(void* vdata)
         session->preallocationMode = tr_preallocation_mode(i);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
     {
-        tr_sessionSetDownloadDir(session, strVal);
+        session->setDownloadDir(sv);
     }
 
     if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &strVal, nullptr))
@@ -1174,35 +1175,14 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    struct tr_device_info* info = nullptr;
-
-    if (!tr_str_is_empty(dir))
-    {
-        info = tr_device_info_create(dir);
-    }
-
-    tr_device_info_free(session->downloadDir);
-    session->downloadDir = info;
+    session->setDownloadDir(dir ? dir : "");
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    char const* dir = nullptr;
-
-    if (session != nullptr && session->downloadDir != nullptr)
-    {
-        dir = session->downloadDir->path;
-    }
-
-    return dir;
-}
-
-int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
-{
-    return tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0 ? tr_device_info_get_disk_space(session->downloadDir).free :
-                                                                     tr_getDirSpace(dir).free;
+    return session->downloadDir().c_str();
 }
 
 /***
@@ -2075,7 +2055,6 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
-    tr_device_info_free(session->downloadDir);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);

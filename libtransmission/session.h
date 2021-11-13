@@ -49,7 +49,6 @@ struct tr_announcer_udp;
 struct tr_bindsockets;
 struct tr_blocklistFile;
 struct tr_cache;
-struct tr_device_info;
 struct tr_fdInfo;
 
 struct tr_turtle_info
@@ -131,6 +130,18 @@ struct CaseInsensitiveStringCompare // case-insensitive string compare
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+public:
+    std::string const& downloadDir() const
+    {
+        return download_dir_;
+    }
+
+    void setDownloadDir(std::string_view dir)
+    {
+        download_dir_ = dir;
+    }
+
+public:
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
@@ -224,8 +235,6 @@ struct tr_session
 
     char* blocklist_url;
 
-    struct tr_device_info* downloadDir;
-
     std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
@@ -260,6 +269,9 @@ struct tr_session
 
     struct tr_bindinfo* bind_ipv4;
     struct tr_bindinfo* bind_ipv6;
+
+private:
+    std::string download_dir_;
 };
 
 constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
