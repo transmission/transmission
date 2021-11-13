@@ -460,8 +460,6 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
 
 bool tr_sys_path_is_relative(std::string_view path)
 {
-    TR_ASSERT(path != nullptr);
-
     /* UNC path: `\\...`. */
     if (is_unc_path(path))
     {
