@@ -1129,13 +1129,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_username;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
     }
     else
     {
-        tr_rpcSetUsername(this, str);
+        tr_rpcSetUsername(this, sv);
     }
 
     key = TR_KEY_rpc_password;
