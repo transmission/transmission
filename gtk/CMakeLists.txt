@@ -181,8 +181,6 @@ target_link_libraries(${TR_NAME}-gtk
 )
 
 if(NOT MSVC)
-    # https://github.com/transmission/transmission/issues/1381 patches welcome
-    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
     target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
 endif()
 
