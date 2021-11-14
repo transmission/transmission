@@ -184,7 +184,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
 
             if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
             {
-                hosts_hash.emplace(key, 1);
+                hosts_hash.emplace(key, 0);
                 hosts.push_back(key);
             }
 
