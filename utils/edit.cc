@@ -86,15 +86,15 @@ static int parseCommandLine(int argc, char const* const* argv)
     return 0;
 }
 
-static bool removeURL(tr_variant* metainfo, char const* url)
+static bool removeURL(tr_variant* metainfo, std::string_view url)
 {
-    char const* str;
+    auto sv = std::string_view{};
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr) && strcmp(str, url) == 0)
+    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && url == sv)
     {
-        printf("\tRemoved \"%s\" from \"announce\"\n", str);
+        printf("\tRemoved \"%" TR_PRIsv "\" from \"announce\"\n", TR_PRIsv_ARG(sv));
         tr_variantDictRemove(metainfo, TR_KEY_announce);
         changed = true;
     }
@@ -110,9 +110,9 @@ static bool removeURL(tr_variant* metainfo, char const* url)
             tr_variant const* node;
             while ((node = tr_variantListChild(tier, nodeIndex)) != nullptr)
             {
-                if (tr_variantGetStr(node, &str, nullptr) && strcmp(str, url) == 0)
+                if (tr_variantGetStrView(node, &sv) && url == sv)
                 {
-                    printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, tierIndex + 1);
+                    printf("\tRemoved \"%" TR_PRIsv "\" from \"announce-list\" tier #%d\n", TR_PRIsv_ARG(sv), tierIndex + 1);
                     tr_variantListRemove(tier, nodeIndex);
                     changed = true;
                 }
@@ -142,16 +142,16 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
     /* if we removed the "announce" field and there's still another track left,
      * use it as the "announce" field */
-    if (changed && !tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr))
+    if (changed && !tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv))
     {
         tr_variant* const tier = tr_variantListChild(announce_list, 0);
         if (tier != nullptr)
         {
             tr_variant const* const node = tr_variantListChild(tier, 0);
-            if ((node != nullptr) && tr_variantGetStr(node, &str, nullptr))
+            if ((node != nullptr) && tr_variantGetStrView(node, &sv))
             {
-                tr_variantDictAddStr(metainfo, TR_KEY_announce, str);
-                printf("\tAdded \"%s\" to announce\n", str);
+                tr_variantDictAddStr(metainfo, TR_KEY_announce, sv);
+                printf("\tAdded \"%" TR_PRIsv "\" to announce\n", TR_PRIsv_ARG(sv));
             }
         }
     }
@@ -159,37 +159,36 @@ static bool removeURL(tr_variant* metainfo, char const* url)
     return changed;
 }
 
-static char* replaceSubstr(char const* str, char const* in, char const* out)
+static std::string replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
 {
-    char const* walk;
-    struct evbuffer* const buf = evbuffer_new();
-    size_t const inlen = strlen(in);
-    size_t const outlen = strlen(out);
+    auto ret = std::string{};
 
-    while ((walk = strstr(str, in)) != nullptr)
+    while (!std::empty(str))
     {
-        evbuffer_add(buf, str, walk - str);
-        evbuffer_add(buf, out, outlen);
-        str = walk + inlen;
+        auto const pos = str.find(oldval);
+        ret += str.substr(0, pos);
+        ret += newval;
+        if (pos == str.npos)
+        {
+            break;
+        }
+        str.remove_prefix(pos + std::size(oldval));
     }
 
-    evbuffer_add(buf, str, strlen(str));
-
-    return evbuffer_free_to_str(buf, nullptr);
+    return ret;
 }
 
-static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
+static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
 {
-    char const* str;
+    auto sv = std::string_view{};
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, nullptr) && strstr(str, in) != nullptr)
+    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strvContains(sv, oldval))
     {
-        char* newstr = replaceSubstr(str, in, out);
-        printf("\tReplaced in \"announce\": \"%s\" --> \"%s\"\n", str, newstr);
+        auto const newstr = replaceSubstr(sv, oldval, newval);
+        printf("\tReplaced in \"announce\": \"%" TR_PRIsv "\" --> \"%s\"\n", TR_PRIsv_ARG(sv), newstr.c_str());
         tr_variantDictAddStr(metainfo, TR_KEY_announce, newstr);
-        tr_free(newstr);
         changed = true;
     }
 
@@ -205,13 +204,16 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
 
             while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
             {
-                if (tr_variantGetStr(node, &str, nullptr) && strstr(str, in) != nullptr)
+                if (tr_variantGetStrView(node, &sv) && tr_strvContains(sv, oldval))
                 {
-                    char* newstr = replaceSubstr(str, in, out);
-                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
+                    auto const newstr = replaceSubstr(sv, oldval, newval);
+                    printf(
+                        "\tReplaced in \"announce-list\" tier %d: \"%" TR_PRIsv "\" --> \"%s\"\n",
+                        tierCount + 1,
+                        TR_PRIsv_ARG(sv),
+                        newstr.c_str());
                     tr_variantFree(node);
                     tr_variantInitStr(node, newstr);
-                    tr_free(newstr);
                     changed = true;
                 }
 
@@ -237,8 +239,8 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 
         while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
         {
-            char const* str = nullptr;
-            if (tr_variantGetStr(node, &str, nullptr) && strcmp(str, url) == 0)
+            auto sv = std::string_view{};
+            if (tr_variantGetStrView(node, &sv) && sv == url)
             {
                 return true;
             }
@@ -254,10 +256,10 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 
 static bool addURL(tr_variant* metainfo, char const* url)
 {
-    char const* announce = nullptr;
+    auto announce = std::string_view{};
     tr_variant* announce_list = nullptr;
     bool changed = false;
-    bool const had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, nullptr);
+    bool const had_announce = tr_variantDictFindStrView(metainfo, TR_KEY_announce, &announce);
     bool const had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
 
     if (!had_announce && !had_announce_list)
