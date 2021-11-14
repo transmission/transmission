@@ -271,17 +271,17 @@ std::string tr_strvPath(T... args)
     auto setme = std::string{};
     auto const n_args = sizeof...(args);
     auto const n = n_args + (std::size(std::string_view{ args }) + ...);
-
     if (setme.capacity() < n)
     {
         setme.reserve(n);
     }
-    auto const foo = [](std::string& setme, std::string_view a)
+
+    auto const foo = [&setme](std::string_view a)
     {
         setme += a;
         setme += TR_PATH_DELIMITER;
     };
-    (foo(setme, args), ...);
+    (foo(args), ...);
     setme.resize(setme.size() - 1);
     return setme;
 }
