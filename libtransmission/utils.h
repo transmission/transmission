@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <cinttypes>
 #include <cstdarg>
 #include <cstddef>
@@ -250,6 +252,14 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 
 /** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
 char const* tr_strcasestr(char const* haystack, char const* needle);
+
+template<typename T>
+std::string tr_strlower(T in)
+{
+    auto out = std::string{ in };
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
+    return out;
+}
 
 /***
 ****  std::string_view utils
