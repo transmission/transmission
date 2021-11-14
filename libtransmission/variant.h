@@ -167,7 +167,6 @@ constexpr bool tr_variantIsString(tr_variant const* b)
     return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
 }
 
-bool tr_variantGetStr(tr_variant const* variant, char const** setme_str, size_t* setme_len);
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);

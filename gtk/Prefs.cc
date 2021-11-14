@@ -206,11 +206,10 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 
         for (size_t i = 0; i < n; ++i)
         {
-            char const* str = nullptr;
-            size_t len = 0;
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &len))
+            auto sv = std::string_view{};
+            if (tr_variantGetStrView(tr_variantListChild(list, i), &sv))
             {
-                ret.emplace_back(str, len);
+                ret.emplace_back(sv);
             }
         }
     }
