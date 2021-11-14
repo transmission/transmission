@@ -220,9 +220,9 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 
 std::string gtr_pref_string_get(tr_quark const key)
 {
-    char const* str;
-
-    return tr_variantDictFindStr(getPrefs(), key, &str, nullptr) ? str : std::string();
+    auto sv = std::string_view{};
+    tr_variantDictFindStrView(getPrefs(), key, &sv);
+    return std::string{ sv };
 }
 
 void gtr_pref_string_set(tr_quark const key, std::string const& value)
