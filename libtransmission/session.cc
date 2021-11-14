@@ -337,7 +337,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 
     tr_variantDictReserve(d, 69);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
+    tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
@@ -412,8 +412,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 68);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_blocklist_url, tr_blocklistGetURL(s));
+    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
+    tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
@@ -867,12 +867,12 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
     {
-        tr_blocklistSetEnabled(session, boolVal);
+        session->useBlocklist(boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_blocklist_url, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
     {
-        tr_blocklistSetURL(session, strVal);
+        session->setBlocklistUrl(sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
@@ -2053,7 +2053,6 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
-    tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
     delete session;
 }
@@ -2343,7 +2342,7 @@ static bool tr_stringEndsWith(char const* strval, char const* end)
 static void loadBlocklists(tr_session* session)
 {
     auto loadme = std::unordered_set<std::string>{};
-    auto const isEnabled = session->isBlocklistEnabled;
+    auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
     auto const dirname = tr_strvPath(session->configDir, "blocklists"sv);
@@ -2460,20 +2459,24 @@ bool tr_blocklistIsEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isBlocklistEnabled;
+    return session->useBlocklist();
+}
+
+void tr_session::useBlocklist(bool enabled)
+{
+    this->blocklist_enabled_ = enabled;
+
+    std::for_each(
+        std::begin(blocklists),
+        std::end(blocklists),
+        [enabled](auto* blocklist) { tr_blocklistFileSetEnabled(blocklist, enabled); });
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isBlocklistEnabled = enabled;
-
-    auto& src = session->blocklists;
-    std::for_each(
-        std::begin(src),
-        std::end(src),
-        [enabled](auto* blocklist) { tr_blocklistFileSetEnabled(blocklist, enabled); });
+    session->useBlocklist(enabled);
 }
 
 bool tr_blocklistExists(tr_session const* session)
@@ -2498,7 +2501,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     if (it == std::end(src))
     {
         auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);
-        b = tr_blocklistFileNew(path.c_str(), session->isBlocklistEnabled);
+        b = tr_blocklistFileNew(path.c_str(), session->useBlocklist());
         src.push_back(b);
     }
     else
@@ -2523,16 +2526,12 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
 {
-    if (session->blocklist_url != url)
-    {
-        tr_free(session->blocklist_url);
-        session->blocklist_url = tr_strdup(url);
-    }
+    session->setBlocklistUrl(url ? url : "");
 }
 
 char const* tr_blocklistGetURL(tr_session const* session)
 {
-    return session->blocklist_url;
+    return session->blocklistUrl().c_str();
 }
 
 /***

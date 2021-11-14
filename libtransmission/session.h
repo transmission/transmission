@@ -131,6 +131,8 @@ struct CaseInsensitiveStringCompare // case-insensitive string compare
 struct tr_session
 {
 public:
+    // download dir
+
     std::string const& downloadDir() const
     {
         return download_dir_;
@@ -140,6 +142,8 @@ public:
     {
         download_dir_ = dir;
     }
+
+    // incomplete dir
 
     std::string const& incompleteDir() const
     {
@@ -161,6 +165,8 @@ public:
         incomplete_dir_enabled_ = enabled;
     }
 
+    // scripts
+
     void useScript(TrScript i, bool enabled)
     {
         scripts_enabled_[i] = enabled;
@@ -181,13 +187,31 @@ public:
         return scripts_[i];
     }
 
+    // blocklist
+
+    bool useBlocklist() const
+    {
+        return blocklist_enabled_;
+    }
+
+    void useBlocklist(bool enabled);
+
+    std::string const& blocklistUrl() const
+    {
+        return blocklist_url_;
+    }
+
+    void setBlocklistUrl(std::string_view url)
+    {
+        blocklist_url_ = url;
+    }
+
 public:
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
     bool isUTPEnabled;
     bool isLPDEnabled;
-    bool isBlocklistEnabled;
     bool isPrefetchEnabled;
     bool isClosing;
     bool isClosed;
@@ -268,8 +292,6 @@ public:
     char* resumeDir;
     char* torrentDir;
 
-    char* blocklist_url;
-
     std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
@@ -307,10 +329,12 @@ public:
 
 private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
-    std::string incomplete_dir_;
+    std::string blocklist_url_;
     std::string download_dir_;
+    std::string incomplete_dir_;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
+    bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 };
 

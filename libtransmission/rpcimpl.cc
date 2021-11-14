@@ -1604,7 +1604,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    tr_webRun(session, session->blocklist_url, gotNewBlocklist, idle_data);
+    tr_webRun(session, session->blocklistUrl().c_str(), gotNewBlocklist, idle_data);
     return nullptr;
 }
 
@@ -1871,7 +1871,6 @@ static char const* sessionSet(
     auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
-    char const* str = nullptr;
     auto sv = std::string_view{};
 
     if (tr_variantDictFindInt(args_in, TR_KEY_cache_size_mb, &i))
@@ -1916,12 +1915,12 @@ static char const* sessionSet(
 
     if (tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &boolVal))
     {
-        tr_blocklistSetEnabled(session, boolVal);
+        session->useBlocklist(boolVal);
     }
 
-    if (tr_variantDictFindStr(args_in, TR_KEY_blocklist_url, &str, nullptr))
+    if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
     {
-        tr_blocklistSetURL(session, str);
+        session->setBlocklistUrl(sv);
     }
 
     if (!std::empty(download_dir))
@@ -2209,11 +2208,11 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_blocklist_enabled:
-        tr_variantDictAddBool(d, key, tr_blocklistIsEnabled(s));
+        tr_variantDictAddBool(d, key, s->useBlocklist());
         break;
 
     case TR_KEY_blocklist_url:
-        tr_variantDictAddStr(d, key, tr_blocklistGetURL(s));
+        tr_variantDictAddStr(d, key, s->blocklistUrl());
         break;
 
     case TR_KEY_cache_size_mb:
@@ -2229,7 +2228,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir:
-        tr_variantDictAddStr(d, key, tr_sessionGetDownloadDir(s));
+        tr_variantDictAddStr(d, key, s->downloadDir());
         break;
 
     case TR_KEY_download_dir_free_space:
@@ -2253,11 +2252,11 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_incomplete_dir:
-        tr_variantDictAddStr(d, key, tr_sessionGetIncompleteDir(s));
+        tr_variantDictAddStr(d, key, s->incompleteDir());
         break;
 
     case TR_KEY_incomplete_dir_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsIncompleteDirEnabled(s));
+        tr_variantDictAddBool(d, key, s->useIncompleteDir());
         break;
 
     case TR_KEY_pex_enabled:
@@ -2441,8 +2440,9 @@ static char const* freeSpace(
     tr_variant* args_out,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    char const* path = nullptr;
-    if (!tr_variantDictFindStr(args_in, TR_KEY_path, &path, nullptr))
+    auto path = std::string_view{};
+
+    if (!tr_variantDictFindStrView(args_in, TR_KEY_path, &path))
     {
         return "directory path argument is missing";
     }
@@ -2460,11 +2460,7 @@ static char const* freeSpace(
     errno = old_errno;
 
     /* response */
-    if (path != nullptr)
-    {
-        tr_variantDictAddStr(args_out, TR_KEY_path, path);
-    }
-
+    tr_variantDictAddStr(args_out, TR_KEY_path, path);
     tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
     tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
     return err;

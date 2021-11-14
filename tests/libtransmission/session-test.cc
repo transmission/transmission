@@ -110,6 +110,36 @@ TEST_F(SessionTest, properties)
         EXPECT_EQ(value, session->useIncompleteDir());
         EXPECT_EQ(value, tr_sessionIsIncompleteDirEnabled(session));
     }
+
+    // blocklist url
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setBlocklistUrl(value);
+        EXPECT_EQ(value, session->blocklistUrl());
+        EXPECT_EQ(value, tr_blocklistGetURL(session));
+
+        tr_blocklistSetURL(session, std::string(value).c_str());
+        EXPECT_EQ(value, session->blocklistUrl());
+        EXPECT_EQ(value, tr_blocklistGetURL(session));
+    }
+
+    tr_blocklistSetURL(session, nullptr);
+    EXPECT_EQ(""sv, session->blocklistUrl());
+    EXPECT_EQ(""sv, tr_blocklistGetURL(session));
+
+    // blocklist enabled
+
+    for (auto const value : { true, false })
+    {
+        session->useBlocklist(value);
+        EXPECT_EQ(value, session->useBlocklist());
+        EXPECT_EQ(value, tr_blocklistIsEnabled(session));
+
+        tr_sessionSetIncompleteDirEnabled(session, value);
+        EXPECT_EQ(value, session->useBlocklist());
+        EXPECT_EQ(value, tr_blocklistIsEnabled(session));
+    }
 }
 
 TEST_F(SessionTest, peerId)
