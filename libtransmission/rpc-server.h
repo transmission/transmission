@@ -15,7 +15,6 @@
 #include <string_view>
 
 #include "transmission.h"
-#include "tr-macros.h"
 
 #include "net.h"
 
