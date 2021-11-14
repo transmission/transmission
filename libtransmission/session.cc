@@ -2551,14 +2551,14 @@ void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpcServer, url);
+    tr_rpcSetUrl(session->rpcServer, url ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUrl(session->rpcServer);
+    return tr_rpcGetUrl(session->rpcServer).c_str();
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)
@@ -2601,28 +2601,28 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpcServer, password);
+    tr_rpcSetPassword(session->rpcServer, password ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPassword(session->rpcServer);
+    return tr_rpcGetPassword(session->rpcServer).c_str();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUsername(session->rpcServer, username);
+    tr_rpcSetUsername(session->rpcServer, username ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUsername(session->rpcServer);
+    return tr_rpcGetUsername(session->rpcServer).c_str();
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled)

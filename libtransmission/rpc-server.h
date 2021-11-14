@@ -15,6 +15,7 @@
 #include <string_view>
 
 #include "transmission.h"
+#include "tr-macros.h"
 
 #include "net.h"
 
@@ -33,9 +34,9 @@ void tr_rpcSetPort(tr_rpc_server* server, tr_port port);
 
 tr_port tr_rpcGetPort(tr_rpc_server const* server);
 
-void tr_rpcSetUrl(tr_rpc_server* server, char const* url);
+void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
 
-char const* tr_rpcGetUrl(tr_rpc_server const* server);
+std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 
 int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
 
@@ -47,13 +48,13 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
 
 std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server);
 
-void tr_rpcSetPassword(tr_rpc_server* server, char const* password);
+void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password);
 
-char const* tr_rpcGetPassword(tr_rpc_server const* server);
+std::string const& tr_rpcGetPassword(tr_rpc_server const* server);
 
-void tr_rpcSetUsername(tr_rpc_server* server, char const* username);
+void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
 
-char const* tr_rpcGetUsername(tr_rpc_server const* server);
+std::string const& tr_rpcGetUsername(tr_rpc_server const* server);
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled);
 
