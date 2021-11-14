@@ -316,7 +316,7 @@ bool tr_variantGetStrView(tr_variant const* v, std::string_view* setme)
     return true;
 }
 
-bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
+static bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
 {
     auto sv = std::string_view{};
     if (!tr_variantGetStrView(v, &sv))
