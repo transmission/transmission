@@ -949,7 +949,6 @@ static void printDetails(tr_variant* top)
         {
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
-            char const* str;
             char buf[512];
             char buf2[512];
             int64_t i;
@@ -957,6 +956,7 @@ static void printDetails(tr_variant* top)
             int64_t k;
             bool boolVal;
             double d;
+            auto sv = std::string_view{};
 
             printf("NAME\n");
 
@@ -965,19 +965,19 @@ static void printDetails(tr_variant* top)
                 printf("  Id: %" PRId64 "\n", i);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_name, &str, nullptr))
+            if (tr_variantDictFindStrView(t, TR_KEY_name, &sv))
             {
-                printf("  Name: %s\n", str);
+                printf("  Name: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_hashString, &str, nullptr))
+            if (tr_variantDictFindStrView(t, TR_KEY_hashString, &sv))
             {
-                printf("  Hash: %s\n", str);
+                printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_magnetLink, &str, nullptr))
+            if (tr_variantDictFindStrView(t, TR_KEY_magnetLink, &sv))
             {
-                printf("  Magnet: %s\n", str);
+                printf("  Magnet: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
@@ -986,9 +986,9 @@ static void printDetails(tr_variant* top)
                 tr_variant const* child;
                 while ((child = tr_variantListChild(l, child_pos++)))
                 {
-                    if (tr_variantGetStr(child, &str, nullptr))
+                    if (tr_variantGetStrView(child, &sv))
                     {
-                        printf(i == 0 ? "%s" : ", %s", str);
+                        printf(i == 0 ? "%" TR_PRIsv : ", %" TR_PRIsv, TR_PRIsv_ARG(sv));
                     }
                 }
 
@@ -1001,9 +1001,9 @@ static void printDetails(tr_variant* top)
             getStatusString(t, buf, sizeof(buf));
             printf("  State: %s\n", buf);
 
-            if (tr_variantDictFindStr(t, TR_KEY_downloadDir, &str, nullptr))
+            if (tr_variantDictFindStrView(t, TR_KEY_downloadDir, &sv))
             {
-                printf("  Location: %s\n", str);
+                printf("  Location: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
@@ -1072,21 +1072,21 @@ static void printDetails(tr_variant* top)
                 printf("  Corrupt DL: %s\n", buf);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_errorString, &str, nullptr) && !tr_str_is_empty(str) &&
+            if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
                 tr_variantDictFindInt(t, TR_KEY_error, &i) && i != 0)
             {
                 switch (i)
                 {
                 case TR_STAT_TRACKER_WARNING:
-                    printf("  Tracker gave a warning: %s\n", str);
+                    printf("  Tracker gave a warning: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
                     break;
 
                 case TR_STAT_TRACKER_ERROR:
-                    printf("  Tracker gave an error: %s\n", str);
+                    printf("  Tracker gave an error: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
                     break;
 
                 case TR_STAT_LOCAL_ERROR:
-                    printf("  Error: %s\n", str);
+                    printf("  Error: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
                     break;
 
                 default:
@@ -1159,19 +1159,19 @@ static void printDetails(tr_variant* top)
                 printf("  Public torrent: %s\n", (boolVal ? "No" : "Yes"));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_comment, &str, nullptr) && !tr_str_is_empty(str))
+            if (tr_variantDictFindStrView(t, TR_KEY_comment, &sv) && !std::empty(sv))
             {
-                printf("  Comment: %s\n", str);
+                printf("  Comment: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_creator, &str, nullptr) && !tr_str_is_empty(str))
+            if (tr_variantDictFindStrView(t, TR_KEY_creator, &sv) && !std::empty(sv))
             {
-                printf("  Creator: %s\n", str);
+                printf("  Creator: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_source, &str, NULL) && str != NULL && *str != '\0')
+            if (tr_variantDictFindStrView(t, TR_KEY_source, &sv) && !std::empty(sv))
             {
-                printf("  Source: %s\n", str);
+                printf("  Source: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceCount, &i))
@@ -1275,13 +1275,13 @@ static void printFileList(tr_variant* top)
             tr_variant* files;
             tr_variant* priorities;
             tr_variant* wanteds;
-            char const* name;
+            auto name = std::string_view{};
 
-            if (tr_variantDictFindStr(d, TR_KEY_name, &name, nullptr) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
+            if (tr_variantDictFindStrView(d, TR_KEY_name, &name) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
                 tr_variantDictFindList(d, TR_KEY_priorities, &priorities) && tr_variantDictFindList(d, TR_KEY_wanted, &wanteds))
             {
                 int const jn = tr_variantListSize(files);
-                printf("%s (%d files):\n", name, jn);
+                printf("%" TR_PRIsv " (%d files):\n", TR_PRIsv_ARG(name), jn);
                 printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
                 for (int j = 0; j < jn; ++j)
@@ -1290,11 +1290,11 @@ static void printFileList(tr_variant* top)
                     int64_t length;
                     int64_t priority;
                     bool wanted;
-                    char const* filename;
+                    auto filename = std::string_view{};
                     tr_variant* file = tr_variantListChild(files, j);
 
                     if (tr_variantDictFindInt(file, TR_KEY_length, &length) &&
-                        tr_variantDictFindStr(file, TR_KEY_name, &filename, nullptr) &&
+                        tr_variantDictFindStrView(file, TR_KEY_name, &filename) &&
                         tr_variantDictFindInt(file, TR_KEY_bytesCompleted, &have) &&
                         tr_variantGetInt(tr_variantListChild(priorities, j), &priority) &&
                         tr_variantGetBool(tr_variantListChild(wanteds, j), &wanted))
@@ -1320,13 +1320,13 @@ static void printFileList(tr_variant* top)
                         }
 
                         printf(
-                            "%3d: %3.0f%% %-8s %-3s %9s  %s\n",
+                            "%3d: %3.0f%% %-8s %-3s %9s  %" TR_PRIsv "\n",
                             j,
                             floor(100.0 * percent),
                             pristr,
                             wanted ? "Yes" : "No",
                             sizestr,
-                            filename);
+                            TR_PRIsv_ARG(filename));
                     }
                 }
             }
@@ -1340,29 +1340,29 @@ static void printPeersImpl(tr_variant* peers)
 
     for (int i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
-        double progress;
-        char const* address;
-        char const* client;
-        char const* flagstr;
-        int64_t rateToClient;
-        int64_t rateToPeer;
+        auto address = std::string_view{};
+        auto client = std::string_view{};
+        auto flagstr = std::string_view{};
+        auto progress = double{};
+        auto rateToClient = int64_t{};
+        auto rateToPeer = int64_t{};
+
         tr_variant* d = tr_variantListChild(peers, i);
 
-        if (tr_variantDictFindStr(d, TR_KEY_address, &address, nullptr) &&
-            tr_variantDictFindStr(d, TR_KEY_clientName, &client, nullptr) &&
-            tr_variantDictFindReal(d, TR_KEY_progress, &progress) &&
-            tr_variantDictFindStr(d, TR_KEY_flagStr, &flagstr, nullptr) &&
+        if (tr_variantDictFindStrView(d, TR_KEY_address, &address) &&
+            tr_variantDictFindStrView(d, TR_KEY_clientName, &client) && tr_variantDictFindReal(d, TR_KEY_progress, &progress) &&
+            tr_variantDictFindStrView(d, TR_KEY_flagStr, &flagstr) &&
             tr_variantDictFindInt(d, TR_KEY_rateToClient, &rateToClient) &&
             tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
             printf(
-                "%-40s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
-                address,
-                flagstr,
+                "%-40s  %-12s  %-5.1f %6.1f  %6.1f  %" TR_PRIsv "\n",
+                std::string{ address }.c_str(),
+                std::string{ flagstr }.c_str(),
                 (progress * 100.0),
                 rateToClient / (double)tr_speed_K,
                 rateToPeer / (double)tr_speed_K,
-                client);
+                TR_PRIsv_ARG(client));
         }
     }
 }
@@ -1497,12 +1497,12 @@ static void printTorrentList(tr_variant* top)
             int64_t sizeWhenDone;
             int64_t leftUntilDone;
             double ratio;
-            char const* name;
+            auto name = std::string_view{};
             tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
-                tr_variantDictFindStr(d, TR_KEY_name, &name, nullptr) && tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
+                tr_variantDictFindStrView(d, TR_KEY_name, &name) && tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
                 tr_variantDictFindInt(d, TR_KEY_rateUpload, &up) &&
                 tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) &&
                 tr_variantDictFindInt(d, TR_KEY_status, &status) && tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
@@ -1544,7 +1544,7 @@ static void printTorrentList(tr_variant* top)
                 }
 
                 printf(
-                    "%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n",
+                    "%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %" TR_PRIsv "\n",
                     (int)torId,
                     errorMark,
                     doneStr,
@@ -1554,7 +1554,7 @@ static void printTorrentList(tr_variant* top)
                     down / (double)tr_speed_K,
                     strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)),
-                    name);
+                    TR_PRIsv_ARG(name));
 
                 total_up += up;
                 total_down += down;
@@ -1577,45 +1577,45 @@ static void printTrackersImpl(tr_variant* trackerStats)
     for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
         tr_variant* const t = tr_variantListChild(trackerStats, i);
-        int64_t downloadCount;
-        bool hasAnnounced;
-        bool hasScraped;
-        char const* host;
-        int64_t trackerId;
-        bool isBackup;
-        int64_t lastAnnouncePeerCount;
-        char const* lastAnnounceResult;
-        int64_t lastAnnounceStartTime;
+
+        auto announceState = int64_t{};
+        auto downloadCount = int64_t{};
+        auto hasAnnounced = bool{};
+        auto hasScraped = bool{};
+        auto host = std::string_view{};
+        auto isBackup = bool{};
+        auto lastAnnouncePeerCount = int64_t{};
+        auto lastAnnounceResult = std::string_view{};
+        auto lastAnnounceStartTime = int64_t{};
+        auto lastAnnounceTime = int64_t{};
+        auto lastScrapeResult = std::string_view{};
+        auto lastScrapeStartTime = int64_t{};
+        auto lastScrapeSucceeded = bool{};
+        auto lastScrapeTime = int64_t{};
+        auto lastScrapeTimedOut = bool{};
+        auto leecherCount = int64_t{};
+        auto nextAnnounceTime = int64_t{};
+        auto nextScrapeTime = int64_t{};
+        auto scrapeState = int64_t{};
+        auto seederCount = int64_t{};
+        auto tier = int64_t{};
+        auto trackerId = int64_t{};
         bool lastAnnounceSucceeded;
-        int64_t lastAnnounceTime;
         bool lastAnnounceTimedOut;
-        char const* lastScrapeResult;
-        bool lastScrapeSucceeded;
-        int64_t lastScrapeStartTime;
-        int64_t lastScrapeTime;
-        bool lastScrapeTimedOut;
-        int64_t leecherCount;
-        int64_t nextAnnounceTime;
-        int64_t nextScrapeTime;
-        int64_t seederCount;
-        int64_t tier;
-        int64_t announceState;
-        int64_t scrapeState;
 
         if (tr_variantDictFindInt(t, TR_KEY_downloadCount, &downloadCount) &&
             tr_variantDictFindBool(t, TR_KEY_hasAnnounced, &hasAnnounced) &&
-            tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) &&
-            tr_variantDictFindStr(t, TR_KEY_host, &host, nullptr) && tr_variantDictFindInt(t, TR_KEY_id, &trackerId) &&
-            tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
+            tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) && tr_variantDictFindStrView(t, TR_KEY_host, &host) &&
+            tr_variantDictFindInt(t, TR_KEY_id, &trackerId) && tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
             tr_variantDictFindInt(t, TR_KEY_announceState, &announceState) &&
             tr_variantDictFindInt(t, TR_KEY_scrapeState, &scrapeState) &&
             tr_variantDictFindInt(t, TR_KEY_lastAnnouncePeerCount, &lastAnnouncePeerCount) &&
-            tr_variantDictFindStr(t, TR_KEY_lastAnnounceResult, &lastAnnounceResult, nullptr) &&
+            tr_variantDictFindStrView(t, TR_KEY_lastAnnounceResult, &lastAnnounceResult) &&
             tr_variantDictFindInt(t, TR_KEY_lastAnnounceStartTime, &lastAnnounceStartTime) &&
             tr_variantDictFindBool(t, TR_KEY_lastAnnounceSucceeded, &lastAnnounceSucceeded) &&
             tr_variantDictFindInt(t, TR_KEY_lastAnnounceTime, &lastAnnounceTime) &&
             tr_variantDictFindBool(t, TR_KEY_lastAnnounceTimedOut, &lastAnnounceTimedOut) &&
-            tr_variantDictFindStr(t, TR_KEY_lastScrapeResult, &lastScrapeResult, nullptr) &&
+            tr_variantDictFindStrView(t, TR_KEY_lastScrapeResult, &lastScrapeResult) &&
             tr_variantDictFindInt(t, TR_KEY_lastScrapeStartTime, &lastScrapeStartTime) &&
             tr_variantDictFindBool(t, TR_KEY_lastScrapeSucceeded, &lastScrapeSucceeded) &&
             tr_variantDictFindInt(t, TR_KEY_lastScrapeTime, &lastScrapeTime) &&
@@ -1628,7 +1628,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             time_t const now = time(nullptr);
 
             printf("\n");
-            printf("  Tracker %d: %s\n", (int)trackerId, host);
+            printf("  Tracker %d: %" TR_PRIsv "\n", (int)trackerId, TR_PRIsv_ARG(host));
 
             if (isBackup)
             {
@@ -1655,7 +1655,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     }
                     else
                     {
-                        printf("  Got an error \"%s\" %s ago\n", lastAnnounceResult, buf);
+                        printf("  Got an error \"%" TR_PRIsv "\" %s ago\n", TR_PRIsv_ARG(lastAnnounceResult), buf);
                     }
                 }
 
@@ -1694,7 +1694,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     }
                     else
                     {
-                        printf("  Got a scrape error \"%s\" %s ago\n", lastScrapeResult, buf);
+                        printf("  Got a scrape error \"%" TR_PRIsv "\" %s ago\n", TR_PRIsv_ARG(lastScrapeResult), buf);
                     }
                 }
 
@@ -1755,14 +1755,14 @@ static void printSession(tr_variant* top)
     {
         int64_t i;
         bool boolVal;
-        char const* str;
+        auto sv = std::string_view{};
         char buf[128];
 
         printf("VERSION\n");
 
-        if (tr_variantDictFindStr(args, TR_KEY_version, &str, nullptr))
+        if (tr_variantDictFindStrView(args, TR_KEY_version, &sv))
         {
-            printf("  Daemon version: %s\n", str);
+            printf("  Daemon version: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
         }
 
         if (tr_variantDictFindInt(args, TR_KEY_rpc_version, &i))
@@ -1779,14 +1779,14 @@ static void printSession(tr_variant* top)
 
         printf("CONFIG\n");
 
-        if (tr_variantDictFindStr(args, TR_KEY_config_dir, &str, nullptr))
+        if (tr_variantDictFindStrView(args, TR_KEY_config_dir, &sv))
         {
-            printf("  Configuration directory: %s\n", str);
+            printf("  Configuration directory: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
         }
 
-        if (tr_variantDictFindStr(args, TR_KEY_download_dir, &str, nullptr))
+        if (tr_variantDictFindStrView(args, TR_KEY_download_dir, &sv))
         {
-            printf("  Download directory: %s\n", str);
+            printf("  Download directory: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
         }
 
         if (tr_variantDictFindInt(args, TR_KEY_peer_port, &i))
@@ -1819,9 +1819,9 @@ static void printSession(tr_variant* top)
             printf("  Peer exchange allowed: %s\n", boolVal ? "Yes" : "No");
         }
 
-        if (tr_variantDictFindStr(args, TR_KEY_encryption, &str, nullptr))
+        if (tr_variantDictFindStrView(args, TR_KEY_encryption, &sv))
         {
-            printf("  Encryption: %s\n", str);
+            printf("  Encryption: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
         }
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
@@ -2025,7 +2025,7 @@ static void printSessionStats(tr_variant* top)
 
 static char id[4096];
 
-static int processResponse(char const* rpcurl, void const* response, size_t len)
+static int processResponse(char const* rpcurl, std::string_view response)
 {
     tr_variant top;
     int status = EXIT_SUCCESS;
@@ -2034,29 +2034,26 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
     {
         fprintf(
             stderr,
-            "got response (len %d):\n--------\n%*.*s\n--------\n",
-            (int)len,
-            TR_ARG_TUPLE((int)len, (int)len, (char const*)response));
+            "got response (len %d):\n--------\n%" TR_PRIsv "\n--------\n",
+            int(std::size(response)),
+            TR_PRIsv_ARG(response));
     }
 
-    if (tr_variantFromJson(&top, response, len) != 0)
+    if (tr_variantFromJson(&top, std::data(response), std::size(response)) != 0)
     {
-        tr_logAddNamedError(
-            MY_NAME,
-            "Unable to parse response \"%*.*s\"",
-            TR_ARG_TUPLE((int)len, (int)len, (char const*)response));
+        tr_logAddNamedError(MY_NAME, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
         status |= EXIT_FAILURE;
     }
     else
     {
         int64_t tag = -1;
-        char const* str;
+        auto sv = std::string_view{};
 
-        if (tr_variantDictFindStr(&top, TR_KEY_result, &str, nullptr))
+        if (tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
         {
-            if (strcmp(str, "success") != 0)
+            if (sv != "success"sv)
             {
-                printf("Error: %s\n", str);
+                printf("Error: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
                 status |= EXIT_FAILURE;
             }
             else
@@ -2115,15 +2112,15 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
                     }
 
                 default:
-                    if (!tr_variantDictFindStr(&top, TR_KEY_result, &str, nullptr))
+                    if (!tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
                     {
                         status |= EXIT_FAILURE;
                     }
                     else
                     {
-                        printf("%s responded: \"%s\"\n", rpcurl, str);
+                        printf("%s responded: \"%" TR_PRIsv "\"\n", rpcurl, TR_PRIsv_ARG(sv));
 
-                        if (strcmp(str, "success") != 0)
+                        if (sv != "success"sv)
                         {
                             status |= EXIT_FAILURE;
                         }
@@ -2229,7 +2226,9 @@ static int flush(char const* rpcurl, tr_variant** benc)
         switch (response)
         {
         case 200:
-            status |= processResponse(rpcurl, (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+            status |= processResponse(
+                rpcurl,
+                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) });
             break;
 
         case 409:
