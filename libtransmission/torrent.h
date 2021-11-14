@@ -237,7 +237,9 @@ struct tr_torrent
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
             {
-                checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
+                auto const begin = info.files[i].firstPiece;
+                auto const end = info.files[i].lastPiece + 1;
+                checked_pieces_.unsetRange(begin, end);
             }
         }
     }
