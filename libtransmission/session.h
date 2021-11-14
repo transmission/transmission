@@ -231,6 +231,28 @@ public:
         return tr_rpcGetWhitelistEnabled(this->rpcServer);
     }
 
+    // peer networking
+
+    std::string const& peerCongestionAlgorithm() const
+    {
+        return peer_congestion_algorithm_;
+    }
+
+    void setPeerCongestionAlgorithm(std::string_view algorithm)
+    {
+        peer_congestion_algorithm_ = algorithm;
+    }
+
+    int peerSocketTos() const
+    {
+        return peer_socket_tos_;
+    }
+
+    void setPeerSocketTos(int tos)
+    {
+        peer_socket_tos_ = tos;
+    }
+
 public:
     bool isPortRandom;
     bool isPexEnabled;
@@ -305,9 +327,6 @@ public:
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
-    int peerSocketTOS;
-    char* peer_congestion_algorithm;
-
     std::unordered_set<tr_torrent*> torrents;
     std::map<int, tr_torrent*> torrentsById;
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
@@ -357,6 +376,9 @@ private:
     std::string blocklist_url_;
     std::string download_dir_;
     std::string incomplete_dir_;
+    std::string peer_congestion_algorithm_;
+
+    int peer_socket_tos_ = 0;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

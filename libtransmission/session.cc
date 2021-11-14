@@ -256,7 +256,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-static int parse_tos(std::string_view tos_in)
+static int parseTos(std::string_view tos_in)
 {
     auto tos = tr_strlower(tr_strvStrip(tos_in));
 
@@ -422,8 +422,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTOS));
-    tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peer_congestion_algorithm);
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTos()));
+    tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
@@ -840,17 +840,12 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
     {
-        session->peerSocketTOS = parse_tos(sv);
+        session->setPeerSocketTos(parseTos(sv));
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_congestion_algorithm, &strVal, nullptr))
-    {
-        session->peer_congestion_algorithm = tr_strdup(strVal);
-    }
-    else
-    {
-        session->peer_congestion_algorithm = tr_strdup("");
-    }
+    sv = ""sv;
+    tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
+    session->setPeerCongestionAlgorithm(sv);
 
     if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
     {
@@ -2040,7 +2035,6 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
-    tr_free(session->peer_congestion_algorithm);
     delete session;
 }
 

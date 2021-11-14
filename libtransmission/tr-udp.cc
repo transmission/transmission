@@ -126,19 +126,21 @@ void tr_udpSetSocketBuffers(tr_session* session)
 
 void tr_udpSetSocketTOS(tr_session* session)
 {
-    if (session->peerSocketTOS == 0)
+    auto const tos = session->peerSocketTos();
+
+    if (tos)
     {
         return;
     }
 
     if (session->udp_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp_socket, session->peerSocketTOS, TR_AF_INET);
+        tr_netSetTOS(session->udp_socket, tos, TR_AF_INET);
     }
 
     if (session->udp6_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp6_socket, session->peerSocketTOS, TR_AF_INET6);
+        tr_netSetTOS(session->udp6_socket, tos, TR_AF_INET6);
     }
 }
 
