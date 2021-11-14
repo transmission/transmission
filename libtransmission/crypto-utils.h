@@ -9,9 +9,11 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
+#include <cinttypes>
+#include <cstddef>
 #include <optional>
-#include <inttypes.h>
-#include <stddef.h>
+#include <string>
+#include <string_view>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "tr-macros.h"
@@ -143,12 +145,12 @@ bool tr_rand_buffer(void* buffer, size_t length);
 /**
  * @brief Generate a SSHA password from its plaintext source.
  */
-char* tr_ssha1(char const* plain_text) TR_GNUC_MALLOC;
+std::string tr_ssha1(std::string_view plain_text);
 
 /**
  * @brief Validate a test password against the a ssha1 password.
  */
-bool tr_ssha1_matches(char const* ssha1, char const* plain_text);
+bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text);
 
 /**
  * @brief Translate a block of bytes into base64.

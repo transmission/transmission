@@ -118,10 +118,8 @@ int tr_rand_int_weak(int upper_bound)
 ****
 ***/
 
-char* tr_ssha1(char const* plain_text)
+std::string tr_ssha1(std::string_view plain_text)
 {
-    TR_ASSERT(plain_text != nullptr);
-
     auto constexpr SaltvalLen = int{ 8 };
     auto constexpr SalterLen = int{ 64 };
 
@@ -142,24 +140,21 @@ char* tr_ssha1(char const* plain_text)
         ch = salter[ch % SalterLen];
     }
 
-    tr_sha1(sha, plain_text, (int)strlen(plain_text), salt, SaltvalLen, nullptr);
+    tr_sha1(sha, std::data(plain_text), std::size(plain_text), salt, SaltvalLen, nullptr);
     tr_sha1_to_hex(&buf[1], sha);
     memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, SaltvalLen);
     buf[1 + 2 * SHA_DIGEST_LENGTH + SaltvalLen] = '\0';
     buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
 
-    return tr_strdup(buf);
+    return std::string{ buf };
 }
 
-bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
+bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text)
 {
-    TR_ASSERT(ssha1 != nullptr);
-    TR_ASSERT(plain_text != nullptr);
-
     size_t const brace_len = 1;
     size_t const brace_and_hash_len = brace_len + 2 * SHA_DIGEST_LENGTH;
 
-    size_t const source_len = strlen(ssha1);
+    size_t const source_len = std::size(ssha1);
 
     if (source_len < brace_and_hash_len || ssha1[0] != '{')
     {
@@ -167,16 +162,16 @@ bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
     }
 
     /* extract the salt */
-    char const* const salt = ssha1 + brace_and_hash_len;
+    char const* const salt = std::data(ssha1) + brace_and_hash_len;
     size_t const salt_len = source_len - brace_and_hash_len;
 
     uint8_t buf[SHA_DIGEST_LENGTH * 2 + 1];
 
     /* hash pass + salt */
-    tr_sha1(buf, plain_text, (int)strlen(plain_text), salt, (int)salt_len, nullptr);
+    tr_sha1(buf, std::data(plain_text), std::size(plain_text), salt, (int)salt_len, nullptr);
     tr_sha1_to_hex((char*)buf, buf);
 
-    return strncmp(ssha1 + brace_len, (char const*)buf, SHA_DIGEST_LENGTH * 2) == 0;
+    return strncmp(std::data(ssha1) + brace_len, (char const*)buf, SHA_DIGEST_LENGTH * 2) == 0;
 }
 
 /***

@@ -40,6 +40,8 @@
 #include "web-utils.h"
 #include "web.h"
 
+using namespace std::literals;
+
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
  * http://en.wikipedia.org/wiki/Cross-site_request_forgery
@@ -64,7 +66,7 @@ struct tr_rpc_server
     int start_retry_counter;
     tr_session* session;
     char* username;
-    char* password;
+    std::string password;
     std::string whitelistStr;
     std::list<std::string> whitelist;
     std::list<std::string> hostWhitelist;
@@ -925,57 +927,47 @@ char const* tr_rpcGetUrl(tr_rpc_server const* server)
     return server->url != nullptr ? server->url : "";
 }
 
-static auto parseWhitelist(char const* whitelistStr)
+static auto parseWhitelist(std::string_view whitelist)
 {
     auto list = std::list<std::string>{};
 
-    /* build the new whitelist entries */
-    for (char const* walk = whitelistStr; !tr_str_is_empty(walk);)
+    while (!std::empty(whitelist))
     {
-        char const* delimiters = " ,;";
-        size_t const len = strcspn(walk, delimiters);
-        list.emplace_back(walk, len);
-        auto const token = list.back().c_str();
+        auto const pos = whitelist.find_first_of(" ,;"sv);
+        auto const token = tr_strvStrip(whitelist.substr(0, pos));
+        list.emplace_back(token);
+        whitelist = pos == whitelist.npos ? ""sv : whitelist.substr(pos + 1);
 
-        if (strcspn(token, "+-") < len)
+        if (token.find_first_of("+-"sv) != token.npos)
         {
             tr_logAddNamedInfo(
                 MY_NAME,
-                "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
-                token);
+                "Adding address to whitelist: %" TR_PRIsv " (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
+                TR_PRIsv_ARG(token));
         }
         else
         {
-            tr_logAddNamedInfo(MY_NAME, "Adding address to whitelist: %s", token);
+            tr_logAddNamedInfo(MY_NAME, "Adding address to whitelist: %" TR_PRIsv, TR_PRIsv_ARG(token));
         }
-
-        walk += len;
-
-        if (*walk == '\0')
-        {
-            break;
-        }
-
-        ++walk;
     }
 
     return list;
 }
 
-void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* str)
+static void tr_rpcSetHostWhitelist(tr_rpc_server* server, std::string_view whitelist)
 {
-    server->hostWhitelist = parseWhitelist(str);
+    server->hostWhitelist = parseWhitelist(whitelist);
 }
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, char const* str)
+void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist)
 {
-    server->whitelistStr = str ? str : "";
-    server->whitelist = parseWhitelist(str);
+    server->whitelistStr = whitelist;
+    server->whitelist = parseWhitelist(whitelist);
 }
 
-char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
+std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server)
 {
-    return server->whitelistStr.c_str();
+    return server->whitelistStr;
 }
 
 void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
@@ -988,7 +980,7 @@ bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server)
     return server->isWhitelistEnabled;
 }
 
-void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
+static void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
 {
     server->isHostWhitelistEnabled = isEnabled;
 }
@@ -1012,23 +1004,21 @@ char const* tr_rpcGetUsername(tr_rpc_server const* server)
 
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
 {
-    tr_free(server->password);
-
     if (*password != '{')
     {
         server->password = tr_ssha1(password);
     }
     else
     {
-        server->password = strdup(password);
+        server->password = password;
     }
 
-    dbgmsg("setting our Password to [%s]", server->password);
+    dbgmsg("setting our Password to [%s]", server->password.c_str());
 }
 
 char const* tr_rpcGetPassword(tr_rpc_server const* server)
 {
-    return server->password != nullptr ? server->password : "";
+    return server->password.c_str();
 }
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1088,7 +1078,6 @@ static void closeServer(void* vserver)
 
     tr_free(server->url);
     tr_free(server->username);
-    tr_free(server->password);
     delete server;
 }
 
@@ -1106,6 +1095,7 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 {
+    auto sv = std::string_view{};
     auto address = tr_address{};
     auto boolVal = bool{};
     auto i = int64_t{};
@@ -1176,13 +1166,13 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_host_whitelist;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr) && str != nullptr)
+    if (!tr_variantDictFindStrView(settings, key, &sv) && !std::empty(sv))
     {
         missing_settings_key(key);
     }
     else
     {
-        tr_rpcSetHostWhitelist(s, str);
+        tr_rpcSetHostWhitelist(s, sv);
     }
 
     key = TR_KEY_rpc_authentication_required;
@@ -1198,13 +1188,13 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_whitelist;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr) && str != nullptr)
+    if (!tr_variantDictFindStrView(settings, key, &sv) && !std::empty(sv))
     {
         missing_settings_key(key);
     }
     else
     {
-        tr_rpcSetWhitelist(s, str);
+        tr_rpcSetWhitelist(s, sv);
     }
 
     key = TR_KEY_rpc_username;
