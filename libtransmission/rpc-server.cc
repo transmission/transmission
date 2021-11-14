@@ -64,7 +64,7 @@ struct tr_rpc_server
     int start_retry_counter;
     tr_session* session;
     char* username;
-    char* password;
+    std::string password;
     std::string whitelistStr;
     std::list<std::string> whitelist;
     std::list<std::string> hostWhitelist;
@@ -1012,23 +1012,21 @@ char const* tr_rpcGetUsername(tr_rpc_server const* server)
 
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
 {
-    tr_free(server->password);
-
     if (*password != '{')
     {
         server->password = tr_ssha1(password);
     }
     else
     {
-        server->password = strdup(password);
+        server->password = password;
     }
 
-    dbgmsg("setting our Password to [%s]", server->password);
+    dbgmsg("setting our Password to [%s]", server->password.c_str());
 }
 
 char const* tr_rpcGetPassword(tr_rpc_server const* server)
 {
-    return server->password != nullptr ? server->password : "";
+    return server->password.c_str();
 }
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1088,7 +1086,6 @@ static void closeServer(void* vserver)
 
     tr_free(server->url);
     tr_free(server->username);
-    tr_free(server->password);
     delete server;
 }
 
