@@ -2579,28 +2579,28 @@ void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetWhitelist(session->rpcServer, whitelist);
+    session->setRpcWhitelist(whitelist ? whitelist : "");
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetWhitelist(session->rpcServer);
+    return session->rpcWhitelist().c_str();
 }
 
-void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetWhitelistEnabled(session->rpcServer, isEnabled);
+    session->useRpcWhitelist(enabled);
 }
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetWhitelistEnabled(session->rpcServer);
+    return session->useRpcWhitelist();
 }
 
 void tr_sessionSetRPCPassword(tr_session* session, char const* password)

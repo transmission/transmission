@@ -25,8 +25,11 @@
 
 #include <event2/util.h> // evutil_ascii_strncasecmp()
 
+#include "transmission.h"
+
 #include "bandwidth.h"
 #include "net.h"
+#include "rpc-server.h"
 #include "tr-macros.h"
 #include "utils.h" // tr_speed_K
 
@@ -204,6 +207,28 @@ public:
     void setBlocklistUrl(std::string_view url)
     {
         blocklist_url_ = url;
+    }
+
+    // RPC
+
+    void setRpcWhitelist(std::string_view whitelist)
+    {
+        tr_rpcSetWhitelist(this->rpcServer, whitelist);
+    }
+
+    std::string const& rpcWhitelist() const
+    {
+        return tr_rpcGetWhitelist(this->rpcServer);
+    }
+
+    void useRpcWhitelist(bool enabled)
+    {
+        tr_rpcSetWhitelistEnabled(this->rpcServer, enabled);
+    }
+
+    bool useRpcWhitelist() const
+    {
+        return tr_rpcGetWhitelistEnabled(this->rpcServer);
     }
 
 public:

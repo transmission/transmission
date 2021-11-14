@@ -12,6 +12,12 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <string_view>
+
+#include "transmission.h"
+
+#include "net.h"
+
 struct tr_rpc_server;
 struct tr_variant;
 
@@ -37,13 +43,9 @@ void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
 
 bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server);
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelist);
+void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
 
-char const* tr_rpcGetWhitelist(tr_rpc_server const* server);
-
-void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
-
-void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* whitelist);
+std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server);
 
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password);
 
