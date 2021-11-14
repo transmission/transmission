@@ -646,10 +646,30 @@ static void daemon_stop(void* /*arg*/)
     event_base_loopexit(ev_base, nullptr);
 }
 
+static bool createPidfile(std::string const& pidfile)
+{
+    tr_error* error = nullptr;
+    auto const fp = tr_sys_file_open(
+        pidfile.c_str(),
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+        0666,
+        &error);
+    if (fp == TR_BAD_SYS_FILE)
+    {
+        tr_logAddError("Unable to save pidfile \"%s\": %s", pidfile.c_str(), error->message);
+        tr_error_free(error);
+        return false;
+    }
+
+    tr_sys_file_write_fmt(fp, "%d", nullptr, (int)getpid());
+    tr_sys_file_close(fp, nullptr);
+    tr_logAddInfo("Saved pidfile \"%s\"", pidfile.c_str());
+    return true;
+}
+
 static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 {
     bool boolVal;
-    char const* pid_filename;
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
@@ -684,29 +704,11 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
     tr_sessionSaveSettings(session, configDir, settings);
 
-    pid_filename = nullptr;
-    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, nullptr);
-    if (!tr_str_is_empty(pid_filename))
+    auto pid_filename = std::string_view{};
+    (void)tr_variantDictFindStrView(settings, key_pidfile, &pid_filename);
+    if (!std::empty(pid_filename))
     {
-        tr_error* error = nullptr;
-        tr_sys_file_t fp = tr_sys_file_open(
-            pid_filename,
-            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-            0666,
-            &error);
-
-        if (fp != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_write_fmt(fp, "%d", nullptr, (int)getpid());
-            tr_sys_file_close(fp, nullptr);
-            tr_logAddInfo("Saved pidfile \"%s\"", pid_filename);
-            pidfile_created = true;
-        }
-        else
-        {
-            tr_logAddError("Unable to save pidfile \"%s\": %s", pid_filename, error->message);
-            tr_error_free(error);
-        }
+        pidfile_created = createPidfile(std::string{ pid_filename });
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
