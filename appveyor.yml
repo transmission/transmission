@@ -2,11 +2,11 @@ version: '{build}'
 
 environment:
   AWS_ACCESS_KEY_ID:
-    secure: JH2KJ09654cSwhYup2MKb80kK60+nezvUmFzBay7tUI=
+    secure: WQRc7y9bDiWiLpjm9lXdw9Q7n4extWau3W1ztQdqMgU=
   AWS_SECRET_ACCESS_KEY:
-    secure: fum5aRKLhJvxh3UQhiQVt2acV4eke8GiGdMhHIW/uuQC7wztj4T9tJWp5IO1U7m4
+    secure: pP+D6ZtfXLDcEnl8pk/n3KApaV1fdGns4VkSyebs0zHzCutlvWj7ee16PalCcnBY
   AWS_S3_BUCKET_NAME:
-    secure: Bf3x1Iruxg+l3tp+an+g9kWhBexLLw/69gEt9bEu7Zk=
+    secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
