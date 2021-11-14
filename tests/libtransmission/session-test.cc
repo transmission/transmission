@@ -29,8 +29,15 @@ namespace libtransmission
 namespace test
 {
 
-TEST_F(SessionTest, properties)
+TEST_F(SessionTest, propertiesApi)
 {
+    // Note, this test is just for confirming that the getters/setters
+    // in both the tr_session class and in the C API bindings all work,
+    // e.g. you can get back the same value you set in.
+    //
+    // Confirming that each of these settings _does_ something in the session
+    // is a much broader scope and left to other tests :)
+
     auto* const session = session_;
 
     // download dir
@@ -127,6 +134,34 @@ TEST_F(SessionTest, properties)
     tr_blocklistSetURL(session, nullptr);
     EXPECT_EQ(""sv, session->blocklistUrl());
     EXPECT_EQ(""sv, tr_blocklistGetURL(session));
+
+    // rpc url
+
+    for (auto const& value : { "http://www.example.com/"sv, "http://www.example.org/transmission"sv, ""sv })
+    {
+        tr_sessionSetRPCUrl(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCUrl(session));
+    }
+
+    tr_sessionSetRPCUrl(session, nullptr);
+    EXPECT_EQ(""sv, tr_sessionGetRPCUrl(session));
+
+    // rpc username, password
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
+
+        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCPassword(session));
+    }
+
+    tr_sessionSetRPCUsername(session, nullptr);
+    EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
+
+    tr_sessionSetRPCPassword(session, nullptr);
+    EXPECT_EQ(""sv, tr_sessionGetRPCPassword(session));
 
     // blocklist enabled
 
