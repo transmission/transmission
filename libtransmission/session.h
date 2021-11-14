@@ -18,6 +18,7 @@
 #include <cstring> // memcmp()
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -213,22 +214,22 @@ public:
 
     void setRpcWhitelist(std::string_view whitelist)
     {
-        tr_rpcSetWhitelist(this->rpcServer, whitelist);
+        tr_rpcSetWhitelist(this->rpc_server_.get(), whitelist);
     }
 
     std::string const& rpcWhitelist() const
     {
-        return tr_rpcGetWhitelist(this->rpcServer);
+        return tr_rpcGetWhitelist(this->rpc_server_.get());
     }
 
     void useRpcWhitelist(bool enabled)
     {
-        tr_rpcSetWhitelistEnabled(this->rpcServer, enabled);
+        tr_rpcSetWhitelistEnabled(this->rpc_server_.get(), enabled);
     }
 
     bool useRpcWhitelist() const
     {
-        return tr_rpcGetWhitelistEnabled(this->rpcServer);
+        return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
     }
 
     // peer networking
@@ -347,7 +348,7 @@ public:
     struct tr_web* web;
 
     struct tr_session_id* session_id;
-    struct tr_rpc_server* rpcServer;
+
     tr_rpc_func rpc_func;
     void* rpc_func_user_data;
 
@@ -370,6 +371,8 @@ public:
 
     struct tr_bindinfo* bind_ipv4;
     struct tr_bindinfo* bind_ipv6;
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
 
 private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
