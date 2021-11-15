@@ -245,14 +245,14 @@ static bool ensurePathExists(std::string const& path)
     }
 
     tr_error* error = nullptr;
-    if (!tr_sys_dir_create(path.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+    if (tr_sys_dir_create(path.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
     {
-        fprintf(stderr, "Unable to create download directory \"%s\": %s\n", path.c_str(), error->message);
-        tr_error_free(error);
-        return false;
+        return true;
     }
 
-    return true;
+    fprintf(stderr, "Unable to create download directory \"%s\": %s\n", path.c_str(), error->message);
+    tr_error_free(error);
+    return false;
 }
 
 int tr_main(int argc, char* argv[])
