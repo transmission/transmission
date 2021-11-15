@@ -1029,11 +1029,10 @@ static void missing_settings_key(tr_quark const q)
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : session{ session_in }
 {
-    auto sv = std::string_view{};
     auto address = tr_address{};
     auto boolVal = bool{};
     auto i = int64_t{};
-    char const* str = nullptr;
+    auto sv = std::string_view{};
 
     auto key = TR_KEY_rpc_enabled;
 
@@ -1129,13 +1128,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_username;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
     }
     else
     {
-        tr_rpcSetUsername(this, str);
+        tr_rpcSetUsername(this, sv);
     }
 
     key = TR_KEY_rpc_password;
@@ -1173,20 +1172,26 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_bind_address;
 
-    if (!tr_variantDictFindStr(settings, key, &str, nullptr))
+    if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
         address = tr_inaddr_any;
     }
-    else if (!tr_address_from_string(&address, str))
+    else
     {
-        tr_logAddNamedError(MY_NAME, _("%s is not a valid address"), str);
-        address = tr_inaddr_any;
-    }
-    else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
-    {
-        tr_logAddNamedError(MY_NAME, _("%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"), str);
-        address = tr_inaddr_any;
+        if (!tr_address_from_string(&address, std::string{ sv }.c_str()))
+        {
+            tr_logAddNamedError(MY_NAME, _("%" TR_PRIsv " is not a valid address"), TR_PRIsv_ARG(sv));
+            address = tr_inaddr_any;
+        }
+        else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
+        {
+            tr_logAddNamedError(
+                MY_NAME,
+                _("%" TR_PRIsv " is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"),
+                TR_PRIsv_ARG(sv));
+            address = tr_inaddr_any;
+        }
     }
 
     this->bindAddress = address;

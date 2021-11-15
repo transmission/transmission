@@ -77,11 +77,10 @@ template<typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* 
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    char const* str;
-    size_t len;
-    if (tr_variantGetStr(variant, &str, &len))
+    auto sv = std::string_view{};
+    if (tr_variantGetStrView(variant, &sv))
     {
-        ret = QString::fromUtf8(str, len);
+        ret = QString::fromUtf8(std::data(sv), std::size(sv));
     }
 
     return ret;
@@ -91,11 +90,10 @@ template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    char const* str;
-    size_t len;
-    if (tr_variantGetStr(variant, &str, &len))
+    auto sv = std::string_view{};
+    if (tr_variantGetStrView(variant, &sv))
     {
-        ret = std::string_view(str, len);
+        ret = std::string_view(std::data(sv), std::size(sv));
     }
 
     return ret;
