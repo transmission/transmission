@@ -129,9 +129,9 @@ static inline int tr_variantFromBenc(tr_variant* setme, std::string_view benc)
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, nullptr);
 }
 
-static inline int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const* source, char const** setme_end)
+static inline int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const** setme_end)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), source, setme_end);
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, setme_end);
 }
 
 static inline int tr_variantFromJson(tr_variant* setme, std::string_view json)

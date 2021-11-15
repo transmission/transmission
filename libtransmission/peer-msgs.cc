@@ -1241,7 +1241,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBencFull(&dict, std::string_view{ tmp, msglen }, nullptr, &benc_end) == 0)
+    if (tr_variantFromBencFull(&dict, std::string_view{ tmp, msglen }, &benc_end) == 0)
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
