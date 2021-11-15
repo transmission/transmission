@@ -261,7 +261,7 @@ static void doScrape(tr_info const* inf)
                 bool matched = false;
                 char const* begin = (char const*)evbuffer_pullup(buf, -1);
 
-                if (tr_variantFromBenc(&top, begin, evbuffer_get_length(buf)) == 0)
+                if (tr_variantFromBenc(&top, { begin, evbuffer_get_length(buf) }) == 0)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {

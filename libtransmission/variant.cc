@@ -160,6 +160,7 @@ static constexpr char const* tr_variant_string_get_string(struct tr_variant_stri
 
     case TR_STRING_TYPE_HEAP:
     case TR_STRING_TYPE_QUARK:
+    case TR_STRING_TYPE_VIEW:
         return str->str.str;
 
     default:
@@ -173,6 +174,15 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
 
     str->type = TR_STRING_TYPE_QUARK;
     str->str.str = tr_quark_get_string(quark, &str->len);
+}
+
+static void tr_variant_string_set_string_view(struct tr_variant_string* str, std::string_view in)
+{
+    tr_variant_string_clear(str);
+
+    str->type = TR_STRING_TYPE_VIEW;
+    str->len = std::size(in);
+    str->str.str = std::data(in);
 }
 
 static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
@@ -486,6 +496,12 @@ void tr_variantInitStr(tr_variant* v, std::string_view str)
     tr_variant_string_set_string(&v->val.s, str);
 }
 
+void tr_variantInitStrView(tr_variant* v, std::string_view str)
+{
+    tr_variantInit(v, TR_VARIANT_TYPE_STR);
+    tr_variant_string_set_string_view(&v->val.s, str);
+}
+
 void tr_variantInitBool(tr_variant* v, bool value)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_BOOL);
@@ -593,6 +609,13 @@ tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view str)
     return child;
 }
 
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view str)
+{
+    tr_variant* child = tr_variantListAdd(list);
+    tr_variantInitStrView(child, str);
+    return child;
+}
+
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const val)
 {
     tr_variant* child = tr_variantListAdd(list);
@@ -691,6 +714,13 @@ tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::stri
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
     tr_variantInitStr(child, str);
+    return child;
+}
+
+tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark const key, std::string_view str)
+{
+    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variantInitStrView(child, str);
     return child;
 }
 
@@ -1289,30 +1319,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
-{
-    bool ret = false;
-
-    auto buflen = size_t{};
-    uint8_t* const buf = tr_loadFile(filename, &buflen, error);
-    if (buf != nullptr)
-    {
-        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
-        {
-            ret = true;
-        }
-        else
-        {
-            tr_error_set_literal(error, 0, _("Unable to parse file content"));
-        }
-
-        tr_free(buf);
-    }
-
-    return ret;
-}
-
-int tr_variantFromBuf(
+static int tr_variantFromBuf(
     tr_variant* setme,
     tr_variant_fmt fmt,
     void const* buf,
@@ -1340,4 +1347,42 @@ int tr_variantFromBuf(
     /* restore the previous locale */
     restore_locale(&locale_ctx);
     return err;
+}
+
+int tr_variantFromBenc(tr_variant* setme, std::string_view benc)
+{
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, nullptr);
+}
+
+int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const** setme_end)
+{
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, setme_end);
+}
+
+int tr_variantFromJson(tr_variant* setme, std::string_view json)
+{
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, std::data(json), std::size(json), nullptr, nullptr);
+}
+
+bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
+{
+    bool ret = false;
+
+    auto buflen = size_t{};
+    uint8_t* const buf = tr_loadFile(filename, &buflen, error);
+    if (buf != nullptr)
+    {
+        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
+        {
+            ret = true;
+        }
+        else
+        {
+            tr_error_set_literal(error, 0, _("Unable to parse file content"));
+        }
+
+        tr_free(buf);
+    }
+
+    return ret;
 }
