@@ -357,7 +357,8 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password);
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username);
 
-/** @brief get the password used to restrict RPC requests.
+// TODO(ckerr): rename function to indicate it returns the salted value
+/** @brief get the salted version of the password used to restrict RPC requests.
     @return the password string.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPassword() */

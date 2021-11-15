@@ -564,6 +564,31 @@ static bool test_session_id(tr_rpc_server* server, struct evhttp_request* req)
     return success;
 }
 
+static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
+{
+    if (!server->isPasswordEnabled)
+    {
+        return true;
+    }
+
+    // https://datatracker.ietf.org/doc/html/rfc7617
+    // `Basic ${base64(username)}:${base64(password)}`
+
+    auto constexpr Prefix = "Basic "sv;
+    auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
+    if (!tr_strvStartsWith(auth, Prefix))
+    {
+        return false;
+    }
+
+    auth.remove_prefix(std::size(Prefix));
+    auto const decoded_str = tr_base64_decode_str(auth);
+    auto decoded = std::string_view{ decoded_str };
+    auto const username = tr_strvSep(&decoded, ':');
+    auto const password = decoded;
+    return server->username == username && tr_ssha1_matches(server->salted_password, password);
+}
+
 static void handle_request(struct evhttp_request* req, void* arg)
 {
     auto* server = static_cast<tr_rpc_server*>(arg);
@@ -605,35 +630,12 @@ static void handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
-        char const* const auth = evhttp_find_header(req->input_headers, "Authorization");
-        char* user = nullptr;
-        char* pass = nullptr;
-
-        if (auth != nullptr && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
-        {
-            auto* p = static_cast<char*>(tr_base64_decode_str(auth + 6, nullptr));
-
-            if (p != nullptr)
-            {
-                if ((pass = strchr(p, ':')) != nullptr)
-                {
-                    user = p;
-                    *pass++ = '\0';
-                }
-                else
-                {
-                    tr_free(p);
-                }
-            }
-        }
-
-        if (server->isPasswordEnabled &&
-            (pass == nullptr || user == nullptr || server->username != user || !tr_ssha1_matches(server->password, pass)))
+        if (!isAuthorized(server, evhttp_find_header(req->input_headers, "Authorization")))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->isAntiBruteForceEnabled)
             {
-                server->loginattempts++;
+                ++server->loginattempts;
             }
 
             char* unauthuser = tr_strdup_printf(
@@ -641,7 +643,6 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 server->loginattempts);
             send_simple_response(req, 401, unauthuser);
             tr_free(unauthuser);
-            tr_free(user);
             return;
         }
 
@@ -703,7 +704,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
             tr_free(tmp);
         }
 #endif
-        else if (location == "rpc"sv)
+        else if (tr_strvStartsWith(location, "rpc"sv))
         {
             handle_rpc(req, server);
         }
@@ -711,8 +712,6 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             send_simple_response(req, HTTP_NOTFOUND, req->uri);
         }
-
-        tr_free(user);
     }
 }
 
@@ -964,16 +963,21 @@ std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
     return server->username;
 }
 
+static constexpr bool isSalted(std::string_view password)
+{
+    return !std::empty(password) && password.front() == '{';
+}
+
 void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password)
 {
-    server->password = !std::empty(password) && password.front() == '{' ? tr_ssha1(password) : password;
+    server->salted_password = isSalted(password) ? password : tr_ssha1(password);
 
-    dbgmsg("setting our Password to [%s]", server->password.c_str());
+    dbgmsg("setting our salted password to [%s]", server->salted_password.c_str());
 }
 
 std::string const& tr_rpcGetPassword(tr_rpc_server const* server)
 {
-    return server->password;
+    return server->salted_password;
 }
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
