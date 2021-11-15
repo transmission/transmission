@@ -160,6 +160,7 @@ static constexpr char const* tr_variant_string_get_string(struct tr_variant_stri
 
     case TR_STRING_TYPE_HEAP:
     case TR_STRING_TYPE_QUARK:
+    case TR_STRING_TYPE_VIEW:
         return str->str.str;
 
     default:
@@ -173,6 +174,15 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
 
     str->type = TR_STRING_TYPE_QUARK;
     str->str.str = tr_quark_get_string(quark, &str->len);
+}
+
+static void tr_variant_string_set_string_view(struct tr_variant_string* str, std::string_view in)
+{
+    tr_variant_string_clear(str);
+
+    str->type = TR_STRING_TYPE_VIEW;
+    str->len = std::size(in);
+    str->str.str = std::data(in);
 }
 
 static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
@@ -486,6 +496,12 @@ void tr_variantInitStr(tr_variant* v, std::string_view str)
     tr_variant_string_set_string(&v->val.s, str);
 }
 
+void tr_variantInitStrView(tr_variant* v, std::string_view str)
+{
+    tr_variantInit(v, TR_VARIANT_TYPE_STR);
+    tr_variant_string_set_string_view(&v->val.s, str);
+}
+
 void tr_variantInitBool(tr_variant* v, bool value)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_BOOL);
@@ -593,6 +609,13 @@ tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view str)
     return child;
 }
 
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view str)
+{
+    tr_variant* child = tr_variantListAdd(list);
+    tr_variantInitStrView(child, str);
+    return child;
+}
+
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const val)
 {
     tr_variant* child = tr_variantListAdd(list);
@@ -691,6 +714,13 @@ tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::stri
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
     tr_variantInitStr(child, str);
+    return child;
+}
+
+tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark const key, std::string_view str)
+{
+    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variantInitStrView(child, str);
     return child;
 }
 
