@@ -725,19 +725,17 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* maybe add a watchdir */
     if (tr_variantDictFindBool(settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
-        char const* dir;
-        bool force_generic;
+        auto force_generic = bool{ false };
+        (void)tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic);
 
-        if (!tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic))
+        auto dir = std::string_view{};
+        (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
+        if (!std::empty(dir))
         {
-            force_generic = false;
-        }
+            tr_logAddInfo("Watching \"%" TR_PRIsv "\" for new .torrent files", TR_PRIsv_ARG(dir));
 
-        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, nullptr) && !tr_str_is_empty(dir))
-        {
-            tr_logAddInfo("Watching \"%s\" for new .torrent files", dir);
-
-            if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == nullptr)
+            watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
+            if (watchdir == nullptr)
             {
                 goto CLEANUP;
             }

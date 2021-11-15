@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "tr-macros.h"
 
 struct event_base;
@@ -26,7 +28,7 @@ using tr_watchdir_cb = tr_watchdir_status (*)(tr_watchdir_t handle, char const* 
 /* ... */
 
 tr_watchdir_t tr_watchdir_new(
-    char const* path,
+    std::string_view path,
     tr_watchdir_cb callback,
     void* callback_user_data,
     struct event_base* event_base,

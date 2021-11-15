@@ -177,6 +177,12 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
 void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
+ * @brief Translate a character range from base64 into raw form.
+ * @return a new std::string with the decoded contents.
+ */
+std::string tr_base64_decode_str(std::string_view input);
+
+/**
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
 void tr_sha1_to_hex(void* hex, void const* sha1);
