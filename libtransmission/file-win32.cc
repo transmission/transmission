@@ -18,6 +18,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 #ifndef MAXSIZE_T
 #define MAXSIZE_T ((SIZE_T) ~((SIZE_T)0))
 #endif
