@@ -314,14 +314,9 @@ static void task_finish_func(void* vtask)
 
     if (task->done_func != nullptr)
     {
-        (*task->done_func)(
-            task->session,
-            task->did_connect,
-            task->did_timeout,
-            task->code,
-            evbuffer_pullup(task->response, -1),
-            evbuffer_get_length(task->response),
-            task->done_func_user_data);
+        auto const sv = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(task->response, -1)),
+                                          evbuffer_get_length(task->response) };
+        (*task->done_func)(task->session, task->did_connect, task->did_timeout, task->code, sv, task->done_func_user_data);
     }
 
     task_free(task);
