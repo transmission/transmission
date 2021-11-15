@@ -2123,7 +2123,7 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
             if (tor->currentDir == tor->incompleteDir)
             {
-                tr_torrentSetLocation(tor, tor->downloadDir, true, nullptr, nullptr);
+                tor->setLocation(tor->downloadDir, true, nullptr, nullptr);
             }
         }
 
@@ -2946,14 +2946,16 @@ static void tr_torrentDeleteLocalData(tr_torrent* tor, tr_fileFunc func)
 
 struct LocationData
 {
-    bool move_from_old_location;
-    int volatile* setme_state;
-    double volatile* setme_progress;
-    char* location;
-    tr_torrent* tor;
+    std::string location;
+
+    tr_torrent* tor = nullptr;
+    double volatile* setme_progress = nullptr;
+    int volatile* setme_state = nullptr;
+
+    bool move_from_old_location = false;
 };
 
-static void setLocation(void* vdata)
+static void setLocationImpl(void* vdata)
 {
     auto* data = static_cast<struct LocationData*>(vdata);
     tr_torrent* tor = data->tor;
@@ -2964,14 +2966,18 @@ static void setLocation(void* vdata)
 
     bool err = false;
     bool const do_move = data->move_from_old_location;
-    char const* location = data->location;
+    auto const& location = data->location;
     double bytesHandled = 0;
 
-    tr_logAddDebug("Moving \"%s\" location from currentDir \"%s\" to \"%s\"", tr_torrentName(tor), tor->currentDir, location);
+    tr_logAddDebug(
+        "Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
+        tr_torrentName(tor),
+        tor->currentDir,
+        location.c_str());
 
-    tr_sys_dir_create(location, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
-    if (!tr_sys_path_is_same(location, tor->currentDir, nullptr))
+    if (!tr_sys_path_is_same(location.c_str(), tor->currentDir, nullptr))
     {
         /* bad idea to move files while they're being verified... */
         tr_verifyRemove(tor);
@@ -3031,7 +3037,7 @@ static void setLocation(void* vdata)
     if (!err)
     {
         /* set the new location and reverify */
-        tr_torrentSetDownloadDir(tor, location);
+        tr_torrentSetDownloadDir(tor, location.c_str());
 
         if (do_move)
         {
@@ -3048,19 +3054,15 @@ static void setLocation(void* vdata)
 
     /* cleanup */
     tr_torrentUnlock(tor);
-    tr_free(data->location);
-    tr_free(data);
+    delete data;
 }
 
-void tr_torrentSetLocation(
-    tr_torrent* tor,
-    char const* location,
+void tr_torrent::setLocation(
+    std::string_view location,
     bool move_from_old_location,
     double volatile* setme_progress,
     int volatile* setme_state)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
     if (setme_state != nullptr)
     {
         *setme_state = TR_LOC_MOVING;
@@ -3072,13 +3074,26 @@ void tr_torrentSetLocation(
     }
 
     /* run this in the libtransmission thread */
-    struct LocationData* data = tr_new(struct LocationData, 1);
-    data->tor = tor;
-    data->location = tr_strdup(location);
+    auto* const data = new LocationData{};
+    data->tor = this;
+    data->location = location;
     data->move_from_old_location = move_from_old_location;
     data->setme_state = setme_state;
     data->setme_progress = setme_progress;
-    tr_runInEventThread(tor->session, setLocation, data);
+    tr_runInEventThread(this->session, setLocationImpl, data);
+}
+
+void tr_torrentSetLocation(
+    tr_torrent* tor,
+    char const* location,
+    bool move_from_old_location,
+    double volatile* setme_progress,
+    int volatile* setme_state)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(!tr_str_is_empty(location));
+
+    return tor->setLocation(location ? location : "", move_from_old_location, setme_progress, setme_state);
 }
 
 std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)

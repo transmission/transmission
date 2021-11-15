@@ -1373,9 +1373,9 @@ static char const* torrentSetLocation(
     tr_variant* /*args_out*/,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    char const* location = nullptr;
+    auto location = std::string_view{};
 
-    if (!tr_variantDictFindStr(args_in, TR_KEY_location, &location, nullptr))
+    if (!tr_variantDictFindStrView(args_in, TR_KEY_location, &location))
     {
         return "no location";
     }
@@ -1390,7 +1390,7 @@ static char const* torrentSetLocation(
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentSetLocation(tor, location, move, nullptr, nullptr);
+        tor->setLocation(location, move, nullptr, nullptr);
         notify(session, TR_RPC_TORRENT_MOVED, tor);
     }
 
