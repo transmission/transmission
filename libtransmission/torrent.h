@@ -136,12 +136,12 @@ struct tr_incomplete_metadata;
 /** @brief Torrent object */
 struct tr_torrent
 {
-    tr_session* session;
-    tr_info info;
-
-    int magicNumber;
-
-    std::optional<double> verify_progress;
+public:
+    void setLocation(
+        std::string_view location,
+        bool move_from_current_location,
+        double volatile* setme_progress,
+        int volatile* setme_state);
 
     tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
     {
@@ -149,7 +149,20 @@ struct tr_torrent
         return this->piece_checksums_[i];
     }
 
+    // these functions should become private when possible,
+    // but more refactoring is needed before that can happen
+    // because much of tr_torrent's impl is in the non-member C bindings
+    //
+    // private:
     void takeMetainfo(tr_metainfo_parsed&& parsed);
+
+public:
+    tr_session* session;
+    tr_info info;
+
+    int magicNumber;
+
+    std::optional<double> verify_progress;
 
     tr_stat_errtype error;
     char errorString[128];
