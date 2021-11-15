@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <limits.h> /* INT_MAX */
 #include <sstream>
 #include <stddef.h>
@@ -1839,6 +1840,8 @@ char const timeout_markup_end[] = "</span>";
 char const success_markup_begin[] = "<span color=\"#080\">";
 char const success_markup_end[] = "</span>";
 
+std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200F"sv };
+
 // if it's been longer than a minute, don't bother showing the seconds
 Glib::ustring tr_strltime_rounded(time_t t)
 {
@@ -1850,11 +1853,12 @@ Glib::ustring tr_strltime_rounded(time_t t)
     return tr_strltime(t);
 }
 
-void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::ostream& gstr)
+void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
     if (st->hasAnnounced && st->announceState != TR_TRACKER_INACTIVE)
     {
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         auto const timebuf = tr_strltime_rounded(now - st->lastAnnounceTime);
 
         if (st->lastAnnounceSucceeded)
@@ -1889,21 +1893,25 @@ void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::
     {
     case TR_TRACKER_INACTIVE:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << _("No updates scheduled");
         break;
 
     case TR_TRACKER_WAITING:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << gtr_sprintf(_("Asking for more peers in %s"), tr_strltime_rounded(st->nextAnnounceTime - now));
         break;
 
     case TR_TRACKER_QUEUED:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << _("Queued to ask for more peers");
         break;
 
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << gtr_sprintf(
             _("Asking for more peers now… <small>%s</small>"),
             tr_strltime_rounded(now - st->lastAnnounceStartTime));
@@ -1911,11 +1919,12 @@ void appendAnnounceInfo(tr_tracker_stat const* const st, time_t const now, std::
     }
 }
 
-void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::ostream& gstr)
+void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, Gtk::TextDirection direction, std::ostream& gstr)
 {
     if (st->hasScraped)
     {
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         auto const timebuf = tr_strltime_rounded(now - st->lastScrapeTime);
 
         if (st->lastScrapeSucceeded)
@@ -1946,16 +1955,19 @@ void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::os
 
     case TR_TRACKER_WAITING:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << gtr_sprintf(_("Asking for peer counts in %s"), tr_strltime_rounded(st->nextScrapeTime - now));
         break;
 
     case TR_TRACKER_QUEUED:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << _("Queued to ask for peer counts");
         break;
 
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
+        gstr << text_dir_mark[direction];
         gstr << gtr_sprintf(
             _("Asking for peer counts now… <small>%s</small>"),
             tr_strltime_rounded(now - st->lastScrapeStartTime));
@@ -1963,9 +1975,15 @@ void appendScrapeInfo(tr_tracker_stat const* const st, time_t const now, std::os
     }
 }
 
-void buildTrackerSummary(std::ostream& gstr, std::string const& key, tr_tracker_stat const* st, bool showScrape)
+void buildTrackerSummary(
+    std::ostream& gstr,
+    std::string const& key,
+    tr_tracker_stat const* st,
+    bool showScrape,
+    Gtk::TextDirection direction)
 {
     // hostname
+    gstr << text_dir_mark[direction];
     gstr << (st->isBackup ? "<i>" : "<b>");
     gstr << Glib::Markup::escape_text(!key.empty() ? gtr_sprintf("%s - %s", st->host, key) : st->host);
     gstr << (st->isBackup ? "</i>" : "</b>");
@@ -1974,11 +1992,11 @@ void buildTrackerSummary(std::ostream& gstr, std::string const& key, tr_tracker_
     {
         time_t const now = time(nullptr);
 
-        appendAnnounceInfo(st, now, gstr);
+        appendAnnounceInfo(st, now, direction, gstr);
 
         if (showScrape)
         {
-            appendScrapeInfo(st, now, gstr);
+            appendScrapeInfo(st, now, direction, gstr);
         }
     }
 }
@@ -2147,7 +2165,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 
             /* update the row */
             gstr.str({});
-            buildTrackerSummary(gstr, summary_name, st, showScrape);
+            buildTrackerSummary(gstr, summary_name, st, showScrape, dialog_.get_direction());
             (*iter)[tracker_cols.text] = gstr.str();
             (*iter)[tracker_cols.is_backup] = st->isBackup;
             (*iter)[tracker_cols.tracker_id] = st->id;
