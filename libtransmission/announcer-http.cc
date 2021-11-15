@@ -132,8 +132,8 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
             continue;
         }
 
-        char const* ip = nullptr;
-        if (!tr_variantDictFindStr(peer, TR_KEY_ip, &ip, nullptr))
+        auto ip = std::string_view{};
+        if (!tr_variantDictFindStrView(peer, TR_KEY_ip, &ip))
         {
             continue;
         }

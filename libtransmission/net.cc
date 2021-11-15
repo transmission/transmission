@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <array>
 #include <cerrno>
 #include <climits>
 #include <cstring>
@@ -108,20 +109,35 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool success = false;
-
     if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
-        success = true;
-    }
-    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
-    {
-        dst->type = TR_AF_INET6;
-        success = true;
+        return true;
     }
 
-    return success;
+    if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
+    {
+        dst->type = TR_AF_INET6;
+        return true;
+    }
+
+    return false;
+}
+
+bool tr_address_from_string(tr_address* dst, std::string_view src)
+{
+    // inet_pton() requires zero-terminated strings,
+    // so make a zero-terminated copy here on the stack.
+    auto buf = std::array<char, 64>{};
+    if (std::size(src) >= std::size(buf))
+    {
+        // shouldn't ever be that large; malformed address
+        return false;
+    }
+
+    *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
+
+    return tr_address_from_string(dst, std::data(buf));
 }
 
 /*
