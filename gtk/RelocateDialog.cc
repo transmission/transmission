@@ -124,7 +124,7 @@ void RelocateDialog::Impl::onResponse(int response)
 
         /* start the move and periodically check its status */
         done_ = TR_LOC_DONE;
-        timer_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::onTimer), 1);
+        timer_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::onTimer), 1);
         onTimer();
     }
     else
@@ -159,7 +159,7 @@ RelocateDialog::Impl::Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& 
     dialog_.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     dialog_.add_button(_("_Apply"), Gtk::RESPONSE_APPLY);
     dialog_.set_default_response(Gtk::RESPONSE_CANCEL);
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
     row = 0;
     auto* t = Gtk::make_managed<HigWorkarea>();

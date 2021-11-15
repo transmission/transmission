@@ -53,9 +53,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(
         makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
         makeString(tr_torrentFindFile(tor, 0)));
-    EXPECT_EQ(
-        makeString(tr_buildPath(incomplete_dir, tor->info.files[1].name, nullptr)),
-        makeString(tr_torrentFindFile(tor, 1)));
+    EXPECT_EQ(tr_strvPath(incomplete_dir, tor->info.files[1].name), makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
@@ -129,9 +127,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
-        EXPECT_EQ(
-            makeString(tr_buildPath(download_dir, tor->info.files[file_index].name, nullptr)),
-            makeString(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(tr_strvPath(download_dir, tor->info.files[file_index].name), makeString(tr_torrentFindFile(tor, file_index)));
     }
 
     // cleanup
@@ -157,7 +153,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "target", nullptr));
+    auto const target_dir = tr_strvPath(tr_sessionGetConfigDir(session_), "target");
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
@@ -185,7 +181,7 @@ TEST_F(MoveTest, setLocation)
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
         EXPECT_EQ(
-            makeString(tr_buildPath(target_dir.data(), tor->info.files[file_index].name, nullptr)),
+            tr_strvPath(target_dir.data(), tor->info.files[file_index].name),
             makeString(tr_torrentFindFile(tor, file_index)));
     }
 

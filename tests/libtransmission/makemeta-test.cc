@@ -19,6 +19,8 @@
 #include <cstring> // strlen()
 #include <string>
 
+using namespace std::literals;
+
 namespace libtransmission
 {
 
@@ -40,23 +42,23 @@ protected:
     {
 
         // create a single input file
-        auto input_file = makeString(tr_buildPath(sandboxDir().data(), "test.XXXXXX", nullptr));
+        auto input_file = tr_strvPath(sandboxDir().data(), "test.XXXXXX");
         createTmpfileWithContents(input_file, payload, payloadSize);
-        tr_sys_path_native_separators(&input_file.front());
+        tr_sys_path_native_separators(std::data(input_file));
         auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
-        EXPECT_STREQ(input_file.c_str(), builder->top);
-        EXPECT_STREQ(input_file.c_str(), builder->files[0].filename);
+        EXPECT_EQ(input_file, builder->top);
+        EXPECT_EQ(input_file, builder->files[0].filename);
         EXPECT_EQ(payloadSize, builder->files[0].size);
         EXPECT_EQ(payloadSize, builder->totalSize);
         EXPECT_FALSE(builder->isFolder);
         EXPECT_FALSE(builder->abortFlag);
 
         // have tr_makeMetaInfo() build the .torrent file
-        auto* torrent_file = tr_strdup_printf("%s.torrent", input_file.data());
-        tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate, source);
+        auto const torrent_file = tr_strvJoin(input_file, ".torrent");
+        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, trackerCount, comment, isPrivate, source);
         EXPECT_EQ(isPrivate, builder->isPrivate);
-        EXPECT_STREQ(torrent_file, builder->outputFile);
+        EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
         EXPECT_STREQ(source, builder->source);
         EXPECT_EQ(trackerCount, builder->trackerCount);
@@ -69,7 +71,7 @@ protected:
         // now let's check our work: parse the  .torrent file
         auto* ctor = tr_ctorNew(nullptr);
         sync();
-        tr_ctorSetMetainfoFromFile(ctor, torrent_file);
+        tr_ctorSetMetainfoFromFile(ctor, torrent_file.c_str());
         auto const parse_result = tr_torrentParse(ctor, &inf);
         EXPECT_EQ(TR_PARSE_OK, parse_result);
 
@@ -83,7 +85,6 @@ protected:
         EXPECT_EQ(trackerCount, inf.trackerCount);
 
         // cleanup
-        tr_free(torrent_file);
         tr_ctorFree(ctor);
         tr_metaInfoBuilderFree(builder);
     }
@@ -99,9 +100,9 @@ protected:
         char const* source)
     {
         // create the top temp directory
-        auto* top = tr_buildPath(sandboxDir().data(), "folder.XXXXXX", nullptr);
-        tr_sys_path_native_separators(top);
-        tr_sys_dir_create_temp(top, nullptr);
+        auto top = tr_strvPath(sandboxDir(), "folder.XXXXXX");
+        tr_sys_path_native_separators(std::data(top));
+        tr_sys_dir_create_temp(std::data(top), nullptr);
 
         // build the payload files that go into the top temp directory
         auto files = std::vector<std::string>{};
@@ -112,9 +113,9 @@ protected:
         {
             auto tmpl = std::array<char, 16>{};
             tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
-            auto path = makeString(tr_buildPath(top, tmpl.data(), nullptr));
+            auto path = tr_strvPath(top, std::data(tmpl));
             createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
-            tr_sys_path_native_separators(&path.front());
+            tr_sys_path_native_separators(std::data(path));
             files.push_back(path);
             total_size += payload_sizes[i];
         }
@@ -122,9 +123,9 @@ protected:
         sync();
 
         // init the builder
-        auto* builder = tr_metaInfoBuilderCreate(top);
+        auto* builder = tr_metaInfoBuilderCreate(top.c_str());
         EXPECT_FALSE(builder->abortFlag);
-        EXPECT_STREQ(top, builder->top);
+        EXPECT_EQ(top, builder->top);
         EXPECT_EQ(payload_count, builder->fileCount);
         EXPECT_EQ(total_size, builder->totalSize);
         EXPECT_TRUE(builder->isFolder);
@@ -136,10 +137,10 @@ protected:
         }
 
         // build the .torrent file
-        auto* torrent_file = tr_strdup_printf("%s.torrent", top);
-        tr_makeMetaInfo(builder, torrent_file, trackers, tracker_count, comment, is_private, source);
+        auto torrent_file = tr_strvJoin(top, ".torrent"sv);
+        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, tracker_count, comment, is_private, source);
         EXPECT_EQ(is_private, builder->isPrivate);
-        EXPECT_STREQ(torrent_file, builder->outputFile);
+        EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
         EXPECT_STREQ(source, builder->source);
         EXPECT_EQ(tracker_count, builder->trackerCount);
@@ -152,14 +153,14 @@ protected:
 
         // now let's check our work: parse the  .torrent file
         auto* ctor = tr_ctorNew(nullptr);
-        tr_ctorSetMetainfoFromFile(ctor, torrent_file);
+        tr_ctorSetMetainfoFromFile(ctor, torrent_file.c_str());
         auto inf = tr_info{};
         auto parse_result = tr_torrentParse(ctor, &inf);
         EXPECT_EQ(TR_PARSE_OK, parse_result);
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(total_size, inf.totalSize);
-        auto* tmpstr = tr_sys_path_basename(top, nullptr);
+        auto* tmpstr = tr_sys_path_basename(top.c_str(), nullptr);
         EXPECT_STREQ(tmpstr, inf.name);
         tr_free(tmpstr);
         EXPECT_STREQ(comment, inf.comment);
@@ -170,12 +171,9 @@ protected:
         EXPECT_EQ(tracker_count, inf.trackerCount);
 
         // cleanup
-        tr_free(torrent_file);
         tr_ctorFree(ctor);
         tr_metainfoFree(&inf);
         tr_metaInfoBuilderFree(builder);
-
-        tr_free(top);
     }
 
     void testSingleDirectoryRandomPayloadImpl(

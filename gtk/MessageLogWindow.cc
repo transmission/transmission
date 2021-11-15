@@ -16,6 +16,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 
+#include "Actions.h"
 #include "HigWorkarea.h"
 #include "MessageLogWindow.h"
 #include "Prefs.h"
@@ -461,27 +462,33 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     toolbar->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(Gtk::StockID("document-save-as"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("document-save-as", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("Save _As"));
         item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(this, &Impl::onSaveRequest));
+        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onSaveRequest));
         toolbar->insert(*item, -1);
     }
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToolButton>(Gtk::StockID("edit-clear"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("edit-clear", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("Clear"));
         item->set_use_underline(true);
-        item->signal_clicked().connect(sigc::mem_fun(this, &Impl::onClearRequest));
+        item->signal_clicked().connect(sigc::mem_fun(*this, &Impl::onClearRequest));
         toolbar->insert(*item, -1);
     }
 
     toolbar->insert(*Gtk::make_managed<Gtk::SeparatorToolItem>(), -1);
 
     {
-        auto* item = Gtk::make_managed<Gtk::ToggleToolButton>(Gtk::StockID("media-playback-pause"));
+        auto* icon = Gtk::make_managed<Gtk::Image>();
+        icon->set_from_icon_name("media-playback-pause", Gtk::BuiltinIconSize::ICON_SIZE_SMALL_TOOLBAR);
+        auto* item = Gtk::make_managed<Gtk::ToggleToolButton>(*icon);
         item->set_is_important(true);
         item->set_label(_("P_ause"));
         item->set_use_underline(true);
@@ -522,7 +529,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     sort_ = Gtk::TreeModelSort::create(filter_);
     sort_->set_sort_column(message_log_cols.sequence, Gtk::SORT_ASCENDING);
     maxLevel_ = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
-    filter_->set_visible_func(sigc::mem_fun(this, &Impl::isRowVisible));
+    filter_->set_visible_func(sigc::mem_fun(*this, &Impl::isRowVisible));
 
     view_ = Gtk::make_managed<Gtk::TreeView>(sort_);
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
@@ -538,9 +545,21 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     window_.add(*vbox);
 
     refresh_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::onRefresh),
+        sigc::mem_fun(*this, &Impl::onRefresh),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();
-    window_.show_all();
+    window_.show_all_children();
+}
+
+void MessageLogWindow::on_show()
+{
+    Gtk::Window::on_show();
+    gtr_action_set_toggled("toggle-message-log", true);
+}
+
+void MessageLogWindow::on_hide()
+{
+    Gtk::Window::on_hide();
+    gtr_action_set_toggled("toggle-message-log", false);
 }

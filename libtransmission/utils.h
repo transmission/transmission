@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <cinttypes>
 #include <cstdarg>
 #include <cstddef>
@@ -18,6 +20,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "platform-quota.h"
 #include "tr-macros.h"
 
 /***
@@ -27,10 +30,7 @@
 struct evbuffer;
 struct event;
 struct timeval;
-
 struct tr_error;
-
-struct tr_disk_space;
 
 /**
  * @addtogroup utils Utilities
@@ -100,7 +100,7 @@ std::string& tr_buildBuf(std::string& setme, T... args)
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-struct tr_disk_space tr_getDirSpace(char const* path);
+tr_disk_space tr_dirSpace(std::string_view path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
@@ -253,9 +253,51 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 /** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
 char const* tr_strcasestr(char const* haystack, char const* needle);
 
+template<typename T>
+std::string tr_strlower(T in)
+{
+    auto out = std::string{ in };
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
+    return out;
+}
+
 /***
 ****  std::string_view utils
 ***/
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string tr_strvPath(T... args)
+{
+    auto setme = std::string{};
+    auto const n_args = sizeof...(args);
+    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+
+    auto const foo = [&setme](std::string_view a)
+    {
+        setme += a;
+        setme += TR_PATH_DELIMITER;
+    };
+    (foo(args), ...);
+    setme.resize(setme.size() - 1);
+    return setme;
+}
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string tr_strvJoin(T... args)
+{
+    auto setme = std::string{};
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
 
 template<typename T>
 constexpr bool tr_strvContains(std::string_view sv, T key) // c++23

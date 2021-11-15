@@ -181,8 +181,8 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core)
     gtr_dialog_set_content(dialog_, *t);
 
     updateStats();
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::dialogResponse));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::dialogResponse));
     update_stats_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::updateStats),
+        sigc::mem_fun(*this, &Impl::updateStats),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 }

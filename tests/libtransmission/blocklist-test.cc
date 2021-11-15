@@ -75,7 +75,7 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr));
+    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -111,7 +111,7 @@ TEST_F(BlocklistTest, parsing)
 TEST_F(BlocklistTest, updating)
 {
     // init the session
-    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
+    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
 
     // no blocklist to start with...
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
@@ -137,7 +137,6 @@ TEST_F(BlocklistTest, updating)
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
     // cleanup
-    tr_free(path);
 }
 
 } // namespace test

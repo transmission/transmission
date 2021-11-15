@@ -1238,7 +1238,7 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
-    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "transmission-lock" : "";
+    (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = key;
     (*iter)[peer_cols.torrent_name] = torrentName;
 }
@@ -1653,7 +1653,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             r->property_xalign() = 0.0F;
             r->property_yalign() = 0.5F;
             c = Gtk::make_managed<Gtk::TreeViewColumn>(Glib::ustring(), *r);
-            c->add_attribute(r->property_stock_id(), *col);
+            c->add_attribute(r->property_icon_name(), *col);
             c->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
             c->set_fixed_width(20);
         }
@@ -1794,10 +1794,9 @@ Gtk::Widget* DetailsDialog::Impl::peer_page_new()
     auto m = Gtk::TreeModelSort::create(peer_store_);
     m->set_sort_column(peer_cols.progress, Gtk::SORT_DESCENDING);
     peer_view_ = Gtk::make_managed<Gtk::TreeView>(m);
-    peer_view_->set_rules_hint(true);
     peer_view_->set_has_tooltip(true);
 
-    peer_view_->signal_query_tooltip().connect(sigc::mem_fun(this, &Impl::onPeerViewQueryTooltip));
+    peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip));
     peer_view_->signal_button_release_event().connect([this](GdkEventButton* event)
                                                       { return on_tree_view_button_released(peer_view_, event); });
 
@@ -1818,7 +1817,7 @@ Gtk::Widget* DetailsDialog::Impl::peer_page_new()
 
     more_peer_details_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _more details"), true);
     more_peer_details_check_->set_active(gtr_pref_flag_get(TR_KEY_show_extra_peer_details));
-    more_peer_details_check_->signal_toggled().connect(sigc::mem_fun(this, &Impl::onMorePeerInfoToggled));
+    more_peer_details_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onMorePeerInfoToggled));
     vbox->pack_start(*more_peer_details_check_, false, false);
 
     return vbox;
@@ -2461,7 +2460,7 @@ Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
     tracker_store_ = Gtk::ListStore::create(tracker_cols);
 
     trackers_filtered_ = Gtk::TreeModelFilter::create(tracker_store_);
-    trackers_filtered_->set_visible_func(sigc::mem_fun(this, &Impl::trackerVisibleFunc));
+    trackers_filtered_->set_visible_func(sigc::mem_fun(*this, &Impl::trackerVisibleFunc));
 
     auto* hbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
 
@@ -2473,7 +2472,7 @@ Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
                                                          { return on_tree_view_button_released(tracker_view_, event); });
 
     auto sel = tracker_view_->get_selection();
-    sel->signal_changed().connect(sigc::mem_fun(this, &Impl::on_tracker_list_selection_changed));
+    sel->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_selection_changed));
 
     auto* c = Gtk::make_managed<Gtk::TreeViewColumn>();
     c->set_title(_("Trackers"));
@@ -2510,15 +2509,15 @@ Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
     auto* v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, GUI_PAD);
 
     add_tracker_button_ = Gtk::make_managed<Gtk::Button>(_("_Add"), true);
-    add_tracker_button_->signal_clicked().connect(sigc::mem_fun(this, &Impl::on_tracker_list_add_button_clicked));
+    add_tracker_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_add_button_clicked));
     v->pack_start(*add_tracker_button_, false, false);
 
     edit_trackers_button_ = Gtk::make_managed<Gtk::Button>(_("_Edit"), true);
-    edit_trackers_button_->signal_clicked().connect(sigc::mem_fun(this, &Impl::on_edit_trackers));
+    edit_trackers_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_edit_trackers));
     v->pack_start(*edit_trackers_button_, false, false);
 
     remove_tracker_button_ = Gtk::make_managed<Gtk::Button>(_("_Remove"), true);
-    remove_tracker_button_->signal_clicked().connect(sigc::mem_fun(this, &Impl::on_tracker_list_remove_button_clicked));
+    remove_tracker_button_->signal_clicked().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_remove_button_clicked));
     v->pack_start(*remove_tracker_button_, false, false);
 
     hbox->pack_start(*v, false, false);
@@ -2527,12 +2526,12 @@ Gtk::Widget* DetailsDialog::Impl::tracker_page_new()
 
     scrape_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _more details"), true);
     scrape_check_->set_active(gtr_pref_flag_get(TR_KEY_show_tracker_scrapes));
-    scrape_check_->signal_toggled().connect(sigc::mem_fun(this, &Impl::onScrapeToggled));
+    scrape_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onScrapeToggled));
     vbox->pack_start(*scrape_check_, false, false);
 
     all_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Show _backup trackers"), true);
     all_check_->set_active(gtr_pref_flag_get(TR_KEY_show_backup_trackers));
-    all_check_->signal_toggled().connect(sigc::mem_fun(this, &Impl::onBackupToggled));
+    all_check_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::onBackupToggled));
     vbox->pack_start(*all_check_, false, false);
 
     return vbox;
@@ -2594,7 +2593,7 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& co
 
     /* return saved window size */
     dialog_.resize((int)gtr_pref_int_get(TR_KEY_details_window_width), (int)gtr_pref_int_get(TR_KEY_details_window_height));
-    dialog_.signal_size_allocate().connect(sigc::mem_fun(this, &Impl::on_details_window_size_allocated));
+    dialog_.signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_details_window_size_allocated));
 
     dialog_.signal_response().connect(sigc::hide<0>(sigc::mem_fun(dialog_, &DetailsDialog::hide)));
     dialog_.set_border_width(GUI_PAD);

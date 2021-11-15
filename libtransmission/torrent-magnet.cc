@@ -43,8 +43,8 @@ struct metadata_node
 
 struct tr_incomplete_metadata
 {
-    uint8_t* metadata;
-    int metadata_size;
+    char* metadata;
+    size_t metadata_size;
     int pieceCount;
 
     /** sorted from least to most recently requested */
@@ -88,7 +88,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     }
 
     m->pieceCount = n;
-    m->metadata = tr_new(uint8_t, size);
+    m->metadata = tr_new(char, size);
     m->metadata_size = size;
     m->piecesNeededCount = n;
     m->piecesNeeded = tr_new(struct metadata_node, n);
@@ -119,7 +119,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
     if (fileContents != nullptr)
     {
         auto top = tr_variant{};
-        if (tr_variantFromBenc(&top, fileContents, fileLen) == 0)
+        if (tr_variantFromBenc(&top, std::string_view{ reinterpret_cast<char const*>(fileContents), fileLen }) == 0)
         {
             tr_variant* infoDict = nullptr;
             if (tr_variantDictFindDict(&top, TR_KEY_info, &infoDict))
@@ -277,7 +277,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         {
             /* checksum passed; now try to parse it as benc */
             tr_variant infoDict;
-            int const err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
+            auto metadata_sv = std::string_view{ m->metadata, m->metadata_size };
+            int const err = tr_variantFromBenc(&infoDict, metadata_sv);
             dbgmsg(tor, "err is %d", err);
 
             metainfoParsed = err == 0;
@@ -296,23 +297,18 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     dbgmsg(tor, "Saving completed metadata to \"%s\"", path);
                     tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
 
-                    auto hasInfo = bool{};
-                    auto info = tr_info{};
-                    auto infoDictLength = size_t{};
-                    success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
-
-                    if (success && tr_getBlockSize(info.pieceSize) == 0)
+                    auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
+                    if (info && tr_getBlockSize(info->info.pieceSize) == 0)
                     {
                         tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
-                        tr_metainfoFree(&info);
                         success = false;
                     }
 
                     if (success)
                     {
                         /* keep the new info */
-                        tor->info = info;
-                        tor->infoDictLength = infoDictLength;
+                        std::swap(tor->info, info->info);
+                        std::swap(tor->infoDictLength, info->info_dict_length);
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);

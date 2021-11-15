@@ -24,6 +24,9 @@ public:
 protected:
     MessageLogWindow(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
+    void on_show() override;
+    void on_hide() override;
+
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;

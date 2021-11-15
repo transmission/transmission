@@ -23,7 +23,7 @@
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_buildPath */
+#include "utils.h"
 #include "variant.h"
 
 using namespace std::literals;

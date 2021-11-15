@@ -176,13 +176,12 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     {
         // In 'table' format, the first entry in 'torrents' is an array of keys.
         // All the other entries are an array of the values for one torrent.
-        char const* str;
-        size_t len;
+        auto sv = std::string_view{};
         size_t i = 0;
         keys.reserve(tr_variantListSize(first_child));
-        while (tr_variantGetStr(tr_variantListChild(first_child, i++), &str, &len))
+        while (tr_variantGetStrView(tr_variantListChild(first_child, i++), &sv))
         {
-            keys.push_back(tr_quark_new(std::string_view(str, len)));
+            keys.push_back(tr_quark_new(sv));
         }
     }
     else if (first_child != nullptr)

@@ -237,12 +237,6 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* downloadDir);
 char const* tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
- * @brief Get available disk space (in bytes) for the specified directory.
- * @return zero or positive integer on success, -1 in case of error.
- */
-int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir);
-
-/**
  * @brief Set the torrent's bandwidth priority.
  */
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
@@ -363,7 +357,8 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password);
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username);
 
-/** @brief get the password used to restrict RPC requests.
+// TODO(ckerr): rename function to indicate it returns the salted value
+/** @brief get the salted version of the password used to restrict RPC requests.
     @return the password string.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPassword() */
@@ -1612,7 +1607,6 @@ struct tr_info
     char* source;
 
     tr_file* files;
-    tr_sha1_digest_t* pieces;
 
     /* these trackers are sorted by tier */
     tr_tracker_info* trackers;

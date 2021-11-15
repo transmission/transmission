@@ -20,6 +20,8 @@
 #include <string>
 #include <unordered_set>
 
+using namespace std::literals;
+
 TEST(Crypto, torrentHash)
 {
     auto a = tr_crypto{};
@@ -124,43 +126,41 @@ TEST(Crypto, ssha1)
 {
     struct LocalTest
     {
-        char const* const plain_text;
-        char const* const ssha1;
+        std::string_view plain_text;
+        std::string_view ssha1;
     };
 
-    auto const tests = std::array<LocalTest, 2>{
-        LocalTest{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
-        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" },
-    };
+    auto constexpr Tests = std::array<LocalTest, 2>{ {
+        { "test"sv, "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
+        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv, "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
+    } };
 
     auto constexpr HashCount = size_t{ 4 * 1024 };
 
-    for (auto const& test : tests)
+    for (auto const& [plain_text, ssha1] : Tests)
     {
-        std::unordered_set<std::string> hashes;
+        auto hashes = std::unordered_set<std::string>{};
         hashes.reserve(HashCount);
 
-        char* const phrase = tr_strdup(test.plain_text);
-        EXPECT_TRUE(tr_ssha1_matches(test.ssha1, phrase));
-        EXPECT_TRUE(tr_ssha1_matches_(test.ssha1, phrase));
+        EXPECT_TRUE(tr_ssha1_matches(ssha1, plain_text));
+        EXPECT_TRUE(tr_ssha1_matches_(ssha1, plain_text));
 
         for (size_t j = 0; j < HashCount; ++j)
         {
-            char* hash = (j % 2 == 0) ? tr_ssha1(phrase) : tr_ssha1_(phrase);
-            EXPECT_NE(nullptr, hash);
+            auto const hash = (j % 2 == 0) ? tr_ssha1(plain_text) : tr_ssha1_(plain_text);
 
             // phrase matches each of generated hashes
-            EXPECT_TRUE(tr_ssha1_matches(hash, phrase));
-            EXPECT_TRUE(tr_ssha1_matches_(hash, phrase));
+            EXPECT_TRUE(tr_ssha1_matches(hash, plain_text));
+            EXPECT_TRUE(tr_ssha1_matches_(hash, plain_text));
 
             hashes.insert(hash);
-            tr_free(hash);
         }
 
         // confirm all hashes are different
         EXPECT_EQ(HashCount, hashes.size());
 
         /* exchange two first chars */
+        auto phrase = std::string{ plain_text };
         phrase[0] ^= phrase[1];
         phrase[1] ^= phrase[0];
         phrase[0] ^= phrase[1];
@@ -168,11 +168,9 @@ TEST(Crypto, ssha1)
         for (auto const& hash : hashes)
         {
             /* changed phrase doesn't match the hashes */
-            EXPECT_FALSE(tr_ssha1_matches(hash.c_str(), phrase));
-            EXPECT_FALSE(tr_ssha1_matches_(hash.c_str(), phrase));
+            EXPECT_FALSE(tr_ssha1_matches(hash, phrase));
+            EXPECT_FALSE(tr_ssha1_matches_(hash, phrase));
         }
-
-        tr_free(phrase);
     }
 
     /* should work with different salt lengths as well */

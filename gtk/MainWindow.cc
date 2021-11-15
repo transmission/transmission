@@ -40,7 +40,7 @@
 class MainWindow::Impl
 {
 public:
-    Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<Session> const& core);
+    Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
@@ -56,6 +56,8 @@ private:
     Gtk::Menu* createSpeedMenu(tr_direction dir);
     Gtk::Menu* createRatioMenu();
 
+    void on_popup_menu(GdkEventButton* event);
+
     void onSpeedToggled(Gtk::CheckMenuItem* check, tr_direction dir, bool enabled);
     void onSpeedSet(tr_direction dir, int KBps);
 
@@ -67,7 +69,6 @@ private:
 
     void syncAltSpeedButton();
 
-    bool onAskTrackerQueryTooltip(int x, int y, bool keyboard_tip, Glib::RefPtr<Gtk::Tooltip> tooltip);
     void status_menu_toggled_cb(Gtk::CheckMenuItem* menu_item, std::string const& val);
     void onOptionsClicked(Gtk::Button* button);
     void onYinYangClicked(Gtk::Button* button);
@@ -75,6 +76,8 @@ private:
     void onAltSpeedToggledIdle();
 
 private:
+    MainWindow& window_;
+
     Gtk::RadioMenuItem* speedlimit_on_item_[2] = { nullptr, nullptr };
     Gtk::RadioMenuItem* speedlimit_off_item_[2] = { nullptr, nullptr };
     Gtk::RadioMenuItem* ratio_on_item_ = nullptr;
@@ -96,20 +99,26 @@ private:
     Gtk::TreeViewColumn* column_ = nullptr;
     Glib::RefPtr<Session> const core_;
     sigc::connection pref_handler_id_;
+    Gtk::Menu* popup_menu_ = nullptr;
 };
 
 /***
 ****
 ***/
 
+void MainWindow::Impl::on_popup_menu(GdkEventButton* event)
+{
+    if (popup_menu_ == nullptr)
+    {
+        popup_menu_ = Gtk::make_managed<Gtk::Menu>(gtr_action_get_object<Gio::Menu>("main-window-popup"));
+        popup_menu_->attach_to_widget(window_);
+    }
+
+    popup_menu_->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
+}
+
 namespace
 {
-
-void on_popup_menu(GdkEventButton* event)
-{
-    auto* menu = gtr_action_get_widget<Gtk::Menu>("/main-window-popup");
-    menu->popup_at_pointer(reinterpret_cast<GdkEvent*>(event));
-}
 
 bool tree_view_search_equal_func(
     Glib::RefPtr<Gtk::TreeModel> const& /*model*/,
@@ -150,9 +159,10 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
 
     selection_->set_mode(Gtk::SELECTION_MULTIPLE);
 
-    view->signal_popup_menu().connect_notify([]() { on_popup_menu(nullptr); });
+    view->signal_popup_menu().connect_notify([this]() { on_popup_menu(nullptr); });
     view->signal_button_press_event().connect(
-        [view](GdkEventButton* event) { return on_tree_view_button_pressed(view, event, &on_popup_menu); },
+        [this, view](GdkEventButton* event)
+        { return on_tree_view_button_pressed(view, event, sigc::mem_fun(*this, &Impl::on_popup_menu)); },
         false);
     view->signal_button_release_event().connect([view](GdkEventButton* event)
                                                 { return on_tree_view_button_released(view, event); });
@@ -235,7 +245,7 @@ void MainWindow::Impl::syncAltSpeedButton()
                          gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
 
     alt_speed_button_->set_active(b);
-    alt_speed_image_->set(Gtk::StockID(stock), Gtk::IconSize(-1));
+    alt_speed_image_->set_from_icon_name(stock, Gtk::BuiltinIconSize::ICON_SIZE_MENU);
     alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_tooltip_text(str);
@@ -249,35 +259,6 @@ void MainWindow::Impl::alt_speed_toggled_cb()
 /***
 ****  FILTER
 ***/
-
-bool MainWindow::Impl::onAskTrackerQueryTooltip(int /*x*/, int /*y*/, bool /*keyboard_tip*/, Glib::RefPtr<Gtk::Tooltip> tooltip)
-{
-    bool handled;
-    time_t maxTime = 0;
-    time_t const now = time(nullptr);
-
-    selection_->selected_foreach(
-        [&maxTime](auto const& /*path*/, auto const& iter)
-        {
-            auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
-            auto const* torStat = tr_torrentStatCached(tor);
-            maxTime = std::max(maxTime, torStat->manualAnnounceTime);
-        });
-
-    if (maxTime <= now)
-    {
-        handled = false;
-    }
-    else
-    {
-        time_t const seconds = maxTime - now;
-
-        tooltip->set_text(gtr_sprintf(_("Tracker will allow requests in %s"), tr_strltime(seconds)));
-        handled = true;
-    }
-
-    return handled;
-}
 
 void MainWindow::Impl::onAltSpeedToggledIdle()
 {
@@ -435,23 +416,24 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 
 std::unique_ptr<MainWindow> MainWindow::create(
     Gtk::Application& app,
-    Glib::RefPtr<Gtk::UIManager> const& uim,
+    Glib::RefPtr<Gio::ActionGroup> const& actions,
     Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<MainWindow>(new MainWindow(app, uim, core));
+    return std::unique_ptr<MainWindow>(new MainWindow(app, actions, core));
 }
 
-MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<Session> const& core)
+MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
     : Gtk::ApplicationWindow()
-    , impl_(std::make_unique<Impl>(*this, ui_mgr, core))
+    , impl_(std::make_unique<Impl>(*this, actions, core))
 {
     app.add_window(*this);
 }
 
 MainWindow::~MainWindow() = default;
 
-MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& ui_mgr, Glib::RefPtr<Session> const& core)
-    : core_(core)
+MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
+    : window_(window)
+    , core_(core)
 {
     static struct
     {
@@ -475,7 +457,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
         window.maximize();
     }
 
-    window.add_accel_group(ui_mgr->get_accel_group());
+    window.insert_action_group("win", actions);
     /* Add style provider to the window. */
     /* Please move it to separate .css file if you’re adding more styles here. */
     auto const* style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
@@ -490,17 +472,9 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     auto* vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 0);
     window.add(*vbox);
 
-    /* main menu */
-    auto* mainmenu = gtr_action_get_widget<Gtk::MenuBar>("/main-window-menu");
-    gtr_action_get_widget<Gtk::MenuItem>("/main-window-menu/torrent-menu/torrent-reannounce")
-        ->signal_query_tooltip()
-        .connect(sigc::mem_fun(this, &Impl::onAskTrackerQueryTooltip));
-
     /* toolbar */
-    toolbar_ = gtr_action_get_widget<Gtk::Toolbar>("/main-window-toolbar");
+    toolbar_ = gtr_action_get_widget<Gtk::Toolbar>("main-window-toolbar");
     toolbar_->get_style_context()->add_class(GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
-    gtr_action_set_important("open-torrent-toolbar", true);
-    gtr_action_set_important("show-torrent-properties", true);
 
     /* filter */
     filter_ = Gtk::make_managed<FilterBar>(core_->get_session(), core_->get_model());
@@ -542,7 +516,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     alt_speed_button_ = Gtk::make_managed<Gtk::ToggleButton>();
     alt_speed_button_->set_image(*alt_speed_image_);
     alt_speed_button_->set_relief(Gtk::RELIEF_NONE);
-    alt_speed_button_->signal_toggled().connect(sigc::mem_fun(this, &Impl::alt_speed_toggled_cb));
+    alt_speed_button_->signal_toggled().connect(sigc::mem_fun(*this, &Impl::alt_speed_toggled_cb));
     status_->add(*alt_speed_button_);
 
     /* spacer */
@@ -557,13 +531,13 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
 
     /* upload */
     ul_lb_ = Gtk::make_managed<Gtk::Label>();
-    ul_lb_->set_margin_left(GUI_PAD);
+    ul_lb_->set_margin_start(GUI_PAD);
     ul_lb_->set_single_line_mode(true);
     status_->add(*ul_lb_);
 
     /* ratio */
     stats_lb_ = Gtk::make_managed<Gtk::Label>();
-    stats_lb_->set_margin_left(GUI_PAD_BIG);
+    stats_lb_->set_margin_start(GUI_PAD_BIG);
     stats_lb_->set_single_line_mode(true);
     status_->add(*stats_lb_);
 
@@ -587,7 +561,6 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     scroll_->add(*view_);
 
     /* lay out the widgets */
-    vbox->pack_start(*mainmenu, false, false);
     vbox->pack_start(*toolbar_, false, false);
     vbox->pack_start(*filter_, false, false);
     vbox->pack_start(*scroll_, true, true);
@@ -617,7 +590,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gtk::UIManager> const& u
     prefsChanged(TR_KEY_statusbar_stats);
     prefsChanged(TR_KEY_show_toolbar);
     prefsChanged(TR_KEY_alt_speed_enabled);
-    pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::prefsChanged));
+    pref_handler_id_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::prefsChanged));
 
     tr_sessionSetAltSpeedFunc(
         core_->get_session(),

@@ -23,6 +23,8 @@
 #include "session-id.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 #define SESSION_ID_SIZE 48
 #define SESSION_ID_DURATION_SEC (60 * 60) /* expire in an hour */
 
@@ -54,12 +56,9 @@ static char* generate_new_session_id_value(void)
     return buf;
 }
 
-static char* get_session_id_lock_file_path(char const* session_id)
+static std::string get_session_id_lock_file_path(std::string_view session_id)
 {
-    char* lock_file_dir = tr_getSessionIdDir();
-    char* lock_file_path = tr_strdup_printf("%s/tr_session_id_%s", lock_file_dir, session_id);
-    tr_free(lock_file_dir);
-    return lock_file_path;
+    return tr_strvJoin(tr_getSessionIdDir(), TR_PATH_DELIMITER_STR, "tr_session_id_"sv, session_id);
 }
 
 static tr_sys_file_t create_session_id_lock_file(char const* session_id)
@@ -69,9 +68,13 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
         return TR_BAD_SYS_FILE;
     }
 
-    char* lock_file_path = get_session_id_lock_file_path(session_id);
+    auto const lock_file_path = get_session_id_lock_file_path(session_id);
     tr_error* error = nullptr;
-    auto lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
+    auto lock_file = tr_sys_file_open(
+        lock_file_path.c_str(),
+        TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE,
+        0600,
+        &error);
 
     if (lock_file != TR_BAD_SYS_FILE)
     {
@@ -95,7 +98,6 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
         tr_error_free(error);
     }
 
-    tr_free(lock_file_path);
     return lock_file;
 }
 
@@ -108,9 +110,8 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
 
     if (session_id != nullptr)
     {
-        char* lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_path_remove(lock_file_path, nullptr);
-        tr_free(lock_file_path);
+        auto const lock_file_path = get_session_id_lock_file_path(session_id);
+        tr_sys_path_remove(lock_file_path.c_str(), nullptr);
     }
 }
 
@@ -167,9 +168,9 @@ bool tr_session_id_is_local(char const* session_id)
 
     if (session_id != nullptr)
     {
-        char* lock_file_path = get_session_id_lock_file_path(session_id);
+        auto const lock_file_path = get_session_id_lock_file_path(session_id);
         tr_error* error = nullptr;
-        auto lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ, 0, &error);
+        auto lock_file = tr_sys_file_open(lock_file_path.c_str(), TR_SYS_FILE_READ, 0, &error);
 
         if (lock_file == TR_BAD_SYS_FILE)
         {
@@ -199,8 +200,6 @@ bool tr_session_id_is_local(char const* session_id)
             tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
             tr_error_free(error);
         }
-
-        tr_free(lock_file_path);
     }
 
     return ret;

@@ -105,9 +105,9 @@ protected:
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        std::string path = makeString(tr_buildPath(parent_dir.data(), tmpl.data(), nullptr));
-        tr_sys_dir_create_temp(&path.front(), nullptr);
-        tr_sys_path_native_separators(&path.front());
+        auto path = tr_strvPath(parent_dir, tmpl);
+        tr_sys_dir_create_temp(std::data(path), nullptr);
+        tr_sys_path_native_separators(std::data(path));
         return path;
     }
 
@@ -126,7 +126,7 @@ protected:
                 {
                     if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
                     {
-                        ret.push_back(makeString(tr_buildPath(path.data(), name, nullptr)));
+                        ret.push_back(tr_strvPath(path, name));
                     }
                 }
 
@@ -300,24 +300,21 @@ private:
         ensureFormattersInited();
 
         // download dir
-        size_t len;
-        char const* str;
+        auto sv = std::string_view{};
         auto q = TR_KEY_download_dir;
-        auto const download_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), TR_ARG_TUPLE((int)len, (int)len, str))) :
-            makeString(tr_buildPath(sandboxDir().data(), "Downloads", nullptr));
+        auto const download_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
+                                                                                tr_strvPath(sandboxDir(), "Downloads");
         tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
         tr_variantDictAddStr(settings, q, download_dir.data());
 
         // incomplete dir
         q = TR_KEY_incomplete_dir;
-        auto const incomplete_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), TR_ARG_TUPLE((int)len, (int)len, str))) :
-            makeString(tr_buildPath(sandboxDir().data(), "Incomplete", nullptr));
+        auto const incomplete_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
+                                                                                  tr_strvPath(sandboxDir(), "Incomplete");
         tr_variantDictAddStr(settings, q, incomplete_dir.data());
 
         // blocklists
-        auto const blocklist_dir = makeString(tr_buildPath(sandboxDir().data(), "blocklists", nullptr));
+        auto const blocklist_dir = tr_strvPath(sandboxDir(), "blocklists");
         tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
 
         // fill in any missing settings

@@ -91,23 +91,21 @@ static int readOrWriteBytes(
         if (err == 0)
         {
             /* open (and maybe create) the file */
-            char* filename = tr_buildPath(base, subpath, nullptr);
+            auto const filename = tr_strvPath(base, subpath);
             tr_preallocation_mode const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE :
                                                                              tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc, file->length);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file->length);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
-                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror(err));
+                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
             }
             else if (doWrite)
             {
                 /* make a note that we just created a file */
                 tr_statsFileCreated(tor->session);
             }
-
-            tr_free(filename);
         }
 
         tr_free(subpath);
@@ -230,9 +228,8 @@ static int readOrWritePiece(
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
-            char* path = tr_buildPath(tor->downloadDir, file->name, nullptr);
-            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path);
-            tr_free(path);
+            auto const path = tr_strvPath(tor->downloadDir, file->name);
+            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path.c_str());
         }
     }
 
@@ -290,5 +287,5 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
 {
     auto const hash = recalculateHash(tor, piece);
-    return hash && *hash == tor->info.pieces[piece];
+    return hash && *hash == tor->pieceHash(piece);
 }

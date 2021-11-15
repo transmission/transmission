@@ -198,6 +198,16 @@ inline T* gtr_get_ptr(Glib::RefPtr<T> const& ptr)
 #endif
 }
 
+template<typename T, typename U>
+inline Glib::RefPtr<T> gtr_ptr_static_cast(Glib::RefPtr<U> const& ptr)
+{
+#if G_ENCODE_VERSION(GLIBMM_MAJOR_VERSION, GLIBMM_MINOR_VERSION) < G_ENCODE_VERSION(2, 68)
+    return Glib::RefPtr<T>::cast_static(ptr);
+#else
+    return std::static_pointer_cast<T>(ptr);
+#endif
+}
+
 template<>
 struct std::hash<Glib::ustring>
 {
