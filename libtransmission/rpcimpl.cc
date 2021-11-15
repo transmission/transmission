@@ -1694,14 +1694,11 @@ static void gotMetadataFromURL(
     tr_free(data);
 }
 
-static bool isCurlURL(char const* filename)
+static bool isCurlURL(std::string_view url)
 {
-    if (filename == nullptr)
-    {
-        return false;
-    }
-
-    return strncmp(filename, "ftp://", 6) == 0 || strncmp(filename, "http://", 7) == 0 || strncmp(filename, "https://", 8) == 0;
+    auto constexpr Schemes = std::array<std::string_view, 4>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv };
+    auto const parsed = tr_urlParse(url);
+    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
 
 static auto fileListFromList(tr_variant* list)
@@ -1727,13 +1724,13 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 {
     TR_ASSERT(idle_data != nullptr);
 
-    char const* filename = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, nullptr);
+    auto filename = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_filename, &filename);
 
-    char const* metainfo_base64 = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, nullptr);
+    auto metainfo_base64 = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_metainfo, &metainfo_base64);
 
-    if (filename == nullptr && metainfo_base64 == nullptr)
+    if (std::empty(filename) && std::empty(metainfo_base64))
     {
         return "no filename or metainfo specified";
     }
@@ -1805,38 +1802,38 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_HIGH);
     }
 
-    dbgmsg("torrentAdd: filename is \"%s\"", filename ? filename : " (null)");
+    dbgmsg("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
 
     if (isCurlURL(filename))
     {
-        struct add_torrent_idle_data* d = tr_new0(struct add_torrent_idle_data, 1);
+        auto* const d = tr_new0(struct add_torrent_idle_data, 1);
         d->data = idle_data;
         d->ctor = ctor;
         tr_webRunWithCookies(session, filename, cookies, gotMetadataFromURL, d);
     }
     else
     {
-        char* fname = tr_strdup(filename);
-
-        if (fname == nullptr)
+        if (std::empty(filename))
         {
-            auto len = size_t{};
-            auto* const metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &len));
-            tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, len);
-            tr_free(metainfo);
-        }
-        else if (strncmp(fname, "magnet:?", 8) == 0)
-        {
-            tr_ctorSetMetainfoFromMagnetLink(ctor, fname);
+            std::string const metainfo = tr_base64_decode_str(metainfo_base64);
+            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo));
         }
         else
         {
-            tr_ctorSetMetainfoFromFile(ctor, fname);
+            // these two tr_ctorSet*() functions require zero-terminated strings
+            auto const filename_str = std::string{ filename };
+
+            if (tr_strvStartsWith(filename, "magnet:?"sv))
+            {
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_str.c_str());
+            }
+            else
+            {
+                tr_ctorSetMetainfoFromFile(ctor, filename_str.c_str());
+            }
         }
 
         addTorrentImpl(idle_data, ctor);
-
-        tr_free(fname);
     }
 
     return nullptr;

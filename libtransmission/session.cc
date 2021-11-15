@@ -941,8 +941,8 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &strVal, nullptr) ||
-        !tr_address_from_string(&b.addr, strVal) || b.addr.type != TR_AF_INET)
+    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv4, &sv) || !tr_address_from_string(&b.addr, sv) ||
+        b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
@@ -950,8 +950,8 @@ static void sessionSetImpl(void* vdata)
     b.socket = TR_BAD_SOCKET;
     session->bind_ipv4 = static_cast<struct tr_bindinfo*>(tr_memdup(&b, sizeof(struct tr_bindinfo)));
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &strVal, nullptr) ||
-        !tr_address_from_string(&b.addr, strVal) || b.addr.type != TR_AF_INET6)
+    if (!tr_variantDictFindStrView(settings, TR_KEY_bind_address_ipv6, &sv) || !tr_address_from_string(&b.addr, sv) ||
+        b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
