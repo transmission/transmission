@@ -396,11 +396,12 @@ TEST_F(VariantTest, bencToJson)
     };
 
     auto constexpr Tests = std::array<LocalTest, 5>{
-        LocalTest{ "i6e", "6" },
-        { "d5:helloi1e5:worldi2ee", R"({"hello":1,"world":2})" },
-        { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee", R"({"foo":[1,2,3],"hello":1,"world":2})" },
-        { "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eeee", R"({"foo":[1,2,3,{"a":0}],"hello":1,"world":2})" },
-        { "d4:argsd6:statusle7:status2lee6:result7:successe", R"({"args":{"status":[],"status2":[]},"result":"success"})" }
+        { { "i6e"sv, "6"sv },
+          { "d5:helloi1e5:worldi2ee"sv, R"({"hello":1,"world":2})"sv },
+          { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee"sv, R"({"foo":[1,2,3],"hello":1,"world":2})"sv },
+          { "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eeee"sv, R"({"foo":[1,2,3,{"a":0}],"hello":1,"world":2})"sv },
+          { "d4:argsd6:statusle7:status2lee6:result7:successe"sv,
+            R"({"args":{"status":[],"status2":[]},"result":"success"})"sv } }
     };
 
     for (auto const& test : Tests)
