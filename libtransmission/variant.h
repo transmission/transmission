@@ -139,16 +139,6 @@ static inline int tr_variantFromBencFull(
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, source, setme_end);
 }
 
-static inline int tr_variantFromJsonFull(
-    tr_variant* setme,
-    void const* buf,
-    size_t buflen,
-    char const* source,
-    char const** setme_end)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, source, setme_end);
-}
-
 static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
 {
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
