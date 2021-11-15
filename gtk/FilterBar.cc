@@ -520,7 +520,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         Glib::ustring icon_name;
     } const types[] = {
         { ACTIVITY_FILTER_ALL, nullptr, N_("All"), {} },
-        { ACTIVITY_FILTER_SEPARATOR, nullptr, "", {} },
+        { ACTIVITY_FILTER_SEPARATOR, nullptr, nullptr, {} },
         { ACTIVITY_FILTER_ACTIVE, nullptr, N_("Active"), "system-run" },
         { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
         { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
@@ -534,8 +534,9 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
 
     for (auto const& type : types)
     {
-        auto const name = Glib::ustring(
-            type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name));
+        auto const name = type.name != nullptr ?
+            Glib::ustring(type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name)) :
+            Glib::ustring();
         auto const iter = store->append();
         iter->set_value(activity_filter_cols.name, name);
         iter->set_value(activity_filter_cols.type, type.type);
