@@ -190,12 +190,12 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
 
                 auto test = tr_variant{};
                 auto have_source = bool{ false };
-                if (tr_urlIsValid({ body.c_str(), body_len }))
+                if (tr_urlIsValid(body))
                 {
-                    tr_variantDictAddRaw(args, TR_KEY_filename, body.c_str(), body_len);
+                    tr_variantDictAddStrView(args, TR_KEY_filename, body);
                     have_source = true;
                 }
-                else if (tr_variantFromBenc(&test, body.c_str(), body_len) == 0)
+                else if (tr_variantFromBenc(&test, body) == 0)
                 {
                     auto* b64 = static_cast<char*>(tr_base64_encode(body.c_str(), body_len, nullptr));
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);

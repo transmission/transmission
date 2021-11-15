@@ -43,8 +43,8 @@ struct metadata_node
 
 struct tr_incomplete_metadata
 {
-    uint8_t* metadata;
-    int metadata_size;
+    char* metadata;
+    size_t metadata_size;
     int pieceCount;
 
     /** sorted from least to most recently requested */
@@ -88,7 +88,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     }
 
     m->pieceCount = n;
-    m->metadata = tr_new(uint8_t, size);
+    m->metadata = tr_new(char, size);
     m->metadata_size = size;
     m->piecesNeededCount = n;
     m->piecesNeeded = tr_new(struct metadata_node, n);
@@ -119,7 +119,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
     if (fileContents != nullptr)
     {
         auto top = tr_variant{};
-        if (tr_variantFromBenc(&top, fileContents, fileLen) == 0)
+        if (tr_variantFromBenc(&top, std::string_view{ reinterpret_cast<char const*>(fileContents), fileLen }) == 0)
         {
             tr_variant* infoDict = nullptr;
             if (tr_variantDictFindDict(&top, TR_KEY_info, &infoDict))
@@ -277,7 +277,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         {
             /* checksum passed; now try to parse it as benc */
             tr_variant infoDict;
-            int const err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
+            auto metadata_sv = std::string_view{ m->metadata, m->metadata_size };
+            int const err = tr_variantFromBenc(&infoDict, metadata_sv);
             dbgmsg(tor, "err is %d", err);
 
             metainfoParsed = err == 0;
