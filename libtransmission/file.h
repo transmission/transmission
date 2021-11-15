@@ -225,7 +225,7 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error);
  *         it when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_basename(char const* path, struct tr_error** error);
+char* tr_sys_path_basename(std::string_view path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `dirname()`.
@@ -239,7 +239,7 @@ char* tr_sys_path_basename(char const* path, struct tr_error** error);
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_dirname(char const* path, struct tr_error** error);
+char* tr_sys_path_dirname(std::string_view path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `rename()`.

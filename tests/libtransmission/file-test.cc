@@ -159,7 +159,7 @@ protected:
         char const* output;
     };
 
-    void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(char const*, tr_error**))
+    void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
