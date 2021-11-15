@@ -216,14 +216,14 @@ static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 ***/
 
 tr_watchdir_t tr_watchdir_new(
-    char const* path,
+    std::string_view path,
     tr_watchdir_cb callback,
     void* callback_user_data,
     struct event_base* event_base,
     bool force_generic)
 {
     auto* handle = tr_new0(struct tr_watchdir, 1);
-    handle->path = tr_strdup(path);
+    handle->path = tr_strvDup(path);
     handle->callback = callback;
     handle->callback_user_data = callback_user_data;
     handle->event_base = event_base;

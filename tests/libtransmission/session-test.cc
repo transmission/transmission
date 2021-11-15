@@ -146,22 +146,33 @@ TEST_F(SessionTest, propertiesApi)
     tr_sessionSetRPCUrl(session, nullptr);
     EXPECT_EQ(""sv, tr_sessionGetRPCUrl(session));
 
-    // rpc username, password
+    // rpc username
 
     for (auto const& value : { "foo"sv, "bar"sv, ""sv })
     {
         tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
         EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
-
-        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
-        EXPECT_EQ(value, tr_sessionGetRPCPassword(session));
     }
 
     tr_sessionSetRPCUsername(session, nullptr);
     EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
 
-    tr_sessionSetRPCPassword(session, nullptr);
-    EXPECT_EQ(""sv, tr_sessionGetRPCPassword(session));
+    // rpc password (unsalted)
+
+    {
+        auto const value = "foo"sv;
+        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        EXPECT_NE(value, tr_sessionGetRPCPassword(session));
+        EXPECT_EQ('{', tr_sessionGetRPCPassword(session)[0]);
+    }
+
+    // rpc password (salted)
+
+    {
+        auto const value = "{foo"sv;
+        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCPassword(session));
+    }
 
     // blocklist enabled
 
