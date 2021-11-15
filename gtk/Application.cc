@@ -151,8 +151,6 @@ private:
     void on_add_torrent(tr_ctor* ctor);
     void on_prefs_changed(tr_quark key);
 
-    void on_message_window_closed();
-
     std::vector<int> get_selected_torrent_ids() const;
     tr_torrent* get_first_selected_torrent() const;
     counts_data get_selected_torrent_counts() const;
@@ -1320,11 +1318,6 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
     return invoked;
 }
 
-void Application::Impl::on_message_window_closed()
-{
-    gtr_action_set_toggled("toggle-message-log", false);
-}
-
 void Application::Impl::remove_selected(bool delete_files)
 {
     std::vector<int> l;
@@ -1513,14 +1506,13 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     {
         if (msgwin_ == nullptr)
         {
-            gtr_action_set_toggled("toggle-message-log", true);
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect(sigc::mem_fun(*this, &Impl::on_message_window_closed));
+            msgwin_->signal_hide().connect([this]() { msgwin_.reset(); });
+            msgwin_->show();
         }
         else
         {
-            gtr_action_set_toggled("toggle-message-log", false);
-            msgwin_.reset();
+            msgwin_->hide();
         }
     }
     else if (action_name == "show-about-dialog")
