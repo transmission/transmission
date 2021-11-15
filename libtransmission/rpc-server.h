@@ -39,7 +39,7 @@ public:
 
     std::list<std::string> hostWhitelist;
     std::list<std::string> whitelist;
-    std::string password;
+    std::string salted_password;
     std::string username;
     std::string whitelistStr;
     std::string url;
