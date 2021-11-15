@@ -231,6 +231,21 @@ export class PrefsDialog extends EventTarget {
     root.append(cal.root);
     const suffix_check = cal.check;
 
+    cal = PrefsDialog._createCheckAndLabel(
+      'download-queue-div',
+      'Download queue size:'
+    );
+    cal.check.dataset.key = 'download-queue-enabled';
+    root.append(cal.root);
+    const download_queue_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'download-queue-size';
+    root.append(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const download_queue_input = input;
+
     label = document.createElement('div');
     label.textContent = 'Seeding';
     label.classList.add('section-label');
@@ -269,6 +284,8 @@ export class PrefsDialog extends EventTarget {
     return {
       autostart_check,
       download_dir,
+      download_queue_check,
+      download_queue_input,
       root,
       stop_idle_check,
       stop_idle_input,
