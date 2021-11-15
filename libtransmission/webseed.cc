@@ -406,8 +406,7 @@ static void web_response_func(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long response_code,
-    void const* /*response*/,
-    size_t /*response_byte_count*/,
+    std::string_view /*response*/,
     void* vtask)
 {
     auto* t = static_cast<struct tr_webseed_task*>(vtask);

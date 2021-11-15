@@ -30,8 +30,7 @@ using tr_web_done_func = void (*)(
     bool did_connect_flag,
     bool timeout_flag,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* user_data);
 
 struct tr_web_task* tr_webRun(tr_session* session, std::string_view url, tr_web_done_func done_func, void* done_func_user_data);
