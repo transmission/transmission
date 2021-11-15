@@ -199,8 +199,7 @@ static void on_announce_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct announce_data*>(vdata);
@@ -219,7 +218,7 @@ static void on_announce_done(
     else
     {
         tr_variant benc;
-        bool const variant_loaded = tr_variantFromBenc(&benc, { static_cast<char const*>(msg), msglen }) == 0;
+        bool const variant_loaded = tr_variantFromBenc(&benc, msg) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -368,8 +367,7 @@ static void on_scrape_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
@@ -392,7 +390,7 @@ static void on_scrape_done(
     else
     {
         auto top = tr_variant{};
-        auto const variant_loaded = tr_variantFromBenc(&top, { static_cast<char const*>(msg), msglen }) == 0;
+        auto const variant_loaded = tr_variantFromBenc(&top, msg) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {

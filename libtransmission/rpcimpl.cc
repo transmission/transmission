@@ -1449,8 +1449,7 @@ static void portTested(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* user_data)
 {
     char result[1024];
@@ -1467,7 +1466,7 @@ static void portTested(
     }
     else /* success */
     {
-        bool const isOpen = response_byte_count != 0 && *(char const*)response == '1';
+        bool const isOpen = tr_strvStartsWith(response, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, isOpen);
         tr_snprintf(result, sizeof(result), "success");
     }
@@ -1497,8 +1496,7 @@ static void gotNewBlocklist(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* user_data)
 {
     char result[1024];
@@ -1530,8 +1528,8 @@ static void gotNewBlocklist(
         stream.zalloc = (alloc_func)Z_NULL;
         stream.zfree = (free_func)Z_NULL;
         stream.opaque = (voidpf)Z_NULL;
-        stream.next_in = static_cast<Bytef const*>(response);
-        stream.avail_in = response_byte_count;
+        stream.next_in = reinterpret_cast<Bytef const*>(std::data(response));
+        stream.avail_in = std::size(response);
         inflateInit2(&stream, windowBits);
 
         auto filename = tr_strvPath(configDir, "blocklist.tmp.XXXXXX");
@@ -1571,7 +1569,7 @@ static void gotNewBlocklist(
         inflateEnd(&stream);
 
         if ((err == Z_DATA_ERROR) && // couldn't inflate it... it's probably already uncompressed
-            !tr_sys_file_write(fd, response, response_byte_count, nullptr, &error))
+            !tr_sys_file_write(fd, std::data(response), std::size(response), nullptr, &error))
         {
             tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
             tr_error_clear(&error);
@@ -1665,8 +1663,7 @@ static void gotMetadataFromURL(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* user_data)
 {
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
@@ -1675,11 +1672,11 @@ static void gotMetadataFromURL(
         "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
         response_code,
         tr_webGetResponseStr(response_code),
-        response_byte_count);
+        std::size(response));
 
     if (response_code == 200 || response_code == 221) /* http or ftp success.. */
     {
-        tr_ctorSetMetainfo(data->ctor, response, response_byte_count);
+        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response));
         addTorrentImpl(data->data, data->ctor);
     }
     else
