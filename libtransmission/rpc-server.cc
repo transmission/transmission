@@ -449,10 +449,10 @@ static void rpc_response_func(tr_session* /*session*/, tr_variant* response, voi
     tr_free(data);
 }
 
-static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, char const* json, size_t json_len)
+static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
     auto top = tr_variant{};
-    auto const have_content = tr_variantFromJson(&top, json, json_len) == 0;
+    auto const have_content = tr_variantFromJson(&top, json) == 0;
 
     auto* const data = tr_new0(struct rpc_response_data, 1);
     data->req = req;
@@ -470,11 +470,9 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 {
     if (req->type == EVHTTP_REQ_POST)
     {
-        handle_rpc_from_json(
-            req,
-            server,
-            (char const*)evbuffer_pullup(req->input_buffer, -1),
-            evbuffer_get_length(req->input_buffer));
+        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(req->input_buffer, -1)),
+                                      evbuffer_get_length(req->input_buffer) };
+        handle_rpc_from_json(req, server, json);
         return;
     }
 

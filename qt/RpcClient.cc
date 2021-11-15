@@ -277,7 +277,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         QByteArray const json_data = reply->readAll().trimmed();
         TrVariantPtr json = createVariant();
 
-        if (tr_variantFromJson(json.get(), json_data.constData(), json_data.size()) == 0)
+        if (tr_variantFromJson(json.get(), json_data) == 0)
         {
             result = parseResponseData(*json);
         }

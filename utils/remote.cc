@@ -2039,7 +2039,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
             TR_PRIsv_ARG(response));
     }
 
-    if (tr_variantFromJson(&top, std::data(response), std::size(response)) != 0)
+    if (tr_variantFromJson(&top, response) != 0)
     {
         tr_logAddNamedError(MY_NAME, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
         status |= EXIT_FAILURE;

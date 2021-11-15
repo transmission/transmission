@@ -139,9 +139,9 @@ static inline int tr_variantFromBencFull(
     return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, source, setme_end);
 }
 
-static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
+static inline int tr_variantFromJson(tr_variant* setme, std::string_view json)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
+    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, std::data(json), std::size(json), nullptr, nullptr);
 }
 
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
