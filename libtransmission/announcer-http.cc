@@ -219,7 +219,7 @@ static void on_announce_done(
     else
     {
         tr_variant benc;
-        bool const variant_loaded = tr_variantFromBenc(&benc, std::string_view{ static_cast<char const*>(msg), msglen }) == 0;
+        bool const variant_loaded = tr_variantFromBenc(&benc, { static_cast<char const*>(msg), msglen }) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -392,7 +392,7 @@ static void on_scrape_done(
     else
     {
         auto top = tr_variant{};
-        auto const variant_loaded = tr_variantFromBenc(&top, std::string_view{ static_cast<char const*>(msg), msglen }) == 0;
+        auto const variant_loaded = tr_variantFromBenc(&top, { static_cast<char const*>(msg), msglen }) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {

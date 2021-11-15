@@ -1124,7 +1124,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     msgs->peerSentLtepHandshake = true;
 
     auto val = tr_variant{};
-    if (tr_variantFromBenc(&val, std::string_view{ tmp, len }) != 0 || !tr_variantIsDict(&val))
+    if (tr_variantFromBenc(&val, { tmp, len }) != 0 || !tr_variantIsDict(&val))
     {
         dbgmsg(msgs, "GET  extended-handshake, couldn't get dictionary");
         tr_free(tmp);
