@@ -31,9 +31,8 @@ using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    size_t len;
     int64_t i;
-    char const* str;
+    auto sv = std::string_view{};
     tr_variant top;
 
     tr_rpc_parse_list_str(&top, "12"sv);
@@ -53,9 +52,8 @@ TEST_F(RpcTest, list)
 
     tr_rpc_parse_list_str(&top, "asdf"sv);
     EXPECT_TRUE(tr_variantIsString(&top));
-    EXPECT_TRUE(tr_variantGetStr(&top, &str, &len));
-    EXPECT_EQ(4, len);
-    EXPECT_STREQ("asdf", str);
+    EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
+    EXPECT_EQ("asdf"sv, sv);
     tr_variantFree(&top);
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);

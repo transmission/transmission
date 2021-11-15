@@ -19,20 +19,21 @@
 #include <unordered_set>
 #include <vector>
 
-#include "bandwidth.h" /* tr_bandwidth */
+#include "bandwidth.h"
 #include "bitfield.h"
-#include "completion.h" /* tr_completion */
+#include "completion.h"
 #include "file.h"
 #include "quark.h"
-#include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_PRINTF */
 
 class tr_swarm;
+struct tr_magnet_info;
+struct tr_metainfo_parsed;
+struct tr_session;
 struct tr_torrent;
 struct tr_torrent_tiers;
-struct tr_magnet_info;
 
 /**
 ***  Package-visible ctor API
@@ -135,7 +136,14 @@ struct tr_torrent
     int magicNumber;
 
     std::optional<double> verify_progress;
-    std::vector<tr_sha1_digest_t> piece_checksums;
+
+    tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
+    {
+        TR_ASSERT(i < std::size(this->piece_checksums_));
+        return this->piece_checksums_[i];
+    }
+
+    void takeMetainfo(tr_metainfo_parsed&& parsed);
 
     tr_stat_errtype error;
     char errorString[128];
@@ -223,7 +231,9 @@ struct tr_torrent
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
             {
-                checked_pieces_.unsetRange(info.files[i].firstPiece, info.files[i].lastPiece);
+                auto const begin = info.files[i].firstPiece;
+                auto const end = info.files[i].lastPiece + 1;
+                checked_pieces_.unsetRange(begin, end);
             }
         }
     }
@@ -274,7 +284,7 @@ struct tr_torrent
     char* incompleteDir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    size_t infoDictLength;
+    uint64_t infoDictLength;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *
@@ -389,6 +399,9 @@ struct tr_torrent
     bool finishedSeedingByIdle;
 
     tr_labels_t labels;
+
+private:
+    mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
 
 /* what piece index is this block in? */

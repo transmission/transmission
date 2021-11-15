@@ -608,30 +608,38 @@ void TorrentCellRenderer::Impl::render_compact(
     fill_area.set_height(fill_area.get_height() - ypad * 2);
 
     auto icon_area = fill_area;
-    auto name_area = fill_area;
-    auto stat_area = fill_area;
-    auto prog_area = fill_area;
-
     icon_renderer_->property_pixbuf() = icon;
     icon_renderer_->get_preferred_width(widget, min_width, width);
     icon_area.set_width(width);
-    text_renderer_->property_text() = name;
-    text_renderer_->property_ellipsize() = Pango::ELLIPSIZE_NONE;
-    text_renderer_->property_scale() = 1.0;
-    text_renderer_->get_preferred_width(widget, min_width, width);
-    name_area.set_width(width);
+
+    auto prog_area = fill_area;
+    prog_area.set_width(BAR_WIDTH);
+
+    auto stat_area = fill_area;
     text_renderer_->property_text() = gstr_stat;
+    text_renderer_->property_ellipsize() = Pango::ELLIPSIZE_NONE;
     text_renderer_->property_scale() = SMALL_SCALE;
     text_renderer_->get_preferred_width(widget, min_width, width);
     stat_area.set_width(width);
 
-    icon_area.set_x(fill_area.get_x());
-    prog_area.set_x(fill_area.get_x() + fill_area.get_width() - BAR_WIDTH);
-    prog_area.set_width(BAR_WIDTH);
-    stat_area.set_x(prog_area.get_x() - GUI_PAD - stat_area.get_width());
-    name_area.set_x(icon_area.get_x() + icon_area.get_width() + GUI_PAD);
-    name_area.set_y(fill_area.get_y());
-    name_area.set_width(stat_area.get_x() - GUI_PAD - name_area.get_x());
+    auto name_area = fill_area;
+    name_area.set_width(
+        fill_area.get_width() - icon_area.get_width() - stat_area.get_width() - prog_area.get_width() - GUI_PAD * 3);
+
+    if ((renderer_.get_state(widget, flags) & Gtk::StateFlags::STATE_FLAG_DIR_RTL) == 0)
+    {
+        icon_area.set_x(fill_area.get_x());
+        prog_area.set_x(fill_area.get_x() + fill_area.get_width() - prog_area.get_width());
+        stat_area.set_x(prog_area.get_x() - stat_area.get_width() - GUI_PAD);
+        name_area.set_x(icon_area.get_x() + icon_area.get_width() + GUI_PAD);
+    }
+    else
+    {
+        icon_area.set_x(fill_area.get_x() + fill_area.get_width() - icon_area.get_width());
+        prog_area.set_x(fill_area.get_x());
+        stat_area.set_x(prog_area.get_x() + prog_area.get_width() + GUI_PAD);
+        name_area.set_x(stat_area.get_x() + stat_area.get_width() + GUI_PAD);
+    }
 
     /**
     *** RENDER
@@ -640,15 +648,18 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_pixbuf() = icon;
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
+
     progress_renderer_->property_value() = (int)(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prog_area, prog_area, flags);
+
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_scale() = SMALL_SCALE;
     text_renderer_->property_ellipsize() = Pango::ELLIPSIZE_END;
     text_renderer_->property_foreground_rgba() = text_color;
     text_renderer_->render(cr, widget, stat_area, stat_area, flags);
+
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->property_foreground_rgba() = text_color;
@@ -665,11 +676,6 @@ void TorrentCellRenderer::Impl::render_full(
     int ypad;
     Gtk::Requisition min_size;
     Gtk::Requisition size;
-    Gdk::Rectangle icon_area;
-    Gdk::Rectangle name_area;
-    Gdk::Rectangle stat_area;
-    Gdk::Rectangle prog_area;
-    Gdk::Rectangle prct_area;
     bool seed;
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
@@ -688,27 +694,33 @@ void TorrentCellRenderer::Impl::render_full(
     auto const text_color = get_text_color(widget, st);
 
     /* get the idealized cell dimensions */
+    Gdk::Rectangle icon_area;
     icon_renderer_->property_pixbuf() = icon;
     icon_renderer_->get_preferred_size(widget, min_size, size);
     icon_area.set_width(size.width);
     icon_area.set_height(size.height);
+
+    Gdk::Rectangle name_area;
     text_renderer_->property_text() = name;
     text_renderer_->property_weight() = Pango::WEIGHT_BOLD;
     text_renderer_->property_ellipsize() = Pango::ELLIPSIZE_NONE;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    name_area.set_width(size.width);
     name_area.set_height(size.height);
+
+    Gdk::Rectangle prog_area;
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_weight() = Pango::WEIGHT_NORMAL;
     text_renderer_->property_scale() = SMALL_SCALE;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    prog_area.set_width(size.width);
     prog_area.set_height(size.height);
+
+    Gdk::Rectangle stat_area;
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    stat_area.set_width(size.width);
     stat_area.set_height(size.height);
+
+    Gdk::Rectangle prct_area;
 
     /**
     *** LAYOUT
@@ -721,13 +733,22 @@ void TorrentCellRenderer::Impl::render_full(
     fill_area.set_height(fill_area.get_height() - ypad * 2);
 
     /* icon */
-    icon_area.set_x(fill_area.get_x());
     icon_area.set_y(fill_area.get_y() + (fill_area.get_height() - icon_area.get_height()) / 2);
 
     /* name */
-    name_area.set_x(icon_area.get_x() + icon_area.get_width() + GUI_PAD);
     name_area.set_y(fill_area.get_y());
-    name_area.set_width(fill_area.get_width() - GUI_PAD - icon_area.get_width() - GUI_PAD_SMALL);
+    name_area.set_width(fill_area.get_width() - GUI_PAD - icon_area.get_width());
+
+    if ((renderer_.get_state(widget, flags) & Gtk::StateFlags::STATE_FLAG_DIR_RTL) == 0)
+    {
+        icon_area.set_x(fill_area.get_x());
+        name_area.set_x(fill_area.get_x() + fill_area.get_width() - name_area.get_width());
+    }
+    else
+    {
+        icon_area.set_x(fill_area.get_x() + fill_area.get_width() - icon_area.get_width());
+        name_area.set_x(fill_area.get_x());
+    }
 
     /* prog */
     prog_area.set_x(name_area.get_x());
@@ -752,20 +773,24 @@ void TorrentCellRenderer::Impl::render_full(
     icon_renderer_->property_pixbuf() = icon;
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
+
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->property_foreground_rgba() = text_color;
     text_renderer_->property_ellipsize() = Pango::ELLIPSIZE_END;
     text_renderer_->property_weight() = Pango::WEIGHT_BOLD;
     text_renderer_->render(cr, widget, name_area, name_area, flags);
+
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_scale() = SMALL_SCALE;
     text_renderer_->property_weight() = Pango::WEIGHT_NORMAL;
     text_renderer_->render(cr, widget, prog_area, prog_area, flags);
+
     progress_renderer_->property_value() = (int)(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prct_area, prct_area, flags);
+
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_foreground_rgba() = text_color;
     text_renderer_->render(cr, widget, stat_area, stat_area, flags);

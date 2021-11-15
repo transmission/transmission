@@ -142,12 +142,11 @@ static void onTorrentFileDownloaded(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long /*response_code*/,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* vctor)
 {
     auto* ctor = static_cast<tr_ctor*>(vctor);
-    tr_ctorSetMetainfo(ctor, response, response_byte_count);
+    tr_ctorSetMetainfo(ctor, std::data(response), std::size(response));
     waitingOnWeb = false;
 }
 

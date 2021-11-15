@@ -17,6 +17,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
 
 #include "FreeSpaceLabel.h"
 #include "HigWorkarea.h"
@@ -429,8 +430,7 @@ void onBlocklistUpdate(Gtk::Button* w, std::shared_ptr<blocklist_data> const& da
 void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
 {
     auto const url = e->get_chars(0, -1);
-    bool const is_url_valid = tr_urlParse(url.c_str(), TR_BAD_SIZE, nullptr, nullptr, nullptr, nullptr);
-    button->set_sensitive(is_url_valid);
+    button->set_sensitive(tr_urlIsValid(url.c_str()));
 }
 
 void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, Glib::RefPtr<Session> const& core)
@@ -1094,7 +1094,7 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
 {
     static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
 
-    core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_core_prefs_changed));
+    core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_core_prefs_changed));
 
     dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
     dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
@@ -1118,6 +1118,6 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
         on_core_prefs_changed(key);
     }
 
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::response_cb));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::response_cb));
     gtr_dialog_set_content(dialog_, *n);
 }

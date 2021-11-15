@@ -8,15 +8,16 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring> /* strlen() */
+#include <cstring>
 #include <iterator>
 #include <string_view>
-
-#include <event2/buffer.h>
+#include <vector>
 
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */
+#include "error.h"
+#include "error-types.h"
 #include "file.h"
 #include "log.h"
 #include "metainfo.h"
@@ -25,6 +26,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -128,7 +130,7 @@ bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view 
     auto constexpr ensure_legal_char = [](auto ch)
     {
         auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
-        auto const banned = Banned.find(ch) != Banned.npos || (unsigned char)ch < 0x20;
+        auto const banned = tr_strvContains(Banned, ch) || (unsigned char)ch < 0x20;
         return banned ? '_' : ch;
     };
     auto const old_out_len = std::size(out);
@@ -312,7 +314,7 @@ static char* tr_convertAnnounceToScrape(std::string_view url)
     // some torrents with UDP announce URLs don't have /announce
     else if (url.find("udp:"sv) == 0)
     {
-        scrape = tr_strvdup(url);
+        scrape = tr_strvDup(url);
     }
 
     return scrape;
@@ -349,13 +351,13 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
             {
                 if (tr_variantGetStrView(tr_variantListChild(tier, j), &url))
                 {
-                    url = tr_strvstrip(url);
+                    url = tr_strvStrip(url);
 
                     if (tr_urlIsValidTracker(url))
                     {
                         tr_tracker_info* t = trackers + trackerCount;
                         t->tier = validTiers;
-                        t->announce = tr_strvdup(url);
+                        t->announce = tr_strvDup(url);
                         t->scrape = tr_convertAnnounceToScrape(url);
                         t->id = trackerCount;
 
@@ -382,13 +384,13 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     /* Regular announce value */
     if (trackerCount == 0 && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        url = tr_strvstrip(url);
+        url = tr_strvStrip(url);
 
         if (tr_urlIsValidTracker(url))
         {
             trackers = tr_new0(tr_tracker_info, 1);
             trackers[trackerCount].tier = 0;
-            trackers[trackerCount].announce = tr_strvdup(url);
+            trackers[trackerCount].announce = tr_strvDup(url);
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
@@ -414,7 +416,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
  */
 static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 {
-    url = tr_strvstrip(url);
+    url = tr_strvStrip(url);
 
     if (!tr_urlIsValid(url))
     {
@@ -426,7 +428,7 @@ static char* fix_webseed_url(tr_info const* inf, std::string_view url)
         return tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
     }
 
-    return tr_strvdup(url);
+    return tr_strvDup(url);
 }
 
 static void geturllist(tr_info* inf, tr_variant* meta)
@@ -468,8 +470,8 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 static char const* tr_metainfoParseImpl(
     tr_session const* session,
     tr_info* inf,
-    bool* hasInfoDict,
-    size_t* infoDictLength,
+    std::vector<tr_sha1_digest_t>* pieces,
+    uint64_t* infoDictLength,
     tr_variant const* meta_in)
 {
     int64_t i = 0;
@@ -482,11 +484,6 @@ static char const* tr_metainfoParseImpl(
      * dictionary, given the definition of the info key above. */
     tr_variant* infoDict = nullptr;
     bool b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
-
-    if (hasInfoDict != nullptr)
-    {
-        *hasInfoDict = b;
-    }
 
     if (!b)
     {
@@ -515,8 +512,8 @@ static char const* tr_metainfoParseImpl(
             {
                 tr_free(inf->name);
                 tr_free(inf->originalName);
-                inf->name = tr_strvdup(sv);
-                inf->originalName = tr_strvdup(sv);
+                inf->name = tr_strvDup(sv);
+                inf->originalName = tr_strvDup(sv);
             }
 
             if (inf->name == nullptr)
@@ -634,9 +631,10 @@ static char const* tr_metainfoParseImpl(
             return "pieces";
         }
 
-        inf->pieceCount = std::size(sv) / SHA_DIGEST_LENGTH;
-        inf->pieces = tr_new0(tr_sha1_digest_t, inf->pieceCount);
-        std::copy_n(std::data(sv), std::size(sv), (uint8_t*)(inf->pieces));
+        auto const n_pieces = std::size(sv) / SHA_DIGEST_LENGTH;
+        inf->pieceCount = n_pieces;
+        pieces->resize(n_pieces);
+        std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<uint8_t*>(std::data(*pieces)));
 
         auto const* const errstr = parseFiles(
             inf,
@@ -675,23 +673,19 @@ static char const* tr_metainfoParseImpl(
     return nullptr;
 }
 
-bool tr_metainfoParse(
-    tr_session const* session,
-    tr_variant const* meta_in,
-    tr_info* inf,
-    bool* hasInfoDict,
-    size_t* infoDictLength)
+std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_error** error)
 {
-    char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
-    bool const success = badTag == nullptr;
+    auto out = tr_metainfo_parsed{};
 
-    if (badTag != nullptr)
+    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.pieces, &out.info_dict_length, meta_in);
+    if (bad_tag != nullptr)
     {
-        tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
-        tr_metainfoFree(inf);
+        tr_error_set(error, TR_ERROR_EINVAL, _("Error parsing metainfo: %s"), bad_tag);
+        tr_metainfoFree(&out.info);
+        return {};
     }
 
-    return success;
+    return std::optional<tr_metainfo_parsed>{ std::move(out) };
 }
 
 void tr_metainfoFree(tr_info* inf)
@@ -707,7 +701,6 @@ void tr_metainfoFree(tr_info* inf)
     }
 
     tr_free(inf->webseeds);
-    tr_free(inf->pieces);
     tr_free(inf->files);
     tr_free(inf->comment);
     tr_free(inf->creator);

@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -11,8 +11,9 @@
 #include <cstdint>
 #include <string_view>
 
-#include "tr-macros.h"
+#include "transmission.h"
 
+struct evbuffer;
 struct tr_address;
 struct tr_web_task;
 
@@ -29,27 +30,22 @@ using tr_web_done_func = void (*)(
     bool did_connect_flag,
     bool timeout_flag,
     long response_code,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* user_data);
 
-char const* tr_webGetResponseStr(long response_code);
-
-struct tr_web_task* tr_webRun(tr_session* session, char const* url, tr_web_done_func done_func, void* done_func_user_data);
+struct tr_web_task* tr_webRun(tr_session* session, std::string_view url, tr_web_done_func done_func, void* done_func_user_data);
 
 struct tr_web_task* tr_webRunWithCookies(
     tr_session* session,
-    char const* url,
-    char const* cookies,
+    std::string_view url,
+    std::string_view cookies,
     tr_web_done_func done_func,
     void* done_func_user_data);
 
-struct evbuffer;
-
 struct tr_web_task* tr_webRunWebseed(
     tr_torrent* tor,
-    char const* url,
-    char const* range,
+    std::string_view url,
+    std::string_view range,
     tr_web_done_func done_func,
     void* done_func_user_data,
     struct evbuffer* buffer);
@@ -57,11 +53,3 @@ struct tr_web_task* tr_webRunWebseed(
 long tr_webGetTaskResponseCode(struct tr_web_task* task);
 
 char const* tr_webGetTaskRealUrl(struct tr_web_task* task);
-
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
-
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
-
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
-
-char* tr_http_unescape(char const* str, size_t len);

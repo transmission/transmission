@@ -110,6 +110,9 @@
 ****
 ***/
 
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
+
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
@@ -138,3 +141,5 @@ using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
 // TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
 auto inline constexpr TR_SHA1_DIGEST_LEN = size_t{ 20 };
 using tr_sha1_digest_t = std::array<std::byte, TR_SHA1_DIGEST_LEN>;
+
+using tr_sha1_digest_string_t = std::array<char, TR_SHA1_DIGEST_LEN * 2 + 1>;

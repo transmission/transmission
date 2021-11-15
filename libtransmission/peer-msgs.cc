@@ -20,6 +20,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "cache.h"
 #include "completion.h"
 #include "file.h"
@@ -27,9 +28,10 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
+#include "ptrarray.h"
 #include "session.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "utils.h"
@@ -1118,12 +1120,12 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
 {
-    uint8_t* const tmp = tr_new(uint8_t, len);
+    auto* const tmp = tr_new(char, len);
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, len);
     msgs->peerSentLtepHandshake = true;
 
     auto val = tr_variant{};
-    if (tr_variantFromBenc(&val, tmp, len) != 0 || !tr_variantIsDict(&val))
+    if (tr_variantFromBenc(&val, { tmp, len }) != 0 || !tr_variantIsDict(&val))
     {
         dbgmsg(msgs, "GET  extended-handshake, couldn't get dictionary");
         tr_free(tmp);
@@ -1233,14 +1235,14 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    uint8_t* const tmp = tr_new(uint8_t, msglen);
+    char* const tmp = tr_new(char, msglen);
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
     char const* const msg_end = (char const*)tmp + msglen;
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBencFull(&dict, tmp, msglen, nullptr, &benc_end) == 0)
+    if (tr_variantFromBencFull(&dict, std::string_view{ tmp, msglen }, &benc_end) == 0)
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
@@ -1305,11 +1307,11 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
         return;
     }
 
-    uint8_t* tmp = tr_new(uint8_t, msglen);
+    auto* tmp = tr_new(char, msglen);
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
 
     tr_variant val;
-    bool const loaded = tr_variantFromBenc(&val, tmp, msglen) == 0;
+    bool const loaded = tr_variantFromBenc(&val, std::string_view{ tmp, msglen }) == 0;
 
     tr_free(tmp);
 
@@ -1716,7 +1718,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             uint8_t* tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen);
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);

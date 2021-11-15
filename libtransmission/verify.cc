@@ -96,7 +96,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         if (leftInPiece == 0)
         {
             auto hash = tr_sha1_final(sha);
-            auto const hasPiece = hash && *hash == tor->info.pieces[pieceIndex];
+            auto const hasPiece = hash && *hash == tor->pieceHash(pieceIndex);
 
             if (hasPiece || hadPiece)
             {

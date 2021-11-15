@@ -9,11 +9,13 @@
 #include <algorithm>
 #include <cstring> /* strlen() */
 #include <set>
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "bandwidth.h"
 #include "cache.h"
 #include "inout.h" /* tr_ioFindFileLocation() */
@@ -21,6 +23,7 @@
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
+#include "web-utils.h"
 #include "web.h"
 #include "webseed.h"
 
@@ -399,8 +402,7 @@ static void web_response_func(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long response_code,
-    void const* /*response*/,
-    size_t /*response_byte_count*/,
+    std::string_view /*response*/,
     void* vtask)
 {
     auto* t = static_cast<struct tr_webseed_task*>(vtask);

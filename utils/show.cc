@@ -18,7 +18,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web.h> /* tr_webGetResponseStr() */
+#include <libtransmission/web-utils.h> /* tr_webGetResponseStr() */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
@@ -261,7 +261,7 @@ static void doScrape(tr_info const* inf)
                 bool matched = false;
                 char const* begin = (char const*)evbuffer_pullup(buf, -1);
 
-                if (tr_variantFromBenc(&top, begin, evbuffer_get_length(buf)) == 0)
+                if (tr_variantFromBenc(&top, { begin, evbuffer_get_length(buf) }) == 0)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {

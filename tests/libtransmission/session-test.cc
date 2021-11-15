@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "version.h"
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 #include <algorithm>
 #include <array>
@@ -21,7 +21,174 @@
 #include <cstring>
 #include <string>
 
-TEST(Session, peerId)
+using namespace std::literals;
+
+namespace libtransmission
+{
+
+namespace test
+{
+
+TEST_F(SessionTest, propertiesApi)
+{
+    // Note, this test is just for confirming that the getters/setters
+    // in both the tr_session class and in the C API bindings all work,
+    // e.g. you can get back the same value you set in.
+    //
+    // Confirming that each of these settings _does_ something in the session
+    // is a much broader scope and left to other tests :)
+
+    auto* const session = session_;
+
+    // download dir
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setDownloadDir(value);
+        EXPECT_EQ(value, session->downloadDir());
+        EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
+
+        tr_sessionSetDownloadDir(session, std::string(value).c_str());
+        EXPECT_EQ(value, session->downloadDir());
+        EXPECT_EQ(value, tr_sessionGetDownloadDir(session));
+    }
+
+    tr_sessionSetDownloadDir(session, nullptr);
+    EXPECT_EQ(""sv, session->downloadDir());
+    EXPECT_EQ(""sv, tr_sessionGetDownloadDir(session));
+
+    // incomplete dir
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setIncompleteDir(value);
+        EXPECT_EQ(value, session->incompleteDir());
+        EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
+
+        tr_sessionSetIncompleteDir(session, std::string(value).c_str());
+        EXPECT_EQ(value, session->incompleteDir());
+        EXPECT_EQ(value, tr_sessionGetIncompleteDir(session));
+    }
+
+    tr_sessionSetIncompleteDir(session, nullptr);
+    EXPECT_EQ(""sv, session->incompleteDir());
+    EXPECT_EQ(""sv, tr_sessionGetIncompleteDir(session));
+
+    // script
+
+    for (auto const& type : { TR_SCRIPT_ON_TORRENT_ADDED, TR_SCRIPT_ON_TORRENT_DONE })
+    {
+        for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+        {
+            session->setScript(type, value);
+            EXPECT_EQ(value, session->script(type));
+            EXPECT_EQ(value, tr_sessionGetScript(session, type));
+
+            tr_sessionSetScript(session, type, std::string(value).c_str());
+            EXPECT_EQ(value, session->script(type));
+            EXPECT_EQ(value, tr_sessionGetScript(session, type));
+        }
+
+        tr_sessionSetScript(session, type, nullptr);
+        EXPECT_EQ(""sv, session->script(type));
+        EXPECT_EQ(""sv, tr_sessionGetScript(session, type));
+
+        for (auto const value : { true, false })
+        {
+            session->useScript(type, value);
+            EXPECT_EQ(value, session->useScript(type));
+            EXPECT_EQ(value, tr_sessionIsScriptEnabled(session, type));
+
+            tr_sessionSetScriptEnabled(session, type, value);
+            EXPECT_EQ(value, session->useScript(type));
+            EXPECT_EQ(value, tr_sessionIsScriptEnabled(session, type));
+        }
+    }
+
+    // incomplete dir enabled
+
+    for (auto const value : { true, false })
+    {
+        session->useIncompleteDir(value);
+        EXPECT_EQ(value, session->useIncompleteDir());
+        EXPECT_EQ(value, tr_sessionIsIncompleteDirEnabled(session));
+
+        tr_sessionSetIncompleteDirEnabled(session, value);
+        EXPECT_EQ(value, session->useIncompleteDir());
+        EXPECT_EQ(value, tr_sessionIsIncompleteDirEnabled(session));
+    }
+
+    // blocklist url
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        session->setBlocklistUrl(value);
+        EXPECT_EQ(value, session->blocklistUrl());
+        EXPECT_EQ(value, tr_blocklistGetURL(session));
+
+        tr_blocklistSetURL(session, std::string(value).c_str());
+        EXPECT_EQ(value, session->blocklistUrl());
+        EXPECT_EQ(value, tr_blocklistGetURL(session));
+    }
+
+    tr_blocklistSetURL(session, nullptr);
+    EXPECT_EQ(""sv, session->blocklistUrl());
+    EXPECT_EQ(""sv, tr_blocklistGetURL(session));
+
+    // rpc url
+
+    for (auto const& value : { "http://www.example.com/"sv, "http://www.example.org/transmission"sv, ""sv })
+    {
+        tr_sessionSetRPCUrl(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCUrl(session));
+    }
+
+    tr_sessionSetRPCUrl(session, nullptr);
+    EXPECT_EQ(""sv, tr_sessionGetRPCUrl(session));
+
+    // rpc username
+
+    for (auto const& value : { "foo"sv, "bar"sv, ""sv })
+    {
+        tr_sessionSetRPCUsername(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCUsername(session));
+    }
+
+    tr_sessionSetRPCUsername(session, nullptr);
+    EXPECT_EQ(""sv, tr_sessionGetRPCUsername(session));
+
+    // rpc password (unsalted)
+
+    {
+        auto const value = "foo"sv;
+        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        EXPECT_NE(value, tr_sessionGetRPCPassword(session));
+        EXPECT_EQ('{', tr_sessionGetRPCPassword(session)[0]);
+    }
+
+    // rpc password (salted)
+
+    {
+        auto const value = "{foo"sv;
+        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
+        EXPECT_EQ(value, tr_sessionGetRPCPassword(session));
+    }
+
+    // blocklist enabled
+
+    for (auto const value : { true, false })
+    {
+        session->useBlocklist(value);
+        EXPECT_EQ(value, session->useBlocklist());
+        EXPECT_EQ(value, tr_blocklistIsEnabled(session));
+
+        tr_sessionSetIncompleteDirEnabled(session, value);
+        EXPECT_EQ(value, session->useBlocklist());
+        EXPECT_EQ(value, tr_blocklistIsEnabled(session));
+    }
+}
+
+TEST_F(SessionTest, peerId)
 {
     auto const peer_id_prefix = std::string{ PEERID_PREFIX };
 
@@ -47,7 +214,7 @@ TEST(Session, peerId)
     }
 }
 
-TEST(Session, sessionId)
+TEST_F(SessionTest, sessionId)
 {
 #ifdef __sun
     // FIXME: File locking doesn't work as expected
@@ -124,3 +291,7 @@ TEST(Session, sessionId)
     tr_free(const_cast<char*>(session_id_str_2));
     tr_free(const_cast<char*>(session_id_str_1));
 }
+
+} // namespace test
+
+} // namespace libtransmission

@@ -303,7 +303,7 @@ OptionsDialog::Impl::Impl(
     priority_combo_ = gtr_priority_combo_new();
     gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
 
-    dialog.signal_response().connect(sigc::mem_fun(this, &Impl::addResponseCB));
+    dialog.signal_response().connect(sigc::mem_fun(*this, &Impl::addResponseCB));
 
     auto* grid = Gtk::make_managed<Gtk::Grid>();
     grid->set_border_width(GUI_PAD_BIG);

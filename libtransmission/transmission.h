@@ -33,6 +33,7 @@ using tr_piece_index_t = uint32_t;
  * if we ever need to grow past that, change this to uint64_t ;) */
 using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
+using tr_tracker_tier_t = uint32_t;
 
 struct tr_block_range_t
 {
@@ -48,8 +49,6 @@ struct tr_torrent;
 struct tr_variant;
 
 using tr_priority_t = int8_t;
-
-using tr_voidptr_compare_func = int (*)(void const* lhs, void const* rhs);
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
@@ -244,12 +243,6 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* downloadDir);
 char const* tr_sessionGetDownloadDir(tr_session const* session);
 
 /**
- * @brief Get available disk space (in bytes) for the specified directory.
- * @return zero or positive integer on success, -1 in case of error.
- */
-int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir);
-
-/**
  * @brief Set the torrent's bandwidth priority.
  */
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
@@ -370,7 +363,8 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password);
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username);
 
-/** @brief get the password used to restrict RPC requests.
+// TODO(ckerr): rename function to indicate it returns the salted value
+/** @brief get the salted version of the password used to restrict RPC requests.
     @return the password string.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPassword() */
@@ -868,14 +862,6 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len);
 
 /** @brief Set the constructor's metainfo from a local .torrent file */
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);
-
-/**
- * @brief Set the metainfo from an existing file in tr_getTorrentDir().
- *
- * This is used by the Mac client on startup to pick and choose which
- * torrents to load
- */
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString);
 
 /** @brief Set how many peers this torrent can connect to. (Default: 50) */
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
@@ -1627,7 +1613,6 @@ struct tr_info
     char* source;
 
     tr_file* files;
-    tr_sha1_digest_t* pieces;
 
     /* these trackers are sorted by tier */
     tr_tracker_info* trackers;

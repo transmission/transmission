@@ -16,6 +16,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
+#include <unordered_set>
 #include <vector>
 
 #ifndef _WIN32
@@ -30,38 +31,41 @@
 
 // #define TR_SHOW_DEPRECATED
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
-#include "error.h"
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
+#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
-#include "session.h"
 #include "session-id.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
+#include "tr-lpd.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
-#include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
 #include "version.h"
 #include "web.h"
+
+using namespace std::literals;
 
 #ifdef TR_LIGHTWEIGHT
 static auto constexpr DefaultCacheSizeMB = int{ 2 };
@@ -252,58 +256,40 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-#ifdef TR_LIGHTWEIGHT
-#define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
-#else
-#define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
-#endif
-
-static int parse_tos(char const* tos)
+static int parseTos(std::string_view tos_in)
 {
-    if (evutil_ascii_strcasecmp(tos, "") == 0)
+    auto tos = tr_strlower(tr_strvStrip(tos_in));
+
+    if (tos == ""sv || tos == "default"sv)
     {
         return 0;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "default") == 0)
-    {
-        return 0;
-    }
-
-    if (evutil_ascii_strcasecmp(tos, "lowcost") == 0)
+    if (tos == "lowcost"sv || tos == "mincost"sv)
     {
         return TR_IPTOS_LOWCOST;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "mincost") == 0)
-    {
-        return TR_IPTOS_LOWCOST;
-    }
-
-    if (evutil_ascii_strcasecmp(tos, "throughput") == 0)
+    if (tos == "throughput"sv)
     {
         return TR_IPTOS_THRUPUT;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "reliability") == 0)
+    if (tos == "reliability"sv)
     {
         return TR_IPTOS_RELIABLE;
     }
 
-    if (evutil_ascii_strcasecmp(tos, "lowdelay") == 0)
+    if (tos == "lowdelay"sv)
     {
         return TR_IPTOS_LOWDELAY;
     }
 
-    char* p = nullptr;
-    int const value = strtol(tos, &p, 0);
-    return p == nullptr || p == tos ? 0 : value;
+    return std::stoi(tos);
 }
 
-static char const* format_tos(int value)
+static std::string format_tos(int value)
 {
-    static char buf[8];
-
     switch (value)
     {
     case 0:
@@ -322,10 +308,15 @@ static char const* format_tos(int value)
         return "lowdelay";
 
     default:
-        tr_snprintf(buf, 8, "%d", value);
-        return buf;
+        return std::to_string(value);
     }
 }
+
+#ifdef TR_LIGHTWEIGHT
+#define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
+#else
+#define TR_DEFAULT_ENCRYPTION TR_ENCRYPTION_PREFERRED
+#endif
 
 void tr_sessionGetDefaultSettings(tr_variant* d)
 {
@@ -333,7 +324,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 
     tr_variantDictReserve(d, 69);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
+    tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
@@ -408,8 +399,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 68);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_blocklist_url, tr_blocklistGetURL(s));
+    tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
+    tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
@@ -431,8 +422,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTOS));
-    tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peer_congestion_algorithm);
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTos()));
+    tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
     tr_variantDictAddInt(d, TR_KEY_preallocation, s->preallocationMode);
@@ -498,10 +489,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    char* const filename = tr_buildPath(configDir, "settings.json", nullptr);
+    auto const filename = tr_strvPath(configDir, "settings.json"sv);
     auto success = bool{};
     tr_error* error = nullptr;
-    if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename, &error))
+    if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -514,7 +505,6 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     }
 
     /* cleanup */
-    tr_free(filename);
     return success;
 }
 
@@ -523,7 +513,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variant settings;
-    char* filename = tr_buildPath(configDir, "settings.json", nullptr);
+    auto const filename = tr_strvPath(configDir, "settings.json"sv);
 
     tr_variantInitDict(&settings, 0);
 
@@ -531,7 +521,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename, nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);
@@ -551,10 +541,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
+    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename.c_str());
 
     /* cleanup */
-    tr_free(filename);
     tr_variantFree(&settings);
 }
 
@@ -745,9 +734,8 @@ static void tr_sessionInitImpl(void* vdata)
     **/
 
     {
-        char* filename = tr_buildPath(session->configDir, "blocklists", nullptr);
-        tr_sys_dir_create(filename, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-        tr_free(filename);
+        auto const filename = tr_strvPath(session->configDir, "blocklists"sv);
+        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
         loadBlocklists(session);
     }
 
@@ -795,6 +783,7 @@ static void sessionSetImpl(void* vdata)
     auto boolVal = bool{};
     auto d = double{};
     auto i = int64_t{};
+    auto sv = std::string_view{};
     char const* strVal = nullptr;
     tr_turtle_info* const turtle = &session->turtle;
 
@@ -849,28 +838,23 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_socket_tos, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
     {
-        session->peerSocketTOS = parse_tos(strVal);
+        session->setPeerSocketTos(parseTos(sv));
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_peer_congestion_algorithm, &strVal, nullptr))
-    {
-        session->peer_congestion_algorithm = tr_strdup(strVal);
-    }
-    else
-    {
-        session->peer_congestion_algorithm = tr_strdup("");
-    }
+    sv = ""sv;
+    tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
+    session->setPeerCongestionAlgorithm(sv);
 
     if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
     {
-        tr_blocklistSetEnabled(session, boolVal);
+        session->useBlocklist(boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_blocklist_url, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_blocklist_url, &sv))
     {
-        tr_blocklistSetURL(session, strVal);
+        session->setBlocklistUrl(sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_start_added_torrents, &boolVal))
@@ -930,19 +914,19 @@ static void sessionSetImpl(void* vdata)
         session->preallocationMode = tr_preallocation_mode(i);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_download_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_download_dir, &sv))
     {
-        tr_sessionSetDownloadDir(session, strVal);
+        session->setDownloadDir(sv);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_incomplete_dir, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_incomplete_dir, &sv))
     {
-        tr_sessionSetIncompleteDir(session, strVal);
+        session->setIncompleteDir(sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_incomplete_dir_enabled, &boolVal))
     {
-        tr_sessionSetIncompleteDirEnabled(session, boolVal);
+        session->useIncompleteDir(boolVal);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rename_partial_files, &boolVal))
@@ -951,12 +935,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     /* rpc server */
-    if (session->rpcServer != nullptr) /* close the old one */
-    {
-        tr_rpcClose(&session->rpcServer);
-    }
-
-    session->rpcServer = tr_rpcInit(session, settings);
+    session->rpc_server_ = std::make_unique<tr_rpc_server>(session, settings);
 
     /* public addresses */
 
@@ -1109,22 +1088,22 @@ static void sessionSetImpl(void* vdata)
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_added_enabled, &boolVal))
     {
-        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
+        session->useScript(TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_added_filename, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_added_filename, &sv))
     {
-        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_ADDED, strVal);
+        session->setScript(TR_SCRIPT_ON_TORRENT_ADDED, sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_done_enabled, &boolVal))
     {
-        tr_sessionSetScriptEnabled(session, TR_SCRIPT_ON_TORRENT_DONE, boolVal);
+        session->useScript(TR_SCRIPT_ON_TORRENT_DONE, boolVal);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_script_torrent_done_filename, &strVal, nullptr))
+    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_done_filename, &sv))
     {
-        tr_sessionSetScript(session, TR_SCRIPT_ON_TORRENT_DONE, strVal);
+        session->setScript(TR_SCRIPT_ON_TORRENT_DONE, sv);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
@@ -1173,35 +1152,14 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    struct tr_device_info* info = nullptr;
-
-    if (!tr_str_is_empty(dir))
-    {
-        info = tr_device_info_create(dir);
-    }
-
-    tr_device_info_free(session->downloadDir);
-    session->downloadDir = info;
+    session->setDownloadDir(dir ? dir : "");
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    char const* dir = nullptr;
-
-    if (session != nullptr && session->downloadDir != nullptr)
-    {
-        dir = session->downloadDir->path;
-    }
-
-    return dir;
-}
-
-int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
-{
-    return tr_strcmp0(dir, tr_sessionGetDownloadDir(session)) == 0 ? tr_device_info_get_disk_space(session->downloadDir).free :
-                                                                     tr_getDirSpace(dir).free;
+    return session->downloadDir().c_str();
 }
 
 /***
@@ -1230,33 +1188,28 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    if (session->incompleteDir != dir)
-    {
-        tr_free(session->incompleteDir);
-
-        session->incompleteDir = tr_strdup(dir);
-    }
+    session->setIncompleteDir(dir ? dir : "");
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->incompleteDir;
+    return session->incompleteDir().c_str();
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isIncompleteDirEnabled = b;
+    session->useIncompleteDir(b);
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isIncompleteDirEnabled;
+    return session->useIncompleteDir();
 }
 
 /***
@@ -1907,7 +1860,7 @@ static void sessionCloseImplStart(tr_session* session)
 
     tr_verifyClose(session);
     tr_sharedClose(session);
-    tr_rpcClose(&session->rpcServer);
+    session->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
@@ -2074,19 +2027,9 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
     tr_lockFree(session->lock);
 
-    if (session->metainfoLookup != nullptr)
-    {
-        tr_variantFree(session->metainfoLookup);
-        tr_free(session->metainfoLookup);
-    }
-
-    tr_device_info_free(session->downloadDir);
     tr_free(session->configDir);
     tr_free(session->resumeDir);
     tr_free(session->torrentDir);
-    tr_free(session->incompleteDir);
-    tr_free(session->blocklist_url);
-    tr_free(session->peer_congestion_algorithm);
     delete session;
 }
 
@@ -2375,86 +2318,79 @@ static bool tr_stringEndsWith(char const* strval, char const* end)
 static void loadBlocklists(tr_session* session)
 {
     auto loadme = std::unordered_set<std::string>{};
-    auto const isEnabled = session->isBlocklistEnabled;
+    auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    char* const dirname = tr_buildPath(session->configDir, "blocklists", nullptr);
-    auto const odir = tr_sys_dir_open(dirname, nullptr);
+    auto const dirname = tr_strvPath(session->configDir, "blocklists"sv);
+    auto const odir = tr_sys_dir_open(dirname.c_str(), nullptr);
 
     if (odir == TR_BAD_SYS_DIR)
     {
-        tr_free(dirname);
         return;
     }
 
     char const* name = nullptr;
     while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
     {
-        char* load = nullptr;
+        auto load = std::string{};
 
         if (name[0] == '.') /* ignore dotfiles */
         {
             continue;
         }
 
-        char* const path = tr_buildPath(dirname, name, nullptr);
+        auto const path = tr_strvPath(dirname, name);
 
-        if (tr_stringEndsWith(path, ".bin"))
+        if (tr_strvEndsWith(path, ".bin"sv))
         {
-            load = tr_strdup(path);
+            load = path;
         }
         else
         {
             tr_sys_path_info path_info;
             tr_sys_path_info binname_info;
 
-            char* const binname = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, name);
+            auto const binname = tr_strvJoin(dirname, TR_PATH_DELIMITER_STR, name, ".bin"sv);
 
-            if (!tr_sys_path_get_info(binname, 0, &binname_info, nullptr)) /* create it */
+            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info, nullptr)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
-                int const n = tr_blocklistFileSetContent(b, path);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                int const n = tr_blocklistFileSetContent(b, path.c_str());
 
                 if (n > 0)
                 {
-                    load = tr_strdup(binname);
+                    load = binname;
                 }
 
                 tr_blocklistFileFree(b);
             }
             else if (
-                tr_sys_path_get_info(path, 0, &path_info, nullptr) &&
+                tr_sys_path_get_info(path.c_str(), 0, &path_info, nullptr) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
-                char* const old = tr_strdup_printf("%s.old", binname);
-                tr_sys_path_remove(old, nullptr);
-                tr_sys_path_rename(binname, old, nullptr);
-                auto* const b = tr_blocklistFileNew(binname, isEnabled);
+                auto const old = binname + ".old";
+                tr_sys_path_remove(old.c_str(), nullptr);
+                tr_sys_path_rename(binname.c_str(), old.c_str(), nullptr);
+                auto* const b = tr_blocklistFileNew(binname.c_str(), isEnabled);
 
-                if (tr_blocklistFileSetContent(b, path) > 0)
+                if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
                 {
-                    tr_sys_path_remove(old, nullptr);
+                    tr_sys_path_remove(old.c_str(), nullptr);
                 }
                 else
                 {
-                    tr_sys_path_remove(binname, nullptr);
-                    tr_sys_path_rename(old, binname, nullptr);
+                    tr_sys_path_remove(binname.c_str(), nullptr);
+                    tr_sys_path_rename(old.c_str(), binname.c_str(), nullptr);
                 }
 
                 tr_blocklistFileFree(b);
-                tr_free(old);
             }
-
-            tr_free(binname);
         }
 
-        if (load != nullptr)
+        if (!std::empty(load))
         {
             loadme.emplace(load);
-            tr_free(load);
         }
-
-        tr_free(path);
     }
 
     session->blocklists.clear();
@@ -2466,7 +2402,6 @@ static void loadBlocklists(tr_session* session)
 
     /* cleanup */
     tr_sys_dir_close(odir, nullptr);
-    tr_free(dirname);
 }
 
 static void closeBlocklists(tr_session* session)
@@ -2500,20 +2435,24 @@ bool tr_blocklistIsEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->isBlocklistEnabled;
+    return session->useBlocklist();
+}
+
+void tr_session::useBlocklist(bool enabled)
+{
+    this->blocklist_enabled_ = enabled;
+
+    std::for_each(
+        std::begin(blocklists),
+        std::end(blocklists),
+        [enabled](auto* blocklist) { tr_blocklistFileSetEnabled(blocklist, enabled); });
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->isBlocklistEnabled = enabled;
-
-    auto& src = session->blocklists;
-    std::for_each(
-        std::begin(src),
-        std::end(src),
-        [enabled](auto* blocklist) { tr_blocklistFileSetEnabled(blocklist, enabled); });
+    session->useBlocklist(enabled);
 }
 
 bool tr_blocklistExists(tr_session const* session)
@@ -2537,10 +2476,9 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
         [&name](auto const* blocklist) { return tr_stringEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
     if (it == std::end(src))
     {
-        char* path = tr_buildPath(session->configDir, "blocklists", name, nullptr);
-        b = tr_blocklistFileNew(path, session->isBlocklistEnabled);
+        auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);
+        b = tr_blocklistFileNew(path.c_str(), session->useBlocklist());
         src.push_back(b);
-        tr_free(path);
     }
     else
     {
@@ -2564,92 +2502,12 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
 {
-    if (session->blocklist_url != url)
-    {
-        tr_free(session->blocklist_url);
-        session->blocklist_url = tr_strdup(url);
-    }
+    session->setBlocklistUrl(url ? url : "");
 }
 
 char const* tr_blocklistGetURL(tr_session const* session)
 {
-    return session->blocklist_url;
-}
-
-/***
-****
-***/
-
-static void metainfoLookupInit(tr_session* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_variant* lookup = tr_new0(tr_variant, 1);
-    tr_variantInitDict(lookup, 0);
-
-    int n = 0;
-
-    tr_sys_path_info info;
-    char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname, nullptr) :
-        TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
-    {
-        tr_ctor* ctor = tr_ctorNew(session);
-        tr_ctorSetSave(ctor, false); /* since we already have them */
-
-        /* walk through the directory and find the mappings */
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
-        {
-            if (tr_str_has_suffix(name, ".torrent"))
-            {
-                tr_info inf;
-                char* path = tr_buildPath(dirname, name, nullptr);
-                tr_ctorSetMetainfoFromFile(ctor, path);
-
-                if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
-                {
-                    ++n;
-                    tr_variantDictAddStr(lookup, tr_quark_new(inf.hashString), path);
-                }
-
-                tr_free(path);
-            }
-        }
-
-        tr_sys_dir_close(odir, nullptr);
-        tr_ctorFree(ctor);
-    }
-
-    session->metainfoLookup = lookup;
-    tr_logAddDebug("Found %d torrents in \"%s\"", n, dirname);
-}
-
-char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString)
-{
-    if (session->metainfoLookup == nullptr)
-    {
-        metainfoLookupInit((tr_session*)session);
-    }
-
-    char const* filename = nullptr;
-    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString), &filename, nullptr);
-    return filename;
-}
-
-void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename)
-{
-    /* since we walk session->configDir/torrents/ to build the lookup table,
-     * and tr_sessionSetTorrentFile() is just to tell us there's a new file
-     * in that same directory, we don't need to do anything here if the
-     * lookup table hasn't been built yet */
-    if (session->metainfoLookup != nullptr)
-    {
-        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString), filename);
-    }
+    return session->blocklistUrl().c_str();
 }
 
 /***
@@ -2660,42 +2518,42 @@ void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetEnabled(session->rpcServer, isEnabled);
+    tr_rpcSetEnabled(session->rpc_server_.get(), isEnabled);
 }
 
 bool tr_sessionIsRPCEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsEnabled(session->rpcServer);
+    return tr_rpcIsEnabled(session->rpc_server_.get());
 }
 
 void tr_sessionSetRPCPort(tr_session* session, tr_port port)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPort(session->rpcServer, port);
+    tr_rpcSetPort(session->rpc_server_.get(), port);
 }
 
 tr_port tr_sessionGetRPCPort(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPort(session->rpcServer);
+    return tr_rpcGetPort(session->rpc_server_.get());
 }
 
 void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpcServer, url);
+    tr_rpcSetUrl(session->rpc_server_.get(), url ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUrl(session->rpcServer);
+    return tr_rpcGetUrl(session->rpc_server_.get()).c_str();
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)
@@ -2710,77 +2568,77 @@ void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetWhitelist(session->rpcServer, whitelist);
+    session->setRpcWhitelist(whitelist ? whitelist : "");
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetWhitelist(session->rpcServer);
+    return session->rpcWhitelist().c_str();
 }
 
-void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetWhitelistEnabled(session->rpcServer, isEnabled);
+    session->useRpcWhitelist(enabled);
 }
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetWhitelistEnabled(session->rpcServer);
+    return session->useRpcWhitelist();
 }
 
 void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpcServer, password);
+    tr_rpcSetPassword(session->rpc_server_.get(), password ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPassword(session->rpcServer);
+    return tr_rpcGetPassword(session->rpc_server_.get()).c_str();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUsername(session->rpcServer, username);
+    tr_rpcSetUsername(session->rpc_server_.get(), username ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUsername(session->rpcServer);
+    return tr_rpcGetUsername(session->rpc_server_.get()).c_str();
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPasswordEnabled(session->rpcServer, isEnabled);
+    tr_rpcSetPasswordEnabled(session->rpc_server_.get(), isEnabled);
 }
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsPasswordEnabled(session->rpcServer);
+    return tr_rpcIsPasswordEnabled(session->rpc_server_.get());
 }
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetBindAddress(session->rpcServer);
+    return tr_rpcGetBindAddress(session->rpc_server_.get());
 }
 
 /****
@@ -2792,7 +2650,7 @@ void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->scripts_enabled[type] = enabled;
+    session->useScript(type, enabled);
 }
 
 bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
@@ -2800,7 +2658,7 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->scripts_enabled[type];
+    return session->useScript(type);
 }
 
 void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
@@ -2808,7 +2666,7 @@ void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->scripts[type].assign(script ? script : "");
+    session->setScript(type, script ? script : "");
 }
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type)
@@ -2816,7 +2674,7 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    return session->scripts[type].c_str();
+    return session->script(type).c_str();
 }
 
 /***
@@ -2888,28 +2746,28 @@ void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
 {
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(bad_requests > 0);
-    tr_rpcSetAntiBruteForceThreshold(session->rpcServer, bad_requests);
+    tr_rpcSetAntiBruteForceThreshold(session->rpc_server_.get(), bad_requests);
 }
 
 void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, is_enabled);
+    tr_rpcSetAntiBruteForceEnabled(session->rpc_server_.get(), is_enabled);
 }
 
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetAntiBruteForceEnabled(session->rpcServer);
+    return tr_rpcGetAntiBruteForceEnabled(session->rpc_server_.get());
 }
 
 int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
+    return tr_rpcGetAntiBruteForceThreshold(session->rpc_server_.get());
 }
 
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted)

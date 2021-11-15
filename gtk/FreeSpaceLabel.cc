@@ -8,6 +8,8 @@
 
 #include <glibmm/i18n.h>
 
+#include <libtransmission/utils.h>
+
 #include "FreeSpaceLabel.h"
 #include "Session.h"
 #include "Utils.h"
@@ -43,7 +45,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
         return false;
     }
 
-    auto const bytes = tr_sessionGetDirFreeSpace(session, dir_.c_str());
+    auto const bytes = tr_dirSpace(dir_).free;
     auto const text = bytes < 0 ? _("Error") : gtr_sprintf(_("%s free"), tr_strlsize(bytes));
     auto const markup = gtr_sprintf("<i>%s</i>", text);
     label_.set_markup(markup);
@@ -64,7 +66,7 @@ FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& c
     , core_(core)
     , dir_(dir)
 {
-    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::on_freespace_timer), 3);
+    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::on_freespace_timer), 3);
     on_freespace_timer();
 }
 

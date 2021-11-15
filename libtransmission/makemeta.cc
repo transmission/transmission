@@ -14,17 +14,19 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
+
 #include "crypto-utils.h" /* tr_sha1 */
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
+#include "web-utils.h"
 
 /****
 *****
@@ -44,20 +46,19 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return nullptr;
     }
 
-    char* buf = tr_buildPath(dir, base, nullptr);
-    (void)tr_sys_path_native_separators(buf);
+    auto buf = tr_strvPath(dir, base);
+    tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
     tr_error* error = nullptr;
-    if (!tr_sys_path_get_info(buf, 0, &info, &error))
+    if (!tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
-        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
-        tr_free(buf);
+        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
         tr_error_free(error);
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, nullptr) : TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -66,7 +67,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         {
             if (name[0] != '.') /* skip dotfiles */
             {
-                list = getFiles(buf, name, list);
+                list = getFiles(buf.c_str(), name, list);
             }
         }
 
@@ -76,12 +77,11 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     {
         struct FileList* node = tr_new(struct FileList, 1);
         node->size = info.size;
-        node->filename = tr_strdup(buf);
+        node->filename = tr_strvDup(buf);
         node->next = list;
         list = node;
     }
 
-    tr_free(buf);
     return list;
 }
 
@@ -366,21 +366,15 @@ static void getFileInfo(
     /* build the path list */
     tr_variantInitList(uninitialized_path, 0);
 
-    if (strlen(file->filename) > offset)
+    auto filename = std::string_view{ file->filename };
+    if (std::size(filename) > offset)
     {
-        char* filename = tr_strdup(file->filename + offset);
-        char* walk = filename;
-        char const* token = nullptr;
-
-        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != nullptr)
+        filename.remove_prefix(offset);
+        auto token = std::string_view{};
+        while (tr_strvSep(&filename, &token, TR_PATH_DELIMITER))
         {
-            if (!tr_str_is_empty(token))
-            {
-                tr_variantListAddStr(uninitialized_path, token);
-            }
+            tr_variantListAddStr(uninitialized_path, token);
         }
-
-        tr_free(filename);
     }
 }
 

@@ -15,6 +15,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h" /* gtr_get_favicon() */
 #include "FilterBar.h"
@@ -183,7 +184,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
 
             if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
             {
-                hosts_hash.emplace(key, 1);
+                hosts_hash.emplace(key, 0);
                 hosts.push_back(key);
             }
 
@@ -519,7 +520,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         Glib::ustring icon_name;
     } const types[] = {
         { ACTIVITY_FILTER_ALL, nullptr, N_("All"), {} },
-        { ACTIVITY_FILTER_SEPARATOR, nullptr, "", {} },
+        { ACTIVITY_FILTER_SEPARATOR, nullptr, nullptr, {} },
         { ACTIVITY_FILTER_ACTIVE, nullptr, N_("Active"), "system-run" },
         { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
         { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
@@ -533,8 +534,9 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
 
     for (auto const& type : types)
     {
-        auto const name = Glib::ustring(
-            type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name));
+        auto const name = type.name != nullptr ?
+            Glib::ustring(type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name)) :
+            Glib::ustring();
         auto const iter = store->append();
         iter->set_value(activity_filter_cols.name, name);
         iter->set_value(activity_filter_cols.type, type.type);
@@ -736,7 +738,7 @@ void FilterBar::Impl::update_count_label_idle()
     if (!pending)
     {
         show_lb_->set_data(DIRTY_KEY, GINT_TO_POINTER(1));
-        Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::update_count_label));
+        Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
     }
 }
 
@@ -764,28 +766,20 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_->property_width_request() = 170;
     static_cast<Gtk::TreeStore*>(gtr_get_ptr(tracker_->get_model()))->set_data(SESSION_KEY, session);
 
-    filter_model_->set_visible_func(sigc::mem_fun(this, &Impl::is_row_visible));
+    filter_model_->set_visible_func(sigc::mem_fun(*this, &Impl::is_row_visible));
 
-    tracker_->signal_changed().connect(sigc::mem_fun(this, &Impl::selection_changed_cb));
-    activity_->signal_changed().connect(sigc::mem_fun(this, &Impl::selection_changed_cb));
+    tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
+    activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
 
     /* add the activity combobox */
     show_lb_->set_mnemonic_widget(*activity_);
     widget_.pack_start(*show_lb_, false, false, 0);
     widget_.pack_start(*activity_, true, true, 0);
-#if GTK_CHECK_VERSION(3, 12, 0)
     activity_->set_margin_end(GUI_PAD);
-#else
-    activity_->set_margin_right(GUI_PAD);
-#endif
 
     /* add the tracker combobox */
     widget_.pack_start(*tracker_, true, true, 0);
-#if GTK_CHECK_VERSION(3, 12, 0)
     tracker_->set_margin_end(GUI_PAD);
-#else
-    tracker_->set_margin_right(GUI_PAD);
-#endif
 
     /* add the entry field */
     entry_ = Gtk::make_managed<Gtk::Entry>();
@@ -793,7 +787,7 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     entry_->signal_icon_release().connect([this](auto /*icon_position*/, auto const* /*event*/) { entry_->set_text({}); });
     widget_.pack_start(*entry_, true, true, 0);
 
-    entry_->signal_changed().connect(sigc::mem_fun(this, &Impl::filter_entry_changed));
+    entry_->signal_changed().connect(sigc::mem_fun(*this, &Impl::filter_entry_changed));
     selection_changed_cb();
 
     update_count_label();

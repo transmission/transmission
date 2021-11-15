@@ -28,12 +28,14 @@
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
+#include <thread>
 #include <time.h>
 #include <vector>
 #include <string_view>
 
 #include <giomm.h>
 #include <glib/gmessages.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
@@ -149,8 +151,6 @@ private:
     void on_add_torrent(tr_ctor* ctor);
     void on_prefs_changed(tr_quark key);
 
-    void on_message_window_closed();
-
     std::vector<int> get_selected_torrent_ids() const;
     tr_torrent* get_first_selected_torrent() const;
     counts_data get_selected_torrent_counts() const;
@@ -171,7 +171,7 @@ private:
     bool is_iconified_ = false;
     bool is_closing_ = false;
 
-    Glib::RefPtr<Gtk::UIManager> ui_manager_;
+    Glib::RefPtr<Gtk::Builder> ui_builder_;
 
     unsigned int activation_count_ = 0;
     sigc::connection timer_;
@@ -328,7 +328,7 @@ void Application::Impl::refresh_actions_soon()
 {
     if (!is_closing_ && !refresh_actions_tag_.connected())
     {
-        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::refresh_actions));
+        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::refresh_actions));
     }
 }
 
@@ -560,14 +560,14 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_manager_ = Gtk::UIManager::create();
-    gtr_actions_init(ui_manager_, this);
-    ui_manager_->add_ui_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
-    ui_manager_->ensure_update();
+    ui_builder_ = Gtk::Builder::create_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
+    auto const actions = gtr_actions_init(ui_builder_, this);
+
+    app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
 
     /* create main window now to be a parent to any error dialogs */
-    wind_ = MainWindow::create(app_, ui_manager_, core_);
-    wind_->signal_size_allocate().connect(sigc::mem_fun(this, &Impl::on_main_window_size_allocated));
+    wind_ = MainWindow::create(app_, actions, core_);
+    wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
     app_.hold();
     app_setup();
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
@@ -674,10 +674,10 @@ void Application::Impl::app_setup()
     gtr_actions_set_core(core_);
 
     /* set up core handlers */
-    core_->signal_busy().connect(sigc::mem_fun(this, &Impl::on_core_busy));
-    core_->signal_add_error().connect(sigc::mem_fun(this, &Impl::on_core_error));
-    core_->signal_add_prompt().connect(sigc::mem_fun(this, &Impl::on_add_torrent));
-    core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_prefs_changed));
+    core_->signal_busy().connect(sigc::mem_fun(*this, &Impl::on_core_busy));
+    core_->signal_add_error().connect(sigc::mem_fun(*this, &Impl::on_core_error));
+    core_->signal_add_prompt().connect(sigc::mem_fun(*this, &Impl::on_add_torrent));
+    core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_prefs_changed));
 
     /* add torrents from command-line and saved state */
     core_->load(start_paused_);
@@ -691,7 +691,7 @@ void Application::Impl::app_setup()
 
     /* start model update timer */
     timer_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::update_model_loop),
+        sigc::mem_fun(*this, &Impl::update_model_loop),
         MAIN_WINDOW_REFRESH_INTERVAL_SECONDS);
     update_model_once();
 
@@ -699,6 +699,7 @@ void Application::Impl::app_setup()
     if (!is_iconified_)
     {
         wind_->show();
+        gtr_action_set_toggled("toggle-main-window", true);
     }
     else
     {
@@ -742,6 +743,8 @@ void Application::Impl::placeWindowFromPrefs()
 
 void Application::Impl::presentMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", true);
+
     if (is_iconified_)
     {
         is_iconified_ = false;
@@ -761,6 +764,8 @@ void Application::Impl::presentMainWindow()
 
 void Application::Impl::hideMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", false);
+
     wind_->set_skip_taskbar_hint(true);
     gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
@@ -825,17 +830,17 @@ void Application::Impl::main_window_setup()
     // cbdata->wind = wind;
     sel_ = wind_->get_selection();
 
-    sel_->signal_changed().connect(sigc::mem_fun(this, &Impl::refresh_actions_soon));
+    sel_->signal_changed().connect(sigc::mem_fun(*this, &Impl::refresh_actions_soon));
     refresh_actions_soon();
     auto const model = core_->get_model();
-    model->signal_row_changed().connect(sigc::mem_fun(this, &Impl::rowChangedCB));
-    wind_->signal_delete_event().connect(sigc::mem_fun(this, &Impl::winclose));
+    model->signal_row_changed().connect(sigc::mem_fun(*this, &Impl::rowChangedCB));
+    wind_->signal_delete_event().connect(sigc::mem_fun(*this, &Impl::winclose));
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
-    wind_->signal_drag_data_received().connect(sigc::mem_fun(this, &Impl::on_drag_data_received));
+    wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
 }
 
 bool Application::Impl::on_session_closed()
@@ -916,12 +921,13 @@ void Application::Impl::on_app_exit()
     /* since tr_sessionClose () is a blocking function,
      * delegate its call to another thread here... when it's done,
      * punt the GUI teardown back to the GTK+ thread */
-    Glib::Thread::create(
+    std::thread(
         [this, session = core_->close()]()
         {
             tr_sessionClose(session);
-            Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::on_session_closed));
-        });
+            Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::on_session_closed));
+        })
+        .detach();
 }
 
 void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::vector<std::string>& files)
@@ -996,7 +1002,7 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     w->signal_hide().connect([w]() mutable { w.reset(); });
-    w->signal_focus_in_event().connect(sigc::mem_fun(this, &Impl::on_main_window_focus_in));
+    w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
 
     if (wind_ != nullptr)
     {
@@ -1042,7 +1048,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
 
             if (show && icon_ == nullptr)
             {
-                icon_ = std::make_unique<SystemTrayIcon>(core_);
+                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
             }
             else if (!show && icon_ != nullptr)
             {
@@ -1237,7 +1243,7 @@ void Application::Impl::update_model_soon()
 {
     if (!update_model_soon_tag_.connected())
     {
-        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::update_model_once));
+        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_model_once));
     }
 }
 
@@ -1310,11 +1316,6 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
 
     tr_variantFree(&top);
     return invoked;
-}
-
-void Application::Impl::on_message_window_closed()
-{
-    gtr_action_set_toggled("toggle-message-log", false);
 }
 
 void Application::Impl::remove_selected(bool delete_files)
@@ -1405,7 +1406,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
-    else if (action_name == "open-torrent-menu" || action_name == "open-torrent-toolbar")
+    else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
         w->signal_hide().connect([w]() mutable { w.reset(); });
@@ -1506,12 +1507,12 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (msgwin_ == nullptr)
         {
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect(sigc::mem_fun(this, &Impl::on_message_window_closed));
+            msgwin_->signal_hide().connect([this]() { msgwin_.reset(); });
+            msgwin_->show();
         }
         else
         {
-            gtr_action_set_toggled("toggle-message-log", false);
-            msgwin_.reset();
+            msgwin_->hide();
         }
     }
     else if (action_name == "show-about-dialog")

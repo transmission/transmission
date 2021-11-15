@@ -62,6 +62,8 @@
 #include "utils.h"
 #include "variant.h"
 
+using namespace std::literals;
+
 static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
@@ -215,14 +217,9 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        tr_sys_file_t f = TR_BAD_SYS_FILE;
+        auto const bootstrap_file = tr_strvPath(cl->session->configDir, "dht.bootstrap");
 
-        char* const bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", nullptr);
-
-        if (bootstrap_file != nullptr)
-        {
-            f = tr_sys_file_open(bootstrap_file, TR_SYS_FILE_READ, 0, nullptr);
-        }
+        tr_sys_file_t const f = tr_sys_file_open(bootstrap_file.c_str(), TR_SYS_FILE_READ, 0, nullptr);
 
         if (f != TR_BAD_SYS_FILE)
         {
@@ -262,8 +259,6 @@ static void dht_bootstrap(void* closure)
 
             tr_sys_file_close(f, nullptr);
         }
-
-        tr_free(bootstrap_file);
     }
 
     if (!bootstrap_done(cl->session, 0))
@@ -318,10 +313,9 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
+    auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
     auto benc = tr_variant{};
-    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, nullptr) ? 0 : -1;
-    tr_free(dat_file);
+    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str(), nullptr) ? 0 : -1;
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
@@ -472,10 +466,9 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
-        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
+        auto const dat_file = tr_strvPath(ss->configDir, "dht.dat");
+        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str());
         tr_variantFree(&benc);
-        tr_free(dat_file);
     }
 
     dht_uninit();

@@ -24,7 +24,8 @@
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
-#include "web.h" /* tr_http_escape() */
+#include "web.h"
+#include "web-utils.h"
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
@@ -198,8 +199,7 @@ static void on_announce_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct announce_data*>(vdata);
@@ -218,7 +218,7 @@ static void on_announce_done(
     else
     {
         tr_variant benc;
-        bool const variant_loaded = tr_variantFromBenc(&benc, msg, msglen) == 0;
+        bool const variant_loaded = tr_variantFromBenc(&benc, msg) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -250,12 +250,12 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strvdup(sv);
+                response->errmsg = tr_strvDup(sv);
             }
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strvdup(sv);
+                response->warning = tr_strvDup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
@@ -270,7 +270,7 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strvdup(sv);
+                response->tracker_id_str = tr_strvDup(sv);
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -367,8 +367,7 @@ static void on_scrape_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
@@ -391,7 +390,7 @@ static void on_scrape_done(
     else
     {
         auto top = tr_variant{};
-        auto const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
+        auto const variant_loaded = tr_variantFromBenc(&top, msg) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
