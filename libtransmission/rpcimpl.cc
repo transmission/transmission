@@ -1755,8 +1755,8 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     /* set the optional arguments */
 
-    char const* cookies = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_cookies, &cookies, nullptr);
+    auto cookies = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_cookies, &cookies);
 
     if (download_dir != nullptr)
     {
