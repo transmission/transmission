@@ -16,6 +16,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 
+#include "Actions.h"
 #include "HigWorkarea.h"
 #include "MessageLogWindow.h"
 #include "Prefs.h"
@@ -548,5 +549,17 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 
     scroll_to_bottom();
-    window_.show_all();
+    window_.show_all_children();
+}
+
+void MessageLogWindow::on_show()
+{
+    Gtk::Window::on_show();
+    gtr_action_set_toggled("toggle-message-log", true);
+}
+
+void MessageLogWindow::on_hide()
+{
+    Gtk::Window::on_hide();
+    gtr_action_set_toggled("toggle-message-log", false);
 }
