@@ -136,7 +136,7 @@ static bool is_valid_path(std::string_view path)
 
         if (pos != path.npos)
         {
-            if (colon_pos != 1 || !isalpha(path[0]))
+            if (pos != 1 || !isalpha(path[0]))
             {
                 return false;
             }
