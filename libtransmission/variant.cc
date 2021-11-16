@@ -1313,7 +1313,7 @@ static int tr_variantFromBuf(
         break;
 
     default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
+        err = tr_variantParseBenc(*setme, std::string_view{ static_cast<char const*>(buf), buflen }, setme_end);
         break;
     }
 
