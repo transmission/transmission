@@ -15,7 +15,6 @@
 #include <cstring>
 
 #include <event2/buffer.h> /* evbuffer_add() */
-#include <event2/util.h> /* evutil_strtoll() */
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -321,7 +320,7 @@ static void action_callback_POP(
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, nullptr, 10));
+            tr_variantInitInt(get_node(jsn), std::strtoll(begin, nullptr, 10));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
         {

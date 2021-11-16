@@ -15,8 +15,6 @@
 #include <optional>
 #include <string_view>
 
-#include "tr-macros.h"
-
 struct tr_variant;
 
 using VariantWalkFunc = void (*)(tr_variant const* val, void* user_data);
