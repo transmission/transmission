@@ -1757,7 +1757,8 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
             }
             else
             {
-                if ((st->hasScraped = tier->lastScrapeTime != 0))
+                st->hasScraped = tier->lastScrapeTime;
+                if (st->hasScraped != 0)
                 {
                     st->lastScrapeTime = tier->lastScrapeTime;
                     st->lastScrapeSucceeded = tier->lastScrapeSucceeded;
@@ -1785,7 +1786,8 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
 
                 st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
 
-                if ((st->hasAnnounced = tier->lastAnnounceTime != 0))
+                st->hasAnnounced = tier->lastAnnounceTime;
+                if (st->hasAnnounced != 0)
                 {
                     st->lastAnnounceTime = tier->lastAnnounceTime;
                     tr_strlcpy(st->lastAnnounceResult, tier->lastAnnounceStr, sizeof(st->lastAnnounceResult));
