@@ -1421,15 +1421,15 @@ static char const* torrentRenamePath(
 {
     char const* errmsg = nullptr;
 
-    char const* oldpath = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, nullptr);
-    char const* newname = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_name, &newname, nullptr);
+    auto oldpath = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_path, &oldpath);
+    auto newname = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
 
     auto const torrents = getTorrents(session, args_in);
     if (std::size(torrents) == 1)
     {
-        tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+        torrents[0]->renamePath(oldpath, newname, torrentRenamePathDone, idle_data);
     }
     else
     {
