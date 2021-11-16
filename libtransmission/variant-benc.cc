@@ -77,6 +77,8 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
     return value;
 }
 
+#include <iostream> // NOCOMMIT
+
 /**
  * Byte strings are encoded as follows:
  * <string length encoded in base ten ASCII>:<string data>
@@ -89,6 +91,7 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     auto const pos = benc->find(':');
     if (pos == benc->npos)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " string can't find ':'" << std::endl;
         return {};
     }
 
@@ -98,6 +101,7 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     auto const len = strtoul(std::data(*benc), &ulend, 10);
     if (errno != 0 || ulend != std::data(*benc) + pos || len >= MAX_BENC_STR_LENGTH)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " string can't find string length" << std::endl;
         return {};
     }
 
@@ -106,6 +110,7 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     walk.remove_prefix(pos + 1);
     if (std::size(walk) < len)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " not enough data" << std::endl;
         return {};
     }
 
@@ -145,8 +150,6 @@ static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_qua
     return node;
 }
 
-#include <iostream> // NOCOMMIT
-
 /**
  * This function's previous recursive implementation was
  * easier to read, but was vulnerable to a smash-stacking
@@ -159,11 +162,15 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
 
     tr_variantInit(&top, 0);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " starting tr_variantParseBenc [" << benc << ']' << std::endl;
+
     int err = 0;
     for (;;)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc [" << benc << ']' << std::endl;
         if (std::empty(benc))
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " eilseq" << std::endl;
             err = EILSEQ;
         }
 
@@ -177,6 +184,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
             auto const value = tr_bencParseInt(&benc);
             if (!value)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
                 break;
             }
 
@@ -214,6 +222,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
 
             if (std::empty(stack) || key)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << " popped empty stack" << std::endl;
                 err = EILSEQ;
                 break;
             }
@@ -229,6 +238,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
             auto const sv = tr_bencParseStr(&benc);
             if (!sv)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
                 break;
             }
 
@@ -247,6 +257,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
         }
         else /* invalid bencoded text... march past it */
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " invalid char" << std::endl;
             benc.remove_prefix(1);
         }
 
@@ -255,6 +266,10 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
             break;
         }
     }
+
+    std::cerr << __FILE__ << ':' << __LINE__ << " err " << err << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " top.type " << top.type << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " std::empty(stack) " << std::empty(stack) << std::endl;
 
     if (err == 0 && (top.type == 0 || !std::empty(stack)))
     {
@@ -274,6 +289,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
         tr_variantInit(&top, 0);
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " returning err " << err << std::endl;
     return err;
 }
 
