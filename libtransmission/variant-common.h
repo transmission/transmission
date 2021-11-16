@@ -40,9 +40,6 @@ void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf);
 
 void tr_variantInit(tr_variant* v, char type);
 
-/* source - such as a filename. Only when logging an error */
-int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_benc, char const** setme_end);
-
 /** @brief Private function that's exposed here only for unit tests */
 std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);
 
@@ -50,3 +47,5 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);
 std::optional<std::string_view> tr_bencParseStr(std::string_view* benc_inout);
 
 int tr_variantParseBenc(tr_variant& setme, std::string_view benc, char const** setme_end);
+
+int tr_variantParseJson(tr_variant& setme, std::string_view benc, char const** setme_end);

@@ -40,7 +40,6 @@ struct json_wrapper_data
     size_t keylen;
     struct evbuffer* keybuf;
     struct evbuffer* strbuf;
-    char const* source;
     std::deque<tr_variant*> stack;
 
     /* A very common pattern is for a container's children to be similar,
@@ -80,19 +79,7 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    if (data->source != nullptr)
-    {
-        tr_logAddError(
-            "JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
-            data->source,
-            jsn->pos,
-            jsonsl_strerror(error),
-            buf);
-    }
-    else
-    {
-        tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
-    }
+    tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
 
     data->error = EILSEQ;
 }
@@ -350,7 +337,7 @@ static void action_callback_POP(
     }
 }
 
-int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant, char const** setme_end)
+int tr_variantParseJson(tr_variant& setme, std::string_view benc, char const** setme_end)
 {
     auto data = json_wrapper_data{};
 
@@ -364,15 +351,14 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.error = 0;
     data.has_content = false;
     data.key = nullptr;
-    data.top = setme_variant;
+    data.top = &setme;
     data.stack = {};
-    data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();
     data.preallocGuess = {};
 
     /* parse it */
-    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
+    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(benc)), std::size(benc));
 
     /* EINVAL if there was no content */
     if (data.error == 0 && !data.has_content)
@@ -383,7 +369,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     /* maybe set the end ptr */
     if (setme_end != nullptr)
     {
-        *setme_end = ((char const*)vbuf) + jsn->pos;
+        *setme_end = std::data(benc) + jsn->pos;
     }
 
     /* cleanup */
