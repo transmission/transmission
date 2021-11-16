@@ -52,6 +52,8 @@ struct tr_ctor
     std::vector<tr_file_index_t> normal;
     std::vector<tr_file_index_t> high;
 
+    std::vector<char> contents;
+
     explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
     {
@@ -113,52 +115,46 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
-    auto len = size_t{};
-    auto* const metainfo = tr_loadFile(filename, &len, nullptr);
-
-    auto err = int{};
-    if (metainfo != nullptr && len != 0)
-    {
-        err = tr_ctorSetMetainfo(ctor, metainfo, len);
-    }
-    else
+    if (!tr_loadFile(ctor->contents, filename, nullptr) || std::empty(ctor->contents))
     {
         clearMetainfo(ctor);
-        err = 1;
+        return EILSEQ;
+    }
+
+    int const err = tr_ctorSetMetainfo(ctor, std::data(ctor->contents), std::size(ctor->contents));
+    if (err)
+    {
+        clearMetainfo(ctor);
+        return err;
     }
 
     setSourceFile(ctor, filename);
 
     /* if no `name' field was set, then set it from the filename */
-    if (ctor->isSet_metainfo)
+    tr_variant* info = nullptr;
+
+    if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
     {
-        tr_variant* info = nullptr;
+        auto name = std::string_view{};
 
-        if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
+        if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) && !tr_variantDictFindStrView(info, TR_KEY_name, &name))
         {
-            auto name = std::string_view{};
+            name = ""sv;
+        }
 
-            if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) &&
-                !tr_variantDictFindStrView(info, TR_KEY_name, &name))
+        if (std::empty(name))
+        {
+            char* base = tr_sys_path_basename(filename, nullptr);
+
+            if (base != nullptr)
             {
-                name = ""sv;
-            }
-
-            if (std::empty(name))
-            {
-                char* base = tr_sys_path_basename(filename, nullptr);
-
-                if (base != nullptr)
-                {
-                    tr_variantDictAddStr(info, TR_KEY_name, base);
-                    tr_free(base);
-                }
+                tr_variantDictAddStr(info, TR_KEY_name, base);
+                tr_free(base);
             }
         }
     }
 
-    tr_free(metainfo);
-    return err;
+    return 0;
 }
 
 /***
