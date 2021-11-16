@@ -162,12 +162,19 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
 
     tr_variantInit(&top, 0);
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " starting tr_variantParseBenc [" << benc << ']' << std::endl;
+    if (std::size(benc) < 500)
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " starting tr_variantParseBenc [" << benc << ']' << std::endl;
+    }
 
     int err = 0;
     for (;;)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc [" << benc << ']' << std::endl;
+        if (std::size(benc) < 500)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc [" << benc << ']' << std::endl;
+        }
+
         if (std::empty(benc))
         {
             std::cerr << __FILE__ << ':' << __LINE__ << " eilseq" << std::endl;
