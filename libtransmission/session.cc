@@ -784,7 +784,6 @@ static void sessionSetImpl(void* vdata)
     auto d = double{};
     auto i = int64_t{};
     auto sv = std::string_view{};
-    char const* strVal = nullptr;
     tr_turtle_info* const turtle = &session->turtle;
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))

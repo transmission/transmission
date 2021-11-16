@@ -143,6 +143,12 @@ public:
         double volatile* setme_progress,
         int volatile* setme_state);
 
+    void renamePath(
+        std::string_view oldpath,
+        std::string_view newname,
+        tr_torrent_rename_done_func callback,
+        void* callback_user_data);
+
     tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
     {
         TR_ASSERT(i < std::size(this->piece_checksums_));

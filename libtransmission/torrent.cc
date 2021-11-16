@@ -3695,6 +3695,22 @@ static void torrentRenamePath(void* vdata)
     tr_free(data);
 }
 
+void tr_torrent::renamePath(
+    std::string_view oldpath,
+    std::string_view newname,
+    tr_torrent_rename_done_func callback,
+    void* callback_user_data)
+{
+    auto* const data = tr_new0(struct rename_data, 1);
+    data->tor = this;
+    data->oldpath = tr_strvDup(oldpath);
+    data->newname = tr_strvDup(newname);
+    data->callback = callback;
+    data->callback_user_data = callback_user_data;
+
+    tr_runInEventThread(this->session, torrentRenamePath, data);
+}
+
 void tr_torrentRenamePath(
     tr_torrent* tor,
     char const* oldpath,
@@ -3702,14 +3718,10 @@ void tr_torrentRenamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    auto* const data = tr_new0(struct rename_data, 1);
-    data->tor = tor;
-    data->oldpath = tr_strdup(oldpath);
-    data->newname = tr_strdup(newname);
-    data->callback = callback;
-    data->callback_user_data = callback_user_data;
+    oldpath = oldpath != nullptr ? oldpath : "";
+    newname = newname != nullptr ? newname : "";
 
-    tr_runInEventThread(tor->session, torrentRenamePath, data);
+    tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
 
 void tr_torrent::takeMetainfo(tr_metainfo_parsed&& parsed)
