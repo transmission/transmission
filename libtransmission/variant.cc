@@ -326,27 +326,6 @@ bool tr_variantGetStrView(tr_variant const* v, std::string_view* setme)
     return true;
 }
 
-static bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
-{
-    auto sv = std::string_view{};
-    if (!tr_variantGetStrView(v, &sv))
-    {
-        return false;
-    }
-
-    if (setme != nullptr)
-    {
-        *setme = std::data(sv);
-    }
-
-    if (len != nullptr)
-    {
-        *len = std::size(sv);
-    }
-
-    return true;
-}
-
 bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
 {
     bool const success = tr_variantIsString(v);
@@ -450,12 +429,6 @@ bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string
 {
     tr_variant const* const child = tr_variantDictFind(dict, key);
     return tr_variantGetStrView(child, setme);
-}
-
-bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len)
-{
-    tr_variant const* const child = tr_variantDictFind(dict, key);
-    return tr_variantGetStr(child, setme, len);
 }
 
 bool tr_variantDictFindList(tr_variant* dict, tr_quark const key, tr_variant** setme)
