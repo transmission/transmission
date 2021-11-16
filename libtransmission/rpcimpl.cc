@@ -1735,9 +1735,8 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         return "no filename or metainfo specified";
     }
 
-    char const* download_dir = nullptr;
-
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, nullptr) && tr_sys_path_is_relative(download_dir))
+    auto download_dir = std::string_view{};
+    if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
@@ -1752,9 +1751,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     auto cookies = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_cookies, &cookies);
 
-    if (download_dir != nullptr)
+    if (!std::empty(download_dir))
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, download_dir);
+        auto const sz_download_dir = std::string{ download_dir };
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, sz_download_dir.c_str());
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_paused, &boolVal))

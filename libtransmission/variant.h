@@ -239,7 +239,6 @@ bool tr_variantDictFindDict(tr_variant* dict, tr_quark const key, tr_variant** s
 bool tr_variantDictFindInt(tr_variant* dict, tr_quark const key, int64_t* setme);
 bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme);
 bool tr_variantDictFindBool(tr_variant* dict, tr_quark const key, bool* setme);
-bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len);
 bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme);
 bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len);
 

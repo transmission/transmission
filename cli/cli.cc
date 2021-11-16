@@ -245,7 +245,6 @@ int tr_main(int argc, char* argv[])
     char const* configDir;
     uint8_t* fileContents;
     size_t fileLength;
-    char const* str;
 
     tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -283,15 +282,22 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, nullptr) && !tr_sys_path_exists(str, nullptr))
+    auto sv = std::string_view{};
+    if (tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
-        tr_error* error = nullptr;
+        // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
+        auto const sz_download_dir = std::string{ sv };
 
-        if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+        if (!tr_sys_path_exists(sz_download_dir.c_str(), nullptr))
         {
-            fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
-            tr_error_free(error);
-            return EXIT_FAILURE;
+            tr_error* error = nullptr;
+
+            if (!tr_sys_dir_create(sz_download_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            {
+                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
+                tr_error_free(error);
+                return EXIT_FAILURE;
+            }
         }
     }
 
