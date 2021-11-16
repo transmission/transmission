@@ -306,7 +306,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     }
 
     /* file size should be able to fit into size_t */
-    if (sizeof(info.size) > sizeof(*size))
+    if constexpr (sizeof(info.size) > sizeof(*size))
     {
         TR_ASSERT(info.size <= SIZE_MAX);
     }
