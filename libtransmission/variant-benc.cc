@@ -24,6 +24,8 @@
 #include "variant.h"
 #include "variant-common.h"
 
+using namespace std::literals;
+
 #define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
 
 /***
@@ -88,8 +90,8 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
 std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
 {
     // find the ':' delimiter
-    auto const pos = benc->find(':');
-    if (pos == benc->npos)
+    auto const colon_pos = benc->find(':');
+    if (colon_pos == benc->npos)
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " string can't find ':'" << std::endl;
         return {};
@@ -99,15 +101,16 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     errno = 0;
     char* ulend = nullptr;
     auto const len = strtoul(std::data(*benc), &ulend, 10);
-    if (errno != 0 || ulend != std::data(*benc) + pos || len >= MAX_BENC_STR_LENGTH)
+    if (errno != 0 || ulend != std::data(*benc) + colon_pos || len >= MAX_BENC_STR_LENGTH)
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " string can't find string length" << std::endl;
         return {};
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " string length is " << len << std::endl;
     // do we have `len` bytes of string data?
     auto walk = *benc;
-    walk.remove_prefix(pos + 1);
+    walk.remove_prefix(colon_pos + 1);
     if (std::size(walk) < len)
     {
         std::cerr << __FILE__ << ':' << __LINE__ << " not enough data" << std::endl;
@@ -117,6 +120,8 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     auto const string = walk.substr(0, len);
     walk.remove_prefix(len);
     *benc = walk;
+    std::cerr << __FILE__ << ':' << __LINE__ << " extracted string is [" << string << "]; remain is [" << *benc << ']'
+              << std::endl;
     return string;
 }
 
@@ -162,22 +167,30 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
 
     tr_variantInit(&top, 0);
 
-    if (std::size(benc) < 500)
+    auto const debug = tr_strvContains(benc, "ld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txteee4"sv);
+
+    if (debug)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " starting tr_variantParseBenc [" << benc << ']' << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " before loop, benc len(" << std::size(benc) << ") [" << benc << ']'
+                  << std::endl;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " starting loop, benc len(" << std::size(benc) << ")" << std::endl;
     int err = 0;
     for (;;)
     {
-        if (std::size(benc) < 500)
+        if (debug)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc [" << benc << ']' << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc len(" << std::size(benc) << ") [" << benc << ']'
+                      << std::endl;
         }
 
         if (std::empty(benc))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " eilseq" << std::endl;
+            if (debug)
+            {
+                std::cerr << __FILE__ << ':' << __LINE__ << " eilseq" << std::endl;
+            }
             err = EILSEQ;
         }
 
@@ -186,7 +199,14 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
             break;
         }
 
-        if (benc.front() == 'i') // int
+        auto const front = benc.front();
+        if (debug)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << " benc front [" << front << "] (" << int(benc.front()) << ')'
+                      << std::endl;
+        }
+
+        if (front == 'i') // int
         {
             auto const value = tr_bencParseInt(&benc);
             if (!value)
@@ -201,7 +221,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                 tr_variantInitInt(v, *value);
             }
         }
-        else if (benc.front() == 'l') /* list */
+        else if (front == 'l') /* list */
         {
             benc.remove_prefix(1);
 
@@ -212,7 +232,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                 stack.push_back(v);
             }
         }
-        else if (benc.front() == 'd') /* dict */
+        else if (front == 'd') /* dict */
         {
             benc.remove_prefix(1);
 
@@ -223,7 +243,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                 stack.push_back(v);
             }
         }
-        else if (benc.front() == 'e') /* end of list or dict */
+        else if (front == 'e') /* end of list or dict */
         {
             benc.remove_prefix(1);
 
@@ -240,7 +260,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                 break;
             }
         }
-        else if (isdigit(benc.front())) /* string? */
+        else if (isdigit(front)) /* string? */
         {
             auto const sv = tr_bencParseStr(&benc);
             if (!sv)
@@ -264,7 +284,7 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
         }
         else /* invalid bencoded text... march past it */
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " invalid char" << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << " invalid char [" << front << ']' << std::endl;
             benc.remove_prefix(1);
         }
 
