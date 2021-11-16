@@ -378,11 +378,9 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_basename(char const* path, tr_error** error)
+char* tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    char* const tmp = tr_strdup(path);
+    char* const tmp = tr_strvDup(path);
     char* ret = basename(tmp);
 
     if (ret != nullptr)
@@ -399,11 +397,9 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_dirname(char const* path, tr_error** error)
+char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    char* const tmp = tr_strdup(path);
+    char* const tmp = tr_strvDup(path);
     char* ret = dirname(tmp);
 
     if (ret != nullptr)
