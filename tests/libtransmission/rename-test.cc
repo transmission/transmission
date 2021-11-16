@@ -212,7 +212,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     // (while it's renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
     sync();
-    loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
+    loaded = tr_torrentLoadResume(tor, ~uint64_t{}, ctor, nullptr);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_NAME));
 
@@ -331,7 +331,7 @@ TEST_F(RenameTest, multifileTorrent)
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tr_free(files[1].name);
     tor->info.files[1].name = tr_strdup("gabba gabba hey");
-    auto const loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
+    auto const loaded = tr_torrentLoadResume(tor, ~uint64_t{}, ctor, nullptr);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
     EXPECT_EQ(expected_files[0], files[0].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", files[1].name);
