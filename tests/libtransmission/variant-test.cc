@@ -211,7 +211,7 @@ TEST_F(VariantTest, parse)
     auto i = int64_t{};
     auto val = tr_variant{};
     char const* end;
-    auto err = tr_variantFromBencFull(&val, benc, &end);
+    auto err = tr_variantFromBenc(&val, benc, &end);
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
     EXPECT_EQ(int64_t(64), i);
@@ -219,7 +219,7 @@ TEST_F(VariantTest, parse)
     tr_variantFree(&val);
 
     benc = "li64ei32ei16ee"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
+    err = tr_variantFromBenc(&val, benc, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
     EXPECT_EQ(size_t{ 3 }, tr_variantListSize(&val));
@@ -240,12 +240,12 @@ TEST_F(VariantTest, parse)
     end = nullptr;
 
     benc = "lllee"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
+    err = tr_variantFromBenc(&val, benc, &end);
     EXPECT_NE(0, err);
     EXPECT_EQ(nullptr, end);
 
     benc = "le"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
+    err = tr_variantFromBenc(&val, benc, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
 
@@ -280,7 +280,7 @@ TEST_F(VariantTest, bencParseAndReencode)
     {
         tr_variant val;
         char const* end = nullptr;
-        auto const err = tr_variantFromBencFull(&val, test.benc, &end);
+        auto const err = tr_variantFromBenc(&val, test.benc, &end);
         if (!test.is_good)
         {
             EXPECT_NE(0, err);
@@ -305,7 +305,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In, &end);
+    auto const err = tr_variantFromBenc(&val, In, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(std::data(In) + std::size(In), end);
 
@@ -325,7 +325,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In, &end);
+    auto const err = tr_variantFromBenc(&val, In, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
 
@@ -447,7 +447,7 @@ TEST_F(VariantTest, stackSmash)
     // confirm that it parses
     char const* end;
     tr_variant val;
-    auto err = tr_variantFromBencFull(&val, in, &end);
+    auto err = tr_variantFromBenc(&val, in, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(in.data() + in.size(), end);
 

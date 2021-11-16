@@ -1316,12 +1316,7 @@ static int tr_variantFromBuf(tr_variant& setme, tr_variant_fmt fmt, std::string_
     return err;
 }
 
-int tr_variantFromBenc(tr_variant* setme, std::string_view benc)
-{
-    return tr_variantFromBuf(*setme, TR_VARIANT_FMT_BENC, benc, nullptr);
-}
-
-int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const** setme_end)
+int tr_variantFromBenc(tr_variant* setme, std::string_view benc, char const** setme_end)
 {
     return tr_variantFromBuf(*setme, TR_VARIANT_FMT_BENC, benc, setme_end);
 }
