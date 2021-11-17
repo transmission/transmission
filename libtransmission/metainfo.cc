@@ -486,8 +486,7 @@ static char const* tr_metainfoParseImpl(
     if (bool b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict); !b)
     {
         /* no info dictionary... is this a magnet link? */
-        tr_variant* d = nullptr;
-        if (tr_variantDictFindDict(meta, TR_KEY_magnet_info, &d))
+        if (tr_variant* d = nullptr; tr_variantDictFindDict(meta, TR_KEY_magnet_info, &d))
         {
             isMagnet = true;
 
