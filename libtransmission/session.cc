@@ -491,8 +491,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     auto fileSettings = tr_variant{};
     auto const filename = tr_strvPath(configDir, "settings.json"sv);
     auto success = bool{};
-    tr_error* error = nullptr;
-    if (tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), &error))
+    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_FMT_JSON, filename.c_str(), &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -2338,9 +2337,7 @@ static void loadBlocklists(tr_session* session)
             continue;
         }
 
-        auto const path = tr_strvPath(dirname, name);
-
-        if (tr_strvEndsWith(path, ".bin"sv))
+        if (auto const path = tr_strvPath(dirname, name); tr_strvEndsWith(path, ".bin"sv))
         {
             load = path;
         }
