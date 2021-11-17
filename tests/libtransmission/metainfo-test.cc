@@ -37,11 +37,18 @@ TEST(Metainfo, magnetLink)
     auto const parse_result = tr_torrentParse(ctor, &inf);
     EXPECT_EQ(TR_PARSE_OK, parse_result);
     EXPECT_EQ(0, inf.fileCount); // because it's a magnet link
-    EXPECT_EQ(2, inf.trackerCount);
-    EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
-    EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
+    ASSERT_EQ(2, inf.trackerCount);
+    if (inf.trackerCount >= 1)
+    {
+        EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
+    }
+    if (inf.trackerCount >= 2)
+        EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
     EXPECT_EQ(1, inf.webseedCount);
-    EXPECT_STREQ("http://transmissionbt.com", inf.webseeds[0]);
+    if (inf.webseedCount >= 1)
+    {
+        EXPECT_STREQ("http://transmissionbt.com", inf.webseeds[0]);
+    }
 
     auto* const link = tr_torrentInfoGetMagnetLink(&inf);
     EXPECT_STREQ(MagnetLink, link);
