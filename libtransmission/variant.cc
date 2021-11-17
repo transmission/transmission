@@ -1292,13 +1292,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
-static int tr_variantFromBuf(
-    tr_variant* setme,
-    tr_variant_fmt fmt,
-    void const* buf,
-    size_t buflen,
-    char const* optional_source,
-    char const** setme_end)
+static int tr_variantFromBuf(tr_variant& setme, tr_variant_fmt fmt, std::string_view buf, char const** setme_end)
 {
     /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
     struct locale_context locale_ctx;
@@ -1309,11 +1303,11 @@ static int tr_variantFromBuf(
     {
     case TR_VARIANT_FMT_JSON:
     case TR_VARIANT_FMT_JSON_LEAN:
-        err = tr_jsonParse(optional_source, buf, buflen, setme, setme_end);
+        err = tr_variantParseJson(setme, buf, setme_end);
         break;
 
     default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
+        err = tr_variantParseBenc(setme, buf, setme_end);
         break;
     }
 
@@ -1322,40 +1316,31 @@ static int tr_variantFromBuf(
     return err;
 }
 
-int tr_variantFromBenc(tr_variant* setme, std::string_view benc)
+int tr_variantFromBenc(tr_variant* setme, std::string_view benc, char const** setme_end)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, nullptr);
-}
-
-int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const** setme_end)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, std::data(benc), std::size(benc), nullptr, setme_end);
+    return tr_variantFromBuf(*setme, TR_VARIANT_FMT_BENC, benc, setme_end);
 }
 
 int tr_variantFromJson(tr_variant* setme, std::string_view json)
 {
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, std::data(json), std::size(json), nullptr, nullptr);
+    return tr_variantFromBuf(*setme, TR_VARIANT_FMT_JSON, json, nullptr);
 }
 
 bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
 {
-    bool ret = false;
-
-    auto buflen = size_t{};
-    uint8_t* const buf = tr_loadFile(filename, &buflen, error);
-    if (buf != nullptr)
+    auto buf = std::vector<char>{};
+    if (!tr_loadFile(buf, filename, error))
     {
-        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
-        {
-            ret = true;
-        }
-        else
-        {
-            tr_error_set_literal(error, 0, _("Unable to parse file content"));
-        }
-
-        tr_free(buf);
+        return false;
     }
 
-    return ret;
+    auto sv = std::string_view{ std::data(buf), std::size(buf) };
+    auto const error_code = tr_variantFromBuf(*setme, fmt, sv, nullptr);
+    if (error_code != 0)
+    {
+        tr_error_set_literal(error, error_code, _("Unable to parse file content"));
+        return false;
+    }
+
+    return true;
 }

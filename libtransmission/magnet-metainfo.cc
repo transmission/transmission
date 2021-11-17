@@ -137,6 +137,18 @@ std::string tr_magnet_metainfo::magnet() const
     return s;
 }
 
+static tr_quark announceToScrape(std::string_view announce)
+{
+    auto buf = std::string{};
+
+    if (!tr_magnet_metainfo::convertAnnounceToScrape(buf, announce))
+    {
+        return TR_KEY_NONE;
+    }
+
+    return tr_quark_new(buf);
+}
+
 bool tr_magnet_metainfo::addTracker(tr_tracker_tier_t tier, std::string_view announce_sv)
 {
     announce_sv = tr_strvStrip(announce_sv);
@@ -146,9 +158,8 @@ bool tr_magnet_metainfo::addTracker(tr_tracker_tier_t tier, std::string_view ann
         return false;
     }
 
-    auto buf = std::string{};
     auto const announce_url = tr_quark_new(announce_sv);
-    auto const scrape_url = convertAnnounceToScrape(buf, announce_sv) ? tr_quark_new(buf) : TR_KEY_NONE;
+    auto const scrape_url = announceToScrape(announce_sv);
     this->trackers.insert({ tier, { announce_url, scrape_url, tier } });
     return true;
 }
