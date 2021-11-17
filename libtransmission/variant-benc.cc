@@ -206,86 +206,99 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                       << std::endl;
         }
 
-        if (front == 'i') // int
+        switch (benc.front())
         {
-            auto const value = tr_bencParseInt(&benc);
-            if (!value)
+        case 'i': // int
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
-                break;
-            }
+                auto const value = tr_bencParseInt(&benc);
+                if (!value)
+                {
+                    std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
+                    break;
+                }
 
-            tr_variant* const v = get_node(stack, key, &top, &err);
-            if (v != nullptr)
-            {
-                tr_variantInitInt(v, *value);
-            }
-        }
-        else if (front == 'l') /* list */
-        {
-            benc.remove_prefix(1);
-
-            tr_variant* const v = get_node(stack, key, &top, &err);
-            if (v != nullptr)
-            {
-                tr_variantInitList(v, 0);
-                stack.push_back(v);
-            }
-        }
-        else if (front == 'd') /* dict */
-        {
-            benc.remove_prefix(1);
-
-            tr_variant* const v = get_node(stack, key, &top, &err);
-            if (v != nullptr)
-            {
-                tr_variantInitDict(v, 0);
-                stack.push_back(v);
-            }
-        }
-        else if (front == 'e') /* end of list or dict */
-        {
-            benc.remove_prefix(1);
-
-            if (std::empty(stack) || key)
-            {
-                std::cerr << __FILE__ << ':' << __LINE__ << " popped empty stack" << std::endl;
-                err = EILSEQ;
-                break;
-            }
-
-            stack.pop_back();
-            if (std::empty(stack))
-            {
-                break;
-            }
-        }
-        else if (isdigit(front)) /* string? */
-        {
-            auto const sv = tr_bencParseStr(&benc);
-            if (!sv)
-            {
-                std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
-                break;
-            }
-
-            if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
-            {
-                key = tr_quark_new(*sv);
-            }
-            else
-            {
                 tr_variant* const v = get_node(stack, key, &top, &err);
                 if (v != nullptr)
                 {
-                    tr_variantInitStr(v, *sv);
+                    tr_variantInitInt(v, *value);
                 }
+                break;
             }
-        }
-        else /* invalid bencoded text... march past it */
-        {
-            std::cerr << __FILE__ << ':' << __LINE__ << " invalid char [" << front << ']' << std::endl;
-            benc.remove_prefix(1);
+        case 'l': // list
+            {
+                benc.remove_prefix(1);
+
+                tr_variant* const v = get_node(stack, key, &top, &err);
+                if (v != nullptr)
+                {
+                    tr_variantInitList(v, 0);
+                    stack.push_back(v);
+                }
+                break;
+            }
+        case 'd': // dict
+            {
+                benc.remove_prefix(1);
+
+                tr_variant* const v = get_node(stack, key, &top, &err);
+                if (v != nullptr)
+                {
+                    tr_variantInitDict(v, 0);
+                    stack.push_back(v);
+                }
+                break;
+            }
+        case 'e': // end of list or dict
+            {
+                benc.remove_prefix(1);
+
+                if (std::empty(stack) || key)
+                {
+                    std::cerr << __FILE__ << ':' << __LINE__ << " popped empty stack" << std::endl;
+                    err = EILSEQ;
+                    break;
+                }
+
+                stack.pop_back();
+                break;
+            }
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9': // string?
+            {
+                auto const sv = tr_bencParseStr(&benc);
+                if (!sv)
+                {
+                    std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
+                    break;
+                }
+
+                if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
+                {
+                    key = tr_quark_new(*sv);
+                }
+                else
+                {
+                    tr_variant* const v = get_node(stack, key, &top, &err);
+                    if (v != nullptr)
+                    {
+                        tr_variantInitStr(v, *sv);
+                    }
+                }
+                break;
+            }
+        default: // invalid bencoded text... march past it
+            {
+                std::cerr << __FILE__ << ':' << __LINE__ << " invalid char [" << front << ']' << std::endl;
+                benc.remove_prefix(1);
+            }
         }
 
         if (std::empty(stack))
