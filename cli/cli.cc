@@ -282,8 +282,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    auto sv = std::string_view{};
-    if (tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
         // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
         auto const sz_download_dir = std::string{ sv };
