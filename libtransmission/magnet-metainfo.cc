@@ -185,7 +185,8 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            addTracker(tier++, tr_urlPercentDecode(value));
+            addTracker(tier, tr_urlPercentDecode(value));
+            ++tier;
         }
         else if (key == "ws"sv)
         {
