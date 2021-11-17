@@ -628,14 +628,10 @@ static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct jsonWalk*>(vdata);
-    bool emptyContainer = false;
 
     jsonPopParent(data);
 
-    if (!emptyContainer)
-    {
-        jsonIndent(data);
-    }
+    jsonIndent(data);
 
     if (tr_variantIsDict(val))
     {
