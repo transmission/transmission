@@ -1515,7 +1515,7 @@ static void gotNewBlocklist(
     }
     else /* successfully fetched the blocklist... */
     {
-        z_stream stream;
+        auto stream = z_stream{};
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
         auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
