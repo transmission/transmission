@@ -483,9 +483,7 @@ static char const* tr_metainfoParseImpl(
      * from the Metainfo file. Note that the value will be a bencoded
      * dictionary, given the definition of the info key above. */
     tr_variant* infoDict = nullptr;
-    bool b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict);
-
-    if (!b)
+    if (bool b = tr_variantDictFindDict(meta, TR_KEY_info, &infoDict); !b)
     {
         /* no info dictionary... is this a magnet link? */
         tr_variant* d = nullptr;
