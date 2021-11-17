@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -27,7 +28,7 @@ using namespace std::literals;
 namespace bitzi
 {
 
-int constexpr base32Lookup[] = {
+auto constexpr Base32Lookup = std::array<int, 80>{
     0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, /* '0', '1', '2', '3', '4', '5', '6', '7' */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* '8', '9', ':', ';', '<', '=', '>', '?' */
     0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, /* '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G' */
@@ -61,7 +62,7 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
         }
 
         /* If this digit is not in the table, ignore it */
-        int const digit = base32Lookup[lookup];
+        int const digit = Base32Lookup[lookup];
 
         if (digit == 0xFF)
         {
