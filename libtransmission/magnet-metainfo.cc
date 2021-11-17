@@ -237,8 +237,7 @@ bool tr_magnet_metainfo::convertAnnounceToScrape(std::string& out, std::string_v
     // the scrape convention. If it does, substitute 'scrape' for
     // 'announce' to find the scrape page.
     auto constexpr oldval = "/announce"sv;
-    auto pos = in.rfind(oldval.front());
-    if (pos != in.npos && in.find(oldval, pos) == pos)
+    if (auto pos = in.rfind(oldval.front()); pos != in.npos && in.find(oldval, pos) == pos)
     {
         auto const prefix = in.substr(0, pos);
         auto const suffix = in.substr(pos + std::size(oldval));
