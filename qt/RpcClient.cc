@@ -277,7 +277,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
         TrVariantPtr json = createVariant();
         RpcResponse result;
-        if (!tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
         {
             result = parseResponseData(*json);
         }
