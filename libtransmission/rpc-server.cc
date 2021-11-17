@@ -554,7 +554,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
         [&hostname](auto const& str) { return tr_wildmat(hostname.c_str(), str.c_str()); });
 }
 
-static bool test_session_id(tr_rpc_server* server, struct evhttp_request* req)
+static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 {
     char const* ours = get_current_session_id(server);
     char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
