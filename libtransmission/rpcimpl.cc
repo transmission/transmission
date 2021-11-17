@@ -1386,7 +1386,7 @@ static char const* torrentSetLocation(
     }
 
     auto move = bool{};
-    tr_variantDictFindBool(args_in, TR_KEY_move, &move);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_move, &move);
 
     for (auto* tor : getTorrents(session, args_in))
     {
