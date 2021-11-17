@@ -43,7 +43,9 @@ TEST(Metainfo, magnetLink)
         EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
     }
     if (inf.trackerCount >= 2)
+    {
         EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
+    }
     EXPECT_EQ(1, inf.webseedCount);
     if (inf.webseedCount >= 1)
     {
