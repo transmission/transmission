@@ -1124,7 +1124,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     msgs->peerSentLtepHandshake = true;
 
     auto val = tr_variant{};
-    if (tr_variantFromBenc(&val, { tmp, len }) != 0 || !tr_variantIsDict(&val))
+    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, len }) || !tr_variantIsDict(&val))
     {
         dbgmsg(msgs, "GET  extended-handshake, couldn't get dictionary");
         tr_free(tmp);
@@ -1241,7 +1241,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBenc(&dict, std::string_view{ tmp, msglen }, &benc_end) == 0)
+    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }, &benc_end))
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);

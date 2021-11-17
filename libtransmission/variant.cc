@@ -1292,12 +1292,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
-bool tr_variantFromBuf(
-    tr_variant* setme,
-    tr_variant_parse_opts opts,
-    std::string_view buf,
-    char const** setme_end,
-    tr_error** error)
+bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
 {
     // supported formats: benc, json
     TR_ASSERT((opts & (TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_JSON)) != 0);

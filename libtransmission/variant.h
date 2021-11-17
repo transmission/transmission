@@ -124,7 +124,7 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char cons
 
 bool tr_variantFromBuf(
     tr_variant* setme,
-    tr_variant_parse_opts opts,
+    int variant_parse_opts,
     std::string_view buf,
     char const** setme_end = nullptr,
     tr_error** error = nullptr);

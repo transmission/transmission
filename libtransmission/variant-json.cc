@@ -40,7 +40,7 @@ struct json_wrapper_data
     size_t keylen;
     std::deque<tr_variant*> stack;
     tr_variant* top;
-    tr_variant_parse_opts opts;
+    int parse_opts;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -291,7 +291,7 @@ static void action_callback_POP(
     {
         auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
-        if ((data->opts & TR_VARIANT_PARSE_INPLACE) != 0)
+        if ((data->parse_opts & TR_VARIANT_PARSE_INPLACE) != 0)
         {
             tr_variantInitStrView(get_node(jsn), { str, len });
         }
@@ -344,8 +344,10 @@ static void action_callback_POP(
     }
 }
 
-int tr_variantParseJson(tr_variant& setme, tr_variant_parse_opts opts, std::string_view benc, char const** setme_end)
+int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc, char const** setme_end)
 {
+    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
+
     auto data = json_wrapper_data{};
 
     jsonsl_t jsn = jsonsl_new(MAX_DEPTH);
@@ -359,7 +361,7 @@ int tr_variantParseJson(tr_variant& setme, tr_variant_parse_opts opts, std::stri
     data.has_content = false;
     data.key = nullptr;
     data.keybuf = evbuffer_new();
-    data.opts = opts;
+    data.parse_opts = parse_opts;
     data.preallocGuess = {};
     data.stack = {};
     data.strbuf = evbuffer_new();

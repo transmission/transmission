@@ -84,9 +84,8 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     clearMetainfo(ctor);
     auto sv = std::string_view{ static_cast<char const*>(metainfo), len };
-    auto const err = tr_variantFromBenc(&ctor->metainfo, sv);
-    ctor->isSet_metainfo = err == 0;
-    return err;
+    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv);
+    return ctor->isSet_metainfo ? 0 : EILSEQ;
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
