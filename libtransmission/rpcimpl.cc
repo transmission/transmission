@@ -317,7 +317,7 @@ static char const* torrentRemove(
     tr_rpc_idle_data* /*idle_data*/)
 {
     auto delete_flag = bool{ false };
-    tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
 
     tr_rpc_callback_type type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
