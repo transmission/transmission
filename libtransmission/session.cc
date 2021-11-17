@@ -842,7 +842,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     sv = ""sv;
-    tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
+    (void)tr_variantDictFindStrView(settings, TR_KEY_peer_congestion_algorithm, &sv);
     session->setPeerCongestionAlgorithm(sv);
 
     if (tr_variantDictFindBool(settings, TR_KEY_blocklist_enabled, &boolVal))
