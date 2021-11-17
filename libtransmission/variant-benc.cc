@@ -81,8 +81,6 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
     return value;
 }
 
-#include <iostream> // NOCOMMIT
-
 /**
  * Byte strings are encoded as follows:
  * <string length encoded in base ten ASCII>:<string data>
@@ -95,7 +93,6 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     auto const colon_pos = benc->find(':');
     if (colon_pos == benc->npos)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " string can't find ':'" << std::endl;
         return {};
     }
 
@@ -105,25 +102,20 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     auto const len = strtoul(std::data(*benc), &ulend, 10);
     if (errno != 0 || ulend != std::data(*benc) + colon_pos || len >= MAX_BENC_STR_LENGTH)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " string can't find string length" << std::endl;
         return {};
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " string length is " << len << std::endl;
     // do we have `len` bytes of string data?
     auto walk = *benc;
     walk.remove_prefix(colon_pos + 1);
     if (std::size(walk) < len)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " not enough data" << std::endl;
         return {};
     }
 
     auto const string = walk.substr(0, len);
     walk.remove_prefix(len);
     *benc = walk;
-    std::cerr << __FILE__ << ':' << __LINE__ << " extracted string is [" << string << "]; remain is [" << *benc << ']'
-              << std::endl;
     return string;
 }
 
@@ -171,43 +163,17 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
 
     tr_variantInit(&top, 0);
 
-    auto const debug = tr_strvContains(benc, "ld6:lengthi2e4:pathl5:a.txteed6:lengthi2e4:pathl5:b.txteee4"sv);
-
-    if (debug)
-    {
-        std::cerr << __FILE__ << ':' << __LINE__ << " before loop, benc len(" << std::size(benc) << ") [" << benc << ']'
-                  << std::endl;
-    }
-
-    std::cerr << __FILE__ << ':' << __LINE__ << " starting loop, benc len(" << std::size(benc) << ")" << std::endl;
     int err = 0;
     for (;;)
     {
-        if (debug)
-        {
-            std::cerr << __FILE__ << ':' << __LINE__ << " in loop, benc len(" << std::size(benc) << ") [" << benc << ']'
-                      << std::endl;
-        }
-
         if (std::empty(benc))
         {
-            if (debug)
-            {
-                std::cerr << __FILE__ << ':' << __LINE__ << " eilseq" << std::endl;
-            }
             err = EILSEQ;
         }
 
         if (err != 0)
         {
             break;
-        }
-
-        auto const front = benc.front();
-        if (debug)
-        {
-            std::cerr << __FILE__ << ':' << __LINE__ << " benc front [" << front << "] (" << int(benc.front()) << ')'
-                      << std::endl;
         }
 
         switch (benc.front())
@@ -217,7 +183,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 auto const value = tr_bencParseInt(&benc);
                 if (!value)
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
                     break;
                 }
 
@@ -258,7 +223,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
 
                 if (std::empty(stack) || key)
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << " popped empty stack" << std::endl;
                     err = EILSEQ;
                     break;
                 }
@@ -280,7 +244,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 auto const sv = tr_bencParseStr(&benc);
                 if (!sv)
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << " int parsing failed" << std::endl;
                     break;
                 }
 
@@ -291,7 +254,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 else
                 {
                     tr_variant* const v = get_node(stack, key, &top, &err);
-
                     if (v != nullptr)
                     {
                         if ((parse_opts & TR_VARIANT_PARSE_INPLACE) != 0)
@@ -307,10 +269,8 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 break;
             }
         default: // invalid bencoded text... march past it
-            {
-                std::cerr << __FILE__ << ':' << __LINE__ << " invalid char [" << front << ']' << std::endl;
-                benc.remove_prefix(1);
-            }
+            benc.remove_prefix(1);
+            break;
         }
 
         if (std::empty(stack))
@@ -318,10 +278,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
             break;
         }
     }
-
-    std::cerr << __FILE__ << ':' << __LINE__ << " err " << err << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << " top.type " << top.type << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << " std::empty(stack) " << std::empty(stack) << std::endl;
 
     if (err == 0 && (top.type == 0 || !std::empty(stack)))
     {
@@ -341,7 +297,6 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
         tr_variantInit(&top, 0);
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " returning err " << err << std::endl;
     return err;
 }
 
@@ -370,12 +325,12 @@ static void saveBoolFunc(tr_variant const* val, void* vevbuf)
 
 static void saveRealFunc(tr_variant const* val, void* vevbuf)
 {
-    char buf[128];
-    int const len = tr_snprintf(buf, sizeof(buf), "%f", val->val.d);
+    auto buf = std::array<char, 64>{};
+    int const len = tr_snprintf(std::data(buf), std::size(buf), "%f", val->val.d);
 
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add_printf(evbuf, "%d:", len);
-    evbuffer_add(evbuf, buf, len);
+    evbuffer_add(evbuf, std::data(buf), len);
 }
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
