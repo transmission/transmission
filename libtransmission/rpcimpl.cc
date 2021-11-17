@@ -697,7 +697,7 @@ static void initField(
         }
         else
         {
-            tr_variantInitStr(initme, ""sv);
+            tr_variantInitStrView(initme, ""sv);
         }
 
         break;
@@ -2290,7 +2290,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
+        tr_variantDictAddStrView(d, key, RPC_VERSION_SEMVER);
         break;
 
     case TR_KEY_rpc_version_minimum:
@@ -2382,7 +2382,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_version:
-        tr_variantDictAddStr(d, key, LONG_VERSION_STRING);
+        tr_variantDictAddStrView(d, key, LONG_VERSION_STRING);
         break;
 
     case TR_KEY_encryption:

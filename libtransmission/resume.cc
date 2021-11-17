@@ -382,7 +382,7 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 
 static void saveName(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_variantDictAddStr(dict, TR_KEY_name, tr_torrentName(tor));
+    tr_variantDictAddStrView(dict, TR_KEY_name, tr_torrentName(tor));
 }
 
 static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
@@ -424,7 +424,7 @@ static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 
         for (tr_file_index_t i = 0; i < n; ++i)
         {
-            tr_variantListAddStr(list, files[i].is_renamed ? files[i].name : "");
+            tr_variantListAddStrView(list, files[i].is_renamed ? files[i].name : "");
         }
     }
 }
@@ -465,7 +465,7 @@ static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
     }
     else if (b->hasAll())
     {
-        tr_variantInitStr(benc, "all"sv);
+        tr_variantInitStrView(benc, "all"sv);
     }
     else
     {
@@ -510,7 +510,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     /* add the progress */
     if (tor->completeness == TR_SEED)
     {
-        tr_variantDictAddStr(prog, TR_KEY_have, "all"sv);
+        tr_variantDictAddStrView(prog, TR_KEY_have, "all"sv);
     }
 
     /* add the blocks bitfield */
@@ -691,7 +691,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
-    tr_variantDictAddStr(&top, TR_KEY_destination, tor->downloadDir);
+    tr_variantDictAddStrView(&top, TR_KEY_destination, tor->downloadDir);
 
     if (tor->incompleteDir != nullptr)
     {
@@ -748,8 +748,14 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-
-    if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
+    auto buf = std::vector<char>{};
+    if (!tr_loadFile(buf, filename, &error) ||
+        !tr_variantFromBuf(
+            &top,
+            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
+            { std::data(buf), std::size(buf) },
+            nullptr,
+            &error))
     {
         tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename, error->message);
         tr_error_clear(&error);

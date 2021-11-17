@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
 
                 auto top = tr_variant{};
                 tr_variantInitDict(&top, 2);
-                tr_variantDictAddStr(&top, TR_KEY_method, "torrent-add");
+                tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-add");
                 auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddBool(args, TR_KEY_paused, paused);
 

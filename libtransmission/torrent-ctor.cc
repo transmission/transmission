@@ -84,7 +84,7 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     clearMetainfo(ctor);
     auto sv = std::string_view{ static_cast<char const*>(metainfo), len };
-    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv);
+    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC, sv);
     return ctor->isSet_metainfo ? 0 : EILSEQ;
 }
 
@@ -95,35 +95,54 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
+    clearMetainfo(ctor);
+
+    // parse the magnet info
     auto mm = tr_magnet_metainfo{};
     if (!mm.parseMagnet(magnet_link ? magnet_link : ""))
     {
         return -1;
     }
-
     auto tmp = tr_variant{};
     mm.toVariant(&tmp);
-    auto len = size_t{};
-    char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-    auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
-    tr_free(str);
-    tr_variantFree(&tmp);
 
+    // save that variant it to ctor->contents
+    auto& contents = ctor->contents;
+    auto len = size_t{};
+    char* const tmpstr = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
+    contents.resize(len);
+    std::copy_n(tmpstr, len, std::begin(contents));
+    tr_free(tmpstr);
+
+    // finally, set the metainfo
+    auto sv = std::string_view{ std::data(contents), std::size(contents) };
+    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv);
+    int const err = ctor->isSet_metainfo ? 0 : EILSEQ;
+
+    tr_variantFree(&tmp);
     return err;
 }
 
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
+    clearMetainfo(ctor);
+
     if (!tr_loadFile(ctor->contents, filename, nullptr) || std::empty(ctor->contents))
+    {
+        return EILSEQ;
+    }
+
+    auto const contents = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, contents);
+    if (!ctor->isSet_metainfo)
     {
         clearMetainfo(ctor);
         return EILSEQ;
     }
 
-    int const err = tr_ctorSetMetainfo(ctor, std::data(ctor->contents), std::size(ctor->contents));
+    int const err = tr_ctorSetMetainfo(ctor, std::data(contents), std::size(contents));
     if (err)
     {
-        clearMetainfo(ctor);
         return err;
     }
 

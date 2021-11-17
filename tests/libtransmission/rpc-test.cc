@@ -87,7 +87,7 @@ TEST_F(RpcTest, sessionGet)
 
     tr_variant request;
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "session-get");
+    tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
     tr_variantFree(&request);

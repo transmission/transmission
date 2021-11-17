@@ -394,9 +394,9 @@ TEST_F(VariantTest, merge)
     tr_variantDictAddInt(&dest, i1, 1);
     tr_variantDictAddInt(&dest, i2, 2);
     tr_variantDictAddInt(&dest, i4, -35); /* remains untouched */
-    tr_variantDictAddStr(&dest, s5, "abc");
-    tr_variantDictAddStr(&dest, s6, "def");
-    tr_variantDictAddStr(&dest, s7, "127.0.0.1"); /* remains untouched */
+    tr_variantDictAddStrView(&dest, s5, "abc");
+    tr_variantDictAddStrView(&dest, s6, "def");
+    tr_variantDictAddStrView(&dest, s7, "127.0.0.1"); /* remains untouched */
 
     /* new dictionary, will overwrite items in dest */
     tr_variant src;
@@ -404,9 +404,9 @@ TEST_F(VariantTest, merge)
     tr_variantDictAddInt(&src, i1, 1); /* same value */
     tr_variantDictAddInt(&src, i2, 4); /* new value */
     tr_variantDictAddInt(&src, i3, 3); /* new key:value */
-    tr_variantDictAddStr(&src, s5, "abc"); /* same value */
-    tr_variantDictAddStr(&src, s6, "xyz"); /* new value */
-    tr_variantDictAddStr(&src, s8, "ghi"); /* new key:value */
+    tr_variantDictAddStrView(&src, s5, "abc"); /* same value */
+    tr_variantDictAddStrView(&src, s6, "xyz"); /* new value */
+    tr_variantDictAddStrView(&src, s8, "ghi"); /* new key:value */
 
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
