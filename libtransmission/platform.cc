@@ -397,7 +397,7 @@ char const* tr_getDefaultDownloadDir(void)
 
         /* read in user-dirs.dirs and look for the download dir entry */
         size_t content_len = 0;
-        char* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
+        auto* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
 
         if (content != nullptr && content_len > 0)
         {
