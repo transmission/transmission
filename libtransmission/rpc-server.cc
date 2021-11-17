@@ -452,7 +452,7 @@ static void rpc_response_func(tr_session* /*session*/, tr_variant* response, voi
 static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
     auto top = tr_variant{};
-    auto const have_content = tr_variantFromJson(&top, json) == 0;
+    auto const have_content = tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json);
 
     auto* const data = tr_new0(struct rpc_response_data, 1);
     data->req = req;
