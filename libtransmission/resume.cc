@@ -749,14 +749,14 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
 
     char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
-    if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, &error))
+    if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
     {
         tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename, error->message);
         tr_error_clear(&error);
 
         char* old_filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
 
-        if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, old_filename, &error))
+        if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, old_filename, &error))
         {
             tr_logAddTorDbg(tor, "Couldn't read \"%s\" either: %s", old_filename, error->message);
             tr_error_free(error);

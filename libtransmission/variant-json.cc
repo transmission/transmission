@@ -32,14 +32,15 @@
 
 struct json_wrapper_data
 {
-    int error;
     bool has_content;
-    tr_variant* top;
     char const* key;
+    evbuffer* keybuf;
+    evbuffer* strbuf;
+    int error;
     size_t keylen;
-    struct evbuffer* keybuf;
-    struct evbuffer* strbuf;
     std::deque<tr_variant*> stack;
+    tr_variant* top;
+    tr_variant_parse_opts opts;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -290,7 +291,14 @@ static void action_callback_POP(
     {
         auto len = size_t{};
         char const* str = extract_string(jsn, state, &len, data->strbuf);
-        tr_variantInitStr(get_node(jsn), { str, len });
+        if ((data->opts & TR_VARIANT_PARSE_INPLACE) != 0)
+        {
+            tr_variantInitStrView(get_node(jsn), { str, len });
+        }
+        else
+        {
+            tr_variantInitStr(get_node(jsn), { str, len });
+        }
         data->has_content = true;
     }
     else if (state->type == JSONSL_T_HKEY)
@@ -336,7 +344,7 @@ static void action_callback_POP(
     }
 }
 
-int tr_variantParseJson(tr_variant& setme, std::string_view benc, char const** setme_end)
+int tr_variantParseJson(tr_variant& setme, tr_variant_parse_opts opts, std::string_view benc, char const** setme_end)
 {
     auto data = json_wrapper_data{};
 
@@ -350,11 +358,12 @@ int tr_variantParseJson(tr_variant& setme, std::string_view benc, char const** s
     data.error = 0;
     data.has_content = false;
     data.key = nullptr;
-    data.top = &setme;
-    data.stack = {};
     data.keybuf = evbuffer_new();
-    data.strbuf = evbuffer_new();
+    data.opts = opts;
     data.preallocGuess = {};
+    data.stack = {};
+    data.strbuf = evbuffer_new();
+    data.top = &setme;
 
     /* parse it */
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(benc)), std::size(benc));

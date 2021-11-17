@@ -15,7 +15,9 @@
 #include <optional>
 #include <string_view>
 
-struct tr_variant;
+#include "transmission.h"
+
+#include "variant.h"
 
 using VariantWalkFunc = void (*)(tr_variant const* val, void* user_data);
 
@@ -44,6 +46,6 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);
 /** @brief Private function that's exposed here only for unit tests */
 std::optional<std::string_view> tr_bencParseStr(std::string_view* benc_inout);
 
-int tr_variantParseBenc(tr_variant& setme, std::string_view benc, char const** setme_end);
+int tr_variantParseBenc(tr_variant& setme, tr_variant_parse_opts opts, std::string_view benc, char const** setme_end);
 
-int tr_variantParseJson(tr_variant& setme, std::string_view benc, char const** setme_end);
+int tr_variantParseJson(tr_variant& setme, tr_variant_parse_opts opts, std::string_view benc, char const** setme_end);

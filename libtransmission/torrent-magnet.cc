@@ -288,7 +288,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                 tr_variant newMetainfo;
                 char* path = tr_strdup(tor->info.torrent);
 
-                if (tr_variantFromFile(&newMetainfo, TR_VARIANT_FMT_BENC, path, nullptr))
+                if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
                 {
                     /* remove any old .torrent and .resume files */
                     tr_sys_path_remove(path, nullptr);
