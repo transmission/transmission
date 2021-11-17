@@ -129,10 +129,6 @@ bool tr_variantFromBuf(
     char const** setme_end = nullptr,
     tr_error** error = nullptr);
 
-int tr_variantFromBenc(tr_variant* setme, std::string_view benc, char const** setme_end = nullptr);
-
-int tr_variantFromJson(tr_variant* setme, std::string_view json);
-
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;

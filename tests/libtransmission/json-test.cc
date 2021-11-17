@@ -48,7 +48,7 @@ TEST_P(JSONTest, testElements)
     };
 
     tr_variant top;
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
@@ -88,14 +88,14 @@ TEST_P(JSONTest, testUtf8)
     char* json;
     tr_quark const key = tr_quark_new("key"sv);
 
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     tr_variantFree(&top);
 
     in = R"({ "key": "\u005C" })"sv;
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("\\"sv, sv);
@@ -110,7 +110,7 @@ TEST_P(JSONTest, testUtf8)
      * 6. Confirm that the result is UTF-8.
      */
     in = R"({ "key": "Let\u00f6lt\u00e9sek" })"sv;
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
@@ -120,7 +120,7 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_NE(nullptr, json);
     EXPECT_NE(nullptr, strstr(json, "\\u00f6"));
     EXPECT_NE(nullptr, strstr(json, "\\u00e9"));
-    EXPECT_TRUE(tr_variantFromJson(&top, json));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
@@ -147,7 +147,7 @@ TEST_P(JSONTest, test1)
     };
 
     tr_variant top;
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
 
     auto sv = std::string_view{};
     int64_t i;
@@ -184,7 +184,7 @@ TEST_P(JSONTest, test2)
     auto const in = std::string{ " " };
 
     top.type = 0;
-    EXPECT_FALSE(tr_variantFromJson(&top, in));
+    EXPECT_FALSE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
     EXPECT_FALSE(tr_variantIsDict(&top));
 }
 
@@ -198,7 +198,7 @@ TEST_P(JSONTest, test3)
              "  \"leftUntilDone\": 2275655680 }"sv;
 
     tr_variant top;
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_errorString, &sv));
@@ -211,7 +211,7 @@ TEST_P(JSONTest, unescape)
 {
     tr_variant top;
     auto const in = std::string{ R"({ "string-1": "\/usr\/lib" })" };
-    EXPECT_TRUE(tr_variantFromJson(&top, in));
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&top, tr_quark_new("string-1"sv), &sv));

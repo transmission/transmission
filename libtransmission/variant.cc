@@ -1316,16 +1316,6 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     return true;
 }
 
-int tr_variantFromBenc(tr_variant* setme, std::string_view benc, char const** setme_end)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_PARSE_BENC, benc, setme_end);
-}
-
-int tr_variantFromJson(tr_variant* setme, std::string_view json)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_PARSE_JSON, json, nullptr);
-}
-
 bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
