@@ -287,7 +287,13 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
 #else
             int const compressionLevel = Z_BEST_COMPRESSION;
 #endif
-            deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
+            // "windowBits can also be greater than 15 for optional gzip encoding.
+            // Add 16 to windowBits to write a simple gzip header and trailer
+            // around the compressed data instead of a zlib wrapper."
+            if (Z_OK != deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
+            {
+                tr_logAddNamedDbg(MY_NAME, "deflateInit2 failed: %s", server->stream.msg);
+            }
         }
 
         server->stream.next_in = static_cast<Bytef*>(content_ptr);
@@ -554,7 +560,7 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
         [&hostname](auto const& str) { return tr_wildmat(hostname.c_str(), str.c_str()); });
 }
 
-static bool test_session_id(tr_rpc_server* server, struct evhttp_request* req)
+static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 {
     char const* ours = get_current_session_id(server);
     char const* theirs = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);

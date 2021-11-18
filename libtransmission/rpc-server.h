@@ -35,6 +35,11 @@ public:
     tr_rpc_server(tr_session* session, tr_variant* settings);
     ~tr_rpc_server();
 
+    tr_rpc_server(tr_rpc_server&) = delete;
+    tr_rpc_server(tr_rpc_server&&) = delete;
+    tr_rpc_server& operator=(tr_rpc_server&) = delete;
+    tr_rpc_server& operator=(tr_rpc_server&&) = delete;
+
     z_stream stream = {};
 
     std::list<std::string> hostWhitelist;

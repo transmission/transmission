@@ -317,7 +317,7 @@ static char const* torrentRemove(
     tr_rpc_idle_data* /*idle_data*/)
 {
     auto delete_flag = bool{ false };
-    tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
 
     tr_rpc_callback_type type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
@@ -1386,7 +1386,7 @@ static char const* torrentSetLocation(
     }
 
     auto move = bool{};
-    tr_variantDictFindBool(args_in, TR_KEY_move, &move);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_move, &move);
 
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -1515,7 +1515,7 @@ static void gotNewBlocklist(
     }
     else /* successfully fetched the blocklist... */
     {
-        z_stream stream;
+        auto stream = z_stream{};
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
         auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
