@@ -2566,7 +2566,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
     }
 
     /* save to the .torrent file */
-    if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent, nullptr))
+    if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, tor->info.torrent, nullptr))
     {
         /* remove the old fields */
         tr_variantDictRemove(&metainfo, TR_KEY_announce);

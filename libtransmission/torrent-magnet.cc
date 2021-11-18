@@ -119,7 +119,8 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
     if (fileContents != nullptr)
     {
         auto top = tr_variant{};
-        if (tr_variantFromBenc(&top, std::string_view{ reinterpret_cast<char const*>(fileContents), fileLen }) == 0)
+        auto const contents_sv = std::string_view{ reinterpret_cast<char const*>(fileContents), fileLen };
+        if (tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, contents_sv))
         {
             tr_variant* infoDict = nullptr;
             if (tr_variantDictFindDict(&top, TR_KEY_info, &infoDict))
@@ -276,19 +277,16 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         if (checksumPassed)
         {
             /* checksum passed; now try to parse it as benc */
-            tr_variant infoDict;
-            auto metadata_sv = std::string_view{ m->metadata, m->metadata_size };
-            int const err = tr_variantFromBenc(&infoDict, metadata_sv);
-            dbgmsg(tor, "err is %d", err);
-
-            metainfoParsed = err == 0;
+            auto infoDict = tr_variant{};
+            auto const metadata_sv = std::string_view{ m->metadata, m->metadata_size };
+            metainfoParsed = tr_variantFromBuf(&infoDict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, metadata_sv);
             if (metainfoParsed)
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_variant newMetainfo;
                 char* path = tr_strdup(tor->info.torrent);
 
-                if (tr_variantFromFile(&newMetainfo, TR_VARIANT_FMT_BENC, path, nullptr))
+                if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
                 {
                     /* remove any old .torrent and .resume files */
                     tr_sys_path_remove(path, nullptr);

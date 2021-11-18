@@ -20,9 +20,11 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
+
+#include "tr-assert.h"
 #include "utils.h" /* tr_snprintf() */
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 using namespace std::literals;
 
@@ -152,8 +154,10 @@ static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_qua
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** setme_end)
+int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end)
 {
+    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_BENC) != 0);
+
     auto stack = std::deque<tr_variant*>{};
     auto key = std::optional<tr_quark>{};
 
@@ -252,7 +256,14 @@ int tr_variantParseBenc(tr_variant& top, std::string_view benc, char const** set
                     tr_variant* const v = get_node(stack, key, &top, &err);
                     if (v != nullptr)
                     {
-                        tr_variantInitStr(v, *sv);
+                        if ((parse_opts & TR_VARIANT_PARSE_INPLACE) != 0)
+                        {
+                            tr_variantInitStrView(v, *sv);
+                        }
+                        else
+                        {
+                            tr_variantInitStr(v, *sv);
+                        }
                     }
                 }
                 break;

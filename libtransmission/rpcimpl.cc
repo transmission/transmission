@@ -420,9 +420,9 @@ static void addTrackers(tr_info const* info, tr_variant* trackers)
     {
         tr_tracker_info const* t = &info->trackers[i];
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddStr(d, TR_KEY_announce, t->announce);
+        tr_variantDictAddStrView(d, TR_KEY_announce, t->announce);
         tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStr(d, TR_KEY_scrape, t->scrape);
+        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape);
         tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
     }
 }
@@ -542,7 +542,7 @@ static void initField(
         break;
 
     case TR_KEY_downloadDir:
-        tr_variantInitStr(initme, tr_torrentGetDownloadDir(tor));
+        tr_variantInitStrView(initme, tr_torrentGetDownloadDir(tor));
         break;
 
     case TR_KEY_downloadedEver:
@@ -562,7 +562,7 @@ static void initField(
         break;
 
     case TR_KEY_errorString:
-        tr_variantInitStr(initme, st->errorString);
+        tr_variantInitStrView(initme, st->errorString);
         break;
 
     case TR_KEY_eta:
@@ -584,7 +584,7 @@ static void initField(
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStr(initme, tor->info.hashString);
+        tr_variantInitStrView(initme, tor->info.hashString);
         break;
 
     case TR_KEY_haveUnchecked:
@@ -646,7 +646,7 @@ static void initField(
         break;
 
     case TR_KEY_name:
-        tr_variantInitStr(initme, tr_torrentName(tor));
+        tr_variantInitStrView(initme, tr_torrentName(tor));
         break;
 
     case TR_KEY_percentDone:
@@ -697,7 +697,7 @@ static void initField(
         }
         else
         {
-            tr_variantInitStr(initme, ""sv);
+            tr_variantInitStrView(initme, ""sv);
         }
 
         break;
@@ -711,7 +711,7 @@ static void initField(
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStr(initme, tr_torrentPrimaryMimeType(tor));
+        tr_variantInitStrView(initme, tr_torrentPrimaryMimeType(tor));
         break;
 
     case TR_KEY_priorities:
@@ -2290,7 +2290,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
+        tr_variantDictAddStrView(d, key, RPC_VERSION_SEMVER);
         break;
 
     case TR_KEY_rpc_version_minimum:
@@ -2382,7 +2382,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_version:
-        tr_variantDictAddStr(d, key, LONG_VERSION_STRING);
+        tr_variantDictAddStrView(d, key, LONG_VERSION_STRING);
         break;
 
     case TR_KEY_encryption:

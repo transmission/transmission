@@ -1124,7 +1124,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     msgs->peerSentLtepHandshake = true;
 
     auto val = tr_variant{};
-    if (tr_variantFromBenc(&val, { tmp, len }) != 0 || !tr_variantIsDict(&val))
+    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, len }) || !tr_variantIsDict(&val))
     {
         dbgmsg(msgs, "GET  extended-handshake, couldn't get dictionary");
         tr_free(tmp);
@@ -1241,7 +1241,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     auto dict = tr_variant{};
     char const* benc_end = nullptr;
-    if (tr_variantFromBenc(&dict, std::string_view{ tmp, msglen }, &benc_end) == 0)
+    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }, &benc_end))
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
@@ -1310,52 +1310,50 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
 
     tr_variant val;
-    bool const loaded = tr_variantFromBenc(&val, std::string_view{ tmp, msglen }) == 0;
+    bool const loaded = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen });
+
+    if (loaded)
+    {
+        uint8_t const* added = nullptr;
+        auto added_len = size_t{};
+        if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
+        {
+            uint8_t const* added_f = nullptr;
+            auto added_f_len = size_t{};
+            if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
+            {
+                added_f_len = 0;
+                added_f = nullptr;
+            }
+
+            auto n = size_t{};
+            tr_pex* const pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
+            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
+            tr_free(pex);
+        }
+
+        if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
+        {
+            uint8_t const* added_f = nullptr;
+            auto added_f_len = size_t{};
+            if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
+            {
+                added_f_len = 0;
+                added_f = nullptr;
+            }
+
+            auto n = size_t{};
+            tr_pex* const pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
+            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
+            tr_free(pex);
+        }
+
+        tr_variantFree(&val);
+    }
 
     tr_free(tmp);
-
-    if (!loaded)
-    {
-        return;
-    }
-
-    uint8_t const* added = nullptr;
-    auto added_len = size_t{};
-    if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
-    {
-        uint8_t const* added_f = nullptr;
-        auto added_f_len = size_t{};
-        if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
-        {
-            added_f_len = 0;
-            added_f = nullptr;
-        }
-
-        auto n = size_t{};
-        tr_pex* const pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-        n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-        tr_free(pex);
-    }
-
-    if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
-    {
-        uint8_t const* added_f = nullptr;
-        auto added_f_len = size_t{};
-        if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
-        {
-            added_f_len = 0;
-            added_f = nullptr;
-        }
-
-        auto n = size_t{};
-        tr_pex* const pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-        n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-        tr_free(pex);
-    }
-
-    tr_variantFree(&val);
 }
 
 static void sendPex(tr_peerMsgsImpl* msgs);

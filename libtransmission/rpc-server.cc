@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
 
                 auto top = tr_variant{};
                 tr_variantInitDict(&top, 2);
-                tr_variantDictAddStr(&top, TR_KEY_method, "torrent-add");
+                tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-add");
                 auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddBool(args, TR_KEY_paused, paused);
 
@@ -195,7 +195,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
                     tr_variantDictAddStrView(args, TR_KEY_filename, body);
                     have_source = true;
                 }
-                else if (tr_variantFromBenc(&test, body) == 0)
+                else if (tr_variantFromBuf(&test, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, body))
                 {
                     auto* b64 = static_cast<char*>(tr_base64_encode(body.c_str(), body_len, nullptr));
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
@@ -458,7 +458,7 @@ static void rpc_response_func(tr_session* /*session*/, tr_variant* response, voi
 static void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
     auto top = tr_variant{};
-    auto const have_content = tr_variantFromJson(&top, json) == 0;
+    auto const have_content = tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json);
 
     auto* const data = tr_new0(struct rpc_response_data, 1);
     data->req = req;
