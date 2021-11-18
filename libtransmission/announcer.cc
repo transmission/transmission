@@ -537,7 +537,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 
 struct AnnTrackerInfo
 {
-    AnnTrackerInfo(tr_tracker_info info_in, tr_url_parsed_t url_in)
+    AnnTrackerInfo(tr_tracker_info const& info_in, tr_url_parsed_t const& url_in)
         : info{ info_in }
         , url{ url_in }
     {
