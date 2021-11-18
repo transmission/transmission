@@ -1517,17 +1517,21 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_sessionRemoveTorrent(session, tor);
 
-    /* resequence the queue positions */
-    for (auto* t : session->torrents)
+    if (!session->isClosing())
     {
-        if (t->queuePosition > tor->queuePosition)
+        // "so you die, captain, and we all move up in rank."
+        // resequence the queue positions
+        for (auto* t : session->torrents)
         {
-            t->queuePosition--;
-            t->anyDate = now;
+            if (t->queuePosition > tor->queuePosition)
+            {
+                t->queuePosition--;
+                t->anyDate = now;
+            }
         }
-    }
 
-    TR_ASSERT(queueIsSequenced(session));
+        TR_ASSERT(queueIsSequenced(session));
+    }
 
     delete tor->bandwidth;
 
