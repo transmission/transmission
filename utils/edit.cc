@@ -342,7 +342,7 @@ int tr_main(int argc, char* argv[])
 
         printf("%s\n", filename);
 
-        if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, &error))
+        if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
         {
             printf("\tError reading file: %s\n", error->message);
             tr_error_free(error);

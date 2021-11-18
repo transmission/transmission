@@ -15,7 +15,6 @@
 #include <cstring>
 
 #include <event2/buffer.h> /* evbuffer_add() */
-#include <event2/util.h> /* evutil_strtoll() */
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -28,20 +27,21 @@
 #include "variant.h"
 #include "variant-common.h"
 
+using namespace std::literals;
+
 /* arbitrary value... this is much deeper than our code goes */
 #define MAX_DEPTH 64
 
 struct json_wrapper_data
 {
-    int error;
     bool has_content;
-    tr_variant* top;
-    char const* key;
-    size_t keylen;
-    struct evbuffer* keybuf;
-    struct evbuffer* strbuf;
-    char const* source;
+    std::string_view key;
+    evbuffer* keybuf;
+    evbuffer* strbuf;
+    int error;
     std::deque<tr_variant*> stack;
+    tr_variant* top;
+    int parse_opts;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -65,12 +65,10 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     {
         node = tr_variantListAdd(parent);
     }
-    else if (tr_variantIsDict(parent) && data->key != nullptr)
+    else if (tr_variantIsDict(parent) && !std::empty(data->key))
     {
-        node = tr_variantDictAdd(parent, tr_quark_new(std::string_view{ data->key, data->keylen }));
-
-        data->key = nullptr;
-        data->keylen = 0;
+        node = tr_variantDictAdd(parent, tr_quark_new(data->key));
+        data->key = ""sv;
     }
 
     return node;
@@ -80,19 +78,7 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    if (data->source != nullptr)
-    {
-        tr_logAddError(
-            "JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
-            data->source,
-            jsn->pos,
-            jsonsl_strerror(error),
-            buf);
-    }
-    else
-    {
-        tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
-    }
+    tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
 
     data->error = EILSEQ;
 }
@@ -168,7 +154,7 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
     return true;
 }
 
-static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, struct evbuffer* buf)
+static std::string_view extract_escaped_string(char const* in, size_t in_len, struct evbuffer* buf)
 {
     char const* const in_end = in + in_len;
 
@@ -266,13 +252,12 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, 
         }
     }
 
-    *len = evbuffer_get_length(buf);
-    return (char*)evbuffer_pullup(buf, -1);
+    return { (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
 }
 
-static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, size_t* len, struct evbuffer* buf)
+static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, struct evbuffer* buf)
 {
-    /* figure out where the string is */
+    // figure out where the string is
     char const* in_begin = jsn->base + state->pos_begin;
     if (*in_begin == '"')
     {
@@ -281,15 +266,13 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
 
     char const* const in_end = jsn->base + state->pos_cur;
     size_t const in_len = in_end - in_begin;
-
     if (memchr(in_begin, '\\', in_len) == nullptr)
     {
         /* it's not escaped */
-        *len = in_len;
-        return in_begin;
+        return std::make_pair(std::string_view{ in_begin, in_len }, true);
     }
 
-    return extract_escaped_string(in_begin, in_len, len, buf);
+    return std::make_pair(extract_escaped_string(in_begin, in_len, buf), false);
 }
 
 static void action_callback_POP(
@@ -302,15 +285,22 @@ static void action_callback_POP(
 
     if (state->type == JSONSL_T_STRING)
     {
-        auto len = size_t{};
-        char const* str = extract_string(jsn, state, &len, data->strbuf);
-        tr_variantInitStr(get_node(jsn), { str, len });
+        auto const [str, inplace] = extract_string(jsn, state, data->strbuf);
+        if (inplace && ((data->parse_opts & TR_VARIANT_PARSE_INPLACE) != 0))
+        {
+            tr_variantInitStrView(get_node(jsn), str);
+        }
+        else
+        {
+            tr_variantInitStr(get_node(jsn), str);
+        }
         data->has_content = true;
     }
     else if (state->type == JSONSL_T_HKEY)
     {
         data->has_content = true;
-        data->key = extract_string(jsn, state, &data->keylen, data->keybuf);
+        auto const [key, inplace] = extract_string(jsn, state, data->keybuf);
+        data->key = key;
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
@@ -334,7 +324,7 @@ static void action_callback_POP(
         {
             char const* begin = jsn->base + state->pos_begin;
             data->has_content = true;
-            tr_variantInitInt(get_node(jsn), evutil_strtoll(begin, nullptr, 10));
+            tr_variantInitInt(get_node(jsn), std::strtoll(begin, nullptr, 10));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
         {
@@ -350,8 +340,10 @@ static void action_callback_POP(
     }
 }
 
-int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant, char const** setme_end)
+int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc, char const** setme_end)
 {
+    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
+
     auto data = json_wrapper_data{};
 
     jsonsl_t jsn = jsonsl_new(MAX_DEPTH);
@@ -363,16 +355,16 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
 
     data.error = 0;
     data.has_content = false;
-    data.key = nullptr;
-    data.top = setme_variant;
-    data.stack = {};
-    data.source = source;
+    data.key = ""sv;
     data.keybuf = evbuffer_new();
-    data.strbuf = evbuffer_new();
+    data.parse_opts = parse_opts;
     data.preallocGuess = {};
+    data.stack = {};
+    data.strbuf = evbuffer_new();
+    data.top = &setme;
 
     /* parse it */
-    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(vbuf), len);
+    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(benc)), std::size(benc));
 
     /* EINVAL if there was no content */
     if (data.error == 0 && !data.has_content)
@@ -383,7 +375,7 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     /* maybe set the end ptr */
     if (setme_end != nullptr)
     {
-        *setme_end = ((char const*)vbuf) + jsn->pos;
+        *setme_end = std::data(benc) + jsn->pos;
     }
 
     /* cleanup */
@@ -643,14 +635,10 @@ static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct jsonWalk*>(vdata);
-    bool emptyContainer = false;
 
     jsonPopParent(data);
 
-    if (!emptyContainer)
-    {
-        jsonIndent(data);
-    }
+    jsonIndent(data);
 
     if (tr_variantIsDict(val))
     {

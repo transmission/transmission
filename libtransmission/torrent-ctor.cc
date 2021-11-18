@@ -52,6 +52,8 @@ struct tr_ctor
     std::vector<tr_file_index_t> normal;
     std::vector<tr_file_index_t> high;
 
+    std::vector<char> contents;
+
     explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
     {
@@ -78,13 +80,22 @@ static void clearMetainfo(tr_ctor* ctor)
     setSourceFile(ctor, nullptr);
 }
 
+static int parseMetainfoContents(tr_ctor* ctor)
+{
+    auto& contents = ctor->contents;
+    auto sv = std::string_view{ std::data(contents), std::size(contents) };
+    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv);
+    return ctor->isSet_metainfo ? 0 : EILSEQ;
+}
+
 int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     clearMetainfo(ctor);
-    auto sv = std::string_view{ static_cast<char const*>(metainfo), len };
-    auto const err = tr_variantFromBenc(&ctor->metainfo, sv);
-    ctor->isSet_metainfo = err == 0;
-    return err;
+
+    ctor->contents.resize(len);
+    std::copy_n(static_cast<char const*>(metainfo), len, std::begin(ctor->contents));
+
+    return parseMetainfoContents(ctor);
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
@@ -113,52 +124,47 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
-    auto len = size_t{};
-    auto* const metainfo = tr_loadFile(filename, &len, nullptr);
+    clearMetainfo(ctor);
 
-    auto err = int{};
-    if (metainfo != nullptr && len != 0)
+    if (!tr_loadFile(ctor->contents, filename, nullptr) || std::empty(ctor->contents))
     {
-        err = tr_ctorSetMetainfo(ctor, metainfo, len);
+        return EILSEQ;
     }
-    else
+
+    int const err = parseMetainfoContents(ctor);
+    if (err)
     {
         clearMetainfo(ctor);
-        err = 1;
+        return err;
     }
 
     setSourceFile(ctor, filename);
 
     /* if no `name' field was set, then set it from the filename */
-    if (ctor->isSet_metainfo)
+    tr_variant* info = nullptr;
+
+    if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
     {
-        tr_variant* info = nullptr;
+        auto name = std::string_view{};
 
-        if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
+        if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) && !tr_variantDictFindStrView(info, TR_KEY_name, &name))
         {
-            auto name = std::string_view{};
+            name = ""sv;
+        }
 
-            if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) &&
-                !tr_variantDictFindStrView(info, TR_KEY_name, &name))
+        if (std::empty(name))
+        {
+            char* base = tr_sys_path_basename(filename, nullptr);
+
+            if (base != nullptr)
             {
-                name = ""sv;
-            }
-
-            if (std::empty(name))
-            {
-                char* base = tr_sys_path_basename(filename, nullptr);
-
-                if (base != nullptr)
-                {
-                    tr_variantDictAddStr(info, TR_KEY_name, base);
-                    tr_free(base);
-                }
+                tr_variantDictAddStr(info, TR_KEY_name, base);
+                tr_free(base);
             }
         }
     }
 
-    tr_free(metainfo);
-    return err;
+    return 0;
 }
 
 /***

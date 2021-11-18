@@ -397,7 +397,7 @@ char const* tr_getDefaultDownloadDir(void)
 
         /* read in user-dirs.dirs and look for the download dir entry */
         size_t content_len = 0;
-        char* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
+        auto* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
 
         if (content != nullptr && content_len > 0)
         {
@@ -543,11 +543,9 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             if (s == nullptr) /* check calling module place */
             {
                 wchar_t wide_module_path[MAX_PATH];
-                char* module_path;
-                char* dir;
                 GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
-                module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                dir = tr_sys_path_dirname(module_path, nullptr);
+                char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
+                char* dir = tr_sys_path_dirname(module_path, nullptr);
                 tr_free(module_path);
 
                 if (dir != nullptr)

@@ -18,6 +18,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 #ifndef MAXSIZE_T
 #define MAXSIZE_T ((SIZE_T) ~((SIZE_T)0))
 #endif
@@ -121,7 +123,7 @@ static constexpr bool is_unc_path(std::string_view path)
     return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
 }
 
-static bool is_valid_path(char const* path)
+static bool is_valid_path(std::string_view path)
 {
     if (is_unc_path(path))
     {
@@ -132,20 +134,20 @@ static bool is_valid_path(char const* path)
     }
     else
     {
-        char const* colon_pos = strchr(path, ':');
+        auto pos = path.find(':');
 
-        if (colon_pos != nullptr)
+        if (pos != path.npos)
         {
-            if (colon_pos != path + 1 || !isalpha(path[0]))
+            if (pos != 1 || !isalpha(path[0]))
             {
                 return false;
             }
 
-            path += 2;
+            path.remove_prefix(2);
         }
     }
 
-    return strpbrk(path, "<>:\"|?*") == nullptr;
+    return path.find_first_of("<>:\"|?*"sv) == path.npos;
 }
 
 static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
@@ -623,9 +625,9 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_basename(char const* path, tr_error** error)
+char* tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    if (tr_str_is_empty(path))
+    if (std::empty(path))
     {
         return tr_strdup(".");
     }
@@ -636,21 +638,22 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
         return nullptr;
     }
 
-    char const* end = path + strlen(path);
+    char const* const begin = std::data(path);
+    char const* end = begin + std::size(path);
 
-    while (end > path && is_slash(*(end - 1)))
+    while (end > begin && is_slash(*(end - 1)))
     {
         --end;
     }
 
-    if (end == path)
+    if (end == begin)
     {
         return tr_strdup("/");
     }
 
     char const* name = end;
 
-    while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
+    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
         --name;
     }
@@ -663,9 +666,9 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
     return tr_strndup(name, end - name);
 }
 
-char* tr_sys_path_dirname(char const* path, tr_error** error)
+char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    if (tr_str_is_empty(path))
+    if (std::empty(path))
     {
         return tr_strdup(".");
     }
@@ -680,44 +683,45 @@ char* tr_sys_path_dirname(char const* path, tr_error** error)
 
     if (is_unc && path[2] == '\0')
     {
-        return tr_strdup(path);
+        return tr_strvDup(path);
     }
 
-    char const* end = path + strlen(path);
+    char const* const begin = std::data(path);
+    char const* end = begin + std::size(path);
 
-    while (end > path && is_slash(*(end - 1)))
+    while (end > begin && is_slash(*(end - 1)))
     {
         --end;
     }
 
-    if (end == path)
+    if (end == begin)
     {
         return tr_strdup("/");
     }
 
     char const* name = end;
 
-    while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
+    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
         --name;
     }
 
-    while (name > path && is_slash(*(name - 1)))
+    while (name > begin && is_slash(*(name - 1)))
     {
         --name;
     }
 
-    if (name == path)
+    if (name == begin)
     {
         return tr_strdup(is_unc ? "\\\\" : ".");
     }
 
-    if (name > path && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
+    if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
     {
-        return tr_strdup_printf("%c:.", path[0]);
+        return tr_strdup_printf("%c:.", begin[0]);
     }
 
-    return tr_strndup(path, name - path);
+    return tr_strndup(begin, name - begin);
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)

@@ -317,7 +317,7 @@ static char const* torrentRemove(
     tr_rpc_idle_data* /*idle_data*/)
 {
     auto delete_flag = bool{ false };
-    tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
 
     tr_rpc_callback_type type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
@@ -420,9 +420,9 @@ static void addTrackers(tr_info const* info, tr_variant* trackers)
     {
         tr_tracker_info const* t = &info->trackers[i];
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddStr(d, TR_KEY_announce, t->announce);
+        tr_variantDictAddStrView(d, TR_KEY_announce, t->announce);
         tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStr(d, TR_KEY_scrape, t->scrape);
+        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape);
         tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
     }
 }
@@ -542,7 +542,7 @@ static void initField(
         break;
 
     case TR_KEY_downloadDir:
-        tr_variantInitStr(initme, tr_torrentGetDownloadDir(tor));
+        tr_variantInitStrView(initme, tr_torrentGetDownloadDir(tor));
         break;
 
     case TR_KEY_downloadedEver:
@@ -562,7 +562,7 @@ static void initField(
         break;
 
     case TR_KEY_errorString:
-        tr_variantInitStr(initme, st->errorString);
+        tr_variantInitStrView(initme, st->errorString);
         break;
 
     case TR_KEY_eta:
@@ -584,7 +584,7 @@ static void initField(
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStr(initme, tor->info.hashString);
+        tr_variantInitStrView(initme, tor->info.hashString);
         break;
 
     case TR_KEY_haveUnchecked:
@@ -646,7 +646,7 @@ static void initField(
         break;
 
     case TR_KEY_name:
-        tr_variantInitStr(initme, tr_torrentName(tor));
+        tr_variantInitStrView(initme, tr_torrentName(tor));
         break;
 
     case TR_KEY_percentDone:
@@ -697,7 +697,7 @@ static void initField(
         }
         else
         {
-            tr_variantInitStr(initme, ""sv);
+            tr_variantInitStrView(initme, ""sv);
         }
 
         break;
@@ -711,7 +711,7 @@ static void initField(
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStr(initme, tr_torrentPrimaryMimeType(tor));
+        tr_variantInitStrView(initme, tr_torrentPrimaryMimeType(tor));
         break;
 
     case TR_KEY_priorities:
@@ -1373,9 +1373,9 @@ static char const* torrentSetLocation(
     tr_variant* /*args_out*/,
     tr_rpc_idle_data* /*idle_data*/)
 {
-    char const* location = nullptr;
+    auto location = std::string_view{};
 
-    if (!tr_variantDictFindStr(args_in, TR_KEY_location, &location, nullptr))
+    if (!tr_variantDictFindStrView(args_in, TR_KEY_location, &location))
     {
         return "no location";
     }
@@ -1386,11 +1386,11 @@ static char const* torrentSetLocation(
     }
 
     auto move = bool{};
-    tr_variantDictFindBool(args_in, TR_KEY_move, &move);
+    (void)tr_variantDictFindBool(args_in, TR_KEY_move, &move);
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentSetLocation(tor, location, move, nullptr, nullptr);
+        tor->setLocation(location, move, nullptr, nullptr);
         notify(session, TR_RPC_TORRENT_MOVED, tor);
     }
 
@@ -1421,15 +1421,15 @@ static char const* torrentRenamePath(
 {
     char const* errmsg = nullptr;
 
-    char const* oldpath = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, nullptr);
-    char const* newname = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_name, &newname, nullptr);
+    auto oldpath = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_path, &oldpath);
+    auto newname = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
 
     auto const torrents = getTorrents(session, args_in);
     if (std::size(torrents) == 1)
     {
-        tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+        torrents[0]->renamePath(oldpath, newname, torrentRenamePathDone, idle_data);
     }
     else
     {
@@ -1515,7 +1515,7 @@ static void gotNewBlocklist(
     }
     else /* successfully fetched the blocklist... */
     {
-        z_stream stream;
+        auto stream = z_stream{};
         char const* configDir = tr_sessionGetConfigDir(session);
         size_t const buflen = 1024 * 128; /* 128 KiB buffer */
         auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
@@ -1694,14 +1694,11 @@ static void gotMetadataFromURL(
     tr_free(data);
 }
 
-static bool isCurlURL(char const* filename)
+static bool isCurlURL(std::string_view url)
 {
-    if (filename == nullptr)
-    {
-        return false;
-    }
-
-    return strncmp(filename, "ftp://", 6) == 0 || strncmp(filename, "http://", 7) == 0 || strncmp(filename, "https://", 8) == 0;
+    auto constexpr Schemes = std::array<std::string_view, 4>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv };
+    auto const parsed = tr_urlParse(url);
+    return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
 
 static auto fileListFromList(tr_variant* list)
@@ -1727,20 +1724,19 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 {
     TR_ASSERT(idle_data != nullptr);
 
-    char const* filename = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, nullptr);
+    auto filename = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_filename, &filename);
 
-    char const* metainfo_base64 = nullptr;
-    (void)tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, nullptr);
+    auto metainfo_base64 = std::string_view{};
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_metainfo, &metainfo_base64);
 
-    if (filename == nullptr && metainfo_base64 == nullptr)
+    if (std::empty(filename) && std::empty(metainfo_base64))
     {
         return "no filename or metainfo specified";
     }
 
-    char const* download_dir = nullptr;
-
-    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir, &download_dir, nullptr) && tr_sys_path_is_relative(download_dir))
+    auto download_dir = std::string_view{};
+    if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
     {
         return "download directory path is not absolute";
     }
@@ -1755,9 +1751,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     auto cookies = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_cookies, &cookies);
 
-    if (download_dir != nullptr)
+    if (!std::empty(download_dir))
     {
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, download_dir);
+        auto const sz_download_dir = std::string{ download_dir };
+        tr_ctorSetDownloadDir(ctor, TR_FORCE, sz_download_dir.c_str());
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_paused, &boolVal))
@@ -1805,38 +1802,38 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_HIGH);
     }
 
-    dbgmsg("torrentAdd: filename is \"%s\"", filename ? filename : " (null)");
+    dbgmsg("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
 
     if (isCurlURL(filename))
     {
-        struct add_torrent_idle_data* d = tr_new0(struct add_torrent_idle_data, 1);
+        auto* const d = tr_new0(struct add_torrent_idle_data, 1);
         d->data = idle_data;
         d->ctor = ctor;
         tr_webRunWithCookies(session, filename, cookies, gotMetadataFromURL, d);
     }
     else
     {
-        char* fname = tr_strdup(filename);
-
-        if (fname == nullptr)
+        if (std::empty(filename))
         {
-            auto len = size_t{};
-            auto* const metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &len));
-            tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, len);
-            tr_free(metainfo);
-        }
-        else if (strncmp(fname, "magnet:?", 8) == 0)
-        {
-            tr_ctorSetMetainfoFromMagnetLink(ctor, fname);
+            std::string const metainfo = tr_base64_decode_str(metainfo_base64);
+            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo));
         }
         else
         {
-            tr_ctorSetMetainfoFromFile(ctor, fname);
+            // these two tr_ctorSet*() functions require zero-terminated strings
+            auto const filename_str = std::string{ filename };
+
+            if (tr_strvStartsWith(filename, "magnet:?"sv))
+            {
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_str.c_str());
+            }
+            else
+            {
+                tr_ctorSetMetainfoFromFile(ctor, filename_str.c_str());
+            }
         }
 
         addTorrentImpl(idle_data, ctor);
-
-        tr_free(fname);
     }
 
     return nullptr;
@@ -2293,7 +2290,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStr(d, key, RPC_VERSION_SEMVER);
+        tr_variantDictAddStrView(d, key, RPC_VERSION_SEMVER);
         break;
 
     case TR_KEY_rpc_version_minimum:
@@ -2385,7 +2382,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_version:
-        tr_variantDictAddStr(d, key, LONG_VERSION_STRING);
+        tr_variantDictAddStrView(d, key, LONG_VERSION_STRING);
         break;
 
     case TR_KEY_encryption:

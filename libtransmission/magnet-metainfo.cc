@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -27,7 +28,7 @@ using namespace std::literals;
 namespace bitzi
 {
 
-int constexpr base32Lookup[] = {
+auto constexpr Base32Lookup = std::array<int, 80>{
     0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, /* '0', '1', '2', '3', '4', '5', '6', '7' */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* '8', '9', ':', ';', '<', '=', '>', '?' */
     0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, /* '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G' */
@@ -61,7 +62,7 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
         }
 
         /* If this digit is not in the table, ignore it */
-        int const digit = base32Lookup[lookup];
+        int const digit = Base32Lookup[lookup];
 
         if (digit == 0xFF)
         {
@@ -137,6 +138,18 @@ std::string tr_magnet_metainfo::magnet() const
     return s;
 }
 
+static tr_quark announceToScrape(std::string_view announce)
+{
+    auto buf = std::string{};
+
+    if (!tr_magnet_metainfo::convertAnnounceToScrape(buf, announce))
+    {
+        return TR_KEY_NONE;
+    }
+
+    return tr_quark_new(buf);
+}
+
 bool tr_magnet_metainfo::addTracker(tr_tracker_tier_t tier, std::string_view announce_sv)
 {
     announce_sv = tr_strvStrip(announce_sv);
@@ -146,9 +159,8 @@ bool tr_magnet_metainfo::addTracker(tr_tracker_tier_t tier, std::string_view ann
         return false;
     }
 
-    auto buf = std::string{};
     auto const announce_url = tr_quark_new(announce_sv);
-    auto const scrape_url = convertAnnounceToScrape(buf, announce_sv) ? tr_quark_new(buf) : TR_KEY_NONE;
+    auto const scrape_url = announceToScrape(announce_sv);
     this->trackers.insert({ tier, { announce_url, scrape_url, tier } });
     return true;
 }
@@ -173,7 +185,8 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            addTracker(tier++, tr_urlPercentDecode(value));
+            addTracker(tier, tr_urlPercentDecode(value));
+            ++tier;
         }
         else if (key == "ws"sv)
         {
@@ -224,8 +237,7 @@ bool tr_magnet_metainfo::convertAnnounceToScrape(std::string& out, std::string_v
     // the scrape convention. If it does, substitute 'scrape' for
     // 'announce' to find the scrape page.
     auto constexpr oldval = "/announce"sv;
-    auto pos = in.rfind(oldval.front());
-    if (pos != in.npos && in.find(oldval, pos) == pos)
+    if (auto pos = in.rfind(oldval.front()); pos != in.npos && in.find(oldval, pos) == pos)
     {
         auto const prefix = in.substr(0, pos);
         auto const suffix = in.substr(pos + std::size(oldval));

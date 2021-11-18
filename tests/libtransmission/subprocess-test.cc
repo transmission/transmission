@@ -139,24 +139,29 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg1, buffer.data());
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg2, buffer.data());
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg3, buffer.data());
 
     if (allow_batch_metachars)
     {
         buffer[0] = '\0';
         EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+        buffer.back() = '\0';
         EXPECT_EQ(test_arg4, buffer.data());
     }
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
 
     tr_sys_file_close(fd, nullptr);
 }
