@@ -135,6 +135,11 @@ struct CaseInsensitiveStringCompare // case-insensitive string compare
 struct tr_session
 {
 public:
+    bool isClosing() const
+    {
+        return is_closing_;
+    }
+
     // download dir
 
     std::string const& downloadDir() const
@@ -261,7 +266,7 @@ public:
     bool isUTPEnabled;
     bool isLPDEnabled;
     bool isPrefetchEnabled;
-    bool isClosing;
+    bool is_closing_ = false;
     bool isClosed;
     bool isRatioLimited;
     bool isIdleLimited;
