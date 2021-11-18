@@ -17,12 +17,12 @@
 #include <string_view>
 #include <vector>
 
-struct tr_variant;
-
 #include "transmission.h"
 
 #include "error.h"
 #include "quark.h"
+
+struct tr_variant;
 
 struct tr_magnet_metainfo
 {

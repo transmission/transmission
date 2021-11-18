@@ -216,8 +216,7 @@ static std::string getblkdev(std::string_view path)
 {
     for (;;)
     {
-        auto const* const device = getdev(path);
-        if (device != nullptr)
+        if (auto const* const device = getdev(path); device != nullptr)
         {
             return device;
         }

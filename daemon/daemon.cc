@@ -649,7 +649,6 @@ static void daemon_stop(void* /*arg*/)
 static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 {
     bool boolVal;
-    char const* pid_filename;
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
@@ -684,13 +683,14 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
     tr_sessionSaveSettings(session, configDir, settings);
 
-    pid_filename = nullptr;
-    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, nullptr);
-    if (!tr_str_is_empty(pid_filename))
+    auto sv = std::string_view{};
+    (void)tr_variantDictFindStrView(settings, key_pidfile, &sv);
+    auto const sz_pid_filename = std::string{ sv };
+    if (!std::empty(sz_pid_filename))
     {
         tr_error* error = nullptr;
         tr_sys_file_t fp = tr_sys_file_open(
-            pid_filename,
+            sz_pid_filename.c_str(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0666,
             &error);
@@ -699,12 +699,12 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             tr_sys_file_write_fmt(fp, "%d", nullptr, (int)getpid());
             tr_sys_file_close(fp, nullptr);
-            tr_logAddInfo("Saved pidfile \"%s\"", pid_filename);
+            tr_logAddInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
             pidfile_created = true;
         }
         else
         {
-            tr_logAddError("Unable to save pidfile \"%s\": %s", pid_filename, error->message);
+            tr_logAddError("Unable to save pidfile \"%s\": %s", sz_pid_filename.c_str(), error->message);
             tr_error_free(error);
         }
     }
@@ -826,7 +826,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(pid_filename, nullptr);
+        tr_sys_path_remove(sz_pid_filename.c_str(), nullptr);
     }
 
     sd_notify(0, "STATUS=\n");

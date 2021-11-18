@@ -112,14 +112,22 @@ char* tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt, size_t* len
 
 struct evbuffer* tr_variantToBuf(tr_variant const* variant, tr_variant_fmt fmt);
 
+enum tr_variant_parse_opts
+{
+    TR_VARIANT_PARSE_BENC = (1 << 0),
+    TR_VARIANT_PARSE_JSON = (1 << 1),
+    TR_VARIANT_PARSE_INPLACE = (1 << 2)
+};
+
 /* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, struct tr_error** error);
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, struct tr_error** error = nullptr);
 
-int tr_variantFromBenc(tr_variant* setme, std::string_view benc);
-
-int tr_variantFromBencFull(tr_variant* setme, std::string_view benc, char const** setme_end);
-
-int tr_variantFromJson(tr_variant* setme, std::string_view json);
+bool tr_variantFromBuf(
+    tr_variant* setme,
+    int variant_parse_opts,
+    std::string_view buf,
+    char const** setme_end = nullptr,
+    tr_error** error = nullptr);
 
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
@@ -239,7 +247,6 @@ bool tr_variantDictFindDict(tr_variant* dict, tr_quark const key, tr_variant** s
 bool tr_variantDictFindInt(tr_variant* dict, tr_quark const key, int64_t* setme);
 bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme);
 bool tr_variantDictFindBool(tr_variant* dict, tr_quark const key, bool* setme);
-bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len);
 bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme);
 bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len);
 
