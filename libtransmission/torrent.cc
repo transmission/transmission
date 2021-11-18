@@ -887,8 +887,14 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     torrentInitFromInfo(tor);
 
+    // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
+    // that set things as dirty, but... these settings being loaded are
+    // the same ones that would be saved back again, so don't let them
+    // affect the 'is dirty' flag.
+    auto const was_dirty = tor->isDirty;
     bool didRenameResumeFileToHashOnlyName = false;
     auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
+    tor->isDirty = was_dirty;
 
     if (didRenameResumeFileToHashOnlyName)
     {
