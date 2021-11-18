@@ -1156,7 +1156,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     }
     else
     {
-        dbgmsg(handshake, "libevent got an error what==%d, errno=%d (%s)", (int)what, errno, tr_strerror(errno));
+        dbgmsg(handshake, "libevent got an error what==%d, errno=%d (%s)", (int)what, errcode, tr_strerror(errcode));
         tr_handshakeDone(handshake, false);
     }
 }
