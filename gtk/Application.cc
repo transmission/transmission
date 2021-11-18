@@ -1298,7 +1298,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
     auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, method);
+    tr_variantDictAddStrView(&top, TR_KEY_method, method);
     args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
     sel_->selected_foreach(
@@ -1337,7 +1337,7 @@ void Application::Impl::start_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-start"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }
@@ -1348,7 +1348,7 @@ void Application::Impl::pause_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-stop"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }

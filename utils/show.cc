@@ -260,8 +260,8 @@ static void doScrape(tr_info const* inf)
                 tr_variant* files;
                 bool matched = false;
                 char const* begin = (char const*)evbuffer_pullup(buf, -1);
-
-                if (tr_variantFromBenc(&top, { begin, evbuffer_get_length(buf) }) == 0)
+                auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
+                if (tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {

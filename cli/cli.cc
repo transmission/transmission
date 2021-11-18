@@ -214,14 +214,14 @@ static char const* getConfigDir(int argc, char const** argv)
 {
     int c;
     char const* configDir = nullptr;
-    char const* optarg;
+    char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
-            configDir = optarg;
+            configDir = my_optarg;
             break;
         }
     }
@@ -282,8 +282,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    auto sv = std::string_view{};
-    if (tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
         // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
         auto const sz_download_dir = std::string{ sv };
@@ -426,9 +425,9 @@ int tr_main(int argc, char* argv[])
 static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 {
     int c;
-    char const* optarg;
+    char const* my_optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -441,7 +440,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'd':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
             tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
             break;
 
@@ -450,7 +449,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'f':
-            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, optarg);
+            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
             tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
             break;
 
@@ -466,15 +465,15 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'p':
-            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
             break;
 
         case 't':
-            tr_variantDictAddInt(d, TR_KEY_peer_socket_tos, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_peer_socket_tos, atoi(my_optarg));
             break;
 
         case 'u':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
             tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
             break;
 
@@ -491,7 +490,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'w':
-            tr_variantDictAddStr(d, TR_KEY_download_dir, optarg);
+            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
             break;
 
         case 910:
@@ -509,7 +508,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
         case TR_OPT_UNK:
             if (torrentPath == nullptr)
             {
-                torrentPath = optarg;
+                torrentPath = my_optarg;
             }
 
             break;

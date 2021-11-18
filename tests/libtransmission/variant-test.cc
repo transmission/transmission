@@ -34,11 +34,6 @@ protected:
         s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
         return s;
     }
-
-    auto bencParseInt(std::string const& in, uint8_t const** end, int64_t* val)
-    {
-        return tr_bencParseInt(in.data(), in.data() + in.size(), end, val);
-    }
 };
 
 #ifndef _WIN32
@@ -94,150 +89,120 @@ TEST_F(VariantTest, getType)
 
 TEST_F(VariantTest, parseInt)
 {
-    auto const in = std::string{ "i64e" };
-    auto constexpr InitVal = int64_t{ 888 };
+    auto constexpr Benc = "i64e"sv;
     auto constexpr ExpectVal = int64_t{ 64 };
 
-    uint8_t const* end = {};
-    auto val = int64_t{ InitVal };
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(ExpectVal, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
+    auto benc = Benc;
+    auto const value = tr_bencParseInt(&benc);
+    EXPECT_TRUE(value);
+    EXPECT_EQ(ExpectVal, *value);
+    EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
 {
-    auto const in = std::string{ "i64" };
-    auto constexpr InitVal = int64_t{ 888 };
+    auto constexpr Benc = "i64"sv;
 
-    uint8_t const* end = {};
-    auto val = int64_t{ InitVal };
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(InitVal, val);
-    EXPECT_EQ(nullptr, end);
+    auto benc = Benc;
+    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto const in = std::string{};
-    auto constexpr InitVal = int64_t{ 888 };
+    auto constexpr Benc = ""sv;
 
-    uint8_t const* end = {};
-    auto val = int64_t{ InitVal };
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(InitVal, val);
-    EXPECT_EQ(nullptr, end);
+    auto benc = Benc;
+    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithBadDigits)
 {
-    auto const in = std::string{ "i6z4e" };
-    auto constexpr InitVal = int64_t{ 888 };
+    auto constexpr Benc = "i6z4e"sv;
 
-    uint8_t const* end = {};
-    auto val = int64_t{ InitVal };
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(InitVal, val);
-    EXPECT_EQ(nullptr, end);
+    auto benc = Benc;
+    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseNegativeInt)
 {
-    auto const in = std::string{ "i-3e" };
+    auto constexpr Benc = "i-3e"sv;
+    auto constexpr Expected = int64_t{ -3 };
 
-    uint8_t const* end = {};
-    auto val = int64_t{};
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(-3, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
+    auto benc = Benc;
+    auto const value = tr_bencParseInt(&benc);
+    EXPECT_TRUE(value);
+    EXPECT_EQ(Expected, *value);
+    EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
+}
+
+TEST_F(VariantTest, parseNegativeWithLeadingZero)
+{
+    auto constexpr Benc = "i-03e"sv;
+
+    auto benc = Benc;
+    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntZero)
 {
-    auto const in = std::string{ "i0e" };
+    auto constexpr Benc = "i0e"sv;
+    auto constexpr Expected = int64_t{ 0 };
 
-    uint8_t const* end = {};
-    auto val = int64_t{};
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(0, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
+    auto benc = Benc;
+    auto const value = tr_bencParseInt(&benc);
+    EXPECT_TRUE(value);
+    EXPECT_EQ(Expected, *value);
+    EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
 {
-    auto const in = std::string{ "i04e" };
-    auto constexpr InitVal = int64_t{ 888 };
+    auto constexpr Benc = "i04e"sv;
 
-    uint8_t const* end = {};
-    auto val = int64_t{ InitVal };
-    auto const err = bencParseInt(in, &end, &val);
-    EXPECT_EQ(EILSEQ, err); // no leading zeroes allowed
-    EXPECT_EQ(InitVal, val);
-    EXPECT_EQ(nullptr, end);
+    auto benc = Benc;
+    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, str)
 {
-    auto buf = std::array<uint8_t, 128>{};
-    int err;
-    int n;
-    uint8_t const* end;
-    uint8_t const* str;
-    size_t len;
-
     // string len is designed to overflow
-    n = tr_snprintf(buf.data(), buf.size(), "%zu:boat", size_t(SIZE_MAX - 2));
-    err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
-    EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(size_t{}, len);
-    EXPECT_EQ(nullptr, str);
-    EXPECT_EQ(nullptr, end);
+    auto benc = "99999999999999999999:boat"sv;
+    auto inout = benc;
+    auto value = tr_bencParseStr(&inout);
+    EXPECT_FALSE(value);
+    EXPECT_EQ(benc, inout);
 
     // good string
-    n = tr_snprintf(buf.data(), buf.size(), "4:boat");
-    err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(size_t{ 4 }, len);
-    EXPECT_EQ(0, memcmp("boat", str, len));
-    EXPECT_EQ(buf.data() + n, end);
-    str = nullptr;
-    end = nullptr;
-    len = 0;
+    inout = benc = "4:boat";
+    value = tr_bencParseStr(&inout);
+    EXPECT_TRUE(value);
+    EXPECT_EQ("boat"sv, *value);
+    EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // string goes past end of buffer
-    err = tr_bencParseStr(&buf[0], &buf[n - 1], &end, &str, &len);
-    EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(size_t{}, len);
-    EXPECT_EQ(nullptr, str);
-    EXPECT_EQ(nullptr, end);
+    inout = benc = "4:boa"sv;
+    value = tr_bencParseStr(&inout);
+    EXPECT_FALSE(value);
+    EXPECT_EQ(benc, inout);
 
     // empty string
-    n = tr_snprintf(buf.data(), buf.size(), "0:");
-    err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(size_t{}, len);
-    EXPECT_EQ('\0', *str);
-    EXPECT_EQ(buf.data() + n, end);
-    str = nullptr;
-    end = nullptr;
-    len = 0;
+    inout = benc = "0:"sv;
+    value = tr_bencParseStr(&inout);
+    EXPECT_TRUE(value);
+    EXPECT_EQ(""sv, *value);
+    EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
-    n = tr_snprintf(buf.data(), buf.size(), "3:boat");
-    err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
-    EXPECT_EQ(0, err);
-    EXPECT_EQ(size_t{ 3 }, len);
-    EXPECT_EQ(0, memcmp("boa", str, len));
-    EXPECT_EQ(buf.data() + 5, end);
-    str = nullptr;
-    end = nullptr;
-    len = 0;
+    inout = benc = "3:boat";
+    value = tr_bencParseStr(&inout);
+    EXPECT_TRUE(value);
+    EXPECT_EQ("boa"sv, *value);
+    EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
 }
 
 TEST_F(VariantTest, parse)
@@ -246,16 +211,16 @@ TEST_F(VariantTest, parse)
     auto i = int64_t{};
     auto val = tr_variant{};
     char const* end;
-    auto err = tr_variantFromBencFull(&val, benc, &end);
-    EXPECT_EQ(0, err);
+    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
+    EXPECT_TRUE(ok);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
     EXPECT_EQ(int64_t(64), i);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
     tr_variantFree(&val);
 
     benc = "li64ei32ei16ee"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
-    EXPECT_EQ(0, err);
+    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
+    EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
     EXPECT_EQ(size_t{ 3 }, tr_variantListSize(&val));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 0), &i));
@@ -275,13 +240,12 @@ TEST_F(VariantTest, parse)
     end = nullptr;
 
     benc = "lllee"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
-    EXPECT_NE(0, err);
+    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
+    EXPECT_FALSE(ok);
     EXPECT_EQ(nullptr, end);
 
     benc = "le"sv;
-    err = tr_variantFromBencFull(&val, benc, &end);
-    EXPECT_EQ(0, err);
+    EXPECT_TRUE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end));
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
 
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
@@ -315,14 +279,10 @@ TEST_F(VariantTest, bencParseAndReencode)
     {
         tr_variant val;
         char const* end = nullptr;
-        auto const err = tr_variantFromBencFull(&val, test.benc, &end);
-        if (!test.is_good)
+        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end);
+        EXPECT_EQ(test.is_good, is_good);
+        if (is_good)
         {
-            EXPECT_NE(0, err);
-        }
-        else
-        {
-            EXPECT_EQ(0, err);
             EXPECT_EQ(test.benc.data() + test.benc.size(), end);
             auto saved_len = size_t{};
             auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &saved_len);
@@ -340,8 +300,8 @@ TEST_F(VariantTest, bencSortWhenSerializing)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In, &end);
-    EXPECT_EQ(0, err);
+    auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
+    EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(In), end);
 
     auto len = size_t{};
@@ -360,8 +320,8 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In, &end);
-    EXPECT_EQ(0, err);
+    auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
+    EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
 
     auto len = size_t{};
@@ -377,14 +337,14 @@ TEST_F(VariantTest, bencMalformedNoEnding)
 {
     auto constexpr In = "l1:a1:b1:c"sv;
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In));
+    EXPECT_FALSE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In));
 }
 
 TEST_F(VariantTest, bencMalformedIncompleteString)
 {
     auto constexpr In = "1:"sv;
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In));
+    EXPECT_FALSE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In));
 }
 
 TEST_F(VariantTest, bencToJson)
@@ -407,7 +367,7 @@ TEST_F(VariantTest, bencToJson)
     for (auto const& test : Tests)
     {
         tr_variant top;
-        tr_variantFromBenc(&top, test.benc);
+        tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc);
 
         auto len = size_t{};
         auto* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN, &len);
@@ -434,9 +394,9 @@ TEST_F(VariantTest, merge)
     tr_variantDictAddInt(&dest, i1, 1);
     tr_variantDictAddInt(&dest, i2, 2);
     tr_variantDictAddInt(&dest, i4, -35); /* remains untouched */
-    tr_variantDictAddStr(&dest, s5, "abc");
-    tr_variantDictAddStr(&dest, s6, "def");
-    tr_variantDictAddStr(&dest, s7, "127.0.0.1"); /* remains untouched */
+    tr_variantDictAddStrView(&dest, s5, "abc");
+    tr_variantDictAddStrView(&dest, s6, "def");
+    tr_variantDictAddStrView(&dest, s7, "127.0.0.1"); /* remains untouched */
 
     /* new dictionary, will overwrite items in dest */
     tr_variant src;
@@ -444,9 +404,9 @@ TEST_F(VariantTest, merge)
     tr_variantDictAddInt(&src, i1, 1); /* same value */
     tr_variantDictAddInt(&src, i2, 4); /* new value */
     tr_variantDictAddInt(&src, i3, 3); /* new key:value */
-    tr_variantDictAddStr(&src, s5, "abc"); /* same value */
-    tr_variantDictAddStr(&src, s6, "xyz"); /* new value */
-    tr_variantDictAddStr(&src, s8, "ghi"); /* new key:value */
+    tr_variantDictAddStrView(&src, s5, "abc"); /* same value */
+    tr_variantDictAddStrView(&src, s6, "xyz"); /* new value */
+    tr_variantDictAddStrView(&src, s8, "ghi"); /* new key:value */
 
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
@@ -482,8 +442,8 @@ TEST_F(VariantTest, stackSmash)
     // confirm that it parses
     char const* end;
     tr_variant val;
-    auto err = tr_variantFromBencFull(&val, in, &end);
-    EXPECT_EQ(0, err);
+    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end);
+    EXPECT_TRUE(ok);
     EXPECT_EQ(in.data() + in.size(), end);
 
     // confirm that we can serialize it back again

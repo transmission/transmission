@@ -220,7 +220,7 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 std::string gtr_pref_string_get(tr_quark const key)
 {
     auto sv = std::string_view{};
-    tr_variantDictFindStrView(getPrefs(), key, &sv);
+    (void)tr_variantDictFindStrView(getPrefs(), key, &sv);
     return std::string{ sv };
 }
 

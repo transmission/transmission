@@ -315,14 +315,14 @@ int tr_dhtInit(tr_session* ss)
 
     auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
     auto benc = tr_variant{};
-    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str(), nullptr) ? 0 : -1;
+    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_JSON, dat_file.c_str());
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
     uint8_t* nodes6 = nullptr;
     size_t len = 0;
     size_t len6 = 0;
-    if (rc == 0)
+    if (ok)
     {
         uint8_t const* raw = nullptr;
         have_id = tr_variantDictFindRaw(&benc, TR_KEY_id, &raw, &len);
@@ -365,8 +365,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr);
-
+    int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr);
     if (rc < 0)
     {
         tr_free(nodes6);
