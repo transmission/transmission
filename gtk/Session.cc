@@ -1445,7 +1445,7 @@ void Session::start_now(int id)
 {
     tr_variant top;
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-start-now");
+    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start-now");
 
     auto args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     auto ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
@@ -1712,7 +1712,7 @@ void Session::port_test()
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
-    tr_variantDictAddStr(&request, TR_KEY_method, "port-test");
+    tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
         &request,
@@ -1743,7 +1743,7 @@ void Session::blocklist_update()
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
-    tr_variantDictAddStr(&request, TR_KEY_method, "blocklist-update");
+    tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
         &request,

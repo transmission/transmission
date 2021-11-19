@@ -37,7 +37,7 @@ struct tr_metainfo_parsed
 
     tr_metainfo_parsed() = default;
 
-    tr_metainfo_parsed(tr_metainfo_parsed&& that)
+    tr_metainfo_parsed(tr_metainfo_parsed&& that) noexcept
     {
         std::swap(this->info, that.info);
         std::swap(this->pieces, that.pieces);

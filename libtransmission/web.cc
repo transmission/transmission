@@ -340,7 +340,7 @@ static struct tr_web_task* tr_webRunImpl(
 {
     struct tr_web_task* task = nullptr;
 
-    if (!session->isClosing)
+    if (!session->isClosing())
     {
         if (session->web == nullptr)
         {

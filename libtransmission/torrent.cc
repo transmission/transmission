@@ -887,8 +887,14 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     torrentInitFromInfo(tor);
 
+    // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
+    // that set things as dirty, but... these settings being loaded are
+    // the same ones that would be saved back again, so don't let them
+    // affect the 'is dirty' flag.
+    auto const was_dirty = tor->isDirty;
     bool didRenameResumeFileToHashOnlyName = false;
     auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
+    tor->isDirty = was_dirty;
 
     if (didRenameResumeFileToHashOnlyName)
     {
@@ -1517,17 +1523,21 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_sessionRemoveTorrent(session, tor);
 
-    /* resequence the queue positions */
-    for (auto* t : session->torrents)
+    if (!session->isClosing())
     {
-        if (t->queuePosition > tor->queuePosition)
+        // "so you die, captain, and we all move up in rank."
+        // resequence the queue positions
+        for (auto* t : session->torrents)
         {
-            t->queuePosition--;
-            t->anyDate = now;
+            if (t->queuePosition > tor->queuePosition)
+            {
+                t->queuePosition--;
+                t->anyDate = now;
+            }
         }
-    }
 
-    TR_ASSERT(queueIsSequenced(session));
+        TR_ASSERT(queueIsSequenced(session));
+    }
 
     delete tor->bandwidth;
 
@@ -2566,7 +2576,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
     }
 
     /* save to the .torrent file */
-    if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent, nullptr))
+    if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, tor->info.torrent, nullptr))
     {
         /* remove the old fields */
         tr_variantDictRemove(&metainfo, TR_KEY_announce);
