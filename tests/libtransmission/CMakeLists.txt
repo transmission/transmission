@@ -15,6 +15,7 @@ add_executable(libtransmission-test
     metainfo-test.cc
     move-test.cc
     peer-msgs-test.cc
+    peer-mgr-active-requests-test.cc
     quark-test.cc
     rename-test.cc
     rpc-test.cc
