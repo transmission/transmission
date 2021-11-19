@@ -6,6 +6,8 @@
  *
  */
 
+#include <mutex>
+
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
 #define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
