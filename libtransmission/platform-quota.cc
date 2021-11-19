@@ -374,7 +374,7 @@ static struct tr_disk_space getquota(char const* device)
 
 #ifdef HAVE_XQM
 
-static struct tr_disk_space getxfsquota(char* device)
+static struct tr_disk_space getxfsquota(char const* device)
 {
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;

@@ -1838,7 +1838,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void*
 
 static void sessionCloseImplStart(tr_session* session)
 {
-    session->isClosing = true;
+    session->is_closing_ = true;
 
     free_incoming_peer_port(session);
 
