@@ -209,7 +209,7 @@ static void verifyThreadFunc(void* /*user_data*/)
         bool changed = false;
 
         {
-            auto const lock = std::unique_lock(verify_mutex_);
+            auto const lock = std::lock_guard(verify_mutex_);
 
             stopCurrent = false;
             if (std::empty(verifyList))
@@ -255,7 +255,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.callback_data = callback_data;
     node.current_size = tr_torrentGetCurrentSizeOnDisk(tor);
 
-    auto const lock = std::unique_lock(verify_mutex_);
+    auto const lock = std::lock_guard(verify_mutex_);
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
     verifyList.insert(node);
 
@@ -307,7 +307,7 @@ void tr_verifyRemove(tr_torrent* tor)
 
 void tr_verifyClose(tr_session* /*session*/)
 {
-    auto const lock = std::unique_lock(verify_mutex_);
+    auto const lock = std::lock_guard(verify_mutex_);
 
     stopCurrent = true;
     verifyList.clear();

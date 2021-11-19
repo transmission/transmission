@@ -209,7 +209,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
         handle->private_key = static_cast<uint8_t*>(tr_malloc(handle->key_length));
     }
 
-    auto const lock = std::unique_lock(rng_mutex_);
+    auto const lock = std::lock_guard(rng_mutex_);
 
     auto my_private_key_length = word32{};
     auto my_public_key_length = word32{};
@@ -279,6 +279,6 @@ bool tr_rand_buffer(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    auto const lock = std::unique_lock(rng_mutex_);
+    auto const lock = std::lock_guard(rng_mutex_);
     return check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
 }

@@ -93,7 +93,7 @@ bool tr_logGetQueueEnabled(void)
 
 tr_log_message* tr_logGetQueue(void)
 {
-    auto const lock = std::unique_lock(message_mutex_);
+    auto const lock = std::lock_guard(message_mutex_);
 
     auto* const ret = myQueue;
     myQueue = nullptr;
@@ -199,7 +199,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
     char buf[1024];
     va_list ap;
 
-    auto const lock = std::unique_lock(message_mutex_);
+    auto const lock = std::lock_guard(message_mutex_);
 
     /* build the text message */
     *buf = '\0';

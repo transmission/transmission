@@ -280,6 +280,6 @@ bool tr_rand_buffer(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    auto const lock = std::unique_lock(rng_mutex_);
+    auto const lock = std::lock_guard(rng_mutex_);
     return check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
 }

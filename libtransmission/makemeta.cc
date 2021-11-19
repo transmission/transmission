@@ -593,7 +593,7 @@ void tr_makeMetaInfo(
     }
 
     /* enqueue the builder */
-    auto const lock = std::unique_lock(queue_mutex_);
+    auto const lock = std::lock_guard(queue_mutex_);
 
     builder->nextBuilder = queue;
     queue = builder;
