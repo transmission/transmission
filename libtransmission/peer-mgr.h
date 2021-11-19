@@ -79,17 +79,13 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-void tr_peerMgrGetNextRequests(
-    tr_torrent* torrent,
-    tr_peer* peer,
-    int numwant,
-    tr_block_index_t* setme,
-    int* numgot,
-    bool get_intervals);
+std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
-void tr_peerMgrRebuildRequests(tr_torrent* torrent);
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range_t range);
+
+size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);
 

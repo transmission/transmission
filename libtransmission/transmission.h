@@ -35,6 +35,12 @@ using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 
+struct tr_block_range_t
+{
+    tr_block_index_t first;
+    tr_block_index_t last;
+};
+
 struct tr_ctor;
 struct tr_error;
 struct tr_info;

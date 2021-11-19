@@ -90,9 +90,6 @@ public:
     /* how many requests the peer has made that we haven't responded to yet */
     int pendingReqsToClient = 0;
 
-    /* how many requests we've made and are currently awaiting a response for */
-    int pendingReqsToPeer = 0;
-
     tr_session* const session;
 
     /* Hook to private peer-mgr information */
