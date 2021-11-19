@@ -622,7 +622,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
 {
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
-        tr_sessionLock(session_);
+        auto const lock = session_->unique_lock();
 
         tr_torrent* const tor = tr_torrentFindFromHash(session_, info_hash);
         if (tor != nullptr && tr_torrentAllowsDHT(tor))
@@ -636,8 +636,6 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
             tr_free(pex);
             tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
-
-        tr_sessionUnlock(session_);
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {

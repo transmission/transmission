@@ -157,6 +157,11 @@ public:
     void takeMetainfo(tr_metainfo_parsed&& parsed);
 
 public:
+    auto unique_lock() const
+    {
+        return session->unique_lock();
+    }
+
     tr_session* session;
     tr_info info;
 
@@ -439,21 +444,6 @@ constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t
 constexpr uint32_t tr_torBlockCountBytes(tr_torrent const* tor, tr_block_index_t const block)
 {
     return block + 1 == tor->blockCount ? tor->lastBlockSize : tor->blockSize;
-}
-
-static inline void tr_torrentLock(tr_torrent const* tor)
-{
-    tr_sessionLock(tor->session);
-}
-
-static inline bool tr_torrentIsLocked(tr_torrent const* tor)
-{
-    return tr_sessionIsLocked(tor->session);
-}
-
-static inline void tr_torrentUnlock(tr_torrent const* tor)
-{
-    tr_sessionUnlock(tor->session);
 }
 
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)

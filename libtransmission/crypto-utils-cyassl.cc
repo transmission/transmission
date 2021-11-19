@@ -103,17 +103,7 @@ static RNG* get_rng(void)
     return &rng;
 }
 
-static tr_lock* get_rng_lock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::mutex rng_mutex_;
 
 /***
 ****
@@ -211,14 +201,13 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
     TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
-    tr_lock* rng_lock = get_rng_lock();
 
     if (handle->private_key == nullptr)
     {
         handle->private_key = static_cast<uint8_t*>(tr_malloc(handle->key_length));
     }
 
-    tr_lockLock(rng_lock);
+    auto const lock = std::unique_lock(rng_mutex_);
 
     auto my_private_key_length = word32{};
     auto my_public_key_length = word32{};
@@ -230,11 +219,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
             public_key,
             &my_public_key_length)))
     {
-        tr_lockUnlock(rng_lock);
         return false;
     }
-
-    tr_lockUnlock(rng_lock);
 
     tr_dh_align_key(public_key, my_public_key_length, handle->key_length);
 
@@ -291,11 +277,6 @@ bool tr_rand_buffer(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    tr_lock* rng_lock = get_rng_lock();
-
-    tr_lockLock(rng_lock);
-    bool const ret = check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
-    tr_lockUnlock(rng_lock);
-
-    return ret;
+    auto const lock = std::unique_lock(rng_mutex_);
+    return check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
 }

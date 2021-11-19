@@ -8,6 +8,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <mutex>
 
 #include <csignal>
 
@@ -26,7 +27,7 @@
 #include "session.h"
 
 #include "transmission.h"
-#include "platform.h" /* tr_lockLock() */
+#include "platform.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
@@ -150,13 +151,15 @@ using tr_pipe_end_t = int;
 
 struct tr_event_handle
 {
-    bool die;
-    tr_pipe_end_t fds[2];
-    tr_lock* lock;
-    tr_session* session;
-    tr_thread* thread;
-    struct event_base* base;
-    struct event* pipeEvent;
+    std::recursive_mutex fds_mutex;
+    tr_pipe_end_t fds[2] = {};
+
+    struct event* pipeEvent = nullptr;
+    struct event_base* base = nullptr;
+    tr_session* session = nullptr;
+    tr_thread* thread = nullptr;
+
+    bool die = false;
 };
 
 struct tr_run_data
@@ -260,7 +263,6 @@ static void libeventThreadFunc(void* veh)
     }
 
     /* shut down the thread */
-    tr_lockFree(eh->lock);
     event_base_free(base);
     eh->session->events = nullptr;
     tr_free(eh);
@@ -271,8 +273,7 @@ void tr_eventInit(tr_session* session)
 {
     session->events = nullptr;
 
-    auto* const eh = tr_new0(tr_event_handle, 1);
-    eh->lock = tr_lockNew();
+    auto* const eh = new tr_event_handle{};
 
     if (pipe(eh->fds) == -1)
     {
@@ -335,9 +336,8 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
     else
     {
         tr_event_handle* e = session->events;
-        struct tr_run_data data;
-
-        tr_lockLock(e->lock);
+        auto const lock = std::unique_lock(e->fds_mutex);
+        auto data = tr_run_data{};
 
         tr_pipe_end_t const fd = e->fds[1];
         char ch = 'r';
@@ -346,8 +346,6 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
         data.func = func;
         data.user_data = user_data;
         ev_ssize_t const res_2 = pipewrite(fd, &data, sizeof(data));
-
-        tr_lockUnlock(e->lock);
 
         if (res_1 == -1 || res_2 == -1)
         {
