@@ -9,6 +9,9 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
+
+#include "benc.h"
+#include "error.h"
 #include "utils.h" /* tr_free */
 #include "variant-common.h"
 #include "variant.h"
@@ -93,7 +96,7 @@ TEST_F(VariantTest, parseInt)
     auto constexpr ExpectVal = int64_t{ 64 };
 
     auto benc = Benc;
-    auto const value = tr_bencParseInt(&benc);
+    auto const value = transmission::benc::impl::ParseInt(&benc);
     EXPECT_TRUE(value);
     EXPECT_EQ(ExpectVal, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
@@ -104,7 +107,7 @@ TEST_F(VariantTest, parseIntWithMissingEnd)
     auto constexpr Benc = "i64"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
@@ -113,7 +116,7 @@ TEST_F(VariantTest, parseIntEmptyBuffer)
     auto constexpr Benc = ""sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
@@ -122,7 +125,7 @@ TEST_F(VariantTest, parseIntWithBadDigits)
     auto constexpr Benc = "i6z4e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
@@ -132,7 +135,7 @@ TEST_F(VariantTest, parseNegativeInt)
     auto constexpr Expected = int64_t{ -3 };
 
     auto benc = Benc;
-    auto const value = tr_bencParseInt(&benc);
+    auto const value = transmission::benc::impl::ParseInt(&benc);
     EXPECT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
@@ -143,7 +146,7 @@ TEST_F(VariantTest, parseNegativeWithLeadingZero)
     auto constexpr Benc = "i-03e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
@@ -153,7 +156,7 @@ TEST_F(VariantTest, parseIntZero)
     auto constexpr Expected = int64_t{ 0 };
 
     auto benc = Benc;
-    auto const value = tr_bencParseInt(&benc);
+    auto const value = transmission::benc::impl::ParseInt(&benc);
     EXPECT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
@@ -164,42 +167,44 @@ TEST_F(VariantTest, parseIntWithLeadingZero)
     auto constexpr Benc = "i04e"sv;
 
     auto benc = Benc;
-    EXPECT_FALSE(tr_bencParseInt(&benc));
+    EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
     EXPECT_EQ(std::data(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, str)
 {
+    using namespace transmission::benc::impl;
+
     // string len is designed to overflow
     auto benc = "99999999999999999999:boat"sv;
     auto inout = benc;
-    auto value = tr_bencParseStr(&inout);
+    auto value = ParseString(&inout);
     EXPECT_FALSE(value);
     EXPECT_EQ(benc, inout);
 
     // good string
     inout = benc = "4:boat";
-    value = tr_bencParseStr(&inout);
+    value = ParseString(&inout);
     EXPECT_TRUE(value);
     EXPECT_EQ("boat"sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // string goes past end of buffer
     inout = benc = "4:boa"sv;
-    value = tr_bencParseStr(&inout);
+    value = ParseString(&inout);
     EXPECT_FALSE(value);
     EXPECT_EQ(benc, inout);
 
     // empty string
     inout = benc = "0:"sv;
-    value = tr_bencParseStr(&inout);
+    value = ParseString(&inout);
     EXPECT_TRUE(value);
     EXPECT_EQ(""sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
     inout = benc = "3:boat";
-    value = tr_bencParseStr(&inout);
+    value = ParseString(&inout);
     EXPECT_TRUE(value);
     EXPECT_EQ("boa"sv, *value);
     EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
@@ -279,7 +284,14 @@ TEST_F(VariantTest, bencParseAndReencode)
     {
         tr_variant val;
         char const* end = nullptr;
-        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end);
+        tr_error* error = nullptr;
+        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end, &error);
+        if (error != nullptr)
+        {
+            std::cerr << "ERROR MESSAGE [" << error->message << "] " << error->code << std::endl;
+            tr_error_clear(&error);
+        }
+
         EXPECT_EQ(test.is_good, is_good);
         if (is_good)
         {
@@ -439,21 +451,16 @@ TEST_F(VariantTest, stackSmash)
     int constexpr Depth = STACK_SMASH_DEPTH;
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
-    // confirm that it parses
+    // confirm that it fails instead of crashing
     char const* end;
     tr_variant val;
-    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end);
-    EXPECT_TRUE(ok);
-    EXPECT_EQ(in.data() + in.size(), end);
+    tr_error* error = nullptr;
+    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
+    EXPECT_NE(nullptr, error);
+    EXPECT_EQ(E2BIG, error->code);
+    EXPECT_FALSE(ok);
 
-    // confirm that we can serialize it back again
-    size_t len;
-    auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_NE(nullptr, saved);
-    EXPECT_EQ(in, std::string(saved, len));
-    tr_free(saved);
-
-    tr_variantFree(&val);
+    tr_error_clear(&error);
 }
 
 TEST_F(VariantTest, boolAndIntRecast)

@@ -21,6 +21,7 @@
 
 #include "transmission.h"
 
+#include "benc.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_snprintf() */
 #include "variant-common.h"
@@ -31,9 +32,12 @@ using namespace std::literals;
 #define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
 
 /***
-****  tr_variantParse()
-****  tr_variantLoad()
+****
+****
 ***/
+
+namespace transmission::benc::impl
+{
 
 /**
  * The initial i and trailing e are beginning and ending delimiters.
@@ -45,7 +49,7 @@ using namespace std::literals;
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
+std::optional<int64_t> ParseInt(std::string_view* benc)
 {
     // find the beginning delimiter
     auto walk = *benc;
@@ -87,7 +91,7 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
+std::optional<std::string_view> ParseString(std::string_view* benc)
 {
     // find the ':' delimiter
     auto const colon_pos = benc->find(':');
@@ -100,7 +104,7 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     errno = 0;
     char* ulend = nullptr;
     auto const len = strtoul(std::data(*benc), &ulend, 10);
-    if (errno != 0 || ulend != std::data(*benc) + colon_pos || len >= MAX_BENC_STR_LENGTH)
+    if (errno != 0 || ulend != std::data(*benc) + colon_pos)
     {
         return {};
     }
@@ -119,185 +123,157 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
     return string;
 }
 
-static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_quark>& dict_key, tr_variant* top, int* err)
+} // namespace transmission::benc::impl
+
+/***
+****  tr_variantParse()
+****  tr_variantLoad()
+***/
+
+#include <iostream>
+
+struct MyHandler : public transmission::benc::Handler
 {
-    tr_variant* node = nullptr;
+    tr_variant* const top_;
+    int const parse_opts_;
+    std::deque<tr_variant*> stack_;
+    std::optional<tr_quark> key_;
 
-    if (std::empty(stack))
+    MyHandler(tr_variant* top, int parse_opts)
+        : top_{ top }
+        , parse_opts_{ parse_opts }
     {
-        node = top;
     }
-    else
-    {
-        auto* parent = stack.back();
 
-        if (tr_variantIsList(parent))
+    bool Int64(int64_t value) final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " Int64 " << value << std::endl;
+
+        if (tr_variant* variant = get_node(); variant != nullptr)
         {
-            node = tr_variantListAdd(parent);
+            tr_variantInitInt(variant, value);
         }
-        else if (dict_key && tr_variantIsDict(parent))
+
+        return true;
+    }
+
+    bool String(std::string_view sv) final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " String [" << sv << ']' << std::endl;
+
+        if (tr_variant* variant = get_node(); variant != nullptr)
         {
-            node = tr_variantDictAdd(parent, *dict_key);
-            dict_key.reset();
+            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as string" << std::endl;
+            if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
+            {
+                tr_variantInitStrView(variant, sv);
+            }
+            else
+            {
+                tr_variantInitStr(variant, sv);
+            }
+        }
+
+        return true;
+    }
+
+    bool StartDict() final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " Start Dict " << std::endl;
+
+        if (tr_variant* variant = get_node(); variant != nullptr)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as dict" << std::endl;
+            tr_variantInitDict(variant, 0);
+            stack_.push_back(variant);
+        }
+
+        return true;
+    }
+
+    bool Key(std::string_view sv) final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " Key [" << sv << ']' << std::endl;
+
+        key_ = tr_quark_new(sv);
+
+        return true;
+    }
+
+    bool EndDict() final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " End Dict " << std::endl;
+
+        stack_.pop_back();
+
+        return true;
+    }
+
+    bool StartArray() final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " Start Array" << std::endl;
+
+        if (tr_variant* variant = get_node(); variant != nullptr)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as array" << std::endl;
+            tr_variantInitList(variant, 0);
+            stack_.push_back(variant);
+        }
+
+        return true;
+    }
+
+    bool EndArray() final
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << " End Array" << std::endl;
+
+        stack_.pop_back();
+
+        return true;
+    }
+
+private:
+    tr_variant* get_node()
+    {
+        tr_variant* node = nullptr;
+
+        if (std::empty(stack_))
+        {
+            node = top_;
         }
         else
         {
-            *err = EILSEQ;
+            auto* parent = stack_.back();
+
+            if (tr_variantIsList(parent))
+            {
+                node = tr_variantListAdd(parent);
+            }
+            else if (key_ && tr_variantIsDict(parent))
+            {
+                node = tr_variantDictAdd(parent, *key_);
+                std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as node for key ["
+                          << tr_quark_get_string_view(*key_) << "] in parent dict" << std::endl;
+                key_.reset();
+            }
         }
+
+        return node;
     }
+};
 
-    return node;
-}
-
-/**
- * This function's previous recursive implementation was
- * easier to read, but was vulnerable to a smash-stacking
- * attack via maliciously-crafted bencoded data. (#667)
- */
-int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end)
+bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
 {
-    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_BENC) != 0);
-
-    auto stack = std::deque<tr_variant*>{};
-    auto key = std::optional<tr_quark>{};
-
-    tr_variantInit(&top, 0);
-
-    int err = 0;
-    for (;;)
-    {
-        if (std::empty(benc))
-        {
-            err = EILSEQ;
-        }
-
-        if (err != 0)
-        {
-            break;
-        }
-
-        switch (benc.front())
-        {
-        case 'i': // int
-            {
-                auto const value = tr_bencParseInt(&benc);
-                if (!value)
-                {
-                    break;
-                }
-
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitInt(v, *value);
-                }
-                break;
-            }
-        case 'l': // list
-            {
-                benc.remove_prefix(1);
-
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitList(v, 0);
-                    stack.push_back(v);
-                }
-                break;
-            }
-        case 'd': // dict
-            {
-                benc.remove_prefix(1);
-
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitDict(v, 0);
-                    stack.push_back(v);
-                }
-                break;
-            }
-        case 'e': // end of list or dict
-            {
-                benc.remove_prefix(1);
-
-                if (std::empty(stack) || key)
-                {
-                    err = EILSEQ;
-                    break;
-                }
-
-                stack.pop_back();
-                break;
-            }
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9': // string?
-            {
-                auto const sv = tr_bencParseStr(&benc);
-                if (!sv)
-                {
-                    break;
-                }
-
-                if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
-                {
-                    key = tr_quark_new(*sv);
-                }
-                else
-                {
-                    tr_variant* const v = get_node(stack, key, &top, &err);
-                    if (v != nullptr)
-                    {
-                        if ((parse_opts & TR_VARIANT_PARSE_INPLACE) != 0)
-                        {
-                            tr_variantInitStrView(v, *sv);
-                        }
-                        else
-                        {
-                            tr_variantInitStr(v, *sv);
-                        }
-                    }
-                }
-                break;
-            }
-        default: // invalid bencoded text... march past it
-            benc.remove_prefix(1);
-            break;
-        }
-
-        if (std::empty(stack))
-        {
-            break;
-        }
-    }
-
-    if (err == 0 && (top.type == 0 || !std::empty(stack)))
-    {
-        err = EILSEQ;
-    }
-
-    if (err == 0)
-    {
-        if (setme_end != nullptr)
-        {
-            *setme_end = std::data(benc);
-        }
-    }
-    else if (top.type != 0)
+    std::cerr << __FILE__ << ':' << __LINE__ << " full benc is [" << benc << ']' << std::endl;
+    using Stack = transmission::benc::ParserStack<512>;
+    auto stack = Stack{};
+    auto handler = MyHandler{ &top, parse_opts };
+    bool const ok = transmission::benc::parse(benc, stack, handler, setme_end, error);
+    if (!ok)
     {
         tr_variantFree(&top);
-        tr_variantInit(&top, 0);
     }
-
-    return err;
+    return ok;
 }
 
 /****

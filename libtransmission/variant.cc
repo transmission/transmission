@@ -1292,6 +1292,8 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
+#include <iostream> // NOCOMMIT
+
 bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
 {
     // supported formats: benc, json
@@ -1301,19 +1303,28 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     auto locale_ctx = locale_context{};
     use_numeric_locale(&locale_ctx, "C");
 
-    auto err = (opts & TR_VARIANT_PARSE_BENC) ? tr_variantParseBenc(*setme, opts, buf, setme_end) :
-                                                tr_variantParseJson(*setme, opts, buf, setme_end);
+    bool ok = false;
+
+    if (opts & TR_VARIANT_PARSE_BENC)
+    {
+        ok = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
+    }
+    else
+    {
+        // TODO(ckerr): update tr_variantParseJson to take a tr_error** arg
+        int err = tr_variantParseJson(*setme, opts, buf, setme_end);
+        ok = err == 0;
+        if (err)
+        {
+            tr_error_set_literal(error, EILSEQ, "error parsing encoded data");
+        }
+    }
 
     /* restore the previous locale */
     restore_locale(&locale_ctx);
 
-    if (err)
-    {
-        tr_error_set_literal(error, EILSEQ, "error parsing encoded data");
-        return false;
-    }
-
-    return true;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_variantFromBuf returning " << ok << std::endl;
+    return ok;
 }
 
 bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, tr_error** error)

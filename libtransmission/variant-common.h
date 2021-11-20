@@ -46,6 +46,6 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);
 /** @brief Private function that's exposed here only for unit tests */
 std::optional<std::string_view> tr_bencParseStr(std::string_view* benc_inout);
 
-int tr_variantParseBenc(tr_variant& setme, int opts, std::string_view benc, char const** setme_end);
+bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error);
 
 int tr_variantParseJson(tr_variant& setme, int opts, std::string_view benc, char const** setme_end);
