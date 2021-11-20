@@ -13,7 +13,6 @@
 #endif
 
 #include <array>
-#include <unordered_set>
 #include <vector>
 
 #include "transmission.h"
@@ -247,7 +246,7 @@ private:
 
     mutable std::array<Band, 2> band_ = {};
     Bandwidth* parent_ = nullptr;
-    std::unordered_set<Bandwidth*> children_;
+    std::vector<Bandwidth*> children_;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };
