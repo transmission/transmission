@@ -286,19 +286,20 @@ bool Application::Impl::refresh_actions()
         size_t const active = core_->get_active_torrent_count();
         auto const torrent_count = core_->get_model()->children().size();
         bool has_selection;
+        bool entry_focused = wind_->get_focus() ? GTK_IS_ENTRY(wind_->get_focus()->gobj()) : false;
 
         auto const sel_counts = get_selected_torrent_counts();
         has_selection = sel_counts.total_count > 0;
 
-        gtr_action_set_sensitive("select-all", torrent_count != 0);
-        gtr_action_set_sensitive("deselect-all", torrent_count != 0);
+        gtr_action_set_sensitive("select-all", torrent_count != 0 && !entry_focused);
+        gtr_action_set_sensitive("deselect-all", torrent_count != 0 && !entry_focused);
         gtr_action_set_sensitive("pause-all-torrents", active != 0);
         gtr_action_set_sensitive("start-all-torrents", active != total);
 
         gtr_action_set_sensitive("torrent-stop", (sel_counts.stopped_count < sel_counts.total_count));
         gtr_action_set_sensitive("torrent-start", (sel_counts.stopped_count) > 0);
         gtr_action_set_sensitive("torrent-start-now", (sel_counts.stopped_count + sel_counts.queued_count) > 0);
-        gtr_action_set_sensitive("torrent-verify", has_selection);
+        gtr_action_set_sensitive("torrent-verify", has_selection && !entry_focused);
         gtr_action_set_sensitive("remove-torrent", has_selection);
         gtr_action_set_sensitive("delete-torrent", has_selection);
         gtr_action_set_sensitive("relocate-torrent", has_selection);
