@@ -398,6 +398,11 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
     return check_result(RAND_bytes(static_cast<unsigned char*>(buffer), (int)length));
