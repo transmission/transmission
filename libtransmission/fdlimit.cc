@@ -447,7 +447,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 
 void tr_fdTorrentClose(tr_session* session, int torrent_id)
 {
-    TR_ASSERT(tr_sessionIsLocked(session));
+    auto const lock = session->unique_lock();
 
     fileset_close_torrent(get_fileset(session), torrent_id);
 }

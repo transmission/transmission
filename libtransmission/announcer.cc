@@ -1683,10 +1683,10 @@ static void onUpkeepTimer(evutil_socket_t /*fd*/, short /*what*/, void* vannounc
 {
     auto* announcer = static_cast<tr_announcer*>(vannouncer);
     tr_session* session = announcer->session;
+    auto const lock = session->unique_lock();
+
     bool const is_closing = session->isClosed;
     time_t const now = tr_time();
-
-    tr_sessionLock(session);
 
     /* maybe send out some "stopped" messages for closed torrents */
     flushCloseMessages(announcer);
@@ -1706,8 +1706,6 @@ static void onUpkeepTimer(evutil_socket_t /*fd*/, short /*what*/, void* vannounc
 
     /* set up the next timer */
     tr_timerAddMsec(announcer->upkeepTimer, UpkeepIntervalMsec);
-
-    tr_sessionUnlock(session);
 }
 
 /***

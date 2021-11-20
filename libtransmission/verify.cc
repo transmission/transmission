@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdlib> /* free() */
 #include <cstring> /* memcmp() */
+#include <mutex>
 #include <set>
 
 #include "transmission.h"
@@ -16,7 +17,7 @@
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h" /* tr_lock() */
+#include "platform.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_malloc(), tr_free() */
@@ -199,17 +200,7 @@ static auto& verifyList{ *new std::set<verify_node>{} };
 static tr_thread* verifyThread = nullptr;
 static bool stopCurrent = false;
 
-static tr_lock* getVerifyLock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::mutex verify_mutex_;
 
 static void verifyThreadFunc(void* /*user_data*/)
 {
@@ -217,18 +208,20 @@ static void verifyThreadFunc(void* /*user_data*/)
     {
         bool changed = false;
 
-        tr_lockLock(getVerifyLock());
-        stopCurrent = false;
-        if (std::empty(verifyList))
         {
-            currentNode.torrent = nullptr;
-            break; // FIXME: unbalanced lock?
-        }
+            auto const lock = std::lock_guard(verify_mutex_);
 
-        auto const it = std::begin(verifyList);
-        currentNode = *it;
-        verifyList.erase(it);
-        tr_lockUnlock(getVerifyLock());
+            stopCurrent = false;
+            if (std::empty(verifyList))
+            {
+                currentNode.torrent = nullptr;
+                break;
+            }
+
+            auto const it = std::begin(verifyList);
+            currentNode = *it;
+            verifyList.erase(it);
+        }
 
         tr_torrent* tor = currentNode.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
@@ -249,7 +242,6 @@ static void verifyThreadFunc(void* /*user_data*/)
     }
 
     verifyThread = nullptr;
-    tr_lockUnlock(getVerifyLock());
 }
 
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
@@ -263,7 +255,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.callback_data = callback_data;
     node.current_size = tr_torrentGetCurrentSizeOnDisk(tor);
 
-    tr_lockLock(getVerifyLock());
+    auto const lock = std::lock_guard(verify_mutex_);
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
     verifyList.insert(node);
 
@@ -271,16 +263,13 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     {
         verifyThread = tr_threadNew(verifyThreadFunc, nullptr);
     }
-
-    tr_lockUnlock(getVerifyLock());
 }
 
 void tr_verifyRemove(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_lock* lock = getVerifyLock();
-    tr_lockLock(lock);
+    verify_mutex_.lock();
 
     if (tor == currentNode.torrent)
     {
@@ -288,9 +277,9 @@ void tr_verifyRemove(tr_torrent* tor)
 
         while (stopCurrent)
         {
-            tr_lockUnlock(lock);
+            verify_mutex_.unlock();
             tr_wait_msec(100);
-            tr_lockLock(lock);
+            verify_mutex_.lock();
         }
     }
     else
@@ -313,15 +302,13 @@ void tr_verifyRemove(tr_torrent* tor)
         }
     }
 
-    tr_lockUnlock(lock);
+    verify_mutex_.unlock();
 }
 
 void tr_verifyClose(tr_session* /*session*/)
 {
-    tr_lockLock(getVerifyLock());
+    auto const lock = std::lock_guard(verify_mutex_);
 
     stopCurrent = true;
     verifyList.clear();
-
-    tr_lockUnlock(getVerifyLock());
 }
