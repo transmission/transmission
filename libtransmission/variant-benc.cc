@@ -130,8 +130,6 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 ****  tr_variantLoad()
 ***/
 
-#include <iostream>
-
 struct MyHandler : public transmission::benc::Handler
 {
     tr_variant* const top_;
@@ -147,8 +145,6 @@ struct MyHandler : public transmission::benc::Handler
 
     bool Int64(int64_t value) final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " Int64 " << value << std::endl;
-
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
             tr_variantInitInt(variant, value);
@@ -159,11 +155,8 @@ struct MyHandler : public transmission::benc::Handler
 
     bool String(std::string_view sv) final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " String [" << sv << ']' << std::endl;
-
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as string" << std::endl;
             if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
             {
                 tr_variantInitStrView(variant, sv);
@@ -179,11 +172,8 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartDict() final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " Start Dict " << std::endl;
-
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as dict" << std::endl;
             tr_variantInitDict(variant, 0);
             stack_.push_back(variant);
         }
@@ -193,8 +183,6 @@ struct MyHandler : public transmission::benc::Handler
 
     bool Key(std::string_view sv) final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " Key [" << sv << ']' << std::endl;
-
         key_ = tr_quark_new(sv);
 
         return true;
@@ -202,8 +190,6 @@ struct MyHandler : public transmission::benc::Handler
 
     bool EndDict() final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " End Dict " << std::endl;
-
         stack_.pop_back();
 
         return true;
@@ -211,11 +197,8 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartArray() final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " Start Array" << std::endl;
-
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as array" << std::endl;
             tr_variantInitList(variant, 0);
             stack_.push_back(variant);
         }
@@ -225,8 +208,6 @@ struct MyHandler : public transmission::benc::Handler
 
     bool EndArray() final
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " End Array" << std::endl;
-
         stack_.pop_back();
 
         return true;
@@ -252,8 +233,6 @@ private:
             else if (key_ && tr_variantIsDict(parent))
             {
                 node = tr_variantDictAdd(parent, *key_);
-                std::cerr << __FILE__ << ':' << __LINE__ << " got node; initializing as node for key ["
-                          << tr_quark_get_string_view(*key_) << "] in parent dict" << std::endl;
                 key_.reset();
             }
         }
@@ -264,7 +243,6 @@ private:
 
 bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " full benc is [" << benc << ']' << std::endl;
     using Stack = transmission::benc::ParserStack<512>;
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_opts };

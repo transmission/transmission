@@ -18,8 +18,6 @@
 #include <optional>
 #include <string_view>
 
-#include <iostream> // NOCOMMIT
-
 #include "error.h"
 
 namespace transmission::benc
@@ -71,8 +69,6 @@ struct ParserStack
     void tokenWalked()
     {
         ++stack[depth].n_children_walked;
-        std::cerr << __FILE__ << ':' << __LINE__ << " stack[" << depth << "].n_children_walked is now "
-                  << stack[depth].n_children_walked << std::endl;
     }
 
     Node& current()
@@ -101,7 +97,6 @@ struct ParserStack
 
     std::optional<ParentType> pop(tr_error** error)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " popping stack depth " << depth << " --> " << depth - 1 << std::endl;
         if (depth == 0)
         {
             tr_error_set_literal(error, EILSEQ, "Cannot pop empty stack");
@@ -128,7 +123,6 @@ struct ParserStack
         }
 
         ++depth;
-        std::cerr << __FILE__ << ':' << __LINE__ << " pushed stack to depth " << depth << std::endl;
         current() = { parent_type, 0 };
         return true;
     }
@@ -270,7 +264,6 @@ bool parse(
     if (err != 0)
     {
         errno = err;
-        std::cerr << __FILE__ << ':' << __LINE__ << " transmission::benc::parse returning false" << std::endl;
         return false;
     }
 
@@ -278,7 +271,6 @@ bool parse(
     {
         err = EILSEQ;
         tr_error_set_literal(error, err, "premature end-of-data reached");
-        std::cerr << __FILE__ << ':' << __LINE__ << " transmission::benc::parse returning false" << std::endl;
         errno = err;
         return false;
     }
@@ -287,7 +279,6 @@ bool parse(
     {
         err = EILSEQ;
         tr_error_set_literal(error, err, "no data found");
-        std::cerr << __FILE__ << ':' << __LINE__ << " transmission::benc::parse returning false" << std::endl;
         errno = err;
         return false;
     }
@@ -297,7 +288,6 @@ bool parse(
         *setme_end = std::data(benc);
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " transmission::benc::parse returning false" << std::endl;
     return true;
 }
 

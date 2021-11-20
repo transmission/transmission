@@ -1292,8 +1292,6 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
-#include <iostream> // NOCOMMIT
-
 bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
 {
     // supported formats: benc, json
@@ -1323,7 +1321,6 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     /* restore the previous locale */
     restore_locale(&locale_ctx);
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_variantFromBuf returning " << ok << std::endl;
     return ok;
 }
 
