@@ -46,7 +46,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "platform-quota.h" /* tr_device_info_free() */
-#include "platform.h" /* tr_lock, tr_getTorrentDir() */
+#include "platform.h" /* tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session-id.h"
@@ -66,6 +66,8 @@
 #include "web.h"
 
 using namespace std::literals;
+
+std::recursive_mutex tr_session::session_mutex_;
 
 #ifdef TR_LIGHTWEIGHT
 static auto constexpr DefaultCacheSizeMB = int{ 2 };
@@ -599,7 +601,6 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
-    session->lock = tr_lockNew();
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
@@ -1208,29 +1209,6 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return session->useIncompleteDir();
-}
-
-/***
-****
-***/
-
-void tr_sessionLock(tr_session* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_lockLock(session->lock);
-}
-
-void tr_sessionUnlock(tr_session* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_lockUnlock(session->lock);
-}
-
-bool tr_sessionIsLocked(tr_session const* session)
-{
-    return tr_isSession(session) && tr_lockHave(session->lock);
 }
 
 /***
@@ -2023,7 +2001,6 @@ void tr_sessionClose(tr_session* session)
     delete session->bandwidth;
     delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
-    tr_lockFree(session->lock);
 
     tr_free(session->configDir);
     tr_free(session->resumeDir);
@@ -2460,7 +2437,7 @@ bool tr_blocklistExists(tr_session const* session)
 
 int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 {
-    tr_sessionLock(session);
+    auto const lock = session->unique_lock();
 
     // find (or add) the default blocklist
     tr_blocklistFile* b = nullptr;
@@ -2483,7 +2460,6 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
     // set the default blocklist's content
     int const ruleCount = tr_blocklistFileSetContent(b, contentFilename);
-    tr_sessionUnlock(session);
     return ruleCount;
 }
 

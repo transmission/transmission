@@ -200,7 +200,7 @@ static void canReadWrapper(tr_peerIo* io)
     /* try to consume the input buffer */
     if (io->canRead != nullptr)
     {
-        tr_sessionLock(session);
+        auto const lock = session->unique_lock();
 
         auto const now = tr_time_msec();
         auto done = bool{ false };
@@ -254,8 +254,6 @@ static void canReadWrapper(tr_peerIo* io)
 
             TR_ASSERT(tr_isPeerIo(io));
         }
-
-        tr_sessionUnlock(session);
     }
 
     tr_peerIoUnref(io);
