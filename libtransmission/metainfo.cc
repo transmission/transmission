@@ -34,69 +34,20 @@ using namespace std::literals;
 ****
 ***/
 
-#ifdef _WIN32
-auto constexpr PATH_DELIMITER_CHARS = std::array<char, 2>{ '/', '\\' };
-#else
-auto constexpr PATH_DELIMITER_CHARS = std::array<char, 1>{ '/' };
-#endif
-
-static constexpr bool char_is_path_separator(char c)
+std::string tr_buildTorrentFilename(
+    std::string_view dirname,
+    tr_info const* inf,
+    enum tr_metainfo_basename_format format,
+    std::string_view suffix)
 {
-    for (auto ch : PATH_DELIMITER_CHARS)
-    {
-        if (c == ch)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return format == TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH ?
+        tr_strvJoin(dirname, "/"sv, inf->name, "."sv, std::string_view{ inf->hashString, 16 }, suffix) :
+        tr_strvJoin(dirname, "/"sv, inf->hashString, suffix);
 }
 
-static char* metainfoGetBasenameNameAndPartialHash(tr_info const* inf)
+static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
 {
-    char const* name = inf->originalName;
-    size_t const name_len = strlen(name);
-    char* ret = tr_strdup_printf("%s.%16.16s", name, inf->hashString);
-
-    for (size_t i = 0; i < name_len; ++i)
-    {
-        if (char_is_path_separator(ret[i]))
-        {
-            ret[i] = '_';
-        }
-    }
-
-    return ret;
-}
-
-static char* metainfoGetBasenameHashOnly(tr_info const* inf)
-{
-    return tr_strdup(inf->hashString);
-}
-
-char* tr_metainfoGetBasename(tr_info const* inf, enum tr_metainfo_basename_format format)
-{
-    switch (format)
-    {
-    case TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH:
-        return metainfoGetBasenameNameAndPartialHash(inf);
-
-    case TR_METAINFO_BASENAME_HASH:
-        return metainfoGetBasenameHashOnly(inf);
-
-    default:
-        TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
-        return nullptr;
-    }
-}
-
-static char* getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
-{
-    char* base = tr_metainfoGetBasename(inf, format);
-    char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
-    tr_free(base);
-    return filename;
+    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf, format, ".torrent"sv);
 }
 
 /***
@@ -665,7 +616,7 @@ static char const* tr_metainfoParseImpl(
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session != nullptr ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : nullptr;
+    inf->torrent = session != nullptr ? tr_strvDup(getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH)) : nullptr;
 
     return nullptr;
 }
@@ -719,13 +670,11 @@ void tr_metainfoFree(tr_info* inf)
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
 {
-    char* filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
-    tr_sys_path_remove(filename, nullptr);
-    tr_free(filename);
+    auto filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
+    tr_sys_path_remove(filename.c_str(), nullptr);
 
     filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-    tr_sys_path_remove(filename, nullptr);
-    tr_free(filename);
+    tr_sys_path_remove(filename.c_str(), nullptr);
 }
 
 void tr_metainfoMigrateFile(
@@ -734,14 +683,15 @@ void tr_metainfoMigrateFile(
     enum tr_metainfo_basename_format old_format,
     enum tr_metainfo_basename_format new_format)
 {
-    char* old_filename = getTorrentFilename(session, info, old_format);
-    char* new_filename = getTorrentFilename(session, info, new_format);
+    auto const old_filename = getTorrentFilename(session, info, old_format);
+    auto const new_filename = getTorrentFilename(session, info, new_format);
 
-    if (tr_sys_path_rename(old_filename, new_filename, nullptr))
+    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
     {
-        tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename, new_filename);
+        tr_logAddNamedError(
+            info->name,
+            "Migrated torrent file from \"%s\" to \"%s\"",
+            old_filename.c_str(),
+            new_filename.c_str());
     }
-
-    tr_free(new_filename);
-    tr_free(old_filename);
 }
