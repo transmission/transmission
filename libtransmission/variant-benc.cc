@@ -200,7 +200,8 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 tr_variant* const v = get_node(stack, key, &top, &err);
                 if (v != nullptr)
                 {
-                    tr_variantInitList(v, 0);
+                    auto constexpr ArbitraryInitSize = size_t{ 32 };
+                    tr_variantInitList(v, ArbitraryInitSize);
                     stack.push_back(v);
                 }
                 break;
