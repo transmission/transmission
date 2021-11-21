@@ -45,6 +45,51 @@ struct Handler
     virtual bool EndArray() = 0;
 };
 
+struct BasicHandler : public Handler
+{
+    bool Int64(int64_t) override
+    {
+        return true;
+    }
+
+    bool String(std::string_view) override
+    {
+        return true;
+    }
+
+    bool StartDict() override
+    {
+        keys.emplace_back();
+        return true;
+    }
+
+    bool Key(std::string_view key) override
+    {
+        keys.back() = key;
+        return true;
+    }
+
+    bool EndDict() override
+    {
+        keys.resize(keys.size() - 1);
+        return true;
+    }
+
+    bool StartArray() override
+    {
+        keys.emplace_back();
+        return true;
+    }
+
+    bool EndArray() override
+    {
+        keys.resize(keys.size() - 1);
+        return true;
+    }
+
+    std::vector<std::string_view> keys;
+};
+
 template<std::size_t MaxDepth>
 struct ParserStack
 {

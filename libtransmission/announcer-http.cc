@@ -16,7 +16,9 @@
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
+
 #include "announcer-common.h"
+#include "benc.h"
 #include "log.h"
 #include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
@@ -26,6 +28,8 @@
 #include "variant.h"
 #include "web.h"
 #include "web-utils.h"
+
+using namespace std::literals;
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
@@ -362,6 +366,89 @@ static void on_scrape_done_eventthread(void* vdata)
     delete data;
 }
 
+#include <iostream> // NOCOMMIT
+
+struct ScrapeHandler : public transmission::benc::BasicHandler
+{
+    using BasicHandler = transmission::benc::BasicHandler;
+
+    tr_scrape_response& response_;
+    std::optional<size_t> row_;
+
+    explicit ScrapeHandler(tr_scrape_response& response)
+        : response_{ response }
+    {
+    }
+
+    bool Key(std::string_view value) final
+    {
+        BasicHandler::Key(value);
+
+        if (std::size(keys) == 2 && keys[0] == "files"sv)
+        {
+            auto* const as_byte = reinterpret_cast<std::byte const*>(value.data());
+            auto it = std::find_if(
+                response_.rows,
+                response_.rows + response_.row_count,
+                [value, as_byte](auto const& row) {
+                    return std::equal(as_byte, as_byte + std::size(value), std::begin(row.info_hash), std::end(row.info_hash));
+                });
+
+            if (it == response_.rows + response_.row_count)
+            {
+                row_.reset();
+                std::cerr << __FILE__ << ':' << __LINE__ << " no match! skipping row :(" << std::endl;
+            }
+            else
+            {
+                row_ = it - response_.rows;
+                std::cerr << __FILE__ << ':' << __LINE__ << " found matching hash in row " << *row_ << std::endl;
+            }
+        }
+
+        return true;
+    }
+
+    bool Int64(int64_t value) final
+    {
+        if (std::size(keys) == 2 && keys[0] == "flags"sv && keys[1] == "min_request_interval"sv)
+        {
+            response_.min_request_interval = value;
+        }
+        else if (row_ && keys.back() == "complete"sv)
+        {
+            response_.rows[*row_].seeders = value;
+            std::cerr << __FILE__ << ':' << __LINE__ << " complete: " << value << std::endl;
+        }
+        else if (row_ && keys.back() == "downloaded"sv)
+        {
+            response_.rows[*row_].downloads = value;
+            std::cerr << __FILE__ << ':' << __LINE__ << " downloaded: " << value << std::endl;
+        }
+        else if (row_ && keys.back() == "downloaders"sv)
+        {
+            response_.rows[*row_].downloaders = value;
+            std::cerr << __FILE__ << ':' << __LINE__ << " downloaders: " << value << std::endl;
+        }
+        else if (row_ && keys.back() == "incomplete"sv)
+        {
+            response_.rows[*row_].leechers = value;
+            std::cerr << __FILE__ << ':' << __LINE__ << " incomplete: " << value << std::endl;
+        }
+        return true;
+    }
+
+    bool String(std::string_view value) final
+    {
+        if (std::size(keys) == 1 && keys.back() == "failure reason"sv)
+        {
+            response_.errmsg = value;
+        }
+
+        return true;
+    }
+};
+
 static void on_scrape_done(
     tr_session* session,
     bool did_connect,
@@ -389,32 +476,32 @@ static void on_scrape_done(
     }
     else
     {
-        auto top = tr_variant{};
+        // auto top = tr_variant{};
 
-        auto const variant_loaded = tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
+        auto stack = transmission::benc::ParserStack<16>{};
+        auto handler = ScrapeHandler{ data->response };
+        auto const ok = transmission::benc::parse(msg, stack, handler);
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
-            if (!variant_loaded)
+            if (!ok)
             {
                 fprintf(stderr, "%s", "Scrape response was not in benc format\n");
             }
             else
             {
-                auto len = size_t{};
-                char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
 
-                for (size_t i = 0; i < len; ++i)
+                for (auto const ch : msg)
                 {
-                    fputc(str[i], stderr);
+                    fputc(ch, stderr);
                 }
 
                 fputc('\n', stderr);
-                tr_free(str);
             }
         }
 
+#if 0
         if (variant_loaded)
         {
             auto sv = std::string_view{};
@@ -478,6 +565,7 @@ static void on_scrape_done(
 
             tr_variantFree(&top);
         }
+#endif
     }
 
     tr_runInEventThread(session, on_scrape_done_eventthread, data);
