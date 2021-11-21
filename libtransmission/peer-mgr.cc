@@ -193,6 +193,11 @@ public:
 
 struct tr_peerMgr
 {
+    auto unique_lock() const
+    {
+        return session->unique_lock();
+    }
+
     tr_session* session;
     tr_ptrArray incomingHandshakes; /* tr_handshake */
     struct event* bandwidthTimer;
@@ -237,39 +242,6 @@ tr_peer::~tr_peer()
         atom->peer = nullptr;
     }
 }
-
-/**
-***
-**/
-
-static inline void managerLock(struct tr_peerMgr const* manager)
-{
-    tr_sessionLock(manager->session);
-}
-
-static inline void managerUnlock(struct tr_peerMgr const* manager)
-{
-    tr_sessionUnlock(manager->session);
-}
-
-static inline void swarmLock(tr_swarm const* swarm)
-{
-    managerLock(swarm->manager);
-}
-
-static inline void swarmUnlock(tr_swarm const* swarm)
-{
-    managerUnlock(swarm->manager);
-}
-
-#ifdef TR_ENABLE_ASSERTS
-
-static inline bool swarmIsLocked(tr_swarm const* swarm)
-{
-    return tr_sessionIsLocked(swarm->manager->session);
-}
-
-#endif /* TR_ENABLE_ASSERTS */
 
 /**
 ***
@@ -348,8 +320,7 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 {
     auto* s = const_cast<tr_swarm*>(cs);
-
-    TR_ASSERT(swarmIsLocked(s));
+    auto const lock = s->manager->unique_lock();
 
     return atom->peer != nullptr || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) != nullptr ||
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
@@ -358,10 +329,10 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 static void swarmFree(void* vs)
 {
     auto* s = static_cast<tr_swarm*>(vs);
-
     TR_ASSERT(s != nullptr);
+    auto const lock = s->manager->unique_lock();
+
     TR_ASSERT(!s->isRunning);
-    TR_ASSERT(swarmIsLocked(s));
     TR_ASSERT(tr_ptrArrayEmpty(&s->outgoingHandshakes));
     TR_ASSERT(tr_ptrArrayEmpty(&s->peers));
 
@@ -432,7 +403,7 @@ static void deleteTimers(struct tr_peerMgr* m)
 
 void tr_peerMgrFree(tr_peerMgr* manager)
 {
-    managerLock(manager);
+    auto const lock = manager->unique_lock();
 
     deleteTimers(manager);
 
@@ -445,7 +416,6 @@ void tr_peerMgrFree(tr_peerMgr* manager)
 
     tr_ptrArrayDestruct(&manager->incomingHandshakes, nullptr);
 
-    managerUnlock(manager);
     tr_free(manager);
 }
 
@@ -699,13 +669,12 @@ static void tr_swarmCancelOldRequests(tr_swarm* swarm)
 static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
-    managerLock(mgr);
+    auto const lock = mgr->unique_lock();
 
     auto& torrents = mgr->session->torrents;
     std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tr_swarmCancelOldRequests(tor->swarm); });
 
     tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
-    managerUnlock(mgr);
 }
 
 static void addStrike(tr_swarm* s, tr_peer* peer)
@@ -803,10 +772,8 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 {
     TR_ASSERT(peer != nullptr);
-
     auto* s = static_cast<tr_swarm*>(vs);
-
-    swarmLock(s);
+    auto const lock = s->manager->unique_lock();
 
     switch (e->eventType)
     {
@@ -911,8 +878,6 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
     default:
         TR_ASSERT_MSG(false, "unhandled peer event type %d", (int)e->eventType);
     }
-
-    swarmUnlock(s);
 }
 
 static int getDefaultShelfLife(uint8_t from)
@@ -1043,10 +1008,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         tr_ptrArrayRemoveSortedPointer(&s->outgoingHandshakes, result.handshake, handshakeCompare);
     }
 
-    if (s != nullptr)
-    {
-        swarmLock(s);
-    }
+    auto const lock = manager->unique_lock();
 
     auto port = tr_port{};
     tr_address const* const addr = tr_peerIoGetAddress(result.io, &port);
@@ -1126,11 +1088,6 @@ static bool on_handshake_done(tr_handshake_result const& result)
         }
     }
 
-    if (s != nullptr)
-    {
-        swarmUnlock(s);
-    }
-
     return success;
 }
 
@@ -1161,8 +1118,7 @@ static void close_peer_socket(struct tr_peer_socket const socket, tr_session* se
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
-
-    managerLock(manager);
+    auto const lock = manager->unique_lock();
 
     tr_session* session = manager->session;
 
@@ -1184,13 +1140,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
 
         tr_ptrArrayInsertSorted(&manager->incomingHandshakes, handshake, handshakeCompare);
     }
-
-    managerUnlock(manager);
 }
 
 void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 {
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     tr_swarm* const swarm = tor->swarm;
     auto atomCount = int{};
@@ -1202,15 +1156,13 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 
     swarm->poolIsAllSeeds = true;
     swarm->poolIsAllSeedsDirty = false;
-
-    tr_torrentUnlock(tor);
 }
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
 {
     size_t n_used = 0;
     tr_swarm* s = tor->swarm;
-    managerLock(s->manager);
+    auto const lock = s->manager->unique_lock();
 
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
@@ -1223,7 +1175,6 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
         }
     }
 
-    managerUnlock(s->manager);
     return n_used;
 }
 
@@ -1392,12 +1343,13 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, uint8_t list_mode, int maxCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
+    auto const lock = tor->unique_lock();
+
     TR_ASSERT(setme_pex != nullptr);
     TR_ASSERT(af == TR_AF_INET || af == TR_AF_INET6);
     TR_ASSERT(list_mode == TR_PEERS_CONNECTED || list_mode == TR_PEERS_INTERESTING);
 
     tr_swarm const* s = tor->swarm;
-    managerLock(s->manager);
 
     /**
     ***  build a list of atoms
@@ -1465,7 +1417,6 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
 
     /* cleanup */
     tr_free(atoms);
-    managerUnlock(s->manager);
     return count;
 }
 
@@ -1507,7 +1458,7 @@ static void ensureMgrTimersExist(struct tr_peerMgr* m)
 void tr_peerMgrStartTorrent(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_torrentIsLocked(tor));
+    auto const lock = tor->unique_lock();
 
     tr_swarm* s = tor->swarm;
 
@@ -1539,7 +1490,7 @@ static void stopSwarm(tr_swarm* swarm)
 void tr_peerMgrStopTorrent(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_torrentIsLocked(tor));
+    auto const lock = tor->unique_lock();
 
     stopSwarm(tor->swarm);
 }
@@ -1547,7 +1498,7 @@ void tr_peerMgrStopTorrent(tr_torrent* tor)
 void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_torrentIsLocked(tor));
+    auto const lock = tor->unique_lock();
     TR_ASSERT(tor->swarm == nullptr);
 
     tor->swarm = swarmNew(manager, tor);
@@ -1556,7 +1507,7 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
 void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_torrentIsLocked(tor));
+    auto const lock = tor->unique_lock();
 
     stopSwarm(tor->swarm);
     swarmFree(tor->swarm);
@@ -1907,7 +1858,7 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount)
 void tr_peerMgrClearInterest(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tr_torrentIsLocked(tor));
+    auto const lock = tor->unique_lock();
 
     tr_swarm* s = tor->swarm;
     int const peerCount = tr_ptrArraySize(&s->peers);
@@ -2225,7 +2176,7 @@ static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_ms
 
 static void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
-    TR_ASSERT(swarmIsLocked(s));
+    auto const lock = s->manager->unique_lock();
 
     int const peerCount = tr_ptrArraySize(&s->peers);
     tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&s->peers);
@@ -2348,9 +2299,8 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
 static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
+    auto const lock = mgr->unique_lock();
     uint64_t const now = tr_time_msec();
-
-    managerLock(mgr);
 
     for (auto* tor : mgr->session->torrents)
     {
@@ -2367,7 +2317,6 @@ static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     }
 
     tr_timerAddMsec(mgr->rechokeTimer, RechokePeriodMsec);
-    managerUnlock(mgr);
 }
 
 /***
@@ -2420,7 +2369,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
 // TODO: return std::vector
 static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSize)
 {
-    TR_ASSERT(swarmIsLocked(s));
+    auto const lock = s->manager->unique_lock();
 
     tr_peer** ret = nullptr;
     auto outsize = int{};
@@ -2507,7 +2456,7 @@ static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const n
 static void removePeer(tr_peer* peer)
 {
     auto* const s = peer->swarm;
-    TR_ASSERT(swarmIsLocked(s));
+    auto const lock = s->manager->unique_lock();
 
     struct peer_atom* atom = peer->atom;
     TR_ASSERT(atom != nullptr);
@@ -2734,8 +2683,8 @@ static void queuePulse(tr_session* session, tr_direction dir)
 static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
+    auto const lock = mgr->unique_lock();
     tr_session* session = mgr->session;
-    managerLock(mgr);
 
     pumpAllPeers(mgr);
 
@@ -2774,7 +2723,6 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     reconnectPulse(0, 0, mgr);
 
     tr_timerAddMsec(mgr->bandwidthTimer, BandwidthPeriodMsec);
-    managerUnlock(mgr);
 }
 
 /***
@@ -2841,7 +2789,7 @@ static int getMaxAtomCount(tr_torrent const* tor)
 static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
-    managerLock(mgr);
+    auto const lock = mgr->unique_lock();
 
     for (auto* tor : mgr->session->torrents)
     {
@@ -2910,7 +2858,6 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     }
 
     tr_timerAddMsec(mgr->atomTimer, AtomPeriodMsec);
-    managerUnlock(mgr);
 }
 
 /***

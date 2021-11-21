@@ -91,8 +91,10 @@ struct tr_web
     bool curl_ssl_verify;
     char* curl_ca_bundle;
     int close_mode;
+
+    std::recursive_mutex web_tasks_mutex;
     struct tr_web_task* tasks;
-    tr_lock* taskLock;
+
     char* cookie_filename;
     std::set<CURL*> paused_easy_handles;
 };
@@ -363,10 +365,9 @@ static struct tr_web_task* tr_webRunImpl(
         task->response = buffer != nullptr ? buffer : evbuffer_new();
         task->freebuf = buffer != nullptr ? nullptr : task->response;
 
-        tr_lockLock(session->web->taskLock);
+        auto const lock = std::unique_lock(session->web->web_tasks_mutex);
         task->next = session->web->tasks;
         session->web->tasks = task;
-        tr_lockUnlock(session->web->taskLock);
     }
 
     return task;
@@ -411,7 +412,6 @@ static void tr_webThreadFunc(void* vsession)
 
     auto* web = new tr_web{};
     web->close_mode = ~0;
-    web->taskLock = tr_lockNew();
     web->tasks = nullptr;
     web->curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     web->curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
@@ -450,20 +450,20 @@ static void tr_webThreadFunc(void* vsession)
         }
 
         /* add tasks from the queue */
-        tr_lockLock(web->taskLock);
-
-        while (web->tasks != nullptr)
         {
-            /* pop the task */
-            struct tr_web_task* task = web->tasks;
-            web->tasks = task->next;
-            task->next = nullptr;
+            auto const lock = std::unique_lock(web->web_tasks_mutex);
 
-            dbgmsg("adding task to curl: [%s]", task->url.c_str());
-            curl_multi_add_handle(multi, createEasy(session, web, task));
+            while (web->tasks != nullptr)
+            {
+                /* pop the task */
+                struct tr_web_task* task = web->tasks;
+                web->tasks = task->next;
+                task->next = nullptr;
+
+                dbgmsg("adding task to curl: [%s]", task->url.c_str());
+                curl_multi_add_handle(multi, createEasy(session, web, task));
+            }
         }
-
-        tr_lockUnlock(web->taskLock);
 
         /* resume any paused curl handles.
            swap paused_easy_handles to prevent oscillation
@@ -559,7 +559,6 @@ static void tr_webThreadFunc(void* vsession)
 
     /* cleanup */
     curl_multi_cleanup(multi);
-    tr_lockFree(web->taskLock);
     tr_free(web->curl_ca_bundle);
     tr_free(web->cookie_filename);
     delete web;
