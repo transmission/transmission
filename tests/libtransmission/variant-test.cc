@@ -284,13 +284,7 @@ TEST_F(VariantTest, bencParseAndReencode)
     {
         tr_variant val;
         char const* end = nullptr;
-        tr_error* error = nullptr;
-        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end, &error);
-        if (error != nullptr)
-        {
-            std::cerr << "ERROR MESSAGE [" << error->message << "] " << error->code << std::endl;
-            tr_error_clear(&error);
-        }
+        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end);
 
         EXPECT_EQ(test.is_good, is_good);
         if (is_good)
