@@ -185,6 +185,9 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
+    ui_.optionsButton->setIcon(getStockIcon(QStringLiteral("preferences-other")));
+    ui_.statsModeButton->setIcon(getStockIcon(QStringLiteral("view-statistics")));
+
     auto make_network_pixmap = [this](QString name, QSize size = { 16, 16 })
     {
         return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
