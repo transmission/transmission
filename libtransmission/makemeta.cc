@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <cstdlib> /* qsort */
 #include <cstring> /* strcmp, strlen */
+#include <mutex>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
@@ -513,17 +514,7 @@ static tr_metainfo_builder* queue = nullptr;
 
 static tr_thread* workerThread = nullptr;
 
-static tr_lock* getQueueLock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::recursive_mutex queue_mutex_;
 
 static void makeMetaWorkerFunc(void* /*user_data*/)
 {
@@ -532,8 +523,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
         tr_metainfo_builder* builder = nullptr;
 
         /* find the next builder to process */
-        tr_lock* lock = getQueueLock();
-        tr_lockLock(lock);
+        queue_mutex_.lock();
 
         if (queue != nullptr)
         {
@@ -541,7 +531,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
             queue = queue->nextBuilder;
         }
 
-        tr_lockUnlock(lock);
+        queue_mutex_.unlock();
 
         /* if no builders, this worker thread is done */
         if (builder == nullptr)
@@ -603,8 +593,8 @@ void tr_makeMetaInfo(
     }
 
     /* enqueue the builder */
-    tr_lock* lock = getQueueLock();
-    tr_lockLock(lock);
+    auto const lock = std::lock_guard(queue_mutex_);
+
     builder->nextBuilder = queue;
     queue = builder;
 
@@ -612,6 +602,4 @@ void tr_makeMetaInfo(
     {
         workerThread = tr_threadNew(makeMetaWorkerFunc, nullptr);
     }
-
-    tr_lockUnlock(lock);
 }

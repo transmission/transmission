@@ -8,13 +8,13 @@
 
 #include <cerrno>
 #include <cstdio>
+#include <mutex>
 
 #include <event2/buffer.h>
 
 #include "transmission.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h" /* tr_lock */
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -48,17 +48,7 @@ tr_log_level tr_logGetLevel(void)
 ****
 ***/
 
-static tr_lock* getMessageLock(void)
-{
-    static tr_lock* l = nullptr;
-
-    if (l == nullptr)
-    {
-        l = tr_lockNew();
-    }
-
-    return l;
-}
+static std::recursive_mutex message_mutex_;
 
 tr_sys_file_t tr_logGetFile(void)
 {
@@ -103,14 +93,13 @@ bool tr_logGetQueueEnabled(void)
 
 tr_log_message* tr_logGetQueue(void)
 {
-    tr_lockLock(getMessageLock());
+    auto const lock = std::lock_guard(message_mutex_);
 
     auto* const ret = myQueue;
     myQueue = nullptr;
     myQueueTail = &myQueue;
     myQueueLength = 0;
 
-    tr_lockUnlock(getMessageLock());
     return ret;
 }
 
@@ -209,7 +198,8 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     va_list ap;
-    tr_lockLock(getMessageLock());
+
+    auto const lock = std::lock_guard(message_mutex_);
 
     /* build the text message */
     *buf = '\0';
@@ -292,6 +282,5 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
     }
 
 FINISH:
-    tr_lockUnlock(getMessageLock());
     errno = err;
 }

@@ -279,8 +279,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
     size_t const n_added = info->n_added;
     auto* task = static_cast<struct tr_webseed_task*>(vtask);
     auto* session = task->session;
-
-    tr_sessionLock(session);
+    auto const lock = session->unique_lock();
 
     if (!task->dead && n_added > 0)
     {
@@ -333,8 +332,6 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
             task->blocks_done += completed;
         }
     }
-
-    tr_sessionUnlock(session);
 }
 
 static void task_request_next_chunk(struct tr_webseed_task* task);

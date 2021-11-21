@@ -838,11 +838,10 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
+    auto const lock = tor->unique_lock();
+
     tr_session* session = tr_ctorGetSession(ctor);
-
     TR_ASSERT(session != nullptr);
-
-    tr_sessionLock(session);
 
     static int nextUniqueId = 1;
 
@@ -980,8 +979,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tr_torrentStart(tor);
     }
-
-    tr_sessionUnlock(session);
 }
 
 tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
@@ -1465,7 +1462,7 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tab, int size)
 
 static void tr_torrentResetTransferStats(tr_torrent* tor)
 {
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     tor->downloadedPrev += tor->downloadedCur;
     tor->downloadedCur = 0;
@@ -1475,8 +1472,6 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
     tor->corruptCur = 0;
 
     tr_torrentSetDirty(tor);
-
-    tr_torrentUnlock(tor);
 }
 
 void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool has)
@@ -1504,13 +1499,13 @@ static bool queueIsSequenced(tr_session*);
 
 static void freeTorrent(tr_torrent* tor)
 {
+    auto const lock = tor->unique_lock();
+
     TR_ASSERT(!tor->isRunning);
 
     tr_session* session = tor->session;
     tr_info* inf = &tor->info;
     time_t const now = tr_time();
-
-    tr_sessionLock(session);
 
     tr_peerMgrRemoveTorrent(tor);
 
@@ -1543,8 +1538,6 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_metainfoFree(inf);
     delete tor;
-
-    tr_sessionUnlock(session);
 }
 
 /**
@@ -1556,10 +1549,9 @@ static void torrentSetQueued(tr_torrent* tor, bool queued);
 static void torrentStartImpl(void* vtor)
 {
     auto* tor = static_cast<tr_torrent*>(vtor);
+    auto const lock = tor->unique_lock();
 
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_sessionLock(tor->session);
 
     tr_torrentRecheckCompleteness(tor);
     torrentSetQueued(tor, false);
@@ -1579,8 +1571,6 @@ static void torrentStartImpl(void* vtor)
     tor->dhtAnnounce6At = now + tr_rand_int_weak(20);
     tor->lpdAnnounceAt = now;
     tr_peerMgrStartTorrent(tor);
-
-    tr_sessionUnlock(tor->session);
 }
 
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor)
@@ -1652,7 +1642,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     }
 
     /* otherwise, start it now... */
-    tr_sessionLock(tor->session);
+    auto const lock = tor->unique_lock();
 
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone(tor))
@@ -1670,8 +1660,6 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     tor->isRunning = true;
     tr_torrentSetDirty(tor);
     tr_runInEventThread(tor->session, torrentStartImpl, tor);
-
-    tr_sessionUnlock(tor->session);
 }
 
 void tr_torrentStart(tr_torrent* tor)
@@ -1745,7 +1733,7 @@ static void verifyTorrent(void* vdata)
 {
     auto* data = static_cast<struct verify_data*>(vdata);
     tr_torrent* tor = data->tor;
-    tr_sessionLock(tor->session);
+    auto const lock = tor->unique_lock();
 
     if (tor->isDeleting)
     {
@@ -1774,8 +1762,6 @@ static void verifyTorrent(void* vdata)
             tr_verifyAdd(tor, onVerifyDone, data);
         }
     }
-
-    tr_sessionUnlock(tor->session);
 }
 
 void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
@@ -1802,12 +1788,10 @@ void tr_torrentSave(tr_torrent* tor)
 static void stopTorrent(void* vtor)
 {
     auto* tor = static_cast<tr_torrent*>(vtor);
-
     TR_ASSERT(tr_isTorrent(tor));
+    auto const lock = tor->unique_lock();
 
     tr_logAddTorInfo(tor, "%s", "Pausing");
-
-    tr_torrentLock(tor);
 
     tr_verifyRemove(tor);
     tr_peerMgrStopTorrent(tor);
@@ -1822,8 +1806,6 @@ static void stopTorrent(void* vtor)
     }
 
     torrentSetQueued(tor, false);
-
-    tr_torrentUnlock(tor);
 
     if (tor->magnetVerify)
     {
@@ -1842,15 +1824,13 @@ void tr_torrentStop(tr_torrent* tor)
 
     if (tr_isTorrent(tor))
     {
-        tr_sessionLock(tor->session);
+        auto const lock = tor->unique_lock();
 
         tor->isRunning = false;
         tor->isStopping = false;
         tor->prefetchMagnetMetadata = false;
         tr_torrentSetDirty(tor);
         tr_runInEventThread(tor->session, stopTorrent, tor);
-
-        tr_sessionUnlock(tor->session);
     }
 }
 
@@ -1885,12 +1865,10 @@ void tr_torrentFree(tr_torrent* tor)
 
         TR_ASSERT(tr_isSession(session));
 
-        tr_sessionLock(session);
+        auto const lock = tor->unique_lock();
 
         tr_torrentClearCompletenessCallback(tor);
         tr_runInEventThread(session, closeTorrent, tor);
-
-        tr_sessionUnlock(session);
     }
 }
 
@@ -1906,8 +1884,7 @@ static void tr_torrentDeleteLocalData(tr_torrent*, tr_fileFunc);
 static void removeTorrent(void* vdata)
 {
     auto* data = static_cast<struct remove_data*>(vdata);
-    tr_session* session = data->tor->session;
-    tr_sessionLock(session);
+    auto const lock = data->tor->unique_lock();
 
     if (data->deleteFlag)
     {
@@ -1917,8 +1894,6 @@ static void removeTorrent(void* vdata)
     tr_torrentClearCompletenessCallback(data->tor);
     closeTorrent(data->tor);
     tr_free(data);
-
-    tr_sessionUnlock(session);
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool deleteFlag, tr_fileFunc deleteFunc)
@@ -2095,7 +2070,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
 void tr_torrentRecheckCompleteness(tr_torrent* tor)
 {
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     auto const completeness = tr_cpGetStatus(&tor->completion);
 
@@ -2154,8 +2129,6 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
-
-    tr_torrentUnlock(tor);
 }
 
 /***
@@ -2208,8 +2181,7 @@ void tr_torrentSetFilePriorities(
     tr_priority_t priority)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     for (tr_file_index_t i = 0; i < fileCount; ++i)
     {
@@ -2220,8 +2192,6 @@ void tr_torrentSetFilePriorities(
     }
 
     tr_torrentSetDirty(tor);
-
-    tr_torrentUnlock(tor);
 }
 
 tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* tor)
@@ -2307,8 +2277,7 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool doDownload)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     for (tr_file_index_t i = 0; i < fileCount; ++i)
     {
@@ -2319,21 +2288,16 @@ void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_fil
     }
 
     tr_cpInvalidateDND(&tor->completion);
-
-    tr_torrentUnlock(tor);
 }
 
 void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool doDownload)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     tr_torrentInitFileDLs(tor, files, fileCount, doDownload);
     tr_torrentSetDirty(tor);
     tr_torrentRecheckCompleteness(tor);
-
-    tr_torrentUnlock(tor);
 }
 
 /***
@@ -2343,13 +2307,10 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     tor->labels = std::move(labels);
     tr_torrentSetDirty(tor);
-
-    tr_torrentUnlock(tor);
 }
 
 /***
@@ -2554,8 +2515,7 @@ static int compareTrackerByTier(void const* va, void const* vb)
 bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_in, int trackerCount)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     auto metainfo = tr_variant{};
     auto ok = bool{ true };
@@ -2642,8 +2602,6 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
         /* tell the announcer to reload this torrent's tracker list */
         tr_announcerResetTorrent(tor->session->announcer, tor);
     }
-
-    tr_torrentUnlock(tor);
 
     tr_free(trackers);
     return ok;
@@ -2967,10 +2925,8 @@ static void setLocationImpl(void* vdata)
 {
     auto* data = static_cast<struct LocationData*>(vdata);
     tr_torrent* tor = data->tor;
-
     TR_ASSERT(tr_isTorrent(tor));
-
-    tr_torrentLock(tor);
+    auto const lock = tor->unique_lock();
 
     bool err = false;
     bool const do_move = data->move_from_old_location;
@@ -3061,7 +3017,6 @@ static void setLocationImpl(void* vdata)
     }
 
     /* cleanup */
-    tr_torrentUnlock(tor);
     delete data;
 }
 
