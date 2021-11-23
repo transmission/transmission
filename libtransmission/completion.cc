@@ -29,7 +29,7 @@ static void tr_cpReset(tr_completion* cp)
 void tr_cpConstruct(tr_completion* cp, tr_torrent* tor)
 {
     cp->tor = tor;
-    cp->blockBitfield = new tr_bitfield(tor->block_count);
+    cp->blockBitfield = new tr_bitfield(tor->n_blocks);
     tr_cpReset(cp);
 }
 
@@ -42,10 +42,10 @@ void tr_cpBlockInit(tr_completion* cp, tr_bitfield const& b)
 
     // set sizeNow
     cp->sizeNow = cp->blockBitfield->count();
-    TR_ASSERT(cp->sizeNow <= cp->tor->block_count);
+    TR_ASSERT(cp->sizeNow <= cp->tor->n_blocks);
     cp->sizeNow *= cp->tor->block_size;
 
-    if (b.test(cp->tor->block_count - 1))
+    if (b.test(cp->tor->n_blocks - 1))
     {
         cp->sizeNow -= (cp->tor->block_size - cp->tor->final_block_size);
     }
@@ -178,7 +178,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     n = cp->blockBitfield->count(first, last + 1);
                     n *= cp->tor->block_size;
 
-                    if (last == cp->tor->block_count - 1 && cp->blockBitfield->test(last))
+                    if (last == cp->tor->n_blocks - 1 && cp->blockBitfield->test(last))
                     {
                         n -= cp->tor->block_size - cp->tor->final_block_size;
                     }

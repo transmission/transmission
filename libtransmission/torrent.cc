@@ -749,7 +749,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
         tor->final_block_size = tor->block_size;
     }
 
-    tor->block_count = tor->block_size != 0 ? (info->totalSize + tor->block_size - 1) / tor->block_size : 0;
+    tor->n_blocks = tor->block_size != 0 ? (info->totalSize + tor->block_size - 1) / tor->block_size : 0;
     tor->n_blocks_in_piece = tor->block_size != 0 ? info->pieceSize / tor->block_size : 0;
     tor->n_blocks_in_final_piece = tor->block_size != 0 ? (tor->final_piece_size + tor->block_size - 1) / tor->block_size : 0;
 
@@ -765,7 +765,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
     t += tor->final_piece_size;
     TR_ASSERT(t == info->totalSize);
 
-    t = tor->block_count - 1;
+    t = tor->n_blocks - 1;
     t *= tor->block_size;
     t += tor->final_block_size;
     TR_ASSERT(t == info->totalSize);
@@ -773,7 +773,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
     t = info->pieceCount - 1;
     t *= tor->n_blocks_in_piece;
     t += tor->n_blocks_in_final_piece;
-    TR_ASSERT(t == (uint64_t)tor->block_count);
+    TR_ASSERT(t == (uint64_t)tor->n_blocks);
 #endif
 
     tr_cpConstruct(&tor->completion, tor);

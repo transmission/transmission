@@ -322,7 +322,7 @@ public:
 
     /* How many bytes we ask for per request */
     uint32_t block_size;
-    tr_block_index_t block_count;
+    tr_block_index_t n_blocks;
 
     uint32_t final_block_size;
     uint32_t final_piece_size;
@@ -443,7 +443,7 @@ constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t
 /* how many bytes are in this block? */
 constexpr uint32_t tr_torBlockCountBytes(tr_torrent const* tor, tr_block_index_t const block)
 {
-    return block + 1 == tor->block_count ? tor->final_block_size : tor->block_size;
+    return block + 1 == tor->n_blocks ? tor->final_block_size : tor->block_size;
 }
 
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)

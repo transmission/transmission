@@ -225,7 +225,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
     , atom{ atom_in }
     , swarm{ tor->swarm }
-    , blame{ tor->block_count }
+    , blame{ tor->n_blocks }
     , have{ tor->info.pieceCount }
 {
 }
