@@ -128,9 +128,16 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent
+struct tr_torrent : public tr_completion::torrent_view
 {
 public:
+    tr_torrent(tr_info const& info)
+        : completion{ this, tr_block_info{ info.totalSize, info.pieceSize } }
+    {
+    }
+
+    virtual ~tr_torrent() = default;
+
     void setLocation(
         std::string_view location,
         bool move_from_current_location,
@@ -177,7 +184,7 @@ public:
 
     tr_bitfield dnd_pieces_ = tr_bitfield{ 0 };
 
-    bool pieceIsDnd(tr_piece_index_t piece) const
+    bool pieceIsDnd(tr_piece_index_t piece) const final
     {
         return dnd_pieces_.test(piece);
     }
@@ -330,7 +337,7 @@ public:
     uint32_t blockCountInPiece;
     uint32_t blockCountInLastPiece;
 
-    struct tr_completion completion;
+    tr_completion completion;
 
     tr_completeness completeness;
 
@@ -560,47 +567,47 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 static inline uint64_t tr_torrentGetLeftUntilDone(tr_torrent const* tor)
 {
-    return tr_cpLeftUntilDone(&tor->completion);
+    return tor->completion.leftUntilDone();
 }
 
 static inline bool tr_torrentHasAll(tr_torrent const* tor)
 {
-    return tr_cpHasAll(&tor->completion);
+    return tor->completion.hasAll();
 }
 
 static inline bool tr_torrentHasNone(tr_torrent const* tor)
 {
-    return tr_cpHasNone(&tor->completion);
+    return tor->completion.hasNone();
 }
 
-static inline bool tr_torrentPieceIsComplete(tr_torrent const* tor, tr_piece_index_t i)
+static inline bool tr_torrentPieceIsComplete(tr_torrent const* tor, tr_piece_index_t piece)
 {
-    return tr_cpPieceIsComplete(&tor->completion, i);
+    return tor->completion.hasPiece(piece);
 }
 
-static inline bool tr_torrentBlockIsComplete(tr_torrent const* tor, tr_block_index_t i)
+static inline bool tr_torrentBlockIsComplete(tr_torrent const* tor, tr_block_index_t block)
 {
-    return tr_cpBlockIsComplete(&tor->completion, i);
+    return tor->completion.hasBlock(block);
 }
 
-static inline size_t tr_torrentMissingBlocksInPiece(tr_torrent const* tor, tr_piece_index_t i)
+static inline size_t tr_torrentMissingBlocksInPiece(tr_torrent const* tor, tr_piece_index_t piece)
 {
-    return tr_cpMissingBlocksInPiece(&tor->completion, i);
+    return tor->completion.countMissingBlocksInPiece(piece);
 }
 
-static inline size_t tr_torrentMissingBytesInPiece(tr_torrent const* tor, tr_piece_index_t i)
+static inline size_t tr_torrentMissingBytesInPiece(tr_torrent const* tor, tr_piece_index_t piece)
 {
-    return tr_cpMissingBytesInPiece(&tor->completion, i);
+    return tor->completion.countMissingBytesInPiece(piece);
 }
 
 static inline std::vector<uint8_t> tr_torrentCreatePieceBitfield(tr_torrent const* tor)
 {
-    return tr_cpCreatePieceBitfield(&tor->completion);
+    return tor->completion.createPieceBitfield();
 }
 
 constexpr uint64_t tr_torrentHaveTotal(tr_torrent const* tor)
 {
-    return tr_cpHaveTotal(&tor->completion);
+    return tor->completion.hasTotal();
 }
 
 constexpr bool tr_torrentIsQueued(tr_torrent const* tor)
