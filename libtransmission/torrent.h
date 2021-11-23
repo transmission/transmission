@@ -328,7 +328,7 @@ public:
     uint32_t final_piece_size;
 
     uint32_t n_blocks_in_piece;
-    uint32_t blockCountInLastPiece;
+    uint32_t n_blocks_in_final_piece;
 
     struct tr_completion completion;
 

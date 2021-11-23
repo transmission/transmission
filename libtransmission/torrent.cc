@@ -750,8 +750,8 @@ static void torrentInitFromInfo(tr_torrent* tor)
     }
 
     tor->block_count = tor->block_size != 0 ? (info->totalSize + tor->block_size - 1) / tor->block_size : 0;
-    tor->blockCountInPiece = tor->block_size != 0 ? info->pieceSize / tor->block_size : 0;
-    tor->blockCountInLastPiece = tor->block_size != 0 ? (tor->final_piece_size + tor->block_size - 1) / tor->block_size : 0;
+    tor->n_blocks_in_piece = tor->block_size != 0 ? info->pieceSize / tor->block_size : 0;
+    tor->n_blocks_in_final_piece = tor->block_size != 0 ? (tor->final_piece_size + tor->block_size - 1) / tor->block_size : 0;
 
 #ifdef TR_ENABLE_ASSERTS
     /* check our work */
@@ -771,8 +771,8 @@ static void torrentInitFromInfo(tr_torrent* tor)
     TR_ASSERT(t == info->totalSize);
 
     t = info->pieceCount - 1;
-    t *= tor->block_count_in_piece;
-    t += tor->blockCountInLastPiece;
+    t *= tor->n_blocks_in_piece;
+    t += tor->n_blocks_in_final_piece;
     TR_ASSERT(t == (uint64_t)tor->block_count);
 #endif
 
