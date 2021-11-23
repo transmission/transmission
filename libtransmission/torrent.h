@@ -325,7 +325,7 @@ public:
     tr_block_index_t block_count;
 
     uint32_t final_block_size;
-    uint32_t lastPieceSize;
+    uint32_t final_piece_size;
 
     uint32_t blockCountInPiece;
     uint32_t blockCountInLastPiece;
@@ -437,7 +437,7 @@ constexpr tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_inde
 /* how many bytes are in this piece? */
 constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t const piece)
 {
-    return piece + 1 == tor->info.pieceCount ? tor->lastPieceSize : tor->info.pieceSize;
+    return piece + 1 == tor->info.pieceCount ? tor->final_piece_size : tor->info.pieceSize;
 }
 
 /* how many bytes are in this block? */
