@@ -1,5 +1,6 @@
 add_executable(libtransmission-test
     bitfield-test.cc
+    block-info-test.cc
     blocklist-test.cc
     clients-test.cc
     copy-test.cc
@@ -14,9 +15,9 @@ add_executable(libtransmission-test
     makemeta-test.cc
     metainfo-test.cc
     move-test.cc
-    peer-msgs-test.cc
-    peer-mgr-wishlist-test.cc
     peer-mgr-active-requests-test.cc
+    peer-mgr-wishlist-test.cc
+    peer-msgs-test.cc
     quark-test.cc
     rename-test.cc
     rpc-test.cc
