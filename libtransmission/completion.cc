@@ -47,7 +47,7 @@ void tr_cpBlockInit(tr_completion* cp, tr_bitfield const& b)
 
     if (b.test(cp->tor->block_count - 1))
     {
-        cp->sizeNow -= (cp->tor->block_size - cp->tor->lastBlockSize);
+        cp->sizeNow -= (cp->tor->block_size - cp->tor->final_block_size);
     }
 
     TR_ASSERT(cp->sizeNow <= cp->tor->info.totalSize);
@@ -180,7 +180,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
 
                     if (last == cp->tor->block_count - 1 && cp->blockBitfield->test(last))
                     {
-                        n -= cp->tor->block_size - cp->tor->lastBlockSize;
+                        n -= cp->tor->block_size - cp->tor->final_block_size;
                     }
                 }
 

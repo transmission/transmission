@@ -741,12 +741,12 @@ static void torrentInitFromInfo(tr_torrent* tor)
 
     if (tor->block_size != 0)
     {
-        tor->lastBlockSize = info->totalSize % tor->block_size;
+        tor->final_block_size = info->totalSize % tor->block_size;
     }
 
-    if (tor->lastBlockSize == 0)
+    if (tor->final_block_size == 0)
     {
-        tor->lastBlockSize = tor->block_size;
+        tor->final_block_size = tor->block_size;
     }
 
     tor->block_count = tor->block_size != 0 ? (info->totalSize + tor->block_size - 1) / tor->block_size : 0;
@@ -767,7 +767,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
 
     t = tor->block_count - 1;
     t *= tor->block_size;
-    t += tor->lastBlockSize;
+    t += tor->final_block_size;
     TR_ASSERT(t == info->totalSize);
 
     t = info->pieceCount - 1;
