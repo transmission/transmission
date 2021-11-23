@@ -43,7 +43,7 @@ void tr_cpBlockInit(tr_completion* cp, tr_bitfield const& b)
     // set sizeNow
     cp->sizeNow = cp->blockBitfield->count();
     TR_ASSERT(cp->sizeNow <= cp->tor->block_count);
-    cp->sizeNow *= cp->tor->block_count;
+    cp->sizeNow *= cp->tor->block_size;
 
     if (b.test(cp->tor->block_count - 1))
     {
