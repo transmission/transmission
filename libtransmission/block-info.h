@@ -29,11 +29,17 @@ struct tr_block_info
     uint32_t final_block_size = 0;
     uint32_t final_piece_size = 0;
 
+    tr_block_info() = default;
+    tr_block_info(uint64_t total_size, uint64_t piece_size)
+    {
+        initSizes(total_size, piece_size);
+    }
+
     void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
 
     constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
     {
-        return block / n_blocks_in_piece;
+        return n_blocks_in_piece ? block / n_blocks_in_piece : 0;
     }
 
     constexpr uint32_t countBytesInPiece(tr_piece_index_t piece) const
@@ -59,6 +65,11 @@ struct tr_block_info
 
     constexpr tr_block_range_t blockRangeForPiece(tr_piece_index_t piece) const
     {
+        if (block_size == 0)
+        {
+            return {};
+        }
+
         uint64_t offset = piece_size;
         offset *= piece;
         tr_block_index_t const first_block = offset / block_size;

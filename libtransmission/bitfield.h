@@ -93,6 +93,11 @@ public:
         return bit_count_;
     }
 
+    [[nodiscard]] constexpr size_t empty() const
+    {
+        return size() == 0;
+    }
+
 #ifdef TR_ENABLE_ASSERTS
     bool assertValid() const;
 #endif

@@ -6,27 +6,28 @@ configure_file(
 )
 
 set(PROJECT_FILES
-  announcer.cc
   announcer-http.cc
   announcer-udp.cc
+  announcer.cc
   bandwidth.cc
   bitfield.cc
+  block-info.cc
   blocklist.cc
   cache.cc
   clients.cc
   completion.cc
-  crypto.cc
-  crypto-utils.cc
   crypto-utils-ccrypto.cc
   crypto-utils-cyassl.cc
   crypto-utils-fallback.cc
   crypto-utils-openssl.cc
   crypto-utils-polarssl.cc
+  crypto-utils.cc
+  crypto.cc
   error.cc
   fdlimit.cc
-  file.cc
   file-posix.cc
   file-win32.cc
+  file.cc
   handshake.cc
   inout.cc
   log.cc
@@ -36,46 +37,46 @@ set(PROJECT_FILES
   natpmp.cc
   net.cc
   peer-io.cc
-  peer-mgr.cc
   peer-mgr-active-requests.cc
   peer-mgr-wishlist.cc
+  peer-mgr.cc
   peer-msgs.cc
-  platform.cc
   platform-quota.cc
+  platform.cc
   port-forwarding.cc
   ptrarray.cc
   quark.cc
   resume.cc
-  rpcimpl.cc
   rpc-server.cc
-  session.cc
+  rpcimpl.cc
   session-id.cc
+  session.cc
+  stats.cc
   subprocess-posix.cc
   subprocess-win32.cc
-  stats.cc
-  torrent.cc
   torrent-ctor.cc
   torrent-magnet.cc
-  tr-dht.cc
-  trevent.cc
+  torrent.cc
   tr-assert.cc
+  tr-dht.cc
   tr-getopt.cc
   tr-lpd.cc
   tr-udp.cc
   tr-utp.cc
+  trevent.cc
   upnp.cc
   utils.cc
   variant-benc.cc
-  variant.cc
   variant-json.cc
+  variant.cc
   verify.cc
-  watchdir.cc
   watchdir-generic.cc
   watchdir-inotify.cc
   watchdir-kqueue.cc
   watchdir-win32.cc
-  web.cc
+  watchdir.cc
   web-utils.cc
+  web.cc
   webseed.cc
 )
 
@@ -147,6 +148,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     announcer.h
     bandwidth.h
     bitfield.h
+    block-info.h
     blocklist.h
     cache.h
     clients.h
@@ -164,9 +166,9 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     net.h
     peer-common.h
     peer-io.h
-    peer-mgr.h
     peer-mgr-active-requests.h
     peer-mgr-wishlist.h
+    peer-mgr.h
     peer-msgs.h
     peer-socket.h
     platform-quota.h

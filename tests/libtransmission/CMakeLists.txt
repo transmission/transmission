@@ -3,6 +3,7 @@ add_executable(libtransmission-test
     block-info-test.cc
     blocklist-test.cc
     clients-test.cc
+    completion-test.cc
     copy-test.cc
     crypto-test-ref.h
     crypto-test.cc
