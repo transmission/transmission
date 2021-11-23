@@ -771,7 +771,7 @@ static void torrentInitFromInfo(tr_torrent* tor)
     TR_ASSERT(t == info->totalSize);
 
     t = info->pieceCount - 1;
-    t *= tor->blockCountInPiece;
+    t *= tor->block_count_in_piece;
     t += tor->blockCountInLastPiece;
     TR_ASSERT(t == (uint64_t)tor->block_count);
 #endif

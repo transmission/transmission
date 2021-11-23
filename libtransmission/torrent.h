@@ -327,7 +327,7 @@ public:
     uint32_t final_block_size;
     uint32_t final_piece_size;
 
-    uint32_t blockCountInPiece;
+    uint32_t n_blocks_in_piece;
     uint32_t blockCountInLastPiece;
 
     struct tr_completion completion;
@@ -431,7 +431,7 @@ private:
 /* what piece index is this block in? */
 constexpr tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_index_t const block)
 {
-    return block / tor->blockCountInPiece;
+    return block / tor->n_blocks_in_piece;
 }
 
 /* how many bytes are in this piece? */
