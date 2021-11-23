@@ -615,7 +615,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
         /// COMPLETION
 
-        auto blocks = tr_bitfield{ tor->blockCount };
+        auto blocks = tr_bitfield{ tor->block_count };
         char const* err = nullptr;
         auto sv = std::string_view{};
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
