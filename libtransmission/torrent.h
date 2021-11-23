@@ -321,7 +321,7 @@ public:
     char const* currentDir;
 
     /* How many bytes we ask for per request */
-    uint32_t blockSize;
+    uint32_t block_size;
     tr_block_index_t blockCount;
 
     uint32_t lastBlockSize;
@@ -443,7 +443,7 @@ constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t
 /* how many bytes are in this block? */
 constexpr uint32_t tr_torBlockCountBytes(tr_torrent const* tor, tr_block_index_t const block)
 {
-    return block + 1 == tor->blockCount ? tor->lastBlockSize : tor->blockSize;
+    return block + 1 == tor->blockCount ? tor->lastBlockSize : tor->block_size;
 }
 
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)

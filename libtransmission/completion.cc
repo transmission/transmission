@@ -43,11 +43,11 @@ void tr_cpBlockInit(tr_completion* cp, tr_bitfield const& b)
     // set sizeNow
     cp->sizeNow = cp->blockBitfield->count();
     TR_ASSERT(cp->sizeNow <= cp->tor->blockCount);
-    cp->sizeNow *= cp->tor->blockSize;
+    cp->sizeNow *= cp->tor->block_size;
 
     if (b.test(cp->tor->blockCount - 1))
     {
-        cp->sizeNow -= (cp->tor->blockSize - cp->tor->lastBlockSize);
+        cp->sizeNow -= (cp->tor->block_size - cp->tor->lastBlockSize);
     }
 
     TR_ASSERT(cp->sizeNow <= cp->tor->info.totalSize);
@@ -176,11 +176,11 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, p);
 
                     n = cp->blockBitfield->count(first, last + 1);
-                    n *= cp->tor->blockSize;
+                    n *= cp->tor->block_size;
 
                     if (last == cp->tor->blockCount - 1 && cp->blockBitfield->test(last))
                     {
-                        n -= cp->tor->blockSize - cp->tor->lastBlockSize;
+                        n -= cp->tor->block_size - cp->tor->lastBlockSize;
                     }
                 }
 
@@ -256,7 +256,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
            It's faster to handle the last block separately because its size
            needs to be checked separately. */
         haveBytes = cp->blockBitfield->count(first, last);
-        haveBytes *= cp->tor->blockSize;
+        haveBytes *= cp->tor->block_size;
     }
 
     if (cp->blockBitfield->test(last)) /* handle the last block */

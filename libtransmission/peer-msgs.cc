@@ -2027,7 +2027,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
          * many requests we should send to this peer */
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize;
+        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->block_size;
         size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
         msgs->desired_request_count = std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
@@ -2194,7 +2194,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->blockSize && popNextRequest(msgs, &req))
+    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->block_size && popNextRequest(msgs, &req))
     {
         --msgs->prefetchCount;
 
