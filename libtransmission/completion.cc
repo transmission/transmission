@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <iostream> // NOCOMMIT
 #include <vector>
 
 #include "transmission.h"
@@ -39,7 +38,6 @@ bool tr_completion::hasPiece(tr_piece_index_t i) const
 bool tr_completion::isDone() const
 {
     auto left_until_done = leftUntilDone();
-    std::cerr << __FILE__ << ':' << __LINE__ << " leftUntilDone " << left_until_done << std::endl;
     return hasMetainfo() && left_until_done == 0;
 }
 tr_bitfield const& tr_completion::blocks() const
@@ -54,7 +52,6 @@ uint64_t tr_completion::leftUntilDone() const
 {
     auto const size_when_done = sizeWhenDone();
     auto const has_total = hasTotal();
-    std::cerr << __FILE__ << ':' << __LINE__ << " sizeWhenDone " << size_when_done << " hasTotal " << has_total << std::endl;
     return size_when_done - has_total;
 }
 
@@ -78,7 +75,6 @@ uint64_t tr_completion::computeHasValid() const
     {
         if (hasPiece(piece))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " has piece " << piece << std::endl;
             size += block_info_->countBytesInPiece(piece);
         }
     }
@@ -91,7 +87,6 @@ uint64_t tr_completion::hasValid() const
     if (!has_valid_)
     {
         has_valid_ = computeHasValid();
-        std::cerr << __FILE__ << ':' << __LINE__ << " recomputed has_valid_; new value is " << *has_valid_ << std::endl;
     }
 
     return *has_valid_;
@@ -118,7 +113,6 @@ uint64_t tr_completion::computeSizeWhenDone() const
         }
     }
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " recomputed sizeWhenDone: " << size << std::endl;
     return size;
 }
 
@@ -254,10 +248,8 @@ void tr_completion::removePiece(tr_piece_index_t piece)
 {
     auto const block_range = block_info_->blockRangeForPiece(piece);
     size_now_ -= countHasBytesInRange(block_info_->blockRangeForPiece(piece));
-    std::cerr << __FILE__ << ':' << __LINE__ << " reset has_valid_" << std::endl;
     has_valid_.reset();
     blocks_.unsetRange(block_range.first, block_range.last + 1);
-    std::cerr << __FILE__ << ':' << __LINE__ << " hasPiece(" << piece << ") " << hasPiece(piece) << std::endl;
 }
 
 uint64_t tr_completion::countHasBytesInRange(tr_block_range_t range) const
