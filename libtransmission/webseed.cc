@@ -371,7 +371,7 @@ static void on_idle(tr_webseed* w)
             task->session = tor->session;
             task->webseed = w;
             task->block = first;
-            task->piece_index = tr_torBlockPiece(tor, first);
+            task->piece_index = tor->pieceForBlock(first);
             task->piece_offset = tor->block_size * first - tor->info.pieceSize * task->piece_index;
             task->length = (last - first) * tor->block_size + tor->countBytesInBlock(last);
             task->blocks_done = 0;

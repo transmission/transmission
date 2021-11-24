@@ -109,7 +109,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
 
     if (!tr_cpBlockIsComplete(cp, block))
     {
-        tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
+        tr_piece_index_t const piece = cp->tor->pieceForBlock(block);
 
         cp->blockBitfield->set(block);
         cp->sizeNow += tor->countBytesInBlock(block);

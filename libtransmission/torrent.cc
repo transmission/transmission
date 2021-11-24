@@ -3076,7 +3076,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
         tr_cpBlockAdd(&tor->completion, block);
         tr_torrentSetDirty(tor);
 
-        tr_piece_index_t const p = tr_torBlockPiece(tor, block);
+        tr_piece_index_t const p = tor->pieceForBlock(block);
 
         if (tr_torrentPieceIsComplete(tor, p))
         {

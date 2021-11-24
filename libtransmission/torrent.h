@@ -415,12 +415,6 @@ private:
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
 
-/* what piece index is this block in? */
-constexpr tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_index_t const block)
-{
-    return block / tor->n_blocks_in_piece;
-}
-
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
 {
     return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;
