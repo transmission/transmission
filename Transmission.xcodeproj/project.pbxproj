@@ -274,8 +274,6 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.mm */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.mm */; };
-		A8B2B4EC35140B6840BE8F7A /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = A8B2B4EC35140B6840BE8F7A /* block-info.h */; };
-		A8B2B4EC35240B6840BE8F7A /* block-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = A8B2B4EC35240B6840BE8F7A /* block-info.cc */; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
 		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
@@ -940,8 +938,6 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsController.mm; sourceTree = "<group>"; };
-		A8B2B4EC35140B6840BE8F7A /* block-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = block-info.h; sourceTree = "<group>"; };
-		A8B2B4EC35240B6840BE8F7A /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = block-info.cc; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniupnpc_declspec.h; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igd_desc_parse.h; sourceTree = "<group>"; };
@@ -1413,8 +1409,6 @@
 				A29DF8B60DB2544C00D04E5A /* resume.cc */,
 				A29DF8B70DB2544C00D04E5A /* resume.h */,
 				A29DF8B80DB2544C00D04E5A /* torrent.h */,
-		    A8B2B4EC35140B6840BE8F7A /* block-info.h */,
-		    Z8B2B4EC35240B6840BE8F7A /* block-info.cc */,
 				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.cc */,
 				C1033E041A3279B800EF44D8 /* crypto-utils-ccrypto.cc */,
 				C1033E051A3279B800EF44D8 /* crypto-utils.cc */,
@@ -1904,7 +1898,6 @@
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
 				A2AF23C916B44FA0003BC59E /* log.h in Headers */,
 				A23FAE55178BC2950053DC5B /* platform-quota.h in Headers */,
-				A8B2B4EC35140B6840BE8F7A /* block-info.h */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2500,7 +2493,6 @@
 				A2EA52311686AC0D00180493 /* quark.cc in Sources */,
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
-		    A8B2B4EC35240B6840BE8F7A /* block-info.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
