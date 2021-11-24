@@ -315,7 +315,7 @@ int tr_dhtInit(tr_session* ss)
 
     auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
     auto benc = tr_variant{};
-    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_JSON, dat_file.c_str());
+    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.c_str());
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
