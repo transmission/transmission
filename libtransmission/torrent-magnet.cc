@@ -297,7 +297,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                     auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
                     success = !!info;
-                    if (info && tr_getBlockSize(info->info.pieceSize) == 0)
+                    if (info && tr_block_info::bestBlockSize(info->info.pieceSize) == 0)
                     {
                         tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
                         success = false;

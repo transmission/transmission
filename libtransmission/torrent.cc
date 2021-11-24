@@ -683,29 +683,6 @@ static void tr_torrentInitPiecePriorities(tr_torrent* tor)
 
 static void torrentStart(tr_torrent* tor, bool bypass_queue);
 
-/**
- * Decide on a block size. Constraints:
- * (1) most clients decline requests over 16 KiB
- * (2) pieceSize must be a multiple of block size
- */
-// NOCOMMIT TODO(ckerr) use block-info version
-uint32_t tr_getBlockSize(uint32_t pieceSize)
-{
-    uint32_t b = pieceSize;
-
-    while (b > MAX_BLOCK_SIZE)
-    {
-        b /= 2U;
-    }
-
-    if (b == 0 || pieceSize % b != 0) /* not cleanly divisible */
-    {
-        return 0;
-    }
-
-    return b;
-}
-
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
 void tr_torrentGotNewInfoDict(tr_torrent* tor)

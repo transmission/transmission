@@ -492,8 +492,6 @@ static inline void tr_torrentMarkEdited(tr_torrent* tor)
     tor->editDate = tr_time();
 }
 
-uint32_t tr_getBlockSize(uint32_t pieceSize);
-
 /**
  * Tell the tr_torrent that it's gotten a block
  */
