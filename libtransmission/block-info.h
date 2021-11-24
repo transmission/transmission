@@ -54,9 +54,16 @@ struct tr_block_info
         return block + 1 == n_blocks ? final_block_size : block_size;
     }
 
+    constexpr tr_piece_index_t pieceOf(uint64_t offset) const
+    {
+        // handle 0-byte files at the end of a torrent
+        return offset == total_size ? n_pieces - 1 : offset / piece_size;
+    }
+
     constexpr tr_block_index_t blockOf(uint64_t offset) const
     {
-        return offset / block_size;
+        // handle 0-byte files at the end of a torrent
+        return offset == total_size ? n_blocks - 1 : offset / block_size;
     }
 
     constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const

@@ -578,34 +578,17 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
 ****
 ***/
 
-// NOCOMMIT TODO(ckerr) move this to block-info
-static constexpr tr_piece_index_t getBytePiece(tr_info const* info, uint64_t byteOffset)
+static constexpr void initFilePieces(tr_torrent* tor, tr_file_index_t fileIndex)
 {
-    TR_ASSERT(info != nullptr);
-    TR_ASSERT(info->pieceSize != 0);
+    TR_ASSERT(tor != nullptr);
+    TR_ASSERT(fileIndex < tor->info.fileCount);
 
-    tr_piece_index_t piece = byteOffset / info->pieceSize;
+    tr_file* file = &tor->info.files[fileIndex];
+    uint64_t first_byte = file->offset;
+    uint64_t last_byte = first_byte + (file->length != 0 ? file->length - 1 : 0);
 
-    /* handle 0-byte files at the end of a torrent */
-    if (byteOffset == info->totalSize)
-    {
-        piece = info->pieceCount - 1;
-    }
-
-    return piece;
-}
-
-static constexpr void initFilePieces(tr_info* info, tr_file_index_t fileIndex)
-{
-    TR_ASSERT(info != nullptr);
-    TR_ASSERT(fileIndex < info->fileCount);
-
-    tr_file* file = &info->files[fileIndex];
-    uint64_t firstByte = file->offset;
-    uint64_t lastByte = firstByte + (file->length != 0 ? file->length - 1 : 0);
-
-    file->firstPiece = getBytePiece(info, firstByte);
-    file->lastPiece = getBytePiece(info, lastByte);
+    file->firstPiece = tor->pieceOf(first_byte);
+    file->lastPiece = tor->pieceOf(last_byte);
 }
 
 static constexpr bool pieceHasFile(tr_piece_index_t piece, tr_file const* file)
@@ -660,7 +643,7 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
     {
         inf->files[f].offset = offset;
         offset += inf->files[f].length;
-        initFilePieces(inf, f);
+        initFilePieces(tor, f);
     }
 }
 
