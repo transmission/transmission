@@ -105,7 +105,7 @@ TEST_F(BlockInfoTest, countBytesInBlock)
     EXPECT_EQ(1, info.countBytesInBlock(info.n_blocks - 1));
 }
 
-TEST_F(BlockInfoTest, totalOffset)
+TEST_F(BlockInfoTest, offset)
 {
     auto info = tr_block_info{};
 
@@ -116,9 +116,18 @@ TEST_F(BlockInfoTest, totalOffset)
     uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(0, info.totalOffset(0, 0));
-    EXPECT_EQ(1, info.totalOffset(0, 0, 1));
-    EXPECT_EQ(PieceSize * 2 + 100 + 1, info.totalOffset(2, 100, 1));
+    EXPECT_EQ(0, info.offset(0, 0));
+    EXPECT_EQ(1, info.offset(0, 0, 1));
+    EXPECT_EQ(PieceSize * 2 + 100 + 1, info.offset(2, 100, 1));
+    EXPECT_EQ(
+        info.total_size - 1,
+        info.offset(
+            info.n_pieces - 1,
+            ((info.n_blocks_in_final_piece - 1) * info.block_size) + info.n_blocks_in_final_piece - 1));
+    EXPECT_EQ(info.n_blocks_in_piece, info.blockOf(info.offset(1, 0)));
+    EXPECT_EQ(info.n_blocks_in_piece, info.blockOf(info.offset(1, info.block_size - 1)));
+    EXPECT_EQ(info.n_blocks_in_piece + 1, info.blockOf(info.offset(1, info.block_size)));
+    EXPECT_EQ(info.n_blocks - 1, info.blockOf(info.total_size - 1));
 }
 
 TEST_F(BlockInfoTest, blockRangeForPiece)

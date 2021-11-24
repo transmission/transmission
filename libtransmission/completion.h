@@ -28,10 +28,10 @@ struct tr_completion
         virtual bool pieceIsDnd(tr_piece_index_t piece) const = 0;
     };
 
-    explicit tr_completion(torrent_view const* tor, tr_block_info const& block_info)
+    explicit tr_completion(torrent_view const* tor, tr_block_info const* block_info)
         : tor_{ tor }
         , block_info_{ block_info }
-        , blocks_{ block_info.n_blocks }
+        , blocks_{ block_info_->n_blocks }
     {
         blocks_.setHasNone();
     }
@@ -75,8 +75,8 @@ private:
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
     [[nodiscard]] uint64_t countHasBytesInRange(tr_block_range_t) const;
 
-    torrent_view const* const tor_;
-    tr_block_info const block_info_;
+    torrent_view const* tor_;
+    tr_block_info const* block_info_;
 
     tr_bitfield blocks_{ 0 };
 

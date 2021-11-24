@@ -80,28 +80,28 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const test_incomplete_dir_threadfunc = [](void* vdata) noexcept
     {
         auto* data = static_cast<TestIncompleteDirData*>(vdata);
-        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->block_size, data->buf);
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
     };
 
     // now finish writing it
     {
-        char* zero_block = tr_new0(char, tor->blockSize);
+        char* zero_block = tr_new0(char, tor->block_size);
 
         struct TestIncompleteDirData data = {};
         data.session = session_;
         data.tor = tor;
         data.buf = evbuffer_new();
 
-        auto const [first, last] = tr_torGetPieceBlockRange(tor, data.pieceIndex);
+        auto const [first, last] = tor->blockRangeForPiece(data.pieceIndex);
 
         for (tr_block_index_t block_index = first; block_index <= last; ++block_index)
         {
-            evbuffer_add(data.buf, zero_block, tor->blockSize);
+            evbuffer_add(data.buf, zero_block, tor->block_size);
             data.block = block_index;
             data.done = false;
-            data.offset = data.block * tor->blockSize;
+            data.offset = data.block * tor->block_size;
             tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()

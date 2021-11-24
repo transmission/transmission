@@ -60,7 +60,7 @@ uint64_t tr_completion::leftUntilDone() const
 
 double tr_completion::percentComplete() const
 {
-    auto const denom = block_info_.total_size;
+    auto const denom = block_info_->total_size;
     return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
 }
 
@@ -74,12 +74,12 @@ uint64_t tr_completion::computeHasValid() const
 {
     uint64_t size = 0;
 
-    for (tr_piece_index_t piece = 0, n = block_info_.n_pieces; piece < n; ++piece)
+    for (tr_piece_index_t piece = 0, n = block_info_->n_pieces; piece < n; ++piece)
     {
         if (hasPiece(piece))
         {
             std::cerr << __FILE__ << ':' << __LINE__ << " has piece " << piece << std::endl;
-            size += block_info_.countBytesInPiece(piece);
+            size += block_info_->countBytesInPiece(piece);
         }
     }
 
@@ -101,20 +101,20 @@ uint64_t tr_completion::computeSizeWhenDone() const
 {
     if (hasAll())
     {
-        return block_info_.total_size;
+        return block_info_->total_size;
     }
 
     // count bytes that we want or that we already have
     auto size = size_t{ 0 };
-    for (tr_piece_index_t piece = 0; piece < block_info_.n_pieces; ++piece)
+    for (tr_piece_index_t piece = 0; piece < block_info_->n_pieces; ++piece)
     {
         if (!tor_->pieceIsDnd(piece))
         {
-            size += block_info_.countBytesInPiece(piece);
+            size += block_info_->countBytesInPiece(piece);
         }
         else
         {
-            size += countHasBytesInRange(block_info_.blockRangeForPiece(piece));
+            size += countHasBytesInRange(block_info_->blockRangeForPiece(piece));
         }
     }
 
@@ -156,7 +156,7 @@ size_t tr_completion::countMissingBlocksInPiece(tr_piece_index_t piece) const
         return 0;
     }
 
-    auto const [first, last] = block_info_.blockRangeForPiece(piece);
+    auto const [first, last] = block_info_->blockRangeForPiece(piece);
     return (last + 1 - first) - blocks_.count(first, last + 1);
 }
 
@@ -167,7 +167,7 @@ size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
         return 0;
     }
 
-    return block_info_.countBytesInPiece(piece) - countHasBytesInRange(block_info_.blockRangeForPiece(piece));
+    return block_info_->countBytesInPiece(piece) - countHasBytesInRange(block_info_->blockRangeForPiece(piece));
 }
 
 tr_completeness tr_completion::status() const
@@ -192,7 +192,7 @@ tr_completeness tr_completion::status() const
 
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
-    auto const n = block_info_.n_pieces;
+    auto const n = block_info_->n_pieces;
     auto pieces = tr_bitfield{ n };
 
     if (hasAll())
@@ -225,7 +225,7 @@ void tr_completion::addBlock(tr_block_index_t block)
     }
 
     blocks_.set(block);
-    size_now_ += block_info_.countBytesInBlock(block);
+    size_now_ += block_info_->countBytesInBlock(block);
 
     has_valid_.reset();
 }
@@ -242,7 +242,7 @@ void tr_completion::setBlocks(tr_bitfield blocks)
 
 void tr_completion::addPiece(tr_piece_index_t piece)
 {
-    auto const [first, last] = block_info_.blockRangeForPiece(piece);
+    auto const [first, last] = block_info_->blockRangeForPiece(piece);
 
     for (tr_block_index_t block = first; block <= last; ++block)
     {
@@ -252,8 +252,8 @@ void tr_completion::addPiece(tr_piece_index_t piece)
 
 void tr_completion::removePiece(tr_piece_index_t piece)
 {
-    auto const block_range = block_info_.blockRangeForPiece(piece);
-    size_now_ -= countHasBytesInRange(block_info_.blockRangeForPiece(piece));
+    auto const block_range = block_info_->blockRangeForPiece(piece);
+    size_now_ -= countHasBytesInRange(block_info_->blockRangeForPiece(piece));
     std::cerr << __FILE__ << ':' << __LINE__ << " reset has_valid_" << std::endl;
     has_valid_.reset();
     blocks_.unsetRange(block_range.first, block_range.last + 1);
@@ -265,11 +265,11 @@ uint64_t tr_completion::countHasBytesInRange(tr_block_range_t range) const
     auto const [first, last] = range;
 
     auto n = blocks_.count(first, last + 1);
-    n *= block_info_.block_size;
+    n *= block_info_->block_size;
 
-    if (last + 1 == block_info_.n_blocks && blocks_.test(last))
+    if (last + 1 == block_info_->n_blocks && blocks_.test(last))
     {
-        n -= block_info_.block_size - block_info_.final_block_size;
+        n -= block_info_->block_size - block_info_->final_block_size;
     }
 
     return n;
