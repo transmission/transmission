@@ -245,7 +245,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
         return 0;
     }
 
-    size_t const pieceByteSize = tor->countBytesInPiece(piece);
+    size_t const pieceByteSize = cp->tor->countBytesInPiece(piece);
     auto const [first, last] = cp->tor->blockRangeForPiece(piece);
 
     auto haveBytes = size_t{};
