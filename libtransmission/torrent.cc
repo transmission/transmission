@@ -989,7 +989,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
     }
 
     auto* tor = new tr_torrent{};
-    tor->takeMetainfo(std::move(*parsed));
+    tor->swapMetainfo(*parsed);
     torrentInit(tor, ctor);
     return tor;
 }
@@ -1985,21 +1985,20 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 
-    char* const cmd[] = {
-        tr_strdup(script),
+    char const* const cmd[] = {
+        script,
         nullptr,
     };
 
-    char* const env[] = {
-        tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
-        tr_strdup_printf("TR_TIME_LOCALTIME=%s", ctime_str),
-        tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
-        tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
-        tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
-        tr_strdup_printf("TR_TORRENT_LABELS=%s", buildLabelsString(tor).c_str()),
-        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
-        tr_strdup_printf("TR_TORRENT_TRACKERS=%s", buildTrackersString(tor).c_str()),
-        nullptr,
+    auto const env = std::map<std::string_view, std::string_view>{
+        { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
+        { "TR_TIME_LOCALTIME"sv, ctime_str },
+        { "TR_TORRENT_DIR"sv, torrent_dir },
+        { "TR_TORRENT_HASH"sv, tor->info.hashString },
+        { "TR_TORRENT_ID"sv, std::to_string(tr_torrentId(tor)) },
+        { "TR_TORRENT_LABELS"sv, buildLabelsString(tor) },
+        { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
+        { "TR_TORRENT_TRACKERS"sv, buildTrackersString(tor) },
     };
 
     tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
@@ -2012,8 +2011,6 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_error_free(error);
     }
 
-    tr_free_ptrv((void* const*)env);
-    tr_free_ptrv((void* const*)cmd);
     tr_free(torrent_dir);
 }
 
@@ -3604,7 +3601,7 @@ void tr_torrentRenamePath(
     tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
 
-void tr_torrent::takeMetainfo(tr_metainfo_parsed&& parsed)
+void tr_torrent::swapMetainfo(tr_metainfo_parsed& parsed)
 {
     std::swap(this->info, parsed.info);
     std::swap(this->piece_checksums_, parsed.pieces);

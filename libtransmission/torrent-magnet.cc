@@ -305,9 +305,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                     if (success)
                     {
-                        /* keep the new info */
-                        std::swap(tor->info, info->info);
-                        std::swap(tor->infoDictLength, info->info_dict_length);
+                        /* tor should keep this metainfo */
+                        tor->swapMetainfo(*info);
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
