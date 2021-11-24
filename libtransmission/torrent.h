@@ -19,8 +19,11 @@
 #include <unordered_set>
 #include <vector>
 
+#include "transmission.h"
+
 #include "bandwidth.h"
 #include "bitfield.h"
+#include "block-info.h"
 #include "completion.h"
 #include "file.h"
 #include "quark.h"
@@ -76,10 +79,6 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const*
 
 bool tr_torrentIsPieceTransferAllowed(tr_torrent const* torrent, tr_direction direction);
 
-#define tr_block(a, b) _tr_block(tor, a, b)
-
-tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset);
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
 uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
@@ -92,8 +91,6 @@ void tr_torrentGetBlockLocation(
     uint32_t* length);
 
 tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file);
-
-tr_block_range_t tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
@@ -128,7 +125,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent
+struct tr_torrent : public tr_block_info
 {
 public:
     void setLocation(
@@ -320,16 +317,6 @@ public:
      * This pointer will be equal to downloadDir or incompleteDir */
     char const* currentDir;
 
-    /* How many bytes we ask for per request */
-    uint32_t blockSize;
-    tr_block_index_t blockCount;
-
-    uint32_t lastBlockSize;
-    uint32_t lastPieceSize;
-
-    uint32_t blockCountInPiece;
-    uint32_t blockCountInLastPiece;
-
     struct tr_completion completion;
 
     tr_completeness completeness;
@@ -427,24 +414,6 @@ public:
 private:
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
-
-/* what piece index is this block in? */
-constexpr tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_index_t const block)
-{
-    return block / tor->blockCountInPiece;
-}
-
-/* how many bytes are in this piece? */
-constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t const piece)
-{
-    return piece + 1 == tor->info.pieceCount ? tor->lastPieceSize : tor->info.pieceSize;
-}
-
-/* how many bytes are in this block? */
-constexpr uint32_t tr_torBlockCountBytes(tr_torrent const* tor, tr_block_index_t const block)
-{
-    return block + 1 == tor->blockCount ? tor->lastBlockSize : tor->blockSize;
-}
 
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
 {

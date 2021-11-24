@@ -358,7 +358,7 @@ public:
 
     bool is_reading_block(tr_block_index_t block) const override
     {
-        return state == AwaitingBtPiece && block == _tr_block(torrent, incoming.blockReq.index, incoming.blockReq.offset);
+        return state == AwaitingBtPiece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
     }
 
     void cancel_block_request(tr_block_index_t block) override
@@ -1885,7 +1885,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     TR_ASSERT(req != nullptr);
 
     tr_torrent* tor = msgs->torrent;
-    tr_block_index_t const block = _tr_block(tor, req->index, req->offset);
+    tr_block_index_t const block = tor->blockOf(req->index, req->offset);
 
     if (!requestIsValid(msgs, req))
     {
@@ -1893,9 +1893,9 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return EBADMSG;
     }
 
-    if (req->length != tr_torBlockCountBytes(msgs->torrent, block))
+    if (req->length != msgs->torrent->countBytesInBlock(block))
     {
-        dbgmsg(msgs, "wrong block size -- expected %u, got %d", tr_torBlockCountBytes(msgs->torrent, block), req->length);
+        dbgmsg(msgs, "wrong block size -- expected %u, got %d", msgs->torrent->countBytesInBlock(block), req->length);
         return EMSGSIZE;
     }
 
@@ -2027,7 +2027,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
          * many requests we should send to this peer */
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize;
+        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->block_size;
         size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
         msgs->desired_request_count = std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
@@ -2194,7 +2194,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->blockSize && popNextRequest(msgs, &req))
+    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->block_size && popNextRequest(msgs, &req))
     {
         --msgs->prefetchCount;
 

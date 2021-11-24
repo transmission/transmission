@@ -721,63 +721,10 @@ uint32_t tr_getBlockSize(uint32_t pieceSize)
     return b;
 }
 
-static void refreshCurrentDir(tr_torrent* tor);
-
 static void torrentInitFromInfo(tr_torrent* tor)
 {
-    tr_info const* const info = &tor->info;
-
-    tor->blockSize = tr_getBlockSize(info->pieceSize);
-
-    if (info->pieceSize != 0)
-    {
-        tor->lastPieceSize = (uint32_t)(info->totalSize % info->pieceSize);
-    }
-
-    if (tor->lastPieceSize == 0)
-    {
-        tor->lastPieceSize = info->pieceSize;
-    }
-
-    if (tor->blockSize != 0)
-    {
-        tor->lastBlockSize = info->totalSize % tor->blockSize;
-    }
-
-    if (tor->lastBlockSize == 0)
-    {
-        tor->lastBlockSize = tor->blockSize;
-    }
-
-    tor->blockCount = tor->blockSize != 0 ? (info->totalSize + tor->blockSize - 1) / tor->blockSize : 0;
-    tor->blockCountInPiece = tor->blockSize != 0 ? info->pieceSize / tor->blockSize : 0;
-    tor->blockCountInLastPiece = tor->blockSize != 0 ? (tor->lastPieceSize + tor->blockSize - 1) / tor->blockSize : 0;
-
-#ifdef TR_ENABLE_ASSERTS
-    /* check our work */
-    if (tor->blockSize != 0)
-    {
-        TR_ASSERT(info->pieceSize % tor->blockSize == 0);
-    }
-
-    uint64_t t = info->pieceCount - 1;
-    t *= info->pieceSize;
-    t += tor->lastPieceSize;
-    TR_ASSERT(t == info->totalSize);
-
-    t = tor->blockCount - 1;
-    t *= tor->blockSize;
-    t += tor->lastBlockSize;
-    TR_ASSERT(t == info->totalSize);
-
-    t = info->pieceCount - 1;
-    t *= tor->blockCountInPiece;
-    t += tor->blockCountInLastPiece;
-    TR_ASSERT(t == (uint64_t)tor->blockCount);
-#endif
-
+    tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
     tr_cpConstruct(&tor->completion, tor);
-
     tr_torrentInitFilePieces(tor);
 }
 
@@ -835,6 +782,8 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
         torrentCallScript(tor, tr_sessionGetScript(session, type));
     }
 }
+
+static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
@@ -1374,21 +1323,21 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     // the first block
     if (tr_torrentBlockIsComplete(tor, first))
     {
-        total += tor->blockSize - f.offset % tor->blockSize;
+        total += tor->block_size - f.offset % tor->block_size;
     }
 
     // the middle blocks
     if (first + 1 < last)
     {
         uint64_t u = tor->completion.blockBitfield->count(first + 1, last);
-        u *= tor->blockSize;
+        u *= tor->block_size;
         total += u;
     }
 
     // the last block
     if (tr_torrentBlockIsComplete(tor, last))
     {
-        total += f.offset + f.length - (uint64_t)tor->blockSize * last;
+        total += f.offset + f.length - (uint64_t)tor->block_size * last;
     }
 
     return total;
@@ -2372,33 +2321,12 @@ void tr_torrentGetBlockLocation(
     uint32_t* length)
 {
     uint64_t pos = block;
-    pos *= tor->blockSize;
+    pos *= tor->block_size;
     *piece = pos / tor->info.pieceSize;
     uint64_t piece_begin = tor->info.pieceSize;
     piece_begin *= *piece;
     *offset = pos - piece_begin;
-    *length = tr_torBlockCountBytes(tor, block);
-}
-
-tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tr_block_index_t ret = 0;
-
-    if (tor->blockSize > 0)
-    {
-        ret = index;
-        ret *= tor->info.pieceSize / tor->blockSize;
-        ret += offset / tor->blockSize;
-    }
-    else
-    {
-        tr_logAddTorErr(tor, "Cannot calculate block number when blockSize is zero");
-        TR_ASSERT(tor->blockSize > 0);
-    }
-
-    return ret;
+    *length = tor->countBytesInBlock(block);
 }
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
@@ -2415,7 +2343,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 2;
     }
-    else if (offset + length > tr_torPieceCountBytes(tor, index))
+    else if (offset + length > tor->countBytesInPiece(index))
     {
         err = 3;
     }
@@ -2459,25 +2387,14 @@ tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t 
     tr_file const* f = &tor->info.files[file];
 
     uint64_t offset = f->offset;
-    tr_block_index_t const first = offset / tor->blockSize;
+    tr_block_index_t const first = offset / tor->block_size;
     if (f->length == 0)
     {
         return { first, first };
     }
 
     offset += f->length - 1;
-    tr_block_index_t const last = offset / tor->blockSize;
-    return { first, last };
-}
-
-tr_block_range_t tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
-{
-    uint64_t offset = tor->info.pieceSize;
-    offset *= piece;
-    tr_block_index_t const first = offset / tor->blockSize;
-    offset += tr_torPieceCountBytes(tor, piece) - 1;
-    tr_block_index_t const last = offset / tor->blockSize;
-
+    tr_block_index_t const last = offset / tor->block_size;
     return { first, last };
 }
 
@@ -3159,7 +3076,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
         tr_cpBlockAdd(&tor->completion, block);
         tr_torrentSetDirty(tor);
 
-        tr_piece_index_t const p = tr_torBlockPiece(tor, block);
+        tr_piece_index_t const p = tor->pieceForBlock(block);
 
         if (tr_torrentPieceIsComplete(tor, p))
         {
@@ -3169,7 +3086,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
             }
             else
             {
-                uint32_t const n = tr_torPieceCountBytes(tor, p);
+                uint32_t const n = tor->countBytesInPiece(p);
                 tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
@@ -3179,7 +3096,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     }
     else
     {
-        uint32_t const n = tr_torBlockCountBytes(tor, block);
+        uint32_t const n = tor->countBytesInBlock(block);
         tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
         tr_logAddTorDbg(tor, "we have this block already...");
     }
