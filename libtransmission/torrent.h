@@ -421,12 +421,6 @@ constexpr tr_piece_index_t tr_torBlockPiece(tr_torrent const* tor, tr_block_inde
     return block / tor->n_blocks_in_piece;
 }
 
-/* how many bytes are in this piece? */
-constexpr uint32_t tr_torPieceCountBytes(tr_torrent const* tor, tr_piece_index_t const piece)
-{
-    return piece + 1 == tor->info.pieceCount ? tor->final_piece_size : tor->info.pieceSize;
-}
-
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
 {
     return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;

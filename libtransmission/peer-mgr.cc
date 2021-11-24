@@ -762,7 +762,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 
     if (pieceCameFromPeers) /* webseed downloads don't belong in announce totals */
     {
-        tr_announcerAddBytes(tor, TR_ANN_DOWN, tr_torPieceCountBytes(tor, p));
+        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->countBytesInPiece(p));
     }
 
     /* bookkeeping */
@@ -1243,7 +1243,7 @@ tr_pex* tr_peerMgrCompact6ToPex(
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 {
     tr_swarm* s = tor->swarm;
-    uint32_t const byteCount = tr_torPieceCountBytes(tor, pieceIndex);
+    uint32_t const byteCount = tor->countBytesInPiece(pieceIndex);
 
     for (int i = 0, n = tr_ptrArraySize(&s->peers); i != n; ++i)
     {

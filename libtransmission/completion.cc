@@ -136,7 +136,7 @@ uint64_t tr_cpHaveValid(tr_completion const* ccp)
         {
             if (tr_cpPieceIsComplete(ccp, i))
             {
-                size += tr_torPieceCountBytes(tor, i);
+                size += tor->countBytesInPiece(i);
             }
         }
 
@@ -165,7 +165,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
             for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
             {
                 uint64_t n = 0;
-                uint64_t const pieceSize = tr_torPieceCountBytes(tor, p);
+                uint64_t const pieceSize = tor->countBytesInPiece(p);
 
                 if (!tor->pieceIsDnd(p))
                 {
@@ -183,7 +183,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     }
                 }
 
-                TR_ASSERT(n <= tr_torPieceCountBytes(tor, p));
+                TR_ASSERT(n <= tor->countBytesInPiece(p));
                 size += n;
             }
         }
@@ -245,7 +245,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
         return 0;
     }
 
-    size_t const pieceByteSize = tr_torPieceCountBytes(cp->tor, piece);
+    size_t const pieceByteSize = tor->countBytesInPiece(piece);
     auto const [first, last] = cp->tor->blockRangeForPiece(piece);
 
     auto haveBytes = size_t{};
