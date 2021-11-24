@@ -124,10 +124,10 @@ TEST_F(BlockInfoTest, offset)
         info.offset(
             info.n_pieces - 1,
             ((info.n_blocks_in_final_piece - 1) * info.block_size) + info.n_blocks_in_final_piece - 1));
-    EXPECT_EQ(info.n_blocks_in_piece, info.blockForOffset(info.offset(1, 0)));
-    EXPECT_EQ(info.n_blocks_in_piece, info.blockForOffset(info.offset(1, info.block_size - 1)));
-    EXPECT_EQ(info.n_blocks_in_piece + 1, info.blockForOffset(info.offset(1, info.block_size)));
-    EXPECT_EQ(info.n_blocks - 1, info.blockForOffset(info.total_size - 1));
+    EXPECT_EQ(info.n_blocks_in_piece, info.blockOf(info.offset(1, 0)));
+    EXPECT_EQ(info.n_blocks_in_piece, info.blockOf(info.offset(1, info.block_size - 1)));
+    EXPECT_EQ(info.n_blocks_in_piece + 1, info.blockOf(info.offset(1, info.block_size)));
+    EXPECT_EQ(info.n_blocks - 1, info.blockOf(info.total_size - 1));
 }
 
 TEST_F(BlockInfoTest, blockRangeForPiece)

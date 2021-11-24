@@ -2398,17 +2398,6 @@ tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t 
     return { first, last };
 }
 
-tr_block_range_t tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece)
-{
-    uint64_t offset = tor->info.pieceSize;
-    offset *= piece;
-    tr_block_index_t const first = offset / tor->block_size;
-    offset += tr_torPieceCountBytes(tor, piece) - 1;
-    tr_block_index_t const last = offset / tor->block_size;
-
-    return { first, last };
-}
-
 /***
 ****
 ***/

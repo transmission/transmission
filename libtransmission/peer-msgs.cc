@@ -358,7 +358,7 @@ public:
 
     bool is_reading_block(tr_block_index_t block) const override
     {
-        return state == AwaitingBtPiece && block == torrent->blockForOffset(incoming.blockReq.index, incoming.blockReq.offset);
+        return state == AwaitingBtPiece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
     }
 
     void cancel_block_request(tr_block_index_t block) override
@@ -1885,7 +1885,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     TR_ASSERT(req != nullptr);
 
     tr_torrent* tor = msgs->torrent;
-    tr_block_index_t const block = tor->blockForOffset(req->index, req->offset);
+    tr_block_index_t const block = tor->blockOf(req->index, req->offset);
 
     if (!requestIsValid(msgs, req))
     {

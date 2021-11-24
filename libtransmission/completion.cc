@@ -80,7 +80,7 @@ tr_completeness tr_cpGetStatus(tr_completion const* cp)
 void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 {
     tr_torrent const* tor = cp->tor;
-    auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
+    auto const [first, last] = cp->tor->blockRangeForPiece(piece);
     for (tr_block_index_t i = first; i <= last; ++i)
     {
         if (tr_cpBlockIsComplete(cp, i))
@@ -96,7 +96,7 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
 {
-    auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
+    auto const [first, last] = cp->tor->blockRangeForPiece(piece);
     for (tr_block_index_t i = first; i <= last; ++i)
     {
         tr_cpBlockAdd(cp, i);
@@ -173,8 +173,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                 }
                 else
                 {
-                    auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, p);
-
+                    auto const [first, last] = cp->tor->blockRangeForPiece(p);
                     n = cp->blockBitfield->count(first, last + 1);
                     n *= cp->tor->block_size;
 
@@ -222,7 +221,7 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
         else
         {
             tr_piece_index_t const piece = (tr_piece_index_t)i * interval;
-            auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
+            auto const [first, last] = cp->tor->blockRangeForPiece(piece);
             tab[i] = cp->blockBitfield->count(first, last + 1) / (float)(last + 1 - first);
         }
     }
@@ -235,7 +234,7 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const* cp, tr_piece_index_t piece
         return 0;
     }
 
-    auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
+    auto const [first, last] = cp->tor->blockRangeForPiece(piece);
     return (last + 1 - first) - cp->blockBitfield->count(first, last + 1);
 }
 
@@ -247,7 +246,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
     }
 
     size_t const pieceByteSize = tr_torPieceCountBytes(cp->tor, piece);
-    auto const [first, last] = tr_torGetPieceBlockRange(cp->tor, piece);
+    auto const [first, last] = cp->tor->blockRangeForPiece(piece);
 
     auto haveBytes = size_t{};
     if (first != last)
