@@ -1513,6 +1513,7 @@
 				C1FEE5731C3223CC00D62832 /* watchdir-generic.cc */,
 				C1FEE5741C3223CC00D62832 /* watchdir-kqueue.cc */,
 				C1FEE5721C3223CC00D62832 /* watchdir-common.h */,
+				0D9C4C8F8924799C5E451C0E /* block-info.cc */,
 			);
 			path = libtransmission;
 			sourceTree = "<group>";
