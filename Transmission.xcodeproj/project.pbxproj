@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.cc */; };
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
-		0D9C4C8F8924799C5E451C0E /* block-info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD1F4244B3F6424B80FBC5C7 /* block-info.cpp */; };
+		0D9C4C8F8924799C5E451C0E /* block-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = FD1F4244B3F6424B80FBC5C7 /* block-info.cc */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
@@ -1033,7 +1033,7 @@
 		ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr-wishlist.cc"; sourceTree = "<group>"; };
 		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
-		FD1F4244B3F6424B80FBC5C7 /* block-info.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "block-info.cpp"; path = "block-info.cpp"; sourceTree = SOURCE_ROOT; };
+		FD1F4244B3F6424B80FBC5C7 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "block-info.cc"; path = "block-info.cc"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1302,7 +1302,7 @@
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				A2F35BBA15C5A0A100EBF632 /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				FD1F4244B3F6424B80FBC5C7 /* block-info.cpp */,
+				FD1F4244B3F6424B80FBC5C7 /* block-info.cc */,
 				52CE4AD4A557E825FE3187BE /* block-info.h */,
 			);
 			name = Transmission;
@@ -2500,7 +2500,7 @@
 				A2EA52311686AC0D00180493 /* quark.cc in Sources */,
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
-				0D9C4C8F8924799C5E451C0E /* block-info.cpp in Sources */,
+				0D9C4C8F8924799C5E451C0E /* block-info.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
