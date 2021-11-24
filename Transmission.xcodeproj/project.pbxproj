@@ -937,7 +937,7 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsController.mm; sourceTree = "<group>"; };
-		A54D44C6A7AAF131D9AE29F5 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "block-info.cc"; path = "block-info.cc"; sourceTree = SOURCE_ROOT; };
+		A54D44C6A7AAF131D9AE29F5 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = block-info.cc; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniupnpc_declspec.h; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igd_desc_parse.h; sourceTree = "<group>"; };
