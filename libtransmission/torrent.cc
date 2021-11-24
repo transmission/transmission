@@ -2326,7 +2326,7 @@ void tr_torrentGetBlockLocation(
     uint64_t piece_begin = tor->info.pieceSize;
     piece_begin *= *piece;
     *offset = pos - piece_begin;
-    *length = tr_torBlockCountBytes(tor, block);
+    *length = tor->countBytesInBlock(block);
 }
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
@@ -3096,7 +3096,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     }
     else
     {
-        uint32_t const n = tr_torBlockCountBytes(tor, block);
+        uint32_t const n = tor->countBytesInBlock(block);
         tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
         tr_logAddTorDbg(tor, "we have this block already...");
     }

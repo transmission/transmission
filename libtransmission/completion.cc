@@ -81,11 +81,11 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 {
     tr_torrent const* tor = cp->tor;
     auto const [first, last] = cp->tor->blockRangeForPiece(piece);
-    for (tr_block_index_t i = first; i <= last; ++i)
+    for (tr_block_index_t block = first; block <= last; ++block)
     {
-        if (tr_cpBlockIsComplete(cp, i))
+        if (tr_cpBlockIsComplete(cp, block))
         {
-            cp->sizeNow -= tr_torBlockCountBytes(tor, i);
+            cp->sizeNow -= tor->countBytesInBlock(block);
         }
     }
 
@@ -112,7 +112,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
         tr_piece_index_t const piece = tr_torBlockPiece(cp->tor, block);
 
         cp->blockBitfield->set(block);
-        cp->sizeNow += tr_torBlockCountBytes(tor, block);
+        cp->sizeNow += tor->countBytesInBlock(block);
 
         cp->haveValidIsDirty = true;
         cp->sizeWhenDoneIsDirty = cp->sizeWhenDoneIsDirty || tor->pieceIsDnd(piece);
@@ -260,7 +260,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
 
     if (cp->blockBitfield->test(last)) /* handle the last block */
     {
-        haveBytes += tr_torBlockCountBytes(cp->tor, last);
+        haveBytes += cp->tor->countBytesInBlock(last);
     }
 
     TR_ASSERT(haveBytes <= pieceByteSize);
