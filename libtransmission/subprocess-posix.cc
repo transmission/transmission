@@ -52,16 +52,23 @@ static void set_system_error(tr_error** error, int code, char const* what)
     }
 }
 
-static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char const* work_dir, int pipe_fd)
+static bool tr_spawn_async_in_child(
+    char const* const* cmd,
+    std::map<std::string_view, std::string_view> const& env,
+    char const* work_dir,
+    int pipe_fd)
 {
-    if (env != nullptr)
+    auto key_sz = std::string{};
+    auto val_sz = std::string{};
+
+    for (auto const& [key_sv, val_sv] : env)
     {
-        for (size_t i = 0; env[i] != nullptr; ++i)
+        key_sz = key_sv;
+        val_sz = val_sv;
+
+        if (setenv(key_sz.c_str(), val_sz.c_str(), 1) != 0)
         {
-            if (putenv(env[i]) != 0)
-            {
-                goto FAIL;
-            }
+            goto FAIL;
         }
     }
 
@@ -70,7 +77,7 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
         goto FAIL;
     }
 
-    if (execvp(cmd[0], cmd) == -1)
+    if (execvp(cmd[0], const_cast<char* const*>(cmd)) == -1)
     {
         goto FAIL;
     }
@@ -115,7 +122,11 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     return true;
 }
 
-bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
+bool tr_spawn_async(
+    char const* const* cmd,
+    std::map<std::string_view, std::string_view> const& env,
+    char const* work_dir,
+    tr_error** error)
 {
     static bool sigchld_handler_set = false;
 
