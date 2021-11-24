@@ -20,6 +20,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 enum tr_app_type
 {
     TR_APP_TYPE_EXE,
