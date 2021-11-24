@@ -151,7 +151,7 @@ public:
     // because much of tr_torrent's impl is in the non-member C bindings
     //
     // private:
-    void takeMetainfo(tr_metainfo_parsed&& parsed);
+    void swapMetainfo(tr_metainfo_parsed& parsed);
 
 public:
     auto unique_lock() const
