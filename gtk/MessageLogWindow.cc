@@ -250,22 +250,19 @@ void MessageLogWindow::Impl::onPauseToggled(Gtk::ToggleToolButton* w)
 namespace
 {
 
-char const* getForegroundColor(int msgLevel)
+void setForegroundColor(Gtk::CellRendererText* renderer, int msgLevel)
 {
-    switch (msgLevel)
+    if (msgLevel == TR_LOG_DEBUG)
     {
-    case TR_LOG_DEBUG:
-        return "forestgreen";
-
-    case TR_LOG_INFO:
-        return "black";
-
-    case TR_LOG_ERROR:
-        return "red";
-
-    default:
-        g_assert_not_reached();
-        return "black";
+        renderer->property_foreground() = "forestgreen";
+    }
+    else if (msgLevel == TR_LOG_ERROR)
+    {
+        renderer->property_foreground() = "red";
+    }
+    else
+    {
+        renderer->property_foreground_set() = false;
     }
 }
 
@@ -276,15 +273,15 @@ void renderText(
 {
     auto const* const node = iter->get_value(message_log_cols.tr_msg);
     renderer->property_text() = iter->get_value(col);
-    renderer->property_foreground() = getForegroundColor(node->level);
     renderer->property_ellipsize() = Pango::ELLIPSIZE_END;
+    setForegroundColor(renderer, node->level);
 }
 
 void renderTime(Gtk::CellRendererText* renderer, Gtk::TreeModel::iterator const& iter)
 {
     auto const* const node = iter->get_value(message_log_cols.tr_msg);
     renderer->property_text() = Glib::DateTime::create_now_local(node->when).format("%T");
-    renderer->property_foreground() = getForegroundColor(node->level);
+    setForegroundColor(renderer, node->level);
 }
 
 void appendColumn(Gtk::TreeView* view, Gtk::TreeModelColumnBase const& col)
