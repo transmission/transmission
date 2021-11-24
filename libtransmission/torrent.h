@@ -19,8 +19,11 @@
 #include <unordered_set>
 #include <vector>
 
+#include "transmission.h"
+
 #include "bandwidth.h"
 #include "bitfield.h"
+#include "block-info.h"
 #include "completion.h"
 #include "file.h"
 #include "quark.h"
@@ -76,10 +79,6 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const*
 
 bool tr_torrentIsPieceTransferAllowed(tr_torrent const* torrent, tr_direction direction);
 
-#define tr_block(a, b) _tr_block(tor, a, b)
-
-tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset);
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
 uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
@@ -128,7 +127,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent
+struct tr_torrent : public tr_block_info
 {
 public:
     void setLocation(
@@ -319,16 +318,6 @@ public:
     /* Where the files are now.
      * This pointer will be equal to downloadDir or incompleteDir */
     char const* currentDir;
-
-    /* How many bytes we ask for per request */
-    uint32_t block_size;
-    tr_block_index_t n_blocks;
-
-    uint32_t final_block_size;
-    uint32_t final_piece_size;
-
-    uint32_t n_blocks_in_piece;
-    uint32_t n_blocks_in_final_piece;
 
     struct tr_completion completion;
 

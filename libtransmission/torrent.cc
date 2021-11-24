@@ -721,63 +721,10 @@ uint32_t tr_getBlockSize(uint32_t pieceSize)
     return b;
 }
 
-static void refreshCurrentDir(tr_torrent* tor);
-
 static void torrentInitFromInfo(tr_torrent* tor)
 {
-    tr_info const* const info = &tor->info;
-
-    tor->block_size = tr_getBlockSize(info->pieceSize);
-
-    if (info->pieceSize != 0)
-    {
-        tor->final_piece_size = (uint32_t)(info->totalSize % info->pieceSize);
-    }
-
-    if (tor->final_piece_size == 0)
-    {
-        tor->final_piece_size = info->pieceSize;
-    }
-
-    if (tor->block_size != 0)
-    {
-        tor->final_block_size = info->totalSize % tor->block_size;
-    }
-
-    if (tor->final_block_size == 0)
-    {
-        tor->final_block_size = tor->block_size;
-    }
-
-    tor->n_blocks = tor->block_size != 0 ? (info->totalSize + tor->block_size - 1) / tor->block_size : 0;
-    tor->n_blocks_in_piece = tor->block_size != 0 ? info->pieceSize / tor->block_size : 0;
-    tor->n_blocks_in_final_piece = tor->block_size != 0 ? (tor->final_piece_size + tor->block_size - 1) / tor->block_size : 0;
-
-#ifdef TR_ENABLE_ASSERTS
-    /* check our work */
-    if (tor->block_size != 0)
-    {
-        TR_ASSERT(info->pieceSize % tor->block_size == 0);
-    }
-
-    uint64_t t = info->pieceCount - 1;
-    t *= info->pieceSize;
-    t += tor->final_piece_size;
-    TR_ASSERT(t == info->totalSize);
-
-    t = tor->n_blocks - 1;
-    t *= tor->block_size;
-    t += tor->final_block_size;
-    TR_ASSERT(t == info->totalSize);
-
-    t = info->pieceCount - 1;
-    t *= tor->n_blocks_in_piece;
-    t += tor->n_blocks_in_final_piece;
-    TR_ASSERT(t == (uint64_t)tor->n_blocks);
-#endif
-
+    tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
     tr_cpConstruct(&tor->completion, tor);
-
     tr_torrentInitFilePieces(tor);
 }
 
@@ -835,6 +782,8 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
         torrentCallScript(tor, tr_sessionGetScript(session, type));
     }
 }
+
+static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
@@ -2378,27 +2327,6 @@ void tr_torrentGetBlockLocation(
     piece_begin *= *piece;
     *offset = pos - piece_begin;
     *length = tr_torBlockCountBytes(tor, block);
-}
-
-tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tr_block_index_t ret = 0;
-
-    if (tor->block_size > 0)
-    {
-        ret = index;
-        ret *= tor->info.pieceSize / tor->block_size;
-        ret += offset / tor->block_size;
-    }
-    else
-    {
-        tr_logAddTorErr(tor, "Cannot calculate block number when blockSize is zero");
-        TR_ASSERT(tor->block_size > 0);
-    }
-
-    return ret;
 }
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)

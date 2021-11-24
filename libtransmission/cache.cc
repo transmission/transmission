@@ -309,7 +309,7 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
 {
     struct cache_block key;
     key.tor = torrent;
-    key.block = _tr_block(torrent, piece, offset);
+    key.block = torrent->blockForOffset(piece, offset);
     return static_cast<struct cache_block*>(tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare));
 }
 
@@ -332,7 +332,7 @@ int tr_cacheWriteBlock(
         cb->piece = piece;
         cb->offset = offset;
         cb->length = length;
-        cb->block = _tr_block(torrent, piece, offset);
+        cb->block = torrent->blockForOffset(piece, offset);
         cb->evbuf = evbuffer_new();
         tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
     }

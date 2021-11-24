@@ -54,13 +54,23 @@ struct tr_block_info
         return block + 1 == n_blocks ? final_block_size : block_size;
     }
 
-    constexpr uint64_t totalOffset(tr_piece_index_t index, uint32_t offset, uint32_t length = 0) const
+    constexpr tr_block_index_t blockForOffset(uint64_t offset) const
+    {
+        return offset / block_size;
+    }
+
+    constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         auto ret = piece_size;
-        ret *= index;
+        ret *= piece;
         ret += offset;
         ret += length;
         return ret;
+    }
+
+    constexpr tr_block_index_t blockForOffset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        return blockForOffset(this->offset(piece, offset, length));
     }
 
     constexpr tr_block_range_t blockRangeForPiece(tr_piece_index_t piece) const
