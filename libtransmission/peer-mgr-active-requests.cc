@@ -171,8 +171,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 {
     auto removed = std::vector<tr_peer*>{};
 
-    auto it = impl_->blocks_.find(block);
-    if (it != std::end(impl_->blocks_))
+    if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
     {
         auto const n = std::size(it->second);
         removed.resize(n);
