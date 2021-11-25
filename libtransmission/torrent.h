@@ -357,7 +357,8 @@ public:
 
     tr_swarm* swarm = nullptr;
 
-    int magicNumber;
+    // TODO: is this actually still needed?
+    int const magicNumber = MagicNumber;
 
     std::optional<double> verify_progress;
 
@@ -490,6 +491,8 @@ public:
 
     tr_labels_t labels;
 
+    static auto constexpr MagicNumber = int{ 95549 };
+
 private:
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
@@ -534,14 +537,9 @@ constexpr bool tr_torrentAllowsLPD(tr_torrent const* tor)
 ****
 ***/
 
-enum
-{
-    TORRENT_MAGIC_NUMBER = 95549
-};
-
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tor->magicNumber == TORRENT_MAGIC_NUMBER && tr_isSession(tor->session);
+    return tor != nullptr && tor->magicNumber == tr_torrent::MagicNumber && tr_isSession(tor->session);
 }
 
 /* set a flag indicating that the torrent's .resume file
