@@ -171,42 +171,42 @@ public:
 
     /// COMPLETION
 
-    [[nodiscard]] constexpr uint64_t leftUntilDone() const
+    [[nodiscard]] uint64_t leftUntilDone() const
     {
         return completion.leftUntilDone();
     }
 
-    [[nodiscard]] constexpr bool hasAll() const
+    [[nodiscard]] bool hasAll() const
     {
         return completion.hasAll();
     }
 
-    [[nodiscard]] constexpr bool hasNone() const
+    [[nodiscard]] bool hasNone() const
     {
         return completion.hasNone();
     }
 
-    [[nodiscard]] constexpr bool hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
     {
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] constexpr bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
 
-    [[nodiscard]] constexpr size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBlocksInPiece(piece);
     }
 
-    [[nodiscard]] constexpr size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBytesInPiece(piece);
     }
 
-    [[nodiscard]] constexpr uint64_t hasTotal() const
+    [[nodiscard]] uint64_t hasTotal() const
     {
         return completion.hasTotal();
     }
