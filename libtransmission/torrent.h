@@ -221,6 +221,16 @@ public:
         return completion.isDone();
     }
 
+    [[nodiscard]] tr_bitfield const& blocks() const
+    {
+        return completion.blocks();
+    }
+
+    void setBlocks(tr_bitfield blocks)
+    {
+        completion.setBlocks(blocks);
+    }
+
     bool pieceIsDnd(tr_piece_index_t piece) const final
     {
         return dnd_pieces_.test(piece);
@@ -326,6 +336,7 @@ public:
 
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
+    // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
     tr_session* session = nullptr;

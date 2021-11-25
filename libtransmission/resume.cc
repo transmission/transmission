@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "transmission.h"
-#include "completion.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -511,7 +510,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     }
 
     /* add the blocks bitfield */
-    bitfieldToRaw(tor->completion.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToRaw(tor->blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -659,7 +658,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tor->completion.setBlocks(blocks);
+            tor->setBlocks(blocks);
         }
 
         ret = TR_FR_PROGRESS;
