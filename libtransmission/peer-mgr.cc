@@ -571,7 +571,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         bool clientCanRequestBlock(tr_block_index_t block) const override
         {
-            return !tr_torrentBlockIsComplete(torrent_, block) && !swarm_->active_requests.has(block, peer_);
+            return !torrnent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
         }
 
         bool clientCanRequestPiece(tr_piece_index_t piece) const override
@@ -729,7 +729,7 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
 
         for (tr_block_index_t b = begin; b < end; ++b)
         {
-            if (tr_torrentBlockIsComplete(tor, b))
+            if (tor->hasBlock(b))
             {
                 uint32_t const offset = getBlockOffsetInPiece(tor, b);
                 uint32_t const length = tor->countBytesInBlock(b);

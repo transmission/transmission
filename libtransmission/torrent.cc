@@ -1280,13 +1280,13 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
 
     if (n == 1)
     {
-        return tr_torrentBlockIsComplete(tor, begin) ? f.length : 0;
+        return tor->hasBlock(begin) ? f.length : 0;
     }
 
     auto total = uint64_t{};
 
     // the first block
-    if (tr_torrentBlockIsComplete(tor, begin))
+    if (tor->hasblock(begin))
     {
         total += tor->block_size - f.offset % tor->block_size;
     }
@@ -1300,7 +1300,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     }
 
     // the last block
-    if (tr_torrentBlockIsComplete(tor, end - 1))
+    if (tor->hasBlock(end - 1))
     {
         total += f.offset + f.length - (uint64_t)tor->block_size * (end - 1);
     }
@@ -3030,7 +3030,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
 
-    bool const block_is_new = !tr_torrentBlockIsComplete(tor, block);
+    bool const block_is_new = !tor->hasBlock(block);
 
     if (block_is_new)
     {
