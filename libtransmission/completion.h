@@ -38,7 +38,7 @@ struct tr_completion
 
     [[nodiscard]] bool hasAll() const;
     [[nodiscard]] bool hasBlock(tr_block_index_t i) const;
-    [[nodiscard]] bool hasBlocks(tr_block_range_t range) const;
+    [[nodiscard]] bool hasBlocks(tr_block_span_t span) const;
     [[nodiscard]] bool hasNone() const;
     [[nodiscard]] bool hasPiece(tr_piece_index_t i) const;
     [[nodiscard]] bool isDone() const;
@@ -73,7 +73,7 @@ private:
     [[nodiscard]] bool hasMetainfo() const;
     [[nodiscard]] uint64_t computeHasValid() const;
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
-    [[nodiscard]] uint64_t countHasBytesInRange(tr_block_range_t) const;
+    [[nodiscard]] uint64_t countHasBytesInSpan(tr_block_span_t) const;
 
     torrent_view const* tor_;
     tr_block_info const* block_info_;

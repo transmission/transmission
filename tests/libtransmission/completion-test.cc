@@ -108,12 +108,12 @@ TEST_F(CompletionTest, hasBlocks)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     auto completion = tr_completion(&torrent, &block_info);
-    EXPECT_FALSE(completion.hasBlocks(tr_block_range_t{ 0, 0 }));
-    EXPECT_FALSE(completion.hasBlocks(tr_block_range_t{ 0, 1 }));
+    EXPECT_FALSE(completion.hasBlocks({ 0, 1 }));
+    EXPECT_FALSE(completion.hasBlocks({ 0, 2 }));
 
     completion.addBlock(0);
-    EXPECT_TRUE(completion.hasBlocks(tr_block_range_t{ 0, 0 }));
-    EXPECT_FALSE(completion.hasBlocks(tr_block_range_t{ 0, 1 }));
+    EXPECT_TRUE(completion.hasBlocks({ 0, 1 }));
+    EXPECT_FALSE(completion.hasBlocks({ 0, 2 }));
 }
 
 TEST_F(CompletionTest, hasNone)

@@ -80,20 +80,16 @@ struct tr_block_info
         return blockOf(this->offset(piece, offset, length));
     }
 
-    constexpr tr_block_range_t blockRangeForPiece(tr_piece_index_t piece) const
+    constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
         if (block_size == 0)
         {
             return {};
         }
 
-        uint64_t offset = piece_size;
-        offset *= piece;
-        tr_block_index_t const first_block = offset / block_size;
-        offset += countBytesInPiece(piece) - 1;
-        tr_block_index_t const final_block = offset / block_size;
-
-        return { first_block, final_block };
+        auto const begin = blockOf(offset(piece, 0));
+        auto const end = 1 + blockOf(offset(piece, countBytesInPiece(piece) - 1));
+        return { begin, end };
     }
 
     static uint32_t bestBlockSize(uint64_t piece_size);

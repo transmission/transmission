@@ -539,12 +539,12 @@ static int countActiveWebseeds(tr_swarm* s)
 }
 
 // TODO: if we keep this, add equivalent API to ActiveRequest
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_range_t range)
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
 {
-    // std::cout << __FILE__ << ':' << __LINE__ << " tr_peerMgrClientSentRequests [" << range.first << "..." << range.last << ']' << std::endl;
+    // std::cout << __FILE__ << ':' << __LINE__ << " tr_peerMgrClientSentRequests [" << range.begin << "..." << range.end << ')' << std::endl;
     auto const now = tr_time();
 
-    for (tr_block_index_t block = range.first; block <= range.last; ++block)
+    for (tr_block_index_t block = span.begin; block < span.end; ++block)
     {
         torrent->swarm->active_requests.add(block, peer, now);
     }
@@ -557,7 +557,7 @@ static void updateEndgame(tr_swarm* s)
     s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->block_size >= tr_torrentGetLeftUntilDone(s->tor);
 }
 
-std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
+std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
 {
     class PeerInfoImpl : public Wishlist::PeerInfo
     {
@@ -594,9 +594,9 @@ std::vector<tr_block_range_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_
             return tr_torrentMissingBlocksInPiece(torrent_, piece);
         }
 
-        tr_block_range_t blockRange(tr_piece_index_t piece) const override
+        tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
-            return torrent_->blockRangeForPiece(piece);
+            return torrent_->blockSpanForPiece(piece);
         }
 
         tr_piece_index_t countAllPieces() const override
@@ -725,9 +725,9 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
     /* request the blocks that we don't have in this piece */
     {
         tr_torrent const* tor = t->tor;
-        auto const [first, last] = tor->blockRangeForPiece(pieceIndex);
+        auto const [begin, end] = tor->blockSpanForPiece(pieceIndex);
 
-        for (tr_block_index_t b = first; b <= last; ++b)
+        for (tr_block_index_t b = begin; b < end; ++b)
         {
             if (tr_torrentBlockIsComplete(tor, b))
             {

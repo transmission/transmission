@@ -1270,34 +1270,41 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
         return 0;
     }
 
-    auto const [first, last] = tr_torGetFileBlockRange(tor, index);
+    auto const [begin, end] = tr_torGetFileBlockSpan(tor, index);
+    auto const n = end - begin;
 
-    if (first == last)
+    if (n == 0)
     {
-        return tr_torrentBlockIsComplete(tor, first) ? f.length : 0;
+        return 0;
+    }
+
+    if (n == 1)
+    {
+        return tr_torrentBlockIsComplete(tor, begin) ? f.length : 0;
     }
 
     auto total = uint64_t{};
 
     // the first block
-    if (tr_torrentBlockIsComplete(tor, first))
+    if (tr_torrentBlockIsComplete(tor, begin))
     {
         total += tor->block_size - f.offset % tor->block_size;
     }
 
     // the middle blocks
-    if (first + 1 < last)
+    if (begin + 1 < end)
     {
         // NOCOMIT TODO(ckerr) countHasBytesInRange
-        uint64_t u = tor->completion.blocks().count(first + 1, last);
+        uint64_t u = tor->completion.blocks().count(begin + 1, end - 1);
         u *= tor->block_size;
         total += u;
     }
 
     // the last block
-    if (tr_torrentBlockIsComplete(tor, last))
+    if (tr_torrentBlockIsComplete(tor, end - 1))
     {
-        total += f.offset + f.length - (uint64_t)tor->block_size * last;
+        // NOCOMMIT FIXME(ckerr) should not use block_size here; could be final block
+        total += f.offset + f.length - (uint64_t)tor->block_size * (end - 1);
     }
 
     return total;
@@ -2337,20 +2344,20 @@ uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t 
     return ret;
 }
 
-tr_block_range_t tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file)
+tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t const file)
 {
     tr_file const* f = &tor->info.files[file];
 
     uint64_t offset = f->offset;
-    tr_block_index_t const first = offset / tor->block_size;
+    tr_block_index_t const begin = offset / tor->block_size;
     if (f->length == 0)
     {
-        return { first, first };
+        return { begin, begin };
     }
 
     offset += f->length - 1;
-    tr_block_index_t const last = offset / tor->block_size;
-    return { first, last };
+    tr_block_index_t const end = 1 + offset / tor->block_size;
+    return { begin, end };
 }
 
 /***
@@ -3013,7 +3020,7 @@ static void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceInde
         tr_file const* file = &tor->info.files[i];
 
         if ((file->firstPiece <= pieceIndex) && (pieceIndex <= file->lastPiece) &&
-            tor->completion.hasBlocks(tr_torGetFileBlockRange(tor, i)))
+            tor->completion.hasBlocks(tr_torGetFileBlockSpan(tor, i)))
         {
             tr_torrentFileCompleted(tor, i);
         }
