@@ -150,7 +150,7 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     removed.reserve(impl_->blocks_.size());
 
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    for (auto const& [block, peer_at] : impl_->blocks_)
+    for (auto const& [block, peers_at] : impl_->blocks_)
     {
         if (peer_at.count(key))
         {
@@ -222,13 +222,13 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
     auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
     sent_before.reserve(std::size(impl_->blocks_));
 
-    for (auto& perblock : impl_->blocks_)
+    for (auto& [block, peers_at] : impl_->blocks_)
     {
-        for (auto& sent : perblock.second)
+        for (auto& sent : peers_at)
         {
             if (sent.when < when)
             {
-                sent_before.emplace_back(perblock.first, sent.peer);
+                sent_before.emplace_back(block, sent.peer);
             }
         }
     }
