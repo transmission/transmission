@@ -65,8 +65,6 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
 void tr_torrentRecheckCompleteness(tr_torrent*);
 
-void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t pieceIndex, bool has);
-
 void tr_torrentChangeMyPort(tr_torrent* session);
 
 tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
@@ -226,9 +224,19 @@ public:
         return completion.blocks();
     }
 
+    void amountDoneBins(float* tab, int n_tabs) const
+    {
+        return completion.amountDone(tab, n_tabs);
+    }
+
     void setBlocks(tr_bitfield blocks)
     {
-        completion.setBlocks(blocks);
+        completion.setBlocks(std::move(blocks));
+    }
+
+    void setHasPiece(tr_piece_index_t piece, bool has)
+    {
+        completion.setHasPiece(piece, has);
     }
 
     bool pieceIsDnd(tr_piece_index_t piece) const final

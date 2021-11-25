@@ -1369,9 +1369,9 @@ void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
     }
 }
 
-void tr_torrentAmountFinished(tr_torrent const* tor, float* tab, int n_tabs)
+void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 {
-    return tor->completion.amountDone(tab, n_tabs);
+    return tor->amountDoneBins(tabs, n_tabs);
 }
 
 static void tr_torrentResetTransferStats(tr_torrent* tor)
@@ -1386,21 +1386,6 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
     tor->corruptCur = 0;
 
     tr_torrentSetDirty(tor);
-}
-
-void tr_torrentSetHasPiece(tr_torrent* tor, tr_piece_index_t piece, bool has)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(piece < tor->info.pieceCount);
-
-    if (has)
-    {
-        tor->completion.addPiece(piece);
-    }
-    else
-    {
-        tor->completion.removePiece(piece);
-    }
 }
 
 /***

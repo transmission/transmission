@@ -108,6 +108,18 @@ struct tr_completion
     void addPiece(tr_piece_index_t i);
     void removePiece(tr_piece_index_t i);
 
+    void setHasPiece(tr_piece_index_t i, bool has)
+    {
+        if (has)
+        {
+            addPiece(i);
+        }
+        else
+        {
+            removePiece(i);
+        }
+    }
+
     void setBlocks(tr_bitfield blocks);
 
     void invalidateSizeWhenDone()

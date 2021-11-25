@@ -266,22 +266,22 @@ TEST_F(CompletionTest, hasTotalAndValid)
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that adding the final piece adjusts by block_info.final_piece_size
-    completion.addPiece(block_info.n_pieces - 1);
+    completion.setHasPiece(block_info.n_pieces - 1, true);
     EXPECT_EQ(block_info.final_piece_size, completion.hasTotal());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that adding a non-final piece adjusts by block_info.piece_size
-    completion.addPiece(0);
+    completion.setHasPiece(0, true);
     EXPECT_EQ(block_info.final_piece_size + block_info.piece_size, completion.hasTotal());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that removing the final piece adjusts by block_info.final_piece_size
-    completion.removePiece(block_info.n_pieces - 1);
+    completion.setHasPiece(block_info.n_pieces - 1, false);
     EXPECT_EQ(block_info.piece_size, completion.hasValid());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that removing a non-final piece adjusts by block_info.piece_size
-    completion.removePiece(0);
+    completion.setHasPiece(0, false);
     EXPECT_EQ(0, completion.hasValid());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
@@ -402,12 +402,51 @@ TEST_F(CompletionTest, createPieceBitfield)
     }
 }
 
+TEST_F(CompletionTest, setHasPiece)
+{
+}
+
 TEST_F(CompletionTest, countMissing)
 {
 }
 
 TEST_F(CompletionTest, amountDone)
 {
+    auto torrent = TestTorrent{};
+    auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
+    auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto completion = tr_completion(&torrent, &block_info);
+
+    // make bins s.t. each bin is a single piece
+    auto bins = std::array<float, TotalSize / PieceSize>{};
+
+    for (tr_piece_index_t piece = 0; piece < block_info.n_pieces; ++piece)
+    {
+        completion.removePiece(piece);
+    }
+    completion.amountDone(std::data(bins), std::size(bins));
+    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(0.0, bin); });
+
+    // one block
+    completion.addBlock(0);
+    completion.amountDone(std::data(bins), std::size(bins));
+    EXPECT_DOUBLE_EQ(1.0 / block_info.n_blocks_in_piece, bins[0]);
+    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+
+    // one piece
+    completion.addPiece(0);
+    completion.amountDone(std::data(bins), std::size(bins));
+    EXPECT_DOUBLE_EQ(1.0, bins[0]);
+    EXPECT_DOUBLE_EQ(0.0, bins[1]);
+
+    // all pieces
+    for (tr_piece_index_t piece = 0; piece < block_info.n_pieces; ++piece)
+    {
+        completion.addPiece(piece);
+    }
+    completion.amountDone(std::data(bins), std::size(bins));
+    std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(1.0, bin); });
 }
 
 TEST_F(CompletionTest, status)
