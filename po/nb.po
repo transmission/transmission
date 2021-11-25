@@ -2104,7 +2104,7 @@ msgstr "Denne mangetlenka ser ut til å være laget for noe annet enn BitTorrent
 #: ../gtk/util.c:725
 #, c-format
 msgid "%s free"
-msgstr "%s gratis"
+msgstr "%s ledig"
 
 #: ../libtransmission/announcer-http.c:215 ../libtransmission/announcer-http.c:383
 #, c-format
