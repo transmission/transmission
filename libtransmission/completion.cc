@@ -35,8 +35,6 @@ bool tr_completion::hasNone() const
     return !hasMetainfo() || blocks_.hasNone();
 }
 
-#include <iostream> // NOCOMMIT
-
 bool tr_completion::hasPiece(tr_piece_index_t piece) const
 {
     return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;

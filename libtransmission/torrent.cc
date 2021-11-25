@@ -1294,7 +1294,6 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     // the middle blocks
     if (begin + 1 < end)
     {
-        // NOCOMIT TODO(ckerr) countHasBytesInRange
         uint64_t u = tor->completion.blocks().count(begin + 1, end - 1);
         u *= tor->block_size;
         total += u;
@@ -1303,7 +1302,6 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     // the last block
     if (tr_torrentBlockIsComplete(tor, end - 1))
     {
-        // NOCOMMIT FIXME(ckerr) should not use block_size here; could be final block
         total += f.offset + f.length - (uint64_t)tor->block_size * (end - 1);
     }
 
