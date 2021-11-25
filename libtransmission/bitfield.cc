@@ -359,6 +359,13 @@ void tr_bitfield::set(size_t nth, bool value)
 /* Sets bit range [begin, end) to 1 */
 void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 {
+    // bounds check
+    end = std::min(end, bit_count_);
+    if (end == 0 || begin >= end)
+    {
+        return;
+    }
+
     // did anything change?
     size_t const old_count = count(begin, end);
     size_t const new_count = value ? (end - begin) : 0;
@@ -367,13 +374,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         return;
     }
 
-    // bounds check
     --end;
-    if (end >= bit_count_ || begin > end)
-    {
-        return;
-    }
-
     if (!ensureNthBitAlloced(end))
     {
         return;

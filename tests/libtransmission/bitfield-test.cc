@@ -233,6 +233,32 @@ TEST(Bitfield, bitfields)
     {
         EXPECT_EQ(field.test(i), (4 <= i && i < 5));
     }
+
+    /* test tr_bitfield::setSpan when end runs beyond the end of the bitfield */
+    field.setHasNone();
+    field.setSpan(100, 1000);
+    EXPECT_FALSE(field.hasNone());
+    EXPECT_FALSE(field.hasAll());
+    EXPECT_EQ(std::size(field) - 100, field.count());
+
+    /* test tr_bitfield::unsetSpan when it changes nothing */
+    field.setHasNone();
+    field.unsetSpan(0, 100);
+    EXPECT_TRUE(field.hasNone());
+    EXPECT_FALSE(field.hasAll());
+    EXPECT_EQ(0, field.count());
+
+    /* test tr_bitfield::setSpan when it changes nothing */
+    field.setHasAll();
+    field.setSpan(0, 100);
+    EXPECT_FALSE(field.hasNone());
+    EXPECT_TRUE(field.hasAll());
+    EXPECT_EQ(std::size(field), field.count());
+
+    /* test tr_bitfield::setSpan with an invalid span doesn't crash */
+    field.setHasAll();
+    field.setSpan(0, 0);
+    EXPECT_TRUE(field.hasAll());
 }
 
 TEST(Bitfield, hasAllNone)
