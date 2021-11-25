@@ -2330,7 +2330,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
 
     struct evbuffer* out = msgs->outMessages;
 
-    auto bytes = tr_torrentCreatePieceBitfield(msgs->torrent);
+    auto bytes = msgs->torrent->createPieceBitfield();
     evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
     evbuffer_add_uint8(out, BtBitfield);
     evbuffer_add(out, bytes.data(), std::size(bytes));
