@@ -2342,7 +2342,7 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
-    if (fext && tr_torrentHasAll(msgs->torrent))
+    if (fext && msgs->torrent->hasAll())
     {
         protocolSendHaveAll(msgs);
     }
