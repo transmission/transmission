@@ -136,7 +136,7 @@ tr_completeness tr_completion::status() const
 
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
-    auto const n = block_info_->n_pieces;
+    size_t const n = block_info_->n_pieces;
     auto pieces = tr_bitfield{ n };
 
     if (hasAll())
