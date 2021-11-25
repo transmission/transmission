@@ -15,64 +15,11 @@
 #include "torrent.h"
 #include "tr-assert.h"
 
-bool tr_completion::hasAll() const
-{
-    return hasMetainfo() && blocks_.hasAll();
-}
-
-bool tr_completion::hasBlock(tr_block_index_t block) const
-{
-    return blocks_.test(block);
-}
-
-bool tr_completion::hasBlocks(tr_block_span_t span) const
-{
-    return blocks_.count(span.begin, span.end) == span.end - span.begin;
-}
-
-bool tr_completion::hasNone() const
-{
-    return !hasMetainfo() || blocks_.hasNone();
-}
-
-bool tr_completion::hasPiece(tr_piece_index_t piece) const
-{
-    return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;
-}
-
-bool tr_completion::isDone() const
-{
-    auto left_until_done = leftUntilDone();
-    return hasMetainfo() && left_until_done == 0;
-}
-
-tr_bitfield const& tr_completion::blocks() const
-{
-    return blocks_;
-}
-
-uint64_t tr_completion::hasTotal() const
-{
-    return size_now_;
-}
-
 uint64_t tr_completion::leftUntilDone() const
 {
     auto const size_when_done = sizeWhenDone();
     auto const has_total = hasTotal();
     return size_when_done - has_total;
-}
-
-double tr_completion::percentComplete() const
-{
-    auto const denom = block_info_->total_size;
-    return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
-}
-
-double tr_completion::percentDone() const
-{
-    auto const denom = sizeWhenDone();
-    return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
 }
 
 uint64_t tr_completion::computeHasValid() const
@@ -268,9 +215,4 @@ uint64_t tr_completion::countHasBytesInSpan(tr_block_span_t span) const
     }
 
     return n;
-}
-
-bool tr_completion::hasMetainfo() const
-{
-    return !std::empty(blocks_);
 }

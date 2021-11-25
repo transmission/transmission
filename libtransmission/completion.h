@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstdint>
 #include <optional>
 #include <vector>
@@ -36,20 +37,65 @@ struct tr_completion
         blocks_.setHasNone();
     }
 
-    [[nodiscard]] bool hasAll() const;
-    [[nodiscard]] bool hasBlock(tr_block_index_t i) const;
-    [[nodiscard]] bool hasBlocks(tr_block_span_t span) const;
-    [[nodiscard]] bool hasNone() const;
-    [[nodiscard]] bool hasPiece(tr_piece_index_t i) const;
-    [[nodiscard]] bool isDone() const;
-    [[nodiscard]] double percentComplete() const;
-    [[nodiscard]] double percentDone() const;
-    [[nodiscard]] tr_bitfield const& blocks() const;
-    [[nodiscard]] tr_completeness status() const;
-    [[nodiscard]] uint64_t hasTotal() const;
+    [[nodiscard]] constexpr tr_bitfield const& blocks() const
+    {
+        return blocks_;
+    }
+
+    [[nodiscard]] constexpr bool hasAll() const
+    {
+        return hasMetainfo() && blocks_.hasAll();
+    }
+
+    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
+    {
+        return blocks_.test(block);
+    }
+
+    [[nodiscard]] bool hasBlocks(tr_block_span_t span) const
+    {
+        return blocks_.count(span.begin, span.end) == span.end - span.begin;
+    }
+
+    [[nodiscard]] constexpr bool hasNone() const
+    {
+        return !hasMetainfo() || blocks_.hasNone();
+    }
+
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
+    {
+        return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;
+    }
+
+    [[nodiscard]] constexpr uint64_t hasTotal() const
+    {
+        return size_now_;
+    }
+
     [[nodiscard]] uint64_t hasValid() const;
+
+    [[nodiscard]] bool isDone() const
+    {
+        return hasMetainfo() && leftUntilDone() == 0;
+    }
+
     [[nodiscard]] uint64_t leftUntilDone() const;
+
+    [[nodiscard]] constexpr double percentComplete() const
+    {
+        auto const denom = block_info_->total_size;
+        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+    }
+
+    [[nodiscard]] constexpr double percentDone() const
+    {
+        auto const denom = sizeWhenDone();
+        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+    }
+
     [[nodiscard]] uint64_t sizeWhenDone() const;
+
+    [[nodiscard]] tr_completeness status() const;
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
@@ -70,7 +116,11 @@ struct tr_completion
     }
 
 private:
-    [[nodiscard]] bool hasMetainfo() const;
+    [[nodiscard]] constexpr bool hasMetainfo() const
+    {
+        return !std::empty(blocks_);
+    }
+
     [[nodiscard]] uint64_t computeHasValid() const;
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
     [[nodiscard]] uint64_t countHasBytesInSpan(tr_block_span_t) const;
