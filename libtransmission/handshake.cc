@@ -848,7 +848,7 @@ static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /* read the throwaway padc */
-    char* const padc = tr_new(char, handshake->pad_c_len);
+    auto* const padc = tr_new(char, handshake->pad_c_len);
     tr_peerIoReadBytes(handshake->io, inbuf, padc, handshake->pad_c_len);
     tr_free(padc);
 
