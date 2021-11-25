@@ -421,7 +421,7 @@ public:
     uint64_t uploadedCur = 0;
     uint64_t uploadedPrev = 0;
     uint64_t corruptCur = 0;
-    uint64_t corruptPrev;
+    uint64_t corruptPrev = 0;
 
     uint64_t etaDLSpeedCalculatedAt = 0;
     uint64_t etaULSpeedCalculatedAt = 0;
