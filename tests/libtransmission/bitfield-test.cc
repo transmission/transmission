@@ -6,7 +6,10 @@
  *
  */
 
+#include <algorithm>
 #include <array>
+#include <limits>
+#include <vector>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -96,7 +99,7 @@ TEST(Bitfield, setRaw)
     auto constexpr TestByte = uint8_t{ 10 };
     auto constexpr TestByteTrueBits = 2;
 
-    auto const raw = std::vector<uint8_t>(100, TestByte);
+    auto raw = std::vector<uint8_t>(100, TestByte);
 
     auto bf = tr_bitfield(std::size(raw) * 8);
     bf.setRaw(std::data(raw), std::size(raw));
@@ -115,6 +118,13 @@ TEST(Bitfield, setRaw)
     }
     EXPECT_EQ(TestByte, test);
     EXPECT_EQ(raw, bf.raw());
+
+    // check that has-all bitfield gets all-true
+    bf = tr_bitfield(std::size(raw) * 8);
+    bf.setHasAll();
+    raw = bf.raw();
+    EXPECT_EQ(std::size(bf) / 8, std::size(raw));
+    EXPECT_EQ(std::numeric_limits<unsigned char>::max(), raw[0]);
 }
 
 TEST(Bitfield, bitfields)
