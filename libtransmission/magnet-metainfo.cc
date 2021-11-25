@@ -123,10 +123,10 @@ std::string tr_magnet_metainfo::magnet() const
         tr_http_escape(s, name, true);
     }
 
-    for (auto const& it : trackers)
+    for (auto const& [tier, tracker] : trackers)
     {
         s += "&tr="sv;
-        tr_http_escape(s, tr_quark_get_string_view(it.second.announce_url), true);
+        tr_http_escape(s, tr_quark_get_string_view(tracker.announce_url), true);
     }
 
     for (auto const& webseed : webseed_urls)
@@ -268,9 +268,9 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     else
     {
         auto* list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-        for (auto const& pair : this->trackers)
+        for (auto const& [tier, tracker] : this->trackers)
         {
-            tr_variantListAddStr(tr_variantListAddList(list, 1), tr_quark_get_string_view(pair.second.announce_url));
+            tr_variantListAddStr(tr_variantListAddList(list, 1), tr_quark_get_string_view(tracker.announce_url));
         }
     }
 

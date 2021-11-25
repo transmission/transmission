@@ -150,11 +150,11 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     removed.reserve(impl_->blocks_.size());
 
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    for (auto const& it : impl_->blocks_)
+    for (auto const& [block, peer_at] : impl_->blocks_)
     {
-        if (it.second.count(key))
+        if (peer_at.count(key))
         {
-            removed.push_back(it.first);
+            removed.push_back(block);
         }
     }
 
