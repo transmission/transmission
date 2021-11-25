@@ -137,6 +137,17 @@ TEST(Bitfield, setRaw)
     raw = bf.raw();
     EXPECT_EQ(std::size(bf) / 8, std::size(raw));
     EXPECT_EQ(std::numeric_limits<unsigned char>::max(), raw[0]);
+
+    // check that the spare bits t the end are zero
+    bf = tr_bitfield{ 1 };
+    uint8_t by = ~uint8_t{};
+    bf.setRaw(&by, 1);
+    EXPECT_TRUE(bf.hasAll());
+    EXPECT_FALSE(bf.hasNone());
+    EXPECT_EQ(1, bf.count());
+    raw = bf.raw();
+    EXPECT_EQ(1, std::size(raw));
+    EXPECT_EQ(1 << 7, raw[0]);
 }
 
 TEST(Bitfield, bitfields)
