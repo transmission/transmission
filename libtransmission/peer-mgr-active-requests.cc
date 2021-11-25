@@ -152,7 +152,7 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        if (peer_at.count(key))
+        if (peers_at.count(key))
         {
             removed.push_back(block);
         }
