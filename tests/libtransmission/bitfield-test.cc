@@ -136,8 +136,8 @@ TEST(Bitfield, bitfields)
         EXPECT_EQ(field.test(i), (i % 7 == 0));
     }
 
-    /* test tr_bitfield::setRange */
-    field.setRange(0, bitcount);
+    /* test tr_bitfield::setSpan */
+    field.setSpan(0, bitcount);
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
@@ -159,8 +159,8 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange in the middle of a boundary */
-    field.setRange(0, 64);
-    field.unsetRange(4, 21);
+    field.setSpan(0, 64);
+    field.unsetSpan(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
@@ -168,8 +168,8 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange on the boundaries */
-    field.setRange(0, 64);
-    field.unsetRange(8, 24);
+    field.setSpan(0, 64);
+    field.unsetSpan(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
@@ -177,35 +177,35 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange when begin & end is on the same word */
-    field.setRange(0, 64);
-    field.unsetRange(4, 5);
+    field.setSpan(0, 64);
+    field.unsetSpan(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (i < 4 || i >= 5));
     }
 
-    /* test tr_bitfield::setRange */
-    field.unsetRange(0, 64);
-    field.setRange(4, 21);
+    /* test tr_bitfield::setSpan */
+    field.unsetSpan(0, 64);
+    field.setSpan(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (4 <= i && i < 21));
     }
 
-    /* test tr_bitfield::setRange on the boundaries */
-    field.unsetRange(0, 64);
-    field.setRange(8, 24);
+    /* test tr_bitfield::setSpan on the boundaries */
+    field.unsetSpan(0, 64);
+    field.setSpan(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (8 <= i && i < 24));
     }
 
-    /* test tr_bitfield::setRange when begin & end is on the same word */
-    field.unsetRange(0, 64);
-    field.setRange(4, 5);
+    /* test tr_bitfield::setSpan when begin & end is on the same word */
+    field.unsetSpan(0, 64);
+    field.setSpan(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {

@@ -133,7 +133,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     auto requested = tr_bitfield(250);
     for (auto const& span : spans)
     {
-        requested.setRange(span.begin, span.end);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(240, requested.count());
     EXPECT_EQ(0, requested.count(0, 10));
@@ -263,7 +263,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     auto requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setRange(span.begin, span.end);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(150, requested.count());
     EXPECT_EQ(0, requested.count(0, 150));
@@ -276,7 +276,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setRange(span.begin, span.end);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(300, requested.count());
     EXPECT_EQ(150, requested.count(0, 150));
@@ -327,7 +327,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setRange(range.begin, range.end);
+            requested.setSpan(range.begin, range.end);
         }
         EXPECT_EQ(10, requested.count());
         EXPECT_EQ(10, requested.count(0, 100));
@@ -343,7 +343,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setRange(range.begin, range.end);
+            requested.setSpan(range.begin, range.end);
         }
         EXPECT_EQ(20, requested.count());
         EXPECT_EQ(10, requested.count(0, 100));

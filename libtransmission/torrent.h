@@ -245,7 +245,7 @@ public:
             {
                 auto const begin = info.files[i].firstPiece;
                 auto const end = info.files[i].lastPiece + 1;
-                checked_pieces_.unsetRange(begin, end);
+                checked_pieces_.unsetSpan(begin, end);
             }
         }
     }

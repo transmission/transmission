@@ -357,7 +357,7 @@ void tr_bitfield::set(size_t nth, bool value)
 }
 
 /* Sets bit range [begin, end) to 1 */
-void tr_bitfield::setRange(size_t begin, size_t end, bool value)
+void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 {
     // did anything change?
     size_t const old_count = count(begin, end);

@@ -252,7 +252,7 @@ void tr_completion::removePiece(tr_piece_index_t piece)
     auto const [begin, end] = block_info_->blockSpanForPiece(piece);
     size_now_ -= countHasBytesInSpan(block_info_->blockSpanForPiece(piece));
     has_valid_.reset();
-    blocks_.unsetRange(begin, end);
+    blocks_.unsetSpan(begin, end);
 }
 
 uint64_t tr_completion::countHasBytesInSpan(tr_block_span_t span) const
