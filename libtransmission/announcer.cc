@@ -1527,7 +1527,8 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            req->info_hash[req->info_hash_count++] = tr_torrentInfoHash(tier->tor);
+            req->info_hash[req->info_hash_count] = tr_torrentInfoHash(tier->tor);
+            ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
             found = true;
@@ -1540,7 +1541,8 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
             req->scrape_url = scrape_info->scrape_url;
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
-            req->info_hash[req->info_hash_count++] = tr_torrentInfoHash(tier->tor);
+            req->info_hash[req->info_hash_count] = tr_torrentInfoHash(tier->tor);
+            ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
         }
