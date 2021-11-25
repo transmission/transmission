@@ -130,8 +130,8 @@ struct tr_torrent
     , public tr_completion::torrent_view
 {
 public:
-    tr_torrent(tr_info const& info)
-        : tr_block_info{ info.totalSize, info.pieceSize }
+    tr_torrent(tr_info const& inf)
+        : tr_block_info{ inf.totalSize, inf.pieceSize }
         , completion{ this, this }
     {
     }

@@ -87,7 +87,7 @@ struct tr_completion
         return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
-    [[nodiscard]] constexpr double percentDone() const
+    [[nodiscard]] double percentDone() const
     {
         auto const denom = sizeWhenDone();
         return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;

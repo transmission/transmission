@@ -30,9 +30,9 @@ struct tr_block_info
     uint32_t final_piece_size = 0;
 
     tr_block_info() = default;
-    tr_block_info(uint64_t total_size, uint64_t piece_size)
+    tr_block_info(uint64_t total_size_in, uint64_t piece_size_in)
     {
-        initSizes(total_size, piece_size);
+        initSizes(total_size_in, piece_size_in);
     }
 
     void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
