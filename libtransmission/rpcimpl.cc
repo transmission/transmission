@@ -2547,7 +2547,7 @@ void tr_rpc_request_exec_json(
         }
         else
         {
-            method = it;
+            method = &*it;
         }
     }
 
