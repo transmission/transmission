@@ -571,7 +571,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         bool clientCanRequestBlock(tr_block_index_t block) const override
         {
-            return !torrnent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
+            return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
         }
 
         bool clientCanRequestPiece(tr_piece_index_t piece) const override
@@ -591,7 +591,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
-            return tr_torrentMissingBlocksInPiece(torrent_, piece);
+            return tor->countMissingBlocksInPiece(piece);
         }
 
         tr_block_span_t blockSpan(tr_piece_index_t piece) const override
