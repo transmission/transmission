@@ -216,6 +216,11 @@ public:
         return completion.createPieceBitfield();
     }
 
+    [[nodiscard]] bool isDone() const
+    {
+        return completion.isDone();
+    }
+
     bool pieceIsDnd(tr_piece_index_t piece) const final
     {
         return dnd_pieces_.test(piece);
