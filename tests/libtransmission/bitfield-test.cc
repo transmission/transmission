@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-TEST(Bitfield, countRange)
+TEST(Bitfield, count)
 {
     auto constexpr IterCount = int{ 10000 };
 
@@ -62,6 +62,18 @@ TEST(Bitfield, countRange)
         auto const count2 = bf.count(begin, end);
         EXPECT_EQ(count1, count2);
     }
+
+    auto bf = tr_bitfield{ 0 };
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(0, bf.count(0, 1));
+
+    bf = tr_bitfield{ 100 };
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(0, bf.count(0, 100));
+    bf.setHasAll();
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(1, bf.count(0, 1));
+    EXPECT_EQ(100, bf.count(0, 100));
 }
 
 TEST(Bitfield, ctorFromFlagArray)
