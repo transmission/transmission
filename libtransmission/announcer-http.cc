@@ -417,8 +417,7 @@ static void on_scrape_done(
 
         if (variant_loaded)
         {
-            auto sv = std::string_view{};
-            if (tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
+            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
             {
                 response->errmsg = sv;
             }
