@@ -1292,7 +1292,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     }
 
     // the middle blocks
-    if (begin + 1 < end)
+    if (end - begin > 2)
     {
         uint64_t u = tor->completion.blocks().count(begin + 1, end - 1);
         u *= tor->block_size;
