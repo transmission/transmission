@@ -171,34 +171,44 @@ public:
 
     /// COMPLETION
 
-    uint64_t leftUntilDone() const
+    [[nodiscard]] constexpr uint64_t leftUntilDone() const
     {
         return completion.leftUntilDone();
     }
 
-    bool hasAll() const
+    [[nodiscard]] constexpr bool hasAll() const
     {
         return completion.hasAll();
     }
 
-    bool hasNone() const
+    [[nodiscard]] constexpr bool hasNone() const
     {
         return completion.hasNone();
     }
 
-    bool hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr bool hasPiece(tr_piece_index_t piece) const
     {
         return completion.hasPiece(piece);
     }
 
-    bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] constexpr bool hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
 
-    size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBlocksInPiece(piece);
+    }
+
+    [[nodiscard]] constexpr size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    {
+        return completion.countMissingBytesInPiece(piece);
+    }
+
+    [[nodiscard]] constexpr uint64_t hasTotal() const
+    {
+        return completion.hasTotal();
     }
 
     bool pieceIsDnd(tr_piece_index_t piece) const final
@@ -565,19 +575,9 @@ uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
-static inline size_t tr_torrentMissingBytesInPiece(tr_torrent const* tor, tr_piece_index_t piece)
-{
-    return tor->completion.countMissingBytesInPiece(piece);
-}
-
 static inline std::vector<uint8_t> tr_torrentCreatePieceBitfield(tr_torrent const* tor)
 {
     return tor->completion.createPieceBitfield();
-}
-
-constexpr uint64_t tr_torrentHaveTotal(tr_torrent const* tor)
-{
-    return tor->completion.hasTotal();
 }
 
 constexpr bool tr_torrentIsQueued(tr_torrent const* tor)

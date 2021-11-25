@@ -713,7 +713,7 @@ static bool hasAnyLocalData(tr_torrent const* tor)
 
 static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
 {
-    bool const disappeared = tr_torrentHaveTotal(tor) > 0 && !hasAnyLocalData(tor);
+    bool const disappeared = tor->hasTotal() > 0 && !hasAnyLocalData(tor);
 
     if (disappeared)
     {
@@ -1153,7 +1153,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
     s->uploadedEver = tor->uploadedCur + tor->uploadedPrev;
     s->haveValid = tor->completion.hasValid();
-    s->haveUnchecked = tr_torrentHaveTotal(tor) - s->haveValid;
+    s->haveUnchecked = tor->hasTotal() - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
     s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
@@ -1286,7 +1286,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
     auto total = uint64_t{};
 
     // the first block
-    if (tor->hasblock(begin))
+    if (tor->hasBlock(begin))
     {
         total += tor->block_size - f.offset % tor->block_size;
     }

@@ -591,7 +591,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
-            return tor->countMissingBlocksInPiece(piece);
+            return torrent_->countMissingBlocksInPiece(piece);
         }
 
         tr_block_span_t blockSpan(tr_piece_index_t piece) const override
@@ -1695,7 +1695,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         if (!tor->pieceIsDnd(i) && have.at(i))
         {
-            desired_available += tr_torrentMissingBytesInPiece(tor, i);
+            desired_available += tor->countMissingBytesInPiece(i);
         }
     }
 
