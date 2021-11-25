@@ -106,11 +106,6 @@ size_t tr_completion::countMissingBlocksInPiece(tr_piece_index_t piece) const
 
 size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
 {
-    if (hasAll())
-    {
-        return 0;
-    }
-
     return block_info_->countBytesInPiece(piece) - countHasBytesInSpan(block_info_->blockSpanForPiece(piece));
 }
 
@@ -139,22 +134,13 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     size_t const n = block_info_->n_pieces;
     auto pieces = tr_bitfield{ n };
 
-    if (hasAll())
+    bool* const flags = new bool[n];
+    for (tr_piece_index_t piece = 0; piece < n; ++piece)
     {
-        pieces.setHasAll();
+        flags[piece] = hasPiece(piece);
     }
-    else if (!hasNone())
-    {
-        bool* flags = tr_new(bool, n);
-
-        for (tr_piece_index_t piece = 0; piece < n; ++piece)
-        {
-            flags[piece] = hasPiece(piece);
-        }
-
-        pieces.setFromBools(flags, n);
-        tr_free(flags);
-    }
+    pieces.setFromBools(flags, n);
+    delete[] flags;
 
     return pieces.raw();
 }

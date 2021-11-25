@@ -406,8 +406,29 @@ TEST_F(CompletionTest, setHasPiece)
 {
 }
 
-TEST_F(CompletionTest, countMissing)
+TEST_F(CompletionTest, countMissingBytesInPiece)
 {
+    auto torrent = TestTorrent{};
+    auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
+    auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto completion = tr_completion(&torrent, &block_info);
+
+    EXPECT_EQ(block_info.countBytesInPiece(0), completion.countMissingBytesInPiece(0));
+    completion.addBlock(0);
+    EXPECT_EQ(block_info.countBytesInPiece(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
+    completion.addPiece(0);
+    EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
+
+    auto const final_piece = block_info.n_pieces - 1;
+    auto const final_block = block_info.n_blocks - 1;
+    EXPECT_EQ(block_info.countBytesInPiece(final_piece), completion.countMissingBytesInPiece(final_piece));
+    completion.addBlock(final_block);
+    EXPECT_EQ(1, block_info.final_piece_size);
+    EXPECT_EQ(1, block_info.final_block_size);
+    EXPECT_EQ(1, block_info.n_blocks_in_final_piece);
+    EXPECT_TRUE(completion.hasPiece(final_piece));
+    EXPECT_EQ(0, completion.countMissingBytesInPiece(final_piece));
 }
 
 TEST_F(CompletionTest, amountDone)
