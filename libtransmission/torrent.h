@@ -169,7 +169,12 @@ public:
         return session->unique_lock();
     }
 
-    /// DND
+    /// COMPLETION
+
+    uint64_t leftUntilDone() const
+    {
+        return completion.leftUntilDone();
+    }
 
     bool pieceIsDnd(tr_piece_index_t piece) const final
     {
@@ -534,11 +539,6 @@ bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-static inline uint64_t tr_torrentGetLeftUntilDone(tr_torrent const* tor)
-{
-    return tor->completion.leftUntilDone();
-}
 
 static inline bool tr_torrentHasAll(tr_torrent const* tor)
 {

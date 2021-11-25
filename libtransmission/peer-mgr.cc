@@ -554,7 +554,7 @@ static void updateEndgame(tr_swarm* s)
 {
     /* we consider ourselves to be in endgame if the number of bytes
        we've got requested is >= the number of bytes left to download */
-    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->block_size >= tr_torrentGetLeftUntilDone(s->tor);
+    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->block_size >= s->tor->leftUntilDone();
 }
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
@@ -1669,7 +1669,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         if (peers[i]->atom != nullptr && atomIsSeed(peers[i]->atom))
         {
-            return tr_torrentGetLeftUntilDone(tor);
+            return tor->leftUntilDone();
         }
     }
 
