@@ -102,38 +102,38 @@ std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
     return candidates;
 }
 
-static std::vector<tr_block_range_t> makeRanges(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+static std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
         return {};
     }
 
-    auto ranges = std::vector<tr_block_range_t>{};
-    auto cur = tr_block_range_t{ sorted_blocks[0], sorted_blocks[0] };
+    auto spans = std::vector<tr_block_span_t>{};
+    auto cur = tr_block_span_t{ sorted_blocks[0], sorted_blocks[0] + 1 };
     for (size_t i = 1; i < n_blocks; ++i)
     {
-        if (cur.last + 1 == sorted_blocks[i])
+        if (cur.end == sorted_blocks[i])
         {
-            cur.last = sorted_blocks[i];
+            ++cur.end;
         }
         else
         {
-            ranges.push_back(cur);
-            cur = tr_block_range_t{ sorted_blocks[i], sorted_blocks[i] };
+            spans.push_back(cur);
+            cur = tr_block_span_t{ sorted_blocks[i], sorted_blocks[i] + 1 };
         }
     }
-    ranges.push_back(cur);
+    spans.push_back(cur);
 
-    return ranges;
+    return spans;
 }
 
 } // namespace
 
-std::vector<tr_block_range_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
     size_t n_blocks = 0;
-    auto ranges = std::vector<tr_block_range_t>{};
+    auto spans = std::vector<tr_block_span_t>{};
 
     // sanity clause
     TR_ASSERT(n_wanted_blocks > 0);
@@ -154,10 +154,10 @@ std::vector<tr_block_range_t> Wishlist::next(Wishlist::PeerInfo const& peer_info
         }
 
         // walk the blocks in this piece
-        auto const [first, last] = peer_info.blockRange(candidate.piece);
+        auto const [begin, end] = peer_info.blockSpan(candidate.piece);
         auto blocks = std::vector<tr_block_index_t>{};
-        blocks.reserve(last + 1 - first);
-        for (tr_block_index_t block = first; block <= last && n_blocks + std::size(blocks) < n_wanted_blocks; ++block)
+        blocks.reserve(end - begin);
+        for (tr_block_index_t block = begin; block < end && n_blocks + std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
             if (!peer_info.clientCanRequestBlock(block))
@@ -181,19 +181,19 @@ std::vector<tr_block_range_t> Wishlist::next(Wishlist::PeerInfo const& peer_info
             continue;
         }
 
-        // copy the ranges into `ranges`
-        auto const tmp = makeRanges(std::data(blocks), std::size(blocks));
-        std::copy(std::begin(tmp), std::end(tmp), std::back_inserter(ranges));
+        // copy the spans into `spans`
+        auto const tmp = makeSpans(std::data(blocks), std::size(blocks));
+        std::copy(std::begin(tmp), std::end(tmp), std::back_inserter(spans));
         n_blocks += std::accumulate(
             std::begin(tmp),
             std::end(tmp),
             size_t{},
-            [](size_t sum, auto range) { return sum + range.last + 1 - range.first; });
+            [](size_t sum, auto span) { return sum + span.end - span.begin; });
         if (n_blocks >= n_wanted_blocks)
         {
             break;
         }
     }
 
-    return ranges;
+    return spans;
 }

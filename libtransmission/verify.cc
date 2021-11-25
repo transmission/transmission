@@ -39,7 +39,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     uint32_t piecePos = 0;
     tr_file_index_t fileIndex = 0;
     tr_file_index_t prevFileIndex = !fileIndex;
-    tr_piece_index_t pieceIndex = 0;
+    tr_piece_index_t piece = 0;
     time_t const begin = tr_time();
     size_t const buflen = 1024 * 128; // 128 KiB buffer
     auto* const buffer = static_cast<uint8_t*>(tr_malloc(buflen));
@@ -49,14 +49,14 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
     tor->verify_progress = 0;
 
-    while (!*stopFlag && pieceIndex < tor->info.pieceCount)
+    while (!*stopFlag && piece < tor->info.pieceCount)
     {
         tr_file const* file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
         if (piecePos == 0)
         {
-            hadPiece = tr_torrentPieceIsComplete(tor, pieceIndex);
+            hadPiece = tor->hasPiece(piece);
         }
 
         /* if we're starting a new file... */
@@ -70,7 +70,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         }
 
         /* figure out how much we can read this pass */
-        uint64_t leftInPiece = tor->countBytesInPiece(pieceIndex) - piecePos;
+        uint64_t leftInPiece = tor->countBytesInPiece(piece) - piecePos;
         uint64_t leftInFile = file->length - filePos;
         uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
         bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
@@ -97,11 +97,11 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         if (leftInPiece == 0)
         {
             auto hash = tr_sha1_final(sha);
-            auto const hasPiece = hash && *hash == tor->pieceHash(pieceIndex);
+            auto const hasPiece = hash && *hash == tor->pieceHash(piece);
 
             if (hasPiece || hadPiece)
             {
-                tr_torrentSetHasPiece(tor, pieceIndex, hasPiece);
+                tor->setHasPiece(piece, hasPiece);
                 changed |= hasPiece != hadPiece;
             }
 
@@ -117,8 +117,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             }
 
             sha = tr_sha1_init();
-            ++pieceIndex;
-            tor->verify_progress = pieceIndex / double(tor->info.pieceCount);
+            ++piece;
+            tor->verify_progress = piece / double(tor->info.pieceCount);
             piecePos = 0;
         }
 

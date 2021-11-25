@@ -100,7 +100,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
     {
         struct cache_block const* b = blocks[pos + len - 1];
         info->last_block_time = b->time;
-        info->is_piece_done = tr_torrentPieceIsComplete(b->tor, b->piece);
+        info->is_piece_done = b->tor->hasPiece(b->piece);
         info->is_multi_piece = b->piece != blocks[pos]->piece;
         info->len = len;
         info->pos = pos;
@@ -426,10 +426,10 @@ int tr_cacheFlushDone(tr_cache* cache)
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 {
-    auto const [first, last] = tr_torGetFileBlockRange(torrent, i);
+    auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
 
-    int pos = findBlockPos(cache, torrent, first);
-    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
+    int pos = findBlockPos(cache, torrent, begin);
+    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end);
 
     /* flush out all the blocks in that file */
     int err = 0;
@@ -442,7 +442,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
             break;
         }
 
-        if (b->block < first || b->block > last)
+        if (b->block < begin || b->block >= end)
         {
             break;
         }

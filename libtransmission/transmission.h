@@ -35,10 +35,10 @@ using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 
-struct tr_block_range_t
+struct tr_block_span_t
 {
-    tr_block_index_t first;
-    tr_block_index_t last;
+    tr_block_index_t begin;
+    tr_block_index_t end;
 };
 
 struct tr_ctor;
@@ -116,6 +116,7 @@ char const* tr_getDefaultDownloadDir(void);
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "default"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
+#define TR_DEFAULT_PEER_LIMIT_TORRENT 50
 
 /**
  * Add libtransmission's default settings to the benc dictionary.

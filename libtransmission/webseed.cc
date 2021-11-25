@@ -212,7 +212,7 @@ static void write_block_func(void* vdata)
         tr_cache* cache = data->session->cache;
         tr_piece_index_t const piece = data->piece_index;
 
-        if (!tr_torrentPieceIsComplete(tor, piece))
+        if (!tor->hasPiece(piece))
         {
             while (len > 0)
             {
@@ -364,16 +364,16 @@ static void on_idle(tr_webseed* w)
     {
         auto n_tasks = size_t{};
 
-        for (auto const range : tr_peerMgrGetNextRequests(tor, w, want))
+        for (auto const span : tr_peerMgrGetNextRequests(tor, w, want))
         {
-            auto const [first, last] = range;
+            auto const [begin, end] = span;
             auto* const task = tr_new0(tr_webseed_task, 1);
             task->session = tor->session;
             task->webseed = w;
-            task->block = first;
-            task->piece_index = tor->pieceForBlock(first);
-            task->piece_offset = tor->block_size * first - tor->info.pieceSize * task->piece_index;
-            task->length = (last - first) * tor->block_size + tor->countBytesInBlock(last);
+            task->block = begin;
+            task->piece_index = tor->pieceForBlock(begin);
+            task->piece_offset = tor->block_size * begin - tor->info.pieceSize * task->piece_index;
+            task->length = (end - 1 - begin) * tor->block_size + tor->countBytesInBlock(end - 1);
             task->blocks_done = 0;
             task->response_code = 0;
             task->block_size = tor->block_size;
@@ -384,7 +384,7 @@ static void on_idle(tr_webseed* w)
 
             --w->idle_connections;
             ++n_tasks;
-            tr_peerMgrClientSentRequests(tor, w, range);
+            tr_peerMgrClientSentRequests(tor, w, span);
         }
 
         if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL && n_tasks > 0)
@@ -460,7 +460,7 @@ static void web_response_func(
             }
             else
             {
-                if (buf_len != 0 && !tr_torrentPieceIsComplete(tor, t->piece_index))
+                if (buf_len != 0 && !tor->hasPiece(t->piece_index))
                 {
                     /* on_content_changed() will not write a block if it is smaller than
                        the torrent's block size, i.e. the torrent's very last block */

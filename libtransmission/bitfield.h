@@ -49,14 +49,14 @@ public:
 
     // set one or more bits
     void set(size_t bit, bool value = true);
-    void setRange(size_t begin, size_t end, bool value = true);
+    void setSpan(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
     {
         set(bit, false);
     }
-    void unsetRange(size_t begin, size_t end)
+    void unsetSpan(size_t begin, size_t end)
     {
-        setRange(begin, end, false);
+        setSpan(begin, end, false);
     }
     void setFromBools(bool const* bytes, size_t n);
 
@@ -91,6 +91,11 @@ public:
     [[nodiscard]] constexpr size_t size() const
     {
         return bit_count_;
+    }
+
+    [[nodiscard]] constexpr size_t empty() const
+    {
+        return size() == 0;
     }
 
 #ifdef TR_ENABLE_ASSERTS

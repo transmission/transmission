@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "transmission.h"
-#include "completion.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -454,19 +453,19 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
+static void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
-    if (b->hasNone() || std::size(*b) == 0)
+    if (b.hasNone() || std::empty(b))
     {
         tr_variantInitStr(benc, "none"sv);
     }
-    else if (b->hasAll())
+    else if (b.hasAll())
     {
         tr_variantInitStrView(benc, "all"sv);
     }
     else
     {
-        auto const raw = b->raw();
+        auto const raw = b.raw();
         tr_variantInitRaw(benc, raw.data(), std::size(raw));
     }
 }
@@ -502,7 +501,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     }
 
     // add the 'checked pieces' bitfield
-    bitfieldToRaw(&tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
+    bitfieldToRaw(tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
 
     /* add the progress */
     if (tor->completeness == TR_SEED)
@@ -511,7 +510,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     }
 
     /* add the blocks bitfield */
-    bitfieldToRaw(tor->completion.blockBitfield, tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToRaw(tor->blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -659,7 +658,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tr_cpBlockInit(&tor->completion, blocks);
+            tor->setBlocks(blocks);
         }
 
         ret = TR_FR_PROGRESS;
@@ -888,7 +887,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     // Only load file priorities if we are actually downloading.
     // If we're a seed or partial seed, loading it is a waste of time.
     // NB: this is why loadProgress() comes before loadFilePriorities()
-    if ((tr_cpLeftUntilDone(&tor->completion) != 0) && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
+    if (tor->isDone() && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
     {
         fieldsLoaded |= loadFilePriorities(&top, tor);
     }

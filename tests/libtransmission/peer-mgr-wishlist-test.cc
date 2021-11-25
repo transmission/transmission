@@ -24,7 +24,7 @@ protected:
     {
         mutable std::map<tr_block_index_t, size_t> active_request_count_;
         mutable std::map<tr_piece_index_t, size_t> missing_block_count_;
-        mutable std::map<tr_piece_index_t, tr_block_range_t> block_range_;
+        mutable std::map<tr_piece_index_t, tr_block_span_t> block_span_;
         mutable std::map<tr_piece_index_t, tr_priority_t> piece_priority_;
         mutable std::set<tr_block_index_t> can_request_block_;
         mutable std::set<tr_piece_index_t> can_request_piece_;
@@ -56,9 +56,9 @@ protected:
             return missing_block_count_[piece];
         }
 
-        [[nodiscard]] tr_block_range_t blockRange(tr_piece_index_t piece) const final
+        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const final
         {
-            return block_range_[piece];
+            return block_span_[piece];
         }
 
         [[nodiscard]] tr_piece_index_t countAllPieces() const final
@@ -83,22 +83,22 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
     peer_info.missing_block_count_[0] = 100;
     peer_info.missing_block_count_[1] = 100;
     peer_info.missing_block_count_[2] = 50;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 250 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 251 };
 
     // but we only want the first piece
     peer_info.can_request_piece_.insert(0);
-    for (tr_block_index_t i = peer_info.block_range_[0].first; i <= peer_info.block_range_[0].last; ++i)
+    for (tr_block_index_t i = peer_info.block_span_[0].begin; i < peer_info.block_span_[0].end; ++i)
     {
         peer_info.can_request_block_.insert(i);
     }
 
     // we should only get the first piece back
-    auto ranges = wishlist.next(peer_info, 1000);
-    ASSERT_EQ(1, std::size(ranges));
-    EXPECT_EQ(peer_info.block_range_[0].first, ranges[0].first);
-    EXPECT_EQ(peer_info.block_range_[0].last, ranges[0].last);
+    auto spans = wishlist.next(peer_info, 1000);
+    ASSERT_EQ(1, std::size(spans));
+    EXPECT_EQ(peer_info.block_span_[0].begin, spans[0].begin);
+    EXPECT_EQ(peer_info.block_span_[0].end, spans[0].end);
 }
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
@@ -111,9 +111,9 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     peer_info.missing_block_count_[0] = 100;
     peer_info.missing_block_count_[1] = 100;
     peer_info.missing_block_count_[2] = 50;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 249 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 251 };
 
     // and we want all three pieces
     peer_info.can_request_piece_.insert(0);
@@ -129,11 +129,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
 
     // even if we ask wishlist for more blocks than exist,
     // it should omit blocks 1-10 from the return set
-    auto ranges = wishlist.next(peer_info, 1000);
+    auto spans = wishlist.next(peer_info, 1000);
     auto requested = tr_bitfield(250);
-    for (auto const& range : ranges)
+    for (auto const& span : spans)
     {
-        requested.setRange(range.first, range.last + 1);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(240, requested.count());
     EXPECT_EQ(0, requested.count(0, 10));
@@ -150,9 +150,9 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     peer_info.missing_block_count_[0] = 100;
     peer_info.missing_block_count_[1] = 100;
     peer_info.missing_block_count_[2] = 50;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 249 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 251 };
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -167,11 +167,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     auto const n_wanted = 10;
-    auto ranges = wishlist.next(peer_info, n_wanted);
+    auto const spans = wishlist.next(peer_info, n_wanted);
     auto n_got = size_t{};
-    for (auto const& range : ranges)
+    for (auto const& span : spans)
     {
-        n_got += range.last + 1 - range.first;
+        n_got += span.end - span.begin;
     }
     EXPECT_EQ(n_wanted, n_got);
 }
@@ -186,9 +186,9 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     peer_info.missing_block_count_[0] = 100;
     peer_info.missing_block_count_[1] = 100;
     peer_info.missing_block_count_[2] = 100;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 299 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 300 };
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -212,16 +212,16 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     for (int run = 0; run < num_runs; ++run)
     {
         auto const n_wanted = 10;
-        auto ranges = wishlist.next(peer_info, n_wanted);
+        auto spans = wishlist.next(peer_info, n_wanted);
         auto n_got = size_t{};
-        for (auto const& range : ranges)
+        for (auto const& span : spans)
         {
-            for (auto block = range.first; block <= range.last; ++block)
+            for (auto block = span.begin; block < span.end; ++block)
             {
-                EXPECT_LE(peer_info.block_range_[1].first, block);
-                EXPECT_LE(block, peer_info.block_range_[1].last);
+                EXPECT_LE(peer_info.block_span_[1].begin, block);
+                EXPECT_LT(block, peer_info.block_span_[1].end);
             }
-            n_got += range.last + 1 - range.first;
+            n_got += span.end - span.begin;
         }
         EXPECT_EQ(n_wanted, n_got);
     }
@@ -237,9 +237,9 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     peer_info.missing_block_count_[0] = 100;
     peer_info.missing_block_count_[1] = 100;
     peer_info.missing_block_count_[2] = 100;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 299 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 300 };
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -259,11 +259,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 
     // even if we ask wishlist to list more blocks than exist,
     // those first 150 should be omitted from the return list
-    auto ranges = wishlist.next(peer_info, 1000);
+    auto spans = wishlist.next(peer_info, 1000);
     auto requested = tr_bitfield(300);
-    for (auto const& range : ranges)
+    for (auto const& span : spans)
     {
-        requested.setRange(range.first, range.last + 1);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(150, requested.count());
     EXPECT_EQ(0, requested.count(0, 150));
@@ -272,11 +272,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     // BUT during endgame it's OK to request dupes,
     // so then we _should_ see the first 150 in the list
     peer_info.is_endgame_ = true;
-    ranges = wishlist.next(peer_info, 1000);
+    spans = wishlist.next(peer_info, 1000);
     requested = tr_bitfield(300);
-    for (auto const& range : ranges)
+    for (auto const& span : spans)
     {
-        requested.setRange(range.first, range.last + 1);
+        requested.setSpan(span.begin, span.end);
     }
     EXPECT_EQ(300, requested.count());
     EXPECT_EQ(150, requested.count(0, 150));
@@ -290,9 +290,9 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
 
     // setup: three pieces, same size
     peer_info.piece_count_ = 3;
-    peer_info.block_range_[0] = { 0, 99 };
-    peer_info.block_range_[1] = { 100, 199 };
-    peer_info.block_range_[2] = { 200, 299 };
+    peer_info.block_span_[0] = { 0, 100 };
+    peer_info.block_span_[1] = { 100, 200 };
+    peer_info.block_span_[2] = { 200, 300 };
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -306,12 +306,12 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     peer_info.missing_block_count_[2] = 100;
     for (tr_piece_index_t piece = 0; piece < 3; ++piece)
     {
-        auto const& range = peer_info.block_range_[piece];
+        auto const& span = peer_info.block_span_[piece];
         auto const& n_missing = peer_info.missing_block_count_[piece];
 
         for (size_t i = 0; i < n_missing; ++i)
         {
-            peer_info.can_request_block_.insert(range.first + i);
+            peer_info.can_request_block_.insert(span.begin + i);
         }
     }
 
@@ -327,7 +327,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setRange(range.first, range.last + 1);
+            requested.setSpan(range.begin, range.end);
         }
         EXPECT_EQ(10, requested.count());
         EXPECT_EQ(10, requested.count(0, 100));
@@ -343,7 +343,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setRange(range.first, range.last + 1);
+            requested.setSpan(range.begin, range.end);
         }
         EXPECT_EQ(20, requested.count());
         EXPECT_EQ(10, requested.count(0, 100));

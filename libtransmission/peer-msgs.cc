@@ -1478,7 +1478,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const reqIsValid = requestIsValid(msgs, req);
-    bool const clientHasPiece = reqIsValid && tr_torrentPieceIsComplete(msgs->torrent, req->index);
+    bool const clientHasPiece = reqIsValid && msgs->torrent->hasPiece(req->index);
     bool const peerIsChoked = msgs->peer_is_choked_;
 
     bool allow = false;
@@ -1907,7 +1907,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return 0;
     }
 
-    if (tr_torrentPieceIsComplete(msgs->torrent, req->index))
+    if (msgs->torrent->hasPiece(req->index))
     {
         dbgmsg(msgs, "we did ask for this message, but the piece is already complete...");
         return 0;
@@ -2086,15 +2086,15 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
     TR_ASSERT(!msgs->is_client_choked());
 
     // std::cout << __FILE__ << ':' << __LINE__ << " wants " << n_wanted << " blocks to request" << std::endl;
-    for (auto const range : tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted))
+    for (auto const span : tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted))
     {
-        for (tr_block_index_t block = range.first; block <= range.last; ++block)
+        for (tr_block_index_t block = span.begin; block < span.end; ++block)
         {
             protocolSendRequest(msgs, blockToReq(msgs->torrent, block));
         }
 
-        // std::cout << __FILE__ << ':' << __LINE__ << " peer " << (void*)msgs << " requested " << range.last + 1 - range.first << " blocks" << std::endl;
-        tr_peerMgrClientSentRequests(msgs->torrent, msgs, range);
+        // std::cout << __FILE__ << ':' << __LINE__ << " peer " << (void*)msgs << " requested " << span.end - span.begin << " blocks" << std::endl;
+        tr_peerMgrClientSentRequests(msgs->torrent, msgs, span);
     }
 }
 
@@ -2198,7 +2198,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     {
         --msgs->prefetchCount;
 
-        if (requestIsValid(msgs, &req) && tr_torrentPieceIsComplete(msgs->torrent, req.index))
+        if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
         {
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
             struct evbuffer_iovec iovec[1];
@@ -2330,7 +2330,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
 
     struct evbuffer* out = msgs->outMessages;
 
-    auto bytes = tr_torrentCreatePieceBitfield(msgs->torrent);
+    auto bytes = msgs->torrent->createPieceBitfield();
     evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
     evbuffer_add_uint8(out, BtBitfield);
     evbuffer_add(out, bytes.data(), std::size(bytes));
@@ -2342,15 +2342,15 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
-    if (fext && tr_torrentHasAll(msgs->torrent))
+    if (fext && msgs->torrent->hasAll())
     {
         protocolSendHaveAll(msgs);
     }
-    else if (fext && tr_torrentHasNone(msgs->torrent))
+    else if (fext && msgs->torrent->hasNone())
     {
         protocolSendHaveNone(msgs);
     }
-    else if (!tr_torrentHasNone(msgs->torrent))
+    else if (!msgs->torrent->hasNone())
     {
         sendBitfield(msgs);
     }

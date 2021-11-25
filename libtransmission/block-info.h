@@ -30,9 +30,9 @@ struct tr_block_info
     uint32_t final_piece_size = 0;
 
     tr_block_info() = default;
-    tr_block_info(uint64_t total_size, uint64_t piece_size)
+    tr_block_info(uint64_t total_size_in, uint64_t piece_size_in)
     {
-        initSizes(total_size, piece_size);
+        initSizes(total_size_in, piece_size_in);
     }
 
     void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
@@ -54,9 +54,16 @@ struct tr_block_info
         return block + 1 == n_blocks ? final_block_size : block_size;
     }
 
+    constexpr tr_piece_index_t pieceOf(uint64_t offset) const
+    {
+        // handle 0-byte files at the end of a torrent
+        return offset == total_size ? n_pieces - 1 : offset / piece_size;
+    }
+
     constexpr tr_block_index_t blockOf(uint64_t offset) const
     {
-        return offset / block_size;
+        // handle 0-byte files at the end of a torrent
+        return offset == total_size ? n_blocks - 1 : offset / block_size;
     }
 
     constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
@@ -73,20 +80,16 @@ struct tr_block_info
         return blockOf(this->offset(piece, offset, length));
     }
 
-    constexpr tr_block_range_t blockRangeForPiece(tr_piece_index_t piece) const
+    constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
         if (block_size == 0)
         {
             return {};
         }
 
-        uint64_t offset = piece_size;
-        offset *= piece;
-        tr_block_index_t const first_block = offset / block_size;
-        offset += countBytesInPiece(piece) - 1;
-        tr_block_index_t const final_block = offset / block_size;
-
-        return { first_block, final_block };
+        auto const begin = blockOf(offset(piece, 0));
+        auto const end = 1 + blockOf(offset(piece, countBytesInPiece(piece) - 1));
+        return { begin, end };
     }
 
     static uint32_t bestBlockSize(uint64_t piece_size);
