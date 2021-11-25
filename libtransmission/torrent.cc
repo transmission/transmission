@@ -3039,7 +3039,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
         tr_piece_index_t const p = tor->pieceForBlock(block);
 
-        if (tr_torrentPieceIsComplete(tor, p))
+        if (tor->hasPiece(p))
         {
             if (tor->checkPiece(p))
             {

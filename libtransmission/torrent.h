@@ -186,6 +186,11 @@ public:
         return completion.hasNone();
     }
 
+    bool hasPiece(tr_piece_index_t piece) const
+    {
+        return completion.hasPiece(piece);
+    }
+
     bool pieceIsDnd(tr_piece_index_t piece) const final
     {
         return dnd_pieces_.test(piece);
@@ -549,11 +554,6 @@ bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-static inline bool tr_torrentPieceIsComplete(tr_torrent const* tor, tr_piece_index_t piece)
-{
-    return tor->completion.hasPiece(piece);
-}
 
 static inline bool tr_torrentBlockIsComplete(tr_torrent const* tor, tr_block_index_t block)
 {

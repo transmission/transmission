@@ -1478,7 +1478,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const reqIsValid = requestIsValid(msgs, req);
-    bool const clientHasPiece = reqIsValid && tr_torrentPieceIsComplete(msgs->torrent, req->index);
+    bool const clientHasPiece = reqIsValid && msgs->torrent->hasPiece(req->index);
     bool const peerIsChoked = msgs->peer_is_choked_;
 
     bool allow = false;
@@ -1907,7 +1907,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return 0;
     }
 
-    if (tr_torrentPieceIsComplete(msgs->torrent, req->index))
+    if (msgs->torrent->hasPiece(req->index))
     {
         dbgmsg(msgs, "we did ask for this message, but the piece is already complete...");
         return 0;
@@ -2198,7 +2198,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     {
         --msgs->prefetchCount;
 
-        if (requestIsValid(msgs, &req) && tr_torrentPieceIsComplete(msgs->torrent, req.index))
+        if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
         {
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
             struct evbuffer_iovec iovec[1];

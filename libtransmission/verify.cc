@@ -56,7 +56,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         /* if we're starting a new piece... */
         if (piecePos == 0)
         {
-            hadPiece = tr_torrentPieceIsComplete(tor, pieceIndex);
+            hadPiece = tor->hasPiece(pieceIndex);
         }
 
         /* if we're starting a new file... */

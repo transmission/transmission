@@ -705,7 +705,7 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
     }
 
     /* don't ask for it if we've already got it */
-    if (tr_torrentPieceIsComplete(t->tor, pieceIndex))
+    if (t->tor->hasPiece(pieceIndex))
     {
         return;
     }
@@ -1590,7 +1590,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
         {
             int const piece = i * interval;
 
-            if (isSeed || tr_torrentPieceIsComplete(tor, piece))
+            if (isSeed || tor->hasPiece(piece))
             {
                 tab[i] = -1;
             }
@@ -2021,7 +2021,7 @@ static void rechokeDownloads(tr_swarm* s)
 
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = !tor->pieceIsDnd(i) && !tr_torrentPieceIsComplete(tor, i);
+            piece_is_interesting[i] = !tor->pieceIsDnd(i) && !tor->hasPiece(i);
         }
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */

@@ -212,7 +212,7 @@ static void write_block_func(void* vdata)
         tr_cache* cache = data->session->cache;
         tr_piece_index_t const piece = data->piece_index;
 
-        if (!tr_torrentPieceIsComplete(tor, piece))
+        if (!tor->hasPiece(piece))
         {
             while (len > 0)
             {
@@ -460,7 +460,7 @@ static void web_response_func(
             }
             else
             {
-                if (buf_len != 0 && !tr_torrentPieceIsComplete(tor, t->piece_index))
+                if (buf_len != 0 && !tor->hasPiece(t->piece_index))
                 {
                     /* on_content_changed() will not write a block if it is smaller than
                        the torrent's block size, i.e. the torrent's very last block */
