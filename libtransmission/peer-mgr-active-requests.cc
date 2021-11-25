@@ -47,11 +47,6 @@ struct peer_at
     {
         return compare(that) == 0;
     }
-
-    bool operator<(peer_at const& that) const
-    {
-        return compare(that) < 0;
-    }
 };
 
 struct PeerAtHash
