@@ -47,11 +47,6 @@ struct peer_at
     {
         return compare(that) == 0;
     }
-
-    bool operator<(peer_at const& that) const
-    {
-        return compare(that) < 0;
-    }
 };
 
 struct PeerAtHash
@@ -155,11 +150,11 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     removed.reserve(impl_->blocks_.size());
 
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    for (auto const& it : impl_->blocks_)
+    for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        if (it.second.count(key))
+        if (peers_at.count(key))
         {
-            removed.push_back(it.first);
+            removed.push_back(block);
         }
     }
 
@@ -176,8 +171,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 {
     auto removed = std::vector<tr_peer*>{};
 
-    auto it = impl_->blocks_.find(block);
-    if (it != std::end(impl_->blocks_))
+    if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
     {
         auto const n = std::size(it->second);
         removed.resize(n);
@@ -228,13 +222,13 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
     auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
     sent_before.reserve(std::size(impl_->blocks_));
 
-    for (auto& perblock : impl_->blocks_)
+    for (auto& [block, peers_at] : impl_->blocks_)
     {
-        for (auto& sent : perblock.second)
+        for (auto& sent : peers_at)
         {
             if (sent.when < when)
             {
-                sent_before.emplace_back(perblock.first, sent.peer);
+                sent_before.emplace_back(block, sent.peer);
             }
         }
     }
