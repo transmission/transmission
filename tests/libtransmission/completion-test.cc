@@ -447,6 +447,11 @@ TEST_F(CompletionTest, amountDone)
     }
     completion.amountDone(std::data(bins), std::size(bins));
     std::for_each(std::begin(bins), std::end(bins), [](float bin) { EXPECT_DOUBLE_EQ(1.0, bin); });
+
+    // don't do anything if fed bad input
+    auto const backup = bins;
+    completion.amountDone(std::data(bins), 0);
+    EXPECT_EQ(backup, bins);
 }
 
 TEST_F(CompletionTest, status)

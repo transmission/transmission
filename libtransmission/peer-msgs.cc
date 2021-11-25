@@ -2093,7 +2093,7 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
             protocolSendRequest(msgs, blockToReq(msgs->torrent, block));
         }
 
-        // std::cout << __FILE__ << ':' << __LINE__ << " peer " << (void*)msgs << " requested " << range.last + 1 - range.first << " blocks" << std::endl;
+        // std::cout << __FILE__ << ':' << __LINE__ << " peer " << (void*)msgs << " requested " << span.end - span.begin << " blocks" << std::endl;
         tr_peerMgrClientSentRequests(msgs->torrent, msgs, span);
     }
 }

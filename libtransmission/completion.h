@@ -22,6 +22,9 @@
 #include "block-info.h"
 #include "bitfield.h"
 
+/**
+ * @brief knows which blocks and pieces we have
+ */
 struct tr_completion
 {
     struct torrent_view
