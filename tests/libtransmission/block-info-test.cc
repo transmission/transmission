@@ -35,6 +35,16 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     EXPECT_EQ(PieceSize, info.final_piece_size);
     EXPECT_EQ(PieceSize, info.piece_size);
     EXPECT_EQ(TotalSize, info.total_size);
+
+    info.initSizes(0, 0);
+    EXPECT_EQ(0, info.block_size);
+    EXPECT_EQ(0, info.final_block_size);
+    EXPECT_EQ(0, info.n_blocks_in_final_piece);
+    EXPECT_EQ(0, info.n_blocks_in_piece);
+    EXPECT_EQ(0, info.n_pieces);
+    EXPECT_EQ(0, info.final_piece_size);
+    EXPECT_EQ(0, info.piece_size);
+    EXPECT_EQ(0, info.total_size);
 }
 
 TEST_F(BlockInfoTest, handlesOddSize)
@@ -147,4 +157,9 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
     EXPECT_EQ(16, info.blockSpanForPiece(3).end);
     EXPECT_EQ(16, info.blockSpanForPiece(4).begin);
     EXPECT_EQ(17, info.blockSpanForPiece(4).end);
+
+    // test that uninitialized block_info returns an invalid span
+    info = tr_block_info{};
+    EXPECT_EQ(0, info.blockSpanForPiece(0).begin);
+    EXPECT_EQ(0, info.blockSpanForPiece(0).end);
 }
