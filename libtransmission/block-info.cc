@@ -44,6 +44,7 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
 
     if (piece_size == 0 || block_size == 0)
     {
+        *this = {};
         return;
     }
 
