@@ -176,14 +176,19 @@ public:
         return completion.leftUntilDone();
     }
 
-    bool pieceIsDnd(tr_piece_index_t piece) const final
-    {
-        return dnd_pieces_.test(piece);
-    }
-
     bool hasAll() const
     {
         return completion.hasAll();
+    }
+
+    bool hasNone() const
+    {
+        return completion.hasNone();
+    }
+
+    bool pieceIsDnd(tr_piece_index_t piece) const final
+    {
+        return dnd_pieces_.test(piece);
     }
 
     /// PRIORITIES
@@ -544,11 +549,6 @@ bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-static inline bool tr_torrentHasNone(tr_torrent const* tor)
-{
-    return tor->completion.hasNone();
-}
 
 static inline bool tr_torrentPieceIsComplete(tr_torrent const* tor, tr_piece_index_t piece)
 {

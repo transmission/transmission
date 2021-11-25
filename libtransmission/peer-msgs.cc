@@ -2346,11 +2346,11 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
     {
         protocolSendHaveAll(msgs);
     }
-    else if (fext && tr_torrentHasNone(msgs->torrent))
+    else if (fext && msgs->torrent->hasNone())
     {
         protocolSendHaveNone(msgs);
     }
-    else if (!tr_torrentHasNone(msgs->torrent))
+    else if (!msgs->torrent->hasNone())
     {
         sendBitfield(msgs);
     }
