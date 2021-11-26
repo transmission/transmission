@@ -91,9 +91,9 @@ public:
 } // namespace
 
 FileTreeModel::FileTreeModel(QObject* parent, bool is_editable)
-    : QAbstractItemModel(parent)
-    , root_item_(new FileTreeItem)
-    , is_editable_(is_editable)
+    : QAbstractItemModel{ parent }
+    , root_item_{ new FileTreeItem }
+    , is_editable_{ is_editable }
 {
 }
 
@@ -320,6 +320,8 @@ void FileTreeModel::clear()
 {
     beginResetModel();
     clearSubtree(QModelIndex());
+    delete root_item_;
+    root_item_ = new FileTreeItem{};
     endResetModel();
 
     assert(index_cache_.isEmpty());
