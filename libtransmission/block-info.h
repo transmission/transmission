@@ -42,13 +42,13 @@ struct tr_block_info
         return n_blocks_in_piece ? block / n_blocks_in_piece : 0;
     }
 
-    constexpr uint32_t countBytesInPiece(tr_piece_index_t piece) const
+    constexpr uint32_t pieceSize(tr_piece_index_t piece) const
     {
         // how many bytes are in this piece?
         return piece + 1 == n_pieces ? final_piece_size : piece_size;
     }
 
-    constexpr uint32_t countBytesInBlock(tr_block_index_t block) const
+    constexpr uint32_t blockSize(tr_block_index_t block) const
     {
         // how many bytes are in this block?
         return block + 1 == n_blocks ? final_block_size : block_size;
@@ -88,7 +88,7 @@ struct tr_block_info
         }
 
         auto const begin = blockOf(offset(piece, 0));
-        auto const end = 1 + blockOf(offset(piece, countBytesInPiece(piece) - 1));
+        auto const end = 1 + blockOf(offset(piece, pieceSize(piece) - 1));
         return { begin, end };
     }
 

@@ -70,7 +70,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         }
 
         /* figure out how much we can read this pass */
-        uint64_t leftInPiece = tor->countBytesInPiece(piece) - piecePos;
+        uint64_t leftInPiece = tor->pieceSize(piece) - piecePos;
         uint64_t leftInFile = file->length - filePos;
         uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
         bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
