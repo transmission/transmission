@@ -147,7 +147,7 @@ static void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_index_
     {
         if (i == count)
         {
-            e.length = tor->countBytesInBlock(block + count - 1);
+            e.length = tor->blockSize(block + count - 1);
         }
 
         publish(w, &e);
@@ -165,7 +165,7 @@ static void fire_client_got_blocks(tr_torrent* tor, tr_webseed* w, tr_block_inde
     {
         if (i == count)
         {
-            e.length = tor->countBytesInBlock(block + count - 1);
+            e.length = tor->blockSize(block + count - 1);
         }
 
         publish(w, &e);
@@ -373,7 +373,7 @@ static void on_idle(tr_webseed* w)
             task->block = begin;
             task->piece_index = tor->pieceForBlock(begin);
             task->piece_offset = tor->block_size * begin - tor->info.pieceSize * task->piece_index;
-            task->length = (end - 1 - begin) * tor->block_size + tor->countBytesInBlock(end - 1);
+            task->length = (end - 1 - begin) * tor->block_size + tor->blockSize(end - 1);
             task->blocks_done = 0;
             task->response_code = 0;
             task->block_size = tor->block_size;

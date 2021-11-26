@@ -48,7 +48,7 @@ struct tr_block_info
         return piece + 1 == n_pieces ? final_piece_size : piece_size;
     }
 
-    constexpr uint32_t countBytesInBlock(tr_block_index_t block) const
+    constexpr uint32_t blockSize(tr_block_index_t block) const
     {
         // how many bytes are in this block?
         return block + 1 == n_blocks ? final_block_size : block_size;

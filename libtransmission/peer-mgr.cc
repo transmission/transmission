@@ -732,7 +732,7 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
             if (tor->hasBlock(b))
             {
                 uint32_t const offset = getBlockOffsetInPiece(tor, b);
-                uint32_t const length = tor->countBytesInBlock(b);
+                uint32_t const length = tor->blockSize(b);
                 tr_peerMsgsAddRequest(peer->msgs, pieceIndex, offset, length);
                 incrementPieceRequests(t, pieceIndex);
             }

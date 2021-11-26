@@ -155,7 +155,7 @@ void tr_completion::addBlock(tr_block_index_t block)
     }
 
     blocks_.set(block);
-    size_now_ += block_info_->countBytesInBlock(block);
+    size_now_ += block_info_->blockSize(block);
 
     has_valid_.reset();
 }
