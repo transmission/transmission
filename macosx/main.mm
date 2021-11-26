@@ -26,11 +26,11 @@ int main(int argc, char** argv)
 {
     if (argc > 1 && strncmp(argv[1], "-v", 2) == 0)
     {
-        char* env;
+        char* level;
         int debug = atoi(&argv[1][2]);
-        asprintf(&env, "TR_DEBUG=%d", debug);
-        putenv(env);
-        free(env);
+        asprintf(&level, "%d", debug);
+        setenv("TR_DEBUG", level, 1);
+        free(level);
     }
     return NSApplicationMain(argc, (char const**)argv);
 }
