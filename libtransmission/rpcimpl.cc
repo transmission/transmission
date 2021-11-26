@@ -1530,7 +1530,12 @@ static void gotNewBlocklist(
         stream.opaque = (voidpf)Z_NULL;
         stream.next_in = reinterpret_cast<Bytef const*>(std::data(response));
         stream.avail_in = std::size(response);
-        inflateInit2(&stream, windowBits);
+        if (inflateInit2(&stream, windowBits) != Z_OK)
+        {
+            // If stream init fails, log an error but keep going forward
+            // since the file may be uncompressed anyway.
+            tr_logAddError("inflateInit2 failed: %s", stream.msg ? stream.msg : "unknown");
+        }
 
         auto filename = tr_strvPath(configDir, "blocklist.tmp.XXXXXX");
         tr_sys_file_t const fd = tr_sys_file_open_temp(std::data(filename), &error);

@@ -753,7 +753,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->session = session;
     tor->uniqueId = nextUniqueId++;
-    tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = tr_sessionCountTorrents(session);
 
     tor->dnd_pieces_ = tr_bitfield{ tor->info.pieceCount };

@@ -526,8 +526,6 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
 
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
-    auto const* it = reinterpret_cast<unsigned char const*>(std::data(sv));
-    auto const* const end = it + std::size(sv);
 
     evbuffer_reserve_space(data->out, std::size(sv) * 4, vec, 1);
     auto* out = static_cast<char*>(vec[0].iov_base);
@@ -536,9 +534,9 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     char* outwalk = out;
     *outwalk++ = '"';
 
-    for (; it != end; ++it)
+    for (; !std::empty(sv); sv.remove_prefix(1))
     {
-        switch (*it)
+        switch (sv.front())
         {
         case '\b':
             *outwalk++ = '\\';
@@ -576,21 +574,23 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             break;
 
         default:
-            if (isprint(*it))
+            if (isprint(sv.front()))
             {
-                *outwalk++ = *it;
+                *outwalk++ = sv.front();
             }
             else
             {
-                UTF8 const* tmp = it;
+                auto const* const begin = reinterpret_cast<UTF8 const*>(std::data(sv));
+                auto const* tmp = begin;
+                auto const* end = tmp + std::size(sv);
                 UTF32 buf[1] = { 0 };
                 UTF32* u32 = buf;
                 ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, {});
 
-                if ((result == conversionOK || result == targetExhausted) && tmp != it)
+                if ((result == conversionOK || result == targetExhausted) && tmp != begin)
                 {
                     outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", (unsigned int)buf[0]);
-                    it = tmp - 1;
+                    sv.remove_prefix(tmp - begin - 1);
                 }
             }
 

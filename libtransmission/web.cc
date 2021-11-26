@@ -276,23 +276,23 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     tr_address const* addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value);
     if (addr != nullptr && !is_default_value)
     {
-        curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
+        (void)curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
 
     addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value);
     if (addr != nullptr && !is_default_value)
     {
-        curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
+        (void)curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
 
     if (!std::empty(task->cookies))
     {
-        curl_easy_setopt(e, CURLOPT_COOKIE, task->cookies.c_str());
+        (void)curl_easy_setopt(e, CURLOPT_COOKIE, task->cookies.c_str());
     }
 
     if (web->cookie_filename != nullptr)
     {
-        curl_easy_setopt(e, CURLOPT_COOKIEFILE, web->cookie_filename);
+        (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, web->cookie_filename);
     }
 
     if (!std::empty(task->range))
