@@ -414,15 +414,15 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
     auto completion = tr_completion(&torrent, &block_info);
 
-    EXPECT_EQ(block_info.countBytesInPiece(0), completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(block_info.pieceSize(0), completion.countMissingBytesInPiece(0));
     completion.addBlock(0);
-    EXPECT_EQ(block_info.countBytesInPiece(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(block_info.pieceSize(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
     EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
 
     auto const final_piece = block_info.n_pieces - 1;
     auto const final_block = block_info.n_blocks - 1;
-    EXPECT_EQ(block_info.countBytesInPiece(final_piece), completion.countMissingBytesInPiece(final_piece));
+    EXPECT_EQ(block_info.pieceSize(final_piece), completion.countMissingBytesInPiece(final_piece));
     completion.addBlock(final_block);
     EXPECT_EQ(1, block_info.final_piece_size);
     EXPECT_EQ(1, block_info.final_block_size);

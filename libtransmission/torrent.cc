@@ -2287,7 +2287,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 2;
     }
-    else if (offset + length > tor->countBytesInPiece(index))
+    else if (offset + length > tor->pieceSize(index))
     {
         err = 3;
     }
@@ -3031,7 +3031,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
             }
             else
             {
-                uint32_t const n = tor->countBytesInPiece(p);
+                uint32_t const n = tor->pieceSize(p);
                 tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
