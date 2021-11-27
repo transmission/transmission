@@ -24,13 +24,5 @@
 
 int main(int argc, char** argv)
 {
-    if (argc > 1 && strncmp(argv[1], "-v", 2) == 0)
-    {
-        char* level;
-        int debug = atoi(&argv[1][2]);
-        asprintf(&level, "%d", debug);
-        setenv("TR_DEBUG", level, 1);
-        free(level);
-    }
     return NSApplicationMain(argc, (char const**)argv);
 }
