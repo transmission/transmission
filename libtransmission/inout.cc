@@ -51,14 +51,13 @@ static int readOrWriteBytes(
 {
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
-    tr_info const* const info = &tor->info;
-    tr_file const* const file = &info->files[fileIndex];
 
-    TR_ASSERT(fileIndex < info->fileCount);
-    TR_ASSERT(file->length == 0 || fileOffset < file->length);
-    TR_ASSERT(fileOffset + buflen <= file->length);
+    TR_ASSERT(fileIndex < tr_torrentFileCount(tor));
+    auto const file = tr_torrentFile(tor, fileIndex);
+    TR_ASSERT(file.length == 0 || fileOffset < file.length);
+    TR_ASSERT(fileOffset + buflen <= file.length);
 
-    if (file->length == 0)
+    if (file.length == 0)
     {
         return 0;
     }
@@ -85,17 +84,17 @@ static int readOrWriteBytes(
             /* figure out where the file should go, so we can create it */
             base = tr_torrentGetCurrentDir(tor);
             subpath = tr_sessionIsIncompleteFileNamingEnabled(tor->session) ? tr_torrentBuildPartial(tor, fileIndex) :
-                                                                              tr_strdup(file->name);
+                                                                              tr_strdup(file.name);
         }
 
         if (err == 0)
         {
             /* open (and maybe create) the file */
             auto const filename = tr_strvPath(base, subpath);
-            tr_preallocation_mode const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE :
-                                                                             tor->session->preallocationMode;
+            tr_preallocation_mode const prealloc = (!file.wanted || !doWrite) ? TR_PREALLOCATE_NONE :
+                                                                                tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file->length);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file.length);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
@@ -124,7 +123,7 @@ static int readOrWriteBytes(
             if (!tr_sys_file_read_at(fd, buf, buflen, fileOffset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "read failed for \"%s\": %s", file->name, error->message);
+                tr_logAddTorErr(tor, "read failed for \"%s\": %s", file.name, error->message);
                 tr_error_free(error);
             }
         }
@@ -133,7 +132,7 @@ static int readOrWriteBytes(
             if (!tr_sys_file_write_at(fd, buf, buflen, fileOffset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "write failed for \"%s\": %s", file->name, error->message);
+                tr_logAddTorErr(tor, "write failed for \"%s\": %s", file.name, error->message);
                 tr_error_free(error);
             }
         }
@@ -155,12 +154,12 @@ static int compareOffsetToFile(void const* a, void const* b)
     auto const offset = *static_cast<uint64_t const*>(a);
     auto const* file = static_cast<tr_file const*>(b);
 
-    if (offset < file->offset)
+    if (offset < file->priv.offset)
     {
         return -1;
     }
 
-    if (offset >= file->offset + file->length)
+    if (offset >= file->priv.offset + file->length)
     {
         return 1;
     }
@@ -187,10 +186,10 @@ void tr_ioFindFileLocation(
     if (file != nullptr)
     {
         *fileIndex = file - tor->info.files;
-        *fileOffset = offset - file->offset;
+        *fileOffset = offset - file->priv.offset;
         TR_ASSERT(*fileIndex < tor->info.fileCount);
         TR_ASSERT(*fileOffset < file->length);
-        TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
+        TR_ASSERT(tor->info.files[*fileIndex].priv.offset + *fileOffset == offset);
     }
 }
 

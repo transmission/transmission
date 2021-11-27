@@ -306,13 +306,13 @@ public:
             auto const found = this->findFile(filename, i);
             auto const mtime = found ? found->last_modified_at : 0;
 
-            info.files[i].mtime = mtime;
+            info.files[i].priv.mtime = mtime;
 
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
             {
-                auto const begin = info.files[i].firstPiece;
-                auto const end = info.files[i].lastPiece + 1;
+                auto const begin = info.files[i].priv.firstPiece;
+                auto const end = info.files[i].priv.lastPiece + 1;
                 checked_pieces_.unsetSpan(begin, end);
             }
         }

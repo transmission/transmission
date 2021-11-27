@@ -42,6 +42,7 @@ struct tr_block_span_t
 };
 
 struct tr_ctor;
+struct tr_file;
 struct tr_error;
 struct tr_info;
 struct tr_session;
@@ -1530,14 +1531,26 @@ void tr_torrentTrackersFree(tr_tracker_stat* trackerStats, int trackerCount);
  */
 double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
 
-struct tr_file_progress
+struct tr_file_view
 {
-    uint64_t bytes_completed;
-    uint64_t bytes_total;
+    char const* name;
+    uint64_t have;
+    uint64_t length;
     double progress;
+    tr_priority_t priority;
+    bool wanted;
 };
 
-tr_file_progress tr_torrentFileProgress(tr_torrent const* torrent, tr_file_index_t file);
+/**
+ * Returns a tr_file_view containing information about a file.
+ *
+ * This view structure is intended for short-term use. Pointers in it are
+ * owned and managed by the torrent. Callers who want to keep this info
+ * must make their own copy.
+ */
+tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t file);
+
+size_t tr_torrentFileCount(tr_torrent const* torrent);
 
 /***********************************************************************
  * tr_torrentAvailability
@@ -1575,18 +1588,24 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
  * tr_info
  **********************************************************************/
 
-/** @brief a part of tr_info that represents a single file of the torrent's content */
-struct tr_file
+// For libtransmission use only.
+struct tr_file_priv
 {
-    time_t mtime;
-    uint64_t length; /* Length of the file, in bytes */
     uint64_t offset; /* file begins at the torrent's nth byte */
-    char* name; /* Path to the file */
+    time_t mtime;
     tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
     tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
     bool dnd; /* "do not download" flag */
     bool is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
+};
+/** @brief a part of tr_info that represents a single file of the torrent's content */
+struct tr_file
+{
+    // public
+    char* name; /* Path to the file */
+    uint64_t length; /* Length of the file, in bytes */
+    tr_file_priv priv;
 };
 
 /** @brief information about a torrent that comes from its metainfo file */
@@ -1613,6 +1632,8 @@ struct tr_info
     /* torrent's source. empty if not set. */
     char* source;
 
+    // Private.
+    // Use tr_torrentFile() and tr_torrentFileCount() instead.
     tr_file* files;
 
     /* these trackers are sorted by tier */

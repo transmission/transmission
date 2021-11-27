@@ -51,9 +51,9 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto* tor = zeroTorrentInit();
     zeroTorrentPopulate(tor, false);
     EXPECT_EQ(
-        makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
+        makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tr_torrentFile(tor, 0).name)),
         makeString(tr_torrentFindFile(tor, 0)));
-    EXPECT_EQ(tr_strvPath(incomplete_dir, tor->info.files[1].name), makeString(tr_torrentFindFile(tor, 1)));
+    EXPECT_EQ(tr_strvPath(incomplete_dir, tr_torrentFile(tor, 1).name), makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
@@ -125,9 +125,10 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_SEED, completeness);
 
-    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    auto const n = tr_torrentFileCount(tor);
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(tr_strvPath(download_dir, tor->info.files[file_index].name), makeString(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(tr_strvPath(download_dir, tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup
@@ -178,11 +179,10 @@ TEST_F(MoveTest, setLocation)
 
     // confirm the files really got moved
     sync();
-    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    auto const n = tr_torrentFileCount(tor);
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(
-            tr_strvPath(target_dir.data(), tor->info.files[file_index].name),
-            makeString(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(tr_strvPath(target_dir.data(), tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup

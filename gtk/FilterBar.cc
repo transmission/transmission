@@ -623,15 +623,14 @@ bool testText(tr_torrent const* tor, Glib::ustring const* key)
     }
     else
     {
-        tr_info const* inf = tr_torrentInfo(tor);
-
         /* test the torrent name... */
         ret = Glib::ustring(tr_torrentName(tor)).casefold().find(*key) != Glib::ustring::npos;
 
         /* test the files... */
-        for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
+        auto const n = tr_torrentFileCount(tor);
+        for (tr_file_index_t i = 0; i < n && !ret; ++i)
         {
-            ret = Glib::ustring(inf->files[i].name).casefold().find(*key) != Glib::ustring::npos;
+            ret = Glib::ustring(tr_torrentFile(tor, i).name).casefold().find(*key) != Glib::ustring::npos;
         }
     }
 

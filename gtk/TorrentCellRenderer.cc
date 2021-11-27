@@ -393,13 +393,13 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
     {
         mime_type = DIRECTORY_MIME_TYPE;
     }
-    else if (strchr(info->files[0].name, '/') != nullptr)
+    else if (strchr(tr_torrentFile(tor, 0).name, '/') != nullptr)
     {
         mime_type = DIRECTORY_MIME_TYPE;
     }
     else
     {
-        mime_type = gtr_get_mime_type_from_filename(info->files[0].name);
+        mime_type = gtr_get_mime_type_from_filename(tr_torrentFile(tor, 0).name);
     }
 
     return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
