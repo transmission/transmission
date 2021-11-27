@@ -1316,7 +1316,7 @@ tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t i)
     auto const* const name = file.name;
     auto const priority = file.priv.priority;
     auto const wanted = !file.priv.dnd;
-    tr_file_index_t const length = file.length;
+    auto const length = file.length;
 
     if (torrent->completeness == TR_SEED || length == 0)
     {
