@@ -496,9 +496,9 @@ TEST_F(RenameTest, partialFile)
     EXPECT_STREQ("files-filled-with-zeroes/512", files[2].name);
 
     zeroTorrentPopulate(tor, false);
-    EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).length + PieceSize);
-    EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).length);
-    EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).length);
+    EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
+    EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
+    EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).have);
     auto const* st = tr_torrentStat(tor);
     EXPECT_EQ(TotalSize, st->sizeWhenDone);
     EXPECT_EQ(PieceSize, st->leftUntilDone);
