@@ -1592,7 +1592,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     __block BOOL canChange = NO;
     [indexSet enumerateIndexesWithOptions:NSEnumerationConcurrent usingBlock:^(NSUInteger index, BOOL* stop) {
-        auto const file = tr_torrentFile(fHandle, index).progress;
+        auto const file = tr_torrentFile(fHandle, index);
         if (file.have < file.length)
         {
             canChange = YES;
@@ -1678,8 +1678,8 @@ bool trashDataFile(char const* filename, tr_error** error)
             continue;
         }
 
-        auto const file = tr_torrentFile(fHandle, index);
-        switch (file.priority)
+        auto const priority = tr_torrentFile(fHandle, index).priority;
+        switch (priority)
         {
         case TR_PRI_LOW:
             if (low)
