@@ -813,9 +813,7 @@ void Application::Impl::on_drag_data_received(
     guint /*info*/,
     guint time_)
 {
-    auto const uris = selection_data.get_uris();
-
-    if (!uris.empty())
+    if (auto const uris = selection_data.get_uris(); !uris.empty())
     {
         auto files = std::vector<Glib::RefPtr<Gio::File>>();
         files.reserve(uris.size());
