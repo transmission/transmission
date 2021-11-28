@@ -131,8 +131,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         return EILSEQ;
     }
 
-    int const err = parseMetainfoContents(ctor);
-    if (err)
+    if (int const err = parseMetainfoContents(ctor); err != 0)
     {
         clearMetainfo(ctor);
         return err;
@@ -141,9 +140,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     setSourceFile(ctor, filename);
 
     /* if no `name' field was set, then set it from the filename */
-    tr_variant* info = nullptr;
-
-    if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
+    if (tr_variant* info = nullptr; tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
     {
         auto name = std::string_view{};
 

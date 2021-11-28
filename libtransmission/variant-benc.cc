@@ -186,50 +186,43 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                     break;
                 }
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
+                if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
                 {
                     tr_variantInitInt(v, *value);
                 }
                 break;
             }
         case 'l': // list
-            {
-                benc.remove_prefix(1);
+            benc.remove_prefix(1);
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitList(v, 0);
-                    stack.push_back(v);
-                }
-                break;
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
+            {
+                tr_variantInitList(v, 0);
+                stack.push_back(v);
             }
+            break;
+
         case 'd': // dict
-            {
-                benc.remove_prefix(1);
+            benc.remove_prefix(1);
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitDict(v, 0);
-                    stack.push_back(v);
-                }
-                break;
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
+            {
+                tr_variantInitDict(v, 0);
+                stack.push_back(v);
             }
+            break;
         case 'e': // end of list or dict
+            benc.remove_prefix(1);
+
+            if (std::empty(stack) || key)
             {
-                benc.remove_prefix(1);
-
-                if (std::empty(stack) || key)
-                {
-                    err = EILSEQ;
-                    break;
-                }
-
-                stack.pop_back();
+                err = EILSEQ;
                 break;
             }
+
+            stack.pop_back();
+            break;
+
         case '0':
         case '1':
         case '2':
