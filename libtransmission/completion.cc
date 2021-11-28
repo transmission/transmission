@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "transmission.h"
@@ -134,13 +135,12 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     size_t const n = block_info_->n_pieces;
     auto pieces = tr_bitfield{ n };
 
-    bool* const flags = new bool[n];
+    auto flags = std::make_unique<bool[]>(n);
     for (tr_piece_index_t piece = 0; piece < n; ++piece)
     {
         flags[piece] = hasPiece(piece);
     }
-    pieces.setFromBools(flags, n);
-    delete[] flags;
+    pieces.setFromBools(flags.get(), n);
 
     return pieces.raw();
 }
