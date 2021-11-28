@@ -134,7 +134,7 @@ public:
     {
     }
 
-    virtual ~tr_torrent() = default;
+    virtual ~tr_torrent() override = default;
 
     void setLocation(
         std::string_view location,
