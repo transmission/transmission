@@ -363,7 +363,7 @@
 		C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5761C3223CC00D62832 /* watchdir.h */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
-		E3184BABAB4709196ED64773 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5FDA439AB6609C092593F98B /* file-piece-map.cc */; };
+		5FDA439AB6609C092593F98B /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5FDA439AB6609C092593F98B /* file-piece-map.cc */; };
 		ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */; };
 		ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */; };
 		ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */; };
@@ -2506,7 +2506,7 @@
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
-				E3184BABAB4709196ED64773 /* file-piece-map.cc in Sources */,
+				5FDA439AB6609C092593F98B /* file-piece-map.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
