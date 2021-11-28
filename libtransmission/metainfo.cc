@@ -23,6 +23,7 @@
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -213,7 +214,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
             }
 
             inf->files[i].length = len;
-            inf->files[i].is_renamed = is_root_adjusted || is_file_adjusted;
+            inf->files[i].priv.is_renamed = is_root_adjusted || is_file_adjusted;
             inf->totalSize += len;
         }
     }
@@ -224,7 +225,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         inf->files = tr_new0(tr_file, 1);
         inf->files[0].name = tr_strndup(root_name.c_str(), std::size(root_name));
         inf->files[0].length = len;
-        inf->files[0].is_renamed = is_root_adjusted;
+        inf->files[0].priv.is_renamed = is_root_adjusted;
         inf->totalSize += len;
     }
     else

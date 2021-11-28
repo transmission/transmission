@@ -1570,7 +1570,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     NSIndexSet* indexSet = node.indexes;
     for (NSInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
-        have += tr_torrentFileProgress(fHandle, index).bytes_completed;
+        have += tr_torrentFile(fHandle, index).have;
     }
 
     return (CGFloat)have / node.size;
@@ -1592,8 +1592,8 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     __block BOOL canChange = NO;
     [indexSet enumerateIndexesWithOptions:NSEnumerationConcurrent usingBlock:^(NSUInteger index, BOOL* stop) {
-        auto const progress = tr_torrentFileProgress(fHandle, index);
-        if (progress.bytes_completed < progress.bytes_total)
+        auto const file = tr_torrentFile(fHandle, index);
+        if (file.have < file.length)
         {
             canChange = YES;
             *stop = YES;
@@ -1607,7 +1607,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
-        if (!fInfo->files[index].dnd || ![self canChangeDownloadCheckForFile:index])
+        auto const file = tr_torrentFile(fHandle, index);
+        if (file.wanted || ![self canChangeDownloadCheckForFile:index])
         {
             onState = YES;
         }
@@ -1657,7 +1658,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
     {
-        if (priority == fInfo->files[index].priority && [self canChangeDownloadCheckForFile:index])
+        if (priority == tr_torrentFile(fHandle, index).priority && [self canChangeDownloadCheckForFile:index])
         {
             return YES;
         }
@@ -1677,7 +1678,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             continue;
         }
 
-        tr_priority_t const priority = fInfo->files[index].priority;
+        auto const priority = tr_torrentFile(fHandle, index).priority;
         switch (priority)
         {
         case TR_PRI_LOW:
@@ -1943,9 +1944,9 @@ bool trashDataFile(char const* filename, tr_error** error)
 
         for (NSInteger i = 0; i < count; i++)
         {
-            tr_file* file = &fInfo->files[i];
+            auto const file = tr_torrentFile(fHandle, i);
 
-            NSString* fullPath = @(file->name);
+            NSString* fullPath = @(file.name);
             NSArray* pathComponents = fullPath.pathComponents;
 
             if (!tempNode)
@@ -1956,7 +1957,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             [self insertPathForComponents:pathComponents
                        withComponentIndex:1
                                 forParent:tempNode
-                                 fileSize:file->length
+                                 fileSize:file.length
                                     index:i
                                  flatList:flatFileList];
         }

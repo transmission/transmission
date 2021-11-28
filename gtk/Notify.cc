@@ -105,9 +105,8 @@ void g_signal_callback(
         }
         else if (action == "file")
         {
-            auto const* inf = tr_torrentInfo(tor);
             char const* dir = tr_torrentGetDownloadDir(tor);
-            auto const path = Glib::build_filename(dir, inf->files[0].name);
+            auto const path = Glib::build_filename(dir, tr_torrentFile(tor, 0).name);
             gtr_open_file(path);
         }
         else if (action == "start-now")
@@ -193,9 +192,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
     {
-        auto const* inf = tr_torrentInfo(tor);
-
-        if (inf->fileCount == 1)
+        if (tr_torrentFileCount(tor) == 1)
         {
             actions.push_back("file");
             actions.push_back(_("Open File"));

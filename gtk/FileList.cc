@@ -151,12 +151,12 @@ bool refreshFilesForeach(
     if (is_file)
     {
         auto const* tor = refresh_data.tor;
-        auto const* inf = tr_torrentInfo(tor);
-        int const enabled = inf->files[index].dnd ? 0 : 1;
-        int const priority = inf->files[index].priority;
-        auto const progress = tr_torrentFileProgress(tor, index);
-        uint64_t const have = progress.bytes_completed;
-        int const prog = std::clamp(int(100 * progress.progress), 0, 100);
+        auto const file = tr_torrentFile(tor, index);
+        int const enabled = file.wanted;
+        int const priority = file.priority;
+        auto const progress = file.progress;
+        uint64_t const have = file.have;
+        int const prog = std::clamp(int(100 * progress), 0, 100);
 
         if (priority != old_priority || enabled != old_enabled || have != old_have || prog != old_prog)
         {
@@ -425,9 +425,9 @@ void buildTree(FileRowNode& node, build_data& build)
 
     auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DIRECTORY_MIME_TYPE;
     auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
-    auto const* inf = tr_torrentInfo(build.tor);
-    int const priority = isLeaf ? inf->files[child_data.index].priority : 0;
-    bool const enabled = isLeaf ? !inf->files[child_data.index].dnd : true;
+    auto const file = tr_torrentFile(build.tor, child_data.index);
+    int const priority = isLeaf ? file.priority : 0;
+    bool const enabled = isLeaf ? file.wanted : true;
     auto name_esc = Glib::Markup::escape_text(child_data.name);
 
     auto const child_iter = build.store->append(build.iter->children());
@@ -490,13 +490,12 @@ void FileList::Impl::set_torrent(int torrentId)
         root_data.index = -1;
         root_data.length = 0;
 
-        auto const* inf = tr_torrentInfo(tor);
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
+        for (tr_file_index_t i = 0, n_files = tr_torrentFileCount(tor); i < n_files; ++i)
         {
             auto* parent = &root;
-            auto const* const file = &inf->files[i];
+            auto const file = tr_torrentFile(tor, i);
 
-            for (char const *last = file->name, *next = strchr(last, '/'); last != nullptr;
+            for (char const *last = file.name, *next = strchr(last, '/'); last != nullptr;
                  last = next != nullptr ? next + 1 : nullptr, next = last != nullptr ? strchr(last, '/') : nullptr)
             {
                 bool const isLeaf = next == nullptr;
@@ -509,7 +508,7 @@ void FileList::Impl::set_torrent(int torrentId)
                     auto& row = node->data();
                     row.name = std::move(name);
                     row.index = isLeaf ? (int)i : -1;
-                    row.length = isLeaf ? file->length : 0;
+                    row.length = isLeaf ? file.length : 0;
                     parent->append(*node);
                 }
 

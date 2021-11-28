@@ -51,7 +51,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
     while (!*stopFlag && piece < tor->info.pieceCount)
     {
-        tr_file const* file = &tor->info.files[fileIndex];
+        auto const file_length = tor->info.files[fileIndex].length;
 
         /* if we're starting a new piece... */
         if (piecePos == 0)
@@ -71,7 +71,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
         /* figure out how much we can read this pass */
         uint64_t leftInPiece = tor->pieceSize(piece) - piecePos;
-        uint64_t leftInFile = file->length - filePos;
+        uint64_t leftInFile = file_length - filePos;
         uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
         bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
 

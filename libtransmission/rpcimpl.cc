@@ -382,27 +382,25 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
 
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
-    auto const* const info = tr_torrentInfo(tor);
-    for (tr_file_index_t i = 0; i < info->fileCount; ++i)
+    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
     {
-        auto const* const file = &info->files[i];
-        tr_variant* const d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, tr_torrentFileProgress(tor, i).bytes_completed);
-        tr_variantDictAddInt(d, TR_KEY_priority, file->priority);
-        tr_variantDictAddBool(d, TR_KEY_wanted, !file->dnd);
+        auto const file = tr_torrentFile(tor, i);
+        tr_variant* d = tr_variantListAddDict(list, 3);
+        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.length);
+        tr_variantDictAddInt(d, TR_KEY_priority, file.priority);
+        tr_variantDictAddBool(d, TR_KEY_wanted, file.wanted);
     }
 }
 
 static void addFiles(tr_torrent const* tor, tr_variant* list)
 {
-    auto const* const info = tr_torrentInfo(tor);
-    for (tr_file_index_t i = 0; i < info->fileCount; ++i)
+    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
     {
-        tr_file const* file = &info->files[i];
+        auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, tr_torrentFileProgress(tor, i).bytes_completed);
-        tr_variantDictAddInt(d, TR_KEY_length, file->length);
-        tr_variantDictAddStr(d, TR_KEY_name, file->name);
+        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_length, file.length);
+        tr_variantDictAddStr(d, TR_KEY_name, file.name);
     }
 }
 
@@ -570,16 +568,16 @@ static void initField(
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, inf->fileCount);
+        tr_variantInitInt(initme, tr_torrentFileCount(tor));
         break;
 
     case TR_KEY_files:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tr_torrentFileCount(tor));
         addFiles(tor, initme);
         break;
 
     case TR_KEY_fileStats:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tr_torrentFileCount(tor));
         addFileStats(tor, initme);
         break;
 
@@ -715,12 +713,14 @@ static void initField(
         break;
 
     case TR_KEY_priorities:
-        tr_variantInitList(initme, inf->fileCount);
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_variantListAddInt(initme, inf->files[i].priority);
+            auto const n = tr_torrentFileCount(tor);
+            tr_variantInitList(initme, n);
+            for (tr_file_index_t i = 0; i < n; ++i)
+            {
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).priority);
+            }
         }
-
         break;
 
     case TR_KEY_queuePosition:
@@ -823,13 +823,14 @@ static void initField(
         break;
 
     case TR_KEY_wanted:
-        tr_variantInitList(initme, inf->fileCount);
-
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_variantListAddInt(initme, inf->files[i].dnd ? 0 : 1);
+            auto const n = tr_torrentFileCount(tor);
+            tr_variantInitList(initme, n);
+            for (tr_file_index_t i = 0; i < n; ++i)
+            {
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted);
+            }
         }
-
         break;
 
     case TR_KEY_webseeds:
