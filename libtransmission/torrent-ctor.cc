@@ -131,8 +131,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
         return EILSEQ;
     }
 
-    int const err = parseMetainfoContents(ctor);
-    if (err)
+    if (int const err = parseMetainfoContents(ctor); err != 0)
     {
         clearMetainfo(ctor);
         return err;
