@@ -167,8 +167,7 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info,
 
             // don't request from too many peers
             size_t const n_peers = peer_info.countActiveRequests(block);
-            size_t const max_peers = peer_info.isEndgame() ? 2 : 1;
-            if (n_peers >= max_peers)
+            if (size_t const max_peers = peer_info.isEndgame() ? 2 : 1; n_peers >= max_peers)
             {
                 continue;
             }
