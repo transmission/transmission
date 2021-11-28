@@ -386,7 +386,7 @@ static void addFileStats(tr_torrent const* tor, tr_variant* list)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.length);
+        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
         tr_variantDictAddInt(d, TR_KEY_priority, file.priority);
         tr_variantDictAddBool(d, TR_KEY_wanted, file.wanted);
     }
