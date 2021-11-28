@@ -592,48 +592,6 @@ static constexpr void initFilePieces(tr_torrent* tor, tr_file_index_t fileIndex)
     file.priv.lastPiece = tor->pieceOf(last_byte);
 }
 
-static constexpr bool pieceHasFile(tr_piece_index_t piece, tr_file const* file)
-{
-    return file->priv.firstPiece <= piece && piece <= file->priv.lastPiece;
-}
-
-static tr_priority_t calculatePiecePriority(tr_info const& info, tr_piece_index_t piece, tr_file_index_t file_hint)
-{
-    // safeguard against a bad arg
-    file_hint = std::min(file_hint, info.fileCount - 1);
-
-    // find the first file with data in this piece
-    tr_file_index_t first = file_hint;
-    while (first > 0 && pieceHasFile(piece, &info.files[first - 1]))
-    {
-        --first;
-    }
-
-    // the priority is the max of all the file priorities in the piece
-    tr_priority_t priority = TR_PRI_LOW;
-    for (tr_file_index_t i = first; i < info.fileCount; ++i)
-    {
-        tr_file const* file = &info.files[i];
-
-        if (!pieceHasFile(piece, file))
-        {
-            break;
-        }
-
-        priority = std::max(priority, file->priv.priority);
-
-        /* When dealing with multimedia files, getting the first and
-           last pieces can sometimes allow you to preview it a bit
-           before it's fully downloaded... */
-        if ((file->priv.priority >= TR_PRI_NORMAL) && (file->priv.firstPiece == piece || file->priv.lastPiece == piece))
-        {
-            priority = TR_PRI_HIGH;
-        }
-    }
-
-    return priority;
-}
-
 static void tr_torrentInitFilePieces(tr_torrent* tor)
 {
     uint64_t offset = 0;
@@ -646,40 +604,6 @@ static void tr_torrentInitFilePieces(tr_torrent* tor)
         offset += inf->files[f].length;
         initFilePieces(tor, f);
     }
-}
-
-static void tr_torrentInitPiecePriorities(tr_torrent* tor)
-{
-    tor->piece_priorities_.clear();
-
-    // throw away file prorities once we're done downloading,
-    // they just waste time & space
-    if (tr_torrentIsSeed(tor))
-    {
-        return;
-    }
-
-    /* build the array of first-file hints to give calculatePiecePriority */
-    tr_info* inf = &tor->info;
-    tr_file_index_t* firstFiles = tr_new(tr_file_index_t, inf->pieceCount);
-    tr_file_index_t f = 0;
-
-    for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
-    {
-        while (inf->files[f].priv.lastPiece < p)
-        {
-            ++f;
-        }
-
-        firstFiles[p] = f;
-    }
-
-    for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
-    {
-        tor->setPiecePriority(p, calculatePiecePriority(*inf, p, firstFiles[p]));
-    }
-
-    tr_free(firstFiles);
 }
 
 static void torrentStart(tr_torrent* tor, bool bypass_queue);
@@ -752,6 +676,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     static int nextUniqueId = 1;
 
+    tor->fpm_.reset(tor->info);
+    tor->file_priorities_.reset(&tor->fpm_);
+
     tor->session = session;
     tor->uniqueId = nextUniqueId++;
     tor->queuePosition = tr_sessionCountTorrents(session);
@@ -814,7 +741,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_ctorInitTorrentPriorities(ctor, tor);
     tr_ctorInitTorrentWanted(ctor, tor);
-    tr_torrentInitPiecePriorities(tor);
 
     refreshCurrentDir(tor);
 
@@ -1315,7 +1241,7 @@ tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t i)
 
     auto const& file = torrent->info.files[i];
     auto const* const name = file.name;
-    auto const priority = file.priv.priority;
+    auto const priority = torrent->file_priorities_.filePriority(i);
     auto const wanted = !file.priv.dnd;
     auto const length = file.length;
 
@@ -2056,61 +1982,6 @@ void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func fun
 
     tor->metadata_func = func;
     tor->metadata_func_user_data = user_data;
-}
-
-/**
-***  File priorities
-**/
-
-void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(fileIndex < tor->info.fileCount);
-    TR_ASSERT(tr_isPriority(priority));
-
-    auto& info = tor->info;
-    tr_file* file = &info.files[fileIndex];
-
-    file->priv.priority = priority;
-
-    for (tr_piece_index_t i = file->priv.firstPiece; i <= file->priv.lastPiece; ++i)
-    {
-        tor->setPiecePriority(i, calculatePiecePriority(info, i, fileIndex));
-    }
-}
-
-void tr_torrentSetFilePriorities(
-    tr_torrent* tor,
-    tr_file_index_t const* files,
-    tr_file_index_t fileCount,
-    tr_priority_t priority)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    for (tr_file_index_t i = 0; i < fileCount; ++i)
-    {
-        if (files[i] < tor->info.fileCount)
-        {
-            tr_torrentInitFilePriority(tor, files[i], priority);
-        }
-    }
-
-    tr_torrentSetDirty(tor);
-}
-
-tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tr_priority_t* p = tr_new0(tr_priority_t, tor->info.fileCount);
-
-    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
-    {
-        p[i] = tor->info.files[i].priv.priority;
-    }
-
-    return p;
 }
 
 /**
@@ -3566,4 +3437,13 @@ void tr_torrent::swapMetainfo(tr_metainfo_parsed& parsed)
     std::swap(this->info, parsed.info);
     std::swap(this->piece_checksums_, parsed.pieces);
     std::swap(this->infoDictLength, parsed.info_dict_length);
+}
+
+void tr_torrentSetFilePriorities(
+    tr_torrent* tor,
+    tr_file_index_t const* files,
+    tr_file_index_t fileCount,
+    tr_priority_t priority)
+{
+    tor->setFilePriorities(files, fileCount, priority);
 }

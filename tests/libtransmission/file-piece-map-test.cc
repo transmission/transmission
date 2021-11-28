@@ -90,7 +90,7 @@ TEST_F(FilePieceMapTest, pieceSpan)
 TEST_F(FilePieceMapTest, priorities)
 {
     auto const fpm = tr_file_piece_map{ block_info_, std::data(FileSizes), std::size(FileSizes) };
-    auto file_priorities = tr_file_priorities(fpm);
+    auto file_priorities = tr_file_priorities(&fpm);
     tr_file_index_t const n_files = std::size(FileSizes);
 
     // make a helper to compare file & piece priorities

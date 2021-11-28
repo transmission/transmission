@@ -15,7 +15,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -90,8 +89,6 @@ void tr_torrentGetBlockLocation(
     uint32_t* length);
 
 tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t const file);
-
-void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
@@ -246,34 +243,21 @@ public:
 
     /// PRIORITIES
 
-    void setPiecePriority(tr_piece_index_t piece, tr_priority_t priority)
-    {
-        // since 'TR_PRI_NORMAL' is by far the most common, save some
-        // space by treating anything not in the map as normal
-        if (priority == TR_PRI_NORMAL)
-        {
-            piece_priorities_.erase(piece);
-
-            if (std::empty(piece_priorities_))
-            {
-                // ensure we release piece_priorities_' internal memory
-                piece_priorities_ = decltype(piece_priorities_){};
-            }
-        }
-        else
-        {
-            piece_priorities_[piece] = priority;
-        }
-    }
-
     tr_priority_t piecePriority(tr_piece_index_t piece) const
     {
-        auto const it = piece_priorities_.find(piece);
-        if (it == std::end(piece_priorities_))
-        {
-            return TR_PRI_NORMAL;
-        }
-        return it->second;
+        return file_priorities_.piecePriority(piece);
+    }
+
+    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
+    {
+        file_priorities_.set(files, fileCount, priority);
+        setDirty();
+    }
+
+    void setFilePriority(tr_file_index_t file, tr_priority_t priority)
+    {
+        file_priorities_.set(file, priority);
+        setDirty();
     }
 
     /// CHECKSUMS
@@ -360,8 +344,6 @@ public:
     int const magicNumber = MagicNumber;
 
     std::optional<double> verify_progress;
-
-    std::unordered_map<tr_piece_index_t, tr_priority_t> piece_priorities_;
 
     tr_stat_errtype error = TR_STAT_OK;
     char errorString[128] = {};
@@ -492,8 +474,8 @@ public:
 
     static auto constexpr MagicNumber = int{ 95549 };
 
-    tr_file_piece_map fpm_ = tr_file_piece_map{ *this, info };
-    tr_file_priorities file_priorities_{ fpm_ };
+    tr_file_piece_map fpm_ = tr_file_piece_map{ info };
+    tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ fpm_ };
 
 private:

@@ -188,20 +188,9 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    for (auto file_index : ctor->low)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_LOW);
-    }
-
-    for (auto file_index : ctor->normal)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_NORMAL);
-    }
-
-    for (auto file_index : ctor->high)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_HIGH);
-    }
+    tor->setFilePriorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
+    tor->setFilePriorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
+    tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)

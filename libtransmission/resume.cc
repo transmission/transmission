@@ -232,7 +232,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
             auto priority = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &priority))
             {
-                tr_torrentInitFilePriority(tor, i, priority);
+                tor->setFilePriority(i, priority);
             }
         }
 

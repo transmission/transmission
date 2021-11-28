@@ -983,11 +983,11 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 
 static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
 {
-    int fileCount = 0;
-    size_t const n = tr_variantListSize(list);
     char const* errmsg = nullptr;
-    tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto files = std::vector<tr_file_index_t>{};
+    files.reserve(tr_torrentFileCount(tor));
 
+    size_t const n = tr_variantListSize(list);
     if (n != 0)
     {
         for (size_t i = 0; i < n; ++i)
@@ -997,7 +997,7 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
             {
                 if (0 <= tmp && tmp < tor->info.fileCount)
                 {
-                    files[fileCount++] = tmp;
+                    files.push_back(tmp);
                 }
                 else
                 {
@@ -1006,20 +1006,16 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
             }
         }
     }
-    else /* if empty set, apply to all */
+    else // if empty set, apply to all
     {
         for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
         {
-            files[fileCount++] = t;
+            files.push_back(t);
         }
     }
 
-    if (fileCount != 0)
-    {
-        tr_torrentSetFilePriorities(tor, files, fileCount, priority);
-    }
+    tor->setFilePriorities(std::data(files), std::size(files), priority);
 
-    tr_free(files);
     return errmsg;
 }
 
