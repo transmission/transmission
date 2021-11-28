@@ -53,7 +53,7 @@ static int readOrWriteBytes(
     bool const doWrite = ioMode >= TR_IO_WRITE;
 
     TR_ASSERT(fileIndex < tr_torrentFileCount(tor));
-    auto const file = tr_torrentFile(tor, fileIndex);
+    auto const& file = tor->info.files[fileIndex];
     TR_ASSERT(file.length == 0 || fileOffset < file.length);
     TR_ASSERT(fileOffset + buflen <= file.length);
 
@@ -91,8 +91,9 @@ static int readOrWriteBytes(
         {
             /* open (and maybe create) the file */
             auto const filename = tr_strvPath(base, subpath);
-            tr_preallocation_mode const prealloc = (!file.wanted || !doWrite) ? TR_PREALLOCATE_NONE :
-                                                                                tor->session->preallocationMode;
+            tr_preallocation_mode const prealloc = (!doWrite || !tor->fileIsWanted(fileIndex)) ?
+                TR_PREALLOCATE_NONE :
+                tor->session->preallocationMode;
 
             fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file.length);
             if (fd == TR_BAD_SYS_FILE)
