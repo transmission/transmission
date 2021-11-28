@@ -506,8 +506,8 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 ***
 *** 1. tr_swarm::active_requests, an opaque class that tracks what requests
 ***    we currently have, i.e. which blocks and from which peers.
-***    This is used for (a) cancelling requests that have been waiting
-***    for too long and (b) avoiding duplicate requests.
+***    This is used for cancelling requests that have been waiting
+***    for too long and avoiding duplicate requests.
 ***
 *** 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
 ***    pieces that we want to request. It's used to decide which blocks to
