@@ -192,9 +192,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
     {
-        auto const* inf = tr_torrentInfo(tor);
-
-        if (inf->fileCount == 1)
+        if (tr_torrentFileCount(tor) == 1)
         {
             actions.push_back("file");
             actions.push_back(_("Open File"));

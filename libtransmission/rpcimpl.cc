@@ -570,16 +570,16 @@ static void initField(
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, inf->fileCount);
+        tr_variantInitInt(initme, tr_torrentFileCount(tor));
         break;
 
     case TR_KEY_files:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tr_torrentFileCount(tor));
         addFiles(tor, initme);
         break;
 
     case TR_KEY_fileStats:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tr_torrentFileCount(tor));
         addFileStats(tor, initme);
         break;
 

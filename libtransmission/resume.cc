@@ -490,9 +490,9 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    size_t const n = inf->fileCount;
+    size_t const n = tr_torrentFileCount(tor);
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
-    for (auto const *file = inf->files, *end = file + inf->fileCount; file != end; ++file)
+    for (auto const *file = inf->files, *end = file + n; file != end; ++file)
     {
         tr_variantListAddInt(l, file->priv.mtime);
     }
@@ -535,14 +535,14 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
     auto ret = uint64_t{};
     tr_info const* inf = tr_torrentInfo(tor);
 
-    tr_variant* prog = nullptr;
-    if (tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
+    if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
         /// CHECKED PIECES
 
         auto checked = tr_bitfield(inf->pieceCount);
         auto mtimes = std::vector<time_t>{};
-        mtimes.reserve(inf->fileCount);
+        auto const n_files = tr_torrentFileCount(tor);
+        mtimes.reserve(n_files);
 
         // try to load mtimes
         tr_variant* l = nullptr;
@@ -567,7 +567,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         // maybe it's a .resume file from [2.20 - 3.00] with the per-piece mtimes
         if (tr_variantDictFindList(prog, TR_KEY_time_checked, &l))
         {
-            for (tr_file_index_t fi = 0; fi < inf->fileCount; ++fi)
+            for (tr_file_index_t fi = 0; fi < n_files; ++fi)
             {
                 tr_variant* const b = tr_variantListChild(l, fi);
                 tr_file* const f = &inf->files[fi];
