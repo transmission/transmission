@@ -541,7 +541,6 @@ static int countActiveWebseeds(tr_swarm* s)
 // TODO: if we keep this, add equivalent API to ActiveRequest
 void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
 {
-    // std::cout << __FILE__ << ':' << __LINE__ << " tr_peerMgrClientSentRequests [" << range.begin << "..." << range.end << ')' << std::endl;
     auto const now = tr_time();
 
     for (tr_block_index_t block = span.begin; block < span.end; ++block)
