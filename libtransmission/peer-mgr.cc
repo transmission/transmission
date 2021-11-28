@@ -568,6 +568,8 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         {
         }
 
+        virtual ~PeerInfoImpl() override = default;
+
         bool clientCanRequestBlock(tr_block_index_t block) const override
         {
             return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
