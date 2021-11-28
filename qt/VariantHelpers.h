@@ -77,8 +77,8 @@ template<typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* 
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto sv = std::string_view{};
-    if (tr_variantGetStrView(variant, &sv))
+
+    if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
         ret = QString::fromUtf8(std::data(sv), std::size(sv));
     }
@@ -90,8 +90,8 @@ template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto sv = std::string_view{};
-    if (tr_variantGetStrView(variant, &sv))
+
+    if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
         ret = std::string_view(std::data(sv), std::size(sv));
     }
@@ -181,8 +181,8 @@ template<typename T>
 auto dictFind(tr_variant* dict, tr_quark key)
 {
     std::optional<T> ret;
-    auto const* child = tr_variantDictFind(dict, key);
-    if (child != nullptr)
+
+    if (auto const* child = tr_variantDictFind(dict, key); child != nullptr)
     {
         ret = getValue<T>(child);
     }
