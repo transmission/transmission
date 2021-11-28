@@ -365,8 +365,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr);
-    if (rc < 0)
+    if (int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
     {
         tr_free(nodes6);
         tr_free(nodes);
