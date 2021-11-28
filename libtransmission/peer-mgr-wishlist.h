@@ -31,8 +31,9 @@ public:
         virtual tr_block_span_t blockSpan(tr_piece_index_t) const = 0;
         virtual tr_piece_index_t countAllPieces() const = 0;
         virtual tr_priority_t priority(tr_piece_index_t) const = 0;
+        virtual ~PeerInfo() = default;
     };
 
     // get a list of the next blocks that we should request from a peer
-    std::vector<tr_block_span_t> next(PeerInfo const& peer_info, size_t n_wanted_blocks);
+    std::vector<tr_block_span_t> next(PeerInfo const& peer_info, size_t n_wanted_blocks) const;
 };

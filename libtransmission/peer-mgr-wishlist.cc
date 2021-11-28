@@ -102,7 +102,7 @@ std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
     return candidates;
 }
 
-static std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
@@ -130,7 +130,7 @@ static std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blo
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks) const
 {
     size_t n_blocks = 0;
     auto spans = std::vector<tr_block_span_t>{};
@@ -167,8 +167,7 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info,
 
             // don't request from too many peers
             size_t const n_peers = peer_info.countActiveRequests(block);
-            size_t const max_peers = peer_info.isEndgame() ? 2 : 1;
-            if (n_peers >= max_peers)
+            if (size_t const max_peers = peer_info.isEndgame() ? 2 : 1; n_peers >= max_peers)
             {
                 continue;
             }

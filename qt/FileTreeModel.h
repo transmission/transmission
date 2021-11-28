@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstdint> // uint64_t
+#include <memory>
 
 #include <QAbstractItemModel>
 #include <QMap>
@@ -98,6 +99,6 @@ private:
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
     QMap<int, FileTreeItem*> index_cache_;
-    FileTreeItem* root_item_ = {};
+    std::unique_ptr<FileTreeItem> root_item_;
     bool is_editable_ = {};
 };

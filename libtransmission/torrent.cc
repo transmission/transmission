@@ -7,6 +7,7 @@
  */
 
 #include <algorithm> /* EINVAL */
+#include <array>
 #include <cerrno> /* EINVAL */
 #include <climits> /* INT_MAX */
 #include <cmath>
@@ -1943,7 +1944,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 
-    char const* const cmd[] = {
+    auto const cmd = std::array<char const*, 2>{
         script,
         nullptr,
     };
@@ -1963,7 +1964,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     tr_error* error = nullptr;
 
-    if (!tr_spawn_async(cmd, env, TR_IF_WIN32("\\", "/"), &error))
+    if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
     {
         tr_logAddTorErr(tor, "Error executing script \"%s\" (%d): %s", script, error->code, error->message);
         tr_error_free(error);
