@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.cc */; };
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
-		1BB44E07B1B52E28291B4E3F /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E3F /* file-piece-map.h */; };
+		1BB44E07B1B52E28291B4E3F /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E3F /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E3F /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E3F /* file-piece-map.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
