@@ -26,6 +26,7 @@
 #include "block-info.h"
 #include "completion.h"
 #include "file.h"
+#include "file-piece-map.h"
 #include "quark.h"
 #include "session.h"
 #include "tr-assert.h"
@@ -490,6 +491,10 @@ public:
     tr_labels_t labels;
 
     static auto constexpr MagicNumber = int{ 95549 };
+
+    tr_file_piece_map fpm_ = tr_file_piece_map{ *this, info };
+    tr_file_priorities file_priorities_{ fpm_ };
+    tr_files_wanted files_wanted_{ fpm_ };
 
 private:
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
