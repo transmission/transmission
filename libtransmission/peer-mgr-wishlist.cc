@@ -102,7 +102,7 @@ std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
     return candidates;
 }
 
-static std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
