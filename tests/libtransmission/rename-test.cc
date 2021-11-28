@@ -270,7 +270,7 @@ TEST_F(RenameTest, multifileTorrent)
         "MjpwaWVjZSBsZW5ndGhpMzI3NjhlNjpwaWVjZXMyMDp27buFkmy8ICfNX4nsJmt0Ckm2Ljc6cHJp"
         "dmF0ZWkwZWVl");
     EXPECT_TRUE(tr_isTorrent(tor));
-    auto& files = tor->info.files;
+    auto* files = tor->info.files;
 
     // sanity check the info
     EXPECT_STREQ("Felidae", tor->info.name);
