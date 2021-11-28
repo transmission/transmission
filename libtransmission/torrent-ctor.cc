@@ -46,8 +46,8 @@ struct tr_ctor
 
     std::string incomplete_dir;
 
-    std::vector<tr_file_index_t> want;
-    std::vector<tr_file_index_t> not_want;
+    std::vector<tr_file_index_t> wanted;
+    std::vector<tr_file_index_t> unwanted;
     std::vector<tr_file_index_t> low;
     std::vector<tr_file_index_t> normal;
     std::vector<tr_file_index_t> high;
@@ -195,14 +195,14 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
 {
-    auto& indices = wanted ? ctor->want : ctor->not_want;
+    auto& indices = wanted ? ctor->wanted : ctor->unwanted;
     indices.assign(files, files + fileCount);
 }
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tr_torrentInitFileDLs(tor, std::data(ctor->not_want), std::size(ctor->not_want), false);
-    tr_torrentInitFileDLs(tor, std::data(ctor->want), std::size(ctor->want), true);
+    tor->initFilesWanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
+    tor->initFilesWanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
 }
 
 /***

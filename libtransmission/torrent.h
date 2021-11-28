@@ -56,14 +56,9 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 ***
 **/
 
-/* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
-void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
-
 using tr_labels_t = std::unordered_set<std::string>;
 
 void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
-
-void tr_torrentRecheckCompleteness(tr_torrent*);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
@@ -236,10 +231,36 @@ public:
         completion.setHasPiece(piece, has);
     }
 
-    bool pieceIsDnd(tr_piece_index_t piece) const final
+    /// FILE <-> PIECE
+
+    auto piecesInFile(tr_file_index_t file) const
     {
-        return dnd_pieces_.test(piece);
+        return fpm_.pieceSpan(file);
     }
+
+    /// WANTED
+
+    bool pieceIsWanted(tr_piece_index_t piece) const final
+    {
+        return files_wanted_.pieceWanted(piece);
+    }
+
+    bool fileIsWanted(tr_file_index_t file) const
+    {
+        return files_wanted_.fileWanted(file);
+    }
+
+    void initFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    {
+        setFilesWanted(files, n_files, wanted, /*is_bootstrapping*/ true);
+    }
+
+    void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    {
+        setFilesWanted(files, n_files, wanted, /*is_bootstrapping*/ false);
+    }
+
+    void recheckCompleteness(); // TODO(ckerr): should be private
 
     /// PRIORITIES
 
@@ -295,8 +316,7 @@ public:
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
             {
-                auto const begin = info.files[i].priv.firstPiece;
-                auto const end = info.files[i].priv.lastPiece + 1;
+                auto const [begin, end] = piecesInFile(i);
                 checked_pieces_.unsetSpan(begin, end);
             }
         }
@@ -476,9 +496,23 @@ public:
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ info };
     tr_file_priorities file_priorities_{ &fpm_ };
-    tr_files_wanted files_wanted_{ fpm_ };
+    tr_files_wanted files_wanted_{ &fpm_ };
 
 private:
+    void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
+    {
+        auto const lock = unique_lock();
+
+        files_wanted_.set(files, n_files, wanted);
+        completion.invalidateSizeWhenDone();
+
+        if (!is_bootstrapping)
+        {
+            setDirty();
+            recheckCompleteness();
+        }
+    }
+
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
 

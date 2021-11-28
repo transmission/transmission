@@ -156,38 +156,27 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
-        tr_file_index_t* dl = tr_new(tr_file_index_t, n);
-        tr_file_index_t* dnd = tr_new(tr_file_index_t, n);
-        tr_file_index_t dlCount = 0;
-        tr_file_index_t dndCount = 0;
+        auto wanted = std::vector<tr_file_index_t>{};
+        auto unwanted = std::vector<tr_file_index_t>{};
+        wanted.reserve(n);
+        unwanted.reserve(n);
 
         for (tr_file_index_t i = 0; i < n; ++i)
         {
             auto tmp = false;
             if (tr_variantGetBool(tr_variantListChild(list, i), &tmp) && tmp)
             {
-                dnd[dndCount++] = i;
+                unwanted.push_back(i);
             }
             else
             {
-                dl[dlCount++] = i;
+                wanted.push_back(i);
             }
         }
 
-        if (dndCount != 0)
-        {
-            tr_torrentInitFileDLs(tor, dnd, dndCount, false);
-            tr_logAddTorDbg(tor, "Resume file found %d files listed as dnd", dndCount);
-        }
+        tor->initFilesWanted(std::data(unwanted), std::size(unwanted), false);
+        tor->initFilesWanted(std::data(wanted), std::size(wanted), true);
 
-        if (dlCount != 0)
-        {
-            tr_torrentInitFileDLs(tor, dl, dlCount, true);
-            tr_logAddTorDbg(tor, "Resume file found %d files marked for download", dlCount);
-        }
-
-        tr_free(dnd);
-        tr_free(dl);
         ret = TR_FR_DND;
     }
     else
@@ -570,7 +559,6 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             for (tr_file_index_t fi = 0; fi < n_files; ++fi)
             {
                 tr_variant* const b = tr_variantListChild(l, fi);
-                tr_file* const f = &inf->files[fi];
                 auto time_checked = time_t{};
 
                 if (tr_variantIsInt(b))
@@ -585,8 +573,8 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
                     time_checked = tr_time();
-                    size_t const pieces = f->priv.lastPiece + 1 - f->priv.firstPiece;
-                    for (size_t i = 0; i < pieces; ++i)
+                    auto const [begin, end] = tor->piecesInFile(fi);
+                    for (size_t i = 0, n = end - begin; i < n; ++i)
                     {
                         int64_t piece_time = 0;
                         tr_variantGetInt(tr_variantListChild(b, i + 1), &piece_time);

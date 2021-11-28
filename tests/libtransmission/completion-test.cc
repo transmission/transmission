@@ -27,9 +27,9 @@ struct TestTorrent : public tr_completion::torrent_view
 {
     std::set<tr_piece_index_t> dnd_pieces;
 
-    [[nodiscard]] bool pieceIsDnd(tr_piece_index_t piece) const final
+    [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final
     {
-        return dnd_pieces.count(piece) != 0;
+        return dnd_pieces.count(piece) == 0;
     }
 };
 

@@ -1594,9 +1594,6 @@ struct tr_file_priv
 {
     uint64_t offset; // file begins at the torrent's nth byte
     time_t mtime;
-    tr_piece_index_t firstPiece; // We need pieces [firstPiece...
-    tr_piece_index_t lastPiece; // ...lastPiece] to dl this file
-    bool dnd; // "do not download" flag
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };
 /** @brief a part of tr_info that represents a single file of the torrent's content */

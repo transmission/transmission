@@ -221,7 +221,7 @@ TEST_F(FilePieceMapTest, priorities)
 TEST_F(FilePieceMapTest, wanted)
 {
     auto const fpm = tr_file_piece_map{ block_info_, std::data(FileSizes), std::size(FileSizes) };
-    auto files_wanted = tr_files_wanted(fpm);
+    auto files_wanted = tr_files_wanted(&fpm);
     tr_file_index_t const n_files = std::size(FileSizes);
 
     // make a helper to compare file & piece priorities

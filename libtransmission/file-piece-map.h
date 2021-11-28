@@ -73,14 +73,20 @@ private:
 class tr_files_wanted
 {
 public:
-    explicit tr_files_wanted(tr_file_piece_map const& fpm);
+    explicit tr_files_wanted(tr_file_piece_map const* fpm)
+        : wanted_(std::size(*fpm))
+    {
+        reset(fpm);
+    }
+    void reset(tr_file_piece_map const* fpm);
+
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] tr_priority_t fileWanted(tr_file_index_t file) const;
-    [[nodiscard]] tr_priority_t pieceWanted(tr_piece_index_t piece) const;
+    [[nodiscard]] bool fileWanted(tr_file_index_t file) const;
+    [[nodiscard]] bool pieceWanted(tr_piece_index_t piece) const;
 
 private:
-    tr_file_piece_map const& fpm_;
+    tr_file_piece_map const* fpm_;
     tr_bitfield wanted_;
 };

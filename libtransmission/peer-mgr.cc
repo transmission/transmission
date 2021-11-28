@@ -577,7 +577,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return !torrent_->pieceIsDnd(piece) && peer_->have.test(piece);
+            return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
         }
 
         bool isEndgame() const override
@@ -1694,7 +1694,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (size_t i = 0; i < n_pieces; ++i)
     {
-        if (!tor->pieceIsDnd(i) && have.at(i))
+        if (tor->pieceIsWanted(i) && have.at(i))
         {
             desired_available += tor->countMissingBytesInPiece(i);
         }
@@ -2022,7 +2022,7 @@ static void rechokeDownloads(tr_swarm* s)
 
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = !tor->pieceIsDnd(i) && !tor->hasPiece(i);
+            piece_is_interesting[i] = tor->pieceIsWanted(i) && !tor->hasPiece(i);
         }
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
@@ -2703,7 +2703,7 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
         if (tor->swarm->needsCompletenessCheck)
         {
             tor->swarm->needsCompletenessCheck = false;
-            tr_torrentRecheckCompleteness(tor);
+            tor->recheckCompleteness();
         }
 
         /* stop torrents that are ready to stop, but couldn't be stopped
