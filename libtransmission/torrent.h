@@ -161,7 +161,6 @@ public:
     // private:
     void swapMetainfo(tr_metainfo_parsed& parsed);
 
-public:
     auto unique_lock() const
     {
         return session->unique_lock();
@@ -337,7 +336,6 @@ public:
 
     std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
-public:
     tr_info info = {};
 
     tr_bitfield dnd_pieces_ = tr_bitfield{ 0 };
