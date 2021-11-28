@@ -195,7 +195,7 @@ static void canReadWrapper(tr_peerIo* io)
 
     tr_peerIoRef(io);
 
-    tr_session* const session = io->session;
+    tr_session const* const session = io->session;
 
     /* try to consume the input buffer */
     if (io->canRead != nullptr)
