@@ -490,8 +490,7 @@ void FileList::Impl::set_torrent(int torrentId)
         root_data.index = -1;
         root_data.length = 0;
 
-        auto const n_files = tr_torrentFileCount(tor);
-        for (tr_file_index_t i = 0; i < n_files; ++i)
+        for (tr_file_index_t i = 0, n_files = tr_torrentFileCount(tor); i < n_files; ++i)
         {
             auto* parent = &root;
             auto const file = tr_torrentFile(tor, i);

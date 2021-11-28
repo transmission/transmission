@@ -382,8 +382,7 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
 
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
-    auto const n = tr_torrentFileCount(tor);
-    for (tr_file_index_t i = 0; i < n; ++i)
+    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
@@ -395,8 +394,7 @@ static void addFileStats(tr_torrent const* tor, tr_variant* list)
 
 static void addFiles(tr_torrent const* tor, tr_variant* list)
 {
-    auto const n = tr_torrentFileCount(tor);
-    for (tr_file_index_t i = 0; i < n; ++i)
+    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);

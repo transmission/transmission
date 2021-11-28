@@ -1533,11 +1533,22 @@ double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
 
 struct tr_file_view
 {
+    // This file's name. Includes the full subpath in the torrent.
     char const* name;
+
+    // the current size of the file, i.e. how much we've downloaded
     uint64_t have;
+
+    // the total size of the file
     uint64_t length;
+
+    // have / length
     double progress;
+
+    // the file's priority
     tr_priority_t priority;
+
+    // do we want to download this file?
     bool wanted;
 };
 

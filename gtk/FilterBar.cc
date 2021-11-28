@@ -627,8 +627,7 @@ bool testText(tr_torrent const* tor, Glib::ustring const* key)
         ret = Glib::ustring(tr_torrentName(tor)).casefold().find(*key) != Glib::ustring::npos;
 
         /* test the files... */
-        auto const n = tr_torrentFileCount(tor);
-        for (tr_file_index_t i = 0; i < n && !ret; ++i)
+        for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n && !ret; ++i)
         {
             ret = Glib::ustring(tr_torrentFile(tor, i).name).casefold().find(*key) != Glib::ustring::npos;
         }
