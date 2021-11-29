@@ -121,7 +121,6 @@
 		A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFB810FB66EF30009BD3E /* Carbon.framework */; };
 		A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCA60FC24ED80009BD3E /* tr-dht.cc */; };
 		A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCA70FC24ED80009BD3E /* tr-dht.h */; };
-		4C027923C7C292AD6F509232 /* strf.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C027923C7C292AD6F509231 /* strf.h */; };
 		A22CFCC20FC24F890009BD3E /* dht.h in Headers */ = {isa = PBXBuildFile; fileRef = A22CFCC00FC24F890009BD3E /* dht.h */; };
 		A22CFCC30FC24F890009BD3E /* dht.c in Sources */ = {isa = PBXBuildFile; fileRef = A22CFCC10FC24F890009BD3E /* dht.c */; };
 		A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22CFCBA0FC24F710009BD3E /* libdht.a */; };
@@ -668,7 +667,6 @@
 		A22CFCA60FC24ED80009BD3E /* tr-dht.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-dht.cc"; sourceTree = "<group>"; };
 		A22CFCA70FC24ED80009BD3E /* tr-dht.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "tr-dht.h"; sourceTree = "<group>"; };
 		A22CFCBA0FC24F710009BD3E /* libdht.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdht.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C027923C7C292AD6F509231 /* strf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = strf.h; sourceTree = "<group>"; };
 		A22CFCC00FC24F890009BD3E /* dht.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dht.h; sourceTree = "<group>"; };
 		A22CFCC10FC24F890009BD3E /* dht.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dht.c; sourceTree = "<group>"; };
 		A22F1E540E7DA8030065DB9D /* sparkle_dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = sparkle_dsa_pub.pem; sourceTree = "<group>"; };
@@ -1300,7 +1298,6 @@
 				C15E58AC219A37C600AB292F /* utils */,
 				C1A7518626ED04EC0038B90A /* arc4 */,
 				A22CFCB50FC24F630009BD3E /* dht */,
-				4C027923C7C292AD6F509230 /* strf */,
 				A2E384BF130DFA49001F501B /* libutp */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
@@ -1553,15 +1550,6 @@
 			);
 			name = CLI;
 			path = cli;
-			sourceTree = "<group>";
-		};
-		4C027923C7C292AD6F509230 /* strf */ = {
-			isa = PBXGroup;
-			children = (
-				4C027923C7C292AD6F509231 /* strf.h */,
-			);
-			name = strf;
-			path = "third-party/strf";
 			sourceTree = "<group>";
 		};
 		A22CFCB50FC24F630009BD3E /* dht */ = {
@@ -3046,6 +3034,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3239,6 +3228,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3489,6 +3479,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
