@@ -31,4 +31,4 @@
 [submodule "third-party/strf"]
 	path = third-party/strf
 	url = https://github.com/transmission/strf.git
-	branch = v0.15.3
+	branch = 0-15-x
