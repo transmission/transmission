@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A6169A50FE5C9A200C66CE6 /* bitfield.cc */; };
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
+		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
+		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ =  {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
@@ -492,6 +494,8 @@
 /* Begin PBXFileReference section */
 		0A6169A50FE5C9A200C66CE6 /* bitfield.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bitfield.cc; sourceTree = "<group>"; };
 		0A6169A60FE5C9A200C66CE6 /* bitfield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitfield.h; sourceTree = "<group>"; };
+		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file-piece-map.cc; sourceTree = "<group>"; };
+		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = file-piece-map.h; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
@@ -1396,6 +1400,8 @@
 				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.cc */,
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
+				1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */,
+				1BB44E07B1B52E28291B4E31 /* file-piece-map.h */,
 				C1425B321EE9C5EA001DB85F /* tr-assert.cc */,
 				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
@@ -1883,6 +1889,7 @@
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
+				1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */,
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
 				ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */,
 				4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */,
@@ -2479,6 +2486,7 @@
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
+				1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */,
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.cc in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */,

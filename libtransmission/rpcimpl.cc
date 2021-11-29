@@ -13,6 +13,7 @@
 #include <cstdlib> /* strtol */
 #include <cstring> /* strcmp */
 #include <iterator>
+#include <numeric>
 #include <string_view>
 #include <vector>
 
@@ -983,11 +984,11 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 
 static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
 {
-    int fileCount = 0;
-    size_t const n = tr_variantListSize(list);
     char const* errmsg = nullptr;
-    tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto files = std::vector<tr_file_index_t>{};
+    files.reserve(tr_torrentFileCount(tor));
 
+    size_t const n = tr_variantListSize(list);
     if (n != 0)
     {
         for (size_t i = 0; i < n; ++i)
@@ -997,7 +998,7 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
             {
                 if (0 <= tmp && tmp < tor->info.fileCount)
                 {
-                    files[fileCount++] = tmp;
+                    files.push_back(tmp);
                 }
                 else
                 {
@@ -1006,41 +1007,39 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
             }
         }
     }
-    else /* if empty set, apply to all */
+    else // if empty set, apply to all
     {
         for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
         {
-            files[fileCount++] = t;
+            files.push_back(t);
         }
     }
 
-    if (fileCount != 0)
-    {
-        tr_torrentSetFilePriorities(tor, files, fileCount, priority);
-    }
+    tor->setFilePriorities(std::data(files), std::size(files), priority);
 
-    tr_free(files);
     return errmsg;
 }
 
-static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* list)
+static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 {
     char const* errmsg = nullptr;
 
-    int fileCount = 0;
-    size_t const n = tr_variantListSize(list);
-    tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto const n_files = tr_torrentFileCount(tor);
+    size_t const n_items = tr_variantListSize(list);
 
-    if (n != 0) /* if argument list, process them */
+    auto files = std::vector<tr_file_index_t>{};
+    files.reserve(n_files);
+
+    if (n_items != 0) // if argument list, process them
     {
-        for (size_t i = 0; i < n; ++i)
+        for (size_t i = 0; i < n_items; ++i)
         {
             auto tmp = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
                 if (0 <= tmp && tmp < tor->info.fileCount)
                 {
-                    files[fileCount++] = tmp;
+                    files.push_back(tmp);
                 }
                 else
                 {
@@ -1049,20 +1048,14 @@ static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* lis
             }
         }
     }
-    else /* if empty set, apply to all */
+    else // if empty set, apply to all
     {
-        for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
-        {
-            files[fileCount++] = t;
-        }
+        files.resize(n_files);
+        std::iota(std::begin(files), std::end(files), 0);
     }
 
-    if (fileCount != 0)
-    {
-        tr_torrentSetFileDLs(tor, files, fileCount, do_download);
-    }
+    tor->setFilesWanted(std::data(files), std::size(files), wanted);
 
-    tr_free(files);
     return errmsg;
 }
 

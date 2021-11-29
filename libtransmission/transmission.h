@@ -1188,15 +1188,6 @@ void tr_torrentSetFilePriorities(
     tr_file_index_t fileCount,
     tr_priority_t priority);
 
-/**
- * @brief Get this torrent's file priorities.
- *
- * @return A malloc()ed array of tor->info.fileCount items,
- *         each holding a TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
- *         It's the caller's responsibility to free() this.
- */
-tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* torrent);
-
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
 
@@ -1603,10 +1594,6 @@ struct tr_file_priv
 {
     uint64_t offset; // file begins at the torrent's nth byte
     time_t mtime;
-    tr_piece_index_t firstPiece; // We need pieces [firstPiece...
-    tr_piece_index_t lastPiece; // ...lastPiece] to dl this file
-    int8_t priority; // TR_PRI_HIGH, _NORMAL, or _LOW
-    bool dnd; // "do not download" flag
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };
 /** @brief a part of tr_info that represents a single file of the torrent's content */

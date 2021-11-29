@@ -9,6 +9,7 @@ add_executable(libtransmission-test
     crypto-test.cc
     error-test.cc
     file-test.cc
+    file-piece-map-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
