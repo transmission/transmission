@@ -3034,7 +3034,6 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
-					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3228,7 +3227,6 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
-					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3479,7 +3477,6 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
-					"third-party/strf",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
