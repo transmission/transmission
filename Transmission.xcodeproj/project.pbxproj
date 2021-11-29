@@ -1558,7 +1558,6 @@
 		4C027923C7C292AD6F509230 /* strf */ = {
 			isa = PBXGroup;
 			children = (
-			mmm
 				4C027923C7C292AD6F509231 /* strf.h */,
 			);
 			name = strf;
