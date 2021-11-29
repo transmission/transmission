@@ -244,6 +244,7 @@ include_directories(
 
 include_directories(
     SYSTEM
+    ${STRF_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}

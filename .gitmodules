@@ -28,3 +28,7 @@
 [submodule "third-party/googletest"]
 	path = third-party/googletest
 	url = https://github.com/google/googletest.git
+[submodule "third-party/strf"]
+	path = third-party/strf
+	url = https://github.com/transmission/strf.git
+	branch = v0.15.3

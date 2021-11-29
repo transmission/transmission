@@ -15,6 +15,7 @@
 #include <cstring>
 
 #include <event2/buffer.h> /* evbuffer_add() */
+#include <strf.hpp>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -483,7 +484,10 @@ static void jsonPopParent(struct jsonWalk* data)
 static void jsonIntFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct jsonWalk*>(vdata);
-    evbuffer_add_printf(data->out, "%" PRId64, val->val.i);
+
+    auto buf = std::array<char, 64>{};
+    auto const r = strf::to(std::data(buf), std::size(buf))(strf::dec(val->val.i));
+    evbuffer_add(data->out, std::data(buf), r.ptr - std::data(buf));
     jsonChildFunc(data);
 }
 
@@ -509,11 +513,15 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
-        evbuffer_add_printf(data->out, "%d", (int)val->val.d);
+        auto buf = std::array<char, 64>{};
+        auto const r = strf::to(std::data(buf), std::size(buf))(strf::dec(int(val->val.d)));
+        evbuffer_add(data->out, std::data(buf), r.ptr - std::data(buf));
     }
     else
     {
-        evbuffer_add_printf(data->out, "%.4f", tr_truncd(val->val.d, 4));
+        auto buf = std::array<char, 64>{};
+        auto const r = strf::to(std::data(buf), std::size(buf))(strf::fixed(val->val.d, 4));
+        evbuffer_add(data->out, std::data(buf), r.ptr - std::data(buf));
     }
 
     jsonChildFunc(data);

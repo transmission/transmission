@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cstdlib>
 #include <cctype> /* isdigit() */
 #include <deque>
@@ -15,6 +16,7 @@
 #include <string_view>
 #include <optional>
 
+#include <strf.hpp>
 #include <event2/buffer.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -299,8 +301,11 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
 
 static void saveIntFunc(tr_variant const* val, void* vevbuf)
 {
+    auto buf = std::array<char, 64>{};
+    auto const r = strf::to(std::data(buf), std::size(buf))('i', strf::dec(val->val.i), 'e');
+
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
+    evbuffer_add(evbuf, std::data(buf), r.ptr - std::data(buf));
 }
 
 static void saveBoolFunc(tr_variant const* val, void* vevbuf)
@@ -316,23 +321,30 @@ static void saveBoolFunc(tr_variant const* val, void* vevbuf)
     }
 }
 
+// `${std::size(std::to_string(d))}:${std::to_string(d)}`
+// (nonstandard)
 static void saveRealFunc(tr_variant const* val, void* vevbuf)
 {
-    auto buf = std::array<char, 64>{};
-    int const len = tr_snprintf(std::data(buf), std::size(buf), "%f", val->val.d);
-
-    auto* evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%d:", len);
-    evbuffer_add(evbuf, std::data(buf), len);
+    auto buf1 = std::array<char, 64>{};
+    auto buf2 = std::array<char, 64>{};
+    auto r = strf::to(std::data(buf1), std::size(buf1))(strf::fixed(val->val.d));
+    r = strf::to(std::data(buf2), std::size(buf2))(strf::dec(r.ptr - std::data(buf1)), ':', std::data(buf1));
+    evbuffer_add(static_cast<evbuffer*>(vevbuf), std::data(buf2), r.ptr - std::data(buf2));
 }
 
+// `${std::size(sv)}:${sv}`
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
+    // get the sv
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
 
+    // format the width
+    auto buf = std::array<char, 64>{};
+    auto r = strf::to(std::data(buf), std::size(buf))(strf::dec(std::size(sv)), ':');
+
     auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%zu:", std::size(sv));
+    evbuffer_add(evbuf, std::data(buf), r.ptr - std::data(buf));
     evbuffer_add(evbuf, std::data(sv), std::size(sv));
 }
 
