@@ -769,7 +769,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
             utf8::next(walk, end);
         }
     }
-    catch (utf8::exception e)
+    catch (utf8::exception&)
     {
     }
 
