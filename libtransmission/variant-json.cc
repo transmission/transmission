@@ -20,13 +20,13 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "ConvertUTF.h"
+
 #include "jsonsl.h"
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 using namespace std::literals;
 
@@ -573,20 +573,27 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             }
             else
             {
-                auto const* const begin = reinterpret_cast<UTF8 const*>(std::data(sv));
-                auto const* tmp = begin;
-                auto const* end = tmp + std::size(sv);
-                UTF32 buf[1] = { 0 };
-                UTF32* u32 = buf;
-                ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, {});
-
-                if ((result == conversionOK || result == targetExhausted) && tmp != begin)
+                auto buf32 = std::array<char32_t, 2>{};
+                strf::to(std::data(buf32), std::size(buf32))(strf::conv(std::data(sv)));
+                auto const r = strf::to(outwalk, outend - outwalk)("\\u", strf::fmt(int(buf32[0])).hex().pad0(4));
+                outwalk = r.ptr;
+                // Unfortunately strf doesn't say how many utf8 bytes were
+                // consumed from `sv` while generating that single utf832
+                // char, so we must figure it out ourselves. We know
+                // (1) it was at it was at least one char and
+                // (2) utf-8 codepoints [2..N] have values 10xxxxxx.
+                // Armed with that knowledge, we can walk it ourselves.
+                size_t n_to_remove = 1; // (1)
+                while (n_to_remove < std::size(sv) && ((sv[n_to_remove] & 0xC0) == 0x80)) // (2)
                 {
-                    outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", (unsigned int)buf[0]);
-                    sv.remove_prefix(tmp - begin - 1);
+                    ++n_to_remove;
                 }
+                // Even that ugliness is not the end of it. The outer for()
+                // loop that we're in also takes one off, so balance
+                // that out here.
+                --n_to_remove;
+                sv.remove_prefix(n_to_remove);
             }
-
             break;
         }
     }
