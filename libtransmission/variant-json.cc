@@ -14,18 +14,19 @@
 #include <cstdio>
 #include <cstring>
 
+#include <utf8.h>
 #include <event2/buffer.h> /* evbuffer_add() */
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "ConvertUTF.h"
+
 #include "jsonsl.h"
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 using namespace std::literals;
 
@@ -224,19 +225,17 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, st
 
                         if (decode_hex_string(in, &val))
                         {
-                            UTF32 str32_buf[2] = { val, 0 };
-                            UTF32 const* str32_walk = str32_buf;
-                            UTF32 const* str32_end = str32_buf + 1;
-                            UTF8 str8_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-                            UTF8* str8_walk = str8_buf;
-                            UTF8* str8_end = str8_buf + 8;
-
-                            if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, {}) == 0)
+                            try
                             {
-                                evbuffer_add(buf, str8_buf, str8_walk - str8_buf);
-                                unescaped = true;
+                                auto buf8 = std::array<char, 8>{};
+                                auto const it = utf8::append(val, std::data(buf8));
+                                evbuffer_add(buf, std::data(buf8), it - std::data(buf8));
                             }
-
+                            catch (utf8::exception)
+                            { // invalid codepoint
+                                evbuffer_add(buf, "?", 1);
+                            }
+                            unescaped = true;
                             in += 6;
                             break;
                         }
@@ -580,20 +579,20 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             }
             else
             {
-                auto const* const begin = reinterpret_cast<UTF8 const*>(std::data(sv));
-                auto const* tmp = begin;
-                auto const* end = tmp + std::size(sv);
-                UTF32 buf[1] = { 0 };
-                UTF32* u32 = buf;
-                ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, {});
-
-                if ((result == conversionOK || result == targetExhausted) && tmp != begin)
+                try
                 {
-                    outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", (unsigned int)buf[0]);
-                    sv.remove_prefix(tmp - begin - 1);
+                    auto* begin8 = std::data(sv);
+                    auto* end8 = begin8 + std::size(sv);
+                    auto* walk8 = begin8;
+                    auto const uch32 = utf8::next(walk8, end8);
+                    outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", uch32);
+                    sv.remove_prefix(walk8 - begin8 - 1);
+                }
+                catch (utf8::exception)
+                {
+                    *outwalk++ = '?';
                 }
             }
-
             break;
         }
     }

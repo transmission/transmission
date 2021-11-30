@@ -87,7 +87,6 @@ foreach(FILE ${PROJECT_FILES})
 endforeach()
 
 set(THIRD_PARTY_FILES
-  ConvertUTF.c
   jsonsl.c
   wildmat.c
 )
@@ -144,7 +143,6 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
 )
 
 set(${PROJECT_NAME}_PRIVATE_HEADERS
-    ConvertUTF.h
     announcer-common.h
     announcer.h
     bandwidth.h
@@ -244,6 +242,7 @@ include_directories(
 
 include_directories(
     SYSTEM
+    ${UTFCPP_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
