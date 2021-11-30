@@ -16,7 +16,6 @@
 
 #include "transmission.h"
 
-#include "ConvertUTF.h" // tr_utf8_validate()
 #include "crypto-utils.h" // tr_rand_int_weak()
 #include "platform.h"
 #include "ptrarray.h"
@@ -182,26 +181,26 @@ TEST_F(UtilsTest, trUtf8clean)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
     out = makeString(tr_utf8clean(in));
     EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
     out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
     EXPECT_EQ(in, out);
 
     in = "\xF4\x00\x81\x82"sv;
     out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 1 || out.size() == 2);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     in = "\xF4\x33\x81\x82"sv;
     out = makeString(tr_utf8clean(in));
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 }
 
 TEST_F(UtilsTest, trStrvUtf8Clean)
@@ -218,13 +217,13 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
@@ -236,13 +235,13 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 1 || out.size() == 2);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     in = "\xF4\x33\x81\x82"sv;
     out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 }
 
 TEST_F(UtilsTest, trParseNumberRange)

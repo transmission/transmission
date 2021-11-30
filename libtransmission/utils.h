@@ -132,6 +132,8 @@ void tr_wait_msec(long int delay_milliseconds);
  */
 char* tr_utf8clean(std::string_view str) TR_GNUC_MALLOC;
 
+bool tr_utf8_validate(std::string_view sv, char const** endptr);
+
 #ifdef _WIN32
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);

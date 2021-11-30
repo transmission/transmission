@@ -51,6 +51,7 @@
 #include <iconv.h>
 #endif
 
+#include <utf8.h>
 #include <event2/buffer.h>
 #include <event2/event.h>
 
@@ -58,7 +59,6 @@
 #include "error.h"
 #include "error-types.h"
 #include "file.h"
-#include "ConvertUTF.h"
 #include "log.h"
 #include "mime-types.h"
 #include "net.h"
@@ -756,29 +756,43 @@ void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeo
 ****
 ***/
 
-static char* strip_non_utf8(char const* in, size_t inlen)
+bool tr_utf8_validate(std::string_view sv, char const** good_end)
 {
-    evbuffer* const buf = evbuffer_new();
+    auto const* begin = std::data(sv);
+    auto const* const end = begin + std::size(sv);
+    auto const* walk = begin;
 
-    char const* end = nullptr;
-    while (!tr_utf8_validate(in, inlen, &end))
+    try
     {
-        int const good_len = end - in;
-
-        evbuffer_add(buf, in, good_len);
-        inlen -= (good_len + 1);
-        in += (good_len + 1);
-        evbuffer_add(buf, "?", 1);
+        while (walk < end)
+        {
+            utf8::next(walk, end);
+        }
+    }
+    catch (utf8::exception&)
+    {
     }
 
-    evbuffer_add(buf, in, inlen);
-    return evbuffer_free_to_str(buf, nullptr);
+    if (good_end != nullptr)
+    {
+        *good_end = walk;
+    }
+
+    return walk == end;
 }
 
-static char* to_utf8(char const* in, size_t inlen)
+static char* strip_non_utf8(std::string_view sv)
+{
+    char* ret = tr_new(char, std::size(sv) + 1);
+    auto const it = utf8::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
+    *it = '\0';
+    return ret;
+}
+
+static char* to_utf8(std::string_view sv)
 {
 #ifdef HAVE_ICONV
-    size_t const buflen = inlen * 4 + 10;
+    size_t const buflen = std::size(sv) * 4 + 10;
     char* out = tr_new(char, buflen);
 
     auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
@@ -791,12 +805,12 @@ static char* to_utf8(char const* in, size_t inlen)
         }
 
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
-        auto const* inbuf = in;
+        auto const* inbuf = std::data(sv);
 #else
-        auto* inbuf = const_cast<char*>(in);
+        auto* inbuf = const_cast<char*>(std::data(sv));
 #endif
         char* outbuf = out;
-        size_t inbytesleft = inlen;
+        size_t inbytesleft = std::size(sv);
         size_t outbytesleft = buflen;
         auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
         iconv_close(cd);
@@ -812,30 +826,24 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #endif
 
-    return strip_non_utf8(in, inlen);
+    return strip_non_utf8(sv);
 }
 
-char* tr_utf8clean(std::string_view str)
+char* tr_utf8clean(std::string_view sv)
 {
-    char* const ret = tr_utf8_validate(std::data(str), std::size(str), nullptr) ? tr_strndup(std::data(str), std::size(str)) :
-                                                                                  to_utf8(std::data(str), std::size(str));
-    TR_ASSERT(tr_utf8_validate(ret, strlen(ret), nullptr));
+    char* const ret = tr_utf8_validate(sv, nullptr) ? tr_strvDup(sv) : to_utf8(sv);
+    TR_ASSERT(tr_utf8_validate(ret, nullptr));
     return ret;
-}
-
-static bool tr_strvUtf8Validate(std::string_view sv)
-{
-    return tr_utf8_validate(std::data(sv), std::size(sv), nullptr);
 }
 
 std::string tr_strvUtf8Clean(std::string_view sv)
 {
-    if (tr_strvUtf8Validate(sv))
+    if (tr_utf8_validate(sv, nullptr))
     {
         return std::string{ sv };
     }
 
-    auto* const tmp = to_utf8(std::data(sv), std::size(sv));
+    auto* const tmp = to_utf8(sv);
     auto ret = std::string{ tmp ? tmp : "" };
     tr_free(tmp);
     return ret;
