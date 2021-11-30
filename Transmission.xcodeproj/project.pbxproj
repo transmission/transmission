@@ -206,8 +206,6 @@
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */; };
 		A2A4E9210DE0F7E9000CE197 /* web.h in Headers */ = {isa = PBXBuildFile; fileRef = A29EBE530DC01FC9006CEE80 /* web.h */; };
 		A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */ = {isa = PBXBuildFile; fileRef = A29EBE520DC01FC9006CEE80 /* web.cc */; };
-		A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
-		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.mm */; };
 		A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A7B328164F87D400B98C65 /* jsonsl.c */; };
 		A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A7B329164F87D400B98C65 /* jsonsl.h */; };
@@ -830,8 +828,6 @@
 		A2A1C81D142EC032008C17BF /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = nl.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PeerProgressIndicatorCell.mm; sourceTree = "<group>"; };
-		A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ConvertUTF.c; sourceTree = "<group>"; };
-		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConvertUTF.h; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BadgeView.mm; sourceTree = "<group>"; };
 		A2A7B328164F87D400B98C65 /* jsonsl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = jsonsl.c; sourceTree = "<group>"; };
@@ -1511,8 +1507,6 @@
 				A2EA52301686AC0D00180493 /* quark.h */,
 				A2AF23C616B44FA0003BC59E /* log.cc */,
 				A2AF23C716B44FA0003BC59E /* log.h */,
-				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
-				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
 				C1FEE5751C3223CC00D62832 /* watchdir.cc */,
 				C1FEE5761C3223CC00D62832 /* watchdir.h */,
@@ -1884,7 +1878,6 @@
 				C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
-				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
@@ -2477,7 +2470,6 @@
 				4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */,
 				A29DF8B90DB2544C00D04E5A /* resume.cc in Sources */,
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
-				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
@@ -3034,6 +3026,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3227,6 +3220,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3477,6 +3471,7 @@
 					"third-party/libb64/include",
 					"third-party/libevent/include",
 					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
