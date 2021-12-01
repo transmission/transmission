@@ -1639,9 +1639,7 @@ std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant* response)
 {
-    int64_t tag;
-
-    if (tr_variantDictFindInt(response, TR_KEY_tag, &tag))
+    if (int64_t tag = 0; tr_variantDictFindInt(response, TR_KEY_tag, &tag))
     {
         if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
