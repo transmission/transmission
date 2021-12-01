@@ -647,7 +647,7 @@ static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_pee
     }
 }
 
-static void cancelAllRequestsForBlock(tr_swarm* swarm, tr_block_index_t block, tr_peer* no_notify)
+static void cancelAllRequestsForBlock(tr_swarm* swarm, tr_block_index_t block, tr_peer const* no_notify)
 {
     for (auto* peer : swarm->active_requests.remove(block))
     {
