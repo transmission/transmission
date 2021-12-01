@@ -988,8 +988,7 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
     auto files = std::vector<tr_file_index_t>{};
     files.reserve(tr_torrentFileCount(tor));
 
-    size_t const n = tr_variantListSize(list);
-    if (n != 0)
+    if (size_t const n = tr_variantListSize(list); n != 0)
     {
         for (size_t i = 0; i < n; ++i)
         {
