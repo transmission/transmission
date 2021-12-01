@@ -2367,33 +2367,6 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     return false;
 }
 
-// TODO: return std::vector
-static tr_peer** getPeersToClose(tr_swarm* s, time_t const now_sec, int* setmeSize)
-{
-    auto const lock = s->manager->unique_lock();
-
-    tr_peer** ret = nullptr;
-    auto outsize = int{};
-    auto peerCount = int{};
-    tr_peer** const peers = (tr_peer**)tr_ptrArrayPeek(&s->peers, &peerCount);
-
-    for (int i = 0; i < peerCount; ++i)
-    {
-        if (shouldPeerBeClosed(s, peers[i], peerCount, now_sec))
-        {
-            if (ret == nullptr)
-            {
-                ret = tr_new(tr_peer*, peerCount);
-            }
-
-            ret[outsize++] = peers[i];
-        }
-    }
-
-    *setmeSize = outsize;
-    return ret;
-}
-
 static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const now)
 {
     auto sec = int{};
@@ -2510,19 +2483,27 @@ static void removeAllPeers(tr_swarm* swarm)
     TR_ASSERT(swarm->stats.peerCount == 0);
 }
 
+static auto getPeersToClose(tr_swarm* s, time_t const now_sec)
+{
+    auto peerCount = int{};
+    auto** const peers = (tr_peer**)tr_ptrArrayPeek(&s->peers, &peerCount);
+
+    auto peers_to_close = std::vector<tr_peer*>{};
+    auto test = [=](auto* peer)
+    {
+        return shouldPeerBeClosed(s, peer, peerCount, now_sec);
+    };
+    std::copy_if(peers, peers + peerCount, std::back_inserter(peers_to_close), test);
+    return peers_to_close;
+}
+
 static void closeBadPeers(tr_swarm* s, time_t const now_sec)
 {
-    if (!tr_ptrArrayEmpty(&s->peers))
+    auto const lock = s->manager->unique_lock();
+
+    for (auto* peer : getPeersToClose(s, now_sec))
     {
-        auto peerCount = int{};
-        tr_peer** const peers = getPeersToClose(s, now_sec, &peerCount);
-
-        for (int i = 0; i < peerCount; ++i)
-        {
-            closePeer(peers[i]);
-        }
-
-        tr_free(peers);
+        closePeer(peer);
     }
 }
 
