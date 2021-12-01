@@ -1684,7 +1684,7 @@ void Session::Impl::send_rpc_request(
     else
     {
         /* remember this request */
-        pendingRequests.emplace(tag, response_func);
+        pendingRequests.try_emplace(tag, response_func);
 
         /* make the request */
 #ifdef DEBUG_RPC
