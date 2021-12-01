@@ -39,8 +39,7 @@ FreeSpaceLabel::Impl::~Impl()
 
 bool FreeSpaceLabel::Impl::on_freespace_timer()
 {
-    auto* const session = core_->get_session();
-    if (session == nullptr)
+    if (core_->get_session() == nullptr)
     {
         return false;
     }
