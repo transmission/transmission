@@ -90,8 +90,8 @@ tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piec
     };
 
     auto const begin = std::begin(files_);
-    auto const pair = std::equal_range(begin, std::end(files_), piece, Compare{});
-    return { tr_piece_index_t(std::distance(begin, pair.first)), tr_piece_index_t(std::distance(begin, pair.second)) };
+    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(files_), piece, Compare{});
+    return { tr_piece_index_t(std::distance(begin, equal_begin)), tr_piece_index_t(std::distance(begin, equal_end)) };
 }
 
 /***
