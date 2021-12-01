@@ -107,7 +107,7 @@ static char const* time_t_to_str(time_t timestamp)
     struct tm tm;
     tr_localtime_r(&timestamp, &tm);
     static char buf[32];
-    strftime(buf, sizeof(buf), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    strftime(buf, sizeof(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
     return buf;
 }
 
