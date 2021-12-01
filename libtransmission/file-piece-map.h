@@ -32,7 +32,7 @@ public:
     using file_span_t = index_span_t<tr_file_index_t>;
     using piece_span_t = index_span_t<tr_piece_index_t>;
 
-    tr_file_piece_map(tr_info const& info)
+    explicit tr_file_piece_map(tr_info const& info)
     {
         reset(info);
     }
