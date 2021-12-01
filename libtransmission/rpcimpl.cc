@@ -997,7 +997,7 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
             {
                 if (0 <= tmp && tmp < tor->info.fileCount)
                 {
-                    files.push_back(tmp);
+                    files.push_back(tr_file_index_t(tmp));
                 }
                 else
                 {
