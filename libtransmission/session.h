@@ -112,8 +112,7 @@ struct CaseInsensitiveStringCompare // case-insensitive string compare
         auto const alen = std::size(a);
         auto const blen = std::size(b);
 
-        auto i = evutil_ascii_strncasecmp(std::data(a), std::data(b), std::min(alen, blen));
-        if (i != 0)
+        if (auto i = evutil_ascii_strncasecmp(std::data(a), std::data(b), std::min(alen, blen)); i != 0)
         {
             return i;
         }
