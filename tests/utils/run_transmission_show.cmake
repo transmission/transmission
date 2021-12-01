@@ -18,7 +18,7 @@ execute_process(
 )
 
 execute_process(
-   COMMAND ${CMAKE_COMMAND} -E compare_files ${reference_file} ${output_file}
+   COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol ${reference_file} ${output_file}
    RESULT_VARIABLE STATUS
 )
 
