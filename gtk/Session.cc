@@ -1663,7 +1663,7 @@ bool core_read_rpc_response_idle(tr_variant* response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
 {
-    tr_variant* response_copy = new tr_variant(std::move(*response));
+    auto* response_copy = new tr_variant(std::move(*response));
 
     tr_variantInitBool(response, false);
 
