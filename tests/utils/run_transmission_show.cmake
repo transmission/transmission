@@ -21,9 +21,23 @@ execute_process(
 )
 
 if(STATUS AND NOT STATUS EQUAL 0)
+   file(READ ${reference_file} CONTENTS)
+   message("EXPECTED CONTENTS (${reference_file}):")
+   message(${CONTENTS})
+
    file(READ ${output_file} CONTENTS)
-   message(status ${CONTENTS})
-   message(FATAL_ERROR "failed: ${output_file} does not match ${expected}")
+   message("RECEIVED CONTENTS (${output_file}):")
+   message(${CONTENTS})
+
+   find_program(DIFF_EXEC diff)
+   if (DIFF_EXEC)
+      message("DIFF:")
+      execute_process(COMMAND ${DIFF_EXEC} ${output_file} ${reference_file})
+   endif()
+
+   file(REMOVE ${output_file})
+   message(FATAL_ERROR "failed: files '${reference_file}' and '${output_file}' do not match")
 else()
-   message(STATUS "passed")
+   file(REMOVE ${output_file})
+   message("passed")
 endif()
