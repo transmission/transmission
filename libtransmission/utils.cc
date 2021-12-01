@@ -761,6 +761,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
     auto const* begin = std::data(sv);
     auto const* const end = begin + std::size(sv);
     auto const* walk = begin;
+    auto all_good = false;
 
     try
     {
@@ -768,9 +769,12 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
         {
             utf8::next(walk, end);
         }
+
+        all_good = true;
     }
     catch (utf8::exception&)
     {
+        all_good = false;
     }
 
     if (good_end != nullptr)
@@ -778,7 +782,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
         *good_end = walk;
     }
 
-    return walk == end;
+    return all_good;
 }
 
 static char* strip_non_utf8(std::string_view sv)
