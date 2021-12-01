@@ -10,6 +10,7 @@ message(STATUS "       input_file ${torrent_file}")
 message(STATUS "      output_file ${output_file}")
 message(STATUS "   reference_file ${reference_file}")
 
+set(ENV{TZ} "UTC")
 execute_process(
    COMMAND ${transmission_show} ${torrent_file}
    OUTPUT_FILE ${output_file}
