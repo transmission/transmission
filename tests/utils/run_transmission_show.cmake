@@ -1,5 +1,4 @@
-# runs transmission-show on a file and
-# compares transmission-show's output against a reference file.
+# compare the output of transmission-show to a reference file.
 # returns 0 if the files match, nonzero otherwise. 
 
 get_filename_component(torrent_basename "${torrent_file}" NAME)
@@ -10,6 +9,8 @@ message(STATUS "       input_file ${torrent_file}")
 message(STATUS "      output_file ${output_file}")
 message(STATUS "   reference_file ${reference_file}")
 
+# The app's output includes timestamps, so fake our TZ to ensure
+# the test doesn't depend on the physical TZ of the test machine
 set(ENV{TZ} "UTC")
 execute_process(
    COMMAND ${transmission_show} ${torrent_file}

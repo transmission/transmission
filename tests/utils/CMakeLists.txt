@@ -1,4 +1,4 @@
-function(AddAssetShowTest name file_basename)
+function(AddShowTest name file_basename)
    add_test(
       NAME ${name}
       COMMAND ${CMAKE_COMMAND}
@@ -10,5 +10,5 @@ function(AddAssetShowTest name file_basename)
    )
 endfunction()
 
-AddAssetShowTest(transmission-show-ubuntu ubuntu-20.04.3-desktop-amd64.iso)
-AddAssetShowTest(transmission-show-thor Thor_and_the_Amazon_Women.avi)
+AddShowTest(transmission-show-ubuntu ubuntu-20.04.3-desktop-amd64.iso)
+AddShowTest(transmission-show-thor Thor_and_the_Amazon_Women.avi)
