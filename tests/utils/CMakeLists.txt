@@ -12,3 +12,4 @@ endfunction()
 
 AddShowTest(transmission-show-ubuntu ubuntu-20.04.3-desktop-amd64.iso)
 AddShowTest(transmission-show-thor Thor_and_the_Amazon_Women.avi)
+AddShowTest(transmission-show-inner-sanctum Inner_Sanctum_movie_archive)
