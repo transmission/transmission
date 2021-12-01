@@ -460,8 +460,7 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    auto const prior = tr_quark_lookup(str);
-    if (prior)
+    if (auto const prior = tr_quark_lookup(str); prior)
     {
         return *prior;
     }
