@@ -982,7 +982,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
     return nullptr;
 }
 
-static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
+static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr_variant* list)
 {
     char const* errmsg = nullptr;
     auto files = std::vector<tr_file_index_t>{};
