@@ -21,6 +21,8 @@ execute_process(
 )
 
 if(STATUS AND NOT STATUS EQUAL 0)
+   file(READ ${output_file} CONTENTS)
+   message(status ${CONTENTS})
    message(FATAL_ERROR "failed: ${output_file} does not match ${expected}")
 else()
    message(STATUS "passed")
