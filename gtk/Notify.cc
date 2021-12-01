@@ -194,13 +194,13 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
     {
         if (tr_torrentFileCount(tor) == 1)
         {
-            actions.push_back("file");
-            actions.push_back(_("Open File"));
+            actions.emplace_back("file");
+            actions.emplace_back(_("Open File"));
         }
         else
         {
-            actions.push_back("folder");
-            actions.push_back(_("Open Folder"));
+            actions.emplace_back("folder");
+            actions.emplace_back(_("Open Folder"));
         }
     }
 
@@ -235,8 +235,8 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
     {
-        actions.push_back("start-now");
-        actions.push_back(_("Start Now"));
+        actions.emplace_back("start-now");
+        actions.emplace_back(_("Start Now"));
     }
 
     auto const n = TrNotification{ core, torrent_id };

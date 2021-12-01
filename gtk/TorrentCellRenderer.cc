@@ -383,9 +383,8 @@ namespace
 Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
     Glib::ustring mime_type;
-    auto const n_files = tr_torrentFileCount(tor);
 
-    if (n_files == 0)
+    if (auto const n_files = tr_torrentFileCount(tor); n_files == 0)
     {
         mime_type = UNKNOWN_MIME_TYPE;
     }

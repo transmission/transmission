@@ -221,7 +221,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
             auto priority = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &priority))
             {
-                tor->setFilePriority(i, priority);
+                tor->setFilePriority(i, tr_priority_t(priority));
             }
         }
 
@@ -728,8 +728,8 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     std::string const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename.c_str(), &error) ||
+
+    if (auto buf = std::vector<char>{}; !tr_loadFile(buf, filename.c_str(), &error) ||
         !tr_variantFromBuf(
             &top,
             TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,

@@ -231,7 +231,7 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, st
                                 auto const it = utf8::append(val, std::data(buf8));
                                 evbuffer_add(buf, std::data(buf8), it - std::data(buf8));
                             }
-                            catch (utf8::exception&)
+                            catch (utf8::exception const&)
                             { // invalid codepoint
                                 evbuffer_add(buf, "?", 1);
                             }
@@ -588,7 +588,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
                     outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", uch32);
                     sv.remove_prefix(walk8 - begin8 - 1);
                 }
-                catch (utf8::exception&)
+                catch (utf8::exception const&)
                 {
                     *outwalk++ = '?';
                 }

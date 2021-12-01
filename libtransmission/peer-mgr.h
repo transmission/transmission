@@ -79,7 +79,7 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant);
+std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 

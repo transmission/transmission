@@ -1639,9 +1639,7 @@ std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant* response)
 {
-    int64_t tag;
-
-    if (tr_variantDictFindInt(response, TR_KEY_tag, &tag))
+    if (int64_t tag = 0; tr_variantDictFindInt(response, TR_KEY_tag, &tag))
     {
         if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
@@ -1665,7 +1663,7 @@ bool core_read_rpc_response_idle(tr_variant* response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
 {
-    tr_variant* response_copy = new tr_variant(std::move(*response));
+    auto* response_copy = new tr_variant(std::move(*response));
 
     tr_variantInitBool(response, false);
 
@@ -1686,7 +1684,7 @@ void Session::Impl::send_rpc_request(
     else
     {
         /* remember this request */
-        pendingRequests.emplace(tag, response_func);
+        pendingRequests.try_emplace(tag, response_func);
 
         /* make the request */
 #ifdef DEBUG_RPC
@@ -1708,7 +1706,8 @@ void Session::Impl::send_rpc_request(
 
 void Session::port_test()
 {
-    auto const tag = nextTag++;
+    auto const tag = nextTag;
+    ++nextTag;
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
@@ -1739,7 +1738,8 @@ void Session::port_test()
 
 void Session::blocklist_update()
 {
-    auto const tag = nextTag++;
+    auto const tag = nextTag;
+    ++nextTag;
 
     tr_variant request;
     tr_variantInitDict(&request, 2);
@@ -1775,7 +1775,8 @@ void Session::blocklist_update()
 
 void Session::exec(tr_variant const* top)
 {
-    auto const tag = nextTag++;
+    auto const tag = nextTag;
+    ++nextTag;
 
     impl_->send_rpc_request(top, tag, {});
 }

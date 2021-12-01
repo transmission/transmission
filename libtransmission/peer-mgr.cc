@@ -556,7 +556,7 @@ static void updateEndgame(tr_swarm* s)
     s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->block_size >= s->tor->leftUntilDone();
 }
 
-std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, size_t numwant)
+std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
     class PeerInfoImpl : public Wishlist::PeerInfo
     {
@@ -647,7 +647,7 @@ static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_pee
     }
 }
 
-static void cancelAllRequestsForBlock(tr_swarm* swarm, tr_block_index_t block, tr_peer* no_notify)
+static void cancelAllRequestsForBlock(tr_swarm* swarm, tr_block_index_t block, tr_peer const* no_notify)
 {
     for (auto* peer : swarm->active_requests.remove(block))
     {

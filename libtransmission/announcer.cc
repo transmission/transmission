@@ -1230,9 +1230,8 @@ static void announce_request_delegate(
 
 #endif
 
-    auto const announce_sv = tr_quark_get_string_view(request->announce_url);
-
-    if (tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+    if (auto const announce_sv = tr_quark_get_string_view(request->announce_url);
+        tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
     {
         tr_tracker_http_announce(session, request, callback, callback_data);
     }
