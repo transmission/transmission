@@ -419,7 +419,7 @@ std::unique_ptr<MainWindow> MainWindow::create(
     Glib::RefPtr<Gio::ActionGroup> const& actions,
     Glib::RefPtr<Session> const& core)
 {
-    return std::unique_ptr<MainWindow>(new MainWindow(app, actions, core));
+    return std::make_unique<MainWindow>(app, actions, core);
 }
 
 MainWindow::MainWindow(Gtk::Application& app, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core)
