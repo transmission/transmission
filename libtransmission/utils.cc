@@ -772,7 +772,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
 
         all_good = true;
     }
-    catch (utf8::exception&)
+    catch (utf8::exception const&)
     {
         all_good = false;
     }
