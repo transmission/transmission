@@ -1311,9 +1311,8 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
 
     tr_variant val;
-    bool const loaded = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen });
 
-    if (loaded)
+    if (tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }))
     {
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
