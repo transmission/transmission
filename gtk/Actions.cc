@@ -129,7 +129,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
         action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& value)
                                           { sort_changed_cb(*a, value, callback_user_data); });
         action_group->add_action(action);
-        key_to_action.emplace(action_name, action);
+        key_to_action.try_emplace(action_name, action);
     }
 
     for (auto const& action_name_view : show_toggle_entries)
@@ -139,7 +139,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
         action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
-        key_to_action.emplace(action_name, action);
+        key_to_action.try_emplace(action_name, action);
     }
 
     for (auto const& action_name_view : pref_toggle_entries)
@@ -149,7 +149,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
         action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
                                           { toggle_pref_cb(*a, callback_user_data); });
         action_group->add_action(action);
-        key_to_action.emplace(action_name, action);
+        key_to_action.try_emplace(action_name, action);
     }
 
     for (auto const& action_name_view : entries)
@@ -159,7 +159,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
         action->signal_activate().connect([a = gtr_get_ptr(action), callback_user_data](auto const& /*value*/)
                                           { action_cb(*a, callback_user_data); });
         action_group->add_action(action);
-        key_to_action.emplace(action_name, action);
+        key_to_action.try_emplace(action_name, action);
     }
 
     return action_group;
