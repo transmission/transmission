@@ -788,8 +788,11 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
 static char* strip_non_utf8(std::string_view sv)
 {
     char* ret = tr_new(char, std::size(sv) + 1);
-    auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
-    *it = '\0';
+    if (ret != nullptr)
+    {
+        auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
+        *it = '\0';
+    }
     return ret;
 }
 
