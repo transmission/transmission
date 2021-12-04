@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "transmission.h"
+
+#include "error.h"
 #include "file.h"
 #include "magnet-metainfo.h"
 #include "session.h"
@@ -88,12 +90,11 @@ static int parseMetainfoContents(tr_ctor* ctor)
     return ctor->isSet_metainfo ? 0 : EILSEQ;
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
+int tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len)
 {
     clearMetainfo(ctor);
 
-    ctor->contents.resize(len);
-    std::copy_n(static_cast<char const*>(metainfo), len, std::begin(ctor->contents));
+    ctor->contents.assign(metainfo, metainfo + len);
 
     return parseMetainfoContents(ctor);
 }
@@ -115,7 +116,7 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
     mm.toVariant(&tmp);
     auto len = size_t{};
     char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-    auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
+    auto const err = tr_ctorSetMetainfo(ctor, str, len);
     tr_free(str);
     tr_variantFree(&tmp);
 
@@ -162,6 +163,20 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     }
 
     return 0;
+}
+
+bool tr_ctorSaveContents(tr_ctor const* ctor, char const* filename, tr_error** error)
+{
+    TR_ASSERT(ctor != nullptr);
+    TR_ASSERT(filename != nullptr);
+
+    if (std::empty(ctor->contents))
+    {
+        tr_error_set_literal(error, ENODATA, "torrent ctor has no contents to save");
+        return false;
+    }
+
+    return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
 }
 
 /***

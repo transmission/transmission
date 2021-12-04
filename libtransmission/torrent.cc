@@ -763,17 +763,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     /* maybe save our own copy of the metainfo */
     if (tr_ctorGetSave(ctor))
     {
-        tr_variant const* val = nullptr;
-        if (tr_ctorGetMetainfo(ctor, &val))
+        tr_error* error = nullptr;
+        if (!tr_ctorSaveContents(ctor, tor->info.torrent, &error))
         {
-            char const* path = tor->info.torrent;
-            int const err = tr_variantToFile(val, TR_VARIANT_FMT_BENC, path);
-
-            if (err != 0)
-            {
-                tr_torrentSetLocalError(tor, "Unable to save torrent file: %s", tr_strerror(err));
-            }
+            tr_torrentSetLocalError(tor, "Unable to save torrent file: %s (%d)", error->message, error->code);
         }
+        tr_error_clear(&error);
     }
 
     tor->tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
