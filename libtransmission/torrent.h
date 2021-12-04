@@ -248,7 +248,7 @@ public:
 
     /// WANTED
 
-    bool pieceIsWanted(tr_piece_index_t piece) const final
+    bool pieceIsWanted(tr_piece_index_t piece) const final override
     {
         return files_wanted_.pieceWanted(piece);
     }

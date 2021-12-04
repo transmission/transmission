@@ -172,7 +172,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, char const* filename, tr_error** e
 
     if (std::empty(ctor->contents))
     {
-        tr_error_set_literal(error, ENODATA, "torrent ctor has no contents to save");
+        tr_error_set_literal(error, EINVAL, "torrent ctor has no contents to save");
         return false;
     }
 
