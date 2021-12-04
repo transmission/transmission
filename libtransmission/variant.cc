@@ -1205,87 +1205,18 @@ char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
     return evbuffer_free_to_str(buf, len);
 }
 
-static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file_t fd, tr_error** error)
-{
-    int err = 0;
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    char const* walk = (char const*)evbuffer_pullup(buf, -1);
-    uint64_t nleft = evbuffer_get_length(buf);
-
-    while (nleft > 0)
-    {
-        uint64_t n = 0;
-
-        tr_error* tmperr = nullptr;
-        if (!tr_sys_file_write(fd, walk, nleft, &n, &tmperr))
-        {
-            err = tmperr->code;
-            tr_error_propagate(error, &tmperr);
-            break;
-        }
-
-        nleft -= n;
-        walk += n;
-    }
-
-    evbuffer_free(buf);
-    return err;
-}
-
 int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
 {
-    /* follow symlinks to find the "real" file, to make sure the temporary
-     * we build with tr_sys_file_open_temp() is created on the right partition */
-    char* real_filename = tr_sys_path_resolve(filename, nullptr);
-    if (real_filename != nullptr)
-    {
-        filename = real_filename;
-    }
-
-    /* if the file already exists, try to move it out of the way & keep it as a backup */
-    char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
+    auto contents_len = size_t{};
+    auto const* contents = tr_variantToStr(v, fmt, &contents_len);
     tr_error* error = nullptr;
-    tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
-
-    int err = 0;
-    if (fd != TR_BAD_SYS_FILE)
+    auto const saved = tr_saveFile(filename, { contents, contents_len }, &error);
+    if (error != nullptr)
     {
-        err = writeVariantToFd(v, fmt, fd, &error);
-        tr_sys_file_close(fd, nullptr);
-
-        if (err)
-        {
-            tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-            tr_sys_path_remove(tmp, nullptr);
-            tr_error_free(error);
-        }
-        else
-        {
-            tr_error_clear(&error);
-
-            if (tr_sys_path_rename(tmp, filename, &error))
-            {
-                tr_logAddInfo(_("Saved \"%s\""), filename);
-            }
-            else
-            {
-                err = error->code;
-                tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_sys_path_remove(tmp, nullptr);
-                tr_error_free(error);
-            }
-        }
+        tr_logAddError(_("Error saving \"%s\": %s (%d)"), filename, error->message, error->code);
+        tr_error_clear(&error);
     }
-    else
-    {
-        err = error->code;
-        tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-        tr_error_free(error);
-    }
-
-    tr_free(tmp);
-    tr_free(real_filename);
-    return err;
+    return saved ? 0 : -1;
 }
 
 /***

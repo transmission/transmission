@@ -484,3 +484,31 @@ TEST_F(UtilsTest, mimeTypes)
     EXPECT_EQ("video/x-msvideo"sv, tr_get_mime_type_for_filename("/path/to/FILENAME.AVI"sv));
     EXPECT_EQ("application/octet-stream"sv, tr_get_mime_type_for_filename("music.ajoijfeisfe"sv));
 }
+
+TEST_F(UtilsTest, saveFile)
+{
+    // save a file to GoogleTest's temp dir
+    auto filename = tr_strvJoin(::testing::TempDir(), "filename.txt");
+    auto contents = "these are the contents"sv;
+    tr_error* error = nullptr;
+    EXPECT_TRUE(tr_saveFile(filename.c_str(), contents, &error));
+    EXPECT_EQ(nullptr, error);
+
+    // now read the file back in and confirm the contents are the same
+    auto buf = std::vector<char>{};
+    EXPECT_TRUE(tr_loadFile(buf, filename.c_str(), &error));
+    EXPECT_EQ(nullptr, error);
+    auto sv = std::string_view{ std::data(buf), std::size(buf) };
+    EXPECT_EQ(contents, sv);
+
+    // remove the tempfile
+    EXPECT_TRUE(tr_sys_path_remove(filename.c_str(), &error));
+    EXPECT_EQ(nullptr, error);
+
+    // try saving a file to a path that doesn't exist
+    filename = "/this/path/does/not/exist/foo.txt";
+    EXPECT_FALSE(tr_saveFile(filename.c_str(), contents, &error));
+    ASSERT_NE(nullptr, error);
+    EXPECT_EQ(ENOENT, error->code);
+    tr_error_clear(&error);
+}
