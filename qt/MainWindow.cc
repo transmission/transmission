@@ -405,7 +405,7 @@ void MainWindow::initStatusBar()
     ui_.optionsButton->setMenu(createOptionsMenu());
 
     int const minimum_speed_width = ui_.downloadSpeedLabel->fontMetrics()
-                                        .boundingRect(Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
+                                        .size(0, Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
                                         .width();
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
