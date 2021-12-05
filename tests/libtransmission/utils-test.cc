@@ -509,6 +509,6 @@ TEST_F(UtilsTest, saveFile)
     filename = "/this/path/does/not/exist/foo.txt";
     EXPECT_FALSE(tr_saveFile(filename.c_str(), contents, &error));
     ASSERT_NE(nullptr, error);
-    EXPECT_EQ(ENOENT, error->code);
+    EXPECT_NE(0, error->code);
     tr_error_clear(&error);
 }
