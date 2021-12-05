@@ -81,6 +81,8 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 
 bool tr_loadFile(std::vector<char>& setme, char const* filename, tr_error** error = nullptr);
 
+bool tr_saveFile(char const* filename_in, std::string_view contents, tr_error** error = nullptr);
+
 /** @brief build a filename from a series of elements using the
            platform's correct directory separator. */
 char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;

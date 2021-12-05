@@ -374,11 +374,11 @@ protected:
 
         // create the torrent ctor
         auto metainfo_len = size_t{};
-        auto* metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
+        auto* const metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
         EXPECT_NE(nullptr, metainfo);
         EXPECT_LT(size_t{ 0 }, metainfo_len);
         auto* ctor = tr_ctorNew(session_);
-        tr_ctorSetMetainfo(ctor, reinterpret_cast<uint8_t*>(metainfo), metainfo_len);
+        tr_ctorSetMetainfo(ctor, static_cast<char const*>(metainfo), metainfo_len);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
         tr_free(metainfo);
 

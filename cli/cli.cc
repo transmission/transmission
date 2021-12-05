@@ -243,8 +243,6 @@ int tr_main(int argc, char* argv[])
     tr_torrent* tor = nullptr;
     tr_variant settings;
     char const* configDir;
-    uint8_t* fileContents;
-    size_t fileLength;
 
     tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -304,12 +302,11 @@ int tr_main(int argc, char* argv[])
 
     ctor = tr_ctorNew(h);
 
-    fileContents = tr_loadFile(torrentPath, &fileLength, nullptr);
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (fileContents != nullptr)
+    if (tr_sys_path_exists(torrentPath, nullptr))
     {
-        tr_ctorSetMetainfo(ctor, fileContents, fileLength);
+        tr_ctorSetMetainfoFromFile(ctor, torrentPath);
     }
     else if (memcmp(torrentPath, "magnet:?", 8) == 0)
     {
@@ -333,8 +330,6 @@ int tr_main(int argc, char* argv[])
         tr_sessionClose(h);
         return EXIT_FAILURE;
     }
-
-    tr_free(fileContents);
 
     tor = tr_torrentNew(ctor, nullptr, nullptr);
     tr_ctorFree(ctor);

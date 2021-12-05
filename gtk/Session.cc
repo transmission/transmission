@@ -1148,7 +1148,7 @@ void Session::Impl::add_file_async_callback(
         {
             g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
         }
-        else if (tr_ctorSetMetainfo(ctor, (uint8_t const*)contents, length) == 0)
+        else if (tr_ctorSetMetainfo(ctor, contents, length) == 0)
         {
             add_ctor(ctor, do_prompt, do_notify);
         }
