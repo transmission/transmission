@@ -209,7 +209,22 @@ NSMutableSet* fTrackerIconLoading;
         }
     }
 
-    return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed:@"FavIcon"];
+    if ((icon && icon != [NSNull null]))
+    {
+        return icon;
+    }
+
+    if (@available(macOS 11.0, *)) {
+        NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
+        [result lockFocus];
+        [NSColor.textColor set];
+        NSRect imageRect = {NSZeroPoint, [result size]};
+        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
+        [result unlockFocus];
+        return result;
+    }
+
+    return [NSImage imageNamed:@"FavIcon"];
 }
 
 #warning better favicon detection
