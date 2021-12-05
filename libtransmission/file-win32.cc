@@ -150,7 +150,7 @@ static bool is_valid_path(std::string_view path)
     return path.find_first_of("<>:\"|?*"sv) == path.npos;
 }
 
-static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
+static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* setme_real_result_size)
 {
     if (path == nullptr)
     {
@@ -170,12 +170,15 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
 
     /* TODO (?): TR_ASSERT(!is_relative); */
 
-    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, real_result_size);
+    int real_result_size = 0;
+    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, &real_result_size);
 
     if (wide_path == nullptr)
     {
         return nullptr;
     }
+
+    real_result_size += extra_chars_before;
 
     /* Relative paths cannot be used with "\\?\" prefixes. This also means that relative paths are
        limited to ~260 chars... but we should rarely work with relative paths in the first place */
@@ -201,9 +204,24 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
         *p++ = L'\\';
     }
 
-    if (real_result_size != nullptr)
+    /* Squash multiple consecutive path separators into one to avoid ERROR_INVALID_NAME */
+    wchar_t* first_conseq_sep = wide_path + extra_chars_before;
+
+    while ((first_conseq_sep = std::wcsstr(first_conseq_sep, L"\\\\")) != nullptr)
     {
-        *real_result_size += extra_chars_before;
+        wchar_t const* last_conseq_sep = first_conseq_sep + 1;
+        while (*(last_conseq_sep + 1) == L'\\')
+        {
+            ++last_conseq_sep;
+        }
+
+        std::copy_n(last_conseq_sep, real_result_size - (last_conseq_sep - wide_path) + 1, first_conseq_sep);
+        real_result_size -= last_conseq_sep - first_conseq_sep;
+    }
+
+    if (setme_real_result_size != nullptr)
+    {
+        *setme_real_result_size = real_result_size;
     }
 
     return wide_path;
