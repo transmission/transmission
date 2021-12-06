@@ -139,7 +139,7 @@ static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
 
 static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const n = tr_torrentFileCount(tor);
+    auto const n = tor->fileCount();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_dnd, n);
 
     for (tr_file_index_t i = 0; i < n; ++i)
@@ -152,7 +152,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 {
     uint64_t ret = 0;
     tr_variant* list = nullptr;
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
@@ -199,7 +199,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
 static void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const n = tr_torrentFileCount(tor);
+    auto const n = tor->fileCount();
 
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_priority, n);
     for (tr_file_index_t i = 0; i < n; ++i)
@@ -212,7 +212,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && tr_variantListSize(list) == n)
     {
@@ -390,7 +390,7 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 
 static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
     tr_file const* files = tor->info.files;
 
     bool any_renamed = false;
@@ -419,16 +419,17 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
         return 0;
     }
 
-    size_t const n = tr_variantListSize(list);
-    tr_file* files = tor->info.files;
-    for (size_t i = 0; i < tor->info.fileCount && i < n; ++i)
+    auto const n_files = tor->fileCount();
+    auto const n_list = tr_variantListSize(list);
+    for (size_t i = 0; i < n_files && i < n_list; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tr_free(files[i].name);
-            files[i].name = tr_strvDup(sv);
-            files[i].priv.is_renamed = true;
+            auto& file = tor->info.files[i];
+            tr_free(file.name);
+            file.name = tr_strvDup(sv);
+            file.priv.is_renamed = true;
         }
     }
 
@@ -479,7 +480,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    size_t const n = tr_torrentFileCount(tor);
+    auto const n = tor->fileCount();
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
     for (auto const *file = inf->files, *end = file + n; file != end; ++file)
     {
@@ -530,7 +531,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
         auto checked = tr_bitfield(inf->pieceCount);
         auto mtimes = std::vector<time_t>{};
-        auto const n_files = tr_torrentFileCount(tor);
+        auto const n_files = tor->fileCount();
         mtimes.reserve(n_files);
 
         // try to load mtimes
@@ -586,13 +587,13 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        if (std::size(mtimes) != tor->info.fileCount)
+        if (std::size(mtimes) != n_files)
         {
-            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(tor->info.fileCount));
+            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
-            mtimes.resize(tor->info.fileCount);
+            mtimes.resize(n_files);
         }
 
         tor->initCheckedPieces(checked, std::data(mtimes));

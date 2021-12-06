@@ -579,16 +579,14 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
 ****
 ***/
 
-static void tr_torrentInitFilePieces(tr_torrent* tor)
+static void tr_torrentInitFileOffsets(tr_torrent* tor)
 {
-    uint64_t offset = 0;
-    tr_info* inf = &tor->info;
+    auto offset = uint64_t{ 0 };
 
-    /* assign the file offsets */
-    for (tr_file_index_t f = 0; f < inf->fileCount; ++f)
+    for (auto *it = tor->info.files, *end = it + tor->fileCount(); it != end; ++it)
     {
-        inf->files[f].priv.offset = offset;
-        offset += inf->files[f].length;
+        it->priv.offset = offset;
+        offset += it->length;
     }
 }
 
@@ -600,7 +598,7 @@ void tr_torrentGotNewInfoDict(tr_torrent* tor)
 {
     tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
     tor->completion = tr_completion{ tor, tor };
-    tr_torrentInitFilePieces(tor);
+    tr_torrentInitFileOffsets(tor);
 
     tr_peerMgrOnTorrentGotMetainfo(tor);
 
@@ -611,7 +609,7 @@ static bool hasAnyLocalData(tr_torrent const* tor)
 {
     auto filename = std::string{};
 
-    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         if (tor->findFile(filename, i))
         {
@@ -706,7 +704,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
     tor->completion = tr_completion{ tor, tor };
-    tr_torrentInitFilePieces(tor);
+    tr_torrentInitFileOffsets(tor);
 
     // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
     // that set things as dirty, but... these settings being loaded are
@@ -1219,7 +1217,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t i)
 {
     TR_ASSERT(tr_isTorrent(torrent));
-    TR_ASSERT(i < torrent->info.fileCount);
+    TR_ASSERT(i < torrent->fileCount());
 
     auto const& file = torrent->info.files[i];
     auto const* const name = file.name;
@@ -1240,7 +1238,7 @@ size_t tr_torrentFileCount(tr_torrent const* torrent)
 {
     TR_ASSERT(tr_isTorrent(torrent));
 
-    return torrent->info.fileCount;
+    return torrent->fileCount();
 }
 
 /***
@@ -1392,7 +1390,7 @@ static void torrentStartImpl(void* vtor)
 uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor)
 {
     uint64_t byte_count = 0;
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
 
     for (tr_file_index_t i = 0; i < n; ++i)
     {
@@ -2300,7 +2298,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
     uint64_t bytesLeft = 0;
 
-    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
 
@@ -2422,7 +2420,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     auto tmpdir = tr_strvPath(top, TR_PATH_DELIMITER_STR, tr_torrentName(tor), "__XXXXXX");
     tr_sys_dir_create_temp(std::data(tmpdir), nullptr);
 
-    for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
+    for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
     {
         /* try to find the file, looking in the partial and download dirs */
         auto filename = tr_strvPath(top, tor->info.files[f].name);
@@ -2495,7 +2493,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* build a list of 'top's child directories that belong to this torrent */
-    for (tr_file_index_t f = 0; f < tor->info.fileCount; ++f)
+    for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
     {
         /* get the directory that this file goes in... */
         auto const filename = tr_strvPath(top, tor->info.files[f].name);
@@ -2596,7 +2594,7 @@ static void setLocationImpl(void* vdata)
         /* try to move the files.
          * FIXME: there are still all kinds of nasty cases, like what
          * if the target directory runs out of space halfway through... */
-        for (tr_file_index_t i = 0; !err && i < tor->info.fileCount; ++i)
+        for (tr_file_index_t i = 0, n = tor->fileCount(); !err && i < n; ++i)
         {
             tr_file const* const f = &tor->info.files[i];
 
@@ -2714,7 +2712,7 @@ std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
     auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
-    for (tr_file const *it = inf->files, *end = it + inf->fileCount; it != end; ++it)
+    for (tr_file const *it = inf->files, *end = it + tor->fileCount(); it != end; ++it)
     {
         auto const mime_type = tr_get_mime_type_for_filename(it->name);
         size_per_mime_type[mime_type] += it->length;
@@ -2837,7 +2835,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
 std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& filename, tr_file_index_t i) const
 {
-    TR_ASSERT(i < this->info.fileCount);
+    TR_ASSERT(i < this->fileCount());
     tr_file const& file = info.files[i];
     auto file_info = tr_sys_path_info{};
 
@@ -3108,23 +3106,24 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)
 {
-    auto n = size_t{};
-    tr_file_index_t* indices = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto const n_files = tor->fileCount();
+    auto n_affected_files = size_t{};
+    tr_file_index_t* indices = tr_new0(tr_file_index_t, n_files);
 
     auto const oldpath_len = strlen(oldpath);
 
-    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
+    for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         char const* name = tor->info.files[i].name;
         size_t const len = strlen(name);
 
         if ((len == oldpath_len || (len > oldpath_len && name[oldpath_len] == '/')) && memcmp(oldpath, name, oldpath_len) == 0)
         {
-            indices[n++] = i;
+            indices[n_affected_files++] = i;
         }
     }
 
-    *setme_n = n;
+    *setme_n = n_affected_files;
     return indices;
 }
 
@@ -3272,7 +3271,7 @@ static void torrentRenamePath(void* vdata)
                 }
 
                 /* update tr_info.name if user changed the toplevel */
-                if (n == tor->info.fileCount && strchr(oldpath, '/') == nullptr)
+                if (n == tor->fileCount() && strchr(oldpath, '/') == nullptr)
                 {
                     tr_free(tor->info.name);
                     tor->info.name = tr_strdup(newname);

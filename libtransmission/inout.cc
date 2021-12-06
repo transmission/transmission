@@ -52,7 +52,7 @@ static int readOrWriteBytes(
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
 
-    TR_ASSERT(fileIndex < tr_torrentFileCount(tor));
+    TR_ASSERT(fileIndex < tor->fileCount());
     auto const& file = tor->info.files[fileIndex];
     TR_ASSERT(file.length == 0 || fileOffset < file.length);
     TR_ASSERT(fileOffset + buflen <= file.length);
@@ -180,15 +180,16 @@ void tr_ioFindFileLocation(
     uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
     TR_ASSERT(offset < tor->info.totalSize);
 
+    auto const n_files = tor->fileCount();
     auto const* file = static_cast<tr_file const*>(
-        bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile));
+        bsearch(&offset, tor->info.files, n_files, sizeof(tr_file), compareOffsetToFile));
     TR_ASSERT(file != nullptr);
 
     if (file != nullptr)
     {
         *fileIndex = file - tor->info.files;
         *fileOffset = offset - file->priv.offset;
-        TR_ASSERT(*fileIndex < tor->info.fileCount);
+        TR_ASSERT(*fileIndex < n_files);
         TR_ASSERT(*fileOffset < file->length);
         TR_ASSERT(tor->info.files[*fileIndex].priv.offset + *fileOffset == offset);
     }
