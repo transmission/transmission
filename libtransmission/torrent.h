@@ -314,7 +314,7 @@ public:
         checked_pieces_ = checked;
 
         auto filename = std::string{};
-        for (size_t i = 0; i < info.fileCount; ++i)
+        for (size_t i = 0, n = this->fileCount(); i < n; ++i)
         {
             auto const found = this->findFile(filename, i);
             auto const mtime = found ? found->last_modified_at : 0;
@@ -330,7 +330,12 @@ public:
         }
     }
 
-    /// FINDING FILES
+    /// FILES
+
+    tr_file_index_t fileCount() const
+    {
+        return info.fileCount;
+    }
 
     struct tr_found_file_t : public tr_sys_path_info
     {

@@ -73,7 +73,7 @@ public:
         have.setHasAll();
         tr_peerUpdateProgress(tor, this);
 
-        file_urls.resize(tr_torrentInfo(tor)->fileCount);
+        file_urls.resize(tor->fileCount());
 
         timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);

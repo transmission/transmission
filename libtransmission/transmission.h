@@ -1083,7 +1083,7 @@ char const* tr_torrentName(tr_torrent const*);
  *         when done) that gives the location of this file on disk,
  *         or nullptr if no file exists yet.
  * @param tor the torrent whose file we're looking for
- * @param fileNum the fileIndex, in [0...tr_info.fileCount)
+ * @param fileNum the fileIndex, in [0...tr_torrentFileCount())
  */
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum);
 

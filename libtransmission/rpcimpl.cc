@@ -383,7 +383,7 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
 
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
-    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
@@ -395,7 +395,7 @@ static void addFileStats(tr_torrent const* tor, tr_variant* list)
 
 static void addFiles(tr_torrent const* tor, tr_variant* list)
 {
-    for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
@@ -569,16 +569,16 @@ static void initField(
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, tr_torrentFileCount(tor));
+        tr_variantInitInt(initme, tor->fileCount());
         break;
 
     case TR_KEY_files:
-        tr_variantInitList(initme, tr_torrentFileCount(tor));
+        tr_variantInitList(initme, tor->fileCount());
         addFiles(tor, initme);
         break;
 
     case TR_KEY_fileStats:
-        tr_variantInitList(initme, tr_torrentFileCount(tor));
+        tr_variantInitList(initme, tor->fileCount());
         addFileStats(tor, initme);
         break;
 
@@ -715,7 +715,7 @@ static void initField(
 
     case TR_KEY_priorities:
         {
-            auto const n = tr_torrentFileCount(tor);
+            auto const n = tor->fileCount();
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
@@ -825,7 +825,7 @@ static void initField(
 
     case TR_KEY_wanted:
         {
-            auto const n = tr_torrentFileCount(tor);
+            auto const n = tor->fileCount();
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
@@ -985,8 +985,10 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
 static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr_variant* list)
 {
     char const* errmsg = nullptr;
+    auto const n_files = tor->fileCount();
+
     auto files = std::vector<tr_file_index_t>{};
-    files.reserve(tr_torrentFileCount(tor));
+    files.reserve(n_files);
 
     if (size_t const n = tr_variantListSize(list); n != 0)
     {
@@ -995,7 +997,7 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
             auto tmp = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
-                if (0 <= tmp && tmp < tor->info.fileCount)
+                if (0 <= tmp && tmp < n_files)
                 {
                     files.push_back(tr_file_index_t(tmp));
                 }
@@ -1008,10 +1010,8 @@ static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr
     }
     else // if empty set, apply to all
     {
-        for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
-        {
-            files.push_back(t);
-        }
+        files.resize(n_files);
+        std::iota(std::begin(files), std::end(files), 0);
     }
 
     tor->setFilePriorities(std::data(files), std::size(files), priority);
@@ -1023,7 +1023,7 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 {
     char const* errmsg = nullptr;
 
-    auto const n_files = tr_torrentFileCount(tor);
+    auto const n_files = tor->fileCount();
     size_t const n_items = tr_variantListSize(list);
 
     auto files = std::vector<tr_file_index_t>{};
@@ -1036,7 +1036,7 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
             auto tmp = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
-                if (0 <= tmp && tmp < tor->info.fileCount)
+                if (0 <= tmp && tmp < n_files)
                 {
                     files.push_back(tmp);
                 }
