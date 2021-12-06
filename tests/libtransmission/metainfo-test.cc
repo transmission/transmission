@@ -195,9 +195,12 @@ TEST(Metainfo, ctorSaveContents)
     auto* ctor = tr_ctorNew(nullptr);
     tr_error* error = nullptr;
     EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
-    ASSERT_NE(nullptr, error);
-    EXPECT_EQ(EINVAL, error->code);
-    tr_error_clear(&error);
+    EXPECT_NE(nullptr, error);
+    if (error != nullptr)
+    {
+        EXPECT_EQ(EINVAL, error->code);
+        tr_error_clear(&error);
+    }
 
     // now try saving _with_ metainfo
     EXPECT_EQ(0, tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str()));
