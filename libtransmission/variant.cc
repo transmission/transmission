@@ -1207,16 +1207,18 @@ char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
 
 int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
 {
+    auto error_code = int{ 0 };
     auto contents_len = size_t{};
     auto const* contents = tr_variantToStr(v, fmt, &contents_len);
     tr_error* error = nullptr;
-    auto const saved = tr_saveFile(filename, { contents, contents_len }, &error);
+    tr_saveFile(filename, { contents, contents_len }, &error);
     if (error != nullptr)
     {
         tr_logAddError(_("Error saving \"%s\": %s (%d)"), filename, error->message, error->code);
+        error_code = error->code;
         tr_error_clear(&error);
     }
-    return saved ? 0 : -1;
+    return error_code;
 }
 
 /***
