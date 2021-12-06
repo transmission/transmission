@@ -384,8 +384,7 @@ bool tr_saveFile(char const* filename_in, std::string_view contents, tr_error** 
 
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
-    char* real_filename = tr_sys_path_resolve(filename.c_str(), nullptr);
-    if (real_filename != nullptr)
+    if (char* real_filename = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename != nullptr)
     {
         filename = real_filename;
         tr_free(real_filename);
