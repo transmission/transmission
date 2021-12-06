@@ -39,7 +39,13 @@ struct tr_block_info
 
     constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
     {
-        return n_blocks_in_piece ? block / n_blocks_in_piece : 0;
+        // if not initialized yet, don't divide by zero
+        if (n_blocks_in_piece == 0)
+        {
+            return 0;
+        }
+
+        return block / n_blocks_in_piece;
     }
 
     constexpr uint32_t pieceSize(tr_piece_index_t piece) const
@@ -56,14 +62,36 @@ struct tr_block_info
 
     constexpr tr_piece_index_t pieceOf(uint64_t offset) const
     {
+        // if not initialized yet, don't divide by zero
+        if (piece_size == 0)
+        {
+            return 0;
+        }
+
         // handle 0-byte files at the end of a torrent
-        return offset == total_size ? n_pieces - 1 : offset / piece_size;
+        if (offset == total_size)
+        {
+            return n_pieces - 1;
+        }
+
+        return offset / piece_size;
     }
 
     constexpr tr_block_index_t blockOf(uint64_t offset) const
     {
+        // if not initialized yet, don't divide by zero
+        if (block_size == 0)
+        {
+            return 0;
+        }
+
         // handle 0-byte files at the end of a torrent
-        return offset == total_size ? n_blocks - 1 : offset / block_size;
+        if (offset == total_size)
+        {
+            return n_blocks - 1;
+        }
+
+        return offset / block_size;
     }
 
     constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
