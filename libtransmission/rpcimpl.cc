@@ -421,7 +421,7 @@ static void addTrackers(tr_info const* info, tr_variant* trackers)
         tr_variant* d = tr_variantListAddDict(trackers, 4);
         tr_variantDictAddStrView(d, TR_KEY_announce, t->announce);
         tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape);
+        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape != nullptr ? t->scrape : ""sv);
         tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
     }
 }
