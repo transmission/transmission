@@ -134,11 +134,11 @@ void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct
 
     if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
+        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
     }
     else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
+        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
     }
 }
 
