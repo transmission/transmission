@@ -1444,14 +1444,14 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
-            char buf[128] = { 0 };
+            auto buf = std::array<char, 128>{};
             if (webseed.is_downloading)
             {
-                tr_formatter_speed_KBps(buf, webseed.download_speed_KBps, sizeof(buf));
+                tr_formatter_speed_KBps(std::data(buf), webseed.download_speed_KBps, std::size(buf));
             }
 
-            (*iter)[webseed_cols.download_rate_double] = KBps;
-            (*iter)[webseed_cols.download_rate_string] = buf;
+            (*iter)[webseed_cols.download_rate_double] = webseed.download_speed_KBps;
+            (*iter)[webseed_cols.download_rate_string] = std::data(buf);
             (*iter)[webseed_cols.was_updated] = true;
         }
     }
