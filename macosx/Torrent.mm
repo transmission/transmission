@@ -1098,7 +1098,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
         if (webseed.is_downloading)
         {
-            dict[@"DL From Rate"] = @(webseed.download_speed_KBps);
+            dict[@"DL From Rate"] = @(double(webseed.download_bytes_per_second) / 1000);
         }
 
         [webSeeds addObject:dict];

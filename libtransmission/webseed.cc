@@ -135,7 +135,7 @@ tr_webseed_view tr_webseedView(tr_peer const* peer)
 
     auto bytes_per_second = unsigned{ 0 };
     auto const is_downloading = peer->is_transferring_pieces(tr_time_msec(), TR_DOWN, &bytes_per_second);
-    return { w->base_url.c_str(), is_downloading, double(bytes_per_second) / tr_speed_K };
+    return { w->base_url.c_str(), is_downloading, bytes_per_second };
 }
 
 /***

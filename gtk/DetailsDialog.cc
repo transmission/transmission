@@ -1403,7 +1403,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
 void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& torrents)
 {
-    int total = 0;
+    auto has_any_webseeds = bool{ false };
     auto& hash = webseed_hash_;
     auto& store = webseed_store_;
 
@@ -1416,12 +1416,10 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     /* step 2: add any new webseeds */
     for (auto const* const tor : torrents)
     {
-        size_t const n_webseeds = tr_torrentWebseedCount(tor);
-
-        total += n_webseeds;
-
-        for (unsigned int j = 0; j < n_webseeds; ++j)
+        for (size_t j = 0, n = tr_torrentWebseedCount(tor); j < n; ++j)
         {
+            has_any_webseeds = true;
+
             auto const* const url = tr_torrentWebseed(tor, j).url;
             auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
 
@@ -1444,13 +1442,14 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
+            auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
             auto buf = std::array<char, 128>{};
             if (webseed.is_downloading)
             {
-                tr_formatter_speed_KBps(std::data(buf), webseed.download_speed_KBps, std::size(buf));
+                tr_formatter_speed_KBps(std::data(buf), KBps, std::size(buf));
             }
 
-            (*iter)[webseed_cols.download_rate_double] = webseed.download_speed_KBps;
+            (*iter)[webseed_cols.download_rate_double] = KBps;
             (*iter)[webseed_cols.download_rate_string] = std::data(buf);
             (*iter)[webseed_cols.was_updated] = true;
         }
@@ -1476,7 +1475,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 
     /* most of the time there are no webseeds...
        don't waste space showing an empty list */
-    webseed_view_->set_visible(total > 0);
+    webseed_view_->set_visible(has_any_webseeds);
 }
 
 void DetailsDialog::Impl::refreshPeers(std::vector<tr_torrent*> const& torrents)
