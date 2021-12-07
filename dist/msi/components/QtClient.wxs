@@ -97,6 +97,9 @@
       <Component Id="dll.qt.network">
         <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Network.dll" />
       </Component>
+      <Component Id="dll.qt.svg">
+        <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Svg.dll" />
+      </Component>
       <Component Id="dll.qt.widgets">
         <File DiskId="1" KeyPath="yes" Name="Qt$(var.QtMajorVer)Widgets.dll" />
       </Component>
@@ -109,7 +112,6 @@
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\plugins">
 
-      <?if $(var.QtMajorVer) = 6 ?>
       <Directory Id="QTIMAGEFORMATSDIR" Name="imageformats">
         <Component Id="dll.qt.plugins.imageformats.gif">
           <File DiskId="1" KeyPath="yes" Name="qgif.dll" />
@@ -120,8 +122,10 @@
         <Component Id="dll.qt.plugins.imageformats.jpeg">
           <File DiskId="1" KeyPath="yes" Name="qjpeg.dll" />
         </Component>
+        <Component Id="dll.qt.plugins.imageformats.svg">
+          <File DiskId="1" KeyPath="yes" Name="qsvg.dll" />
+        </Component>
       </Directory>
-      <?endif ?>
 
       <Directory Id="QTPLATFORMDIR" Name="platforms">
         <Component Id="dll.qt.plugins.platforms.windows">
@@ -161,15 +165,15 @@
       <ComponentRef Id="dll.qt.dbus" />
       <ComponentRef Id="dll.qt.gui" />
       <ComponentRef Id="dll.qt.network" />
+      <ComponentRef Id="dll.qt.svg" />
       <ComponentRef Id="dll.qt.widgets" />
       <?if $(var.QtMajorVer) = 5 ?>
       <ComponentRef Id="dll.qt.winextras" />
       <?endif ?>
-      <?if $(var.QtMajorVer) = 6 ?>
       <ComponentRef Id="dll.qt.plugins.imageformats.gif" />
       <ComponentRef Id="dll.qt.plugins.imageformats.ico" />
       <ComponentRef Id="dll.qt.plugins.imageformats.jpeg" />
-      <?endif ?>
+      <ComponentRef Id="dll.qt.plugins.imageformats.svg" />
       <ComponentRef Id="dll.qt.plugins.platforms.windows" />
       <ComponentRef Id="dll.qt.plugins.styles.windowsvista" />
       <?if $(var.QtMajorVer) = 6 ?>
