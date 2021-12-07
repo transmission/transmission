@@ -391,13 +391,12 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
     auto const n = tor->fileCount();
-    tr_file const* files = tor->info.files;
 
     bool any_renamed = false;
 
     for (tr_file_index_t i = 0; !any_renamed && i < n; ++i)
     {
-        any_renamed = files[i].priv.is_renamed;
+        any_renamed = tor->file(i).priv.is_renamed;
     }
 
     if (any_renamed)
@@ -406,7 +405,8 @@ static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 
         for (tr_file_index_t i = 0; i < n; ++i)
         {
-            tr_variantListAddStrView(list, files[i].priv.is_renamed ? files[i].name : "");
+            auto const& file = tor->file(i);
+            tr_variantListAddStrView(list, file.priv.is_renamed ? file.name : "");
         }
     }
 }
@@ -426,7 +426,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            auto& file = tor->info.files[i];
+            auto& file = tor->file(i);
             tr_free(file.name);
             file.name = tr_strvDup(sv);
             file.priv.is_renamed = true;
@@ -475,16 +475,14 @@ static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawl
 
 static void saveProgress(tr_variant* dict, tr_torrent* tor)
 {
-    tr_info const* inf = tr_torrentInfo(tor);
-
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
     auto const n = tor->fileCount();
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
-    for (auto const *file = inf->files, *end = file + n; file != end; ++file)
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddInt(l, file->priv.mtime);
+        tr_variantListAddInt(l, tor->file(i).priv.mtime);
     }
 
     // add the 'checked pieces' bitfield

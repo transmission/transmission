@@ -999,12 +999,12 @@ using tr_torrent_rename_done_func = void (*)( //
  * EXAMPLES
  *
  *   Consider a tr_torrent where its
- *   info.files[0].name is "frobnitz-linux/checksum" and
- *   info.files[1].name is "frobnitz-linux/frobnitz.iso".
+ *   tr_torrentFile(tor, 0).name is "frobnitz-linux/checksum" and
+ *   tr_torrentFile(tor, 1).name is "frobnitz-linux/frobnitz.iso".
  *
  *   1. tr_torrentRenamePath(tor, "frobnitz-linux", "foo") will rename
- *      the "frotbnitz-linux" folder as "foo", and update both info.name
- *      and info.files[*].name.
+ *      the "frotbnitz-linux" folder as "foo", and update both
+ *      tr_torrentName(tor) and tr_torrentFile(tor, *).name.
  *
  *   2. tr_torrentRenamePath(tor, "frobnitz-linux/checksum", "foo") will
  *      rename the "frobnitz-linux/checksum" file as "foo" and update
@@ -1513,34 +1513,19 @@ void tr_torrentTrackersFree(tr_tracker_stat* trackerStats, int trackerCount);
  */
 double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
 
+/*
+ * This view structure is intended for short-term use. Its pointers are owned
+ * by the torrent and may be invalidated if the torrent is edited or removed.
+ */
 struct tr_file_view
 {
-    // This file's name. Includes the full subpath in the torrent.
-    char const* name;
-
-    // the current size of the file, i.e. how much we've downloaded
-    uint64_t have;
-
-    // the total size of the file
-    uint64_t length;
-
-    // have / length
-    double progress;
-
-    // the file's priority
-    tr_priority_t priority;
-
-    // do we want to download this file?
-    bool wanted;
+    char const* name; // This file's name. Includes the full subpath in the torrent.
+    uint64_t have; // the current size of the file, i.e. how much we've downloaded
+    uint64_t length; // the total size of the file
+    double progress; // have / length
+    tr_priority_t priority; // the file's priority
+    bool wanted; // do we want to download this file?
 };
-
-/**
- * Returns a tr_file_view containing information about a file.
- *
- * This view structure is intended for short-term use. Pointers in it are
- * owned and managed by the torrent. Callers who want to keep this info
- * must make their own copy.
- */
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t file);
 
 size_t tr_torrentFileCount(tr_torrent const* torrent);
@@ -1603,10 +1588,6 @@ struct tr_info
 {
     /* total size of the torrent, in bytes */
     uint64_t totalSize;
-
-    /* The original name that came in this torrent's metainfo.
-     * CLIENT CODE: NOT USE THIS FIELD. */
-    char* originalName;
 
     /* The torrent's name. */
     char* name;

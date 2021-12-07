@@ -460,19 +460,12 @@ static char const* tr_metainfoParseImpl(
             if (tr_variantDictFindStrView(d, TR_KEY_display_name, &sv))
             {
                 tr_free(inf->name);
-                tr_free(inf->originalName);
                 inf->name = tr_strvDup(sv);
-                inf->originalName = tr_strvDup(sv);
             }
 
             if (inf->name == nullptr)
             {
                 inf->name = tr_strdup(inf->hashString);
-            }
-
-            if (inf->originalName == nullptr)
-            {
-                inf->originalName = tr_strdup(inf->hashString);
             }
         }
         else // not a magnet link and has no info dict...
@@ -510,9 +503,7 @@ static char const* tr_metainfoParseImpl(
         }
 
         tr_free(inf->name);
-        tr_free(inf->originalName);
         inf->name = tr_utf8clean(sv);
-        inf->originalName = tr_strdup(inf->name);
     }
 
     /* comment */
@@ -655,7 +646,6 @@ void tr_metainfoFree(tr_info* inf)
     tr_free(inf->creator);
     tr_free(inf->source);
     tr_free(inf->torrent);
-    tr_free(inf->originalName);
     tr_free(inf->name);
 
     for (unsigned int i = 0; i < inf->trackerCount; i++)

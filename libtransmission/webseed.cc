@@ -518,7 +518,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         auto file_offset = uint64_t{};
         tr_ioFindFileLocation(tor, step_piece, step_piece_offset, &file_index, &file_offset);
 
-        auto const& file = inf->files[file_index];
+        auto const& file = tor->file(file_index);
         uint64_t this_pass = std::min(remain, file.length - file_offset);
 
         if (std::empty(urls[file_index]))
