@@ -52,8 +52,7 @@ static int readOrWriteBytes(
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
 
-    TR_ASSERT(fileIndex < tor->fileCount());
-    auto const& file = tor->info.files[fileIndex];
+    auto const& file = tor->file(fileIndex);
     TR_ASSERT(file.length == 0 || fileOffset < file.length);
     TR_ASSERT(fileOffset + buflen <= file.length);
 
@@ -168,6 +167,7 @@ static int compareOffsetToFile(void const* a, void const* b)
     return 0;
 }
 
+// TODO(ckerr) migrate to fpm
 void tr_ioFindFileLocation(
     tr_torrent const* tor,
     tr_piece_index_t pieceIndex,
@@ -191,7 +191,7 @@ void tr_ioFindFileLocation(
         *fileOffset = offset - file->priv.offset;
         TR_ASSERT(*fileIndex < n_files);
         TR_ASSERT(*fileOffset < file->length);
-        TR_ASSERT(tor->info.files[*fileIndex].priv.offset + *fileOffset == offset);
+        TR_ASSERT(tor->file(*fileIndex).priv.offset + *fileOffset == offset);
     }
 }
 
@@ -205,7 +205,6 @@ static int readOrWritePiece(
     size_t buflen)
 {
     int err = 0;
-    tr_info const* info = &tor->info;
 
     if (pieceIndex >= tor->info.pieceCount)
     {
@@ -218,8 +217,8 @@ static int readOrWritePiece(
 
     while (buflen != 0 && err == 0)
     {
-        tr_file const* file = &info->files[fileIndex];
-        uint64_t const bytesThisPass = std::min(uint64_t{ buflen }, uint64_t{ file->length - fileOffset });
+        auto const& file = tor->file(fileIndex);
+        uint64_t const bytesThisPass = std::min(uint64_t{ buflen }, uint64_t{ file.length - fileOffset });
 
         err = readOrWriteBytes(tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass);
         buf += bytesThisPass;
@@ -229,7 +228,7 @@ static int readOrWritePiece(
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
-            auto const path = tr_strvPath(tor->downloadDir, file->name);
+            auto const path = tr_strvPath(tor->downloadDir, file.name);
             tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path.c_str());
         }
     }

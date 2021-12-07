@@ -289,6 +289,44 @@ public:
         setDirty();
     }
 
+    /// FILES
+
+    tr_file_index_t fileCount() const
+    {
+        return info.fileCount;
+    }
+
+    auto& file(tr_file_index_t i)
+    {
+        TR_ASSERT(i < this->fileCount());
+
+        return info.files[i];
+    }
+
+    auto const& file(tr_file_index_t i) const
+    {
+        TR_ASSERT(i < this->fileCount());
+
+        return info.files[i];
+    }
+
+    struct tr_found_file_t : public tr_sys_path_info
+    {
+        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
+        std::string_view base; // /home/foo/Downloads
+        std::string_view subpath; // /torrent/01-file-one.txt
+
+        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
+            : tr_sys_path_info{ info }
+            , filename{ f }
+            , base{ b }
+            , subpath{ f.c_str() + std::size(b) + 1 }
+        {
+        }
+    };
+
+    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
+
     /// CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
@@ -319,7 +357,7 @@ public:
             auto const found = this->findFile(filename, i);
             auto const mtime = found ? found->last_modified_at : 0;
 
-            info.files[i].priv.mtime = mtime;
+            this->file(i).priv.mtime = mtime;
 
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
@@ -329,30 +367,6 @@ public:
             }
         }
     }
-
-    /// FILES
-
-    tr_file_index_t fileCount() const
-    {
-        return info.fileCount;
-    }
-
-    struct tr_found_file_t : public tr_sys_path_info
-    {
-        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
-        std::string_view base; // /home/foo/Downloads
-        std::string_view subpath; // /torrent/01-file-one.txt
-
-        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
-            : tr_sys_path_info{ info }
-            , filename{ f }
-            , base{ b }
-            , subpath{ f.c_str() + std::size(b) + 1 }
-        {
-        }
-    };
-
-    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
     tr_info info = {};
 
