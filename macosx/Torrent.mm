@@ -1085,7 +1085,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSArray*)webSeeds
 {
-    NSUinteger n = tr_torrentWebseedCount(fHandle);
+    NSUInteger n = tr_torrentWebseedCount(fHandle);
     NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:n];
 
     for (NSUInteger i = 0; i < n; ++i)
