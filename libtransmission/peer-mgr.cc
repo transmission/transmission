@@ -1707,14 +1707,11 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->swarm->manager != nullptr);
+    TR_ASSERT(tor->swarm != nullptr);
     size_t const n = tr_ptrArraySize(&tor->swarm->webseeds);
     TR_ASSERT(i < n);
-    if (i >= n)
-    {
-        return {};
-    }
-    return tr_webseedView(static_cast<tr_peer const*>(tr_ptrArrayNth(&tor->swarm->webseeds, i)));
+
+    return i >= n ? tr_webseed_view{} : tr_webseedView(static_cast<tr_peer const*>(tr_ptrArrayNth(&tor->swarm->webseeds, i)));
 }
 
 static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)

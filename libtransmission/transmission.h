@@ -1526,7 +1526,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    unsigned download_bytes_per_second; // current download rate
+    unsigned download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
