@@ -1416,13 +1416,13 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     /* step 2: add any new webseeds */
     for (auto const* const tor : torrents)
     {
-        auto const* inf = tr_torrentInfo(tor);
+        size_t const n_webseeds = tr_torrentWebseedCount(tor);
 
-        total += inf->webseedCount;
+        total += n_webseeds;
 
-        for (unsigned int j = 0; j < inf->webseedCount; ++j)
+        for (unsigned int j = 0; j < n_webseeds; ++j)
         {
-            char const* url = inf->webseeds[j];
+            auto const* const url = tr_torrentWebseed(tor, j).url;
             auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
 
             if (hash.find(key) == hash.end())
@@ -1438,27 +1438,22 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     /* step 3: update the webseeds */
     for (auto const* const tor : torrents)
     {
-        auto const* inf = tr_torrentInfo(tor);
-        double* speeds_KBps = tr_torrentWebSpeeds_KBps(tor);
-
-        for (unsigned int j = 0; j < inf->webseedCount; ++j)
+        for (size_t j = 0, n = tr_torrentWebseedCount(tor); j < n; ++j)
         {
-            char const* const url = inf->webseeds[j];
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
+            auto const webseed = tr_torrentWebseed(tor, j);
+            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             char buf[128] = { 0 };
-            if (speeds_KBps[j] > 0)
+            if (webseed.is_downloading)
             {
-                tr_formatter_speed_KBps(buf, speeds_KBps[j], sizeof(buf));
+                tr_formatter_speed_KBps(buf, webseed.download_speed_KBps, sizeof(buf));
             }
 
-            (*iter)[webseed_cols.download_rate_double] = speeds_KBps[j];
+            (*iter)[webseed_cols.download_rate_double] = KBps;
             (*iter)[webseed_cols.download_rate_string] = buf;
             (*iter)[webseed_cols.was_updated] = true;
         }
-
-        tr_free(speeds_KBps);
     }
 
     /* step 4: remove webseeds that have disappeared */

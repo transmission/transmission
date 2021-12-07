@@ -1241,16 +1241,21 @@ size_t tr_torrentFileCount(tr_torrent const* torrent)
     return torrent->fileCount();
 }
 
-/***
-****
-***/
+tr_webseed_view tr_torrentWebseed(tr_torrent const* tor, size_t i)
+{
+    return tr_peerMgrWebseed(tor, i);
+}
 
-double* tr_torrentWebSpeeds_KBps(tr_torrent const* tor)
+size_t tr_torrentWebseedCount(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_peerMgrWebSpeeds_KBps(tor);
+    return tor->webseedCount();
 }
+
+/***
+****
+***/
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
 {
