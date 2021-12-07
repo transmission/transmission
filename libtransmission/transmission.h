@@ -1589,10 +1589,6 @@ struct tr_info
     /* total size of the torrent, in bytes */
     uint64_t totalSize;
 
-    /* The original name that came in this torrent's metainfo.
-     * CLIENT CODE: NOT USE THIS FIELD. */
-    char* originalName;
-
     /* The torrent's name. */
     char* name;
 
