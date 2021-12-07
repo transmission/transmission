@@ -1403,7 +1403,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
 void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& torrents)
 {
-    int total = 0;
+    auto has_any_webseeds = bool{ false };
     auto& hash = webseed_hash_;
     auto& store = webseed_store_;
 
@@ -1416,13 +1416,11 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     /* step 2: add any new webseeds */
     for (auto const* const tor : torrents)
     {
-        auto const* inf = tr_torrentInfo(tor);
-
-        total += inf->webseedCount;
-
-        for (unsigned int j = 0; j < inf->webseedCount; ++j)
+        for (size_t j = 0, n = tr_torrentWebseedCount(tor); j < n; ++j)
         {
-            char const* url = inf->webseeds[j];
+            has_any_webseeds = true;
+
+            auto const* const url = tr_torrentWebseed(tor, j).url;
             auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
 
             if (hash.find(key) == hash.end())
@@ -1438,27 +1436,23 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
     /* step 3: update the webseeds */
     for (auto const* const tor : torrents)
     {
-        auto const* inf = tr_torrentInfo(tor);
-        double* speeds_KBps = tr_torrentWebSpeeds_KBps(tor);
-
-        for (unsigned int j = 0; j < inf->webseedCount; ++j)
+        for (size_t j = 0, n = tr_torrentWebseedCount(tor); j < n; ++j)
         {
-            char const* const url = inf->webseeds[j];
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
+            auto const webseed = tr_torrentWebseed(tor, j);
+            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
-            char buf[128] = { 0 };
-            if (speeds_KBps[j] > 0)
+            auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
+            auto buf = std::array<char, 128>{};
+            if (webseed.is_downloading)
             {
-                tr_formatter_speed_KBps(buf, speeds_KBps[j], sizeof(buf));
+                tr_formatter_speed_KBps(std::data(buf), KBps, std::size(buf));
             }
 
-            (*iter)[webseed_cols.download_rate_double] = speeds_KBps[j];
-            (*iter)[webseed_cols.download_rate_string] = buf;
+            (*iter)[webseed_cols.download_rate_double] = KBps;
+            (*iter)[webseed_cols.download_rate_string] = std::data(buf);
             (*iter)[webseed_cols.was_updated] = true;
         }
-
-        tr_free(speeds_KBps);
     }
 
     /* step 4: remove webseeds that have disappeared */
@@ -1481,7 +1475,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 
     /* most of the time there are no webseeds...
        don't waste space showing an empty list */
-    webseed_view_->set_visible(total > 0);
+    webseed_view_->set_visible(has_any_webseeds);
 }
 
 void DetailsDialog::Impl::refreshPeers(std::vector<tr_torrent*> const& torrents)

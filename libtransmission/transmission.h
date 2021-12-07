@@ -1501,18 +1501,6 @@ tr_tracker_stat* tr_torrentTrackers(tr_torrent const* torrent, int* setmeTracker
 
 void tr_torrentTrackersFree(tr_tracker_stat* trackerStats, int trackerCount);
 
-/**
- * @brief get the download speeds for each of this torrent's webseed sources.
- *
- * @return an array of tor->info.webseedCount floats giving download speeds.
- *         Each speed in the array corresponds to the webseed at the same
- *         array index in tor->info.webseeds.
- *         To differentiate "idle" and "stalled" status, idle webseeds will
- *         return -1 instead of 0 KiB/s.
- *         NOTE: always free this array with tr_free() when you're done with it.
- */
-double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
-
 /*
  * This view structure is intended for short-term use. Its pointers are owned
  * by the torrent and may be invalidated if the torrent is edited or removed.
@@ -1529,6 +1517,21 @@ struct tr_file_view
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t file);
 
 size_t tr_torrentFileCount(tr_torrent const* torrent);
+
+/*
+ * This view structure is intended for short-term use. Its pointers are owned
+ * by the torrent and may be invalidated if the torrent is edited or removed.
+ */
+struct tr_webseed_view
+{
+    char const* url; // the url to download from
+    bool is_downloading; // can be true even if speed is 0, e.g. slow download
+    unsigned download_bytes_per_second; // current download speed
+};
+
+struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
+
+size_t tr_torrentWebseedCount(tr_torrent const* torrent);
 
 /***********************************************************************
  * tr_torrentAvailability

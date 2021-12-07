@@ -1080,31 +1080,29 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSUInteger)webSeedCount
 {
-    return fInfo->webseedCount;
+    return tr_torrentWebseedCount(fHandle);
 }
 
 - (NSArray*)webSeeds
 {
-    NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:fInfo->webseedCount];
+    NSUInteger n = tr_torrentWebseedCount(fHandle);
+    NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:n];
 
-    double* dlSpeeds = tr_torrentWebSpeeds_KBps(fHandle);
-
-    for (NSInteger i = 0; i < fInfo->webseedCount; i++)
+    for (NSUInteger i = 0; i < n; ++i)
     {
+        auto const webseed = tr_torrentWebseed(fHandle, i);
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:3];
 
         dict[@"Name"] = self.name;
-        dict[@"Address"] = @(fInfo->webseeds[i]);
+        dict[@"Address"] = @(webseed.url);
 
-        if (dlSpeeds[i] != -1.0)
+        if (webseed.is_downloading)
         {
-            dict[@"DL From Rate"] = @(dlSpeeds[i]);
+            dict[@"DL From Rate"] = @(double(webseed.download_bytes_per_second) / 1000);
         }
 
         [webSeeds addObject:dict];
     }
-
-    tr_free(dlSpeeds);
 
     return webSeeds;
 }
