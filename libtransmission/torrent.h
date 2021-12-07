@@ -348,6 +348,13 @@ public:
         return info.webseeds[i];
     }
 
+    /// TRACKERS
+
+    auto trackerCount() const
+    {
+        return info.trackerCount;
+    }
+
     /// CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)

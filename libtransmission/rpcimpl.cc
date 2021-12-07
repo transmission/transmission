@@ -426,39 +426,35 @@ static void addTrackers(tr_info const* info, tr_variant* trackers)
     }
 }
 
-static void addTrackerStats(tr_tracker_stat const* st, int n, tr_variant* list)
+static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
 {
-    for (int i = 0; i < n; ++i)
-    {
-        tr_tracker_stat const* s = &st[i];
-        tr_variant* d = tr_variantListAddDict(list, 26);
-        tr_variantDictAddStr(d, TR_KEY_announce, s->announce);
-        tr_variantDictAddInt(d, TR_KEY_announceState, s->announceState);
-        tr_variantDictAddInt(d, TR_KEY_downloadCount, s->downloadCount);
-        tr_variantDictAddBool(d, TR_KEY_hasAnnounced, s->hasAnnounced);
-        tr_variantDictAddBool(d, TR_KEY_hasScraped, s->hasScraped);
-        tr_variantDictAddStr(d, TR_KEY_host, s->host);
-        tr_variantDictAddInt(d, TR_KEY_id, s->id);
-        tr_variantDictAddBool(d, TR_KEY_isBackup, s->isBackup);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, s->lastAnnouncePeerCount);
-        tr_variantDictAddStr(d, TR_KEY_lastAnnounceResult, s->lastAnnounceResult);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnounceStartTime, s->lastAnnounceStartTime);
-        tr_variantDictAddBool(d, TR_KEY_lastAnnounceSucceeded, s->lastAnnounceSucceeded);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnounceTime, s->lastAnnounceTime);
-        tr_variantDictAddBool(d, TR_KEY_lastAnnounceTimedOut, s->lastAnnounceTimedOut);
-        tr_variantDictAddStr(d, TR_KEY_lastScrapeResult, s->lastScrapeResult);
-        tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, s->lastScrapeStartTime);
-        tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, s->lastScrapeSucceeded);
-        tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, s->lastScrapeTime);
-        tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, s->lastScrapeTimedOut);
-        tr_variantDictAddInt(d, TR_KEY_leecherCount, s->leecherCount);
-        tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, s->nextAnnounceTime);
-        tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, s->nextScrapeTime);
-        tr_variantDictAddStr(d, TR_KEY_scrape, s->scrape);
-        tr_variantDictAddInt(d, TR_KEY_scrapeState, s->scrapeState);
-        tr_variantDictAddInt(d, TR_KEY_seederCount, s->seederCount);
-        tr_variantDictAddInt(d, TR_KEY_tier, s->tier);
-    }
+    auto* const d = tr_variantListAddDict(list, 26);
+    tr_variantDictAddStr(d, TR_KEY_announce, tracker.announce);
+    tr_variantDictAddInt(d, TR_KEY_announceState, tracker.announceState);
+    tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
+    tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
+    tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
+    tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
+    tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, tracker.lastAnnouncePeerCount);
+    tr_variantDictAddStr(d, TR_KEY_lastAnnounceResult, tracker.lastAnnounceResult);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnounceStartTime, tracker.lastAnnounceStartTime);
+    tr_variantDictAddBool(d, TR_KEY_lastAnnounceSucceeded, tracker.lastAnnounceSucceeded);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnounceTime, tracker.lastAnnounceTime);
+    tr_variantDictAddBool(d, TR_KEY_lastAnnounceTimedOut, tracker.lastAnnounceTimedOut);
+    tr_variantDictAddStr(d, TR_KEY_lastScrapeResult, tracker.lastScrapeResult);
+    tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, tracker.lastScrapeStartTime);
+    tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, tracker.lastScrapeSucceeded);
+    tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, tracker.lastScrapeTime);
+    tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, tracker.lastScrapeTimedOut);
+    tr_variantDictAddInt(d, TR_KEY_leecherCount, tracker.leecherCount);
+    tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, tracker.nextAnnounceTime);
+    tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, tracker.nextScrapeTime);
+    tr_variantDictAddStr(d, TR_KEY_scrape, tracker.scrape);
+    tr_variantDictAddInt(d, TR_KEY_scrapeState, tracker.scrapeState);
+    tr_variantDictAddInt(d, TR_KEY_seederCount, tracker.seederCount);
+    tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
 }
 
 static void addPeers(tr_torrent* tor, tr_variant* list)
@@ -791,11 +787,13 @@ static void initField(
 
     case TR_KEY_trackerStats:
         {
-            auto n = int{};
-            tr_tracker_stat* s = tr_torrentTrackers(tor, &n);
+            auto const n = tr_torrentTrackerCount(tor);
             tr_variantInitList(initme, n);
-            addTrackerStats(s, n, initme);
-            tr_torrentTrackersFree(s, n);
+            for (size_t i = 0; i < n; ++i)
+            {
+                auto const& tracker = tr_torrentTracker(tor, i);
+                addTrackerStats(tracker, initme);
+            }
             break;
         }
 
