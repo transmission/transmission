@@ -77,6 +77,13 @@ char const* tr_torrentName(tr_torrent const* tor)
     return tor != nullptr ? tor->info.name : "";
 }
 
+uint64_t tr_torrentTotalSize(tr_torrent const* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    return tor->info.totalSize;
+}
+
 int tr_torrentId(tr_torrent const* tor)
 {
     return tor != nullptr ? tor->uniqueId : -1;
@@ -1263,6 +1270,27 @@ size_t tr_torrentTrackerCount(tr_torrent const* tor)
     return tor->trackerCount();
 }
 
+tr_torrent_view tr_torrentView(tr_torrent const* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    auto ret = tr_torrent_view{};
+    ret.name = tor->info.name;
+    ret.hash_string = tor->info.hashString;
+    ret.torrent_filename = tor->info.torrent;
+    ret.comment = tor->info.comment;
+    ret.creator = tor->info.creator;
+    ret.source = tor->info.source;
+    ret.total_size = tor->info.totalSize;
+    ret.date_created = tor->info.dateCreated;
+    ret.piece_size = tor->info.pieceSize;
+    ret.n_pieces = tor->info.pieceCount;
+    ret.is_private = tor->info.isPrivate;
+    ret.is_folder = tor->info.isFolder;
+
+    return ret;
+}
+
 /***
 ****
 ***/
@@ -2248,6 +2276,66 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 
     tr_free(trackers);
     return ok;
+}
+
+static bool hasTracker(tr_torrent const* tor, std::string_view announce)
+{
+    auto const n = tor->trackerCount();
+    auto const matches = [&announce](auto const& tracker)
+    {
+        return announce == tracker.announce;
+    };
+    return std::any_of(tor->info.trackers, tor->info.trackers + n, matches);
+}
+
+bool tr_torrent::trackerAdd(std::string_view announce)
+{
+    if (!tr_urlParseTracker(announce) || hasTracker(this, announce))
+    {
+        return false;
+    }
+
+    auto const sz_announce = std::string{ announce };
+    auto trackers = std::vector<tr_tracker_info>(this->info.trackers, this->info.trackers + this->info.trackerCount);
+    trackers.push_back(tr_tracker_info{ std::empty(trackers) ? 0 : trackers.back().tier + 1,
+                                        const_cast<char*>(sz_announce.c_str()),
+                                        nullptr,
+                                        0 });
+    return tr_torrentSetAnnounceList(this, std::data(trackers), std::size(trackers));
+}
+
+bool tr_torrentTrackerAdd(tr_torrent* tor, char const* announce)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(announce != nullptr);
+
+    return tr_isTorrent(tor) && announce != nullptr && tor->trackerAdd(announce);
+}
+
+bool tr_torrent::trackerRemove(std::string_view announce)
+{
+    if (!tr_urlParseTracker(announce) || !hasTracker(this, announce))
+    {
+        return false;
+    }
+
+    auto const n = this->trackerCount();
+    auto const keep = [&announce](auto const& tracker)
+    {
+        return announce != tracker.announce;
+    };
+    auto trackers = std::vector<tr_tracker_info>{};
+    trackers.reserve(n);
+    std::copy_if(this->info.trackers, this->info.trackers + n, std::back_inserter(trackers), keep);
+    return tr_torrentSetAnnounceList(this, std::data(trackers), std::size(trackers));
+}
+
+bool tr_torrentTrackerRemove(tr_torrent* tor, char const* announce_url)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(announce_url != nullptr);
+
+    return tr_isTorrent(tor) && announce_url != nullptr && tor->trackerRemove(announce_url);
 }
 
 /**
@@ -3341,4 +3429,9 @@ void tr_torrentSetFilePriorities(
     tr_priority_t priority)
 {
     tor->setFilePriorities(files, fileCount, priority);
+}
+
+bool tr_torrentHasMetadata(tr_torrent const* tor)
+{
+    return tor->info.fileCount > 0;
 }

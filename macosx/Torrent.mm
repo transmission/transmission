@@ -152,14 +152,11 @@ bool trashDataFile(char const* filename, tr_error** error)
 @implementation Torrent
 {
     tr_torrent* fHandle;
-    tr_info const* fInfo;
     tr_stat const* fStat;
 
     NSUserDefaults* fDefaults;
 
     NSImage* fIcon;
-
-    NSString* fHashString;
 
     NSArray* fFileList;
     NSArray* fFlatFileList;
@@ -424,7 +421,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     if (fResumeOnWake)
     {
-        tr_logAddNamedInfo(fInfo->name, "restarting because of wakeUp");
+        tr_logAddNamedInfo(tr_torrentName(fHandle), "restarting because of wakeUp");
         tr_torrentStart(fHandle);
     }
 }
@@ -719,17 +716,17 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)name
 {
-    return fInfo->name != NULL ? @(fInfo->name) : fHashString;
+    return @(tr_torrentName(fHandle));
 }
 
 - (BOOL)isFolder
 {
-    return fInfo->isFolder;
+    return tr_torrentView(fHandle).is_folder;
 }
 
 - (uint64_t)size
 {
-    return fInfo->totalSize;
+    return tr_torrentTotalSize(fHandle);
 }
 
 - (uint64_t)sizeLeft
@@ -763,11 +760,12 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSArray*)allTrackersFlat
 {
-    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:fInfo->trackerCount];
+    auto const n = tr_torrentTrackerCount(fHandle);
+    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:n];
 
-    for (NSInteger i = 0; i < fInfo->trackerCount; i++)
+    for (size_t i = 0; i < n; ++i)
     {
-        [allTrackers addObject:@(fInfo->trackers[i].announce)];
+        [allTrackers addObject:@(tr_torrentTracker(fHandle, i).announce)];
     }
 
     return allTrackers;
@@ -782,84 +780,61 @@ bool trashDataFile(char const* filename, tr_error** error)
         tracker = [@"http://" stringByAppendingString:tracker];
     }
 
-    //recreate the tracker structure
-    int const oldTrackerCount = fInfo->trackerCount;
-    tr_tracker_info* trackerStructs = tr_new(tr_tracker_info, oldTrackerCount + 1);
-    for (int i = 0; i < oldTrackerCount; ++i)
-    {
-        trackerStructs[i] = fInfo->trackers[i];
-    }
-
-    trackerStructs[oldTrackerCount].announce = (char*)tracker.UTF8String;
-    trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount - 1].tier + 1;
-    trackerStructs[oldTrackerCount].id = oldTrackerCount;
-
-    BOOL const success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount + 1);
-    tr_free(trackerStructs);
-
-    return success;
+    return tr_torrentAddTracker(fHandle, (char*)tracker.UTF8String);
 }
 
 - (void)removeTrackers:(NSSet*)trackers
 {
-    //recreate the tracker structure
-    tr_tracker_info* trackerStructs = tr_new(tr_tracker_info, fInfo->trackerCount);
-
-    NSUInteger newCount = 0;
-    for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
+    for(NSString* announce in trackers)
     {
-        if (![trackers containsObject:@(fInfo->trackers[i].announce)])
-        {
-            trackerStructs[newCount++] = fInfo->trackers[i];
-        }
+        BOOL const success = tr_torrentTrackerRemove(fHandle, announce.UTF8String);
+        NSAssert(success, @"Removing tracker addresses failed");
     }
-
-    BOOL const success = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
-    NSAssert(success, @"Removing tracker addresses failed");
-
-    tr_free(trackerStructs);
 }
 
 - (NSString*)comment
 {
-    return fInfo->comment ? @(fInfo->comment) : @"";
+    auto const* comment = tr_torrentView(fHandle).comment;
+    return comment ? @(comment) : @"";
 }
 
 - (NSString*)creator
 {
-    return fInfo->creator ? @(fInfo->creator) : @"";
+    auto const* comment = tr_torrentView(fHandle).creator;
+    return creator ? @(creator) : @"";
 }
 
 - (NSDate*)dateCreated
 {
-    NSInteger date = fInfo->dateCreated;
+    auto const date = tr_torrentView(fHandle).date_created;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970:date] : nil;
 }
 
 - (NSInteger)pieceSize
 {
-    return fInfo->pieceSize;
+    return tr_torrentView(fHandle).piece_size;
 }
 
 - (NSInteger)pieceCount
 {
-    return fInfo->pieceCount;
+    return tr_torrentView(fHandle).n_pieces;
 }
 
 - (NSString*)hashString
 {
-    return fHashString;
+    return tr_torrentView(fHandle).hash_string;
 }
 
 - (BOOL)privateTorrent
 {
-    return fInfo->isPrivate;
+    return tr_torrentView(fHandle).is_private;
 }
 
 - (NSString*)torrentLocation
 {
-    return fInfo->torrent ? @(fInfo->torrent) : @"";
-}
+    auto const* filename = tr_torrentView(fHandle).torrent_filename;
+    return filename ? @(filename) : @"";
+:
 
 - (NSString*)dataLocation
 {
@@ -930,7 +905,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
-    tr_torrentRenamePath(fHandle, fInfo->name, newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    tr_torrentRenamePath(fHandle, tr_torerntName(fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
 }
 
 - (void)renameFileNode:(FileListNode*)node
@@ -1886,15 +1861,11 @@ bool trashDataFile(char const* filename, tr_error** error)
         }
     }
 
-    fInfo = tr_torrentInfo(fHandle);
-
     tr_torrentSetQueueStartCallback(fHandle, startQueueCallback, (__bridge void*)(self));
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, (__bridge void*)(self));
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, (__bridge void*)(self));
     tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, (__bridge void*)(self));
     tr_torrentSetMetadataCallback(fHandle, metadataCallback, (__bridge void*)(self));
-
-    fHashString = @(fInfo->hashString);
 
     fResumeOnWake = NO;
 

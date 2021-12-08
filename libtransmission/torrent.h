@@ -355,6 +355,10 @@ public:
         return info.trackerCount;
     }
 
+    bool trackerAdd(std::string_view announce_url);
+
+    bool trackerRemove(std::string_view announce_url);
+
     /// CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
@@ -685,3 +689,5 @@ constexpr tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
 {
     return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
+
+tr_info const* tr_torrentInfo(tr_torrent const* torrent);

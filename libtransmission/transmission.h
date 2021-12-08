@@ -1076,6 +1076,8 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
  */
 char const* tr_torrentName(tr_torrent const*);
 
+uint64_t tr_torrentTotalSize(tr_torrent const*);
+
 /**
  * @brief find the location of a torrent's file by looking with and without
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
@@ -1182,8 +1184,6 @@ void tr_torrentSetFilePriorities(
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
 
-tr_info const* tr_torrentInfo(tr_torrent const* torrent);
-
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
    a newly-instantiated tr_torrent object. */
@@ -1206,10 +1206,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf);
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
  */
-static inline char* tr_torrentGetMagnetLink(tr_torrent const* tor)
-{
-    return tr_torrentInfoGetMagnetLink(tr_torrentInfo(tor));
-}
+char* tr_torrentGetMagnetLink(tr_torrent const* tor);
 
 /**
 ***
@@ -1238,6 +1235,10 @@ struct tr_tracker_info
  * @param trackerCount size of the `trackers' array
  */
 bool tr_torrentSetAnnounceList(tr_torrent* torrent, tr_tracker_info const* trackers, int trackerCount);
+
+bool tr_torrentTrackerAdd(tr_torrent* torrent, char const* announce_url);
+
+bool tr_torrentTrackerRemove(tr_torrent* torrent, char const* announce_url);
 
 /**
 ***
@@ -1480,6 +1481,33 @@ struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
 
 size_t tr_torrentWebseedCount(tr_torrent const* torrent);
 
+/*
+ * This view structure is intended for short-term use. Its pointers are owned
+ * by the torrent and may be invalidated if the torrent is edited or removed.
+ */
+struct tr_torrent_view
+{
+    char const* name;
+    char const* hash_string;
+    char const* torrent_filename;
+
+    char const* comment; // optional; may be nullptr
+    char const* creator; // optional; may be nullptr
+    char const* source; // optional; may be nullptr
+
+    uint64_t total_size; // total size of the torrent, in bytes
+
+    time_t date_created;
+
+    uint32_t piece_size;
+    tr_piece_index_t n_pieces;
+
+    bool is_private;
+    bool is_folder;
+};
+
+struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
+
 /***********************************************************************
  * tr_torrentAvailability
  ***********************************************************************
@@ -1578,11 +1606,7 @@ struct tr_info
     bool isFolder;
 };
 
-static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
-{
-    tr_info const* const inf = tr_torrentInfo(tor);
-    return (inf != nullptr) && (inf->fileCount > 0);
-}
+bool tr_torrentHasMetadata(tr_torrent const* tor);
 
 /**
  * What the torrent is doing right now.
@@ -1785,13 +1809,13 @@ struct tr_stat
     /** Cumulative seconds the torrent's ever spent seeding */
     int secondsSeeding;
 
-    /** A torrent is considered finished if it has met its seed ratio.
-        As a result, only paused torrents can be finished. */
-    bool finished;
-
     /** This torrent's queue position.
         All torrents have a queue position, even if it's not queued. */
     int queuePosition;
+
+    /** A torrent is considered finished if it has met its seed ratio.
+        As a result, only paused torrents can be finished. */
+    bool finished;
 
     /** True if the torrent is running, but has been idle for long enough
         to be considered stalled.  @see tr_sessionGetQueueStalledMinutes() */

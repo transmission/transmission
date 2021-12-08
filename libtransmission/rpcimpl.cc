@@ -1056,11 +1056,6 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     return errmsg;
 }
 
-static bool hasAnnounceUrl(tr_tracker_info const* t, int n, std::string_view url)
-{
-    return std::any_of(t, t + n, [&url](auto const& row) { return row.announce == url; });
-}
-
 static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
 {
     int maxTier = -1;
@@ -1087,44 +1082,16 @@ static void freeTrackers(tr_tracker_info* trackers, int n)
 
 static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    char const* errmsg = nullptr;
+    bool changed = false;
 
-    /* make a working copy of the existing announce list */
-    auto const* const inf = tr_torrentInfo(tor);
-    int n = inf->trackerCount;
-    auto* const trackers = tr_new0(tr_tracker_info, n + tr_variantListSize(urls));
-    int tier = copyTrackers(trackers, inf->trackers, n);
-
-    /* and add the new ones */
-    auto i = int{ 0 };
-    auto changed = bool{ false };
-    tr_variant const* val = nullptr;
-    while ((val = tr_variantListChild(urls, i)) != nullptr)
+    for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
+        auto const* child = tr_variantListChild(urls, i);
         auto announce = std::string_view{};
-
-        if (tr_variantGetStrView(val, &announce) && tr_urlIsValidTracker(announce) && !hasAnnounceUrl(trackers, n, announce))
-        {
-            trackers[n].tier = ++tier; /* add a new tier */
-            trackers[n].announce = tr_strvDup(announce);
-            ++n;
-            changed = true;
-        }
-
-        ++i;
+        changed |= tr_variantGetStrView(child, &announce) && tor->trackerAdd(announce);
     }
 
-    if (!changed)
-    {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
-    }
-
-    freeTrackers(trackers, n);
-    return errmsg;
+    return changed ? nullptr : "error setting announce list";
 }
 
 static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
