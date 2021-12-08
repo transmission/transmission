@@ -754,7 +754,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             [trackers addObject:@{ @"Tier" : @(tracker.tier + 1), @"Name" : self.name }];
         }
 
-        auto* tracker_node = [[TrackerNode alloc] initWithTrackerStat:&stats[i] torrent:self];
+        auto* tracker_node = [[TrackerNode alloc] initWithTrackerView:tracker torrent:self];
         [trackers addObject:tracker_node];
     }
 

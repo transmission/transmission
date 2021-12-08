@@ -29,7 +29,7 @@
     tr_tracker_stat fStat;
 }
 
-- (instancetype)initWithTrackerStat:(tr_tracker_stat*)stat torrent:(Torrent*)torrent
+- (instancetype)initWithTrackerView:(tr_tracker_view*)stat torrent:(Torrent*)torrent
 {
     if ((self = [super init]))
     {

@@ -1404,17 +1404,17 @@ enum tr_tracker_state
 };
 
 /*
- * This view structure is intended for short-term use. Its pointers are owned
- * by the torrent and may be invalidated if the torrent is edited or removed.
+ * Unlike other _view structs, it is safe to keep a tr_tracker_view copy.
+ * The announce, scrape, and host strings are interned & never go out-of-scope.
  */
 struct tr_tracker_view
 {
     char const* announce; // full announce URL
-    char const* host; // human-readable tracker name. (`${host}:${port}`)
     char const* scrape; // full scrape URL
+    char const* host; // human-readable tracker name. (`${host}:${port}`)
 
-    char const* lastAnnounceResult; // if hasAnnounced, the human-readable result of latest announce
-    char const* lastScrapeResult; // if hasScraped, the human-readable result of the latest scrape
+    char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
+    char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape
 
     time_t lastAnnounceStartTime; // if hasAnnounced, when the latest announce request was sent
     time_t lastAnnounceTime; // if hasAnnounced, when the latest announce reply was received

@@ -1720,10 +1720,12 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
 
     view.host = tr_quark_get_string(tracker.key);
     view.announce = tr_quark_get_string(tracker.announce_url);
+    view.scrape = tracker.scrape_info == nullptr ? "" : tr_quark_get_string(tracker.scrape_info->scrape_url);
+
+    view.id = tracker.id;
     view.tier = tier_index;
     view.isBackup = &tracker != tier.currentTracker;
     view.lastScrapeStartTime = tier.lastScrapeStartTime;
-    view.scrape = tracker.scrape_info == nullptr ? "" : tr_quark_get_string(tracker.scrape_info->scrape_url);
     view.seederCount = tracker.seederCount;
     view.leecherCount = tracker.leecherCount;
     view.downloadCount = tracker.downloadCount;
@@ -1743,7 +1745,7 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
             view.lastScrapeTime = tier.lastScrapeTime;
             view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
             view.lastScrapeTimedOut = tier.lastScrapeTimedOut;
-            view.lastScrapeResult = tier.lastScrapeStr;
+            tr_strlcpy(view.lastScrapeResult, tier.lastScrapeStr, sizeof(view.lastScrapeResult));
         }
 
         if (tier.isScraping)
@@ -1770,10 +1772,10 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
         if (view.hasAnnounced != 0)
         {
             view.lastAnnounceTime = tier.lastAnnounceTime;
-            view.lastAnnounceResult = tier.lastAnnounceStr;
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;
             view.lastAnnounceTimedOut = tier.lastAnnounceTimedOut;
             view.lastAnnouncePeerCount = tier.lastAnnouncePeerCount;
+            tr_strlcpy(view.lastAnnounceResult, tier.lastAnnounceStr, sizeof(view.lastAnnounceResult));
         }
 
         if (tier.isAnnouncing)
