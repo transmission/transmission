@@ -1,13 +1,13 @@
 <svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">
- <g fill="#ffffff">
+ <g fill="#363636">
   <g transform="translate(4,-4)">
    <path d="m5 15a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
    <g transform="translate(0,10)" stroke-width="1.5">
     <g transform="matrix(.43738 0 0 .5 -145.4 -266.68)">
-     <g transform="matrix(0,-1.0825,-1.0825,0,1464.7,557.15)" fill="#ffffff" stroke-width="1.5"></g>
+     <g transform="matrix(0,-1.0825,-1.0825,0,1464.7,557.15)" fill="#363636" stroke-width="1.5"></g>
     </g>
     <g transform="matrix(-.43738 0 0 -.5 161.4 278.68)">
-     <g transform="matrix(0,-1.0825,-1.0825,0,1464.7,557.15)" fill="#ffffff" stroke-width="1.5"></g>
+     <g transform="matrix(0,-1.0825,-1.0825,0,1464.7,557.15)" fill="#363636" stroke-width="1.5"></g>
     </g>
    </g>
   </g>
