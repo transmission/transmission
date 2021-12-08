@@ -33,13 +33,13 @@
 namespace
 {
 
-Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_stat const* st)
+Glib::ustring getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
     Glib::ustring gstr;
 
     bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
-    bool const isSeed = st->haveValid >= info->totalSize;
+    bool const isSeed = st->haveValid >= total_size;
     double seedRatio;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
@@ -67,7 +67,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %6$s is the ratio we want to reach before we stop uploading */
                 _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"),
                 tr_strlsize(haveTotal),
-                tr_strlsize(info->totalSize),
+                tr_strlsize(total_size),
                 tr_strlpercent(st->percentComplete * 100.0),
                 tr_strlsize(st->uploadedEver),
                 tr_strlratio(st->ratio),
@@ -83,7 +83,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %5$s is our upload-to-download ratio */
                 _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"),
                 tr_strlsize(haveTotal),
-                tr_strlsize(info->totalSize),
+                tr_strlsize(total_size),
                 tr_strlpercent(st->percentComplete * 100.0),
                 tr_strlsize(st->uploadedEver),
                 tr_strlratio(st->ratio));
@@ -99,7 +99,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %3$s is our upload-to-download ratio,
                    %4$s is the ratio we want to reach before we stop uploading */
                 _("%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"),
-                tr_strlsize(info->totalSize),
+                tr_strlsize(total_size),
                 tr_strlsize(st->uploadedEver),
                 tr_strlratio(st->ratio),
                 tr_strlratio(seedRatio));
@@ -111,7 +111,7 @@ Glib::ustring getProgressString(tr_torrent const* tor, tr_info const* info, tr_s
                    %2$s is how much we've uploaded,
                    %3$s is our upload-to-download ratio */
                 _("%1$s, uploaded %2$s (Ratio: %3$s)"),
-                tr_strlsize(info->totalSize),
+                tr_strlsize(total_size),
                 tr_strlsize(st->uploadedEver),
                 tr_strlratio(st->ratio));
         }
@@ -458,12 +458,12 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
-    auto const* const inf = tr_torrentInfo(tor);
+    auto const total_size = tr_torrentInfo(tor)->totalSize;
 
     auto const icon = get_icon(tor, FULL_ICON_SIZE, widget);
     auto const name = Glib::ustring(tr_torrentName(tor));
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
-    auto const gstr_prog = getProgressString(tor, inf, st);
+    auto const gstr_prog = getProgressString(tor, total_size, st);
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
@@ -677,7 +677,7 @@ void TorrentCellRenderer::Impl::render_full(
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
-    auto const* const inf = tr_torrentInfo(tor);
+    auto const total_size = tr_torrentInfo(tor)->totalSize;
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
@@ -685,7 +685,7 @@ void TorrentCellRenderer::Impl::render_full(
 
     auto const icon = get_icon(tor, FULL_ICON_SIZE, widget);
     auto const name = Glib::ustring(tr_torrentName(tor));
-    auto const gstr_prog = getProgressString(tor, inf, st);
+    auto const gstr_prog = getProgressString(tor, total_size, st);
     auto const gstr_stat = getStatusString(tor, st, upload_speed_KBps.get_value(), download_speed_KBps.get_value());
     renderer_.get_padding(xpad, ypad);
     auto const text_color = get_text_color(widget, st);

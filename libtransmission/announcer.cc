@@ -1713,115 +1713,120 @@ static void onUpkeepTimer(evutil_socket_t /*fd*/, short /*what*/, void* vannounc
 ****
 ***/
 
-tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount)
+static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tier const& tier, tr_tracker const& tracker)
 {
-    TR_ASSERT(tr_isTorrent(torrent));
+    auto const now = tr_time();
+    auto view = tr_tracker_view{};
 
-    time_t const now = tr_time();
+    view.host = tr_quark_get_string(tracker.key);
+    view.announce = tr_quark_get_string(tracker.announce_url);
+    view.scrape = tracker.scrape_info == nullptr ? "" : tr_quark_get_string(tracker.scrape_info->scrape_url);
 
-    int out = 0;
-    struct tr_torrent_tiers const* const tt = torrent->tiers;
+    view.id = tracker.id;
+    view.tier = tier_index;
+    view.isBackup = &tracker != tier.currentTracker;
+    view.lastScrapeStartTime = tier.lastScrapeStartTime;
+    view.seederCount = tracker.seederCount;
+    view.leecherCount = tracker.leecherCount;
+    view.downloadCount = tracker.downloadCount;
 
-    /* alloc the stats */
-    *setmeTrackerCount = tt->tracker_count;
-    tr_tracker_stat* const ret = tr_new0(tr_tracker_stat, tt->tracker_count);
-
-    /* populate the stats */
-    for (int i = 0; i < tt->tier_count; ++i)
+    if (view.isBackup)
     {
-        tr_tier const* const tier = &tt->tiers[i];
-
-        for (int j = 0; j < tier->tracker_count; ++j)
+        view.scrapeState = TR_TRACKER_INACTIVE;
+        view.announceState = TR_TRACKER_INACTIVE;
+        view.nextScrapeTime = 0;
+        view.nextAnnounceTime = 0;
+    }
+    else
+    {
+        view.hasScraped = tier.lastScrapeTime;
+        if (view.hasScraped != 0)
         {
-            tr_tracker const* const tracker = &tier->trackers[j];
-            tr_tracker_stat* st = &ret[out++];
+            view.lastScrapeTime = tier.lastScrapeTime;
+            view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
+            view.lastScrapeTimedOut = tier.lastScrapeTimedOut;
+            tr_strlcpy(view.lastScrapeResult, tier.lastScrapeStr, sizeof(view.lastScrapeResult));
+        }
 
-            st->id = tracker->id;
-            st->host = tr_quark_get_string(tracker->key);
-            st->announce = tr_quark_get_string(tracker->announce_url);
-            st->tier = i;
-            st->isBackup = tracker != tier->currentTracker;
-            st->lastScrapeStartTime = tier->lastScrapeStartTime;
-            st->scrape = tracker->scrape_info == nullptr ? "" : tr_quark_get_string(tracker->scrape_info->scrape_url);
-            st->seederCount = tracker->seederCount;
-            st->leecherCount = tracker->leecherCount;
-            st->downloadCount = tracker->downloadCount;
+        if (tier.isScraping)
+        {
+            view.scrapeState = TR_TRACKER_ACTIVE;
+        }
+        else if (tier.scrapeAt == 0)
+        {
+            view.scrapeState = TR_TRACKER_INACTIVE;
+        }
+        else if (tier.scrapeAt > now)
+        {
+            view.scrapeState = TR_TRACKER_WAITING;
+            view.nextScrapeTime = tier.scrapeAt;
+        }
+        else
+        {
+            view.scrapeState = TR_TRACKER_QUEUED;
+        }
 
-            if (st->isBackup)
-            {
-                st->scrapeState = TR_TRACKER_INACTIVE;
-                st->announceState = TR_TRACKER_INACTIVE;
-                st->nextScrapeTime = 0;
-                st->nextAnnounceTime = 0;
-            }
-            else
-            {
-                st->hasScraped = tier->lastScrapeTime;
-                if (st->hasScraped != 0)
-                {
-                    st->lastScrapeTime = tier->lastScrapeTime;
-                    st->lastScrapeSucceeded = tier->lastScrapeSucceeded;
-                    st->lastScrapeTimedOut = tier->lastScrapeTimedOut;
-                    tr_strlcpy(st->lastScrapeResult, tier->lastScrapeStr, sizeof(st->lastScrapeResult));
-                }
+        view.lastAnnounceStartTime = tier.lastAnnounceStartTime;
 
-                if (tier->isScraping)
-                {
-                    st->scrapeState = TR_TRACKER_ACTIVE;
-                }
-                else if (tier->scrapeAt == 0)
-                {
-                    st->scrapeState = TR_TRACKER_INACTIVE;
-                }
-                else if (tier->scrapeAt > now)
-                {
-                    st->scrapeState = TR_TRACKER_WAITING;
-                    st->nextScrapeTime = tier->scrapeAt;
-                }
-                else
-                {
-                    st->scrapeState = TR_TRACKER_QUEUED;
-                }
+        view.hasAnnounced = tier.lastAnnounceTime;
+        if (view.hasAnnounced != 0)
+        {
+            view.lastAnnounceTime = tier.lastAnnounceTime;
+            view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;
+            view.lastAnnounceTimedOut = tier.lastAnnounceTimedOut;
+            view.lastAnnouncePeerCount = tier.lastAnnouncePeerCount;
+            tr_strlcpy(view.lastAnnounceResult, tier.lastAnnounceStr, sizeof(view.lastAnnounceResult));
+        }
 
-                st->lastAnnounceStartTime = tier->lastAnnounceStartTime;
-
-                st->hasAnnounced = tier->lastAnnounceTime;
-                if (st->hasAnnounced != 0)
-                {
-                    st->lastAnnounceTime = tier->lastAnnounceTime;
-                    tr_strlcpy(st->lastAnnounceResult, tier->lastAnnounceStr, sizeof(st->lastAnnounceResult));
-                    st->lastAnnounceSucceeded = tier->lastAnnounceSucceeded;
-                    st->lastAnnounceTimedOut = tier->lastAnnounceTimedOut;
-                    st->lastAnnouncePeerCount = tier->lastAnnouncePeerCount;
-                }
-
-                if (tier->isAnnouncing)
-                {
-                    st->announceState = TR_TRACKER_ACTIVE;
-                }
-                else if (!torrent->isRunning || tier->announceAt == 0)
-                {
-                    st->announceState = TR_TRACKER_INACTIVE;
-                }
-                else if (tier->announceAt > now)
-                {
-                    st->announceState = TR_TRACKER_WAITING;
-                    st->nextAnnounceTime = tier->announceAt;
-                }
-                else
-                {
-                    st->announceState = TR_TRACKER_QUEUED;
-                }
-            }
+        if (tier.isAnnouncing)
+        {
+            view.announceState = TR_TRACKER_ACTIVE;
+        }
+        else if (!tor.isRunning || tier.announceAt == 0)
+        {
+            view.announceState = TR_TRACKER_INACTIVE;
+        }
+        else if (tier.announceAt > now)
+        {
+            view.announceState = TR_TRACKER_WAITING;
+            view.nextAnnounceTime = tier.announceAt;
+        }
+        else
+        {
+            view.announceState = TR_TRACKER_QUEUED;
         }
     }
 
-    return ret;
+    TR_ASSERT(0 <= view.tier);
+    TR_ASSERT(view.tier < tor.tiers->tier_count);
+    return view;
 }
 
-void tr_announcerStatsFree(tr_tracker_stat* trackers, int /*trackerCount*/)
+tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
 {
-    tr_free(trackers);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tor->tiers != nullptr);
+
+    // find the nth tracker
+    struct tr_torrent_tiers const* const tt = tor->tiers;
+    if (nth >= size_t(tt->tracker_count))
+    {
+        return {};
+    }
+    auto const& tracker = tt->trackers[nth];
+    for (int i = 0; i < tt->tier_count; ++i)
+    {
+        tr_tier const& tier = tt->tiers[i];
+
+        for (int j = 0; j < tier.tracker_count; ++j)
+        {
+            if (&tier.trackers[j] == &tracker)
+            {
+                return trackerView(*tor, i, tier, tracker);
+            }
+        }
+    }
+    return {};
 }
 
 /***

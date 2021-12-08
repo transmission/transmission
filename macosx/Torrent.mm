@@ -20,7 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <optional>
+
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h> // tr_new()
@@ -736,25 +739,25 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSMutableArray*)allTrackerStats
 {
-    int count;
-    tr_tracker_stat* stats = tr_torrentTrackers(fHandle, &count);
+    auto const count = tr_torrentTrackerCount(fHandle);
+    auto tier = std::optional<int>{};
 
-    NSMutableArray* trackers = [NSMutableArray arrayWithCapacity:(count > 0 ? count + (stats[count - 1].tier + 1) : 0)];
+    NSMutableArray* trackers = [NSMutableArray arrayWithCapacity:count * 2];
 
-    int prevTier = -1;
-    for (int i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
     {
-        if (stats[i].tier != prevTier)
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        if (!tier || tier != tracker.tier)
         {
-            [trackers addObject:@{ @"Tier" : @(stats[i].tier + 1), @"Name" : self.name }];
-            prevTier = stats[i].tier;
+            tier = tracker.tier;
+            [trackers addObject:@{ @"Tier" : @(tracker.tier + 1), @"Name" : self.name }];
         }
 
-        TrackerNode* tracker = [[TrackerNode alloc] initWithTrackerStat:&stats[i] torrent:self];
-        [trackers addObject:tracker];
+        auto* tracker_node = [[TrackerNode alloc] initWithTrackerView:&tracker torrent:self];
+        [trackers addObject:tracker_node];
     }
 
-    tr_torrentTrackersFree(stats, count);
     return trackers;
 }
 
@@ -1548,7 +1551,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSInteger)fileCount
 {
-    return fInfo->fileCount;
+    return tr_torrentFileCount(fHandle);
 }
 
 - (CGFloat)fileProgress:(FileListNode*)node
@@ -1792,21 +1795,19 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)trackerSortKey
 {
-    int count;
-    tr_tracker_stat* stats = tr_torrentTrackers(fHandle, &count);
-
     NSString* best = nil;
 
-    for (int i = 0; i < count; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
     {
-        NSString* tracker = @(stats[i].host);
-        if (!best || [tracker localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        NSString* host = @(tracker.host);
+        if (!best || [host localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
         {
-            best = tracker;
+            best = host;
         }
     }
 
-    tr_torrentTrackersFree(stats, count);
     return best;
 }
 
