@@ -26,7 +26,7 @@
 
 @implementation TrackerNode
 {
-    tr_tracker_stat fStat;
+    tr_tracker_view fStat;
 }
 
 - (instancetype)initWithTrackerView:(tr_tracker_view*)stat torrent:(Torrent*)torrent
