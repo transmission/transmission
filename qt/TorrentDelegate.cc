@@ -17,6 +17,7 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
+#include "IconCache.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -437,12 +438,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = QIcon::fromTheme(QStringLiteral("emblem-important"));
-    }
-
-    if (icon.isNull())
-    {
-        icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
+        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
     }
 
     return icon;

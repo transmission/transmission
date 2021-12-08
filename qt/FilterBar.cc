@@ -22,6 +22,7 @@
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
+#include "IconCache.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -53,31 +54,33 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("system-run")), tr("Active"));
+    auto& icons = IconCache::get();
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-down")), tr("Downloading"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading"));
     row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-up")), tr("Seeding"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding"));
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("media-playback-pause")), tr("Paused"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused"));
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("dialog-ok")), tr("Finished"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished"));
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("view-refresh")), tr("Verifying"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying"));
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("process-stop")), tr("Error"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error"));
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 
