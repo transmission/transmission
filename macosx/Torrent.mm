@@ -822,7 +822,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)hashString
 {
-    return tr_torrentView(fHandle).hash_string;
+    return @(tr_torrentView(fHandle).hash_string);
 }
 
 - (BOOL)privateTorrent
@@ -905,7 +905,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     NSDictionary* contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
-    tr_torrentRenamePath(fHandle, tr_torerntName(fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+    tr_torrentRenamePath(fHandle, tr_torrentName(fHandle), newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
 }
 
 - (void)renameFileNode:(FileListNode*)node
