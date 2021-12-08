@@ -1551,7 +1551,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSInteger)fileCount
 {
-    return fInfo->fileCount;
+    return tr_torrentFileCount(fHandle);
 }
 
 - (CGFloat)fileProgress:(FileListNode*)node

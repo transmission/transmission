@@ -174,13 +174,12 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
     for (auto const& row : tmodel->children())
     {
         auto const* tor = static_cast<tr_torrent const*>(row.get_value(torrent_cols.torrent));
-        auto const* const inf = tr_torrentInfo(tor);
 
         std::set<std::string const*> keys;
 
-        for (unsigned int i = 0; i < inf->trackerCount; ++i)
+        for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
         {
-            auto const* const key = &*strings.insert(gtr_get_host_from_url(inf->trackers[i].announce)).first;
+            auto const* const key = &*strings.insert(gtr_get_host_from_url(tr_torrentTracker(tor, i).announce)).first;
 
             if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
             {
@@ -384,21 +383,20 @@ namespace
 
 bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring const& host)
 {
-    bool matches = true;
-
-    if (active_tracker_type == TRACKER_FILTER_TYPE_HOST)
+    if (active_tracker_type != TRACKER_FILTER_TYPE_HOST)
     {
-        auto const* const inf = tr_torrentInfo(tor);
+        return true;
+    }
 
-        matches = false;
-
-        for (unsigned int i = 0; !matches && i < inf->trackerCount; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
+    {
+        if (gtr_get_host_from_url(tr_torrentTracker(tor, i).announce) == host)
         {
-            matches = gtr_get_host_from_url(inf->trackers[i].announce) == host;
+            return true;
         }
     }
 
-    return matches;
+    return false;
 }
 
 /***

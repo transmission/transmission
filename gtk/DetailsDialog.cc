@@ -2253,19 +2253,18 @@ std::string get_editable_tracker_list(tr_torrent const* tor)
 {
     std::ostringstream gstr;
     int tier = 0;
-    tr_info const* inf = tr_torrentInfo(tor);
 
-    for (unsigned int i = 0; i < inf->trackerCount; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        tr_tracker_info const* t = &inf->trackers[i];
+        auto const tracker = tr_torrentTracker(tor, i);
 
-        if (tier != t->tier)
+        if (tier != tracker.tier)
         {
-            tier = t->tier;
+            tier = tracker.tier;
             gstr << '\n';
         }
 
-        gstr << t->announce << '\n';
+        gstr << tracker.announce << '\n';
     }
 
     auto str = gstr.str();
@@ -2628,8 +2627,7 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     {
         int const id = ids.front();
         auto const* tor = core_->find_torrent(id);
-        auto const* inf = tr_torrentInfo(tor);
-        title = gtr_sprintf(_("%s Properties"), inf->name);
+        title = gtr_sprintf(_("%s Properties"), tr_torrentName(tor));
 
         file_list_->set_torrent(id);
         file_list_->show();

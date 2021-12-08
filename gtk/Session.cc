@@ -456,15 +456,9 @@ int compare_by_activity(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
 
 int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    int ret = 0;
-
     auto* const ta = static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent));
     auto* const tb = static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent));
-
-    if (ret == 0)
-    {
-        ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
-    }
+    int ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
 
     if (ret == 0)
     {
@@ -476,15 +470,9 @@ int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
 
 int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    int ret = 0;
-
-    auto const* const ia = tr_torrentInfo(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
-    auto const* const ib = tr_torrentInfo(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-
-    if (ret == 0)
-    {
-        ret = compare_uint64(ia->totalSize, ib->totalSize);
-    }
+    auto const size_a = tr_torrentInfo(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)))->totalSize;
+    auto const size_b = tr_torrentInfo(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)))->totalSize;
+    int ret = compare_uint64(size_a, size_b);
 
     if (ret == 0)
     {
@@ -496,15 +484,9 @@ int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator 
 
 int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    int ret = 0;
-
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-
-    if (ret == 0)
-    {
-        ret = compare_double(sa->percentComplete, sb->percentComplete);
-    }
+    int ret = compare_double(sa->percentComplete, sb->percentComplete);
 
     if (ret == 0)
     {
@@ -521,15 +503,9 @@ int compare_by_progress(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::itera
 
 int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    int ret = 0;
-
     auto const* const sa = tr_torrentStatCached(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
     auto const* const sb = tr_torrentStatCached(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
-
-    if (ret == 0)
-    {
-        ret = compare_eta(sa->eta, sb->eta);
-    }
+    int ret = compare_eta(sa->eta, sb->eta);
 
     if (ret == 0)
     {
@@ -541,15 +517,9 @@ int compare_by_eta(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
 
 int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    int ret = 0;
-
     auto const sa = a->get_value(torrent_cols.activity);
     auto const sb = b->get_value(torrent_cols.activity);
-
-    if (ret == 0)
-    {
-        ret = compare_int(sa, sb);
-    }
+    int ret = compare_int(sa, sb);
 
     if (ret == 0)
     {
@@ -893,8 +863,7 @@ namespace
 
 Glib::ustring get_collated_name(tr_torrent const* tor)
 {
-    auto const* const inf = tr_torrentInfo(tor);
-    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), inf->hashString);
+    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentInfo(tor)->hashString);
 }
 
 struct metadata_callback_data
@@ -951,14 +920,13 @@ namespace
 
 unsigned int build_torrent_trackers_hash(tr_torrent* tor)
 {
-    uint64_t hash = 0;
-    tr_info const* const inf = tr_torrentInfo(tor);
+    auto hash = uint64_t{};
 
-    for (unsigned int i = 0; i < inf->trackerCount; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        for (char const* pch = inf->trackers[i].announce; *pch != '\0'; ++pch)
+        for (auto const ch : std::string_view{ tr_torrentTracker(tor, i).announce })
         {
-            hash = (hash << 4) ^ (hash >> 28) ^ *pch;
+            hash = (hash << 4) ^ (hash >> 28) ^ ch;
         }
     }
 
