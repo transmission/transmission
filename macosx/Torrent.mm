@@ -780,7 +780,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         tracker = [@"http://" stringByAppendingString:tracker];
     }
 
-    return tr_torrentAddTracker(fHandle, (char*)tracker.UTF8String);
+    return tr_torrentTrackerAdd(fHandle, tracker.UTF8String);
 }
 
 - (void)removeTrackers:(NSSet*)trackers
@@ -800,7 +800,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)creator
 {
-    auto const* comment = tr_torrentView(fHandle).creator;
+    auto const* creator = tr_torrentView(fHandle).creator;
     return creator ? @(creator) : @"";
 }
 
@@ -834,7 +834,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     auto const* filename = tr_torrentView(fHandle).torrent_filename;
     return filename ? @(filename) : @"";
-:
+}
 
 - (NSString*)dataLocation
 {
