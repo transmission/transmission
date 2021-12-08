@@ -425,7 +425,7 @@ void buildTree(FileRowNode& node, build_data& build)
 
     auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DIRECTORY_MIME_TYPE;
     auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
-    auto const file = tr_torrentFile(build.tor, child_data.index);
+    auto const file = isLeaf ? tr_torrentFile(build.tor, child_data.index) : tr_file_view{};
     int const priority = isLeaf ? file.priority : 0;
     bool const enabled = isLeaf ? file.wanted : true;
     auto name_esc = Glib::Markup::escape_text(child_data.name);

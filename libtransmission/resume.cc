@@ -375,6 +375,12 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
         return 0;
     }
 
+    name = tr_strvDup(name);
+    if (std::empty(name))
+    {
+        return 0;
+    }
+
     if (name != tr_torrentName(tor))
     {
         tr_free(tor->info.name);
