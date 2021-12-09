@@ -233,7 +233,7 @@ QIcon IconCache::getThemeIcon(
 
     if (icon.isNull())
     {
-        icon = getThemeIcon(fallbackName + rtlSuffix);
+        icon = QIcon::fromTheme(fallbackName + rtlSuffix);
     }
 
     if (icon.isNull() && fallbackPixmap.has_value())
