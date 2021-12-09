@@ -55,7 +55,6 @@ private:
     void initFilesTab() const;
     void initOptionsTab();
 
-    QIcon getStockIcon(QString const& freedesktop_name, int fallback) const;
     void setEnabled(bool);
 
 private slots:
