@@ -1853,15 +1853,19 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         nullptr,
     };
 
+    auto const id_str = std::to_string(tr_torrentId(tor));
+    auto const labels_str = buildLabelsString(tor);
+    auto const trackers_str = buildTrackersString(tor);
+
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, ctime_str },
         { "TR_TORRENT_DIR"sv, torrent_dir },
         { "TR_TORRENT_HASH"sv, tor->info.hashString },
-        { "TR_TORRENT_ID"sv, std::to_string(tr_torrentId(tor)) },
-        { "TR_TORRENT_LABELS"sv, buildLabelsString(tor) },
+        { "TR_TORRENT_ID"sv, id_str },
+        { "TR_TORRENT_LABELS"sv, labels_str },
         { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
-        { "TR_TORRENT_TRACKERS"sv, buildTrackersString(tor) },
+        { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
     tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
