@@ -1844,7 +1844,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     struct tm tm;
     char ctime_str[32];
     tr_localtime_r(&now, &tm);
-    strftime(ctime_str, sizeof(ctime_str), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 

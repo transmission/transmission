@@ -934,7 +934,7 @@ static char* format_date(char* buf, size_t buflen, time_t now)
 {
     struct tm tm;
     tr_localtime_r(&now, &tm);
-    strftime(buf, buflen, "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    strftime(buf, buflen, "%a %b %d %T %Y%n", &tm); /* ctime equiv */
     return buf;
 }
 
