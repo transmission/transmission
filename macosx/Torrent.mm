@@ -20,7 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <optional>
+
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h> // tr_new()
@@ -736,25 +739,25 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSMutableArray*)allTrackerStats
 {
-    int count;
-    tr_tracker_stat* stats = tr_torrentTrackers(fHandle, &count);
+    auto const count = tr_torrentTrackerCount(fHandle);
+    auto tier = std::optional<int>{};
 
-    NSMutableArray* trackers = [NSMutableArray arrayWithCapacity:(count > 0 ? count + (stats[count - 1].tier + 1) : 0)];
+    NSMutableArray* trackers = [NSMutableArray arrayWithCapacity:count * 2];
 
-    int prevTier = -1;
-    for (int i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
     {
-        if (stats[i].tier != prevTier)
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        if (!tier || tier != tracker.tier)
         {
-            [trackers addObject:@{ @"Tier" : @(stats[i].tier + 1), @"Name" : self.name }];
-            prevTier = stats[i].tier;
+            tier = tracker.tier;
+            [trackers addObject:@{ @"Tier" : @(tracker.tier + 1), @"Name" : self.name }];
         }
 
-        TrackerNode* tracker = [[TrackerNode alloc] initWithTrackerStat:&stats[i] torrent:self];
-        [trackers addObject:tracker];
+        auto* tracker_node = [[TrackerNode alloc] initWithTrackerView:&tracker torrent:self];
+        [trackers addObject:tracker_node];
     }
 
-    tr_torrentTrackersFree(stats, count);
     return trackers;
 }
 
@@ -1080,31 +1083,29 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSUInteger)webSeedCount
 {
-    return fInfo->webseedCount;
+    return tr_torrentWebseedCount(fHandle);
 }
 
 - (NSArray*)webSeeds
 {
-    NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:fInfo->webseedCount];
+    NSUInteger n = tr_torrentWebseedCount(fHandle);
+    NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:n];
 
-    double* dlSpeeds = tr_torrentWebSpeeds_KBps(fHandle);
-
-    for (NSInteger i = 0; i < fInfo->webseedCount; i++)
+    for (NSUInteger i = 0; i < n; ++i)
     {
+        auto const webseed = tr_torrentWebseed(fHandle, i);
         NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity:3];
 
         dict[@"Name"] = self.name;
-        dict[@"Address"] = @(fInfo->webseeds[i]);
+        dict[@"Address"] = @(webseed.url);
 
-        if (dlSpeeds[i] != -1.0)
+        if (webseed.is_downloading)
         {
-            dict[@"DL From Rate"] = @(dlSpeeds[i]);
+            dict[@"DL From Rate"] = @(double(webseed.download_bytes_per_second) / 1000);
         }
 
         [webSeeds addObject:dict];
     }
-
-    tr_free(dlSpeeds);
 
     return webSeeds;
 }
@@ -1550,7 +1551,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSInteger)fileCount
 {
-    return fInfo->fileCount;
+    return tr_torrentFileCount(fHandle);
 }
 
 - (CGFloat)fileProgress:(FileListNode*)node
@@ -1794,21 +1795,19 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)trackerSortKey
 {
-    int count;
-    tr_tracker_stat* stats = tr_torrentTrackers(fHandle, &count);
-
     NSString* best = nil;
 
-    for (int i = 0; i < count; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
     {
-        NSString* tracker = @(stats[i].host);
-        if (!best || [tracker localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        NSString* host = @(tracker.host);
+        if (!best || [host localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
         {
-            best = tracker;
+            best = host;
         }
     }
 
-    tr_torrentTrackersFree(stats, count);
     return best;
 }
 

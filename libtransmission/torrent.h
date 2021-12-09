@@ -327,6 +327,34 @@ public:
 
     std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
+    /// WEBSEEDS
+
+    auto webseedCount() const
+    {
+        return info.webseedCount;
+    }
+
+    auto const& webseed(size_t i) const
+    {
+        TR_ASSERT(i < webseedCount());
+
+        return info.webseeds[i];
+    }
+
+    auto& webseed(size_t i)
+    {
+        TR_ASSERT(i < webseedCount());
+
+        return info.webseeds[i];
+    }
+
+    /// TRACKERS
+
+    auto trackerCount() const
+    {
+        return info.trackerCount;
+    }
+
     /// CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)

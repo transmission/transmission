@@ -1241,16 +1241,31 @@ size_t tr_torrentFileCount(tr_torrent const* torrent)
     return torrent->fileCount();
 }
 
-/***
-****
-***/
+tr_webseed_view tr_torrentWebseed(tr_torrent const* tor, size_t i)
+{
+    return tr_peerMgrWebseed(tor, i);
+}
 
-double* tr_torrentWebSpeeds_KBps(tr_torrent const* tor)
+size_t tr_torrentWebseedCount(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tr_peerMgrWebSpeeds_KBps(tor);
+    return tor->webseedCount();
 }
+
+tr_tracker_view tr_torrentTracker(tr_torrent const* tor, size_t i)
+{
+    return tr_announcerTracker(tor, i);
+}
+
+size_t tr_torrentTrackerCount(tr_torrent const* tor)
+{
+    return tor->trackerCount();
+}
+
+/***
+****
+***/
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
 {
@@ -1262,18 +1277,6 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
 void tr_torrentPeersFree(tr_peer_stat* peers, int /*peerCount*/)
 {
     tr_free(peers);
-}
-
-tr_tracker_stat* tr_torrentTrackers(tr_torrent const* tor, int* setmeTrackerCount)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    return tr_announcerStats(tor, setmeTrackerCount);
-}
-
-void tr_torrentTrackersFree(tr_tracker_stat* trackers, int trackerCount)
-{
-    tr_announcerStatsFree(trackers, trackerCount);
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
@@ -1817,20 +1820,15 @@ static std::string buildTrackersString(tr_torrent const* tor)
 {
     auto buf = std::stringstream{};
 
-    int n = 0;
-    tr_tracker_stat* stats = tr_torrentTrackers(tor, &n);
-    for (int i = 0; i < n;)
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        tr_tracker_stat const* s = &stats[i];
-
-        buf << s->host;
+        buf << tr_torrentTracker(tor, i).host;
 
         if (++i < n)
         {
             buf << ',';
         }
     }
-    tr_torrentTrackersFree(stats, n);
 
     return buf.str();
 }

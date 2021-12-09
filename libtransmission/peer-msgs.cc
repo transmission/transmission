@@ -1750,6 +1750,11 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
                 {
                     tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request), msgs->pendingReqsToClient);
                     --msgs->pendingReqsToClient;
+                    if (fext)
+                    {
+                        protocolSendReject(msgs, &r);
+                    }
+
                     break;
                 }
             }

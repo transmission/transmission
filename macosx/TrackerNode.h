@@ -30,7 +30,7 @@
 
 @property(nonatomic, weak, readonly) Torrent* torrent;
 
-- (instancetype)initWithTrackerStat:(tr_tracker_stat*)stat torrent:(Torrent*)torrent;
+- (instancetype)initWithTrackerView:(tr_tracker_view const*)stat torrent:(Torrent*)torrent;
 
 - (BOOL)isEqual:(id)object;
 

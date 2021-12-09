@@ -1403,115 +1403,50 @@ enum tr_tracker_state
     TR_TRACKER_ACTIVE = 3
 };
 
-struct tr_tracker_stat
+/*
+ * Unlike other _view structs, it is safe to keep a tr_tracker_view copy.
+ * The announce, scrape, and host strings are interned & never go out-of-scope.
+ */
+struct tr_tracker_view
 {
-    /* how many downloads this tracker knows of (-1 means it does not know) */
-    int downloadCount;
+    char const* announce; // full announce URL
+    char const* scrape; // full scrape URL
+    char const* host; // human-readable tracker name. (`${host}:${port}`)
 
-    /* whether or not we've ever sent this tracker an announcement */
-    bool hasAnnounced;
+    char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
+    char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape
 
-    /* whether or not we've ever scraped to this tracker */
-    bool hasScraped;
+    time_t lastAnnounceStartTime; // if hasAnnounced, when the latest announce request was sent
+    time_t lastAnnounceTime; // if hasAnnounced, when the latest announce reply was received
+    time_t nextAnnounceTime; // if announceState == TR_TRACKER_WAITING, time of next announce
 
-    /* human-readable string identifying the tracker.
-     * 'host' is a slight misnomer; the current format ist `$host:$port` */
-    char const* host;
+    time_t lastScrapeStartTime; // if hasScraped, when the latest scrape request was sent
+    time_t lastScrapeTime; // if hasScraped, when the latest scrape reply was received
+    time_t nextScrapeTime; // if scrapeState == TR_TRACKER_WAITING, time of next scrape
 
-    /* the full announce URL */
-    char const* announce;
+    int downloadCount; // number of times this torrent's been downloaded, or -1 if unknown
+    int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
+    int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
+    int seederCount; // number of seeders the tracker knows of, or -1 if  unknown
 
-    /* the full scrape URL */
-    char const* scrape;
+    int tier; // which tier this tracker is in
+    int id; // unique transmission-generated ID for use in libtransmission API
 
-    /* Transmission uses one tracker per tier,
-     * and the others are kept as backups */
-    bool isBackup;
+    tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
+    tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.
 
-    /* is the tracker announcing, waiting, queued, etc */
-    tr_tracker_state announceState;
-
-    /* is the tracker scraping, waiting, queued, etc */
-    tr_tracker_state scrapeState;
-
-    /* number of peers the tracker told us about last time.
-     * if "lastAnnounceSucceeded" is false, this field is undefined */
-    int lastAnnouncePeerCount;
-
-    /* human-readable string with the result of the last announce.
-       if "hasAnnounced" is false, this field is undefined */
-    char lastAnnounceResult[128];
-
-    /* when the last announce was sent to the tracker.
-     * if "hasAnnounced" is false, this field is undefined */
-    time_t lastAnnounceStartTime;
-
-    /* whether or not the last announce was a success.
-       if "hasAnnounced" is false, this field is undefined */
-    bool lastAnnounceSucceeded;
-
-    /* whether or not the last announce timed out. */
-    bool lastAnnounceTimedOut;
-
-    /* when the last announce was completed.
-       if "hasAnnounced" is false, this field is undefined */
-    time_t lastAnnounceTime;
-
-    /* human-readable string with the result of the last scrape.
-     * if "hasScraped" is false, this field is undefined */
-    char lastScrapeResult[128];
-
-    /* when the last scrape was sent to the tracker.
-     * if "hasScraped" is false, this field is undefined */
-    time_t lastScrapeStartTime;
-
-    /* whether or not the last scrape was a success.
-       if "hasAnnounced" is false, this field is undefined */
-    bool lastScrapeSucceeded;
-
-    /* whether or not the last scrape timed out. */
-    bool lastScrapeTimedOut;
-
-    /* when the last scrape was completed.
-       if "hasScraped" is false, this field is undefined */
-    time_t lastScrapeTime;
-
-    /* number of leechers this tracker knows of (-1 means it does not know) */
-    int leecherCount;
-
-    /* when the next periodic announce message will be sent out.
-       if announceState isn't TR_TRACKER_WAITING, this field is undefined */
-    time_t nextAnnounceTime;
-
-    /* when the next periodic scrape message will be sent out.
-       if scrapeState isn't TR_TRACKER_WAITING, this field is undefined */
-    time_t nextScrapeTime;
-
-    /* number of seeders this tracker knows of (-1 means it does not know) */
-    int seederCount;
-
-    /* which tier this tracker is in */
-    int tier;
-
-    /* used to match to a tr_tracker_info */
-    uint32_t id;
+    bool hasAnnounced; // true iff we've announced to this tracker during this session
+    bool hasScraped; // true iff we've scraped this tracker during this session
+    bool isBackup; // only one tracker per tier is used; the others are kept as backups
+    bool lastAnnounceSucceeded; // if hasAnnounced, whether or not the latest announce succeeded
+    bool lastAnnounceTimedOut; // true iff the latest announce request timed out
+    bool lastScrapeSucceeded; // if hasScraped, whether or not the latest scrape succeeded
+    bool lastScrapeTimedOut; // true iff the latest scrape request timed out
 };
 
-tr_tracker_stat* tr_torrentTrackers(tr_torrent const* torrent, int* setmeTrackerCount);
+struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);
 
-void tr_torrentTrackersFree(tr_tracker_stat* trackerStats, int trackerCount);
-
-/**
- * @brief get the download speeds for each of this torrent's webseed sources.
- *
- * @return an array of tor->info.webseedCount floats giving download speeds.
- *         Each speed in the array corresponds to the webseed at the same
- *         array index in tor->info.webseeds.
- *         To differentiate "idle" and "stalled" status, idle webseeds will
- *         return -1 instead of 0 KiB/s.
- *         NOTE: always free this array with tr_free() when you're done with it.
- */
-double* tr_torrentWebSpeeds_KBps(tr_torrent const* torrent);
+size_t tr_torrentTrackerCount(tr_torrent const* torrent);
 
 /*
  * This view structure is intended for short-term use. Its pointers are owned
@@ -1529,6 +1464,21 @@ struct tr_file_view
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t file);
 
 size_t tr_torrentFileCount(tr_torrent const* torrent);
+
+/*
+ * This view structure is intended for short-term use. Its pointers are owned
+ * by the torrent and may be invalidated if the torrent is edited or removed.
+ */
+struct tr_webseed_view
+{
+    char const* url; // the url to download from
+    bool is_downloading; // can be true even if speed is 0, e.g. slow download
+    unsigned download_bytes_per_second; // current download speed
+};
+
+struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
+
+size_t tr_torrentWebseedCount(tr_torrent const* torrent);
 
 /***********************************************************************
  * tr_torrentAvailability

@@ -1704,36 +1704,14 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     return desired_available;
 }
 
-double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor)
+tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
 {
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tor->swarm != nullptr);
+    size_t const n = tr_ptrArraySize(&tor->swarm->webseeds);
+    TR_ASSERT(i < n);
 
-    auto const now = tr_time_msec();
-
-    tr_swarm* const s = tor->swarm;
-    TR_ASSERT(s->manager != nullptr);
-
-    unsigned int n = tr_ptrArraySize(&s->webseeds);
-    TR_ASSERT(n == tor->info.webseedCount);
-
-    double* ret = tr_new0(double, n);
-
-    for (unsigned int i = 0; i < n; ++i)
-    {
-        unsigned int Bps = 0;
-        auto const* const peer = static_cast<tr_peer*>(tr_ptrArrayNth(&s->webseeds, i));
-
-        if (peer->is_transferring_pieces(now, TR_DOWN, &Bps))
-        {
-            ret[i] = Bps / (double)tr_speed_K;
-        }
-        else
-        {
-            ret[i] = -1.0;
-        }
-    }
-
-    return ret;
+    return i >= n ? tr_webseed_view{} : tr_webseedView(static_cast<tr_peer const*>(tr_ptrArrayNth(&tor->swarm->webseeds, i)));
 }
 
 static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
