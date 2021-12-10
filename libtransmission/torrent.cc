@@ -602,7 +602,6 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
 
-    tor->dnd_pieces_ = tr_bitfield{ tor->info.pieceCount };
     tor->checked_pieces_ = tr_bitfield{ tor->info.pieceCount };
 }
 
