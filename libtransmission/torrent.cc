@@ -1255,7 +1255,7 @@ tr_tracker_view tr_torrentTracker(tr_torrent const* tor, size_t i)
 
 size_t tr_torrentTrackerCount(tr_torrent const* tor)
 {
-    return tor->trackerCount();
+    return tr_announcerTrackerCount(tor);
 }
 
 /***
