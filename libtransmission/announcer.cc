@@ -1802,6 +1802,14 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     return view;
 }
 
+size_t tr_announcerTrackerCount(tr_torrent const* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tor->tiers != nullptr);
+
+    return tor->tiers->tracker_count;
+}
+
 tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
 {
     TR_ASSERT(tr_isTorrent(tor));

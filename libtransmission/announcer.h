@@ -95,6 +95,8 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 
 tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t i);
 
+size_t tr_announcerTrackerCount(tr_torrent const* tor);
+
 /***
 ****
 ***/

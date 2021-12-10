@@ -1209,7 +1209,8 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 {
     auto error_code = int{ 0 };
     auto contents_len = size_t{};
-    auto const* contents = tr_variantToStr(v, fmt, &contents_len);
+    auto* const contents = tr_variantToStr(v, fmt, &contents_len);
+
     tr_error* error = nullptr;
     tr_saveFile(filename, { contents, contents_len }, &error);
     if (error != nullptr)
@@ -1218,6 +1219,8 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
         error_code = error->code;
         tr_error_clear(&error);
     }
+
+    tr_free(contents);
     return error_code;
 }
 
