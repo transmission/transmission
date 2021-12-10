@@ -12,11 +12,13 @@
 #include <unordered_set>
 #endif
 
+#include <optional>
 #include <unordered_map>
 
 #include <QFileIconProvider>
 #include <QIcon>
 #include <QString>
+#include <QStyle>
 
 #include "Utils.h" // std::hash<QString>()
 
@@ -44,6 +46,8 @@ public:
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
     QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 
+    QIcon getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
+
 protected:
     IconCache() = default;
 
@@ -61,4 +65,9 @@ private:
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
     QIcon getMimeIcon(QString const& filename) const;
 #endif
+
+    QIcon getThemeIcon(
+        QString const& name,
+        QString const& fallbackName,
+        std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const;
 };

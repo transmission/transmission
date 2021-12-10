@@ -586,30 +586,36 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
 ****
 ***/
 
-static void tr_torrentInitFileOffsets(tr_torrent* tor)
-{
-    auto offset = uint64_t{ 0 };
+static void torrentStart(tr_torrent* tor, bool bypass_queue);
 
+static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
+
+static void torrentInitFromInfoDict(tr_torrent* tor)
+{
+    tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
+    tor->completion = tr_completion{ tor, tor };
+    tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
+
+    // init file offsets
+    auto offset = uint64_t{ 0 };
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         auto& file = tor->file(i);
         file.priv.offset = offset;
         offset += file.length;
     }
+
+    tor->fpm_.reset(tor->info);
+    tor->file_priorities_.reset(&tor->fpm_);
+    tor->files_wanted_.reset(&tor->fpm_);
+
+    tor->checked_pieces_ = tr_bitfield{ tor->info.pieceCount };
 }
-
-static void torrentStart(tr_torrent* tor, bool bypass_queue);
-
-static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
 void tr_torrentGotNewInfoDict(tr_torrent* tor)
 {
-    tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
-    tor->completion = tr_completion{ tor, tor };
-    tr_torrentInitFileOffsets(tor);
-
+    torrentInitFromInfoDict(tor);
     tr_peerMgrOnTorrentGotMetainfo(tor);
-
     tr_torrentFireMetadataCompleted(tor);
 }
 
@@ -661,25 +667,17 @@ static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
+    static auto next_unique_id = int{ 1 };
     auto const lock = tor->unique_lock();
 
     tr_session* session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
 
-    static int nextUniqueId = 1;
-
-    tor->fpm_.reset(tor->info);
-    tor->file_priorities_.reset(&tor->fpm_);
-    tor->files_wanted_.reset(&tor->fpm_);
-
     tor->session = session;
-    tor->uniqueId = nextUniqueId++;
+    tor->uniqueId = next_unique_id++;
     tor->queuePosition = tr_sessionCountTorrents(session);
 
-    tor->dnd_pieces_ = tr_bitfield{ tor->info.pieceCount };
-    tor->checked_pieces_ = tr_bitfield{ tor->info.pieceCount };
-
-    tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
+    torrentInitFromInfoDict(tor);
 
     char const* dir = nullptr;
     if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
@@ -709,10 +707,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     TR_ASSERT(tor->uploadedCur == 0);
 
     tr_torrentSetDateAdded(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
-
-    tor->initSizes(tor->info.totalSize, tor->info.pieceSize);
-    tor->completion = tr_completion{ tor, tor };
-    tr_torrentInitFileOffsets(tor);
 
     // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
     // that set things as dirty, but... these settings being loaded are
@@ -1267,7 +1261,7 @@ tr_tracker_view tr_torrentTracker(tr_torrent const* tor, size_t i)
 
 size_t tr_torrentTrackerCount(tr_torrent const* tor)
 {
-    return tor->trackerCount();
+    return tr_announcerTrackerCount(tor);
 }
 
 tr_torrent_view tr_torrentView(tr_torrent const* tor)
@@ -1872,7 +1866,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     struct tm tm;
     char ctime_str[32];
     tr_localtime_r(&now, &tm);
-    strftime(ctime_str, sizeof(ctime_str), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 
@@ -1881,15 +1875,19 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         nullptr,
     };
 
+    auto const id_str = std::to_string(tr_torrentId(tor));
+    auto const labels_str = buildLabelsString(tor);
+    auto const trackers_str = buildTrackersString(tor);
+
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, ctime_str },
         { "TR_TORRENT_DIR"sv, torrent_dir },
         { "TR_TORRENT_HASH"sv, tor->info.hashString },
-        { "TR_TORRENT_ID"sv, std::to_string(tr_torrentId(tor)) },
-        { "TR_TORRENT_LABELS"sv, buildLabelsString(tor) },
+        { "TR_TORRENT_ID"sv, id_str },
+        { "TR_TORRENT_LABELS"sv, labels_str },
         { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
-        { "TR_TORRENT_TRACKERS"sv, buildTrackersString(tor) },
+        { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
     tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
