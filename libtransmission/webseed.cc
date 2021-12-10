@@ -248,10 +248,10 @@ static void write_block_func(void* vdata)
 
 struct connection_succeeded_data
 {
-    struct tr_webseed* webseed;
-    char* real_url;
-    tr_piece_index_t piece_index;
-    uint32_t piece_offset;
+    tr_webseed* webseed = nullptr;
+    std::string real_url;
+    tr_piece_index_t piece_index = 0;
+    uint32_t piece_offset = 0;
 };
 
 static void connection_succeeded(void* vdata)
@@ -265,7 +265,7 @@ static void connection_succeeded(void* vdata)
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
     }
 
-    if (data->real_url != nullptr)
+    if (!std::empty(data->real_url))
     {
         tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
@@ -275,12 +275,10 @@ static void connection_succeeded(void* vdata)
             auto file_offset = uint64_t{};
             tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
             w->file_urls[file_index].assign(data->real_url);
-            data->real_url = nullptr;
         }
     }
 
-    tr_free(data->real_url);
-    tr_free(data);
+    delete data;
 }
 
 /***
@@ -308,15 +306,17 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             if (task->response_code == 206)
             {
-                auto* const data = tr_new(struct connection_succeeded_data, 1);
-                data->webseed = w;
-                data->real_url = tr_strdup(tr_webGetTaskRealUrl(task->web_task));
-                data->piece_index = task->piece_index;
-                data->piece_offset = task->piece_offset + task->blocks_done * task->block_size + len - 1;
+                auto const* real_url = tr_webGetTaskRealUrl(task->web_task);
 
                 /* processing this uses a tr_torrent pointer,
                    so push the work to the libevent thread... */
-                tr_runInEventThread(session, connection_succeeded, data);
+                tr_runInEventThread(
+                    session,
+                    connection_succeeded,
+                    new connection_succeeded_data{ w,
+                                                   real_url ? real_url : "",
+                                                   task->piece_index,
+                                                   task->piece_offset + task->blocks_done * task->block_size + len - 1 });
             }
         }
 
