@@ -32,6 +32,7 @@ class tr_announce_list
 public:
     struct tracker_info
     {
+        std::string host;
         tr_url_parsed_t announce;
         tr_url_parsed_t scrape;
         tr_quark announce_interned = TR_KEY_NONE;
@@ -117,6 +118,9 @@ public:
             tracker.announce = *tr_urlParseTracker(tr_quark_get_string_view(tracker.announce_interned));
             tracker.tier = getTier(tier, *announce);
             tracker.id = nextUniqueId();
+            tracker.host = tracker.announce.host;
+            tracker.host += ':';
+            tracker.host += tracker.announce.portstr;
 
             auto const scrape_str = announceToScrape(announce_url_sv);
             if (scrape_str)

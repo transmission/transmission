@@ -29,6 +29,7 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.full);
     EXPECT_EQ(Tier, tracker.tier);
+    EXPECT_EQ("example.org:443"sv, tracker.host);
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -38,16 +39,23 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     auto constexpr Tier3 = tr_tracker_tier_t{ 3 };
     auto constexpr Announce1 = "https://example.org/announce"sv;
     auto constexpr Announce2 = "http://example.org/announce"sv;
-    auto constexpr Announce3 = "udp://example.org/announce"sv;
+    auto constexpr Announce3 = "udp://example.org:999/announce"sv;
 
     auto announce_list = tr_announce_list{};
     EXPECT_EQ(1, announce_list.add(Tier1, Announce1));
     EXPECT_EQ(2, announce_list.add(Tier2, Announce2));
     EXPECT_EQ(3, announce_list.add(Tier3, Announce3));
+
     EXPECT_EQ(3, std::size(announce_list));
     EXPECT_EQ(Tier1, announce_list.at(0).tier);
     EXPECT_EQ(Tier1, announce_list.at(1).tier);
     EXPECT_EQ(Tier1, announce_list.at(2).tier);
+    EXPECT_EQ(Announce1, announce_list.at(1).announce.full);
+    EXPECT_EQ(Announce2, announce_list.at(0).announce.full);
+    EXPECT_EQ(Announce3, announce_list.at(2).announce.full);
+    EXPECT_EQ("example.org:443"sv, announce_list.at(1).host);
+    EXPECT_EQ("example.org:80"sv, announce_list.at(0).host);
+    EXPECT_EQ("example.org:999"sv, announce_list.at(2).host);
 }
 
 TEST_F(AnnounceListTest, canAddWithoutScrape)
