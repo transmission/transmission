@@ -34,6 +34,7 @@ using tr_piece_index_t = uint32_t;
 using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
+using tr_tracker_id_t = uint32_t;
 
 struct tr_block_span_t
 {
@@ -1522,6 +1523,7 @@ struct tr_file_priv
     time_t mtime;
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };
+
 /** @brief a part of tr_info that represents a single file of the torrent's content */
 struct tr_file
 {
