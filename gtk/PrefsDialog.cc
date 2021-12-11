@@ -92,12 +92,12 @@ Gtk::CheckButton* new_check_button(Glib::ustring const& mnemonic, tr_quark const
     return w;
 }
 
-#define IDLE_DATA "idle-data"
+auto const IdleDataKey = Glib::Quark("idle-data");
 
 bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Session> const& core, bool isDouble)
 {
     bool keep_waiting = true;
-    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IDLE_DATA));
+    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey));
 
     /* has the user stopped making changes? */
     if (last_change->elapsed() > 0.33)
@@ -115,7 +115,7 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Sessio
         }
 
         /* cleanup */
-        spin->set_data(IDLE_DATA, nullptr);
+        spin->set_data(IdleDataKey, nullptr);
         keep_waiting = false;
         spin->unreference();
     }
@@ -127,12 +127,12 @@ void spun_cb(Gtk::SpinButton* w, tr_quark const key, Glib::RefPtr<Session> const
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
-    auto* last_change = static_cast<Glib::Timer*>(w->get_data(IDLE_DATA));
+    auto* last_change = static_cast<Glib::Timer*>(w->get_data(IdleDataKey));
 
     if (last_change == nullptr)
     {
         last_change = new Glib::Timer();
-        w->set_data(IDLE_DATA, last_change, [](void* p) { delete static_cast<Glib::Timer*>(p); });
+        w->set_data(IdleDataKey, last_change, [](void* p) { delete static_cast<Glib::Timer*>(p); });
         w->reference();
         Glib::signal_timeout().connect_seconds([w, key, core, isDouble]() { return spun_cb_idle(w, key, core, isDouble); }, 1);
     }

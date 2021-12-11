@@ -24,10 +24,10 @@
 #include "Session.h"
 #include "Utils.h"
 
-#define TR_COLUMN_ID_KEY "tr-model-column-id-key"
-
 namespace
 {
+
+auto const ColumnIdKey = Glib::Quark("tr-model-column-id-key");
 
 enum
 {
@@ -423,7 +423,7 @@ void buildTree(FileRowNode& node, build_data& build)
     auto& child_data = node.data();
     bool const isLeaf = node.child_count() == 0;
 
-    auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DIRECTORY_MIME_TYPE;
+    auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DirectoryMimeType;
     auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
     auto const file = isLeaf ? tr_torrentFile(build.tor, child_data.index) : tr_file_view{};
     int const priority = isLeaf ? file.priority : 0;
@@ -637,7 +637,7 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 
     bool handled = false;
 
-    auto const cid = GPOINTER_TO_INT(col->get_data(TR_COLUMN_ID_KEY));
+    auto const cid = GPOINTER_TO_INT(col->get_data(ColumnIdKey));
     auto* tor = core_->find_torrent(torrent_id_);
 
     if (tor != nullptr && (cid == file_cols.priority.index() || cid == file_cols.enabled.index()))
@@ -735,7 +735,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         if (auto const iter = store_->get_iter(path_string); iter)
         {
             bool const isLeaf = iter->children().empty();
-            auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname) : DIRECTORY_MIME_TYPE;
+            auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname) : DirectoryMimeType;
             auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *view_);
 
             (*iter)[file_cols.label] = newname;
@@ -902,7 +902,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(TR_COLUMN_ID_KEY, GINT_TO_POINTER(file_cols.enabled.index()));
+        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.enabled.index()));
         col->set_fixed_width(width);
         col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderDownload));
@@ -921,7 +921,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         rend->property_xalign() = 0.5F;
         rend->property_yalign() = 0.5F;
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(TR_COLUMN_ID_KEY, GINT_TO_POINTER(file_cols.priority.index()));
+        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.priority.index()));
         col->set_fixed_width(width);
         col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
         col->set_sort_column(file_cols.priority);

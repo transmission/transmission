@@ -28,6 +28,8 @@
 #include "Session.h"
 #include "Utils.h"
 
+using namespace std::literals;
+
 /***
 ****  UNITS
 ***/
@@ -470,7 +472,7 @@ Gtk::ComboBox* gtr_priority_combo_new()
 ****
 ***/
 
-#define GTR_CHILD_HIDDEN "gtr-child-hidden"
+auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
@@ -489,14 +491,14 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
                 continue;
             }
 
-            if (b && l->get_data(GTR_CHILD_HIDDEN) != nullptr)
+            if (b && l->get_data(ChildHiddenKey) != nullptr)
             {
-                l->steal_data(GTR_CHILD_HIDDEN);
+                l->steal_data(ChildHiddenKey);
                 gtr_widget_set_visible(*l, true);
             }
             else if (!b)
             {
-                l->set_data(GTR_CHILD_HIDDEN, GINT_TO_POINTER(1));
+                l->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
                 gtr_widget_set_visible(*l, false);
             }
         }
@@ -573,4 +575,10 @@ void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& newstr)
     {
         lb.set_text(newstr);
     }
+}
+
+std::string gtr_get_full_resource_path(std::string const& rel_path)
+{
+    static auto const BasePath = "/com/transmissionbt/transmission/"s;
+    return BasePath + rel_path;
 }

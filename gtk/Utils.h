@@ -9,6 +9,8 @@
 #pragma once
 
 #include <functional>
+#include <string>
+
 #include <sys/types.h>
 
 #include <glibmm.h>
@@ -138,6 +140,8 @@ inline T gtr_str_strip(T const& text)
     auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
+
+std::string gtr_get_full_resource_path(std::string const& rel_path);
 
 namespace gtr_detail
 {

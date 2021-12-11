@@ -97,11 +97,6 @@ std::array<std::string_view, 29> const entries = {
     "present-main-window"sv,
 };
 
-void register_my_icons()
-{
-    Gtk::IconTheme::get_default()->add_resource_path(TR_RESOURCE_PATH "icons");
-}
-
 Gtk::Builder* myBuilder = nullptr;
 
 std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::SimpleAction>> key_to_action;
@@ -116,8 +111,6 @@ void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
 Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, void* callback_user_data)
 {
     myBuilder = gtr_get_ptr(builder);
-
-    register_my_icons();
 
     auto const action_group = Gio::SimpleActionGroup::create();
 

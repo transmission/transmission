@@ -14,10 +14,15 @@
 #include "IconCache.h"
 #include "Utils.h"
 
-#define VOID_PIXBUF_KEY "void-pixbuf"
+using namespace std::literals;
+
+Glib::ustring const DirectoryMimeType = "folder"s;
+Glib::ustring const UnknownMimeType = "unknown"s;
 
 namespace
 {
+
+auto const VoidPixbufKey = "void-pixbuf"s;
 
 struct IconCache
 {
@@ -48,7 +53,7 @@ std::unique_ptr<IconCache> icon_cache_new(Gtk::Widget& for_widget, Gtk::IconSize
     auto icons = std::make_unique<IconCache>();
     icons->icon_theme = Gtk::IconTheme::get_for_screen(for_widget.get_screen());
     icons->icon_size = get_size_in_pixels(icon_size);
-    icons->cache.emplace(VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
+    icons->cache.emplace(VoidPixbufKey, create_void_pixbuf(icons->icon_size, icons->icon_size));
     return icons;
 }
 
@@ -134,7 +139,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
     auto key = _icon_cache_get_icon_key(icon);
     if (key.empty())
     {
-        key = VOID_PIXBUF_KEY;
+        key = VoidPixbufKey;
     }
 
     if (auto pixbuf_it = icons.cache.find(key); pixbuf_it != icons.cache.end())

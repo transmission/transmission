@@ -59,14 +59,14 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define MY_CONFIG_NAME "transmission"
-
 using namespace std::literals;
 
 #define SHOW_LICENSE
 
 namespace
 {
+
+auto const AppIconName = Glib::ustring("transmission"s);
 
 char const* LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
@@ -83,7 +83,7 @@ char const* LICENSE =
     "Some of Transmission's source files have more permissive licenses. "
     "Those files may, of course, be used on their own under their own terms.\n";
 
-}
+} // namespace
 
 class Application::Impl
 {
@@ -534,6 +534,9 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
+    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    Gtk::Window::set_default_icon_name(AppIconName);
+
     tr_session* session;
 
     ::signal(SIGINT, signal_handler);
@@ -560,7 +563,7 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_builder_ = Gtk::Builder::create_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
+    ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
     auto const actions = gtr_actions_init(ui_builder_, this);
 
     app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
@@ -1283,7 +1286,7 @@ void Application::Impl::show_about_dialog()
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
     d.set_copyright(_("Copyright (c) The Transmission Project"));
-    d.set_logo_icon_name(MY_CONFIG_NAME);
+    d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"

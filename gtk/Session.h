@@ -32,8 +32,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
-#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
-
 class Session : public Glib::Object
 {
 public:

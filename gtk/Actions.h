@@ -14,10 +14,6 @@
 
 class Session;
 
-#define WINDOW_ICON "transmission-main-window-icon"
-#define TRAY_ICON "transmission-tray-icon"
-#define NOTIFICATION_ICON "transmission-notification-icon"
-
 Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, void* callback_user_data);
 void gtr_actions_set_core(Glib::RefPtr<Session> const& core);
 void gtr_actions_handler(Glib::ustring const& action_name, void* user_data);

@@ -31,13 +31,13 @@
 namespace
 {
 
-#define N_RECENT 4
+auto const MaxRecentDestinations = size_t{ 4 };
 
 std::list<std::string> get_recent_destinations()
 {
     std::list<std::string> list;
 
-    for (int i = 0; i < N_RECENT; ++i)
+    for (size_t i = 0; i < MaxRecentDestinations; ++i)
     {
         auto const key = gtr_sprintf("recent-download-dir-%d", i + 1);
 
@@ -65,8 +65,8 @@ void save_recent_destination(Glib::RefPtr<Session> const& core, std::string cons
     /* add it to the front of the list */
     list.push_front(dir);
 
-    /* save the first N_RECENT directories */
-    list.resize(N_RECENT);
+    /* save the first MaxRecentDestinations directories */
+    list.resize(MaxRecentDestinations);
     int i = 0;
     for (auto const& d : list)
     {

@@ -44,6 +44,8 @@
 #include "Session.h"
 #include "Utils.h"
 
+using namespace std::literals;
+
 namespace
 {
 
@@ -1438,12 +1440,12 @@ void Session::Impl::update()
 ***  Hibernate
 **/
 
-#define SESSION_MANAGER_SERVICE_NAME "org.gnome.SessionManager"
-#define SESSION_MANAGER_INTERFACE "org.gnome.SessionManager"
-#define SESSION_MANAGER_OBJECT_PATH "/org/gnome/SessionManager"
-
 namespace
 {
+
+auto const SessionManagerServiceName = Glib::ustring("org.gnome.SessionManager"s);
+auto const SessionManagerInterface = Glib::ustring("org.gnome.SessionManager"s);
+auto const SessionManagerObjectPath = Glib::ustring("/org/gnome/SessionManager"s);
 
 bool gtr_inhibit_hibernation(guint32& cookie)
 {
@@ -1458,8 +1460,8 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
         auto response = connection->call_sync(
-            SESSION_MANAGER_OBJECT_PATH,
-            SESSION_MANAGER_INTERFACE,
+            SessionManagerObjectPath,
+            SessionManagerInterface,
             "Inhibit",
             Glib::VariantContainerBase::create_tuple({
                 Glib::Variant<Glib::ustring>::create(application),
@@ -1467,7 +1469,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
                 Glib::Variant<Glib::ustring>::create(reason),
                 Glib::Variant<guint32>::create(flags),
             }),
-            SESSION_MANAGER_SERVICE_NAME,
+            SessionManagerServiceName,
             1000);
 
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
@@ -1492,11 +1494,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
         auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
         connection->call_sync(
-            SESSION_MANAGER_OBJECT_PATH,
-            SESSION_MANAGER_INTERFACE,
+            SessionManagerObjectPath,
+            SessionManagerInterface,
             "Uninhibit",
             Glib::VariantContainerBase::create_tuple({ Glib::Variant<guint32>::create(inhibit_cookie) }),
-            SESSION_MANAGER_SERVICE_NAME,
+            SessionManagerServiceName,
             1000);
 
         /* logging */
