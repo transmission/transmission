@@ -410,6 +410,11 @@
                                                 <action selector="setSort:" target="206" id="1904"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="ETA" tag="8" id="8f9-Jp-K00">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="W08-H8-Rjg"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Nome" tag="2" id="1902">
                                             <connections>
                                                 <action selector="setSort:" target="206" id="1905"/>

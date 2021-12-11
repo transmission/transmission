@@ -133,6 +133,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
               withName:(NSString*)newName
      completionHandler:(void (^)(BOOL didRename))completionHandler;
 
+@property(nonatomic, readonly) NSInteger eta;
 @property(nonatomic, readonly) CGFloat progress;
 @property(nonatomic, readonly) CGFloat progressDone;
 @property(nonatomic, readonly) CGFloat progressLeft;

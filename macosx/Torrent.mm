@@ -2178,6 +2178,23 @@ bool trashDataFile(char const* filename, tr_error** error)
     completionHandler(success);
 }
 
+- (NSInteger)eta
+{
+    if (fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN)
+    {
+        return fStat->eta;
+    }
+    else if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
+    {
+        return fStat->etaIdle;
+    }
+
+    // We have to return something valid. Returning 0 or -1 or some other indicator value
+    // will cause problems if this is used for sorting. So we return INT_MAX which acts
+    // like an infinite amount of time remaining if we're sorting by ETA.
+    return INT_MAX;
+}
+
 - (BOOL)shouldShowEta
 {
     if (fStat->activity == TR_STATUS_DOWNLOAD)

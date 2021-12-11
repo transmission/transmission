@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -408,6 +408,11 @@
                                         <menuItem title="Дате добавления" tag="1" id="1900">
                                             <connections>
                                                 <action selector="setSort:" target="206" id="1904"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="ETA" tag="8" id="8f9-Jp-K00">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="W08-H8-Rjg"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Имени" tag="2" id="1902">

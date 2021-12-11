@@ -95,6 +95,7 @@ typedef NS_ENUM(unsigned int, toolbarGroupTag) { //
 #define SORT_ORDER @"Order"
 #define SORT_ACTIVITY @"Activity"
 #define SORT_SIZE @"Size"
+#define SORT_ETA @"ETA"
 
 typedef NS_ENUM(unsigned int, sortTag) {
     SORT_ORDER_TAG = 0,
@@ -104,7 +105,8 @@ typedef NS_ENUM(unsigned int, sortTag) {
     SORT_STATE_TAG = 4,
     SORT_TRACKER_TAG = 5,
     SORT_ACTIVITY_TAG = 6,
-    SORT_SIZE_TAG = 7
+    SORT_SIZE_TAG = 7,
+    SORT_ETA_TAG = 8
 };
 
 typedef NS_ENUM(unsigned int, sortOrderTag) { //
@@ -2499,6 +2501,9 @@ static void removeKeRangerRansomware()
     case SORT_SIZE_TAG:
         sortType = SORT_SIZE;
         break;
+    case SORT_ETA_TAG:
+        sortType = SORT_ETA;
+        break;
     default:
         NSAssert1(NO, @"Unknown sort tag received: %ld", senderMenuItem.tag);
         return;
@@ -2588,6 +2593,11 @@ static void removeKeRangerRansomware()
     else if ([sortType isEqualToString:SORT_NAME])
     {
         descriptors = @[ nameDescriptor ];
+    }
+    else if ([sortType isEqualToString:SORT_ETA])
+    {
+        NSSortDescriptor* etaDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"eta" ascending:asc];
+        descriptors = @[ etaDescriptor, nameDescriptor];
     }
     else
     {
@@ -4747,6 +4757,9 @@ static void removeKeRangerRansomware()
             break;
         case SORT_SIZE_TAG:
             sortType = SORT_SIZE;
+            break;
+        case SORT_ETA_TAG:
+            sortType = SORT_ETA;
             break;
         default:
             NSAssert1(NO, @"Unknown sort tag received: %ld", [menuItem tag]);
