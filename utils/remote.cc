@@ -934,7 +934,7 @@ static char* format_date(char* buf, size_t buflen, time_t now)
 {
     struct tm tm;
     tr_localtime_r(&now, &tm);
-    strftime(buf, buflen, "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    strftime(buf, buflen, "%a %b %d %T %Y%n", &tm); /* ctime equiv */
     return buf;
 }
 
@@ -2754,8 +2754,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 712:
-                tr_variantListAddInt(tr_variantDictAddList(args, TR_KEY_trackerRemove, 1), atoi(optarg));
-                break;
+                {
+                    tr_variant* list;
+                    if (!tr_variantDictFindList(args, TR_KEY_trackerRemove, &list))
+                    {
+                        list = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
+                    }
+                    tr_variantListAddInt(list, atoi(optarg));
+                    break;
+                }
 
             case 950:
                 tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, atof(optarg));
@@ -2831,8 +2838,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 710:
-                tr_variantListAddStr(tr_variantDictAddList(args, TR_KEY_trackerAdd, 1), optarg);
-                break;
+                {
+                    tr_variant* list;
+                    if (!tr_variantDictFindList(args, TR_KEY_trackerAdd, &list))
+                    {
+                        list = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
+                    }
+                    tr_variantListAddStr(list, optarg);
+                    break;
+                }
 
             default:
                 assert("unhandled value" && 0);

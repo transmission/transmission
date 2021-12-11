@@ -348,13 +348,6 @@ public:
         return info.webseeds[i];
     }
 
-    /// TRACKERS
-
-    auto trackerCount() const
-    {
-        return info.trackerCount;
-    }
-
     /// CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
@@ -374,7 +367,7 @@ public:
         return checked;
     }
 
-    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount*/)
+    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
     {
         TR_ASSERT(std::size(checked) == info.pieceCount);
         checked_pieces_ = checked;
@@ -397,8 +390,6 @@ public:
     }
 
     tr_info info = {};
-
-    tr_bitfield dnd_pieces_ = tr_bitfield{ 0 };
 
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
