@@ -417,8 +417,7 @@ auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "webseedsSendingToUs"sv };
 
 size_t constexpr quarks_are_sorted = ( //
-    []() constexpr
-    {
+    []() constexpr {
         for (size_t i = 1; i < std::size(my_static); ++i)
         {
             if (my_static[i - 1] >= my_static[i])
