@@ -40,4 +40,14 @@
     return coloredImage;
 }
 
++ (NSImage*)systemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
+{
+    if (@available(macOS 11.0, *))
+    {
+        return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
+    }
+
+    return [NSImage imageNamed:fallbackName];
+}
+
 @end

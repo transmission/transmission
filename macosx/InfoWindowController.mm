@@ -28,7 +28,7 @@
 #import "InfoPeersViewController.h"
 #import "InfoFileViewController.h"
 #import "InfoOptionsViewController.h"
-#import "InfoTabButtonCell.h"
+#import "NSImageAdditions.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
@@ -91,12 +91,31 @@ typedef NS_ENUM(unsigned int, tabTag) {
     window.becomesKeyOnlyIfNeeded = YES;
 
     //set tab tooltips
-    [fTabMatrix setToolTip:NSLocalizedString(@"General Info", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_GENERAL_TAG]];
-    [fTabMatrix setToolTip:NSLocalizedString(@"Activity", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_ACTIVITY_TAG]];
-    [fTabMatrix setToolTip:NSLocalizedString(@"Trackers", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_TRACKERS_TAG]];
-    [fTabMatrix setToolTip:NSLocalizedString(@"Peers", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_PEERS_TAG]];
-    [fTabMatrix setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_FILE_TAG]];
-    [fTabMatrix setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forCell:[fTabMatrix cellWithTag:TAB_OPTIONS_TAG]];
+    [fTabs.cell setToolTip:NSLocalizedString(@"General Info", "Inspector -> tab") forSegment:TAB_GENERAL_TAG];
+    [fTabs.cell setToolTip:NSLocalizedString(@"Activity", "Inspector -> tab") forSegment:TAB_ACTIVITY_TAG];
+    [fTabs.cell setToolTip:NSLocalizedString(@"Trackers", "Inspector -> tab") forSegment:TAB_TRACKERS_TAG];
+    [fTabs.cell setToolTip:NSLocalizedString(@"Peers", "Inspector -> tab") forSegment:TAB_PEERS_TAG];
+    [fTabs.cell setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forSegment:TAB_FILE_TAG];
+    [fTabs.cell setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forSegment:TAB_OPTIONS_TAG];
+
+    [fTabs setImage:[NSImage systemSymbol:@"info.circle"
+                             withFallback:@"InfoGeneral"]
+         forSegment:TAB_GENERAL_TAG];
+    [fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.square"
+                             withFallback:@"InfoActivity"]
+         forSegment:TAB_ACTIVITY_TAG];
+    [fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right"
+                             withFallback:@"InfoTracker"]
+         forSegment:TAB_TRACKERS_TAG];
+    [fTabs setImage:[NSImage systemSymbol:@"person.2"
+                             withFallback:@"InfoPeers"]
+         forSegment:TAB_PEERS_TAG];
+    [fTabs setImage:[NSImage systemSymbol:@"doc.on.doc"
+                             withFallback:@"InfoFiles"]
+         forSegment:TAB_FILE_TAG];
+    [fTabs setImage:[NSImage systemSymbol:@"gearshape"
+                             withFallback:@"InfoOptions"]
+         forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
     fCurrentTabTag = INVALID;
@@ -131,7 +150,11 @@ typedef NS_ENUM(unsigned int, tabTag) {
         [NSUserDefaults.standardUserDefaults setObject:TAB_INFO_IDENT forKey:@"InspectorSelected"];
         tag = TAB_GENERAL_TAG;
     }
-    [fTabMatrix selectCellWithTag:tag];
+
+    fTabs.target = self;
+    fTabs.action = @selector(setTab:);
+
+    fTabs.selectedSegment = tag;
     [self setTab:nil];
 
     //set blank inspector
@@ -184,7 +207,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 - (void)setTab:(id)sender
 {
     NSInteger const oldTabTag = fCurrentTabTag;
-    fCurrentTabTag = [fTabMatrix selectedTag];
+    fCurrentTabTag = fTabs.selectedTag;
     if (fCurrentTabTag == oldTabTag)
     {
         return;
@@ -194,9 +217,6 @@ typedef NS_ENUM(unsigned int, tabTag) {
     CGFloat oldHeight = 0;
     if (oldTabTag != INVALID)
     {
-        //deselect old tab item
-        [(InfoTabButtonCell*)[fTabMatrix cellWithTag:oldTabTag] setSelectedTab:NO];
-
         if ([fViewController respondsToSelector:@selector(saveViewSize)])
         {
             [fViewController saveViewSize];
@@ -290,9 +310,6 @@ typedef NS_ENUM(unsigned int, tabTag) {
     window.title = [NSString
         stringWithFormat:@"%@ - %@", fViewController.title, NSLocalizedString(@"Torrent Inspector", "Inspector -> title")];
 
-    //selected tab item
-    [(InfoTabButtonCell*)fTabMatrix.selectedCell setSelectedTab:YES];
-
     NSView* view = fViewController.view;
 
     [fViewController updateInfo];
@@ -340,7 +357,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                                                                                  views:@{ @"view" : view }]];
     [window.contentView
         addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[tabs]-0-[view]-0-|" options:0 metrics:nil
-                                                                 views:@{ @"tabs" : fTabMatrix, @"view" : view }]];
+                                                                 views:@{ @"tabs" : fTabs, @"view" : view }]];
 
     if ((fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG) &&
         ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
@@ -351,25 +368,25 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (void)setNextTab
 {
-    NSInteger tag = [fTabMatrix selectedTag] + 1;
-    if (tag >= fTabMatrix.numberOfColumns)
+    NSInteger tag = fTabs.selectedSegment + 1;
+    if (tag >= fTabs.segmentCount)
     {
         tag = 0;
     }
 
-    [fTabMatrix selectCellWithTag:tag];
+    fTabs.selectedSegment = tag;
     [self setTab:nil];
 }
 
 - (void)setPreviousTab
 {
-    NSInteger tag = [fTabMatrix selectedTag] - 1;
+    NSInteger tag = fTabs.selectedSegment - 1;
     if (tag < 0)
     {
-        tag = fTabMatrix.numberOfColumns - 1;
+        tag = fTabs.segmentCount - 1;
     }
 
-    [fTabMatrix selectCellWithTag:tag];
+    fTabs.selectedSegment = tag;
     [self setTab:nil];
 }
 
