@@ -43,6 +43,8 @@ public:
     Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void refresh();
 
 private:

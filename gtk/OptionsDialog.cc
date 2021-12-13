@@ -88,6 +88,8 @@ class OptionsDialog::Impl
 public:
     Impl(OptionsDialog& dialog, Glib::RefPtr<Session> const& core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
 private:
     void sourceChanged(Gtk::FileChooserButton* b);
     void downloadDirChanged(Gtk::FileChooserButton* b);

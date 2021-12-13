@@ -76,6 +76,8 @@ public:
     Impl(FileList& widget, Glib::RefPtr<Session> const& core, int torrent_id);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void set_torrent(int torrent_id);
 
 private:

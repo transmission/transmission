@@ -38,6 +38,8 @@ public:
     Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
 private:

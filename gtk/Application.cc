@@ -90,6 +90,8 @@ class Application::Impl
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void open_files(std::vector<Glib::RefPtr<Gio::File>> const& files);
 
     void on_startup();

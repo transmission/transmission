@@ -13,6 +13,8 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 struct tr_torrent;
 
 class TorrentCellRenderer : public Gtk::CellRenderer
@@ -20,6 +22,8 @@ class TorrentCellRenderer : public Gtk::CellRenderer
 public:
     TorrentCellRenderer();
     ~TorrentCellRenderer() override;
+
+    TR_DISABLE_COPY_MOVE(TorrentCellRenderer)
 
     Glib::PropertyProxy<gpointer> property_torrent();
     Glib::PropertyProxy<double> property_piece_upload_speed();

@@ -28,11 +28,15 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Application : public Gtk::Application
 {
 public:
     Application(std::string const& config_dir, bool start_paused, bool is_iconified);
     ~Application() override;
+
+    TR_DISABLE_COPY_MOVE(Application)
 
     friend void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 

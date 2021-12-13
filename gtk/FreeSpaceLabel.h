@@ -12,6 +12,8 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class FreeSpaceLabel : public Gtk::Label
@@ -19,6 +21,8 @@ class FreeSpaceLabel : public Gtk::Label
 public:
     FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string const& dir = {});
     ~FreeSpaceLabel() override;
+
+    TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
     void set_dir(std::string const& dir);
 

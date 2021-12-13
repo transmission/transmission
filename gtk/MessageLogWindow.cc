@@ -49,6 +49,8 @@ public:
     Impl(MessageLogWindow& window, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
 private:
     bool onRefresh();
 

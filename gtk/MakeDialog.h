@@ -12,12 +12,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class MakeDialog : public Gtk::Dialog
 {
 public:
     ~MakeDialog() override;
+
+    TR_DISABLE_COPY_MOVE(MakeDialog)
 
     static std::unique_ptr<MakeDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

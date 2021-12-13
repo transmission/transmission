@@ -30,6 +30,7 @@
 #include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
 class Session : public Glib::Object
@@ -44,6 +45,8 @@ public:
 
 public:
     ~Session() override;
+
+    TR_DISABLE_COPY_MOVE(Session)
 
     static Glib::RefPtr<Session> create(tr_session* session);
 

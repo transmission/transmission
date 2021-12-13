@@ -43,6 +43,8 @@ public:
     Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
     void refresh();

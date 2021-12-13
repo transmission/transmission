@@ -23,9 +23,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
-
-#include "Macros.h"
 
 class QByteArray;
 class QNetworkAccessManager;

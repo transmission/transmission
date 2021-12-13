@@ -337,6 +337,8 @@ public:
     Impl(TorrentCellRenderer& renderer);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void get_size_compact(Gtk::Widget& widget, int& width, int& height) const;
     void get_size_full(Gtk::Widget& widget, int& width, int& height) const;
 

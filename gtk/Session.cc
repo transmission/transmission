@@ -80,6 +80,8 @@ public:
         model_.set_sort_column(sort_column_id_, sort_type_);
     }
 
+    TR_DISABLE_COPY_MOVE(ScopedModelSortBlocker)
+
 private:
     Gtk::TreeSortable& model_;
     int sort_column_id_ = -1;

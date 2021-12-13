@@ -34,6 +34,8 @@ public:
         Glib::RefPtr<Session> const& core);
     ~MakeProgressDialog() override;
 
+    TR_DISABLE_COPY_MOVE(MakeProgressDialog)
+
 private:
     bool onProgressDialogRefresh();
     void onProgressDialogResponse(int response);
@@ -56,6 +58,8 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser);

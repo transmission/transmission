@@ -40,6 +40,8 @@ public:
     Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void set_torrents(std::vector<int> const& torrent_ids);
 
 private:

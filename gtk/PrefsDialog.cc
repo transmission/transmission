@@ -36,6 +36,8 @@ public:
     Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
 private:
     Gtk::Widget* speedPage();
     Gtk::Widget* downloadingPage();
@@ -363,7 +365,10 @@ namespace
 
 struct blocklist_data
 {
+    blocklist_data() = default;
     ~blocklist_data();
+
+    TR_DISABLE_COPY_MOVE(blocklist_data)
 
     sigc::connection updateBlocklistTag;
     Gtk::Button* updateBlocklistButton = nullptr;
@@ -918,7 +923,10 @@ namespace
 
 struct network_page_data
 {
+    network_page_data() = default;
     ~network_page_data();
+
+    TR_DISABLE_COPY_MOVE(network_page_data)
 
     Glib::RefPtr<Session> core;
     Gtk::Label* portLabel = nullptr;

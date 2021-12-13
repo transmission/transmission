@@ -12,12 +12,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class StatsDialog : public Gtk::Dialog
 {
 public:
     ~StatsDialog() override;
+
+    TR_DISABLE_COPY_MOVE(StatsDialog)
 
     static std::unique_ptr<StatsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

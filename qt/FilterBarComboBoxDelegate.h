@@ -10,7 +10,7 @@
 
 #include <QItemDelegate>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class QAbstractItemModel;
 class QComboBox;
