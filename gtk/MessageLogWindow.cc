@@ -53,8 +53,8 @@ private:
     bool onRefresh();
 
     void onSaveRequest();
-    void onSaveDialogResponse(Gtk::FileChooserDialog* d, int response);
-    void doSave(Gtk::Window* parent, Glib::ustring const& filename);
+    void onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response);
+    void doSave(Gtk::Window& parent, Glib::ustring const& filename);
 
     void onClearRequest();
     void onPauseToggled(Gtk::ToggleToolButton* w);
@@ -162,20 +162,20 @@ Glib::ustring gtr_asctime(time_t t)
 
 } // namespace
 
-void MessageLogWindow::Impl::doSave(Gtk::Window* parent, Glib::ustring const& filename)
+void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
 {
     auto* fp = fopen(filename.c_str(), "w+");
 
     if (fp == nullptr)
     {
-        auto* w = new Gtk::MessageDialog(
-            *parent,
+        auto w = std::make_shared<Gtk::MessageDialog>(
+            parent,
             gtr_sprintf(_("Couldn't save \"%s\""), filename),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);
         w->set_secondary_text(Glib::strerror(errno));
-        w->signal_response().connect([w](int /*response*/) { delete w; });
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
     }
     else
@@ -215,23 +215,23 @@ void MessageLogWindow::Impl::doSave(Gtk::Window* parent, Glib::ustring const& fi
     }
 }
 
-void MessageLogWindow::Impl::onSaveDialogResponse(Gtk::FileChooserDialog* d, int response)
+void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response)
 {
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        doSave(d, d->get_filename());
+        doSave(*d, d->get_filename());
     }
 
-    delete d;
+    d.reset();
 }
 
 void MessageLogWindow::Impl::onSaveRequest()
 {
-    auto* d = new Gtk::FileChooserDialog(window_, _("Save Log"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    auto d = std::make_shared<Gtk::FileChooserDialog>(window_, _("Save Log"), Gtk::FILE_CHOOSER_ACTION_SAVE);
     d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     d->add_button(_("_Save"), Gtk::RESPONSE_ACCEPT);
 
-    d->signal_response().connect([this, d](int response) { onSaveDialogResponse(d, response); });
+    d->signal_response().connect([this, d](int response) mutable { onSaveDialogResponse(d, response); });
     d->show();
 }
 

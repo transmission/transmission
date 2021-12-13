@@ -795,7 +795,7 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
     }
 
     /* do the renaming */
-    auto* rename_data = new struct rename_data();
+    auto rename_data = std::make_unique<struct rename_data>();
     rename_data->newname = newname;
     rename_data->impl = this;
     rename_data->path_string = path_string;
@@ -811,7 +811,7 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
                         return static_cast<Impl*>(rdata->impl)->on_rename_done_idle(rdata->path_string, rdata->newname, error);
                     });
             }),
-        rename_data);
+        rename_data.release());
 }
 
 FileList::FileList(Glib::RefPtr<Session> const& core, int torrent_id)

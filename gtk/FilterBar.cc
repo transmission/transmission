@@ -28,7 +28,6 @@ namespace
 
 auto const DIRTY_KEY = Glib::Quark("tr-filter-dirty-key");
 auto const SESSION_KEY = Glib::Quark("tr-session-key");
-auto const TEXT_KEY = Glib::Quark("tr-filter-text-key");
 auto const TORRENT_MODEL_KEY = Glib::Quark("tr-filter-torrent-model-key");
 
 } // namespace
@@ -72,6 +71,8 @@ private:
     sigc::connection torrent_model_row_changed_tag_;
     sigc::connection torrent_model_row_inserted_tag_;
     sigc::connection torrent_model_row_deleted_cb_tag_;
+
+    Glib::ustring filter_text_;
 };
 
 /***
@@ -611,23 +612,23 @@ Gtk::ComboBox* FilterBar::Impl::activity_combo_box_new(Glib::RefPtr<Gtk::TreeMod
 namespace
 {
 
-bool testText(tr_torrent const* tor, Glib::ustring const* key)
+bool testText(tr_torrent const* tor, Glib::ustring const& key)
 {
     bool ret = false;
 
-    if (key == nullptr || key->empty())
+    if (key.empty())
     {
         ret = true;
     }
     else
     {
         /* test the torrent name... */
-        ret = Glib::ustring(tr_torrentName(tor)).casefold().find(*key) != Glib::ustring::npos;
+        ret = Glib::ustring(tr_torrentName(tor)).casefold().find(key) != Glib::ustring::npos;
 
         /* test the files... */
         for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n && !ret; ++i)
         {
-            ret = Glib::ustring(tr_torrentFile(tor, i).name).casefold().find(*key) != Glib::ustring::npos;
+            ret = Glib::ustring(tr_torrentFile(tor, i).name).casefold().find(key) != Glib::ustring::npos;
         }
     }
 
@@ -638,10 +639,7 @@ bool testText(tr_torrent const* tor, Glib::ustring const* key)
 
 void FilterBar::Impl::filter_entry_changed()
 {
-    filter_model_->set_data(
-        TEXT_KEY,
-        new Glib::ustring(gtr_str_strip(entry_->get_text().casefold())),
-        [](void* p) { delete static_cast<Glib::ustring*>(p); });
+    filter_text_ = gtr_str_strip(entry_->get_text().casefold());
     filter_model_->refilter();
 }
 
@@ -654,10 +652,9 @@ void FilterBar::Impl::filter_entry_changed()
 bool FilterBar::Impl::is_row_visible(Gtk::TreeModel::const_iterator const& iter)
 {
     auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
-    auto const* text = static_cast<Glib::ustring const*>(filter_model_->get_data(TEXT_KEY));
 
     return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_host_) &&
-        test_torrent_activity(tor, active_activity_type_) && testText(tor, text);
+        test_torrent_activity(tor, active_activity_type_) && testText(tor, filter_text_);
 }
 
 void FilterBar::Impl::selection_changed_cb()

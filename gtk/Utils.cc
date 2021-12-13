@@ -241,9 +241,14 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* dupli
         secondary = gtr_sprintf(_("The torrent file \"%s\" encountered an unknown error."), filename);
     }
 
-    auto* w = new Gtk::MessageDialog(*win, _("Error opening torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *win,
+        _("Error opening torrent"),
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_CLOSE);
     w->set_secondary_text(secondary);
-    w->signal_response().connect([w](int /*response*/) { delete w; });
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
     w->show_all();
 }
 
@@ -526,7 +531,12 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     Glib::ustring gstr;
 
-    auto* w = new Gtk::MessageDialog(*window, _("Unrecognized URL"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *window,
+        _("Unrecognized URL"),
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_CLOSE);
 
     gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 
@@ -540,7 +550,7 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
     }
 
     w->set_secondary_text(gstr);
-    w->signal_response().connect([w](int /*response*/) { delete w; });
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
     w->show();
 }
 

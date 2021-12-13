@@ -75,35 +75,28 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
 
 void favicon_web_done_cb(tr_session*, bool, bool, long, std::string_view, void*);
 
-bool favicon_web_done_idle_cb(favicon_data* fav)
+bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
-    bool finished = false;
 
     if (!fav->contents.empty()) /* we got something... try to make a pixbuf from it */
     {
         favicon_save_to_cache(fav->host, fav->contents);
         pixbuf = favicon_load_from_cache(fav->host);
-        finished = pixbuf != nullptr;
     }
 
-    if (!finished) /* no pixbuf yet... */
+    if (pixbuf == nullptr && ++fav->type < image_types.size()) /* keep trying */
     {
-        if (++fav->type == image_types.size()) /* failure */
-        {
-            finished = true;
-        }
-        else /* keep trying */
-        {
-            fav->contents.clear();
-            tr_webRun(fav->session, get_url(fav->host, fav->type).c_str(), favicon_web_done_cb, fav);
-        }
+        fav->contents.clear();
+        auto* const session = fav->session;
+        auto const next_url = get_url(fav->host, fav->type);
+        tr_webRun(session, next_url.c_str(), favicon_web_done_cb, fav.release());
     }
 
-    if (finished)
+    // Not released into the next web request, means we're done trying (even if `pixbuf` is still invalid)
+    if (fav != nullptr)
     {
         fav->func(pixbuf);
-        delete fav;
     }
 
     return false;
@@ -120,7 +113,7 @@ void favicon_web_done_cb(
     auto* fav = static_cast<favicon_data*>(vfav);
     fav->contents.assign(std::data(data), std::size(data));
 
-    Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(fav); });
+    Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(std::unique_ptr<favicon_data>(fav)); });
 }
 
 } // namespace
@@ -138,12 +131,12 @@ void gtr_get_favicon(
     }
     else
     {
-        auto* data = new favicon_data();
+        auto data = std::make_unique<favicon_data>();
         data->session = session;
         data->func = pixbuf_ready_func;
         data->host = host;
 
-        tr_webRun(session, get_url(host, 0).c_str(), favicon_web_done_cb, data);
+        tr_webRun(session, get_url(host, 0).c_str(), favicon_web_done_cb, data.release());
     }
 }
 

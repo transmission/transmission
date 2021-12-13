@@ -142,7 +142,7 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
 
     selection_ = view->get_selection();
 
-    column_ = new Gtk::TreeViewColumn();
+    column_ = Gtk::make_managed<Gtk::TreeViewColumn>();
     column_->set_title(_("Torrent"));
     column_->set_resizable(true);
     column_->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);

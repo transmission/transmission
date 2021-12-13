@@ -49,6 +49,22 @@ using namespace std::literals;
 namespace
 {
 
+using TrVariantPtr = std::shared_ptr<tr_variant>;
+
+TrVariantPtr create_variant(tr_variant&& other)
+{
+    auto result = TrVariantPtr(
+        tr_new0(tr_variant, 1),
+        [](tr_variant* ptr)
+        {
+            tr_variantFree(ptr);
+            tr_free(ptr);
+        });
+    *result = std::move(other);
+    tr_variantInitBool(&other, false);
+    return result;
+}
+
 class ScopedModelSortBlocker
 {
 public:
@@ -1603,19 +1619,17 @@ namespace
 
 int64_t nextTag = 1;
 
-typedef void (*server_response_func)(Session* core, tr_variant* response, gpointer user_data);
-
 std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
-bool core_read_rpc_response_idle(tr_variant* response)
+bool core_read_rpc_response_idle(TrVariantPtr const& response)
 {
-    if (int64_t tag = 0; tr_variantDictFindInt(response, TR_KEY_tag, &tag))
+    if (int64_t tag = 0; tr_variantDictFindInt(response.get(), TR_KEY_tag, &tag))
     {
         if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
             if (auto const& response_func = data_it->second; response_func)
             {
-                response_func(response);
+                response_func(response.get());
             }
 
             pendingRequests.erase(data_it);
@@ -1626,18 +1640,13 @@ bool core_read_rpc_response_idle(tr_variant* response)
         }
     }
 
-    tr_variantFree(response);
-    delete response;
     return false;
 }
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
 {
-    auto* response_copy = new tr_variant(std::move(*response));
-
-    tr_variantInitBool(response, false);
-
-    Glib::signal_idle().connect([response_copy]() { return core_read_rpc_response_idle(response_copy); });
+    Glib::signal_idle().connect([response_copy = create_variant(std::move(*response))]() mutable
+                                { return core_read_rpc_response_idle(response_copy); });
 }
 
 } // namespace
