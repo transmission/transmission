@@ -101,7 +101,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [fTabs setImage:[NSImage systemSymbol:@"info.circle"
                              withFallback:@"InfoGeneral"]
          forSegment:TAB_GENERAL_TAG];
-    [fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.square"
+    [fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square"
                              withFallback:@"InfoActivity"]
          forSegment:TAB_ACTIVITY_TAG];
     [fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right"
