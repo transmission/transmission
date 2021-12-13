@@ -764,7 +764,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error_clear(&error);
     }
 
-    tor->tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
     if (isNewTorrent)
     {
@@ -2210,8 +2210,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
         if (parsed)
         {
             /* it's good, so keep these new trackers and free the old ones */
-            std::swap(tor->info.trackers, parsed->info.trackers);
-            std::swap(tor->info.trackerCount, parsed->info.trackerCount);
+            std::swap(*tor->info.announce_list, *parsed->info.announce_list);
             tr_torrentMarkEdited(tor);
             tr_variantToFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
         }

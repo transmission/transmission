@@ -20,6 +20,7 @@
 ****
 ***/
 
+#include <memory>
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
@@ -35,6 +36,8 @@ using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
+
+#include "announce-list.h"
 
 struct tr_block_span_t
 {
@@ -1559,13 +1562,12 @@ struct tr_info
     // Use tr_torrentFile() and tr_torrentFileCount() instead.
     tr_file* files;
 
-    /* these trackers are sorted by tier */
-    tr_tracker_info* trackers;
+    // FIXME(ckerr) this is transitional; won't be a shared_pointer
+    std::shared_ptr<tr_announce_list> announce_list;
 
     /* Torrent info */
     time_t dateCreated;
 
-    unsigned int trackerCount;
     unsigned int webseedCount;
     tr_file_index_t fileCount;
     uint32_t pieceSize;

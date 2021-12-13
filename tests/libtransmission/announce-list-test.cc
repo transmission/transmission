@@ -29,7 +29,7 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.full);
     EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("example.org:443"sv, tracker.host);
+    EXPECT_EQ("example.org:443"sv, tr_quark_get_string_view(tracker.host));
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -42,9 +42,9 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     auto constexpr Announce3 = "udp://example.org:999/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Tier1, Announce1));
-    EXPECT_EQ(2, announce_list.add(Tier2, Announce2));
-    EXPECT_EQ(3, announce_list.add(Tier3, Announce3));
+    EXPECT_TRUE(announce_list.add(Tier1, Announce1));
+    EXPECT_TRUE(announce_list.add(Tier2, Announce2));
+    EXPECT_TRUE(announce_list.add(Tier3, Announce3));
 
     EXPECT_EQ(3, std::size(announce_list));
     EXPECT_EQ(Tier1, announce_list.at(0).tier);
@@ -53,9 +53,9 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     EXPECT_EQ(Announce1, announce_list.at(1).announce.full);
     EXPECT_EQ(Announce2, announce_list.at(0).announce.full);
     EXPECT_EQ(Announce3, announce_list.at(2).announce.full);
-    EXPECT_EQ("example.org:443"sv, announce_list.at(1).host);
-    EXPECT_EQ("example.org:80"sv, announce_list.at(0).host);
-    EXPECT_EQ("example.org:999"sv, announce_list.at(2).host);
+    EXPECT_EQ("example.org:443"sv, tr_quark_get_string_view(announce_list.at(1).host));
+    EXPECT_EQ("example.org:80"sv, tr_quark_get_string_view(announce_list.at(0).host));
+    EXPECT_EQ("example.org:999"sv, tr_quark_get_string_view(announce_list.at(2).host));
 }
 
 TEST_F(AnnounceListTest, canAddWithoutScrape)
@@ -64,7 +64,7 @@ TEST_F(AnnounceListTest, canAddWithoutScrape)
     auto constexpr Announce = "https://example.org/foo"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Tier, Announce));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ(TR_KEY_NONE, tracker.scrape_interned);
@@ -77,7 +77,7 @@ TEST_F(AnnounceListTest, canAddUdp)
     auto constexpr Announce = "udp://example.org/"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Tier, Announce));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("udp://example.org/"sv, tracker.scrape.full);
@@ -90,13 +90,13 @@ TEST_F(AnnounceListTest, canNotAddDuplicateAnnounce)
     auto constexpr Announce = "https://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Tier, Announce));
     EXPECT_EQ(1, announce_list.size());
-    EXPECT_EQ(1, announce_list.add(Tier, Announce));
+    EXPECT_FALSE(announce_list.add(Tier, Announce));
     EXPECT_EQ(1, announce_list.size());
 
     auto constexpr Announce2 = "https://example.org:443/announce"sv;
-    EXPECT_EQ(1, announce_list.add(Tier, Announce2));
+    EXPECT_FALSE(announce_list.add(Tier, Announce2));
     EXPECT_EQ(1, announce_list.size());
 }
 
@@ -106,7 +106,7 @@ TEST_F(AnnounceListTest, canNotAddInvalidUrl)
     auto constexpr Announce = "telnet://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(0, announce_list.add(Tier, Announce));
+    EXPECT_FALSE(announce_list.add(Tier, Announce));
     EXPECT_EQ(0, announce_list.size());
 }
 
@@ -209,7 +209,7 @@ TEST_F(AnnounceListTest, canRemoveById)
     EXPECT_EQ(1, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
-    EXPECT_EQ(0, announce_list.remove(id));
+    EXPECT_TRUE(announce_list.remove(id));
     EXPECT_EQ(0, std::size(announce_list));
 }
 
@@ -223,7 +223,7 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidId)
     EXPECT_EQ(1, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
-    EXPECT_EQ(1, announce_list.remove(id + 1));
+    EXPECT_FALSE(announce_list.remove(id + 1));
     EXPECT_EQ(1, std::size(announce_list));
     EXPECT_EQ(Announce, announce_list.at(0).announce.full);
 }
@@ -237,7 +237,7 @@ TEST_F(AnnounceListTest, canRemoveByAnnounce)
     announce_list.add(Tier, Announce);
     EXPECT_EQ(1, std::size(announce_list));
 
-    EXPECT_EQ(0, announce_list.remove(Announce));
+    EXPECT_TRUE(announce_list.remove(Announce));
     EXPECT_EQ(0, std::size(announce_list));
 }
 
@@ -250,6 +250,6 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidAnnounce)
     announce_list.add(Tier, Announce);
     EXPECT_EQ(1, std::size(announce_list));
 
-    EXPECT_EQ(1, announce_list.remove("https://www.not-example.com/announce"sv));
+    EXPECT_FALSE(announce_list.remove("https://www.not-example.com/announce"sv));
     EXPECT_EQ(1, std::size(announce_list));
 }
