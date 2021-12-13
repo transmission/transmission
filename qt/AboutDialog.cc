@@ -37,9 +37,9 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
         QString title = QStringLiteral(
             "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
-                     .arg(tr("This GUI"))
+                     .arg(tr("Client"))
                      .arg(QStringLiteral(LONG_VERSION_STRING));
-        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Remote")).arg(session.sessionVersion());
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Server")).arg(session.sessionVersion());
         ui_.titleLabel->setText(title);
     }
 

@@ -134,7 +134,6 @@
 		A23547E211CD0B090046EAE6 /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = A23547E011CD0B090046EAE6 /* cache.cc */; };
 		A23547E311CD0B090046EAE6 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A23547E111CD0B090046EAE6 /* cache.h */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.mm */; };
-		A238D49F21CDA1A5006B03EA /* InfoTabMatrix.mm in Sources */ = {isa = PBXBuildFile; fileRef = A238D49E21CDA1A5006B03EA /* InfoTabMatrix.mm */; };
 		A23F29A1132A447400E9A83B /* announcer-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A23F299F132A447400E9A83B /* announcer-common.h */; };
 		A23F29A2132A447400E9A83B /* announcer-http.cc in Sources */ = {isa = PBXBuildFile; fileRef = A23F29A0132A447400E9A83B /* announcer-http.cc */; };
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
@@ -160,7 +159,6 @@
 		66F977825E65AD498C028BB2 /* announce-list.h in Headers */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB3 /* announce-list.h */; };
 		A25964A6106D73A800453B31 /* announcer.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25964A4106D73A800453B31 /* announcer.cc */; };
 		A25964A7106D73A800453B31 /* announcer.h in Headers */ = {isa = PBXBuildFile; fileRef = A25964A5106D73A800453B31 /* announcer.h */; };
-		A25BB02A12F4F517004B724E /* InfoTabButtonBack.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25BB02912F4F517004B724E /* InfoTabButtonBack.mm */; };
 		A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD63167BED3B0039D1AA /* variant-benc.cc */; };
 		A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A25BFD64167BED3B0039D1AA /* variant-common.h */; };
 		A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD65167BED3B0039D1AA /* variant-json.cc */; };
@@ -244,7 +242,6 @@
 		A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.mm */; };
 		A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.mm */; };
-		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.mm */; };
 		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
 		A2E384DC130DFB3A001F501B /* utp_config.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D4130DFB3A001F501B /* utp_config.h */; };
 		A2E384DD130DFB3A001F501B /* utp_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E384D5130DFB3A001F501B /* utp_utils.cpp */; };
@@ -684,8 +681,6 @@
 		A236D19615F6BD9C000C3DD4 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DragOverlayWindow.mm; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DragOverlayWindow.h; sourceTree = "<group>"; };
-		A238D49D21CDA1A5006B03EA /* InfoTabMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoTabMatrix.h; sourceTree = "<group>"; };
-		A238D49E21CDA1A5006B03EA /* InfoTabMatrix.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoTabMatrix.mm; sourceTree = "<group>"; };
 		A23F299F132A447400E9A83B /* announcer-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "announcer-common.h"; sourceTree = "<group>"; };
 		A23F29A0132A447400E9A83B /* announcer-http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announcer-http.cc"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
@@ -713,8 +708,6 @@
 		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = announce-list.h; sourceTree = "<group>"; };
 		A25964A4106D73A800453B31 /* announcer.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = announcer.cc; sourceTree = "<group>"; };
 		A25964A5106D73A800453B31 /* announcer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = announcer.h; sourceTree = "<group>"; };
-		A25BB02812F4F517004B724E /* InfoTabButtonBack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoTabButtonBack.h; sourceTree = "<group>"; };
-		A25BB02912F4F517004B724E /* InfoTabButtonBack.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoTabButtonBack.mm; sourceTree = "<group>"; };
 		A25BFD63167BED3B0039D1AA /* variant-benc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-benc.cc"; sourceTree = "<group>"; };
 		A25BFD64167BED3B0039D1AA /* variant-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "variant-common.h"; sourceTree = "<group>"; };
 		A25BFD65167BED3B0039D1AA /* variant-json.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-json.cc"; sourceTree = "<group>"; };
@@ -892,8 +885,6 @@
 		A2D8CFBF15FA177A0056E93D /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CreatorWindowController.mm; sourceTree = "<group>"; };
-		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoTabButtonCell.h; sourceTree = "<group>"; };
-		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoTabButtonCell.mm; sourceTree = "<group>"; };
 		A2E384D2130DFB3A001F501B /* templates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = templates.h; sourceTree = "<group>"; };
 		A2E384D3130DFB3A001F501B /* utp_config_example.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utp_config_example.h; sourceTree = "<group>"; };
 		A2E384D4130DFB3A001F501B /* utp_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utp_config.h; sourceTree = "<group>"; };
@@ -1764,41 +1755,35 @@
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
 			children = (
-				A247A442114C701800547DFC /* InfoViewController.h */,
-				A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */,
-				A209EAC51142CF28002B02D1 /* InfoGeneralViewController.mm */,
 				A209EAC21142CF28002B02D1 /* InfoActivityViewController.h */,
 				A209EAC31142CF28002B02D1 /* InfoActivityViewController.mm */,
-				A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */,
-				A209EB001142D3A5002B02D1 /* InfoTrackersViewController.mm */,
-				A209EB9B1142E59A002B02D1 /* InfoPeersViewController.h */,
-				A209EB9C1142E59A002B02D1 /* InfoPeersViewController.mm */,
 				A209EBCC1142F2B4002B02D1 /* InfoFileViewController.h */,
 				A209EBCD1142F2B4002B02D1 /* InfoFileViewController.mm */,
+				A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */,
+				A209EAC51142CF28002B02D1 /* InfoGeneralViewController.mm */,
 				A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */,
 				A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.mm */,
-				A257C17F0CAD3003004E121C /* PeerTableView.h */,
-				A257C1800CAD3003004E121C /* PeerTableView.mm */,
-				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
-				A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.mm */,
-				A238D49D21CDA1A5006B03EA /* InfoTabMatrix.h */,
-				A238D49E21CDA1A5006B03EA /* InfoTabMatrix.mm */,
-				A25BB02812F4F517004B724E /* InfoTabButtonBack.h */,
-				A25BB02912F4F517004B724E /* InfoTabButtonBack.mm */,
+				A209EB9B1142E59A002B02D1 /* InfoPeersViewController.h */,
+				A209EB9C1142E59A002B02D1 /* InfoPeersViewController.mm */,
+				A263CFBE10DD67670038DE27 /* InfoTextField.h */,
+				A263CFBF10DD67670038DE27 /* InfoTextField.mm */,
+				A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */,
+				A209EB001142D3A5002B02D1 /* InfoTrackersViewController.mm */,
+				A247A442114C701800547DFC /* InfoViewController.h */,
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
 				A200B83A0A2263BA007BBB1E /* InfoWindowController.mm */,
 				A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */,
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.mm */,
+				A257C17F0CAD3003004E121C /* PeerTableView.h */,
+				A257C1800CAD3003004E121C /* PeerTableView.mm */,
 				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.mm */,
-				A2725D5B0DE7507C003445E7 /* TrackerTableView.h */,
-				A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */,
 				A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */,
 				A21A9D40106EC2E800F1C3C1 /* TrackerCell.mm */,
+				A2725D5B0DE7507C003445E7 /* TrackerTableView.h */,
+				A2725D5C0DE7507C003445E7 /* TrackerTableView.mm */,
 				A2D7744F154CC25700A62B93 /* WebSeedTableView.h */,
 				A2D77450154CC25700A62B93 /* WebSeedTableView.mm */,
-				A263CFBE10DD67670038DE27 /* InfoTextField.h */,
-				A263CFBF10DD67670038DE27 /* InfoTextField.mm */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -2552,7 +2537,6 @@
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,
 				A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
-				A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,
 				A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
@@ -2584,14 +2568,12 @@
 				A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.mm in Sources */,
 				A21F15AC11729A8B00CF5A9C /* AddMagnetWindowController.mm in Sources */,
 				A2661D6112D0E8D9004F69D5 /* FilterBarView.mm in Sources */,
-				A25BB02A12F4F517004B724E /* InfoTabButtonBack.mm in Sources */,
 				A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.mm in Sources */,
 				A2E57ABB1310822C00A7DAB1 /* StatusBarController.mm in Sources */,
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.mm in Sources */,
 				A2B5B4E91880665E0071A66A /* ShareTorrentFileHelper.mm in Sources */,
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.mm in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm in Sources */,
-				A238D49F21CDA1A5006B03EA /* InfoTabMatrix.mm in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.mm in Sources */,
 				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */,

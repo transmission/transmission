@@ -39,7 +39,7 @@
 
     NSViewController<InfoViewController>* fViewController;
     NSInteger fCurrentTabTag;
-    IBOutlet NSMatrix* fTabMatrix;
+    IBOutlet NSSegmentedControl* fTabs;
 
     InfoGeneralViewController* fGeneralViewController;
     InfoActivityViewController* fActivityViewController;

@@ -26,4 +26,6 @@
 
 - (NSImage*)imageWithColor:(NSColor*)color;
 
++ (NSImage*)systemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName;
+
 @end
