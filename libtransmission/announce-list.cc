@@ -15,28 +15,6 @@
 
 #include "announce-list.h"
 
-size_t tr_announce_list::size() const
-{
-    return std::size(trackers_);
-}
-
-bool tr_announce_list::empty() const
-{
-    return std::empty(trackers_);
-}
-
-void tr_announce_list::clear()
-{
-    return trackers_.clear();
-}
-
-tr_announce_list::tracker_info const& tr_announce_list::at(size_t i) const
-{
-    auto static constexpr Empty = tracker_info{};
-    TR_ASSERT(i < size());
-    return i < size() ? trackers_.at(i) : Empty;
-}
-
 bool tr_announce_list::save(char const* torrent_file, tr_error** error) const
 {
     return false;

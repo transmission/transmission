@@ -67,9 +67,27 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    bool empty() const;
-    size_t size() const;
-    tracker_info const& at(size_t i) const;
+    auto begin() const
+    {
+        return std::begin(trackers_);
+    }
+    auto end() const
+    {
+        return std::end(trackers_);
+    }
+    bool empty() const
+    {
+        return std::empty(trackers_);
+    }
+    size_t size() const
+    {
+        return std::size(trackers_);
+    }
+    tracker_info const& at(size_t i) const
+    {
+        return trackers_.at(i);
+    }
+
     std::set<tr_tracker_tier_t> tiers() const;
     tr_tracker_tier_t nextTier() const;
 
@@ -78,7 +96,10 @@ public:
     bool remove(tr_tracker_id_t id);
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);
     size_t set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
-    void clear();
+    void clear()
+    {
+        return trackers_.clear();
+    }
 
     bool save(char const* torrent_file, tr_error** error = nullptr) const;
 

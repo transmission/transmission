@@ -552,14 +552,20 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
 
 void tr_metainfoFree(tr_info* inf)
 {
-    for (unsigned int i = 0; i < inf->webseedCount; i++)
+    if (inf->webseeds != nullptr)
     {
-        tr_free(inf->webseeds[i]);
+        for (unsigned int i = 0; i < inf->webseedCount; i++)
+        {
+            tr_free(inf->webseeds[i]);
+        }
     }
 
-    for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
+    if (inf->files != nullptr)
     {
-        tr_free(inf->files[ff].name);
+        for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
+        {
+            tr_free(inf->files[ff].name);
+        }
     }
 
     tr_free(inf->comment);
@@ -579,9 +585,6 @@ void tr_metainfoFree(tr_info* inf)
     inf->webseeds = nullptr;
 
     inf->announce_list.reset();
-
-    // FIXME(ckerr) shouldn't memset over live objects like std::shared_ptr
-    memset(inf, '\0', sizeof(tr_info));
 }
 
 void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
