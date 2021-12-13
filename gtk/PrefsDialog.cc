@@ -132,7 +132,7 @@ void spun_cb(Gtk::SpinButton* w, tr_quark const key, Glib::RefPtr<Session> const
     if (last_change == nullptr)
     {
         last_change = new Glib::Timer();
-        w->set_data(IdleDataKey, last_change, [](void* p) { delete static_cast<Glib::Timer*>(p); });
+        w->set_data(IdleDataKey, last_change, [](gpointer p) { delete static_cast<Glib::Timer*>(p); });
         w->reference();
         Glib::signal_timeout().connect_seconds([w, key, core, isDouble]() { return spun_cb_idle(w, key, core, isDouble); }, 1);
     }

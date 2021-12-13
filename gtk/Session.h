@@ -160,7 +160,7 @@ public:
     TorrentModelColumns();
 
     Gtk::TreeModelColumn<Glib::ustring> name_collated;
-    Gtk::TreeModelColumn<void*> torrent;
+    Gtk::TreeModelColumn<gpointer> torrent;
     Gtk::TreeModelColumn<int> torrent_id;
     Gtk::TreeModelColumn<double> speed_up;
     Gtk::TreeModelColumn<double> speed_down;

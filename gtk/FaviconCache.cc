@@ -73,7 +73,7 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
     }
 }
 
-void favicon_web_done_cb(tr_session*, bool, bool, long, std::string_view, void*);
+void favicon_web_done_cb(tr_session*, bool, bool, long, std::string_view, gpointer);
 
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
@@ -108,7 +108,7 @@ void favicon_web_done_cb(
     bool /*did_timeout*/,
     long /*code*/,
     std::string_view data,
-    void* vfav)
+    gpointer vfav)
 {
     auto* fav = static_cast<favicon_data*>(vfav);
     fav->contents.assign(std::data(data), std::size(data));

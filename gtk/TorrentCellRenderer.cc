@@ -352,7 +352,7 @@ public:
         Gtk::CellRendererState flags);
 
 public:
-    Glib::Property<void*> torrent;
+    Glib::Property<gpointer> torrent;
     Glib::Property<int> bar_height;
 
     /* Use this instead of tr_stat.pieceUploadSpeed so that the model can
@@ -853,7 +853,7 @@ TorrentCellRenderer::Impl::Impl(TorrentCellRenderer& renderer)
     icon_renderer_ = Gtk::make_managed<Gtk::CellRendererPixbuf>();
 }
 
-Glib::PropertyProxy<void*> TorrentCellRenderer::property_torrent()
+Glib::PropertyProxy<gpointer> TorrentCellRenderer::property_torrent()
 {
     return impl_->torrent.get_proxy();
 }

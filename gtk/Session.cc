@@ -996,11 +996,11 @@ void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
 
         tr_torrentSetMetadataCallback(
             tor,
-            [](auto* tor2, void* impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
+            [](auto* tor2, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
             this);
         tr_torrentSetCompletenessCallback(
             tor,
-            [](auto* tor2, auto completeness, bool was_running, void* impl)
+            [](auto* tor2, auto completeness, bool was_running, gpointer impl)
             { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor2, completeness, was_running); },
             this);
     }
@@ -1643,7 +1643,7 @@ bool core_read_rpc_response_idle(TrVariantPtr const& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
     Glib::signal_idle().connect([response_copy = create_variant(std::move(*response))]() mutable
                                 { return core_read_rpc_response_idle(response_copy); });

@@ -161,7 +161,11 @@ private:
     bool call_rpc_for_selected_torrents(std::string const& method);
     void remove_selected(bool delete_files);
 
-    static tr_rpc_callback_status on_rpc_changed(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor, void* gdata);
+    static tr_rpc_callback_status on_rpc_changed(
+        tr_session* session,
+        tr_rpc_callback_type type,
+        tr_torrent* tor,
+        gpointer gdata);
 
 private:
     Application& app_;
@@ -484,7 +488,7 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
     tr_session* /*session*/,
     tr_rpc_callback_type type,
     tr_torrent* tor,
-    void* gdata)
+    gpointer gdata)
 {
     auto* impl = static_cast<Impl*>(gdata);
     auto const torrent_id = tr_torrentId(tor);
@@ -502,7 +506,7 @@ namespace
 {
 
 sig_atomic_t global_sigcount = 0;
-void* sighandler_cbdata = nullptr;
+gpointer sighandler_cbdata = nullptr;
 
 void signal_handler(int sig)
 {
@@ -1405,7 +1409,7 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     tr_free(magnet);
 }
 
-void gtr_actions_handler(Glib::ustring const& action_name, void* user_data)
+void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
 {
     static_cast<Application::Impl*>(user_data)->actions_handler(action_name);
 }

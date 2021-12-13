@@ -725,7 +725,7 @@ struct rename_data
 {
     Glib::ustring newname;
     Glib::ustring path_string;
-    void* impl;
+    gpointer impl;
 };
 
 bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
@@ -804,7 +804,7 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         oldpath.c_str(),
         newname.c_str(),
         static_cast<tr_torrent_rename_done_func>(
-            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* data)
+            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, gpointer data)
             {
                 Glib::signal_idle().connect(
                     [rdata = std::shared_ptr<struct rename_data>(static_cast<struct rename_data*>(data)), error]() {

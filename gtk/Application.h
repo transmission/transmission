@@ -34,7 +34,7 @@ public:
     Application(std::string const& config_dir, bool start_paused, bool is_iconified);
     ~Application() override;
 
-    friend void gtr_actions_handler(Glib::ustring const& action_name, void* user_data);
+    friend void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 
 protected:
     void on_startup() override;
