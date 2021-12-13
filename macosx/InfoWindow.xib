@@ -68,7 +68,7 @@
                             <font key="font" metaFont="system"/>
                             <segments>
                                 <segment image="info.circle" catalog="system" selected="YES"/>
-                                <segment image="square.grid.3x3.square" catalog="system" tag="1"/>
+                                <segment image="square.grid.3x3.fill.square" catalog="system" tag="1"/>
                                 <segment image="antenna.radiowaves.left.and.right" catalog="system" tag="2"/>
                                 <segment image="person.2" catalog="system" tag="3"/>
                                 <segment image="doc.on.doc" catalog="system" tag="4"/>
@@ -107,6 +107,6 @@
         <image name="gearshape" catalog="system" width="16" height="16"/>
         <image name="info.circle" catalog="system" width="15" height="15"/>
         <image name="person.2" catalog="system" width="21" height="14"/>
-        <image name="square.grid.3x3.square" catalog="system" width="15" height="14"/>
+        <image name="square.grid.3x3.fill.square" catalog="system" width="15" height="14"/>
     </resources>
 </document>
