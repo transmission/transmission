@@ -539,35 +539,6 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
 ****
 ***/
 
-struct AnnTrackerInfo
-{
-    AnnTrackerInfo(tr_tracker_info const& info_in, tr_url_parsed_t const& url_in)
-        : info{ info_in }
-        , url{ url_in }
-    {
-    }
-
-    tr_tracker_info info;
-    tr_url_parsed_t url;
-
-    /* primary key: tier
-     * secondary key: udp comes before http */
-    int compare(AnnTrackerInfo const& that) const // <=>
-    {
-        if (this->info.tier != that.info.tier)
-        {
-            return this->info.tier - that.info.tier;
-        }
-
-        return -this->url.scheme.compare(that.url.scheme);
-    }
-
-    bool operator<(AnnTrackerInfo const& that) const // less than
-    {
-        return this->compare(that) < 0;
-    }
-};
-
 static void addTorrentToTier(tr_announcer_tiers* tt, tr_torrent* tor)
 {
     auto const n = tor->trackerCount();

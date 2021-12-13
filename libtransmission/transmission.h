@@ -1219,15 +1219,6 @@ static inline char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 ***
 **/
 
-/** @brief a part of tr_info that represents a single tracker */
-struct tr_tracker_info
-{
-    int tier;
-    char* announce;
-    char* scrape;
-    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
-};
-
 /**
  * @brief Modify a torrent's tracker list.
  *
@@ -1235,13 +1226,11 @@ struct tr_tracker_info
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
  *
  * @param torrent The torrent whose tracker list is to be modified
- * @param trackers An array of trackers, sorted by tier from first to last.
- *                 NOTE: only the `tier' and `announce' fields are used.
- *                 libtransmission derives `scrape' from `announce'
- *                 and reassigns 'id'.
- * @param trackerCount size of the `trackers' array
+ * @param urls Array of n announce url strings
+ * @param tiers Array of n tier numbers for grouping 'urls' into tiers
+ * @param n the number of urls/tiers
  */
-bool tr_torrentSetAnnounceList(tr_torrent* torrent, tr_tracker_info const* trackers, int trackerCount);
+bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
 
 /**
 ***

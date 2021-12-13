@@ -119,7 +119,6 @@ enum tr_variant_parse_opts
     TR_VARIANT_PARSE_INPLACE = (1 << 2)
 };
 
-/* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
 bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, struct tr_error** error = nullptr);
 
 bool tr_variantFromBuf(

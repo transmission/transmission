@@ -7,11 +7,17 @@
  */
 
 #include <array>
+#include <cstdlib>
 #include <set>
+#include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "metainfo.h"
+#include "utils.h"
+#include "variant.h"
 
 #include "gtest/gtest.h"
 
@@ -323,4 +329,74 @@ TEST_F(AnnounceListTest, announceToScrape)
         auto const scrape = tr_announce_list::announceToScrape(tr_quark_new(test.announce));
         EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
     }
+}
+
+TEST_F(AnnounceListTest, save)
+{
+    auto constexpr Urls = std::array<char const*, 3>{
+        "https://www.example.com/a/announce",
+        "https://www.example.com/b/announce",
+        "https://www.example.com/c/announce",
+    };
+    auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 0, 1, 2 };
+
+    // first, set up a scratch .torrent
+    auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
+    auto original_content = std::vector<char>{};
+    auto const test_file = tr_strvJoin(::testing::TempDir(), "filename.torrent");
+    EXPECT_TRUE(tr_loadFile(original_content, OriginalFile));
+    EXPECT_TRUE(tr_saveFile(test_file.c_str(), { std::data(original_content), std::size(original_content) }));
+
+    // make an announce_list for it
+    auto announce_list = tr_announce_list();
+    EXPECT_TRUE(announce_list.add(Tiers[0], Urls[0]));
+    EXPECT_TRUE(announce_list.add(Tiers[1], Urls[1]));
+    EXPECT_TRUE(announce_list.add(Tiers[2], Urls[2]));
+
+    // try saving to a nonexistent .torrent file
+    tr_error* error = nullptr;
+    EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
+    EXPECT_NE(nullptr, error);
+    EXPECT_NE(0, error->code);
+    tr_error_clear(&error);
+
+    // now save to a real .torrent fi le
+    EXPECT_TRUE(announce_list.save(test_file.c_str(), &error));
+    EXPECT_EQ(nullptr, error);
+
+    // load the original
+    auto metainfo = tr_variant{};
+    EXPECT_TRUE(tr_variantFromBuf(
+        &metainfo,
+        TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
+        { std::data(original_content), std::size(original_content) },
+        nullptr,
+        nullptr));
+    auto original = tr_metainfoParse(nullptr, &metainfo, nullptr);
+    EXPECT_TRUE(original);
+    tr_variantFree(&metainfo);
+
+    // load the scratch that we saved to
+    metainfo = tr_variant{};
+    EXPECT_TRUE(tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, test_file.c_str(), nullptr));
+    auto saved = tr_metainfoParse(nullptr, &metainfo, nullptr);
+    EXPECT_TRUE(saved);
+    tr_variantFree(&metainfo);
+
+    // test that non-announce parts of the metainfo are the same
+    EXPECT_STREQ(original->info.name, saved->info.name);
+    EXPECT_EQ(original->info.fileCount, saved->info.fileCount);
+    EXPECT_EQ(original->info.dateCreated, saved->info.dateCreated);
+    EXPECT_EQ(original->pieces, saved->pieces);
+
+    // test that the saved version has the updated announce list
+    EXPECT_EQ(std::size(announce_list), std::size(*saved->info.announce_list));
+    EXPECT_TRUE(std::equal(
+        std::begin(announce_list),
+        std::end(announce_list),
+        std::begin(*saved->info.announce_list),
+        std::end(*saved->info.announce_list)));
+
+    // cleanup
+    std::remove(test_file.c_str());
 }

@@ -26,6 +26,14 @@ enum tr_metainfo_builder_err
     TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
 };
 
+struct tr_tracker_info
+{
+    int tier;
+    char* announce;
+    char* scrape;
+    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
+};
+
 struct tr_metainfo_builder
 {
     /**

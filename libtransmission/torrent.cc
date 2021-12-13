@@ -2138,113 +2138,40 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
 ****
 ***/
 
-static int compareTrackerByTier(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_tracker_info const*>(va);
-    auto const* const b = static_cast<tr_tracker_info const*>(vb);
-
-    /* sort by tier */
-    if (a->tier != b->tier)
-    {
-        return a->tier - b->tier;
-    }
-
-    /* get the effects of a stable sort by comparing the two elements' addresses */
-    return a - b;
-}
-
-bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_in, int trackerCount)
+bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
-    auto metainfo = tr_variant{};
-    auto ok = bool{ true };
-
-    /* ensure the trackers' tiers are in ascending order */
-    auto* trackers = static_cast<tr_tracker_info*>(tr_memdup(trackers_in, sizeof(tr_tracker_info) * trackerCount));
-    qsort(trackers, trackerCount, sizeof(tr_tracker_info), compareTrackerByTier);
-
-    /* look for bad URLs */
-    for (int i = 0; ok && i < trackerCount; ++i)
+    auto announce_list = tr_announce_list();
+    if (!announce_list.set(announce_urls, tiers, n) || !announce_list.save(tor->info.torrent))
     {
-        if (!tr_urlIsValidTracker(trackers[i].announce))
+        return false;
+    }
+
+    std::swap(*tor->info.announce_list, announce_list);
+    tr_torrentMarkEdited(tor);
+
+    /* if we had a tracker-related error on this torrent,
+     * and that tracker's been removed,
+     * then clear the error */
+    if (tor->error == TR_STAT_TRACKER_WARNING || tor->error == TR_STAT_TRACKER_ERROR)
+    {
+        auto const error_url = tor->error_announce_url;
+
+        if (std::any_of(
+                std::begin(*tor->info.announce_list),
+                std::end(*tor->info.announce_list),
+                [error_url](auto const& tracker) { return tracker.announce_interned == error_url; }))
         {
-            ok = false;
+            tr_torrentClearError(tor);
         }
     }
 
-    /* save to the .torrent file */
-    if (ok && tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, tor->info.torrent, nullptr))
-    {
-        /* remove the old fields */
-        tr_variantDictRemove(&metainfo, TR_KEY_announce);
-        tr_variantDictRemove(&metainfo, TR_KEY_announce_list);
+    /* tell the announcer to reload this torrent's tracker list */
+    tr_announcerResetTorrent(tor->session->announcer, tor);
 
-        /* add the new fields */
-        if (trackerCount > 0)
-        {
-            tr_variantDictAddStr(&metainfo, TR_KEY_announce, trackers[0].announce);
-        }
-
-        if (trackerCount > 1)
-        {
-            int prevTier = -1;
-            tr_variant* tier = nullptr;
-            tr_variant* announceList = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
-
-            for (int i = 0; i < trackerCount; ++i)
-            {
-                if (prevTier != trackers[i].tier)
-                {
-                    prevTier = trackers[i].tier;
-                    tier = tr_variantListAddList(announceList, 0);
-                }
-
-                tr_variantListAddStr(tier, trackers[i].announce);
-            }
-        }
-
-        /* try to parse it back again, to make sure it's good */
-        auto parsed = tr_metainfoParse(tor->session, &metainfo, nullptr);
-        if (parsed)
-        {
-            /* it's good, so keep these new trackers and free the old ones */
-            std::swap(*tor->info.announce_list, *parsed->info.announce_list);
-            tr_torrentMarkEdited(tor);
-            tr_variantToFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
-        }
-
-        /* cleanup */
-        tr_variantFree(&metainfo);
-
-        /* if we had a tracker-related error on this torrent,
-         * and that tracker's been removed,
-         * then clear the error */
-        if (tor->error == TR_STAT_TRACKER_WARNING || tor->error == TR_STAT_TRACKER_ERROR)
-        {
-            bool clear = true;
-
-            for (int i = 0; clear && i < trackerCount; ++i)
-            {
-                if (strcmp(trackers[i].announce, tr_quark_get_string(tor->error_announce_url)) == 0)
-                {
-                    clear = false;
-                }
-            }
-
-            if (clear)
-            {
-                tr_torrentClearError(tor);
-            }
-        }
-
-        /* tell the announcer to reload this torrent's tracker list */
-        tr_announcerResetTorrent(tor->session->announcer, tor);
-    }
-
-    tr_free(trackers);
-    return ok;
+    return true;
 }
 
 /**

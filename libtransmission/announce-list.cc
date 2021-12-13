@@ -14,11 +14,9 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-
-bool tr_announce_list::save(char const* torrent_file, tr_error** error) const
-{
-    return false;
-}
+#include "metainfo.h"
+#include "utils.h"
+#include "variant.h"
 
 size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
 {
@@ -205,4 +203,57 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
             tracker.announce.port == announce.port && tracker.announce.path == announce.path;
     };
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
+}
+
+bool tr_announce_list::save(char const* torrent_file, tr_error** error) const
+{
+    // load the .torrent file
+    auto metainfo = tr_variant{};
+    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    {
+        return false;
+    }
+
+    // remove the old fields
+    tr_variantDictRemove(&metainfo, TR_KEY_announce);
+    tr_variantDictRemove(&metainfo, TR_KEY_announce_list);
+
+    // add the new fields
+    if (this->size() == 1)
+    {
+        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce_interned);
+    }
+    else if (this->size() > 1)
+    {
+        tr_variant* tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
+
+        auto current_tier = std::optional<tr_tracker_tier_t>{};
+        tr_variant* tracker_list = nullptr;
+
+        for (auto const& tracker : *this)
+        {
+            if (tracker_list == nullptr || !current_tier || current_tier != tracker.tier)
+            {
+                tracker_list = tr_variantListAddList(tier_list, 1);
+                current_tier = tracker.tier;
+            }
+
+            tr_variantListAddQuark(tracker_list, tracker.announce_interned);
+        }
+    }
+
+    // confirm that it's good by parsing it back again
+    if (!tr_metainfoParse(nullptr, &metainfo, error))
+    {
+        tr_variantFree(&metainfo);
+        return false;
+    }
+
+    // save it
+    auto contents_len = size_t{};
+    auto* const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC, &contents_len);
+    tr_variantFree(&metainfo);
+    auto const success = tr_saveFile(torrent_file, { contents, contents_len }, error);
+    tr_free(contents);
+    return success;
 }

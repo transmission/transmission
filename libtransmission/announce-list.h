@@ -57,9 +57,14 @@ public:
             return 0;
         }
 
-        bool operator<(tracker_info const& that) const // <
+        bool operator<(tracker_info const& that) const
         {
             return compare(that) < 0;
+        }
+
+        bool operator==(tracker_info const& that) const
+        {
+            return compare(that) == 0;
         }
     };
 
