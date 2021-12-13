@@ -8,7 +8,7 @@
 
 #pragma once
 
-#if 0 // FIXME(ckerr): temporarily disable
+#if 0 // TODO(ckerr): re-enable this after tr_info is made private
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif

@@ -1551,7 +1551,7 @@ struct tr_info
     // Use tr_torrentFile() and tr_torrentFileCount() instead.
     tr_file* files;
 
-    // FIXME(ckerr) this is transitional; won't be a shared_pointer
+    // TODO(ckerr) aggregate this directly, rather than  using a shared_ptr, when tr_info is private
     std::shared_ptr<tr_announce_list> announce_list;
 
     /* Torrent info */

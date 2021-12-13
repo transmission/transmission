@@ -763,11 +763,12 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSArray*)allTrackersFlat
 {
-    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:fInfo->trackerCount];
+    auto const n = tr_torrentTrackerCount(fHandle);
+    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:n];
 
-    for (NSInteger i = 0; i < fInfo->trackerCount; i++)
+    for (size_t i = 0; i < n; ++i)
     {
-        [allTrackers addObject:@(fInfo->trackers[i].announce)];
+        [allTrackers addObject:@(tr_torrentTracker(fHandle, i).announce)];
     }
 
     return allTrackers;
@@ -792,7 +793,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     urls.push_back(new_tracker.UTF8String);
-    urls.push_back(std::empty(tiers) ? 0 : tiers.back().tier + 1);
+    urls.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
 
     BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
 
