@@ -793,7 +793,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     urls.push_back(new_tracker.UTF8String);
-    urls.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
+    tiers.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
 
     BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
 
