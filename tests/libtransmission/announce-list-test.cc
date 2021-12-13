@@ -128,6 +128,9 @@ TEST_F(AnnounceListTest, canSet)
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.full);
     EXPECT_EQ(Urls[1], announce_list.at(1).announce.full);
     EXPECT_EQ(Urls[2], announce_list.at(2).announce.full);
+    auto const expected_tiers = std::set<tr_tracker_tier_t>(std::begin(Tiers), std::end(Tiers));
+    auto const tiers = announce_list.tiers();
+    EXPECT_EQ(expected_tiers, tiers);
 }
 
 TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
@@ -252,4 +255,72 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidAnnounce)
 
     EXPECT_FALSE(announce_list.remove("https://www.not-example.com/announce"sv));
     EXPECT_EQ(1, std::size(announce_list));
+}
+
+TEST_F(AnnounceListTest, canReplace)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "https://www.example.com/2/announce"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_TRUE(announce_list.replace(announce_list.at(0).id, Announce2));
+    EXPECT_EQ(Announce2, announce_list.at(0).announce.full);
+}
+
+TEST_F(AnnounceListTest, canNotReplaceInvalidId)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "https://www.example.com/2/announce"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_FALSE(announce_list.replace(announce_list.at(0).id + 1, Announce2));
+    EXPECT_EQ(Announce1, announce_list.at(0).announce.full);
+}
+
+TEST_F(AnnounceListTest, canNotReplaceWithInvalidAnnounce)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "telnet://www.example.com/2/announce"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_FALSE(announce_list.replace(announce_list.at(0).id, Announce2));
+    EXPECT_EQ(Announce1, announce_list.at(0).announce.full);
+}
+
+TEST_F(AnnounceListTest, canNotReplaceWithDuplicate)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce = "https://www.example.com/announce"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Tier, Announce));
+    EXPECT_FALSE(announce_list.replace(announce_list.at(0).id, Announce));
+    EXPECT_EQ(Announce, announce_list.at(0).announce.full);
+}
+
+TEST_F(AnnounceListTest, announceToScrape)
+{
+    struct ScrapeTest
+    {
+        std::string_view announce;
+        std::string_view expected_scrape;
+    };
+
+    auto constexpr Tests = std::array<ScrapeTest, 3>{ {
+        { "https://www.example.com/announce"sv, "https://www.example.com/scrape"sv },
+        { "https://www.example.com/foo"sv, ""sv },
+        { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
+    } };
+
+    for (auto const test : Tests)
+    {
+        auto const scrape = tr_announce_list::announceToScrape(tr_quark_new(test.announce));
+        EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
+    }
 }
