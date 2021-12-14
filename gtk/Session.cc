@@ -68,7 +68,7 @@ TrVariantPtr create_variant(tr_variant&& other)
 class ScopedModelSortBlocker
 {
 public:
-    ScopedModelSortBlocker(Gtk::TreeSortable& model)
+    explicit ScopedModelSortBlocker(Gtk::TreeSortable& model)
         : model_(model)
     {
         model_.get_sort_column_id(sort_column_id_, sort_type_);

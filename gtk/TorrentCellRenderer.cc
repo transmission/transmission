@@ -337,7 +337,7 @@ Glib::ustring getStatusString(
 class TorrentCellRenderer::Impl
 {
 public:
-    Impl(TorrentCellRenderer& renderer);
+    explicit Impl(TorrentCellRenderer& renderer);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)

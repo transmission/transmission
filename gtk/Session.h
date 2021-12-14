@@ -146,7 +146,7 @@ public:
     sigc::signal<void(bool)>& signal_port_tested();
 
 protected:
-    Session(tr_session* session);
+    explicit Session(tr_session* session);
 
 private:
     class Impl;
