@@ -20,22 +20,22 @@
 #include <libtransmission/tr-macros.h>
 
 extern int const mem_K;
-extern char const* mem_K_str;
-extern char const* mem_M_str;
-extern char const* mem_G_str;
-extern char const* mem_T_str;
+extern char const* const mem_K_str;
+extern char const* const mem_M_str;
+extern char const* const mem_G_str;
+extern char const* const mem_T_str;
 
 extern int const disk_K;
-extern char const* disk_K_str;
-extern char const* disk_M_str;
-extern char const* disk_G_str;
-extern char const* disk_T_str;
+extern char const* const disk_K_str;
+extern char const* const disk_M_str;
+extern char const* const disk_G_str;
+extern char const* const disk_T_str;
 
 extern int const speed_K;
-extern char const* speed_K_str;
-extern char const* speed_M_str;
-extern char const* speed_G_str;
-extern char const* speed_T_str;
+extern char const* const speed_K_str;
+extern char const* const speed_M_str;
+extern char const* const speed_G_str;
+extern char const* const speed_T_str;
 
 enum
 {

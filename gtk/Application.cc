@@ -68,7 +68,7 @@ namespace
 
 auto const AppIconName = Glib::ustring("transmission"s);
 
-char const* LICENSE =
+char const* const LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "

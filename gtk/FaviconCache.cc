@@ -19,7 +19,7 @@
 namespace
 {
 
-std::array<char const*, 4> image_types = { "ico", "png", "gif", "jpg" };
+std::array<char const*, 4> const image_types = { "ico", "png", "gif", "jpg" };
 
 struct favicon_data
 {
