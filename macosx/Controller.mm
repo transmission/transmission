@@ -1213,8 +1213,7 @@ static void removeKeRangerRansomware()
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(fLib, address.UTF8String)))
     {
-        tr_info const* info = tr_torrentInfo(duplicateTorrent);
-        NSString* name = (info != NULL && info->name != NULL) ? @(info->name) : nil;
+        NSString* name = @(tr_torrentName(duplicateTorrent));
         [self duplicateOpenMagnetAlert:address transferName:name];
         return;
     }

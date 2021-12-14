@@ -413,3 +413,8 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
     return evbuffer_free_to_str(s, nullptr);
 }
+
+char* tr_torrentGetMagnetLink(tr_torrent const* tor)
+{
+    return tr_torrentInfoGetMagnetLink(tr_torrentInfo(tor));
+}

@@ -415,14 +415,13 @@ static void addWebseeds(tr_info const* info, tr_variant* webseeds)
 
 static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
 {
-    for (size_t i = 0, n = tor->trackerCount(); i < n; ++i)
+    for (auto const& tracker : *tor->info.announce_list)
     {
-        auto const info = tor->tracker(i);
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddQuark(d, TR_KEY_announce, info.announce_interned);
-        tr_variantDictAddInt(d, TR_KEY_id, info.id);
-        tr_variantDictAddQuark(d, TR_KEY_scrape, info.scrape_interned);
-        tr_variantDictAddInt(d, TR_KEY_tier, info.tier);
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_interned);
+        tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_interned);
+        tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
 

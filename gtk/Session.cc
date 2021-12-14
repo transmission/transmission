@@ -490,8 +490,8 @@ int compare_by_age(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator c
 
 int compare_by_size(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator const& b)
 {
-    auto const size_a = tr_torrentInfo(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)))->totalSize;
-    auto const size_b = tr_torrentInfo(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)))->totalSize;
+    auto const size_a = tr_torrentTotalSize(static_cast<tr_torrent*>(a->get_value(torrent_cols.torrent)));
+    auto const size_b = tr_torrentTotalSize(static_cast<tr_torrent*>(b->get_value(torrent_cols.torrent)));
     int ret = compare_uint64(size_a, size_b);
 
     if (ret == 0)
@@ -883,7 +883,7 @@ namespace
 
 Glib::ustring get_collated_name(tr_torrent const* tor)
 {
-    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentInfo(tor)->hashString);
+    return gtr_sprintf("%s\t%s", Glib::ustring(tr_torrentName(tor)).lowercase(), tr_torrentView(tor).hash_string);
 }
 
 struct metadata_callback_data

@@ -614,14 +614,14 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     Glib::ustring stateString;
     uint64_t sizeWhenDone = 0;
     std::vector<tr_stat const*> stats;
-    std::vector<tr_info const*> infos;
+    std::vector<tr_torrent_view> infos;
 
     stats.reserve(torrents.size());
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
         stats.push_back(tr_torrentStatCached(torrent));
-        infos.push_back(tr_torrentInfo(torrent));
+        infos.push_back(tr_torrentView(torrent));
     }
 
     /* privacy_lb */
@@ -631,11 +631,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        bool const baseline = infos.front()->isPrivate;
+        bool const baseline = infos.front().is_private;
         bool const is_uniform = std::all_of(
             infos.begin(),
             infos.end(),
-            [baseline](auto const* info) { return info->isPrivate == baseline; });
+            [baseline](auto const& info) { return info.is_private == baseline; });
 
         if (is_uniform)
         {
@@ -656,17 +656,17 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const creator = Glib::ustring(infos.front()->creator != nullptr ? infos.front()->creator : "");
-        time_t const date = infos.front()->dateCreated;
+        auto const creator = Glib::ustring(infos.front().creator != nullptr ? infos.front().creator : "");
+        auto const date = infos.front().date_created;
         auto const datestr = get_short_date_string(date);
         bool const mixed_creator = std::any_of(
             infos.begin(),
             infos.end(),
-            [&creator](auto const* info) { return creator != (info->creator != nullptr ? info->creator : ""); });
+            [&creator](auto const& info) { return creator != (info.creator != nullptr ? info.creator : ""); });
         bool const mixed_date = std::any_of(
             infos.begin(),
             infos.end(),
-            [date](auto const* info) { return date != info->dateCreated; });
+            [date](auto const& info) { return date != info.date_created; });
 
         bool const empty_creator = creator.empty();
         bool const empty_date = date == 0;
@@ -705,11 +705,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = Glib::ustring(infos.front()->comment != nullptr ? infos.front()->comment : "");
+        auto const baseline = Glib::ustring(infos.front().comment != nullptr ? infos.front().comment : "");
         bool const is_uniform = std::all_of(
             infos.begin(),
             infos.end(),
-            [&baseline](auto const* info) { return baseline == (info->comment != nullptr ? info->comment : ""); });
+            [&baseline](auto const& info) { return baseline == (info.comment != nullptr ? info.comment : ""); });
 
         str = is_uniform ? baseline : mixed;
     }
@@ -818,16 +818,16 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         int pieces = 0;
         int32_t pieceSize = 0;
 
-        for (auto const* const info : infos)
+        for (auto const& info : infos)
         {
-            size += info->totalSize;
-            pieces += info->pieceCount;
+            size += info.total_size;
+            pieces += info.n_pieces;
 
             if (pieceSize == 0)
             {
-                pieceSize = info->pieceSize;
+                pieceSize = info.piece_size;
             }
-            else if (pieceSize != (int)info->pieceSize)
+            else if (pieceSize != (int)info.piece_size)
             {
                 pieceSize = -1;
             }
@@ -963,7 +963,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else if (infos.size() == 1)
     {
-        str = infos.front()->hashString;
+        str = infos.front().hash_string;
     }
     else
     {

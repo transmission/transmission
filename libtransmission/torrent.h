@@ -330,7 +330,7 @@ public:
 
     /// TRACKERS
 
-    size_t trackerCount() const
+    auto trackerCount() const
     {
         return std::size(*info.announce_list);
     }
@@ -694,3 +694,5 @@ constexpr tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
 {
     return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
+
+tr_info const* tr_torrentInfo(tr_torrent const* torrent);

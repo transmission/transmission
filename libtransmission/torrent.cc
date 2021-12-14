@@ -77,6 +77,13 @@ char const* tr_torrentName(tr_torrent const* tor)
     return tor != nullptr ? tor->info.name : "";
 }
 
+uint64_t tr_torrentTotalSize(tr_torrent const* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    return tor->info.totalSize;
+}
+
 int tr_torrentId(tr_torrent const* tor)
 {
     return tor != nullptr ? tor->uniqueId : -1;
@@ -1255,6 +1262,27 @@ tr_tracker_view tr_torrentTracker(tr_torrent const* tor, size_t i)
 size_t tr_torrentTrackerCount(tr_torrent const* tor)
 {
     return tr_announcerTrackerCount(tor);
+}
+
+tr_torrent_view tr_torrentView(tr_torrent const* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    auto ret = tr_torrent_view{};
+    ret.name = tor->info.name;
+    ret.hash_string = tor->info.hashString;
+    ret.torrent_filename = tor->info.torrent;
+    ret.comment = tor->info.comment;
+    ret.creator = tor->info.creator;
+    ret.source = tor->info.source;
+    ret.total_size = tor->info.totalSize;
+    ret.date_created = tor->info.dateCreated;
+    ret.piece_size = tor->info.pieceSize;
+    ret.n_pieces = tor->info.pieceCount;
+    ret.is_private = tor->info.isPrivate;
+    ret.is_folder = tor->info.isFolder;
+
+    return ret;
 }
 
 /***
@@ -3265,4 +3293,9 @@ void tr_torrentSetFilePriorities(
     tr_priority_t priority)
 {
     tor->setFilePriorities(files, fileCount, priority);
+}
+
+bool tr_torrentHasMetadata(tr_torrent const* tor)
+{
+    return tor->info.fileCount > 0;
 }

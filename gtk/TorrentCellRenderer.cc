@@ -462,7 +462,7 @@ void TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget, int& width, i
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
-    auto const total_size = tr_torrentInfo(tor)->totalSize;
+    auto const total_size = tr_torrentTotalSize(tor);
 
     auto const icon = get_icon(tor, FullIconSize, widget);
     auto const name = Glib::ustring(tr_torrentName(tor));
@@ -681,7 +681,7 @@ void TorrentCellRenderer::Impl::render_full(
 
     auto* const tor = static_cast<tr_torrent*>(torrent.get_value());
     auto const* const st = tr_torrentStatCached(tor);
-    auto const total_size = tr_torrentInfo(tor)->totalSize;
+    auto const total_size = tr_torrentTotalSize(tor);
     bool const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT;
     auto const percentDone = get_percent_done(tor, st, &seed);
