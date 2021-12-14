@@ -26,13 +26,24 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define ICON_NAME "transmission"
+using namespace std::literals;
+
+namespace
+{
+
+auto const TrayIconName = Glib::ustring("transmission-tray-icon"s);
+auto const AppIconName = Glib::ustring("transmission"s);
+auto const AppName = Glib::ustring("transmission-gtk"s);
+
+} // namespace
 
 class SystemTrayIcon::Impl
 {
 public:
     Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void refresh();
 
@@ -142,24 +153,24 @@ void SystemTrayIcon::Impl::refresh()
 namespace
 {
 
-std::string getIconName()
+Glib::ustring getIconName()
 {
-    std::string icon_name;
+    Glib::ustring icon_name;
 
     auto theme = Gtk::IconTheme::get_default();
 
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!theme->has_icon(TRAY_ICON))
+    if (!theme->has_icon(TrayIconName))
     {
-        icon_name = ICON_NAME;
+        icon_name = AppIconName;
     }
     else
     {
-        auto const icon_info = theme->lookup_icon(TRAY_ICON, 48, Gtk::ICON_LOOKUP_USE_BUILTIN);
+        auto const icon_info = theme->lookup_icon(TrayIconName, 48, Gtk::ICON_LOOKUP_USE_BUILTIN);
         bool const icon_is_builtin = icon_info.get_filename().empty();
 
-        icon_name = icon_is_builtin ? ICON_NAME : TRAY_ICON;
+        icon_name = icon_is_builtin ? AppIconName : TrayIconName;
     }
 
     return icon_name;
@@ -188,7 +199,7 @@ SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const
 
 #ifdef HAVE_LIBAPPINDICATOR
 
-    indicator_ = app_indicator_new(ICON_NAME, icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+    indicator_ = app_indicator_new(AppName.c_str(), icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
     app_indicator_set_status(indicator_, APP_INDICATOR_STATUS_ACTIVE);
     app_indicator_set_menu(indicator_, Glib::unwrap(menu_));
     app_indicator_set_title(indicator_, Glib::get_application_name().c_str());

@@ -15,7 +15,7 @@
 #include <QSet>
 #include <QString>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class TorrentModel;
 

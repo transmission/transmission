@@ -21,10 +21,10 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
 #include "FaviconCache.h"
 #include "IconCache.h"
-#include "Macros.h"
 #include "Speed.h"
 
 #ifdef ERROR

@@ -29,12 +29,12 @@ namespace
 
 Session* myCore = nullptr;
 
-void action_cb(Gio::SimpleAction& action, void* user_data)
+void action_cb(Gio::SimpleAction& action, gpointer user_data)
 {
     gtr_actions_handler(action.get_name(), user_data);
 }
 
-void sort_changed_cb(Gio::SimpleAction& action, Glib::VariantBase const& value, void* /*user_data*/)
+void sort_changed_cb(Gio::SimpleAction& action, Glib::VariantBase const& value, gpointer /*user_data*/)
 {
     action.set_state(value);
     myCore->set_pref(TR_KEY_sort_mode, Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(value).get());
@@ -45,7 +45,7 @@ std::array<std::string_view, 2> const show_toggle_entries = {
     "toggle-message-log"sv,
 };
 
-void toggle_pref_cb(Gio::SimpleAction& action, void* /*user_data*/)
+void toggle_pref_cb(Gio::SimpleAction& action, gpointer /*user_data*/)
 {
     auto const key = action.get_name();
     bool val = false;
@@ -97,11 +97,6 @@ std::array<std::string_view, 29> const entries = {
     "present-main-window"sv,
 };
 
-void register_my_icons()
-{
-    Gtk::IconTheme::get_default()->add_resource_path(TR_RESOURCE_PATH "icons");
-}
-
 Gtk::Builder* myBuilder = nullptr;
 
 std::unordered_map<Glib::ustring, Glib::RefPtr<Gio::SimpleAction>> key_to_action;
@@ -113,11 +108,9 @@ void gtr_actions_set_core(Glib::RefPtr<Session> const& core)
     myCore = gtr_get_ptr(core);
 }
 
-Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, void* callback_user_data)
+Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder> const& builder, gpointer callback_user_data)
 {
     myBuilder = gtr_get_ptr(builder);
-
-    register_my_icons();
 
     auto const action_group = Gio::SimpleActionGroup::create();
 

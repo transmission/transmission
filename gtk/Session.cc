@@ -44,13 +44,31 @@
 #include "Session.h"
 #include "Utils.h"
 
+using namespace std::literals;
+
 namespace
 {
+
+using TrVariantPtr = std::shared_ptr<tr_variant>;
+
+TrVariantPtr create_variant(tr_variant&& other)
+{
+    auto result = TrVariantPtr(
+        tr_new0(tr_variant, 1),
+        [](tr_variant* ptr)
+        {
+            tr_variantFree(ptr);
+            tr_free(ptr);
+        });
+    *result = std::move(other);
+    tr_variantInitBool(&other, false);
+    return result;
+}
 
 class ScopedModelSortBlocker
 {
 public:
-    ScopedModelSortBlocker(Gtk::TreeSortable& model)
+    explicit ScopedModelSortBlocker(Gtk::TreeSortable& model)
         : model_(model)
     {
         model_.get_sort_column_id(sort_column_id_, sort_type_);
@@ -61,6 +79,8 @@ public:
     {
         model_.set_sort_column(sort_column_id_, sort_type_);
     }
+
+    TR_DISABLE_COPY_MOVE(ScopedModelSortBlocker)
 
 private:
     Gtk::TreeSortable& model_;
@@ -978,11 +998,11 @@ void Session::Impl::add_torrent(tr_torrent* tor, bool do_notify)
 
         tr_torrentSetMetadataCallback(
             tor,
-            [](auto* tor2, void* impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
+            [](auto* tor2, gpointer impl) { static_cast<Impl*>(impl)->on_torrent_metadata_changed(tor2); },
             this);
         tr_torrentSetCompletenessCallback(
             tor,
-            [](auto* tor2, auto completeness, bool was_running, void* impl)
+            [](auto* tor2, auto completeness, bool was_running, gpointer impl)
             { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor2, completeness, was_running); },
             this);
     }
@@ -1438,12 +1458,12 @@ void Session::Impl::update()
 ***  Hibernate
 **/
 
-#define SESSION_MANAGER_SERVICE_NAME "org.gnome.SessionManager"
-#define SESSION_MANAGER_INTERFACE "org.gnome.SessionManager"
-#define SESSION_MANAGER_OBJECT_PATH "/org/gnome/SessionManager"
-
 namespace
 {
+
+auto const SessionManagerServiceName = Glib::ustring("org.gnome.SessionManager"s);
+auto const SessionManagerInterface = Glib::ustring("org.gnome.SessionManager"s);
+auto const SessionManagerObjectPath = Glib::ustring("/org/gnome/SessionManager"s);
 
 bool gtr_inhibit_hibernation(guint32& cookie)
 {
@@ -1458,8 +1478,8 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
         auto response = connection->call_sync(
-            SESSION_MANAGER_OBJECT_PATH,
-            SESSION_MANAGER_INTERFACE,
+            SessionManagerObjectPath,
+            SessionManagerInterface,
             "Inhibit",
             Glib::VariantContainerBase::create_tuple({
                 Glib::Variant<Glib::ustring>::create(application),
@@ -1467,7 +1487,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
                 Glib::Variant<Glib::ustring>::create(reason),
                 Glib::Variant<guint32>::create(flags),
             }),
-            SESSION_MANAGER_SERVICE_NAME,
+            SessionManagerServiceName,
             1000);
 
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
@@ -1492,11 +1512,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
         auto const connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
         connection->call_sync(
-            SESSION_MANAGER_OBJECT_PATH,
-            SESSION_MANAGER_INTERFACE,
+            SessionManagerObjectPath,
+            SessionManagerInterface,
             "Uninhibit",
             Glib::VariantContainerBase::create_tuple({ Glib::Variant<guint32>::create(inhibit_cookie) }),
-            SESSION_MANAGER_SERVICE_NAME,
+            SessionManagerServiceName,
             1000);
 
         /* logging */
@@ -1601,19 +1621,17 @@ namespace
 
 int64_t nextTag = 1;
 
-typedef void (*server_response_func)(Session* core, tr_variant* response, gpointer user_data);
-
 std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
-bool core_read_rpc_response_idle(tr_variant* response)
+bool core_read_rpc_response_idle(TrVariantPtr const& response)
 {
-    if (int64_t tag = 0; tr_variantDictFindInt(response, TR_KEY_tag, &tag))
+    if (int64_t tag = 0; tr_variantDictFindInt(response.get(), TR_KEY_tag, &tag))
     {
         if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
             if (auto const& response_func = data_it->second; response_func)
             {
-                response_func(response);
+                response_func(response.get());
             }
 
             pendingRequests.erase(data_it);
@@ -1624,18 +1642,13 @@ bool core_read_rpc_response_idle(tr_variant* response)
         }
     }
 
-    tr_variantFree(response);
-    delete response;
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, void* /*user_data*/)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
-    auto* response_copy = new tr_variant(std::move(*response));
-
-    tr_variantInitBool(response, false);
-
-    Glib::signal_idle().connect([response_copy]() { return core_read_rpc_response_idle(response_copy); });
+    Glib::signal_idle().connect([response_copy = create_variant(std::move(*response))]() mutable
+                                { return core_read_rpc_response_idle(response_copy); });
 }
 
 } // namespace

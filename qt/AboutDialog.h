@@ -10,8 +10,9 @@
 
 #include <QPointer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "ui_AboutDialog.h"
 
 class LicenseDialog;

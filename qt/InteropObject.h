@@ -10,7 +10,7 @@
 
 #include <QObject>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class InteropObject : public QObject
 {

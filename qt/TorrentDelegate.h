@@ -12,7 +12,7 @@
 
 #include <QStyledItemDelegate>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class QStyle;
 class QStyleOptionProgressBar;

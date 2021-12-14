@@ -11,7 +11,8 @@
 #include <QSet>
 #include <QTreeView>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "Torrent.h" // FileList
 
 class QAction;

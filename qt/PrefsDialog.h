@@ -10,8 +10,9 @@
 
 #include <QMap>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Prefs.h"
 #include "ui_PrefsDialog.h"
 

@@ -13,8 +13,9 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "Filters.h"
-#include "Macros.h"
 
 class QString;
 

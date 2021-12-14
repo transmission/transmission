@@ -16,9 +16,10 @@
 #include <QString>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Torrent.h" // FileList
 #include "ui_OptionsDialog.h"
 
