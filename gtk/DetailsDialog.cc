@@ -571,6 +571,9 @@ Glib::ustring activityString(int activity, bool finished)
 
     case TR_STATUS_STOPPED:
         return finished ? _("Finished") : _("Paused");
+
+    default:
+        g_assert_not_reached();
     }
 
     return {};
@@ -1553,6 +1556,9 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
             case 'T':
                 s = _("Peer is connected over µTP");
                 break;
+
+            default:
+                g_assert_not_reached();
             }
 
             if (s != nullptr)
@@ -1912,6 +1918,9 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
             _("Asking for more peers now… <small>%s</small>"),
             tr_strltime_rounded(now - tracker.lastAnnounceStartTime));
         break;
+
+    default:
+        g_assert_not_reached();
     }
 }
 
@@ -1968,6 +1977,9 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
             _("Asking for peer counts now… <small>%s</small>"),
             tr_strltime_rounded(now - tracker.lastScrapeStartTime));
         break;
+
+    default:
+        g_assert_not_reached();
     }
 }
 

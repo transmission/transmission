@@ -481,6 +481,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
     case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
         /* nothing interesting to do here */
         break;
+
+    default:
+        g_assert_not_reached();
     }
 
     return false;

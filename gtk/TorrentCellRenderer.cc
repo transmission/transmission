@@ -308,6 +308,9 @@ Glib::ustring getStatusString(
                 st->peersGettingFromUs,
                 st->peersConnected);
             break;
+
+        default:
+            g_assert_not_reached();
         }
     }
 
