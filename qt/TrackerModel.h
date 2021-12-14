@@ -12,7 +12,8 @@
 
 #include <QAbstractListModel>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "Torrent.h"
 #include "Typedefs.h"
 

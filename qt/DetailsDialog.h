@@ -15,8 +15,9 @@
 #include <QSet>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Session.h"
 #include "Typedefs.h"
 

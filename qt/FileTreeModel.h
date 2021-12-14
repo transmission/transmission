@@ -15,7 +15,7 @@
 #include <QMap>
 #include <QSet>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class FileTreeItem;
 

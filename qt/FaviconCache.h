@@ -15,7 +15,8 @@
 #include <QPixmap>
 #include <QString>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "Utils.h" // std::hash<QString>
 
 class QNetworkAccessManager;

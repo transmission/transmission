@@ -9,6 +9,8 @@
 #pragma once
 
 #include <functional>
+#include <string>
+
 #include <sys/types.h>
 
 #include <glibmm.h>
@@ -18,22 +20,22 @@
 #include <libtransmission/tr-macros.h>
 
 extern int const mem_K;
-extern char const* mem_K_str;
-extern char const* mem_M_str;
-extern char const* mem_G_str;
-extern char const* mem_T_str;
+extern char const* const mem_K_str;
+extern char const* const mem_M_str;
+extern char const* const mem_G_str;
+extern char const* const mem_T_str;
 
 extern int const disk_K;
-extern char const* disk_K_str;
-extern char const* disk_M_str;
-extern char const* disk_G_str;
-extern char const* disk_T_str;
+extern char const* const disk_K_str;
+extern char const* const disk_M_str;
+extern char const* const disk_G_str;
+extern char const* const disk_T_str;
 
 extern int const speed_K;
-extern char const* speed_K_str;
-extern char const* speed_M_str;
-extern char const* speed_G_str;
-extern char const* speed_T_str;
+extern char const* const speed_K_str;
+extern char const* const speed_M_str;
+extern char const* const speed_G_str;
+extern char const* const speed_T_str;
 
 enum
 {
@@ -138,6 +140,8 @@ inline T gtr_str_strip(T const& text)
     auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
 }
+
+std::string gtr_get_full_resource_path(std::string const& rel_path);
 
 namespace gtr_detail
 {

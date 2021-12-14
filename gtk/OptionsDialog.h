@@ -12,12 +12,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 typedef struct tr_ctor tr_ctor;
 
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
 public:
+    TR_DISABLE_COPY_MOVE(TorrentUrlChooserDialog)
+
     static std::unique_ptr<TorrentUrlChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 protected:
@@ -30,6 +34,8 @@ private:
 class TorrentFileChooserDialog : public Gtk::FileChooserDialog
 {
 public:
+    TR_DISABLE_COPY_MOVE(TorrentFileChooserDialog)
+
     static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
 protected:
@@ -43,6 +49,8 @@ class OptionsDialog : public Gtk::Dialog
 {
 public:
     ~OptionsDialog() override;
+
+    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
     static std::unique_ptr<OptionsDialog> create(
         Gtk::Window& parent,

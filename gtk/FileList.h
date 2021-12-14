@@ -12,6 +12,8 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class FileList : public Gtk::ScrolledWindow
@@ -19,6 +21,8 @@ class FileList : public Gtk::ScrolledWindow
 public:
     FileList(Glib::RefPtr<Session> const& core, int torrent_id);
     ~FileList() override;
+
+    TR_DISABLE_COPY_MOVE(FileList)
 
     void clear();
     void set_torrent(int torrent_id);

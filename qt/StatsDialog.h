@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "BaseDialog.h"
-#include "Macros.h"
-#include "ui_StatsDialog.h"
-
 #include <QTimer>
+
+#include <libtransmission/tr-macros.h>
+
+#include "BaseDialog.h"
+#include "ui_StatsDialog.h"
 
 class Session;
 
