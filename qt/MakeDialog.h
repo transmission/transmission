@@ -10,8 +10,9 @@
 
 #include <memory>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "ui_MakeDialog.h"
 
 class QAbstractButton;

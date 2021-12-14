@@ -59,8 +59,6 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define MY_CONFIG_NAME "transmission"
-
 using namespace std::literals;
 
 #define SHOW_LICENSE
@@ -68,7 +66,9 @@ using namespace std::literals;
 namespace
 {
 
-char const* LICENSE =
+auto const AppIconName = Glib::ustring("transmission"s);
+
+char const* const LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
@@ -83,12 +83,14 @@ char const* LICENSE =
     "Some of Transmission's source files have more permissive licenses. "
     "Those files may, of course, be used on their own under their own terms.\n";
 
-}
+} // namespace
 
 class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void open_files(std::vector<Glib::RefPtr<Gio::File>> const& files);
 
@@ -161,7 +163,11 @@ private:
     bool call_rpc_for_selected_torrents(std::string const& method);
     void remove_selected(bool delete_files);
 
-    static tr_rpc_callback_status on_rpc_changed(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor, void* gdata);
+    static tr_rpc_callback_status on_rpc_changed(
+        tr_session* session,
+        tr_rpc_callback_type type,
+        tr_torrent* tor,
+        gpointer gdata);
 
 private:
     Application& app_;
@@ -475,6 +481,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
     case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
         /* nothing interesting to do here */
         break;
+
+    default:
+        g_assert_not_reached();
     }
 
     return false;
@@ -484,7 +493,7 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
     tr_session* /*session*/,
     tr_rpc_callback_type type,
     tr_torrent* tor,
-    void* gdata)
+    gpointer gdata)
 {
     auto* impl = static_cast<Impl*>(gdata);
     auto const torrent_id = tr_torrentId(tor);
@@ -502,7 +511,7 @@ namespace
 {
 
 sig_atomic_t global_sigcount = 0;
-void* sighandler_cbdata = nullptr;
+gpointer sighandler_cbdata = nullptr;
 
 void signal_handler(int sig)
 {
@@ -534,6 +543,9 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
+    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    Gtk::Window::set_default_icon_name(AppIconName);
+
     tr_session* session;
 
     ::signal(SIGINT, signal_handler);
@@ -560,7 +572,7 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_builder_ = Gtk::Builder::create_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
+    ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
     auto const actions = gtr_actions_init(ui_builder_, this);
 
     app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
@@ -1283,7 +1295,7 @@ void Application::Impl::show_about_dialog()
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
     d.set_copyright(_("Copyright (c) The Transmission Project"));
-    d.set_logo_icon_name(MY_CONFIG_NAME);
+    d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"
@@ -1402,7 +1414,7 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     tr_free(magnet);
 }
 
-void gtr_actions_handler(Glib::ustring const& action_name, void* user_data)
+void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
 {
     static_cast<Application::Impl*>(user_data)->actions_handler(action_name);
 }

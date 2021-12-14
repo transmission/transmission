@@ -40,6 +40,8 @@ public:
     Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void set_torrents(std::vector<int> const& torrent_ids);
 
 private:
@@ -62,8 +64,8 @@ private:
     void onScrapeToggled();
     void onBackupToggled();
 
-    void on_add_tracker_response(int response, Gtk::Dialog* dialog);
-    void on_edit_trackers_response(int response, Gtk::Dialog* dialog);
+    void on_add_tracker_response(int response, std::shared_ptr<Gtk::Dialog>& dialog);
+    void on_edit_trackers_response(int response, std::shared_ptr<Gtk::Dialog>& dialog);
 
     void torrent_set_bool(tr_quark key, bool value);
     void torrent_set_int(tr_quark key, int value);
@@ -569,6 +571,9 @@ Glib::ustring activityString(int activity, bool finished)
 
     case TR_STATUS_STOPPED:
         return finished ? _("Finished") : _("Paused");
+
+    default:
+        g_assert_not_reached();
     }
 
     return {};
@@ -1551,6 +1556,9 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
             case 'T':
                 s = _("Peer is connected over µTP");
                 break;
+
+            default:
+                g_assert_not_reached();
             }
 
             if (s != nullptr)
@@ -1910,6 +1918,9 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
             _("Asking for more peers now… <small>%s</small>"),
             tr_strltime_rounded(now - tracker.lastAnnounceStartTime));
         break;
+
+    default:
+        g_assert_not_reached();
     }
 }
 
@@ -1966,6 +1977,9 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
             _("Asking for peer counts now… <small>%s</small>"),
             tr_strltime_rounded(now - tracker.lastScrapeStartTime));
         break;
+
+    default:
+        g_assert_not_reached();
     }
 }
 
@@ -2189,7 +2203,7 @@ void DetailsDialog::Impl::onBackupToggled()
     refresh();
 }
 
-void DetailsDialog::Impl::on_edit_trackers_response(int response, Gtk::Dialog* dialog)
+void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_ptr<Gtk::Dialog>& dialog)
 {
     bool do_destroy = true;
 
@@ -2247,7 +2261,7 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, Gtk::Dialog* d
 
     if (do_destroy)
     {
-        delete dialog;
+        dialog.reset();
     }
 }
 
@@ -2292,13 +2306,13 @@ void DetailsDialog::Impl::on_edit_trackers()
         guint row;
         int const torrent_id = tr_torrentId(tor);
 
-        auto* d = new Gtk::Dialog(
+        auto d = std::make_shared<Gtk::Dialog>(
             gtr_sprintf(_("%s - Edit Trackers"), tr_torrentName(tor)),
             dialog_,
             Gtk::DIALOG_MODAL | Gtk::DIALOG_DESTROY_WITH_PARENT);
         d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
         d->add_button(_("_Save"), Gtk::RESPONSE_ACCEPT);
-        d->signal_response().connect([this, d](int response) { on_edit_trackers_response(response, d); });
+        d->signal_response().connect([this, d](int response) mutable { on_edit_trackers_response(response, d); });
 
         row = 0;
         auto* t = Gtk::make_managed<HigWorkarea>();
@@ -2343,7 +2357,7 @@ void DetailsDialog::Impl::on_tracker_list_selection_changed()
     edit_trackers_button_->set_sensitive(tor != nullptr);
 }
 
-void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dialog)
+void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<Gtk::Dialog>& dialog)
 {
     bool destroy = true;
 
@@ -2383,7 +2397,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, Gtk::Dialog* dia
 
     if (destroy)
     {
-        delete dialog;
+        dialog.reset();
     }
 }
 
@@ -2395,13 +2409,13 @@ void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
     {
         guint row;
 
-        auto* w = new Gtk::Dialog(
+        auto w = std::make_shared<Gtk::Dialog>(
             gtr_sprintf(_("%s - Add Tracker"), tr_torrentName(tor)),
             dialog_,
             Gtk::DIALOG_DESTROY_WITH_PARENT);
         w->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
         w->add_button(_("_Add"), Gtk::RESPONSE_ACCEPT);
-        w->signal_response().connect([this, w](int response) { on_add_tracker_response(response, w); });
+        w->signal_response().connect([this, w](int response) mutable { on_add_tracker_response(response, w); });
 
         row = 0;
         auto* t = Gtk::make_managed<HigWorkarea>();

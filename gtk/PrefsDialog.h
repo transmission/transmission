@@ -12,12 +12,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class PrefsDialog : public Gtk::Dialog
 {
 public:
     ~PrefsDialog() override;
+
+    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
     static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

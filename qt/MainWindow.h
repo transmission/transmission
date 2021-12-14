@@ -19,8 +19,9 @@
 #include <QTimer>
 #include <QWidgetList>
 
+#include <libtransmission/tr-macros.h>
+
 #include "Filters.h"
-#include "Macros.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"

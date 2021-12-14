@@ -10,6 +10,8 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 /**
 *** utility code for making dialog layout that follows the Gnome HIG.
 *** see section 8.2.2, Visual Design > Window Layout > Dialogs.
@@ -19,6 +21,8 @@ class HigWorkarea : public Gtk::Grid
 {
 public:
     HigWorkarea();
+
+    TR_DISABLE_COPY_MOVE(HigWorkarea)
 
     void add_section_divider(guint& row);
     void add_section_title_widget(guint& row, Gtk::Widget& w);

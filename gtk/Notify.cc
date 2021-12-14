@@ -17,9 +17,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#define NOTIFICATIONS_DBUS_NAME "org.freedesktop.Notifications"
-#define NOTIFICATIONS_DBUS_CORE_OBJECT "/org/freedesktop/Notifications"
-#define NOTIFICATIONS_DBUS_CORE_INTERFACE "org.freedesktop.Notifications"
+using namespace std::literals;
 
 using StringVariantType = Glib::Variant<Glib::ustring>;
 using StringListVariantType = Glib::Variant<std::vector<Glib::ustring>>;
@@ -27,6 +25,10 @@ using UInt32VariantType = Glib::Variant<guint32>;
 
 namespace
 {
+
+auto const NotificationsDbusName = Glib::ustring("org.freedesktop.Notifications"s);
+auto const NotificationsDbusCoreObject = Glib::ustring("/org/freedesktop/Notifications"s);
+auto const NotificationsDbusCoreInterface = Glib::ustring("org.freedesktop.Notifications"s);
 
 struct TrNotification
 {
@@ -122,7 +124,7 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 
     if (proxy == nullptr)
     {
-        g_warning("Failed to create proxy for %s", NOTIFICATIONS_DBUS_NAME);
+        g_warning("Failed to create proxy for %s", NotificationsDbusName.c_str());
         return;
     }
 
@@ -136,9 +138,9 @@ void gtr_notify_init()
 {
     Gio::DBus::Proxy::create_for_bus(
         Gio::DBus::BUS_TYPE_SESSION,
-        NOTIFICATIONS_DBUS_NAME,
-        NOTIFICATIONS_DBUS_CORE_OBJECT,
-        NOTIFICATIONS_DBUS_CORE_INTERFACE,
+        NotificationsDbusName,
+        NotificationsDbusCoreObject,
+        NotificationsDbusCoreInterface,
         &dbus_proxy_ready_callback,
         {},
         Gio::DBus::PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES);

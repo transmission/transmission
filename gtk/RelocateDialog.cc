@@ -32,6 +32,8 @@ public:
     Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
 private:
     void onResponse(int response);
     bool onTimer();

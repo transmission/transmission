@@ -20,6 +20,8 @@ public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir);
     ~Impl();
 
+    TR_DISABLE_COPY_MOVE(Impl)
+
     void set_dir(std::string const& dir);
 
 private:
