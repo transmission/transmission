@@ -155,6 +155,8 @@
 		A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.mm */; };
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.mm */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
+		66F977825E65AD498C028BB0 /* announce-list.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB1 /* announcer-list.cc */; };
+		66F977825E65AD498C028BB2 /* announce-list.h in Headers */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB3 /* announce-list.h */; };
 		A25964A6106D73A800453B31 /* announcer.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25964A4106D73A800453B31 /* announcer.cc */; };
 		A25964A7106D73A800453B31 /* announcer.h in Headers */ = {isa = PBXBuildFile; fileRef = A25964A5106D73A800453B31 /* announcer.h */; };
 		A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD63167BED3B0039D1AA /* variant-benc.cc */; };
@@ -702,6 +704,8 @@
 		A25892620CF1F7E800CCCDDF /* StatsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatsWindowController.h; sourceTree = "<group>"; };
 		A25892630CF1F7E800CCCDDF /* StatsWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = StatsWindowController.mm; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = TransmissionHelp; sourceTree = "<group>"; };
+		66F977825E65AD498C028BB1 /* announce-list.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = announce-list.cc; sourceTree = "<group>"; };
+		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = announce-list.h; sourceTree = "<group>"; };
 		A25964A4106D73A800453B31 /* announcer.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = announcer.cc; sourceTree = "<group>"; };
 		A25964A5106D73A800453B31 /* announcer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = announcer.h; sourceTree = "<group>"; };
 		A25BFD63167BED3B0039D1AA /* variant-benc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-benc.cc"; sourceTree = "<group>"; };
@@ -1447,6 +1451,8 @@
 				C10C644C1D9AF328003C1B4C /* session-id.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
 				A23F299F132A447400E9A83B /* announcer-common.h */,
+				66F977825E65AD498C028BB1 /* announce-list.cc */,
+				66F977825E65AD498C028BB3 /* announce-list.h */,
 				A25964A4106D73A800453B31 /* announcer.cc */,
 				A25964A5106D73A800453B31 /* announcer.h */,
 				A23F29A0132A447400E9A83B /* announcer-http.cc */,
@@ -1869,6 +1875,7 @@
 				0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */,
 				1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */,
 				A25964A7106D73A800453B31 /* announcer.h in Headers */,
+				66F977825E65AD498C028BB2 /* announce-list.h in Headers */,
 				ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */,
 				4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */,
 				4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */,
@@ -2465,6 +2472,7 @@
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
 				1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */,
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
+				66F977825E65AD498C028BB0 /* announce-list.cc in Sources */,
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.cc in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */,
 				A220EC5B118C8A060022B4BE /* tr-lpd.cc in Sources */,

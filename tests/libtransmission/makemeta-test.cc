@@ -82,7 +82,7 @@ protected:
         EXPECT_EQ(tr_file_index_t{ 1 }, inf.fileCount);
         EXPECT_EQ(isPrivate, inf.isPrivate);
         EXPECT_FALSE(inf.isFolder);
-        EXPECT_EQ(trackerCount, inf.trackerCount);
+        EXPECT_EQ(trackerCount, std::size(*inf.announce_list));
 
         // cleanup
         tr_ctorFree(ctor);
@@ -168,7 +168,7 @@ protected:
         EXPECT_EQ(payload_count, inf.fileCount);
         EXPECT_EQ(is_private, inf.isPrivate);
         EXPECT_EQ(builder->isFolder, inf.isFolder);
-        EXPECT_EQ(tracker_count, inf.trackerCount);
+        EXPECT_EQ(tracker_count, std::size(*inf.announce_list));
 
         // cleanup
         tr_ctorFree(ctor);

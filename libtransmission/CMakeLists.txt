@@ -6,6 +6,7 @@ configure_file(
 )
 
 set(PROJECT_FILES
+  announce-list.cc
   announcer-http.cc
   announcer-udp.cc
   announcer.cc
@@ -143,6 +144,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
 )
 
 set(${PROJECT_NAME}_PRIVATE_HEADERS
+    announce-list.h
     announcer-common.h
     announcer.h
     bandwidth.h

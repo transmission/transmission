@@ -39,14 +39,15 @@ TEST(Metainfo, magnetLink)
     auto const parse_result = tr_torrentParse(ctor, &inf);
     EXPECT_EQ(TR_PARSE_OK, parse_result);
     EXPECT_EQ(0, inf.fileCount); // because it's a magnet link
-    EXPECT_EQ(2, inf.trackerCount);
-    if (inf.trackerCount >= 1)
+    auto const n = std::size(*inf.announce_list);
+    EXPECT_EQ(2, n);
+    if (n >= 1)
     {
-        EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
+        EXPECT_EQ("http://tracker.publicbt.com/announce"sv, inf.announce_list->at(0).announce.full);
     }
-    if (inf.trackerCount >= 2)
+    if (n >= 2)
     {
-        EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
+        EXPECT_EQ("udp://tracker.publicbt.com:80"sv, inf.announce_list->at(1).announce.full);
     }
     EXPECT_EQ(1, inf.webseedCount);
     if (inf.webseedCount >= 1)

@@ -20,6 +20,7 @@
 
 #include "transmission.h"
 
+#include "announce-list.h"
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "block-info.h"
@@ -36,7 +37,7 @@ struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
 struct tr_torrent;
-struct tr_torrent_tiers;
+struct tr_announcer_tiers;
 
 /**
 ***  Package-visible ctor API
@@ -327,6 +328,23 @@ public:
 
     std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
+    /// TRACKERS
+
+    auto trackerCount() const
+    {
+        return std::size(*info.announce_list);
+    }
+
+    auto const& tracker(size_t i) const
+    {
+        return info.announce_list->at(i);
+    }
+
+    auto tiers() const
+    {
+        return info.announce_list->tiers();
+    }
+
     /// WEBSEEDS
 
     auto webseedCount() const
@@ -347,17 +365,6 @@ public:
 
         return info.webseeds[i];
     }
-
-    /// TRACKERS
-
-    auto trackerCount() const
-    {
-        return info.trackerCount;
-    }
-
-    bool trackerAdd(std::string_view announce_url);
-
-    bool trackerRemove(std::string_view announce_url);
 
     /// CHECKSUMS
 
@@ -409,7 +416,7 @@ public:
 
     tr_session* session = nullptr;
 
-    struct tr_torrent_tiers* tiers = nullptr;
+    tr_announcer_tiers* announcer_tiers = nullptr;
 
     // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value

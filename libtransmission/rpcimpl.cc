@@ -413,16 +413,15 @@ static void addWebseeds(tr_info const* info, tr_variant* webseeds)
     }
 }
 
-static void addTrackers(tr_info const* info, tr_variant* trackers)
+static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
 {
-    for (unsigned int i = 0; i < info->trackerCount; ++i)
+    for (auto const& tracker : *tor->info.announce_list)
     {
-        tr_tracker_info const* t = &info->trackers[i];
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddStrView(d, TR_KEY_announce, t->announce);
-        tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape != nullptr ? t->scrape : ""sv);
-        tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_interned);
+        tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_interned);
+        tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
 
@@ -781,8 +780,8 @@ static void initField(
         break;
 
     case TR_KEY_trackers:
-        tr_variantInitList(initme, inf->trackerCount);
-        addTrackers(inf, initme);
+        tr_variantInitList(initme, tor->trackerCount());
+        addTrackers(tor, initme);
         break;
 
     case TR_KEY_trackerStats:
@@ -1056,142 +1055,79 @@ static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
     return errmsg;
 }
 
-static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
-{
-    int maxTier = -1;
-
-    for (int i = 0; i < n; ++i)
-    {
-        tgt[i].tier = src[i].tier;
-        tgt[i].announce = tr_strdup(src[i].announce);
-        maxTier = std::max(maxTier, src[i].tier);
-    }
-
-    return maxTier;
-}
-
-static void freeTrackers(tr_tracker_info* trackers, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        tr_free(trackers[i].announce);
-    }
-
-    tr_free(trackers);
-}
-
 static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    bool changed = false;
+    auto const old_size = tor->trackerCount();
 
     for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
-        auto const* child = tr_variantListChild(urls, i);
-        auto announce = std::string_view{};
-        changed |= tr_variantGetStrView(child, &announce) && tor->trackerAdd(announce);
-    }
-
-    return changed ? nullptr : "error setting announce list";
-}
-
-static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
-{
-    char const* errmsg = nullptr;
-
-    /* make a working copy of the existing announce list */
-    auto const* const inf = tr_torrentInfo(tor);
-    int const n = inf->trackerCount;
-    auto* const trackers = tr_new0(tr_tracker_info, n);
-    copyTrackers(trackers, inf->trackers, n);
-
-    /* make the substitutions... */
-    bool changed = false;
-    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
-    {
-        auto pos = int64_t{};
-        auto newval = std::string_view{};
-
-        if (tr_variantGetInt(tr_variantListChild(urls, i), &pos) &&
-            tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval) && tr_urlIsValidTracker(newval) && pos < n &&
-            pos >= 0)
-        {
-            tr_free(trackers[pos].announce);
-            trackers[pos].announce = tr_strvDup(newval);
-            changed = true;
-        }
-    }
-
-    if (!changed)
-    {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
-    }
-
-    freeTrackers(trackers, n);
-    return errmsg;
-}
-
-static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
-{
-    /* make a working copy of the existing announce list */
-    tr_info const* inf = tr_torrentInfo(tor);
-    int n = inf->trackerCount;
-    int* tids = tr_new0(int, n);
-    tr_tracker_info* trackers = tr_new0(tr_tracker_info, n);
-    copyTrackers(trackers, inf->trackers, n);
-
-    /* remove the ones specified in the urls list */
-    int i = 0;
-    int t = 0;
-    tr_variant const* val = nullptr;
-    while ((val = tr_variantListChild(ids, i)) != nullptr)
-    {
-        auto pos = int64_t{};
-
-        if (tr_variantGetInt(val, &pos) && 0 <= pos && pos < n)
-        {
-            tids[t++] = (int)pos;
-        }
-
-        ++i;
-    }
-
-    /* sort trackerIds and remove from largest to smallest so there is no need to recalculate array indicies */
-    std::sort(tids, tids + t);
-
-    bool changed = false;
-    int dup = -1;
-    while (t-- != 0)
-    {
-        /* check for duplicates */
-        if (tids[t] == dup)
+        auto announce = std::string_view();
+        auto* const val = tr_variantListChild(urls, i);
+        if (val == nullptr || !tr_variantGetStrView(val, &announce))
         {
             continue;
         }
 
-        tr_removeElementFromArray(trackers, tids[t], sizeof(tr_tracker_info), n);
-        --n;
-
-        dup = tids[t];
-        changed = true;
+        tor->info.announce_list->add(tor->info.announce_list->nextTier(), announce);
     }
 
-    char const* errmsg = nullptr;
+    if (tor->trackerCount() == old_size)
+    {
+        return "error setting announce list";
+    }
+
+    tor->info.announce_list->save(tor->info.torrent);
+    return nullptr;
+}
+
+static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
+{
+    auto changed = bool{ false };
+
+    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
+    {
+        auto id = int64_t{};
+        auto newval = std::string_view{};
+
+        if (tr_variantGetInt(tr_variantListChild(urls, i), &id) &&
+            tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval))
+        {
+            changed |= tor->info.announce_list->replace(id, newval);
+        }
+    }
+
     if (!changed)
     {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
+        return "error setting announce list";
     }
 
-    freeTrackers(trackers, n);
-    tr_free(tids);
-    return errmsg;
+    tor->info.announce_list->save(tor->info.torrent);
+    return nullptr;
+}
+
+static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
+{
+    auto const old_size = tor->trackerCount();
+
+    for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
+    {
+        auto id = int64_t{};
+        auto* const val = tr_variantListChild(ids, i);
+        if (val == nullptr || !tr_variantGetInt(val, &id))
+        {
+            continue;
+        }
+
+        tor->info.announce_list->remove(id);
+    }
+
+    if (tor->trackerCount() == old_size)
+    {
+        return "error setting announce list";
+    }
+
+    tor->info.announce_list->save(tor->info.torrent);
+    return nullptr;
 }
 
 static char const* torrentSet(

@@ -399,10 +399,10 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
         tr_http_escape(s, name, true);
     }
 
-    for (unsigned int i = 0; i < inf->trackerCount; ++i)
+    for (size_t i = 0, n = std::size(*inf->announce_list); i < n; ++i)
     {
         evbuffer_add_printf(s, "%s", "&tr=");
-        tr_http_escape(s, inf->trackers[i].announce, true);
+        tr_http_escape(s, inf->announce_list->at(i).announce.full, true);
     }
 
     for (unsigned int i = 0; i < inf->webseedCount; i++)

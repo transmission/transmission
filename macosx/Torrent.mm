@@ -771,25 +771,52 @@ bool trashDataFile(char const* filename, tr_error** error)
     return allTrackers;
 }
 
-- (BOOL)addTrackerToNewTier:(NSString*)tracker
+- (BOOL)addTrackerToNewTier:(NSString*)new_tracker
 {
-    tracker = [tracker stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-
-    if ([tracker rangeOfString:@"://"].location == NSNotFound)
+    new_tracker = [new_tracker stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if ([new_tracker rangeOfString:@"://"].location == NSNotFound)
     {
-        tracker = [@"http://" stringByAppendingString:tracker];
+        new_tracker = [@"http://" stringByAppendingString:new_tracker];
     }
 
-    return tr_torrentTrackerAdd(fHandle, tracker.UTF8String);
+    auto urls = std::vector<char const*>{};
+    auto tiers = std::vector<tr_tracker_tier_t>{};
+
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
+    {
+        auto const tracker = tr_torrentTracker(fHandle, i);
+        urls.push_back(tracker.announce);
+        tiers.push_back(tracker.tier);
+    }
+
+    urls.push_back(new_tracker.UTF8String);
+    tiers.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
+
+    BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
+
+    return success;
 }
 
 - (void)removeTrackers:(NSSet*)trackers
 {
-    for(NSString* announce in trackers)
+    auto urls = std::vector<char const*>{};
+    auto tiers = std::vector<tr_tracker_tier_t>{};
+
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
     {
-        BOOL const success = tr_torrentTrackerRemove(fHandle, announce.UTF8String);
-        NSAssert(success, @"Removing tracker addresses failed");
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        if ([trackers containsObject:@(tracker.announce)])
+        {
+            continue;
+        }
+
+        urls.push_back(tracker.announce);
+        tiers.push_back(tracker.tier);
     }
+
+    BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
+    NSAssert(success, @"Removing tracker addresses failed");
 }
 
 - (NSString*)comment

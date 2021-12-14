@@ -20,6 +20,7 @@
 ****
 ***/
 
+#include <memory>
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
@@ -34,6 +35,9 @@ using tr_piece_index_t = uint32_t;
 using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
+using tr_tracker_id_t = uint32_t;
+
+#include "announce-list.h"
 
 struct tr_block_span_t
 {
@@ -42,8 +46,8 @@ struct tr_block_span_t
 };
 
 struct tr_ctor;
-struct tr_file;
 struct tr_error;
+struct tr_file;
 struct tr_info;
 struct tr_session;
 struct tr_torrent;
@@ -1212,15 +1216,6 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
 ***
 **/
 
-/** @brief a part of tr_info that represents a single tracker */
-struct tr_tracker_info
-{
-    int tier;
-    char* announce;
-    char* scrape;
-    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
-};
-
 /**
  * @brief Modify a torrent's tracker list.
  *
@@ -1228,17 +1223,11 @@ struct tr_tracker_info
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
  *
  * @param torrent The torrent whose tracker list is to be modified
- * @param trackers An array of trackers, sorted by tier from first to last.
- *                 NOTE: only the `tier' and `announce' fields are used.
- *                 libtransmission derives `scrape' from `announce'
- *                 and reassigns 'id'.
- * @param trackerCount size of the `trackers' array
+ * @param urls Array of n announce url strings
+ * @param tiers Array of n tier numbers for grouping 'urls' into tiers
+ * @param n the number of urls/tiers
  */
-bool tr_torrentSetAnnounceList(tr_torrent* torrent, tr_tracker_info const* trackers, int trackerCount);
-
-bool tr_torrentTrackerAdd(tr_torrent* torrent, char const* announce_url);
-
-bool tr_torrentTrackerRemove(tr_torrent* torrent, char const* announce_url);
+bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
 
 /**
 ***
@@ -1550,6 +1539,7 @@ struct tr_file_priv
     time_t mtime;
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };
+
 /** @brief a part of tr_info that represents a single file of the torrent's content */
 struct tr_file
 {
@@ -1585,13 +1575,12 @@ struct tr_info
     // Use tr_torrentFile() and tr_torrentFileCount() instead.
     tr_file* files;
 
-    /* these trackers are sorted by tier */
-    tr_tracker_info* trackers;
+    // TODO(ckerr) aggregate this directly, rather than  using a shared_ptr, when tr_info is private
+    std::shared_ptr<tr_announce_list> announce_list;
 
     /* Torrent info */
     time_t dateCreated;
 
-    unsigned int trackerCount;
     unsigned int webseedCount;
     tr_file_index_t fileCount;
     uint32_t pieceSize;

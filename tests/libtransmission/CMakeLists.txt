@@ -1,4 +1,5 @@
 add_executable(libtransmission-test
+    announce-list-test.cc
     bitfield-test.cc
     block-info-test.cc
     blocklist-test.cc
