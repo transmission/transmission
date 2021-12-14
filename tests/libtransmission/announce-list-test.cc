@@ -343,9 +343,12 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch .torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const test_file = tr_strvJoin(::testing::TempDir(), "filename.torrent");
-    EXPECT_TRUE(tr_loadFile(original_content, OriginalFile));
-    EXPECT_TRUE(tr_saveFile(test_file.c_str(), { std::data(original_content), std::size(original_content) }));
+    auto const test_file = tr_strvJoin(::testing::TempDir(), "transmission-announce-list-test.torrent"sv);
+    tr_error* error = nullptr;
+    EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
+    EXPECT_EQ(nullptr, error);
+    EXPECT_TRUE(tr_saveFile(test_file.c_str(), { std::data(original_content), std::size(original_content) }, &error));
+    EXPECT_EQ(nullptr, error);
 
     // make an announce_list for it
     auto announce_list = tr_announce_list();
@@ -354,7 +357,6 @@ TEST_F(AnnounceListTest, save)
     EXPECT_TRUE(announce_list.add(Tiers[2], Urls[2]));
 
     // try saving to a nonexistent .torrent file
-    tr_error* error = nullptr;
     EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
