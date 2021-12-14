@@ -998,7 +998,7 @@ using tr_torrent_rename_done_func = void (*)( //
  * @param callback_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
- * update tr_info.name.
+ * update tr_torrentName().
  *
  * EXAMPLES
  *
@@ -1016,9 +1016,10 @@ using tr_torrent_rename_done_func = void (*)( //
  *
  * RETURN
  *
- *   Changing tr_info's contents requires a session lock, so this function
- *   returns asynchronously to avoid blocking. If you don't want to be notified
- *   when the function has finished, you can pass nullptr as the callback arg.
+ *   Changing the torrent's internal fields requires a session thread lock,
+ *   so this function returns asynchronously to avoid blocking. If you don't
+ *   want to be notified when the function has finished, you can pass nullptr
+ *   as the callback arg.
  *
  *   On success, the callback's error argument will be 0.
  *
@@ -1062,9 +1063,8 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 /**
  * @brief Returns this torrent's unique ID.
  *
- * IDs are good as simple lookup keys, but are not persistent
- * between sessions. If you need that, use tr_info.hash or
- * tr_info.hashString.
+ * IDs are fast lookup keys, but are not persistent between sessions.
+ * If you need that, use tr_torrentView().hash_string.
  */
 int tr_torrentId(tr_torrent const* torrent);
 
@@ -1725,13 +1725,13 @@ struct tr_stat
     int webseedsSendingToUs;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
-        whether or not we have it yet. This may be less than tr_info.totalSize
+        whether or not we have it yet. This may be less than tr_torrentTotalSize()
         if only some of the torrent's files are wanted.
-        [0...tr_info.totalSize] */
+        [0...tr_torrentTotalSize()] */
     uint64_t sizeWhenDone;
 
     /** Byte count of how much data is left to be downloaded until we've got
-        all the pieces that we want. [0...tr_info.sizeWhenDone] */
+        all the pieces that we want. [0...tr_stat.sizeWhenDone] */
     uint64_t leftUntilDone;
 
     /** Byte count of all the piece data we want and don't have yet,
