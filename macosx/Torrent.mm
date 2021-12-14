@@ -763,61 +763,63 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSArray*)allTrackersFlat
 {
-    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:fInfo->trackerCount];
+    auto const n = tr_torrentTrackerCount(fHandle);
+    NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:n];
 
-    for (NSInteger i = 0; i < fInfo->trackerCount; i++)
+    for (size_t i = 0; i < n; ++i)
     {
-        [allTrackers addObject:@(fInfo->trackers[i].announce)];
+        [allTrackers addObject:@(tr_torrentTracker(fHandle, i).announce)];
     }
 
     return allTrackers;
 }
 
-- (BOOL)addTrackerToNewTier:(NSString*)tracker
+- (BOOL)addTrackerToNewTier:(NSString*)new_tracker
 {
-    tracker = [tracker stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-
-    if ([tracker rangeOfString:@"://"].location == NSNotFound)
+    new_tracker = [new_tracker stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if ([new_tracker rangeOfString:@"://"].location == NSNotFound)
     {
-        tracker = [@"http://" stringByAppendingString:tracker];
+        new_tracker = [@"http://" stringByAppendingString:new_tracker];
     }
 
-    //recreate the tracker structure
-    int const oldTrackerCount = fInfo->trackerCount;
-    tr_tracker_info* trackerStructs = tr_new(tr_tracker_info, oldTrackerCount + 1);
-    for (int i = 0; i < oldTrackerCount; ++i)
+    auto urls = std::vector<char const*>{};
+    auto tiers = std::vector<tr_tracker_tier_t>{};
+
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
     {
-        trackerStructs[i] = fInfo->trackers[i];
+        auto const tracker = tr_torrentTracker(fHandle, i);
+        urls.push_back(tracker.announce);
+        tiers.push_back(tracker.tier);
     }
 
-    trackerStructs[oldTrackerCount].announce = (char*)tracker.UTF8String;
-    trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount - 1].tier + 1;
-    trackerStructs[oldTrackerCount].id = oldTrackerCount;
+    urls.push_back(new_tracker.UTF8String);
+    tiers.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
 
-    BOOL const success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount + 1);
-    tr_free(trackerStructs);
+    BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
 
     return success;
 }
 
 - (void)removeTrackers:(NSSet*)trackers
 {
-    //recreate the tracker structure
-    tr_tracker_info* trackerStructs = tr_new(tr_tracker_info, fInfo->trackerCount);
+    auto urls = std::vector<char const*>{};
+    auto tiers = std::vector<tr_tracker_tier_t>{};
 
-    NSUInteger newCount = 0;
-    for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
+    for (size_t i = 0, n = tr_torrentTrackerCount(fHandle); i < n; ++i)
     {
-        if (![trackers containsObject:@(fInfo->trackers[i].announce)])
+        auto const tracker = tr_torrentTracker(fHandle, i);
+
+        if ([trackers containsObject:@(tracker.announce)])
         {
-            trackerStructs[newCount++] = fInfo->trackers[i];
+            continue;
         }
+
+        urls.push_back(tracker.announce);
+        tiers.push_back(tracker.tier);
     }
 
-    BOOL const success = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
+    BOOL const success = tr_torrentSetAnnounceList(fHandle, std::data(urls), std::data(tiers), std::size(urls));
     NSAssert(success, @"Removing tracker addresses failed");
-
-    tr_free(trackerStructs);
 }
 
 - (NSString*)comment

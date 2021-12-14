@@ -2219,9 +2219,10 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
             auto const tracker_text = text_buffer->get_text(false);
             std::istringstream tracker_strings(tracker_text);
 
-            std::vector<tr_tracker_info> trackers;
-            std::list<std::string> announce_urls;
-            int tier = 0;
+            auto announce_url_strings = std::vector<std::string>{};
+            auto announce_urls = std::vector<char const*>{};
+            auto tiers = std::vector<tr_tracker_tier_t>{};
+            auto tier = tr_tracker_tier_t{ 0 };
 
             std::string str;
             while (std::getline(tracker_strings, str))
@@ -2232,13 +2233,17 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
                 }
                 else
                 {
-                    announce_urls.push_front(str);
-                    trackers.push_back(tr_tracker_info{ tier, announce_urls.front().data(), nullptr, 0 });
+                    announce_url_strings.push_back(str);
+                    tiers.push_back(tier);
                 }
             }
 
-            /* update the torrent */
-            if (tr_torrentSetAnnounceList(tor, trackers.data(), trackers.size()))
+            std::transform(
+                std::begin(announce_url_strings),
+                std::end(announce_url_strings),
+                std::back_inserter(announce_urls),
+                [](auto const& url) { return url.c_str(); });
+            if (tr_torrentSetAnnounceList(tor, std::data(announce_urls), std::data(tiers), std::size(announce_urls)))
             {
                 refresh();
             }

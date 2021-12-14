@@ -123,10 +123,10 @@ std::string tr_magnet_metainfo::magnet() const
         tr_http_escape(s, name, true);
     }
 
-    for (auto const& [tier, tracker] : trackers)
+    for (auto const& tracker : this->announce_list)
     {
         s += "&tr="sv;
-        tr_http_escape(s, tr_quark_get_string_view(tracker.announce_url), true);
+        tr_http_escape(s, tracker.announce.full, true);
     }
 
     for (auto const& webseed : webseed_urls)
@@ -136,33 +136,6 @@ std::string tr_magnet_metainfo::magnet() const
     }
 
     return s;
-}
-
-static tr_quark announceToScrape(std::string_view announce)
-{
-    auto buf = std::string{};
-
-    if (!tr_magnet_metainfo::convertAnnounceToScrape(buf, announce))
-    {
-        return TR_KEY_NONE;
-    }
-
-    return tr_quark_new(buf);
-}
-
-bool tr_magnet_metainfo::addTracker(tr_tracker_tier_t tier, std::string_view announce_sv)
-{
-    announce_sv = tr_strvStrip(announce_sv);
-
-    if (!tr_urlIsValidTracker(announce_sv))
-    {
-        return false;
-    }
-
-    auto const announce_url = tr_quark_new(announce_sv);
-    auto const scrape_url = announceToScrape(announce_sv);
-    this->trackers.insert({ tier, { announce_url, scrape_url, tier } });
-    return true;
 }
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
@@ -175,7 +148,6 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     }
 
     bool got_checksum = false;
-    auto tier = tr_tracker_tier_t{ 0 };
     for (auto const& [key, value] : tr_url_query_view{ parsed->query })
     {
         if (key == "dn"sv)
@@ -185,8 +157,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            addTracker(tier, tr_urlPercentDecode(value));
-            ++tier;
+            this->announce_list.add(this->announce_list.nextTier(), tr_urlPercentDecode(value));
         }
         else if (key == "ws"sv)
         {
@@ -228,49 +199,31 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     return got_checksum;
 }
 
-bool tr_magnet_metainfo::convertAnnounceToScrape(std::string& out, std::string_view in)
-{
-    // To derive the scrape URL use the following steps:
-    // Begin with the announce URL. Find the last '/' in it.
-    // If the text immediately following that '/' isn't 'announce'
-    // it will be taken as a sign that that tracker doesn't support
-    // the scrape convention. If it does, substitute 'scrape' for
-    // 'announce' to find the scrape page.
-    auto constexpr oldval = "/announce"sv;
-    if (auto pos = in.rfind(oldval.front()); pos != in.npos && in.find(oldval, pos) == pos)
-    {
-        auto const prefix = in.substr(0, pos);
-        auto const suffix = in.substr(pos + std::size(oldval));
-        tr_buildBuf(out, prefix, "/scrape"sv, suffix);
-        return true;
-    }
-
-    // some torrents with UDP announce URLs don't have /announce
-    if (tr_strvStartsWith(in, "udp:"sv))
-    {
-        out = in;
-        return true;
-    }
-
-    return false;
-}
-
 void tr_magnet_metainfo::toVariant(tr_variant* top) const
 {
     tr_variantInitDict(top, 4);
 
     // announce list
-    auto n = std::size(this->trackers);
+    auto n = std::size(this->announce_list);
     if (n == 1)
     {
-        tr_variantDictAddStr(top, TR_KEY_announce, tr_quark_get_string_view(std::begin(this->trackers)->second.announce_url));
+        tr_variantDictAddQuark(top, TR_KEY_announce, this->announce_list.at(0).announce_interned);
     }
     else
     {
-        auto* list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-        for (auto const& [tier, tracker] : this->trackers)
+        auto current_tier = tr_tracker_tier_t{};
+        tr_variant* tracker_list = nullptr;
+
+        auto* tier_list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
+        for (auto const& tracker : this->announce_list)
         {
-            tr_variantListAddStr(tr_variantListAddList(list, 1), tr_quark_get_string_view(tracker.announce_url));
+            if (tracker_list == nullptr || current_tier != tracker.tier)
+            {
+                tracker_list = tr_variantListAddList(tier_list, 1);
+                current_tier = tracker.tier;
+            }
+
+            tr_variantListAddQuark(tracker_list, tracker.announce_interned);
         }
     }
 
