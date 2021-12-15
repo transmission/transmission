@@ -119,7 +119,7 @@ static void error_prefix_valist(tr_error** error, char const* prefix_format, va_
 
     char* prefix = tr_strdup_vprintf(prefix_format, args);
 
-    char* new_message = tr_strdup_printf("%s%s", prefix, (*error)->message);
+    char* new_message = tr_strvDup(tr_strvJoin(prefix, (*error)->message));
     tr_free((*error)->message);
     (*error)->message = new_message;
 
