@@ -1076,7 +1076,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 
@@ -1101,7 +1101,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 
@@ -1126,7 +1126,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 

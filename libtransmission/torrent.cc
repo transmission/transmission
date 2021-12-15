@@ -758,13 +758,13 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
-    bool const isNewTorrent = !tr_sys_path_exists(tor->info.torrent, nullptr);
+    bool const isNewTorrent = !tr_sys_path_exists(tor->torrentFile(), nullptr);
 
     /* maybe save our own copy of the metainfo */
     if (tr_ctorGetSave(ctor))
     {
         tr_error* error = nullptr;
-        if (!tr_ctorSaveContents(ctor, tor->info.torrent, &error))
+        if (!tr_ctorSaveContents(ctor, tor->torrentFile(), &error))
         {
             tr_torrentSetLocalError(tor, "Unable to save torrent file: %s (%d)", error->message, error->code);
         }
@@ -1271,7 +1271,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     auto ret = tr_torrent_view{};
     ret.name = tor->info.name;
     ret.hash_string = tor->hashString();
-    ret.torrent_filename = tor->info.torrent;
+    ret.torrent_filename = tor->torrentFile();
     ret.comment = tor->info.comment;
     ret.creator = tor->info.creator;
     ret.source = tor->info.source;
@@ -1279,7 +1279,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.date_created = tor->info.dateCreated;
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
-    ret.is_private = tor->info.isPrivate;
+    ret.is_private = tor->isPrivate();
     ret.is_folder = tor->info.isFolder;
 
     return ret;
@@ -2172,7 +2172,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
     auto const lock = tor->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if (!announce_list.set(announce_urls, tiers, n) || !announce_list.save(tor->info.torrent))
+    if (!announce_list.set(announce_urls, tiers, n) || !announce_list.save(tor->torrentFile()))
     {
         return false;
     }

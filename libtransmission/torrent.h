@@ -413,6 +413,11 @@ public:
         return *this->info.announce_list;
     }
 
+    auto const& torrentFile() const
+    {
+        return this->info.torrent;
+    }
+
     /// METAINFO - CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
