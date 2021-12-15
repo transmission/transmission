@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <iterator>
 
 #include <event2/util.h>
 
