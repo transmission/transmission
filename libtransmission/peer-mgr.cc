@@ -13,7 +13,6 @@
 #include <cstring> /* memcpy, memcmp, strstr */
 #include <iostream>
 #include <iterator>
-#include <set>
 #include <vector>
 
 #include <event2/event.h>

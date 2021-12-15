@@ -9,6 +9,7 @@
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
 #include <cstring> /* strchr(), memcmp(), memcpy() */
+#include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */

@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <string_view>
 
 #include <windows.h>
 

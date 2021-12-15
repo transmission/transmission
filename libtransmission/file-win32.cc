@@ -7,6 +7,7 @@
  */
 
 #include <ctype.h> /* isalpha() */
+#include <string_view>
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */

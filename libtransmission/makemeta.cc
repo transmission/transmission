@@ -11,6 +11,7 @@
 #include <cstdlib> /* qsort */
 #include <cstring> /* strcmp, strlen */
 #include <mutex>
+#include <string_view>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 

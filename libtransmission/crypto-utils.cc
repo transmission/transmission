@@ -9,6 +9,7 @@
 #include <cstdarg>
 #include <cstring> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
+#include <string_view>
 
 #include <arc4.h>
 

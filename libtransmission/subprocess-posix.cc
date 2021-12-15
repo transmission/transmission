@@ -9,6 +9,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdlib>
+#include <string_view>
 
 #include <fcntl.h>
 #include <sys/types.h>

@@ -10,6 +10,7 @@
 
 #include <cstddef> // size_t
 #include <inttypes.h> // int64_t
+#include <string_view>
 
 #include "tr-macros.h"
 #include "quark.h"

@@ -8,11 +8,12 @@
 
 #include <array>
 #include <cctype>
-#include <deque>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
 #include <cstdio>
 #include <cstring>
+#include <deque>
+#include <string_view>
 
 #include <utf8.h>
 #include <event2/buffer.h> /* evbuffer_add() */
