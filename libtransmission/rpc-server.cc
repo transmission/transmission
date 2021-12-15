@@ -422,13 +422,11 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
         }
         else
         {
-            char* filename = tr_strdup_printf(
-                "%s%s%s",
+            auto const filename = tr_strvJoin(
                 webClientDir,
                 TR_PATH_DELIMITER_STR,
                 tr_str_is_empty(subpath) ? "index.html" : subpath);
-            serve_file(req, server, filename);
-            tr_free(filename);
+            serve_file(req, server, filename.c_str());
         }
 
         tr_free(subpath);
@@ -643,11 +641,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 ++server->loginattempts;
             }
 
-            char* unauthuser = tr_strdup_printf(
-                "<p>Unauthorized User. %d unsuccessful login attempts.</p>",
-                server->loginattempts);
-            send_simple_response(req, 401, unauthuser);
-            tr_free(unauthuser);
+            auto const unauthuser = tr_strvJoin(
+                "<p>Unauthorized User. "sv,
+                std::to_string(server->loginattempts),
+                " unsuccessful login attempts.</p>"sv);
+            send_simple_response(req, 401, unauthuser.c_str());
             return;
         }
 
@@ -672,7 +670,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
         }
         else if (!isHostnameAllowed(server, req))
         {
-            char* const tmp = tr_strdup_printf(
+            char const* const tmp =
                 "<p>Transmission received your request, but the hostname was unrecognized.</p>"
                 "<p>To fix this, choose one of the following options:"
                 "<ul>"
@@ -682,15 +680,14 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
-                "attacks.</p>");
+                "attacks.</p>";
             send_simple_response(req, 421, tmp);
-            tr_free(tmp);
         }
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
             char const* sessionId = get_current_session_id(server);
-            char* tmp = tr_strdup_printf(
+            auto const tmp = tr_strvJoin(
                 "<p>Your request had an invalid session-id header.</p>"
                 "<p>To fix this, follow these steps:"
                 "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
@@ -700,13 +697,13 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
                 "attacks.</p>"
-                "<p><code>%s: %s</code></p>",
-                TR_RPC_SESSION_ID_HEADER,
-                sessionId);
+                "<p><code>" TR_RPC_SESSION_ID_HEADER,
+                ": "sv,
+                sessionId,
+                "</code></p>");
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
-            send_simple_response(req, 409, tmp);
-            tr_free(tmp);
+            send_simple_response(req, 409, tmp.c_str());
         }
 #endif
         else if (tr_strvStartsWith(location, "rpc"sv))
