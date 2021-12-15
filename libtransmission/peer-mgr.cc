@@ -522,7 +522,7 @@ static int countActiveWebseeds(tr_swarm* s)
 {
     int activeCount = 0;
 
-    if (s->tor->isRunning && !tr_torrentIsSeed(s->tor))
+    if (s->tor->isRunning && !s->tor->isDone())
     {
         uint64_t const now = tr_time_msec();
 
@@ -1317,7 +1317,7 @@ static int compareAtomsByUsefulness(void const* va, void const* vb)
 
 static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 {
-    if (tr_torrentIsSeed(tor) && atomIsSeed(atom))
+    if (tor->isDone() && atomIsSeed(atom))
     {
         return false;
     }
@@ -1648,7 +1648,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tr_torrentIsSeed(tor) || !tr_torrentHasMetadata(tor))
+    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tr_torrentHasMetadata(tor))
     {
         return 0;
     }
@@ -1852,7 +1852,7 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
-    TR_ASSERT(!tr_torrentIsSeed(tor));
+    TR_ASSERT(!tor->isDone());
     TR_ASSERT(tr_torrentIsPieceTransferAllowed(tor, TR_PEER_TO_CLIENT));
 
     if (tr_peerIsSeed(peer))
@@ -1909,7 +1909,7 @@ static void rechokeDownloads(tr_swarm* s)
     time_t const now = tr_time();
 
     /* some cases where this function isn't necessary */
-    if (tr_torrentIsSeed(s->tor))
+    if (s->tor->isDone())
     {
         return;
     }
@@ -2120,7 +2120,7 @@ static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
 {
     auto Bps = unsigned{};
 
-    if (tr_torrentIsSeed(tor))
+    if (tor->isDone())
     {
         Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_CLIENT_TO_PEER);
     }
@@ -2317,7 +2317,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     }
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tr_torrentIsSeed(tor) && tr_peerIsSeed(peer))
+    if (tor->isDone() && tr_peerIsSeed(peer))
     {
         return !tor->allowsPex() || now - atom->time >= 30;
     }
@@ -2830,7 +2830,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 static bool isPeerCandidate(tr_torrent const* tor, struct peer_atom* atom, time_t const now)
 {
     /* not if we're both seeds */
-    if (tr_torrentIsSeed(tor) && atomIsSeed(atom))
+    if (tor->isDone() && atomIsSeed(atom))
     {
         return false;
     }
@@ -2919,7 +2919,7 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
     score = addValToKey(score, 1, i);
 
     /* prefer torrents we're downloading with */
-    i = tr_torrentIsSeed(tor) ? 1 : 0;
+    i = tor->isDone() ? 1 : 0;
     score = addValToKey(score, 1, i);
 
     /* prefer peers that are known to be connectible */
@@ -3003,7 +3003,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
 
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
-        bool const seeding = tr_torrentIsSeed(tor);
+        bool const seeding = tor->isDone();
         if (seeding && swarmIsAllSeeds(tor->swarm) && tor->isPrivate())
         {
             continue;
@@ -3101,7 +3101,7 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
 
     fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", tr_atomAddrStr(c->atom),
         tr_torrentName(c->tor), c->tor->isPrivate() ? "private" : "public",
-        tr_torrentIsSeed(c->tor) ? "seed" : "downloader");
+        c->tor->isDone() ? "seed" : "downloader");
 
 #endif
 

@@ -668,7 +668,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     {
         if (tor->isRunning)
         {
-            if (tr_torrentIsSeed(tor))
+            if (tor->isDone())
             {
                 ++tor->secondsSeeding;
             }
@@ -2752,7 +2752,7 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     candidates.reserve(tr_sessionCountTorrents(session));
     for (auto* tor : session->torrents)
     {
-        if (tr_torrentIsQueued(tor) && (direction == tr_torrentGetQueueDirection(tor)))
+        if (tr_torrentIsQueued(tor) && (direction == tor->queueDirection()))
         {
             candidates.push_back(tor);
         }

@@ -373,7 +373,7 @@ static void on_idle(tr_webseed* w)
         w->retry_challenge = running_tasks + w->idle_connections + 1;
     }
 
-    if (tor != nullptr && tor->isRunning && !tr_torrentIsSeed(tor) && want > 0)
+    if (tor != nullptr && tor->isRunning && !tor->isDone() && want > 0)
     {
         auto n_tasks = size_t{};
 

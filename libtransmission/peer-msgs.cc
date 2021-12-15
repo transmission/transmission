@@ -541,7 +541,7 @@ private:
         }
 
         auto const active = is_client_interested() && !is_client_choked();
-        TR_ASSERT(!active || !tr_torrentIsSeed(torrent));
+        TR_ASSERT(!active || !torrent->isDone());
         return active;
     }
 
@@ -1087,7 +1087,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // the extension handshake 'upload_only'. Setting the value of this
     // key to 1 indicates that this peer is not interested in downloading
     // anything.
-    tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
+    tr_variantDictAddBool(&val, TR_KEY_upload_only, msgs->torrent->isDone());
 
     if (allow_metadata_xfer || allow_pex)
     {
@@ -2004,7 +2004,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
     tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
-    if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked_ || !msgs->client_is_interested_)
+    if (torrent->isDone() || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked_ || !msgs->client_is_interested_)
     {
         msgs->desired_request_count = 0;
     }

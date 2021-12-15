@@ -1500,11 +1500,11 @@ static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    bool const is_seed_a = tr_torrentIsSeed(a->tor);
-    bool const is_seed_b = tr_torrentIsSeed(b->tor);
-    if (is_seed_a != is_seed_b)
+    bool const is_done_a = a->tor->isDone();
+    bool const is_done_b = b->tor->isDone();
+    if (is_done_a != is_done_b)
     {
-        return is_seed_a ? 1 : -1;
+        return is_done_a ? 1 : -1;
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */

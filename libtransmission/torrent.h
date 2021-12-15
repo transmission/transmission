@@ -215,9 +215,9 @@ public:
         return completion.createPieceBitfield();
     }
 
-    [[nodiscard]] bool isDone() const
+    [[nodiscard]] constexpr bool isDone() const
     {
-        return completion.isDone();
+        return completeness != TR_LEECH;
     }
 
     [[nodiscard]] tr_bitfield const& blocks() const
@@ -456,6 +456,11 @@ public:
 
     ///
 
+    constexpr auto queueDirection() const
+    {
+        return this->isDone() ? TR_UP : TR_DOWN;
+    }
+
     auto allowsPex() const
     {
         return this->isPublic() && this->session->isPexEnabled;
@@ -654,12 +659,6 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
     return tor->completeness;
 }
 
-// TODO: rename this to tr_torrentIsDone()? both seed and partial seed return true
-constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
-{
-    return tr_torrentGetCompleteness(tor) != TR_LEECH;
-}
-
 /***
 ****
 ***/
@@ -732,11 +731,6 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 constexpr bool tr_torrentIsQueued(tr_torrent const* tor)
 {
     return tor->isQueued;
-}
-
-constexpr tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
-{
-    return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
 
 tr_info const* tr_torrentInfo(tr_torrent const* torrent);

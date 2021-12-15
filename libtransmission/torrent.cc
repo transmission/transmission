@@ -371,7 +371,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLe
             *setmeGoal = goal;
         }
 
-        seedRatioApplies = tr_torrentIsSeed(tor);
+        seedRatioApplies = tor->isDone();
     }
 
     return seedRatioApplies;
@@ -475,7 +475,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (!tor->isRunning || tor->isStopping || !tr_torrentIsSeed(tor))
+    if (!tor->isRunning || tor->isStopping || !tor->isDone())
     {
         return;
     }
@@ -954,7 +954,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
 {
     tr_torrent_activity ret = TR_STATUS_STOPPED;
 
-    bool const is_seed = tr_torrentIsSeed(tor);
+    bool const is_seed = tor->isDone();
 
     if (tor->verifyState == TR_VERIFY_NOW)
     {
@@ -1435,7 +1435,7 @@ uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor)
 
 static bool torrentShouldQueue(tr_torrent const* tor)
 {
-    tr_direction const dir = tr_torrentGetQueueDirection(tor);
+    tr_direction const dir = tor->queueDirection();
 
     return tr_sessionCountQueueFreeSlots(tor->session, dir) == 0;
 }
@@ -1912,7 +1912,7 @@ void tr_torrent::recheckCompleteness()
     if (new_completeness != completeness)
     {
         bool const recentChange = downloadedCur != 0;
-        bool const wasLeeching = !tr_torrentIsSeed(this);
+        bool const wasLeeching = !this->isDone();
         bool const wasRunning = isRunning;
 
         if (recentChange)
@@ -1927,7 +1927,7 @@ void tr_torrent::recheckCompleteness()
         this->completeness = new_completeness;
         tr_fdTorrentClose(this->session, this->uniqueId);
 
-        if (tr_torrentIsSeed(this))
+        if (this->isDone())
         {
             if (recentChange)
             {
@@ -1949,7 +1949,7 @@ void tr_torrent::recheckCompleteness()
 
         fireCompletenessChange(this, completeness, wasRunning);
 
-        if (tr_torrentIsSeed(this) && wasLeeching && wasRunning)
+        if (this->isDone() && wasLeeching && wasRunning)
         {
             /* if completeness was TR_LEECH, the seed limit check
                will have been skipped in bandwidthPulse */
@@ -1958,7 +1958,7 @@ void tr_torrent::recheckCompleteness()
 
         this->setDirty();
 
-        if (tr_torrentIsSeed(this))
+        if (this->isDone())
         {
             tr_torrentSave(this);
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
@@ -3078,7 +3078,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 {
     int err = 0;
 
-    char const* const base = !tr_torrentIsSeed(tor) && tor->incompleteDir != nullptr ? tor->incompleteDir : tor->downloadDir;
+    char const* const base = !tor->isDone() && tor->incompleteDir != nullptr ? tor->incompleteDir : tor->downloadDir;
 
     auto src = tr_strvPath(base, oldpath);
 
