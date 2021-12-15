@@ -31,7 +31,6 @@
 
 #include "bandwidth.h"
 #include "net.h"
-#include "rpc-server.h"
 #include "tr-macros.h"
 #include "utils.h" // tr_speed_K
 
@@ -48,6 +47,7 @@ struct event_base;
 struct evdns_base;
 
 class tr_bitfield;
+class tr_rpc_server;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
@@ -222,25 +222,13 @@ public:
 
     // RPC
 
-    void setRpcWhitelist(std::string_view whitelist)
-    {
-        tr_rpcSetWhitelist(this->rpc_server_.get(), whitelist);
-    }
+    void setRpcWhitelist(std::string_view whitelist) const;
 
-    std::string const& rpcWhitelist() const
-    {
-        return tr_rpcGetWhitelist(this->rpc_server_.get());
-    }
+    std::string const& rpcWhitelist() const;
 
-    void useRpcWhitelist(bool enabled)
-    {
-        tr_rpcSetWhitelistEnabled(this->rpc_server_.get(), enabled);
-    }
+    void useRpcWhitelist(bool enabled) const;
 
-    bool useRpcWhitelist() const
-    {
-        return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
-    }
+    bool useRpcWhitelist() const;
 
     // peer networking
 
