@@ -54,12 +54,6 @@ TEST(Error, propagate)
     EXPECT_STREQ("oops", err2->message);
     EXPECT_EQ(nullptr, err);
 
-    tr_error_propagate_prefixed(&err, &err2, "error: ");
-    EXPECT_NE(nullptr, err);
-    EXPECT_EQ(1, err->code);
-    EXPECT_STREQ("error: oops", err->message);
-    EXPECT_EQ(nullptr, err2);
-
     tr_error_propagate(nullptr, &err);
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(nullptr, err2);

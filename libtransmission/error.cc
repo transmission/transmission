@@ -141,21 +141,3 @@ void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
     error_prefix_valist(error, prefix_format, args);
     va_end(args);
 }
-
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
-{
-    TR_ASSERT(prefix_format != nullptr);
-
-    tr_error_propagate(new_error, old_error);
-
-    if (new_error == nullptr)
-    {
-        return;
-    }
-
-    va_list args;
-
-    va_start(args, prefix_format);
-    error_prefix_valist(new_error, prefix_format, args);
-    va_end(args);
-}

@@ -98,19 +98,4 @@ void tr_error_clear(tr_error** error);
  */
 void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_PRINTF(2, 3);
 
-/**
- * @brief Prefix message and propagate existing error object upwards.
- *
- * If passed pointer to new error object is not `nullptr`, copy old error object
- * to new error object, prefix its message with `printf`-style formatted text,
- * and free old error object. Otherwise, just free old error object.
- *
- * @param[in,out] new_error Pointer to error object to be set.
- * @param[in,out] old_error     Error object to be propagated. Cleared on return.
- * @param[in] prefix_format Prefix format string.
- * @param[in] ... Format arguments.
- */
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
-    TR_GNUC_PRINTF(3, 4);
-
 /** @} */
