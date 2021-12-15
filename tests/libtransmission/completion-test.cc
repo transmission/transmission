@@ -48,7 +48,6 @@ TEST_F(CompletionTest, MagnetLink)
     EXPECT_FALSE(completion.hasBlocks({ 0, 1 }));
     EXPECT_FALSE(completion.hasBlocks({ 0, 1000 }));
     EXPECT_FALSE(completion.hasPiece(0));
-    EXPECT_FALSE(completion.isDone());
     EXPECT_DOUBLE_EQ(0.0, completion.percentDone());
     EXPECT_DOUBLE_EQ(0.0, completion.percentComplete());
     EXPECT_EQ(TR_LEECH, completion.status());
@@ -165,51 +164,6 @@ TEST_F(CompletionTest, hasPiece)
     completion.addBlock(0);
     EXPECT_TRUE(completion.hasPiece(0));
     EXPECT_EQ(PieceSize, completion.hasValid());
-}
-
-TEST_F(CompletionTest, isDone)
-{
-    auto torrent = TestTorrent{};
-    auto constexpr TotalSize = uint64_t{ BlockSize * 4096 };
-    auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
-    auto const block_info = tr_block_info{ TotalSize, PieceSize };
-
-    // check that in blank-slate initial state, isDone() is false
-    auto completion = tr_completion(&torrent, &block_info);
-    EXPECT_FALSE(completion.isDone());
-    EXPECT_EQ(TR_LEECH, completion.status());
-    EXPECT_EQ(block_info.total_size, completion.leftUntilDone());
-
-    // check that we're done if we have all the blocks
-    auto left = block_info.total_size;
-    for (size_t i = 1; i < block_info.n_blocks; ++i)
-    {
-        completion.addBlock(i);
-        left -= block_info.block_size;
-        EXPECT_EQ(left, completion.leftUntilDone());
-    }
-    EXPECT_FALSE(completion.isDone());
-    completion.addBlock(0);
-    EXPECT_EQ(0, completion.leftUntilDone());
-    EXPECT_TRUE(completion.isDone());
-    EXPECT_EQ(TR_SEED, completion.status());
-
-    // check that not having all the pieces (and we want all) means we're not done
-    completion.removePiece(0);
-    EXPECT_FALSE(completion.isDone());
-    EXPECT_EQ(TR_LEECH, completion.status());
-
-    // check that having all the pieces we want, even if it's not ALL pieces, means we're done
-    torrent.dnd_pieces.insert(0);
-    completion.invalidateSizeWhenDone();
-    EXPECT_TRUE(completion.isDone());
-    EXPECT_EQ(TR_PARTIAL_SEED, completion.status());
-
-    // but if we decide we do want that missing piece after all, then we're not done
-    torrent.dnd_pieces.erase(0);
-    completion.invalidateSizeWhenDone();
-    EXPECT_FALSE(completion.isDone());
-    EXPECT_EQ(TR_LEECH, completion.status());
 }
 
 TEST_F(CompletionTest, percentCompleteAndDone)

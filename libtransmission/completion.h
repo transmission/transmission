@@ -79,11 +79,6 @@ struct tr_completion
 
     [[nodiscard]] uint64_t hasValid() const;
 
-    [[nodiscard]] bool isDone() const
-    {
-        return hasMetainfo() && leftUntilDone() == 0;
-    }
-
     [[nodiscard]] uint64_t leftUntilDone() const;
 
     [[nodiscard]] constexpr double percentComplete() const

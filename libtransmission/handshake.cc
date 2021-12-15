@@ -803,7 +803,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     if (tr_torrent const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash);
         tor != nullptr)
     {
-        bool const clientIsSeed = tr_torrentIsSeed(tor);
+        bool const clientIsSeed = tor->isDone();
         bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, nullptr));
         dbgmsg(handshake, "got INCOMING connection's encrypted handshake for torrent [%s]", tr_torrentName(tor));
         tr_peerIoSetTorrentHash(handshake->io, tor->info.hash);
