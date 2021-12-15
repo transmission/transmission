@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "tr-macros.h"
-
 using tr_session_id_t = struct tr_session_id*;
 
 /**

@@ -16,6 +16,8 @@
 
 #include "transmission.h"
 
+#include "tr-macros.h"
+
 /**
  * @addtogroup utils Utilities
  * @{

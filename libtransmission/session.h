@@ -29,6 +29,7 @@
 #include "transmission.h"
 
 #include "net.h"
+#include "tr-macros.h"
 
 enum tr_auto_switch_state_t
 {

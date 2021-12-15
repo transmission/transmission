@@ -38,8 +38,6 @@
 #include <netinet/in.h>
 #endif
 
-#include "tr-macros.h"
-
 #ifdef _WIN32
 using tr_socket_t = SOCKET;
 #define TR_BAD_SOCKET INVALID_SOCKET

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "tr-macros.h"
-
 /**
  * @addtogroup utils Utilities
  * @{

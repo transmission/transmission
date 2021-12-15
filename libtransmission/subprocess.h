@@ -11,8 +11,6 @@
 #include <map>
 #include <string_view>
 
-#include "tr-macros.h"
-
 struct tr_error;
 
 bool tr_spawn_async(

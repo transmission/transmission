@@ -20,6 +20,8 @@
 
 #include "transmission.h"
 
+#include "tr-macros.h"
+
 struct tr_error;
 struct tr_variant;
 

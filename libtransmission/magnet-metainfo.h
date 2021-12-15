@@ -20,6 +20,7 @@
 
 #include "announce-list.h"
 #include "quark.h"
+#include "tr-macros.h"
 
 struct tr_error;
 struct tr_variant;
