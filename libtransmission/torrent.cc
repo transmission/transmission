@@ -184,7 +184,7 @@ static int peerIdTTL(tr_torrent const* tor)
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 {
     bool const needs_new_peer_id = !tor->peer_id || // doesn't have one
-        (!tr_torrentIsPrivate(tor) && (peerIdTTL(tor) <= 0)); // has one but it's expired
+        (tor->isPublic() && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
@@ -550,7 +550,7 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_COUNTS:
-        if (tr_torrentIsPrivate(tor) && (event->leechers == 0))
+        if (tor->isPrivate() && (event->leechers == 0))
         {
             tr_peerMgrSetSwarmIsAllSeeds(tor);
         }

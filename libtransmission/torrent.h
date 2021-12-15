@@ -290,7 +290,7 @@ public:
         setDirty();
     }
 
-    /// FILES
+    /// METAINFO - FILES
 
     tr_file_index_t fileCount() const
     {
@@ -328,7 +328,7 @@ public:
 
     std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
 
-    /// TRACKERS
+    /// METAINFO - TRACKERS
 
     auto trackerCount() const
     {
@@ -345,7 +345,7 @@ public:
         return info.announce_list->tiers();
     }
 
-    /// WEBSEEDS
+    /// METAINFO - WEBSEEDS
 
     auto webseedCount() const
     {
@@ -366,7 +366,7 @@ public:
         return info.webseeds[i];
     }
 
-    /// CHECKSUMS
+    /// METAINFO - CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
     {
@@ -405,6 +405,35 @@ public:
                 checked_pieces_.unsetSpan(begin, end);
             }
         }
+    }
+
+    /// METAINFO - OTHER
+
+    auto isPrivate() const
+    {
+        return this->info.isPrivate;
+    }
+
+    auto isPublic() const
+    {
+        return !this->isPrivate();
+    }
+
+    ///
+
+    auto allowsPex() const
+    {
+        return this->isPublic() && this->session->isPexEnabled;
+    }
+
+    auto allowsDht() const
+    {
+        return this->isPublic() && tr_sessionAllowsDHT(this->session);
+    }
+
+    auto allowsLpd() const // local peer discovery
+    {
+        return this->isPublic() && tr_sessionAllowsLPD(this->session);
     }
 
     tr_info info = {};
@@ -594,26 +623,6 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
 constexpr bool tr_torrentIsSeed(tr_torrent const* tor)
 {
     return tr_torrentGetCompleteness(tor) != TR_LEECH;
-}
-
-constexpr bool tr_torrentIsPrivate(tr_torrent const* tor)
-{
-    return tor != nullptr && tor->info.isPrivate;
-}
-
-constexpr bool tr_torrentAllowsPex(tr_torrent const* tor)
-{
-    return tor != nullptr && tor->session->isPexEnabled && !tr_torrentIsPrivate(tor);
-}
-
-constexpr bool tr_torrentAllowsDHT(tr_torrent const* tor)
-{
-    return tor != nullptr && tr_sessionAllowsDHT(tor->session) && !tr_torrentIsPrivate(tor);
-}
-
-constexpr bool tr_torrentAllowsLPD(tr_torrent const* tor)
-{
-    return tor != nullptr && tr_sessionAllowsLPD(tor->session) && !tr_torrentIsPrivate(tor);
 }
 
 /***

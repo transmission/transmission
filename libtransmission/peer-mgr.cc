@@ -2126,7 +2126,7 @@ static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
     }
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
-    else if (tr_torrentIsPrivate(tor))
+    else if (tor->isPrivate())
     {
         Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_PEER_TO_CLIENT) +
             tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_CLIENT_TO_PEER);
@@ -2319,7 +2319,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     /* disconnect if we're both seeds and enough time has passed for PEX */
     if (tr_torrentIsSeed(tor) && tr_peerIsSeed(peer))
     {
-        return !tr_torrentAllowsPex(tor) || now - atom->time >= 30;
+        return !tor->allowsPex() || now - atom->time >= 30;
     }
 
     /* disconnect if it's been too long since piece data has been transferred.
@@ -3004,7 +3004,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tr_torrentIsSeed(tor);
-        if (seeding && swarmIsAllSeeds(tor->swarm) && tr_torrentIsPrivate(tor))
+        if (seeding && swarmIsAllSeeds(tor->swarm) && tor->isPrivate())
         {
             continue;
         }
@@ -3100,7 +3100,7 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
 #if 0
 
     fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", tr_atomAddrStr(c->atom),
-        tr_torrentName(c->tor), tr_torrentIsPrivate(c->tor) ? "private" : "public",
+        tr_torrentName(c->tor), c->tor->isPrivate() ? "private" : "public",
         tr_torrentIsSeed(c->tor) ? "seed" : "downloader");
 
 #endif

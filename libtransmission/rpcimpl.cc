@@ -606,7 +606,7 @@ static void initField(
         break;
 
     case TR_KEY_isPrivate:
-        tr_variantInitBool(initme, tr_torrentIsPrivate(tor));
+        tr_variantInitBool(initme, tor->isPrivate());
         break;
 
     case TR_KEY_isStalled:

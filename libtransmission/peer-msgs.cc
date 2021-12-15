@@ -233,7 +233,7 @@ public:
         , callback_{ callback }
         , callbackData_{ callbackData }
     {
-        if (tr_torrentAllowsPex(torrent))
+        if (torrent->allowsPex())
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
             tr_timerAdd(pex_timer.get(), PexIntervalSecs, 0);
@@ -1028,11 +1028,11 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
-    bool const allow_metadata_xfer = !tr_torrentIsPrivate(msgs->torrent);
+    bool const allow_metadata_xfer = msgs->torrent->isPublic();
 
     /* decide if we want to advertise pex support */
     auto allow_pex = bool{};
-    if (!tr_torrentAllowsPex(msgs->torrent))
+    if (!msgs->torrent->allowsPex())
     {
         allow_pex = false;
     }
@@ -1266,7 +1266,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     if (msg_type == METADATA_MSG_TYPE_REQUEST)
     {
-        if (piece >= 0 && tr_torrentHasMetadata(msgs->torrent) && !tr_torrentIsPrivate(msgs->torrent) &&
+        if (piece >= 0 && tr_torrentHasMetadata(msgs->torrent) && msgs->torrent->isPublic() &&
             msgs->peerAskedForMetadataCount < MetadataReqQ)
         {
             msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
@@ -1302,7 +1302,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     tr_torrent* tor = msgs->torrent;
-    if (!tr_torrentAllowsPex(tor))
+    if (!tor->allowsPex())
     {
         return;
     }
@@ -2479,7 +2479,7 @@ static void tr_set_compare(
 
 static void sendPex(tr_peerMsgsImpl* msgs)
 {
-    if (msgs->peerSupportsPex && tr_torrentAllowsPex(msgs->torrent))
+    if (msgs->peerSupportsPex && msgs->torrent->allowsPex())
     {
         PexDiffs diffs;
         PexDiffs diffs6;
