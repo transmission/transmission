@@ -12,6 +12,7 @@
 #error only the libtransmission peer module should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <vector>
 
 #include "transmission.h"

@@ -26,6 +26,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <string_view>
 
 #ifdef _WIN32

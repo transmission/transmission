@@ -13,6 +13,7 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <vector>
 
 #include "transmission.h"

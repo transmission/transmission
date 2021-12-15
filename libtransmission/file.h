@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include <cinttypes>
+#include <ctime>
 #include <string_view>
-#include <inttypes.h>
-#include <time.h>
 
 #ifdef _WIN32
 #include <windows.h>
