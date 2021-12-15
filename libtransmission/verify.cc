@@ -105,11 +105,11 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
                 changed |= hasPiece != hadPiece;
             }
 
-            time_t const now = tr_time();
-            tor->anyDate = now;
+            tor->markChanged();
 
             /* sleeping even just a few msec per second goes a long
              * way towards reducing IO load... */
+            time_t const now = tr_time();
             if (lastSleptAt != now)
             {
                 lastSleptAt = now;
@@ -232,7 +232,7 @@ static void verifyThreadFunc(void* /*user_data*/)
 
         if (!stopCurrent && changed)
         {
-            tr_torrentSetDirty(tor);
+            tor->setDirty();
         }
 
         if (currentNode.callback_func != nullptr)

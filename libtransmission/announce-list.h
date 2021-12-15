@@ -25,7 +25,6 @@
 
 #include "quark.h"
 #include "tr-assert.h"
-#include "utils.h"
 #include "web-utils.h"
 
 struct tr_error;

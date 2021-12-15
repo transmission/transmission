@@ -206,7 +206,7 @@ void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int
 
     if (tor->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
     {
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -238,7 +238,7 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
 
     if (tor->bandwidth->setLimited(dir, do_use))
     {
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -255,7 +255,7 @@ void tr_torrentUseSessionLimits(tr_torrent* tor, bool doUse)
 
     if (tor->bandwidth->honorParentLimits(TR_UP, doUse) || tor->bandwidth->honorParentLimits(TR_DOWN, doUse))
     {
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -279,7 +279,7 @@ void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode)
     {
         tor->ratioLimitMode = mode;
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -298,7 +298,7 @@ void tr_torrentSetRatioLimit(tr_torrent* tor, double desiredRatio)
     {
         tor->desiredRatio = desiredRatio;
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -396,7 +396,7 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode)
     {
         tor->idleLimitMode = mode;
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -415,7 +415,7 @@ void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idleMinutes)
     {
         tor->idleLimitMinutes = idleMinutes;
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -874,8 +874,8 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
         tr_free(tor->downloadDir);
         tor->downloadDir = tr_strdup(path);
 
-        tr_torrentMarkEdited(tor);
-        tr_torrentSetDirty(tor);
+        tor->markEdited();
+        tor->setDirty();
     }
 
     refreshCurrentDir(tor);
@@ -947,7 +947,7 @@ void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state)
     TR_ASSERT(state == TR_VERIFY_NONE || state == TR_VERIFY_WAIT || state == TR_VERIFY_NOW);
 
     tor->verifyState = state;
-    tor->anyDate = tr_time();
+    tor->markChanged();
 }
 
 tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
@@ -1327,7 +1327,7 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
     tor->corruptPrev += tor->corruptCur;
     tor->corruptCur = 0;
 
-    tr_torrentSetDirty(tor);
+    tor->setDirty();
 }
 
 /***
@@ -1366,7 +1366,7 @@ static void freeTorrent(tr_torrent* tor)
             if (t->queuePosition > tor->queuePosition)
             {
                 t->queuePosition--;
-                t->anyDate = now;
+                t->markChanged();
             }
         }
 
@@ -1400,7 +1400,7 @@ static void torrentStartImpl(void* vtor)
     tor->isRunning = true;
     tor->completeness = tor->completion.status();
     tor->startDate = now;
-    tor->anyDate = now;
+    tor->markChanged();
     tr_torrentClearError(tor);
     tor->finishedSeedingByIdle = false;
 
@@ -1497,7 +1497,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
      * was missed to ensure that we didn't think someone was cheating. */
     tr_torrentUnsetPeerId(tor);
     tor->isRunning = true;
-    tr_torrentSetDirty(tor);
+    tor->setDirty();
     tr_runInEventThread(tor->session, torrentStartImpl, tor);
 }
 
@@ -1668,7 +1668,7 @@ void tr_torrentStop(tr_torrent* tor)
         tor->isRunning = false;
         tor->isStopping = false;
         tor->prefetchMagnetMetadata = false;
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
         tr_runInEventThread(tor->session, stopTorrent, tor);
     }
 }
@@ -1932,7 +1932,8 @@ void tr_torrent::recheckCompleteness()
             if (recentChange)
             {
                 tr_announcerTorrentCompleted(this);
-                this->doneDate = this->anyDate = tr_time();
+                this->markChanged();
+                this->doneDate = tr_time();
             }
 
             if (wasLeeching && wasRunning)
@@ -2009,7 +2010,7 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
     auto const lock = tor->unique_lock();
 
     tor->labels = std::move(labels);
-    tr_torrentSetDirty(tor);
+    tor->setDirty();
 }
 
 /***
@@ -2032,7 +2033,7 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
     {
         tor->bandwidth->setPriority(priority);
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -2048,7 +2049,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t maxConnectedPeers)
     {
         tor->maxConnectedPeers = maxConnectedPeers;
 
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
     }
 }
 
@@ -2178,7 +2179,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
     }
 
     std::swap(*tor->info.announce_list, announce_list);
-    tr_torrentMarkEdited(tor);
+    tor->markEdited();
 
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
@@ -2749,7 +2750,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     if (block_is_new)
     {
         tor->completion.addBlock(block);
-        tr_torrentSetDirty(tor);
+        tor->setDirty();
 
         tr_piece_index_t const p = tor->pieceForBlock(block);
 
@@ -2952,13 +2953,13 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
         if ((old_pos < pos) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= pos))
         {
             walk->queuePosition--;
-            walk->anyDate = now;
+            walk->markChanged();
         }
 
         if ((old_pos > pos) && (pos <= walk->queuePosition) && (walk->queuePosition < old_pos))
         {
             walk->queuePosition++;
-            walk->anyDate = now;
+            walk->markChanged();
         }
 
         if (back < walk->queuePosition)
@@ -2968,7 +2969,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
     }
 
     tor->queuePosition = std::min(pos, back + 1);
-    tor->anyDate = now;
+    tor->markChanged();
 
     TR_ASSERT(queueIsSequenced(tor->session));
 }
@@ -3028,8 +3029,8 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
     if (tr_torrentIsQueued(tor) != queued)
     {
         tor->isQueued = queued;
-        tor->anyDate = tr_time();
-        tr_torrentSetDirty(tor);
+        tor->markChanged();
+        tor->setDirty();
     }
 }
 
@@ -3224,8 +3225,8 @@ static void torrentRenamePath(void* vdata)
                     tor->info.name = tr_strdup(newname);
                 }
 
-                tr_torrentMarkEdited(tor);
-                tr_torrentSetDirty(tor);
+                tor->markEdited();
+                tor->setDirty();
             }
         }
 
@@ -3236,7 +3237,7 @@ static void torrentRenamePath(void* vdata)
     ****
     ***/
 
-    tor->anyDate = tr_time();
+    tor->markChanged();
 
     /* callback */
     if (data->callback != nullptr)
@@ -3298,4 +3299,14 @@ void tr_torrentSetFilePriorities(
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
     return tor->info.fileCount > 0;
+}
+
+void tr_torrent::markEdited()
+{
+    this->editDate = tr_time();
+}
+
+void tr_torrent::markChanged()
+{
+    this->anyDate = tr_time();
 }

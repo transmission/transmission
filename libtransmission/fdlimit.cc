@@ -20,6 +20,7 @@
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
+#include "utils.h" // tr_time()
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 

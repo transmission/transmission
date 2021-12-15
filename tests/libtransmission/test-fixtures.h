@@ -8,22 +8,23 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdlib> // getenv()
+#include <cstring> // strlen()
+#include <memory>
+#include <mutex> // std::once_flag()
+#include <string>
+#include <thread>
+
 #include "crypto-utils.h" // tr_base64_decode_str()
 #include "error.h"
 #include "file.h" // tr_sys_file_*()
-#include "quark.h"
 #include "platform.h" // TR_PATH_DELIMITER
-#include "trevent.h" // tr_amInEventThread()
+#include "quark.h"
 #include "torrent.h"
+#include "trevent.h" // tr_amInEventThread()
+#include "utils.h"
 #include "variant.h"
-
-#include <chrono>
-#include <cstring> // strlen()
-#include <memory>
-#include <thread>
-#include <mutex> // std::once_flag()
-#include <string>
-#include <cstdlib> // getenv()
 
 #include "gtest/gtest.h"
 
