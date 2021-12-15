@@ -493,7 +493,7 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
             struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
             data->req = req;
             data->server = server;
-            tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+            tr_rpc_request_exec_uri(server->session, q + 1, rpc_response_func, data);
             return;
         }
     }

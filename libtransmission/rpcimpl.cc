@@ -2554,8 +2554,7 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 
 void tr_rpc_request_exec_uri(
     tr_session* session,
-    char const* request_uri,
-    size_t request_uri_len,
+    std::string_view request_uri,
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
@@ -2563,7 +2562,7 @@ void tr_rpc_request_exec_uri(
     tr_variantInitDict(&top, 3);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    auto const parsed = tr_urlParse({ request_uri, request_uri_len });
+    auto const parsed = tr_urlParse(request_uri);
     if (parsed)
     {
         for (auto const& [key, val] : tr_url_query_view(parsed->query))
