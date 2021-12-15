@@ -2889,7 +2889,7 @@ static void refreshCurrentDir(tr_torrent* tor)
 
 char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t i)
 {
-    return tr_strdup_printf("%s.part", tor->file(i).name);
+    return tr_strvDup(tr_strvJoin(tor->file(i).name, ".part"sv));
 }
 
 /***
