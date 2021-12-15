@@ -53,7 +53,6 @@ using in_port_t = uint16_t; /* all missing */
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
-#include "version.h"
 
 #define SIZEOF_HASH_STRING (sizeof(((struct tr_info*)0)->hashString))
 

@@ -66,7 +66,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
-#include "version.h"
 
 using namespace std::literals;
 
