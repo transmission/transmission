@@ -364,9 +364,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, char c
 
         if (file == nullptr)
         {
-            char* tmp = tr_strdup_printf("%s (%s)", filename, error->message);
-            send_simple_response(req, HTTP_NOTFOUND, tmp);
-            tr_free(tmp);
+            auto const tmp = tr_strvJoin(filename, " ("sv, error->message, ")"sv);
+            send_simple_response(req, HTTP_NOTFOUND, tmp.c_str());
             tr_error_free(error);
         }
         else
