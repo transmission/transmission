@@ -226,7 +226,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     , atom{ atom_in }
     , swarm{ tor->swarm }
     , blame{ tor->n_blocks }
-    , have{ tor->info.pieceCount }
+    , have{ tor->pieceCount() }
 {
 }
 
@@ -602,7 +602,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         tr_piece_index_t countAllPieces() const override
         {
-            return torrent_->info.pieceCount;
+            return torrent_->pieceCount();
         }
 
         tr_priority_t priority(tr_piece_index_t piece) const override
@@ -700,7 +700,7 @@ static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_inde
     TR_ASSERT(peer->msgs != nullptr);
 
     /* is this a valid piece? */
-    if (pieceIndex >= t->tor->info.pieceCount)
+    if (pieceIndex >= t->tor->pieceCount())
     {
         return;
     }
@@ -1532,7 +1532,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
         if (tr_torrentHasMetadata(tor))
         {
-            peer->progress = true_count / tor->info.pieceCount;
+            peer->progress = true_count / tor->pieceCount();
         }
         else /* without pieceCount, this result is only a best guess... */
         {
@@ -1584,7 +1584,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
         tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
-        float const interval = tor->info.pieceCount / (float)tabCount;
+        float const interval = tor->pieceCount() / (float)tabCount;
         bool const isSeed = tr_torrentGetCompleteness(tor) == TR_SEED;
 
         for (tr_piece_index_t i = 0; i < tabCount; ++i)
@@ -1677,7 +1677,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     // do it the hard way
 
     auto desired_available = uint64_t{};
-    auto const n_pieces = tor->info.pieceCount;
+    auto const n_pieces = tor->pieceCount();
     auto have = std::vector<bool>(n_pieces);
 
     for (size_t i = 0; i < n_peers; ++i)
@@ -1700,7 +1700,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         }
     }
 
-    TR_ASSERT(desired_available <= tor->info.totalSize);
+    TR_ASSERT(desired_available <= tor->totalSize());
     return desired_available;
 }
 
@@ -1860,7 +1860,7 @@ static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_
         return true;
     }
 
-    for (tr_piece_index_t i = 0; i < tor->info.pieceCount; ++i)
+    for (tr_piece_index_t i = 0; i < tor->pieceCount(); ++i)
     {
         if (piece_is_interesting[i] && peer->have.test(i))
         {
@@ -1993,7 +1993,7 @@ static void rechokeDownloads(tr_swarm* s)
     if (peerCount > 0)
     {
         tr_torrent const* const tor = s->tor;
-        int const n = tor->info.pieceCount;
+        int const n = tor->pieceCount();
 
         /* build a bitfield of interesting pieces... */
         bool* const piece_is_interesting = tr_new(bool, n);

@@ -54,7 +54,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tr_torrentFile(tor, 0).name)),
         makeString(tr_torrentFindFile(tor, 0)));
     EXPECT_EQ(tr_strvPath(incomplete_dir, tr_torrentFile(tor, 1).name), makeString(tr_torrentFindFile(tor, 1)));
-    EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
     // auto completeness = completeness_unset;

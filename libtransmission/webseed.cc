@@ -385,7 +385,7 @@ static void on_idle(tr_webseed* w)
             task->webseed = w;
             task->block = begin;
             task->piece_index = tor->pieceForBlock(begin);
-            task->piece_offset = tor->block_size * begin - tor->info.pieceSize * task->piece_index;
+            task->piece_offset = tor->block_size * begin - tor->pieceSize() * task->piece_index;
             task->length = (end - 1 - begin) * tor->block_size + tor->blockSize(end - 1);
             task->blocks_done = 0;
             task->response_code = 0;
