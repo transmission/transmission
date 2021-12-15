@@ -20,9 +20,9 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-#include "error.h"
 #include "quark.h"
 
+struct tr_error;
 struct tr_variant;
 
 struct tr_magnet_metainfo

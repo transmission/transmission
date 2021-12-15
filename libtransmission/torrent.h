@@ -33,6 +33,7 @@
 #include "tr-macros.h"
 
 class tr_swarm;
+struct tr_error;
 struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;

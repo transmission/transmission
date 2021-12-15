@@ -15,6 +15,7 @@
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "error.h"
 #include "metainfo.h"
 #include "utils.h"
 #include "variant.h"
