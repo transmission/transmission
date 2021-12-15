@@ -27,10 +27,7 @@
 
 #include "transmission.h"
 
-#include "bandwidth.h"
 #include "net.h"
-#include "tr-macros.h"
-#include "utils.h" // tr_speed_K
 
 enum tr_auto_switch_state_t
 {
@@ -46,6 +43,7 @@ struct evdns_base;
 
 class tr_bitfield;
 class tr_rpc_server;
+struct Bandwidth;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
@@ -404,31 +402,6 @@ constexpr bool tr_isPriority(tr_priority_t p)
 /***
 ****
 ***/
-
-static inline unsigned int toSpeedBytes(unsigned int KBps)
-{
-    return KBps * tr_speed_K;
-}
-
-static inline double toSpeedKBps(unsigned int Bps)
-{
-    return Bps / (double)tr_speed_K;
-}
-
-static inline uint64_t toMemBytes(unsigned int MB)
-{
-    uint64_t B = (uint64_t)tr_mem_K * tr_mem_K;
-    B *= MB;
-    return B;
-}
-
-static inline int toMemMB(uint64_t B)
-{
-    return (int)(B / (tr_mem_K * tr_mem_K));
-}
-
-/**
-**/
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);

@@ -1726,8 +1726,8 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.progress = peer->progress;
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
-    stats.rateToClient_KBps = toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
+    stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
+    stats.rateToClient_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_PEER_TO_CLIENT));
     stats.peerIsChoked = peer->is_peer_choked();
     stats.peerIsInterested = peer->is_peer_interested();
     stats.clientIsChoked = peer->is_client_choked();
