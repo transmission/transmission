@@ -13,6 +13,7 @@
 #endif
 
 #include <inttypes.h> /* uint16_t */
+#include <vector>
 
 #ifdef _WIN32
 #include <winsock2.h> /* struct in_addr */

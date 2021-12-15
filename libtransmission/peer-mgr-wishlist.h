@@ -12,7 +12,10 @@
 #error only the libtransmission peer module should #include this header.
 #endif
 
+#include <vector>
+
 #include "transmission.h"
+
 #include "torrent.h"
 
 /**
