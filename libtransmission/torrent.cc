@@ -105,9 +105,9 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 
 tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string)
 {
-    auto& src = session->torrentsByHashString;
-    auto it = src.find(hash_string);
-    return it == std::end(src) ? nullptr : it->second;
+    auto info_hash = std::array<uint8_t, TR_SHA1_DIGEST_LEN>{};
+    tr_hex_to_sha1(std::data(info_hash), std::data(hash_string));
+    return tr_torrentFindFromHash(session, std::data(info_hash));
 }
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)

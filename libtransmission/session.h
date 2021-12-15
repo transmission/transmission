@@ -25,8 +25,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strncasecmp()
-
 #include "transmission.h"
 
 #include "bandwidth.h"
@@ -102,32 +100,6 @@ struct CompareHash
     bool operator()(uint8_t const* const a, uint8_t const* const b) const
     {
         return std::memcmp(a, b, SHA_DIGEST_LENGTH) < 0;
-    }
-};
-
-struct CaseInsensitiveStringCompare // case-insensitive string compare
-{
-    int compare(std::string_view a, std::string_view b) const // <=>
-    {
-        auto const alen = std::size(a);
-        auto const blen = std::size(b);
-
-        if (auto i = evutil_ascii_strncasecmp(std::data(a), std::data(b), std::min(alen, blen)); i != 0)
-        {
-            return i;
-        }
-
-        if (alen != blen)
-        {
-            return alen < blen ? -1 : 1;
-        }
-
-        return 0;
-    }
-
-    bool operator()(std::string_view a, std::string_view b) const // less than
-    {
-        return compare(a, b) < 0;
     }
 };
 
@@ -329,7 +301,6 @@ public:
     std::unordered_set<tr_torrent*> torrents;
     std::map<int, tr_torrent*> torrentsById;
     std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
-    std::map<std::string_view, tr_torrent*, CaseInsensitiveStringCompare> torrentsByHashString;
 
     char* configDir;
     char* resumeDir;

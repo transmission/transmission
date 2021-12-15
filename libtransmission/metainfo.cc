@@ -13,6 +13,8 @@
 #include <string_view>
 #include <vector>
 
+#include <event2/util.h> // evutil_ascii_strncasecmp()
+
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */
