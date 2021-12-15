@@ -16,6 +16,7 @@
 
 #include <array>
 #include <cstring> // memcmp()
+#include <ctime>
 #include <list>
 #include <mutex>
 #include <map>

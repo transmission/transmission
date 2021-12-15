@@ -16,6 +16,8 @@
 ***
 **/
 
+#include <ctime>
+
 #include <event2/buffer.h>
 
 #include "transmission.h"

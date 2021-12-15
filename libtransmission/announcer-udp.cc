@@ -8,6 +8,7 @@
 
 #include <cerrno> /* errno, EAFNOSUPPORT */
 #include <cstring> /* memcpy(), memset() */
+#include <ctime>
 #include <vector>
 
 #include <event2/buffer.h>

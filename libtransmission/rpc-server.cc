@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstring> /* memcpy */
+#include <ctime>
 #include <list>
 #include <string>
 #include <string_view>

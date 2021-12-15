@@ -24,6 +24,7 @@
 #include <cerrno>
 #include <climits>
 #include <cstring>
+#include <ctime>
 #include <string_view>
 
 #include <sys/types.h>

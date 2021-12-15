@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <map>
 #include <string_view>
 
 #include <windows.h>

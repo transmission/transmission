@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdlib> /* free() */
 #include <cstring> /* memcmp() */
+#include <ctime>
 #include <mutex>
 #include <set>
 

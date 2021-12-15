@@ -43,7 +43,6 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h> /* StrStrIA() */
 #else
-#include <ctime>
 #include <unistd.h> /* getpagesize() */
 #endif
 

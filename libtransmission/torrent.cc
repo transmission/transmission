@@ -15,6 +15,8 @@
 #include <cstdarg>
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcmp */
+#include <ctime>
+#include <map>
 #include <set>
 #include <sstream>
 #include <string>

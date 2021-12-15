@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <ctime>
 #include <optional>
 #include <string>
 #include <string_view>

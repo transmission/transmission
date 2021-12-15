@@ -8,6 +8,7 @@
 
 #include <climits> /* INT_MAX */
 #include <cstring> /* memcpy(), memset(), memcmp() */
+#include <ctime>
 #include <string_view>
 
 #include <event2/buffer.h>

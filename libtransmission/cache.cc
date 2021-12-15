@@ -7,6 +7,7 @@
  */
 
 #include <cstdlib> /* qsort() */
+#include <ctime>
 
 #include <event2/buffer.h>
 
