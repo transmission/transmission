@@ -624,7 +624,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
         auto const lock = session_->unique_lock();
 
         tr_torrent* const tor = tr_torrentFindFromHash(session_, info_hash);
-        if (tor != nullptr && tr_torrentAllowsDHT(tor))
+        if (tor != nullptr && tor->allowsDht())
         {
             size_t n = 0;
             tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
@@ -665,7 +665,7 @@ enum class AnnounceResult
 
 static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 {
-    if (!tr_torrentAllowsDHT(tor))
+    if (!tor->allowsDht())
     {
         return AnnounceResult::INVALID;
     }
@@ -727,7 +727,7 @@ void tr_dhtUpkeep(tr_session* session)
 
     for (auto* tor : session->torrents)
     {
-        if (!tor->isRunning || !tr_torrentAllowsDHT(tor))
+        if (!tor->isRunning || !tor->allowsDht())
         {
             continue;
         }

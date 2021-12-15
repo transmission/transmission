@@ -559,7 +559,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 
         tor = tr_torrentFindFromHashString(session, hashString);
 
-        if (tr_isTorrent(tor) && tr_torrentAllowsLPD(tor))
+        if (tr_isTorrent(tor) && tor->allowsLpd())
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
@@ -604,7 +604,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         {
             int announcePrio = 0;
 
-            if (!tr_torrentAllowsLPD(tor))
+            if (!tor->allowsLpd())
             {
                 continue;
             }
