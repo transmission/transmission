@@ -300,7 +300,7 @@ static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 
     if (inf->fileCount > 1 && !std::empty(url) && url.back() != '/')
     {
-        return tr_strdup_printf("%" TR_PRIsv "/", TR_PRIsv_ARG(url));
+        return tr_strvDup(tr_strvJoin(url, "/"sv));
     }
 
     return tr_strvDup(url);
