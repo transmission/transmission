@@ -31,9 +31,12 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
+using namespace std::literals;
+
+static auto constexpr DefaultHost = "localhost"sv;
+static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
+
 #define MY_NAME "transmission-remote"
-#define DEFAULT_HOST "localhost"
-#define DEFAULT_PORT TR_DEFAULT_RPC_PORT
 #define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
 
 #define ARGUMENTS TR_KEY_arguments
@@ -55,8 +58,6 @@
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
-
-using namespace std::literals;
 
 /***
 ****
@@ -3077,7 +3078,7 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
+static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl)
 {
     if (*argv[1] == '-')
     {
@@ -3089,12 +3090,12 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
-        *rpcurl = tr_strdup_printf("%s/rpc/", s + 7);
+        *rpcurl = tr_strvJoin(s + 7, "/rpc/"sv);
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
         UseSSL = true;
-        *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
+        *rpcurl = tr_strvJoin(s + 8, "/rpc/"sv);
     }
     else if (parsePortString(s, port))
     {
@@ -3103,7 +3104,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
     else if (last_colon == nullptr)
     {
         // it was a non-ipv6 host with no port
-        *host = tr_strdup(s);
+        *host = s;
     }
     else
     {
@@ -3121,7 +3122,8 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
 
-        *host = is_unbracketed_ipv6 ? tr_strdup_printf("[%*s]", TR_ARG_TUPLE((int)(hend - s), s)) : tr_strndup(s, hend - s);
+        auto const sv = std::string_view{ s, size_t(hend - s) };
+        *host = is_unbracketed_ipv6 ? tr_strvJoin("[", sv, "]") : sv;
     }
 
     *argc -= 1;
@@ -3134,10 +3136,9 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 
 int tr_main(int argc, char* argv[])
 {
-    int port = DEFAULT_PORT;
-    char* host = nullptr;
-    char* rpcurl = nullptr;
-    int exit_status = EXIT_SUCCESS;
+    auto port = DefaultPort;
+    auto host = std::string{};
+    auto rpcurl = std::string{};
 
     if (argc < 2)
     {
@@ -3151,19 +3152,15 @@ int tr_main(int argc, char* argv[])
 
     getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl);
 
-    if (host == nullptr)
+    if (std::empty(host))
     {
-        host = tr_strdup(DEFAULT_HOST);
+        host = DefaultHost;
     }
 
-    if (rpcurl == nullptr)
+    if (std::empty(rpcurl))
     {
-        rpcurl = tr_strdup_printf("%s:%d%s", host, port, DEFAULT_URL);
+        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DEFAULT_URL);
     }
 
-    exit_status = processArgs(rpcurl, argc, (char const* const*)argv);
-
-    tr_free(host);
-    tr_free(rpcurl);
-    return exit_status;
+    return processArgs(rpcurl.c_str(), argc, (char const* const*)argv);
 }
