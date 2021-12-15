@@ -20,6 +20,8 @@
 
 #include "units.h"
 
+using namespace std::literals;
+
 #define MY_NAME "transmission-create"
 
 #define MAX_TRACKERS 128
@@ -172,11 +174,10 @@ int tr_main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        char* end = tr_strdup_printf("%s.torrent", base);
+        auto const end = tr_strvJoin(base, ".torrent"sv);
         char* cwd = tr_getcwd();
-        outfile = out2 = tr_buildPath(cwd, end, nullptr);
+        outfile = out2 = tr_buildPath(cwd, end.c_str(), nullptr);
         tr_free(cwd);
-        tr_free(end);
         tr_free(base);
     }
 
