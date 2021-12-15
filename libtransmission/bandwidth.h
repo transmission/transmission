@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "transmission.h"
+
 #include "tr-assert.h"
 
 class tr_peerIo;

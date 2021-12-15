@@ -1346,7 +1346,6 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_session* session = tor->session;
     tr_info* inf = &tor->info;
-    time_t const now = tr_time();
 
     tr_peerMgrRemoveTorrent(tor);
 
@@ -2939,7 +2938,6 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 {
     int back = -1;
     int const old_pos = tor->queuePosition;
-    time_t const now = tr_time();
 
     if (pos < 0)
     {

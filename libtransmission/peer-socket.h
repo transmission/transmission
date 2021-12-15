@@ -13,7 +13,6 @@
 #endif
 
 #include "net.h"
-#include "tr-assert.h"
 #include "tr-macros.h"
 
 enum tr_peer_socket_type

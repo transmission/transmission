@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
 #include "peer-socket.h"
-#include "tr-assert.h"
 #include "tr-utp.h"
 #include "utils.h"
 

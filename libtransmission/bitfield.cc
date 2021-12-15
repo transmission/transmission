@@ -161,16 +161,10 @@ bool tr_bitfield::testFlag(size_t n) const
 ****
 ***/
 
-#ifdef TR_ENABLE_ASSERTS
-
-bool tr_bitfield::assertValid() const
+bool tr_bitfield::isValid() const
 {
-    TR_ASSERT(std::empty(flags_) || true_count_ == countFlags());
-
-    return true;
+    return std::empty(flags_) || true_count_ == countFlags();
 }
-
-#endif
 
 std::vector<uint8_t> tr_bitfield::raw() const
 {
@@ -238,7 +232,7 @@ void tr_bitfield::setTrueCount(size_t n)
         freeArray();
     }
 
-    TR_ASSERT(assertValid());
+    TR_ASSERT(isValid());
 }
 
 void tr_bitfield::rebuildTrueCount()
@@ -269,7 +263,7 @@ void tr_bitfield::decrementTrueCount(size_t dec)
 tr_bitfield::tr_bitfield(size_t bit_count)
     : bit_count_{ bit_count }
 {
-    TR_ASSERT(assertValid());
+    TR_ASSERT(isValid());
 }
 
 void tr_bitfield::setHasNone()
@@ -279,7 +273,7 @@ void tr_bitfield::setHasNone()
     have_all_hint_ = false;
     have_none_hint_ = true;
 
-    TR_ASSERT(assertValid());
+    TR_ASSERT(isValid());
 }
 
 void tr_bitfield::setHasAll()
@@ -289,7 +283,7 @@ void tr_bitfield::setHasAll()
     have_all_hint_ = true;
     have_none_hint_ = false;
 
-    TR_ASSERT(assertValid());
+    TR_ASSERT(isValid());
 }
 
 void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)

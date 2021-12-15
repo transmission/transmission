@@ -24,7 +24,6 @@
 #include "transmission.h"
 
 #include "quark.h"
-#include "tr-assert.h"
 #include "web-utils.h"
 
 struct tr_error;

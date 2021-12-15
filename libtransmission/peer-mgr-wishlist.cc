@@ -16,8 +16,10 @@
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "transmission.h"
+
 #include "crypto-utils.h" // tr_rand_buffer()
 #include "peer-mgr-wishlist.h"
+#include "tr-assert.h"
 
 namespace
 {

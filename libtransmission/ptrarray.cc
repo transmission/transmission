@@ -282,3 +282,12 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
     TR_ASSERT(removed == ptr);
     TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == nullptr);
 }
+
+void* tr_ptrArrayNth(tr_ptrArray* array, int i)
+{
+    TR_ASSERT(array != nullptr);
+    TR_ASSERT(i >= 0);
+    TR_ASSERT(i < array->n_items);
+
+    return array->items[i];
+}
