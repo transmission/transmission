@@ -132,8 +132,6 @@
 
 #define TR_ADDRSTRLEN 64
 
-#define TR_BAD_SIZE ((size_t)-1)
-
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
 
