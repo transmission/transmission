@@ -415,7 +415,7 @@ static void addWebseeds(tr_info const* info, tr_variant* webseeds)
 
 static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
 {
-    for (auto const& tracker : *tor->info.announce_list)
+    for (auto const& tracker : tor->announceList())
     {
         tr_variant* d = tr_variantListAddDict(trackers, 4);
         tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_interned);
@@ -578,7 +578,7 @@ static void initField(
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStrView(initme, tor->info.hashString);
+        tr_variantInitStrView(initme, tor->hashString());
         break;
 
     case TR_KEY_haveUnchecked:
@@ -1068,7 +1068,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
             continue;
         }
 
-        tor->info.announce_list->add(tor->info.announce_list->nextTier(), announce);
+        tor->announceList().add(tor->announceList().nextTier(), announce);
     }
 
     if (tor->trackerCount() == old_size)
@@ -1076,7 +1076,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->info.announce_list->save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 
@@ -1092,7 +1092,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
         if (tr_variantGetInt(tr_variantListChild(urls, i), &id) &&
             tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval))
         {
-            changed |= tor->info.announce_list->replace(id, newval);
+            changed |= tor->announceList().replace(id, newval);
         }
     }
 
@@ -1101,7 +1101,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->info.announce_list->save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 
@@ -1118,7 +1118,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
             continue;
         }
 
-        tor->info.announce_list->remove(id);
+        tor->announceList().remove(id);
     }
 
     if (tor->trackerCount() == old_size)
@@ -1126,7 +1126,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         return "error setting announce list";
     }
 
-    tor->info.announce_list->save(tor->info.torrent);
+    tor->announceList().save(tor->torrentFile());
     return nullptr;
 }
 

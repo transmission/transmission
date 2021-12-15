@@ -142,11 +142,11 @@ private:
 
     tr_bitfield blocks_{ 0 };
 
-    // Number of bytes we'll have when done downloading. [0..info.totalSize]
+    // Number of bytes we'll have when done downloading. [0..totalSize]
     // Mutable because lazy-calculated
     mutable std::optional<uint64_t> size_when_done_;
 
-    // Number of verified bytes we have right now. [0..info.totalSize]
+    // Number of verified bytes we have right now. [0..totalSize]
     // Mutable because lazy-calculated
     mutable std::optional<uint64_t> has_valid_;
 

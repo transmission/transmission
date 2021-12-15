@@ -473,9 +473,10 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     }
 
     /* make sure the hash string is normalized, just in case */
+    auto const* const sourceHashString = t->hashString();
     for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
     {
-        hashString[i] = toupper(t->info.hashString[i]);
+        hashString[i] = toupper(sourceHashString[i]);
     }
 
     /* prepare a zero-terminated announce message */

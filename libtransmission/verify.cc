@@ -49,7 +49,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
     tor->verify_progress = 0;
 
-    while (!*stopFlag && piece < tor->info.pieceCount)
+    while (!*stopFlag && piece < tor->pieceCount())
     {
         auto const file_length = tor->file(fileIndex).length;
 
@@ -118,7 +118,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
             sha = tr_sha1_init();
             ++piece;
-            tor->verify_progress = piece / double(tor->info.pieceCount);
+            tor->verify_progress = piece / double(tor->pieceCount());
             piecePos = 0;
         }
 
@@ -152,8 +152,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         tor,
         "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
         (int)(end - begin),
-        tor->info.totalSize,
-        (uint64_t)(tor->info.totalSize / (1 + (end - begin))));
+        tor->totalSize(),
+        (uint64_t)(tor->totalSize() / (1 + (end - begin))));
 
     return changed;
 }

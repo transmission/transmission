@@ -115,7 +115,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
 
     /* load the file, and find the info dict's offset inside the file */
     auto fileLen = size_t{};
-    uint8_t* const fileContents = tr_loadFile(tor->info.torrent, &fileLen, nullptr);
+    uint8_t* const fileContents = tr_loadFile(tor->torrentFile(), &fileLen, nullptr);
     if (fileContents != nullptr)
     {
         auto top = tr_variant{};
@@ -166,7 +166,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         TR_ASSERT(tor->infoDictLength > 0);
 
-        auto const fd = tr_sys_file_open(tor->info.torrent, TR_SYS_FILE_READ, 0, nullptr);
+        auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
         if (fd != TR_BAD_SYS_FILE)
         {
             size_t const o = piece * METADATA_PIECE_SIZE;
@@ -284,7 +284,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_variant newMetainfo;
-                char* path = tr_strdup(tor->info.torrent);
+                char* path = tr_strdup(tor->torrentFile());
 
                 if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
                 {
@@ -309,7 +309,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                         tor->swapMetainfo(*info);
 
                         /* save the new .torrent file */
-                        tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
+                        tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->torrentFile());
                         tr_torrentGotNewInfoDict(tor);
                         tr_torrentSetDirty(tor);
                     }

@@ -412,7 +412,7 @@ protected:
 
             for (uint64_t j = 0; j < file.length; ++j)
             {
-                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, nullptr, nullptr);
+                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->pieceSize()) ? "\1" : "\0", 1, nullptr, nullptr);
             }
 
             tr_sys_file_close(fd, nullptr);
@@ -432,7 +432,7 @@ protected:
         }
         else
         {
-            EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+            EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
         }
     }
 

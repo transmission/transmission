@@ -1534,7 +1534,7 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
     case BtBitfield:
         if (tr_torrentHasMetadata(msg->torrent))
         {
-            return len == (msg->torrent->info.pieceCount >> 3) + ((msg->torrent->info.pieceCount & 7) != 0 ? 1 : 0) + 1U;
+            return len == (msg->torrent->pieceCount() >> 3) + ((msg->torrent->pieceCount() & 7) != 0 ? 1 : 0) + 1U;
         }
 
         /* we don't know the piece count yet,
@@ -1694,7 +1694,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
         dbgmsg(msgs, "got Have: %u", ui32);
 
-        if (tr_torrentHasMetadata(msgs->torrent) && ui32 >= msgs->torrent->info.pieceCount)
+        if (tr_torrentHasMetadata(msgs->torrent) && ui32 >= msgs->torrent->pieceCount())
         {
             msgs->publishError(ERANGE);
             return READ_ERR;

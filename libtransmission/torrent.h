@@ -366,11 +366,63 @@ public:
         return info.webseeds[i];
     }
 
+    /// METAINFO - OTHER
+
+    auto isPrivate() const
+    {
+        return this->info.isPrivate;
+    }
+
+    auto isPublic() const
+    {
+        return !this->isPrivate();
+    }
+
+    auto pieceCount() const
+    {
+        return this->info.pieceCount;
+    }
+
+    auto pieceSize() const
+    {
+        return this->info.pieceSize;
+    }
+
+    auto pieceSize(tr_piece_index_t i) const
+    {
+        return tr_block_info::pieceSize(i);
+    }
+
+    auto totalSize() const
+    {
+        return this->info.totalSize;
+    }
+
+    auto hashString() const
+    {
+        return this->info.hashString;
+    }
+
+    auto const& announceList() const
+    {
+        return *this->info.announce_list;
+    }
+
+    auto& announceList()
+    {
+        return *this->info.announce_list;
+    }
+
+    auto const& torrentFile() const
+    {
+        return this->info.torrent;
+    }
+
     /// METAINFO - CHECKSUMS
 
     bool ensurePieceIsChecked(tr_piece_index_t piece)
     {
-        TR_ASSERT(piece < info.pieceCount);
+        TR_ASSERT(piece < this->pieceCount());
 
         if (checked_pieces_.test(piece))
         {
@@ -387,7 +439,7 @@ public:
 
     void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
     {
-        TR_ASSERT(std::size(checked) == info.pieceCount);
+        TR_ASSERT(std::size(checked) == this->pieceCount());
         checked_pieces_ = checked;
 
         auto filename = std::string{};
@@ -405,18 +457,6 @@ public:
                 checked_pieces_.unsetSpan(begin, end);
             }
         }
-    }
-
-    /// METAINFO - OTHER
-
-    auto isPrivate() const
-    {
-        return this->info.isPrivate;
-    }
-
-    auto isPublic() const
-    {
-        return !this->isPrivate();
     }
 
     ///

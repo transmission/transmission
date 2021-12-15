@@ -178,7 +178,7 @@ void tr_ioFindFileLocation(
     TR_ASSERT(tr_isTorrent(tor));
 
     uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
-    TR_ASSERT(offset < tor->info.totalSize);
+    TR_ASSERT(offset < tor->totalSize());
 
     auto const n_files = tor->fileCount();
     auto const* file = static_cast<tr_file const*>(
@@ -206,7 +206,7 @@ static int readOrWritePiece(
 {
     int err = 0;
 
-    if (pieceIndex >= tor->info.pieceCount)
+    if (pieceIndex >= tor->pieceCount())
     {
         return EINVAL;
     }
@@ -258,7 +258,7 @@ int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uin
 static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
-    TR_ASSERT(piece < tor->info.pieceCount);
+    TR_ASSERT(piece < tor->pieceCount());
 
     auto bytes_left = size_t{ tor->pieceSize(piece) };
     auto offset = uint32_t{};

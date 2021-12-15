@@ -2821,7 +2821,7 @@ void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
     session->torrents.insert(tor);
     session->torrentsById.insert_or_assign(tor->uniqueId, tor);
     session->torrentsByHash.insert_or_assign(tor->info.hash, tor);
-    session->torrentsByHashString.insert_or_assign(tor->info.hashString, tor);
+    session->torrentsByHashString.insert_or_assign(tor->hashString(), tor);
 }
 
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
@@ -2829,5 +2829,5 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
     session->torrents.erase(tor);
     session->torrentsById.erase(tor->uniqueId);
     session->torrentsByHash.erase(tor->info.hash);
-    session->torrentsByHashString.erase(tor->info.hashString);
+    session->torrentsByHashString.erase(tor->hashString());
 }
