@@ -96,6 +96,6 @@ void tr_error_clear(tr_error** error);
  * @param[in]     prefix_format Prefix format string.
  * @param[in]     ...           Format arguments.
  */
-void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_PRINTF(2, 3);
+void tr_error_prefix(tr_error** error, char const* prefix);
 
 /** @} */
