@@ -32,6 +32,8 @@
 
 #define dbgmsg(key, ...) tr_logAddDeepNamed(tr_quark_get_string(key), __VA_ARGS__)
 
+using namespace std::literals;
+
 /****
 *****
 ****/
@@ -495,10 +497,9 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
 
     if (errcode != 0)
     {
-        char* errmsg = tr_strdup_printf(_("DNS Lookup failed: %s"), evutil_gai_strerror(errcode));
-        dbgmsg(tracker->key, "%s", errmsg);
-        tau_tracker_fail_all(tracker, false, false, errmsg);
-        tr_free(errmsg);
+        auto const errmsg = tr_strvJoin("DNS Lookup failed: "sv, evutil_gai_strerror(errcode));
+        dbgmsg(tracker->key, "%s", errmsg.c_str());
+        tau_tracker_fail_all(tracker, false, false, errmsg.c_str());
     }
     else
     {
