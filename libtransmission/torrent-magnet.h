@@ -12,8 +12,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h>
-#include <time.h>
+#include <cinttypes>
+#include <ctime>
 
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;

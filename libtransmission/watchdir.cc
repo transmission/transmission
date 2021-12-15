@@ -7,6 +7,8 @@
  */
 
 #include <cstring> /* strcmp() */
+#include <string_view>
+#include <unordered_set>
 
 #include <event2/event.h>
 #include <event2/util.h>

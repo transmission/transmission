@@ -6,7 +6,10 @@
  *
  */
 
+#include <cstdarg>
+
 #include "transmission.h"
+
 #include "error.h"
 #include "tr-assert.h"
 #include "utils.h"
@@ -22,7 +25,7 @@ tr_error* tr_error_new_literal(int code, char const* message)
     return error;
 }
 
-tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
+static tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
 {
     TR_ASSERT(message_format != nullptr);
 

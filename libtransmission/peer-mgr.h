@@ -12,7 +12,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h> /* uint16_t */
+#include <cinttypes> // uintX_t
+#include <cstdlib> // size_t
+#include <vector>
 
 #ifdef _WIN32
 #include <winsock2.h> /* struct in_addr */

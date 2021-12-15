@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <ctime>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -33,6 +34,7 @@
 #include "tr-macros.h"
 
 class tr_swarm;
+struct tr_error;
 struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
@@ -430,7 +432,7 @@ public:
         }
 
         bool const checked = checkPiece(piece);
-        this->anyDate = tr_time();
+        this->markChanged();
         this->setDirty();
 
         checked_pieces_.set(piece, checked);
@@ -612,6 +614,9 @@ public:
         this->isDirty = true;
     }
 
+    void markEdited();
+    void markChanged();
+
     uint16_t maxConnectedPeers = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
     tr_verify_state verifyState = TR_VERIFY_NONE;
@@ -671,23 +676,6 @@ constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
     return tor != nullptr && tor->magicNumber == tr_torrent::MagicNumber && tr_isSession(tor->session);
-}
-
-/* set a flag indicating that the torrent's .resume file
- * needs to be saved when the torrent is closed */
-constexpr void tr_torrentSetDirty(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->isDirty = true;
-}
-
-/* note that the torrent's tr_info just changed */
-static inline void tr_torrentMarkEdited(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->editDate = tr_time();
 }
 
 /**

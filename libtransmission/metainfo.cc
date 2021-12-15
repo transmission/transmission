@@ -13,6 +13,8 @@
 #include <string_view>
 #include <vector>
 
+#include <event2/util.h> // evutil_ascii_strncasecmp()
+
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1 */
@@ -24,7 +26,6 @@
 #include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
 #include "torrent.h"
-#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "web-utils.h"

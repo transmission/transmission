@@ -6,7 +6,13 @@
  *
  */
 
+#include <array>
+#include <cstring>
+#include <string>
+#include <unordered_set>
+
 #include "transmission.h"
+
 #include "crypto.h"
 #include "crypto-utils.h"
 #include "utils.h"
@@ -14,11 +20,6 @@
 #include "crypto-test-ref.h"
 
 #include "gtest/gtest.h"
-
-#include <array>
-#include <cstring>
-#include <string>
-#include <unordered_set>
 
 using namespace std::literals;
 
@@ -176,6 +177,23 @@ TEST(Crypto, ssha1)
     /* should work with different salt lengths as well */
     EXPECT_TRUE(tr_ssha1_matches("{a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", "test"));
     EXPECT_TRUE(tr_ssha1_matches("{d209a21d3bc4f8fc4f8faf347e69f3def597eb170pySy4ai1ZPMjeU1", "test"));
+}
+
+TEST(Crypto, hex)
+{
+    auto constexpr Hex = std::array<std::string_view, 2>{
+        "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv,
+        "d209a21d3bc4f8fc4f8faf347e69f3def597eb17"sv,
+    };
+
+    for (auto const& hex : Hex)
+    {
+        auto digest = tr_sha1_digest_t{};
+        tr_hex_to_sha1(std::data(digest), std::data(hex));
+        auto hex2 = std::array<char, TR_SHA1_DIGEST_LEN * 2 + 1>{};
+        tr_sha1_to_hex(std::data(hex2), std::data(digest));
+        EXPECT_EQ(hex, std::data(hex2));
+    }
 }
 
 TEST(Crypto, random)

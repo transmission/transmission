@@ -24,6 +24,8 @@
 #include <cerrno>
 #include <climits>
 #include <cstring>
+#include <ctime>
+#include <string_view>
 
 #include <sys/types.h>
 
@@ -39,6 +41,7 @@
 #include <libutp/utp.h>
 
 #include "transmission.h"
+
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"

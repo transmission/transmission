@@ -12,6 +12,7 @@
 #include <cerrno>
 #include <cstdlib> /* strtol */
 #include <cstring> /* strcmp */
+#include <ctime>
 #include <iterator>
 #include <numeric>
 #include <string_view>
@@ -481,8 +482,8 @@ static void addPeers(tr_torrent* tor, tr_variant* list)
         tr_variantDictAddBool(d, TR_KEY_peerIsInterested, peer->peerIsInterested);
         tr_variantDictAddInt(d, TR_KEY_port, peer->port);
         tr_variantDictAddReal(d, TR_KEY_progress, peer->progress);
-        tr_variantDictAddInt(d, TR_KEY_rateToClient, toSpeedBytes(peer->rateToClient_KBps));
-        tr_variantDictAddInt(d, TR_KEY_rateToPeer, toSpeedBytes(peer->rateToPeer_KBps));
+        tr_variantDictAddInt(d, TR_KEY_rateToClient, tr_toSpeedBytes(peer->rateToClient_KBps));
+        tr_variantDictAddInt(d, TR_KEY_rateToPeer, tr_toSpeedBytes(peer->rateToPeer_KBps));
     }
 
     tr_torrentPeersFree(peers, peerCount);
@@ -728,11 +729,11 @@ static void initField(
         break;
 
     case TR_KEY_rateDownload:
-        tr_variantInitInt(initme, toSpeedBytes(st->pieceDownloadSpeed_KBps));
+        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceDownloadSpeed_KBps));
         break;
 
     case TR_KEY_rateUpload:
-        tr_variantInitInt(initme, toSpeedBytes(st->pieceUploadSpeed_KBps));
+        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceUploadSpeed_KBps));
         break;
 
     case TR_KEY_recheckProgress:

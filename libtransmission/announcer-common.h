@@ -13,9 +13,12 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <string>
+#include <string_view>
 
 #include "transmission.h"
+
 #include "quark.h"
 #include "web-utils.h"
 

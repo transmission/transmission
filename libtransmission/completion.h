@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstddef> // size_t
 #include <optional>
 #include <vector>
 

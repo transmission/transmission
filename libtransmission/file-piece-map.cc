@@ -7,13 +7,13 @@
  */
 
 #include <algorithm>
-#include <iterator>
 #include <vector>
 
 #include "transmission.h"
 
 #include "block-info.h"
 #include "file-piece-map.h"
+#include "tr-assert.h"
 
 void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
 {

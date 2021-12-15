@@ -6,17 +6,19 @@
  *
  */
 
+#include <string>
+#include <utility>
+
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "cache.h" // tr_cacheWriteBlock()
 #include "file.h" // tr_sys_path_*()
+#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"
-
-#include <string>
-#include <utility>
 
 namespace libtransmission
 {

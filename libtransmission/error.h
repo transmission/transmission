@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <stdarg.h>
-
 #include "tr-macros.h"
 
 /**
@@ -35,17 +33,6 @@ struct tr_error
  * @return Newly allocated error object on success, `nullptr` otherwise.
  */
 tr_error* tr_error_new_literal(int code, char const* message);
-
-/**
- * @brief Create new error object using `vprintf`-style formatting.
- *
- * @param[in] code           Error code (platform-specific).
- * @param[in] message_format Error message format string.
- * @param[in] args           Format arguments.
- *
- * @return Newly allocated error object on success, `nullptr` otherwise.
- */
-tr_error* tr_error_new_valist(int code, char const* message_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 /**
  * @brief Free memory used by error object.

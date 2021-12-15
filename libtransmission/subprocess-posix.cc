@@ -9,6 +9,8 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdlib>
+#include <map>
+#include <string_view>
 
 #include <fcntl.h>
 #include <sys/types.h>

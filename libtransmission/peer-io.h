@@ -16,13 +16,17 @@
 ***
 **/
 
+#include <ctime>
+
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "bandwidth.h"
 #include "crypto.h"
 #include "net.h" /* tr_address */
 #include "peer-socket.h"
+#include "tr-assert.h"
 #include "utils.h" // tr_time()
 
 class tr_peerIo;

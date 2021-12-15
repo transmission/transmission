@@ -17,9 +17,10 @@
 
 #include <algorithm> // std::sort
 #include <cerrno>
-#include <stack>
 #include <cstdlib> /* strtod() */
 #include <cstring>
+#include <stack>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32

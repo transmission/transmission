@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "tr-macros.h"
 #include "transmission.h"
 
 struct tr_metainfo_builder_file

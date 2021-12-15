@@ -6,10 +6,13 @@
  *
  */
 
+#include <ctime>
+
 #include "transmission.h"
-#include "session.h"
+
 #include "log.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
+#include "session.h"
 #include "stats.h"
 #include "utils.h"
 #include "variant.h"

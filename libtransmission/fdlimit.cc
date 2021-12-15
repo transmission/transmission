@@ -10,16 +10,19 @@
 #include <cerrno>
 #include <cinttypes>
 #include <cstring>
+#include <ctime>
 
 #include "transmission.h"
-#include "error.h"
+
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
+#include "utils.h" // tr_time()
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 

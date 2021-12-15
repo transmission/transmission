@@ -12,8 +12,6 @@
 #include <optional>
 #include <string_view>
 
-#include "tr-macros.h"
-
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 using tr_quark = size_t;
 

@@ -13,7 +13,6 @@
 #include <cctype> /* isprint() */
 #include <cstdlib> /* strtol() */
 #include <cstring>
-#include <iterator>
 #include <optional>
 #include <string_view>
 #include <tuple>

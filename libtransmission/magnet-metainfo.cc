@@ -14,6 +14,7 @@
 #include "transmission.h"
 
 #include "crypto-utils.h"
+#include "error.h"
 #include "error-types.h"
 #include "magnet-metainfo.h"
 #include "tr-assert.h"

@@ -8,6 +8,8 @@
 
 #include <climits> /* INT_MAX */
 #include <cstring> /* memcpy(), memset(), memcmp() */
+#include <ctime>
+#include <string_view>
 
 #include <event2/buffer.h>
 
@@ -311,7 +313,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->torrentFile());
                         tr_torrentGotNewInfoDict(tor);
-                        tr_torrentSetDirty(tor);
+                        tor->setDirty();
                     }
 
                     tr_variantFree(&newMetainfo);
@@ -329,7 +331,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             tor->isStopping = true;
             tor->magnetVerify = true;
             tor->startAfterVerify = !tor->prefetchMagnetMetadata;
-            tr_torrentMarkEdited(tor);
+            tor->markEdited();
         }
         else /* drat. */
         {

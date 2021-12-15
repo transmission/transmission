@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <ctime>
 #include <functional>
 #include <memory>
 #include <numeric>
@@ -18,6 +19,7 @@
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "peer-mgr-active-requests.h"
+#include "tr-assert.h"
 
 namespace
 {

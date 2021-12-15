@@ -13,9 +13,11 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring> /* memcpy */
+#include <ctime>
 #include <iterator> // std::back_inserter
 #include <list>
 #include <numeric> // std::acumulate()
+#include <string_view>
 #include <unordered_set>
 #include <vector>
 
@@ -1046,12 +1048,12 @@ static void sessionSetImpl(void* vdata)
     /* update the turtle mode's fields */
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_up, &i))
     {
-        turtle->speedLimit_Bps[TR_UP] = toSpeedBytes(i);
+        turtle->speedLimit_Bps[TR_UP] = tr_toSpeedBytes(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_down, &i))
     {
-        turtle->speedLimit_Bps[TR_DOWN] = toSpeedBytes(i);
+        turtle->speedLimit_Bps[TR_DOWN] = tr_toSpeedBytes(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_alt_speed_time_begin, &i))
@@ -1381,7 +1383,7 @@ bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction 
 {
     unsigned int Bps = 0;
     bool const is_active = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &Bps);
-    *setme_KBps = toSpeedKBps(Bps);
+    *setme_KBps = tr_toSpeedKBps(Bps);
     return is_active;
 }
 
@@ -1531,7 +1533,7 @@ static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned 
 
 void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KBps)
 {
-    tr_sessionSetSpeedLimit_Bps(s, d, toSpeedBytes(KBps));
+    tr_sessionSetSpeedLimit_Bps(s, d, tr_toSpeedBytes(KBps));
 }
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* s, tr_direction d)
@@ -1544,7 +1546,7 @@ unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* s, tr_direction d)
 
 unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
 {
-    return toSpeedKBps(tr_sessionGetSpeedLimit_Bps(s, d));
+    return tr_toSpeedKBps(tr_sessionGetSpeedLimit_Bps(s, d));
 }
 
 void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
@@ -1581,7 +1583,7 @@ static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned in
 
 void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps)
 {
-    tr_sessionSetAltSpeed_Bps(s, d, toSpeedBytes(KBps));
+    tr_sessionSetAltSpeed_Bps(s, d, tr_toSpeedBytes(KBps));
 }
 
 static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
@@ -1594,7 +1596,7 @@ static unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction 
 
 unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 {
-    return toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
+    return tr_toSpeedKBps(tr_sessionGetAltSpeed_Bps(s, d));
 }
 
 static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
@@ -1791,7 +1793,7 @@ static unsigned int tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_dire
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    return toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
+    return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
 int tr_sessionCountTorrents(tr_session const* session)
@@ -2236,14 +2238,14 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, int max_bytes)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_cacheSetLimit(session->cache, toMemBytes(max_bytes));
+    tr_cacheSetLimit(session->cache, tr_toMemBytes(max_bytes));
 }
 
 int tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return toMemMB(tr_cacheGetLimit(session->cache));
+    return tr_toMemMB(tr_cacheGetLimit(session->cache));
 }
 
 /***
@@ -2485,6 +2487,26 @@ char const* tr_blocklistGetURL(tr_session const* session)
 /***
 ****
 ***/
+
+void tr_session::setRpcWhitelist(std::string_view whitelist) const
+{
+    tr_rpcSetWhitelist(this->rpc_server_.get(), whitelist);
+}
+
+std::string const& tr_session::rpcWhitelist() const
+{
+    return tr_rpcGetWhitelist(this->rpc_server_.get());
+}
+
+void tr_session::useRpcWhitelist(bool enabled) const
+{
+    tr_rpcSetWhitelistEnabled(this->rpc_server_.get(), enabled);
+}
+
+bool tr_session::useRpcWhitelist() const
+{
+    return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
+}
 
 void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled)
 {
@@ -2821,7 +2843,6 @@ void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
     session->torrents.insert(tor);
     session->torrentsById.insert_or_assign(tor->uniqueId, tor);
     session->torrentsByHash.insert_or_assign(tor->info.hash, tor);
-    session->torrentsByHashString.insert_or_assign(tor->hashString(), tor);
 }
 
 void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
@@ -2829,5 +2850,4 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
     session->torrents.erase(tor);
     session->torrentsById.erase(tor->uniqueId);
     session->torrentsByHash.erase(tor->info.hash);
-    session->torrentsByHashString.erase(tor->hashString());
 }

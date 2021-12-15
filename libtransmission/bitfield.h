@@ -16,8 +16,6 @@
 #include <cstdint>
 #include <vector>
 
-#include "tr-assert.h"
-
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
  *
@@ -98,9 +96,7 @@ public:
         return size() == 0;
     }
 
-#ifdef TR_ENABLE_ASSERTS
-    bool assertValid() const;
-#endif
+    bool isValid() const;
 
 private:
     std::vector<uint8_t> flags_;

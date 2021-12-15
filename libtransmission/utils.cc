@@ -43,7 +43,6 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h> /* StrStrIA() */
 #else
-#include <ctime>
 #include <unistd.h> /* getpagesize() */
 #endif
 
@@ -66,7 +65,6 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
-#include "version.h"
 
 using namespace std::literals;
 

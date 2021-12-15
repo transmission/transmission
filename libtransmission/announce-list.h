@@ -23,11 +23,10 @@
 
 #include "transmission.h"
 
-#include "error.h"
 #include "quark.h"
-#include "tr-assert.h"
-#include "utils.h"
 #include "web-utils.h"
+
+struct tr_error;
 
 class tr_announce_list
 {

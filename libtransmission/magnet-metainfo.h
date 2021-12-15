@@ -12,7 +12,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,9 +19,10 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-#include "error.h"
 #include "quark.h"
+#include "tr-macros.h"
 
+struct tr_error;
 struct tr_variant;
 
 struct tr_magnet_metainfo

@@ -7,13 +7,13 @@
  */
 
 #include <algorithm>
-#include <iterator>
 
 #include <event2/util.h>
 
 #include "transmission.h"
 
 #include "block-info.h"
+#include "tr-assert.h"
 
 // Decide on a block size. Constraints:
 // (1) most clients decline requests over 16 KiB

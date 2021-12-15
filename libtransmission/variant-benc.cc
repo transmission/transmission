@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <cstdlib>
 #include <cctype> /* isdigit() */
 #include <deque>

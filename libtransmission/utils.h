@@ -480,6 +480,28 @@ char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 
+static inline unsigned int tr_toSpeedBytes(unsigned int KBps)
+{
+    return KBps * tr_speed_K;
+}
+
+static inline double tr_toSpeedKBps(unsigned int Bps)
+{
+    return Bps / (double)tr_speed_K;
+}
+
+static inline uint64_t tr_toMemBytes(unsigned int MB)
+{
+    uint64_t B = (uint64_t)tr_mem_K * tr_mem_K;
+    B *= MB;
+    return B;
+}
+
+static inline int tr_toMemMB(uint64_t B)
+{
+    return (int)(B / (tr_mem_K * tr_mem_K));
+}
+
 /***
 ****
 ***/

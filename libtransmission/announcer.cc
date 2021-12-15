@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstdlib> /* qsort() */
 #include <cstring> /* strcmp(), memcpy(), strncmp() */
+#include <ctime>
 #include <set>
 #include <string_view>
 #include <unordered_map>

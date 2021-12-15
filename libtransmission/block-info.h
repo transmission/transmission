@@ -14,8 +14,6 @@
 
 #include "transmission.h"
 
-#include "metainfo.h"
-
 struct tr_block_info
 {
     uint64_t total_size = 0;

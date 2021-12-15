@@ -28,6 +28,8 @@
 #include <cstdio>
 #include <cstdlib> /* atoi() */
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
+#include <ctime>
+#include <string_view>
 
 #ifdef _WIN32
 #include <inttypes.h>

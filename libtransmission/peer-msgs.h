@@ -12,7 +12,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h>
+#include <cinttypes>
+#include <ctime>
+
 #include "peer-common.h"
 
 class tr_peer;
