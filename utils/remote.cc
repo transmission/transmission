@@ -2199,10 +2199,10 @@ static int flush(char const* rpcurl, tr_variant** benc)
     int status = EXIT_SUCCESS;
     struct evbuffer* buf = evbuffer_new();
     char* json = tr_variantToStr(*benc, TR_VARIANT_FMT_JSON_LEAN, nullptr);
-    char* rpcurl_http = tr_strdup_printf(UseSSL ? "https://%s" : "http://%s", rpcurl);
+    auto const rpcurl_http = tr_strvJoin(UseSSL ? "https://" : "http://", rpcurl);
 
     curl = tr_curl_easy_init(buf);
-    curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http);
+    curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, getTimeoutSecs(json));
 
@@ -2213,7 +2213,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
 
     if ((res = curl_easy_perform(curl)) != CURLE_OK)
     {
-        tr_logAddNamedError(MY_NAME, " (%s) %s", rpcurl_http, curl_easy_strerror(res));
+        tr_logAddNamedError(MY_NAME, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
         status |= EXIT_FAILURE;
     }
     else
@@ -2248,7 +2248,6 @@ static int flush(char const* rpcurl, tr_variant** benc)
     }
 
     /* cleanup */
-    tr_free(rpcurl_http);
     tr_free(json);
     evbuffer_free(buf);
 
