@@ -1414,27 +1414,6 @@ static void torrentStartImpl(void* vtor)
     tr_peerMgrStartTorrent(tor);
 }
 
-uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor)
-{
-    uint64_t byte_count = 0;
-    auto const n = tor->fileCount();
-
-    for (tr_file_index_t i = 0; i < n; ++i)
-    {
-        tr_sys_path_info info;
-        char* filename = tr_torrentFindFile(tor, i);
-
-        if (filename != nullptr && tr_sys_path_get_info(filename, 0, &info, nullptr))
-        {
-            byte_count += info.size;
-        }
-
-        tr_free(filename);
-    }
-
-    return byte_count;
-}
-
 static bool torrentShouldQueue(tr_torrent const* tor)
 {
     tr_direction const dir = tor->queueDirection();

@@ -711,14 +711,6 @@ void tr_torrentGotNewInfoDict(tr_torrent* tor);
 void tr_torrentSetSpeedLimit_Bps(tr_torrent*, tr_direction, unsigned int Bps);
 unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const*, tr_direction);
 
-/**
- * @brief Test a piece against its info dict checksum
- * @return true if the piece's passes the checksum test
- */
-bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
-
-uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
-
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 constexpr bool tr_torrentIsQueued(tr_torrent const* tor)
