@@ -42,19 +42,18 @@ TEST(Error, propagate)
 {
     tr_error* err = nullptr;
     tr_error* err2 = nullptr;
+    auto constexpr Code = int{ 1 };
 
-    tr_error_set_literal(&err, 1, "oops");
+    tr_error_set_literal(&err, Code, "oops");
     EXPECT_NE(nullptr, err);
-    EXPECT_EQ(1, err->code);
+    EXPECT_EQ(Code, err->code);
     EXPECT_STREQ("oops", err->message);
 
     tr_error_propagate(&err2, &err);
     EXPECT_NE(nullptr, err2);
-    EXPECT_EQ(1, err2->code);
+    EXPECT_EQ(Code, err2->code);
     EXPECT_STREQ("oops", err2->message);
     EXPECT_EQ(nullptr, err);
 
-    tr_error_propagate(nullptr, &err);
-    EXPECT_EQ(nullptr, err);
-    EXPECT_EQ(nullptr, err2);
+    tr_error_clear(&err2);
 }
