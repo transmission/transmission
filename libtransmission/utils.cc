@@ -1619,7 +1619,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
         value = default_value;
     }
 
-    return value != nullptr ? tr_strdup(value) : nullptr;
+    return value != nullptr ? tr_strvDup(value) : nullptr;
 
 #endif
 }
