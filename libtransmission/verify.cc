@@ -226,9 +226,9 @@ static void verifyThreadFunc(void* /*user_data*/)
 
         tr_torrent* tor = currentNode.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
-        tr_torrentSetVerifyState(tor, TR_VERIFY_NOW);
+        tor->setVerifyState(TR_VERIFY_NOW);
         changed = verifyTorrent(tor, &stopCurrent);
-        tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
+        tor->setVerifyState(TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
         if (!stopCurrent && changed)
@@ -257,7 +257,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.current_size = tor->hasTotal();
 
     auto const lock = std::lock_guard(verify_mutex_);
-    tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);
+    tor->setVerifyState(TR_VERIFY_WAIT);
     verifyList.insert(node);
 
     if (verifyThread == nullptr)
@@ -290,7 +290,7 @@ void tr_verifyRemove(tr_torrent* tor)
             std::end(verifyList),
             [tor](auto const& task) { return tor == task.torrent; });
 
-        tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
+        tor->setVerifyState(TR_VERIFY_NONE);
 
         if (it != std::end(verifyList))
         {

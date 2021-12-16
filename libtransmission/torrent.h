@@ -120,8 +120,6 @@ enum tr_verify_state
     TR_VERIFY_NOW
 };
 
-void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
-
 tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 
 struct tr_incomplete_metadata;
@@ -503,6 +501,8 @@ public:
     {
         return this->isPublic() && tr_sessionAllowsLPD(this->session);
     }
+
+    void setVerifyState(tr_verify_state state);
 
     tr_info info = {};
 

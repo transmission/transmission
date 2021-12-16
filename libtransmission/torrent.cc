@@ -937,13 +937,12 @@ tr_stat const* tr_torrentStatCached(tr_torrent* tor)
     return (tr_isTorrent(tor) && now == tor->lastStatTime) ? &tor->stats : tr_torrentStat(tor);
 }
 
-void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state)
+void tr_torrent::setVerifyState(tr_verify_state state)
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(state == TR_VERIFY_NONE || state == TR_VERIFY_WAIT || state == TR_VERIFY_NOW);
 
-    tor->verifyState = state;
-    tor->markChanged();
+    this->verifyState = state;
+    this->markChanged();
 }
 
 tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
