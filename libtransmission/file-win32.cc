@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <ctype.h> /* isalpha() */
 #include <cstring>
 #include <string_view>
