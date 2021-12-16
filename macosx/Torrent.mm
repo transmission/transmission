@@ -242,10 +242,6 @@ bool trashDataFile(char const* filename, tr_error** error)
         {
             tr_torrentSetAddedDate(fHandle, date.timeIntervalSince1970);
         }
-        if ((date = history[@"DateActivity"]))
-        {
-            tr_torrentSetActivityDate(fHandle, date.timeIntervalSince1970);
-        }
 
         //upgrading from versions < 1.60: get old stop ratio settings
         NSNumber* ratioSetting;

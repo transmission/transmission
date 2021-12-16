@@ -1825,10 +1825,6 @@ tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
     private code, use tr_torentSetDateAdded() instead */
 TR_DEPRECATED void tr_torrentSetAddedDate(tr_torrent* torrent, time_t addedDate);
 
-/** @deprecated because this should only be accessible to libtransmission.
-    private code, use tr_torentSetDateActive() instead */
-TR_DEPRECATED void tr_torrentSetActivityDate(tr_torrent* torrent, time_t activityDate);
-
 /** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
