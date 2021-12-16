@@ -707,7 +707,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);
 
-    tr_torrentSetDateAdded(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
+    auto const now = tr_time();
+    tor->addedDate = now; // this is a default that will be overwritten by the resume file
+    tor->anyDate = now;
 
     // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
     // that set things as dirty, but... these settings being loaded are
@@ -937,13 +939,12 @@ tr_stat const* tr_torrentStatCached(tr_torrent* tor)
     return (tr_isTorrent(tor) && now == tor->lastStatTime) ? &tor->stats : tr_torrentStat(tor);
 }
 
-void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state)
+void tr_torrent::setVerifyState(tr_verify_state state)
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(state == TR_VERIFY_NONE || state == TR_VERIFY_WAIT || state == TR_VERIFY_NOW);
 
-    tor->verifyState = state;
-    tor->markChanged();
+    this->verifyState = state;
+    this->markChanged();
 }
 
 tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
@@ -2181,44 +2182,6 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
 ***
 **/
 
-#define BACK_COMPAT_FUNC(oldname, newname) \
-    void oldname(tr_torrent* tor, time_t t) \
-    { \
-        newname(tor, t); \
-    }
-BACK_COMPAT_FUNC(tr_torrentSetAddedDate, tr_torrentSetDateAdded)
-BACK_COMPAT_FUNC(tr_torrentSetActivityDate, tr_torrentSetDateActive)
-BACK_COMPAT_FUNC(tr_torrentSetDoneDate, tr_torrentSetDateDone)
-#undef BACK_COMPAT_FUNC
-
-void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->addedDate = t;
-    tor->anyDate = std::max(tor->anyDate, tor->addedDate);
-}
-
-void tr_torrentSetDateActive(tr_torrent* tor, time_t t)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->activityDate = t;
-    tor->anyDate = std::max(tor->anyDate, tor->activityDate);
-}
-
-void tr_torrentSetDateDone(tr_torrent* tor, time_t t)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->doneDate = t;
-    tor->anyDate = std::max(tor->anyDate, tor->doneDate);
-}
-
-/**
-***
-**/
-
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -2631,15 +2594,15 @@ void tr_torrentSetLocation(
     return tor->setLocation(location ? location : "", move_from_old_location, setme_progress, setme_state);
 }
 
-std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
+std::string_view tr_torrent::primaryMimeType() const
 {
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
     auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = this->fileCount(); i < n; ++i)
     {
-        auto const& file = tor->file(i);
+        auto const& file = this->file(i);
         auto const mime_type = tr_get_mime_type_for_filename(file.name);
         size_per_mime_type[mime_type] += file.length;
     }

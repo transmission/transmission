@@ -27,6 +27,11 @@ THE SOFTWARE.
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+#include <cstdint> // uintX_t
+
+struct tr_session;
+
 void tr_udpInit(tr_session*);
 void tr_udpUninit(tr_session*);
 void tr_udpSetSocketBuffers(tr_session*);

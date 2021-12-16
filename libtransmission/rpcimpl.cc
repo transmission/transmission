@@ -706,7 +706,7 @@ static void initField(
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStrView(initme, tr_torrentPrimaryMimeType(tor));
+        tr_variantInitStrView(initme, tor->primaryMimeType());
         break;
 
     case TR_KEY_priorities:

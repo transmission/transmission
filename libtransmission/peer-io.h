@@ -16,6 +16,8 @@
 ***
 **/
 
+#include <cstddef> // size_t
+#include <cstdint> // uintX_t
 #include <ctime>
 
 #include <event2/buffer.h>

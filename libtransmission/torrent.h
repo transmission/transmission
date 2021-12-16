@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <ctime>
 #include <optional>
 #include <string>
@@ -103,24 +104,12 @@ void tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
 
-void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
-
-void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
-
-void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
-
-/** Return the mime-type (e.g. "audio/x-flac") that matches more of the
-    torrent's content than any other mime-type. */
-std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor);
-
 enum tr_verify_state
 {
     TR_VERIFY_NONE,
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
 };
-
-void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
 
 tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 
@@ -503,6 +492,18 @@ public:
     {
         return this->isPublic() && tr_sessionAllowsLPD(this->session);
     }
+
+    void setVerifyState(tr_verify_state state);
+
+    void setDateActive(time_t t)
+    {
+        this->activityDate = t;
+        this->anyDate = std::max(this->anyDate, this->activityDate);
+    }
+
+    /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
+        torrent's content than any other mime-type. */
+    std::string_view primaryMimeType() const;
 
     tr_info info = {};
 

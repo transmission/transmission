@@ -13,6 +13,7 @@
 #endif
 
 #include <cinttypes>
+#include <cstddef>
 #include <ctime>
 
 #include "peer-common.h"

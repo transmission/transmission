@@ -15,12 +15,14 @@
 #define TR_NAME "Transmission"
 
 #include <array>
+#include <cstddef> // size_t
+#include <cstdint> // uintX_t
 #include <cstring> // memcmp()
 #include <ctime>
 #include <list>
-#include <mutex>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_set>
