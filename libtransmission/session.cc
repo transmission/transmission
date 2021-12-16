@@ -12,7 +12,6 @@
 #include <csignal>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring> /* memcpy */
 #include <ctime>
 #include <iterator> // std::back_inserter
 #include <list>

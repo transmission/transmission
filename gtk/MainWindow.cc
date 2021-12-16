@@ -20,8 +20,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <string.h> /* strlen() */
-
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>

@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdlib> /* bsearch() */
-#include <cstring> /* memcmp() */
 #include <optional>
 #include <vector>
 

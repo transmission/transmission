@@ -6,6 +6,7 @@
  *
  */
 
+#include <cstring> // strchr
 #include <limits.h> /* INT_MAX */
 #include <stddef.h>
 #include <stdio.h>

@@ -7,6 +7,7 @@
  */
 
 #include <ctype.h> /* isalpha() */
+#include <cstring>
 #include <string_view>
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */

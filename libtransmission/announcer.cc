@@ -10,8 +10,7 @@
 #include <array>
 #include <climits> /* INT_MAX */
 #include <cstdio>
-#include <cstdlib> /* qsort() */
-#include <cstring> /* strcmp(), memcpy(), strncmp() */
+#include <cstring>
 #include <ctime>
 #include <set>
 #include <string_view>

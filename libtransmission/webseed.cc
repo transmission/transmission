@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstring> /* strlen() */
 #include <set>
 #include <string_view>
 #include <vector>

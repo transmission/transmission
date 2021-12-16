@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstring> /* memset() */
 #include <vector>
 
 #include "transmission.h"
