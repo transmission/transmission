@@ -237,10 +237,7 @@ public:
         return completion.amountDone(tab, n_tabs);
     }
 
-    void setBlocks(tr_bitfield blocks)
-    {
-        completion.setBlocks(std::move(blocks));
-    }
+    void setBlocks(tr_bitfield blocks);
 
     void setHasPiece(tr_piece_index_t piece, bool has)
     {
@@ -495,11 +492,7 @@ public:
 
     void setVerifyState(tr_verify_state state);
 
-    void setDateActive(time_t t)
-    {
-        this->activityDate = t;
-        this->anyDate = std::max(this->anyDate, this->activityDate);
-    }
+    void setDateActive(time_t t);
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */

@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <climits>

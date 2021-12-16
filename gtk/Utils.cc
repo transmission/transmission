@@ -11,7 +11,6 @@
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
 #include <stdarg.h>
-#include <string.h> /* strchr(), strrchr(), strlen(), strstr() */
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>

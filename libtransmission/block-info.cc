@@ -6,8 +6,6 @@
  *
  */
 
-#include <algorithm>
-
 #include <event2/util.h>
 
 #include "transmission.h"
