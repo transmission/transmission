@@ -3006,7 +3006,7 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
 
     if (tor->isQueued() != queued)
     {
-        tor->isQueued = queued;
+        tor->is_queued = queued;
         tor->markChanged();
         tor->setDirty();
     }

@@ -690,7 +690,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
-    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued);
+    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
     if (tr_torrentHasMetadata(tor))

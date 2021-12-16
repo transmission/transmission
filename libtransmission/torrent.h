@@ -481,7 +481,7 @@ public:
 
     [[nodiscard]] auto isQueued() const
     {
-        return this->isQueued;
+        return this->is_queued;
     }
 
     [[nodiscard]] constexpr auto queueDirection() const
@@ -619,7 +619,7 @@ public:
 
     bool isDeleting = false;
     bool isDirty = false;
-    bool isQueued = false;
+    bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
     bool startAfterVerify = false;

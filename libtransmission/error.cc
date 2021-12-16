@@ -12,6 +12,7 @@
 
 #include "error.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h"
 
 tr_error* tr_error_new_literal(int code, char const* message)
@@ -24,6 +25,8 @@ tr_error* tr_error_new_literal(int code, char const* message)
 
     return error;
 }
+
+static tr_error* tr_error_new_valist(int code, char const* message_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 static tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
 {
