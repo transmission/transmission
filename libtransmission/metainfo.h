@@ -12,6 +12,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstdint>
 #include <optional>
 #include <string>

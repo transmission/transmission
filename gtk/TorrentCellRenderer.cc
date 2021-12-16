@@ -7,6 +7,7 @@
  */
 
 #include <limits.h> /* INT_MAX */
+#include <cstring> // strchr()
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

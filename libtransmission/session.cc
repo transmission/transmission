@@ -12,7 +12,6 @@
 #include <csignal>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring> /* memcpy */
 #include <ctime>
 #include <iterator> // std::back_inserter
 #include <list>
@@ -2284,14 +2283,6 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static bool tr_stringEndsWith(char const* strval, char const* end)
-{
-    size_t const slen = strlen(strval);
-    size_t const elen = strlen(end);
-
-    return slen >= elen && memcmp(&strval[slen - elen], end, elen) == 0;
-}
-
 static void loadBlocklists(tr_session* session)
 {
     auto loadme = std::unordered_set<std::string>{};
@@ -2448,7 +2439,8 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     auto const it = std::find_if(
         std::begin(src),
         std::end(src),
-        [&name](auto const* blocklist) { return tr_stringEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
+        [&name](auto const* blocklist) { return tr_strvEndsWith(tr_blocklistFileGetFilename(blocklist), name); });
+
     if (it == std::end(src))
     {
         auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);

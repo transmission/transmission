@@ -8,10 +8,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype> /* isdigit */
 #include <cerrno>
-#include <cstdlib> /* strtol */
-#include <cstring> /* strcmp */
 #include <ctime>
 #include <iterator>
 #include <numeric>

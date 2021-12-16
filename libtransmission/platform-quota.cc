@@ -7,7 +7,6 @@
  */
 
 #include <cerrno>
-#include <cstdlib>
 #include <cstring>
 #include <string_view>
 

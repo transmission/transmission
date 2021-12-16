@@ -7,7 +7,7 @@
  */
 
 #include <cerrno> /* errno, EAFNOSUPPORT */
-#include <cstring> /* memcpy(), memset() */
+#include <cstring> /* memset() */
 #include <ctime>
 #include <vector>
 
