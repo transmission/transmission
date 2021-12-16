@@ -200,7 +200,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     auto tmpstr = tr_strvPath(tor->currentDir, "hello-world.txt");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
-    EXPECT_EQ(0, torrentRenameAndWait(tor, tor->info.name, "foobar"));
+    EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the old filename can't be found
     EXPECT_TRUE(files[0].priv.is_renamed); // confirm the file's 'renamed' flag is set
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
@@ -273,7 +273,7 @@ TEST_F(RenameTest, multifileTorrent)
     auto* files = tor->info.files;
 
     // sanity check the info
-    EXPECT_STREQ("Felidae", tor->info.name);
+    EXPECT_STREQ("Felidae", tr_torrentName(tor));
     EXPECT_EQ(TotalSize, tor->totalSize());
     EXPECT_EQ(tr_file_index_t{ 4 }, tor->fileCount());
 
@@ -448,7 +448,7 @@ TEST_F(RenameTest, multifileTorrent)
 
     // rename prefix of top
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Feli", "FelidaeX"));
-    EXPECT_STREQ("Felidae", tor->info.name);
+    EXPECT_STREQ("Felidae", tr_torrentName(tor));
     EXPECT_FALSE(files[0].priv.is_renamed);
     EXPECT_FALSE(files[1].priv.is_renamed);
     EXPECT_FALSE(files[2].priv.is_renamed);
@@ -456,7 +456,7 @@ TEST_F(RenameTest, multifileTorrent)
 
     // rename false path
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
-    EXPECT_STREQ("Felidae", tor->info.name);
+    EXPECT_STREQ("Felidae", tr_torrentName(tor));
     EXPECT_FALSE(files[0].priv.is_renamed);
     EXPECT_FALSE(files[1].priv.is_renamed);
     EXPECT_FALSE(files[2].priv.is_renamed);
