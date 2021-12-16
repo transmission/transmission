@@ -399,9 +399,8 @@ protected:
         {
             auto const& file = tor->info.files[i];
 
-            auto path = (!complete && i == 0) ?
-                makeString(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name)) :
-                makeString(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
+            auto path = (!complete && i == 0) ? tr_strvJoin(tor->currentDir, TR_PATH_DELIMITER_STR, file.name, ".part") :
+                                                tr_strvJoin(tor->currentDir, TR_PATH_DELIMITER_STR, file.name);
 
             auto const dirname = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
             tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);

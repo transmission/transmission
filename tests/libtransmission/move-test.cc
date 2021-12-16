@@ -52,9 +52,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     // the test zero_torrent will be missing its first piece.
     auto* tor = zeroTorrentInit();
     zeroTorrentPopulate(tor, false);
-    EXPECT_EQ(
-        makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tr_torrentFile(tor, 0).name)),
-        makeString(tr_torrentFindFile(tor, 0)));
+    EXPECT_EQ(tr_strvJoin(incomplete_dir, "/", tr_torrentFile(tor, 0).name, ".part"), makeString(tr_torrentFindFile(tor, 0)));
     EXPECT_EQ(tr_strvPath(incomplete_dir, tr_torrentFile(tor, 1).name), makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
 

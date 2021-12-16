@@ -1376,9 +1376,8 @@ static char const* portTest(
     struct tr_rpc_idle_data* idle_data)
 {
     int const port = tr_sessionGetPeerPort(session);
-    char* url = tr_strdup_printf("https://portcheck.transmissionbt.com/%d", port);
+    auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
     tr_webRun(session, url, portTested, idle_data);
-    tr_free(url);
     return nullptr;
 }
 
@@ -2554,44 +2553,27 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 
 void tr_rpc_request_exec_uri(
     tr_session* session,
-    void const* request_uri,
-    size_t request_uri_len,
+    std::string_view request_uri,
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
-    char* const request = tr_strndup(request_uri, request_uri_len);
-
     auto top = tr_variant{};
     tr_variantInitDict(&top, 3);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    char const* pch = strchr(request, '?');
-    if (pch == nullptr)
+    auto const parsed = tr_urlParse(request_uri);
+    if (parsed)
     {
-        pch = request;
-    }
-
-    while (pch != nullptr)
-    {
-        char const* delim = strchr(pch, '=');
-        char const* next = strchr(pch, '&');
-
-        if (delim != nullptr)
+        for (auto const& [key, val] : tr_url_query_view(parsed->query))
         {
-            auto const key = std::string_view{ pch, size_t(delim - pch) };
-            bool isArg = key != "method" && key != "tag";
-            tr_variant* parent = isArg ? args : &top;
-
-            auto const val = std::string_view{ delim + 1, next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1) };
+            auto is_arg = key != "method"sv && key != "tag"sv;
+            auto* const parent = is_arg ? args : &top;
             tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
         }
-
-        pch = next != nullptr ? next + 1 : nullptr;
     }
 
     tr_rpc_request_exec_json(session, &top, callback, callback_user_data);
 
-    /* cleanup */
+    // cleanup
     tr_variantFree(&top);
-    tr_free(request);
 }

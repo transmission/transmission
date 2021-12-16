@@ -31,8 +31,7 @@ void tr_rpc_request_exec_json(
 /* see the RPC spec's "Request URI Notation" section */
 void tr_rpc_request_exec_uri(
     tr_session* session,
-    void const* request_uri,
-    size_t request_uri_len,
+    std::string_view request_uri,
     tr_rpc_response_func callback,
     void* callback_user_data);
 

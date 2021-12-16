@@ -124,7 +124,7 @@ protected:
                 slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = makeString(tr_strndup(path, size_t(slash_pos - path + 1)));
+            auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
 
             if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))

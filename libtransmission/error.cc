@@ -109,53 +109,17 @@ void tr_error_clear(tr_error** error)
     *error = nullptr;
 }
 
-static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args) TR_GNUC_PRINTF(2, 0);
-
-static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
+void tr_error_prefix(tr_error** error, char const* prefix)
 {
-    TR_ASSERT(error != nullptr);
-    TR_ASSERT(*error != nullptr);
-    TR_ASSERT(prefix_format != nullptr);
-
-    char* prefix = tr_strdup_vprintf(prefix_format, args);
-
-    char* new_message = tr_strdup_printf("%s%s", prefix, (*error)->message);
-    tr_free((*error)->message);
-    (*error)->message = new_message;
-
-    tr_free(prefix);
-}
-
-void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
-{
-    TR_ASSERT(prefix_format != nullptr);
+    TR_ASSERT(prefix != nullptr);
 
     if (error == nullptr || *error == nullptr)
     {
         return;
     }
 
-    va_list args;
-
-    va_start(args, prefix_format);
-    error_prefix_valist(error, prefix_format, args);
-    va_end(args);
-}
-
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
-{
-    TR_ASSERT(prefix_format != nullptr);
-
-    tr_error_propagate(new_error, old_error);
-
-    if (new_error == nullptr)
-    {
-        return;
-    }
-
-    va_list args;
-
-    va_start(args, prefix_format);
-    error_prefix_valist(new_error, prefix_format, args);
-    va_end(args);
+    auto* err = *error;
+    auto* const new_message = tr_strvDup(tr_strvJoin(prefix, err->message));
+    tr_free(err->message);
+    err->message = new_message;
 }

@@ -508,12 +508,12 @@ char* tr_strvDup(std::string_view in)
 char* tr_strndup(void const* vin, size_t len)
 {
     auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvDup({ in, len == TR_BAD_SIZE ? strlen(in) : len });
+    return in == nullptr ? nullptr : tr_strvDup({ in, len });
 }
 
 char* tr_strdup(void const* in)
 {
-    return tr_strndup(in, TR_BAD_SIZE);
+    return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
 }
 
 char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle, size_t needlelen)

@@ -30,6 +30,8 @@
 #include "version.h"
 #include "web-utils.h"
 
+using namespace std::literals;
+
 /****
 *****
 ****/
@@ -590,7 +592,7 @@ void tr_makeMetaInfo(
     }
     else
     {
-        builder->outputFile = tr_strdup_printf("%s.torrent", builder->top);
+        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
     }
 
     /* enqueue the builder */
