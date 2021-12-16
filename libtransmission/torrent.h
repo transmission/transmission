@@ -170,6 +170,12 @@ public:
         return session->unique_lock();
     }
 
+    /// SPEED LIMIT
+
+    void setSpeedLimitBps(tr_direction, unsigned int Bps);
+
+    unsigned int speedLimitBps(tr_direction) const;
+
     /// COMPLETION
 
     [[nodiscard]] uint64_t leftUntilDone() const
@@ -707,9 +713,6 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 /* for when the info dict has been fundamentally changed wrt files,
  * piece size, etc. such as in BEP 9 where peers exchange metadata */
 void tr_torrentGotNewInfoDict(tr_torrent* tor);
-
-void tr_torrentSetSpeedLimit_Bps(tr_torrent*, tr_direction, unsigned int Bps);
-unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const*, tr_direction);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 

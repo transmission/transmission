@@ -2017,7 +2017,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
         auto rate_Bps = tr_peerGetPieceSpeed_Bps(msgs, now, TR_PEER_TO_CLIENT);
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
-            rate_Bps = std::min(rate_Bps, tr_torrentGetSpeedLimit_Bps(torrent, TR_PEER_TO_CLIENT));
+            rate_Bps = std::min(rate_Bps, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
         }
 
         /* honor the session limits, if enabled */

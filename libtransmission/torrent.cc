@@ -151,7 +151,7 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction) && tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
+    if (tr_torrentUsesSpeedLimit(tor, direction) && tor->speedLimitBps(direction) <= 0)
     {
         allowed = false;
     }
@@ -202,28 +202,26 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
 
-void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int Bps)
+void tr_torrent::setSpeedLimitBps(tr_direction dir, unsigned int Bps)
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
+    if (this->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
     {
-        tor->setDirty();
+        this->setDirty();
     }
 }
 
 void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, unsigned int KBps)
 {
-    tr_torrentSetSpeedLimit_Bps(tor, dir, tr_toSpeedBytes(KBps));
+    tor->setSpeedLimitBps(dir, tr_toSpeedBytes(KBps));
 }
 
-unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir)
+unsigned int tr_torrent::speedLimitBps(tr_direction dir) const
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tor->bandwidth->getDesiredSpeedBytesPerSecond(dir);
+    return this->bandwidth->getDesiredSpeedBytesPerSecond(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -231,7 +229,7 @@ unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction di
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tr_toSpeedKBps(tr_torrentGetSpeedLimit_Bps(tor, dir));
+    return tr_toSpeedKBps(tor->speedLimitBps(dir));
 }
 
 void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
@@ -740,9 +738,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & TR_FR_SPEEDLIMIT) == 0)
     {
         tr_torrentUseSpeedLimit(tor, TR_UP, false);
-        tr_torrentSetSpeedLimit_Bps(tor, TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
+        tor->setSpeedLimitBps(TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
         tr_torrentUseSpeedLimit(tor, TR_DOWN, false);
-        tr_torrentSetSpeedLimit_Bps(tor, TR_DOWN, tr_sessionGetSpeedLimit_Bps(tor->session, TR_DOWN));
+        tor->setSpeedLimitBps(TR_DOWN, tr_sessionGetSpeedLimit_Bps(tor->session, TR_DOWN));
         tr_torrentUseSessionLimits(tor, true);
     }
 

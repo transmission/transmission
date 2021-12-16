@@ -240,7 +240,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
-    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tr_torrentGetSpeedLimit_Bps(tor, dir));
+    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
     tr_variantDictAddBool(d, TR_KEY_use_global_speed_limit, tr_torrentUsesSessionLimits(tor));
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
 }
@@ -272,11 +272,11 @@ static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* to
 
     if (tr_variantDictFindInt(d, TR_KEY_speed_Bps, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i);
+        tor->setSpeedLimitBps(dir, i);
     }
     else if (tr_variantDictFindInt(d, TR_KEY_speed, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i * 1024);
+        tor->setSpeedLimitBps(dir, i * 1024);
     }
 
     if (tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &boolVal))
