@@ -6,10 +6,13 @@
  *
  */
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
 #include <list>
 #include <string>
+#include <string_view>
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600 /* needed for recursive locks. */
@@ -298,61 +301,67 @@ char const* tr_getDefaultConfigDir(char const* appname)
     return s;
 }
 
+static std::string getUserDirsFilename()
+{
+    char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
+    auto config_file = !tr_str_is_empty(config_home) ? tr_strvPath(config_home, "user-dirs.dirs") :
+                                                       tr_strvPath(getHomeDir(), ".config", "user-dirs.dirs");
+
+    tr_free(config_home);
+    return config_file;
+}
+
+static std::string getXdgEntryFromUserDirs(std::string_view key)
+{
+    auto content = std::vector<char>{};
+    if (!tr_loadFile(content, getUserDirsFilename().c_str()) && std::empty(content))
+    {
+        return {};
+    }
+
+    // search for key="val" and extract val
+    auto const search = tr_strvJoin(key, "=\""sv);
+    auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
+    if (begin == std::end(content))
+    {
+        return {};
+    }
+    std::advance(begin, std::size(search));
+    auto const end = std::find(begin, std::end(content), '"');
+    if (end == std::end(content))
+    {
+        return {};
+    }
+    auto val = std::string{ begin, end };
+
+    // if val contains "$HOME", replace that with getHomeDir()
+    auto constexpr Home = "$HOME"sv;
+    auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home));
+    if (it != std::end(val))
+    {
+        val.replace(it, it + std::size(Home), std::string_view{ getHomeDir() });
+    }
+
+    return val;
+}
+
 char const* tr_getDefaultDownloadDir(void)
 {
     static char const* user_dir = nullptr;
 
     if (user_dir == nullptr)
     {
-        /* figure out where to look for user-dirs.dirs */
-        char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
-
-        auto const config_file = !tr_str_is_empty(config_home) ? tr_strvPath(config_home, "user-dirs.dirs") :
-                                                                 tr_strvPath(getHomeDir(), ".config", "user-dirs.dirs");
-
-        tr_free(config_home);
-
-        /* read in user-dirs.dirs and look for the download dir entry */
-        size_t content_len = 0;
-        auto* const content = (char*)tr_loadFile(config_file.c_str(), &content_len, nullptr);
-
-        if (content != nullptr && content_len > 0)
+        auto const xdg_user_dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv);
+        if (!std::empty(xdg_user_dir))
         {
-            char const* key = "XDG_DOWNLOAD_DIR=\"";
-            char* line = strstr(content, key);
-
-            if (line != nullptr)
-            {
-                char* value = line + strlen(key);
-                char* end = strchr(value, '"');
-
-                if (end != nullptr)
-                {
-                    *end = '\0';
-
-                    if (strncmp(value, "$HOME/", 6) == 0)
-                    {
-                        user_dir = tr_buildPath(getHomeDir(), value + 6, nullptr);
-                    }
-                    else if (strcmp(value, "$HOME") == 0)
-                    {
-                        user_dir = tr_strdup(getHomeDir());
-                    }
-                    else
-                    {
-                        user_dir = tr_strdup(value);
-                    }
-                }
-            }
+            user_dir = tr_strvDup(xdg_user_dir);
         }
 
 #ifdef _WIN32
-
         if (user_dir == nullptr)
         {
             user_dir = win32_get_known_folder(FOLDERID_Downloads);
         }
-
 #endif
 
         if (user_dir == nullptr)
@@ -363,8 +372,6 @@ char const* tr_getDefaultDownloadDir(void)
             user_dir = tr_buildPath(getHomeDir(), "Downloads", nullptr);
 #endif
         }
-
-        tr_free(content);
     }
 
     return user_dir;
