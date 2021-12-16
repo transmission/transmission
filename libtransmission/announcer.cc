@@ -1485,33 +1485,27 @@ static constexpr int countDownloaders(tr_tier const* tier)
 static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
     /* prefer higher-priority events */
-    int const priority_a = a->announce_event_priority;
-    int const priority_b = b->announce_event_priority;
-    if (priority_a != priority_b)
+    if (auto const priority_a = a->announce_event_priority, priority_b = b->announce_event_priority; priority_a != priority_b)
     {
         return priority_a > priority_b ? -1 : 1;
     }
 
     /* prefer swarms where we might upload */
-    int const downloader_count_a = countDownloaders(a);
-    int const downloader_count_b = countDownloaders(b);
-    if (downloader_count_a != downloader_count_b)
+    if (auto const leechers_a = countDownloaders(a), leechers_b = countDownloaders(b); leechers_a != leechers_b)
     {
-        return downloader_count_a > downloader_count_b ? -1 : 1;
+        return leechers_a > leechers_b ? -1 : 1;
     }
 
     /* prefer swarms where we might download */
-    bool const is_done_a = a->tor->isDone();
-    bool const is_done_b = b->tor->isDone();
-    if (is_done_a != is_done_b)
+    if (auto const is_done_a = a->tor->isDone(), is_done_b = b->tor->isDone(); is_done_a != is_done_b)
     {
         return is_done_a ? 1 : -1;
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */
-    auto const xa = a->byteCounts[TR_ANN_UP] + a->byteCounts[TR_ANN_DOWN];
-    auto const xb = b->byteCounts[TR_ANN_UP] + b->byteCounts[TR_ANN_DOWN];
-    if (xa != xb)
+    if (auto const xa = a->byteCounts[TR_ANN_UP] + a->byteCounts[TR_ANN_DOWN],
+        xb = b->byteCounts[TR_ANN_UP] + b->byteCounts[TR_ANN_DOWN];
+        xa != xb)
     {
         return xa > xb ? -1 : 1;
     }
