@@ -38,7 +38,7 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 static std::string getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
-    return tr_buildTorrentFilename(tr_getResumeDir(tor->session), tr_torrentInfo(tor), format, ".resume"sv);
+    return tr_buildTorrentFilename(tr_getResumeDir(tor->session), tr_torrentName(tor), tor->hashString(), format, ".resume"sv);
 }
 
 /***
@@ -240,7 +240,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
-    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tr_torrentGetSpeedLimit_Bps(tor, dir));
+    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
     tr_variantDictAddBool(d, TR_KEY_use_global_speed_limit, tr_torrentUsesSessionLimits(tor));
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
 }
@@ -272,11 +272,11 @@ static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* to
 
     if (tr_variantDictFindInt(d, TR_KEY_speed_Bps, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i);
+        tor->setSpeedLimitBps(dir, i);
     }
     else if (tr_variantDictFindInt(d, TR_KEY_speed, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i * 1024);
+        tor->setSpeedLimitBps(dir, i * 1024);
     }
 
     if (tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &boolVal))
@@ -529,13 +529,12 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
-    tr_info const* inf = tr_torrentInfo(tor);
 
     if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
         /// CHECKED PIECES
 
-        auto checked = tr_bitfield(inf->pieceCount);
+        auto checked = tr_bitfield(tor->pieceCount());
         auto mtimes = std::vector<time_t>{};
         auto const n_files = tor->fileCount();
         mtimes.reserve(n_files);
@@ -690,7 +689,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
-    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued);
+    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
     if (tr_torrentHasMetadata(tor))

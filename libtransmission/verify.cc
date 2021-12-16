@@ -254,7 +254,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     node.torrent = tor;
     node.callback_func = callback_func;
     node.callback_data = callback_data;
-    node.current_size = tr_torrentGetCurrentSizeOnDisk(tor);
+    node.current_size = tor->hasTotal();
 
     auto const lock = std::lock_guard(verify_mutex_);
     tr_torrentSetVerifyState(tor, TR_VERIFY_WAIT);

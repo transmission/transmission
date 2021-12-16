@@ -1585,7 +1585,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
         tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
         float const interval = tor->pieceCount() / (float)tabCount;
-        bool const isSeed = tr_torrentGetCompleteness(tor) == TR_SEED;
+        auto const isSeed = tor->isSeed();
 
         for (tr_piece_index_t i = 0; i < tabCount; ++i)
         {

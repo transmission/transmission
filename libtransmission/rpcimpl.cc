@@ -302,7 +302,7 @@ static char const* torrentStop(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tr_torrentIsQueued(tor))
+        if (tor->isRunning || tor->isQueued())
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);
@@ -406,11 +406,11 @@ static void addFiles(tr_torrent const* tor, tr_variant* list)
     }
 }
 
-static void addWebseeds(tr_info const* info, tr_variant* webseeds)
+static void addWebseeds(tr_torrent const* tor, tr_variant* webseeds)
 {
-    for (unsigned int i = 0; i < info->webseedCount; ++i)
+    for (size_t i = 0, n = tor->webseedCount(); i < n; ++i)
     {
-        tr_variantListAddStr(webseeds, info->webseeds[i]);
+        tr_variantListAddStr(webseeds, tor->webseed(i));
     }
 }
 
@@ -491,7 +491,7 @@ static void addPeers(tr_torrent* tor, tr_variant* list)
 
 static void initField(
     tr_torrent* const tor,
-    tr_info const* const inf,
+    tr_torrent_view const* view,
     tr_stat const* const st,
     tr_variant* const initme,
     tr_quark key)
@@ -513,7 +513,7 @@ static void initField(
         break;
 
     case TR_KEY_comment:
-        tr_variantInitStr(initme, std::string_view{ inf->comment != nullptr ? inf->comment : "" });
+        tr_variantInitStr(initme, std::string_view{ view->comment != nullptr ? view->comment : "" });
         break;
 
     case TR_KEY_corruptEver:
@@ -521,11 +521,11 @@ static void initField(
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStr(initme, std::string_view{ inf->creator != nullptr ? inf->creator : "" });
+        tr_variantInitStr(initme, std::string_view{ view->creator != nullptr ? view->creator : "" });
         break;
 
     case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, inf->dateCreated);
+        tr_variantInitInt(initme, view->date_created);
         break;
 
     case TR_KEY_desiredAvailable:
@@ -698,11 +698,11 @@ static void initField(
         break;
 
     case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, inf->pieceCount);
+        tr_variantInitInt(initme, view->n_pieces);
         break;
 
     case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, inf->pieceSize);
+        tr_variantInitInt(initme, view->piece_size);
         break;
 
     case TR_KEY_primary_mime_type:
@@ -761,7 +761,7 @@ static void initField(
         break;
 
     case TR_KEY_source:
-        tr_variantDictAddStr(initme, key, inf->source);
+        tr_variantDictAddStr(initme, key, view->source ? view->source : "");
         break;
 
     case TR_KEY_startDate:
@@ -798,11 +798,11 @@ static void initField(
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStr(initme, inf->torrent);
+        tr_variantInitStr(initme, view->torrent_filename);
         break;
 
     case TR_KEY_totalSize:
-        tr_variantInitInt(initme, inf->totalSize);
+        tr_variantInitInt(initme, view->total_size);
         break;
 
     case TR_KEY_uploadedEver:
@@ -833,8 +833,8 @@ static void initField(
         break;
 
     case TR_KEY_webseeds:
-        tr_variantInitList(initme, inf->webseedCount);
-        addWebseeds(inf, initme);
+        tr_variantInitList(initme, tor->webseedCount());
+        addWebseeds(tor, initme);
         break;
 
     case TR_KEY_webseedsSendingToUs:
@@ -859,14 +859,14 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
 
     if (fieldCount > 0)
     {
-        tr_info const* const inf = tr_torrentInfo(tor);
+        auto const torrent_view = tr_torrentView(tor);
         tr_stat const* const st = tr_torrentStat(tor);
 
         for (size_t i = 0; i < fieldCount; ++i)
         {
             tr_variant* child = format == TR_FORMAT_TABLE ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
-            initField(tor, inf, st, child, fields[i]);
+            initField(tor, &torrent_view, st, child, fields[i]);
         }
     }
 }

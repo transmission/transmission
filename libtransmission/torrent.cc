@@ -151,7 +151,7 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction) && tr_torrentGetSpeedLimit_Bps(tor, direction) <= 0)
+    if (tr_torrentUsesSpeedLimit(tor, direction) && tor->speedLimitBps(direction) <= 0)
     {
         allowed = false;
     }
@@ -202,28 +202,26 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
 
-void tr_torrentSetSpeedLimit_Bps(tr_torrent* tor, tr_direction dir, unsigned int Bps)
+void tr_torrent::setSpeedLimitBps(tr_direction dir, unsigned int Bps)
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    if (tor->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
+    if (this->bandwidth->setDesiredSpeedBytesPerSecond(dir, Bps))
     {
-        tor->setDirty();
+        this->setDirty();
     }
 }
 
 void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, unsigned int KBps)
 {
-    tr_torrentSetSpeedLimit_Bps(tor, dir, tr_toSpeedBytes(KBps));
+    tor->setSpeedLimitBps(dir, tr_toSpeedBytes(KBps));
 }
 
-unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const* tor, tr_direction dir)
+unsigned int tr_torrent::speedLimitBps(tr_direction dir) const
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tor->bandwidth->getDesiredSpeedBytesPerSecond(dir);
+    return this->bandwidth->getDesiredSpeedBytesPerSecond(dir);
 }
 
 unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -231,7 +229,7 @@ unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction di
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tr_toSpeedKBps(tr_torrentGetSpeedLimit_Bps(tor, dir));
+    return tr_toSpeedKBps(tor->speedLimitBps(dir));
 }
 
 void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
@@ -740,9 +738,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if ((loaded & TR_FR_SPEEDLIMIT) == 0)
     {
         tr_torrentUseSpeedLimit(tor, TR_UP, false);
-        tr_torrentSetSpeedLimit_Bps(tor, TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
+        tor->setSpeedLimitBps(TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
         tr_torrentUseSpeedLimit(tor, TR_DOWN, false);
-        tr_torrentSetSpeedLimit_Bps(tor, TR_DOWN, tr_sessionGetSpeedLimit_Bps(tor->session, TR_DOWN));
+        tor->setSpeedLimitBps(TR_DOWN, tr_sessionGetSpeedLimit_Bps(tor->session, TR_DOWN));
         tr_torrentUseSessionLimits(tor, true);
     }
 
@@ -932,11 +930,6 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
     return tr_isTorrent(tor) && tor->isRunning && tr_announcerCanManualAnnounce(tor);
 }
 
-tr_info const* tr_torrentInfo(tr_torrent const* tor)
-{
-    return tr_isTorrent(tor) ? &tor->info : nullptr;
-}
-
 tr_stat const* tr_torrentStatCached(tr_torrent* tor)
 {
     time_t const now = tr_time();
@@ -971,7 +964,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     {
         ret = is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
     }
-    else if (tr_torrentIsQueued(tor))
+    else if (tor->isQueued())
     {
         if (is_seed && tr_sessionGetQueueEnabled(tor->session, TR_UP))
         {
@@ -1412,27 +1405,6 @@ static void torrentStartImpl(void* vtor)
     tor->dhtAnnounce6At = now + tr_rand_int_weak(20);
     tor->lpdAnnounceAt = now;
     tr_peerMgrStartTorrent(tor);
-}
-
-uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor)
-{
-    uint64_t byte_count = 0;
-    auto const n = tor->fileCount();
-
-    for (tr_file_index_t i = 0; i < n; ++i)
-    {
-        tr_sys_path_info info;
-        char* filename = tr_torrentFindFile(tor, i);
-
-        if (filename != nullptr && tr_sys_path_get_info(filename, 0, &info, nullptr))
-        {
-            byte_count += info.size;
-        }
-
-        tr_free(filename);
-    }
-
-    return byte_count;
 }
 
 static bool torrentShouldQueue(tr_torrent const* tor)
@@ -3027,9 +2999,9 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tr_torrentIsQueued(tor) != queued)
+    if (tor->isQueued() != queued)
     {
-        tor->isQueued = queued;
+        tor->is_queued = queued;
         tor->markChanged();
         tor->setDirty();
     }

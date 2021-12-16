@@ -170,6 +170,12 @@ public:
         return session->unique_lock();
     }
 
+    /// SPEED LIMIT
+
+    void setSpeedLimitBps(tr_direction, unsigned int Bps);
+
+    unsigned int speedLimitBps(tr_direction) const;
+
     /// COMPLETION
 
     [[nodiscard]] uint64_t leftUntilDone() const
@@ -222,6 +228,16 @@ public:
         return completeness != TR_LEECH;
     }
 
+    [[nodiscard]] constexpr bool isSeed() const
+    {
+        return completeness == TR_SEED;
+    }
+
+    [[nodiscard]] constexpr bool isPartialSeed() const
+    {
+        return completeness == TR_PARTIAL_SEED;
+    }
+
     [[nodiscard]] tr_bitfield const& blocks() const
     {
         return completion.blocks();
@@ -244,19 +260,19 @@ public:
 
     /// FILE <-> PIECE
 
-    auto piecesInFile(tr_file_index_t file) const
+    [[nodiscard]] auto piecesInFile(tr_file_index_t file) const
     {
         return fpm_.pieceSpan(file);
     }
 
     /// WANTED
 
-    bool pieceIsWanted(tr_piece_index_t piece) const final
+    [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final
     {
         return files_wanted_.pieceWanted(piece);
     }
 
-    bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] bool fileIsWanted(tr_file_index_t file) const
     {
         return files_wanted_.fileWanted(file);
     }
@@ -275,7 +291,7 @@ public:
 
     /// PRIORITIES
 
-    tr_priority_t piecePriority(tr_piece_index_t piece) const
+    [[nodiscard]] tr_priority_t piecePriority(tr_piece_index_t piece) const
     {
         return file_priorities_.piecePriority(piece);
     }
@@ -294,19 +310,19 @@ public:
 
     /// METAINFO - FILES
 
-    tr_file_index_t fileCount() const
+    [[nodiscard]] tr_file_index_t fileCount() const
     {
         return info.fileCount;
     }
 
-    auto& file(tr_file_index_t i)
+    [[nodiscard]] auto& file(tr_file_index_t i)
     {
         TR_ASSERT(i < this->fileCount());
 
         return info.files[i];
     }
 
-    auto const& file(tr_file_index_t i) const
+    [[nodiscard]] auto const& file(tr_file_index_t i) const
     {
         TR_ASSERT(i < this->fileCount());
 
@@ -332,36 +348,36 @@ public:
 
     /// METAINFO - TRACKERS
 
-    auto trackerCount() const
+    [[nodiscard]] auto trackerCount() const
     {
         return std::size(*info.announce_list);
     }
 
-    auto const& tracker(size_t i) const
+    [[nodiscard]] auto const& tracker(size_t i) const
     {
         return info.announce_list->at(i);
     }
 
-    auto tiers() const
+    [[nodiscard]] auto tiers() const
     {
         return info.announce_list->tiers();
     }
 
     /// METAINFO - WEBSEEDS
 
-    auto webseedCount() const
+    [[nodiscard]] auto webseedCount() const
     {
         return info.webseedCount;
     }
 
-    auto const& webseed(size_t i) const
+    [[nodiscard]] auto const& webseed(size_t i) const
     {
         TR_ASSERT(i < webseedCount());
 
         return info.webseeds[i];
     }
 
-    auto& webseed(size_t i)
+    [[nodiscard]] auto& webseed(size_t i)
     {
         TR_ASSERT(i < webseedCount());
 
@@ -370,59 +386,59 @@ public:
 
     /// METAINFO - OTHER
 
-    auto isPrivate() const
+    [[nodiscard]] auto isPrivate() const
     {
         return this->info.isPrivate;
     }
 
-    auto isPublic() const
+    [[nodiscard]] auto isPublic() const
     {
         return !this->isPrivate();
     }
 
-    auto pieceCount() const
+    [[nodiscard]] auto pieceCount() const
     {
         return this->info.pieceCount;
     }
 
-    auto pieceSize() const
+    [[nodiscard]] auto pieceSize() const
     {
         return this->info.pieceSize;
     }
 
-    auto pieceSize(tr_piece_index_t i) const
+    [[nodiscard]] auto pieceSize(tr_piece_index_t i) const
     {
         return tr_block_info::pieceSize(i);
     }
 
-    auto totalSize() const
+    [[nodiscard]] auto totalSize() const
     {
         return this->info.totalSize;
     }
 
-    auto hashString() const
+    [[nodiscard]] auto hashString() const
     {
         return this->info.hashString;
     }
 
-    auto const& announceList() const
+    [[nodiscard]] auto const& announceList() const
     {
         return *this->info.announce_list;
     }
 
-    auto& announceList()
+    [[nodiscard]] auto& announceList()
     {
         return *this->info.announce_list;
     }
 
-    auto const& torrentFile() const
+    [[nodiscard]] auto const& torrentFile() const
     {
         return this->info.torrent;
     }
 
     /// METAINFO - CHECKSUMS
 
-    bool ensurePieceIsChecked(tr_piece_index_t piece)
+    [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece)
     {
         TR_ASSERT(piece < this->pieceCount());
 
@@ -463,22 +479,27 @@ public:
 
     ///
 
-    constexpr auto queueDirection() const
+    [[nodiscard]] auto isQueued() const
+    {
+        return this->is_queued;
+    }
+
+    [[nodiscard]] constexpr auto queueDirection() const
     {
         return this->isDone() ? TR_UP : TR_DOWN;
     }
 
-    auto allowsPex() const
+    [[nodiscard]] auto allowsPex() const
     {
         return this->isPublic() && this->session->isPexEnabled;
     }
 
-    auto allowsDht() const
+    [[nodiscard]] auto allowsDht() const
     {
         return this->isPublic() && tr_sessionAllowsDHT(this->session);
     }
 
-    auto allowsLpd() const // local peer discovery
+    [[nodiscard]] auto allowsLpd() const // local peer discovery
     {
         return this->isPublic() && tr_sessionAllowsLPD(this->session);
     }
@@ -598,7 +619,7 @@ public:
 
     bool isDeleting = false;
     bool isDirty = false;
-    bool isQueued = false;
+    bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
     bool startAfterVerify = false;
@@ -664,11 +685,6 @@ static inline bool tr_torrentExists(tr_session const* session, uint8_t const* to
     return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;
 }
 
-constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
-{
-    return tor->completeness;
-}
-
 /***
 ****
 ***/
@@ -708,22 +724,4 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
  * piece size, etc. such as in BEP 9 where peers exchange metadata */
 void tr_torrentGotNewInfoDict(tr_torrent* tor);
 
-void tr_torrentSetSpeedLimit_Bps(tr_torrent*, tr_direction, unsigned int Bps);
-unsigned int tr_torrentGetSpeedLimit_Bps(tr_torrent const*, tr_direction);
-
-/**
- * @brief Test a piece against its info dict checksum
- * @return true if the piece's passes the checksum test
- */
-bool tr_torrentCheckPiece(tr_torrent* tor, tr_piece_index_t pieceIndex);
-
-uint64_t tr_torrentGetCurrentSizeOnDisk(tr_torrent const* tor);
-
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-constexpr bool tr_torrentIsQueued(tr_torrent const* tor)
-{
-    return tor->isQueued;
-}
-
-tr_info const* tr_torrentInfo(tr_torrent const* torrent);

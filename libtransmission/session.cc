@@ -2774,7 +2774,7 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     candidates.reserve(tr_sessionCountTorrents(session));
     for (auto* tor : session->torrents)
     {
-        if (tr_torrentIsQueued(tor) && (direction == tor->queueDirection()))
+        if (tor->isQueued() && (direction == tor->queueDirection()))
         {
             candidates.push_back(tor);
         }
