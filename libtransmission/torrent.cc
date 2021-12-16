@@ -2844,7 +2844,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
 
     if (subpath != nullptr)
     {
-        *subpath = tr_strndup(std::data(found->subpath), std::size(found->subpath));
+        *subpath = tr_strvDup(found->subpath);
     }
 
     if (mtime != nullptr)
