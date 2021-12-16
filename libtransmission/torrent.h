@@ -105,8 +105,6 @@ void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRIN
 
 void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
 
-void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
-
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
@@ -503,6 +501,12 @@ public:
     }
 
     void setVerifyState(tr_verify_state state);
+
+    void setDateActive(time_t t)
+    {
+        this->activityDate = t;
+        this->anyDate = std::max(this->anyDate, this->activityDate);
+    }
 
     tr_info info = {};
 
