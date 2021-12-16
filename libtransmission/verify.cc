@@ -110,8 +110,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
             /* sleeping even just a few msec per second goes a long
              * way towards reducing IO load... */
-            time_t const now = tr_time();
-            if (lastSleptAt != now)
+            if (auto const now = tr_time(); lastSleptAt != now)
             {
                 lastSleptAt = now;
                 tr_wait_msec(MsecToSleepPerSecondDuringVerify);
