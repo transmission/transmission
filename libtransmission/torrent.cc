@@ -707,7 +707,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);
 
-    tr_torrentSetDateAdded(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
+    auto const now = tr_time();
+    tor->addedDate = now; // this is a default that will be overwritten by the resume file
+    tor->anyDate = now;
 
     // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
     // that set things as dirty, but... these settings being loaded are
@@ -2174,26 +2176,6 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
     tr_announcerResetTorrent(tor->session->announcer, tor);
 
     return true;
-}
-
-/**
-***
-**/
-
-#define BACK_COMPAT_FUNC(oldname, newname) \
-    void oldname(tr_torrent* tor, time_t t) \
-    { \
-        newname(tor, t); \
-    }
-BACK_COMPAT_FUNC(tr_torrentSetAddedDate, tr_torrentSetDateAdded)
-#undef BACK_COMPAT_FUNC
-
-void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->addedDate = t;
-    tor->anyDate = std::max(tor->anyDate, tor->addedDate);
 }
 
 /**

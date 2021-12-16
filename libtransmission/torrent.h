@@ -103,8 +103,6 @@ void tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
 
-void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
-
 /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
     torrent's content than any other mime-type. */
 std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor);

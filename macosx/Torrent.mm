@@ -236,13 +236,6 @@ bool trashDataFile(char const* filename, tr_error** error)
             [self startTransferNoQueue];
         }
 
-        //upgrading from versions < 1.30: get old added, activity, and done dates
-        NSDate* date;
-        if ((date = history[@"Date"]))
-        {
-            tr_torrentSetAddedDate(fHandle, date.timeIntervalSince1970);
-        }
-
         //upgrading from versions < 1.60: get old stop ratio settings
         NSNumber* ratioSetting;
         if ((ratioSetting = history[@"RatioSetting"]))

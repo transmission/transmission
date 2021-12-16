@@ -1821,10 +1821,6 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
-/** @deprecated because this should only be accessible to libtransmission.
-    private code, use tr_torentSetDateAdded() instead */
-TR_DEPRECATED void tr_torrentSetAddedDate(tr_torrent* torrent, time_t addedDate);
-
 /** @} */
 
 /** @brief Sanity checker to test that the direction is TR_UP or TR_DOWN */
