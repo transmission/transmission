@@ -395,9 +395,9 @@ protected:
 
     void zeroTorrentPopulate(tr_torrent* tor, bool complete)
     {
-        for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
+        for (size_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
         {
-            auto const& file = tor->info.files[i];
+            auto const file = tr_torrentFile(tor, i);
 
             auto path = (!complete && i == 0) ? tr_strvJoin(tor->currentDir, TR_PATH_DELIMITER_STR, file.name, ".part") :
                                                 tr_strvJoin(tor->currentDir, TR_PATH_DELIMITER_STR, file.name);

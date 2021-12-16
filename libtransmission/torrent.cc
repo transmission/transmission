@@ -1088,7 +1088,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             tor->etaDLSpeedCalculatedAt = now;
         }
 
-        if (s->leftUntilDone > s->desiredAvailable && tor->info.webseedCount < 1)
+        if (s->leftUntilDone > s->desiredAvailable && tor->webseedCount() < 1)
         {
             s->eta = TR_ETA_NOT_AVAIL;
         }
@@ -2844,7 +2844,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
 
     if (subpath != nullptr)
     {
-        *subpath = tr_strndup(std::data(found->subpath), std::size(found->subpath));
+        *subpath = tr_strvDup(found->subpath);
     }
 
     if (mtime != nullptr)

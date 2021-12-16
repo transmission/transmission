@@ -260,10 +260,10 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
     else
     {
         size_t const buflen = evbuffer_get_length(buf);
-        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
-                                                                        tr_strdup(_("Unknown error"));
+        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+            _("Unknown error");
         tau_scrape_request_fail(request, true, false, errmsg);
-        tr_free(errmsg);
     }
 }
 

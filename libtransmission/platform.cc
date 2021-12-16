@@ -374,7 +374,7 @@ char const* tr_getDefaultDownloadDir(void)
 ****
 ***/
 
-static bool isWebClientDir(char const* path)
+static bool isWebClientDir(std::string_view path)
 {
     auto tmp = tr_strvPath(path, "index.html");
     bool const ret = tr_sys_path_exists(tmp.c_str(), nullptr);
@@ -500,50 +500,32 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             /* XDG_DATA_DIRS are the backup directories */
             {
                 char const* const pkg = PACKAGE_DATA_DIR;
-                char* xdg = tr_env_get_string("XDG_DATA_DIRS", nullptr);
-                char const* fallback = "/usr/local/share:/usr/share";
-                char* buf = tr_strdup_printf("%s:%s:%s", pkg, xdg != nullptr ? xdg : "", fallback);
+                auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
+                auto const buf = tr_strvJoin(pkg, ":", xdg, ":/usr/local/share:/usr/share");
                 tr_free(xdg);
-                tmp = buf;
 
-                while (!tr_str_is_empty(tmp))
+                auto sv = std::string_view{ buf };
+                auto token = std::string_view{};
+                while (tr_strvSep(&sv, &token, ':'))
                 {
-                    char const* end = strchr(tmp, ':');
-
-                    if (end != nullptr)
+                    token = tr_strvStrip(token);
+                    if (!std::empty(token))
                     {
-                        if (end - tmp > 1)
-                        {
-                            candidates.emplace_back(tmp, (size_t)(end - tmp));
-                        }
-
-                        tmp = (char*)end + 1;
-                    }
-                    else if (!tr_str_is_empty(tmp))
-                    {
-                        candidates.emplace_back(tmp);
-                        break;
+                        candidates.emplace_back(token);
                     }
                 }
-
-                tr_free(buf);
             }
 
             /* walk through the candidates & look for a match */
             for (auto const& dir : candidates)
             {
-                char* path = tr_buildPath(dir.c_str(), "transmission", "public_html", nullptr);
-                bool const found = isWebClientDir(path);
-
-                if (found)
+                auto const path = tr_strvPath(dir, "transmission"sv, "public_html"sv);
+                if (isWebClientDir(path))
                 {
-                    s = path;
+                    s = tr_strvDup(path);
                     break;
                 }
-
-                tr_free(path);
             }
-
 #endif
         }
     }
