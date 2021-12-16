@@ -155,7 +155,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     auto const& files = tor->info.files;
 
     // sanity check the info
-    EXPECT_EQ(tr_file_index_t{ 1 }, tor->info.fileCount);
+    EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
     EXPECT_STREQ("hello-world.txt", files[0].name);
     EXPECT_FALSE(files[0].priv.is_renamed);
 
@@ -275,7 +275,7 @@ TEST_F(RenameTest, multifileTorrent)
     // sanity check the info
     EXPECT_STREQ("Felidae", tor->info.name);
     EXPECT_EQ(TotalSize, tor->totalSize());
-    EXPECT_EQ(tr_file_index_t{ 4 }, tor->info.fileCount);
+    EXPECT_EQ(tr_file_index_t{ 4 }, tor->fileCount());
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
