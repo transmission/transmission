@@ -1088,7 +1088,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             tor->etaDLSpeedCalculatedAt = now;
         }
 
-        if (s->leftUntilDone > s->desiredAvailable && tor->info.webseedCount < 1)
+        if (s->leftUntilDone > s->desiredAvailable && tor->webseedCount() < 1)
         {
             s->eta = TR_ETA_NOT_AVAIL;
         }
