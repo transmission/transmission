@@ -228,6 +228,16 @@ public:
         return completeness != TR_LEECH;
     }
 
+    [[nodiscard]] constexpr bool isSeed() const
+    {
+        return completeness == TR_SEED;
+    }
+
+    [[nodiscard]] constexpr bool isPartialSeed() const
+    {
+        return completeness == TR_PARTIAL_SEED;
+    }
+
     [[nodiscard]] tr_bitfield const& blocks() const
     {
         return completion.blocks();
@@ -668,11 +678,6 @@ private:
 static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
 {
     return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;
-}
-
-constexpr tr_completeness tr_torrentGetCompleteness(tr_torrent const* tor)
-{
-    return tor->completeness;
 }
 
 /***

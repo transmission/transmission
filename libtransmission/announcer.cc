@@ -823,7 +823,7 @@ static tr_announce_request* announce_request_new(
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;
-    req->partial_seed = tr_torrentGetCompleteness(tor) == TR_PARTIAL_SEED;
+    req->partial_seed = tor->isPartialSeed();
     tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
     return req;
 }
