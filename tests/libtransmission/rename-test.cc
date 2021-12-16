@@ -205,7 +205,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(files[0].priv.is_renamed); // confirm the file's 'renamed' flag is set
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", files[0].name); // confirm the file's name is now 'foobar' in our struct
-    EXPECT_STREQ(nullptr, strstr(tor->info.torrent, "foobar")); // confirm the name in the .torrent file hasn't changed
+    EXPECT_STREQ(nullptr, strstr(tr_torrentView(tor).torrent_filename, "foobar")); // confirm .torrent file hasn't changed
     tmpstr = tr_strvPath(tor->currentDir, "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
