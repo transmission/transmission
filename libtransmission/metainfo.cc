@@ -224,7 +224,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         inf->isFolder = false;
         inf->fileCount = 1;
         inf->files = tr_new0(tr_file, 1);
-        inf->files[0].name = tr_strndup(root_name.c_str(), std::size(root_name));
+        inf->files[0].name = tr_strvDup(root_name);
         inf->files[0].length = len;
         inf->files[0].priv.is_renamed = is_root_adjusted;
         inf->totalSize += len;
