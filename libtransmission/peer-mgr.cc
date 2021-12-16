@@ -1532,11 +1532,11 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
         if (tr_torrentHasMetadata(tor))
         {
-            peer->progress = true_count / tor->pieceCount();
+            peer->progress = true_count / float(tor->pieceCount());
         }
-        else /* without pieceCount, this result is only a best guess... */
+        else // without pieceCount, this result is only a best guess...
         {
-            peer->progress = true_count / static_cast<float>(have->size() + 1);
+            peer->progress = true_count / float(have->size() + 1);
         }
     }
 
