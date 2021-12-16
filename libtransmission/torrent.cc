@@ -969,7 +969,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     {
         ret = is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
     }
-    else if (tr_torrentIsQueued(tor))
+    else if (tor->isQueued())
     {
         if (is_seed && tr_sessionGetQueueEnabled(tor->session, TR_UP))
         {
@@ -3004,7 +3004,7 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tr_torrentIsQueued(tor) != queued)
+    if (tor->isQueued() != queued)
     {
         tor->isQueued = queued;
         tor->markChanged();

@@ -479,6 +479,11 @@ public:
 
     ///
 
+    [[nodiscard]] auto isQueued() const
+    {
+        return this->isQueued;
+    }
+
     [[nodiscard]] constexpr auto queueDirection() const
     {
         return this->isDone() ? TR_UP : TR_DOWN;
@@ -720,10 +725,5 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 void tr_torrentGotNewInfoDict(tr_torrent* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-constexpr bool tr_torrentIsQueued(tr_torrent const* tor)
-{
-    return tor->isQueued;
-}
 
 tr_info const* tr_torrentInfo(tr_torrent const* torrent);
