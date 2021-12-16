@@ -2594,15 +2594,15 @@ void tr_torrentSetLocation(
     return tor->setLocation(location ? location : "", move_from_old_location, setme_progress, setme_state);
 }
 
-std::string_view tr_torrentPrimaryMimeType(tr_torrent const* tor)
+std::string_view tr_torrent::primaryMimeType() const
 {
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
     auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = this->fileCount(); i < n; ++i)
     {
-        auto const& file = tor->file(i);
+        auto const& file = this->file(i);
         auto const mime_type = tr_get_mime_type_for_filename(file.name);
         size_per_mime_type[mime_type] += file.length;
     }
