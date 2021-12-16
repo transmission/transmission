@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <cinttypes>
+#include <cstddef> // size_t
+#include <cinttypes> // uintX_t
 #include <ctime>
 #include <string_view>
 

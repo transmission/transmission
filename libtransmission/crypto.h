@@ -14,7 +14,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h>
+#include <cstddef>
+#include <cinttypes> // uintX_t
 
 #include "crypto-utils.h"
 #include "tr-macros.h"

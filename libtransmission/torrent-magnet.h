@@ -12,8 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cinttypes>
+#include <cinttypes> // intX_t
+#include <cstddef> // size_t
 #include <ctime>
+
+struct tr_torrent;
 
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
