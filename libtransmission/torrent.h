@@ -725,5 +725,3 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 void tr_torrentGotNewInfoDict(tr_torrent* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-tr_info const* tr_torrentInfo(tr_torrent const* torrent);

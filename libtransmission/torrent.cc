@@ -930,11 +930,6 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
     return tr_isTorrent(tor) && tor->isRunning && tr_announcerCanManualAnnounce(tor);
 }
 
-tr_info const* tr_torrentInfo(tr_torrent const* tor)
-{
-    return tr_isTorrent(tor) ? &tor->info : nullptr;
-}
-
 tr_stat const* tr_torrentStatCached(tr_torrent* tor)
 {
     time_t const now = tr_time();

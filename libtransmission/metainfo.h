@@ -62,7 +62,8 @@ void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 
 std::string tr_buildTorrentFilename(
     std::string_view dirname,
-    tr_info const* inf,
+    std::string_view name,
+    std::string_view info_hash_string,
     enum tr_metainfo_basename_format format,
     std::string_view suffix);
 

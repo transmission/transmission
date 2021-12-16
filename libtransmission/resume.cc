@@ -38,7 +38,7 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 static std::string getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
-    return tr_buildTorrentFilename(tr_getResumeDir(tor->session), tr_torrentInfo(tor), format, ".resume"sv);
+    return tr_buildTorrentFilename(tr_getResumeDir(tor->session), tr_torrentName(tor), tor->hashString(), format, ".resume"sv);
 }
 
 /***
@@ -529,13 +529,12 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
-    tr_info const* inf = tr_torrentInfo(tor);
 
     if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
         /// CHECKED PIECES
 
-        auto checked = tr_bitfield(inf->pieceCount);
+        auto checked = tr_bitfield(tor->pieceCount());
         auto mtimes = std::vector<time_t>{};
         auto const n_files = tor->fileCount();
         mtimes.reserve(n_files);

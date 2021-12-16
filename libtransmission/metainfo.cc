@@ -38,18 +38,19 @@ using namespace std::literals;
 
 std::string tr_buildTorrentFilename(
     std::string_view dirname,
-    tr_info const* inf,
+    std::string_view name,
+    std::string_view info_hash_string,
     enum tr_metainfo_basename_format format,
     std::string_view suffix)
 {
     return format == TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH ?
-        tr_strvJoin(dirname, "/"sv, inf->name, "."sv, std::string_view{ inf->hashString, 16 }, suffix) :
-        tr_strvJoin(dirname, "/"sv, inf->hashString, suffix);
+        tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix) :
+        tr_strvJoin(dirname, "/"sv, info_hash_string, suffix);
 }
 
 static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
 {
-    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf, format, ".torrent"sv);
+    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf->name, inf->hashString, format, ".torrent"sv);
 }
 
 /***

@@ -418,5 +418,5 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tr_torrentInfoGetMagnetLink(tr_torrentInfo(tor));
+    return tr_torrentInfoGetMagnetLink(&tor->info);
 }
