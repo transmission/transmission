@@ -1530,7 +1530,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     {
         float const true_count = have->count();
 
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             peer->progress = true_count / tor->pieceCount();
         }
@@ -1580,7 +1580,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 
     memset(tab, 0, tabCount);
 
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
         tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
@@ -1648,7 +1648,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tr_torrentHasMetadata(tor))
+    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tor->hasMetadata())
     {
         return 0;
     }

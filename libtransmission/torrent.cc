@@ -778,12 +778,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
         }
 
-        if (!tr_torrentHasMetadata(tor) && !doStart)
+        if (!tor->hasMetadata() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
             tr_torrentStartNow(tor);
@@ -2298,7 +2298,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     }
 
     /* if it's a magnet link, there's nothing to move... */
-    if (!tr_torrentHasMetadata(tor))
+    if (!tor->hasMetadata())
     {
         return;
     }
@@ -2807,7 +2807,7 @@ static void refreshCurrentDir(tr_torrent* tor)
     {
         dir = tor->downloadDir;
     }
-    else if (!tr_torrentHasMetadata(tor)) /* no files to find */
+    else if (!tor->hasMetadata()) /* no files to find */
     {
         dir = tor->incompleteDir;
     }
@@ -3234,7 +3234,7 @@ void tr_torrentSetFilePriorities(
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tor->info.fileCount > 0;
+    return tor->hasMetadata();
 }
 
 void tr_torrent::markEdited()

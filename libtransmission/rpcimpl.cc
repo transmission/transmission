@@ -683,7 +683,7 @@ static void initField(
         break;
 
     case TR_KEY_pieces:
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             auto const bytes = tor->createPieceBitfield();
             auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));

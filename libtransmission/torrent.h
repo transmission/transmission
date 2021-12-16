@@ -425,6 +425,11 @@ public:
         return this->info.torrent;
     }
 
+    [[nodiscard]] auto hasMetadata() const
+    {
+        return fileCount() > 0;
+    }
+
     /// METAINFO - CHECKSUMS
 
     [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece)
