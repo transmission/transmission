@@ -447,8 +447,7 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
 
     if (announcer != nullptr)
     {
-        tr_session* session = announcer->session;
-        tr_torrent* tor = tr_torrentFindFromHash(session, info_hash);
+        tr_torrent* const tor = announcer->session->getTorrent(info_hash);
 
         if (tor != nullptr && tor->announcer_tiers != nullptr)
         {
@@ -818,7 +817,7 @@ static tr_announce_request* announce_request_new(
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->leftUntilComplete = tr_torrentHasMetadata(tor) ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req->leftUntilComplete = tor->hasMetadata() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;
@@ -1281,7 +1280,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     for (int i = 0; i < response->row_count; ++i)
     {
         struct tr_scrape_response_row const* row = &response->rows[i];
-        tr_torrent* tor = tr_torrentFindFromHash(session, row->info_hash);
+        tr_torrent* tor = session->getTorrent(row->info_hash);
 
         if (tor != nullptr)
         {

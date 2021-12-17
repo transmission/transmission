@@ -30,6 +30,7 @@
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "net.h"
 #include "tr-macros.h"
 
@@ -117,6 +118,37 @@ public:
     bool isClosing() const
     {
         return is_closing_;
+    }
+
+    [[nodiscard]] auto const* getTorrent(uint8_t const* info_dict_hash) const
+    {
+        auto& src = this->torrentsByHash;
+        auto it = src.find(info_dict_hash);
+        return it == std::end(src) ? nullptr : it->second;
+    }
+
+    [[nodiscard]] auto* getTorrent(uint8_t const* info_dict_hash)
+    {
+        auto& src = this->torrentsByHash;
+        auto it = src.find(info_dict_hash);
+        return it == std::end(src) ? nullptr : it->second;
+    }
+
+    [[nodiscard]] auto getTorrent(tr_sha1_digest_t const& info_dict_hash)
+    {
+        return this->getTorrent(reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
+    }
+
+    [[nodiscard]] auto getTorrent(std::string_view info_dict_hash_string)
+    {
+        auto info_dict_hash = std::array<uint8_t, TR_SHA1_DIGEST_LEN>{};
+        tr_hex_to_sha1(std::data(info_dict_hash), std::data(info_dict_hash_string));
+        return this->getTorrent(std::data(info_dict_hash));
+    }
+
+    [[nodiscard]] auto contains(uint8_t const* info_dict_hash) const
+    {
+        return getTorrent(info_dict_hash) != nullptr;
     }
 
     // download dir

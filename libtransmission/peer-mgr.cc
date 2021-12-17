@@ -299,7 +299,7 @@ tr_address const* tr_peerAddress(tr_peer const* peer)
 
 static tr_swarm* getExistingSwarm(tr_peerMgr* manager, uint8_t const* hash)
 {
-    tr_torrent* tor = tr_torrentFindFromHash(manager->session, hash);
+    tr_torrent* tor = manager->session->getTorrent(hash);
 
     return tor == nullptr ? nullptr : tor->swarm;
 }
@@ -1530,7 +1530,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     {
         float const true_count = have->count();
 
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             peer->progress = true_count / float(tor->pieceCount());
         }
@@ -1580,7 +1580,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 
     memset(tab, 0, tabCount);
 
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
         tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
@@ -1648,7 +1648,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tr_torrentHasMetadata(tor))
+    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tor->hasMetadata())
     {
         return 0;
     }
@@ -1853,7 +1853,7 @@ static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_
 {
     /* these cases should have already been handled by the calling code... */
     TR_ASSERT(!tor->isDone());
-    TR_ASSERT(tr_torrentIsPieceTransferAllowed(tor, TR_PEER_TO_CLIENT));
+    TR_ASSERT(tor->clientCanDownload());
 
     if (tr_peerIsSeed(peer))
     {
@@ -1909,12 +1909,7 @@ static void rechokeDownloads(tr_swarm* s)
     time_t const now = tr_time();
 
     /* some cases where this function isn't necessary */
-    if (s->tor->isDone())
-    {
-        return;
-    }
-
-    if (!tr_torrentIsPieceTransferAllowed(s->tor, TR_PEER_TO_CLIENT))
+    if (s->tor->isDone() || !s->tor->clientCanDownload())
     {
         return;
     }
@@ -2161,7 +2156,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     tr_peerMsgs** peers = (tr_peerMsgs**)tr_ptrArrayBase(&s->peers);
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
-    bool const chokeAll = !tr_torrentIsPieceTransferAllowed(s->tor, TR_CLIENT_TO_PEER);
+    bool const chokeAll = !s->tor->clientCanUpload();
     bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"

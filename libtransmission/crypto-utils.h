@@ -9,14 +9,13 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
-#include <cinttypes>
-#include <cstddef>
+#include <cinttypes> // intX_t
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
-#include "tr-macros.h"
 
 /**
 *** @addtogroup utils Utilities

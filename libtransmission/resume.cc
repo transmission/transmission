@@ -692,7 +692,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
