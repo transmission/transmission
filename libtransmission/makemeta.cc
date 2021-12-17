@@ -54,8 +54,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
-    tr_error* error = nullptr;
-    if (!tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
+    if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
         tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
         tr_error_free(error);
