@@ -1144,15 +1144,15 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     if (!seedRatioApplies || s->finished)
     {
-        s->seedRatioPercentDone = 1;
+        s->seedRatioPercentDone = 1.0F;
     }
     else if (seedRatioBytesGoal == 0) /* impossible? safeguard for div by zero */
     {
-        s->seedRatioPercentDone = 0;
+        s->seedRatioPercentDone = 0.0F;
     }
     else
     {
-        s->seedRatioPercentDone = (double)(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
+        s->seedRatioPercentDone = float(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
     }
 
     /* test some of the constraints */
