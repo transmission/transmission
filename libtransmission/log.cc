@@ -57,9 +57,7 @@ tr_sys_file_t tr_logGetFile(void)
 
     if (!initialized)
     {
-        int const fd = tr_env_get_int("TR_DEBUG_FD", 0);
-
-        switch (fd)
+        switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
@@ -67,6 +65,10 @@ tr_sys_file_t tr_logGetFile(void)
 
         case 2:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            break;
+
+        default:
+            file = TR_BAD_SYS_FILE;
             break;
         }
 
@@ -124,7 +126,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     struct timeval tv;
     tr_gettimeofday(&tv);
     time_t const seconds = tv.tv_sec;
-    int const milliseconds = (int)(tv.tv_usec / 1000);
+    auto const milliseconds = int(tv.tv_usec / 1000);
     char msec_str[8];
     tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
 

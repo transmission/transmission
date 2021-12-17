@@ -446,7 +446,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
     return isLimited;
 }
 
-static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
+static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
 {
     auto idleMinutes = uint16_t{};
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
@@ -641,7 +641,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script);
 
 static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 {
-    auto* session = tor->session;
+    auto const* session = tor->session;
 
     if (tr_sessionIsScriptEnabled(session, type))
     {
@@ -1129,15 +1129,15 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     if (!seedRatioApplies || s->finished)
     {
-        s->seedRatioPercentDone = 1;
+        s->seedRatioPercentDone = 1.0F;
     }
     else if (seedRatioBytesGoal == 0) /* impossible? safeguard for div by zero */
     {
-        s->seedRatioPercentDone = 0;
+        s->seedRatioPercentDone = 0.0F;
     }
     else
     {
-        s->seedRatioPercentDone = (double)(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
+        s->seedRatioPercentDone = float(seedRatioBytesGoal - seedRatioBytesLeft) / seedRatioBytesGoal;
     }
 
     /* test some of the constraints */
@@ -1488,9 +1488,8 @@ struct verify_data
 static void onVerifyDoneThreadFunc(void* vdata)
 {
     auto* data = static_cast<struct verify_data*>(vdata);
-    tr_torrent* tor = data->tor;
 
-    if (!tor->isDeleting)
+    if (auto* const tor = data->tor; !tor->isDeleting)
     {
         if (!data->aborted)
         {
@@ -1565,7 +1564,7 @@ static void verifyTorrent(void* vdata)
 
 void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
-    struct verify_data* const data = tr_new(struct verify_data, 1);
+    auto* const data = tr_new(struct verify_data, 1);
     data->tor = tor;
     data->aborted = false;
     data->callback_func = callback_func;
@@ -1682,7 +1681,7 @@ static void tr_torrentDeleteLocalData(tr_torrent*, tr_fileFunc);
 
 static void removeTorrent(void* vdata)
 {
-    auto* data = static_cast<struct remove_data*>(vdata);
+    auto* const data = static_cast<struct remove_data*>(vdata);
     auto const lock = data->tor->unique_lock();
 
     if (data->deleteFlag)
@@ -1701,7 +1700,7 @@ void tr_torrentRemove(tr_torrent* tor, bool deleteFlag, tr_fileFunc deleteFunc)
 
     tor->isDeleting = true;
 
-    struct remove_data* data = tr_new0(struct remove_data, 1);
+    auto* const data = tr_new0(struct remove_data, 1);
     data->tor = tor;
     data->deleteFlag = deleteFlag;
     data->deleteFunc = deleteFunc;
@@ -2329,8 +2328,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
-    tr_sys_dir_t const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr);
-    if (odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr); odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
@@ -2977,7 +2975,7 @@ static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* old
 {
     auto const n_files = tor->fileCount();
     auto n_affected_files = size_t{};
-    tr_file_index_t* indices = tr_new0(tr_file_index_t, n_files);
+    auto* const indices = tr_new0(tr_file_index_t, n_files);
 
     auto const oldpath_len = strlen(oldpath);
 

@@ -188,9 +188,6 @@ void* tr_realloc(void* p, size_t size);
 /** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
-/** @brief Free pointers in a nullptr-terminated array (the array itself is not freed) */
-void tr_free_ptrv(void* const* p);
-
 /**
  * @brief make a newly-allocated copy of a chunk of memory
  * @param src the memory to copy

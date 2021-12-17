@@ -130,14 +130,13 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
 {
     auto* task = static_cast<struct tr_web_task*>(vtask);
-    auto const isScrape = tr_strvContains(task->url, "scrape"sv);
-    auto const isAnnounce = tr_strvContains(task->url, "announce"sv);
 
     /* announce and scrape requests have tiny payloads. */
-    if (isScrape || isAnnounce)
+    if (auto const is_scrape = tr_strvContains(task->url, "scrape"sv), is_announce = tr_strvContains(task->url, "announce"sv);
+        is_scrape || is_announce)
     {
-        int const sndbuf = isScrape ? 4096 : 1024;
-        int const rcvbuf = isScrape ? 4096 : 3072;
+        int const sndbuf = is_scrape ? 4096 : 1024;
+        int const rcvbuf = is_scrape ? 4096 : 3072;
         /* ignore the sockopt() return values -- these are suggestions
            rather than hard requirements & it's OK for them to fail */
         (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
@@ -209,9 +208,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
 static long getTimeoutFromURL(struct tr_web_task const* task)
 {
-    tr_session const* const session = task->session;
-
-    if (session == nullptr || session->isClosed)
+    if (auto const* const session = task->session; session == nullptr || session->isClosed)
     {
         return 20L;
     }

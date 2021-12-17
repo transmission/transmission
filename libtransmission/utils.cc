@@ -192,20 +192,6 @@ void tr_free(void* p)
     }
 }
 
-void tr_free_ptrv(void* const* p)
-{
-    if (p == nullptr)
-    {
-        return;
-    }
-
-    while (*p != nullptr)
-    {
-        tr_free(*p);
-        ++p;
-    }
-}
-
 void* tr_memdup(void const* src, size_t byteCount)
 {
     return memcpy(tr_malloc(byteCount), src, byteCount);
@@ -280,7 +266,6 @@ void tr_timerAddMsec(struct event* timer, int msec)
 ***
 **/
 
-// TODO: return a std::vector<>
 uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
@@ -483,7 +468,7 @@ tr_disk_space tr_dirSpace(std::string_view dir)
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
 {
     size_t const n = evbuffer_get_length(buf);
-    char* ret = tr_new(char, n + 1);
+    auto* const ret = tr_new(char, n + 1);
     evbuffer_copyout(buf, ret, n);
     evbuffer_free(buf);
     ret[n] = '\0';
@@ -1190,8 +1175,7 @@ double tr_truncd(double x, int precision)
     char buf[128];
     tr_snprintf(buf, sizeof(buf), "%.*f", TR_ARG_TUPLE(DBL_DIG, x));
 
-    char* const pt = strstr(buf, localeconv()->decimal_point);
-    if (pt != nullptr)
+    if (auto* const pt = strstr(buf, localeconv()->decimal_point); pt != nullptr)
     {
         pt[precision != 0 ? precision + 1 : 0] = '\0';
     }
@@ -1462,15 +1446,14 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
 
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 {
-    double const K = speed_units[TR_FMT_KB].value;
-    double speed = KBps;
-
-    if (speed <= 999.95) /* 0.0 KB to 999.9 KB */
+    if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
         tr_snprintf(buf, buflen, "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
     }
     else
     {
+        double const K = speed_units[TR_FMT_KB].value;
+
         speed /= K;
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
@@ -1563,9 +1546,7 @@ int tr_env_get_int(char const* key, int default_value)
 
 #else
 
-    char const* value = getenv(key);
-
-    if (!tr_str_is_empty(value))
+    if (char const* value = getenv(key); !tr_str_is_empty(value))
     {
         return atoi(value);
     }
@@ -1652,8 +1633,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         return entry.suffix < suffix;
     };
 
-    auto const pos = filename.rfind('.');
-    if (pos != filename.npos)
+    if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         // make a lowercase copy of the file suffix
         filename.remove_prefix(pos + 1);

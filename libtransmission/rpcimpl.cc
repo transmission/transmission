@@ -119,9 +119,8 @@ static auto getTorrents(tr_session* session, tr_variant* args)
 
     auto id = int64_t{};
     auto sv = std::string_view{};
-    tr_variant* ids = nullptr;
 
-    if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
+    if (tr_variant* ids = nullptr; tr_variantDictFindList(args, TR_KEY_ids, &ids))
     {
         size_t const n = tr_variantListSize(ids);
         torrents.reserve(n);
@@ -148,8 +147,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     }
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
-        tr_torrent* const tor = tr_torrentFindFromId(session, id);
-        if (tor != nullptr)
+        if (auto* const tor = tr_torrentFindFromId(session, id); tor != nullptr)
         {
             torrents.push_back(tor);
         }
@@ -165,7 +163,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
                 std::begin(session->torrents),
                 std::end(session->torrents),
                 std::back_inserter(torrents),
-                [&cutoff](tr_torrent* tor) { return tor->anyDate >= cutoff; });
+                [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
         }
         else
         {
@@ -454,7 +452,7 @@ static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
     tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
 }
 
-static void addPeers(tr_torrent* tor, tr_variant* list)
+static void addPeers(tr_torrent const* tor, tr_variant* list)
 {
     auto peerCount = int{};
     tr_peer_stat* peers = tr_torrentPeers(tor, &peerCount);
