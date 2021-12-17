@@ -119,9 +119,8 @@ static auto getTorrents(tr_session* session, tr_variant* args)
 
     auto id = int64_t{};
     auto sv = std::string_view{};
-    tr_variant* ids = nullptr;
 
-    if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
+    if (tr_variant* ids = nullptr; tr_variantDictFindList(args, TR_KEY_ids, &ids))
     {
         size_t const n = tr_variantListSize(ids);
         torrents.reserve(n);
