@@ -452,7 +452,7 @@ static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
     tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
 }
 
-static void addPeers(tr_torrent* tor, tr_variant* list)
+static void addPeers(tr_torrent const* tor, tr_variant* list)
 {
     auto peerCount = int{};
     tr_peer_stat* peers = tr_torrentPeers(tor, &peerCount);
