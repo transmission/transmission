@@ -2558,8 +2558,7 @@ void tr_rpc_request_exec_uri(
     tr_variantInitDict(&top, 3);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    auto const parsed = tr_urlParse(request_uri);
-    if (parsed)
+    if (auto const parsed = tr_urlParse(request_uri); parsed)
     {
         for (auto const& [key, val] : tr_url_query_view(parsed->query))
         {
