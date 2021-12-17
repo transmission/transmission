@@ -163,7 +163,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
                 std::begin(session->torrents),
                 std::end(session->torrents),
                 std::back_inserter(torrents),
-                [&cutoff](tr_torrent* tor) { return tor->anyDate >= cutoff; });
+                [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
         }
         else
         {
