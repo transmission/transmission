@@ -81,9 +81,9 @@ static auto constexpr SaveIntervalSecs = int{ 360 };
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
-static tr_port getRandomPort(tr_session* s)
+static tr_port getRandomPort(tr_session const* s)
 {
-    return tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow;
+    return tr_port(tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow);
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
