@@ -192,20 +192,6 @@ void tr_free(void* p)
     }
 }
 
-void tr_free_ptrv(void* const* p)
-{
-    if (p == nullptr)
-    {
-        return;
-    }
-
-    while (*p != nullptr)
-    {
-        tr_free(*p);
-        ++p;
-    }
-}
-
 void* tr_memdup(void const* src, size_t byteCount)
 {
     return memcpy(tr_malloc(byteCount), src, byteCount);
