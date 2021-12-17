@@ -461,7 +461,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idleMinutes)
     return isLimited;
 }
 
-static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
+static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
 {
     auto idleMinutes = uint16_t{};
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
