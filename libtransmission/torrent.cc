@@ -2990,7 +2990,7 @@ static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* old
 {
     auto const n_files = tor->fileCount();
     auto n_affected_files = size_t{};
-    tr_file_index_t* indices = tr_new0(tr_file_index_t, n_files);
+    auto* const indices = tr_new0(tr_file_index_t, n_files);
 
     auto const oldpath_len = strlen(oldpath);
 
