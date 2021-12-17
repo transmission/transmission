@@ -166,11 +166,11 @@ static std::string replaceSubstr(std::string_view str, std::string_view oldval, 
     {
         auto const pos = str.find(oldval);
         ret += str.substr(0, pos);
-        ret += newval;
         if (pos == str.npos)
         {
             break;
         }
+        ret += newval;
         str.remove_prefix(pos + std::size(oldval));
     }
 
