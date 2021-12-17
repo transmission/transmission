@@ -58,7 +58,7 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
     // find the ending delimiter
     walk.remove_prefix(1);
     auto const pos = walk.find('e');
-    if (pos == walk.npos)
+    if (pos == std::string_view::npos)
     {
         return {};
     }
@@ -92,7 +92,7 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
 {
     // find the ':' delimiter
     auto const colon_pos = benc->find(':');
-    if (colon_pos == benc->npos)
+    if (colon_pos == std::string_view::npos)
     {
         return {};
     }
