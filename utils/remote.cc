@@ -34,8 +34,12 @@
 
 using namespace std::literals;
 
-static auto constexpr DefaultHost = "localhost"sv;
+#define SPEED_K_STR "kB/s"
+#define MEM_M_STR "MiB"
+
 static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
+static char constexpr DefaultHost[] = "localhost";
+static char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
 static char constexpr MyName[] = "transmission-remote";
 static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
@@ -50,27 +54,25 @@ static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
                                 "\n"
                                 "See the man page for detailed explanations and many examples.";
 
-#define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
+static auto constexpr Arguments = TR_KEY_arguments;
 
-#define ARGUMENTS TR_KEY_arguments
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = MEM_M_STR;
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
 
-#define DISK_K 1000
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
-
-#define SPEED_K 1000
-#define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static auto constexpr SpeedK = size_t{ 1000 };
+static auto constexpr SpeedKStr = SPEED_K_STR;
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 /***
 ****
@@ -2099,7 +2101,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                         int64_t i;
                         tr_variant* b = &top;
 
-                        if (tr_variantDictFindDict(&top, ARGUMENTS, &b) &&
+                        if (tr_variantDictFindDict(&top, Arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
                             tr_snprintf(id, sizeof(id), "%" PRId64, i);
@@ -2269,14 +2271,14 @@ static tr_variant* ensure_sset(tr_variant** sset)
 
     if (*sset != nullptr)
     {
-        args = tr_variantDictFind(*sset, ARGUMENTS);
+        args = tr_variantDictFind(*sset, Arguments);
     }
     else
     {
         *sset = tr_new0(tr_variant, 1);
         tr_variantInitDict(*sset, 3);
         tr_variantDictAddStrView(*sset, TR_KEY_method, "session-set"sv);
-        args = tr_variantDictAddDict(*sset, ARGUMENTS, 0);
+        args = tr_variantDictAddDict(*sset, Arguments, 0);
     }
 
     return args;
@@ -2288,14 +2290,14 @@ static tr_variant* ensure_tset(tr_variant** tset)
 
     if (*tset != nullptr)
     {
-        args = tr_variantDictFind(*tset, ARGUMENTS);
+        args = tr_variantDictFind(*tset, Arguments);
     }
     else
     {
         *tset = tr_new0(tr_variant, 1);
         tr_variantInitDict(*tset, 3);
         tr_variantDictAddStrView(*tset, TR_KEY_method, "torrent-set"sv);
-        args = tr_variantDictAddDict(*tset, ARGUMENTS, 1);
+        args = tr_variantDictAddDict(*tset, Arguments, 1);
     }
 
     return args;
@@ -2333,7 +2335,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                 if (tset != nullptr)
                 {
-                    addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                    addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                     status |= flush(rpcurl, &tset);
                 }
 
@@ -2341,7 +2343,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 tr_variantInitDict(tadd, 3);
                 tr_variantDictAddStrView(tadd, TR_KEY_method, "torrent-add"sv);
                 tr_variantDictAddInt(tadd, TR_KEY_tag, TAG_TORRENT_ADD);
-                tr_variantDictAddDict(tadd, ARGUMENTS, 0);
+                tr_variantDictAddDict(tadd, Arguments, 0);
                 break;
 
             case 'b': /* debug */
@@ -2379,7 +2381,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                 if (tset != nullptr)
                 {
-                    addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                    addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                     status |= flush(rpcurl, &tset);
                 }
 
@@ -2399,7 +2401,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case TR_OPT_UNK:
                 if (tadd != nullptr)
                 {
-                    tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
+                    tr_variant* args = tr_variantDictFind(tadd, Arguments);
                     char* tmp = getEncodedMetainfo(optarg);
 
                     if (tmp != nullptr)
@@ -2429,12 +2431,12 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             tr_variant* fields;
             tr_variantInitDict(top, 3);
             tr_variantDictAddStrView(top, TR_KEY_method, "torrent-get"sv);
-            args = tr_variantDictAddDict(top, ARGUMENTS, 0);
+            args = tr_variantDictAddDict(top, Arguments, 0);
             fields = tr_variantDictAddList(args, TR_KEY_fields, 0);
 
             if (tset != nullptr)
             {
-                addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                 status |= flush(rpcurl, &tset);
             }
 
@@ -2790,7 +2792,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             if (tadd != nullptr)
             {
-                args = tr_variantDictFind(tadd, ARGUMENTS);
+                args = tr_variantDictFind(tadd, Arguments);
             }
             else
             {
@@ -2851,7 +2853,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         {
             if (tadd != nullptr)
             {
-                tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
+                tr_variant* args = tr_variantDictFind(tadd, Arguments);
                 tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
             }
             else
@@ -2860,7 +2862,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 tr_variant* top = tr_new0(tr_variant, 1);
                 tr_variantInitDict(top, 2);
                 tr_variantDictAddStrView(top, TR_KEY_method, "torrent-set-location"sv);
-                args = tr_variantDictAddDict(top, ARGUMENTS, 3);
+                args = tr_variantDictAddDict(top, Arguments, 3);
                 tr_variantDictAddStr(args, TR_KEY_location, optarg);
                 tr_variantDictAddBool(args, TR_KEY_move, false);
                 addIdArg(args, id, nullptr);
@@ -2893,7 +2895,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                         tr_variant* top = tr_new0(tr_variant, 1);
                         tr_variantInitDict(top, 2);
                         tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
-                        addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                         status |= flush(rpcurl, &top);
                     }
 
@@ -2911,7 +2913,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                         tr_variant* top = tr_new0(tr_variant, 1);
                         tr_variantInitDict(top, 2);
                         tr_variantDictAddStrView(top, TR_KEY_method, "torrent-stop"sv);
-                        addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                         status |= flush(rpcurl, &top);
                     }
 
@@ -2969,14 +2971,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (tset != nullptr)
                     {
-                        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                         status |= flush(rpcurl, &tset);
                     }
 
                     top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-reannounce"sv);
-                    addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                     status |= flush(rpcurl, &top);
                     break;
                 }
@@ -2987,14 +2989,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (tset != nullptr)
                     {
-                        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                         status |= flush(rpcurl, &tset);
                     }
 
                     top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-verify"sv);
-                    addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                     status |= flush(rpcurl, &top);
                     break;
                 }
@@ -3006,7 +3008,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variant* top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-remove"sv);
-                    args = tr_variantDictAddDict(top, ARGUMENTS, 2);
+                    args = tr_variantDictAddDict(top, Arguments, 2);
                     tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
                     addIdArg(args, id, nullptr);
                     status |= flush(rpcurl, &top);
@@ -3019,7 +3021,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variant* top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-set-location"sv);
-                    args = tr_variantDictAddDict(top, ARGUMENTS, 3);
+                    args = tr_variantDictAddDict(top, Arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_location, optarg);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, id, nullptr);
@@ -3044,7 +3046,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
     if (tset != nullptr)
     {
-        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
         status |= flush(rpcurl, &tset);
     }
 
@@ -3142,9 +3144,9 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl);
 
@@ -3155,7 +3157,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DEFAULT_URL);
+        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DefaultUrl);
     }
 
     return processArgs(rpcurl.c_str(), argc, (char const* const*)argv);

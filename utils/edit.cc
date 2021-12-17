@@ -9,6 +9,7 @@
 #include <array>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* EXIT_FAILURE */
+#include <vector>
 
 #include <event2/buffer.h>
 
@@ -22,12 +23,14 @@
 static char constexpr MyName[] = "transmission-edit";
 static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
 
-static int fileCount = 0;
-static bool showVersion = false;
-static char const** files = nullptr;
-static char const* add = nullptr;
-static char const* deleteme = nullptr;
-static char const* replace[2] = { nullptr, nullptr };
+struct app_options
+{
+    std::vector<char const*> files;
+    char const* add = nullptr;
+    char const* deleteme = nullptr;
+    std::array<char const*, 2> replace;
+    bool show_version = false;
+};
 
 static auto constexpr Options = std::array<tr_option, 5>{
     { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
@@ -37,7 +40,7 @@ static auto constexpr Options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static int parseCommandLine(int argc, char const* const* argv)
+static int parseCommandLine(app_options& opts, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -47,15 +50,15 @@ static int parseCommandLine(int argc, char const* const* argv)
         switch (c)
         {
         case 'a':
-            add = optarg;
+            opts.add = optarg;
             break;
 
         case 'd':
-            deleteme = optarg;
+            opts.deleteme = optarg;
             break;
 
         case 'r':
-            replace[0] = optarg;
+            opts.replace[0] = optarg;
             c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg);
 
             if (c != TR_OPT_UNK)
@@ -63,15 +66,15 @@ static int parseCommandLine(int argc, char const* const* argv)
                 return 1;
             }
 
-            replace[1] = optarg;
+            opts.replace[1] = optarg;
             break;
 
         case 'V':
-            showVersion = true;
+            opts.show_version = true;
             break;
 
         case TR_OPT_UNK:
-            files[fileCount++] = optarg;
+            opts.files.push_back(optarg);
             break;
 
         default:
@@ -298,22 +301,21 @@ int tr_main(int argc, char* argv[])
 {
     int changedCount = 0;
 
-    files = tr_new0(char const*, argc);
-
     tr_logSetLevel(TR_LOG_ERROR);
 
-    if (parseCommandLine(argc, (char const* const*)argv) != 0)
+    auto options = app_options{};
+    if (parseCommandLine(options, argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
 
-    if (showVersion)
+    if (options.show_version)
     {
         fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
-    if (fileCount < 1)
+    if (std::empty(options.files))
     {
         fprintf(stderr, "ERROR: No torrent files specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
@@ -321,7 +323,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (add == nullptr && deleteme == nullptr && replace[0] == 0)
+    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == 0)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
@@ -329,11 +331,10 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    for (int i = 0; i < fileCount; ++i)
+    for (auto const& filename : options.files)
     {
         tr_variant top;
         bool changed = false;
-        char const* filename = files[i];
         tr_error* error = nullptr;
 
         printf("%s\n", filename);
@@ -345,19 +346,19 @@ int tr_main(int argc, char* argv[])
             continue;
         }
 
-        if (deleteme != nullptr)
+        if (options.deleteme != nullptr)
         {
-            changed |= removeURL(&top, deleteme);
+            changed |= removeURL(&top, options.deleteme);
         }
 
-        if (add != nullptr)
+        if (options.add != nullptr)
         {
-            changed = addURL(&top, add);
+            changed = addURL(&top, options.add);
         }
 
-        if (replace[0] != nullptr && replace[1] != nullptr)
+        if (options.replace[0] != nullptr && options.replace[1] != nullptr)
         {
-            changed |= replaceURL(&top, replace[0], replace[1]);
+            changed |= replaceURL(&top, options.replace[0], options.replace[1]);
         }
 
         if (changed)
@@ -371,6 +372,5 @@ int tr_main(int argc, char* argv[])
 
     printf("Changed %d files\n", changedCount);
 
-    tr_free((void*)files);
     return EXIT_SUCCESS;
 }
