@@ -19,7 +19,7 @@ tr_error* tr_error_new_literal(int code, char const* message)
 {
     TR_ASSERT(message != nullptr);
 
-    tr_error* error = tr_new(tr_error, 1);
+    auto* const error = tr_new(tr_error, 1);
     error->code = code;
     error->message = tr_strdup(message);
 
@@ -32,7 +32,7 @@ static tr_error* tr_error_new_valist(int code, char const* message_format, va_li
 {
     TR_ASSERT(message_format != nullptr);
 
-    tr_error* error = tr_new(tr_error, 1);
+    auto* const error = tr_new(tr_error, 1);
     error->code = code;
     error->message = tr_strdup_vprintf(message_format, args);
 
