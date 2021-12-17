@@ -557,7 +557,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = session->torrent(hashString);
+        tor = session->getTorrent(hashString);
 
         if (tr_isTorrent(tor) && tor->allowsLpd())
         {

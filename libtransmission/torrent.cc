@@ -108,13 +108,13 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
 {
-    return session->torrent(hash);
+    return session->getTorrent(hash);
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     auto mm = tr_magnet_metainfo{};
-    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->torrent(mm.info_hash) : nullptr;
+    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.info_hash) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
@@ -827,7 +827,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
         return nullptr;
     }
 
-    tr_torrent const* const dupe = session->torrent(parsed->info.hash);
+    tr_torrent const* const dupe = session->getTorrent(parsed->info.hash);
     if (dupe != nullptr)
     {
         if (setme_duplicate_id != nullptr)

@@ -624,7 +624,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     {
         auto const lock = session_->unique_lock();
 
-        tr_torrent* const tor = session_->torrent(info_hash);
+        tr_torrent* const tor = session_->getTorrent(info_hash);
         if (tor != nullptr && tor->allowsDht())
         {
             size_t n = 0;
@@ -639,7 +639,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = session_->torrent(info_hash);
+        tr_torrent* tor = session_->getTorrent(info_hash);
 
         if (tor != nullptr)
         {

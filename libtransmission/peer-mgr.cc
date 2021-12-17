@@ -299,7 +299,7 @@ tr_address const* tr_peerAddress(tr_peer const* peer)
 
 static tr_swarm* getExistingSwarm(tr_peerMgr* manager, uint8_t const* hash)
 {
-    tr_torrent* tor = manager->session->torrent(hash);
+    tr_torrent* tor = manager->session->getTorrent(hash);
 
     return tor == nullptr ? nullptr : tor->swarm;
 }

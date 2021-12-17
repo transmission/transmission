@@ -137,7 +137,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             }
             else if (tr_variantGetStrView(node, &sv))
             {
-                tor = session->torrent(sv);
+                tor = session->getTorrent(sv);
             }
 
             if (tor != nullptr)
@@ -169,7 +169,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
         }
         else
         {
-            auto* const tor = session->torrent(sv);
+            auto* const tor = session->getTorrent(sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);
