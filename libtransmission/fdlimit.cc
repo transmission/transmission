@@ -477,9 +477,7 @@ tr_sys_file_t tr_fdFileCheckout(
 
     if (!cached_file_is_open(o))
     {
-        int const err = cached_file_open(o, filename, writable, allocation, file_size);
-
-        if (err != 0)
+        if (int const err = cached_file_open(o, filename, writable, allocation, file_size); err != 0)
         {
             errno = err;
             return TR_BAD_SYS_FILE;
