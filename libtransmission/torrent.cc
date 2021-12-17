@@ -1503,9 +1503,8 @@ struct verify_data
 static void onVerifyDoneThreadFunc(void* vdata)
 {
     auto* data = static_cast<struct verify_data*>(vdata);
-    tr_torrent* tor = data->tor;
 
-    if (!tor->isDeleting)
+    if (auto* const tor = data->tor; !tor->isDeleting)
     {
         if (!data->aborted)
         {
