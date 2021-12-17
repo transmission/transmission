@@ -27,7 +27,7 @@ constexpr size_t getBytesNeeded(size_t bit_count)
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
 
-static void setAllTrue(uint8_t* array, size_t bit_count)
+void setAllTrue(uint8_t* array, size_t bit_count)
 {
     uint8_t constexpr Val = 0xFF;
     size_t const n = getBytesNeeded(bit_count);
