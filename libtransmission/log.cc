@@ -57,9 +57,7 @@ tr_sys_file_t tr_logGetFile(void)
 
     if (!initialized)
     {
-        int const fd = tr_env_get_int("TR_DEBUG_FD", 0);
-
-        switch (fd)
+        switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
@@ -67,6 +65,10 @@ tr_sys_file_t tr_logGetFile(void)
 
         case 2:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            break;
+
+        default:
+            file = TR_BAD_SYS_FILE;
             break;
         }
 
