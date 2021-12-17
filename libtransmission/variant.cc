@@ -1098,7 +1098,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     {
         auto key = tr_quark{};
         tr_variant* val = nullptr;
-        if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
+        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &val))
         {
             tr_variant* t = nullptr;
 
