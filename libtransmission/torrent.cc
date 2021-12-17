@@ -1579,7 +1579,7 @@ static void verifyTorrent(void* vdata)
 
 void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
-    struct verify_data* const data = tr_new(struct verify_data, 1);
+    auto* const data = tr_new(struct verify_data, 1);
     data->tor = tor;
     data->aborted = false;
     data->callback_func = callback_func;
