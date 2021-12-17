@@ -1546,9 +1546,7 @@ int tr_env_get_int(char const* key, int default_value)
 
 #else
 
-    char const* value = getenv(key);
-
-    if (!tr_str_is_empty(value))
+    if (char const* value = getenv(key); !tr_str_is_empty(value))
     {
         return atoi(value);
     }
