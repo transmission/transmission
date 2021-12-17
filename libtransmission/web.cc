@@ -208,9 +208,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
 static long getTimeoutFromURL(struct tr_web_task const* task)
 {
-    tr_session const* const session = task->session;
-
-    if (session == nullptr || session->isClosed)
+    if (auto const* const session = task->session; session == nullptr || session->isClosed)
     {
         return 20L;
     }
