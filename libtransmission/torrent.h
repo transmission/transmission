@@ -78,8 +78,6 @@ tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
 
-bool tr_torrentIsPieceTransferAllowed(tr_torrent const* torrent, tr_direction direction);
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
 uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
@@ -489,6 +487,18 @@ public:
     [[nodiscard]] auto allowsLpd() const // local peer discovery
     {
         return this->isPublic() && tr_sessionAllowsLPD(this->session);
+    }
+
+    [[nodiscard]] bool isPieceTransferAllowed(tr_direction direction) const;
+
+    [[nodiscard]] bool clientCanDownload() const
+    {
+        return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
+    }
+
+    [[nodiscard]] bool clientCanUpload() const
+    {
+        return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
     }
 
     void setVerifyState(tr_verify_state state);

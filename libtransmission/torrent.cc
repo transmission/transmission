@@ -130,22 +130,21 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const*
     return nullptr;
 }
 
-bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direction)
+bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(direction));
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction) && tor->speedLimitBps(direction) <= 0)
+    if (tr_torrentUsesSpeedLimit(this, direction) && this->speedLimitBps(direction) <= 0)
     {
         allowed = false;
     }
 
-    if (tr_torrentUsesSessionLimits(tor))
+    if (tr_torrentUsesSessionLimits(this))
     {
         unsigned int limit = 0;
-        if (tr_sessionGetActiveSpeedLimit_Bps(tor->session, direction, &limit) && (limit <= 0))
+        if (tr_sessionGetActiveSpeedLimit_Bps(this->session, direction, &limit) && (limit <= 0))
         {
             allowed = false;
         }
