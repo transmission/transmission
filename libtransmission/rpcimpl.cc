@@ -147,8 +147,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     }
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
-        tr_torrent* const tor = tr_torrentFindFromId(session, id);
-        if (tor != nullptr)
+        if (auto* const tor = tr_torrentFindFromId(session, id); tor != nullptr)
         {
             torrents.push_back(tor);
         }
