@@ -64,8 +64,13 @@
 ***/
 
 #define LINEWIDTH 80
-#define MY_CONFIG_NAME "transmission"
-#define MY_READABLE_NAME "transmission-cli"
+
+static char constexpr MyConfigName[] = "transmission";
+static char constexpr MyReadableName[] = "transmission-cli";
+static char constexpr Usage
+    [] = "A fast and easy BitTorrent client\n"
+         "\n"
+         "Usage: transmission-cli [options] <file|url|magnet>";
 
 static bool showVersion = false;
 static bool verify = false;
@@ -95,16 +100,6 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
-
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        "A fast and easy BitTorrent client\n"
-        "\n"
-        "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
-    // clang-format on
-}
 
 static int parseCommandLine(tr_variant*, int argc, char const** argv);
 
@@ -218,7 +213,7 @@ static char const* getConfigDir(int argc, char const** argv)
     char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -231,7 +226,7 @@ static char const* getConfigDir(int argc, char const** argv)
 
     if (configDir == nullptr)
     {
-        configDir = tr_getDefaultConfigDir(MY_CONFIG_NAME);
+        configDir = tr_getDefaultConfigDir(MyConfigName);
     }
 
     return configDir;
@@ -249,19 +244,19 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    printf("%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING);
+    printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
 
     /* user needs to pass in at least one argument */
     if (argc < 2)
     {
-        tr_getopt_usage(MY_READABLE_NAME, getUsage(), std::data(Options));
+        tr_getopt_usage(MyReadableName, Usage, std::data(Options));
         return EXIT_FAILURE;
     }
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
     configDir = getConfigDir(argc, (char const**)argv);
-    tr_sessionLoadSettings(&settings, configDir, MY_CONFIG_NAME);
+    tr_sessionLoadSettings(&settings, configDir, MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -423,7 +418,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
     int c;
     char const* my_optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {

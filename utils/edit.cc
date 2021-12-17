@@ -19,7 +19,8 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-#define MY_NAME "transmission-edit"
+static char constexpr MyName[] = "transmission-edit";
+static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
 
 static int fileCount = 0;
 static bool showVersion = false;
@@ -36,17 +37,12 @@ static auto constexpr Options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static char const* getUsage(void)
-{
-    return "Usage: " MY_NAME " [options] torrent-file(s)";
-}
-
 static int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -60,7 +56,7 @@ static int parseCommandLine(int argc, char const* const* argv)
 
         case 'r':
             replace[0] = optarg;
-            c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg);
+            c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg);
 
             if (c != TR_OPT_UNK)
             {
@@ -313,14 +309,14 @@ int tr_main(int argc, char* argv[])
 
     if (showVersion)
     {
-        fprintf(stderr, MY_NAME " " LONG_VERSION_STRING "\n");
+        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     if (fileCount < 1)
     {
         fprintf(stderr, "ERROR: No torrent files specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }
@@ -328,7 +324,7 @@ int tr_main(int argc, char* argv[])
     if (add == nullptr && deleteme == nullptr && replace[0] == 0)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
-        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

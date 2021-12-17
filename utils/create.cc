@@ -23,10 +23,11 @@
 
 using namespace std::literals;
 
-#define MY_NAME "transmission-create"
+static char constexpr MyName[] = "transmission-create";
+static char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>";
 
 #define MAX_TRACKERS 128
-static uint32_t const KiB = 1024;
+static uint32_t constexpr KiB = 1024;
 static tr_tracker_info trackers[MAX_TRACKERS];
 static int trackerCount = 0;
 static bool isPrivate = false;
@@ -53,17 +54,12 @@ static auto constexpr Options = std::array<tr_option, 8>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static char const* getUsage(void)
-{
-    return "Usage: " MY_NAME " [options] <file|directory>";
-}
-
 static int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -157,14 +153,14 @@ int tr_main(int argc, char* argv[])
 
     if (showVersion)
     {
-        fprintf(stderr, MY_NAME " " LONG_VERSION_STRING "\n");
+        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     if (infile == nullptr)
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

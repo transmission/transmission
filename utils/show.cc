@@ -25,7 +25,9 @@
 
 #include "units.h"
 
-#define MY_NAME "transmission-show"
+static char constexpr MyName[] = "transmission-show";
+static char constexpr Usage[] = "Usage: transmission-show [options] <.torrent file>";
+
 #define TIMEOUT_SECS 30
 
 using namespace std::literals;
@@ -38,11 +40,6 @@ static auto constexpr Options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static char const* getUsage(void)
-{
-    return "Usage: " MY_NAME " [options] <.torrent file>";
-}
-
 static bool magnetFlag = false;
 static bool scrapeFlag = false;
 static bool unsorted = false;
@@ -54,7 +51,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -208,7 +205,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, tr_strvJoin(MyName, "/", LONG_VERSION_STRING).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -325,7 +322,7 @@ int tr_main(int argc, char* argv[])
 
     if (showVersion)
     {
-        fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
@@ -333,7 +330,7 @@ int tr_main(int argc, char* argv[])
     if (filename == nullptr)
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

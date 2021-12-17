@@ -55,6 +55,16 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #include "daemon.h"
 
+static char constexpr MyName[] = "transmission-daemon";
+static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
+                                "  https://transmissionbt.com/\n"
+                                "A fast and easy BitTorrent client\n"
+                                "\n"
+                                "transmission-daemon is a headless Transmission session that can be\n"
+                                "controlled via transmission-qt, transmission-remote, or its web interface.\n"
+                                "\n"
+                                "Usage: transmission-daemon [options]";
+
 #define MY_NAME "transmission-daemon"
 
 #define MEM_K 1024
@@ -88,21 +98,6 @@ static struct event_base* ev_base = nullptr;
 /***
 ****  Config File
 ***/
-
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
-        "A fast and easy BitTorrent client\n"
-        "\n"
-        MY_NAME " is a headless Transmission session\n"
-        "that can be controlled via transmission-remote\n"
-        "or the web interface.\n"
-        "\n"
-        "Usage: " MY_NAME " [options]";
-    // clang-format on
-}
 
 static auto constexpr Options = std::array<tr_option, 43>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
@@ -204,7 +199,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
     char const* optstr;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -217,7 +212,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
 
     if (configDir == nullptr)
     {
-        configDir = tr_getDefaultConfigDir(MY_NAME);
+        configDir = tr_getDefaultConfigDir(MyName);
     }
 
     return configDir;
@@ -416,7 +411,7 @@ static bool parse_args(
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -471,7 +466,7 @@ static bool parse_args(
             break;
 
         case 'V': /* version */
-            fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+            fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
             *exit_code = 0;
             return false;
 
@@ -597,7 +592,7 @@ static bool parse_args(
             break;
 
         default:
-            tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+            tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 0;
             return false;
         }
@@ -635,7 +630,7 @@ static void daemon_reconfigure(void* /*arg*/)
         tr_logAddInfo("Reloading settings from \"%s\"", configDir);
         tr_variantInitDict(&settings, 0);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&settings, configDir, MY_NAME);
+        tr_sessionLoadSettings(&settings, configDir, MyName);
         tr_sessionSet(mySession, &settings);
         tr_variantFree(&settings);
         tr_sessionReloadBlocklists(mySession);
@@ -671,7 +666,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
         return 1;
     }
 
@@ -712,7 +707,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logAddNamedInfo(MY_NAME, "requiring authentication");
+        tr_logAddNamedInfo(MyName, "requiring authentication");
     }
 
     mySession = session;
@@ -762,7 +757,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (!foreground)
     {
-        openlog(MY_NAME, LOG_CONS | LOG_PID, LOG_DAEMON);
+        openlog(MyName, LOG_CONS | LOG_PID, LOG_DAEMON);
     }
 
 #endif
@@ -842,7 +837,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     /* load settings from defaults + config file */
     tr_variantInitDict(&data->settings, 0);
     tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MY_NAME);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MyName);
 
     bool dumpSettings;
 
@@ -861,7 +856,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (!loaded)
     {
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
         goto EXIT_EARLY;
     }
@@ -907,7 +902,7 @@ int tr_main(int argc, char* argv[])
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
         tr_error_free(error);
     }
 

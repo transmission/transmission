@@ -37,7 +37,19 @@ using namespace std::literals;
 static auto constexpr DefaultHost = "localhost"sv;
 static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
 
-#define MY_NAME "transmission-remote"
+static char constexpr MyName[] = "transmission-remote";
+static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
+                                "\n"
+                                "A fast and easy BitTorrent client\n"
+                                "https://transmissionbt.com/\n"
+                                "\n"
+                                "Usage: transmission-remote [host] [options]\n"
+                                "       transmission-remote [port] [options]\n"
+                                "       transmission-remote [host:port] [options]\n"
+                                "       transmission-remote [http(s?)://host:port/transmission/] [options]\n"
+                                "\n"
+                                "See the man page for detailed explanations and many examples.";
+
 #define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
 
 #define ARGUMENTS TR_KEY_arguments
@@ -238,23 +250,6 @@ enum
     TAG_TRACKERS
 };
 
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        MY_NAME " " LONG_VERSION_STRING "\n"
-        "A fast and easy BitTorrent client\n"
-        "https://transmissionbt.com/\n"
-        "\n"
-        "Usage: " MY_NAME " [host] [options]\n"
-        "       " MY_NAME " [port] [options]\n"
-        "       " MY_NAME " [host:port] [options]\n"
-        "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
-        "\n"
-        "See the man page for detailed explanations and many examples.";
-    // clang-format on
-}
-
 /***
 ****
 ****  Command-Line Arguments
@@ -384,7 +379,7 @@ static auto constexpr Options = std::array<tr_option, 87>{
 
 static void showUsage(void)
 {
-    tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
+    tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
 static int numarg(char const* arg)
@@ -2042,7 +2037,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedError(MY_NAME, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
+        tr_logAddNamedError(MyName, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2143,7 +2138,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, tr_strvJoin(MyName, "/", LONG_VERSION_STRING).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parseResponseHeader);
@@ -2215,7 +2210,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
 
     if ((res = curl_easy_perform(curl)) != CURLE_OK)
     {
-        tr_logAddNamedError(MY_NAME, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
+        tr_logAddNamedError(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
         status |= EXIT_FAILURE;
     }
     else
@@ -2317,7 +2312,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
     *id = '\0';
 
-    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         int const stepMode = getOptMode(c);
 
@@ -2392,7 +2387,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'V': /* show version number */
-                fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+                fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
                 exit(0);
 
             case TR_OPT_ERR:
