@@ -154,7 +154,7 @@ void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
  * @param setme_dictionary the dictionary to populate
  * @see tr_sessionGetDefaultSettings()
  */
-void tr_sessionGetSettings(tr_session* session, struct tr_variant* setme_dictionary);
+void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_dictionary);
 
 /**
  * Load settings from the configuration directory's settings.json file,

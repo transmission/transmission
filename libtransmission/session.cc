@@ -397,7 +397,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
 
-void tr_sessionGetSettings(tr_session* s, tr_variant* d)
+void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
