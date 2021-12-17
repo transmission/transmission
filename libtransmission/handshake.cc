@@ -175,7 +175,7 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
     uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
-    tr_torrent* const tor = torrent_hash == nullptr ? nullptr : tr_torrentFindFromHash(handshake->session, torrent_hash);
+    tr_torrent* const tor = torrent_hash == nullptr ? nullptr : handshake->session->torrent(torrent_hash);
     bool const success = tor != nullptr;
 
     if (success)
@@ -245,8 +245,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     tr_peerIoReadBytes(handshake->io, inbuf, hash, sizeof(hash));
     TR_ASSERT(tr_peerIoHasTorrentHash(handshake->io));
 
-    if (!tr_torrentExists(handshake->session, hash) ||
-        memcmp(hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH) != 0)
+    if (!handshake->session->contains(hash) || memcmp(hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH) != 0)
     {
         dbgmsg(handshake, "peer returned the wrong hash. wtf?");
         return HANDSHAKE_BAD_TORRENT;
@@ -260,7 +259,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     /* peer id */
     dbgmsg(handshake, "peer-id is [%" TR_PRIsv "]", TR_PRIsv_ARG(peer_id));
 
-    auto* const tor = tr_torrentFindFromHash(handshake->session, hash);
+    auto* const tor = handshake->session->torrent(hash);
     if (peer_id == tr_torrentGetPeerId(tor))
     {
         dbgmsg(handshake, "streuth!  we've connected to ourselves.");
@@ -645,7 +644,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
 
     if (tr_peerIoIsIncoming(handshake->io))
     {
-        if (!tr_torrentExists(handshake->session, hash))
+        if (!handshake->session->contains(hash))
         {
             dbgmsg(handshake, "peer is trying to connect to us for a torrent we don't have.");
             return tr_handshakeDone(handshake, false);
@@ -702,7 +701,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     dbgmsg(handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming(handshake->io));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    auto* const tor = tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(handshake->io));
+    auto* const tor = handshake->session->torrent(tr_peerIoGetTorrentHash(handshake->io));
     bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
@@ -1120,9 +1119,8 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         /* This peer probably doesn't speak uTP. */
 
-        tr_torrent* const tor = tr_peerIoHasTorrentHash(io) ?
-            tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(io)) :
-            nullptr;
+        tr_torrent* const tor = tr_peerIoHasTorrentHash(io) ? handshake->session->torrent(tr_peerIoGetTorrentHash(io)) :
+                                                              nullptr;
 
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))

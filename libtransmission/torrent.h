@@ -76,10 +76,6 @@ void tr_torrentChangeMyPort(tr_torrent* session);
 
 tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& info_dict_hah);
-
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string);
-
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
 
 bool tr_torrentIsPieceTransferAllowed(tr_torrent const* torrent, tr_direction direction);
@@ -678,11 +674,6 @@ private:
 
     mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
-
-static inline bool tr_torrentExists(tr_session const* session, uint8_t const* torrentHash)
-{
-    return tr_torrentFindFromHash((tr_session*)session, torrentHash) != nullptr;
-}
 
 /***
 ****

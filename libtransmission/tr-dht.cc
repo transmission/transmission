@@ -44,23 +44,22 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-/* third party */
 #include <event2/event.h>
 #include <dht/dht.h>
 
-/* libT */
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
-#include "platform.h" /* tr_threadNew() */
+#include "peer-mgr.h"
+#include "platform.h"
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
-#include "trevent.h" /* tr_runInEventThread() */
+#include "trevent.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -625,7 +624,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     {
         auto const lock = session_->unique_lock();
 
-        tr_torrent* const tor = tr_torrentFindFromHash(session_, info_hash);
+        tr_torrent* const tor = session_->torrent(info_hash);
         if (tor != nullptr && tor->allowsDht())
         {
             size_t n = 0;
@@ -640,7 +639,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = tr_torrentFindFromHash(session_, info_hash);
+        tr_torrent* tor = session_->torrent(info_hash);
 
         if (tor != nullptr)
         {
