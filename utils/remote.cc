@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <assert.h>
 #include <ctype.h> /* isspace */
 #include <errno.h>
@@ -33,31 +34,45 @@
 
 using namespace std::literals;
 
-static auto constexpr DefaultHost = "localhost"sv;
-static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
-
-#define MY_NAME "transmission-remote"
-#define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
-
-#define ARGUMENTS TR_KEY_arguments
-
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
-
-#define DISK_K 1000
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
-
-#define SPEED_K 1000
 #define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+#define MEM_M_STR "MiB"
+
+static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
+static char constexpr DefaultHost[] = "localhost";
+static char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
+
+static char constexpr MyName[] = "transmission-remote";
+static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
+                                "\n"
+                                "A fast and easy BitTorrent client\n"
+                                "https://transmissionbt.com/\n"
+                                "\n"
+                                "Usage: transmission-remote [host] [options]\n"
+                                "       transmission-remote [port] [options]\n"
+                                "       transmission-remote [host:port] [options]\n"
+                                "       transmission-remote [http(s?)://host:port/transmission/] [options]\n"
+                                "\n"
+                                "See the man page for detailed explanations and many examples.";
+
+static auto constexpr Arguments = TR_KEY_arguments;
+
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = MEM_M_STR;
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
+
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
+
+static auto constexpr SpeedK = size_t{ 1000 };
+static auto constexpr SpeedKStr = SPEED_K_STR;
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 /***
 ****
@@ -237,153 +252,136 @@ enum
     TAG_TRACKERS
 };
 
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        MY_NAME " " LONG_VERSION_STRING "\n"
-        "A fast and easy BitTorrent client\n"
-        "https://transmissionbt.com/\n"
-        "\n"
-        "Usage: " MY_NAME " [host] [options]\n"
-        "       " MY_NAME " [port] [options]\n"
-        "       " MY_NAME " [host:port] [options]\n"
-        "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
-        "\n"
-        "See the man page for detailed explanations and many examples.";
-    // clang-format on
-}
-
 /***
 ****
 ****  Command-Line Arguments
 ****
 ***/
 
-static tr_option opts[] = {
-    { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
-    { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
-    { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
-    { 972, "alt-speed-downlimit", "max alternate download speed (in " SPEED_K_STR ")", "asd", true, "<speed>" },
-    { 973, "alt-speed-uplimit", "max alternate upload speed (in " SPEED_K_STR ")", "asu", true, "<speed>" },
-    { 974, "alt-speed-scheduler", "Use the scheduled on/off times", "asc", false, nullptr },
-    { 975, "no-alt-speed-scheduler", "Don't use the scheduled on/off times", "ASC", false, nullptr },
-    { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
-    { 977, "alt-speed-time-end", "Time to stop using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
-    { 978, "alt-speed-days", "Numbers for any/all days of the week - eg. \"1-7\"", nullptr, true, "<days>" },
-    { 963, "blocklist-update", "Blocklist update", nullptr, false, nullptr },
-    { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", true, "<dir>" },
-    { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", false, nullptr },
-    { 'b', "debug", "Print debugging information", "b", false, nullptr },
-    { 'd',
-      "downlimit",
-      "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
-      "d",
-      true,
-      "<speed>" },
-    { 'D', "no-downlimit", "Disable max download speed for the current torrent(s) or globally", "D", false, nullptr },
-    { 'e', "cache", "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", true, "<size>" },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-    { 850, "exit", "Tell the transmission session to shut down", nullptr, false, nullptr },
-    { 940, "files", "List the current torrent(s)' files", "f", false, nullptr },
-    { 'g', "get", "Mark files for download", "g", true, "<files>" },
-    { 'G', "no-get", "Mark files for not downloading", "G", true, "<files>" },
-    { 'i', "info", "Show the current torrent(s)' details", "i", false, nullptr },
-    { 940, "info-files", "List the current torrent(s)' files", "if", false, nullptr },
-    { 941, "info-peers", "List the current torrent(s)' peers", "ip", false, nullptr },
-    { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", false, nullptr },
-    { 943, "info-trackers", "List the current torrent(s)' trackers", "it", false, nullptr },
-    { 920, "session-info", "Show the session's details", "si", false, nullptr },
-    { 921, "session-stats", "Show the session's statistics", "st", false, nullptr },
-    { 'l', "list", "List all torrents", "l", false, nullptr },
-    { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
-    { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
-    { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-    { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-    { 'n', "auth", "Set username and password", "n", true, "<user:pw>" },
-    { 810, "authenv", "Set authentication info from the TR_AUTH environment variable (user:pw)", "ne", false, nullptr },
-    { 'N', "netrc", "Set authentication info from a .netrc file", "N", true, "<file>" },
-    { 820, "ssl", "Use SSL when talking to daemon", nullptr, false, nullptr },
-    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
-    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-    { 962, "port-test", "Port testing", "pt", false, nullptr },
-    { 'P', "random-port", "Random port for incoming peers", "P", false, nullptr },
-    { 900, "priority-high", "Try to download these file(s) first", "ph", true, "<files>" },
-    { 901, "priority-normal", "Try to download these file(s) normally", "pn", true, "<files>" },
-    { 902, "priority-low", "Try to download these file(s) last", "pl", true, "<files>" },
-    { 700, "bandwidth-high", "Give this torrent first chance at available bandwidth", "Bh", false, nullptr },
-    { 701, "bandwidth-normal", "Give this torrent bandwidth left over by high priority torrents", "Bn", false, nullptr },
-    { 702,
-      "bandwidth-low",
-      "Give this torrent bandwidth left over by high and normal priority torrents",
-      "Bl",
-      false,
-      nullptr },
-    { 600, "reannounce", "Reannounce the current torrent(s)", nullptr, false, nullptr },
-    { 'r', "remove", "Remove the current torrent(s)", "r", false, nullptr },
-    { 930, "peers", "Set the maximum number of peers for the current torrent(s) or globally", "pr", true, "<max>" },
-    { 840, "remove-and-delete", "Remove the current torrent(s) and delete local data", "rad", false, nullptr },
-    { 800, "torrent-done-script", "Specify a script to run when a torrent finishes", nullptr, true, "<file>" },
-    { 801, "no-torrent-done-script", "Don't run a script when torrents finish", nullptr, false, nullptr },
-    { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", true, "ratio" },
-    { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", false, nullptr },
-    { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", false, nullptr },
-    { 953,
-      "global-seedratio",
-      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-      "gsr",
-      true,
-      "ratio" },
-    { 954,
-      "no-global-seedratio",
-      "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-      "GSR",
-      false,
-      nullptr },
-    { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
-    { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
-    { 's', "start", "Start the current torrent(s)", "s", false, nullptr },
-    { 'S', "stop", "Stop the current torrent(s)", "S", false, nullptr },
-    { 't', "torrent", "Set the current torrent(s)", "t", true, "<torrent>" },
-    { 990, "start-paused", "Start added torrents paused", nullptr, false, nullptr },
-    { 991, "no-start-paused", "Start added torrents unpaused", nullptr, false, nullptr },
-    { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
-    { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
-    { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
-    { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
-    { 'u',
-      "uplimit",
-      "Set the max upload speed in " SPEED_K_STR " for the current torrent(s) or globally",
-      "u",
-      true,
-      "<speed>" },
-    { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", false, nullptr },
-    { 830, "utp", "Enable uTP for peer connections", nullptr, false, nullptr },
-    { 831, "no-utp", "Disable uTP for peer connections", nullptr, false, nullptr },
-    { 'v', "verify", "Verify the current torrent(s)", "v", false, nullptr },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 'w',
-      "download-dir",
-      "When used in conjunction with --add, set the new torrent's download folder. "
-      "Otherwise, set the default download folder",
-      "w",
-      true,
-      "<path>" },
-    { 'x', "pex", "Enable peer exchange (PEX)", "x", false, nullptr },
-    { 'X', "no-pex", "Disable peer exchange (PEX)", "X", false, nullptr },
-    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, nullptr },
-    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, nullptr },
-    { 941, "peer-info", "List the current torrent(s)' peers", "pi", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 87>{
+    { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
+      { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
+      { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
+      { 972, "alt-speed-downlimit", "max alternate download speed (in " SPEED_K_STR ")", "asd", true, "<speed>" },
+      { 973, "alt-speed-uplimit", "max alternate upload speed (in " SPEED_K_STR ")", "asu", true, "<speed>" },
+      { 974, "alt-speed-scheduler", "Use the scheduled on/off times", "asc", false, nullptr },
+      { 975, "no-alt-speed-scheduler", "Don't use the scheduled on/off times", "ASC", false, nullptr },
+      { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
+      { 977, "alt-speed-time-end", "Time to stop using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
+      { 978, "alt-speed-days", "Numbers for any/all days of the week - eg. \"1-7\"", nullptr, true, "<days>" },
+      { 963, "blocklist-update", "Blocklist update", nullptr, false, nullptr },
+      { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", true, "<dir>" },
+      { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", false, nullptr },
+      { 'b', "debug", "Print debugging information", "b", false, nullptr },
+      { 'd',
+        "downlimit",
+        "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
+        "d",
+        true,
+        "<speed>" },
+      { 'D', "no-downlimit", "Disable max download speed for the current torrent(s) or globally", "D", false, nullptr },
+      { 'e', "cache", "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", true, "<size>" },
+      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
+      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
+      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
+      { 850, "exit", "Tell the transmission session to shut down", nullptr, false, nullptr },
+      { 940, "files", "List the current torrent(s)' files", "f", false, nullptr },
+      { 'g', "get", "Mark files for download", "g", true, "<files>" },
+      { 'G', "no-get", "Mark files for not downloading", "G", true, "<files>" },
+      { 'i', "info", "Show the current torrent(s)' details", "i", false, nullptr },
+      { 940, "info-files", "List the current torrent(s)' files", "if", false, nullptr },
+      { 941, "info-peers", "List the current torrent(s)' peers", "ip", false, nullptr },
+      { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", false, nullptr },
+      { 943, "info-trackers", "List the current torrent(s)' trackers", "it", false, nullptr },
+      { 920, "session-info", "Show the session's details", "si", false, nullptr },
+      { 921, "session-stats", "Show the session's statistics", "st", false, nullptr },
+      { 'l', "list", "List all torrents", "l", false, nullptr },
+      { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
+      { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
+      { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
+      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
+      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
+      { 'n', "auth", "Set username and password", "n", true, "<user:pw>" },
+      { 810, "authenv", "Set authentication info from the TR_AUTH environment variable (user:pw)", "ne", false, nullptr },
+      { 'N', "netrc", "Set authentication info from a .netrc file", "N", true, "<file>" },
+      { 820, "ssl", "Use SSL when talking to daemon", nullptr, false, nullptr },
+      { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
+      { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, nullptr },
+      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
+      { 962, "port-test", "Port testing", "pt", false, nullptr },
+      { 'P', "random-port", "Random port for incoming peers", "P", false, nullptr },
+      { 900, "priority-high", "Try to download these file(s) first", "ph", true, "<files>" },
+      { 901, "priority-normal", "Try to download these file(s) normally", "pn", true, "<files>" },
+      { 902, "priority-low", "Try to download these file(s) last", "pl", true, "<files>" },
+      { 700, "bandwidth-high", "Give this torrent first chance at available bandwidth", "Bh", false, nullptr },
+      { 701, "bandwidth-normal", "Give this torrent bandwidth left over by high priority torrents", "Bn", false, nullptr },
+      { 702,
+        "bandwidth-low",
+        "Give this torrent bandwidth left over by high and normal priority torrents",
+        "Bl",
+        false,
+        nullptr },
+      { 600, "reannounce", "Reannounce the current torrent(s)", nullptr, false, nullptr },
+      { 'r', "remove", "Remove the current torrent(s)", "r", false, nullptr },
+      { 930, "peers", "Set the maximum number of peers for the current torrent(s) or globally", "pr", true, "<max>" },
+      { 840, "remove-and-delete", "Remove the current torrent(s) and delete local data", "rad", false, nullptr },
+      { 800, "torrent-done-script", "Specify a script to run when a torrent finishes", nullptr, true, "<file>" },
+      { 801, "no-torrent-done-script", "Don't run a script when torrents finish", nullptr, false, nullptr },
+      { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", true, "ratio" },
+      { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", false, nullptr },
+      { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", false, nullptr },
+      { 953,
+        "global-seedratio",
+        "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr",
+        true,
+        "ratio" },
+      { 954,
+        "no-global-seedratio",
+        "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR",
+        false,
+        nullptr },
+      { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
+      { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
+      { 's', "start", "Start the current torrent(s)", "s", false, nullptr },
+      { 'S', "stop", "Stop the current torrent(s)", "S", false, nullptr },
+      { 't', "torrent", "Set the current torrent(s)", "t", true, "<torrent>" },
+      { 990, "start-paused", "Start added torrents paused", nullptr, false, nullptr },
+      { 991, "no-start-paused", "Start added torrents unpaused", nullptr, false, nullptr },
+      { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
+      { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
+      { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
+      { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
+      { 'u',
+        "uplimit",
+        "Set the max upload speed in " SPEED_K_STR " for the current torrent(s) or globally",
+        "u",
+        true,
+        "<speed>" },
+      { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", false, nullptr },
+      { 830, "utp", "Enable uTP for peer connections", nullptr, false, nullptr },
+      { 831, "no-utp", "Disable uTP for peer connections", nullptr, false, nullptr },
+      { 'v', "verify", "Verify the current torrent(s)", "v", false, nullptr },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 'w',
+        "download-dir",
+        "When used in conjunction with --add, set the new torrent's download folder. "
+        "Otherwise, set the default download folder",
+        "w",
+        true,
+        "<path>" },
+      { 'x', "pex", "Enable peer exchange (PEX)", "x", false, nullptr },
+      { 'X', "no-pex", "Disable peer exchange (PEX)", "X", false, nullptr },
+      { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, nullptr },
+      { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, nullptr },
+      { 941, "peer-info", "List the current torrent(s)' peers", "pi", false, nullptr },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static void showUsage(void)
 {
-    tr_getopt_usage(MY_NAME, getUsage(), opts);
+    tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
 static int numarg(char const* arg)
@@ -2041,7 +2039,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedError(MY_NAME, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
+        tr_logAddNamedError(MyName, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2103,7 +2101,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
                         int64_t i;
                         tr_variant* b = &top;
 
-                        if (tr_variantDictFindDict(&top, ARGUMENTS, &b) &&
+                        if (tr_variantDictFindDict(&top, Arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
                             tr_snprintf(id, sizeof(id), "%" PRId64, i);
@@ -2142,7 +2140,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, MY_NAME "/" LONG_VERSION_STRING);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, tr_strvJoin(MyName, "/", LONG_VERSION_STRING).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parseResponseHeader);
@@ -2214,7 +2212,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
 
     if ((res = curl_easy_perform(curl)) != CURLE_OK)
     {
-        tr_logAddNamedError(MY_NAME, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
+        tr_logAddNamedError(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
         status |= EXIT_FAILURE;
     }
     else
@@ -2273,14 +2271,14 @@ static tr_variant* ensure_sset(tr_variant** sset)
 
     if (*sset != nullptr)
     {
-        args = tr_variantDictFind(*sset, ARGUMENTS);
+        args = tr_variantDictFind(*sset, Arguments);
     }
     else
     {
         *sset = tr_new0(tr_variant, 1);
         tr_variantInitDict(*sset, 3);
         tr_variantDictAddStrView(*sset, TR_KEY_method, "session-set"sv);
-        args = tr_variantDictAddDict(*sset, ARGUMENTS, 0);
+        args = tr_variantDictAddDict(*sset, Arguments, 0);
     }
 
     return args;
@@ -2292,14 +2290,14 @@ static tr_variant* ensure_tset(tr_variant** tset)
 
     if (*tset != nullptr)
     {
-        args = tr_variantDictFind(*tset, ARGUMENTS);
+        args = tr_variantDictFind(*tset, Arguments);
     }
     else
     {
         *tset = tr_new0(tr_variant, 1);
         tr_variantInitDict(*tset, 3);
         tr_variantDictAddStrView(*tset, TR_KEY_method, "torrent-set"sv);
-        args = tr_variantDictAddDict(*tset, ARGUMENTS, 1);
+        args = tr_variantDictAddDict(*tset, Arguments, 1);
     }
 
     return args;
@@ -2316,7 +2314,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
     *id = '\0';
 
-    while ((c = tr_getopt(getUsage(), argc, argv, opts, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         int const stepMode = getOptMode(c);
 
@@ -2337,7 +2335,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                 if (tset != nullptr)
                 {
-                    addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                    addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                     status |= flush(rpcurl, &tset);
                 }
 
@@ -2345,7 +2343,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 tr_variantInitDict(tadd, 3);
                 tr_variantDictAddStrView(tadd, TR_KEY_method, "torrent-add"sv);
                 tr_variantDictAddInt(tadd, TR_KEY_tag, TAG_TORRENT_ADD);
-                tr_variantDictAddDict(tadd, ARGUMENTS, 0);
+                tr_variantDictAddDict(tadd, Arguments, 0);
                 break;
 
             case 'b': /* debug */
@@ -2383,7 +2381,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                 if (tset != nullptr)
                 {
-                    addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                    addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                     status |= flush(rpcurl, &tset);
                 }
 
@@ -2391,7 +2389,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'V': /* show version number */
-                fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+                fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
                 exit(0);
 
             case TR_OPT_ERR:
@@ -2403,7 +2401,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             case TR_OPT_UNK:
                 if (tadd != nullptr)
                 {
-                    tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
+                    tr_variant* args = tr_variantDictFind(tadd, Arguments);
                     char* tmp = getEncodedMetainfo(optarg);
 
                     if (tmp != nullptr)
@@ -2433,12 +2431,12 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             tr_variant* fields;
             tr_variantInitDict(top, 3);
             tr_variantDictAddStrView(top, TR_KEY_method, "torrent-get"sv);
-            args = tr_variantDictAddDict(top, ARGUMENTS, 0);
+            args = tr_variantDictAddDict(top, Arguments, 0);
             fields = tr_variantDictAddList(args, TR_KEY_fields, 0);
 
             if (tset != nullptr)
             {
-                addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                 status |= flush(rpcurl, &tset);
             }
 
@@ -2794,7 +2792,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             if (tadd != nullptr)
             {
-                args = tr_variantDictFind(tadd, ARGUMENTS);
+                args = tr_variantDictFind(tadd, Arguments);
             }
             else
             {
@@ -2855,7 +2853,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         {
             if (tadd != nullptr)
             {
-                tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
+                tr_variant* args = tr_variantDictFind(tadd, Arguments);
                 tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
             }
             else
@@ -2864,7 +2862,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 tr_variant* top = tr_new0(tr_variant, 1);
                 tr_variantInitDict(top, 2);
                 tr_variantDictAddStrView(top, TR_KEY_method, "torrent-set-location"sv);
-                args = tr_variantDictAddDict(top, ARGUMENTS, 3);
+                args = tr_variantDictAddDict(top, Arguments, 3);
                 tr_variantDictAddStr(args, TR_KEY_location, optarg);
                 tr_variantDictAddBool(args, TR_KEY_move, false);
                 addIdArg(args, id, nullptr);
@@ -2897,7 +2895,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                         tr_variant* top = tr_new0(tr_variant, 1);
                         tr_variantInitDict(top, 2);
                         tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
-                        addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                         status |= flush(rpcurl, &top);
                     }
 
@@ -2915,7 +2913,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                         tr_variant* top = tr_new0(tr_variant, 1);
                         tr_variantInitDict(top, 2);
                         tr_variantDictAddStrView(top, TR_KEY_method, "torrent-stop"sv);
-                        addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                         status |= flush(rpcurl, &top);
                     }
 
@@ -2973,14 +2971,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (tset != nullptr)
                     {
-                        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                         status |= flush(rpcurl, &tset);
                     }
 
                     top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-reannounce"sv);
-                    addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                     status |= flush(rpcurl, &top);
                     break;
                 }
@@ -2991,14 +2989,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (tset != nullptr)
                     {
-                        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+                        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
                         status |= flush(rpcurl, &tset);
                     }
 
                     top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-verify"sv);
-                    addIdArg(tr_variantDictAddDict(top, ARGUMENTS, 1), id, nullptr);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
                     status |= flush(rpcurl, &top);
                     break;
                 }
@@ -3010,7 +3008,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variant* top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-remove"sv);
-                    args = tr_variantDictAddDict(top, ARGUMENTS, 2);
+                    args = tr_variantDictAddDict(top, Arguments, 2);
                     tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
                     addIdArg(args, id, nullptr);
                     status |= flush(rpcurl, &top);
@@ -3023,7 +3021,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variant* top = tr_new0(tr_variant, 1);
                     tr_variantInitDict(top, 2);
                     tr_variantDictAddStrView(top, TR_KEY_method, "torrent-set-location"sv);
-                    args = tr_variantDictAddDict(top, ARGUMENTS, 3);
+                    args = tr_variantDictAddDict(top, Arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_location, optarg);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, id, nullptr);
@@ -3048,7 +3046,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
     if (tset != nullptr)
     {
-        addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, nullptr);
+        addIdArg(tr_variantDictFind(tset, Arguments), id, nullptr);
         status |= flush(rpcurl, &tset);
     }
 
@@ -3146,9 +3144,9 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl);
 
@@ -3159,7 +3157,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DEFAULT_URL);
+        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DefaultUrl);
     }
 
     return processArgs(rpcurl.c_str(), argc, (char const* const*)argv);

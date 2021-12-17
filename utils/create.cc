@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* strtoul(), EXIT_FAILURE */
 #include <inttypes.h> /* PRIu32 */
@@ -22,91 +23,83 @@
 
 using namespace std::literals;
 
-#define MY_NAME "transmission-create"
+static char constexpr MyName[] = "transmission-create";
+static char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>";
 
-#define MAX_TRACKERS 128
-static uint32_t const KiB = 1024;
-static tr_tracker_info trackers[MAX_TRACKERS];
-static int trackerCount = 0;
-static bool isPrivate = false;
-static bool showVersion = false;
-static char const* comment = nullptr;
-static char const* outfile = nullptr;
-static char const* infile = nullptr;
-static uint32_t piecesize_kib = 0;
-static char const* source = NULL;
+static uint32_t constexpr KiB = 1024;
 
-static tr_option options[] = {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
-    { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 8>{
+    { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
+      { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
+      { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
+      { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", true, "<KiB>" },
+      { 'c', "comment", "Add a comment", "c", true, "<comment>" },
+      { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static char const* getUsage(void)
+struct app_options
 {
-    return "Usage: " MY_NAME " [options] <file|directory>";
-}
+    std::vector<tr_tracker_info> trackers;
+    bool is_private = false;
+    bool show_version = false;
+    char const* comment = nullptr;
+    char const* outfile = nullptr;
+    char const* infile = nullptr;
+    uint32_t piecesize_kib = 0;
+    char const* source = nullptr;
+};
 
-static int parseCommandLine(int argc, char const* const* argv)
+static int parseCommandLine(app_options& options, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
         case 'V':
-            showVersion = true;
+            options.show_version = true;
             break;
 
         case 'p':
-            isPrivate = true;
+            options.is_private = true;
             break;
 
         case 'o':
-            outfile = optarg;
+            options.outfile = optarg;
             break;
 
         case 'c':
-            comment = optarg;
+            options.comment = optarg;
             break;
 
         case 't':
-            if (trackerCount + 1 < MAX_TRACKERS)
-            {
-                trackers[trackerCount].tier = trackerCount;
-                trackers[trackerCount].announce = (char*)optarg;
-                ++trackerCount;
-            }
-
+            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg), nullptr, 0 });
             break;
 
         case 's':
             if (optarg != nullptr)
             {
                 char* endptr = nullptr;
-                piecesize_kib = strtoul(optarg, &endptr, 10);
+                options.piecesize_kib = strtoul(optarg, &endptr, 10);
 
                 if (endptr != nullptr && *endptr == 'M')
                 {
-                    piecesize_kib *= KiB;
+                    options.piecesize_kib *= KiB;
                 }
             }
 
             break;
 
         case 'r':
-            source = optarg;
+            options.source = optarg;
             break;
 
         case TR_OPT_UNK:
-            infile = optarg;
+            options.infile = optarg;
             break;
 
         default:
@@ -144,29 +137,30 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (char const* const*)argv) != 0)
+    auto options = app_options{};
+    if (parseCommandLine(options, argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
 
-    if (showVersion)
+    if (options.show_version)
     {
-        fprintf(stderr, MY_NAME " " LONG_VERSION_STRING "\n");
+        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
-    if (infile == nullptr)
+    if (options.infile == nullptr)
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), options);
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }
 
-    if (outfile == nullptr)
+    if (options.outfile == nullptr)
     {
         tr_error* error = nullptr;
-        char* base = tr_sys_path_basename(infile, &error);
+        char* base = tr_sys_path_basename(options.infile, &error);
 
         if (base == nullptr)
         {
@@ -176,14 +170,14 @@ int tr_main(int argc, char* argv[])
 
         auto const end = tr_strvJoin(base, ".torrent"sv);
         char* cwd = tr_getcwd();
-        outfile = out2 = tr_buildPath(cwd, end.c_str(), nullptr);
+        options.outfile = out2 = tr_buildPath(cwd, end.c_str(), nullptr);
         tr_free(cwd);
         tr_free(base);
     }
 
-    if (trackerCount == 0)
+    if (std::empty(options.trackers))
     {
-        if (isPrivate)
+        if (options.is_private)
         {
             fprintf(stderr, "ERROR: no trackers specified for a private torrent\n");
             return EXIT_FAILURE;
@@ -194,9 +188,9 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    printf("Creating torrent \"%s\"\n", outfile);
+    printf("Creating torrent \"%s\"\n", options.outfile);
 
-    b = tr_metaInfoBuilderCreate(infile);
+    b = tr_metaInfoBuilderCreate(options.infile);
 
     if (b == nullptr)
     {
@@ -204,9 +198,9 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (piecesize_kib != 0)
+    if (options.piecesize_kib != 0)
     {
-        tr_metaInfoBuilderSetPieceSize(b, piecesize_kib * KiB);
+        tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
     }
 
     char buf[128];
@@ -219,7 +213,14 @@ int tr_main(int argc, char* argv[])
         b->pieceCount,
         tr_formatter_size_B(buf, b->pieceSize, sizeof(buf)));
 
-    tr_makeMetaInfo(b, outfile, trackers, trackerCount, comment, isPrivate, source);
+    tr_makeMetaInfo(
+        b,
+        options.outfile,
+        std::data(options.trackers),
+        std::size(options.trackers),
+        options.comment,
+        options.is_private,
+        options.source);
 
     uint32_t last = UINT32_MAX;
     while (!b->isDone)
