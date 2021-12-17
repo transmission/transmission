@@ -1446,15 +1446,14 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
 
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 {
-    double const K = speed_units[TR_FMT_KB].value;
-    double speed = KBps;
-
-    if (speed <= 999.95) /* 0.0 KB to 999.9 KB */
+    if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
         tr_snprintf(buf, buflen, "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
     }
     else
     {
+        double const K = speed_units[TR_FMT_KB].value;
+
         speed /= K;
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
