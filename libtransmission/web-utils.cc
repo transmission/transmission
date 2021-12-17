@@ -335,7 +335,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         url.remove_prefix(std::size(key));
         auto pos = url.find_first_of("/?#");
         parsed.authority = url.substr(0, pos);
-        url = pos == url.npos ? ""sv : url.substr(pos);
+        url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
         auto remain = parsed.authority;
         parsed.host = tr_strvSep(&remain, ':');
@@ -347,7 +347,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     //  number sign ("#") character, or by the end of the URI.
     auto pos = url.find_first_of("?#");
     parsed.path = url.substr(0, pos);
-    url = pos == url.npos ? ""sv : url.substr(pos);
+    url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
     // query
     if (tr_strvStartsWith(url, '?'))
@@ -355,7 +355,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         url.remove_prefix(1);
         pos = url.find('#');
         parsed.query = url.substr(0, pos);
-        url = pos == url.npos ? ""sv : url.substr(pos);
+        url = pos == std::string_view::npos ? ""sv : url.substr(pos);
     }
 
     // fragment
@@ -410,7 +410,7 @@ std::string tr_urlPercentDecode(std::string_view in)
     {
         auto pos = in.find('%');
         out += in.substr(0, pos);
-        if (pos == in.npos)
+        if (pos == std::string_view::npos)
         {
             break;
         }
