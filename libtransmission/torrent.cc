@@ -1696,7 +1696,7 @@ static void tr_torrentDeleteLocalData(tr_torrent*, tr_fileFunc);
 
 static void removeTorrent(void* vdata)
 {
-    auto* data = static_cast<struct remove_data*>(vdata);
+    auto* const data = static_cast<struct remove_data*>(vdata);
     auto const lock = data->tor->unique_lock();
 
     if (data->deleteFlag)
@@ -1715,7 +1715,7 @@ void tr_torrentRemove(tr_torrent* tor, bool deleteFlag, tr_fileFunc deleteFunc)
 
     tor->isDeleting = true;
 
-    struct remove_data* data = tr_new0(struct remove_data, 1);
+    auto* const data = tr_new0(struct remove_data, 1);
     data->tor = tor;
     data->deleteFlag = deleteFlag;
     data->deleteFunc = deleteFunc;
