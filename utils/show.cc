@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <stdio.h> /* fprintf() */
 #include <string.h> /* strcmp(), strchr(), memcmp() */
 #include <stdlib.h> /* qsort() */
@@ -29,12 +30,12 @@
 
 using namespace std::literals;
 
-static tr_option options[] = {
-    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
-    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
-    { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 5>{
+    { { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
+      { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
+      { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static char const* getUsage(void)
@@ -53,7 +54,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -332,7 +333,7 @@ int tr_main(int argc, char* argv[])
     if (filename == nullptr)
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), options);
+        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

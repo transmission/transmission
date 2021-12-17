@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* EXIT_FAILURE */
 
@@ -27,12 +28,12 @@ static char const* add = nullptr;
 static char const* deleteme = nullptr;
 static char const* replace[2] = { nullptr, nullptr };
 
-static tr_option options[] = {
-    { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
-    { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
-    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 5>{
+    { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
+      { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
+      { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static char const* getUsage(void)
@@ -45,7 +46,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -59,7 +60,7 @@ static int parseCommandLine(int argc, char const* const* argv)
 
         case 'r':
             replace[0] = optarg;
-            c = tr_getopt(getUsage(), argc, argv, options, &optarg);
+            c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg);
 
             if (c != TR_OPT_UNK)
             {
@@ -319,7 +320,7 @@ int tr_main(int argc, char* argv[])
     if (fileCount < 1)
     {
         fprintf(stderr, "ERROR: No torrent files specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), options);
+        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }
@@ -327,7 +328,7 @@ int tr_main(int argc, char* argv[])
     if (add == nullptr && deleteme == nullptr && replace[0] == 0)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
-        tr_getopt_usage(MY_NAME, getUsage(), options);
+        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

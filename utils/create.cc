@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* strtoul(), EXIT_FAILURE */
 #include <inttypes.h> /* PRIu32 */
@@ -36,15 +37,20 @@ static char const* infile = nullptr;
 static uint32_t piecesize_kib = 0;
 static char const* source = NULL;
 
-static tr_option options[] = {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
-    { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 8>{
+    { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
+      { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
+      { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
+      { 's',
+        "piecesize",
+        "Set how many KiB each piece should be, overriding the preferred default",
+        "s",
+        true,
+        "<size in KiB>" },
+      { 'c', "comment", "Add a comment", "c", true, "<comment>" },
+      { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static char const* getUsage(void)
@@ -57,7 +63,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -158,7 +164,7 @@ int tr_main(int argc, char* argv[])
     if (infile == nullptr)
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
-        tr_getopt_usage(MY_NAME, getUsage(), options);
+        tr_getopt_usage(MY_NAME, getUsage(), std::data(Options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }

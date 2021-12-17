@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <array>
 #include <stdio.h> /* fprintf () */
 #include <stdlib.h> /* atoi () */
 #include <string.h> /* memcmp () */
@@ -73,26 +74,26 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = nullptr;
 
-static struct tr_option const options[] = {
-    { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
-    { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-    { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
-    { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-    { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
-    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
-    { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
-    { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 19>{
+    { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
+      { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
+      { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
+      { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
+      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
+      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
+      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
+      { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
+      { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
+      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
+      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
+      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
+      { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
+      { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
+      { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
+      { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static char const* getUsage(void)
@@ -217,7 +218,7 @@ static char const* getConfigDir(int argc, char const** argv)
     char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -253,7 +254,7 @@ int tr_main(int argc, char* argv[])
     /* user needs to pass in at least one argument */
     if (argc < 2)
     {
-        tr_getopt_usage(MY_READABLE_NAME, getUsage(), options);
+        tr_getopt_usage(MY_READABLE_NAME, getUsage(), std::data(Options));
         return EXIT_FAILURE;
     }
 
@@ -422,7 +423,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
     int c;
     char const* my_optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &my_optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
