@@ -250,7 +250,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 static uint8_t* getHashInfo(tr_metainfo_builder* b)
 {
     uint32_t fileIndex = 0;
-    uint8_t* ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
+    auto* const ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
     uint8_t* walk = ret;
     uint64_t off = 0;
     tr_error* error = nullptr;
