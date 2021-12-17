@@ -330,8 +330,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // The authority component is preceded by a double slash ("//") and is
     // terminated by the next slash ("/"), question mark ("?"), or number
     // sign ("#") character, or by the end of the URI.
-    auto key = "//"sv;
-    if (tr_strvStartsWith(url, key))
+    if (auto key = "//"sv; tr_strvStartsWith(url, key))
     {
         url.remove_prefix(std::size(key));
         auto pos = url.find_first_of("/?#");
