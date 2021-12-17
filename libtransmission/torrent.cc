@@ -656,7 +656,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script);
 
 static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 {
-    auto* session = tor->session;
+    auto const* session = tor->session;
 
     if (tr_sessionIsScriptEnabled(session, type))
     {
