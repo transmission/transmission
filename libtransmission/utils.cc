@@ -1633,8 +1633,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
         return entry.suffix < suffix;
     };
 
-    auto const pos = filename.rfind('.');
-    if (pos != filename.npos)
+    if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         // make a lowercase copy of the file suffix
         filename.remove_prefix(pos + 1);
