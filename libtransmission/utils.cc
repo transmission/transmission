@@ -266,7 +266,6 @@ void tr_timerAddMsec(struct event* timer, int msec)
 ***
 **/
 
-// TODO: return a std::vector<>
 uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
@@ -469,7 +468,7 @@ tr_disk_space tr_dirSpace(std::string_view dir)
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
 {
     size_t const n = evbuffer_get_length(buf);
-    char* ret = tr_new(char, n + 1);
+    auto* const ret = tr_new(char, n + 1);
     evbuffer_copyout(buf, ret, n);
     evbuffer_free(buf);
     ret[n] = '\0';
