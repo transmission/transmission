@@ -1175,8 +1175,7 @@ double tr_truncd(double x, int precision)
     char buf[128];
     tr_snprintf(buf, sizeof(buf), "%.*f", TR_ARG_TUPLE(DBL_DIG, x));
 
-    char* const pt = strstr(buf, localeconv()->decimal_point);
-    if (pt != nullptr)
+    if (auto* const pt = strstr(buf, localeconv()->decimal_point); pt != nullptr)
     {
         pt[precision != 0 ? precision + 1 : 0] = '\0';
     }
