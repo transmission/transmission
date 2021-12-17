@@ -302,6 +302,13 @@ static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_leng
     }
 }
 
+std::string tr_sha1_to_hex(tr_sha1_digest_t const& digest)
+{
+    auto str = std::string(std::size(digest) * 2, '?');
+    tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
+    return str;
+}
+
 void tr_sha1_to_hex(void* hex, void const* sha1)
 {
     tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);

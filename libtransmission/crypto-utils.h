@@ -57,6 +57,14 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* setme);
 
 std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle);
 
+template<typename... T>
+std::optional<tr_sha1_digest_t> tr_makeSha1(T... args)
+{
+    auto ctx = tr_sha1_init();
+    (tr_sha1_update(ctx, std::data(args), std::size(args)), ...);
+    return tr_sha1_final(ctx);
+}
+
 /**
  * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
  */
@@ -185,6 +193,8 @@ std::string tr_base64_decode_str(std::string_view input);
  * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
 void tr_sha1_to_hex(void* hex, void const* sha1);
+
+std::string tr_sha1_to_hex(tr_sha1_digest_t const&);
 
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.

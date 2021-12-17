@@ -116,7 +116,7 @@ tr_sha1_ctx_t tr_sha1_init(void)
 
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
-    auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    auto* const handle = static_cast<EVP_MD_CTX*>(raw_handle);
 
     TR_ASSERT(handle != nullptr);
 

@@ -9,6 +9,7 @@
 #include <array>
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 
 #include "transmission.h"
@@ -121,6 +122,20 @@ TEST(Crypto, sha1)
         0,
         memcmp(hash1.data(), "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", hash1.size()));
     EXPECT_EQ(0, memcmp(hash1.data(), hash2.data(), hash2.size()));
+
+    EXPECT_TRUE(tr_sha1(hash1.data(), "test", 4, nullptr));
+
+    auto const hash3 = tr_makeSha1("test"sv);
+    EXPECT_TRUE(hash3);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_hex(*hash3));
+
+    auto const hash4 = tr_makeSha1("te"sv, "st"sv);
+    EXPECT_TRUE(hash4);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_hex(*hash4));
+
+    auto const hash5 = tr_makeSha1("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
+    EXPECT_TRUE(hash5);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_hex(*hash5));
 }
 
 TEST(Crypto, ssha1)
