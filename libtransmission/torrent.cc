@@ -2343,8 +2343,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
-    tr_sys_dir_t const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr);
-    if (odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr); odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
