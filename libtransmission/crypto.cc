@@ -81,7 +81,7 @@ bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey)
 
 uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 {
-    ensureKeyExists((tr_crypto*)crypto);
+    ensureKeyExists(const_cast<tr_crypto*>(crypto));
     *setme_len = KEY_LEN;
     return crypto->myPublicKey;
 }
