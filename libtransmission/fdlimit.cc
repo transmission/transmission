@@ -251,17 +251,15 @@ static int cached_file_open(
     return 0;
 
 FAIL:
+    int const err = error->code;
+    tr_error_free(error);
+
+    if (fd != TR_BAD_SYS_FILE)
     {
-        int const err = error->code;
-        tr_error_free(error);
-
-        if (fd != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_close(fd, nullptr);
-        }
-
-        return err;
+        tr_sys_file_close(fd, nullptr);
     }
+
+    return err;
 }
 
 /***
