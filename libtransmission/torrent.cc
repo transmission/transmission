@@ -106,29 +106,15 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromHashString(tr_session* session, std::string_view hash_string)
-{
-    auto info_hash = std::array<uint8_t, TR_SHA1_DIGEST_LEN>{};
-    tr_hex_to_sha1(std::data(info_hash), std::data(hash_string));
-    return tr_torrentFindFromHash(session, std::data(info_hash));
-}
-
 tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
 {
-    auto& src = session->torrentsByHash;
-    auto it = src.find(hash);
-    return it == std::end(src) ? nullptr : it->second;
-}
-
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const& info_dict_hash)
-{
-    return tr_torrentFindFromHash(session, reinterpret_cast<uint8_t const*>(std::data(info_dict_hash)));
+    return session->getTorrent(hash);
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     auto mm = tr_magnet_metainfo{};
-    return mm.parseMagnet(magnet_link ? magnet_link : "") ? tr_torrentFindFromHash(session, mm.info_hash) : nullptr;
+    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.info_hash) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
@@ -144,22 +130,21 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const*
     return nullptr;
 }
 
-bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direction)
+bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(direction));
 
     bool allowed = true;
 
-    if (tr_torrentUsesSpeedLimit(tor, direction) && tor->speedLimitBps(direction) <= 0)
+    if (tr_torrentUsesSpeedLimit(this, direction) && this->speedLimitBps(direction) <= 0)
     {
         allowed = false;
     }
 
-    if (tr_torrentUsesSessionLimits(tor))
+    if (tr_torrentUsesSessionLimits(this))
     {
         unsigned int limit = 0;
-        if (tr_sessionGetActiveSpeedLimit_Bps(tor->session, direction, &limit) && (limit <= 0))
+        if (tr_sessionGetActiveSpeedLimit_Bps(this->session, direction, &limit) && (limit <= 0))
         {
             allowed = false;
         }
@@ -778,12 +763,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
         }
 
-        if (!tr_torrentHasMetadata(tor) && !doStart)
+        if (!tor->hasMetadata() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
             tr_torrentStartNow(tor);
@@ -842,7 +827,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
         return nullptr;
     }
 
-    tr_torrent const* const dupe = tr_torrentFindFromHash(session, parsed->info.hash);
+    tr_torrent const* const dupe = session->getTorrent(parsed->info.hash);
     if (dupe != nullptr)
     {
         if (setme_duplicate_id != nullptr)
@@ -2297,7 +2282,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     }
 
     /* if it's a magnet link, there's nothing to move... */
-    if (!tr_torrentHasMetadata(tor))
+    if (!tor->hasMetadata())
     {
         return;
     }
@@ -2805,7 +2790,7 @@ static void refreshCurrentDir(tr_torrent* tor)
     {
         dir = tor->downloadDir;
     }
-    else if (!tr_torrentHasMetadata(tor)) /* no files to find */
+    else if (!tor->hasMetadata()) /* no files to find */
     {
         dir = tor->incompleteDir;
     }
@@ -3232,7 +3217,7 @@ void tr_torrentSetFilePriorities(
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tor->info.fileCount > 0;
+    return tor->hasMetadata();
 }
 
 void tr_torrent::markEdited()

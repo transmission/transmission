@@ -63,7 +63,7 @@ static void incompleteMetadataFree(struct tr_incomplete_metadata* m)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         return false;
     }
@@ -145,7 +145,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
 
 static void ensureInfoDictOffsetIsCached(tr_torrent* tor)
 {
-    TR_ASSERT(tr_torrentHasMetadata(tor));
+    TR_ASSERT(tor->hasMetadata());
 
     if (!tor->infoDictOffsetIsCached)
     {
@@ -162,7 +162,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
     char* ret = nullptr;
 
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         ensureInfoDictOffsetIsCached(tor);
 
@@ -377,7 +377,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         return 1.0;
     }

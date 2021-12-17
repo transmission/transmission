@@ -136,7 +136,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             }
             else if (tr_variantGetStrView(node, &sv))
             {
-                tor = tr_torrentFindFromHashString(session, sv);
+                tor = session->getTorrent(sv);
             }
 
             if (tor != nullptr)
@@ -167,7 +167,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
         }
         else
         {
-            tr_torrent* const tor = tr_torrentFindFromHashString(session, sv);
+            auto* const tor = session->getTorrent(sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);
@@ -678,7 +678,7 @@ static void initField(
         break;
 
     case TR_KEY_pieces:
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
             auto const bytes = tor->createPieceBitfield();
             auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));
@@ -2556,8 +2556,7 @@ void tr_rpc_request_exec_uri(
     tr_variantInitDict(&top, 3);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    auto const parsed = tr_urlParse(request_uri);
-    if (parsed)
+    if (auto const parsed = tr_urlParse(request_uri); parsed)
     {
         for (auto const& [key, val] : tr_url_query_view(parsed->query))
         {
