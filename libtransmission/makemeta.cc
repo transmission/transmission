@@ -136,7 +136,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         return nullptr;
     }
 
-    tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
+    auto* const ret = tr_new0(tr_metainfo_builder, 1);
 
     ret->top = real_top;
 
