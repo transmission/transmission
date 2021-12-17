@@ -61,9 +61,8 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
+    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
+        odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
@@ -127,14 +126,6 @@ static uint32_t bestPieceSize(uint64_t totalSize)
     return 32 * KiB; /* less than 50 meg */
 }
 
-static int builderFileCompare(void const* va, void const* vb)
-{
-    auto const* a = static_cast<tr_metainfo_builder_file const*>(va);
-    auto const* b = static_cast<tr_metainfo_builder_file const*>(vb);
-
-    return evutil_ascii_strcasecmp(a->filename, b->filename);
-}
-
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
     char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
@@ -187,7 +178,10 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(tmp);
     }
 
-    qsort(ret->files, ret->fileCount, sizeof(tr_metainfo_builder_file), builderFileCompare);
+    std::sort(
+        ret->files,
+        ret->files + ret->fileCount,
+        [](auto const& a, auto const& b) { return evutil_ascii_strcasecmp(a.filename, b.filename) < 0; });
 
     tr_metaInfoBuilderSetPieceSize(ret, bestPieceSize(ret->totalSize));
 
