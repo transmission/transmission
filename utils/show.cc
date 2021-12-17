@@ -25,12 +25,12 @@
 
 #include "units.h"
 
+using namespace std::literals;
+
 static char constexpr MyName[] = "transmission-show";
 static char constexpr Usage[] = "Usage: transmission-show [options] <.torrent file>";
 
-#define TIMEOUT_SECS 30
-
-using namespace std::literals;
+static auto constexpr TimeoutSecs = long{ 30 };
 
 static auto constexpr Options = std::array<tr_option, 5>{
     { { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
@@ -234,7 +234,7 @@ static void doScrape(tr_info const* inf)
         auto* const buf = evbuffer_new();
         auto* const curl = tr_curl_easy_init(buf);
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT_SECS);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
 
         auto const res = curl_easy_perform(curl);
         if (res != CURLE_OK)
