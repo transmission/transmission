@@ -396,8 +396,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    char* const base = tr_sys_path_basename(builder->top, nullptr);
-    if (base != nullptr)
+    if (auto* const base = tr_sys_path_basename(builder->top, nullptr); base != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
         tr_free(base);
@@ -405,8 +404,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    uint8_t* const pch = getHashInfo(builder);
-    if (pch != nullptr)
+    if (auto* const pch = getHashInfo(builder); pch != nullptr)
     {
         tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
         tr_free(pch);
