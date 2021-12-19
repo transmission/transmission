@@ -178,7 +178,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 switch (std::size(hash))
                 {
                 case 40:
-                    tr_hex_to_sha1(std::data(this->info_hash), std::data(hash));
+                    this->info_hash = tr_sha1_from_string(std::data(hash));
                     got_checksum = true;
                     break;
 

@@ -61,7 +61,7 @@
 #define tr_base64_decode_str tr_base64_decode_str_
 #define tr_base64_decode_impl tr_base64_decode_impl_
 #define tr_sha1_to_string tr_sha1_to_string_
-#define tr_hex_to_sha1 tr_hex_to_sha1_
+#define tr_sha1_from_string tr_sha1_from_string_
 
 #undef TR_ENCRYPTION_H
 #undef TR_CRYPTO_UTILS_H
@@ -120,7 +120,7 @@
 #undef tr_base64_decode_str
 #undef tr_base64_decode_impl
 #undef tr_sha1_to_string
-#undef tr_hex_to_sha1
+#undef tr_sha1_from_string
 
 #else /* CRYPTO_REFERENCE_CHECK */
 
@@ -172,7 +172,7 @@
 #define tr_base64_decode_str_ tr_base64_decode_str
 #define tr_base64_decode_impl_ tr_base64_decode_impl
 #define tr_sha1_to_string_ tr_sha1_to_string
-#define tr_hex_to_sha1_ tr_hex_to_sha1
+#define tr_sha1_from_string_ tr_sha1_from_string
 
 #endif /* CRYPTO_REFERENCE_CHECK */
 

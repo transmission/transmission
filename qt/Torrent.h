@@ -119,12 +119,12 @@ public:
 
     explicit TorrentHash(char const* str)
     {
-        tr_hex_to_sha1(data_.data(), str);
+        data_ = tr_sha1_from_string(str);
     }
 
     explicit TorrentHash(QString const& str)
     {
-        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
+        data_ = tr_sha1_from_string(str.toUtf8().constData());
     }
 
     bool operator==(TorrentHash const& that) const

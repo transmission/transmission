@@ -127,8 +127,7 @@ public:
 
     [[nodiscard]] auto getTorrent(std::string_view info_dict_hash_string)
     {
-        auto info_dict_hash = tr_sha1_digest_t{};
-        tr_hex_to_sha1(std::data(info_dict_hash), std::data(info_dict_hash_string));
+        auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
         return this->getTorrent(info_dict_hash);
     }
 

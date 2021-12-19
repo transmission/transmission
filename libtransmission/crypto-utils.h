@@ -150,6 +150,11 @@ bool tr_rand_buffer(void* buffer, size_t length);
 std::string tr_ssha1(std::string_view plain_text);
 
 /**
+ * @brief Return true if this is salted text, false otherwise
+ */
+bool tr_ssha1_test(std::string_view text);
+
+/**
  * @brief Validate a test password against the a ssha1 password.
  */
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text);
@@ -186,6 +191,7 @@ std::string tr_base64_decode_str(std::string_view input);
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
+ * @return address pointing past the last element written.
  */
 char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf);
 
@@ -197,7 +203,7 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
-void tr_hex_to_sha1(void* sha1, void const* hex);
+tr_sha1_digest_t tr_sha1_from_string(char const* hex);
 
 /** @} */
 

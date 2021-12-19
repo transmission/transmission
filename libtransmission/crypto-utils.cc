@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <cstdarg>
 #include <cstring> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
@@ -23,6 +24,8 @@ extern "C"
 #include "crypto-utils.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 /***
 ****
@@ -76,35 +79,44 @@ int tr_rand_int_weak(int upper_bound)
 ****
 ***/
 
-std::string tr_ssha1(std::string_view plain_text)
+static auto constexpr DigestStringSize = TR_SHA1_DIGEST_LEN * 2;
+static auto constexpr SaltedPrefix = std::string_view{ "{" };
+
+std::string tr_ssha1(std::string_view plaintext)
 {
-    auto constexpr SaltvalLen = int{ 8 };
-    auto constexpr SalterLen = int{ 64 };
+    auto constexpr Salter = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ./"sv;
+    static_assert(std::size(Salter) == 64);
 
-    static char const* salter =
-        "0123456789"
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "./";
+    // build an array of random Salter chars
+    auto constexpr SaltSize = size_t{ 8 };
+    auto salt = std::array<char, SaltSize>{};
+    tr_rand_buffer(std::data(salt), std::size(salt));
+    std::transform(
+        std::begin(salt),
+        std::end(salt),
+        std::begin(salt),
+        [&Salter](auto ch) { return Salter[ch % std::size(Salter)]; });
 
-    char salt[SaltvalLen];
+    // build a sha1 digest of the original content and the salt
+    auto const digest = tr_sha1(plaintext, salt);
 
-    tr_rand_buffer(salt, SaltvalLen);
+    // convert it to a string.
+    // prepend with a '{' marker so the codebase can identify salted strings
 
-    for (auto& ch : salt)
-    {
-        ch = salter[ch % SalterLen];
-    }
+    auto constexpr BufSize = std::size(SaltedPrefix) + DigestStringSize + SaltSize;
+    auto buf = std::array<char, BufSize>{};
+    auto* walk = std::begin(buf);
+    walk = std::copy(std::begin(SaltedPrefix), std::end(SaltedPrefix), walk);
+    walk = tr_sha1_to_string(*digest, walk);
+    walk = std::copy(std::begin(salt), std::end(salt), walk);
+    TR_ASSERT(walk == std::begin(buf) + std::size(buf));
 
-    auto const digest = tr_sha1(plain_text, std::string_view{ salt, SaltvalLen });
+    return std::string{ std::data(buf), std::size(buf) };
+}
 
-    char buf[2 * SHA_DIGEST_LENGTH + SaltvalLen + 2];
-    buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
-    tr_sha1_to_string(*digest, &buf[1]);
-    memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, SaltvalLen);
-    buf[1 + 2 * SHA_DIGEST_LENGTH + SaltvalLen] = '\0';
-
-    return std::string{ buf };
+bool tr_ssha1_test(std::string_view text)
+{
+    return tr_strvStartsWith(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text)
@@ -129,6 +141,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text)
     {
         return false;
     }
+
     char strbuf[SHA_DIGEST_LENGTH * 2 + 1];
     tr_sha1_to_string(*salted_digest, strbuf);
     return strncmp(std::data(ssha1) + brace_len, strbuf, SHA_DIGEST_LENGTH * 2) == 0;
@@ -243,7 +256,7 @@ std::string tr_base64_decode_str(std::string_view input)
 
 static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
 {
-    static char const hex[] = "0123456789abcdef";
+    static char constexpr Hex[] = "0123456789abcdef";
 
     auto const* input = static_cast<uint8_t const*>(vinput);
     auto* output = static_cast<char*>(voutput);
@@ -257,8 +270,8 @@ static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_leng
     while (byte_length-- > 0)
     {
         unsigned int const val = *(--input);
-        *(--output) = hex[val & 0xf];
-        *(--output) = hex[val >> 4];
+        *(--output) = Hex[val & 0xf];
+        *(--output) = Hex[val >> 4];
     }
 }
 
@@ -272,25 +285,27 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
 char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
 {
     tr_binary_to_hex(std::data(digest), strbuf, std::size(digest));
-    return strbuf;
+    return strbuf + (std::size(digest) * 2);
 }
 
 static void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
 {
-    static char const hex[] = "0123456789abcdef";
+    static char constexpr Hex[] = "0123456789abcdef";
 
     auto const* input = static_cast<uint8_t const*>(vinput);
     auto* output = static_cast<uint8_t*>(voutput);
 
     for (size_t i = 0; i < byte_length; ++i)
     {
-        int const hi = strchr(hex, tolower(*input++)) - hex;
-        int const lo = strchr(hex, tolower(*input++)) - hex;
+        int const hi = strchr(Hex, tolower(*input++)) - Hex;
+        int const lo = strchr(Hex, tolower(*input++)) - Hex;
         *output++ = (uint8_t)((hi << 4) | lo);
     }
 }
 
-void tr_hex_to_sha1(void* sha1, void const* hex)
+tr_sha1_digest_t tr_sha1_from_string(char const* hex)
 {
-    tr_hex_to_binary(hex, sha1, SHA_DIGEST_LENGTH);
+    auto digest = tr_sha1_digest_t{};
+    tr_hex_to_binary(hex, std::data(digest), SHA_DIGEST_LENGTH);
+    return digest;
 }

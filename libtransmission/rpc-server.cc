@@ -967,7 +967,7 @@ std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
 
 static constexpr bool isSalted(std::string_view password)
 {
-    return !std::empty(password) && password.front() == '{';
+    return tr_ssha1_test(password);
 }
 
 void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password)
