@@ -965,7 +965,7 @@ std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
     return server->username;
 }
 
-static constexpr bool isSalted(std::string_view password)
+static bool isSalted(std::string_view password)
 {
     return tr_ssha1_test(password);
 }
