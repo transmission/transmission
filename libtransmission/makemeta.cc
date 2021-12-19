@@ -17,7 +17,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_sha1 */
+#include "crypto-utils.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -247,11 +247,11 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 *****
 ****/
 
-static uint8_t* getHashInfo(tr_metainfo_builder* b)
+static std::byte* getHashInfo(tr_metainfo_builder* b)
 {
     uint32_t fileIndex = 0;
-    auto* const ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
-    uint8_t* walk = ret;
+    auto* const ret = tr_new0(std::byte, SHA_DIGEST_LENGTH * b->pieceCount);
+    auto* walk = ret;
     uint64_t off = 0;
     tr_error* error = nullptr;
 
@@ -260,7 +260,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return ret;
     }
 
-    auto* const buf = static_cast<uint8_t*>(tr_malloc(b->pieceSize));
+    char* const buf = tr_new(char, b->pieceSize);
     b->pieceIndex = 0;
     uint64_t totalRemain = b->totalSize;
 
@@ -280,7 +280,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
-        uint8_t* bufptr = buf;
+        auto* bufptr = buf;
         uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
@@ -319,8 +319,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
         TR_ASSERT(bufptr - buf == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
-        tr_sha1(walk, buf, (int)thisPieceSize, nullptr);
-        walk += SHA_DIGEST_LENGTH;
+        auto const digest = tr_sha1(std::string_view{ buf, thisPieceSize });
+        walk = std::copy(std::begin(*digest), std::end(*digest), walk);
 
         if (b->abortFlag)
         {

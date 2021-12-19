@@ -154,23 +154,19 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return true;
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<api_sha1_context*>(raw_handle);
+    TR_ASSERT(handle != nullptr);
 
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        API(sha1_finish)(handle, hash);
-    }
-
+    auto digest = tr_sha1_digest_t{};
+    API(sha1_finish)(handle, std::data(digest));
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_free)(handle);
 #endif
 
     tr_free(handle);
-    return true;
+    return digest;
 }
 
 /***

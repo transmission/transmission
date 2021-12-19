@@ -19,6 +19,7 @@
 #include <QString>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/tr-macros.h>
@@ -109,7 +110,7 @@ using FileList = std::vector<TorrentFile>;
 class TorrentHash
 {
 private:
-    std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
+    tr_sha1_digest_t data_ = {};
 
 public:
     TorrentHash()
@@ -143,9 +144,9 @@ public:
 
     QString toString() const
     {
-        char str[SHA_DIGEST_LENGTH * 2 + 1];
-        tr_sha1_to_hex(str, data_.data());
-        return QString::fromUtf8(str, SHA_DIGEST_LENGTH * 2);
+        char strbuf[TR_SHA1_DIGEST_LEN * 2 + 1];
+        tr_sha1_to_string(data_, strbuf);
+        return QString::fromUtf8(strbuf, SHA_DIGEST_LENGTH * 2);
     }
 };
 

@@ -47,48 +47,6 @@ void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size)
 ****
 ***/
 
-bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
-{
-    tr_sha1_ctx_t sha = tr_sha1_init();
-    if (sha == nullptr)
-    {
-        return false;
-    }
-
-    if (tr_sha1_update(sha, data1, data1_length))
-    {
-        va_list vl;
-        va_start(vl, data1_length);
-
-        void const* data = nullptr;
-        while ((data = va_arg(vl, void const*)) != nullptr)
-        {
-            int const data_length = va_arg(vl, int);
-            TR_ASSERT(data_length >= 0);
-
-            if (!tr_sha1_update(sha, data, data_length))
-            {
-                break;
-            }
-        }
-
-        va_end(vl);
-
-        /* did we reach the end of argument list? */
-        if (data == nullptr)
-        {
-            return tr_sha1_final(sha, hash);
-        }
-    }
-
-    tr_sha1_final(sha, nullptr);
-    return false;
-}
-
-/***
-****
-***/
-
 int tr_rand_int(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
@@ -129,9 +87,7 @@ std::string tr_ssha1(std::string_view plain_text)
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "./";
 
-    unsigned char salt[SaltvalLen];
-    uint8_t sha[SHA_DIGEST_LENGTH];
-    char buf[2 * SHA_DIGEST_LENGTH + SaltvalLen + 2];
+    char salt[SaltvalLen];
 
     tr_rand_buffer(salt, SaltvalLen);
 
@@ -140,11 +96,13 @@ std::string tr_ssha1(std::string_view plain_text)
         ch = salter[ch % SalterLen];
     }
 
-    tr_sha1(sha, std::data(plain_text), std::size(plain_text), salt, SaltvalLen, nullptr);
-    tr_sha1_to_hex(&buf[1], sha);
+    auto const digest = tr_sha1(plain_text, std::string_view{ salt, SaltvalLen });
+
+    char buf[2 * SHA_DIGEST_LENGTH + SaltvalLen + 2];
+    buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
+    tr_sha1_to_string(*digest, &buf[1]);
     memcpy(&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, SaltvalLen);
     buf[1 + 2 * SHA_DIGEST_LENGTH + SaltvalLen] = '\0';
-    buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
 
     return std::string{ buf };
 }
@@ -165,13 +123,15 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text)
     char const* const salt = std::data(ssha1) + brace_and_hash_len;
     size_t const salt_len = source_len - brace_and_hash_len;
 
-    uint8_t buf[SHA_DIGEST_LENGTH * 2 + 1];
-
     /* hash pass + salt */
-    tr_sha1(buf, std::data(plain_text), std::size(plain_text), salt, (int)salt_len, nullptr);
-    tr_sha1_to_hex((char*)buf, buf);
-
-    return strncmp(std::data(ssha1) + brace_len, (char const*)buf, SHA_DIGEST_LENGTH * 2) == 0;
+    auto const salted_digest = tr_sha1(plain_text, std::string_view{ salt, salt_len });
+    if (!salted_digest)
+    {
+        return false;
+    }
+    char strbuf[SHA_DIGEST_LENGTH * 2 + 1];
+    tr_sha1_to_string(*salted_digest, strbuf);
+    return strncmp(std::data(ssha1) + brace_len, strbuf, SHA_DIGEST_LENGTH * 2) == 0;
 }
 
 /***
@@ -302,16 +262,17 @@ static void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_leng
     }
 }
 
-std::string tr_sha1_to_hex(tr_sha1_digest_t const& digest)
+std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
 {
     auto str = std::string(std::size(digest) * 2, '?');
     tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
     return str;
 }
 
-void tr_sha1_to_hex(void* hex, void const* sha1)
+char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
 {
-    tr_binary_to_hex(sha1, hex, SHA_DIGEST_LENGTH);
+    tr_binary_to_hex(std::data(digest), strbuf, std::size(digest));
+    return strbuf;
 }
 
 static void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)

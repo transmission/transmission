@@ -15,7 +15,7 @@
 #include <string>
 #include <string_view>
 
-#include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "transmission.h" // tr_sha1_digest_t
 
 /**
 *** @addtogroup utils Utilities
@@ -36,11 +36,6 @@ using tr_x509_store_t = void*;
 using tr_x509_cert_t = void*;
 
 /**
- * @brief Generate a SHA1 hash from one or more chunks of memory.
- */
-bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...) TR_GNUC_NULL_TERMINATED;
-
-/**
  * @brief Allocate and initialize new SHA1 hasher context.
  */
 tr_sha1_ctx_t tr_sha1_init(void);
@@ -53,12 +48,13 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length);
 /**
  * @brief Finalize and export SHA1 hash, free hasher context.
  */
-bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* setme);
-
 std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle);
 
+/**
+ * @brief Generate a SHA1 hash from one or more chunks of memory.
+ */
 template<typename... T>
-std::optional<tr_sha1_digest_t> tr_makeSha1(T... args)
+std::optional<tr_sha1_digest_t> tr_sha1(T... args)
 {
     auto ctx = tr_sha1_init();
     (tr_sha1_update(ctx, std::data(args), std::size(args)), ...);
@@ -93,13 +89,12 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
  * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
  *        given data to the key during calculation.
  */
-bool tr_dh_secret_derive(
+std::optional<tr_sha1_digest_t> tr_dh_secret_derive(
     tr_dh_secret_t handle,
     void const* prepend_data,
     size_t prepend_data_size,
     void const* append_data,
-    size_t append_data_size,
-    uint8_t* hash);
+    size_t append_data_size);
 
 /**
  * @brief Free DH secret key returned by @ref tr_dh_agree.
@@ -190,11 +185,14 @@ void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 std::string tr_base64_decode_str(std::string_view input);
 
 /**
- * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
+ * @brief Generate an ascii hex string for a sha1 digest.
  */
-void tr_sha1_to_hex(void* hex, void const* sha1);
+char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf);
 
-std::string tr_sha1_to_hex(tr_sha1_digest_t const&);
+/**
+ * @brief Generate an ascii hex string for a sha1 digest.
+ */
+std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
  * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.

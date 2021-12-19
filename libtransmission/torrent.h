@@ -76,7 +76,7 @@ void tr_torrentChangeMyPort(tr_torrent* session);
 
 tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
 
-tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* hash);
+tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
@@ -366,6 +366,11 @@ public:
 
     /// METAINFO - OTHER
 
+    [[nodiscard]] auto const& hash() const
+    {
+        return this->info.hash;
+    }
+
     [[nodiscard]] auto isPrivate() const
     {
         return this->info.isPrivate;
@@ -537,7 +542,7 @@ public:
 
     bool checkPiece(tr_piece_index_t piece);
 
-    uint8_t obfuscatedHash[SHA_DIGEST_LENGTH] = {};
+    tr_sha1_digest_t obfuscated_hash = {};
 
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstring>
 #include <iterator>
 #include <string_view>
 #include <vector>
@@ -371,13 +372,13 @@ static char const* tr_metainfoParseImpl(
                 return "info_hash";
             }
 
-            if (std::size(sv) != SHA_DIGEST_LENGTH)
+            if (std::size(sv) != std::size(inf->hash))
             {
                 return "info_hash";
             }
 
-            std::copy(std::begin(sv), std::end(sv), inf->hash);
-            tr_sha1_to_hex(inf->hashString, inf->hash);
+            (void)memcpy(std::data(inf->hash), std::data(sv), std::size(sv));
+            tr_sha1_to_string(inf->hash, inf->hashString);
 
             // maybe get the display name
             if (tr_variantDictFindStrView(d, TR_KEY_display_name, &sv))
@@ -400,8 +401,8 @@ static char const* tr_metainfoParseImpl(
     {
         size_t blen = 0;
         char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
-        tr_sha1(inf->hash, bstr, (int)blen, nullptr);
-        tr_sha1_to_hex(inf->hashString, inf->hash);
+        inf->hash = *tr_sha1(std::string_view{ bstr, blen });
+        tr_sha1_to_string(inf->hash, inf->hashString);
 
         if (infoDictLength != nullptr)
         {

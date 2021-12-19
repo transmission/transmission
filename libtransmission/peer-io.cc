@@ -609,7 +609,7 @@ static tr_peerIo* tr_peerIoNew(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
+    tr_sha1_digest_t const* torrent_hash,
     bool isIncoming,
     bool isSeed,
     struct tr_peer_socket const socket)
@@ -631,7 +631,7 @@ static tr_peerIo* tr_peerIoNew(
     }
 
     auto* io = new tr_peerIo{ session, *addr, port, isSeed };
-    tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
+    tr_cryptoConstruct(&io->crypto, torrent_hash, isIncoming);
     io->socket = socket;
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
@@ -688,13 +688,12 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
+    tr_sha1_digest_t const& torrent_hash,
     bool isSeed,
     bool utp)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
-    TR_ASSERT(torrentHash != nullptr);
 
     auto socket = tr_peer_socket{};
 
@@ -717,7 +716,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
         return nullptr;
     }
 
-    return tr_peerIoNew(session, parent, addr, port, torrentHash, false, isSeed, socket);
+    return tr_peerIoNew(session, parent, addr, port, &torrent_hash, false, isSeed, socket);
 }
 
 /***
@@ -994,25 +993,18 @@ int tr_peerIoReconnect(tr_peerIo* io)
 ***
 **/
 
-void tr_peerIoSetTorrentHash(tr_peerIo* io, uint8_t const* hash)
+void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_cryptoSetTorrentHash(&io->crypto, hash);
+    tr_cryptoSetTorrentHash(&io->crypto, info_hash);
 }
 
-uint8_t const* tr_peerIoGetTorrentHash(tr_peerIo* io)
+std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
     return tr_cryptoGetTorrentHash(&io->crypto);
-}
-
-bool tr_peerIoHasTorrentHash(tr_peerIo const* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    return tr_cryptoHasTorrentHash(&io->crypto);
 }
 
 /**
