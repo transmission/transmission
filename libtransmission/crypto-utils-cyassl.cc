@@ -139,13 +139,14 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
 
-std::optonal<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<Sha*>(raw_handle);
     TR_ASSERT(handle != nullptr);
 
     auto digest = tr_sha1_digest_t{};
-    auto const ok = check_result(API(ShaFinal)(handle, std::data(digest)));
+    auto digest_in_cyassl = reinterpret_cast<unsigned char*>(std::data(digest));
+    auto const ok = check_result(API(ShaFinal)(handle, digest_in_cyassl));
     tr_free(handle);
 
     return ok ? digest : std::optional<tr_sha1_digest> t{};
