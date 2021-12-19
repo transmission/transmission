@@ -160,7 +160,8 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     TR_ASSERT(handle != nullptr);
 
     auto digest = tr_sha1_digest_t{};
-    API(sha1_finish)(handle, std::data(digest));
+    auto* const digest_in_polarssl = reinterpret_cast<unsigned char*>(std::data(digest));
+    API(sha1_finish)(handle, digest_in_polarssl);
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_free)(handle);
 #endif
