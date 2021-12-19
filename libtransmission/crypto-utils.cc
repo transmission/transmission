@@ -79,15 +79,36 @@ int tr_rand_int_weak(int upper_bound)
 ****
 ***/
 
-static auto constexpr DigestStringSize = TR_SHA1_DIGEST_LEN * 2;
-static auto constexpr SaltedPrefix = std::string_view{ "{" };
+namespace
+{
+
+auto constexpr DigestStringSize = TR_SHA1_DIGEST_LEN * 2;
+auto constexpr SaltedPrefix = std::string_view{ "{" };
+
+std::string tr_salt(std::string_view plaintext, std::string_view salt)
+{
+    // build a sha1 digest of the original content and the salt
+    auto const digest = tr_sha1(plaintext, salt);
+
+    // convert it to a string.
+    // prepend with a '{' marker so the codebase can identify salted strings
+
+    auto str = std::string(std::size(SaltedPrefix) + DigestStringSize + std::size(salt), '?');
+    char* it = std::data(str);
+    it = std::copy(std::begin(SaltedPrefix), std::end(SaltedPrefix), it);
+    it = tr_sha1_to_string(*digest, it);
+    it = std::copy(std::begin(salt), std::end(salt), it);
+    TR_ASSERT(std::size(str) == size_t(it - std::data(str)));
+    return str;
+}
+
+} // namespace
 
 std::string tr_ssha1(std::string_view plaintext)
 {
+    // build an array of random Salter chars
     auto constexpr Salter = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ./"sv;
     static_assert(std::size(Salter) == 64);
-
-    // build an array of random Salter chars
     auto constexpr SaltSize = size_t{ 8 };
     auto salt = std::array<char, SaltSize>{};
     tr_rand_buffer(std::data(salt), std::size(salt));
@@ -97,21 +118,7 @@ std::string tr_ssha1(std::string_view plaintext)
         std::begin(salt),
         [&Salter](auto ch) { return Salter[ch % std::size(Salter)]; });
 
-    // build a sha1 digest of the original content and the salt
-    auto const digest = tr_sha1(plaintext, salt);
-
-    // convert it to a string.
-    // prepend with a '{' marker so the codebase can identify salted strings
-
-    auto constexpr BufSize = std::size(SaltedPrefix) + DigestStringSize + SaltSize;
-    auto buf = std::array<char, BufSize>{};
-    auto* walk = std::begin(buf);
-    walk = std::copy(std::begin(SaltedPrefix), std::end(SaltedPrefix), walk);
-    walk = tr_sha1_to_string(*digest, walk);
-    walk = std::copy(std::begin(salt), std::end(salt), walk);
-    TR_ASSERT(walk == std::begin(buf) + std::size(buf));
-
-    return std::string{ std::data(buf), std::size(buf) };
+    return tr_salt(plaintext, std::string_view{ std::data(salt), std::size(salt) });
 }
 
 bool tr_ssha1_test(std::string_view text)
@@ -119,32 +126,15 @@ bool tr_ssha1_test(std::string_view text)
     return tr_strvStartsWith(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
-bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text)
+bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 {
-    size_t const brace_len = 1;
-    size_t const brace_and_hash_len = brace_len + 2 * SHA_DIGEST_LENGTH;
-
-    size_t const source_len = std::size(ssha1);
-
-    if (source_len < brace_and_hash_len || ssha1[0] != '{')
+    if (!tr_ssha1_test(ssha1))
     {
         return false;
     }
 
-    /* extract the salt */
-    char const* const salt = std::data(ssha1) + brace_and_hash_len;
-    size_t const salt_len = source_len - brace_and_hash_len;
-
-    /* hash pass + salt */
-    auto const salted_digest = tr_sha1(plain_text, std::string_view{ salt, salt_len });
-    if (!salted_digest)
-    {
-        return false;
-    }
-
-    char strbuf[SHA_DIGEST_LENGTH * 2 + 1];
-    tr_sha1_to_string(*salted_digest, strbuf);
-    return strncmp(std::data(ssha1) + brace_len, strbuf, SHA_DIGEST_LENGTH * 2) == 0;
+    auto const salt = ssha1.substr(std::size(SaltedPrefix) + DigestStringSize);
+    return tr_salt(plaintext, salt) == ssha1;
 }
 
 /***
