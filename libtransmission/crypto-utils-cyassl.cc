@@ -149,7 +149,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     auto const ok = check_result(API(ShaFinal)(handle, digest_in_cyassl));
     tr_free(handle);
 
-    return ok ? digest : std::optional<tr_sha1_digest> t{};
+    return ok ? digest : std::optional<tr_sha1_digest_t>{};
 }
 
 /***
