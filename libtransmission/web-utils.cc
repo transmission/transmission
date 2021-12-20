@@ -313,7 +313,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 
     if (!urlCharsAreValid(url))
     {
-        return {};
+        return std::nullopt;
     }
 
     auto parsed = tr_url_parsed_t{};
@@ -323,7 +323,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     parsed.scheme = tr_strvSep(&url, ':');
     if (std::empty(parsed.scheme))
     {
-        return {};
+        return std::nullopt;
     }
 
     // authority
@@ -370,7 +370,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_url_parsed_t>{};
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)

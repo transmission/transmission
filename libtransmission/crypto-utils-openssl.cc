@@ -142,7 +142,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     TR_ASSERT(!ok || hash_length == std::size(digest));
 
     EVP_MD_CTX_destroy(handle);
-    return ok ? digest : std::optional<tr_sha1_digest_t>{};
+    return ok ? std::make_optional(digest) : std::nullopt;
 }
 
 /***
