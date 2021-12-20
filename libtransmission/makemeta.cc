@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdint>
 #include <cstdlib> /* qsort */
 #include <cstring> /* strcmp, strlen */
 #include <mutex>
@@ -320,6 +321,16 @@ static std::byte* getHashInfo(tr_metainfo_builder* b)
         TR_ASSERT(bufptr - buf == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
         auto const digest = tr_sha1(std::string_view{ buf, thisPieceSize });
+        if (!digest)
+        {
+            b->my_errno = errno;
+            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            b->result = TR_MAKEMETA_IO_READ;
+            tr_free(buf);
+            tr_free(ret);
+            return nullptr;
+        }
+
         walk = std::copy(std::begin(*digest), std::end(*digest), walk);
 
         if (b->abortFlag)

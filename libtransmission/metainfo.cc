@@ -401,15 +401,21 @@ static char const* tr_metainfoParseImpl(
     {
         size_t blen = 0;
         char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
-        inf->hash = *tr_sha1(std::string_view{ bstr, blen });
+        auto const hash = tr_sha1(std::string_view{ bstr, blen });
+        tr_free(bstr);
+
+        if (!hash)
+        {
+            return "hash";
+        }
+
+        inf->hash = *hash;
         tr_sha1_to_string(inf->hash, inf->hashString);
 
         if (infoDictLength != nullptr)
         {
             *infoDictLength = blen;
         }
-
-        tr_free(bstr);
     }
 
     /* name */

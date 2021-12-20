@@ -578,7 +578,17 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->initSizes(tor->totalSize(), tor->pieceSize());
     tor->completion = tr_completion{ tor, tor };
-    tor->obfuscated_hash = *tr_sha1("req2"sv, tor->info.hash);
+    auto const obfuscated = tr_sha1("req2"sv, tor->info.hash);
+    if (obfuscated)
+    {
+        tor->obfuscated_hash = *obfuscated;
+    }
+    else
+    {
+        // lookups by obfuscated hash will fail for this torrent
+        tr_logAddTorErr(tor, "error computing obfuscated info hash");
+        tor->obfuscated_hash = tr_sha1_digest_t{};
+    }
 
     // init file offsets
     auto offset = uint64_t{ 0 };

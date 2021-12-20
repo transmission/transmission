@@ -414,6 +414,11 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     /* HASH('req1', S) */
     {
         auto const req1 = computeRequestHash(handshake, "req1"sv);
+        if (!req1)
+        {
+            dbgmsg(handshake, "error while computing req1 hash after Yb");
+            return tr_handshakeDone(handshake, false);
+        }
         evbuffer_add(outbuf, std::data(*req1), std::size(*req1));
     }
 
@@ -421,8 +426,13 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
     {
         auto const req2 = tr_sha1("req2"sv, *tr_cryptoGetTorrentHash(handshake->crypto));
         auto const req3 = computeRequestHash(handshake, "req3"sv);
-        auto buf = tr_sha1_digest_t{};
+        if (!req2 || !req3)
+        {
+            dbgmsg(handshake, "error while computing req2/req3 hash after Yb");
+            return tr_handshakeDone(handshake, false);
+        }
 
+        auto buf = tr_sha1_digest_t{};
         for (size_t i = 0, n = std::size(buf); i < n; ++i)
         {
             buf[i] = (*req2)[i] ^ (*req3)[i];
@@ -721,7 +731,13 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
         return tr_handshakeDone(handshake, false);
     }
 
-    handshake->myReq1 = *computeRequestHash(handshake, "req1"sv);
+    auto req1 = computeRequestHash(handshake, "req1"sv);
+    if (!req1)
+    {
+        dbgmsg(handshake, "error while computing req1 hash after Ya");
+        return tr_handshakeDone(handshake, false);
+    }
+    handshake->myReq1 = *req1;
 
     /* send our public key to the peer */
     dbgmsg(handshake, "sending B->A: Diffie Hellman Yb, PadB");
@@ -790,7 +806,13 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     dbgmsg(handshake, "reading obfuscated torrent hash...");
     auto req2 = tr_sha1_digest_t{};
     evbuffer_remove(inbuf, std::data(req2), std::size(req2));
+
     auto const req3 = computeRequestHash(handshake, "req3"sv);
+    if (!req3)
+    {
+        dbgmsg(handshake, "error while computing req3 hash after req2");
+        return tr_handshakeDone(handshake, false);
+    }
 
     auto obfuscated_hash = tr_sha1_digest_t{};
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
