@@ -165,6 +165,7 @@
 #define tr_rand_buffer_ tr_rand_buffer
 #define tr_ssha1_ tr_ssha1
 #define tr_ssha1_matches_ tr_ssha1_matches
+#define tr_ssha1_test_ tr_ssha1_test
 #define tr_base64_encode_ tr_base64_encode
 #define tr_base64_encode_str_ tr_base64_encode_str
 #define tr_base64_encode_impl_ tr_base64_encode_impl
