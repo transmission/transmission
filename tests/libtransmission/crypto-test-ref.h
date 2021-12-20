@@ -54,6 +54,7 @@
 #define tr_rand_buffer tr_rand_buffer_
 #define tr_ssha1 tr_ssha1_
 #define tr_ssha1_matches tr_ssha1_matches_
+#define tr_ssha1_test tr_ssha1_test_
 #define tr_base64_encode tr_base64_encode_
 #define tr_base64_encode_str tr_base64_encode_str_
 #define tr_base64_encode_impl tr_base64_encode_impl_
@@ -113,6 +114,7 @@
 #undef tr_rand_buffer
 #undef tr_ssha1
 #undef tr_ssha1_matches
+#undef tr_ssha1_test
 #undef tr_base64_encode
 #undef tr_base64_encode_str
 #undef tr_base64_encode_impl
