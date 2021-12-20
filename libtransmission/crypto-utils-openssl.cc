@@ -137,8 +137,8 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 
     unsigned int hash_length = 0;
     auto digest = tr_sha1_digest_t{};
-    auto* digest_as_evp = reinterpret_cast<unsigned char*>(std::data(digest));
-    bool const ok = check_result(EVP_DigestFinal_ex(handle, digest_as_evp, &hash_length));
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    bool const ok = check_result(EVP_DigestFinal_ex(handle, digest_as_uchar, &hash_length));
     TR_ASSERT(!ok || hash_length == std::size(digest));
 
     EVP_MD_CTX_destroy(handle);

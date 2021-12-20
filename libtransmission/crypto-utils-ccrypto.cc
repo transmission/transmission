@@ -169,11 +169,10 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     auto* handle = static_cast<CC_SHA1_CTX*>(raw_handle);
 
     auto digest = tr_sha1_digest_t{};
-    auto* digest_as_cc = reinterpret_cast<unsigned char*>(std::data(digest));
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    CC_SHA1_Final(digest_as_uchar, handle);
 
-    CC_SHA1_Final(digest_as_cc, handle);
     delete handle;
-
     return digest;
 }
 

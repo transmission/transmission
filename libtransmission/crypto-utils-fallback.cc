@@ -52,12 +52,12 @@ std::optional<tr_sha1_digest_t> tr_dh_secret_derive(
 {
     TR_ASSERT(raw_handle != nullptr);
 
-    auto* handle = static_cast<struct tr_dh_secret*>(raw_handle);
+    auto const* handle = static_cast<struct tr_dh_secret*>(raw_handle);
 
-    auto const prepend = std::string_view{ static_cast<char const*>(prepend_data), prepend_data_size };
-    auto const key = std::string_view{ reinterpret_cast<char const*>(handle->key), handle->key_length };
-    auto const append = std::string_view{ static_cast<char const*>(append_data), append_data_size };
-    return tr_sha1(prepend, key, append);
+    return tr_sha1(
+        std::string_view{ static_cast<char const*>(prepend_data), prepend_data_size },
+        std::string_view{ reinterpret_cast<char const*>(handle->key), handle->key_length },
+        std::string_view{ static_cast<char const*>(append_data), append_data_size });
 }
 
 void tr_dh_secret_free(tr_dh_secret_t handle)

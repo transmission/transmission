@@ -145,8 +145,8 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
     TR_ASSERT(handle != nullptr);
 
     auto digest = tr_sha1_digest_t{};
-    auto digest_in_cyassl = reinterpret_cast<unsigned char*>(std::data(digest));
-    auto const ok = check_result(API(ShaFinal)(handle, digest_in_cyassl));
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    auto const ok = check_result(API(ShaFinal)(handle, digest_as_uchar));
     tr_free(handle);
 
     return ok ? std::make_optional(digest) : std::nullopt;
