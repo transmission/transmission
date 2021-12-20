@@ -7,9 +7,11 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cstdarg>
-#include <cstring> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
+#include <cstring> /* memmove(), memset(), strlen() */
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
+#include <string>
 #include <string_view>
 
 #include <arc4.h>
@@ -90,16 +92,9 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
     // build a sha1 digest of the original content and the salt
     auto const digest = tr_sha1(plaintext, salt);
 
-    // convert it to a string.
-    // prepend with a '{' marker so the codebase can identify salted strings
-
-    auto str = std::string(std::size(SaltedPrefix) + DigestStringSize + std::size(salt), '?');
-    char* it = std::data(str);
-    it = std::copy(std::begin(SaltedPrefix), std::end(SaltedPrefix), it);
-    it = tr_sha1_to_string(*digest, it);
-    it = std::copy(std::begin(salt), std::end(salt), it);
-    TR_ASSERT(std::size(str) == size_t(it - std::data(str)));
-    return str;
+    // convert it to a string. string holds three parts:
+    // DigestPrefix, stringified digest of plaintext + salt, and the salt.
+    return tr_strvJoin(SaltedPrefix, tr_sha1_to_string(*digest), salt);
 }
 
 } // namespace
