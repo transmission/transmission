@@ -291,6 +291,6 @@ static void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_leng
 tr_sha1_digest_t tr_sha1_from_string(char const* hex)
 {
     auto digest = tr_sha1_digest_t{};
-    tr_hex_to_binary(hex, std::data(digest), SHA_DIGEST_LENGTH);
+    tr_hex_to_binary(hex, std::data(digest), std::size(digest));
     return digest;
 }
