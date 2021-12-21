@@ -179,7 +179,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 switch (std::size(hash))
                 {
                 case std::tuple_size_v<tr_sha1_digest_t> * 2:
-                    this->info_hash = tr_sha1_from_string(std::data(hash));
+                    this->info_hash = tr_sha1_from_string(hash);
                     got_checksum = true;
                     break;
 
