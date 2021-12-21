@@ -57,11 +57,20 @@ template<typename... T>
 std::optional<tr_sha1_digest_t> tr_sha1(T... args)
 {
     auto ctx = tr_sha1_init();
-    if ((ctx != nullptr) && (tr_sha1_update(ctx, std::data(args), std::size(args)) && ...))
+    if (ctx == nullptr)
+    {
+        return std::nullopt;
+    }
+
+    if ((tr_sha1_update(ctx, std::data(args), std::size(args)) && ...))
     {
         return tr_sha1_final(ctx);
     }
-    return {};
+
+    // one of the update() calls failed so we will return nullopt,
+    // but we need to call final() first to ensure ctx is released
+    tr_sha1_final(ctx);
+    return std::nullopt;
 }
 
 /**
