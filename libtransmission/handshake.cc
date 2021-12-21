@@ -26,6 +26,8 @@
 #include "tr-dht.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 /* enable LibTransmission extension protocol */
 #define ENABLE_LTEP * /
 /* fast extensions */
@@ -117,7 +119,7 @@ struct tr_handshake
     uint16_t ia_len;
     uint32_t crypto_select;
     uint32_t crypto_provide;
-    uint8_t myReq1[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t myReq1;
     struct event* timeout_timer;
 
     std::optional<tr_peer_id_t> peer_id;
@@ -174,8 +176,8 @@ static void setReadState(tr_handshake* handshake, handshake_state_t state)
 
 static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
 {
-    uint8_t const* const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
-    auto* const tor = torrent_hash == nullptr ? nullptr : handshake->session->getTorrent(torrent_hash);
+    auto const torrent_hash = tr_cryptoGetTorrentHash(handshake->crypto);
+    auto* const tor = torrent_hash ? handshake->session->getTorrent(*torrent_hash) : nullptr;
     bool const success = tor != nullptr;
 
     if (success)
@@ -196,7 +198,7 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         }
         walk += HANDSHAKE_FLAGS_LEN;
 
-        walk = std::copy_n(torrent_hash, SHA_DIGEST_LENGTH, walk);
+        walk = std::copy_n(reinterpret_cast<char const*>(std::data(tor->hash())), std::size(tor->hash()), walk);
 
         auto const& peer_id = tr_torrentGetPeerId(tor);
         std::copy_n(std::data(peer_id), std::size(peer_id), walk);
@@ -221,7 +223,6 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
 {
     uint8_t name[HANDSHAKE_NAME_LEN];
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
-    uint8_t hash[SHA_DIGEST_LENGTH];
 
     dbgmsg(handshake, "payload: need %d, got %zu", HANDSHAKE_SIZE, evbuffer_get_length(inbuf));
 
@@ -242,10 +243,10 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     tr_peerIoReadBytes(handshake->io, inbuf, reserved, HANDSHAKE_FLAGS_LEN);
 
     /* torrent hash */
-    tr_peerIoReadBytes(handshake->io, inbuf, hash, sizeof(hash));
-    TR_ASSERT(tr_peerIoHasTorrentHash(handshake->io));
-
-    if (!handshake->session->contains(hash) || memcmp(hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH) != 0)
+    auto hash = tr_sha1_digest_t{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
+    auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io);
+    if (!torrent_hash || *torrent_hash != hash)
     {
         dbgmsg(handshake, "peer returned the wrong hash. wtf?");
         return HANDSHAKE_BAD_TORRENT;
@@ -359,9 +360,9 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
     return 0;
 }
 
-static void computeRequestHash(tr_handshake const* handshake, char const* name, uint8_t* hash)
+static auto computeRequestHash(tr_handshake const* handshake, std::string_view name)
 {
-    tr_cryptoSecretKeySha1(handshake->crypto, name, 4, nullptr, 0, hash);
+    return tr_cryptoSecretKeySha1(handshake->crypto, std::data(name), std::size(name), "", 0);
 }
 
 static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
@@ -412,26 +413,32 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req1', S) */
     {
-        uint8_t req1[SHA_DIGEST_LENGTH];
-        computeRequestHash(handshake, "req1", req1);
-        evbuffer_add(outbuf, req1, SHA_DIGEST_LENGTH);
+        auto const req1 = computeRequestHash(handshake, "req1"sv);
+        if (!req1)
+        {
+            dbgmsg(handshake, "error while computing req1 hash after Yb");
+            return tr_handshakeDone(handshake, false);
+        }
+        evbuffer_add(outbuf, std::data(*req1), std::size(*req1));
     }
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        uint8_t req2[SHA_DIGEST_LENGTH];
-        uint8_t req3[SHA_DIGEST_LENGTH];
-        uint8_t buf[SHA_DIGEST_LENGTH];
-
-        tr_sha1(req2, "req2", 4, tr_cryptoGetTorrentHash(handshake->crypto), SHA_DIGEST_LENGTH, nullptr);
-        computeRequestHash(handshake, "req3", req3);
-
-        for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
+        auto const req2 = tr_sha1("req2"sv, *tr_cryptoGetTorrentHash(handshake->crypto));
+        auto const req3 = computeRequestHash(handshake, "req3"sv);
+        if (!req2 || !req3)
         {
-            buf[i] = req2[i] ^ req3[i];
+            dbgmsg(handshake, "error while computing req2/req3 hash after Yb");
+            return tr_handshakeDone(handshake, false);
         }
 
-        evbuffer_add(outbuf, buf, SHA_DIGEST_LENGTH);
+        auto buf = tr_sha1_digest_t{};
+        for (size_t i = 0, n = std::size(buf); i < n; ++i)
+        {
+            buf[i] = (*req2)[i] ^ (*req3)[i];
+        }
+
+        evbuffer_add(outbuf, std::data(buf), std::size(buf));
     }
 
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
@@ -639,8 +646,8 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
 
     /* torrent hash */
-    uint8_t hash[SHA_DIGEST_LENGTH];
-    tr_peerIoReadBytes(handshake->io, inbuf, hash, sizeof(hash));
+    auto hash = tr_sha1_digest_t{};
+    tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
 
     if (tr_peerIoIsIncoming(handshake->io))
     {
@@ -650,14 +657,12 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
             return tr_handshakeDone(handshake, false);
         }
 
-        TR_ASSERT(!tr_peerIoHasTorrentHash(handshake->io));
         tr_peerIoSetTorrentHash(handshake->io, hash);
     }
     else /* outgoing */
     {
-        TR_ASSERT(tr_peerIoHasTorrentHash(handshake->io));
-
-        if (memcmp(hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH) != 0)
+        auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io);
+        if (!torrent_hash || *torrent_hash != hash)
         {
             dbgmsg(handshake, "peer returned the wrong hash. wtf?");
             return tr_handshakeDone(handshake, false);
@@ -701,7 +706,8 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     dbgmsg(handshake, "peer-id is [%s] ... isIncoming is %d", client, tr_peerIoIsIncoming(handshake->io));
 
     // if we've somehow connected to ourselves, don't keep the connection
-    auto* const tor = handshake->session->getTorrent(tr_peerIoGetTorrentHash(handshake->io));
+    auto const hash = tr_peerIoGetTorrentHash(handshake->io);
+    auto* const tor = hash ? handshake->session->getTorrent(*hash) : nullptr;
     bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
@@ -725,7 +731,13 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
         return tr_handshakeDone(handshake, false);
     }
 
-    computeRequestHash(handshake, "req1", handshake->myReq1);
+    auto req1 = computeRequestHash(handshake, "req1"sv);
+    if (!req1)
+    {
+        dbgmsg(handshake, "error while computing req1 hash after Ya");
+        return tr_handshakeDone(handshake, false);
+    }
+    handshake->myReq1 = *req1;
 
     /* send our public key to the peer */
     dbgmsg(handshake, "sending B->A: Diffie Hellman Yb, PadB");
@@ -746,7 +758,11 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     /* resynchronizing on HASH('req1', S) */
-    struct evbuffer_ptr ptr = evbuffer_search(inbuf, (char const*)handshake->myReq1, SHA_DIGEST_LENGTH, nullptr);
+    struct evbuffer_ptr ptr = evbuffer_search(
+        inbuf,
+        reinterpret_cast<char const*>(std::data(handshake->myReq1)),
+        std::size(handshake->myReq1),
+        nullptr);
 
     if (ptr.pos != -1) /* match */
     {
@@ -770,9 +786,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
 
     uint8_t vc_in[VC_LENGTH];
-    uint8_t req2[SHA_DIGEST_LENGTH];
-    uint8_t req3[SHA_DIGEST_LENGTH];
-    uint8_t obfuscatedTorrentHash[SHA_DIGEST_LENGTH];
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1', s) */
@@ -791,16 +804,23 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
      * we can get the first half of that (the obufscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
     dbgmsg(handshake, "reading obfuscated torrent hash...");
-    evbuffer_remove(inbuf, req2, SHA_DIGEST_LENGTH);
-    computeRequestHash(handshake, "req3", req3);
+    auto req2 = tr_sha1_digest_t{};
+    evbuffer_remove(inbuf, std::data(req2), std::size(req2));
 
-    for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
+    auto const req3 = computeRequestHash(handshake, "req3"sv);
+    if (!req3)
     {
-        obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
+        dbgmsg(handshake, "error while computing req3 hash after req2");
+        return tr_handshakeDone(handshake, false);
     }
 
-    if (tr_torrent const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash);
-        tor != nullptr)
+    auto obfuscated_hash = tr_sha1_digest_t{};
+    for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
+    {
+        obfuscated_hash[i] = req2[i] ^ (*req3)[i];
+    }
+
+    if (auto const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscated_hash); tor != nullptr)
     {
         bool const clientIsSeed = tor->isDone();
         bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, nullptr));
@@ -1119,8 +1139,8 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     {
         /* This peer probably doesn't speak uTP. */
 
-        tr_torrent* const tor = tr_peerIoHasTorrentHash(io) ? handshake->session->getTorrent(tr_peerIoGetTorrentHash(io)) :
-                                                              nullptr;
+        auto const hash = tr_peerIoGetTorrentHash(io);
+        auto* const tor = hash ? handshake->session->getTorrent(*hash) : nullptr;
 
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))

@@ -275,7 +275,7 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         is_private,
         "TESTME");
 
-    EXPECT_TRUE(std::memcmp(inf_foobar.hash, inf_testme.hash, sizeof(inf_foobar.hash)) != 0);
+    EXPECT_NE(inf_foobar.hash, inf_testme.hash);
 
     tr_metainfoFree(&inf_foobar);
     tr_metainfoFree(&inf_testme);

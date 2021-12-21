@@ -8,7 +8,9 @@
 
 #include <array>
 #include <cstring>
+#include <numeric>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 
 #include "transmission.h"
@@ -23,58 +25,42 @@
 
 using namespace std::literals;
 
+namespace
+{
+
+auto constexpr SomeHash = tr_sha1_digest_t{
+    std::byte{ 0 },  std::byte{ 1 },  std::byte{ 2 },  std::byte{ 3 },  std::byte{ 4 },  std::byte{ 5 },  std::byte{ 6 },
+    std::byte{ 7 },  std::byte{ 8 },  std::byte{ 9 },  std::byte{ 10 }, std::byte{ 11 }, std::byte{ 12 }, std::byte{ 13 },
+    std::byte{ 14 }, std::byte{ 15 }, std::byte{ 16 }, std::byte{ 17 }, std::byte{ 18 }, std::byte{ 19 },
+};
+
+} // namespace
+
 TEST(Crypto, torrentHash)
 {
+
     auto a = tr_crypto{};
-
-    auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    for (size_t i = 0; i < hash.size(); ++i)
-    {
-        hash[i] = uint8_t(i);
-    }
-
     tr_cryptoConstruct(&a, nullptr, true);
+    EXPECT_FALSE(tr_cryptoGetTorrentHash(&a));
 
-    EXPECT_FALSE(tr_cryptoHasTorrentHash(&a));
-    EXPECT_EQ(nullptr, tr_cryptoGetTorrentHash(&a));
-
-    tr_cryptoSetTorrentHash(&a, hash.data());
-    EXPECT_TRUE(tr_cryptoHasTorrentHash(&a));
-    EXPECT_NE(nullptr, tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), hash.data(), hash.size()));
-
+    tr_cryptoSetTorrentHash(&a, SomeHash);
+    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
+    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
     tr_cryptoDestruct(&a);
 
-    for (size_t i = 0; i < hash.size(); ++i)
-    {
-        hash[i] = uint8_t(i + 1);
-    }
-
-    tr_cryptoConstruct(&a, hash.data(), false);
-
-    EXPECT_TRUE(tr_cryptoHasTorrentHash(&a));
-    EXPECT_NE(nullptr, tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), hash.data(), hash.size()));
-
-    tr_cryptoSetTorrentHash(&a, nullptr);
-    EXPECT_FALSE(tr_cryptoHasTorrentHash(&a));
-    EXPECT_EQ(nullptr, tr_cryptoGetTorrentHash(&a));
+    tr_cryptoConstruct(&a, &SomeHash, false);
+    EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
+    EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
 
     tr_cryptoDestruct(&a);
 }
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    for (size_t i = 0; i < hash.size(); ++i)
-    {
-        hash[i] = uint8_t(i);
-    }
-
     auto a = tr_crypto{};
-    tr_cryptoConstruct(&a, hash.data(), false);
+    tr_cryptoConstruct(&a, &SomeHash, false);
     auto b = tr_crypto_{};
-    tr_cryptoConstruct_(&b, hash.data(), true);
+    tr_cryptoConstruct_(&b, &SomeHash, true);
     auto public_key_length = int{};
     EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
     EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
@@ -105,22 +91,42 @@ TEST(Crypto, encryptDecrypt)
 
 TEST(Crypto, sha1)
 {
-    auto hash1 = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-    auto hash2 = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
-
-    EXPECT_TRUE(tr_sha1(hash1.data(), "test", 4, nullptr));
-    EXPECT_TRUE(tr_sha1_(hash2.data(), "test", 4, nullptr));
+    auto hash1 = tr_sha1("test"sv);
+    EXPECT_TRUE(hash1);
     EXPECT_EQ(
         0,
-        memcmp(hash1.data(), "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", hash1.size()));
-    EXPECT_EQ(0, memcmp(hash1.data(), hash2.data(), hash2.size()));
+        memcmp(
+            std::data(*hash1),
+            "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3",
+            std::size(*hash1)));
 
-    EXPECT_TRUE(tr_sha1(hash1.data(), "1", 1, "22", 2, "333", 3, nullptr));
-    EXPECT_TRUE(tr_sha1_(hash2.data(), "1", 1, "22", 2, "333", 3, nullptr));
+    auto hash2 = tr_sha1("test"sv);
+    EXPECT_TRUE(hash1);
+    EXPECT_EQ(*hash1, *hash2);
+
+    hash1 = tr_sha1("1"sv, "22"sv, "333"sv);
+    hash2 = tr_sha1("1"sv, "22"sv, "333"sv);
+    EXPECT_TRUE(hash1);
+    EXPECT_TRUE(hash2);
+    EXPECT_EQ(*hash1, *hash2);
     EXPECT_EQ(
         0,
-        memcmp(hash1.data(), "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", hash1.size()));
-    EXPECT_EQ(0, memcmp(hash1.data(), hash2.data(), hash2.size()));
+        memcmp(
+            std::data(*hash1),
+            "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed",
+            std::size(*hash1)));
+
+    auto const hash3 = tr_sha1("test"sv);
+    EXPECT_TRUE(hash3);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash3));
+
+    auto const hash4 = tr_sha1("te"sv, "st"sv);
+    EXPECT_TRUE(hash4);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash4));
+
+    auto const hash5 = tr_sha1("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
+    EXPECT_TRUE(hash5);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash5));
 }
 
 TEST(Crypto, ssha1)
@@ -188,11 +194,9 @@ TEST(Crypto, hex)
 
     for (auto const& hex : Hex)
     {
-        auto digest = tr_sha1_digest_t{};
-        tr_hex_to_sha1(std::data(digest), std::data(hex));
-        auto hex2 = std::array<char, TR_SHA1_DIGEST_LEN * 2 + 1>{};
-        tr_sha1_to_hex(std::data(hex2), std::data(digest));
-        EXPECT_EQ(hex, std::data(hex2));
+        auto const digest = tr_sha1_from_string(hex);
+        auto const str = tr_sha1_to_string(digest);
+        EXPECT_EQ(hex, str);
     }
 }
 

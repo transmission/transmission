@@ -92,13 +92,6 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent)
-{
-    auto digest = tr_sha1_digest_t{};
-    std::copy_n(reinterpret_cast<std::byte const*>(torrent->info.hash), SHA_DIGEST_LENGTH, std::begin(digest));
-    return digest;
-}
-
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
     auto& src = session->torrentsById;
@@ -106,9 +99,9 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return it == std::end(src) ? nullptr : it->second;
 }
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash)
+tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
 {
-    return session->getTorrent(hash);
+    return hash == nullptr ? nullptr : session->getTorrent(*hash);
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
@@ -117,11 +110,11 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet
     return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.info_hash) : nullptr;
 }
 
-tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, uint8_t const* obfuscatedTorrentHash)
+tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)
 {
     for (auto* tor : session->torrents)
     {
-        if (memcmp(tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH) == 0)
+        if (tor->obfuscated_hash == obfuscated_hash)
         {
             return tor;
         }
@@ -580,7 +573,17 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->initSizes(tor->totalSize(), tor->pieceSize());
     tor->completion = tr_completion{ tor, tor };
-    tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, nullptr);
+    auto const obfuscated = tr_sha1("req2"sv, tor->info.hash);
+    if (obfuscated)
+    {
+        tor->obfuscated_hash = *obfuscated;
+    }
+    else
+    {
+        // lookups by obfuscated hash will fail for this torrent
+        tr_logAddTorErr(tor, "error computing obfuscated info hash");
+        tor->obfuscated_hash = tr_sha1_digest_t{};
+    }
 
     // init file offsets
     auto offset = uint64_t{ 0 };

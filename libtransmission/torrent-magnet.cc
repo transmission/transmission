@@ -269,14 +269,12 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     {
         bool success = false;
         bool metainfoParsed = false;
-        uint8_t sha1[SHA_DIGEST_LENGTH];
 
         /* we've got a complete set of metainfo... see if it passes the checksum test */
         dbgmsg(tor, "metainfo piece %d was the last one", piece);
-        tr_sha1(sha1, m->metadata, m->metadata_size, nullptr);
-
-        bool const checksumPassed = memcmp(sha1, tor->info.hash, SHA_DIGEST_LENGTH) == 0;
-        if (checksumPassed)
+        auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
+        bool const checksum_passed = sha1 && *sha1 == tor->info.hash;
+        if (checksum_passed)
         {
             /* checksum passed; now try to parse it as benc */
             auto infoDict = tr_variant{};
@@ -346,7 +344,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             m->piecesNeededCount = n;
             dbgmsg(tor, "metadata error; trying again. %d pieces left", n);
 
-            tr_logAddError("magnet status: checksum passed %d, metainfo parsed %d", (int)checksumPassed, (int)metainfoParsed);
+            tr_logAddError("magnet status: checksum passed %d, metainfo parsed %d", (int)checksum_passed, (int)metainfoParsed);
         }
     }
 }

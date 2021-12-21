@@ -1070,7 +1070,7 @@ int tr_torrentId(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, uint8_t const* hash);
+tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash);
 
 /** @brief Convenience function similar to tr_torrentFindFromHash() */
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
@@ -1587,7 +1587,7 @@ struct tr_info
     tr_piece_index_t pieceCount;
 
     /* General info */
-    uint8_t hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t hash;
     char hashString[2 * SHA_DIGEST_LENGTH + 1];
 
     /* Flags */

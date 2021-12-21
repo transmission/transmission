@@ -19,6 +19,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <optional>
 
 #include <event2/buffer.h>
 
@@ -142,7 +143,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
+    tr_sha1_digest_t const& torrent_hash,
     bool isSeed,
     bool utp);
 
@@ -221,11 +222,9 @@ char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 
-uint8_t const* tr_peerIoGetTorrentHash(tr_peerIo* io);
+std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
 
-bool tr_peerIoHasTorrentHash(tr_peerIo const* io);
-
-void tr_peerIoSetTorrentHash(tr_peerIo* io, uint8_t const* hash);
+void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
 

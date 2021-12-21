@@ -141,7 +141,7 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
     {
         auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
         auto const pos = str.find(ch);
-        return pos != std::string_view::npos ? pos : std::optional<int>{};
+        return pos != std::string_view::npos ? std::make_optional(pos) : std::nullopt;
     };
 
     auto peer_id = std::string_view{ std::data(in), 9 };
