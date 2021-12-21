@@ -119,7 +119,7 @@ public:
 
     explicit TorrentHash(char const* str)
     {
-        data_ = tr_sha1_from_string(str);
+        data_ = tr_sha1_from_string(str != nullptr ? str : "");
     }
 
     explicit TorrentHash(QString const& str)
@@ -144,9 +144,7 @@ public:
 
     QString toString() const
     {
-        char strbuf[TR_SHA1_DIGEST_LEN * 2 + 1];
-        tr_sha1_to_string(data_, strbuf);
-        return QString::fromUtf8(strbuf, SHA_DIGEST_LENGTH * 2);
+        return QString::fromStdString(tr_sha1_to_string(data_));
     }
 };
 
