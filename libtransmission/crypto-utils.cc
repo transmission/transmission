@@ -13,7 +13,6 @@
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
 #include <string>
 #include <string_view>
-#include <tuple>
 
 #include <arc4.h>
 
@@ -85,7 +84,7 @@ int tr_rand_int_weak(int upper_bound)
 namespace
 {
 
-auto constexpr DigestStringSize = std::tuple_size_v<tr_sha1_digest_t> * 2;
+auto constexpr DigestStringSize = TR_SHA1_DIGEST_STRLEN;
 auto constexpr SaltedPrefix = "{"sv;
 
 std::string tr_salt(std::string_view plaintext, std::string_view salt)
@@ -292,7 +291,7 @@ static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_lengt
 
 tr_sha1_digest_t tr_sha1_from_string(std::string_view hex)
 {
-    TR_ASSERT(std::size(hex) == std::tuple_size_v<tr_sha1_digest_t> * 2);
+    TR_ASSERT(std::size(hex) == TR_SHA1_DIGEST_STRLEN);
 
     auto digest = tr_sha1_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
