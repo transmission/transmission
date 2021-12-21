@@ -124,7 +124,7 @@ public:
 
     explicit TorrentHash(QString const& str)
     {
-        data_ = tr_sha1_from_string(str.toUtf8().constData());
+        data_ = tr_sha1_from_string(str.toStdString());
     }
 
     bool operator==(TorrentHash const& that) const
