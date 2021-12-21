@@ -22,8 +22,7 @@ enum tr_metainfo_builder_err
     TR_MAKEMETA_URL,
     TR_MAKEMETA_CANCELLED,
     TR_MAKEMETA_IO_READ, /* see builder.errfile, builder.my_errno */
-    TR_MAKEMETA_IO_WRITE, /* see builder.errfile, builder.my_errno */
-    TR_MAKEMETA_CHECKSUM /* error generating checksums */
+    TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
 };
 
 struct tr_tracker_info
