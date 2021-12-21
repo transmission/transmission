@@ -85,7 +85,7 @@ namespace
 {
 
 auto constexpr DigestStringSize = TR_SHA1_DIGEST_LEN * 2;
-auto constexpr SaltedPrefix = std::string_view{ "{" };
+auto constexpr SaltedPrefix = "{"sv;
 
 std::string tr_salt(std::string_view plaintext, std::string_view salt)
 {
