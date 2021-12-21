@@ -13,7 +13,6 @@
 #include <cstring> /* strcmp, strlen */
 #include <mutex>
 #include <string_view>
-#include <tuple>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
@@ -251,7 +250,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 
 static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 {
-    auto ret = std::vector<std::byte>(std::tuple_size_v<tr_sha1_digest_t> * b->pieceCount);
+    auto ret = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * b->pieceCount);
 
     if (b->totalSize == 0)
     {

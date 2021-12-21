@@ -11,7 +11,6 @@
 #include <cstring>
 #include <iterator>
 #include <string_view>
-#include <tuple>
 #include <vector>
 
 #include <event2/util.h> // evutil_ascii_strncasecmp()
@@ -497,12 +496,12 @@ static char const* tr_metainfoParseImpl(
             return "pieces";
         }
 
-        if (std::size(sv) % std::tuple_size_v<tr_sha1_digest_t> != 0)
+        if (std::size(sv) % std::size(tr_sha1_digest_t{}) != 0)
         {
             return "pieces";
         }
 
-        auto const n_pieces = std::size(sv) / std::tuple_size_v<tr_sha1_digest_t>;
+        auto const n_pieces = std::size(sv) / std::size(tr_sha1_digest_t{});
         inf->pieceCount = n_pieces;
         pieces->resize(n_pieces);
         std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<uint8_t*>(std::data(*pieces)));
