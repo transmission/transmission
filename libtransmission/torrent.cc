@@ -92,11 +92,6 @@ int tr_torrentId(tr_torrent const* tor)
     return tor != nullptr ? tor->uniqueId : -1;
 }
 
-tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* tor)
-{
-    return tor->info.hash;
-}
-
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
     auto& src = session->torrentsById;

@@ -74,8 +74,6 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
-tr_sha1_digest_t tr_torrentInfoHash(tr_torrent const* torrent);
-
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
