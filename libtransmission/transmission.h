@@ -1588,7 +1588,6 @@ struct tr_info
 
     /* General info */
     tr_sha1_digest_t hash;
-    // uint8_t hash[SHA_DIGEST_LENGTH];
     char hashString[2 * SHA_DIGEST_LENGTH + 1];
 
     /* Flags */
