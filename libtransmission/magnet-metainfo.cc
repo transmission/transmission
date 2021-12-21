@@ -10,6 +10,7 @@
 #include <cstring>
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #include "transmission.h"
 
@@ -177,7 +178,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 auto const hash = value.substr(std::size(ValPrefix));
                 switch (std::size(hash))
                 {
-                case TR_SHA1_DIGEST_LEN * 2:
+                case std::tuple_size_v<tr_sha1_digest_t> * 2:
                     this->info_hash = tr_sha1_from_string(std::data(hash));
                     got_checksum = true;
                     break;

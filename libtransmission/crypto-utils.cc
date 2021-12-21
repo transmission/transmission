@@ -13,6 +13,7 @@
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #include <arc4.h>
 
@@ -84,11 +85,13 @@ int tr_rand_int_weak(int upper_bound)
 namespace
 {
 
-auto constexpr DigestStringSize = TR_SHA1_DIGEST_LEN * 2;
+auto constexpr DigestStringSize = std::tuple_size_v<tr_sha1_digest_t> * 2;
 auto constexpr SaltedPrefix = "{"sv;
 
 std::string tr_salt(std::string_view plaintext, std::string_view salt)
 {
+    static_assert(DigestStringSize == 40);
+
     // build a sha1 digest of the original content and the salt
     auto const digest = tr_sha1(plaintext, salt);
 
@@ -273,11 +276,10 @@ char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
     return strbuf + (std::size(digest) * 2);
 }
 
-static void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
+static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
 {
     static char constexpr Hex[] = "0123456789abcdef";
 
-    auto const* input = static_cast<uint8_t const*>(vinput);
     auto* output = static_cast<uint8_t*>(voutput);
 
     for (size_t i = 0; i < byte_length; ++i)
@@ -288,9 +290,11 @@ static void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_leng
     }
 }
 
-tr_sha1_digest_t tr_sha1_from_string(char const* hex)
+tr_sha1_digest_t tr_sha1_from_string(std::string_view hex)
 {
+    TR_ASSERT(std::size(hex) == std::tuple_size_v<tr_sha1_digest_t> * 2);
+
     auto digest = tr_sha1_digest_t{};
-    tr_hex_to_binary(hex, std::data(digest), std::size(digest));
+    tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
     return digest;
 }
