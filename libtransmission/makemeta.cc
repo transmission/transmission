@@ -13,6 +13,7 @@
 #include <cstring> /* strcmp, strlen */
 #include <mutex>
 #include <string_view>
+#include <tuple>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
@@ -248,22 +249,22 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 *****
 ****/
 
-static std::byte* getHashInfo(tr_metainfo_builder* b)
+static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 {
-    uint32_t fileIndex = 0;
-    auto* const ret = tr_new0(std::byte, SHA_DIGEST_LENGTH * b->pieceCount);
-    auto* walk = ret;
-    uint64_t off = 0;
-    tr_error* error = nullptr;
+    auto ret = std::vector<std::byte>(std::tuple_size_v<tr_sha1_digest_t> * b->pieceCount);
 
     if (b->totalSize == 0)
     {
-        return ret;
+        return {};
     }
 
-    char* const buf = tr_new(char, b->pieceSize);
     b->pieceIndex = 0;
     uint64_t totalRemain = b->totalSize;
+    uint32_t fileIndex = 0;
+    auto* walk = std::data(ret);
+    auto buf = std::vector<char>(b->pieceSize);
+    uint64_t off = 0;
+    tr_error* error = nullptr;
 
     tr_sys_file_t fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
@@ -271,17 +272,15 @@ static std::byte* getHashInfo(tr_metainfo_builder* b)
         b->my_errno = error->code;
         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
         b->result = TR_MAKEMETA_IO_READ;
-        tr_free(buf);
-        tr_free(ret);
         tr_error_free(error);
-        return nullptr;
+        return {};
     }
 
     while (totalRemain != 0)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
-        auto* bufptr = buf;
+        auto* bufptr = std::data(buf);
         uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
@@ -309,26 +308,22 @@ static std::byte* getHashInfo(tr_metainfo_builder* b)
                         b->my_errno = error->code;
                         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
                         b->result = TR_MAKEMETA_IO_READ;
-                        tr_free(buf);
-                        tr_free(ret);
                         tr_error_free(error);
-                        return nullptr;
+                        return {};
                     }
                 }
             }
         }
 
-        TR_ASSERT(bufptr - buf == (int)thisPieceSize);
+        TR_ASSERT(bufptr - std::data(buf) == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
-        auto const digest = tr_sha1(std::string_view{ buf, thisPieceSize });
+        auto const digest = tr_sha1(buf);
         if (!digest)
         {
             b->my_errno = errno;
             tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
             b->result = TR_MAKEMETA_IO_READ;
-            tr_free(buf);
-            tr_free(ret);
-            return nullptr;
+            return {};
         }
 
         walk = std::copy(std::begin(*digest), std::end(*digest), walk);
@@ -343,7 +338,7 @@ static std::byte* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    TR_ASSERT(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
+    TR_ASSERT(b->abortFlag || size_t(walk - std::data(ret)) == std::size(ret));
     TR_ASSERT(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
@@ -351,7 +346,6 @@ static std::byte* getHashInfo(tr_metainfo_builder* b)
         tr_sys_file_close(fd, nullptr);
     }
 
-    tr_free(buf);
     return ret;
 }
 
@@ -415,10 +409,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    if (auto* const pch = getHashInfo(builder); pch != nullptr)
+    if (auto const piece_hashes = getHashInfo(builder); !std::empty(piece_hashes))
     {
-        tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
-        tr_free(pch);
+        tr_variantDictAddRaw(dict, TR_KEY_pieces, std::data(piece_hashes), std::size(piece_hashes));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);

@@ -213,7 +213,7 @@ char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf);
 std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
- * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
+ * @brief Generate a sha1 digest from a hex string.
  */
 tr_sha1_digest_t tr_sha1_from_string(std::string_view hex);
 

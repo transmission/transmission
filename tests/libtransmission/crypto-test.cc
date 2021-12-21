@@ -194,10 +194,9 @@ TEST(Crypto, hex)
 
     for (auto const& hex : Hex)
     {
-        auto digest = tr_sha1_from_string(std::data(hex));
-        auto strbuf = std::array<char, TR_SHA1_DIGEST_LEN * 2 + 1>{};
-        tr_sha1_to_string(digest, std::data(strbuf));
-        EXPECT_EQ(hex, std::data(strbuf));
+        auto const digest = tr_sha1_from_string(hex);
+        auto const str = tr_sha1_to_string(digest);
+        EXPECT_EQ(hex, str);
     }
 }
 
