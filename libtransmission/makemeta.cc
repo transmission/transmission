@@ -320,9 +320,8 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         auto const digest = tr_sha1(buf);
         if (!digest)
         {
-            b->my_errno = errno;
             tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
-            b->result = TR_MAKEMETA_IO_READ;
+            b->result = TR_MAKEMETA_CHECKSUM;
             return {};
         }
 
