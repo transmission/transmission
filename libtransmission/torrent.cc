@@ -668,7 +668,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     char const* dir = nullptr;
     if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
     {
-        tor->downloadDir = tr_strdup(dir);
+        tor->download_dir = dir;
     }
 
     if (!tr_ctorGetIncompleteDir(ctor, &dir))
@@ -678,7 +678,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (tr_sessionIsIncompleteDirEnabled(session))
     {
-        tor->incompleteDir = tr_strdup(dir);
+        tor->incomplete_dir = dir;
     }
 
     tor->bandwidth = new Bandwidth(session->bandwidth);
@@ -857,11 +857,9 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (path == nullptr || tor->downloadDir == nullptr || strcmp(path, tor->downloadDir) != 0)
+    if (tor->download_dir != path)
     {
-        tr_free(tor->downloadDir);
-        tor->downloadDir = tr_strdup(path);
-
+        tor->download_dir = path;
         tor->markEdited();
         tor->setDirty();
     }
@@ -873,14 +871,14 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->downloadDir;
+    return tor->downloadDir().c_str();
 }
 
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->currentDir;
+    return tor->currentDir().c_str();
 }
 
 void tr_torrentChangeMyPort(tr_torrent* tor)
@@ -1332,9 +1330,6 @@ static void freeTorrent(tr_torrent* tor)
     tr_peerMgrRemoveTorrent(tor);
 
     tr_announcerRemoveTorrent(session->announcer, tor);
-
-    tr_free(tor->downloadDir);
-    tr_free(tor->incompleteDir);
 
     tr_sessionRemoveTorrent(session, tor);
 
@@ -1827,7 +1822,8 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     tr_localtime_r(&now, &tm);
     strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
 
-    char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
+    auto torrent_dir = std::string{ tor->currentDir().sv() };
+    tr_sys_path_native_separators(std::data(torrent_dir));
 
     auto const cmd = std::array<char const*, 2>{
         script,
@@ -1841,7 +1837,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, ctime_str },
-        { "TR_TORRENT_DIR"sv, torrent_dir },
+        { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
         { "TR_TORRENT_HASH"sv, tor->hashString() },
         { "TR_TORRENT_ID"sv, id_str },
         { "TR_TORRENT_LABELS"sv, labels_str },
@@ -1858,8 +1854,6 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_logAddTorErr(tor, "Error executing script \"%s\" (%d): %s", script, error->code, error->message);
         tr_error_free(error);
     }
-
-    tr_free(torrent_dir);
 }
 
 void tr_torrent::recheckCompleteness()
@@ -1901,9 +1895,9 @@ void tr_torrent::recheckCompleteness()
                 tr_peerMgrClearInterest(this);
             }
 
-            if (this->currentDir == this->incompleteDir)
+            if (this->currentDir() == this->incompleteDir())
             {
-                this->setLocation(this->downloadDir, true, nullptr, nullptr);
+                this->setLocation(this->downloadDir().sv(), true, nullptr, nullptr);
             }
         }
 
@@ -2273,7 +2267,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 {
     auto files = std::vector<std::string>{};
     auto folders = std::set<std::string>{};
-    char const* const top = tor->currentDir;
+    char const* const top = tor->currentDir().c_str();
 
     /* don't try to delete local data if the directory's gone missing */
     if (!tr_sys_path_exists(top, nullptr))
@@ -2454,12 +2448,12 @@ static void setLocationImpl(void* vdata)
     tr_logAddDebug(
         "Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
         tr_torrentName(tor),
-        tor->currentDir,
+        tor->currentDir().c_str(),
         location.c_str());
 
     tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
-    if (!tr_sys_path_is_same(location.c_str(), tor->currentDir, nullptr))
+    if (!tr_sys_path_is_same(location.c_str(), tor->currentDir().c_str(), nullptr))
     {
         /* bad idea to move files while they're being verified... */
         tr_verifyRemove(tor);
@@ -2523,9 +2517,8 @@ static void setLocationImpl(void* vdata)
 
         if (do_move)
         {
-            tr_free(tor->incompleteDir);
-            tor->incompleteDir = nullptr;
-            tor->currentDir = tor->downloadDir;
+            tor->incomplete_dir.clear();
+            tor->current_dir = tor->downloadDir();
         }
     }
 
@@ -2707,9 +2700,9 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
     tr_file const& file = this->file(i);
     auto file_info = tr_sys_path_info{};
 
-    if (this->downloadDir != nullptr)
+    if (!std::empty(this->downloadDir()))
     {
-        auto base = std::string_view{ this->downloadDir };
+        auto const base = this->downloadDir().sv();
 
         tr_buildBuf(filename, base, "/"sv, file.name);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
@@ -2724,9 +2717,9 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
         }
     }
 
-    if (this->incompleteDir != nullptr)
+    if (!std::empty(this->incompleteDir()))
     {
-        auto const base = std::string_view{ this->incompleteDir };
+        auto const base = this->incompleteDir().sv();
 
         tr_buildBuf(filename, base, "/"sv, file.name);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
@@ -2784,25 +2777,27 @@ char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 /* Decide whether we should be looking for files in downloadDir or incompleteDir. */
 static void refreshCurrentDir(tr_torrent* tor)
 {
-    char const* dir = nullptr;
+    tr_interned_string dir;
 
-    if (tor->incompleteDir == nullptr)
+    if (std::empty(tor->incompleteDir()))
     {
-        dir = tor->downloadDir;
+        dir = tor->downloadDir();
     }
     else if (!tor->hasMetadata()) /* no files to find */
     {
-        dir = tor->incompleteDir;
+        dir = tor->incompleteDir();
     }
-    else if (!tr_torrentFindFile2(tor, 0, &dir, nullptr, nullptr))
+    else
     {
-        dir = tor->incompleteDir;
+        auto filename = std::string{};
+        auto const found = tor->findFile(filename, 0);
+        dir = found ? tr_interned_string{ found->base } : tor->incompleteDir();
     }
 
-    TR_ASSERT(dir != nullptr);
-    TR_ASSERT(dir == tor->downloadDir || dir == tor->incompleteDir);
+    TR_ASSERT(!std::empty(dir));
+    TR_ASSERT(dir == tor->downloadDir() || dir == tor->incompleteDir());
 
-    tor->currentDir = dir;
+    tor->current_dir = dir;
 }
 
 char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t i)
@@ -2998,7 +2993,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 {
     int err = 0;
 
-    char const* const base = !tor->isDone() && tor->incompleteDir != nullptr ? tor->incompleteDir : tor->downloadDir;
+    auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir().sv() : tor->incompleteDir().sv();
 
     auto src = tr_strvPath(base, oldpath);
 

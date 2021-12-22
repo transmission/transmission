@@ -29,6 +29,7 @@
 #include "completion.h"
 #include "file.h"
 #include "file-piece-map.h"
+#include "interned-string.h"
 #include "quark.h"
 #include "session.h"
 #include "tr-assert.h"
@@ -286,6 +287,23 @@ public:
     {
         file_priorities_.set(file, priority);
         setDirty();
+    }
+
+    /// LOCATION
+
+    [[nodiscard]] tr_interned_string currentDir() const
+    {
+        return this->current_dir;
+    }
+
+    [[nodiscard]] tr_interned_string downloadDir() const
+    {
+        return this->download_dir;
+    }
+
+    [[nodiscard]] tr_interned_string incompleteDir() const
+    {
+        return this->incomplete_dir;
     }
 
     /// METAINFO - FILES
@@ -555,15 +573,16 @@ public:
 
     time_t peer_id_creation_time = 0;
 
-    /* Where the files will be when it's complete */
-    char* downloadDir = nullptr;
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir;
 
-    /* Where the files are when the torrent is incomplete */
-    char* incompleteDir = nullptr;
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir;
 
-    /* Where the files are now.
-     * This pointer will be equal to downloadDir or incompleteDir */
-    char const* currentDir = nullptr;
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
     uint64_t infoDictLength = 0;
