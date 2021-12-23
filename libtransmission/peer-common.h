@@ -105,7 +105,7 @@ public:
 
     /* the client name.
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
-    tr_quark client = TR_KEY_NONE;
+    tr_interned_string client;
 
     tr_recentHistory blocksSentToClient;
     tr_recentHistory blocksSentToPeer;

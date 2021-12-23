@@ -36,7 +36,7 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.full);
     EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("example.org:443"sv, tr_quark_get_string_view(tracker.host));
+    EXPECT_EQ("example.org:443"sv, tracker.host.sv());
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -60,9 +60,9 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     EXPECT_EQ(Announce1, announce_list.at(1).announce.full);
     EXPECT_EQ(Announce2, announce_list.at(0).announce.full);
     EXPECT_EQ(Announce3, announce_list.at(2).announce.full);
-    EXPECT_EQ("example.org:443"sv, tr_quark_get_string_view(announce_list.at(1).host));
-    EXPECT_EQ("example.org:80"sv, tr_quark_get_string_view(announce_list.at(0).host));
-    EXPECT_EQ("example.org:999"sv, tr_quark_get_string_view(announce_list.at(2).host));
+    EXPECT_EQ("example.org:443"sv, announce_list.at(1).host.sv());
+    EXPECT_EQ("example.org:80"sv, announce_list.at(0).host.sv());
+    EXPECT_EQ("example.org:999"sv, announce_list.at(2).host.sv());
 }
 
 TEST_F(AnnounceListTest, canAddWithoutScrape)
@@ -74,7 +74,7 @@ TEST_F(AnnounceListTest, canAddWithoutScrape)
     EXPECT_TRUE(announce_list.add(Tier, Announce));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
-    EXPECT_EQ(TR_KEY_NONE, tracker.scrape_interned);
+    EXPECT_TRUE(std::empty(tracker.scrape_str));
     EXPECT_EQ(Tier, tracker.tier);
 }
 

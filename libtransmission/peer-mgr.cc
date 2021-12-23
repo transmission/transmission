@@ -1722,7 +1722,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     auto const* const atom = peer->atom;
 
     tr_address_to_string_with_buf(&atom->addr, stats.addr, sizeof(stats.addr));
-    tr_strlcpy(stats.client, tr_quark_get_string(peer->client), sizeof(stats.client));
+    stats.client = peer->client.c_str();
     stats.port = ntohs(peer->atom->port);
     stats.from = atom->fromFirst;
     stats.progress = peer->progress;

@@ -676,7 +676,7 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
             tr_logGetTimeStr(timestr, sizeof(timestr)),
             tr_torrentName(msgs->torrent),
             tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
-            tr_quark_get_string(msgs->client));
+            msgs->client.c_str());
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);
@@ -2231,10 +2231,11 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
-                    tr_torrentSetLocalError(
-                        msgs->torrent,
-                        _("Please Verify Local Data! Piece #%zu is corrupt."),
-                        (size_t)req.index);
+                    auto const errmsg = tr_strvJoin(
+                        "Please Verify Local Data! Piece #",
+                        std::to_string(req.index),
+                        " is corrupt.");
+                    msgs->torrent->setLocalError(errmsg);
                 }
             }
 

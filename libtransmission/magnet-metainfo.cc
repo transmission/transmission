@@ -208,7 +208,7 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     auto n = std::size(this->announce_list);
     if (n == 1)
     {
-        tr_variantDictAddQuark(top, TR_KEY_announce, this->announce_list.at(0).announce_interned);
+        tr_variantDictAddQuark(top, TR_KEY_announce, this->announce_list.at(0).announce_str.quark());
     }
     else
     {
@@ -224,7 +224,7 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
                 current_tier = tracker.tier;
             }
 
-            tr_variantListAddQuark(tracker_list, tracker.announce_interned);
+            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
         }
     }
 

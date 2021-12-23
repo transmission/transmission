@@ -82,20 +82,20 @@ bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url
     }
 
     auto tracker = tracker_info{};
-    tracker.announce_interned = tr_quark_new(announce_url_sv);
-    tracker.announce = *tr_urlParseTracker(tr_quark_get_string_view(tracker.announce_interned));
+    tracker.announce_str = announce_url_sv;
+    tracker.announce = *tr_urlParseTracker(tracker.announce_str.sv());
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
     auto host = std::string{ tracker.announce.host };
     host += ':';
     host += tracker.announce.portstr;
-    tracker.host = tr_quark_new(host);
+    tracker.host = host;
 
     auto const scrape_str = announceToScrape(announce_url_sv);
     if (scrape_str)
     {
-        tracker.scrape_interned = tr_quark_new(*scrape_str);
-        tracker.scrape = *tr_urlParseTracker(tr_quark_get_string_view(tracker.scrape_interned));
+        tracker.scrape_str = *scrape_str;
+        tracker.scrape = *tr_urlParseTracker(tracker.scrape_str.sv());
     }
 
     auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
@@ -221,7 +221,7 @@ bool tr_announce_list::save(char const* torrent_file, tr_error** error) const
     // add the new fields
     if (this->size() == 1)
     {
-        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce_interned);
+        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce_str.quark());
     }
     else if (this->size() > 1)
     {
@@ -238,7 +238,7 @@ bool tr_announce_list::save(char const* torrent_file, tr_error** error) const
                 current_tier = tracker.tier;
             }
 
-            tr_variantListAddQuark(tracker_list, tracker.announce_interned);
+            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
         }
     }
 

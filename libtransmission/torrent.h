@@ -29,6 +29,7 @@
 #include "completion.h"
 #include "file.h"
 #include "file-piece-map.h"
+#include "interned-string.h"
 #include "quark.h"
 #include "session.h"
 #include "tr-assert.h"
@@ -93,8 +94,6 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
-
-void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
 
 enum tr_verify_state
 {
@@ -284,6 +283,23 @@ public:
     {
         file_priorities_.set(file, priority);
         setDirty();
+    }
+
+    /// LOCATION
+
+    [[nodiscard]] tr_interned_string currentDir() const
+    {
+        return this->current_dir;
+    }
+
+    [[nodiscard]] tr_interned_string downloadDir() const
+    {
+        return this->download_dir;
+    }
+
+    [[nodiscard]] tr_interned_string incompleteDir() const
+    {
+        return this->incomplete_dir;
     }
 
     /// METAINFO - FILES
@@ -504,6 +520,13 @@ public:
         return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
     }
 
+    void setLocalError(std::string_view errmsg)
+    {
+        this->error = TR_STAT_LOCAL_ERROR;
+        this->error_announce_url = TR_KEY_NONE;
+        this->error_string = errmsg;
+    }
+
     void setVerifyState(tr_verify_state state);
 
     void setDateActive(time_t t);
@@ -535,8 +558,8 @@ public:
     std::optional<double> verify_progress;
 
     tr_stat_errtype error = TR_STAT_OK;
-    char errorString[128] = {};
-    tr_quark error_announce_url = TR_KEY_NONE;
+    tr_interned_string error_announce_url;
+    std::string error_string;
 
     bool checkPiece(tr_piece_index_t piece);
 
@@ -558,15 +581,16 @@ public:
 
     time_t peer_id_creation_time = 0;
 
-    /* Where the files will be when it's complete */
-    char* downloadDir = nullptr;
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir;
 
-    /* Where the files are when the torrent is incomplete */
-    char* incompleteDir = nullptr;
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir;
 
-    /* Where the files are now.
-     * This pointer will be equal to downloadDir or incompleteDir */
-    char const* currentDir = nullptr;
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
     uint64_t infoDictLength = 0;

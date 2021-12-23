@@ -43,7 +43,7 @@ static char const* get_event_string(tr_announce_request const* req)
 
 static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    auto const announce_sv = tr_quark_get_string_view(req->announce_url);
+    auto const announce_sv = req->announce_url.sv();
 
     char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
     tr_http_escape_sha1(escaped_info_hash, req->info_hash);
@@ -190,8 +190,6 @@ static void on_announce_done_eventthread(void* vdata)
     tr_free(data->response.pex6);
     tr_free(data->response.pex);
     tr_free(data->response.tracker_id_str);
-    tr_free(data->response.warning);
-    tr_free(data->response.errmsg);
     tr_free(data);
 }
 
@@ -251,12 +249,12 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strvDup(sv);
+                response->errmsg = sv;
             }
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strvDup(sv);
+                response->warning = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
@@ -377,7 +375,7 @@ static void on_scrape_done(
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
 
-    auto const scrape_url_sv = tr_quark_get_string_view(response->scrape_url);
+    auto const scrape_url_sv = response->scrape_url.sv();
     dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
@@ -485,12 +483,12 @@ static void on_scrape_done(
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    auto const sv = tr_quark_get_string_view(req->scrape_url);
+    auto const sv = req->scrape_url.sv();
 
     auto* const buf = evbuffer_new();
     evbuffer_add(buf, std::data(sv), std::size(sv));
 
-    char delimiter = sv.find('?') == sv.npos ? '?' : '&';
+    char delimiter = sv.find('?') == std::string_view::npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];

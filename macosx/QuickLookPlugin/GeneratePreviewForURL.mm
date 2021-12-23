@@ -171,7 +171,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 #warning handle tiers?
         for (auto const tracker : *inf.announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tr_quark_get_string(tracker.announce_interned)];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce_str.c_str()];
         }
 
         [listSection appendString:@"</table>"];

@@ -43,13 +43,13 @@ protected:
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
-    void createSingleFileTorrentContents(char const* top)
+    void createSingleFileTorrentContents(std::string_view top)
     {
         auto const path = tr_strvPath(top, "hello-world.txt");
         createFileWithContents(path, "hello, world!\n");
     }
 
-    void createMultifileTorrentContents(char const* top)
+    void createMultifileTorrentContents(std::string_view top)
     {
         auto path = tr_strvPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester");
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
@@ -163,7 +163,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     blockingTorrentVerify(tor);
     expectHaveNone(tor, TotalSize);
 
-    createSingleFileTorrentContents(tor->currentDir);
+    createSingleFileTorrentContents(tor->currentDir().sv());
 
     // sanity check the stats again, now that we've added the file
     blockingTorrentVerify(tor);
@@ -197,7 +197,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  Now try a rename that should succeed
     ***/
 
-    auto tmpstr = tr_strvPath(tor->currentDir, "hello-world.txt");
+    auto tmpstr = tr_strvPath(tor->currentDir().sv(), "hello-world.txt");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
@@ -206,7 +206,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", files[0].name); // confirm the file's name is now 'foobar' in our struct
     EXPECT_STREQ(nullptr, strstr(tr_torrentView(tor).torrent_filename, "foobar")); // confirm .torrent file hasn't changed
-    tmpstr = tr_strvPath(tor->currentDir, "foobar");
+    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
@@ -221,7 +221,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  ...and rename it back again
     ***/
 
-    tmpstr = tr_strvPath(tor->currentDir, "foobar");
+    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
@@ -287,7 +287,7 @@ TEST_F(RenameTest, multifileTorrent)
     expectHaveNone(tor, TotalSize);
 
     // build the local data
-    createMultifileTorrentContents(tor->currentDir);
+    createMultifileTorrentContents(tor->currentDir().sv());
 
     // sanity check the (full) stats
     blockingTorrentVerify(tor);
@@ -523,7 +523,7 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        auto const expected = tr_strvPath(tor->currentDir, strings[i]);
+        auto const expected = tr_strvPath(tor->currentDir().sv(), strings[i]);
         char* path = tr_torrentFindFile(tor, i);
         EXPECT_EQ(expected, path);
         tr_free(path);

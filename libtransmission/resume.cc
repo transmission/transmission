@@ -678,11 +678,11 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
-    tr_variantDictAddStrView(&top, TR_KEY_destination, tor->downloadDir);
+    tr_variantDictAddQuark(&top, TR_KEY_destination, tor->downloadDir().quark());
 
-    if (tor->incompleteDir != nullptr)
+    if (!std::empty(tor->incompleteDir()))
     {
-        tr_variantDictAddStr(&top, TR_KEY_incomplete_dir, tor->incompleteDir);
+        tr_variantDictAddQuark(&top, TR_KEY_incomplete_dir, tor->incompleteDir().quark());
     }
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
@@ -710,7 +710,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename.c_str());
     if (err != 0)
     {
-        tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
+        tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }
 
     tr_variantFree(&top);
@@ -778,13 +778,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->currentDir == tor->downloadDir;
-        tr_free(tor->downloadDir);
-        tor->downloadDir = tr_strvDup(sv);
-
+        bool const is_current_dir = tor->current_dir == tor->download_dir;
+        tor->download_dir = sv;
         if (is_current_dir)
         {
-            tor->currentDir = tor->downloadDir;
+            tor->current_dir = sv;
         }
 
         fieldsLoaded |= TR_FR_DOWNLOAD_DIR;
@@ -793,13 +791,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->currentDir == tor->incompleteDir;
-        tr_free(tor->incompleteDir);
-        tor->incompleteDir = tr_strvDup(sv);
-
+        bool const is_current_dir = tor->current_dir == tor->incomplete_dir;
+        tor->incomplete_dir = sv;
         if (is_current_dir)
         {
-            tor->currentDir = tor->incompleteDir;
+            tor->current_dir = sv;
         }
 
         fieldsLoaded |= TR_FR_INCOMPLETE_DIR;
@@ -953,8 +949,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
         if (tr_ctorGetDownloadDir(ctor, mode, &path) && !tr_str_is_empty(path))
         {
             ret |= TR_FR_DOWNLOAD_DIR;
-            tr_free(tor->downloadDir);
-            tor->downloadDir = tr_strdup(path);
+            tor->download_dir = path;
         }
     }
 

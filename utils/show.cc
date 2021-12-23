@@ -218,7 +218,7 @@ static void doScrape(tr_info const* inf)
 {
     for (auto const& tracker : *inf->announce_list)
     {
-        if (tracker.scrape_interned == TR_KEY_NONE)
+        if (std::empty(tracker.scrape_str))
         {
             continue;
         }
