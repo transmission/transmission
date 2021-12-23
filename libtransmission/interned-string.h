@@ -5,6 +5,8 @@
  * or any future license endorsed by Mnemosyne LLC.
  */
 
+#pragma once
+
 #include <string_view>
 
 #include "transmission.h"
@@ -18,6 +20,7 @@ class tr_interned_string
 {
 public:
     tr_interned_string() = default;
+
     explicit tr_interned_string(tr_quark quark)
         : quark_{ quark }
     {
@@ -103,9 +106,18 @@ public:
         return this->compare(that) < 0;
     }
 
+    [[nodiscard]] bool operator>(tr_interned_string const& that) const
+    {
+        return this->compare(that) > 0;
+    }
+
     [[nodiscard]] bool operator==(tr_interned_string const& that) const
     {
         return this->compare(that) == 0;
+    }
+    [[nodiscard]] bool operator!=(tr_interned_string const& that) const
+    {
+        return this->compare(that) != 0;
     }
 
     [[nodiscard]] bool operator==(std::string_view that) const

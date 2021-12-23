@@ -2144,7 +2144,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
         if (std::any_of(
                 std::begin(tor->announceList()),
                 std::end(tor->announceList()),
-                [error_url](auto const& tracker) { return tracker.announce_interned == error_url; }))
+                [error_url](auto const& tracker) { return tracker.announce_str == error_url; }))
         {
             tr_torrentClearError(tor);
         }

@@ -23,7 +23,7 @@
 
 #include "transmission.h"
 
-#include "quark.h"
+#include "interned-string.h"
 #include "web-utils.h"
 
 struct tr_error;
@@ -33,11 +33,11 @@ class tr_announce_list
 public:
     struct tracker_info
     {
-        tr_quark host;
         tr_url_parsed_t announce;
         tr_url_parsed_t scrape;
-        tr_quark announce_interned = TR_KEY_NONE;
-        tr_quark scrape_interned = TR_KEY_NONE;
+        tr_interned_string announce_str;
+        tr_interned_string scrape_str;
+        tr_interned_string host;
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 

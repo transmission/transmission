@@ -30,7 +30,7 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define dbgmsg(key, ...) tr_logAddDeepNamed(tr_quark_get_string(key), __VA_ARGS__)
+#define dbgmsg(key, ...) tr_logAddDeepNamed(key.c_str(), __VA_ARGS__)
 
 using namespace std::literals;
 
@@ -423,8 +423,8 @@ struct tau_tracker
 {
     tr_session* const session;
 
-    tr_quark const key;
-    tr_quark const host;
+    tr_interned_string const key;
+    tr_interned_string const host;
     int const port;
 
     struct evdns_getaddrinfo_request* dns_request = nullptr;
@@ -441,7 +441,7 @@ struct tau_tracker
     tr_ptrArray announces = {};
     tr_ptrArray scrapes = {};
 
-    tau_tracker(tr_session* session_in, tr_quark key_in, tr_quark host_in, int port_in)
+    tau_tracker(tr_session* session_in, tr_interned_string key_in, tr_interned_string host_in, int port_in)
         : session{ session_in }
         , key{ key_in }
         , host{ host_in }
@@ -687,7 +687,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tr_quark_get_string(tracker->host),
+            tracker->host.c_str(),
             nullptr,
             &hints,
             tau_tracker_on_dns,
@@ -765,10 +765,10 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 
 /* Finds the tau_tracker struct that corresponds to this url.
    If it doesn't exist yet, create one. */
-static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark announce_url)
+static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_interned_string announce_url)
 {
     // build a lookup key for this tracker
-    auto const announce_sv = tr_quark_get_string_view(announce_url);
+    auto const announce_sv = announce_url.sv();
     auto parsed = tr_urlParseTracker(announce_sv);
     TR_ASSERT(parsed);
     if (!parsed)
@@ -789,7 +789,7 @@ static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark anno
     }
 
     // we don't have it -- build a new one
-    auto* const tracker = new tau_tracker{ tau->session, key, tr_quark_new(parsed->host), parsed->port };
+    auto* const tracker = new tau_tracker{ tau->session, key, tr_interned_string(parsed->host), parsed->port };
     tr_ptrArrayAppend(&tau->trackers, tracker);
     dbgmsg(tracker->key, "New tau_tracker created");
     return tracker;

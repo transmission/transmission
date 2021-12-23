@@ -1343,8 +1343,8 @@ struct tr_peer_stat
     tr_port port;
 
     char addr[TR_INET6_ADDRSTRLEN];
-    char client[80];
     char flagStr[32];
+    char const* client;
 
     float progress;
     double rateToPeer_KBps;

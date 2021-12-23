@@ -414,9 +414,9 @@ static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
     for (auto const& tracker : tor->announceList())
     {
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_interned);
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_str.quark());
         tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
-        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_interned);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_str.quark());
         tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }

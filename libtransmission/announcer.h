@@ -44,7 +44,7 @@ struct tr_tracker_event
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
     char const* text;
-    tr_quark announce_url;
+    tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */
     struct tr_pex const* pex;

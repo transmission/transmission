@@ -551,7 +551,7 @@ public:
 
     tr_stat_errtype error = TR_STAT_OK;
     char errorString[128] = {};
-    tr_quark error_announce_url = TR_KEY_NONE;
+    tr_interned_string error_announce_url;
 
     bool checkPiece(tr_piece_index_t piece);
 
