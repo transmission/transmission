@@ -16,7 +16,7 @@ TEST(PeerMsgs, placeholder)
 {
 #if 0
 
-    uint8_t infohash[SHA_DIGEST_LENGTH];
+    auto infohash = tr_sha1_digest_t{};
     struct tr_address addr;
     tr_piece_index_t pieceCount = 1313;
     size_t numwant;
@@ -24,7 +24,7 @@ TEST(PeerMsgs, placeholder)
     tr_piece_index_t pieces[] = { 1059, 431, 808, 1217, 287, 376, 1188, 353, 508 };
     tr_piece_index_t buf[16];
 
-    memset(infohash, 0xaa, SHA_DIGEST_LENGTH);
+    memset(std::data(infohash), 0xaa, std::size(infohash));
 
     tr_address_from_string(&addr, "80.4.4.200");
 

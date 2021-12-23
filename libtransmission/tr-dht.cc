@@ -620,11 +620,13 @@ char const* tr_dhtPrintableStatus(int status)
 
 static void callback(void* /*ignore*/, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
+    auto hash = tr_sha1_digest_t{};
+    std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
+    auto const lock = session_->unique_lock();
+    tr_torrent* const tor = session_->getTorrent(hash);
+
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
-        auto const lock = session_->unique_lock();
-
-        tr_torrent* const tor = session_->getTorrent(info_hash);
         if (tor != nullptr && tor->allowsDht())
         {
             size_t n = 0;
@@ -639,8 +641,6 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = session_->getTorrent(info_hash);
-
         if (tor != nullptr)
         {
             if (event == DHT_EVENT_SEARCH_DONE)
@@ -690,7 +690,8 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return AnnounceResult::FAILED;
     }
 
-    int const rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
+    auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->info.hash));
+    int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {
         tr_logAddTorErr(
@@ -805,10 +806,17 @@ int dht_blacklisted(sockaddr const* /*sa*/, int /*salen*/)
 
 void dht_hash(void* hash_return, int hash_size, void const* v1, int len1, void const* v2, int len2, void const* v3, int len3)
 {
-    unsigned char sha1[SHA_DIGEST_LENGTH];
-    tr_sha1(sha1, v1, len1, v2, len2, v3, len3, nullptr);
-    memset(hash_return, 0, hash_size);
-    memcpy(hash_return, sha1, std::min(hash_size, SHA_DIGEST_LENGTH));
+    auto* setme = reinterpret_cast<std::byte*>(hash_return);
+    std::fill_n(static_cast<char*>(hash_return), hash_size, '\0');
+
+    auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
+    auto const sv2 = std::string_view{ static_cast<char const*>(v2), size_t(len2) };
+    auto const sv3 = std::string_view{ static_cast<char const*>(v3), size_t(len3) };
+    auto const digest = tr_sha1(sv1, sv2, sv3);
+    if (digest)
+    {
+        std::copy_n(std::data(*digest), std::min(size_t(hash_size), std::size(*digest)), setme);
+    }
 }
 
 int dht_random_bytes(void* buf, size_t size)

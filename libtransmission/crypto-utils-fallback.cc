@@ -43,28 +43,21 @@ static void tr_dh_secret_align(struct tr_dh_secret* handle, size_t current_key_l
     tr_dh_align_key(handle->key, current_key_length, handle->key_length);
 }
 
-bool tr_dh_secret_derive(
+std::optional<tr_sha1_digest_t> tr_dh_secret_derive(
     tr_dh_secret_t raw_handle,
     void const* prepend_data,
     size_t prepend_data_size,
     void const* append_data,
-    size_t append_data_size,
-    uint8_t* hash)
+    size_t append_data_size)
 {
     TR_ASSERT(raw_handle != nullptr);
-    TR_ASSERT(hash != nullptr);
 
-    auto* handle = static_cast<struct tr_dh_secret*>(raw_handle);
+    auto const* handle = static_cast<struct tr_dh_secret*>(raw_handle);
 
     return tr_sha1(
-        hash,
-        prepend_data == nullptr ? "" : prepend_data,
-        prepend_data == nullptr ? 0 : (int)prepend_data_size,
-        handle->key,
-        (int)handle->key_length,
-        append_data,
-        append_data == nullptr ? 0 : (int)append_data_size,
-        nullptr);
+        std::string_view{ static_cast<char const*>(prepend_data), prepend_data_size },
+        std::string_view{ reinterpret_cast<char const*>(handle->key), handle->key_length },
+        std::string_view{ static_cast<char const*>(append_data), append_data_size });
 }
 
 void tr_dh_secret_free(tr_dh_secret_t handle)

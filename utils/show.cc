@@ -267,7 +267,7 @@ static void doScrape(tr_info const* inf)
 
                         while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
-                            if (memcmp(inf->hash, tr_quark_get_string(key), SHA_DIGEST_LENGTH) == 0)
+                            if (memcmp(std::data(inf->hash), tr_quark_get_string(key), std::size(inf->hash)) == 0)
                             {
                                 int64_t seeders;
                                 if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))

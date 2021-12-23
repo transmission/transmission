@@ -297,7 +297,7 @@ tr_address const* tr_peerAddress(tr_peer const* peer)
     return &peer->atom->addr;
 }
 
-static tr_swarm* getExistingSwarm(tr_peerMgr* manager, uint8_t const* hash)
+static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& hash)
 {
     tr_torrent* tor = manager->session->getTorrent(hash);
 
@@ -998,7 +998,9 @@ static bool on_handshake_done(tr_handshake_result const& result)
     bool ok = result.isConnected;
     bool success = false;
     auto* manager = static_cast<tr_peerMgr*>(result.userData);
-    tr_swarm* s = tr_peerIoHasTorrentHash(result.io) ? getExistingSwarm(manager, tr_peerIoGetTorrentHash(result.io)) : nullptr;
+
+    auto const hash = tr_peerIoGetTorrentHash(result.io);
+    tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
 
     if (tr_peerIoIsIncoming(result.io))
     {
