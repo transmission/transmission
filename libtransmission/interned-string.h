@@ -25,12 +25,12 @@ public:
         : quark_{ quark }
     {
     }
-    explicit tr_interned_string(std::string_view str)
-        : tr_interned_string{ tr_quark_new(str) }
+    explicit tr_interned_string(std::string_view sv)
+        : tr_interned_string{ tr_quark_new(sv) }
     {
     }
-    explicit tr_interned_string(char const* str)
-        : tr_interned_string{ std::string_view{ str ? str : "" } }
+    explicit tr_interned_string(char const* c_str)
+        : tr_interned_string{ std::string_view{ c_str ? c_str : "" } }
     {
     }
 
@@ -43,9 +43,9 @@ public:
     {
         return *this = tr_quark_new(sv);
     }
-    tr_interned_string& operator=(char const* str)
+    tr_interned_string& operator=(char const* c_str)
     {
-        return *this = std::string_view{ str != nullptr ? str : "" };
+        return *this = std::string_view{ c_str != nullptr ? c_str : "" };
     }
 
     [[nodiscard]] tr_quark quark() const
