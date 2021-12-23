@@ -491,7 +491,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 ****
 ***/
 
-static constexpr void tr_torrentClearError(tr_torrent* tor)
+static void tr_torrentClearError(tr_torrent* tor)
 {
     tor->error = TR_STAT_OK;
     tor->error_announce_url.clear();
