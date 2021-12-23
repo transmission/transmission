@@ -710,7 +710,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename.c_str());
     if (err != 0)
     {
-        tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
+        tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }
 
     tr_variantFree(&top);

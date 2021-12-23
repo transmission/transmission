@@ -12,7 +12,6 @@
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <csignal> /* signal() */
-#include <cstdarg>
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcmp */
 #include <ctime>
@@ -499,31 +498,11 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 ****
 ***/
 
-void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    va_list ap;
-
-    va_start(ap, fmt);
-    tor->error = TR_STAT_LOCAL_ERROR;
-    tor->error_announce_url = TR_KEY_NONE;
-    evutil_vsnprintf(tor->errorString, sizeof(tor->errorString), fmt, ap);
-    va_end(ap);
-
-    tr_logAddTorErr(tor, "%s", tor->errorString);
-
-    if (tor->isRunning)
-    {
-        tor->isStopping = true;
-    }
-}
-
 static constexpr void tr_torrentClearError(tr_torrent* tor)
 {
     tor->error = TR_STAT_OK;
     tor->error_announce_url = TR_KEY_NONE;
-    tor->errorString[0] = '\0';
+    tor->error_string.clear();
 }
 
 static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
@@ -544,16 +523,16 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_WARNING:
-        tr_logAddTorErr(tor, _("Tracker warning: \"%s\""), event->text);
+        tr_logAddTorErr(tor, _("Tracker warning: \"%" TR_PRIsv "\""), TR_PRIsv_ARG(event->text));
         tor->error = TR_STAT_TRACKER_WARNING;
         tor->error_announce_url = event->announce_url;
-        tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
+        tor->error_string = event->text;
         break;
 
     case TR_TRACKER_ERROR:
         tor->error = TR_STAT_TRACKER_ERROR;
         tor->error_announce_url = event->announce_url;
-        tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
+        tor->error_string = event->text;
         break;
 
     case TR_TRACKER_ERROR_CLEAR:
@@ -627,11 +606,8 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     if (disappeared)
     {
         tr_deeplog_tor(tor, "%s", "[LAZY] uh oh, the files disappeared");
-        tr_torrentSetLocalError(
-            tor,
-            "%s",
-            _("No data found! Ensure your drives are connected or use \"Set Location\". "
-              "To re-download, remove the torrent and re-add it."));
+        tor->setLocalError(_(
+            "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
     }
 
     return disappeared;
@@ -754,7 +730,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error* error = nullptr;
         if (!tr_ctorSaveContents(ctor, tor->torrentFile(), &error))
         {
-            tr_torrentSetLocalError(tor, "Unable to save torrent file: %s (%d)", error->message, error->code);
+            tor->setLocalError(
+                tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
         }
         tr_error_clear(&error);
     }
@@ -1002,7 +979,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->queuePosition = tor->queuePosition;
     s->idleSecs = torrentGetIdleSecs(tor, s->activity);
     s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
-    s->errorString = tor->errorString;
+    s->errorString = tor->error_string.c_str();
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
     s->peersConnected = swarm_stats.peerCount;

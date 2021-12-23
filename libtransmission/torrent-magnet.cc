@@ -301,7 +301,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     success = !!info;
                     if (info && tr_block_info::bestBlockSize(info->info.pieceSize) == 0)
                     {
-                        tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
+                        tor->setLocalError(_("Magnet torrent's metadata is not usable"));
                         success = false;
                     }
 

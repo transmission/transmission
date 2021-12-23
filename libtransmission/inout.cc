@@ -26,6 +26,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 /****
 *****  Low-level IO functions
 ****/
@@ -228,7 +230,7 @@ static int readOrWritePiece(
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
             auto const path = tr_strvPath(tor->downloadDir().sv(), file.name);
-            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path.c_str());
+            tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
         }
     }
 

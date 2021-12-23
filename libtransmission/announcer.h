@@ -43,7 +43,7 @@ struct tr_tracker_event
     TrackerEventType messageType;
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
-    char const* text;
+    std::string_view text;
     tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */

@@ -467,7 +467,7 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
 ****  PUBLISH
 ***/
 
-static void publishMessage(tr_tier* tier, char const* msg, TrackerEventType type)
+static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType type)
 {
     if (tier != nullptr && tier->tor != nullptr && tier->tor->announcer_tiers != nullptr &&
         tier->tor->announcer_tiers->callback != nullptr)
@@ -488,15 +488,15 @@ static void publishMessage(tr_tier* tier, char const* msg, TrackerEventType type
 
 static void publishErrorClear(tr_tier* tier)
 {
-    publishMessage(tier, nullptr, TR_TRACKER_ERROR_CLEAR);
+    publishMessage(tier, ""sv, TR_TRACKER_ERROR_CLEAR);
 }
 
-static void publishWarning(tr_tier* tier, char const* msg)
+static void publishWarning(tr_tier* tier, std::string_view msg)
 {
     publishMessage(tier, msg, TR_TRACKER_WARNING);
 }
 
-static void publishError(tr_tier* tier, char const* msg)
+static void publishError(tr_tier* tier, std::string_view msg)
 {
     publishMessage(tier, msg, TR_TRACKER_ERROR);
 }
@@ -951,8 +951,8 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             response->tracker_id_str != nullptr ? response->tracker_id_str : "none",
             response->pex_count,
             response->pex6_count,
-            response->errmsg != nullptr ? response->errmsg : "none",
-            response->warning != nullptr ? response->warning : "none");
+            (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
+            (!std::empty(response->warning) ? response->warning.c_str() : "none"));
 
         tier->lastAnnounceTime = now;
         tier->lastAnnounceTimedOut = response->did_timeout;
@@ -968,7 +968,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
         {
             on_announce_error(tier, _("Tracker did not respond"), event);
         }
-        else if (response->errmsg != nullptr)
+        else if (!std::empty(response->errmsg))
         {
             /* If the torrent's only tracker returned an error, publish it.
                Don't bother publishing if there are other trackers -- it's
@@ -979,7 +979,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 publishError(tier, response->errmsg);
             }
 
-            on_announce_error(tier, response->errmsg, event);
+            on_announce_error(tier, response->errmsg.c_str(), event);
         }
         else
         {
@@ -1020,12 +1020,12 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 }
             }
 
-            char const* const str = response->warning;
-            if (str != nullptr)
+            auto const& warning = response->warning;
+            if (!std::empty(warning))
             {
-                tr_strlcpy(tier->lastAnnounceStr, str, sizeof(tier->lastAnnounceStr));
-                dbgmsg(tier, "tracker gave \"%s\"", str);
-                publishWarning(tier, str);
+                tr_strlcpy(tier->lastAnnounceStr, warning.c_str(), sizeof(tier->lastAnnounceStr));
+                dbgmsg(tier, "tracker gave \"%s\"", warning.c_str());
+                publishWarning(tier, warning);
             }
             else
             {

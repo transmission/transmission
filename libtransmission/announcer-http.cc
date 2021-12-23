@@ -190,8 +190,6 @@ static void on_announce_done_eventthread(void* vdata)
     tr_free(data->response.pex6);
     tr_free(data->response.pex);
     tr_free(data->response.tracker_id_str);
-    tr_free(data->response.warning);
-    tr_free(data->response.errmsg);
     tr_free(data);
 }
 
@@ -251,12 +249,12 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strvDup(sv);
+                response->errmsg = sv;
             }
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strvDup(sv);
+                response->warning = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))

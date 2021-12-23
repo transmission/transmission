@@ -356,8 +356,6 @@ static struct tau_announce_request* tau_announce_request_new(
 static void tau_announce_request_free(struct tau_announce_request* req)
 {
     tr_free(req->response.tracker_id_str);
-    tr_free(req->response.warning);
-    tr_free(req->response.errmsg);
     tr_free(req->response.pex6);
     tr_free(req->response.pex);
     delete req;

@@ -2231,10 +2231,11 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
-                    tr_torrentSetLocalError(
-                        msgs->torrent,
-                        _("Please Verify Local Data! Piece #%zu is corrupt."),
-                        (size_t)req.index);
+                    auto const errmsg = tr_strvJoin(
+                        "Please Verify Local Data! Piece #",
+                        std::to_string(req.index),
+                        " is corrupt.");
+                    msgs->torrent->setLocalError(errmsg);
                 }
             }
 

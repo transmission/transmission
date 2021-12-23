@@ -97,8 +97,6 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
-
 enum tr_verify_state
 {
     TR_VERIFY_NONE,
@@ -519,6 +517,13 @@ public:
         return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
     }
 
+    void setLocalError(std::string_view errmsg)
+    {
+        this->error = TR_STAT_LOCAL_ERROR;
+        this->error_announce_url = TR_KEY_NONE;
+        this->error_string = errmsg;
+    }
+
     void setVerifyState(tr_verify_state state);
 
     void setDateActive(time_t t);
@@ -550,8 +555,8 @@ public:
     std::optional<double> verify_progress;
 
     tr_stat_errtype error = TR_STAT_OK;
-    char errorString[128] = {};
     tr_interned_string error_announce_url;
+    std::string error_string;
 
     bool checkPiece(tr_piece_index_t piece);
 
