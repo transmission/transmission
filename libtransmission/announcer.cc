@@ -1020,8 +1020,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 }
             }
 
-            auto const& warning = response->warning;
-            if (!std::empty(warning))
+            if (auto const& warning = response->warning; !std::empty(warning))
             {
                 tr_strlcpy(tier->lastAnnounceStr, warning.c_str(), sizeof(tier->lastAnnounceStr));
                 dbgmsg(tier, "tracker gave \"%s\"", warning.c_str());
