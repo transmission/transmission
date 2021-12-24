@@ -105,7 +105,7 @@ public:
         return trackers_.clear();
     }
 
-    bool save(char const* torrent_file, tr_error** error = nullptr) const;
+    bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
     static std::optional<std::string> announceToScrape(std::string_view announce);
     static tr_quark announceToScrape(tr_quark announce);

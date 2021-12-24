@@ -166,10 +166,10 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
     return 0;
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, char const* filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
-    TR_ASSERT(filename != nullptr);
+    TR_ASSERT(!std::empty(filename));
 
     if (std::empty(ctor->contents))
     {
