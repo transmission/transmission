@@ -556,7 +556,7 @@ static int getOptMode(int val)
 static bool debug = false;
 static char* auth = nullptr;
 static char* netrc = nullptr;
-static std::string session_id;
+static char* session_id = nullptr;
 static bool UseSSL = false;
 
 static char* getEncodedMetainfo(char const* filename)
@@ -810,7 +810,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* /*
             ++end;
         }
 
-        session_id.assign(begin, end);
+        session_id = tr_strvDup(std::string_view{ begin, size_t(end - begin) });
     }
 
     return line_len;
@@ -2166,7 +2166,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); /* since most certs will be self-signed, do not verify against CA */
     }
 
-    if (!std::empty(session_id))
+    if (!tr_str_is_empty(session_id))
     {
         auto const h = tr_strvJoin(TR_RPC_SESSION_ID_HEADER, ": "sv, session_id);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
