@@ -33,6 +33,15 @@ public:
     using file_span_t = index_span_t<tr_file_index_t>;
     using piece_span_t = index_span_t<tr_piece_index_t>;
 
+    template<typename T>
+    struct offset_t
+    {
+        T index;
+        uint64_t offset;
+    };
+
+    using file_offset_t = offset_t<tr_file_index_t>;
+
     explicit tr_file_piece_map(tr_info const& info)
     {
         reset(info);
@@ -46,13 +55,55 @@ public:
 
     [[nodiscard]] piece_span_t pieceSpan(tr_file_index_t file) const;
     [[nodiscard]] file_span_t fileSpan(tr_piece_index_t piece) const;
+
+    [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
+
     [[nodiscard]] size_t size() const
     {
-        return std::size(files_);
+        return std::size(file_pieces_);
     }
 
 private:
-    std::vector<piece_span_t> files_;
+    using byte_span_t = index_span_t<tr_byte_index_t>;
+    std::vector<byte_span_t> file_bytes_;
+
+    std::vector<piece_span_t> file_pieces_;
+
+    template<typename T>
+    struct CompareToSpan
+    {
+        using span_t = index_span_t<T>;
+
+        int compare(T item, span_t span) const // <=>
+        {
+            if (item < span.begin)
+            {
+                return -1;
+            }
+
+            if (item >= span.end)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        bool operator()(T item, span_t span) const // <
+        {
+            return compare(item, span) < 0;
+        }
+
+        int compare(span_t span, T item) const // <=>
+        {
+            return -compare(item, span);
+        }
+
+        bool operator()(span_t span, T item) const // <
+        {
+            return compare(span, item) < 0;
+        }
+    };
 };
 
 class tr_file_priorities

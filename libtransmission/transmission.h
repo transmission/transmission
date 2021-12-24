@@ -36,6 +36,7 @@ using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
+using tr_byte_index_t = uint64_t;
 
 #include "announce-list.h"
 

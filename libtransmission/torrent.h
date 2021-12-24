@@ -242,6 +242,16 @@ public:
         return fpm_.pieceSpan(file);
     }
 
+    [[nodiscard]] auto fileOffset(uint64_t offset) const
+    {
+        return fpm_.fileOffset(offset);
+    }
+
+    [[nodiscard]] auto fileOffset(tr_piece_index_t piece, uint32_t piece_offset) const
+    {
+        return fpm_.fileOffset(this->offset(piece, piece_offset));
+    }
+
     /// WANTED
 
     [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final
