@@ -737,7 +737,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     std::string const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
     auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename.c_str(), &error) ||
+    if (!tr_loadFile(buf, filename, &error) ||
         !tr_variantFromBuf(
             &top,
             TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
