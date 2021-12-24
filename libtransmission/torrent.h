@@ -390,7 +390,9 @@ public:
 
     /// METAINFO - OTHER
 
-    [[nodiscard]] auto const& hash() const
+    void setName(std::string_view name);
+
+    [[nodiscard]] auto const& infoHash() const
     {
         return this->info.hash;
     }
@@ -425,7 +427,7 @@ public:
         return this->info.totalSize;
     }
 
-    [[nodiscard]] auto hashString() const
+    [[nodiscard]] auto infoHashString() const
     {
         return this->info.hashString;
     }
@@ -448,6 +450,11 @@ public:
     [[nodiscard]] auto hasMetadata() const
     {
         return fileCount() > 0;
+    }
+
+    [[nodiscard]] auto infoDictLength() const
+    {
+        return this->info_dict_length;
     }
 
     /// METAINFO - CHECKSUMS
@@ -603,7 +610,7 @@ public:
     tr_interned_string current_dir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    uint64_t infoDictLength = 0;
+    uint64_t info_dict_length = 0;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *

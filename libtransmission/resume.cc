@@ -38,7 +38,12 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 static std::string getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
-    return tr_buildTorrentFilename(tr_getResumeDir(tor->session), tr_torrentName(tor), tor->hashString(), format, ".resume"sv);
+    return tr_buildTorrentFilename(
+        tr_getResumeDir(tor->session),
+        tr_torrentName(tor),
+        tor->infoHashString(),
+        format,
+        ".resume"sv);
 }
 
 /***
@@ -383,11 +388,7 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
         return 0;
     }
 
-    if (name != tr_torrentName(tor))
-    {
-        tr_free(tor->info.name);
-        tor->info.name = tr_strvDup(name);
-    }
+    tor->setName(name);
 
     return TR_FR_NAME;
 }

@@ -690,7 +690,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return AnnounceResult::FAILED;
     }
 
-    auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->info.hash));
+    auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->infoHash()));
     int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {

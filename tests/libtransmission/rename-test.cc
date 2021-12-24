@@ -151,12 +151,10 @@ TEST_F(RenameTest, singleFilenameTorrent)
         "OmhlbGxvLXdvcmxkLnR4dDEyOnBpZWNlIGxlbmd0aGkzMjc2OGU2OnBpZWNlczIwOukboJcrkFUY"
         "f6LvqLXBVvSHqCk6Nzpwcml2YXRlaTBlZWU=");
     EXPECT_TRUE(tr_isTorrent(tor));
-    auto const& files = tor->info.files;
 
     // sanity check the info
     EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
-    EXPECT_STREQ("hello-world.txt", files[0].name);
-    EXPECT_FALSE(files[0].priv.is_renamed);
+    EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
 
     // sanity check the (empty) stats
     blockingTorrentVerify(tor);
@@ -188,9 +186,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ".."));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "hello-world.txt", "hello-world.txt"));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", "hello/world.txt"));
-
-    EXPECT_FALSE(files[0].priv.is_renamed);
-    EXPECT_STREQ("hello-world.txt", files[0].name);
+    EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
 
     /***
     ****  Now try a rename that should succeed
@@ -201,9 +197,8 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the old filename can't be found
-    EXPECT_TRUE(files[0].priv.is_renamed); // confirm the file's 'renamed' flag is set
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
-    EXPECT_STREQ("foobar", files[0].name); // confirm the file's name is now 'foobar' in our struct
+    EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     EXPECT_STREQ(nullptr, strstr(tr_torrentView(tor).torrent_filename, "foobar")); // confirm .torrent file hasn't changed
     tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
@@ -224,9 +219,8 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
-    EXPECT_TRUE(files[0].priv.is_renamed);
-    EXPECT_STREQ("hello-world.txt", files[0].name);
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
+    EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
 
     // cleanup

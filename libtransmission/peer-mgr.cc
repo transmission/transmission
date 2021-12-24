@@ -349,17 +349,15 @@ static void peerCallbackFunc(tr_peer*, tr_peer_event const*, void*);
 
 static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
 {
-    tr_info const* inf = &tor->info;
-
     /* clear the array */
     tr_ptrArrayDestruct(&s->webseeds, [](void* peer) { delete static_cast<tr_peer*>(peer); });
     s->webseeds = {};
     s->stats.activeWebseedCount = 0;
 
     /* repopulate it */
-    for (unsigned int i = 0; i < inf->webseedCount; ++i)
+    for (size_t i = 0, n = tor->webseedCount(); i < n; ++i)
     {
-        tr_peer* w = tr_webseedNew(tor, inf->webseeds[i], peerCallbackFunc, s);
+        auto* const w = tr_webseedNew(tor, tor->webseed(i), peerCallbackFunc, s);
         tr_ptrArrayAppend(&s->webseeds, w);
     }
 }
@@ -3067,7 +3065,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
         mgr->session->bandwidth,
         &atom->addr,
         atom->port,
-        s->tor->info.hash,
+        s->tor->infoHash(),
         s->tor->completeness == TR_SEED,
         utp);
 

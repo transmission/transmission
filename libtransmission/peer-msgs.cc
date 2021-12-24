@@ -1059,9 +1059,10 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // It also adds "metadata_size" to the handshake message (not the
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
-    if (allow_metadata_xfer && msgs->torrent->hasMetadata() && msgs->torrent->infoDictLength > 0)
+    auto const info_dict_length = msgs->torrent->infoDictLength();
+    if (allow_metadata_xfer && msgs->torrent->hasMetadata() && info_dict_length > 0)
     {
-        tr_variantDictAddInt(&val, TR_KEY_metadata_size, msgs->torrent->infoDictLength);
+        tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_length);
     }
 
     // http://bittorrent.org/beps/bep_0010.html
@@ -2150,7 +2151,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             tr_variantInitDict(&tmp, 3);
             tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_DATA);
             tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
-            tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictLength);
+            tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictLength());
             evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */

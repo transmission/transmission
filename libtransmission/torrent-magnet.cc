@@ -166,7 +166,8 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     {
         ensureInfoDictOffsetIsCached(tor);
 
-        TR_ASSERT(tor->infoDictLength > 0);
+        auto const info_dict_length = tor->infoDictLength();
+        TR_ASSERT(info_dict_length > 0);
 
         auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
         if (fd != TR_BAD_SYS_FILE)
@@ -175,7 +176,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
             if (tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, nullptr, nullptr))
             {
-                size_t const l = o + METADATA_PIECE_SIZE <= tor->infoDictLength ? METADATA_PIECE_SIZE : tor->infoDictLength - o;
+                size_t const l = o + METADATA_PIECE_SIZE <= info_dict_length ? METADATA_PIECE_SIZE : info_dict_length - o;
 
                 if (0 < l && l <= METADATA_PIECE_SIZE)
                 {
@@ -273,7 +274,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         /* we've got a complete set of metainfo... see if it passes the checksum test */
         dbgmsg(tor, "metainfo piece %d was the last one", piece);
         auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-        bool const checksum_passed = sha1 && *sha1 == tor->info.hash;
+        bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
         if (checksum_passed)
         {
             /* checksum passed; now try to parse it as benc */

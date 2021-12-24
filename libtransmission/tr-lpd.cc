@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include <csignal> /* sig_atomic_t */
 #include <cstdio>
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
+#include <type_traits>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -43,8 +44,8 @@ using in_port_t = uint16_t; /* all missing */
 #include <event2/event.h>
 #include <event2/util.h>
 
-/* libT */
 #include "transmission.h"
+
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
@@ -54,7 +55,7 @@ using in_port_t = uint16_t; /* all missing */
 #include "tr-lpd.h"
 #include "utils.h"
 
-#define SIZEOF_HASH_STRING (sizeof(((struct tr_info*)0)->hashString))
+static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
 /**
 * @brief Local Peer Discovery
@@ -275,7 +276,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
      * However, the code should work as long as interfaces to the rest of
      * libtransmission are compatible with char* strings. */
-    static_assert(sizeof(((struct tr_info*)nullptr)->hashString[0]) == sizeof(char), "");
+    static_assert(std::is_same_v<char const, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
 
     struct ip_mreq mcastReq;
     int const opt_on = 1;
@@ -472,7 +473,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     }
 
     /* make sure the hash string is normalized, just in case */
-    auto const* const sourceHashString = t->hashString();
+    auto const* const sourceHashString = t->infoHashString();
     for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
     {
         hashString[i] = toupper(sourceHashString[i]);
