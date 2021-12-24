@@ -452,6 +452,11 @@ public:
         return fileCount() > 0;
     }
 
+    [[nodiscard]] auto infoDictLength() const
+    {
+        return this->info_dict_length;
+    }
+
     /// METAINFO - CHECKSUMS
 
     [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece)
@@ -605,7 +610,7 @@ public:
     tr_interned_string current_dir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    uint64_t infoDictLength = 0;
+    uint64_t info_dict_length = 0;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *

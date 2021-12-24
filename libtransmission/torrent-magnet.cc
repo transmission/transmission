@@ -166,7 +166,8 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     {
         ensureInfoDictOffsetIsCached(tor);
 
-        TR_ASSERT(tor->infoDictLength > 0);
+        auto const info_dict_length = tor->infoDictLength();
+        TR_ASSERT(info_dict_length > 0);
 
         auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
         if (fd != TR_BAD_SYS_FILE)
@@ -175,7 +176,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
             if (tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, nullptr, nullptr))
             {
-                size_t const l = o + METADATA_PIECE_SIZE <= tor->infoDictLength ? METADATA_PIECE_SIZE : tor->infoDictLength - o;
+                size_t const l = o + METADATA_PIECE_SIZE <= info_dict_length ? METADATA_PIECE_SIZE : info_dict_length - o;
 
                 if (0 < l && l <= METADATA_PIECE_SIZE)
                 {
