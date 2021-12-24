@@ -318,32 +318,34 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     return buf;
 }
 
-bool tr_loadFile(std::vector<char>& setme, char const* path, tr_error** error)
+bool tr_loadFile(std::vector<char>& setme, std::string_view path_sv, tr_error** error)
 {
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    auto const path = std::string{ path_sv };
+    auto const* const path_sz = path.c_str();
 
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
     {
-        tr_logAddDebug(err_fmt, path, my_error->message);
+        tr_logAddDebug(err_fmt, path_sz, my_error->message);
         tr_error_propagate(error, &my_error);
         return false;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(err_fmt, path, _("Not a regular file"));
+        tr_logAddError(err_fmt, path_sz, _("Not a regular file"));
         tr_error_set_literal(error, TR_ERROR_EISDIR, _("Not a regular file"));
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    tr_sys_file_t const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    tr_sys_file_t const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_logAddError(err_fmt, path_sz, my_error->message);
         tr_error_propagate(error, &my_error);
         return false;
     }
@@ -351,7 +353,7 @@ bool tr_loadFile(std::vector<char>& setme, char const* path, tr_error** error)
     setme.resize(info.size);
     if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_logAddError(err_fmt, path_sz, my_error->message);
         tr_sys_file_close(fd, nullptr);
         tr_error_propagate(error, &my_error);
         return false;
@@ -361,7 +363,7 @@ bool tr_loadFile(std::vector<char>& setme, char const* path, tr_error** error)
     return true;
 }
 
-bool tr_saveFile(char const* filename_in, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
 {
     auto filename = std::string{ filename_in };
 
