@@ -227,13 +227,13 @@ QIcon IconCache::getThemeIcon(
     QString const& fallbackName,
     std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const
 {
-    static auto const RtlSuffix = qApp->layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
+    auto const rtl_suffix = qApp->layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
 
-    auto icon = QIcon::fromTheme(name + RtlSuffix);
+    auto icon = QIcon::fromTheme(name + rtl_suffix);
 
     if (icon.isNull())
     {
-        icon = QIcon::fromTheme(fallbackName + RtlSuffix);
+        icon = QIcon::fromTheme(fallbackName + rtl_suffix);
     }
 
     if (icon.isNull() && fallbackPixmap.has_value())
