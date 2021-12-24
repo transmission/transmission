@@ -188,10 +188,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     /* maybe instantiate a torrent */
     if (!filename.empty() || tor_ == nullptr)
     {
-        int err = 0;
         bool new_file = false;
-        int duplicate_id = 0;
-        tr_torrent* torrent;
 
         if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str(), nullptr)))
         {
@@ -204,15 +201,15 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
         tr_ctorSetPaused(ctor_.get(), TR_FORCE, true);
         tr_ctorSetDeleteSource(ctor_.get(), false);
 
-        if (torrent = tr_torrentNew(ctor_.get(), &err, &duplicate_id); torrent != nullptr)
+        tr_torrent* duplicate_of = nullptr;
+        if (tr_torrent* const torrent = tr_torrentNew(ctor_.get(), &duplicate_of); torrent != nullptr)
         {
             removeOldTorrent();
             tor_ = torrent;
         }
         else if (new_file)
         {
-            tr_torrent* tor = duplicate_id != 0 ? core_->find_torrent(duplicate_id) : nullptr;
-            gtr_add_torrent_error_dialog(*b, err, tor, filename_);
+            gtr_add_torrent_error_dialog(*b, duplicate_of, filename_);
         }
 
         updateTorrent();

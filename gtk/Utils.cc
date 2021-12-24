@@ -219,16 +219,12 @@ Gtk::Window* getWindow(Gtk::Widget* w)
 
 } // namespace
 
-void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* duplicate_torrent, std::string const& filename)
+void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torrent, std::string const& filename)
 {
     Glib::ustring secondary;
     auto* win = getWindow(&child);
 
-    if (err == TR_PARSE_ERR)
-    {
-        secondary = gtr_sprintf(_("The torrent file \"%s\" contains invalid data."), filename);
-    }
-    else if (err == TR_PARSE_DUPLICATE)
+    if (duplicate_torrent != nullptr)
     {
         secondary = gtr_sprintf(
             _("The torrent file \"%s\" is already in use by \"%s.\""),
@@ -237,7 +233,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* dupli
     }
     else
     {
-        secondary = gtr_sprintf(_("The torrent file \"%s\" encountered an unknown error."), filename);
+        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
