@@ -17,26 +17,36 @@
 
 void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
 {
-    files_.resize(n_files);
-    files_.shrink_to_fit();
+    file_bytes_.resize(n_files);
+    file_bytes_.shrink_to_fit();
+
+    file_pieces_.resize(n_files);
+    file_pieces_.shrink_to_fit();
 
     uint64_t offset = 0;
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const file_size = file_sizes[i];
-        auto const begin_piece = block_info.pieceOf(offset);
-        tr_piece_index_t end_piece = 0;
+        auto const begin_byte = offset;
+        auto const begin_piece = block_info.pieceOf(begin_byte);
+        auto end_byte = tr_byte_index_t{};
+        auto end_piece = tr_piece_index_t{};
+
         if (file_size != 0)
         {
-            auto const last_byte = offset + file_size - 1;
-            auto const final_piece = block_info.pieceOf(last_byte);
+            end_byte = offset + file_size;
+            auto const final_byte = end_byte - 1;
+            auto const final_piece = block_info.pieceOf(final_byte);
             end_piece = final_piece + 1;
         }
         else
         {
+            end_byte = begin_byte;
+            // TODO(ckerr): should end_piece == begin_piece, same as _bytes are?
             end_piece = begin_piece + 1;
         }
-        files_[i] = piece_span_t{ begin_piece, end_piece };
+        file_pieces_[i] = piece_span_t{ begin_piece, end_piece };
+        file_bytes_[i] = byte_span_t{ begin_byte, end_byte };
         offset += file_size;
     }
 }
@@ -51,47 +61,25 @@ void tr_file_piece_map::reset(tr_info const& info)
 
 tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const
 {
-    return files_[file];
+    return file_pieces_[file];
 }
 
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
 {
-    struct Compare
-    {
-        int compare(tr_piece_index_t piece, piece_span_t span) const // <=>
-        {
-            if (piece < span.begin)
-            {
-                return -1;
-            }
-
-            if (piece >= span.end)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        bool operator()(tr_piece_index_t piece, piece_span_t span) const // <
-        {
-            return compare(piece, span) < 0;
-        }
-
-        int compare(piece_span_t span, tr_piece_index_t piece) const // <=>
-        {
-            return -compare(piece, span);
-        }
-
-        bool operator()(piece_span_t span, tr_piece_index_t piece) const // <
-        {
-            return compare(span, piece) < 0;
-        }
-    };
-
-    auto const begin = std::begin(files_);
-    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(files_), piece, Compare{});
+    auto compare = CompareToSpan<tr_piece_index_t>{};
+    auto const begin = std::begin(file_pieces_);
+    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, compare);
     return { tr_piece_index_t(std::distance(begin, equal_begin)), tr_piece_index_t(std::distance(begin, equal_end)) };
+}
+
+tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) const
+{
+    auto compare = CompareToSpan<uint64_t>{};
+    auto const begin = std::begin(file_bytes_);
+    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, compare);
+    tr_file_index_t const file_index = std::distance(begin, it);
+    auto const file_offset = offset - it->begin;
+    return file_offset_t{ file_index, file_offset };
 }
 
 /***

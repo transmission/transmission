@@ -18,7 +18,6 @@
 
 #include "bandwidth.h"
 #include "cache.h"
-#include "inout.h" /* tr_ioFindFileLocation() */
 #include "peer-mgr.h"
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -271,9 +270,7 @@ static void connection_succeeded(void* vdata)
 
         if (tor != nullptr)
         {
-            auto file_index = tr_file_index_t{};
-            auto file_offset = uint64_t{};
-            tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
+            auto const file_index = tor->fileOffset(data->piece_index, data->piece_offset).index;
             w->file_urls[file_index].assign(data->real_url);
         }
     }
@@ -527,10 +524,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         tr_piece_index_t const step_piece = total_offset / piece_size;
         uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 
-        auto file_index = tr_file_index_t{};
-        auto file_offset = uint64_t{};
-        tr_ioFindFileLocation(tor, step_piece, step_piece_offset, &file_index, &file_offset);
-
+        auto const [file_index, file_offset] = tor->fileOffset(step_piece, step_piece_offset);
         auto const& file = tor->file(file_index);
         uint64_t this_pass = std::min(remain, file.length - file_offset);
 
