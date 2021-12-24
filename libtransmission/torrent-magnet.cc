@@ -273,7 +273,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         /* we've got a complete set of metainfo... see if it passes the checksum test */
         dbgmsg(tor, "metainfo piece %d was the last one", piece);
         auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-        bool const checksum_passed = sha1 && *sha1 == tor->info.hash;
+        bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
         if (checksum_passed)
         {
             /* checksum passed; now try to parse it as benc */

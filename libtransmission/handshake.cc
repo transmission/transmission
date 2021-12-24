@@ -198,7 +198,7 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
         }
         walk += HANDSHAKE_FLAGS_LEN;
 
-        walk = std::copy_n(reinterpret_cast<char const*>(std::data(tor->hash())), std::size(tor->hash()), walk);
+        walk = std::copy_n(reinterpret_cast<char const*>(std::data(tor->infoHash())), std::size(tor->infoHash()), walk);
 
         auto const& peer_id = tr_torrentGetPeerId(tor);
         std::copy_n(std::data(peer_id), std::size(peer_id), walk);
@@ -825,7 +825,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         bool const clientIsSeed = tor->isDone();
         bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, nullptr));
         dbgmsg(handshake, "got INCOMING connection's encrypted handshake for torrent [%s]", tr_torrentName(tor));
-        tr_peerIoSetTorrentHash(handshake->io, tor->info.hash);
+        tr_peerIoSetTorrentHash(handshake->io, tor->infoHash());
 
         if (clientIsSeed && peerIsSeed)
         {

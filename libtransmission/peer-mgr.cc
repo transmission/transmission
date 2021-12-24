@@ -3067,7 +3067,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
         mgr->session->bandwidth,
         &atom->addr,
         atom->port,
-        s->tor->info.hash,
+        s->tor->infoHash(),
         s->tor->completeness == TR_SEED,
         utp);
 

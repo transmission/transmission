@@ -574,7 +574,7 @@ static void initField(
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStrView(initme, tor->hashString());
+        tr_variantInitStrView(initme, tor->infoHashString());
         break;
 
     case TR_KEY_haveUnchecked:
