@@ -552,7 +552,7 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->initSizes(tor->totalSize(), tor->pieceSize());
     tor->completion = tr_completion{ tor, tor };
-    auto const obfuscated = tr_sha1("req2"sv, tor->info.hash);
+    auto const obfuscated = tr_sha1("req2"sv, tor->infoHash());
     if (obfuscated)
     {
         tor->obfuscated_hash = *obfuscated;
@@ -1229,8 +1229,8 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     TR_ASSERT(tr_isTorrent(tor));
 
     auto ret = tr_torrent_view{};
-    ret.name = tor->info.name;
-    ret.hash_string = tor->hashString();
+    ret.name = tr_torrentName(tor);
+    ret.hash_string = tor->infoHashString();
     ret.torrent_filename = tor->torrentFile();
     ret.comment = tor->info.comment;
     ret.creator = tor->info.creator;
@@ -1818,7 +1818,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, ctime_str },
         { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
-        { "TR_TORRENT_HASH"sv, tor->hashString() },
+        { "TR_TORRENT_HASH"sv, tor->infoHashString() },
         { "TR_TORRENT_ID"sv, id_str },
         { "TR_TORRENT_LABELS"sv, labels_str },
         { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
@@ -3115,8 +3115,7 @@ static void torrentRenamePath(void* vdata)
                 /* update tr_info.name if user changed the toplevel */
                 if (n == tor->fileCount() && strchr(oldpath, '/') == nullptr)
                 {
-                    tr_free(tor->info.name);
-                    tor->info.name = tr_strdup(newname);
+                    tor->setName(newname);
                 }
 
                 tor->markEdited();
@@ -3178,7 +3177,7 @@ void tr_torrent::swapMetainfo(tr_metainfo_parsed& parsed)
 {
     std::swap(this->info, parsed.info);
     std::swap(this->piece_checksums_, parsed.pieces);
-    std::swap(this->infoDictLength, parsed.info_dict_length);
+    std::swap(this->info_dict_length, parsed.info_dict_length);
 }
 
 void tr_torrentSetFilePriorities(
@@ -3214,4 +3213,15 @@ void tr_torrent::setDateActive(time_t t)
 void tr_torrent::setBlocks(tr_bitfield blocks)
 {
     this->completion.setBlocks(std::move(blocks));
+}
+
+void tr_torrent::setName(std::string_view name)
+{
+    if (name == this->info.name)
+    {
+        return;
+    }
+
+    tr_free(this->info.name);
+    this->info.name = tr_strvDup(name);
 }

@@ -809,7 +809,7 @@ static tr_announce_request* announce_request_new(
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
     req->announce_url = tier->currentTracker->announce_url;
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
-    req->info_hash = tor->hash();
+    req->info_hash = tor->infoHash();
     req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
@@ -1420,7 +1420,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
                 continue;
             }
 
-            req->info_hash[req->info_hash_count] = tier->tor->hash();
+            req->info_hash[req->info_hash_count] = tier->tor->infoHash();
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
@@ -1434,7 +1434,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
             req->scrape_url = scrape_info->scrape_url;
             tier_build_log_name(tier, req->log_name, sizeof(req->log_name));
 
-            req->info_hash[req->info_hash_count] = tier->tor->hash();
+            req->info_hash[req->info_hash_count] = tier->tor->infoHash();
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
