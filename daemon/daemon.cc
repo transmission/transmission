@@ -233,11 +233,9 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
 
     if (err == 0)
     {
-        tr_torrentNew(ctor, &err, nullptr);
-
-        if (err == TR_PARSE_ERR)
+        if (tr_torrentNew(ctor, nullptr) == nullptr)
         {
-            tr_logAddError("Error parsing .torrent file \"%s\"", name);
+            tr_logAddError("Unable to add .torrent file \"%s\"", name);
         }
         else
         {

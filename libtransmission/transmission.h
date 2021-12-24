@@ -953,13 +953,10 @@ void tr_metainfoFree(tr_info* inf);
  * Returns a pointer to the torrent on success, or nullptr on failure.
  *
  * @param ctor               the builder struct
- * @param setme_error        TR_PARSE_ERR if the parsing failed.
- *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate.
- *                           TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
- * @param setme_duplicate_id when setmeError is TR_PARSE_DUPLICATE,
- *                           this field is set to the duplicate torrent's id.
+ * @param setme_duplicate_of If the torrent couldn't be created because it's a duplicate,
+ *                           this is set to point to the original torrent.
  */
-tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_duplicate_id);
+tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of);
 
 /** @} */
 

@@ -1506,21 +1506,20 @@ static char const* blocklistUpdate(
 
 static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 {
-    auto err = int{};
-    auto duplicate_id = int{};
-    tr_torrent* tor = tr_torrentNew(ctor, &err, &duplicate_id);
+    tr_torrent* duplicate_of = nullptr;
+    tr_torrent* tor = tr_torrentNew(ctor, &duplicate_of);
     tr_ctorFree(ctor);
 
     auto key = tr_quark{};
     char const* result = "invalid or corrupt torrent file";
-    if (err == 0)
+    if (tor != nullptr)
     {
         key = TR_KEY_torrent_added;
         result = nullptr;
     }
-    else if (err == TR_PARSE_DUPLICATE)
+    else if (duplicate_of != nullptr)
     {
-        tor = tr_torrentFindFromId(data->session, duplicate_id);
+        tor = duplicate_of;
         key = TR_KEY_torrent_duplicate;
         result = "duplicate torrent";
     }
