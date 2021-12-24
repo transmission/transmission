@@ -236,7 +236,6 @@ int tr_main(int argc, char* argv[])
 {
     tr_session* h;
     tr_ctor* ctor;
-    tr_torrent* tor = nullptr;
     tr_variant settings;
     char const* configDir;
 
@@ -327,9 +326,8 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    tor = tr_torrentNew(ctor, nullptr, nullptr);
+    tr_torrent* tor = tr_torrentNew(ctor, nullptr);
     tr_ctorFree(ctor);
-
     if (tor == nullptr)
     {
         fprintf(stderr, "Failed opening torrent file `%s'\n", torrentPath);

@@ -788,7 +788,7 @@ tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
     return TR_PARSE_OK;
 }
 
-tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_duplicate_id)
+tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
@@ -799,25 +799,15 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
     auto parsed = tr_metainfoParse(session, metainfo, nullptr);
     if (!parsed)
     {
-        if (setme_error != nullptr)
-        {
-            *setme_error = TR_PARSE_ERR;
-        }
-
         return nullptr;
     }
 
-    tr_torrent const* const dupe = session->getTorrent(parsed->info.hash);
-    if (dupe != nullptr)
+    auto* const duplicate_of = session->getTorrent(parsed->info.hash);
+    if (duplicate_of != nullptr)
     {
-        if (setme_duplicate_id != nullptr)
+        if (setme_duplicate_of != nullptr)
         {
-            *setme_duplicate_id = tr_torrentId(dupe);
-        }
-
-        if (setme_error != nullptr)
-        {
-            *setme_error = TR_PARSE_DUPLICATE;
+            *setme_duplicate_of = duplicate_of;
         }
 
         return nullptr;

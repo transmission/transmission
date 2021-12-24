@@ -1862,7 +1862,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
         if (result == TR_PARSE_OK)
         {
-            fHandle = tr_torrentNew(ctor, NULL, NULL);
+            fHandle = tr_torrentNew(ctor, NULL);
         }
 
         tr_ctorFree(ctor);

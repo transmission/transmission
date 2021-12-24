@@ -1016,7 +1016,7 @@ tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
      * doesn't have any concept of the glib trash API */
     tr_ctorGetDeleteSource(ctor, &do_trash);
     tr_ctorSetDeleteSource(ctor, false);
-    tr_torrent* const tor = tr_torrentNew(ctor, nullptr, nullptr);
+    tr_torrent* const tor = tr_torrentNew(ctor, nullptr);
 
     if (tor != nullptr && do_trash)
     {

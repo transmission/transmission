@@ -77,9 +77,8 @@ protected:
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
-        auto err = int{};
-        auto* tor = tr_torrentNew(ctor, &err, nullptr);
-        EXPECT_EQ(0, err);
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
 
         // cleanup
         tr_free(metainfo);

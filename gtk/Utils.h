@@ -107,11 +107,7 @@ void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url);
 
-void gtr_add_torrent_error_dialog(
-    Gtk::Widget& window_or_child,
-    int err,
-    tr_torrent* duplicate_torrent,
-    std::string const& filename);
+void gtr_add_torrent_error_dialog(Gtk::Widget& window_or_child, tr_torrent* duplicate_torrent, std::string const& filename);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
