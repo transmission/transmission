@@ -19,33 +19,58 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-#include "quark.h"
-#include "tr-macros.h"
 
 struct tr_error;
 struct tr_variant;
 
-struct tr_magnet_metainfo
+class tr_magnet_metainfo
 {
+public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
-
     std::string magnet() const;
+    virtual ~tr_magnet_metainfo() = default;
 
-    void toVariant(tr_variant*) const;
-
-    std::string_view infoHashString() const
+    auto const& infoHash() const
     {
-        // trim one byte off the end because of zero termination
-        return std::string_view{ std::data(info_hash_chars), std::size(info_hash_chars) - 1 };
+        return info_hash_;
+    }
+    auto const& name() const
+    {
+        return name_;
+    }
+    auto const& webseeds() const
+    {
+        return webseed_urls_;
     }
 
-    tr_announce_list announce_list;
+    auto& announceList()
+    {
+        return announce_list_;
+    }
 
-    std::vector<std::string> webseed_urls;
+    auto const& announceList() const
+    {
+        return announce_list_;
+    }
 
-    std::string name;
+    std::string const& infoHashString() const
+    {
+        return info_hash_str_;
+    }
 
-    tr_sha1_digest_string_t info_hash_chars;
+    virtual void clear();
 
-    tr_sha1_digest_t info_hash;
+    void setName(std::string_view name)
+    {
+        name_ = name;
+    }
+
+    void toVariant(tr_variant* top) const;
+
+protected:
+    tr_announce_list announce_list_;
+    std::vector<std::string> webseed_urls_;
+    tr_sha1_digest_t info_hash_;
+    std::string info_hash_str_;
+    std::string name_;
 };

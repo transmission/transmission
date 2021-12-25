@@ -38,6 +38,8 @@
 		4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D8017E910BBC073008A4AF2 /* torrent-magnet.h */; };
 		4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */; };
 		4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */; };
+		0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */; };
+		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
 		4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DB74F070E8CD75100AEB1A8 /* wildmat.c */; };
 		4DCCBB3E09C3D71100D3CABF /* TorrentCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */; };
@@ -530,6 +532,8 @@
 		4D8017E910BBC073008A4AF2 /* torrent-magnet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-magnet.h"; sourceTree = "<group>"; };
 		4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "magnet-metainfo.cc"; sourceTree = "<group>"; };
 		4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "magnet-metainfo.h"; sourceTree = "<group>"; };
+		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
+		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
 		4DB74F070E8CD75100AEB1A8 /* wildmat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = wildmat.c; sourceTree = "<group>"; };
 		4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
 		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
@@ -1390,6 +1394,8 @@
 				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
 				4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */,
 				4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */,
+				0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */,
+				0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */,
 				4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */,
 				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.cc */,
@@ -1882,6 +1888,7 @@
 				ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */,
 				4D8017EB10BBC073008A4AF2 /* torrent-magnet.h in Headers */,
 				4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */,
+				0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */,
 				A209EE5D1144B51E002B02D1 /* history.h in Headers */,
 				A247A443114C701800547DFC /* InfoViewController.h in Headers */,
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
@@ -2479,6 +2486,7 @@
 				66F977825E65AD498C028BB0 /* announce-list.cc in Sources */,
 				4D8017EA10BBC073008A4AF2 /* torrent-magnet.cc in Sources */,
 				4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */,
+				0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */,
 				A220EC5B118C8A060022B4BE /* tr-lpd.cc in Sources */,
 				C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.cc in Sources */,
