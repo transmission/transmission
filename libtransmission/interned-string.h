@@ -98,7 +98,17 @@ public:
 
     [[nodiscard]] auto compare(tr_interned_string const& that) const // <=>
     {
-        return this->quark() - that.quark();
+        if (this->quark() < that.quark())
+        {
+            return -1;
+        }
+
+        if (this->quark() > that.quark())
+        {
+            return 1;
+        }
+
+        return 0;
     }
 
     [[nodiscard]] bool operator<(tr_interned_string const& that) const

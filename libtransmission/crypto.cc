@@ -52,24 +52,21 @@ static void ensureKeyExists(tr_crypto* crypto)
     }
 }
 
-void tr_cryptoConstruct(tr_crypto* crypto, tr_sha1_digest_t const* torrent_hash, bool isIncoming)
+tr_crypto::tr_crypto(tr_sha1_digest_t const* torrent_hash_in, bool is_incoming_in)
+    : is_incoming{ is_incoming_in }
 {
-    memset(crypto, 0, sizeof(tr_crypto));
-
-    crypto->isIncoming = isIncoming;
-
-    if (torrent_hash != nullptr)
+    if (torrent_hash_in != nullptr)
     {
-        tr_cryptoSetTorrentHash(crypto, *torrent_hash);
+        this->torrent_hash = *torrent_hash_in;
     }
 }
 
-void tr_cryptoDestruct(tr_crypto* crypto)
+tr_crypto::~tr_crypto()
 {
-    tr_dh_secret_free(crypto->mySecret);
-    tr_dh_free(crypto->dh);
-    tr_free(crypto->enc_key);
-    tr_free(crypto->dec_key);
+    tr_dh_secret_free(this->mySecret);
+    tr_dh_free(this->dh);
+    tr_free(this->enc_key);
+    tr_free(this->dec_key);
 }
 
 /**
@@ -128,7 +125,7 @@ static void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_
 
 void tr_cryptoDecryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->dec_key, crypto->isIncoming ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(crypto, &crypto->dec_key, crypto->is_incoming ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
@@ -138,7 +135,7 @@ void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, voi
 
 void tr_cryptoEncryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->enc_key, crypto->isIncoming ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(crypto, &crypto->enc_key, crypto->is_incoming ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
