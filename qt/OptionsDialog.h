@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <QDir>
@@ -22,6 +23,10 @@
 #include "BaseDialog.h"
 #include "Torrent.h" // FileList
 #include "ui_OptionsDialog.h"
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 class Prefs;
 class Session;
@@ -66,7 +71,6 @@ private:
     std::vector<int> priorities_;
     Session& session_;
     Ui::OptionsDialog ui_ = {};
-    tr_info info_ = {};
-    bool have_info_ = {};
+    std::optional<tr_torrent_metainfo> metainfo_;
     bool is_local_ = {};
 };
