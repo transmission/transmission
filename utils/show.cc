@@ -7,32 +7,42 @@
  */
 
 #include <array>
-#include <stdio.h> /* fprintf() */
-#include <string.h> /* strcmp(), strchr(), memcmp() */
-#include <stdlib.h> /* qsort() */
-#include <time.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
+#include <string_view>
+#include <algorithm>
 
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h> /* tr_webGetResponseStr() */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
 
 #include "units.h"
 
 using namespace std::literals;
 
-static char constexpr MyName[] = "transmission-show";
-static char constexpr Usage[] = "Usage: transmission-show [options] <.torrent file>";
+namespace
+{
 
-static auto constexpr TimeoutSecs = long{ 30 };
+auto constexpr TimeoutSecs = long{ 30 };
 
-static auto constexpr Options = std::array<tr_option, 5>{
+char constexpr MyName[] = "transmission-show";
+char constexpr Usage[] = "Usage: transmission-show [options] <.torrent file>";
+char constexpr UserAgent[] = "transmission-show/" LONG_VERSION_STRING;
+
+auto options = std::array<tr_option, 5>{
     { { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
       { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
       { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
@@ -40,39 +50,39 @@ static auto constexpr Options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static bool magnetFlag = false;
-static bool scrapeFlag = false;
-static bool unsorted = false;
-static bool showVersion = false;
-char const* filename = nullptr;
+auto filename_opt = std::string_view{};
+auto magnet_opt = bool{ false };
+auto scrape_opt = bool{ false };
+auto show_version_opt = bool{ false };
+auto unsorted_opt = bool{ false };
 
-static int parseCommandLine(int argc, char const* const* argv)
+int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
         case 'm':
-            magnetFlag = true;
+            magnet_opt = true;
             break;
 
         case 's':
-            scrapeFlag = true;
+            scrape_opt = true;
             break;
 
         case 'u':
-            unsorted = true;
+            unsorted_opt = true;
             break;
 
         case 'V':
-            showVersion = true;
+            show_version_opt = true;
             break;
 
         case TR_OPT_UNK:
-            filename = optarg;
+            filename_opt = optarg;
             break;
 
         default:
@@ -83,58 +93,48 @@ static int parseCommandLine(int argc, char const* const* argv)
     return 0;
 }
 
-static void doShowMagnet(tr_info const* inf)
-{
-    char* str = tr_torrentInfoGetMagnetLink(inf);
-    printf("%s", str);
-    tr_free(str);
-}
-
-static int compare_files_by_name(void const* va, void const* vb)
-{
-    tr_file const* a = *(tr_file const* const*)va;
-    tr_file const* b = *(tr_file const* const*)vb;
-    return strcmp(a->name, b->name);
-}
-
-static char const* time_t_to_str(time_t timestamp)
+auto toString(time_t timestamp)
 {
     if (timestamp == 0)
     {
-        return "Unknown";
+        return std::string{ "Unknown" };
     }
 
     struct tm tm;
     tr_localtime_r(&timestamp, &tm);
-    static char buf[32];
-    strftime(buf, sizeof(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
-    return buf;
+    auto buf = std::array<char, 64>{};
+    strftime(std::data(buf), std::size(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
+    return std::string{ std::data(buf) };
 }
 
-static void showInfo(tr_info const* inf)
+void showInfo(tr_torrent_metainfo const& metainfo)
 {
-    char buf[128];
-    tr_file** files;
+    auto buf = std::array<char, 128>{};
 
     /**
     ***  General Info
     **/
 
     printf("GENERAL\n\n");
-    printf("  Name: %s\n", inf->name);
-    printf("  Hash: %s\n", inf->hashString);
-    printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
-    printf("  Created on: %s\n", time_t_to_str(inf->dateCreated));
+    printf("  Name: %s\n", metainfo.name().c_str());
+    printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
+    printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
+    printf("  Created on: %s\n", toString(metainfo.dateCreated()).c_str());
 
-    if (!tr_str_is_empty(inf->comment))
+    if (!std::empty(metainfo.comment()))
     {
-        printf("  Comment: %s\n", inf->comment);
+        printf("  Comment: %s\n", metainfo.comment().c_str());
     }
 
-    printf("  Piece Count: %zu\n", size_t(inf->pieceCount));
-    printf("  Piece Size: %s\n", tr_formatter_mem_B(buf, inf->pieceSize, sizeof(buf)));
-    printf("  Total Size: %s\n", tr_formatter_size_B(buf, inf->totalSize, sizeof(buf)));
-    printf("  Privacy: %s\n", inf->isPrivate ? "Private torrent" : "Public torrent");
+    if (!std::empty(metainfo.source()))
+    {
+        printf("  Source: %s\n", metainfo.source().c_str());
+    }
+
+    printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
+    printf("  Piece Size: %s\n", tr_formatter_mem_B(std::data(buf), metainfo.pieceSize(), std::size(buf)));
+    printf("  Total Size: %s\n", tr_formatter_size_B(std::data(buf), metainfo.totalSize(), std::size(buf)));
+    printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
 
     /**
     ***  Trackers
@@ -143,7 +143,7 @@ static void showInfo(tr_info const* inf)
     printf("\nTRACKERS\n");
     auto current_tier = std::optional<tr_tracker_tier_t>{};
     auto print_tier = size_t{ 1 };
-    for (auto const& tracker : *inf->announce_list)
+    for (auto const& tracker : metainfo.announceList())
     {
         if (!current_tier || current_tier != tracker.tier)
         {
@@ -159,13 +159,14 @@ static void showInfo(tr_info const* inf)
     ***
     **/
 
-    if (inf->webseedCount > 0)
+    auto const& webseeds = metainfo.webseeds();
+    if (!std::empty(webseeds))
     {
         printf("\nWEBSEEDS\n\n");
 
-        for (unsigned int i = 0; i < inf->webseedCount; ++i)
+        for (auto const& webseed : webseeds)
         {
-            printf("  %s\n", inf->webseeds[i]);
+            printf("  %s\n", webseed.c_str());
         }
     }
 
@@ -174,27 +175,29 @@ static void showInfo(tr_info const* inf)
     **/
 
     printf("\nFILES\n\n");
-    files = tr_new(tr_file*, inf->fileCount);
 
-    for (unsigned int i = 0; i < inf->fileCount; ++i)
+    auto filenames = std::vector<std::string>{};
+    for (auto const& file : metainfo.files())
     {
-        files[i] = &inf->files[i];
+        std::string filename = file.path();
+        filename += " (";
+        filename += tr_formatter_size_B(std::data(buf), file.length(), std::size(buf));
+        filename += ')';
+        filenames.emplace_back(filename);
     }
 
-    if (!unsorted)
+    if (!unsorted_opt)
     {
-        qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
+        std::sort(std::begin(filenames), std::end(filenames));
     }
 
-    for (unsigned int i = 0; i < inf->fileCount; ++i)
+    for (auto const& filename : filenames)
     {
-        printf("  %s (%s)\n", files[i]->name, tr_formatter_size_B(buf, files[i]->length, sizeof(buf)));
+        printf("  %s\n", filename.c_str());
     }
-
-    tr_free(files);
 }
 
-static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
+size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
     auto* buf = static_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
@@ -202,10 +205,10 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
     return byteCount;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
+CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, tr_strvJoin(MyName, "/", LONG_VERSION_STRING).c_str());
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -214,19 +217,24 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
     return curl;
 }
 
-static void doScrape(tr_info const* inf)
+void doScrape(tr_torrent_metainfo const& metainfo)
 {
-    for (auto const& tracker : *inf->announce_list)
+    for (auto const& tracker : metainfo.announceList())
     {
         if (std::empty(tracker.scrape_str))
         {
             continue;
         }
 
-        char escaped[SHA_DIGEST_LENGTH * 3 + 1];
-        tr_http_escape_sha1(escaped, inf->hash);
+        // build the full scrape URL
+        auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
+        tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
         auto const scrape = tracker.scrape.full;
-        auto const url = tr_strvJoin(scrape, (tr_strvContains(scrape, '?') ? "&"sv : "?"sv), "info_hash="sv, escaped);
+        auto const url = tr_strvJoin(
+            scrape,
+            (tr_strvContains(scrape, '?') ? "&"sv : "?"sv),
+            "info_hash="sv,
+            std::data(escaped));
 
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);
@@ -265,9 +273,12 @@ static void doScrape(tr_info const* inf)
                         tr_quark key;
                         tr_variant* val;
 
+                        auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
+                                                        std::size(metainfo.infoHash()) };
+
                         while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
-                            if (memcmp(std::data(inf->hash), tr_quark_get_string(key), std::size(inf->hash)) == 0)
+                            if (hashsv == tr_quark_get_string_view(key))
                             {
                                 int64_t seeders;
                                 if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
@@ -304,12 +315,10 @@ static void doScrape(tr_info const* inf)
     }
 }
 
+} // namespace
+
 int tr_main(int argc, char* argv[])
 {
-    int err;
-    tr_info inf;
-    tr_ctor* ctor;
-
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -320,56 +329,62 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (showVersion)
+    if (show_version_opt)
     {
         fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     /* make sure the user specified a filename */
-    if (filename == nullptr)
+    if (std::empty(filename_opt))
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
-        tr_getopt_usage(MyName, Usage, std::data(Options));
+        tr_getopt_usage(MyName, Usage, std::data(options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }
 
     /* try to parse the .torrent file */
-    ctor = tr_ctorNew(nullptr);
-    tr_ctorSetMetainfoFromFile(ctor, filename);
-    err = tr_torrentParse(ctor, &inf);
-    tr_ctorFree(ctor);
-
-    if (err != TR_PARSE_OK)
+    auto metainfo = tr_torrent_metainfo{};
+    tr_error* error = nullptr;
+    auto const parsed = metainfo.parseTorrentFile(filename_opt, nullptr, &error);
+    if (error != nullptr)
     {
-        fprintf(stderr, "Error parsing .torrent file \"%s\"\n", filename);
+        fprintf(
+            stderr,
+            "Error parsing .torrent file \"%" TR_PRIsv "\": %s (%d)\n",
+            TR_PRIsv_ARG(filename_opt),
+            error->message,
+            error->code);
+        tr_error_clear(&error);
+    }
+    if (!parsed)
+    {
         return EXIT_FAILURE;
     }
 
-    if (magnetFlag)
+    if (magnet_opt)
     {
-        doShowMagnet(&inf);
+        printf("%s", metainfo.magnet().c_str());
     }
     else
     {
-        printf("Name: %s\n", inf.name);
-        printf("File: %s\n", filename);
+        printf("Name: %s\n", metainfo.name().c_str());
+        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(filename_opt));
         printf("\n");
         fflush(stdout);
 
-        if (scrapeFlag)
+        if (scrape_opt)
         {
-            doScrape(&inf);
+            doScrape(metainfo);
         }
         else
         {
-            showInfo(&inf);
+            showInfo(metainfo);
         }
     }
 
     /* cleanup */
     putc('\n', stdout);
-    tr_metainfoFree(&inf);
     return EXIT_SUCCESS;
 }
