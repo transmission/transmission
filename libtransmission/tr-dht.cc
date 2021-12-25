@@ -316,7 +316,7 @@ int tr_dhtInit(tr_session* ss)
 
     auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
     auto benc = tr_variant{};
-    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.c_str());
+    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file);
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
@@ -466,7 +466,7 @@ void tr_dhtUninit(tr_session* ss)
         }
 
         auto const dat_file = tr_strvPath(ss->configDir, "dht.dat");
-        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.c_str());
+        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
         tr_variantFree(&benc);
     }
 

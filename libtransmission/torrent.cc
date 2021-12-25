@@ -106,7 +106,7 @@ tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     auto mm = tr_magnet_metainfo{};
-    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.info_hash) : nullptr;
+    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.infoHash()) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)

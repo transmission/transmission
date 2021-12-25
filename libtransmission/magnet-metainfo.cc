@@ -26,6 +26,8 @@ using namespace std::literals;
 
 /* this base32 code converted from code by Robert Kaye and Gordon Mohr
  * and is public domain. see http://bitzi.com/publicdomain for more info */
+namespace
+{
 namespace bitzi
 {
 
@@ -106,10 +108,16 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 }
 
 } // namespace bitzi
+} // namespace
 
 /***
 ****
 ***/
+
+void tr_magnet_metainfo::clear()
+{
+    *this = tr_magnet_metainfo{};
+}
 
 std::string tr_magnet_metainfo::magnet() const
 {
@@ -118,19 +126,19 @@ std::string tr_magnet_metainfo::magnet() const
     s += "magnet:?xt=urn:btih:"sv;
     s += infoHashString();
 
-    if (!std::empty(name))
+    if (!std::empty(name_))
     {
         s += "&dn="sv;
-        tr_http_escape(s, name, true);
+        tr_http_escape(s, name_, true);
     }
 
-    for (auto const& tracker : this->announce_list)
+    for (auto const& tracker : this->announceList())
     {
         s += "&tr="sv;
         tr_http_escape(s, tracker.announce.full, true);
     }
 
-    for (auto const& webseed : webseed_urls)
+    for (auto const& webseed : webseed_urls_)
     {
         s += "&ws="sv;
         tr_http_escape(s, webseed, true);
@@ -153,12 +161,12 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     {
         if (key == "dn"sv)
         {
-            this->name = tr_urlPercentDecode(value);
+            this->setName(tr_urlPercentDecode(value));
         }
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
             // "tr." explanation @ https://trac.transmissionbt.com/ticket/3341
-            this->announce_list.add(this->announce_list.nextTier(), tr_urlPercentDecode(value));
+            this->announce_list_.add(this->announce_list_.nextTier(), tr_urlPercentDecode(value));
         }
         else if (key == "ws"sv)
         {
@@ -166,7 +174,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
             auto const url_sv = tr_strvStrip(url);
             if (tr_urlIsValid(url_sv))
             {
-                this->webseed_urls.emplace_back(url_sv);
+                this->webseed_urls_.emplace_back(url_sv);
             }
         }
         else if (key == "xt"sv)
@@ -178,13 +186,13 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 switch (std::size(hash))
                 {
                 case TR_SHA1_DIGEST_STRLEN:
-                    this->info_hash = tr_sha1_from_string(hash);
+                    this->info_hash_ = tr_sha1_from_string(hash);
                     got_checksum = true;
                     break;
 
                 case 32:
                     bitzi::base32_to_sha1(
-                        reinterpret_cast<uint8_t*>(std::data(this->info_hash)),
+                        reinterpret_cast<uint8_t*>(std::data(this->info_hash_)),
                         std::data(hash),
                         std::size(hash));
                     got_checksum = true;
@@ -197,6 +205,8 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         }
     }
 
+    info_hash_str_ = tr_sha1_to_string(this->infoHash());
+
     return got_checksum;
 }
 
@@ -205,10 +215,10 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     tr_variantInitDict(top, 4);
 
     // announce list
-    auto n = std::size(this->announce_list);
+    auto n = std::size(this->announceList());
     if (n == 1)
     {
-        tr_variantDictAddQuark(top, TR_KEY_announce, this->announce_list.at(0).announce_str.quark());
+        tr_variantDictAddQuark(top, TR_KEY_announce, this->announceList().at(0).announce_str.quark());
     }
     else
     {
@@ -216,7 +226,7 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
         tr_variant* tracker_list = nullptr;
 
         auto* tier_list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-        for (auto const& tracker : this->announce_list)
+        for (auto const& tracker : this->announceList())
         {
             if (tracker_list == nullptr || current_tier != tracker.tier)
             {
@@ -229,12 +239,12 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     }
 
     // webseeds
-    n = std::size(this->webseed_urls);
+    n = std::size(this->webseeds());
     if (n != 0)
     {
         tr_variant* list = tr_variantDictAddList(top, TR_KEY_url_list, n);
 
-        for (auto& url : this->webseed_urls)
+        for (auto& url : this->webseeds())
         {
             tr_variantListAddStr(list, url);
         }
@@ -243,10 +253,10 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     // nonstandard keys
     auto* const d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
 
-    tr_variantDictAddRaw(d, TR_KEY_info_hash, std::data(this->info_hash), std::size(this->info_hash));
+    tr_variantDictAddRaw(d, TR_KEY_info_hash, std::data(this->infoHash()), std::size(this->infoHash()));
 
-    if (!std::empty(this->name))
+    if (!std::empty(this->name()))
     {
-        tr_variantDictAddStr(d, TR_KEY_display_name, this->name);
+        tr_variantDictAddStr(d, TR_KEY_display_name, this->name());
     }
 }

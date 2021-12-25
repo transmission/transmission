@@ -58,6 +58,7 @@ set(PROJECT_FILES
   subprocess-win32.cc
   torrent-ctor.cc
   torrent-magnet.cc
+  torrent-metainfo.cc
   torrent.cc
   tr-assert.cc
   tr-dht.cc
@@ -183,6 +184,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     stats.h
     subprocess.h
     torrent-magnet.h
+    torrent-metainfo.h
     torrent.h
     tr-dht.h
     tr-lpd.h
