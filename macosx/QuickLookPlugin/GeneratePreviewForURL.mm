@@ -1,6 +1,10 @@
 #import <QuickLook/QuickLook.h>
 
+#include <string>
+
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 #import "NSStringAdditions.h"
 
@@ -47,12 +51,8 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     [NSApplication sharedApplication];
 
     //try to parse the torrent file
-    tr_info inf;
-    tr_ctor* ctor = tr_ctorNew(NULL);
-    tr_ctorSetMetainfoFromFile(ctor, [[(__bridge NSURL*)url path] UTF8String]);
-    int const err = tr_torrentParse(ctor, &inf);
-    tr_ctorFree(ctor);
-    if (err)
+    auto metainfo = tr_torrent_metainfo{};
+    if (!metainfo.parseTorrentFile([[(__bridge NSURL*)url path] UTF8String]))
     {
         return noErr;
     }
@@ -67,8 +67,11 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSMutableDictionary* allImgProps = [NSMutableDictionary dictionary];
 
-    NSString* name = [NSString stringWithUTF8String:inf.name];
-    NSString* fileTypeString = inf.isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
+    NSString* name = [NSString stringWithUTF8String:metainfo.name().c_str()];
+
+    auto const n_files = std::size(metainfo.files());
+    auto const is_multifile = n_files > 1;
+    NSString* fileTypeString = is_multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
 
     NSUInteger const width = 32;
     [htmlString appendFormat:@"<h2><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</h2>",
@@ -77,28 +80,22 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
                              width,
                              name];
 
-    NSString* fileSizeString = [NSString stringForFileSize:inf.totalSize];
-    if (inf.isFolder)
+    NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
+    if (is_multifile)
     {
-        NSString* fileCountString;
-        if (inf.fileCount == 1)
-        {
-            fileCountString = NSLocalizedStringFromTableInBundle(@"1 file", nil, bundle, "quicklook file count");
-        }
-        else
-        {
-            fileCountString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"),
-                                                         [NSString formattedUInteger:inf.fileCount]];
-        }
+        NSString* fileCountString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"),
+                                                         [NSString formattedUInteger:n_files]];
         fileSizeString = [NSString stringWithFormat:@"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
 
-    NSString* dateCreatedString = inf.dateCreated > 0 ?
-        [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:inf.dateCreated] dateStyle:NSDateFormatterLongStyle
+    auto const date_created = metainfo.dateCreated();
+    NSString* dateCreatedString = date_created > 0 ?
+        [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:date_created] dateStyle:NSDateFormatterLongStyle
                                        timeStyle:NSDateFormatterShortStyle] :
         nil;
-    NSString* creatorString = inf.creator ? [NSString stringWithUTF8String:inf.creator] : nil;
+    auto const& creator = metainfo.creator();
+    NSString* creatorString = !std::empty(creator) ? [NSString stringWithUTF8String:creator.c_str()] : nil;
     if ([creatorString isEqualToString:@""])
     {
         creatorString = nil;
@@ -126,29 +123,31 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [htmlString appendFormat:@"<p>%@</p>", creationString];
     }
 
-    if (inf.comment)
+    auto const& commentStr = metainfo.comment();
+    if (!std::empty(commentStr))
     {
-        NSString* comment = [NSString stringWithUTF8String:inf.comment];
+        NSString* comment = [NSString stringWithUTF8String:commentStr.c_str()];
         if (![comment isEqualToString:@""])
             [htmlString appendFormat:@"<p>%@</p>", comment];
     }
 
     NSMutableArray* lists = [NSMutableArray array];
 
-    if (inf.webseedCount > 0)
+    auto const n_webseeds = std::size(metainfo.webseeds());
+    if (n_webseeds > 0)
     {
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 
-        NSString* headerTitleString = inf.webseedCount == 1 ?
+        NSString* headerTitleString = n_webseeds == 1 ?
             NSLocalizedStringFromTableInBundle(@"1 Web Seed", nil, bundle, "quicklook web seed header") :
             [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Web Seeds", nil, bundle, "quicklook web seed header"),
-                                       [NSString formattedUInteger:inf.webseedCount]];
+                                       [NSString formattedUInteger:n_webseeds]];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
-        for (int i = 0; i < inf.webseedCount; ++i)
+        for (auto const& url : metainfo.webseeds())
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", inf.webseeds[i]];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", url.c_str()];
         }
 
         [listSection appendString:@"</table>"];
@@ -156,7 +155,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [lists addObject:listSection];
     }
 
-    if (!std::empty(*inf.announce_list))
+    if (!std::empty(*metainfo.announce_list))
     {
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
@@ -171,7 +170,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 #warning handle tiers?
         for (auto const tracker : *inf.announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce_str.c_str()];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", tr_quark_get_string(tracker.announce_interned)];
         }
 
         [listSection appendString:@"</table>"];
@@ -179,22 +178,20 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [lists addObject:listSection];
     }
 
-    if (inf.isFolder)
+    if (is_multifile)
     {
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 
-        NSString* fileTitleString = inf.fileCount == 1 ?
-            NSLocalizedStringFromTableInBundle(@"1 File", nil, bundle, "quicklook file header") :
-            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"),
-                                       [NSString formattedUInteger:inf.fileCount]];
+        NSString* fileTitleString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"),
+                                       [NSString formattedUInteger:n_files]];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
 #warning display size?
 #warning display folders?
-        for (int i = 0; i < inf.fileCount; ++i)
+        for (auto const& file : metainfo.files())
         {
-            NSString* fullFilePath = [NSString stringWithUTF8String:inf.files[i].name];
+            NSString* fullFilePath = [NSString stringWithUTF8String:file.path().c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:[name length] + 1];
@@ -218,8 +215,6 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     }
 
     [htmlString appendString:@"</body></html>"];
-
-    tr_metainfoFree(&inf);
 
     NSDictionary* props = @{
         (NSString*)kQLPreviewPropertyTextEncodingNameKey : @"UTF-8",

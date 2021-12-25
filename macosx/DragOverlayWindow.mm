@@ -24,6 +24,9 @@
 #import "DragOverlayView.h"
 #import "NSStringAdditions.h"
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/torrent-metainfo.h>
+
 @interface DragOverlayWindow (Private)
 
 - (void)resizeWindow;
@@ -83,7 +86,6 @@
     NSInteger count = 0;
 
     NSString* name;
-    BOOL folder;
     NSInteger fileCount = 0;
 
     for (NSString* file in files)
@@ -91,24 +93,20 @@
         if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
             [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
         {
-            tr_ctor* ctor = tr_ctorNew(fLib);
-            tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-            tr_info info;
-            if (tr_torrentParse(ctor, &info) == TR_PARSE_OK)
+            auto metainfo = tr_torrent_metainfo{};
+            if (metainfo.parseTorrentFile(file.UTF8String))
             {
-                count++;
-                size += info.totalSize;
-                fileCount += info.fileCount;
+                ++count;
 
-                //only useful when one torrent
-                if (count == 1)
+                size += metainfo.totalSize();
+
+                auto const n_files = std::size(metainfo.files());
+                fileCount += n_files;
+                if (n_files == 1)
                 {
-                    name = @(info.name);
-                    folder = info.isFolder;
+                    name = @(metainfo.name().c_str());
                 }
             }
-            tr_metainfoFree(&info);
-            tr_ctorFree(ctor);
         }
     }
 
@@ -119,7 +117,7 @@
 
     //set strings and icon
     NSString* secondString = [NSString stringForFileSize:size];
-    if (count > 1 || folder)
+    if (count > 1)
     {
         NSString* fileString;
         if (fileCount == 1)
@@ -137,7 +135,7 @@
     NSImage* icon;
     if (count == 1)
     {
-        icon = [NSWorkspace.sharedWorkspace iconForFileType:folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension];
+        icon = [NSWorkspace.sharedWorkspace iconForFileType:name ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     }
     else
     {
