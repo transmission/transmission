@@ -117,6 +117,11 @@ public:
     {
     }
 
+    explicit TorrentHash(tr_sha1_digest_t const& data)
+        : data_{ data }
+    {
+    }
+
     explicit TorrentHash(char const* str)
     {
         data_ = tr_sha1_from_string(str != nullptr ? str : "");
