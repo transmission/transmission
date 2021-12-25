@@ -8,10 +8,6 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
-
 #include <string>
 #include <string_view>
 #include <vector>
