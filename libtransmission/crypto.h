@@ -35,20 +35,17 @@ enum
 /** @brief Holds state information for encrypted peer communications */
 struct tr_crypto
 {
-    std::optional<tr_sha1_digest_t> torrent_hash;
-    struct arc4_context* dec_key;
-    struct arc4_context* enc_key;
-    tr_dh_ctx_t dh;
-    uint8_t myPublicKey[KEY_LEN];
-    tr_dh_secret_t mySecret;
-    bool isIncoming;
+    tr_crypto(tr_sha1_digest_t const* torrent_hash = nullptr, bool is_incoming = true);
+    ~tr_crypto();
+
+    std::optional<tr_sha1_digest_t> torrent_hash = {};
+    struct arc4_context* dec_key = nullptr;
+    struct arc4_context* enc_key = nullptr;
+    tr_dh_ctx_t dh = {};
+    uint8_t myPublicKey[KEY_LEN] = {};
+    tr_dh_secret_t mySecret = {};
+    bool is_incoming = false;
 };
-
-/** @brief construct a new tr_crypto object */
-void tr_cryptoConstruct(tr_crypto* crypto, tr_sha1_digest_t const* torrent_hash, bool isIncoming);
-
-/** @brief destruct an existing tr_crypto object */
-void tr_cryptoDestruct(tr_crypto* crypto);
 
 void tr_cryptoSetTorrentHash(tr_crypto* crypto, tr_sha1_digest_t const& torrent_hash);
 

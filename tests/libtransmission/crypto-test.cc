@@ -40,27 +40,22 @@ TEST(Crypto, torrentHash)
 {
 
     auto a = tr_crypto{};
-    tr_cryptoConstruct(&a, nullptr, true);
     EXPECT_FALSE(tr_cryptoGetTorrentHash(&a));
 
     tr_cryptoSetTorrentHash(&a, SomeHash);
     EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
     EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
-    tr_cryptoDestruct(&a);
 
-    tr_cryptoConstruct(&a, &SomeHash, false);
+    a = tr_crypto{ &SomeHash, false };
     EXPECT_TRUE(tr_cryptoGetTorrentHash(&a));
     EXPECT_EQ(SomeHash, *tr_cryptoGetTorrentHash(&a));
-
-    tr_cryptoDestruct(&a);
 }
 
 TEST(Crypto, encryptDecrypt)
 {
-    auto a = tr_crypto{};
-    tr_cryptoConstruct(&a, &SomeHash, false);
-    auto b = tr_crypto_{};
-    tr_cryptoConstruct_(&b, &SomeHash, true);
+    auto a = tr_crypto{ &SomeHash, false };
+    auto b = tr_crypto_{ &SomeHash, true };
+
     auto public_key_length = int{};
     EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
     EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
@@ -84,9 +79,6 @@ TEST(Crypto, encryptDecrypt)
     tr_cryptoDecryptInit(&a);
     tr_cryptoDecrypt(&a, input2.size(), encrypted2.data(), decrypted2.data());
     EXPECT_EQ(input2, std::string(decrypted2.data(), input2.size()));
-
-    tr_cryptoDestruct_(&b);
-    tr_cryptoDestruct(&a);
 }
 
 TEST(Crypto, sha1)
