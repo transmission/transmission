@@ -12,7 +12,9 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_base64_encode()
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/error.h>
 
 #include "AddData.h"
 #include "Utils.h"
@@ -20,22 +22,16 @@
 namespace
 {
 
-QString getNameFromMetainfo(QByteArray const& metainfo)
+QString getNameFromMetainfo(QByteArray const& benc)
 {
-    QString name;
-
-    tr_ctor* ctor = tr_ctorNew(nullptr);
-    tr_ctorSetMetainfo(ctor, metainfo.constData(), metainfo.size());
-
-    auto inf = tr_info{};
-    if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
+    auto metainfo = tr_torrent_metainfo{};
+    if (metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
     {
-        name = QString::fromUtf8(inf.name); // metainfo is required to be UTF-8
-        tr_metainfoFree(&inf);
+        auto const& mname = metainfo.name();
+        return QString::fromUtf8(std::data(mname), std::size(mname));
     }
 
-    tr_ctorFree(ctor);
-    return name;
+    return {};
 }
 
 } // namespace
