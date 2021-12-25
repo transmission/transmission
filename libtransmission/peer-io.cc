@@ -610,7 +610,7 @@ static tr_peerIo* tr_peerIoNew(
     tr_address const* addr,
     tr_port port,
     tr_sha1_digest_t const* torrent_hash,
-    bool isIncoming,
+    bool is_incoming,
     bool isSeed,
     struct tr_peer_socket const socket)
 {
@@ -630,8 +630,7 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, *addr, port, isSeed };
-    tr_cryptoConstruct(&io->crypto, torrent_hash, isIncoming);
+    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, isSeed };
     io->socket = socket;
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
@@ -653,7 +652,7 @@ static tr_peerIo* tr_peerIoNew(
         dbgmsg(io, "%s", "calling UTP_SetCallbacks &utp_function_table");
         UTP_SetCallbacks(socket.handle.utp, &utp_function_table, io);
 
-        if (!isIncoming)
+        if (!is_incoming)
         {
             dbgmsg(io, "%s", "calling UTP_Connect");
             UTP_Connect(socket.handle.utp);
@@ -875,7 +874,6 @@ static void io_dtor(void* vio)
     event_disable(io, EV_READ | EV_WRITE);
     delete io->bandwidth;
     io_close_socket(io);
-    tr_cryptoDestruct(&io->crypto);
 
     while (io->outbuf_datatypes != nullptr)
     {

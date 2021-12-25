@@ -9,8 +9,8 @@ add_executable(libtransmission-test
     crypto-test-ref.h
     crypto-test.cc
     error-test.cc
-    file-test.cc
     file-piece-map-test.cc
+    file-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
@@ -28,6 +28,7 @@ add_executable(libtransmission-test
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
+    torrent-metainfo-test.cc
     utils-test.cc
     variant-test.cc
     watchdir-test.cc

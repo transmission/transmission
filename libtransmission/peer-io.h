@@ -67,8 +67,15 @@ auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 class tr_peerIo
 {
 public:
-    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_seed_in)
-        : addr{ addr_in }
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr_in,
+        tr_port port_in,
+        bool is_seed_in)
+        : crypto{ torrent_hash, is_incoming }
+        , addr{ addr_in }
         , session{ session_in }
         , inbuf{ evbuffer_new() }
         , outbuf{ evbuffer_new() }
@@ -83,7 +90,7 @@ public:
         evbuffer_free(inbuf);
     }
 
-    tr_crypto crypto = {};
+    tr_crypto crypto;
 
     tr_address const addr;
 
@@ -230,7 +237,7 @@ int tr_peerIoReconnect(tr_peerIo* io);
 
 constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
-    return io->crypto.isIncoming;
+    return io->crypto.is_incoming;
 }
 
 // TODO: remove this func; let caller get the current time instead
