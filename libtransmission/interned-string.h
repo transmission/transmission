@@ -96,7 +96,7 @@ public:
         return std::rend(this->sv());
     }
 
-    [[nodiscard]] int compare(tr_interned_string const& that) const // <=>
+    [[nodiscard]] auto compare(tr_interned_string const& that) const // <=>
     {
         return this->quark() - that.quark();
     }
