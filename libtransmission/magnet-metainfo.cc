@@ -161,7 +161,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     {
         if (key == "dn"sv)
         {
-            this->name_ = tr_urlPercentDecode(value);
+            this->setName(tr_urlPercentDecode(value));
         }
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
@@ -204,6 +204,8 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
             }
         }
     }
+
+    info_hash_str_ = tr_sha1_to_string(this->infoHash());
 
     return got_checksum;
 }

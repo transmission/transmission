@@ -25,6 +25,7 @@ struct tr_info;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
+    tr_torrent_metainfo() = default;
     ~tr_torrent_metainfo() override = default;
 
     [[nodiscard]] auto empty() const
@@ -108,7 +109,7 @@ public:
     }
 
 private:
-    static char* parsePath(std::string_view root, tr_variant* path, std::string& buf);
+    static std::string parsePath(std::string_view root, tr_variant* path, std::string& buf);
     static std::string fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url);
     static std::string_view parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size);
     static std::string_view parseImpl(tr_torrent_metainfo& setme, tr_variant* meta, std::string_view benc);

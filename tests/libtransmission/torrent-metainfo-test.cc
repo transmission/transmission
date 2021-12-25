@@ -23,7 +23,7 @@
 
 using namespace std::literals;
 
-TEST(Metainfo, magnetLink)
+TEST(TorrentMetainfo, magnetLink)
 {
     // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
     char const constexpr* const MagnetLink =
@@ -47,7 +47,7 @@ TEST(Metainfo, magnetLink)
     "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
 
 // FIXME: split these into parameterized tests?
-TEST(Metainfo, bucket)
+TEST(TorrentMetainfo, bucket)
 {
     struct LocalTest
     {
@@ -81,7 +81,7 @@ TEST(Metainfo, bucket)
     }
 }
 
-TEST(Metainfo, sanitize)
+TEST(TorrentMetainfo, sanitize)
 {
     struct LocalTest
     {
@@ -139,7 +139,7 @@ TEST(Metainfo, sanitize)
     }
 }
 
-TEST(Metainfo, AndroidTorrent)
+TEST(TorrentMetainfo, AndroidTorrent)
 {
     auto const filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
 
@@ -149,7 +149,7 @@ TEST(Metainfo, AndroidTorrent)
     tr_ctorFree(ctor);
 }
 
-TEST(Metainfo, ctorSaveContents)
+TEST(TorrentMetainfo, ctorSaveContents)
 {
     auto const src_filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
     auto const tgt_filename = tr_strvJoin(::testing::TempDir(), "save-contents-test.torrent");
