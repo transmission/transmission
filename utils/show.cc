@@ -50,13 +50,16 @@ auto options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-auto filename_opt = std::string_view{};
-auto magnet_opt = bool{ false };
-auto scrape_opt = bool{ false };
-auto show_version_opt = bool{ false };
-auto unsorted_opt = bool{ false };
+struct app_opts
+{
+    std::string_view filename;
+    bool scrape = false;
+    bool show_magnet = false;
+    bool show_version = false;
+    bool unsorted = false;
+};
 
-int parseCommandLine(int argc, char const* const* argv)
+int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -66,23 +69,23 @@ int parseCommandLine(int argc, char const* const* argv)
         switch (c)
         {
         case 'm':
-            magnet_opt = true;
+            opts.show_magnet = true;
             break;
 
         case 's':
-            scrape_opt = true;
+            opts.scrape = true;
             break;
 
         case 'u':
-            unsorted_opt = true;
+            opts.unsorted = true;
             break;
 
         case 'V':
-            show_version_opt = true;
+            opts.show_version = true;
             break;
 
         case TR_OPT_UNK:
-            filename_opt = optarg;
+            opts.filename = optarg;
             break;
 
         default:
@@ -107,7 +110,7 @@ auto toString(time_t timestamp)
     return std::string{ std::data(buf) };
 }
 
-void showInfo(tr_torrent_metainfo const& metainfo)
+void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 {
     auto buf = std::array<char, 128>{};
 
@@ -185,7 +188,7 @@ void showInfo(tr_torrent_metainfo const& metainfo)
         filenames.emplace_back(filename);
     }
 
-    if (!unsorted_opt)
+    if (!opts.unsorted)
     {
         std::sort(std::begin(filenames), std::end(filenames));
     }
@@ -323,19 +326,20 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (char const* const*)argv) != 0)
+    auto opts = app_opts{};
+    if (parseCommandLine(opts, argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
 
-    if (show_version_opt)
+    if (opts.show_version)
     {
         fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     /* make sure the user specified a filename */
-    if (std::empty(filename_opt))
+    if (std::empty(opts.filename))
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(options));
@@ -346,13 +350,13 @@ int tr_main(int argc, char* argv[])
     /* try to parse the .torrent file */
     auto metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    auto const parsed = metainfo.parseTorrentFile(filename_opt, nullptr, &error);
+    auto const parsed = metainfo.parseTorrentFile(opts.filename, nullptr, &error);
     if (error != nullptr)
     {
         fprintf(
             stderr,
             "Error parsing .torrent file \"%" TR_PRIsv "\": %s (%d)\n",
-            TR_PRIsv_ARG(filename_opt),
+            TR_PRIsv_ARG(opts.filename),
             error->message,
             error->code);
         tr_error_clear(&error);
@@ -362,24 +366,24 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (magnet_opt)
+    if (opts.show_magnet)
     {
         printf("%s", metainfo.magnet().c_str());
     }
     else
     {
         printf("Name: %s\n", metainfo.name().c_str());
-        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(filename_opt));
+        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(opts.filename));
         printf("\n");
         fflush(stdout);
 
-        if (scrape_opt)
+        if (opts.scrape)
         {
             doScrape(metainfo);
         }
         else
         {
-            showInfo(metainfo);
+            showInfo(opts, metainfo);
         }
     }
 
