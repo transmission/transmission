@@ -429,6 +429,51 @@ TEST_F(CompletionTest, amountDone)
     EXPECT_EQ(backup, bins);
 }
 
+TEST_F(CompletionTest, countHasBytesInSpan)
+{
+    // set up a fake torrent
+    auto torrent = TestTorrent{};
+    auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
+    auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto completion = tr_completion(&torrent, &block_info);
+
+    // torrent is complete
+    auto blocks = tr_bitfield{ block_info.n_blocks };
+    blocks.setHasAll();
+    completion.setBlocks(blocks);
+
+    EXPECT_EQ(TotalSize, completion.countHasBytesInSpan({ 0, TotalSize }));
+    EXPECT_EQ(TotalSize, completion.countHasBytesInSpan({ 0, TotalSize + 1 }));
+    // test span that's entirely in a single block
+    EXPECT_EQ(1, completion.countHasBytesInSpan({ 16, 17 }));
+    EXPECT_EQ(16, completion.countHasBytesInSpan({ 16, 32 }));
+    // test edge cases on block boundary
+    EXPECT_EQ(1, completion.countHasBytesInSpan({ BlockSize - 1, BlockSize }));
+    EXPECT_EQ(1, completion.countHasBytesInSpan({ BlockSize, BlockSize + 1 }));
+    EXPECT_EQ(2, completion.countHasBytesInSpan({ BlockSize - 1, BlockSize + 1 }));
+    // test edge cases on piece boundary
+    EXPECT_EQ(1, completion.countHasBytesInSpan({ PieceSize - 1, PieceSize }));
+    EXPECT_EQ(1, completion.countHasBytesInSpan({ PieceSize, PieceSize + 1 }));
+    EXPECT_EQ(2, completion.countHasBytesInSpan({ PieceSize - 1, PieceSize + 1 }));
+
+    // test span that has a middle block
+    EXPECT_EQ(BlockSize * 3, completion.countHasBytesInSpan({ 0, BlockSize * 3 }));
+    EXPECT_EQ(BlockSize * 2, completion.countHasBytesInSpan({ BlockSize / 2, BlockSize * 2 + BlockSize / 2 }));
+
+    // test span where first block is missing
+    blocks.unset(0);
+    completion.setBlocks(blocks);
+    EXPECT_EQ(BlockSize * 2, completion.countHasBytesInSpan({ 0, BlockSize * 3 }));
+    EXPECT_EQ(BlockSize * 1.5, completion.countHasBytesInSpan({ BlockSize / 2, BlockSize * 2 + BlockSize / 2 }));
+    // test span where final block is missing
+    blocks.setHasAll();
+    blocks.unset(2);
+    completion.setBlocks(blocks);
+    EXPECT_EQ(BlockSize * 2, completion.countHasBytesInSpan({ 0, BlockSize * 3 }));
+    EXPECT_EQ(BlockSize * 1.5, completion.countHasBytesInSpan({ BlockSize / 2, BlockSize * 2 + BlockSize / 2 }));
+}
+
 TEST_F(CompletionTest, status)
 {
 }

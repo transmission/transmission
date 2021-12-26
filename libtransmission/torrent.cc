@@ -575,15 +575,6 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
         tor->obfuscated_hash = tr_sha1_digest_t{};
     }
 
-    // init file offsets
-    auto offset = uint64_t{ 0 };
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
-    {
-        auto& file = tor->file(i);
-        file.priv.offset = offset;
-        offset += file.length;
-    }
-
     tor->fpm_.reset(tor->info);
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
@@ -1115,68 +1106,22 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 ****
 ***/
 
-static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t index)
+tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t i)
 {
-    tr_file const& f = tor->file(index);
-    if (f.length == 0)
-    {
-        return 0;
-    }
+    TR_ASSERT(tr_isTorrent(tor));
 
-    auto const [begin, end] = tr_torGetFileBlockSpan(tor, index);
-    auto const n = end - begin;
-
-    if (n == 0)
-    {
-        return 0;
-    }
-
-    if (n == 1)
-    {
-        return tor->hasBlock(begin) ? f.length : 0;
-    }
-
-    auto total = uint64_t{};
-
-    // the first block
-    if (tor->hasBlock(begin))
-    {
-        total += tor->block_size - f.priv.offset % tor->block_size;
-    }
-
-    // the middle blocks
-    if (end - begin > 2)
-    {
-        uint64_t u = tor->completion.blocks().count(begin + 1, end - 1);
-        u *= tor->block_size;
-        total += u;
-    }
-
-    // the last block
-    if (tor->hasBlock(end - 1))
-    {
-        total += f.priv.offset + f.length - (uint64_t)tor->block_size * (end - 1);
-    }
-
-    return total;
-}
-
-tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t i)
-{
-    TR_ASSERT(tr_isTorrent(torrent));
-
-    auto const& file = torrent->file(i);
+    auto const& file = tor->file(i);
     auto const* const name = file.name;
-    auto const priority = torrent->file_priorities_.filePriority(i);
-    auto const wanted = torrent->files_wanted_.fileWanted(i);
+    auto const priority = tor->file_priorities_.filePriority(i);
+    auto const wanted = tor->files_wanted_.fileWanted(i);
     auto const length = file.length;
 
-    if (torrent->completeness == TR_SEED || length == 0)
+    if (tor->completeness == TR_SEED || length == 0)
     {
         return { name, length, length, 1.0, priority, wanted };
     }
 
-    auto const have = countFileBytesCompleted(torrent, i);
+    auto const have = tor->completion.countHasBytesInSpan(tor->fpm_.byteSpan(i));
     return { name, have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
 }
 
@@ -2039,21 +1984,20 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     return err == 0;
 }
 
-// TODO(ckerr) migrate to fpm
+// TODO(ckerr) migrate to fpm?
 tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t const i)
 {
-    tr_file const& file = tor->file(i);
+    auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
 
-    uint64_t offset = file.priv.offset;
-    tr_block_index_t const begin = offset / tor->block_size;
-    if (file.length == 0)
+    auto const begin_block = tor->blockOf(begin_byte);
+    if (begin_byte >= end_byte)
     {
-        return { begin, begin };
+        return { begin_block, begin_block };
     }
 
-    offset += file.length - 1;
-    tr_block_index_t const end = 1 + offset / tor->block_size;
-    return { begin, end };
+    auto const final_byte = end_byte - 1;
+    auto const end_block = tor->blockOf(final_byte) + 1;
+    return { begin_block, end_block };
 }
 
 /***

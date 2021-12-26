@@ -46,6 +46,12 @@ struct tr_block_span_t
     tr_block_index_t end;
 };
 
+struct tr_byte_span_t
+{
+    uint64_t begin;
+    uint64_t end;
+};
+
 struct tr_ctor;
 struct tr_error;
 struct tr_file;
@@ -1495,7 +1501,6 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
 
 struct tr_file_priv
 {
-    uint64_t offset; // file begins at the torrent's nth byte
     time_t mtime;
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };
