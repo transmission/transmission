@@ -53,6 +53,7 @@
 #include "session.h"
 #include "subprocess.h"
 #include "torrent-magnet.h"
+#include "torrent-metainfo.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -101,6 +102,16 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
 {
     return hash == nullptr ? nullptr : session->getTorrent(*hash);
+}
+
+tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
+{
+    if (session == nullptr || metainfo == nullptr)
+    {
+        return nullptr;
+    }
+
+    return tr_torrentFindFromHash(session, &metainfo->infoHash());
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
