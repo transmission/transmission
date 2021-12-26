@@ -52,6 +52,7 @@ struct tr_file;
 struct tr_info;
 struct tr_session;
 struct tr_torrent;
+struct tr_torrent_metainfo;
 struct tr_variant;
 
 using tr_priority_t = int8_t;
@@ -1067,6 +1068,8 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 int tr_torrentId(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
+
+tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash);
 
