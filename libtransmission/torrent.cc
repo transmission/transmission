@@ -773,7 +773,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(tr_isSession(session));
 
-    // is the metainfo valid
+    // is the metainfo valid?
     auto top = tr_variant{};
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr))
     {
@@ -786,9 +786,8 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
-    // is it a duplicate
-    auto* const duplicate_of = session->getTorrent(parsed->info.hash);
-    if (duplicate_of != nullptr)
+    // is it a duplicate?
+    if (auto* const duplicate_of = session->getTorrent(parsed->info.hash); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {

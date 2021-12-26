@@ -470,8 +470,7 @@ std::string_view tr_torrent_metainfo::parseAnnounce(tr_torrent_metainfo& setme, 
 
     // announce-list
     // example: d['announce-list'] = [ [tracker1], [backup1], [backup2] ]
-    tr_variant* tiers = nullptr;
-    if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
+    if (tr_variant* tiers = nullptr; tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         for (size_t i = 0, n_tiers = tr_variantListSize(tiers); i < n_tiers; ++i)
         {
