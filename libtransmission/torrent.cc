@@ -1965,7 +1965,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 4;
     }
-    else if (tr_pieceOffset(tor, index, offset, length) > tor->totalSize())
+    else if (tor->offset(index, offset, length) > tor->totalSize())
     {
         err = 5;
     }
@@ -1982,19 +1982,6 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     }
 
     return err == 0;
-}
-
-// TODO(ckerr) migrate to block_info
-uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    auto ret = uint64_t{};
-    ret = tor->pieceSize();
-    ret *= index;
-    ret += offset;
-    ret += length;
-    return ret;
 }
 
 // TODO(ckerr) migrate to fpm?
