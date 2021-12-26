@@ -1499,21 +1499,12 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
  * tr_info
  **********************************************************************/
 
-struct tr_file_priv
-{
-    time_t mtime;
-    bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
-};
-
 /** @brief a part of tr_info that represents a single file of the torrent's content */
 struct tr_file
 {
     // public
     char* name; /* Path to the file */
     uint64_t length; /* Length of the file, in bytes */
-
-    // libtransmission implementation; do not use
-    tr_file_priv priv;
 };
 
 /** @brief information about a torrent that comes from its metainfo file */

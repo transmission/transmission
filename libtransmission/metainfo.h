@@ -21,8 +21,9 @@
 
 #include "transmission.h"
 
-#include "tr-macros.h"
+#include "bitfield.h"
 #include "torrent.h"
+#include "tr-macros.h"
 
 struct tr_error;
 struct tr_variant;
@@ -38,6 +39,7 @@ struct tr_metainfo_parsed
     tr_info info = {};
     uint64_t info_dict_length = 0;
     std::vector<tr_sha1_digest_t> pieces;
+    tr_bitfield files_renamed = tr_bitfield{ 0 };
 
     tr_metainfo_parsed() = default;
 
@@ -76,4 +78,4 @@ void tr_metainfoMigrateFile(
     enum tr_metainfo_basename_format new_format);
 
 /** @brief Private function that's exposed here only for unit tests */
-bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view in, bool* is_adjusted);
+bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view in);

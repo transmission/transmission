@@ -317,10 +317,6 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_EQ(expected_files[3], tr_torrentFile(tor, 3).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 1, expected_contents[1]));
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, expected_contents[2]));
-    EXPECT_FALSE(files[0].priv.is_renamed);
-    EXPECT_TRUE(files[1].priv.is_renamed);
-    EXPECT_TRUE(files[2].priv.is_renamed);
-    EXPECT_FALSE(files[3].priv.is_renamed);
 
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
@@ -342,11 +338,6 @@ TEST_F(RenameTest, multifileTorrent)
         EXPECT_EQ(expected_files[i], tr_torrentFile(tor, i).name);
         EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]));
     }
-
-    EXPECT_FALSE(files[0].priv.is_renamed);
-    EXPECT_TRUE(files[1].priv.is_renamed);
-    EXPECT_TRUE(files[2].priv.is_renamed);
-    EXPECT_FALSE(files[3].priv.is_renamed);
 
     /***
     ****  Test it an incomplete torrent...
@@ -439,23 +430,14 @@ TEST_F(RenameTest, multifileTorrent)
         "MjpwaWVjZSBsZW5ndGhpMzI3NjhlNjpwaWVjZXMyMDp27buFkmy8ICfNX4nsJmt0Ckm2Ljc6cHJp"
         "dmF0ZWkwZWVl");
     EXPECT_TRUE(tr_isTorrent(tor));
-    files = tor->info.files;
 
     // rename prefix of top
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Feli", "FelidaeX"));
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
-    EXPECT_FALSE(files[0].priv.is_renamed);
-    EXPECT_FALSE(files[1].priv.is_renamed);
-    EXPECT_FALSE(files[2].priv.is_renamed);
-    EXPECT_FALSE(files[3].priv.is_renamed);
 
     // rename false path
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
-    EXPECT_FALSE(files[0].priv.is_renamed);
-    EXPECT_FALSE(files[1].priv.is_renamed);
-    EXPECT_FALSE(files[2].priv.is_renamed);
-    EXPECT_FALSE(files[3].priv.is_renamed);
 
     /***
     ****
