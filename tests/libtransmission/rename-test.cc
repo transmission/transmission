@@ -73,7 +73,9 @@ protected:
         auto* metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &metainfo_len));
         EXPECT_NE(nullptr, metainfo);
         EXPECT_LT(size_t(0), metainfo_len);
-        tr_ctorSetMetainfo(ctor, metainfo, metainfo_len);
+        tr_error* error = nullptr;
+        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, metainfo, metainfo_len, &error));
+        EXPECT_EQ(nullptr, error);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent

@@ -1569,7 +1569,7 @@ static void gotMetadataFromURL(
 
     if (response_code == 200 || response_code == 221) /* http or ftp success.. */
     {
-        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response));
+        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response), nullptr);
         addTorrentImpl(data->data, data->ctor);
     }
     else
@@ -1709,20 +1709,20 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         if (std::empty(filename))
         {
             std::string const metainfo = tr_base64_decode_str(metainfo_base64);
-            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo));
+            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
         }
         else
         {
             // these two tr_ctorSet*() functions require zero-terminated strings
-            auto const filename_str = std::string{ filename };
+            auto const filename_sz = std::string{ filename };
 
             if (tr_strvStartsWith(filename, "magnet:?"sv))
             {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_str.c_str());
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_sz.c_str(), nullptr);
             }
             else
             {
-                tr_ctorSetMetainfoFromFile(ctor, filename_str.c_str());
+                tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr);
             }
         }
 

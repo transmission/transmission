@@ -379,7 +379,9 @@ protected:
         EXPECT_NE(nullptr, metainfo);
         EXPECT_LT(size_t{ 0 }, metainfo_len);
         auto* ctor = tr_ctorNew(session_);
-        tr_ctorSetMetainfo(ctor, static_cast<char const*>(metainfo), metainfo_len);
+        tr_error* error = nullptr;
+        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, static_cast<char const*>(metainfo), metainfo_len, &error));
+        EXPECT_EQ(nullptr, error);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
         tr_free(metainfo);
 

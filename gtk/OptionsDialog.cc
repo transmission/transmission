@@ -193,7 +193,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
         if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str(), nullptr)))
         {
             filename_ = filename;
-            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str());
+            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
             new_file = true;
         }
 

@@ -776,43 +776,26 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
 }
 
-tr_parse_result tr_torrentParse(tr_ctor const* ctor, tr_info* setmeInfo)
-{
-    tr_variant const* metainfo = nullptr;
-    if (!tr_ctorGetMetainfo(ctor, &metainfo))
-    {
-        return TR_PARSE_ERR;
-    }
-
-    auto parsed = tr_metainfoParse(tr_ctorGetSession(ctor), metainfo, nullptr);
-    if (!parsed)
-    {
-        return TR_PARSE_ERR;
-    }
-
-    if (setmeInfo != nullptr)
-    {
-        *setmeInfo = parsed->info;
-        parsed->info = {};
-    }
-
-    return TR_PARSE_OK;
-}
-
 tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(tr_isSession(session));
 
-    tr_variant const* metainfo = nullptr;
-    tr_ctorGetMetainfo(ctor, &metainfo);
-    auto parsed = tr_metainfoParse(session, metainfo, nullptr);
+    // is the metainfo valid
+    auto top = tr_variant{};
+    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr))
+    {
+        return nullptr;
+    }
+    auto parsed = tr_metainfoParse(session, &top, nullptr);
+    tr_variantFree(&top);
     if (!parsed)
     {
         return nullptr;
     }
 
+    // is it a duplicate
     auto* const duplicate_of = session->getTorrent(parsed->info.hash);
     if (duplicate_of != nullptr)
     {
@@ -824,7 +807,8 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
-    auto* tor = new tr_torrent{ parsed->info };
+    // add it
+    auto* const tor = new tr_torrent{ parsed->info };
     tor->swapMetainfo(*parsed);
     torrentInit(tor, ctor);
     return tor;
