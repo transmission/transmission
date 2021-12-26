@@ -1849,18 +1849,19 @@ bool trashDataFile(char const* filename, tr_error** error)
             tr_ctorSetIncompleteDir(ctor, incompleteFolder.UTF8String);
         }
 
-        tr_parse_result result = TR_PARSE_ERR;
+        bool loaded = false;
+
         if (path)
         {
-            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromFile(ctor, path.UTF8String));
+            loaded = tr_ctorSetMetainfoFromFile(ctor, path.UTF8String, nullptr);
         }
 
-        if (result != TR_PARSE_OK && magnetAddress)
+        if (!loaded && magnetAddress)
         {
-            result = static_cast<tr_parse_result>(tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String));
+            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnetAddress.UTF8String, nullptr);
         }
 
-        if (result == TR_PARSE_OK)
+        if (loaded)
         {
             fHandle = tr_torrentNew(ctor, NULL);
         }

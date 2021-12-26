@@ -31,8 +31,10 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-assert.h>
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/variant.h>
@@ -1040,44 +1042,36 @@ tr_torrent* Session::Impl::create_new_torrent(tr_ctor* ctor)
 
 int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 {
-    tr_info inf;
-    auto err = tr_torrentParse(ctor, &inf);
-
-    switch (err)
+    auto const* metainfo = tr_ctorGetMetainfo(ctor);
+    if (metainfo == nullptr)
     {
-    case TR_PARSE_ERR:
-        break;
+        return TR_PARSE_ERR;
+    }
 
-    case TR_PARSE_DUPLICATE:
+    if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
+    {
         /* don't complain about .torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
         {
-            signal_add_error.emit(static_cast<ErrorCode>(err), inf.name);
+            signal_add_error.emit(static_cast<ErrorCode>(ERR_ADD_TORRENT_DUP), metainfo->name().c_str());
         }
 
-        tr_metainfoFree(&inf);
         tr_ctorFree(ctor);
-        break;
-
-    default:
-        if (do_prompt)
-        {
-            signal_add_prompt.emit(ctor);
-        }
-        else
-        {
-            ScopedModelSortBlocker disable_sort(*gtr_get_ptr(sorted_model_));
-            add_torrent(create_new_torrent(ctor), do_notify);
-            tr_ctorFree(ctor);
-        }
-
-        tr_metainfoFree(&inf);
-        break;
+        return TR_PARSE_DUPLICATE;
     }
 
-    return err;
+    if (!do_prompt)
+    {
+        ScopedModelSortBlocker disable_sort(*gtr_get_ptr(sorted_model_));
+        add_torrent(create_new_torrent(ctor), do_notify);
+        tr_ctorFree(ctor);
+        return 0;
+    }
+
+    signal_add_prompt.emit(ctor);
+    return 0;
 }
 
 namespace
@@ -1136,7 +1130,7 @@ void Session::Impl::add_file_async_callback(
         {
             g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
         }
-        else if (tr_ctorSetMetainfo(ctor, contents, length) == 0)
+        else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
             add_ctor(ctor, do_prompt, do_notify);
         }
@@ -1175,7 +1169,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
 
             if ((tried = !str.empty() && Glib::file_test(str, Glib::FILE_TEST_EXISTS)))
             {
-                loaded = !tr_ctorSetMetainfoFromFile(ctor, str.c_str());
+                loaded = tr_ctorSetMetainfoFromFile(ctor, str.c_str(), nullptr);
             }
         }
 
@@ -1186,7 +1180,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
             auto const str = file->get_parse_name();
             auto const magnet = gtr_sprintf("magnet:%s", str.substr(str.find('?')));
             tried = true;
-            loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
+            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
         }
 
         /* hashcodes that we can turn into magnet links... */
@@ -1197,7 +1191,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
             if (gtr_is_hex_hashcode(str))
             {
                 auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
-                loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
+                loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
             }
         }
 
