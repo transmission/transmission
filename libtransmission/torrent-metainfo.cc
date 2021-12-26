@@ -313,7 +313,7 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     auto constexpr ensure_legal_char = [](auto ch)
     {
         auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
-        auto const banned = Banned.find(ch) != Banned.npos || (unsigned char)ch < 0x20;
+        auto const banned = Banned.find(ch) != std::string_view::npos || (unsigned char)ch < 0x20;
         return banned ? '_' : ch;
     };
     auto const old_out_len = std::size(out);
