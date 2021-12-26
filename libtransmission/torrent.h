@@ -479,13 +479,16 @@ public:
         TR_ASSERT(std::size(checked) == this->pieceCount());
         checked_pieces_ = checked;
 
+        auto const n = this->fileCount();
+        this->file_mtimes_.resize(n);
+
         auto filename = std::string{};
-        for (size_t i = 0, n = this->fileCount(); i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             auto const found = this->findFile(filename, i);
             auto const mtime = found ? found->last_modified_at : 0;
 
-            this->file(i).priv.mtime = mtime;
+            this->file_mtimes_[i] = mtime;
 
             // if a file has changed, mark its pieces as unchecked
             if (mtime == 0 || mtime != mtimes[i])
@@ -708,6 +711,8 @@ public:
     tr_file_piece_map fpm_ = tr_file_piece_map{ info };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
+
+    std::vector<time_t> file_mtimes_;
 
 private:
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)

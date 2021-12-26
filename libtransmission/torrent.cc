@@ -2507,8 +2507,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
-    tr_file& file = tor->file(i);
-    file.priv.mtime = tr_time();
+    tor->file_mtimes_[i] = tr_time();
 
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
@@ -2517,6 +2516,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     char* sub = nullptr;
     if (tr_torrentFindFile2(tor, i, &base, &sub, nullptr))
     {
+        tr_file& file = tor->file(i);
         if (strcmp(sub, file.name) != 0)
         {
             auto const oldpath = tr_strvPath(base, sub);

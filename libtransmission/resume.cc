@@ -491,7 +491,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddInt(l, tor->file(i).priv.mtime);
+        tr_variantListAddInt(l, tor->file_mtimes_[i]);
     }
 
     // add the 'checked pieces' bitfield
