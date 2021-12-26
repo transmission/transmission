@@ -185,7 +185,7 @@ void OptionsDialog::reload()
 
     if (metainfo_)
     {
-        size_t i = 0;
+        int i = 0;
         auto const n_files = std::size(metainfo_->files());
         priorities_.assign(n_files, TR_PRI_NORMAL);
         wanted_.assign(n_files, true);
