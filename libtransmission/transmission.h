@@ -1501,7 +1501,6 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
 
 struct tr_file_priv
 {
-    uint64_t offset; // file begins at the torrent's nth byte
     time_t mtime;
     bool is_renamed; // true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
 };

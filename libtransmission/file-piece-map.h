@@ -63,8 +63,15 @@ public:
         return std::size(file_pieces_);
     }
 
+    // TODO(ckerr) minor wart here, two identical span types
+    [[nodiscard]] tr_byte_span_t byteSpan(tr_file_index_t file) const
+    {
+        auto const& span = file_bytes_.at(file);
+        return tr_byte_span_t{ span.begin, span.end };
+    }
+
 private:
-    using byte_span_t = index_span_t<tr_byte_index_t>;
+    using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
 
     std::vector<piece_span_t> file_pieces_;
