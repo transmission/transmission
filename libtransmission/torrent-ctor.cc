@@ -6,21 +6,21 @@
  *
  */
 
-#include <cerrno> /* EINVAL */
+#include <cerrno> // EINVAL
 #include <optional>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "transmission.h"
 
 #include "error.h"
-#include "file.h"
+#include "error-types.h"
 #include "magnet-metainfo.h"
 #include "session.h"
-#include "torrent.h" /* tr_ctorGetSave() */
+#include "torrent-metainfo.h"
+#include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new0 */
+#include "utils.h"
 #include "variant.h"
 
 using namespace std::literals;
@@ -40,14 +40,14 @@ struct tr_ctor
     bool saveInOurTorrentsDir = false;
     std::optional<bool> delete_source;
 
+    tr_torrent_metainfo metainfo = {};
+
     tr_priority_t priority = TR_PRI_NORMAL;
-    bool isSet_metainfo = false;
-    tr_variant metainfo = {};
-    std::string source_file;
 
     struct optional_args optional_args[2];
 
     std::string incomplete_dir;
+    std::string torrent_filename;
 
     std::vector<tr_file_index_t> wanted;
     std::vector<tr_file_index_t> unwanted;
@@ -67,109 +67,52 @@ struct tr_ctor
 ****
 ***/
 
-static void setSourceFile(tr_ctor* ctor, char const* source_file)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    ctor->source_file.assign(source_file ? source_file : "");
-}
-
-static void clearMetainfo(tr_ctor* ctor)
-{
-    if (ctor->isSet_metainfo)
+    if (filename == nullptr)
     {
-        ctor->isSet_metainfo = false;
-        tr_variantFree(&ctor->metainfo);
+        tr_error_set_literal(error, EINVAL, "no filename specified");
+        return false;
     }
 
-    setSourceFile(ctor, nullptr);
+    if (!tr_loadFile(ctor->contents, filename, error))
+    {
+        return false;
+    }
+
+    ctor->metainfo.clear();
+    auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    return ctor->metainfo.parseBenc(contents_sv, error);
 }
 
-static int parseMetainfoContents(tr_ctor* ctor)
+bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
 {
-    auto& contents = ctor->contents;
-    auto sv = std::string_view{ std::data(contents), std::size(contents) };
-    ctor->isSet_metainfo = tr_variantFromBuf(&ctor->metainfo, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv);
-    return ctor->isSet_metainfo ? 0 : EILSEQ;
-}
-
-int tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len)
-{
-    clearMetainfo(ctor);
-
+    ctor->metainfo.clear();
     ctor->contents.assign(metainfo, metainfo + len);
+    auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    return ctor->metainfo.parseBenc(contents_sv, error);
+}
 
-    return parseMetainfoContents(ctor);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
+{
+    ctor->metainfo.clear();
+    return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
+}
+
+std::string_view tr_ctorGetContents(tr_ctor const* ctor)
+{
+    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->source_file.c_str();
+    return ctor->metainfo.parsedTorrentFile().c_str();
 }
 
-int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
-{
-    auto mm = tr_magnet_metainfo{};
-    if (!mm.parseMagnet(magnet_link ? magnet_link : ""))
-    {
-        return -1;
-    }
-
-    auto tmp = tr_variant{};
-    mm.toVariant(&tmp);
-    auto len = size_t{};
-    char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-    auto const err = tr_ctorSetMetainfo(ctor, str, len);
-    tr_free(str);
-    tr_variantFree(&tmp);
-
-    return err;
-}
-
-int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
-{
-    clearMetainfo(ctor);
-
-    if (!tr_loadFile(ctor->contents, filename, nullptr) || std::empty(ctor->contents))
-    {
-        return EILSEQ;
-    }
-
-    if (int const err = parseMetainfoContents(ctor); err != 0)
-    {
-        clearMetainfo(ctor);
-        return err;
-    }
-
-    setSourceFile(ctor, filename);
-
-    /* if no `name' field was set, then set it from the filename */
-    if (tr_variant* info = nullptr; tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
-    {
-        auto name = std::string_view{};
-
-        if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) && !tr_variantDictFindStrView(info, TR_KEY_name, &name))
-        {
-            name = ""sv;
-        }
-
-        if (std::empty(name))
-        {
-            char* base = tr_sys_path_basename(filename, nullptr);
-
-            if (base != nullptr)
-            {
-                tr_variantDictAddStr(info, TR_KEY_name, base);
-                tr_free(base);
-            }
-        }
-    }
-
-    return 0;
-}
-
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, char const* filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
-    TR_ASSERT(!std::empty(filename));
+    TR_ASSERT(filename != nullptr);
 
     if (std::empty(ctor->contents))
     {
@@ -353,19 +296,9 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
+tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
 {
-    if (!ctor->isSet_metainfo)
-    {
-        return false;
-    }
-
-    if (setme != nullptr)
-    {
-        *setme = &ctor->metainfo;
-    }
-
-    return true;
+    return std::empty(ctor->metainfo.files()) ? nullptr : &ctor->metainfo;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)
@@ -399,17 +332,14 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
-tr_ctor* tr_ctorNew(tr_session const* session)
+tr_ctor* tr_ctorNew(tr_session* session)
 {
     auto* const ctor = new tr_ctor{ session };
 
-    if (session != nullptr)
-    {
-        tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
-        tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
-        tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
-        tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
-    }
+    tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
+    tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
+    tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
     tr_ctorSetSave(ctor, true);
     return ctor;
@@ -417,6 +347,5 @@ tr_ctor* tr_ctorNew(tr_session const* session)
 
 void tr_ctorFree(tr_ctor* ctor)
 {
-    clearMetainfo(ctor);
     delete ctor;
 }

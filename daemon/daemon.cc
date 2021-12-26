@@ -218,7 +218,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
     return configDir;
 }
 
-static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
+static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
     auto const* session = static_cast<tr_session const*>(vsession);
 
@@ -229,48 +229,44 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
 
     auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
     tr_ctor* ctor = tr_ctorNew(session);
-    int err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
-
-    if (err == 0)
+    if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
     {
-        if (tr_torrentNew(ctor, nullptr) == nullptr)
-        {
-            tr_logAddError("Unable to add .torrent file \"%s\"", name);
-        }
-        else
-        {
-            bool trash = false;
-            bool const test = tr_ctorGetDeleteSource(ctor, &trash);
+        tr_ctorFree(ctor);
+        return TR_WATCHDIR_RETRY;
+    }
 
-            tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
-
-            if (test && trash)
-            {
-                tr_error* error = nullptr;
-
-                tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
-
-                if (!tr_sys_path_remove(filename.c_str(), &error))
-                {
-                    tr_logAddError("Error deleting .torrent file: %s", error->message);
-                    tr_error_free(error);
-                }
-            }
-            else
-            {
-                auto const new_filename = filename + ".added";
-                tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
-            }
-        }
+    if (tr_torrentNew(ctor, nullptr) == nullptr)
+    {
+        tr_logAddError("Unable to add .torrent file \"%s\"", name);
     }
     else
     {
-        err = TR_PARSE_ERR;
+        bool trash = false;
+        bool const test = tr_ctorGetDeleteSource(ctor, &trash);
+
+        tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
+
+        if (test && trash)
+        {
+            tr_error* error = nullptr;
+
+            tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
+
+            if (!tr_sys_path_remove(filename.c_str(), &error))
+            {
+                tr_logAddError("Error deleting .torrent file: %s", error->message);
+                tr_error_free(error);
+            }
+        }
+        else
+        {
+            auto const new_filename = filename + ".added";
+            tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
+        }
     }
 
     tr_ctorFree(ctor);
-
-    return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
+    return TR_WATCHDIR_ACCEPT;
 }
 
 static void printMessage(

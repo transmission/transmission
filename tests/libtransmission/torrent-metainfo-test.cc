@@ -144,8 +144,9 @@ TEST(TorrentMetainfo, AndroidTorrent)
     auto const filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
 
     auto* ctor = tr_ctorNew(nullptr);
-    auto const err = tr_ctorSetMetainfoFromFile(ctor, filename.c_str());
-    EXPECT_EQ(0, err);
+    tr_error* error = nullptr;
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
+    EXPECT_EQ(nullptr, error);
     tr_ctorFree(ctor);
 }
 
@@ -166,7 +167,8 @@ TEST(TorrentMetainfo, ctorSaveContents)
     }
 
     // now try saving _with_ metainfo
-    EXPECT_EQ(0, tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str()));
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str()), &error);
+    EXPECT_EQ(nullptr, error);
     EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
     EXPECT_EQ(nullptr, error);
 

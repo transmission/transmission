@@ -863,13 +863,13 @@ void tr_ctorFree(tr_ctor* ctor);
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
 
 /** @brief Set the constructor's metainfo from a magnet link */
-int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error** error);
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
-int tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len);
+bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error);
 
 /** @brief Set the constructor's metainfo from a local .torrent file */
-int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error);
 
 /** @brief Set how many peers this torrent can connect to. (Default: 50) */
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);

@@ -142,7 +142,7 @@ static void onTorrentFileDownloaded(
     void* vctor)
 {
     auto* ctor = static_cast<tr_ctor*>(vctor);
-    tr_ctorSetMetainfo(ctor, std::data(response), std::size(response));
+    tr_ctorSetMetainfo(ctor, std::data(response), std::size(response), nullptr);
     waitingOnWeb = false;
 }
 
@@ -301,11 +301,11 @@ int tr_main(int argc, char* argv[])
 
     if (tr_sys_path_exists(torrentPath, nullptr))
     {
-        tr_ctorSetMetainfoFromFile(ctor, torrentPath);
+        tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr);
     }
     else if (memcmp(torrentPath, "magnet:?", 8) == 0)
     {
-        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath);
+        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr);
     }
     else if (memcmp(torrentPath, "http", 4) == 0)
     {
