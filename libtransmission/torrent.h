@@ -79,8 +79,6 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
-uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
-
 void tr_torrentGetBlockLocation(
     tr_torrent const* tor,
     tr_block_index_t block,
