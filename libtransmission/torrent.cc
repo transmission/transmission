@@ -576,9 +576,9 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
     }
 
     tor->fpm_.reset(tor->info);
+    tor->file_mtimes_.resize(tor->fileCount());
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
-
     tor->checked_pieces_ = tr_bitfield{ tor->pieceCount() };
 }
 
@@ -2975,7 +2975,6 @@ static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char c
     {
         tr_free(file.name);
         file.name = name;
-        file.priv.is_renamed = true;
     }
 }
 

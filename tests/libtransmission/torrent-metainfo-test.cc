@@ -94,55 +94,52 @@ TEST_F(TorrentMetainfoTest, sanitize)
     {
         std::string_view input;
         std::string_view expected_output;
-        bool expected_is_adjusted;
     };
 
     auto const tests = std::array<LocalTest, 29>{
         // skipped
-        LocalTest{ ""sv, ""sv, false },
-        { "."sv, ""sv, true },
-        { ".."sv, ""sv, true },
-        { "....."sv, ""sv, true },
-        { "  "sv, ""sv, true },
-        { " . "sv, ""sv, true },
-        { ". . ."sv, ""sv, true },
+        LocalTest{ ""sv, ""sv },
+        { "."sv, ""sv },
+        { ".."sv, ""sv },
+        { "....."sv, ""sv },
+        { "  "sv, ""sv },
+        { " . "sv, ""sv },
+        { ". . ."sv, ""sv },
         // replaced with '_'
-        { "/"sv, "_"sv, true },
-        { "////"sv, "____"sv, true },
-        { "\\\\"sv, "__"sv, true },
-        { "/../"sv, "_.._"sv, true },
-        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv, true },
-        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv, true },
+        { "/"sv, "_"sv },
+        { "////"sv, "____"sv },
+        { "\\\\"sv, "__"sv },
+        { "/../"sv, "_.._"sv },
+        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv },
+        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv },
         // appended with '_'
-        { "con"sv, "con_"sv, true },
-        { "cOm4"sv, "cOm4_"sv, true },
-        { "LPt9.txt"sv, "LPt9_.txt"sv, true },
-        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv, true },
+        { "con"sv, "con_"sv },
+        { "cOm4"sv, "cOm4_"sv },
+        { "LPt9.txt"sv, "LPt9_.txt"sv },
+        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv },
         // trimmed
-        { " foo"sv, "foo"sv, true },
-        { "foo "sv, "foo"sv, true },
-        { " foo "sv, "foo"sv, true },
-        { "foo."sv, "foo"sv, true },
-        { "foo..."sv, "foo"sv, true },
-        { " foo... "sv, "foo"sv, true },
+        { " foo"sv, "foo"sv },
+        { "foo "sv, "foo"sv },
+        { " foo "sv, "foo"sv },
+        { "foo."sv, "foo"sv },
+        { "foo..."sv, "foo"sv },
+        { " foo... "sv, "foo"sv },
         // unmodified
-        { "foo"sv, "foo"sv, false },
-        { ".foo"sv, ".foo"sv, false },
-        { "..foo"sv, "..foo"sv, false },
-        { "foo.bar.baz"sv, "foo.bar.baz"sv, false },
-        { "null"sv, "null"sv, false },
-        { "compass"sv, "compass"sv, false },
+        { "foo"sv, "foo"sv },
+        { ".foo"sv, ".foo"sv },
+        { "..foo"sv, "..foo"sv },
+        { "foo.bar.baz"sv, "foo.bar.baz"sv },
+        { "null"sv, "null"sv },
+        { "compass"sv, "compass"sv },
     };
 
     auto out = std::string{};
-    auto is_adjusted = bool{};
     for (auto const& test : tests)
     {
         out.clear();
-        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input, &is_adjusted);
+        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input);
         EXPECT_EQ(!std::empty(out), success);
         EXPECT_EQ(test.expected_output, out);
-        EXPECT_EQ(test.expected_is_adjusted, is_adjusted);
     }
 }
 
